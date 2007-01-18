@@ -1,0 +1,3 @@
+Bundle-SymbolicName: org.mule.example.hello
+Spring-Context: hello-spring-config.xml
+org-springframework-context: hello-spring-config.xml

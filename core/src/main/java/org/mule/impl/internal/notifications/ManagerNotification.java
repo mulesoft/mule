@@ -17,7 +17,7 @@ import org.mule.umo.manager.UMOServerNotification;
  * <code>ManagerNotification</code> is fired when an event such as the manager
  * starting occurs. The payload of this event will always be a reference to the
  * manager.
- * 
+ *
  * @see org.mule.MuleManager
  * @see org.mule.umo.manager.UMOManager
  */
@@ -39,18 +39,35 @@ public class ManagerNotification extends UMOServerNotification implements Blocki
     public static final int MANAGER_DISPOSED_CONNECTORS = MANAGER_EVENT_ACTION_START_RANGE + 10;
 
     private static final transient String[] ACTIONS = new String[]{"initialising", "initialised", "starting",
-        "started", "stopping", "stopped", "disposing", "disposed", "disposing connectors",
-        "disposed connectors"};
+            "started", "stopping", "stopped", "disposing", "disposed", "disposing connectors",
+            "disposed connectors"};
 
-    public ManagerNotification(UMOManager message, int action)
+    private String clusterId;
+    private String domain;
+
+
+    public ManagerNotification(String id, String clusterId, String domain, int action)
     {
-        super(message, action);
-        resourceIdentifier = message.getId();
+        super(id, action);
+        resourceIdentifier = domain + "." + clusterId + "." + id;
+        this.clusterId = clusterId;
+        this.domain = domain;
+    }
+
+
+    public String getClusterId()
+    {
+        return clusterId;
+    }
+
+    public String getDomain()
+    {
+        return domain;
     }
 
     protected String getPayloadToString()
     {
-        return ((UMOManager)source).getId();
+        return ((UMOManager) source).getId();
     }
 
     protected String getActionName(int action)
@@ -66,6 +83,6 @@ public class ManagerNotification extends UMOServerNotification implements Blocki
     public String toString()
     {
         return EVENT_NAME + "{" + "action=" + getActionName(action) + ", resourceId=" + resourceIdentifier
-               + ", timestamp=" + timestamp + "}";
+                + ", timestamp=" + timestamp + "}";
     }
 }

@@ -10,7 +10,6 @@
 
 package org.mule.providers.http.jetty;
 
-import org.apache.commons.lang.StringUtils;
 import org.mortbay.http.HttpContext;
 import org.mortbay.http.SocketListener;
 import org.mortbay.jetty.Server;
@@ -30,6 +29,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.util.StringUtils;
 
 /**
  * <code>HttpMessageReceiver</code> is a simple http server that can be used to

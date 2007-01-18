@@ -9,9 +9,97 @@
         <version>2.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-wssecurity</artifactId>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
     <name>Web Service Security</name>
     <description>Mule WS-Security uses Apache's WSS4J and XFire's WSS4JHandlers to secure webservices using soap.</description>
+
+    <build>
+         <plugins>
+              <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Export-Package>
+                            org.mule.extras.wssecurity.*
+                        </Export-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+         </plugins>
+    </build>
+
+    <!-- XML is always a joy. -->
+    <profiles>
+        <profile>
+            <id>java14</id>
+            <activation>
+                <jdk>1.4</jdk>
+            </activation>
+            <dependencies>
+                <!--
+                Sun's 1.4.x JVMs come with a bundled Crimson XML parser.
+                Unfortunately it is very buggy and does not support validation
+                against an XML Schema, so we have to unconditionally include
+                both xml-apis and xerces (in matching versions!) for JDK 1.4.
+                -->
+                <dependency>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
+                    <version>1.3.03</version>
+                </dependency>
+                <dependency>
+                    <groupId>xerces</groupId>
+                    <artifactId>xercesImpl</artifactId>
+                    <version>2.8.1</version>
+                </dependency>
+                <!-- XFire -->
+                <dependency>
+                    <groupId>org.codehaus.xfire</groupId>
+                    <artifactId>xfire-ws-security</artifactId>
+                    <version>1.2.2</version>
+                    <exclusions>
+                        <!-- this is JDK5 only - see below for JDK14 version -->
+                        <exclusion>
+                            <groupId>org.codehaus.xfire</groupId>
+                            <artifactId>bcprov-jdk15</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+                <!-- re-add BouncyCastle provider for JDK 1.4 -->
+                <dependency>
+                    <groupId>org.codehaus.xfire</groupId>
+                    <artifactId>bcprov-jdk14</artifactId>
+                    <version>133</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>java5</id>
+            <activation>
+                <jdk>1.5</jdk>
+            </activation>
+            <dependencies>
+                <!-- XFire -->
+                <dependency>
+                    <groupId>org.codehaus.xfire</groupId>
+                    <artifactId>xfire-ws-security</artifactId>
+                    <version>1.2.2</version>
+                    <exclusions>
+                        <!-- IMPORTANT for JDK5 -->
+                        <exclusion>
+                            <groupId>xml-apis</groupId>
+                            <artifactId>xml-apis</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>xerces</groupId>
+                            <artifactId>xercesImpl</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 
     <dependencies>
 		<dependency>

@@ -1,0 +1,5 @@
+Bundle-Version: 2.0
+Bundle-SymbolicName: org.mule.osgi
+Bundle-Name: Mule Manager
+Import-Package: org.apache.commons.logging; provider=paxlogging
+Bundle-Activator: org.mule.modules.osgi.MuleManagerActivator

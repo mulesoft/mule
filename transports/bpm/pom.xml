@@ -9,9 +9,27 @@
         <version>2.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-bpm</artifactId>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
     <name>BPM Transport</name>
     <description>Allows Mule events to initiate and/or advance processes in an external or embedded Business Process Management System (BPMS). It also allows executing processes to generate Mule events.</description>
+
+    <build>
+         <plugins>
+              <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Export-Package>
+                            org.mule.providers.bpm.*,
+                            org.jbpm.*
+                        </Export-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+         </plugins>
+    </build>
+
     <dependencies>
         <!-- *************************************************************************
              jBPM
@@ -27,6 +45,60 @@
             <groupId>org.springmodules</groupId>
             <artifactId>spring-modules-jbpm31-nodeps</artifactId>
             <version>0.6</version>
+            <!-- Exclude older Spring version -->
+            <exclusions>
+                <!--
+                <exclusion>
+                    <groupId>commons-collections</groupId>
+                    <artifactId>commons-collections</artifactId>
+                </exclusion>
+                -->
+                <exclusion>
+                    <groupId>jboss</groupId>
+                    <artifactId>jbpm</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-beans</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-context</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-dao</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-support</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-orm</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-hibernate</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-jdbc</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-aop</artifactId>
+                </exclusion>
+                <!-- Provided by OSGi -->
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- Only needed if using jBpm's built-in identity management
         <dependency>

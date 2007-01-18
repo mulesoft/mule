@@ -13,6 +13,7 @@ package org.mule.umo.endpoint;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.lifecycle.Initialisable;
+import org.mule.umo.lifecycle.Registerable;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatching;
 import org.mule.umo.security.UMOEndpointSecurityFilter;
@@ -26,7 +27,7 @@ import java.util.Map;
  * sent or received. An Enpoint is an Resource address (EndpointUri), with associated
  * transformation, transaction and filtering rules.
  */
-public interface UMOImmutableEndpoint extends Serializable, Cloneable, Initialisable, UMOMessageDispatching
+public interface UMOImmutableEndpoint extends Serializable, Cloneable, Initialisable, Registerable, UMOMessageDispatching
 {
     public static final String INITIAL_STATE_STARTED = "started";
     public static final String INITIAL_STATE_STOPPED = "stopped";

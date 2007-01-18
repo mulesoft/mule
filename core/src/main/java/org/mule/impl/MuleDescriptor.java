@@ -13,6 +13,7 @@ package org.mule.impl;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.ThreadingProfile;
 import org.mule.impl.container.DescriptorContainerKeyPair;
+import org.mule.registry.RegistrationException;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOInterceptor;
 import org.mule.umo.routing.UMOInboundMessageRouter;
@@ -250,5 +251,15 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
     public void setContainer(String containerName)
     {
         this.container = containerName;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.lifecycle.Registerable#register()
+     */
+    public void register() throws RegistrationException
+    {
+        super.register();
     }
 }

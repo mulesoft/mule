@@ -14,6 +14,9 @@ import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.NullPayload;
+import org.mule.registry.ComponentReference;
+import org.mule.registry.DeregistrationException;
+import org.mule.registry.RegistrationException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -62,6 +65,11 @@ public abstract class AbstractTransformer implements UMOTransformer
     protected UMOTransformer nextTransformer;
 
     private boolean ignoreBadInput = false;
+
+    /**
+     * Registry ID
+     */
+    protected String registryId = null;
 
     /**
      * default constructor required for discovery
@@ -346,6 +354,49 @@ public abstract class AbstractTransformer implements UMOTransformer
     public void initialise() throws InitialisationException
     {
         // nothing to do
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.lifecycle.Registerable#register()
+     */
+    public void register() throws RegistrationException
+    {
+        ComponentReference ref = 
+            MuleManager.getInstance().getRegistry().getComponentReferenceInstance();
+
+        if (endpoint != null)
+            ref.setParentId(endpoint.getRegistryId());
+        else
+            ref.setParentId(MuleManager.getInstance().getRegistryId());
+
+        ref.setType("UMOTransformer");
+        ref.setComponent(this);
+
+        registryId = 
+            MuleManager.getInstance().getRegistry().registerComponent(ref);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.lifecycle.Registerable#deregister()
+     */
+    public void deregister() throws DeregistrationException
+    {
+        MuleManager.getInstance().getRegistry().deregisterComponent(registryId);
+        registryId = null;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.lifecycle.Registerable#getRegistryId()
+     */
+    public String getRegistryId()
+    {
+        return registryId;
     }
 
     protected String generateTransformerName()

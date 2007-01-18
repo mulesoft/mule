@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.mule.examples</groupId>
+        <artifactId>mule-examples</artifactId>
+        <version>2.0-REGISTRY</version>
+    </parent>
+    <artifactId>mule-example-hello-osgi</artifactId>
+    <packaging>bundle</packaging>
+    <name>Hello Example OSGi</name>
+    <description>Packages the Hello example as OSGi bundles</description>
+
+    <build>
+         <plugins>
+              <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Spring-Context>hello-spring-config.xml</Spring-Context>
+                        <!-- Packages which are referenced from the config xml but not listed in the java imports
+                        must be explicitly listed here because the maven-bundle-plugin will not detect them. -->
+                        <Import-Package>
+                            org.mule.config.i18n,
+                            org.mule.extras.spring.config,
+                            org.mule.providers.file,
+                            org.mule.providers.http,
+                            org.mule.transformers,
+                            org.mule.transformers.simple,
+                            org.mule.umo.transformer,
+                            org.mule.impl,
+                            org.mule.impl.endpoint
+                        </Import-Package>
+                        <Private-Package>
+                            org.mule.samples.hello.*
+                        </Private-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+         </plugins>
+    </build>
+</project>

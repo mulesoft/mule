@@ -11,7 +11,7 @@
     <description>Provides some JMS examples</description>
 
     <properties>
-        <muleVersion>1.4-SNAPSHOT</muleVersion>
+        <muleVersion>2.0-REGISTRY</muleVersion>
     </properties>
 
     <dependencies>

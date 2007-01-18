@@ -19,6 +19,9 @@ import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.service.TransportFactory;
 import org.mule.providers.service.TransportFactoryException;
+import org.mule.registry.ComponentReference;
+import org.mule.registry.DeregistrationException;
+import org.mule.registry.RegistrationException;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOFilter;
@@ -162,6 +165,8 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
      * determines if a new connector should be created for this endpoint
      */
     protected int createConnector = TransportFactory.GET_OR_CREATE_CONNECTOR;
+
+    protected String registryId;
 
     /**
      * Default ctor
@@ -750,6 +755,62 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         }
 
         initialised.set(true);
+
+        // For now at least, we don't want a registration error to affect
+        // the initialisation process.
+        try
+        {
+            register();
+            if (transformer != null && transformer.getRegistryId() == null) transformer.register();
+            if (responseTransformer != null && responseTransformer.getRegistryId() == null) responseTransformer.register();
+        }
+        catch (RegistrationException re)
+        {
+            logger.warn(re);
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.lifecycle.Registerable#register()
+     */
+    public void register() throws RegistrationException
+    {
+        ComponentReference ref = 
+            MuleManager.getInstance().getRegistry().getComponentReferenceInstance();
+        //ref.setParentId(MuleManager.getInstance().getModel().getRegistryId());
+
+        if (connector == null || connector.getRegistryId() == null)
+            throw new RegistrationException("Unable to find the endpoint's connector registry ID");
+
+        ref.setParentId(connector.getRegistryId());
+        ref.setType("UMOImmutableEndpoint");
+        ref.setComponent(this);
+
+        registryId = 
+            MuleManager.getInstance().getRegistry().registerComponent(ref);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.lifecycle.Registerable#deregister()
+     */
+    public void deregister() throws DeregistrationException
+    {
+        MuleManager.getInstance().getRegistry().deregisterComponent(registryId);
+        registryId = null;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.lifecycle.Registerable#getRegistryId()
+     */
+    public String getRegistryId()
+    {
+        return registryId;
     }
 
     /**

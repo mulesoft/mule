@@ -9,8 +9,27 @@
         <version>2.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-scripting</artifactId>
+    <packaging>bundle</packaging>
     <name>JSR-223 Scripting</name>
     <description>Support for Scripting Mule Services and embedding Mule inside scripts</description>
+
+    <build>
+         <plugins>
+              <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <!-- TODO This module needs reorganization in order to properly export its packages. -->
+                        <Export-Package>
+                            org.mule.components.script.*,
+                            org.mule.transformers.script.*
+                        </Export-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+         </plugins>
+    </build>
 
     <dependencies>
         <!-- TODO This can't be in the parent pom.xml because it creates a cyclic dependency: 

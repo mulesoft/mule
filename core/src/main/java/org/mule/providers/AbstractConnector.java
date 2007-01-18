@@ -23,6 +23,9 @@ import org.mule.impl.internal.notifications.ConnectionNotification;
 import org.mule.providers.service.TransportFactory;
 import org.mule.providers.service.TransportServiceDescriptor;
 import org.mule.providers.service.TransportServiceException;
+import org.mule.registry.ComponentReference;
+import org.mule.registry.DeregistrationException;
+import org.mule.registry.RegistrationException;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOComponent;
@@ -254,6 +257,11 @@ public abstract class AbstractConnector
      */
     protected UMOSessionHandler sessionHandler = new MuleSessionHandler();
 
+    /**
+     * Registry ID
+     */
+    protected String registryId = null;
+
     public AbstractConnector()
     {
         super();
@@ -346,6 +354,44 @@ public abstract class AbstractConnector
         }
 
         initialised.set(true);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.lifecycle.Registerable#register()
+     */
+    public void register() throws RegistrationException
+    {
+        ComponentReference ref = 
+            MuleManager.getInstance().getRegistry().getComponentReferenceInstance();
+        ref.setParentId(MuleManager.getInstance().getRegistryId());
+        ref.setType("UMOConnector");
+        ref.setComponent(this);
+
+        registryId = 
+            MuleManager.getInstance().getRegistry().registerComponent(ref);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.lifecycle.Registerable#deregister()
+     */
+    public void deregister() throws DeregistrationException
+    {
+        MuleManager.getInstance().getRegistry().deregisterComponent(registryId);
+        registryId = null;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.lifecycle.Registerable#getRegistryId()
+     */
+    public String getRegistryId()
+    {
+        return registryId;
     }
 
     public abstract String getProtocol();

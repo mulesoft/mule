@@ -19,6 +19,9 @@ import org.mule.impl.ImmutableMuleDescriptor;
 import org.mule.impl.MuleSession;
 import org.mule.impl.internal.notifications.ModelNotification;
 import org.mule.model.DynamicEntryPointResolver;
+import org.mule.registry.ComponentReference;
+import org.mule.registry.DeregistrationException;
+import org.mule.registry.RegistrationException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
@@ -79,6 +82,8 @@ public abstract class AbstractModel implements UMOModel
     private AtomicBoolean started = new AtomicBoolean(false);
 
     private ExceptionListener exceptionListener;
+
+    protected String registryId;
 
     /**
      * Default constructor
@@ -158,6 +163,16 @@ public abstract class AbstractModel implements UMOModel
 
         if (initialised.get())
         {
+            try 
+            {
+                descriptor.register();
+            }
+            catch (UMOException e)
+            {
+                logger.error("Unable to register descriptor " + 
+                    descriptor.getName() + " with the registry");
+            }
+
             descriptor.initialise();
         }
         // Set the es if one wasn't set in the configuration
@@ -214,6 +229,7 @@ public abstract class AbstractModel implements UMOModel
             component.stop();
             descriptors.remove(descriptor.getName());
             component.dispose();
+            component.deregister();
             logger.info("The component: " + descriptor.getName() + " has been unregistered and disposing");
         }
     }
@@ -468,6 +484,15 @@ public abstract class AbstractModel implements UMOModel
             for (Iterator i = components.values().iterator(); i.hasNext();)
             {
                 component = (UMOComponent)i.next();
+
+                try 
+                {
+                    component.register();
+                } catch (RegistrationException re)
+                {
+                    logger.info("Unable to register component");
+                }
+
                 component.initialise();
 
                 logger.info("Component " + component.getDescriptor().getName()
@@ -480,6 +505,49 @@ public abstract class AbstractModel implements UMOModel
         {
             logger.debug("Model already initialised");
         }
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.lifecycle.Registerable#register()
+     */
+    public void register() throws RegistrationException
+    {
+    	ComponentReference ref;
+    	try {
+    		ref = MuleManager.getInstance().getRegistry().getComponentReferenceInstance();
+    	} 
+    	catch (NullPointerException e) {
+        	throw new RegistrationException("Unable to get ComponentReference.");
+        }
+        ref.setParentId(MuleManager.getInstance().getRegistryId());
+        ref.setType("UMOModel");
+        ref.setComponent(this);
+
+        registryId = 
+            MuleManager.getInstance().getRegistry().registerComponent(ref);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.lifecycle.Registerable#deregister()
+     */
+    public void deregister() throws DeregistrationException
+    {
+        MuleManager.getInstance().getRegistry().deregisterComponent(registryId);
+        registryId = null;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.lifecycle.Registerable#getRegistryId()
+     */
+    public String getRegistryId()
+    {
+        return registryId;
     }
 
     public ExceptionListener getExceptionListener()

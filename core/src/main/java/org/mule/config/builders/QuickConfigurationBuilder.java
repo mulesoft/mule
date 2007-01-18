@@ -50,7 +50,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
 {
     private static final String MODEL_NOT_SET = "not set";
 
-    private UMOManager manager;
+    protected UMOManager manager;
 
     /**
      * Constructs a default builder
@@ -136,6 +136,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         {
             manager.setModel(ModelFactory.createModel(modeltype));
         }
+        System.out.println("BEFORE START");
         manager.start();
         return manager;
     }

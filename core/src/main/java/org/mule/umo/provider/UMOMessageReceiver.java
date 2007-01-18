@@ -14,6 +14,7 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.Lifecycle;
+import org.mule.umo.lifecycle.Registerable;
 
 /**
  * <code>UMOMessageReceiver</code> is used to receive data from an external system.
@@ -26,7 +27,7 @@ import org.mule.umo.lifecycle.Lifecycle;
  * data from the external system. For example, the file endpoint will poll a
  * specified directory for its data.
  */
-public interface UMOMessageReceiver extends Lifecycle, UMOConnectable
+public interface UMOMessageReceiver extends Lifecycle, Registerable, UMOConnectable
 {
     /**
      * @return the receivers endpoint

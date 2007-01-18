@@ -14,6 +14,7 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Disposable;
+import org.mule.umo.lifecycle.Registerable;
 
 import java.io.OutputStream;
 
@@ -21,7 +22,7 @@ import java.io.OutputStream;
  * <code>UMOMessageDispatcher</code> combines {@link UMOMessageDispatching} with
  * various lifecycle methods for the actual instances doing message sending/receiving.
  */
-public interface UMOMessageDispatcher extends Disposable, UMOConnectable, UMOMessageDispatching
+public interface UMOMessageDispatcher extends Registerable, Disposable, UMOConnectable, UMOMessageDispatching
 {
 
     /**

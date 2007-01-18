@@ -38,6 +38,7 @@ public interface CoreMessageConstants
     int FATAL_ERROR_SHUTDOWN = 20;
     int NORMAL_SHUTDOWN = 21;
     int NONE = 22;
+    int NOT_CLUSTERED = 23;
 
     int FAILED_TO_ROUTER_VIA_ENDPOINT = 30;
     int NO_COMPONENT_FOR_LOCAL_REFERENCE = 31;

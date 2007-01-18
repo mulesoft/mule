@@ -1,0 +1,4 @@
+# load common properties
+-xargs ../conf/props.xargs
+
+-launch 0

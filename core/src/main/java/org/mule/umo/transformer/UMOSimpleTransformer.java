@@ -11,6 +11,7 @@
 package org.mule.umo.transformer;
 
 import org.mule.umo.lifecycle.Initialisable;
+import org.mule.umo.lifecycle.Registerable;
 
 import java.io.Serializable;
 
@@ -24,7 +25,7 @@ import java.io.Serializable;
  * @version $Revision$
  */
 
-public interface UMOSimpleTransformer extends Initialisable, Serializable, Cloneable
+public interface UMOSimpleTransformer extends Initialisable, Registerable, Serializable, Cloneable
 {
     /**
      * JDK1.3+ 'Service Provider' specification (

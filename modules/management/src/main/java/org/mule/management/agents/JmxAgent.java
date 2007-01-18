@@ -46,6 +46,8 @@ import org.mule.management.mbeans.MuleConfigurationService;
 import org.mule.management.mbeans.MuleConfigurationServiceMBean;
 import org.mule.management.mbeans.MuleService;
 import org.mule.management.mbeans.MuleServiceMBean;
+import org.mule.management.mbeans.RegistryService;
+import org.mule.management.mbeans.RegistryServiceMBean;
 import org.mule.management.mbeans.StatisticsService;
 import org.mule.management.support.AutoDiscoveryJmxSupportFactory;
 import org.mule.management.support.JmxSupport;
@@ -178,6 +180,7 @@ public class JmxAgent implements UMOAgent
                         registerComponentServices();
                         registerEndpointServices();
                         registerConnectorServices();
+                        registerRegistryService();
                     } catch (Exception e) {
                         throw new MuleRuntimeException(new Message(Messages.X_FAILED_TO_INITIALISE, "MBeans"), e);
                     }
@@ -413,6 +416,17 @@ public class JmxAgent implements UMOAgent
         }
     }
 
+    protected void registerRegistryService() throws NotCompliantMBeanException, MBeanRegistrationException,
+            InstanceAlreadyExistsException, MalformedObjectNameException
+    {
+        RegistryServiceMBean serviceMBean = new RegistryService();
+        String rawName = serviceMBean.getName();
+        String name = jmxSupport.escape(rawName);
+        ObjectName on = jmxSupport.getObjectName(jmxSupport.getDomainName() + ":type=org.mule.registry,name=" + name);
+        logger.debug("Registering registry with name: " + on);
+        mBeanServer.registerMBean(serviceMBean, on);
+        registeredMBeans.add(on);
+    }
     /**
      * @return Returns the createServer.
      */

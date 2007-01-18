@@ -11,11 +11,13 @@
 package org.mule.umo.routing;
 
 import org.mule.management.stats.RouterStatistics;
+import org.mule.umo.lifecycle.Registerable;
 
 /**
  * <code>UMORouter</code> is a base interface for all routers.
  */
-public interface UMORouter
+//public interface UMORouter extends Registerable
+public interface UMORouter 
 {
     void setRouterStatistics(RouterStatistics stats);
 

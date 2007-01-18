@@ -18,6 +18,9 @@ import org.mule.impl.container.DescriptorContainerContext;
 import org.mule.impl.container.DescriptorContainerKeyPair;
 import org.mule.impl.container.MuleContainerContext;
 import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.registry.ComponentReference;
+import org.mule.registry.DeregistrationException;
+import org.mule.registry.RegistrationException;
 import org.mule.routing.inbound.InboundMessageRouter;
 import org.mule.routing.inbound.InboundPassThroughRouter;
 import org.mule.routing.outbound.OutboundMessageRouter;
@@ -54,6 +57,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     public static final String INITIAL_STATE_STOPPED = "stopped";
     public static final String INITIAL_STATE_STARTED = "started";
     public static final String INITIAL_STATE_PAUSED = "paused";
+
     /**
      * Property that allows for a property file to be used to load properties instead
      * of listing them directly in the mule-configuration file
@@ -133,6 +137,8 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
      * its implementation class name.
      */
     protected String container = null;
+
+    protected String registryId;
 
     /**
      * Default constructor. Initalises common properties for the MuleConfiguration
@@ -265,6 +271,47 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
                 implementationReference = new ContainerKeyPair(container, implementationReference);
             }
         }
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.lifecycle.Registerable#register()
+     */
+    public void register() throws RegistrationException
+    {
+        ComponentReference ref = 
+            MuleManager.getInstance().getRegistry().getComponentReferenceInstance();
+        /*
+         * THIS WILL HAVE TO CHANGE
+         */
+        ref.setParentId(MuleManager.getInstance().getModel().getRegistryId());
+        ref.setType("UMODescriptor");
+        ref.setComponent(this);
+
+        registryId = 
+            MuleManager.getInstance().getRegistry().registerComponent(ref);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.lifecycle.Registerable#deregister()
+     */
+    public void deregister() throws DeregistrationException
+    {
+        MuleManager.getInstance().getRegistry().deregisterComponent(registryId);
+        registryId = null;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.lifecycle.Registerable#getRegistryId()
+     */
+    public String getRegistryId()
+    {
+        return registryId;
     }
 
     /*

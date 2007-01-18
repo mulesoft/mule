@@ -16,6 +16,7 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOSession;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.Lifecycle;
+import org.mule.umo.lifecycle.Registerable;
 import org.mule.umo.lifecycle.UMOLifecycleAdapterFactory;
 
 import java.beans.ExceptionListener;
@@ -30,7 +31,7 @@ import java.util.List;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public interface UMOModel extends Lifecycle, Initialisable
+public interface UMOModel extends Lifecycle, Initialisable, Registerable
 {
     public static final String DEFAULT_MODEL_NAME = "default";
 

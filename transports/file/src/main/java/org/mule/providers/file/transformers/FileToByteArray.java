@@ -16,9 +16,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.ArrayUtils;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
+import org.mule.util.ArrayUtils;
 
 /**
  * <code>FileToByteArray</code> reads the contents of a file as a byte array.

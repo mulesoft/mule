@@ -56,7 +56,6 @@ The distribution you have downloaded contains the following:
                  therefore be used to patch the distributed Mule classes if necessary.
 ./licences     - License information for all libraries shipped with Mule
 ./logs         - Output will be sent here by default when running in background mode
-./sbin         - Internal scripts which are not to be run by the user
 ./src          - The source code for all Mule modules, you can import this into your IDE
 ./INSTALL.txt  - erm... this file!
 ./LICENSE.txt  - License agreement for Mule

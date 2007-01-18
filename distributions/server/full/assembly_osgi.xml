@@ -1,0 +1,248 @@
+<!--
+Assembly descriptor for the full Mule distribution.
+-->
+<assembly>
+  <id>full</id>
+  <formats>
+    <format>zip</format>
+    <format>tar.gz</format>
+  </formats>
+
+  <fileSets>
+    <fileSet>
+      <directory>../src/main/resources</directory>
+      <outputDirectory></outputDirectory>
+      <!-- <lineEnding>???</lineEnding> -->
+    </fileSet>
+
+    <!-- Make binary directories executable. -->
+    <fileSet>
+      <directory>../src/main/resources/bin</directory>
+      <outputDirectory>bin</outputDirectory>
+      <fileMode>744</fileMode>
+    </fileSet>
+    <fileSet>
+      <directory>../src/main/resources/lib/boot/exec</directory>
+      <outputDirectory>lib/boot/exec</outputDirectory>
+      <fileMode>744</fileMode>
+    </fileSet>
+
+      <!--
+        ============================
+            Mule Examples: Hello
+        ============================
+      -->
+      <!-- Maven-style example -->
+      <fileSet>
+          <directory>../../../examples/hello</directory>
+          <outputDirectory>examples/maven/hello</outputDirectory>
+          <includes>
+              <include>README.txt</include>
+          </includes>
+      </fileSet>
+      <fileSet>
+          <directory>../../../examples/hello/dist</directory>
+          <outputDirectory>examples/maven/hello</outputDirectory>
+          <includes>
+              <include>pom.xml</include>
+          </includes>
+      </fileSet>
+      <fileSet>
+          <directory>../../../examples/hello/dist</directory>
+          <outputDirectory>examples/maven/hello</outputDirectory>
+          <includes>
+              <include>hello</include>
+              <include>*.bat</include>
+          </includes>
+          <fileMode>744</fileMode>
+      </fileSet>
+      <fileSet>
+          <directory>../../../examples/hello/conf</directory>
+          <outputDirectory>examples/maven/hello/conf</outputDirectory>
+      </fileSet>
+      <fileSet>
+          <directory>../../../examples/hello/src</directory>
+          <outputDirectory>examples/maven/hello/src</outputDirectory>
+      </fileSet>
+
+      <!-- Ant-style example -->
+      <fileSet>
+          <directory>../../../examples/hello</directory>
+          <outputDirectory>examples/ant/hello</outputDirectory>
+          <includes>
+              <include>README.txt</include>
+          </includes>
+      </fileSet>
+      <fileSet>
+          <directory>../../../examples/hello/dist</directory>
+          <outputDirectory>examples/ant/hello</outputDirectory>
+          <includes>
+              <include>build.xml</include>
+          </includes>
+      </fileSet>
+      <fileSet>
+          <directory>../../../examples/hello/dist</directory>
+          <outputDirectory>examples/ant/hello</outputDirectory>
+          <includes>
+              <include>hello</include>
+              <include>*.bat</include>
+          </includes>
+          <fileMode>744</fileMode>
+      </fileSet>
+      <fileSet>
+          <directory>../../../examples/hello/conf</directory>
+          <outputDirectory>examples/ant/hello/conf</outputDirectory>
+      </fileSet>
+      <fileSet>
+          <directory>../../../examples/hello/src/main/java</directory>
+          <outputDirectory>examples/ant/hello/src</outputDirectory>
+      </fileSet>
+
+
+    <!-- Copy the USAGE.txt file to the root directory for visibility -->
+    <fileSet>
+      <directory>../src/main/resources/bin</directory>
+      <outputDirectory></outputDirectory>
+      <includes>
+          <include>USAGE.txt</include>
+      </includes>
+    </fileSet>
+
+    <!-- Copy javadocs -->
+    <fileSet>
+      <directory>../../../target/site/apidocs</directory>
+      <outputDirectory>docs/api</outputDirectory>
+    </fileSet>
+
+    <!-- Copy source bundles ("mvn -DperformRelease=true" must have been run previously) -->
+    <fileSet>
+      <directory>../../..</directory>
+      <outputDirectory>src</outputDirectory>
+      <includes>
+          <include>**/*-sources.jar</include>
+      </includes>
+    </fileSet>
+  </fileSets>
+
+  <!--
+       TODO: http://jira.codehaus.org/browse/MASSEMBLY-41 is now fixed.
+       Update to use wildcards.
+   -->
+  <dependencySets>
+
+    <!-- Mule bootstrap -->
+    <dependencySet>
+      <outputDirectory>lib/boot</outputDirectory>
+      <!-- No version number  -->
+      <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
+      <includes>
+        <include>org.mule.modules:mule-module-boot</include>
+        <include>commons-cli:commons-cli</include>
+        <include>tanukisoft:wrapper</include>
+        <include>org.knopflerfish:osgi</include>
+      </includes>
+    </dependencySet>
+
+    <!-- Mule bundles -->
+    <dependencySet>
+      <outputDirectory>lib/mule</outputDirectory>
+      <!-- No version number  -->
+      <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
+      <scope>runtime</scope>
+      <includes>
+        <!-- Core -->
+        <include>org.mule:mule-core</include>
+        <!-- Transports -->
+        <include>org.mule.transports:mule-transport-axis</include>
+        <include>org.mule.transports:mule-transport-bpm</include>
+        <include>org.mule.transports:mule-transport-dq</include>
+        <include>org.mule.transports:mule-transport-ejb</include>
+        <include>org.mule.transports:mule-transport-email</include>
+        <include>org.mule.transports:mule-transport-file</include>
+        <include>org.mule.transports:mule-transport-ftp</include>
+        <include>org.mule.transports:mule-transport-gigaspaces</include>
+        <include>org.mule.transports:mule-transport-glue</include>
+        <include>org.mule.transports:mule-transport-http</include>
+        <include>org.mule.transports:mule-transport-jbi</include>
+        <include>org.mule.transports:mule-transport-jdbc</include>
+        <include>org.mule.transports:mule-transport-jms</include>
+        <include>org.mule.transports:mule-transport-multicast</include>
+        <include>org.mule.transports:mule-transport-oracleaq</include>
+        <include>org.mule.transports:mule-transport-quartz</include>
+        <include>org.mule.transports:mule-transport-rmi</include>
+        <include>org.mule.transports:mule-transport-soap</include>
+        <include>org.mule.transports:mule-transport-space</include>
+        <include>org.mule.transports:mule-transport-ssl</include>
+        <include>org.mule.transports:mule-transport-stream</include>
+        <include>org.mule.transports:mule-transport-tcp</include>
+        <include>org.mule.transports:mule-transport-udp</include>
+        <include>org.mule.transports:mule-transport-vm</include>
+        <include>org.mule.transports:mule-transport-xfire</include>
+        <include>org.mule.transports:mule-transport-xmpp</include>
+        <!-- Modules -->
+        <include>org.mule.modules:mule-module-acegi</include>
+        <include>org.mule.modules:mule-module-builders</include>
+        <include>org.mule.modules:mule-module-client</include>
+        <include>org.mule.modules:mule-module-hivemind</include>
+        <include>org.mule.modules:mule-module-jaas</include>
+        <include>org.mule.modules:mule-module-jotm</include>
+        <include>org.mule.modules:mule-module-management</include>
+        <include>org.mule.modules:mule-module-osgi</include>
+        <include>org.mule.modules:mule-module-ognl</include>
+        <include>org.mule.modules:mule-module-pgp</include>
+        <include>org.mule.modules:mule-module-picocontainer</include>
+        <include>org.mule.modules:mule-module-scripting</include>
+        <include>org.mule.modules:mule-module-springcore</include>
+        <include>org.mule.modules:mule-module-spring</include>
+        <include>org.mule.modules:mule-module-xml</include>
+      </includes>
+    </dependencySet>
+
+    <!-- Non-Mule bundles -->
+    <dependencySet>
+      <outputDirectory>lib/opt</outputDirectory>
+      <!-- No version number  -->
+      <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
+      <scope>runtime</scope>
+      <includes>
+      	<!-- Common Java libraries -->
+        <include>org.springframework.osgi:aopalliance.osgi</include>
+        <include>org.springframework.osgi:backport-util-concurrent</include>
+        <include>org.springframework.osgi:commons-beanutils.osgi</include>
+        <include>org.springframework.osgi:commons-collections.osgi</include>
+        <include>org.springframework.osgi:commons-lang.osgi</include>
+        <include>org.springframework.osgi:commons-pool.osgi</include>
+        <include>org.springframework.osgi:asm.osgi</include>
+        <include>org.springframework.osgi:aspectjrt.osgi</include>
+        <include>org.springframework.osgi:cglib-nodep.osgi</include>
+        <include>org.springframework.osgi:commons-attributes.osgi</include>
+        <!-- PAX Logging -->
+        <include>org.ops4j.pax.logging:api</include>
+        <include>org.ops4j.pax.logging:service</include>
+        <include>org.ops4j.pax.logging:log4j</include>
+        <include>org.ops4j.pax.logging:jcl</include>
+        <include>org.ops4j.pax.logging:slf4j</include>
+        <!-- Spring -->
+        <include>org.springframework.osgi:spring-osgi-core</include>
+        <include>org.springframework.osgi:spring-osgi-io</include>
+        <include>org.springframework.osgi:spring-osgi-extender</include>
+        <include>org.springframework.osgi:spring-core</include>
+        <include>org.springframework.osgi:spring-aop</include>
+        <include>org.springframework.osgi:spring-context</include>
+        <include>org.springframework.osgi:spring-beans</include>
+        <include>org.springframework.osgi:spring-jmx</include>
+      </includes>
+    </dependencySet>
+
+    <!-- Mule examples -->
+    <dependencySet>
+      <outputDirectory>lib/user</outputDirectory>
+      <scope>runtime</scope>
+      <!-- No version number  -->
+      <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
+      <includes>
+        <include>org.mule.examples:mule-example-hello-osgi</include>
+      </includes>
+    </dependencySet>
+  </dependencySets>
+</assembly>

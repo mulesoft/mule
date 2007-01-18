@@ -19,6 +19,9 @@ import org.mule.impl.RequestContext;
 import org.mule.impl.internal.notifications.ComponentNotification;
 import org.mule.management.stats.ComponentStatistics;
 import org.mule.providers.AbstractConnector;
+import org.mule.registry.ComponentReference;
+import org.mule.registry.DeregistrationException;
+import org.mule.registry.RegistrationException;
 import org.mule.umo.ComponentException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
@@ -97,6 +100,8 @@ public abstract class AbstractComponent implements UMOComponent
      */
     protected WaitableBoolean paused = new WaitableBoolean(false);
 
+    protected String registryId;
+
     /**
      * Default constructor
      */
@@ -126,6 +131,17 @@ public abstract class AbstractComponent implements UMOComponent
             throw new InitialisationException(new Message(Messages.OBJECT_X_ALREADY_INITIALISED,
                 "Component '" + descriptor.getName() + "'"), this);
         }
+
+        try 
+        {
+            descriptor.register();
+        }
+        catch (UMOException e)
+        {
+            logger.error("Unable to register descriptor " + 
+                    descriptor.getName() + " with the registry");
+        }
+
         descriptor.initialise();
 
         this.exceptionListener = descriptor.getExceptionListener();
@@ -135,7 +151,7 @@ public abstract class AbstractComponent implements UMOComponent
         // initialise statistics
         stats = createStatistics();
         stats.setEnabled(((MuleManager)MuleManager.getInstance()).getStatistics().isEnabled());
-        ((MuleManager)MuleManager.getInstance()).getStatistics().add(stats);
+        ((MuleManager) MuleManager.getInstance()).getStatistics().add(stats);
         stats.setOutboundRouterStat(getDescriptor().getOutboundRouter().getStatistics());
         stats.setInboundRouterStat(getDescriptor().getInboundRouter().getStatistics());
         
@@ -147,6 +163,44 @@ public abstract class AbstractComponent implements UMOComponent
     protected ComponentStatistics createStatistics()
     {
         return new ComponentStatistics(getName(), descriptor.getThreadingProfile().getMaxThreadsActive());
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.lifecycle.Registerable#register()
+     */
+    public void register() throws RegistrationException
+    {
+        ComponentReference ref = 
+            MuleManager.getInstance().getRegistry().getComponentReferenceInstance();
+        ref.setParentId(model.getRegistryId());
+        ref.setType("UMOComponent");
+        ref.setComponent(this);
+
+        registryId = 
+            MuleManager.getInstance().getRegistry().registerComponent(ref);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.lifecycle.Registerable#deregister()
+     */
+    public void deregister() throws DeregistrationException
+    {
+        MuleManager.getInstance().getRegistry().deregisterComponent(registryId);
+        registryId = null;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.lifecycle.Registerable#getRegistryId()
+     */
+    public String getRegistryId()
+    {
+        return registryId;
     }
 
     protected void fireComponentNotification(int action)

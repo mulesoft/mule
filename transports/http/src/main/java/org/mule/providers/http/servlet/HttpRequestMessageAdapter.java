@@ -21,7 +21,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.commons.lang.SystemUtils;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -30,6 +29,7 @@ import org.mule.providers.http.HttpConstants;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
+import org.mule.util.SystemUtils;
 
 /**
  * <code>HttpRequestMessageAdapter</code> is a Mule message adapter for

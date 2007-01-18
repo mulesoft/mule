@@ -16,7 +16,6 @@ import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
-import org.mule.util.properties.PropertyExtractor;
 import org.mule.umo.UMOMessage;
 
 /**
@@ -37,7 +36,7 @@ public class JXPathPropertyExtractor implements PropertyExtractor
         Object payload = message;
         if (message instanceof UMOMessage)
         {
-            payload = ((UMOMessage)message).getPayload();
+            payload = ((UMOMessage) message).getPayload();
         }
 
         if (payload instanceof String)
@@ -45,7 +44,7 @@ public class JXPathPropertyExtractor implements PropertyExtractor
             Document doc;
             try
             {
-                doc = DocumentHelper.parseText((String)payload);
+                doc = DocumentHelper.parseText((String) payload);
             }
             catch (DocumentException e)
             {

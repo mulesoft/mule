@@ -19,6 +19,8 @@ import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.InternalMessageListener;
 import org.mule.providers.jbi.JbiMessageAdapter;
 import org.mule.providers.jbi.JbiUtils;
+import org.mule.registry.DeregistrationException;
+import org.mule.registry.RegistrationException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
@@ -143,7 +145,7 @@ public class MuleReceiver extends AbstractEndpointComponent implements InternalM
             if (targetService != null)
             {
                 me.setService(targetService);
-                ServiceEndpoint endpoint = null;
+                ServiceEndpoint endpoint;
                 ServiceEndpoint[] eps = context.getEndpointsForService(targetService);
                 if (eps.length == 0)
                 {
@@ -231,7 +233,7 @@ public class MuleReceiver extends AbstractEndpointComponent implements InternalM
      */
     class NullUMOComponent implements UMOComponent
     {
-        /**
+		/**
          * Serial version
          */
         private static final long serialVersionUID = 6446394166371870045L;
@@ -301,6 +303,23 @@ public class MuleReceiver extends AbstractEndpointComponent implements InternalM
         {
             return null;
         }
-    }
 
+		public void register() throws RegistrationException {
+            // nothing to do
+		}
+
+		public void deregister() throws DeregistrationException {
+            // nothing to do
+		}
+
+        /**
+         * Returns the registry id.
+         *
+         * @return the registry ID
+         */
+        public String getRegistryId () {
+            // TODO MERGE dummy implementation
+            throw new UnsupportedOperationException("TODO");
+        }
+    }
 }

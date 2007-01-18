@@ -21,6 +21,7 @@ import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
+import org.mule.util.StringUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -34,7 +35,6 @@ import java.util.Map;
 
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpVersion;
-import org.apache.commons.lang.StringUtils;
 
 /**
  * <code>UMOMessageToHttpResponse</code> converts a UMOMEssage into an Http

@@ -20,14 +20,13 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
+import org.mule.util.StringUtils;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URI;
-
-import org.apache.commons.lang.StringUtils;
 
 /**
  * <code>TcpStreamingMessageReceiver</code> establishes a TCP client connection to

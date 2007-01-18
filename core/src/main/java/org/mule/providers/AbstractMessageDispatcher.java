@@ -10,6 +10,7 @@
 
 package org.mule.providers;
 
+import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
 import org.mule.config.MuleProperties;
 import org.mule.config.ThreadingProfile;
@@ -19,6 +20,9 @@ import org.mule.impl.RequestContext;
 import org.mule.impl.internal.notifications.ConnectionNotification;
 import org.mule.impl.internal.notifications.MessageNotification;
 import org.mule.impl.internal.notifications.SecurityNotification;
+import org.mule.registry.ComponentReference;
+import org.mule.registry.DeregistrationException;
+import org.mule.registry.RegistrationException;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.TransactionException;
 import org.mule.umo.UMOEvent;
@@ -69,6 +73,8 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
     protected volatile boolean connecting = false;
     protected volatile boolean connected = false;
 
+    protected String registryId;
+
     public AbstractMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
         this.endpoint = endpoint;
@@ -97,6 +103,53 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
                 throw new MuleRuntimeException(new Message(Messages.FAILED_TO_START_X, "WorkManager"), e);
             }
         }
+
+        try 
+        {
+            register();
+        }
+        catch (RegistrationException re)
+        {
+            logger.error("Unable to register: " + re.toString());
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.lifecycle.Registerable#register()
+     */
+    public void register() throws RegistrationException
+    {
+        ComponentReference ref = 
+            MuleManager.getInstance().getRegistry().getComponentReferenceInstance();
+        ref.setParentId(connector.getRegistryId());
+        ref.setType("UMOMessageDispatcher");
+        ref.setComponent(this);
+
+        registryId = 
+            MuleManager.getInstance().getRegistry().registerComponent(ref);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.lifecycle.Registerable#deregister()
+     */
+    public void deregister() throws DeregistrationException
+    {
+        MuleManager.getInstance().getRegistry().deregisterComponent(registryId);
+        registryId = null;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.lifecycle.Registerable#getRegistryId()
+     */
+    public String getRegistryId()
+    {
+        return registryId;
     }
 
     /*

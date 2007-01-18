@@ -12,6 +12,7 @@ package org.mule.umo;
 
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.Lifecycle;
+import org.mule.umo.lifecycle.Registerable;
 
 import java.io.Serializable;
 
@@ -24,7 +25,7 @@ import java.io.Serializable;
  * @version $Revision$
  */
 
-public interface UMOComponent extends Serializable, Lifecycle, Initialisable
+public interface UMOComponent extends Serializable, Lifecycle, Initialisable, Registerable
 {
     /**
      * @return the UMODescriptor associated with the component
