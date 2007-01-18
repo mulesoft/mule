@@ -36,7 +36,7 @@ APP_NAME=${MULE_APP}
 APP_LONG_NAME=${MULE_APP_LONG}
 
 # Wrapper
-WRAPPER_CMD="${MULE_HOME}/sbin/wrapper"
+WRAPPER_CMD="../lib/boot/exec/wrapper"
 WRAPPER_CONF="../conf/wrapper.conf"
 
 # Set the startup directory so that any relative paths can be resolved later.
@@ -434,7 +434,7 @@ testpid() {
 }
 
 console() {
-    echo "Running $APP_LONG_NAME..."
+    echo "Running wrapper for $APP_LONG_NAME..."
     getpid
     if [ "X$pid" = "X" ]
     then
@@ -451,7 +451,7 @@ console() {
 }
 
 start() {
-    echo "Starting $APP_LONG_NAME..."
+    echo "Starting wrapper for $APP_LONG_NAME..."
     getpid
     if [ "X$pid" = "X" ]
     then

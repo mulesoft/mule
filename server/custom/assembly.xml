@@ -26,8 +26,8 @@ Assembly descriptor for the minimal Mule distribution.
       <fileMode>744</fileMode>
     </fileSet>
     <fileSet>
-      <directory>../src/main/resources/sbin</directory>
-      <outputDirectory>sbin</outputDirectory>
+      <directory>../src/main/resources/lib/boot/exec</directory>
+      <outputDirectory>lib/boot/exec</outputDirectory>
       <fileMode>744</fileMode>
     </fileSet>
   </fileSets>
