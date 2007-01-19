@@ -9,8 +9,25 @@
         <version>2.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-dq</artifactId>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
     <name>AS400 Data Queue Transport</name>
+    
+    <build>
+         <plugins>
+              <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Export-Package>
+                            org.mule.providers.dq.*
+                        </Export-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+         </plugins>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>as400dq</groupId>

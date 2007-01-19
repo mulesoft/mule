@@ -1,3 +1,0 @@
-Bundle-SymbolicName: org.mule.transports.file
-Export-Package: org.mule.providers.file, org.mule.providers.file.transformers, org.mule.providers.file.filters
-Require-Bundle: org.mule.core

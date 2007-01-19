@@ -9,7 +9,44 @@
         <version>2.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-tcp</artifactId>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
     <name>Tcp Transport</name>
     <description>A Mule transport for Tcp Connectivity. This transport supplies a tcp Server and client implementation.</description>
+
+    <build>
+         <plugins>
+              <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Export-Package>
+                            org.mule.providers.tcp.*
+                        </Export-Package>
+                        <Private-Package>
+                            org.apache.commons.io.*,
+                            javax.resource.spi.work,
+                            javax.transaction.xa,
+                            javax.resource
+                        </Private-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+         </plugins>
+    </build>
+    
+    <dependencies>
+        <!-- TODO This needs to be a bundle -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>1.2</version>
+        </dependency>
+        <!-- Used for the WorkManager API -->
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+    </dependencies>
 </project>

@@ -9,9 +9,26 @@
         <version>2.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-jdbc</artifactId>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
     <name>Jdbc Transport</name>
     <description>A Mule transport for Jdbc Connectivity.</description>
+    
+    <build>
+         <plugins>
+              <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Export-Package>
+                            org.mule.providers.jdbc.*
+                        </Export-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+         </plugins>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>commons-dbutils</groupId>

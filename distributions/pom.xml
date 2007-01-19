@@ -69,11 +69,14 @@
             <artifactId>mule-transport-axis</artifactId>
             <version>${version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-bpm</artifactId>
-            <version>${version}</version>
-        </dependency>
+        <!-- TODO uncomment after mule-transport-bpm problems are resolved,
+             for now this will allow distributions to be assembled
+        -->
+        <!--<dependency>-->
+            <!--<groupId>org.mule.transports</groupId>-->
+            <!--<artifactId>mule-transport-bpm</artifactId>-->
+            <!--<version>${version}</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-dq</artifactId>
@@ -272,47 +275,7 @@
         -->
         <dependency>
             <groupId>org.mule.examples</groupId>
-            <artifactId>mule-example-echo</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.examples</groupId>
-            <artifactId>mule-example-errorhandler</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.examples</groupId>
-            <artifactId>mule-example-hello</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.examples</groupId>
-            <artifactId>mule-example-loanbroker</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.examples</groupId>
-            <artifactId>mule-example-loanbroker-esb</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.examples</groupId>
-            <artifactId>mule-example-loanbroker-esb-credit-agency</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.examples</groupId>
-            <artifactId>mule-example-scripting</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.examples</groupId>
-            <artifactId>mule-example-stockquote</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.examples</groupId>
-            <artifactId>mule-example-voipservice</artifactId>
+            <artifactId>mule-example-hello-osgi</artifactId>
             <version>${version}</version>
         </dependency>
     </dependencies>

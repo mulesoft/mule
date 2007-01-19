@@ -9,9 +9,26 @@
         <version>2.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-space</artifactId>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
     <name>Space Transport</name>
     <description>Allows Mule to send and receive events via the Mule Space API.  This enables interation with JCache, Jini, Rio or other 'space' types using a common interface.</description>
+
+    <build>
+         <plugins>
+              <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Export-Package>
+                            org.mule.providers.space.*,
+                            org.mule.umo.space.*
+                        </Export-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+         </plugins>
+    </build>
 
     <dependencies>
         <!-- Needed for unit tests only -->

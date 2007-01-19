@@ -9,9 +9,39 @@
         <version>2.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-http</artifactId>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
     <name>Http Transport</name>
     <description>A Mule transport for Http Connectivity. This transport supplies a simple Http Server implementation.</description>
+
+    <build>
+         <plugins>
+              <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Export-Package>
+                            org.mule.providers.http.*
+                        </Export-Package>
+                        <Private-Package>
+                            org.apache.commons.codec.*,
+                            org.apache.commons.httpclient.*,
+                            org.apache.commons.io.*,
+                            javax.resource,
+                            javax.resource.spi.work,
+                            javax.transaction.xa,
+                            org.mortbay.http.*,
+                            org.mortbay.jetty.*,
+                            org.mortbay.log,
+                            org.mortbay.xml,
+                            org.mortbay.util
+                        </Private-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+         </plugins>
+    </build>
+    
     <dependencies>
         <dependency>
             <groupId>org.mule.transports</groupId>
@@ -32,6 +62,18 @@
             <groupId>jetty</groupId>
             <artifactId>org.mortbay.jetty</artifactId>
             <version>5.1.10</version>
+        </dependency>
+        <!-- TODO This needs to be a bundle -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>1.2</version>
+        </dependency>
+        <!-- Used for the WorkManager API -->
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
+            <version>1.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>

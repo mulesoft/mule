@@ -9,9 +9,25 @@
         <version>2.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-gigaspaces</artifactId>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
     <name>GigaSpaces Transport</name>
     <description>Allows Mule to send and receive events via the GigaSpaces Jini implementation.</description>
+
+    <build>
+         <plugins>
+              <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Export-Package>
+                            org.mule.providers.gs.*
+                        </Export-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+         </plugins>
+    </build>
 
     <dependencies>
         <!-- This transport is based on the Spaces transport -->

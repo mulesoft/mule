@@ -9,9 +9,26 @@
         <version>2.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-jms</artifactId>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
     <name>Jms Transport</name>
     <description>A Mule transport for Jms Connectivity.</description>
+
+    <build>
+         <plugins>
+              <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Export-Package>
+                            org.mule.providers.jms.*
+                        </Export-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+         </plugins>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>

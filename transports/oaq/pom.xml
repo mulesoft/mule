@@ -9,9 +9,26 @@
         <version>2.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-oracleaq</artifactId>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
     <name>Oracle Advanced Queuing Transport</name>
     <description>Adds Oracle-specific functionality to the standard Mule JMS transport.</description>
+
+    <build>
+         <plugins>
+              <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Export-Package>
+                            org.mule.providers.oracle.jms.*
+                        </Export-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+         </plugins>
+    </build>
+
     <dependencies>
         <!-- The standard JMS transport for Mule -->
         <dependency>

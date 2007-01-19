@@ -9,9 +9,26 @@
         <version>2.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-jotm</artifactId>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
     <name>Jotm Support</name>
     <description>Provides access to the Jotm transaction manager for User and Xa transactions.</description>
+
+    <build>
+         <plugins>
+              <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Export-Package>
+                            org.mule.extras.jotm.*
+                        </Export-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+         </plugins>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>jotm</groupId>
@@ -26,6 +43,11 @@
 					<groupId>javax.transaction</groupId>
 					<artifactId>jta</artifactId>
 				</exclusion>
+                <!-- Provided by OSGi -->
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 		<!--Instead of the javax.resource j2ee connector-->

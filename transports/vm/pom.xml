@@ -9,7 +9,24 @@
         <version>2.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-vm</artifactId>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
     <name>VM Transport</name>
     <description>A Mule transport that enables event sending and receiving over VM or embedded memory queues. These queues can be persistent or transient.</description>
+
+    <build>
+         <plugins>
+              <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Export-Package>
+                            org.mule.providers.vm.*
+                        </Export-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+         </plugins>
+    </build>
+
 </project>

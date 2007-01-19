@@ -9,11 +9,27 @@
         <version>2.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-picocontainer</artifactId>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
     <name>Pico Extensions</name>
     <description>Provides extensions to use PicoContainer with Mule, such as using the container as a
         factory for Mule managed objects.</description>
     
+    <build>
+         <plugins>
+              <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Export-Package>
+                            org.mule.extras.picocontainer.*
+                        </Export-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+         </plugins>
+    </build>
+
     <profiles>
         <profile>
             <id>java14</id>
@@ -25,7 +41,7 @@
                 <dependency>
                     <groupId>xml-apis</groupId>
                     <artifactId>xml-apis</artifactId>
-                    <version>1.3.04</version>
+                    <version>1.3.03</version>
                 </dependency>
                 <dependency>
                     <groupId>xerces</groupId>

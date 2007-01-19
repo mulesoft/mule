@@ -9,9 +9,25 @@
         <version>2.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-quartz</artifactId>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
     <name>Quartz Transport</name>
     <description>A Mule transport for Quartz. This transport supplies a receiver for jobs scheduled with Quartz.</description>
+
+    <build>
+         <plugins>
+              <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Export-Package>
+                            org.mule.providers.quartz.*
+                        </Export-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+         </plugins>
+    </build>
 
     <dependencies>
         <dependency>

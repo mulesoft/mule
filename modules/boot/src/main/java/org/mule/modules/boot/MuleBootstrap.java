@@ -146,8 +146,8 @@ public class MuleBootstrap
         // 
         // Now we will download these libraries to MULE_BASE/lib/user. In
         // a standard installation, MULE_BASE will be MULE_HOME.
-
-        if (!isClassOnPath("javax.activation.DataSource")) {
+        if (!isClassOnPath("javax.activation.DataSource"))
+        {
             LibraryDownloader downloader = new LibraryDownloader(muleBase);
             addLibrariesToClasspath(downloader.downloadLibraries());
         }

@@ -9,9 +9,26 @@
         <version>2.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-hivemind</artifactId>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
     <name>HiveMind Extensions</name>
     <description>Provides extensions to use HiveMind with Mule, such as using the container as a factory for Mule managed objects.</description>
+
+    <build>
+         <plugins>
+              <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Export-Package>
+                            org.mule.extras.hivemind.*
+                        </Export-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+         </plugins>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>hivemind</groupId>

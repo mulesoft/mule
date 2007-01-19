@@ -9,8 +9,26 @@
         <version>2.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-builders</artifactId>
+    <packaging>bundle</packaging>
     <name>Mule Configuration Builders</name>
     <description>Standard configuration builders for Mule</description>
+
+    <build>
+         <plugins>
+              <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Export-Package>
+                            org.mule.config.builders,
+                            org.mule.config.converters
+                        </Export-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+         </plugins>
+    </build>
 
     <profiles>
         <profile>
@@ -23,7 +41,7 @@
                 <dependency>
                     <groupId>xml-apis</groupId>
                     <artifactId>xml-apis</artifactId>
-                    <version>1.3.04</version>
+                    <version>1.3.03</version>
                 </dependency>
                 <dependency>
                     <groupId>xerces</groupId>

@@ -1,3 +1,0 @@
-Bundle-SymbolicName: org.mule.transports.http
-Export-Package: org.mule.providers.http, org.mule.providers.http.transformers, org.mule.providers.http.filters, org.mule.providers.servlet, org.mule.providers.http.jetty
-Require-Bundle: org.mule.core

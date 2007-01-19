@@ -9,11 +9,27 @@
         <version>2.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-soap</artifactId>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
     <name>Soap Transport</name>
     <description>A Mule transport for SOAP connectivity. The transport will use Axis, Glue or XFire
         depending on which is on the classpath.</description>
     
+    <build>
+         <plugins>
+              <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Export-Package>
+                            org.mule.providers.soap.*
+                        </Export-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+         </plugins>
+    </build>
+
     <profiles>
         <profile>
             <id>java14</id>
@@ -25,7 +41,7 @@
                 <dependency>
                     <groupId>xml-apis</groupId>
                     <artifactId>xml-apis</artifactId>
-                    <version>1.3.04</version>
+                    <version>1.3.03</version>
                 </dependency>
                 <dependency>
                     <groupId>xerces</groupId>

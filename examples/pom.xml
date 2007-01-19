@@ -15,6 +15,8 @@
     <description>Mule Example Applications</description>
 
     <modules>
+        <module>hello-osgi</module>
+        <!--
         <module>echo</module>
         <module>errorhandler</module>
         <module>hello</module>
@@ -24,7 +26,32 @@
         <module>stockquote</module>
         <module>voipservice</module>
         <module>webapp</module>
+        -->
     </modules>
+
+    <build>
+        <!-- Allow config files to be in the "conf" directory to make it easier for users to find them. -->
+        <resources>
+            <resource>
+                <directory>conf</directory>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+
+         <plugins>
+              <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Include-Resource>conf, src/main/resources</Include-Resource>
+                    </instructions>
+                </configuration>
+            </plugin>
+         </plugins>
+    </build>
 
     <dependencies>
         <dependency>
@@ -75,6 +102,61 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>
             <version>${version}</version>
+        </dependency>
+
+        <!-- Note: Ideally, the following list of libraries should be in the Mule project's top-level
+            POM, but Maven has visibility problems when dependencies are more than 2 levels
+            away, so this list is repeated in core/pom.xml, modules/pom.xml, and transports/pom.xml -->
+
+        <!-- The following libraries are provided by separate OSGi bundles -->
+        <dependency>
+            <groupId>backport-util-concurrent</groupId>
+            <artifactId>backport-util-concurrent</artifactId>
+            <version>3.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>1.7.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>3.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- TODO This needs to be a bundle -->
+        <dependency>
+            <groupId>commons-discovery</groupId>
+            <artifactId>commons-discovery</artifactId>
+            <version>0.2</version>
+        </dependency>
+        <!-- TODO This needs to be a bundle -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.0.4</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- Used by mules default component pooling mechanism -->
+        <dependency>
+            <groupId>commons-pool</groupId>
+            <artifactId>commons-pool</artifactId>
+            <version>1.3</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>

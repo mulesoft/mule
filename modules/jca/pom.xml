@@ -10,10 +10,24 @@
     </parent>
     <artifactId>mule-module-jca</artifactId>
     <name>JCA Resource Adapter</name>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
     <description>A Resource Adapter implementation that allows a Mule instance to be deployed to a Java EE application server and exposes Mule services via the JCA connector architecture.</description>
 
     <build>
+         <plugins>
+              <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Export-Package>
+                            org.mule.ra.*
+                        </Export-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+         </plugins>
+
         <resources>
             <!--
                 Need to inject the final RAR name into some

@@ -9,9 +9,26 @@
         <version>2.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-acegi</artifactId>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
     <name>Acegi Security</name>
     <description>Mule Acegi Support exposes Acegi Authentication providers and Method interceptors to authentication event traffic via endpoints and method level authorisation on components.</description>   
+
+    <build>
+         <plugins>
+              <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Export-Package>
+                            org.mule.extras.acegi.*
+                        </Export-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+         </plugins>
+    </build>
+
     <dependencies>
         <!-- TODO This can't be in the parent pom.xml because it creates a cyclic dependency: 
                 mule-tests-functional -> mule-module-builders -> mule-tests-functional -->
@@ -86,6 +103,11 @@
                 <exclusion>
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-support</artifactId>
+                </exclusion>
+                <!-- Provided by OSGi -->
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
                 </exclusion>
             </exclusions>  
         </dependency>

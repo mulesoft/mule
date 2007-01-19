@@ -70,21 +70,49 @@
             <scope>provided</scope>
         </dependency>
 
-        <!--
-            TODO this is a hack. Duplicate declaration (original is in the top pom.xml)
-            makes JMS transport happy to compile when run from the project root folder,
-            otherwise it cannot find classes from commons-collections.
+        <!-- Note: Ideally, the following list of libraries should be in the Mule project's top-level
+            POM, but Maven has visibility problems when dependencies are more than 2 levels
+            away, so this list is repeated in core/pom.xml, modules/pom.xml, and transports/pom.xml -->
 
-            At the same time, running either from the transports or jms folder works fine
-            without this hack.
-
-            It seems m2 dependency visibility hierarchy is limited to 1 level deep.
-        -->
+        <!-- The following libraries are provided by separate OSGi bundles -->
+        <dependency>
+            <groupId>backport-util-concurrent</groupId>
+            <artifactId>backport-util-concurrent</artifactId>
+            <version>3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>1.7.0</version>
+        </dependency>
         <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
             <version>3.2</version>
         </dependency>
+        <!-- TODO This needs to be a bundle -->
+        <dependency>
+            <groupId>commons-discovery</groupId>
+            <artifactId>commons-discovery</artifactId>
+            <version>0.2</version>
+        </dependency>
+        <!-- TODO This needs to be a bundle -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.0.4</version>
+        </dependency>
+        <!-- Used by mules default component pooling mechanism -->
         <dependency>
             <groupId>commons-pool</groupId>
             <artifactId>commons-pool</artifactId>

@@ -1,3 +1,0 @@
-Bundle-SymbolicName: org.mule.transports.tcp
-Export-Package: org.mule.providers.tcp, org.mule.providers.tcp.protocols
-Require-Bundle: org.mule.core

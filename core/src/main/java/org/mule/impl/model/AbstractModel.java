@@ -46,14 +46,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentSkipListMap;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
-import java.beans.ExceptionListener;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * <code>MuleModel</code> is the default implementation of the UMOModel. The model
  * encapsulates and manages the runtime behaviour of a Mule Server instance. It is
@@ -407,7 +399,7 @@ public abstract class AbstractModel implements UMOModel
         else
         {
             component.stop();
-            logger.info("mule " + name + " has been stopped successfully");
+            logger.info("Mule " + name + " has been stopped successfully");
         }
     }
 

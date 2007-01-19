@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="FileReader" version="1.0">
+	<connector name="FileConnector" className="org.mule.providers.file.FileConnector"/>
+
+    <model name="model"> 		
+		<mule-descriptor name="TestUMO" implementation="org.mule.components.simple.BridgeComponent">
+            <inbound-router>
+                <endpoint address="vm://filesend"/>
+            </inbound-router>      
+            <outbound-router>
+                  <router className="org.mule.routing.outbound.ChainingRouter">
+                        <endpoint address="file://FirstWrite">
+                             <properties>
+                                    <property name="outputPattern" value="export.txt"/>
+                             </properties>
+                        </endpoint>                        
+                        <endpoint address="file://SecondWrite">
+                              <properties>
+                                    <property name="outputPattern" value="export.txt.OK"/>
+                              </properties>
+                        </endpoint>
+                </router>
+            </outbound-router>           
+        </mule-descriptor>
+	</model>	
+</mule-configuration>
+

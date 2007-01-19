@@ -22,6 +22,7 @@
         <agent name="jmxAgent" className="org.mule.management.agents.JmxAgent"/>
     </agents>
 
+    // TODO RM Ross, isn't jca model type ignored now?
     <model name="main" type="jca">
 
     </model>

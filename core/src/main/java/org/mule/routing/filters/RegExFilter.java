@@ -46,7 +46,7 @@ public class RegExFilter implements UMOFilter, ObjectFilter
             return false;
         }
 
-        return (pattern != null ? pattern.matcher(object.toString()).find() : false);
+        return (pattern != null && pattern.matcher(object.toString()).find());
     }
 
     public String getExpression()

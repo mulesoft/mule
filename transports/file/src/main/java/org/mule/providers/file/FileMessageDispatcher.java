@@ -102,7 +102,13 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
         }
 
         String filename;
+        // TODO MERGE check if it were a recent bugfix or smth
         String outPattern = message.getStringProperty(FileConnector.PROPERTY_OUTPUT_PATTERN, null);
+        // String outPattern = (String)endpoint.getProperty(FileConnector.PROPERTY_OUTPUT_PATTERN);
+        // if (outPattern == null)
+        // {
+        //    outPattern = message.getStringProperty(FileConnector.PROPERTY_OUTPUT_PATTERN, null);
+        //}
         if (outPattern == null)
         {
             outPattern = connector.getOutputPattern();
