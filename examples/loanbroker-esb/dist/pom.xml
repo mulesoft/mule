@@ -12,7 +12,7 @@
     <description>Demonstrates the Loan Broker using a typical ESB architecture with a shared Message Bus and is based on the example presented in the Enterprise Integration Patterns book. This chapter of the book is available online so you can see a detailed description of the application here (http://www.eaipatterns.com/ComposedMessagingWS.html).</description>
 
     <properties>
-        <muleVersion>2.0-REGISTRY</muleVersion>
+        <muleVersion>2.0-SNAPSHOT</muleVersion>
     </properties>
 
     <modules>
