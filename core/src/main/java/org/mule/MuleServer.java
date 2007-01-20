@@ -107,7 +107,7 @@ public class MuleServer implements Runnable
     {
         MuleServer server = new MuleServer(args);
         muleShutdownHook = new MuleShutdownHook(server);
-        server.start(false);
+        server.start(false, true);
 
     }
 
@@ -198,9 +198,12 @@ public class MuleServer implements Runnable
      * @param ownThread determines if the server will run in its own daemon thread or
      *                  the current calling thread
      */
-    public void start(boolean ownThread)
+    public void start(boolean ownThread, boolean registerShutdownHook)
     {
-        registerShutdownHook(muleShutdownHook);
+        if (registerShutdownHook)
+        {
+            registerShutdownHook(muleShutdownHook);
+        }
         if (ownThread)
         {
             Thread serverThread = new Thread(this, "MuleServer");
@@ -287,9 +290,6 @@ public class MuleServer implements Runnable
     {
         logger.info("Mule Server starting...");
 
-        // TODO Why is this disabled?
-        // registerShutdownHook();
-
         // install an RMI security manager in case we expose any RMI objects
         if (System.getSecurityManager() == null)
         {
@@ -349,7 +349,7 @@ public class MuleServer implements Runnable
      */
     public void shutdown()
     {
-        logger.info("Mule server shutting dow due to normal shutdown request");
+        logger.info("Mule server shutting down due to normal shutdown request");
         List msgs = new ArrayList();
         msgs.add(new Message(Messages.NORMAL_SHUTDOWN).getMessage());
         msgs.add(new Message(Messages.SERVER_STARTED_AT_X, new Date(MuleManager.getInstance().getStartDate())).getMessage());

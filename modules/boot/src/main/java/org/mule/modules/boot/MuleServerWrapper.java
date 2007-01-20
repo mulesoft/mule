@@ -44,7 +44,7 @@ public class MuleServerWrapper implements WrapperListener
     {
     	try {
         	mule = new MuleServer( args );
-            mule.start(false);
+            mule.start(false, false);
             return null;
     	} catch (Exception e) {
             e.printStackTrace();
