@@ -112,7 +112,7 @@
 #############################################################
 -initlevel 10
 -istart mule/mule-core.jar
--istart mule/mule-module-springcore.jar
+#-istart mule/mule-module-spring.jar
 -istart mule/mule-module-osgi.jar
 -istart mule/mule-transport-file.jar
 -istart mule/mule-transport-tcp.jar
