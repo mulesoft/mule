@@ -16,9 +16,11 @@ fi
 MULE_LIB=./conf
 export MULE_LIB
 
-if [ -f "$MULE_BASE/lib/user/activemq.jar" ]; then
+ACTIVEMQ=activemq-3.2.4.jar
+
+if [ -f "$MULE_BASE/lib/user/${ACTIVEMQ}" ]; then
     exec $MULE_BASE/bin/mule -config ./conf/error-config.xml
-elif [ -f "$MULE_HOME/lib/user/activemq.jar" ]; then
+elif [ -f "$MULE_HOME/lib/user/${ACTIVEMQ}" ]; then
     exec $MULE_BASE/bin/mule -config ./conf/error-config.xml
 else
     echo "This example requires additional libraries which need to be downloaded by the build script.  Please follow the instructions in the README.txt file."

@@ -34,7 +34,7 @@ public class RoundRobinXmlSplitter extends FilteringXmlMessageSplitter
     // We have to do some additional checks if we're going to allow filters on the
     // round robin endpoints
     // So for performance lets turn it off by default
-    protected boolean enableEndpointFiltering = false;
+    protected volatile boolean enableEndpointFiltering = false;
 
     public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous)
         throws RoutingException

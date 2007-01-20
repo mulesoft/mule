@@ -10,19 +10,11 @@
 
 package org.mule.routing.outbound;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.dom4j.Document;
-import org.dom4j.DocumentHelper;
-import org.dom4j.Element;
-import org.dom4j.Node;
-import org.dom4j.XPath;
-import org.dom4j.io.SAXReader;
 import org.mule.impl.MuleMessage;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
-import org.xml.sax.SAXException;
 
 import java.io.InputStream;
 import java.io.StringReader;
@@ -31,6 +23,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.dom4j.Document;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
+import org.dom4j.Node;
+import org.dom4j.XPath;
+import org.dom4j.io.SAXReader;
 
 /**
  * <code>FilteringXmlMessageSplitter</code> will split a DOM4J document into nodes
@@ -46,23 +46,24 @@ import java.util.Map;
 public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
 {
     // xml parser feature names for optional XSD validation
-    private static final String APACHE_XML_FEATURES_VALIDATION_SCHEMA = "http://apache.org/xml/features/validation/schema";
-    private static final String APACHE_XML_FEATURES_VALIDATION_SCHEMA_FULL_CHECKING = "http://apache.org/xml/features/validation/schema-full-checking";
+    public static final String APACHE_XML_FEATURES_VALIDATION_SCHEMA = "http://apache.org/xml/features/validation/schema";
+    public static final String APACHE_XML_FEATURES_VALIDATION_SCHEMA_FULL_CHECKING = "http://apache.org/xml/features/validation/schema-full-checking";
 
     // JAXP property for specifying external XSD location
-    private static final String JAXP_PROPERTIES_SCHEMA_SOURCE = "http://java.sun.com/xml/jaxp/properties/schemaSource";
+    public static final String JAXP_PROPERTIES_SCHEMA_SOURCE = "http://java.sun.com/xml/jaxp/properties/schemaSource";
 
     // JAXP properties for specifying external XSD language (as required by newer
     // JAXP implementation)
-    private static final String JAXP_PROPERTIES_SCHEMA_LANGUAGE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
-    private static final String JAXP_PROPERTIES_SCHEMA_LANGUAGE_VALUE = "http://www.w3.org/2001/XMLSchema";
+    public static final String JAXP_PROPERTIES_SCHEMA_LANGUAGE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
+    public static final String JAXP_PROPERTIES_SCHEMA_LANGUAGE_VALUE = "http://www.w3.org/2001/XMLSchema";
 
-    protected static ThreadLocal properties = new ThreadLocal();
-    protected static ThreadLocal nodes = new ThreadLocal();
-    protected String splitExpression = "";
-    protected Map namespaces = null;
-    protected boolean validateSchema = false;
-    protected String externalSchemaLocation = "";
+    protected static final ThreadLocal properties = new ThreadLocal();
+    protected static final ThreadLocal nodes = new ThreadLocal();
+
+    protected volatile String splitExpression = "";
+    protected volatile Map namespaces = null;
+    protected volatile boolean validateSchema = false;
+    protected volatile String externalSchemaLocation = "";
 
     public void setSplitExpression(String splitExpression)
     {
@@ -141,21 +142,7 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
                 String xml = (String)src;
                 SAXReader reader = new SAXReader();
                 setDoSchemaValidation(reader, isValidateSchema());
-
-                InputStream xsdAsStream = IOUtils.getResourceAsStream(getExternalSchemaLocation(), getClass());
-                if (xsdAsStream == null)
-                {
-                    throw new IllegalArgumentException("Couldn't find schema at "
-                                                       + getExternalSchemaLocation());
-                }
-
-                // Set schema language property (must be done before the schemaSource
-                // is set)
-                reader.setProperty(JAXP_PROPERTIES_SCHEMA_LANGUAGE, JAXP_PROPERTIES_SCHEMA_LANGUAGE_VALUE);
-
-                // Need this one to map schemaLocation to a physical location
-                reader.setProperty(JAXP_PROPERTIES_SCHEMA_SOURCE, xsdAsStream);
-
+                
                 dom4jDoc = reader.read(new StringReader(xml));
             }
             else if (src instanceof org.dom4j.Document)
@@ -281,10 +268,32 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
         return null;
     }
 
-    protected void setDoSchemaValidation(SAXReader reader, boolean validate) throws SAXException
+    protected void setDoSchemaValidation(SAXReader reader, boolean validate) throws Exception
     {
         reader.setValidation(validate);
         reader.setFeature(APACHE_XML_FEATURES_VALIDATION_SCHEMA, validate);
         reader.setFeature(APACHE_XML_FEATURES_VALIDATION_SCHEMA_FULL_CHECKING, true);
+        
+        /*
+         * By default we're not validating against an XSD. If this is the case,
+         * there's no need to continue here, so we bail.
+         */
+        if (!validate) {
+         return;
+        }
+
+        InputStream xsdAsStream = IOUtils.getResourceAsStream(getExternalSchemaLocation(), getClass());
+        if (xsdAsStream == null)
+        {
+            throw new IllegalArgumentException("Couldn't find schema at "
+                                               + getExternalSchemaLocation());
+        }
+
+        // Set schema language property (must be done before the schemaSource
+        // is set)
+        reader.setProperty(JAXP_PROPERTIES_SCHEMA_LANGUAGE, JAXP_PROPERTIES_SCHEMA_LANGUAGE_VALUE);
+
+        // Need this one to map schemaLocation to a physical location
+        reader.setProperty(JAXP_PROPERTIES_SCHEMA_SOURCE, xsdAsStream);
     }
 }

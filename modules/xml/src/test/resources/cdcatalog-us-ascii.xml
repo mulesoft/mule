@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<catalog>
+    <cd>
+        <title>De f&#248;rste k&#230;rester p&#229; m&#229;nen</title>
+        <artist>TV-2</artist>
+        <country>Danmark</country>
+        <company>Columbia</company>
+        <price>149</price>
+        <year>2005</year>
+    </cd>
+    <cd>
+        <title>&#26149;&#12398;&#12363;&#12383;&#12415;</title>
+        <artist>&#20803;&#12385;&#12392;&#12379;</artist>
+        <country>Japan</country>
+        <company>Sony Records</company>
+        <price>42</price>
+        <year>2006</year>
+    </cd>
+</catalog>

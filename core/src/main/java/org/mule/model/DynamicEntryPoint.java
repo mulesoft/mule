@@ -21,20 +21,25 @@ import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.model.UMOEntryPoint;
 import org.mule.util.ClassUtils;
 
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>DynamicEntryPoint</code> is used to detemine the entry point on a bean
  * after an event has been received for it. The entrypoint is then discovered using
- * the event payload type as the argument. An entry point will try and be matched for
- * different argument types so it's possible to have multiple entry points on a
+ * the event payload type as the argument. An entry point will try and match for
+ * different argument types, so it's possible to have multiple entry points on a
  * single component.
  */
 
@@ -45,33 +50,45 @@ public class DynamicEntryPoint implements UMOEntryPoint
      */
     protected static final Log logger = LogFactory.getLog(DynamicEntryPoint.class);
 
-    private Map entryPoints = new HashMap();
-    private Method currentMethod;
+    // we don't want to match these methods when looking for a service method
+    protected static final Set ignoredMethods = new HashSet(Arrays.asList(new String[]{"equals",
+        "getInvocationHandler"}));
 
-    // we don't want to match these methods when looking for a service method to
-    // invoke
-    protected String[] ignoreMethods = new String[]{"equals", "getInvocationHandler"};
+    // @GuardedBy(itself)
+    private final ConcurrentMap entryPoints = new ConcurrentHashMap();
+
+    private volatile Method currentMethod;
+
+    public DynamicEntryPoint()
+    {
+        super();
+    }
+
+    public boolean isVoid()
+    {
+        return (currentMethod != null ? currentMethod.getReturnType().getName().equals("void") : false);
+    }
+
+    public String getMethodName()
+    {
+        return (currentMethod != null ? currentMethod.getName() : null);
+    }
 
     public Class[] getParameterTypes()
     {
-        if (currentMethod == null)
-        {
-            return null;
-        }
-        return currentMethod.getParameterTypes();
+        return (currentMethod != null ? currentMethod.getParameterTypes() : null);
     }
 
-    public synchronized Object invoke(Object component, UMOEventContext context) throws Exception
+    public Object invoke(Object component, UMOEventContext context) throws Exception
     {
-        Object payload = null;
         Method method = null;
+        Object payload = null;
 
-        // Transports such as Soap need he method property to be ignorred
-        Boolean ignoreMethod = (Boolean)context.getMessage().removeProperty(
-            MuleProperties.MULE_IGNORE_METHOD_PROPERTY);
-        boolean ignore = (ignoreMethod == null ? false : ignoreMethod.booleanValue());
+        // Transports such as SOAP need to ignore the method property
+        boolean ignoreMethod = BooleanUtils.toBoolean((Boolean)context.getMessage().removeProperty(
+            MuleProperties.MULE_IGNORE_METHOD_PROPERTY));
 
-        if (!ignore)
+        if (!ignoreMethod)
         {
             // Check for method override and remove it from the event
             Object methodOverride = context.getMessage().removeProperty(MuleProperties.MULE_METHOD_PROPERTY);
@@ -90,20 +107,25 @@ public class DynamicEntryPoint implements UMOEntryPoint
             }
         }
 
+        // do we need to lookup the method?
         if (method == null)
         {
+            // prefer Callable
             if (component instanceof Callable)
             {
                 method = Callable.class.getMethods()[0];
                 payload = context;
             }
-            if (method == null)
+            else
             {
-                method = getMethod(component, context);
+                // no Callable: try to find the method dynamically
+                // first we try to find a method that accepts UMOEventContext
+                method = (Method)entryPoints.get(context.getClass().getName());
                 if (method == null)
                 {
+                    // if that failed we try to find the method by payload
                     payload = context.getTransformedMessage();
-                    method = getMethod(component, payload);
+                    method = (Method)entryPoints.get(payload.getClass().getName());
                     if (method != null)
                     {
                         RequestContext.rewriteEvent(new MuleMessage(payload, context.getMessage()));
@@ -115,123 +137,108 @@ public class DynamicEntryPoint implements UMOEntryPoint
                 }
             }
         }
-        if (method != null)
-        {
-            validateMethod(component, method, method.getName());
 
-            currentMethod = method;
-            if (payload == null)
-            {
-                payload = context.getTransformedMessage();
-                RequestContext.rewriteEvent(new MuleMessage(payload, context.getMessage()));
-            }
-            return invokeCurrent(component, payload);
-        }
+        // method is not in cache, so find it
+        if (method == null)
+        {
+            // do any methods on the component accept a context?
+            List methods = ClassUtils.getSatisfiableMethods(component.getClass(), ClassUtils
+                .getClassTypes(context), true, false, ignoredMethods);
 
-        // Are any methods on the component accepting an context?
-        List methods = ClassUtils.getSatisfiableMethods(component.getClass(),
-            ClassUtils.getClassTypes(context), true, false, ignoreMethods);
-        if (methods.size() > 1)
-        {
-            TooManySatisfiableMethodsException tmsmex = new TooManySatisfiableMethodsException(
-                component.getClass());
-            throw new InvocationTargetException(tmsmex, "There must be only one method accepting "
-                                                        + context.getClass().getName() + " in component "
-                                                        + component.getClass().getName());
-        }
-        else if (methods.size() == 1)
-        {
-            if (logger.isDebugEnabled())
+            int numMethods = methods.size();
+            if (numMethods > 1)
             {
-                logger.debug("Dynamic Entrypoint using method: " + component.getClass().getName() + "."
-                             + ((Method)methods.get(0)).getName() + "(" + context.getClass().getName() + ")");
+                // too many methods match the context argument
+                TooManySatisfiableMethodsException tmsmex = new TooManySatisfiableMethodsException(component
+                    .getClass());
+                throw new InvocationTargetException(tmsmex, "There must be only one method accepting "
+                                + context.getClass().getName() + " in component "
+                                + component.getClass().getName());
             }
-            addMethod(component, (Method)methods.get(0), context.getClass());
-            return invokeCurrent(component, context);
-        }
-        else
-        {
-            methods = ClassUtils.getSatisfiableMethods(component.getClass(),
-                ClassUtils.getClassTypes(payload), true, true, ignoreMethods);
-            if (methods.size() > 1)
+            else if (numMethods == 1)
             {
-                throw new TooManySatisfiableMethodsException(component.getClass());
-            }
-            if (methods.size() == 1)
-            {
+                // found exact match for method with context argument
                 if (logger.isDebugEnabled())
                 {
                     logger.debug("Dynamic Entrypoint using method: " + component.getClass().getName() + "."
-                                 + ((Method)methods.get(0)).getName() + "(" + payload.getClass().getName()
-                                 + ")");
+                                    + ((Method)methods.get(0)).getName() + "(" + context.getClass().getName()
+                                    + ")");
                 }
-                addMethod(component, (Method)methods.get(0), payload.getClass());
-                return invokeCurrent(component, payload);
+
+                method = (Method)methods.get(0);
+                Method previous = (Method)entryPoints.putIfAbsent(context.getClass().getName(), method);
+                if (previous != null)
+                {
+                    method = previous;
+                }
+
+                payload = context;
             }
             else
             {
-                throw new NoSatisfiableMethodsException(component.getClass(),
-                    ClassUtils.getClassTypes(payload));
+                // no method for context: try payload
+                payload = context.getTransformedMessage();
+                RequestContext.rewriteEvent(new MuleMessage(payload, context.getMessage()));
+
+                methods = ClassUtils.getSatisfiableMethods(component.getClass(), ClassUtils
+                    .getClassTypes(payload), true, true, ignoredMethods);
+
+                numMethods = methods.size();
+
+                if (numMethods > 1)
+                {
+                    // too many methods match the payload argument
+                    throw new TooManySatisfiableMethodsException(component.getClass());
+                }
+                else if (numMethods == 1)
+                {
+                    // found exact match for payload argument
+                    method = (Method)methods.get(0);
+                    Method previous = (Method)entryPoints.putIfAbsent(payload.getClass().getName(), method);
+                    if (previous != null)
+                    {
+                        method = previous;
+                    }
+
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Dynamic Entrypoint using method: " + component.getClass().getName()
+                                        + "." + method.getName() + "(" + payload.getClass().getName() + ")");
+                    }
+                }
+                else
+                {
+                    // no method for payload argument either - bail out
+                    throw new NoSatisfiableMethodsException(component.getClass(), ClassUtils
+                        .getClassTypes(payload));
+                }
             }
         }
-    }
 
-    /**
-     * This method can be used to validate that the method exists and is allowed to
-     * be executed.
-     * 
-     * @param component
-     * @param method
-     * @param methodName
-     * @throws Exception
-     */
-    protected void validateMethod(Object component, Method method, String methodName) throws Exception
-    {
-        boolean fallback = component instanceof Callable;
-        if (method == null && !fallback)
-        {
-            throw new NoSuchMethodException(new Message(Messages.METHOD_X_WITH_PARAMS_X_NOT_FOUND_ON_X,
-                methodName, "unknown", component.getClass().getName()).toString());
-        }
-        // This will throw NoSuchMethodException if it doesn't exist
-        try
-        {
-            component.getClass().getMethod(method.getName(), method.getParameterTypes());
-        }
-        catch (Exception e)
-        {
-            if (!fallback) throw e;
-        }
-    }
-
-    protected Method getMethod(Object component, Object arg)
-    {
-        return (Method)entryPoints.get(component.getClass().getName() + ":" + arg.getClass().getName());
-    }
-
-    protected void addMethod(Object component, Method method, Class arg)
-    {
-        entryPoints.put(component.getClass().getName() + ":" + arg.getName(), method);
+        // remember the last invoked method
         currentMethod = method;
+
+        if (payload == null)
+        {
+            payload = context.getTransformedMessage();
+            RequestContext.rewriteEvent(new MuleMessage(payload, context.getMessage()));
+        }
+
+        return this.invokeMethod(component, method, payload);
     }
 
     /**
-     * Will invoke the entry point method on the given component
-     * 
-     * @param component the component to invoke
-     * @param arg the argument to pass to the method invocation
-     * @return An object (if any) returned by the invocation
-     * @throws InvocationTargetException
-     * @throws IllegalAccessException
+     * This method will actually invoke the given method on the given component.
      */
-    private Object invokeCurrent(Object component, Object arg)
+    protected Object invokeMethod(Object component, Method method, Object arg)
         throws InvocationTargetException, IllegalAccessException
     {
         String methodCall = null;
+
         if (logger.isDebugEnabled())
         {
             methodCall = component.getClass().getName() + "." + currentMethod.getName() + "("
-                         + arg.getClass().getName() + ")";
+                            + arg.getClass().getName() + ")";
             logger.debug("Invoking " + methodCall);
         }
 
@@ -255,29 +262,48 @@ public class DynamicEntryPoint implements UMOEntryPoint
         {
             args = new Object[]{arg};
         }
-        Object result = currentMethod.invoke(component, args);
+
+        Object result = method.invoke(component, args);
+
         if (logger.isDebugEnabled())
         {
             logger.debug("Result of call " + methodCall + " is " + (result == null ? "null" : "not null"));
         }
+
         return result;
     }
 
-    public boolean isVoid()
+    /**
+     * This method can be used to validate that the method exists and is allowed to
+     * be executed.
+     */
+    protected void validateMethod(Object component, Method method, String methodName) throws Exception
     {
-        if (currentMethod == null)
+        boolean fallback = component instanceof Callable;
+
+        if (method != null)
         {
-            return false;
+            // This will throw NoSuchMethodException if it doesn't exist
+            try
+            {
+                component.getClass().getMethod(method.getName(), method.getParameterTypes());
+            }
+            catch (Exception e)
+            {
+                if (!fallback)
+                {
+                    throw e;
+                }
+            }
         }
-        return currentMethod.getReturnType().getName().equals("void");
+        else
+        {
+            if (!fallback)
+            {
+                throw new NoSuchMethodException(new Message(Messages.METHOD_X_WITH_PARAMS_X_NOT_FOUND_ON_X,
+                    methodName, "unknown", component.getClass().getName()).toString());
+            }
+        }
     }
 
-    public String getMethodName()
-    {
-        if (currentMethod == null)
-        {
-            return null;
-        }
-        return currentMethod.getName();
-    }
 }

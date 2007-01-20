@@ -15,14 +15,24 @@ fi
 # Any changes to the files in ./conf will take precedence over those deployed to $MULE_HOME/lib/user
 MULE_LIB=./conf
 export MULE_LIB
+ACTIVEMQ=activemq-3.4.2.jar
+OPENEJB=openejb-core-1.0.jar
 
-GROOVY=groovy-all-1.0.jar
+if [ ! -f "$MULE_BASE/lib/user/${OPENEJB}" ]; then
+   if [ ! -f "$MULE_HOME/lib/user/${OPENEJB}" ]; then
+      MISSING_LIB=1
+   fi
+fi
 
-# Check for additional libraries
-if [ -f "$MULE_BASE/lib/user/${GROOVY}" ]; then
-        exec $MULE_BASE/bin/mule -config ./conf/scripting-config.xml
-elif [ -f "$MULE_HOME/lib/user/${GROOVY}" ]; then
-        exec $MULE_BASE/bin/mule -config ./conf/scripting-config.xml
+if [ ! -f "$MULE_BASE/lib/user/${ACTIVEMQ}" ]; then
+   if [ ! -f "$MULE_HOME/lib/user/${ACTIVEMQ}" ]; then
+      MISSING_LIB=1
+   fi
+fi
+
+if [ -z "$MISSING_LIB" ]
+then
+    exec $MULE_BASE/bin/mule -main org.mule.samples.loanbroker.esb.Main
 else
     echo "This example requires additional libraries which need to be downloaded by the build script.  Please follow the instructions in the README.txt file."
 fi

@@ -234,7 +234,7 @@ public abstract class AbstractTransformer implements UMOTransformer
             else
             {
                 throw new TransformerException(new Message(Messages.TRANSFORM_X_UNSUPORTED_TYPE_X_ENDPOINT_X,
-                    getName(), src.getClass().getName(), endpoint.getEndpointURI()), this);
+                    getName(), src.getClass().getName(), (endpoint != null ? endpoint.getEndpointURI() : null)), this);
             }
         }
 

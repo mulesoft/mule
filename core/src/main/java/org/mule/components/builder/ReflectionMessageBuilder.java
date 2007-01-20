@@ -16,7 +16,10 @@ import org.mule.umo.UMOMessage;
 import org.mule.util.ClassUtils;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Will try and set the result of an invocation as a bean property on the request
@@ -26,7 +29,7 @@ public class ReflectionMessageBuilder extends AbstractMessageBuilder
 {
 
     // we don't want to match these methods when looking for a method
-    protected String[] ignoreMethods = new String[]{"equals", "getInvocationHandler"};
+    protected final Set ignoreMethods = new HashSet(Arrays.asList(new String[]{"equals", "getInvocationHandler"}));
 
     public Object buildMessage(UMOMessage request, UMOMessage response) throws MessageBuilderException
     {

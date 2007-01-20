@@ -14,7 +14,6 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractPollingMessageReceiver;
-import org.mule.providers.http.extras.URLAuthenticator;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -22,9 +21,9 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.util.MapUtils;
+import org.mule.util.Base64;
 
 import java.io.InputStream;
-import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -43,25 +42,18 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
     private URL pollUrl;
 
     private int defaultBufferSize = 1024 * 32;
-    
-    private URLAuthenticator authenticator;
-    
+
     public PollingHttpMessageReceiver(UMOConnector connector,
                                       UMOComponent component,
                                       final UMOEndpoint endpoint) throws InitialisationException
     {
         this(connector, component, endpoint, AbstractPollingMessageReceiver.DEFAULT_POLL_FREQUENCY);
 
-        long pollingFrequency = MapUtils.getLongValue(endpoint.getProperties(), "pollingFrequency", -1);
+        long pollingFrequency = MapUtils.getLongValue(endpoint.getProperties(), "pollingFrequency",
+            -1);
         if (pollingFrequency > 0)
         {
             setFrequency(pollingFrequency);
-        }
-        if (endpoint.getEndpointURI().getUserInfo() != null){
-            this.authenticator = new URLAuthenticator(endpoint.getEndpointURI().getUsername(), endpoint.getEndpointURI().getPassword());
-        }
-        else{
-            this.authenticator = new URLAuthenticator("","");
         }
     }
 
@@ -75,17 +67,11 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
         try
         {
             pollUrl = new URL(endpoint.getEndpointURI().getAddress());
-            if (endpoint.getEndpointURI().getUserInfo() != null){
-                this.authenticator = new URLAuthenticator(endpoint.getEndpointURI().getUsername(), endpoint.getEndpointURI().getPassword());
-            }
-            else{
-                this.authenticator = new URLAuthenticator("","");
-            }
         }
         catch (MalformedURLException e)
         {
-            throw new InitialisationException(new Message(Messages.VALUE_X_IS_INVALID_FOR_X, endpoint
-                .getEndpointURI().getAddress(), "uri"), e, this);
+            throw new InitialisationException(new Message(Messages.VALUE_X_IS_INVALID_FOR_X,
+                endpoint.getEndpointURI().getAddress(), "uri"), e, this);
         }
     }
 
@@ -93,9 +79,9 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
     {
         // template method
     }
-    
+
     protected void doConnect() throws Exception
-    {       
+    {
         URL url = null;
         String connectUrl = (String)endpoint.getProperties().get("connectUrl");
         if (connectUrl == null)
@@ -117,9 +103,15 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
     }
 
     public void poll() throws Exception
-    { 
-        setAuthenticator(this.authenticator);
+    {
         HttpURLConnection connection = (HttpURLConnection)pollUrl.openConnection();
+        String authentication = endpoint.getEndpointURI().getUserInfo();
+        if (authentication != null)
+        {
+            connection.setRequestProperty("Authorization", "Basic "
+                                                           + Base64.encodeBytes(authentication
+                                                               .getBytes()));
+        }
 
         int len = 0;
         int bytesWritten = 0;
@@ -178,9 +170,5 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
         connection.disconnect();
         UMOMessage message = new MuleMessage(adapter);
         routeMessage(message, endpoint.isSynchronous());
-    }
-    
-    public void setAuthenticator(URLAuthenticator auth){
-        Authenticator.setDefault(auth);
     }
 }

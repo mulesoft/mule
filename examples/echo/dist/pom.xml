@@ -86,9 +86,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <!-- The overWrite functionality is documented but not available in the latest 
-                    released version (see http://jira.codehaus.org/browse/MDEP-35) -->
-                <version>2.0-20060907.213033-3</version>
                 <executions>
                     <execution>
                         <id>copy-artifact</id>

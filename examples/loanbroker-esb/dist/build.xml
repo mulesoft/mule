@@ -37,21 +37,21 @@
     <target name="get.libraries">
             
         <get src="${url.maven.repo}/activemq/activemq/3.2.4/activemq-3.2.4.jar"
-             dest="${dir.user.lib}/activemq.jar"
+             dest="${dir.user.lib}/activemq-3.2.4.jar"
              verbose="true"
              usetimestamp="true"/>
         <!-- Used by ActiveMQ -->
         <get src="${url.maven.repo}/concurrent/concurrent/1.3.4/concurrent-1.3.4.jar"
-             dest="${dir.user.lib}/concurrent.jar"
+             dest="${dir.user.lib}/concurrent-1.3.4.jar"
              verbose="true"
              usetimestamp="true"/>
         <get src="${url.maven.repo}/openejb/openejb-core/1.0/openejb-core-1.0.jar"
-             dest="${dir.user.lib}/openejb.jar"
+             dest="${dir.user.lib}/openejb-core-1.0.jar"
              verbose="true"
              usetimestamp="true"/>
         <!-- Used by OpenEJB -->
         <get src="${url.maven.repo}/castor/castor/0.9.9/castor-0.9.9.jar"
-             dest="${dir.user.lib}/castor.jar"
+             dest="${dir.user.lib}/castor-0.9.9.jar"
              verbose="true"
              usetimestamp="true"/>
     </target>

@@ -10,13 +10,6 @@
 
 package org.mule.test.util;
 
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.util.Enumeration;
-import java.util.List;
-
-import junit.framework.TestCase;
-
 import org.mule.tck.testmodels.fruit.AbstractFruit;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
@@ -26,12 +19,22 @@ import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.fruit.WaterMelon;
 import org.mule.util.ClassUtils;
 
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import junit.framework.TestCase;
+
 public class ClassUtilsTestCase extends TestCase
 {
 
     // we do not want to match these methods when looking for a service method to
     // invoke
-    protected String[] ignoreMethods = new String[]{"equals", "getInvocationHandler"};
+    protected final Set ignoreMethods = new HashSet(Arrays.asList(new String[]{"equals", "getInvocationHandler"}));
 
     public void testIsConcrete() throws Exception
     {

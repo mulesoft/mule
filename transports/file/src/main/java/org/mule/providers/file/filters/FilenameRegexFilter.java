@@ -13,10 +13,24 @@ package org.mule.providers.file.filters;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * <code>FilenameRegexFilter</code> filters incoming files from a directory, based
+ * on a regular expression. If the expression evaluates to true, then the file will
+ * be accepted.
+ */
 public class FilenameRegexFilter extends FilenameWildcardFilter
 {
-    protected Pattern[] compiledPatterns = null;
+    protected volatile Pattern[] compiledPatterns = null;
 
+    /**
+     * UMOFilter condition decider method.
+     * <p>
+     * Returns <code>boolean</code> <code>TRUE</code> if the file conforms to the
+     * regular expression pattern or <code>FALSE</code> otherwise.
+     * 
+     * @param name The name of the file to apply the filter to.
+     * @return indication of acceptance as boolean.
+     */
     // @Override
     public boolean accept(Object object)
     {
@@ -49,6 +63,11 @@ public class FilenameRegexFilter extends FilenameWildcardFilter
         return foundMatch;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.routing.filters.WildcardFilter#setCaseSensitive(boolean)
+     */
     // @Override
     public void setCaseSensitive(boolean caseSensitive)
     {
@@ -56,6 +75,11 @@ public class FilenameRegexFilter extends FilenameWildcardFilter
         this.setPattern(pattern);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.routing.filters.WildcardFilter#setPattern(java.lang.String)
+     */
     // @Override
     public void setPattern(String pattern)
     {

@@ -36,7 +36,7 @@ public class DomDocumentToXml extends AbstractXmlTransformer
             if (byte[].class.equals(returnClass))
                 return convertToBytes(src, encoding);
             else
-                return convertToText(src);
+            	return convertToText(src, encoding);
         }
         catch (Exception e)
         {

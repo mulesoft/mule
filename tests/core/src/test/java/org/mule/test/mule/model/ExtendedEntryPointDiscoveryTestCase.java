@@ -34,11 +34,6 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.util.EventObject;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
- * @version $Revision$
- */
 public class ExtendedEntryPointDiscoveryTestCase extends AbstractEntryPointDiscoveryTestCase
 {
     /** Name of the method override property on the event. */
@@ -47,11 +42,6 @@ public class ExtendedEntryPointDiscoveryTestCase extends AbstractEntryPointDisco
     /** Name of the non-existent method. */
     private static final String INVALID_METHOD_NAME = "nosuchmethod";
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.model.AbstractEntryPointDiscoveryTestCase#getComponentMappings()
-     */
     public ComponentMethodMapping[] getComponentMappings()
     {
         ComponentMethodMapping[] mappings = new ComponentMethodMapping[4];
@@ -63,11 +53,6 @@ public class ExtendedEntryPointDiscoveryTestCase extends AbstractEntryPointDisco
         return mappings;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.model.AbstractEntryPointDiscoveryTestCase#getDescriptorToResolve(java.lang.String)
-     */
     public UMODescriptor getDescriptorToResolve(String className) throws Exception
     {
         UMODescriptor descriptor = super.getDescriptorToResolve(className);
@@ -87,11 +72,6 @@ public class ExtendedEntryPointDiscoveryTestCase extends AbstractEntryPointDisco
         return descriptor;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.model.AbstractEntryPointDiscoveryTestCase#getEntryPointResolver()
-     */
     public UMOEntryPointResolver getEntryPointResolver()
     {
         return new DynamicEntryPointResolver();
@@ -104,15 +84,14 @@ public class ExtendedEntryPointDiscoveryTestCase extends AbstractEntryPointDisco
     public void testFailEntryPointMultipleEventContextMatches() throws Exception
     {
         UMOEntryPointResolver epd = getEntryPointResolver();
-        UMODescriptor descriptor = getTestDescriptor("badContexts",
-            MultipleEventContextsTestObject.class.getName());
+        UMODescriptor descriptor = getTestDescriptor("badContexts", MultipleEventContextsTestObject.class
+            .getName());
 
-        UMOEntryPoint ep;
-        ep = epd.resolveEntryPoint(descriptor);
-        assertTrue(ep != null);
+        UMOEntryPoint ep = epd.resolveEntryPoint(descriptor);
+        assertNotNull(ep);
+
         try
         {
-
             RequestContext.setEvent(getTestEvent("Hello"));
             ep.invoke(new MultipleEventContextsTestObject(), RequestContext.getEventContext());
             fail("Should have failed to find entrypoint.");
@@ -143,19 +122,17 @@ public class ExtendedEntryPointDiscoveryTestCase extends AbstractEntryPointDisco
     public void testFailEntryPointMultiplePayloadMatches() throws Exception
     {
         UMOEntryPointResolver epd = getEntryPointResolver();
-        UMODescriptor descriptor = getTestDescriptor("badPayloads",
-            MultiplePayloadsTestObject.class.getName());
+        UMODescriptor descriptor = getTestDescriptor("badPayloads", MultiplePayloadsTestObject.class
+            .getName());
 
-        UMOEntryPoint ep;
-        ep = epd.resolveEntryPoint(descriptor);
-        assertTrue(ep != null);
+        UMOEntryPoint ep = epd.resolveEntryPoint(descriptor);
+        assertNotNull(ep);
+
         try
         {
-
             RequestContext.setEvent(getTestEvent("Hello"));
             ep.invoke(new MultiplePayloadsTestObject(), RequestContext.getEventContext());
             fail("Should have failed to find entrypoint.");
-
         }
         catch (TooManySatisfiableMethodsException itex)
         {
@@ -165,7 +142,6 @@ public class ExtendedEntryPointDiscoveryTestCase extends AbstractEntryPointDisco
         {
             RequestContext.setEvent(null);
         }
-
     }
 
     /**
@@ -178,13 +154,11 @@ public class ExtendedEntryPointDiscoveryTestCase extends AbstractEntryPointDisco
         UMOEntryPointResolver epd = getEntryPointResolver();
         UMODescriptor descriptor = getDescriptorToResolve(FruitBowl.class.getName());
 
-        UMOEntryPoint ep = null;
-        ep = epd.resolveEntryPoint(descriptor);
+        UMOEntryPoint ep = epd.resolveEntryPoint(descriptor);
         assertNotNull(ep);
 
         try
         {
-
             RequestContext.setEvent(getTestEvent(new FruitLover("Yummy!")));
 
             // those are usually set on the endpoint and copied over to the message
@@ -273,4 +247,5 @@ public class ExtendedEntryPointDiscoveryTestCase extends AbstractEntryPointDisco
             RequestContext.setEvent(null);
         }
     }
+
 }

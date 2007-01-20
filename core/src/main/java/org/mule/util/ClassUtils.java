@@ -23,9 +23,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * This class is useful for loading resources and classes in a fault tolerant manner
@@ -434,39 +434,45 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      * @param implementation the class to build methods on
      * @param parameterTypes the argument param types to look for
      * @param voidOk whether void methods shouldbe included in the found list
-     * @param matchOnObject Determines whether parameters of OBject type are matched
+     * @param matchOnObject determines whether parameters of OBject type are matched
      *            when they are of Object.class type
-     * @param ignoreMethods An array of method names to ignore. Often 'equals' is not
+     * @param ignoredMethodNames a Set of method names to ignore. Often 'equals' is not
      *            a desired match. This argument can be null.
-     * @return a list of methods on the class that match the criteria. If there are
+     * @return a List of methods on the class that match the criteria. If there are
      *         none, an empty list is returned
      */
     public static List getSatisfiableMethods(Class implementation,
                                              Class[] parameterTypes,
                                              boolean voidOk,
                                              boolean matchOnObject,
-                                             String[] ignoreMethods)
+                                             Set ignoredMethodNames)
     {
         List result = new ArrayList();
-        List ignore = (ignoreMethods == null ? Collections.EMPTY_LIST : Arrays.asList(ignoreMethods));
-        List methods = Arrays.asList(implementation.getMethods());
-        for (Iterator iterator = methods.iterator(); iterator.hasNext();)
+
+        if (ignoredMethodNames == null)
         {
-            Method method = (Method)iterator.next();
+            ignoredMethodNames = Collections.EMPTY_SET;
+        }
+
+        Method[] methods = implementation.getMethods();
+        for (int i = 0; i < methods.length; i++)
+        {
+            Method method = methods[i];
             Class[] methodParams = method.getParameterTypes();
 
             if (compare(methodParams, parameterTypes, matchOnObject))
             {
-                if (!ignore.contains(method.getName()))
+                if (!ignoredMethodNames.contains(method.getName()))
                 {
-                    if ((method.getReturnType().getName().equals("void") && voidOk)
-                                    || !method.getReturnType().getName().equals("void"))
+                    String returnType = method.getReturnType().getName();
+                    if ((returnType.equals("void") && voidOk) || !returnType.equals("void"))
                     {
                         result.add(method);
                     }
                 }
             }
         }
+
         return result;
     }
 

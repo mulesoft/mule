@@ -25,11 +25,11 @@
     <!-- Download any additional libraries needed to run the application -->
     <target name="get.libraries">
         <get src="${url.mule-deps.repo}/com/sun/script/groovy/20061114/groovy-20061114-jdk14.jar"
-             dest="${dir.user.lib}/groovy-engine.jar"
+             dest="${dir.user.lib}/groovy-20061114-jdk14.jar"
              verbose="true"
              usetimestamp="true"/>
         <get src="${url.maven.repo}/groovy/groovy-all/1.0/groovy-all-1.0.jar"
-             dest="${dir.user.lib}/groovy.jar"
+             dest="${dir.user.lib}/groovy-all-1.0.jar"
              verbose="true"
              usetimestamp="true"/>
     </target>

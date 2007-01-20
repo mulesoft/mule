@@ -35,7 +35,7 @@
         <dependency>
             <groupId>groovy</groupId>
             <artifactId>groovy-all</artifactId>
-            <version>1.0-RC-02</version>
+            <version>1.0</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
@@ -102,9 +102,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <!-- The overWrite functionality is documented but not available in the latest
-                    released version (see http://jira.codehaus.org/browse/MDEP-35) -->
-                <version>2.0-20060907.213033-3</version>
                 <executions>
                     <execution>
                         <id>copy-artifact</id>
@@ -128,13 +125,11 @@
                                     <artifactId>groovy</artifactId>
                                     <version>20061114</version>
                                     <classifier>jdk14</classifier>
-                                    <destFileName>groovy-engine.jar</destFileName>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>groovy</groupId>
                                     <artifactId>groovy-all</artifactId>
                                     <version>1.0</version>
-                                    <destFileName>groovy.jar</destFileName>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>

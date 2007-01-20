@@ -91,8 +91,8 @@ public class LibraryDownloader
         try
         {
             libraries.add(getLibrary(REPO_CENTRAL, "/javax/activation/activation/1.1/activation-1.1.jar",
-                "activation.jar"));
-            libraries.add(getLibrary(REPO_CENTRAL, "/javax/mail/mail/1.4/mail-1.4.jar", "mail.jar"));
+                "activation-1.1.jar"));
+            libraries.add(getLibrary(REPO_CENTRAL, "/javax/mail/mail/1.4/mail-1.4.jar", "mail-1.4.jar"));
             return libraries;
         }
         catch (UnknownHostException uhe)
