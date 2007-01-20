@@ -148,14 +148,15 @@ public class MuleServer implements Runnable
             {
                 config = configUrl.toExternalForm();
             }
+            else
+            {
+                System.out.println(new Message(Messages.CONFIG_NOT_FOUND_USAGE));
+                System.exit(-1);
+            }
         }
         if (config != null)
         {
             setConfigurationResources(config);
-        }
-        else if (!options.containsKey("idle"))
-        {
-            throw new IllegalArgumentException(new Message(Messages.CONFIG_NOT_FOUND_USAGE).toString());
         }
 
         // Configuration builder
