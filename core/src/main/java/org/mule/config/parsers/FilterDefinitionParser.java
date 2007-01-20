@@ -7,9 +7,8 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extras.spring.config.parsers;
+package org.mule.config.parsers;
 
-import org.mule.extras.spring.config.AbstractChildBeanDefinitionParser;
 import org.mule.routing.filters.EqualsFilter;
 import org.mule.routing.filters.ExceptionTypeFilter;
 import org.mule.routing.filters.MessagePropertyFilter;

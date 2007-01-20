@@ -7,15 +7,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extras.spring.config.parsers;
+package org.mule.config.parsers;
 
-import org.mule.extras.spring.config.AbstractChildBeanDefinitionParser;
-import org.mule.providers.SimpleRetryConnectionStrategy;
-import org.mule.util.ClassUtils;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.w3c.dom.Element;
+import org.mule.providers.SimpleRetryConnectionStrategy;
+import org.mule.util.ClassUtils;
+
 import org.springframework.beans.FatalBeanException;
+import org.w3c.dom.Element;
 
 /**
  * TODO

@@ -9,7 +9,7 @@
  */
 package org.mule.extras.spring.config.handlers;
 
-import org.mule.extras.spring.config.parsers.FilterDefinitionParser;
+import org.mule.config.parsers.FilterDefinitionParser;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 

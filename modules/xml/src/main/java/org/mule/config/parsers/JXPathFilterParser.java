@@ -9,8 +9,6 @@
  */
 package org.mule.config.parsers;
 
-import org.mule.extras.spring.config.parsers.SimpleChildDefinitionParser;
-
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;

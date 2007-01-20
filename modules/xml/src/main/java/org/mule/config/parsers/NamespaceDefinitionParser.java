@@ -9,14 +9,12 @@
  */
 package org.mule.config.parsers;
 
-import org.mule.extras.spring.config.AbstractChildBeanDefinitionParser;
-
 import java.util.HashMap;
 import java.util.Map;
 
-import org.w3c.dom.Element;
-import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.xml.ParserContext;
+import org.w3c.dom.Element;
 
 /**
  * TODO

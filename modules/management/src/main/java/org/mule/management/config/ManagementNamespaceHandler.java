@@ -9,9 +9,9 @@
  */
 package org.mule.management.config;
 
+import org.mule.config.parsers.PropertiesDefinitionParser;
+import org.mule.config.parsers.SingleElementDefinitionParser;
 import org.mule.extras.spring.config.handlers.AbstractHierarchicalNamespaceHandler;
-import org.mule.extras.spring.config.parsers.PropertiesDefinitionParser;
-import org.mule.extras.spring.config.parsers.SingleElementDefinitionParser;
 import org.mule.impl.internal.admin.EndpointNotificationLoggerAgent;
 import org.mule.impl.internal.admin.Log4jNotificationLoggerAgent;
 import org.mule.management.agents.DefaultJmxSupportAgent;

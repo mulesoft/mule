@@ -9,7 +9,7 @@
  */
 package org.mule.management.config.parsers;
 
-import org.mule.extras.spring.config.AbstractMuleSingleBeanDefinitionParser;
+import org.mule.config.parsers.AbstractMuleSingleBeanDefinitionParser;
 import org.mule.management.agents.JmxAgent;
 import org.mule.util.StringUtils;
 
