@@ -50,26 +50,15 @@ public class MuleBootstrap
 
     public static void main( String[] args ) throws Exception
     {
-        // The last argument is the command from the Service Wrapper (console/start/stop).
-        if (args.length < 1) 
-        {
-            throw new IllegalArgumentException("Missing expected arguments from the Service Wrapper.");
-        }
-        String wrapperCommand = args[args.length - 1];
-        // Drop the last argument.
-        String[] remainingArgs = new String[args.length - 1];
-        System.arraycopy(args, 0, remainingArgs, 0, args.length - 1);
-
         // Parse any command line options based on the list above.
-        CommandLine commandLine = parseCommandLine(remainingArgs);
+        CommandLine commandLine = parseCommandLine(args);
         // Any unrecognized arguments get passed through to the next class (e.g., to Knopflerfish).
-        remainingArgs = commandLine.getArgs();
+        String[] remainingArgs = commandLine.getArgs();
         
         String mainClassName = commandLine.getOptionValue("main");
         if (commandLine.hasOption("osgi")) 
         {
-            // Only start up the GUI console if Mule is run in the foreground.
-            boolean startGui = wrapperCommand.startsWith("console") && !commandLine.hasOption("nogui");
+            boolean startGui = !commandLine.hasOption("nogui");
             System.out.println("Starting the OSGi Framework...");
             WrapperManager.start(new OsgiFrameworkWrapper(startGui), remainingArgs);
         }
