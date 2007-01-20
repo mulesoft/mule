@@ -727,6 +727,15 @@ Assembly descriptor for the full Mule distribution.
           <include>**/*-sources.jar</include>
       </includes>
     </fileSet>
+
+    <!-- OpenEJB needs a direct path to the openejb.conf file (i.e., it can't find it from within a jar) -->
+    <fileSet>
+      <directory>../../../examples/loanbroker-esb/loanbroker/src/main/resources</directory>
+      <outputDirectory>lib/user</outputDirectory>
+      <includes>
+          <include>openejb.conf</include>
+      </includes>
+    </fileSet>
   </fileSets>
 
   <!--
@@ -744,15 +753,17 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.modules:mule-module-boot</include>
         <include>commons-cli:commons-cli</include>
         <include>tanukisoft:wrapper</include>
-        <include>org.knopflerfish:osgi</include>
       </includes>
     </dependencySet>
 
     <!-- Mule libraries -->
     <dependencySet>
       <outputDirectory>lib/mule</outputDirectory>
-      <!-- No version number  -->
-      <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
+      <!--
+        Uncomment if you encounter startup failures as described in
+        http://mule.mulesource.org/jira/browse/MULE-1153
+      -->
+      <!-- outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping -->
       <scope>runtime</scope>
       <includes>
         <!-- Core -->
@@ -792,7 +803,6 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.modules:mule-module-jaas</include>
         <include>org.mule.modules:mule-module-jotm</include>
         <include>org.mule.modules:mule-module-management</include>
-        <include>org.mule.modules:mule-module-osgi</include>
         <include>org.mule.modules:mule-module-ognl</include>
         <include>org.mule.modules:mule-module-pgp</include>
         <include>org.mule.modules:mule-module-picocontainer</include>
@@ -805,8 +815,6 @@ Assembly descriptor for the full Mule distribution.
     <!-- Non-Mule libraries -->
     <dependencySet>
       <outputDirectory>lib/opt</outputDirectory>
-      <!-- No version number  -->
-      <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
       <scope>runtime</scope>
       <excludes>
         <!-- Core -->
@@ -849,17 +857,21 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule.modules:mule-module-jotm</exclude>
         <exclude>org.mule.modules:mule-module-management</exclude>
         <exclude>org.mule.modules:mule-module-ognl</exclude>
-        <exclude>org.mule.modules:mule-module-osgi</exclude>
         <exclude>org.mule.modules:mule-module-pgp</exclude>
         <exclude>org.mule.modules:mule-module-picocontainer</exclude>
         <exclude>org.mule.modules:mule-module-scripting</exclude>
         <exclude>org.mule.modules:mule-module-spring</exclude>
         <exclude>org.mule.modules:mule-module-xml</exclude>
         <!-- Examples -->
-        <exclude>org.mule.examples:mule-example-hello-osgi</exclude>
-        <!-- Boot libraries -->
-        <exclude>tanukisoft:wrapper</exclude>
-        <exclude>org.knopflerfish:osgi</exclude>
+        <exclude>org.mule.examples:mule-example-echo</exclude>
+        <exclude>org.mule.examples:mule-example-errorhandler</exclude>
+        <exclude>org.mule.examples:mule-example-hello</exclude>
+        <exclude>org.mule.examples:mule-example-loanbroker</exclude>
+        <exclude>org.mule.examples:mule-example-loanbroker-esb</exclude>
+        <exclude>org.mule.examples:mule-example-loanbroker-esb-credit-agency</exclude>
+        <exclude>org.mule.examples:mule-example-scripting</exclude>
+        <exclude>org.mule.examples:mule-example-stockquote</exclude>
+        <exclude>org.mule.examples:mule-example-voipservice</exclude>
         <!-- Workaround, see comment for "<packaging>jar</packaging>" in the pom.xml -->
         <exclude>org.mule.distributions:mule-full</exclude>
         <!-- TODO Remove these -->
@@ -872,10 +884,27 @@ Assembly descriptor for the full Mule distribution.
     <dependencySet>
       <outputDirectory>lib/user</outputDirectory>
       <scope>runtime</scope>
-      <!-- No version number  -->
+      <!-- Don't put the version number in the examples. -->
       <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
       <includes>
-        <include>org.mule.examples:mule-example-hello-osgi</include>
+        <include>org.mule.examples:mule-example-echo</include>
+        <include>org.mule.examples:mule-example-errorhandler</include>
+        <include>org.mule.examples:mule-example-hello</include>
+        <include>org.mule.examples:mule-example-loanbroker</include>
+        <include>org.mule.examples:mule-example-loanbroker-esb</include>
+        <include>org.mule.examples:mule-example-loanbroker-esb-credit-agency</include>
+        <include>org.mule.examples:mule-example-scripting</include>
+        <include>org.mule.examples:mule-example-stockquote</include>
+        <include>org.mule.examples:mule-example-voipservice</include>
+      </includes>
+    </dependencySet>
+
+    <dependencySet>
+      <outputDirectory>lib/user</outputDirectory>
+      <scope>test</scope>
+      <includes>
+        <include>org.mule.tests:mule-tests-core</include>
+        <include>org.mule.tests:mule-tests-functional</include>
       </includes>
     </dependencySet>
   </dependencySets>
