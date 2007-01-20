@@ -17,6 +17,7 @@ import org.mule.providers.NullPayload;
 import org.mule.registry.ComponentReference;
 import org.mule.registry.DeregistrationException;
 import org.mule.registry.RegistrationException;
+import org.mule.registry.Registry;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -363,8 +364,10 @@ public abstract class AbstractTransformer implements UMOTransformer
      */
     public void register() throws RegistrationException
     {
-        ComponentReference ref = 
-            MuleManager.getInstance().getRegistry().getComponentReferenceInstance();
+        Registry registry = MuleManager.getInstance().getRegistry();
+        if (registry == null) throw new RegistrationException("No registry available");
+        
+        ComponentReference ref = registry.getComponentReferenceInstance();
 
         if (endpoint != null)
             ref.setParentId(endpoint.getRegistryId());
