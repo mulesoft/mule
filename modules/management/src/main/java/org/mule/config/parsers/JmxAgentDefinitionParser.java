@@ -7,9 +7,8 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.management.config.parsers;
+package org.mule.config.parsers;
 
-import org.mule.config.parsers.AbstractMuleSingleBeanDefinitionParser;
 import org.mule.management.agents.JmxAgent;
 import org.mule.util.StringUtils;
 

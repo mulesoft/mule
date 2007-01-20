@@ -7,9 +7,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.management.config;
+package org.mule.config.handlers;
 
-import org.mule.config.handlers.AbstractHierarchicalNamespaceHandler;
+import org.mule.config.parsers.JmxAgentDefinitionParser;
 import org.mule.config.parsers.PropertiesDefinitionParser;
 import org.mule.config.parsers.SingleElementDefinitionParser;
 import org.mule.impl.internal.admin.EndpointNotificationLoggerAgent;
@@ -19,10 +19,9 @@ import org.mule.management.agents.JmxServerNotificationAgent;
 import org.mule.management.agents.Log4jAgent;
 import org.mule.management.agents.Mx4jAgent;
 import org.mule.management.agents.RmiRegistryAgent;
-import org.mule.management.config.parsers.JmxAgentDefinitionParser;
 
 /**
- * todo document
+ * TODO document
  *
  */
 public class ManagementNamespaceHandler extends AbstractHierarchicalNamespaceHandler
