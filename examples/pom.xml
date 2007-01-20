@@ -15,8 +15,6 @@
     <description>Mule Example Applications</description>
 
     <modules>
-        <module>hello-osgi</module>
-        <!--
         <module>echo</module>
         <module>errorhandler</module>
         <module>hello</module>
@@ -26,9 +24,17 @@
         <module>stockquote</module>
         <module>voipservice</module>
         <module>webapp</module>
-        -->
     </modules>
 
+    <profiles>
+        <profile>
+            <id>osgi</id>
+		    <modules>
+        		<module>hello-osgi</module>
+		    </modules>
+        </profile>
+    </profiles>
+    
     <build>
         <!-- Allow config files to be in the "conf" directory to make it easier for users to find them. -->
         <resources>

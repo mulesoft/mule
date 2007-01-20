@@ -23,10 +23,5 @@
             <artifactId>mule-module-boot</artifactId>
             <version>${version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-osgi</artifactId>
-            <version>${version}</version>
-        </dependency>
     </dependencies>
 </project>

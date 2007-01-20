@@ -25,7 +25,6 @@
         <module>jotm</module>
         <module>management</module>
         <module>ognl</module>
-        <module>osgi</module>
         <module>pgp</module>
         <module>picocontainer</module>
         <module>registry</module>
@@ -35,6 +34,15 @@
         <module>xml</module>
     </modules>
 
+    <profiles>
+        <profile>
+            <id>osgi</id>
+		    <modules>
+		        <module>osgi</module>
+		    </modules>
+        </profile>
+    </profiles>
+            
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>

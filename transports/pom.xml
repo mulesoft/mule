@@ -15,8 +15,7 @@
 
     <modules>
         <module>axis</module>
-        <!-- TODO MERGE it was failing in the other branch as well -->
-        <!-- module>bpm</module -->
+        <module>bpm</module>
         <module>dq</module>
         <module>ejb</module>
         <module>email</module>
