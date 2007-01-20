@@ -35,11 +35,9 @@ import org.mule.impl.internal.notifications.NotificationException;
 import org.mule.impl.internal.notifications.SecurityNotification;
 import org.mule.impl.internal.notifications.SecurityNotificationListener;
 import org.mule.impl.internal.notifications.ServerNotificationManager;
-import org.mule.impl.internal.notifications.MessageNotificationListener;
-import org.mule.impl.internal.notifications.MessageNotification;
+import org.mule.impl.model.seda.SedaModel;
 import org.mule.impl.security.MuleSecurityManager;
 import org.mule.impl.work.MuleWorkManager;
-import org.mule.impl.model.seda.SedaModel;
 import org.mule.management.stats.AllStatistics;
 import org.mule.registry.ComponentReference;
 import org.mule.registry.RegistrationException;
@@ -68,10 +66,11 @@ import org.mule.util.MapUtils;
 import org.mule.util.SpiUtils;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.UUID;
-import org.mule.util.queue.QueueManager;
-import org.mule.util.queue.TransactionalQueueManager;
 import org.mule.util.queue.CachingPersistenceStrategy;
+import org.mule.util.queue.MemoryPersistenceStrategy;
+import org.mule.util.queue.QueueManager;
 import org.mule.util.queue.QueuePersistenceStrategy;
+import org.mule.util.queue.TransactionalQueueManager;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
@@ -781,12 +780,11 @@ public class MuleManager implements UMOManager
                 {
                     try
                     {
-                        // TODO MERGE no such method?
-                        //TransactionalQueueManager queueMgr = new TransactionalQueueManager();
-                        //QueuePersistenceStrategy ps = new CachingPersistenceStrategy(
-                        //        getConfiguration().getPersistenceStrategy());
-                        //queueMgr.setPersistenceStrategy(ps);
-                        //queueManager = queueMgr;
+                        TransactionalQueueManager queueMgr = new TransactionalQueueManager();
+                        // TODO RM: The persistence strategy should come from the user's config.
+                        QueuePersistenceStrategy ps = new CachingPersistenceStrategy(new MemoryPersistenceStrategy()/*config.getPersistenceStrategy()*/);
+                        queueMgr.setPersistenceStrategy(ps);
+                        queueManager = queueMgr;
                     }
                     catch (Exception e)
                     {

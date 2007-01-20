@@ -29,8 +29,6 @@ import org.mule.impl.internal.notifications.ManagementNotification;
 import org.mule.impl.internal.notifications.ManagementNotificationListener;
 import org.mule.impl.internal.notifications.ManagerNotification;
 import org.mule.impl.internal.notifications.ManagerNotificationListener;
-import org.mule.impl.internal.notifications.MessageNotification;
-import org.mule.impl.internal.notifications.MessageNotificationListener;
 import org.mule.impl.internal.notifications.ModelNotification;
 import org.mule.impl.internal.notifications.ModelNotificationListener;
 import org.mule.impl.internal.notifications.NotificationException;
@@ -55,6 +53,7 @@ import org.mule.umo.store.UMOStore;
 import org.mule.util.DateUtils;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.queue.CachingPersistenceStrategy;
+import org.mule.util.queue.MemoryPersistenceStrategy;
 import org.mule.util.queue.QueueManager;
 import org.mule.util.queue.QueuePersistenceStrategy;
 import org.mule.util.queue.TransactionalQueueManager;
@@ -241,11 +240,11 @@ public class ManagementContext implements UMOManagementContext
                 {
                     try
                     {
-                        // TODO MERGE no such method?
-                        //TransactionalQueueManager queueMgr = new TransactionalQueueManager();
-                        //QueuePersistenceStrategy ps = new CachingPersistenceStrategy(config.getPersistenceStrategy());
-                        //queueMgr.setPersistenceStrategy(ps);
-                        //queueManager = queueMgr;
+                        TransactionalQueueManager queueMgr = new TransactionalQueueManager();
+                        // TODO RM: The persistence strategy should come from the user's config.
+                        QueuePersistenceStrategy ps = new CachingPersistenceStrategy(new MemoryPersistenceStrategy()/*config.getPersistenceStrategy()*/);
+                        queueMgr.setPersistenceStrategy(ps);
+                        queueManager = queueMgr;
                     }
                     catch (Exception e)
                     {
