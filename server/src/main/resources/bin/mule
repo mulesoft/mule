@@ -193,7 +193,7 @@ case "$DIST_OS" in
 esac
 
 ######################################################################
-# Patched for Mule (MULE-1288)
+# Patched for Mule (MULE-1288, MULE-1322)
 ######################################################################
 
 # Resolve the architecture
@@ -213,7 +213,7 @@ do
         'pa_risc' | 'pa-risc')
             DIST_ARCH="parisc"
             break;;
-        'sun4u' | 'sparcv9' | 'sparc')
+        'sun4u' | 'sun4v' | 'sparcv9' | 'sparc')
             DIST_ARCH="sparc"
             break;;
         '9000/800')
