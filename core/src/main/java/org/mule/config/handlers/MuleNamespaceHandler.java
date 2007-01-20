@@ -7,7 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extras.spring.config.handlers;
+package org.mule.config.handlers;
 
 import org.mule.config.parsers.ConfigurationDefinitionParser;
 import org.mule.config.parsers.ConnectionStrategyDefinitionParser;

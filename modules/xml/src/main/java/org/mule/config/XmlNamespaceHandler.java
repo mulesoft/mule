@@ -9,9 +9,9 @@
  */
 package org.mule.config;
 
+import org.mule.config.handlers.AbstractHierarchicalNamespaceHandler;
 import org.mule.config.parsers.JXPathFilterParser;
 import org.mule.config.parsers.NamespaceDefinitionParser;
-import org.mule.extras.spring.config.handlers.AbstractHierarchicalNamespaceHandler;
 import org.mule.routing.filters.xml.JXPathFilter;
 
 /**
