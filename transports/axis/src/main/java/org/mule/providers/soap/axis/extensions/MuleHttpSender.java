@@ -545,7 +545,7 @@ public class MuleHttpSender extends BasicHandler
             }
             if (100 == returnCode)
             { // got 100 we may continue.
-                // Need todo a little msgContext house keeping....
+                // Need TODO a little msgContext house keeping....
                 msgContext.removeProperty(HTTPConstants.MC_HTTP_STATUS_CODE);
                 msgContext.removeProperty(HTTPConstants.MC_HTTP_STATUS_MESSAGE);
             }

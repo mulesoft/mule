@@ -17,7 +17,7 @@ import java.util.List;
 import org.mule.providers.soap.axis.AxisConnector;
 
 /**
- * todo document
+ * TODO document
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$

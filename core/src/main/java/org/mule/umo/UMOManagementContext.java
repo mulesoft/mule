@@ -29,7 +29,7 @@ import java.util.Map;
 import javax.transaction.TransactionManager;
 
 /**
- * todo document
+ * TODO document
  */
 public interface UMOManagementContext extends Lifecycle
 {

@@ -507,7 +507,7 @@ public class XMLEntityCodec
          */
         public String escape(String str)
         {
-            // todo: rewrite to use a Writer
+            // TODO: rewrite to use a Writer
             StringBuffer buf = new StringBuffer(str.length() * 2);
             for (int i = 0; i < str.length(); ++i)
             {

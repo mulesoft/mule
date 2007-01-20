@@ -1002,7 +1002,7 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration
         addSetPropertiesRule(path, digester, new String[]{"address", "transformers", "responseTransformers",
             "createConnector"}, new String[]{"endpointURI", "transformer", "responseTransformer",
             "createConnectorAsString"});
-        // todo test
+        // TODO test
         addMulePropertiesRule(path, digester, "setProperties");
         addTransactionConfigRules(path, digester);
 

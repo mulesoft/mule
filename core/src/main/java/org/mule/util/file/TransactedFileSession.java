@@ -24,7 +24,7 @@ import java.io.RandomAccessFile;
 import org.apache.commons.io.IOUtils;
 
 /**
- * todo document
+ * TODO document
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$

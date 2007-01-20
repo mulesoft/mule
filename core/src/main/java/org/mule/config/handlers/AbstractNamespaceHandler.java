@@ -28,7 +28,7 @@ import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.w3c.dom.Element;
 
 /**
- * todo document
+ * TODO document
  */
 // TODO MERGE missing
 public abstract class AbstractNamespaceHandler implements NamespaceHandler//, BeanDefinitionParserAware

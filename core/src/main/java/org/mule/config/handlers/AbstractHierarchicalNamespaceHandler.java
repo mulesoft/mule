@@ -16,7 +16,7 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
- * todo document
+ * TODO document
  */
 public abstract class AbstractHierarchicalNamespaceHandler extends NamespaceHandlerSupport
 {

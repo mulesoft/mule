@@ -347,7 +347,7 @@ public class MuleClient implements Disposable
                 }
                 else
                 {
-                    // todo i18n (though this case should never happen...)
+                    // TODO i18n (though this case should never happen...)
                     throw new IllegalStateException(
                         "Mismatch of stream states. A stream was used for outbound channel, but a stream was not used for the response");
                 }

@@ -70,7 +70,7 @@ public class SmtpConnector extends AbstractMailConnector
 
     private String contentType = DEFAULT_CONTENT_TYPE;
 
-    //todo RM*: This doesn't look right. The init should be done in the super class in initialise
+    //TODO RM*: This doesn't look right. The init should be done in the super class in initialise
 //    public SmtpConnector() throws InitialisationException
 //    {
 //        initFromServiceDescriptor();

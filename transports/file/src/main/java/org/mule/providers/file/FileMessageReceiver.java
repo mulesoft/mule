@@ -357,10 +357,10 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     {
         try
         {
-            File[] todoFiles = readDirectory.listFiles(filenameFilter);
+            File[] TODOFiles = readDirectory.listFiles(filenameFilter);
             // logger.trace("Reading directory " + readDirectory.getAbsolutePath() +
-            // " -> " + todoFiles.length + " file(s)");
-            return (todoFiles == null ? new File[0] : todoFiles);
+            // " -> " + TODOFiles.length + " file(s)");
+            return (TODOFiles == null ? new File[0] : TODOFiles);
         }
         catch (Exception e)
         {

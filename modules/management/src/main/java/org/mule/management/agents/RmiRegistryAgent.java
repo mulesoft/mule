@@ -109,7 +109,7 @@ public class RmiRegistryAgent implements UMOAgent
 
     public void stop() throws UMOException
     {
-        // todo how do you unbind a registry??
+        // TODO how do you unbind a registry??
         rmiRegistry = null;
     }
 

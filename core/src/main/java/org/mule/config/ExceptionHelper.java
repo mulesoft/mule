@@ -71,7 +71,7 @@ public class ExceptionHelper
 
     private static String J2SE_VERSION = "";
 
-    /** todo How do you get the j2ee version?? */
+    /** TODO How do you get the j2ee version?? */
     private static String J2EE_VERSION = "1.3ee";
 
     /**

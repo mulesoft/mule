@@ -14,7 +14,7 @@ import org.mule.config.parsers.FilterDefinitionParser;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 /**
- * todo document
+ * TODO document
  */
 public class FilterNamespaceHandler extends NamespaceHandlerSupport
 {
@@ -31,9 +31,9 @@ public class FilterNamespaceHandler extends NamespaceHandlerSupport
         registerBeanDefinitionParser("message-property", parser);
         registerBeanDefinitionParser("payload-type", parser);
         registerBeanDefinitionParser("wildcard", parser);
-        //todo
+        //TODO
         registerBeanDefinitionParser("ognl", parser);
-        //todo
+        //TODO
         //registerBeanDefinitionParser("xpath", parser);
         //registerBeanDefinitionParser("xquery", parser);
     }

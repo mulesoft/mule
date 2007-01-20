@@ -98,7 +98,7 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
             String resourceInfo = endpoint.getEndpointURI().getResourceInfo();
             boolean topic = (resourceInfo != null && JmsConstants.TOPIC_PROPERTY.equalsIgnoreCase(resourceInfo));
 
-            // todo MULE20 remove resource Info support
+            // TODO MULE20 remove resource Info support
             if (!topic)
             {
                 topic = MapUtils.getBooleanValue(endpoint.getProperties(), JmsConstants.TOPIC_PROPERTY, false);

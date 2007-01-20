@@ -77,7 +77,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * todo document
+ * TODO document
  */
 public class ManagementContext implements UMOManagementContext
 {

@@ -12,10 +12,8 @@ package org.mule.config.handlers;
 import org.mule.config.ConfigurationException;
 
 /**
- * todo document
+ * TODO document
  *
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public abstract class AbstractConnectorNamespaceHandler extends AbstractNamespaceHandler {
 

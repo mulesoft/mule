@@ -172,7 +172,7 @@ public abstract class AbstractJbiComponent implements Component, Work, Component
 
     public Object getExtensionMBean()
     {
-        return null; // todo
+        return null; // TODO
     }
 
     public QName getService()

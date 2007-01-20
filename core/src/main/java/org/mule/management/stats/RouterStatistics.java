@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <code>RouterStatistics</code> todo
+ * <code>RouterStatistics</code> TODO
  * 
  * @author <a href="mailto:S.Vanmeerhaege@gfdi.be">Vanmeerhaeghe Stéphane</a>
  * @version $Revision$

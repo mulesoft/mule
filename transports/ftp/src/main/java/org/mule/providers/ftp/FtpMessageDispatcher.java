@@ -175,7 +175,7 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
         {
 
             client = connector.getFtp(endpoint.getEndpointURI());
-            // not sure this getParams() will always work, there's a todo in the code
+            // not sure this getParams() will always work, there's a TODO in the code
             connector.enterActiveOrPassiveMode(client, endpoint);
             connector.setupFileType(client, endpoint);
             if (!client.changeWorkingDirectory(endpoint.getEndpointURI().getPath()))

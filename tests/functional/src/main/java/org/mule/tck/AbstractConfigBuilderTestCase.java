@@ -138,7 +138,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         // check first Router
         UMOOutboundRouter route1 = (UMOOutboundRouter)router.getRouters().get(0);
         assertTrue(route1 instanceof FilteringOutboundRouter);
-        // todo don't currently support "transformer" property
+        // TODO don't currently support "transformer" property
         // assertNotNull(((FilteringOutboundRouter) route1).getTransformer());
 
         UMOFilter filter = ((FilteringOutboundRouter)route1).getFilter();

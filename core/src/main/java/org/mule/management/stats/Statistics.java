@@ -13,7 +13,7 @@ package org.mule.management.stats;
 import java.io.Serializable;
 
 /**
- * <code>Statistics</code> todo
+ * <code>Statistics</code> TODO
  * 
  * @author <a href="mailto:S.Vanmeerhaege@gfdi.be">Vanmeerhaeghe Stéphane</a>
  * @version $Revision$

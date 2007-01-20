@@ -102,7 +102,7 @@ public class MulePropertiesRuleSet extends RuleSetBase
                     MethodUtils.invokeMethod(digester.peek(), propertiesSetterName, props);
                     // digester.addSetNext(path + "/properties", "setProperties");
                 }
-                // todo - is this needed?
+                // TODO - is this needed?
                 // support for setting transformers as properties
                 // String trans = (String) props.remove("transformer");
                 // if (trans != null) {

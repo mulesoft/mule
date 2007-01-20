@@ -1057,7 +1057,7 @@ public class MuleManager implements UMOManager
      */
     public UMOModel getModel()
     {
-        // todo in version two we must not assume the model
+        // TODO in version two we must not assume the model
         if (registry == null)
         {
             createRegistry();

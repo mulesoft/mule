@@ -15,7 +15,7 @@ import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.mule.providers.tcp.TcpConnector;
 
 /**
- * todo document
+ * TODO document
  *
  */
 public class TcpNamespaceHandler extends NamespaceHandlerSupport

@@ -27,7 +27,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 
 /**
- * todo document
+ * TODO document
  */
 public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBeanDefinitionParser
 {

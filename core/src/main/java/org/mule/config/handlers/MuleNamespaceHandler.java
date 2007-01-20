@@ -74,7 +74,7 @@ import org.mule.transformers.simple.ObjectToByteArray;
 import org.mule.transformers.simple.SerializableToByteArray;
 
 /**
- * todo document
+ * TODO document
  *
  */
 public class MuleNamespaceHandler extends AbstractHierarchicalNamespaceHandler
