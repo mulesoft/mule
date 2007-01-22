@@ -10,6 +10,7 @@
 
 package org.mule.extras.spring.config;
 
+import org.mule.config.MuleObjectNameProcessor;
 import org.mule.umo.transformer.UMOTransformer;
 
 import java.io.IOException;

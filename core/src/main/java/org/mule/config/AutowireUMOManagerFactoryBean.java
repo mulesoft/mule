@@ -8,11 +8,11 @@
  * LICENSE.txt file.
  */
 
-package org.mule.extras.spring.config;
+package org.mule.config;
 
 import org.mule.MuleManager;
 import org.mule.config.MuleConfiguration;
-import org.mule.extras.spring.SpringContainerContext;
+import org.mule.config.SpringContainerContext;
 import org.mule.impl.model.ModelFactory;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
