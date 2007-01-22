@@ -53,5 +53,10 @@ public interface Persistable
      */
     Object getStorageKey() throws UMOException;
 
+    /**
+     * Returns an optional PersistenceHelper to do any pre-persistence
+     * chores on the part of this persistable object.
+     */
+    PersistenceHelper getPersistenceHelper();
 }
 
