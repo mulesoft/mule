@@ -13,7 +13,7 @@
     See http://mule.mulesource.org/LoanBroker+ESB for details.
     </description>
 
-    <container-context className="org.mule.extras.spring.SpringContainerContext">
+    <container-context className="org.mule.config.SpringContainerContext">
         <properties>
             <text-property name="configuration">
                 <![CDATA[
