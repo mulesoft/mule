@@ -15,6 +15,8 @@ import org.mule.config.PoolingProfile;
 import org.mule.config.QueueProfile;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.model.AbstractModel;
+import org.mule.registry.metadata.MetadataStore;
+import org.mule.registry.metadata.ObjectMetadata;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -26,6 +28,7 @@ import org.mule.umo.lifecycle.InitialisationException;
  */
 public class SedaModel extends AbstractModel
 {
+    public static ObjectMetadata objectMetadata = new ObjectMetadata(SedaModel.class, 2, new String[] { "name" });
 
     /**
      * The time out used for taking from the Seda Queue
@@ -66,6 +69,10 @@ public class SedaModel extends AbstractModel
 
     public void initialise() throws InitialisationException
     {
+
+        // Spring should do this
+        MetadataStore.addObjectMetadata(objectMetadata);
+
         if(queueProfile==null) {
             queueProfile = new QueueProfile();
         }

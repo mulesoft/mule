@@ -25,6 +25,8 @@ import org.mule.impl.model.DefaultMuleProxy;
 import org.mule.impl.model.MuleProxy;
 import org.mule.management.stats.ComponentStatistics;
 import org.mule.management.stats.SedaComponentStatistics;
+import org.mule.registry.metadata.MetadataStore;
+import org.mule.registry.metadata.ObjectMetadata;
 import org.mule.umo.ComponentException;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
@@ -50,6 +52,8 @@ import javax.resource.spi.work.WorkManager;
  */
 public class SedaComponent extends AbstractComponent implements Work, WorkListener
 {
+    public static ObjectMetadata objectMetadata = new ObjectMetadata(SedaComponent.class, 0, new String[] { });
+
     public static final String QUEUE_PROFILE_PROPERTY = "queueProfile";
     public static final String POOLING_PROFILE_PROPERTY = "poolingProfile";
     /**
@@ -109,6 +113,10 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
     public SedaComponent(MuleDescriptor descriptor, SedaModel model)
     {
         super(descriptor, model);
+
+        // Spring should do this
+        MetadataStore.addObjectMetadata(objectMetadata);
+
         descriptorQueueName = descriptor.getName() + ".component";
         queueTimeout = model.getQueueTimeout();
         enablePooling = model.isEnablePooling();
