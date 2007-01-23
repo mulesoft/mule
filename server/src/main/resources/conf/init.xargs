@@ -103,16 +103,15 @@
 -istart opt/spring-context.jar
 -istart opt/spring-beans.jar
 -istart opt/spring-jmx.jar
--istart opt/spring-osgi-core.jar
+-istart opt/spring-osgi-core-mule.jar
+-istart opt/spring-osgi-extender-mule.jar
 -istart opt/spring-osgi-io.jar
--istart opt/spring-osgi-extender.jar
 
 #############################################################
 # Mule
 #############################################################
 -initlevel 10
 -istart mule/mule-core.jar
-#-istart mule/mule-module-spring.jar
 -istart mule/mule-module-osgi.jar
 -istart mule/mule-transport-file.jar
 -istart mule/mule-transport-tcp.jar
