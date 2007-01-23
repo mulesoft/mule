@@ -14,13 +14,14 @@ import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.NullPayload;
-import org.mule.registry.ComponentReference;
+import org.mule.registry.Registration;
 import org.mule.registry.DeregistrationException;
 import org.mule.registry.RegistrationException;
 import org.mule.registry.Registry;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.Registerable;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
@@ -366,19 +367,17 @@ public abstract class AbstractTransformer implements UMOTransformer
     {
         Registry registry = MuleManager.getInstance().getRegistry();
         if (registry == null) throw new RegistrationException("No registry available");
-        
-        ComponentReference ref = registry.getComponentReferenceInstance();
-
+        Registerable parent = null;
         if (endpoint != null)
-            ref.setParentId(endpoint.getRegistryId());
-        else
-            ref.setParentId(MuleManager.getInstance().getRegistryId());
+        {
+            parent = endpoint;
+        }
+        else 
+        {
+            parent = MuleManager.getInstance();
+        }
 
-        ref.setType("UMOTransformer");
-        ref.setComponent(this);
-
-        registryId = 
-            MuleManager.getInstance().getRegistry().registerComponent(ref);
+        registryId = MuleManager.getInstance().getRegistry().registerMuleObject(parent, this).getId();
     }
 
     /*

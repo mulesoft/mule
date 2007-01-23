@@ -19,7 +19,7 @@ import org.mule.impl.ImmutableMuleDescriptor;
 import org.mule.impl.MuleSession;
 import org.mule.impl.internal.notifications.ModelNotification;
 import org.mule.model.DynamicEntryPointResolver;
-import org.mule.registry.ComponentReference;
+import org.mule.registry.Registration;
 import org.mule.registry.DeregistrationException;
 import org.mule.registry.RegistrationException;
 import org.mule.umo.UMOComponent;
@@ -75,7 +75,7 @@ public abstract class AbstractModel implements UMOModel
 
     private ExceptionListener exceptionListener;
 
-    protected String registryId;
+    protected String registryId = null;
 
     /**
      * Default constructor
@@ -506,19 +506,7 @@ public abstract class AbstractModel implements UMOModel
      */
     public void register() throws RegistrationException
     {
-    	ComponentReference ref;
-    	try {
-    		ref = MuleManager.getInstance().getRegistry().getComponentReferenceInstance();
-    	} 
-    	catch (NullPointerException e) {
-        	throw new RegistrationException("Unable to get ComponentReference.");
-        }
-        ref.setParentId(MuleManager.getInstance().getRegistryId());
-        ref.setType("UMOModel");
-        ref.setComponent(this);
-
-        registryId = 
-            MuleManager.getInstance().getRegistry().registerComponent(ref);
+        registryId = MuleManager.getInstance().getRegistry().registerMuleObject(MuleManager.getInstance(), this).getId();
     }
 
     /*

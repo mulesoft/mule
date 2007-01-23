@@ -23,7 +23,7 @@ import org.mule.impl.internal.notifications.ConnectionNotification;
 import org.mule.providers.service.TransportFactory;
 import org.mule.providers.service.TransportServiceDescriptor;
 import org.mule.providers.service.TransportServiceException;
-import org.mule.registry.ComponentReference;
+import org.mule.registry.Registration;
 import org.mule.registry.DeregistrationException;
 import org.mule.registry.RegistrationException;
 import org.mule.routing.filters.WildcardFilter;
@@ -354,6 +354,14 @@ public abstract class AbstractConnector
         }
 
         initialised.set(true);
+
+        try
+        {
+            register();
+        }
+        catch (RegistrationException re)
+        {
+        }
     }
 
     /*
@@ -363,14 +371,8 @@ public abstract class AbstractConnector
      */
     public void register() throws RegistrationException
     {
-        ComponentReference ref = 
-            MuleManager.getInstance().getRegistry().getComponentReferenceInstance();
-        ref.setParentId(MuleManager.getInstance().getRegistryId());
-        ref.setType("UMOConnector");
-        ref.setComponent(this);
-
         registryId = 
-            MuleManager.getInstance().getRegistry().registerComponent(ref);
+            MuleManager.getInstance().getRegistry().registerMuleObject(MuleManager.getInstance(), this).getId();
     }
 
     /*

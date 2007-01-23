@@ -19,7 +19,7 @@ import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.service.TransportFactory;
 import org.mule.providers.service.TransportFactoryException;
-import org.mule.registry.ComponentReference;
+import org.mule.registry.Registration;
 import org.mule.registry.DeregistrationException;
 import org.mule.registry.RegistrationException;
 import org.mule.umo.UMOEvent;
@@ -166,7 +166,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
      */
     protected int createConnector = TransportFactory.GET_OR_CREATE_CONNECTOR;
 
-    protected String registryId;
+    protected String registryId = null;
 
     /**
      * Default ctor
@@ -777,19 +777,11 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
      */
     public void register() throws RegistrationException
     {
-        ComponentReference ref = 
-            MuleManager.getInstance().getRegistry().getComponentReferenceInstance();
-        //ref.setParentId(MuleManager.getInstance().getModel().getRegistryId());
-
         if (connector == null || connector.getRegistryId() == null)
-            throw new RegistrationException("Unable to find the endpoint's connector registry ID");
-
-        ref.setParentId(connector.getRegistryId());
-        ref.setType("UMOImmutableEndpoint");
-        ref.setComponent(this);
+            throw new RegistrationException("Unable to find the endpoint's connector registryId");
 
         registryId = 
-            MuleManager.getInstance().getRegistry().registerComponent(ref);
+            MuleManager.getInstance().getRegistry().registerMuleObject(connector, this).getId();
     }
 
     /*

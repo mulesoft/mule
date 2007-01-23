@@ -39,7 +39,8 @@ import org.mule.impl.model.seda.SedaModel;
 import org.mule.impl.security.MuleSecurityManager;
 import org.mule.impl.work.MuleWorkManager;
 import org.mule.management.stats.AllStatistics;
-import org.mule.registry.ComponentReference;
+import org.mule.registry.DeregistrationException;
+import org.mule.registry.Registration;
 import org.mule.registry.RegistrationException;
 import org.mule.registry.Registry;
 import org.mule.registry.impl.DummyRegistry;
@@ -229,9 +230,9 @@ public class MuleManager implements UMOManager
     private Registry registry;
 
     /**
-     * Registry ID for this Manager
+     * Registration ID for this Manager
      */
-    private String registryId;
+    private String registryId = null;
 
     /**
      * logger used by this class
@@ -599,14 +600,6 @@ public class MuleManager implements UMOManager
         if (initialised.get() || initialising.get())
         {
             connector.initialise();
-
-            try
-            {
-                connector.register();
-            }
-            catch (RegistrationException re)
-            {
-            }
         }
         if ((started.get() || starting.get()) && !connector.isStarted())
         {
@@ -722,6 +715,37 @@ public class MuleManager implements UMOManager
     public void setRegistry(Registry registry)
     {
         this.registry = registry;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.lifecycle.Registerable#register()
+     */
+    public void register() throws RegistrationException
+    {
+        registryId = getRegistry().registerMuleObject(null, this).getId();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.lifecycle.Registerable#deregister()
+     */
+    public void deregister() throws DeregistrationException
+    {
+        getRegistry().deregisterComponent(registryId);
+        registryId = null;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.lifecycle.Registerable#getRegistryId()
+     */
+    public String getRegistryId()
+    {
+        return registryId;
     }
 
     /**
@@ -1658,11 +1682,6 @@ public class MuleManager implements UMOManager
         this.queueManager = queueManager;
     }
 
-    public String getRegistryId()
-    {
-        return registryId;
-    }
-
     private void createRegistry()
     {
         try
@@ -1672,17 +1691,21 @@ public class MuleManager implements UMOManager
             registry = (Registry) o;
             registry.start();
             registerListener(new RegistryNotificationListener(registry));
-            ComponentReference ref = registry.getComponentReferenceInstance();
-            ref.setParentId(null);
-            ref.setType("UMOManager");
-            ref.setComponent(this);
-            registryId = registry.registerComponent(ref);
         }
         catch (Exception e)
         {
             logger.warn("Couldn't create MuleRegistry: " + e.toString());
             logger.warn("Creating dummy registry so that things will run");
             registry = new DummyRegistry();
+        }
+
+        try
+        {
+            register();
+        }
+        catch (RegistrationException e)
+        {
+            logger.warn("Unable to register the manager: " + e.toString());
         }
     }
 

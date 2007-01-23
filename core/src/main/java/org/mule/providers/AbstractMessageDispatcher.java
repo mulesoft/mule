@@ -20,7 +20,7 @@ import org.mule.impl.RequestContext;
 import org.mule.impl.internal.notifications.ConnectionNotification;
 import org.mule.impl.internal.notifications.MessageNotification;
 import org.mule.impl.internal.notifications.SecurityNotification;
-import org.mule.registry.ComponentReference;
+import org.mule.registry.Registration;
 import org.mule.registry.DeregistrationException;
 import org.mule.registry.RegistrationException;
 import org.mule.transaction.TransactionCoordination;
@@ -73,7 +73,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
     protected volatile boolean connecting = false;
     protected volatile boolean connected = false;
 
-    protected String registryId;
+    protected String registryId = null;
 
     public AbstractMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
@@ -121,14 +121,8 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
      */
     public void register() throws RegistrationException
     {
-        ComponentReference ref = 
-            MuleManager.getInstance().getRegistry().getComponentReferenceInstance();
-        ref.setParentId(connector.getRegistryId());
-        ref.setType("UMOMessageDispatcher");
-        ref.setComponent(this);
-
         registryId = 
-            MuleManager.getInstance().getRegistry().registerComponent(ref);
+            MuleManager.getInstance().getRegistry().registerMuleObject(connector, this).getId();
     }
 
     /*

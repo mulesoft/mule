@@ -18,7 +18,6 @@ import org.mule.impl.container.DescriptorContainerContext;
 import org.mule.impl.container.DescriptorContainerKeyPair;
 import org.mule.impl.container.MuleContainerContext;
 import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.registry.ComponentReference;
 import org.mule.registry.DeregistrationException;
 import org.mule.registry.RegistrationException;
 import org.mule.routing.inbound.InboundMessageRouter;
@@ -138,7 +137,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
      */
     protected String container = null;
 
-    protected String registryId;
+    protected String registryId = null;
 
     /**
      * Default constructor. Initalises common properties for the MuleConfiguration
@@ -280,17 +279,11 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
      */
     public void register() throws RegistrationException
     {
-        ComponentReference ref = 
-            MuleManager.getInstance().getRegistry().getComponentReferenceInstance();
         /*
          * THIS WILL HAVE TO CHANGE
          */
-        ref.setParentId(MuleManager.getInstance().getModel().getRegistryId());
-        ref.setType("UMODescriptor");
-        ref.setComponent(this);
-
         registryId = 
-            MuleManager.getInstance().getRegistry().registerComponent(ref);
+            MuleManager.getInstance().getRegistry().registerMuleObject(MuleManager.getInstance().getModel(), this).getId();
     }
 
     /*

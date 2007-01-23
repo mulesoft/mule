@@ -19,7 +19,7 @@ import org.mule.impl.RequestContext;
 import org.mule.impl.internal.notifications.ComponentNotification;
 import org.mule.management.stats.ComponentStatistics;
 import org.mule.providers.AbstractConnector;
-import org.mule.registry.ComponentReference;
+import org.mule.registry.Registration;
 import org.mule.registry.DeregistrationException;
 import org.mule.registry.RegistrationException;
 import org.mule.umo.ComponentException;
@@ -100,7 +100,7 @@ public abstract class AbstractComponent implements UMOComponent
      */
     protected WaitableBoolean paused = new WaitableBoolean(false);
 
-    protected String registryId;
+    protected String registryId = null;
 
     /**
      * Default constructor
@@ -172,14 +172,8 @@ public abstract class AbstractComponent implements UMOComponent
      */
     public void register() throws RegistrationException
     {
-        ComponentReference ref = 
-            MuleManager.getInstance().getRegistry().getComponentReferenceInstance();
-        ref.setParentId(model.getRegistryId());
-        ref.setType("UMOComponent");
-        ref.setComponent(this);
-
         registryId = 
-            MuleManager.getInstance().getRegistry().registerComponent(ref);
+            MuleManager.getInstance().getRegistry().registerMuleObject(model, this).getId();
     }
 
     /*

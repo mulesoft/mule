@@ -17,6 +17,7 @@ import org.mule.umo.UMOInterceptorStack;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.Lifecycle;
+import org.mule.umo.lifecycle.Registerable;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOSecurityManager;
@@ -34,7 +35,7 @@ import javax.transaction.TransactionManager;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public interface UMOManager extends Lifecycle
+public interface UMOManager extends Lifecycle, Registerable
 {
     /**
      * Getter for the envionment parameters declared in the mule-config.xml

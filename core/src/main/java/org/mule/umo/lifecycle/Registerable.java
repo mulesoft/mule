@@ -12,6 +12,7 @@ package org.mule.umo.lifecycle;
 
 import org.mule.registry.DeregistrationException;
 import org.mule.registry.RegistrationException;
+import org.mule.registry.Registration;
 
 /**
  * <code>Registerable</code> is a lifecycle interface that gets called at the

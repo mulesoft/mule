@@ -22,7 +22,7 @@ import org.mule.impl.ResponseOutputStream;
 import org.mule.impl.internal.notifications.ConnectionNotification;
 import org.mule.impl.internal.notifications.MessageNotification;
 import org.mule.impl.internal.notifications.SecurityNotification;
-import org.mule.registry.ComponentReference;
+import org.mule.registry.Registration;
 import org.mule.registry.DeregistrationException;
 import org.mule.registry.RegistrationException;
 import org.mule.transaction.TransactionCoordination;
@@ -100,7 +100,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
 
     protected ConnectionStrategy connectionStrategy;
 
-    protected String registryId;
+    protected String registryId = null;
 
     /**
      * Creates the Message Receiver
@@ -155,14 +155,8 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
      */
     public void register() throws RegistrationException
     {
-        ComponentReference ref = 
-            MuleManager.getInstance().getRegistry().getComponentReferenceInstance();
-        ref.setParentId(connector.getRegistryId());
-        ref.setType("UMOMessageReceiver");
-        ref.setComponent(this);
-
         registryId = 
-            MuleManager.getInstance().getRegistry().registerComponent(ref);
+            MuleManager.getInstance().getRegistry().registerMuleObject(connector, this).getId();
     }
 
     /*

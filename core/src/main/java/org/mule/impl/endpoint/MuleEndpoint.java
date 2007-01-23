@@ -15,9 +15,6 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.ImmutableMuleEndpoint;
 import org.mule.providers.service.TransportFactory;
-import org.mule.registry.ComponentReference;
-import org.mule.registry.DeregistrationException;
-import org.mule.registry.RegistrationException;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOTransactionConfig;
@@ -119,44 +116,6 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
 
         return clone;
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.UMOImmutableEndpoint#register()
-    public void register() throws RegistrationException
-    {
-        ComponentReference ref = 
-            MuleManager.getInstance().getRegistry().getComponentReferenceInstance();
-        //ref.setParentId(MuleManager.getInstance().getModel().getRegistryId());
-        ref.setParentId(null);
-        ref.setType("MuleEndpoint");
-        ref.setComponent(this);
-
-        registryId = 
-            MuleManager.getInstance().getRegistry().registerComponent(ref);
-    }
-     */
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.UMOModel#deregister()
-    public void deregister() throws DeregistrationException
-    {
-        registryId = null;
-    }
-     */
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.lifecycle.Registerable#getRegistryId()
-    public String getRegistryId()
-    {
-        return registryId;
-    }
-     */
 
     /*
      * (non-Javadoc)
