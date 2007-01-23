@@ -48,12 +48,12 @@ public class OsgiFrameworkWrapper implements WrapperListener
      */
     public Integer start( String[] args )
     {
-        Properties SYSTEM_PROPS = new Properties();
+        Properties osgiSysProps = new Properties();
         // Directory where bundle state info. is stored.
         // .xargs files will be read from the parent of this directory.
-        SYSTEM_PROPS.put("org.osgi.framework.dir", "../conf/knopflerfish");
+        osgiSysProps.put("org.osgi.framework.dir", "../conf/knopflerfish");
 
-        for (Iterator iter = SYSTEM_PROPS.entrySet().iterator(); iter.hasNext();) {
+        for (Iterator iter = osgiSysProps.entrySet().iterator(); iter.hasNext();) {
             Map.Entry entry = (Map.Entry) iter.next();
             System.setProperty((String) entry.getKey(), (String) entry.getValue());
         }
