@@ -28,6 +28,18 @@ public class ObjectMetadata extends Metadata
         this.properties = properties;
     }
 
+    public ObjectMetadata(Class clazz, int flags, String[] propertyNames)
+    {
+        this.properties = new HashMap();
+        this.className = clazz.getName();
+        this.flags = flags;
+
+        for (int i = 0; i < propertyNames.length; i++)
+        {
+            setProperty(new PropertyMetadata(propertyNames[i], 2));
+        }
+    }
+
     public void setProperty(PropertyMetadata property)
     {
         this.properties.put(property.getPropertyName(), property);

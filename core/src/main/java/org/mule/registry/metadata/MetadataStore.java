@@ -17,7 +17,10 @@ public class MetadataStore
 
     public static void addObjectMetadata(ObjectMetadata om)
     {
-        metadata.put(om.getClassName(), om);
+        if (!metadata.containsKey(om.getClassName()))
+        {
+            metadata.put(om.getClassName(), om);
+        }
     }
 
     /*
