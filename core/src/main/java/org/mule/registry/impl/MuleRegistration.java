@@ -35,7 +35,7 @@ public class MuleRegistration implements Registration
     protected String type = null;
     protected Object component = null;
     protected int state;
-    protected HashMap properties = null;
+    protected HashMap properties = new HashMap();
     protected HashMap children = new HashMap();
 
     public MuleRegistration()
