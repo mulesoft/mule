@@ -29,17 +29,6 @@ public class MuleRegistration implements Registration
 {
     public static int COMPONENT_STATE_UNITIALISED = 0;
 
-    protected static String[] GETTERS_TO_GET = {
-        "java.lang.Boolean", "java.lang.Date", 
-        "byte", "java.lang.Byte",
-        "double", "java.lang.Double",
-        "float", "java.lang.Float",
-        "int", "java.lang.Integer",
-        "long", "java.lang.Long", 
-        "short", "java.lang.Short",
-        "java.lang.String", "java.lang.StringBuffer"
-    };
-
     protected String id = null;
     protected ComponentVersion version;
     protected String parentId = null;
@@ -62,7 +51,6 @@ public class MuleRegistration implements Registration
         this.children = new HashMap();
         loadProperties(component);
     }
-    */
 
     public void setComponent(Object component) 
     {
@@ -113,6 +101,7 @@ public class MuleRegistration implements Registration
         } catch (Exception e) {
         }
     }
+    */
 
     public String getType()
     {
@@ -198,13 +187,14 @@ public class MuleRegistration implements Registration
     	this.version = version;
     }
 
+    /*
     private boolean doCapture(String retType)
     {
         for (int i = 0; i < GETTERS_TO_GET.length; i++)
             if (StringUtils.equals(GETTERS_TO_GET[i], retType)) return true;
         return false;
     }
-    /*
+
     public void register()
     {
     }

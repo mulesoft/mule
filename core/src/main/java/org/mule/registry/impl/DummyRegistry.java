@@ -45,12 +45,14 @@ public class DummyRegistry implements Registry {
         return null;
     }
 
+    /*
     public String registerComponent(ComponentReference component) throws RegistrationException {
         String newId = "" + getRandomId();
         component.setId(newId);
         logger.info("Received registration of " + component.getType() + "/" + component.getId() + " under parent " + component.getParentId());
         return newId;
     }
+    */
 
     public Registration registerMuleObject(Registerable parent, Registerable object) throws RegistrationException
     {
@@ -61,19 +63,23 @@ public class DummyRegistry implements Registry {
         return registration;
     }
 
+    /*
     public void deregisterComponent(ComponentReference component) throws DeregistrationException 
     {
         logger.info("Received deregistration of " + component.getType() + "/" + component.getId());
     }
+    */
 
     public void deregisterComponent(String registryId) throws DeregistrationException 
     {
         logger.info("Received deregistration of " + registryId);
     }
 
+    /*
     public void reregisterComponent(ComponentReference component) throws ReregistrationException {
         logger.info("Received reregistration of " + component.getType() + "/" + component.getId());
     }
+    */
 
     public Map getRegisteredComponents(String parentId) 
     {
@@ -85,7 +91,7 @@ public class DummyRegistry implements Registry {
         return null;
     }
 
-    public ComponentReference getRegisteredComponent(String id) {
+    public Registration getRegisteredComponent(String id) {
         return null;
     }
 
@@ -118,6 +124,7 @@ public class DummyRegistry implements Registry {
         return generator.nextLong();
     }
 
+    /*
     public ComponentReference getComponentReferenceInstance()
     {
         return new BasicComponentReference();
@@ -127,6 +134,7 @@ public class DummyRegistry implements Registry {
     {
         return new BasicComponentReference();
     }
+    */
 
     public String getPersistenceMode()
     {
