@@ -75,11 +75,6 @@ public class MuleRegistry implements Registry {
         metadata = new HashMap();
 
         // TODO for testing only
-        ObjectMetadata om = new ObjectMetadata();
-        om.setClassName("org.mule.providers.stream.SystemStreamConnector");
-        om.setIsPersistable();
-        om.setProperty(new PropertyMetadata("promptMessage", 2));
-        om.setProperty(new PropertyMetadata("messageDelayTime", 2));
         //metadata.put(om.getClassName(), om);
 
         registrationFactory = new RegistrationFactory();

@@ -54,6 +54,7 @@ public class RegistryPersistenceHelper implements PersistenceHelper, Converter
         try 
         {
             metadata = MetadataStore.getObjectMetadata(className);
+            logger.warn("EUREKA! Found metadata for " + className);
         }
         catch (MissingMetadataException mme) 
         {
