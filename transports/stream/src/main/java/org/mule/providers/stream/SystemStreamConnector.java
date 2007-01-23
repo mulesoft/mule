@@ -10,6 +10,8 @@
 
 package org.mule.providers.stream;
 
+import org.mule.registry.metadata.MetadataStore;
+import org.mule.registry.metadata.ObjectMetadata;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -26,6 +28,8 @@ import java.io.OutputStream;
 public class SystemStreamConnector extends StreamConnector
 {
 
+    public static ObjectMetadata objectMetadata = new ObjectMetadata(SystemStreamConnector.class, 2, new String[] { "promptMessage", "outputMessage", "messageDelayTime", "firstTime" });
+
     private String promptMessage;
     private String outputMessage;
     private long messageDelayTime = 3000;
@@ -34,6 +38,10 @@ public class SystemStreamConnector extends StreamConnector
     public SystemStreamConnector()
     {
         super();
+        
+        // Spring should do this
+        MetadataStore.addObjectMetadata(objectMetadata);
+
         inputStream = System.in;
         outputStream = System.out;
     }
