@@ -10,11 +10,13 @@
 
 package org.mule.registry.impl.store;
 
+import org.mule.persistence.PersistenceHelper;
 import org.mule.persistence.PersistenceNotification;
 import org.mule.persistence.PersistenceNotificationListener;
-import org.mule.registry.ComponentReference;
+import org.mule.registry.Registration;
 import org.mule.registry.DeregistrationException;
 import org.mule.registry.RegistrationException;
+import org.mule.registry.Registry;
 import org.mule.registry.RegistryStore;
 import org.mule.registry.ReregistrationException;
 import org.mule.umo.UMOException;
@@ -30,7 +32,7 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * The InMemoryStore represents an, well, in-memory store of 
- * ComponentReferences.
+ * Registrations.
  */
 public class InMemoryStore implements RegistryStore
 {
@@ -42,7 +44,7 @@ public class InMemoryStore implements RegistryStore
     /**
      * The root allows traversal of a tree
      */
-    private ComponentReference root = null;
+    private Registration root = null;
 
     /**
      * This is the listener for the persistence manager. When
@@ -61,11 +63,23 @@ public class InMemoryStore implements RegistryStore
      */
     private Map typeList = null;
 
-    public InMemoryStore() 
+    /**
+     * This is the persistence helper the store needs
+     */
+    private RegistryPersistenceHelper helper = null;
+
+    public InMemoryStore(Registry registry) 
     {
+        helper = new RegistryPersistenceHelper(registry);
+        helper.setPersistAll(true);
     }
 
-    public void registerComponent(ComponentReference component) throws RegistrationException
+    public void setPersistAll(boolean persistAll)
+    {
+        helper.setPersistAll(persistAll);
+    }
+
+    public void registerComponent(Registration component) throws RegistrationException
     {
         if (component.getId().equals("0")) 
         {
@@ -74,11 +88,11 @@ public class InMemoryStore implements RegistryStore
         }
         else 
         {
-            ComponentReference parent = null;
+            Registration parent = null;
 
             if (component.getParentId() != null) 
             {
-                parent = (ComponentReference)store.get(component.getParentId());
+                parent = (Registration)store.get(component.getParentId());
             }
             else
             {
@@ -87,6 +101,7 @@ public class InMemoryStore implements RegistryStore
             }
 
             logger.info("About to add component " + component.getId() + 
+                    " (" + component.getProperty("sourceObjectClassName") + ")" +
                     " to parent " + component.getParentId());
 
             if (parent != null)
@@ -100,11 +115,11 @@ public class InMemoryStore implements RegistryStore
         store.put(component.getId(), component);
     }
 
-    public void deregisterComponent(ComponentReference component) throws DeregistrationException
+    public void deregisterComponent(Registration component) throws DeregistrationException
     {
         logger.info("Received deregistration of " + component.getType() + "/" + component.getId());
-        ComponentReference ref = 
-            (ComponentReference)store.get(component.getId());
+        Registration ref = 
+            (Registration)store.get(component.getId());
         // We will throw an exception here
         if (ref == null) return;
         store.remove(ref);
@@ -112,16 +127,16 @@ public class InMemoryStore implements RegistryStore
 
     public void deregisterComponent(String registryId) throws DeregistrationException
     {
-        ComponentReference ref = (ComponentReference)store.get(registryId);
+        Registration ref = (Registration)store.get(registryId);
         // We will throw an exception here
         if (ref == null) return;
         store.remove(ref);
     }
 
-    public void reregisterComponent(ComponentReference component) throws ReregistrationException
+    public void reregisterComponent(Registration component) throws ReregistrationException
     {
-        ComponentReference ref = 
-            (ComponentReference)store.get(component.getId());
+        Registration ref = 
+            (Registration)store.get(component.getId());
         // We will throw an exception here
         if (ref == null) return;
         store.put(ref.getId(), ref);
@@ -134,7 +149,7 @@ public class InMemoryStore implements RegistryStore
         while (iter.hasNext())
         {
             String id = (String)iter.next();
-            ComponentReference ref = (ComponentReference)store.get(id);
+            Registration ref = (Registration)store.get(id);
             if (ref.getType().equals(type))
                 store.put(ref.getId(), ref);
         }
@@ -147,7 +162,7 @@ public class InMemoryStore implements RegistryStore
         return new HashMap();
     }
 
-    public ComponentReference getRegisteredComponent(String id)
+    public Registration getRegisteredComponent(String id)
     {
         return null;
     }
@@ -213,12 +228,17 @@ public class InMemoryStore implements RegistryStore
         return root;
     }
 
+    public PersistenceHelper getPersistenceHelper() 
+    {
+        return helper;
+    }
+
     public Object getStorageKey() throws UMOException
     {
         return null;
     }
 
-    public ComponentReference getRootObject()
+    public Registration getRootObject()
     { 
         return root;
     }

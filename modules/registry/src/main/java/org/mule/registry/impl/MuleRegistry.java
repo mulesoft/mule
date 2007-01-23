@@ -10,6 +10,7 @@
 
 package org.mule.registry.impl;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -17,25 +18,45 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.persistence.PersistenceManager;
 import org.mule.persistence.PersistenceNotificationListener;
 import org.mule.persistence.manager.ObjectPersistenceManager;
-import org.mule.registry.ComponentReference;
-import org.mule.registry.ComponentReferenceFactory;
+import org.mule.registry.Registration;
 import org.mule.registry.DeregistrationException;
 import org.mule.registry.RegistrationException;
 import org.mule.registry.Registry;
 import org.mule.registry.RegistryStore;
 import org.mule.registry.ReregistrationException;
 import org.mule.registry.impl.store.InMemoryStore;
+import org.mule.registry.metadata.*;
 import org.mule.umo.UMOException;
+import org.mule.umo.lifecycle.Registerable;
+import org.mule.util.StringUtils;
+
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * The MuleRegistry implements the Registry interface
  */
 public class MuleRegistry implements Registry {
 
+    // Temporary
+    protected static String[] GETTERS_TO_GET = {
+        "java.lang.Boolean", "java.lang.Date", 
+        "byte", "java.lang.Byte",
+        "double", "java.lang.Double",
+        "float", "java.lang.Float",
+        "int", "java.lang.Integer",
+        "long", "java.lang.Long", 
+        "short", "java.lang.Short",
+        "java.lang.String", "java.lang.StringBuffer"
+    };
+
     private long counter = 0L;
     private RegistryStore registryStore;
+    private HashMap metadata;
     private PersistenceManager persistenceManager;
-    private ComponentReferenceFactory referenceFactory;
+    private RegistrationFactory registrationFactory;
 
     /**
      * logger used by this class
@@ -50,8 +71,18 @@ public class MuleRegistry implements Registry {
     public MuleRegistry() 
     {
         persistenceManager = new ObjectPersistenceManager();
-        registryStore = new InMemoryStore();
-        referenceFactory = new ComponentReferenceFactoryImpl();
+        registryStore = new InMemoryStore(this);
+        metadata = new HashMap();
+
+        // TODO for testing only
+        ObjectMetadata om = new ObjectMetadata();
+        om.setClassName("org.mule.providers.stream.SystemStreamConnector");
+        om.setIsPersistable();
+        om.setProperty(new PropertyMetadata("promptMessage", 2));
+        om.setProperty(new PropertyMetadata("messageDelayTime", 2));
+        //metadata.put(om.getClassName(), om);
+
+        registrationFactory = new RegistrationFactory();
         PersistenceNotificationListener listener = 
             new PersistenceNotificationListener(persistenceManager);
 
@@ -71,14 +102,16 @@ public class MuleRegistry implements Registry {
 
         // The registry will, for now, be the "root" component reference
         // and will have an id of 0
+        //
+        // Really, this should be the ManagementContext
         try
         {
-            ComponentReference ref = getComponentReferenceInstance();
-            ref.setParentId(null);
-            ref.setType("Registry");
-            ref.setComponent(this);
-            ref.setId("0");
-            registryStore.registerComponent(ref);
+            Registration registration = 
+                registrationFactory.getInstance(RegistrationFactory.REF_MULE_COMPONENT);
+            registration.setId("0");
+            registration.setProperty("sourceObjectClassName", this.getClass().getName());
+            registration.setType("Registry");
+            registryStore.registerComponent(registration);
         }
         catch (Exception e)
         {
@@ -97,42 +130,69 @@ public class MuleRegistry implements Registry {
         return registryStore;
     }
 
-    /**
-     * (non-Javadoc)
-     *
-     * @see org.mule.registry.Registry#registerComponent
-     */
-    public String registerComponent(ComponentReference component) throws RegistrationException 
+    public Registration registerMuleObject(Registerable parent, Registerable object) throws RegistrationException
     {
+        Registration registration = 
+            registrationFactory.getInstance(RegistrationFactory.REF_MULE_COMPONENT);
         String newId = "" + getNewId();
-        component.setId(newId);
-        registryStore.registerComponent(component);
-        return newId;
-    }
+        registration.setId(newId);
+        String cn = object.getClass().getName();
+        registration.setProperty("sourceObjectClassName", cn);
+        int pos = cn.lastIndexOf(".");
 
-    /**
-     * (non-Javadoc)
-     *
-     * @see org.mule.registry.Registry#deregisterComponent
-     */
-    public void deregisterComponent(ComponentReference component) throws DeregistrationException
-    {
-        registryStore.deregisterComponent(component);
+        if (pos > -1)
+        {
+            registration.setType(cn.substring(pos+1));
+        }
+        else
+        {
+            registration.setType(cn);
+        }
+
+        if (parent != null)
+        {
+            if (parent.getRegistryId() == null) 
+            {
+                // We really should throw an exception here
+                // but for now lets see where this happens
+                logger.warn("Trying to register " + object.getClass().getName() + " but parent " + parent.getClass().getName() + " has no Registration record");
+            }
+            else 
+            {
+                registration.setParentId(parent.getRegistryId());
+            }
+        }
+
+        ObjectMetadata om = null;
+
+        try 
+        {
+            om = MetadataStore.getObjectMetadata(object.getClass().getName());
+        }
+        catch (MissingMetadataException mme)
+        {
+            // Don't throw this yet until we understand what we are 
+            // missing
+            //throw new RegistrationException(mme.getMessage());
+            logger.warn("Trying to register " + object.getClass().getName() + " but no ObjectMetadata found");
+        }
+
+        try 
+        {
+            loadProperties(om, registration, object);
+        }
+        catch (Exception e)
+        {
+            logger.warn("Unable to load properties for object " + object.getClass().getName());
+        }
+
+        registryStore.registerComponent(registration);
+        return registration;
     }
 
     public void deregisterComponent(String registryId) throws DeregistrationException
     {
         registryStore.deregisterComponent(registryId);
-    }
-
-    /**
-     * (non-Javadoc)
-     *
-     * @see org.mule.registry.Registry#reregisterComponent
-     */
-    public void reregisterComponent(ComponentReference component) throws ReregistrationException
-    {
-        registryStore.reregisterComponent(component);
     }
 
     /**
@@ -160,7 +220,7 @@ public class MuleRegistry implements Registry {
      *
      * @see org.mule.registry.Registry#getRegisteredComponent
      */
-    public ComponentReference getRegisteredComponent(String id)
+    public Registration getRegisteredComponent(String id)
     {
         return registryStore.getRegisteredComponent(id);
     }
@@ -238,19 +298,63 @@ public class MuleRegistry implements Registry {
         }
     }
 
-    public ComponentReference getComponentReferenceInstance()
-    {
-        return referenceFactory.getInstance();
-    }
-
-    public ComponentReference getComponentReferenceInstance(String referenceType)
-    {
-        return referenceFactory.getInstance(referenceType);
-    }
-
     public String getPersistenceMode()
     {
         if (persistenceManager == null) return "NONE";
         return persistenceManager.getStoreType();
+    }
+
+    // This is temporary
+    private void loadProperties(ObjectMetadata om, Registration registration, Object object) throws Exception
+    {
+
+        try {
+            Method[] methods = object.getClass().getMethods();
+            for (int i = 0; i < methods.length; i++) {
+                Method method = methods[i];
+
+                // We only want getters
+                if (!method.getName().startsWith("get")) continue;
+                // We only can handle no argument getters
+                if (method.getParameterTypes().length > 0) continue;
+                // We don't want the registry ID (hasn't been set yet)
+                if (method.getName().equals("getRegistryId")) continue;
+                // We don't want the registration record
+                if (method.getName().equals("getRegistration")) continue;
+
+                String retType = method.getReturnType().getName();
+                String name = method.getName().substring(3, 4).toLowerCase() +
+                    method.getName().substring(4);
+
+                if (doCapture(retType))
+                {
+                    Object value = method.invoke(object, null);
+                    registration.setProperty(name, value);
+                }
+                else if (retType.equals("java.util.Map"))
+                {
+                    Map map = (Map)method.invoke(object, null);
+                    Iterator iter = map.keySet().iterator();
+                    while (iter.hasNext())
+                    {
+                        Object key = iter.next();
+                        Object val = map.get(key);
+                        if (doCapture(val.getClass().getName()))
+                        {
+                            registration.setProperty(key.toString(), val);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw (e);
+        }
+    }
+
+    private boolean doCapture(String retType)
+    {
+        for (int i = 0; i < GETTERS_TO_GET.length; i++)
+            if (StringUtils.equals(GETTERS_TO_GET[i], retType)) return true;
+        return false;
     }
 }

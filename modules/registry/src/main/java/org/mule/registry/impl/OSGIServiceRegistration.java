@@ -12,11 +12,11 @@ package org.mule.registry.impl;
 
 import java.util.Dictionary;
 
-import org.mule.registry.impl.BasicComponentReference;
+import org.mule.registry.impl.MuleRegistration;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 
-public class OSGIServiceRegistration extends BasicComponentReference implements ServiceRegistration
+public class OSGIServiceRegistration extends MuleRegistration implements ServiceRegistration
 {
     public ServiceReference getReference()
     {
