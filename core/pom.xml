@@ -54,7 +54,8 @@
                             org.apache.commons.discovery.*,
                             org.apache.commons.cli.*,
                             org.apache.commons.io.*,
-                            org.safehaus.uuid.*
+                            org.safehaus.uuid.*,
+                            org.w3c.dom.*
                         </Private-Package>
                     </instructions>
 		        </configuration>
