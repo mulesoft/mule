@@ -88,11 +88,11 @@
 #############################################################
 # PAX Logging - supports log4j, commons-logging, and slf4j APIs
 #############################################################
--istart opt/api.jar
--istart opt/service.jar
--istart opt/log4j.jar
--istart opt/jcl.jar
--istart opt/slf4j.jar
+-istart opt/api-jdk14.jar
+-istart opt/service-jdk14.jar
+-istart opt/log4j-jdk14.jar
+-istart opt/jcl-jdk14.jar
+-istart opt/slf4j-jdk14.jar
 
 #############################################################
 # Spring 
