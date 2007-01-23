@@ -57,8 +57,6 @@ public interface Registration {
 
     public void setProperty(String key, Object property);
 
-    public void setComponent(Object component);
-
     public void addChild(Registration component);
 
     public void setVersion(ComponentVersion version);

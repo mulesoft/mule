@@ -31,21 +31,21 @@ public interface RegistryStore extends Initialisable, Startable, Stoppable, Disp
      * Returns the root of the registry store - this can be used
      * to traverse all the children in the registry
      */
-    public ComponentReference getRootObject();
+    public Registration getRootObject();
 
-    public void registerComponent(ComponentReference component) throws RegistrationException;
+    public void registerComponent(Registration component) throws RegistrationException;
 
     public void deregisterComponent(String registryId) throws DeregistrationException;
 
-    public void deregisterComponent(ComponentReference component) throws DeregistrationException;
+    public void deregisterComponent(Registration component) throws DeregistrationException;
 
-    public void reregisterComponent(ComponentReference component) throws ReregistrationException;
+    public void reregisterComponent(Registration component) throws ReregistrationException;
 
     public Map getRegisteredComponents(String parentId);
 
     public Map getRegisteredComponents(String parentId, String type);
 
-    public ComponentReference getRegisteredComponent(String id);
+    public Registration getRegisteredComponent(String id);
 
     /**
      * Start the registry store

@@ -43,8 +43,8 @@ public interface Registry extends Startable, Stoppable, Disposable {
      * its lifetime. Ids cannot be reused.
      *
      * @return String ID
-     */
     String registerComponent(ComponentReference component) throws RegistrationException;
+     */
 
     /**
      * New registration method - just pass in the object, the registry
@@ -59,8 +59,8 @@ public interface Registry extends Startable, Stoppable, Disposable {
 
     /**
      * Unregister a component
-     */
     void deregisterComponent(ComponentReference component) throws DeregistrationException;
+     */
 
     /**
      * Unregister a component by registry ID
@@ -70,8 +70,8 @@ public interface Registry extends Startable, Stoppable, Disposable {
     /**
      * Re-register a component, but this might not be used. Not sure
      * at present.
-     */
     void reregisterComponent(ComponentReference component) throws ReregistrationException;
+     */
 
     /**
      * Get a Map of all registered components of a certain type. 
@@ -93,9 +93,9 @@ public interface Registry extends Startable, Stoppable, Disposable {
      * Get a specific registered component, based on ID
      *
      * @param id the reference ID
-     * @return ComponentReference
+     * @return Registration
      */
-    ComponentReference getRegisteredComponent(String id);
+    Registration getRegisteredComponent(String id);
 
     /**
      * Start the registry
@@ -126,19 +126,19 @@ public interface Registry extends Startable, Stoppable, Disposable {
     void notifyPropertyChange(String id, String propertyName, Object propertyValue);
 
     /**
-     * Returns a ComponentReference instance from the factory
+     * Returns a Registration instance from the factory
      * Utility method so objects don't have to know what objects to
      * create.
-     */
     ComponentReference getComponentReferenceInstance();
+     */
 
     /**
      * Returns a ComponentReference instance from the factory
      * based on the reference type.
      * Utility method so objects don't have to know what objects to
      * create.
-     */
     ComponentReference getComponentReferenceInstance(String referenceType);
+     */
 
     /**
      * Returns the type of persistence store used by the Registry
