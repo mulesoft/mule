@@ -27,7 +27,8 @@
         <module>ognl</module>
         <module>pgp</module>
         <module>picocontainer</module>
-        <!--<module>registry</module>-->
+        <module>persistence</module>
+        <module>registry</module>
         <module>scripting</module>
         <module>spring</module>
         <module>wssecurity</module>
