@@ -22,7 +22,7 @@ public class ObjectMetadata extends Metadata
         properties = new HashMap();
     }
 
-    public ObjectMetadata(Class className, Map properties)
+    public ObjectMetadata(String className, Map properties)
     {
         this.className = className;
         this.properties = properties;
