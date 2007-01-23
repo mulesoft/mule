@@ -224,8 +224,8 @@ Assembly descriptor for the full Mule distribution.
         <include>org.ops4j.pax.logging:slf4j</include>
         <!-- Spring -->
         <include>org.springframework.osgi:spring-osgi-core</include>
-        <include>org.springframework.osgi:spring-osgi-io</include>
         <include>org.springframework.osgi:spring-osgi-extender</include>
+        <include>org.springframework.osgi:spring-osgi-io</include>
         <include>org.springframework.osgi:spring-core</include>
         <include>org.springframework.osgi:spring-aop</include>
         <include>org.springframework.osgi:spring-context</include>
