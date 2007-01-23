@@ -14,6 +14,7 @@ import java.util.Map;
 
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.Disposable;
+import org.mule.umo.lifecycle.Registerable;
 import org.mule.umo.lifecycle.Startable;
 import org.mule.umo.lifecycle.Stoppable;
 
@@ -43,30 +44,41 @@ public interface Registry extends Startable, Stoppable, Disposable {
      *
      * @return String ID
      */
-    public String registerComponent(ComponentReference component) throws RegistrationException;
+    String registerComponent(ComponentReference component) throws RegistrationException;
+
+    /**
+     * New registration method - just pass in the object, the registry
+     * will take care of the rest
+     */
+    Registration registerMuleObject(Registerable parent, Registerable object) throws RegistrationException;
+
+    /**
+     * Experimental OSGI registration - not yet tested
+    Registrant registerOSGIBundle(Bundle bundle) throws RegistrationException;
+     */
 
     /**
      * Unregister a component
      */
-    public void deregisterComponent(ComponentReference component) throws DeregistrationException;
+    void deregisterComponent(ComponentReference component) throws DeregistrationException;
 
     /**
      * Unregister a component by registry ID
      */
-    public void deregisterComponent(String registryId) throws DeregistrationException;
+    void deregisterComponent(String registryId) throws DeregistrationException;
 
     /**
      * Re-register a component, but this might not be used. Not sure
      * at present.
      */
-    public void reregisterComponent(ComponentReference component) throws ReregistrationException;
+    void reregisterComponent(ComponentReference component) throws ReregistrationException;
 
     /**
      * Get a Map of all registered components of a certain type. 
      * For example, you could call getRegisteredComponents("descriptors")
      * to get a list of all routes
      */
-    public Map getRegisteredComponents(String parentId, String type);
+    Map getRegisteredComponents(String parentId, String type);
 
     /**
      * Get a Map of all registered components that are children
@@ -75,7 +87,7 @@ public interface Registry extends Startable, Stoppable, Disposable {
      * @param id the parent ID
      * @return Map of components
      */
-    public Map getRegisteredComponents(String parentId);
+    Map getRegisteredComponents(String parentId);
 
     /**
      * Get a specific registered component, based on ID
@@ -83,35 +95,35 @@ public interface Registry extends Startable, Stoppable, Disposable {
      * @param id the reference ID
      * @return ComponentReference
      */
-    public ComponentReference getRegisteredComponent(String id);
+    ComponentReference getRegisteredComponent(String id);
 
     /**
      * Start the registry
      */
-    public void start() throws UMOException;
+    void start() throws UMOException;
 
     /**
      * Stop the registry
      */
-    public void stop() throws UMOException;
+    void stop() throws UMOException;
 
     /**
      * Clean up and release any resources
      */
-    public void dispose();
+    void dispose();
 
     /**
      * Method to alert the registry when a component state has 
      * changed. This method should be called by listeners that have
      * already been registered to watch the component's state.
      */
-    public void notifyStateChange(String id, int state);
+    void notifyStateChange(String id, int state);
 
     /**
      * Method to alert the registry when a component property has
      * changed. Not used yet.
      */
-    public void notifyPropertyChange(String id, String propertyName, Object propertyValue);
+    void notifyPropertyChange(String id, String propertyName, Object propertyValue);
 
     /**
      * Returns a ComponentReference instance from the factory
@@ -132,4 +144,5 @@ public interface Registry extends Startable, Stoppable, Disposable {
      * Returns the type of persistence store used by the Registry
      */
     String getPersistenceMode();
+
 }
