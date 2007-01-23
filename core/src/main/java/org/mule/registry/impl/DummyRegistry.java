@@ -18,6 +18,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.registry.*;
 import org.mule.umo.UMOException;
+import org.mule.umo.lifecycle.Registerable;
 
 /**
  * This dummy registry just reports on registration events but
@@ -49,6 +50,15 @@ public class DummyRegistry implements Registry {
         component.setId(newId);
         logger.info("Received registration of " + component.getType() + "/" + component.getId() + " under parent " + component.getParentId());
         return newId;
+    }
+
+    public Registration registerMuleObject(Registerable parent, Registerable object) throws RegistrationException
+    {
+        String newId = "" + getRandomId();
+        Registration registration = new MuleRegistration();
+        registration.setId(newId);
+        if (parent != null) registration.setParentId(parent.getRegistryId());
+        return registration;
     }
 
     public void deregisterComponent(ComponentReference component) throws DeregistrationException 
@@ -122,4 +132,5 @@ public class DummyRegistry implements Registry {
     {
         return new String("NONE");
     }
+
 }
