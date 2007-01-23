@@ -39,6 +39,6 @@ public class MetadataStore
             throw new MissingMetadataException(className);
         if (!((ObjectMetadata)metadata.get(className)).getProperties().containsKey(propertyName))
             throw new MissingMetadataException(className, propertyName);
-        return (PropertyMetadata)((Metadata)metadata.get(className)).getProperty(propertyName);
+        return (PropertyMetadata)((ObjectMetadata)metadata.get(className)).getProperty(propertyName);
     }
 }
