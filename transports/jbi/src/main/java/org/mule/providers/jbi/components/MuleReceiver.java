@@ -19,7 +19,6 @@ import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.InternalMessageListener;
 import org.mule.providers.jbi.JbiMessageAdapter;
 import org.mule.providers.jbi.JbiUtils;
-import org.mule.registry.ComponentReference;
 import org.mule.registry.DeregistrationException;
 import org.mule.registry.RegistrationException;
 import org.mule.umo.UMOComponent;
@@ -317,14 +316,15 @@ public class MuleReceiver extends AbstractEndpointComponent implements InternalM
         */
         public void register() throws RegistrationException
         {
-            ComponentReference ref = 
-                MuleManager.getInstance().getRegistry().getComponentReferenceInstance();
-            ref.setParentId(descriptor.getRegistryId());
-            ref.setType("UMOComponent");
-            ref.setComponent(this);
-
-            registryId = 
-                MuleManager.getInstance().getRegistry().registerComponent(ref);
+            // TODO LM: broken compilation, fix this
+            //ComponentReference ref =
+            //    MuleManager.getInstance().getRegistry().getComponentReferenceInstance();
+            //ref.setParentId(descriptor.getRegistryId());
+            //ref.setType("UMOComponent");
+            //ref.setComponent(this);
+            //
+            //registryId =
+            //    MuleManager.getInstance().getRegistry().registerComponent(ref);
 		}
 
         /*

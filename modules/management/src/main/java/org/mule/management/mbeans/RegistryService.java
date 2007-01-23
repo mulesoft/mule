@@ -10,12 +10,8 @@
 
 package org.mule.management.mbeans;
 
-import javax.management.ObjectName;
-
 import org.mule.MuleManager;
-import org.mule.registry.ComponentReference;
 import org.mule.registry.Registry;
-import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 
 /**

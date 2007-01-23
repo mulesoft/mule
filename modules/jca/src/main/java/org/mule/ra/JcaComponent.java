@@ -19,7 +19,6 @@ import org.mule.impl.RequestContext;
 import org.mule.impl.container.ContainerKeyPair;
 import org.mule.impl.internal.notifications.ComponentNotification;
 import org.mule.management.stats.ComponentStatistics;
-import org.mule.registry.ComponentReference;
 import org.mule.registry.DeregistrationException;
 import org.mule.registry.RegistrationException;
 import org.mule.umo.UMOComponent;
@@ -225,14 +224,15 @@ public class JcaComponent implements UMOComponent
      */
     public void register() throws RegistrationException
     {
-        ComponentReference ref = 
-            MuleManager.getInstance().getRegistry().getComponentReferenceInstance();
-        ref.setParentId(MuleManager.getInstance().getModel().getRegistryId());
-        ref.setType("UMOComponent");
-        ref.setComponent(this);
-
-        registryId = 
-            MuleManager.getInstance().getRegistry().registerComponent(ref);
+        // TODO LM: broken compilation, fix this
+        //ComponentReference ref = 
+        //    MuleManager.getInstance().getRegistry().getComponentReferenceInstance();
+        //ref.setParentId(MuleManager.getInstance().getModel().getRegistryId());
+        //ref.setType("UMOComponent");
+        //ref.setComponent(this);
+        //
+        //registryId =
+        //    MuleManager.getInstance().getRegistry().registerComponent(ref);
     }
 
     /*

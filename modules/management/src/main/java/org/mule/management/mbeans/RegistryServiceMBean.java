@@ -10,8 +10,6 @@
 
 package org.mule.management.mbeans;
 
-import org.mule.registry.ComponentReference;
-import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 
 /**
@@ -28,5 +26,4 @@ public interface RegistryServiceMBean
 
     String getName();
 
-    //ComponentReference getRootObject();
 }
