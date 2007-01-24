@@ -21,15 +21,12 @@
                 <configuration>
                     <instructions>
                         <Export-Package>
-                            org.mule.providers.http.*
+                            org.mule.providers.http.*,
+                            META-INF/services/org/mule/providers
                         </Export-Package>
                         <Private-Package>
                             org.apache.commons.codec.*,
                             org.apache.commons.httpclient.*,
-                            org.apache.commons.io.*,
-                            javax.resource,
-                            javax.resource.spi.work,
-                            javax.transaction.xa,
                             org.mortbay.http.*,
                             org.mortbay.jetty.*,
                             org.mortbay.log,
@@ -63,18 +60,6 @@
             <artifactId>org.mortbay.jetty</artifactId>
             <version>5.1.10</version>
         </dependency>
-        <!-- TODO This needs to be a bundle -->
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>1.2</version>
-        </dependency>
-        <!-- Used for the WorkManager API -->
-        <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
-            <version>1.0.1</version>
-        </dependency>
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-servlet_2.4_spec</artifactId>
@@ -84,19 +69,6 @@
                 needed otherwise.
             <scope>provided</scope> 
             -->
-        </dependency>
-
-        <!--
-            TODO this is a hack. Duplicate declaration (original is in the top pom.xml)
-            makes me happy to compile when run from the project root folder,
-            otherwise it cannot find classes from commons-logging.
-
-            It seems m2 dependency visibility hierarchy is limited to 1 level deep.
-        -->
-        <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-            <version>1.0.4</version>
         </dependency>
     </dependencies>
 </project>

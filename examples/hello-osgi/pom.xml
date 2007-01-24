@@ -24,7 +24,8 @@
                         <!-- Packages which are referenced from the config xml but not listed in the java imports
                         must be explicitly listed here because the maven-bundle-plugin will not detect them. -->
                         <Import-Package>
-                            org.mule.config.*,
+                            org.mule.config,
+                            org.mule.config.i18n,
                             org.mule.providers.file,
                             org.mule.providers.http,
                             org.mule.transformers,

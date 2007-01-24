@@ -23,23 +23,12 @@
                 <configuration>
                     <instructions>
                         <Export-Package>
-                            org.mule.providers.file.*
+                            org.mule.providers.file.*,
+                            META-INF/services/org/mule/providers
                         </Export-Package>
-                        <Private-Package>
-                            org.apache.commons.io.*
-                        </Private-Package>
                     </instructions>
                 </configuration>
             </plugin>
          </plugins>
-    </build>
-    
-    <dependencies>
-        <!-- TODO This needs to be a bundle -->
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>1.2</version>
-        </dependency>
-    </dependencies>
+    </build>    
 </project>
