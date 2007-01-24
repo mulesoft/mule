@@ -194,6 +194,7 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.modules:mule-module-scripting</include>
         <include>org.mule.modules:mule-module-springcore</include>
         <include>org.mule.modules:mule-module-spring</include>
+        <include>org.mule.modules:mule-module-util</include>
         <include>org.mule.modules:mule-module-xml</include>
       </includes>
     </dependencySet>
@@ -205,13 +206,18 @@ Assembly descriptor for the full Mule distribution.
       <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
       <scope>runtime</scope>
       <includes>
-      	<!-- Common Java libraries -->
+        <!-- Spring OSGi -->
+        <include>org.springframework.osgi:spring-osgi-core</include>
+        <include>org.springframework.osgi:spring-osgi-extender</include>
+        <include>org.springframework.osgi:spring-osgi-io</include>
+        <!-- Spring -->
+        <include>org.springframework.osgi:spring-core</include>
+        <include>org.springframework.osgi:spring-aop</include>
+        <include>org.springframework.osgi:spring-context</include>
+        <include>org.springframework.osgi:spring-beans</include>
+        <include>org.springframework.osgi:spring-jmx</include>
+      	<!-- Spring dependencies -->
         <include>org.springframework.osgi:aopalliance.osgi</include>
-        <include>org.springframework.osgi:backport-util-concurrent</include>
-        <include>org.springframework.osgi:commons-beanutils.osgi</include>
-        <include>org.springframework.osgi:commons-collections.osgi</include>
-        <include>org.springframework.osgi:commons-lang.osgi</include>
-        <include>org.springframework.osgi:commons-pool.osgi</include>
         <include>org.springframework.osgi:asm.osgi</include>
         <include>org.springframework.osgi:aspectjrt.osgi</include>
         <include>org.springframework.osgi:cglib-nodep.osgi</include>
@@ -222,19 +228,10 @@ Assembly descriptor for the full Mule distribution.
         <include>org.ops4j.pax.logging:log4j</include>
         <include>org.ops4j.pax.logging:jcl</include>
         <include>org.ops4j.pax.logging:slf4j</include>
-        <!-- Spring -->
-        <include>org.springframework.osgi:spring-osgi-core</include>
-        <include>org.springframework.osgi:spring-osgi-extender</include>
-        <include>org.springframework.osgi:spring-osgi-io</include>
-        <include>org.springframework.osgi:spring-core</include>
-        <include>org.springframework.osgi:spring-aop</include>
-        <include>org.springframework.osgi:spring-context</include>
-        <include>org.springframework.osgi:spring-beans</include>
-        <include>org.springframework.osgi:spring-jmx</include>
       </includes>
     </dependencySet>
 
-    <!-- Mule examples -->
+    <!-- Mule example apps -->
     <dependencySet>
       <outputDirectory>lib/user</outputDirectory>
       <scope>runtime</scope>
