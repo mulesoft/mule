@@ -316,16 +316,9 @@ public class MuleReceiver extends AbstractEndpointComponent implements InternalM
         */
         public void register() throws RegistrationException
         {
-            // TODO LM: broken compilation, fix this
-            //ComponentReference ref =
-            //    MuleManager.getInstance().getRegistry().getComponentReferenceInstance();
-            //ref.setParentId(descriptor.getRegistryId());
-            //ref.setType("UMOComponent");
-            //ref.setComponent(this);
-            //
-            //registryId =
-            //    MuleManager.getInstance().getRegistry().registerComponent(ref);
-		}
+            registryId = 
+                MuleManager.getInstance().getRegistry().registerMuleObject(descriptor, this).getId();
+        }
 
         /*
         * (non-Javadoc)
