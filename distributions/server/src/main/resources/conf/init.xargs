@@ -73,17 +73,7 @@
 # Common Java libraries
 #############################################################
 -initlevel 8
--istart opt/aopalliance.osgi.jar
--istart opt/asm.osgi.jar
--istart opt/aspectjrt.osgi.jar
--istart opt/backport-util-concurrent.jar
--istart opt/commons-beanutils.osgi.jar
--istart opt/commons-collections.osgi.jar
--istart opt/commons-lang.osgi.jar
--istart opt/commons-pool.osgi.jar
-# These aren't working for some reason.
-# -istart opt/cglib-nodep.osgi.jar
-# -istart opt/commons-attributes.osgi.jar
+-istart mule/mule-module-util.jar
 
 #############################################################
 # PAX Logging - supports log4j, commons-logging, and slf4j APIs
@@ -98,11 +88,19 @@
 # Spring 
 #############################################################
 -initlevel 9
+# Spring Dependencies
+-istart opt/aopalliance.osgi.jar
+-istart opt/asm.osgi.jar
+-istart opt/aspectjrt.osgi.jar
+# -istart opt/cglib-nodep.osgi.jar
+# -istart opt/commons-attributes.osgi.jar
+# Spring
 -istart opt/spring-core.jar
 -istart opt/spring-aop.jar
 -istart opt/spring-context.jar
 -istart opt/spring-beans.jar
 -istart opt/spring-jmx.jar
+# Spring OSGi
 -istart opt/spring-osgi-core-mule.jar
 -istart opt/spring-osgi-extender-mule.jar
 -istart opt/spring-osgi-io.jar
@@ -111,8 +109,10 @@
 # Mule
 #############################################################
 -initlevel 10
+# Core
 -istart mule/mule-core.jar
 -istart mule/mule-module-osgi.jar
+# Transports
 -istart mule/mule-transport-file.jar
 -istart mule/mule-transport-tcp.jar
 -istart mule/mule-transport-http.jar

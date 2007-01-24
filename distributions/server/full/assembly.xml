@@ -808,6 +808,7 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.modules:mule-module-picocontainer</include>
         <include>org.mule.modules:mule-module-scripting</include>
         <include>org.mule.modules:mule-module-spring</include>
+        <include>org.mule.modules:mule-module-util</include>
         <include>org.mule.modules:mule-module-xml</include>
       </includes>
     </dependencySet>
@@ -861,6 +862,7 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule.modules:mule-module-picocontainer</exclude>
         <exclude>org.mule.modules:mule-module-scripting</exclude>
         <exclude>org.mule.modules:mule-module-spring</exclude>
+        <exclude>org.mule.modules:mule-module-util</exclude>
         <exclude>org.mule.modules:mule-module-xml</exclude>
         <!-- Examples -->
         <exclude>org.mule.examples:mule-example-echo</exclude>
