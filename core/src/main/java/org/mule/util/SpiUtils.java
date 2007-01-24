@@ -22,6 +22,9 @@ import org.apache.commons.discovery.tools.DiscoverClass;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+/**
+ * @deprecated The SPI discovery mechanism should probably use the OSGi Service Registry for Mule 2.x
+ */
 // @ThreadSafe
 public class SpiUtils
 {
