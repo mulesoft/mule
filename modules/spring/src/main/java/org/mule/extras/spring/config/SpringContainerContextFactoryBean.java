@@ -9,7 +9,7 @@
  */
 package org.mule.extras.spring.config;
 
-import org.mule.extras.spring.SpringContainerContext;
+import org.mule.config.SpringContainerContext;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.ApplicationContext;
