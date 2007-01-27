@@ -41,8 +41,7 @@
                             org.mule.model,
                             org.mule.persistence.*,
                             org.mule.providers.*,
-                            org.mule.registry,
-                            org.mule.registry.impl,
+                            org.mule.registry.*,
                             org.mule.routing.*,
                             org.mule.transaction.*,
                             org.mule.transformers.*,
@@ -50,6 +49,7 @@
                             org.mule.util.*
                         </Export-Package>
                         <Private-Package>
+                            org.mule.*,
                             org.apache.commons.discovery.*,
                             org.apache.commons.cli.*,
                             org.safehaus.uuid.*
