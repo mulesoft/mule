@@ -178,12 +178,12 @@ public class IOUtils extends org.apache.commons.io.IOUtils
                 });
                 if (url == null)
                 {
-                    logger.debug("Unable to load resource from the classpath");
+                    logger.debug("Unable to load resource " + resourceName + " from the classpath");
                 }
             }
             catch (Exception e)
             {
-                logger.debug("Unable to load resource from the classpath: " + e.getMessage());
+                logger.debug("Unable to load resource " + resourceName + " from the classpath: " + e.getMessage());
             }
         }
 
