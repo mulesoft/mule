@@ -428,7 +428,6 @@ public class ManagementContext implements UMOManagementContext
         }
         else
         {
-            // TODO MERGE should it be called setDefaultEncoding? Why not just encoding?
             config.setDefaultEncoding(encoding);
         }
         //Check we have a valid and supported encoding
