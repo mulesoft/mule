@@ -371,8 +371,12 @@ public abstract class AbstractConnector
      */
     public void register() throws RegistrationException
     {
-        registryId = 
-            MuleManager.getInstance().getRegistry().registerMuleObject(MuleManager.getInstance(), this).getId();
+        try {
+            registryId = 
+                MuleManager.getInstance().getRegistry().registerMuleObject(MuleManager.getInstance(), this).getId();
+        } catch (NullPointerException e) {
+            throw new RegistrationException(e.getMessage());
+        }
     }
 
     /*
