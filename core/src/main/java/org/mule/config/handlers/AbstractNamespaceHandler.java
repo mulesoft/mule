@@ -30,8 +30,7 @@ import org.w3c.dom.Element;
 /**
  * TODO document
  */
-// TODO MERGE missing
-public abstract class AbstractNamespaceHandler implements NamespaceHandler//, BeanDefinitionParserAware
+public abstract class AbstractNamespaceHandler implements NamespaceHandler
 {
 
     public static final String BASE_DEFINITION_PARSER_LOCATION = "META-INF/services/org/mule/config/";
@@ -46,9 +45,6 @@ public abstract class AbstractNamespaceHandler implements NamespaceHandler//, Be
      * local name of the {@link Element Elements} they handle.
      */
     private final Map parsers = new HashMap();
-
-    // TODO MERGE missing
-    //private MuleXmlBeanDefinitionParser rootParser;
 
     protected AbstractNamespaceHandler(ClassLoader classLoader) {
         this.classLoader = classLoader;
@@ -75,11 +71,6 @@ public abstract class AbstractNamespaceHandler implements NamespaceHandler//, Be
         return parser;
     }
 
-    // TODO MERGE missing
-    //public void setBeanDefinitionParser(MuleXmlBeanDefinitionParser parser) {
-    //    this.rootParser = parser;
-    //}
-
     protected void registerBeanDefinitionParsers() throws ConfigurationException {
 
         try {
@@ -88,10 +79,6 @@ public abstract class AbstractNamespaceHandler implements NamespaceHandler//, Be
                 Map.Entry entry = (Map.Entry) iterator.next();
                 BeanDefinitionParser parser = null;
                 parser = (BeanDefinitionParser) ClassUtils.instanciateClass(entry.getValue().toString(), ClassUtils.NO_ARGS);
-                // TODO MERGE missing
-                //if(parser instanceof BeanDefinitionParserAware) {
-                //    ((BeanDefinitionParserAware)parser).setBeanDefinitionParser(this.rootParser);
-                //}
                 registerBeanDefinitionParser(entry.getKey().toString(), parser);
             }
         } catch (Exception e) {
