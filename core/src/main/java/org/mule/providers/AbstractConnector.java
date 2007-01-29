@@ -23,7 +23,6 @@ import org.mule.impl.internal.notifications.ConnectionNotification;
 import org.mule.providers.service.TransportFactory;
 import org.mule.providers.service.TransportServiceDescriptor;
 import org.mule.providers.service.TransportServiceException;
-import org.mule.registry.Registration;
 import org.mule.registry.DeregistrationException;
 import org.mule.registry.RegistrationException;
 import org.mule.routing.filters.WildcardFilter;
@@ -371,12 +370,7 @@ public abstract class AbstractConnector
      */
     public void register() throws RegistrationException
     {
-        try {
-            registryId = 
-                MuleManager.getInstance().getRegistry().registerMuleObject(MuleManager.getInstance(), this).getId();
-        } catch (NullPointerException e) {
-            throw new RegistrationException(e.getMessage());
-        }
+		registryId = MuleManager.getInstance().getRegistry().registerMuleObject(MuleManager.getInstance(), this).getId();
     }
 
     /*
