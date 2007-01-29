@@ -28,10 +28,7 @@ import org.mule.util.MuleObjectHelper;
 import org.mule.util.ObjectFactory;
 import org.mule.util.ObjectNameHelper;
 import org.mule.util.PropertiesUtils;
-import org.mule.util.SpiUtils;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -51,6 +48,7 @@ import org.apache.commons.logging.LogFactory;
 public class TransportFactory
 {
     public static final String PROVIDER_SERVICES_PATH = "org/mule/providers";
+    public static final String PROVIDER_SERVICE_TYPE = "transport";
 
     /**
      * logger used by this class
@@ -300,49 +298,22 @@ public class TransportFactory
             overrides));
         if (csd == null)
         {
-
-            String location = SpiUtils.SERVICE_ROOT + PROVIDER_SERVICES_PATH;
-            InputStream is = SpiUtils.findServiceDescriptor(PROVIDER_SERVICES_PATH, protocol + ".properties",
-                TransportFactory.class);
-
-
-            // TODO RM: this can be removed in Mule 2.0
-            if (is == null)
+            Properties props = MuleManager.getInstance().lookupServiceDescriptor(PROVIDER_SERVICE_TYPE, protocol);
+            if (props != null)
             {
-                //The legacy connector decriptors did did not use file extensions
-                is = SpiUtils.findServiceDescriptor(PROVIDER_SERVICES_PATH, protocol,
-                TransportFactory.class);
-                if(is==null)
+                csd = new TransportServiceDescriptor(protocol, props);
+                // set any overides on the descriptor
+                csd.setOverrides(overrides);
+                if (csd.getServiceFinder() != null)
                 {
-                    logger.warn("The transport " + protocol + " is using a legacy style of descriptor. This needs to be updated."
-                     + " Future versions of Mule will not work with this connector descriptor.");
+                    TransportServiceFinder finder = csd.createServiceFinder();
+                    csd = finder.findService(protocol, csd);
                 }
+                csdCache.put(new CSDKey(csd.getProtocol(), overrides), csd);
             }
-            try
+            else
             {
-                if (is != null)
-                {
-                    Properties props = new Properties();
-                    props.load(is);
-                    csd = new TransportServiceDescriptor(protocol, location, props);
-                    // set any overides on the descriptor
-                    csd.setOverrides(overrides);
-                    if (csd.getServiceFinder() != null)
-                    {
-                        TransportServiceFinder finder = csd.createServiceFinder();
-                        csd = finder.findService(protocol, csd);
-                    }
-                    csdCache.put(new CSDKey(csd.getProtocol(), overrides), csd);
-                }
-                else
-                {
-                    throw new TransportServiceNotFoundException(location + "/" + protocol);
-                }
-            }
-            catch (IOException e)
-            {
-                throw new TransportFactoryException(new Message(Messages.FAILED_TO_ENDPOINT_FROM_LOCATION_X,
-                    location + "/" + protocol), e);
+                throw new TransportServiceNotFoundException(protocol);
             }
         }
         return csd;

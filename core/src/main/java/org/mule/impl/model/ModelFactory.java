@@ -10,14 +10,11 @@
 
 package org.mule.impl.model;
 
-import org.mule.providers.service.TransportFactory;
+import org.mule.MuleManager;
 import org.mule.umo.model.UMOModel;
 import org.mule.util.BeanUtils;
 import org.mule.util.ClassUtils;
-import org.mule.util.SpiUtils;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
 
 /**
@@ -26,10 +23,9 @@ import java.util.Properties;
  */
 public class ModelFactory
 {
-
     public static final String MODEL_SERVICE_PATH = "org/mule/models";
+    public static final String MODEL_SERVICE_TYPE = "model";
     public static final String MODEL_PROPERTY = "model";
-    public static final String MODEL_TYPE_POSTFIX = ".properties";
 
     public static UMOModel createModel(String type) throws ModelServiceNotFoundException
     {
@@ -69,24 +65,14 @@ public class ModelFactory
 
     public static Properties getModelDescriptor(String type) throws ModelServiceNotFoundException
     {
-        String location = SpiUtils.SERVICE_ROOT + MODEL_SERVICE_PATH;
-        InputStream is = SpiUtils.findServiceDescriptor(MODEL_SERVICE_PATH, type + MODEL_TYPE_POSTFIX, TransportFactory.class);
-        try
+        Properties props = MuleManager.getInstance().lookupServiceDescriptor(MODEL_SERVICE_TYPE, type);
+        if (props != null)
         {
-            if (is != null)
-            {
-                Properties props = new Properties();
-                props.load(is);
-                return props;
-            }
-            else
-            {
-                throw new ModelServiceNotFoundException(location + "/" + type);
-            }
+            return props;
         }
-        catch (IOException e)
+        else
         {
-            throw new ModelServiceNotFoundException(location + "/" + type, e);
+            throw new ModelServiceNotFoundException(type);
         }
     }
 }

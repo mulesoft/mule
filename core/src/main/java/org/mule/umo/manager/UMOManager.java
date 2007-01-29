@@ -25,15 +25,13 @@ import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.queue.QueueManager;
 
 import java.util.Map;
+import java.util.Properties;
 
 import javax.transaction.TransactionManager;
 
 /**
  * <code>UMOManager</code> maintains and provides services for a UMO server
  * instance.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public interface UMOManager extends Lifecycle, Registerable
 {
@@ -317,6 +315,13 @@ public interface UMOManager extends Lifecycle, Registerable
     void unregisterListener(UMOServerNotificationListener l);
 
     /**
+     * Searches for and returns the service descriptor for a transport, model, or any other entity.
+     * 
+     * @return properties describing the service or null if service not found.
+     */
+    Properties lookupServiceDescriptor(String type, String name);
+
+    /**
      * Fires a server notification to all regiistered listeners
      * 
      * @param notification the notification to fire
@@ -416,5 +421,4 @@ public interface UMOManager extends Lifecycle, Registerable
      * @return the registry ID
      */
     String getRegistryId();
-
 }

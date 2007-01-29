@@ -11,6 +11,7 @@
 package org.mule;
 
 import org.mule.config.ConfigurationException;
+import org.mule.config.ExceptionHelper;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.MuleProperties;
 import org.mule.config.ThreadingProfile;
@@ -35,12 +36,13 @@ import org.mule.impl.internal.notifications.NotificationException;
 import org.mule.impl.internal.notifications.SecurityNotification;
 import org.mule.impl.internal.notifications.SecurityNotificationListener;
 import org.mule.impl.internal.notifications.ServerNotificationManager;
+import org.mule.impl.model.ModelFactory;
 import org.mule.impl.model.seda.SedaModel;
 import org.mule.impl.security.MuleSecurityManager;
 import org.mule.impl.work.MuleWorkManager;
 import org.mule.management.stats.AllStatistics;
+import org.mule.providers.service.TransportFactory;
 import org.mule.registry.DeregistrationException;
-import org.mule.registry.Registration;
 import org.mule.registry.RegistrationException;
 import org.mule.registry.Registry;
 import org.mule.registry.impl.DummyRegistry;
@@ -75,6 +77,8 @@ import org.mule.util.queue.TransactionalQueueManager;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
@@ -88,6 +92,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.jar.Manifest;
 
 import javax.transaction.TransactionManager;
@@ -294,23 +299,22 @@ public class MuleManager implements UMOManager
      * Getter method for the current singleton MuleManager
      *
      * @return the current singleton MuleManager
+     * 
+     * @deprecated There is no more singleton MuleManager in 2.x
      */
     public static synchronized UMOManager getInstance()
     {
         if (instance == null)
         {
             logger.info("Creating new MuleManager instance");
-
-            Class clazz = SpiUtils.findService(UMOManager.class, MuleManager.class.getName(),
-                    MuleManager.class);
             try
             {
-                instance = (UMOManager) clazz.newInstance();
+                instance = new MuleManager();
             }
             catch (Exception e)
             {
                 throw new MuleRuntimeException(new Message(Messages.FAILED_TO_CREATE_MANAGER_INSTANCE_X,
-                        clazz.getName()), e);
+                    MuleManager.class.getName()), e);
             }
         }
 
@@ -1538,6 +1542,50 @@ public class MuleManager implements UMOManager
         if (notificationManager != null)
         {
             notificationManager.unregisterListener(l);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Properties lookupServiceDescriptor(String type, String name)
+    {
+        InputStream is = null;
+        if (type.equals(TransportFactory.PROVIDER_SERVICE_TYPE)) 
+        {
+            is = SpiUtils.findServiceDescriptor(TransportFactory.PROVIDER_SERVICES_PATH, name, TransportFactory.class);
+        }
+        else if (type.equals(ModelFactory.MODEL_SERVICE_TYPE))
+        {
+            is = SpiUtils.findServiceDescriptor(ModelFactory.MODEL_SERVICE_PATH, name, ModelFactory.class);
+        }
+        else if (type.equals(ExceptionHelper.EXCEPTION_SERVICE_TYPE))
+        {
+            is = SpiUtils.findServiceDescriptor("org/mule/config", name, ExceptionHelper.class);
+        }
+        else 
+        {
+            logger.warn("Attempt to lookup unrecognized service type: " + type);
+            return null;
+        }
+
+        if (is != null)
+        {
+            Properties props = new Properties();
+            try 
+            {
+                props.load(is);
+                return props;
+            }
+            catch (IOException e)
+            {
+                logger.warn("Descriptor found but unable to load properties for service " + name + " of type " + type);
+                return null;
+            }
+        }
+        else 
+        {
+            return null;
         }
     }
 

@@ -10,6 +10,7 @@
 
 package org.mule.config;
 
+import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
 import org.mule.config.i18n.Message;
 import org.mule.umo.UMOException;
@@ -54,6 +55,8 @@ public class ExceptionHelper
      */
     public static final String APPLY_TO_PROPERTY = "apply.to";
 
+    public static final String EXCEPTION_SERVICE_TYPE = "exception";
+    
     /**
      * logger used by this class
      */
@@ -91,42 +94,29 @@ public class ExceptionHelper
 
     public static void initialise()
     {
-        try
+        if (initialised)
         {
-            if (initialised)
-            {
-                return;
-            }
-
-            registerExceptionReader(new UMOExceptionReader());
-            registerExceptionReader(new NamingExceptionReader());
-            J2SE_VERSION = System.getProperty("java.specification.version");
-
-            InputStream is = SpiUtils.findServiceDescriptor("org/mule/config",
-                "mule-exception-codes.properties", ExceptionHelper.class);
-            if (is == null)
-            {
-                throw new NullPointerException(
-                    "Failed to load resource: META_INF/services/org/mule/config/mule-exception-codes.properties");
-            }
-            errorCodes.load(is);
-            reverseErrorCodes = MapUtils.invertMap(errorCodes);
-            is = SpiUtils.findServiceDescriptor("org/mule/config", "mule-exception-config.properties",
-                ExceptionHelper.class);
-            if (is == null)
-            {
-                throw new NullPointerException(
-                    "Failed to load resource: META_INF/services/org/mule/config/mule-exception-config.properties");
-            }
-            errorDocs.load(is);
-
-            initialised = true;
+            return;
         }
-        catch (IOException e)
+
+        registerExceptionReader(new UMOExceptionReader());
+        registerExceptionReader(new NamingExceptionReader());
+        J2SE_VERSION = System.getProperty("java.specification.version");
+
+        errorCodes = MuleManager.getInstance().lookupServiceDescriptor(EXCEPTION_SERVICE_TYPE, "mule-exception-codes");
+        if (errorCodes == null)
         {
-            throw new MuleRuntimeException(Message.createStaticMessage("Failed to load Exception resources"),
-                e);
+            throw new MuleRuntimeException(Message.createStaticMessage("Failed to load Exception resource: mule-exception-codes.properties"));
         }
+        reverseErrorCodes = MapUtils.invertMap(errorCodes);
+
+        errorDocs = MuleManager.getInstance().lookupServiceDescriptor(EXCEPTION_SERVICE_TYPE, "mule-exception-config");
+        if (errorDocs == null)
+        {
+            throw new MuleRuntimeException(Message.createStaticMessage("Failed to load Exception resource: mule-exception-config.properties"));
+        }
+
+        initialised = true;
     }
 
     public static int getErrorCode(Class exception)
