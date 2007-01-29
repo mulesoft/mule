@@ -58,7 +58,6 @@ public class TransportServiceDescriptor
     protected static final Log logger = LogFactory.getLog(TransportServiceDescriptor.class);
 
     private String protocol;
-    private String serviceLocation;
     private String serviceError;
     private String serviceFinder;
     private String connector;
@@ -82,10 +81,9 @@ public class TransportServiceDescriptor
     // private EndpointBuilder endpointBuilderImpl;
     private TransportServiceFinder transportServiceFinder;
 
-    public TransportServiceDescriptor(String protocol, String serviceLocation, Properties props)
+    public TransportServiceDescriptor(String protocol, Properties props)
     {
         this.protocol = protocol;
-        this.serviceLocation = serviceLocation;
         this.properties = props;
 
         serviceError = removeProperty(MuleProperties.CONNECTOR_SERVICE_ERROR);
@@ -171,11 +169,6 @@ public class TransportServiceDescriptor
     public String getProtocol()
     {
         return protocol;
-    }
-
-    public String getServiceLocation()
-    {
-        return serviceLocation;
     }
 
     public String getServiceError()
@@ -718,12 +711,6 @@ public class TransportServiceDescriptor
         {
             return false;
         }
-        if (serviceLocation != null
-                        ? !serviceLocation.equals(transportServiceDescriptor.serviceLocation)
-                        : transportServiceDescriptor.serviceLocation != null)
-        {
-            return false;
-        }
         if (sessionHandler != null
                         ? !sessionHandler.equals(transportServiceDescriptor.sessionHandler)
                         : transportServiceDescriptor.sessionHandler != null)
@@ -755,7 +742,6 @@ public class TransportServiceDescriptor
     public int hashCode()
     {
         int result = (protocol != null ? protocol.hashCode() : 0);
-        result = 29 * result + (serviceLocation != null ? serviceLocation.hashCode() : 0);
         result = 29 * result + (serviceError != null ? serviceError.hashCode() : 0);
         result = 29 * result + (serviceFinder != null ? serviceFinder.hashCode() : 0);
         result = 29 * result + (connector != null ? connector.hashCode() : 0);
