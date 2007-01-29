@@ -50,7 +50,6 @@
                         </Export-Package>
                         <Private-Package>
                             org.mule.*,
-                            org.apache.commons.discovery.*,
                             org.apache.commons.cli.*,
                             org.safehaus.uuid.*
                         </Private-Package>
@@ -90,12 +89,6 @@
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.14</version>
-        </dependency>
-        <!-- Used by SPIUtils, should probably go away for Mule 2.x -->
-        <dependency>
-            <groupId>commons-discovery</groupId>
-            <artifactId>commons-discovery</artifactId>
-            <version>0.2</version>
         </dependency>
         <!-- TODO Remove this since command-line parsing is limited to mule-module-boot -->
         <dependency>
