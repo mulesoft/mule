@@ -16,6 +16,7 @@ import org.w3c.dom.Element;
 /**
  * Allows a series of key vlaue pair elements to be set on an object as a Map. There is no need to define
  * a surrounding 'map' element to contain the map entries.
+ * TODO RM: add a sample config snippet to this JavaDoc.
  */
 public class MapEntryDefinitionParser extends AbstractChildBeanDefinitionParser
 {
