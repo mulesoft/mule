@@ -17,6 +17,7 @@ import org.mule.tck.AbstractMuleTestCase;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -60,7 +61,7 @@ public class JXPathFilterTestCase extends AbstractMuleTestCase
         w3cDocumentInputNS = dbf.newDocumentBuilder().parse(
             new InputSource(new StringReader(xmlStringInputNS)));
         nsAwareFilter = new JXPathFilter();
-        HashMap namespaces = new HashMap();
+        Map namespaces = new HashMap();
         namespaces.put("nsone", "http://one.org");
         namespaces.put("nstwo", "http://two.org");
         nsAwareFilter.setNamespaces(namespaces);
