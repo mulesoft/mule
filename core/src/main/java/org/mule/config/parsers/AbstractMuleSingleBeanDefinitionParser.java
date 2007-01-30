@@ -32,6 +32,7 @@ import org.w3c.dom.NamedNodeMap;
 public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBeanDefinitionParser
 {
     public static final String ATTRIBUTE_ID = "id";
+    public static final String ATTRIBUTE_IDREF = "idref";
     public static final String ATTRIBUTE_CLASS = "class";
     /**
      * logger used by this class
@@ -48,6 +49,7 @@ public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBea
     {
         attributeMappings = new Properties();
         valueMappings = new HashMap();
+        registerAttributeMapping(ATTRIBUTE_ID, "name");
     }
 
     public void registerValueMapping(ValueMap mapping)
@@ -88,7 +90,7 @@ public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBea
                 name = attribute.getNodeName();
             }
 
-            if (AbstractBeanDefinitionParser.ID_ATTRIBUTE.equals(name))
+            if (ATTRIBUTE_ID.equals(name) || ATTRIBUTE_IDREF.equals(name))
             {
                 continue;
             }
@@ -248,6 +250,4 @@ public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBea
             return mappings.get(key);
         }
     }
-
-
 }

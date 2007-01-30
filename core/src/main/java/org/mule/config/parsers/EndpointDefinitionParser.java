@@ -28,7 +28,7 @@ import org.w3c.dom.NamedNodeMap;
  */
 public class EndpointDefinitionParser extends AbstractChildBeanDefinitionParser
 {
-
+    public static final String ADDRESS_ATTRIBUTE = "address";
 
     public EndpointDefinitionParser()
     {
@@ -80,8 +80,6 @@ public class EndpointDefinitionParser extends AbstractChildBeanDefinitionParser
         return true;
     }
 
-    public static final String ADDRESS_ATTRIBUTE = "address";
-
     protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
         registry = parserContext.getRegistry();
@@ -90,7 +88,7 @@ public class EndpointDefinitionParser extends AbstractChildBeanDefinitionParser
         {
             Attr attribute = (Attr) attributes.item(x);
             String name = attribute.getName();
-            if (ID_ATTRIBUTE.equals(name))
+            if (ATTRIBUTE_IDREF.equals(name))
             {
                 continue;
             }
@@ -115,26 +113,6 @@ public class EndpointDefinitionParser extends AbstractChildBeanDefinitionParser
         }
         postProcess(builder, element);
     }
-
-//    protected void postProcess(RootBeanDefinition beanDefinition, Element element)
-//    {
-//        String parentBean = ((Element) element.getParentNode()).getAttribute("id");
-//        if (StringUtils.isBlank(parentBean))
-//        {
-//            return;
-//        }
-//        BeanDefinition parent = registry.getBeanDefinition(parentBean);
-//        PropertyValue pv = parent.getPropertyValues().getPropertyValue("endpoints");
-//        if (pv == null)
-//        {
-//            pv = new PropertyValue("endpoints", new ManagedList());
-//            parent.getPropertyValues().addPropertyValue(pv);
-//        }
-//        ((List) pv.getValue()).add(beanDefinition);
-//
-//        //parent.getPropertyValues().addPropertyValue(new PropertyValue(getPropertyName(element), beanDefinition));
-//
-//    }
 
 
 

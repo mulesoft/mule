@@ -9,6 +9,8 @@
  */
 package org.mule.config.parsers;
 
+import org.mule.util.StringUtils;
+
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.w3c.dom.Element;
 
@@ -23,8 +25,7 @@ public class EndpointRefDefinitionParser extends EndpointDefinitionParser
     protected BeanDefinitionBuilder createBeanDefinitionBuilder(Element element, Class beanClass)
     {
         String parent = element.getAttribute(ATTRIBUTE_ENDPOINT_REF);
-        element.removeAttribute(ATTRIBUTE_ENDPOINT_REF);
-        if(parent==null)
+        if(StringUtils.isEmpty(parent))
         {
             throw new IllegalArgumentException("Atribute: " + ATTRIBUTE_ENDPOINT_REF + " must be specified for element: " + element.getNodeName());
         }
