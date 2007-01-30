@@ -25,10 +25,10 @@ import org.w3c.dom.NodeList;
 /**
  * TODO
  */
-public class MuleHeirarchicalBeanDefinitionParserDelegate extends BeanDefinitionParserDelegate
+public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinitionParserDelegate
 {
 
-    public MuleHeirarchicalBeanDefinitionParserDelegate(XmlReaderContext readerContext)
+    public MuleHierarchicalBeanDefinitionParserDelegate (XmlReaderContext readerContext)
     {
         super(readerContext);
     }
