@@ -31,7 +31,7 @@
     <!--<transaction-manager factory="org.mule.tck.testmodels.mule.TestTransactionManagerFactory"/>-->
 
     <mgmt:jmx-server id="jmxAgent">
-        <mgmt:connector-server url="ddd"/>
+        <!-- TODO find correct url <mgmt:connector-server url="ddd"/>-->
     </mgmt:jmx-server>
 
     <mule:custom-connector id="dummyConnector" class="org.mule.tck.testmodels.mule.TestConnector">
@@ -59,6 +59,7 @@
     <mule:endpoint id="fruitBowlEndpoint" address="test://fruitBowlPublishQ">
         <xm:jxpath-filter expectedValue="bar" expression="name">
             <xm:namespace prefix="foo" uri="http://foo.com"/>
+            <xm:namespace prefix="bar" uri="http://bar.com"/>
         </xm:jxpath-filter>
     </mule:endpoint>
     <mule:endpoint id="waterMelonEndpoint" address="test://test.queue"/>
@@ -71,6 +72,7 @@
         </mule:properties>
     </mule:endpoint>
 
+    <!-- TODO RM*: Add an interceptor wrapper and use spring AOP to configure these -->
     <!--<interceptor-stack name="default">-->
     <!--<interceptor className="org.mule.interceptors.LoggingInterceptor"/>-->
     <!--<interceptor className="org.mule.interceptors.TimerInterceptor"/>-->
@@ -78,17 +80,20 @@
 
     <bean id="apple" class="org.mule.tck.testmodels.fruit.Apple"/>
 
+    <bean id="orange" class="org.mule.tck.testmodels.fruit.Orange"/>
+    
     <mule:model-seda id="test-model">
         <mule:custom-entrypoint-resolver class="org.mule.tck.testmodels.mule.TestEntryPointResolver"/>
 
         <mule:custom-exception-strategy class="org.mule.tck.testmodels.mule.TestExceptionStrategy">
-            <mule:endpoint address=" test://component.exceptions "/>
+            <mule:endpoint address=" test://orange.exceptions "/>
         </mule:custom-exception-strategy>
+
 
         <mule:service id="orangeComponent" implementation="orange">
 
             <mule:inbound-router>
-                <mule:endpoint-ref idref="waterMelonEndpoint"/>
+                <mule:endpoint-ref idref="waterMelonEndpoint" id="foo"/>
                 <mule:forwarding-catch-all-strategy>
                     <mule:endpoint address="test://catch.all"/>
                 </mule:forwarding-catch-all-strategy>
@@ -123,6 +128,7 @@
             </mule:default-component-exception-strategy>
 
             <mule:properties>
+                <!-- TODO RM*:  note in doucmentation, the Descriptor container is no longer necessary -->
                 <property name="orange">
                     <bean class="org.mule.tck.testmodels.fruit.Orange"/>
                 </property>

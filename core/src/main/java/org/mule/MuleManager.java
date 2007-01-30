@@ -58,6 +58,7 @@ import org.mule.umo.manager.UMOManager;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.manager.UMOServerNotificationListener;
 import org.mule.umo.manager.UMOWorkManager;
+import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOSecurityManager;
@@ -579,20 +580,14 @@ public class MuleManager implements UMOManager
      */
     public UMOTransformer lookupTransformer(String name)
     {
-        UMOTransformer trans = (UMOTransformer) transformers.get(name);
-        if (trans != null)
+        try
         {
-            try
-            {
-                return (UMOTransformer) trans.clone();
-            }
-            catch (Exception e)
-            {
-                throw new MuleRuntimeException(new Message(Messages.FAILED_TO_CLONE_X, "Transformer: "
-                        + trans.getName()), e);
-            }
+            return (UMOTransformer)getContainerContext().getComponent(name);
         }
-        return null;
+        catch (ObjectNotFoundException e)
+        {
+            return null;
+        }
     }
 
     /**

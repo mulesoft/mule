@@ -81,8 +81,6 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
 
     public void testEndpointConfig()
     {
-        String endpointString = MuleManager.getInstance().lookupEndpointIdentifier("Test Queue", null);
-        assertEquals(endpointString, "test://test.queue");
         // test that endpoints have been resolved on endpoints
         UMOEndpoint endpoint = MuleManager.getInstance().lookupEndpoint("waterMelonEndpoint");
         assertNotNull(endpoint);

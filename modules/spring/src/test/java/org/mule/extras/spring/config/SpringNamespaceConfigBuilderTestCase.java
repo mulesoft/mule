@@ -13,7 +13,7 @@ import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.impl.AbstractExceptionListener;
 import org.mule.impl.MuleDescriptor;
-import org.mule.impl.container.DescriptorContainerKeyPair;
+import org.mule.impl.container.ContainerKeyPair;
 import org.mule.routing.ForwardingCatchAllStrategy;
 import org.mule.routing.filters.xml.JXPathFilter;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
@@ -82,33 +82,22 @@ public class SpringNamespaceConfigBuilderTestCase extends AbstractScriptConfigBu
         JXPathFilter filter = (JXPathFilter)endpoint.getFilter();
         assertEquals("name", filter.getExpression());
         assertEquals("bar", filter.getExpectedValue());
+        assertEquals(2, filter.getNamespaces().size());
         assertEquals("http://foo.com", filter.getNamespaces().get("foo"));
     }
 
     public void testEndpointConfig()
     {
-        String endpointString = MuleManager.getInstance().lookupEndpointIdentifier("Test Queue", null);
-        assertEquals(endpointString, "test://test.queue");
-        // test that endpoints have been resolved on endpoints
         UMOEndpoint endpoint = MuleManager.getInstance().lookupEndpoint("waterMelonEndpoint");
         assertNotNull(endpoint);
         assertEquals("test.queue", endpoint.getEndpointURI().getAddress());
 
         UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("orangeComponent");
-        UMOEndpoint ep = descriptor.getInboundRouter().getEndpoint("Orange");
-        assertNotNull(ep);
-        assertNotNull(ep.getResponseTransformer());
-        assertTrue(ep.getResponseTransformer() instanceof TestCompressionTransformer);
+        UMOEndpoint endpoint2 = descriptor.getInboundRouter().getEndpoint("Orange");
+        assertNotNull(endpoint2);
+        assertNotNull(endpoint2.getResponseTransformer());
+        assertTrue(endpoint2.getResponseTransformer() instanceof TestCompressionTransformer);
     }
-
-//    public void testInterceptorStacks()
-//    {
-//        UMOInterceptorStack stack = MuleManager.getInstance().lookupInterceptorStack("default");
-//        assertNotNull(stack);
-//        assertEquals(2, stack.getInterceptors().size());
-//        assertTrue(stack.getInterceptors().get(0) instanceof LoggingInterceptor);
-//        assertTrue(stack.getInterceptors().get(1) instanceof TimerInterceptor);
-//    }
 
     public void testExceptionStrategy()
     {
@@ -270,14 +259,15 @@ public class SpringNamespaceConfigBuilderTestCase extends AbstractScriptConfigBu
         assertEquals(UMOEndpoint.ENDPOINT_TYPE_RESPONSE, ep.getType());
     }
 
+    //TODO RM*: This is no longer relivant
     public void testObjectReferences() throws UMOException
     {
         MuleDescriptor descriptor = (MuleDescriptor)MuleManager.getInstance().getModel().getDescriptor(
             "orangeComponent");
-        assertEquals(new DescriptorContainerKeyPair("orangeComponent", "orange"),
+        assertEquals(new ContainerKeyPair(null, "orange"),
             descriptor.getImplementation());
-        assertEquals("descriptor", descriptor.getContainer());
-        assertNotNull(descriptor.getProperties().get("orange"));
+        assertEquals(null, descriptor.getContainer());
+        //assertNotNull(descriptor.getProperties().get("orange"));
         assertEquals(Orange.class, descriptor.getImplementationClass());
     }
 

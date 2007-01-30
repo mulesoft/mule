@@ -13,12 +13,12 @@ import org.mule.util.StringUtils;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
-import org.springframework.beans.factory.parsing.BeanComponentDefinition;
-import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.NamespaceHandler;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.beans.factory.xml.XmlReaderContext;
+import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
+import org.springframework.beans.factory.parsing.BeanComponentDefinition;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -79,6 +79,7 @@ public class MuleHeirarchicalBeanDefinitionParserDelegate extends BeanDefinition
         for (int i = 0; i < list.getLength(); i++)
         {
             Element element = (Element) list.item(i);
+            System.out.println(element.toString());
             if (isDefaultNamespace(element.getNamespaceURI()) && (PROPERTY_ELEMENT.equals(element.getLocalName())))
             {
                 parsePropertyElements(element, bd);
@@ -87,7 +88,7 @@ public class MuleHeirarchicalBeanDefinitionParserDelegate extends BeanDefinition
             else
             {
                 bd = parseCustomElement(element, bd);
-                registerBean(element, bd);
+                //registerBean(element, bd);
             }
         }
         return root;
@@ -99,7 +100,7 @@ public class MuleHeirarchicalBeanDefinitionParserDelegate extends BeanDefinition
         {
             return;
         }
-        String name = generateChildBeanName(ele);
+        String name =  generateChildBeanName(ele);
         BeanDefinitionHolder bdHolder = new BeanDefinitionHolder(bd, name);
 
         //bdHolder = decorateBeanDefinitionIfRequired(ele, bdHolder);

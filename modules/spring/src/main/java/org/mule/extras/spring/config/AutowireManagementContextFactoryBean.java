@@ -176,7 +176,7 @@ public class AutowireManagementContextFactoryBean
     protected void createModel() throws UMOException
     {
         // set the model
-        Map temp = context.getBeansOfType(UMOModel.class, true, true);
+        Map temp = context.getBeansOfType(UMOModel.class, false, true);
         UMOModel model;
         if (temp.size() > 0)
         {

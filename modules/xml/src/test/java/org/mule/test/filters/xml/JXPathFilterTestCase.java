@@ -10,19 +10,19 @@
 
 package org.mule.test.filters.xml;
 
+import org.mule.impl.MuleMessage;
+import org.mule.routing.filters.xml.JXPathFilter;
+import org.mule.tck.AbstractMuleTestCase;
+
 import java.io.InputStream;
 import java.io.StringReader;
 import java.util.HashMap;
-import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.io.IOUtils;
 import org.dom4j.DocumentHelper;
 import org.dom4j.InvalidXPathException;
-import org.mule.impl.MuleMessage;
-import org.mule.routing.filters.xml.JXPathFilter;
-import org.mule.tck.AbstractMuleTestCase;
 import org.xml.sax.InputSource;
 
 public class JXPathFilterTestCase extends AbstractMuleTestCase
@@ -60,7 +60,7 @@ public class JXPathFilterTestCase extends AbstractMuleTestCase
         w3cDocumentInputNS = dbf.newDocumentBuilder().parse(
             new InputSource(new StringReader(xmlStringInputNS)));
         nsAwareFilter = new JXPathFilter();
-        Map namespaces = new HashMap();
+        HashMap namespaces = new HashMap();
         namespaces.put("nsone", "http://one.org");
         namespaces.put("nstwo", "http://two.org");
         nsAwareFilter.setNamespaces(namespaces);

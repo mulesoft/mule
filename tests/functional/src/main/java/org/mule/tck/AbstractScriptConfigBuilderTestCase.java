@@ -10,15 +10,10 @@
 
 package org.mule.tck;
 
-import java.util.List;
-import java.util.Map;
-
 import org.mule.MuleManager;
 import org.mule.impl.AbstractExceptionListener;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.container.DescriptorContainerKeyPair;
-import org.mule.interceptors.LoggingInterceptor;
-import org.mule.interceptors.TimerInterceptor;
 import org.mule.providers.SimpleRetryConnectionStrategy;
 import org.mule.routing.ForwardingCatchAllStrategy;
 import org.mule.routing.filters.xml.JXPathFilter;
@@ -32,7 +27,6 @@ import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.tck.testmodels.mule.TestResponseAggregator;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOInterceptorStack;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.manager.UMOAgent;
 import org.mule.umo.model.UMOModel;
@@ -42,6 +36,9 @@ import org.mule.umo.routing.UMOOutboundRouter;
 import org.mule.umo.routing.UMOResponseMessageRouter;
 import org.mule.umo.routing.UMOResponseRouter;
 import org.mule.umo.transformer.UMOTransformer;
+
+import java.util.List;
+import java.util.Map;
 
 public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTestCase
 {
@@ -97,14 +94,15 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertTrue(ep.getResponseTransformer() instanceof TestCompressionTransformer);
     }
 
-    public void testInterceptorStacks()
-    {
-        UMOInterceptorStack stack = MuleManager.getInstance().lookupInterceptorStack("default");
-        assertNotNull(stack);
-        assertEquals(2, stack.getInterceptors().size());
-        assertTrue(stack.getInterceptors().get(0) instanceof LoggingInterceptor);
-        assertTrue(stack.getInterceptors().get(1) instanceof TimerInterceptor);
-    }
+    //TODO RM* Validate the use of AOP Interceptors
+//    public void testInterceptorStacks()
+//    {
+//        UMOInterceptorStack stack = MuleManager.getInstance().lookupInterceptorStack("default");
+//        assertNotNull(stack);
+//        assertEquals(2, stack.getInterceptors().size());
+//        assertTrue(stack.getInterceptors().get(0) instanceof LoggingInterceptor);
+//        assertTrue(stack.getInterceptors().get(1) instanceof TimerInterceptor);
+//    }
 
     public void testExceptionStrategy()
     {

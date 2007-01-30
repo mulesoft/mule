@@ -9,10 +9,6 @@
  */
 package org.mule.config.parsers;
 
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.xml.ParserContext;
-import org.w3c.dom.Element;
-
 /**
  * TODO
  */
@@ -22,11 +18,5 @@ public class JXPathFilterParser extends SimpleChildDefinitionParser
     public JXPathFilterParser(String setterMethod, Class clazz)
     {
         super(setterMethod, clazz);
-    }
-
-
-    protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
-    {
-        super.parseChild(element, parserContext, builder);    //To change body of overridden methods use File | Settings | File Templates.
     }
 }

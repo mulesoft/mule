@@ -10,6 +10,10 @@
 
 package org.mule.routing.filters.xml;
 
+import org.mule.umo.UMOFilter;
+import org.mule.umo.UMOMessage;
+import org.mule.util.StringMessageUtils;
+
 import java.util.Iterator;
 import java.util.Map;
 
@@ -21,9 +25,6 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.XPath;
-import org.mule.umo.UMOFilter;
-import org.mule.umo.UMOMessage;
-import org.mule.util.StringMessageUtils;
 
 /**
  * <code>JXPathFilter</code> evaluates an XPath expression against a W3C Document,

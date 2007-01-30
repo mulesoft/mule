@@ -134,7 +134,7 @@
         <xsd:complexContent>
             <xsd:extension base="baseEndpointType">
                 <xsd:attribute name="idref" type="xsd:IDREF" use="required"/>
-                <xsd:attribute name="id" type="xsd:IDREF" use="prohibited"/>
+                <!--<xsd:attribute name="id" type="xsd:IDREF" use="prohibited"/>-->
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -205,6 +205,9 @@
     </xsd:complexType>
 
     <xsd:complexType name="filterType" mixed="true">
+        <xsd:choice minOccurs="0" maxOccurs="1">
+            <xsd:element name="properties" type="propertiesType" minOccurs="0" maxOccurs="1"/>
+        </xsd:choice>
         <xsd:attribute name="not" type="xsd:boolean"/>
     </xsd:complexType>
 
