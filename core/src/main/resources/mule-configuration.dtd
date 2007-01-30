@@ -19,7 +19,7 @@
     distributed Mule environments have their own properties
 -->
 <!ATTLIST mule-configuration id              NMTOKEN         #REQUIRED>
-<!ATTLIST mule-configuration clusrterId              NMTOKEN         #IMPLIED>
+<!ATTLIST mule-configuration clusterId              NMTOKEN         #IMPLIED>
 <!ATTLIST mule-configuration domain              NMTOKEN         #IMPLIED>
 <!--
     The version attribute is used to bind a mule_props.xml
@@ -1047,7 +1047,7 @@ The name of the method that will be bound to the endpoint
 
 <!--
 //TODO
-If a timeout occurs, should an error be thorwn or allow the events to be passed on regardless
+If a timeout occurs, should an error be thrown or allow the events to be passed on regardless
 -->
 <!--<!ATTLIST response-router failOnTimeout        (true | false)         "true">-->
 

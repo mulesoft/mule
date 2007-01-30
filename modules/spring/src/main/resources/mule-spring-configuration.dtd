@@ -1009,7 +1009,7 @@ Whether every configured router will be matched
 
 <!--
 //TODO
-If a timeout occurs, should an error be thorwn or allow the events to be passed on regardless
+If a timeout occurs, should an error be thrown or allow the events to be passed on regardless
 -->
 <!--<!ATTLIST response-router failOnTimeout        (true | false)         "true">-->
 
