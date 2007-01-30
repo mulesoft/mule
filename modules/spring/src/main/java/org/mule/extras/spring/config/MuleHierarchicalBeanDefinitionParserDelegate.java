@@ -11,6 +11,8 @@ package org.mule.extras.spring.config;
 
 import org.mule.util.StringUtils;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
@@ -22,11 +24,16 @@ import org.springframework.beans.factory.parsing.BeanComponentDefinition;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+
 /**
  * TODO
  */
 public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinitionParserDelegate
 {
+    /**
+     * logger used by this class
+     */
+    protected static final Log logger = LogFactory.getLog(MuleHierarchicalBeanDefinitionParserDelegate.class);
 
     public MuleHierarchicalBeanDefinitionParserDelegate (XmlReaderContext readerContext)
     {
@@ -79,7 +86,9 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
         for (int i = 0; i < list.getLength(); i++)
         {
             Element element = (Element) list.item(i);
-            System.out.println(element.toString());
+            if (logger.isDebugEnabled()) {
+                logger.debug(element.toString());
+            }
             if (isDefaultNamespace(element.getNamespaceURI()) && (PROPERTY_ELEMENT.equals(element.getLocalName())))
             {
                 parsePropertyElements(element, bd);
