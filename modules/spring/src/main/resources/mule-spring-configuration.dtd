@@ -18,7 +18,7 @@
     distributed Mule environments have their own properties
 -->
 <!ATTLIST mule-configuration id              NMTOKEN         #REQUIRED>
-<!ATTLIST mule-configuration clusrterId              NMTOKEN         #IMPLIED>
+<!ATTLIST mule-configuration clusterId              NMTOKEN         #IMPLIED>
 <!ATTLIST mule-configuration domain              NMTOKEN         #IMPLIED>
 <!--
     The version attribute is used to bind a mule_props.xml
