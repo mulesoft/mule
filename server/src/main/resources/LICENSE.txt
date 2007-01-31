@@ -1,5 +1,5 @@
 MuleSource Public License
-Version 1.1.3
+Version 1.1.4
 
 The MuleSource Public License Version ("MSPL") consists of the Mozilla Public 
 License Version 1.1, modified to be specific to MuleSource, with the Additional 
@@ -385,10 +385,11 @@ Covered Code as "Multiple-Licensed". "Multiple-Licensed" means that the Initial
 Developer permits you to utilize portions of the Covered Code under Your choice 
 of the SPL or the alternative licenses, if any, specified by the Initial 
 Developer in the file described in Exhibit A.
-MuleSource Public License 1.1.3 - Exhibit A
+
+MuleSource Public License 1.1.4 - Exhibit A
 
 The contents of this file are subject to the MuleSource Public License Version 
-1.1.3 ("License"); You may not use this file except in compliance with the 
+1.1.4 ("License"); You may not use this file except in compliance with the 
 License. You may obtain a copy of the License at http://www.MuleSource.com/MSPL 
 Software distributed under the License is distributed on an "AS IS" basis, 
 WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for the 
@@ -406,26 +407,24 @@ notices in the Source Code files of the Original Code. You should use the text
 of this Exhibit A rather than the text found in the Original Code Source Code 
 for Your Modifications.]
 
-MuleSource Public License 1.1.3 - Exhibit B
+MuleSource Public License 1.1.4 - Exhibit B
+
 Additional Terms applicable to the MuleSource Public License.
 
 I. Effect.These additional terms described in this MuleSource Public License - 
 Additional Terms shall apply to the Covered Code under this License.
 
 II. MuleSource and logo. This License does not grant any rights to use the 
-trademarks "MuleSource", "Mule" and the "MuleSource", "Mule" logos even if such 
-marks are included in the Original Code or Modifications. However, in addition 
-to the other notice obligations, all copies of the Covered Code in Executable 
-and Source Code form distributed must, as a form of attribution of the original 
-author, include on each user interface screen (i) the "Powered by Mule" logo and 
-(ii) the copyright notice in the same form as the latest version of the Covered 
-Code distributed by MuleSource, Inc. at the time of distribution of such copy. 
-In addition, the "Powered by Mule" logo must be visible to all users and be 
-located at the very bottom center of each user interface screen. Notwithstanding 
-the above, the dimensions of the "Powered by Mule" logo must be at least 130 x 
-25 pixels. When users click on the "Powered by Mule" logo it must direct them 
-back to http://www.MuleSource.com. In addition, the copyright notice must remain 
-visible to all users at all times at the bottom of the user interface screen. 
-When users click on the copyright notice, it must direct them back to 
-http://www.MuleSource.com
+trademarks "MuleSource", "Mule" and the "MuleSource", "Mule" logos even if 
+such marks are included in the Original Code or Modifications.
 
+Redistributions of the Covered Code in binary form or source code form, must 
+ensure that the first time the resulting executable program is launched, a 
+user interface, if any, shall include the attribution information set forth 
+below prominently. If the executable program does not launch a user interface, 
+the Company name and URL shall be included in the notice section of each file 
+of the Covered Code.  :
+
+(a) MuleSource Inc.
+(b) Logo image: http://www.mulesource.com/images/mulesource_logo.gif
+(c) http://www.mulesource.com
