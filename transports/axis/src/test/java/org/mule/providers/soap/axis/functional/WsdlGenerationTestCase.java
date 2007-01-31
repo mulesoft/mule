@@ -10,20 +10,17 @@
 
 package org.mule.providers.soap.axis.functional;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.dom4j.Document;
-import org.dom4j.DocumentHelper;
 import org.mule.extras.client.MuleClient;
 import org.mule.providers.http.HttpConnector;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
+import java.util.HashMap;
+import java.util.Map;
+
+import org.dom4j.Document;
+import org.dom4j.DocumentHelper;
+
 public class WsdlGenerationTestCase extends FunctionalTestCase
 {
 

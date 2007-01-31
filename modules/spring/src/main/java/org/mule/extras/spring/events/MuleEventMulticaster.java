@@ -24,6 +24,8 @@ import org.mule.impl.MuleSession;
 import org.mule.impl.RequestContext;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.impl.model.ModelHelper;
+import org.mule.impl.model.seda.SedaModel;
 import org.mule.providers.AbstractConnector;
 import org.mule.routing.filters.ObjectFilter;
 import org.mule.routing.filters.WildcardFilter;
@@ -39,7 +41,7 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.umo.routing.UMOInboundMessageRouter;
+import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
@@ -598,7 +600,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
         {
             descriptor = getDefaultDescriptor();
             setSubscriptionsOnDescriptor((MuleDescriptor)descriptor);
-            component = MuleManager.getInstance().getModel().registerComponent(descriptor);
+            component = MuleManager.getInstance().lookupModel(ModelHelper.SYSTEM_MODEL).registerComponent(descriptor);
         }
     }
 
@@ -771,7 +773,13 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
     {
         // When the the beanFactory is refreshed all the beans get
         // reloaded so we need to unregister the component from Mule
-        UMOModel model = MuleManager.getInstance().getModel();
+        UMOModel model = MuleManager.getInstance().lookupModel(ModelHelper.SYSTEM_MODEL);
+        if(model==null)
+        {
+            model = new SedaModel();
+            model.setName(ModelHelper.SYSTEM_MODEL);
+            MuleManager.getInstance().registerModel(model);
+        }
         UMODescriptor descriptor = model.getDescriptor(EVENT_MULTICASTER_DESCRIPTOR_NAME);
         if (descriptor != null)
         {
@@ -786,7 +794,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
         else
         {
             // Set multiple inbound subscriptions on the descriptor
-            UMOInboundMessageRouter messageRouter = descriptor.getInboundRouter();
+            UMOInboundRouterCollection messageRouter = descriptor.getInboundRouter();
 
             for (int i = 0; i < subscriptions.length; i++)
             {

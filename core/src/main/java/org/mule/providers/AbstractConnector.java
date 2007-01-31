@@ -173,15 +173,10 @@ public abstract class AbstractConnector
     private ThreadingProfile receiverThreadingProfile = null;
 
     /**
-     * @see {@link #isCreateDispatcherPerRequest()}
-     */
-    protected boolean createDispatcherPerRequest = false;
-
-    /**
      * @see {@link #isCreateMultipleTransactedReceivers()}
      */
     protected boolean createMultipleTransactedReceivers = true;
-    
+
     /**
      * @see {@link #getNumberOfConcurrentTransactedReceivers()}
      */
@@ -241,12 +236,13 @@ public abstract class AbstractConnector
     private ScheduledExecutorService scheduler = null;
 
     /**
-    * Holds the service configuration for this connector
+     * Holds the service configuration for this connector
      */
     protected TransportServiceDescriptor serviceDescriptor;
 
     /**
-     * The map of service overrides that can e used to extend the capabilities of the connector
+     * The map of service overrides that can e used to extend the capabilities of the
+     * connector
      */
     protected Properties serviceOverrides;
 
@@ -336,7 +332,7 @@ public abstract class AbstractConnector
         {
             logger.info("Initialising " + getClass().getName());
         }
-        //Initialise the structure of this connector
+        // Initialise the structure of this connector
         initFromServiceDescriptor();
 
         // we clear out any registered dispatchers and receivers without resetting
@@ -714,7 +710,8 @@ public abstract class AbstractConnector
 
             if (logger.isDebugEnabled())
             {
-                logger.debug("Borrowed a dispatcher for endpoint: " + endpoint.getEndpointURI() + " = " + dispatcher.toString());
+                logger.debug("Borrowed a dispatcher for endpoint: " + endpoint.getEndpointURI() + " = "
+                                + dispatcher.toString());
             }
 
             return dispatcher;
@@ -733,9 +730,10 @@ public abstract class AbstractConnector
             {
                 if (logger.isDebugEnabled())
                 {
-                    logger.debug("Returning dispatcher for endpoint: " + endpoint.getEndpointURI() + " = " + dispatcher.toString());
+                    logger.debug("Returning dispatcher for endpoint: " + endpoint.getEndpointURI() + " = "
+                                    + dispatcher.toString());
                 }
-    
+
                 dispatchers.returnObject(endpoint, dispatcher);
             }
             catch (Exception ex)
@@ -1168,29 +1166,6 @@ public abstract class AbstractConnector
     }
 
     /**
-     * Controls whether dispatchers are cached or created per request. Note that if
-     * an exception occurs in the dispatcher it is automatically disposed of and a
-     * new one is created for the next request. This allows dispatchers to recover
-     * from loss of connection and other faults.
-     * 
-     * @return true if a a new dispatcher is created for every request
-     */
-    public boolean isCreateDispatcherPerRequest()
-    {
-        return createDispatcherPerRequest;
-    }
-
-    /**
-     * @see {@link #isCreateDispatcherPerRequest()}
-     * @param createDispatcherPerRequest whether a new dispatcher is created for
-     *            every request or not
-     */
-    public void setCreateDispatcherPerRequest(boolean createDispatcherPerRequest)
-    {
-        this.createDispatcherPerRequest = createDispatcherPerRequest;
-    }
-
-    /**
      * For better throughput when using TransactedMessageReceivers this will enable a
      * number of concurrent receivers, based on the value returned by
      * {@link #getNumberOfConcurrentTransactedReceivers()}. This property is used by
@@ -1213,7 +1188,7 @@ public abstract class AbstractConnector
     {
         this.createMultipleTransactedReceivers = createMultipleTransactedReceivers;
     }
-    
+
     /**
      * Returns the number of concurrent receivers that will be launched when
      * {@link #isCreateMultipleTransactedReceivers()} returns <code>true</code>.
@@ -1232,7 +1207,7 @@ public abstract class AbstractConnector
     {
         numberOfConcurrentTransactedReceivers = count;
     }
-    
+
     /**
      * Whether to fire message notifications for every message that is sent or
      * received from this connector
@@ -1524,16 +1499,19 @@ public abstract class AbstractConnector
         }
     }
 
-
-    //-------- Methods from the removed AbstractServiceEnabled Connector
+    // -------- Methods from the removed AbstractServiceEnabled Connector
 
     /**
-     * When this connector is created via the {@link org.mule.providers.service.TransportFactory} the endpoint used to determine the connector
-     * type is passed to this method so that any properties set on the endpoint that can be used to initialise
-     * the connector are made available.
+     * When this connector is created via the
+     * {@link org.mule.providers.service.TransportFactory} the endpoint used to
+     * determine the connector type is passed to this method so that any properties
+     * set on the endpoint that can be used to initialise the connector are made
+     * available.
+     * 
      * @param endpointUri the {@link UMOEndpointURI} use to create this connector
-     * @throws InitialisationException If there are any problems with the configuration set on the Endpoint or if another
-     * exception is thrown it is wrapped in an InitialisationException.
+     * @throws InitialisationException If there are any problems with the
+     *             configuration set on the Endpoint or if another exception is
+     *             thrown it is wrapped in an InitialisationException.
      */
     public void initialiseFromUrl(UMOEndpointURI endpointUri) throws InitialisationException
     {
@@ -1571,10 +1549,12 @@ public abstract class AbstractConnector
     }
 
     /**
-     * Initialises this connector from its {@link TransportServiceDescriptor} This will be called before the
-     * {@link #doInitialise()} method is called.
-     * @throws InitialisationException InitialisationException If there are any problems with the configuration or if another
-     * exception is thrown it is wrapped in an InitialisationException.
+     * Initialises this connector from its {@link TransportServiceDescriptor} This
+     * will be called before the {@link #doInitialise()} method is called.
+     * 
+     * @throws InitialisationException InitialisationException If there are any
+     *             problems with the configuration or if another exception is thrown
+     *             it is wrapped in an InitialisationException.
      */
     protected synchronized void initFromServiceDescriptor() throws InitialisationException
     {
@@ -1600,8 +1580,8 @@ public abstract class AbstractConnector
             // This provides a really convenient way to set properties on an object
             // from unit tests
             Map props = new HashMap();
-            PropertiesUtils.getPropertiesWithPrefix(MuleManager.getInstance().getProperties(),
-                getProtocol().toLowerCase(), props);
+            PropertiesUtils.getPropertiesWithPrefix(MuleManager.getInstance().getProperties(), getProtocol()
+                .toLowerCase(), props);
             if (props.size() > 0)
             {
                 props = PropertiesUtils.removeNamespaces(props);
@@ -1615,10 +1595,11 @@ public abstract class AbstractConnector
     }
 
     /**
-     * Get the {@link TransportServiceDescriptor} for this connector. This will be null if the connector
-     * was created by the developer. To create a connector the proper way the developer should use the
-     * {@link TransportFactory} and pass in an endpoint.
-     *
+     * Get the {@link TransportServiceDescriptor} for this connector. This will be
+     * null if the connector was created by the developer. To create a connector the
+     * proper way the developer should use the {@link TransportFactory} and pass in
+     * an endpoint.
+     * 
      * @return the {@link TransportServiceDescriptor} for this connector
      */
     protected TransportServiceDescriptor getServiceDescriptor()
@@ -1632,14 +1613,19 @@ public abstract class AbstractConnector
 
     /**
      * Create a Message receiver for this connector
-     * @param component the component that will receive events from this receiver, the listener
+     * 
+     * @param component the component that will receive events from this receiver,
+     *            the listener
      * @param endpoint the endpoint that defies this inbound communication
-     * @return an instance of the message receiver defined in this connectors' {@link org.mule.providers.service.TransportServiceDescriptor}
-     * initialised using the component and endpoint.
-     * @throws Exception if there is a problem creating the receiver. This exception really depends on the underlying
-     * transport, thus any exception could be thrown
+     * @return an instance of the message receiver defined in this connectors'
+     *         {@link org.mule.providers.service.TransportServiceDescriptor}
+     *         initialised using the component and endpoint.
+     * @throws Exception if there is a problem creating the receiver. This exception
+     *             really depends on the underlying transport, thus any exception
+     *             could be thrown
      */
-    protected UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception
+    protected UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint)
+        throws Exception
     {
         return getServiceDescriptor().createMessageReceiver(this, component, endpoint);
     }
@@ -1647,7 +1633,7 @@ public abstract class AbstractConnector
     /**
      * Gets a <code>UMOMessageAdapter</code> for the endpoint for the given message
      * (data)
-     *
+     * 
      * @param message the data with which to initialise the
      *            <code>UMOMessageAdapter</code>
      * @return the <code>UMOMessageAdapter</code> for the endpoint
@@ -1672,7 +1658,7 @@ public abstract class AbstractConnector
      * Gets a {@link UMOStreamMessageAdapter} from the connector for the given
      * message. This Adapter will correctly handle data streaming for this type of
      * connector
-     *
+     * 
      * @param in the input stream to read the data from
      * @param out the outputStream to write data to. This can be null.
      * @return the {@link UMOStreamMessageAdapter} for the endpoint
@@ -1694,8 +1680,9 @@ public abstract class AbstractConnector
     }
 
     /**
-     * A map of fully qualified class names that should override those in the connectors' service descriptor
-     * This map will be null if there are no overrides
+     * A map of fully qualified class names that should override those in the
+     * connectors' service descriptor This map will be null if there are no overrides
+     * 
      * @return a map of override values or null
      */
     public Map getServiceOverrides()
@@ -1705,6 +1692,7 @@ public abstract class AbstractConnector
 
     /**
      * Set the Service overrides on this connector.
+     * 
      * @param serviceOverrides the override values to use
      */
     public void setServiceOverrides(Map serviceOverrides)
@@ -1713,4 +1701,21 @@ public abstract class AbstractConnector
         this.serviceOverrides.putAll(serviceOverrides);
     }
 
+    /**
+     * Well get the output stream (if any) for this type of transport. Typically this
+     * will be called only when Streaming is being used on an outbound endpoint.
+     * If Streaming is not supported by this transport an {@link UnsupportedOperationException}
+     * is thrown
+     *
+     * @param endpoint the endpoint that releates to this Dispatcher
+     * @param message the current message being processed
+     * @return the output stream to use for this request or null if the transport
+     *         does not support streaming
+     * @throws org.mule.umo.UMOException
+     */
+    public OutputStream getOutputStream(UMOImmutableEndpoint endpoint, UMOMessage message)
+        throws UMOException
+    {
+        throw new UnsupportedOperationException(new Message(Messages.STREAMING_NOT_SUPPORTED_FOR_X, getProtocol()).toString());
+    }
 }

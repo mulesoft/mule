@@ -18,7 +18,7 @@ import org.mule.providers.DefaultMessageAdapter;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.routing.outbound.FilteringOutboundRouter;
-import org.mule.routing.outbound.OutboundMessageRouter;
+import org.mule.routing.outbound.OutboundRouterCollection;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 import org.mule.umo.UMOMessage;
@@ -35,7 +35,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
     {
         Mock session = MuleTestUtils.getMockSession();
         session.expectAndReturn("getComponent", getTestComponent(getTestDescriptor("test", "blah")));
-        OutboundMessageRouter messageRouter = new OutboundMessageRouter();
+        OutboundRouterCollection messageRouter = new OutboundRouterCollection();
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
         assertNotNull(messageRouter.getCatchAllStrategy());
 
@@ -107,7 +107,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         final int[] count2 = new int[]{0};
         final int[] catchAllCount = new int[]{0};
 
-        OutboundMessageRouter messageRouter = new OutboundMessageRouter();
+        OutboundRouterCollection messageRouter = new OutboundRouterCollection();
 
         FilteringOutboundRouter filterRouter1 = new FilteringOutboundRouter()
         {

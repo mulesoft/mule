@@ -13,7 +13,7 @@ package org.mule.test.integration.providers.vm;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
-import org.mule.model.TooManySatisfiableMethodsException;
+import org.mule.impl.TooManySatisfiableMethodsException;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.services.MatchingMethodsComponent;
 import org.mule.umo.UMOMessage;

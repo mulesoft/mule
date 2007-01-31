@@ -317,7 +317,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.endpoint.UMOEndpoint#getEndpointURI()
      */
     public UMOEndpointURI getEndpointURI()
@@ -332,7 +332,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.endpoint.UMOImmutableEndpoint#getType()
      */
     public String getType()
@@ -342,7 +342,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.endpoint.UMOImmutableEndpoint#getConnectorName()
      */
     public UMOConnector getConnector()
@@ -352,7 +352,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.endpoint.UMOImmutableEndpoint#getName()
      */
     public String getName()
@@ -362,7 +362,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.endpoint.UMOEndpoint#getTransformer()
      */
     public UMOTransformer getTransformer()
@@ -372,7 +372,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.endpoint.UMOImmutableEndpoint#getParams()
      */
     public Map getProperties()
@@ -382,7 +382,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#clone()
      */
     // TODO this is the 'old' implementation of the clone() method which returns
@@ -433,7 +433,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.endpoint.UMOImmutableEndpoint#isReadOnly()
      */
     public boolean isReadOnly()
@@ -455,7 +455,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.endpoint.UMOImmutableEndpoint#getProtocol()
      */
     public String getProtocol()
@@ -465,7 +465,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.endpoint.UMOImmutableEndpoint#canReceive()
      */
     public boolean canReceive()
@@ -476,7 +476,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.endpoint.UMOImmutableEndpoint#canSend()
      */
     public boolean canSend()
@@ -486,7 +486,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.endpoint.UMOEndpoint#getTransactionConfig()
      */
     public UMOTransactionConfig getTransactionConfig()
@@ -700,6 +700,11 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
                 {
                     transformer = ((AbstractConnector)connector).getDefaultOutboundTransformer();
                 }
+                else if (UMOEndpoint.ENDPOINT_TYPE_SENDER_AND_RECEIVER.equals(type))
+                {
+                	transformer = ((AbstractConnector)connector).getDefaultOutboundTransformer();
+                	responseTransformer = ((AbstractConnector)connector).getDefaultInboundTransformer();
+                }
                 else
                 {
                     transformer = ((AbstractConnector)connector).getDefaultInboundTransformer();
@@ -808,7 +813,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     /**
      * Returns an UMOEndpointSecurityFilter for this endpoint. If one is not set,
      * there will be no authentication on events sent via this endpoint
-     * 
+     *
      * @return UMOEndpointSecurityFilter responsible for authenticating message flow
      *         via this endpoint.
      * @see org.mule.umo.security.UMOEndpointSecurityFilter
@@ -822,7 +827,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
      * Determines if requests originating from this endpoint should be synchronous
      * i.e. execute in a single thread and possibly return an result. This property
      * is only used when the endpoint is of type 'receiver'
-     * 
+     *
      * @return whether requests on this endpoint should execute in a single thread.
      *         This property is only used when the endpoint is of type 'receiver'
      */
@@ -850,7 +855,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
      * (outputStream) or Jms (ReplyTo) Mule can automatically wait for a response
      * from a backchannel when dispatching over these protocols. This is different
      * for synchronous as synchronous behavior only applies to in
-     * 
+     *
      * @return
      */
     public boolean isRemoteSync()
@@ -871,7 +876,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     /**
      * The timeout value for remoteSync invocations
-     * 
+     *
      * @return the timeout in milliseconds
      */
     public int getRemoteSyncTimeout()
@@ -886,7 +891,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     /**
      * Sets the state the endpoint will be loaded in. The States are 'stopped' and
      * 'started' (default)
-     * 
+     *
      * @return the endpoint starting state
      */
     public String getInitialState()
@@ -901,7 +906,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     /**
      * Determines whether the endpoint should deal with requests as streams
-     * 
+     *
      * @return true if the request should be streamed
      */
     public boolean isStreaming()
@@ -919,7 +924,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         return value;
     }
 
-    
+
     // TODO the following methods should most likely be lifecycle-enabled
 
     public void dispatch(UMOEvent event) throws DispatchException
@@ -930,7 +935,8 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         }
         else
         {
-            // TODO: what?
+            //TODO: Either remove because this should never happen or i18n the message
+            throw new IllegalStateException("The connector on the endpoint: " + toString() + "is null. Please contact dev@mule.codehaus.org");
         }
     }
 
@@ -942,8 +948,8 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         }
         else
         {
-            // TODO: what?
-            return null;
+            //TODO: Either remove because this should never happen or i18n the message
+            throw new IllegalStateException("The connector on the endpoint: " + toString() + "is null. Please contact dev@mule.codehaus.org");
         }
     }
 
@@ -955,8 +961,8 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         }
         else
         {
-            // TODO: what?
-            return null;
+            //TODO: Either remove because this should never happen or i18n the message
+            throw new IllegalStateException("The connector on the endpoint: " + toString() + "is null. Please contact dev@mule.codehaus.org");
         }
     }
 

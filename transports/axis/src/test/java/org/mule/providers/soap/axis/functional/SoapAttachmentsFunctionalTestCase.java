@@ -43,7 +43,7 @@ public class SoapAttachmentsFunctionalTestCase extends AbstractProviderFunctiona
         model.getPoolingProfile().setInitialisationPolicy(
             PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
 
-        manager.setModel(model);
+        manager.registerModel(new SedaModel());
         callbackCalled = false;
         callbackCount = 0;
         connector = createConnector();

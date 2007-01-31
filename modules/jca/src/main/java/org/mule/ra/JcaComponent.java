@@ -28,7 +28,6 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.ObjectNotFoundException;
-import org.mule.umo.model.ModelException;
 import org.mule.umo.model.UMOEntryPoint;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
@@ -144,10 +143,10 @@ public class JcaComponent implements UMOComponent
         descriptor.initialise();
         try
         {
-            entryPoint = MuleManager.getInstance().getModel().getEntryPointResolver().resolveEntryPoint(
+            entryPoint = MuleManager.getInstance().lookupModel(JcaModel.JCA_MODEL_TYPE).getEntryPointResolver().resolveEntryPoint(
                 descriptor);
         }
-        catch (ModelException e)
+        catch (UMOException e)
         {
             throw new InitialisationException(e, this);
         }

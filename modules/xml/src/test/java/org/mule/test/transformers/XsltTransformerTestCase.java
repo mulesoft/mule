@@ -20,6 +20,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
     private String srcData;
     private String resultData;
 
+    // @Override
     protected void doSetUp() throws Exception
     {
         srcData = IOUtils.getResourceAsString("cdcatalog.xml", getClass());
@@ -39,6 +40,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         return null;
     }
 
+    // @Override
     public void testRoundtripTransform() throws Exception
     {
         // disable this test
@@ -54,12 +56,4 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         return resultData;
     }
 
-    public boolean compareResults(Object src, Object result)
-    {
-        if (src != null)
-        {
-            src = ((String)src).replaceAll("\r", "");
-        }
-        return super.compareResults(src, result);
-    }
 }

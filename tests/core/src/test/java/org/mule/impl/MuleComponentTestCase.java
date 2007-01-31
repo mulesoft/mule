@@ -10,9 +10,6 @@
 
 package org.mule.impl;
 
-import java.util.Iterator;
-
-import org.mule.MuleManager;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.providers.AbstractConnector;
 import org.mule.tck.AbstractMuleTestCase;
@@ -23,7 +20,10 @@ import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOSession;
 import org.mule.umo.manager.UMOManager;
+import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOMessageReceiver;
+
+import java.util.Iterator;
 
 public class MuleComponentTestCase extends AbstractMuleTestCase
 {
@@ -31,9 +31,10 @@ public class MuleComponentTestCase extends AbstractMuleTestCase
     {
         QuickConfigurationBuilder builder = new QuickConfigurationBuilder(true);
         builder.registerComponent(Orange.class.getName(), "orangeComponent", "test://in", "test://out", null);
-        UMOManager manager = builder.createStartedManager(true, "");
+        builder.createStartedManager(true, "");
+        UMOModel model = getDefaultModel();
 
-        final UMOComponent comp = manager.getModel().getComponentSession("orangeComponent").getComponent();
+        final UMOComponent comp = model.getComponent("orangeComponent");
         assertTrue(comp.isStarted());
         comp.pause();
         new Thread(new Runnable()
@@ -108,7 +109,8 @@ public class MuleComponentTestCase extends AbstractMuleTestCase
         // Start model
         UMOManager manager = builder.createStartedManager(true, "");
 
-        UMOSession session = MuleManager.getInstance().getModel().getComponentSession("orangeComponent");
+        UMOModel model = getDefaultModel();
+        UMOSession session = new MuleSession(model.getComponent("orangeComponent"));
         final UMOComponent c = session.getComponent();
         // Component initially stopped
         assertFalse(c.isStarted());
@@ -144,8 +146,8 @@ public class MuleComponentTestCase extends AbstractMuleTestCase
 
         // Start model
         UMOManager manager = builder.createStartedManager(true, "");
-
-        UMOSession session = MuleManager.getInstance().getModel().getComponentSession("orangeComponent");
+        UMOModel model = getDefaultModel();
+        UMOSession session = new MuleSession(model.getComponent("orangeComponent"));
         final UMOComponent c = session.getComponent();
         assertTrue(c.isStarted());
 

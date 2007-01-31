@@ -288,12 +288,7 @@ public class TransportServiceDescriptor
     {
         if (getStreamMessageAdapter() == null)
         {
-            // streamMessageAdapter = StreamMessageAdapter.class.getName();
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("No stream.message.adapter set in service description, defaulting to: "
-                             + streamMessageAdapter);
-            }
+
             // If the stream.message.adapter is not set streaming should not be used
             throw new TransportServiceException(new Message(Messages.X_NOT_SET_IN_SERVICE_X,
                 "stream.message.adapter", getProtocol() + " service descriptor"));

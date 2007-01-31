@@ -14,6 +14,7 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleDescriptor;
 import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.model.UMOModel;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.pool.PoolableObjectFactory;
@@ -31,9 +32,9 @@ public class CommonsPoolProxyFactory extends AbstractProxyFactory implements Poo
      * @param descriptor the descriptor to use to construct a MuleProxy
      * @see MuleDescriptor
      */
-    public CommonsPoolProxyFactory(MuleDescriptor descriptor)
+    public CommonsPoolProxyFactory(MuleDescriptor descriptor, UMOModel model)
     {
-        super(descriptor);
+        super(descriptor, model);
     }
 
     /*

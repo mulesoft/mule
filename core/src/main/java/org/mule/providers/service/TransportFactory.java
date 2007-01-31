@@ -60,6 +60,7 @@ public class TransportFactory
     public static final int NEVER_CREATE_CONNECTOR = 2;
     public static final int USE_CONNECTOR = 3;
 
+    // @GuardedBy("TransportFactory.class")
     private static Map csdCache = new HashMap();
 
     public static UMOEndpoint createEndpoint(UMOEndpointURI uri, String type) throws EndpointException
@@ -291,7 +292,7 @@ public class TransportFactory
         return getServiceDescriptor(protocol, null);
     }
 
-    public static TransportServiceDescriptor getServiceDescriptor(String protocol, Properties overrides)
+    public static synchronized TransportServiceDescriptor getServiceDescriptor(String protocol, Properties overrides)
         throws TransportFactoryException
     {
         TransportServiceDescriptor csd = (TransportServiceDescriptor)csdCache.get(new CSDKey(protocol,
@@ -385,6 +386,7 @@ public class TransportFactory
             this.protocol = protocol;
         }
 
+        // @Override
         public boolean equals(Object o)
         {
             if (this == o)
@@ -410,6 +412,7 @@ public class TransportFactory
             return true;
         }
 
+        // @Override
         public int hashCode()
         {
             return 29 * (overrides != null ? overrides.hashCode() : 0) + protocol.hashCode();

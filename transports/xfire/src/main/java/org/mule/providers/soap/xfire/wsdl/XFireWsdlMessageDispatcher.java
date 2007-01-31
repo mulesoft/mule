@@ -10,6 +10,9 @@
 
 package org.mule.providers.soap.xfire.wsdl;
 
+import org.mule.providers.soap.xfire.XFireMessageDispatcher;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
+
 import java.net.URL;
 
 import javax.xml.namespace.QName;
@@ -18,8 +21,6 @@ import org.apache.commons.pool.impl.StackObjectPool;
 import org.codehaus.xfire.XFire;
 import org.codehaus.xfire.client.Client;
 import org.codehaus.xfire.service.Service;
-import org.mule.providers.soap.xfire.XFireMessageDispatcher;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 /**
  * TODO document
@@ -32,7 +33,8 @@ public class XFireWsdlMessageDispatcher extends XFireMessageDispatcher
         super(endpoint);
     }
 
-    protected void doConnect(final UMOImmutableEndpoint endpoint) throws Exception
+    // @Override
+    protected void doConnect() throws Exception
     {
         try
         {

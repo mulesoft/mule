@@ -66,4 +66,20 @@ public interface UMOResponseRouter extends UMORouter
      * @return the time in milliseconds to wait for a response event
      */
     int getTimeout();
+
+    /**
+     * Should the router fail and throw an exception if a timeout occurs or should it return
+     * the events received so far.
+     * //TODO This method is not implemented yet
+     * @param fail
+     */
+    void setFailOnTimeout(boolean fail);
+
+    /**
+     * Should the router fail and throw an exception if a timeout occurs or should it return
+     * the events received so far.
+     * //TODO This method is not implemented yet
+     * @return
+     */
+    boolean isFailOnTimeout();
 }

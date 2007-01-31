@@ -33,15 +33,17 @@ import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleTransactionConfig;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.model.ModelFactory;
+import org.mule.impl.model.resolvers.DynamicEntryPointResolver;
 import org.mule.impl.security.MuleSecurityManager;
 import org.mule.interceptors.InterceptorStack;
-import org.mule.model.DynamicEntryPointResolver;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.ConnectionStrategy;
 import org.mule.routing.LoggingCatchAllStrategy;
-import org.mule.routing.inbound.InboundMessageRouter;
-import org.mule.routing.outbound.OutboundMessageRouter;
-import org.mule.routing.response.ResponseMessageRouter;
+import org.mule.routing.inbound.InboundRouterCollection;
+import org.mule.routing.nested.NestedRouter;
+import org.mule.routing.nested.NestedRouterCollection;
+import org.mule.routing.outbound.OutboundRouterCollection;
+import org.mule.routing.response.ResponseRouterCollection;
 import org.mule.transaction.constraints.BatchConstraint;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEncryptionStrategy;
@@ -58,10 +60,11 @@ import org.mule.umo.manager.UMOManager;
 import org.mule.umo.manager.UMOTransactionManagerFactory;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.umo.routing.UMOInboundMessageRouter;
-import org.mule.umo.routing.UMOOutboundMessageRouter;
+import org.mule.umo.routing.UMOInboundRouterCollection;
+import org.mule.umo.routing.UMONestedRouterCollection;
 import org.mule.umo.routing.UMOOutboundRouter;
-import org.mule.umo.routing.UMOResponseMessageRouter;
+import org.mule.umo.routing.UMOOutboundRouterCollection;
+import org.mule.umo.routing.UMOResponseRouterCollection;
 import org.mule.umo.security.UMOEndpointSecurityFilter;
 import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.security.UMOSecurityProvider;
@@ -104,9 +107,11 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration
     public static final String DEFAULT_TRANSACTION_CONFIG = MuleTransactionConfig.class.getName();
     public static final String DEFAULT_DESCRIPTOR = MuleDescriptor.class.getName();
     public static final String DEFAULT_SECURITY_MANAGER = MuleSecurityManager.class.getName();
-    public static final String DEFAULT_OUTBOUND_MESSAGE_ROUTER = OutboundMessageRouter.class.getName();
-    public static final String DEFAULT_INBOUND_MESSAGE_ROUTER = InboundMessageRouter.class.getName();
-    public static final String DEFAULT_RESPONSE_MESSAGE_ROUTER = ResponseMessageRouter.class.getName();
+    public static final String DEFAULT_OUTBOUND_ROUTER_COLLECTION = OutboundRouterCollection.class.getName();
+    public static final String DEFAULT_INBOUND_ROUTER_COLLECTION = InboundRouterCollection.class.getName();
+    public static final String DEFAULT_NESTED_ROUTER_COLLECTION = NestedRouterCollection.class.getName();
+    public static final String DEFAULT_RESPONSE_ROUTER_COLLECTION = ResponseRouterCollection.class.getName();
+    public static final String DEFAULT_NESTED_ROUTER = NestedRouter.class.getName();
     public static final String DEFAULT_CATCH_ALL_STRATEGY = LoggingCatchAllStrategy.class.getName();
     public static final String DEFAULT_POOL_FACTORY = CommonsPoolFactory.class.getName();
     public static final String THREADING_PROFILE = ThreadingProfile.class.getName();
@@ -114,9 +119,10 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration
     public static final String QUEUE_PROFILE = QueueProfile.class.getName();
 
     public static final String PERSISTENCE_STRATEGY_INTERFACE = EventFilePersistenceStrategy.class.getName();
-    public static final String INBOUND_MESSAGE_ROUTER_INTERFACE = UMOInboundMessageRouter.class.getName();
-    public static final String RESPONSE_MESSAGE_ROUTER_INTERFACE = UMOResponseMessageRouter.class.getName();
-    public static final String OUTBOUND_MESSAGE_ROUTER_INTERFACE = UMOOutboundMessageRouter.class.getName();
+    public static final String INBOUND_MESSAGE_ROUTER_INTERFACE = UMOInboundRouterCollection.class.getName();
+    public static final String NESTED_MESSAGE_ROUTER_INTERFACE = UMONestedRouterCollection.class.getName();
+    public static final String RESPONSE_MESSAGE_ROUTER_INTERFACE = UMOResponseRouterCollection.class.getName();
+    public static final String OUTBOUND_MESSAGE_ROUTER_INTERFACE = UMOOutboundRouterCollection.class.getName();
     public static final String TRANSFORMER_INTERFACE = UMOTransformer.class.getName();
     public static final String TRANSACTION_MANAGER_FACTORY_INTERFACE = UMOTransactionManagerFactory.class.getName();
     public static final String SECURITY_PROVIDER_INTERFACE = UMOSecurityProvider.class.getName();
@@ -250,7 +256,7 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration
 
     /**
      * Indicate whether this ConfigurationBulder has been configured yet
-     * 
+     *
      * @return <code>true</code> if this ConfigurationBulder has been configured
      */
     public boolean isConfigured()
@@ -638,46 +644,53 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration
         {
             public void begin(String string, String string1, Attributes attributes) throws Exception
             {
-                UMOModel model = manager.getModel();
-                // The Model is the default one created by the manager, then be can
-                // dispose it. This is a non-issue in Mule 2.0
-                if (MuleManager.DEFAULT_MODEL_NAME.equals(model.getName()))
+                UMOModel model;
+                String modelType = attributes.getValue("type");
+                String modelName = attributes.getValue("name");
+                if (modelType == null)
                 {
-                    model = null;
+                    logger.debug("Model type not set, defaulting to SEDA");
+                    modelType = "seda";
                 }
-                if (model == null)
+                if (modelType.equalsIgnoreCase("custom"))
                 {
-                    String modelType = attributes.getValue("type");
-//                    if (modelType == null)
-//                    {
-//                        modelType = MuleManager.getConfiguration().getModelType();
-//                    }
-                    if (modelType.equalsIgnoreCase("custom"))
+                    String className = attributes.getValue("className");
+                    if (className == null)
                     {
-                        String className = attributes.getValue("className");
-                        if (className == null)
-                        {
-                            throw new IllegalArgumentException(
-                                "Cannot use 'custom' model type without setting the 'className' for the model");
-                        }
-                        else
-                        {
-                            model = (UMOModel)ClassUtils.instanciateClass(className, ClassUtils.NO_ARGS,
-                                getClass());
-                        }
+                        throw new IllegalArgumentException(
+                            "Cannot use 'custom' model type without setting the 'className' for the model");
                     }
                     else
                     {
-                        model = ModelFactory.createModel(modelType);
+                        model = (UMOModel)ClassUtils.instanciateClass(className, ClassUtils.NO_ARGS,
+                            getClass());
                     }
                 }
+                else if (modelType.equalsIgnoreCase("inherited"))
+                {
+                    Map models = MuleManager.getInstance().getModels();
+                    if(models.size()==0)
+                    {
+                        throw new IllegalArgumentException("When using model inheritance there must be one model registered with Mule");
+                    }
+                    model = (UMOModel)models.get(modelName);
+                    if(model == null)
+                    {
+                        throw new IllegalArgumentException("Cannot inherit from model '" + modelName + "'. No such model registered");
+                    }
+                }
+                else
+                {
+                    model = ModelFactory.createModel(modelType);
+                }
+
                 digester.push(model);
             }
         });
 
         addSetPropertiesRule(path, digester);
 
-        digester.addSetRoot(path, "setModel");
+        digester.addSetRoot(path, "registerModel");
 
         // Create endpointUri resolver
         digester.addObjectCreate(path + "/entry-point-resolver", DEFAULT_ENTRY_POINT_RESOLVER, "className");
@@ -712,6 +725,7 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration
         // Create Message Routers
         addMessageRouterRules(digester, path, "inbound");
         addMessageRouterRules(digester, path, "outbound");
+        addMessageRouterRules(digester, path, "nested");
         addMessageRouterRules(digester, path, "response");
 
         // Add threading profile rules
@@ -775,15 +789,7 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration
             {
                 UMODescriptor descriptor = (UMODescriptor)digester.peek();
                 Object obj = digester.peek(1);
-                final UMOModel model;
-                if (obj instanceof UMOManager)
-                {
-                    model = ((UMOManager)obj).getModel();
-                }
-                else
-                {
-                    model = (UMOModel)obj;
-                }
+                final UMOModel model = (UMOModel)obj;
                 model.registerComponent(descriptor);
             }
         });
@@ -867,7 +873,7 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration
         String setMethod;
         if ("inbound".equals(type))
         {
-            defaultRouter = DEFAULT_INBOUND_MESSAGE_ROUTER;
+            defaultRouter = DEFAULT_INBOUND_ROUTER_COLLECTION;
             setMethod = "setInboundRouter";
             path += "/inbound-router";
             // Add endpoints for multiple inbound endpoints
@@ -876,7 +882,7 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration
         }
         else if ("response".equals(type))
         {
-            defaultRouter = DEFAULT_RESPONSE_MESSAGE_ROUTER;
+            defaultRouter = DEFAULT_RESPONSE_ROUTER_COLLECTION;
             setMethod = "setResponseRouter";
             path += "/response-router";
             // Add endpoints for multiple response endpoints i.e. replyTo
@@ -884,9 +890,15 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration
             addEndpointRules(digester, path, "addEndpoint");
             addGlobalReferenceEndpointRules(digester, path, "addEndpoint");
         }
+        else if ("nested".equals(type)) {
+			defaultRouter = DEFAULT_NESTED_ROUTER_COLLECTION;
+			setMethod = "setNestedRouter";
+			path += "/nested-router";
+
+    	}
         else
         {
-            defaultRouter = DEFAULT_OUTBOUND_MESSAGE_ROUTER;
+            defaultRouter = DEFAULT_OUTBOUND_ROUTER_COLLECTION;
             setMethod = "setOutboundRouter";
             path += "/outbound-router";
         }
@@ -914,17 +926,25 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration
     protected void addRouterRules(Digester digester, String path, final String type)
         throws ConfigurationException
     {
-        path += "/router";
-        if ("inbound".equals(type))
+        if("nested".equals(type))
         {
+            path += "/binding";
+            digester.addObjectCreate(path, DEFAULT_NESTED_ROUTER);
+
+
+        } else if ("inbound".equals(type))
+        {
+            path += "/router";
             digester.addObjectCreate(path, INBOUND_MESSAGE_ROUTER_INTERFACE, "className");
         }
         else if ("response".equals(type))
         {
+            path += "/router";
             digester.addObjectCreate(path, RESPONSE_MESSAGE_ROUTER_INTERFACE, "className");
         }
         else
         {
+            path += "/router";
             digester.addObjectCreate(path, OUTBOUND_MESSAGE_ROUTER_INTERFACE, "className");
         }
 
@@ -937,6 +957,13 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration
             addReplyToRules(digester, path);
             addGlobalReferenceEndpointRules(digester, path, "addEndpoint");
             addTransactionConfigRules(path, digester);
+        }
+        else if("nested".equals(type))
+        {
+            //Right now only one endpoint can be set on a nested Router so call
+            //setEndpoint not addEndpoint
+            addEndpointRules(digester, path, "setEndpoint");
+			addGlobalReferenceEndpointRules(digester, path, "setEndpoint");
         }
         addFilterRules(digester, path);
 

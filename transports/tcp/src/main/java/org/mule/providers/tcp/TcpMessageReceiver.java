@@ -321,19 +321,27 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
                 {
                     try
                     {
-                        Serializable readMsg = protocol.read(dataIn);
-                        if (readMsg == null)
+                        if(endpoint.isStreaming())
                         {
-                            break;
+                            UMOMessageAdapter adapter = connector.getStreamMessageAdapter(dataIn, dataOut);
+                            routeMessage(new MuleMessage(adapter), endpoint.isSynchronous(), null);
                         }
-
-                        Serializable result = processData(readMsg);
-                        if (result != null)
+                        else
                         {
-                            protocol.write(dataOut, result);
-                        }
+                            Serializable readMsg = protocol.read(dataIn);
+                            if (readMsg == null)
+                            {
+                                break;
+                            }
 
-                        dataOut.flush();
+                            Serializable result = processData(readMsg);
+                            if (result != null)
+                            {
+                                protocol.write(dataOut, result);
+                            }
+
+                            dataOut.flush();
+                        }
                     }
                     catch (SocketTimeoutException e)
                     {
@@ -369,6 +377,21 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
             }
         }
 
+    }
+
+    protected class TcpStreamWorker extends TcpWorker
+    {
+
+        public TcpStreamWorker(Socket socket)
+        {
+            super(socket);
+        }
+
+
+        public void run()
+        {
+            super.run();    //To change body of overridden methods use File | Settings | File Templates.
+        }
     }
 
 }

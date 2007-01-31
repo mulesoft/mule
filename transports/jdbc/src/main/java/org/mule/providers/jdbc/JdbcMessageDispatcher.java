@@ -10,23 +10,20 @@
 
 package org.mule.providers.jdbc;
 
+import org.mule.impl.MuleMessage;
+import org.mule.providers.AbstractMessageDispatcher;
+import org.mule.transaction.TransactionCoordination;
+import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOTransaction;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.provider.UMOMessageAdapter;
+
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.impl.MuleMessage;
-import org.mule.providers.AbstractMessageDispatcher;
-import org.mule.transaction.TransactionCoordination;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOTransaction;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.provider.ConnectorException;
-import org.mule.umo.provider.UMOMessageAdapter;
 
 /**
  * The Jdbc Message dispatcher is responsible for executing SQL queries against a
@@ -224,25 +221,6 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
     protected void doDisconnect() throws Exception
     {
         // template method
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.provider.UMOMessageDispatcher#getDelegateSession()
-     */
-    // TODO HH: move to connector
-    public Object getDelegateSession() throws UMOException
-    {
-        try
-        {
-            return connector.getConnection();
-        }
-        catch (Exception e)
-        {
-            throw new ConnectorException(new Message(Messages.FAILED_TO_CREATE_X, "Jdbc Connection"),
-                connector, e);
-        }
     }
 
 }

@@ -10,7 +10,7 @@
 
 package org.mule.tck.testmodels.mule;
 
-import org.mule.model.DynamicEntryPointResolver;
+import org.mule.impl.model.resolvers.DynamicEntryPointResolver;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.model.ModelException;
 import org.mule.umo.model.UMOEntryPoint;

@@ -10,19 +10,19 @@
 
 package org.mule.management.mbeans;
 
+import org.mule.impl.model.AbstractComponent;
+import org.mule.impl.model.ModelHelper;
+import org.mule.impl.model.seda.SedaComponent;
+import org.mule.management.stats.ComponentStatistics;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOException;
+
 import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.MuleManager;
-import org.mule.impl.model.AbstractComponent;
-import org.mule.impl.model.seda.SedaComponent;
-import org.mule.management.stats.ComponentStatistics;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOSession;
 
 /**
  * <code>ComponentService</code> exposes service information about a Mule Managed
@@ -214,15 +214,7 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
 
     private AbstractComponent getComponent()
     {
-        UMOSession session = MuleManager.getInstance().getModel().getComponentSession(getName());
-        if (session == null)
-        {
-            return null;
-        }
-        else
-        {
-            return (AbstractComponent)session.getComponent();
-        }
+        return (AbstractComponent)ModelHelper.getComponent(getName());
     }
 
     // ///// Component stats impl /////////

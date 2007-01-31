@@ -18,11 +18,13 @@ public class XFireLoanBrokerSynchronousFunctionalTestCase extends AxisLoanBroker
         super();
     }
     
+    // @Override
     protected String getConfigResources()
     {
         return "loan-broker-xfire-sync-test-config.xml";
     }
 
+    // @Override
     protected int getNumberOfRequests()
     {
         return 10;

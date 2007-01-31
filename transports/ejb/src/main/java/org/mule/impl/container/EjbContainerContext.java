@@ -59,7 +59,7 @@ public class EjbContainerContext extends RmiContainerContext
         else if (homeObject instanceof EJBHome)
         {
 
-            Method method = ClassUtils.getMethod("create", null, homeObject.getClass());
+            Method method = ClassUtils.getMethod(homeObject.getClass(), "create", null);
             if (method == null)
             {
                 throw new ObjectNotFoundException(key.toString(), new IllegalArgumentException(new Message(

@@ -177,7 +177,6 @@
                         </goals>
                         <configuration>
                             <outputDirectory>${MULE_HOME}/lib/user</outputDirectory>
-                            <stripVersion>true</stripVersion>
                             <overWriteReleases>true</overWriteReleases>
                             <overWriteSnapshots>true</overWriteSnapshots>
                             <artifactItems>

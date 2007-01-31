@@ -41,10 +41,10 @@ public class ModelNotification extends UMOServerNotification implements Blocking
         "initialising listeners", "initialised listeners", "starting", "started", "stopping", "stopped",
         "disposing", "disposed"};
 
-    public ModelNotification(UMOModel message, int action)
+    public ModelNotification(UMOModel model, int action)
     {
-        super(message, action);
-        resourceIdentifier = message.getName();
+        super(model, action);
+        resourceIdentifier = model.getName();
     }
 
     protected String getPayloadToString()

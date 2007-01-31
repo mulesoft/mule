@@ -12,13 +12,14 @@ package org.mule.routing.outbound;
 
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
-import org.mule.management.stats.RouterStatistics;
+import org.mule.routing.AbstractRouter;
 import org.mule.routing.CorrelationPropertiesExtractor;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.routing.UMOOutboundRouter;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringMessageUtils;
@@ -40,7 +41,7 @@ import org.apache.commons.logging.LogFactory;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public abstract class AbstractOutboundRouter implements UMOOutboundRouter
+public abstract class AbstractOutboundRouter extends AbstractRouter implements UMOOutboundRouter
 {
     public static final int ENABLE_CORRELATION_IF_NOT_SET = 0;
     public static final int ENABLE_CORRELATION_ALWAYS = 1;
@@ -57,8 +58,6 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
     protected int enableCorrelation = ENABLE_CORRELATION_IF_NOT_SET;
 
     protected PropertyExtractor propertyExtractor = new CorrelationPropertiesExtractor();
-
-    protected RouterStatistics routerStatistics;
 
     protected UMOTransactionConfig transactionConfig;
 
@@ -81,11 +80,11 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
         }
 
         session.dispatchEvent(message, endpoint);
-        if (routerStatistics != null)
+        if (getRouterStatistics() != null)
         {
-            if (routerStatistics.isEnabled())
+            if (getRouterStatistics().isEnabled())
             {
-                routerStatistics.incrementRoutedMessage(endpoint);
+                getRouterStatistics().incrementRoutedMessage(endpoint);
             }
         }
     }
@@ -118,11 +117,11 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
             }
         }
         UMOMessage result = session.sendEvent(message, endpoint);
-        if (routerStatistics != null)
+        if (getRouterStatistics() != null)
         {
-            if (routerStatistics.isEnabled())
+            if (getRouterStatistics().isEnabled())
             {
-                routerStatistics.incrementRoutedMessage(endpoint);
+                getRouterStatistics().incrementRoutedMessage(endpoint);
             }
         }
 
@@ -230,11 +229,11 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
 
     public void addEndpoint(UMOEndpoint endpoint)
     {
-        endpoint.setType(UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        //TODO RM** endpoint.setType(UMOEndpoint.ENDPOINT_TYPE_SENDER);
         endpoints.add(endpoint);
     }
 
-    public boolean removeEndpoint(UMOEndpoint endpoint)
+    public boolean removeEndpoint(UMOImmutableEndpoint endpoint)
     {
         return endpoints.remove(endpoint);
     }
@@ -254,16 +253,6 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
         {
             this.replyTo = null;
         }
-    }
-
-    public RouterStatistics getRouterStatistics()
-    {
-        return routerStatistics;
-    }
-
-    public void setRouterStatistics(RouterStatistics routerStatistics)
-    {
-        this.routerStatistics = routerStatistics;
     }
 
     public int getEnableCorrelation()

@@ -31,8 +31,6 @@ import org.mule.umo.manager.UMOAgent;
  * <code>JdmkAgent</code> configures an Jdmk Http Adaptor for Jmx management,
  * statistics and configuration viewing of a Mule instance.
  * 
- * @author Guillaume Nodet
- * @version $Revision$
  */
 public class JdmkAgent implements UMOAgent
 {
@@ -188,6 +186,7 @@ public class JdmkAgent implements UMOAgent
         {
             mBeanServer = (MBeanServer)MBeanServerFactory.findMBeanServer(null).get(0);
             adaptor = createAdaptor();
+            // TODO use Jmx support classes
             adaptorName = new ObjectName("Adaptor:class=" + adaptor.getClass().getName());
             mBeanServer.registerMBean(adaptor, adaptorName);
         }

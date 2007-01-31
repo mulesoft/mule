@@ -21,10 +21,11 @@ import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.internal.admin.MuleAdminAgent;
 import org.mule.impl.model.ModelFactory;
+import org.mule.impl.model.seda.SedaModel;
 import org.mule.providers.service.TransportFactory;
-import org.mule.routing.inbound.InboundMessageRouter;
-import org.mule.routing.outbound.OutboundMessageRouter;
+import org.mule.routing.inbound.InboundRouterCollection;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
+import org.mule.routing.outbound.OutboundRouterCollection;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
@@ -51,6 +52,8 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     private static final String MODEL_NOT_SET = "not set";
 
     protected UMOManager manager;
+
+    private UMOModel model;
 
     /**
      * Constructs a default builder
@@ -103,9 +106,11 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         }
     }
 
-    public void setModel(String model) throws UMOException
+    public void registerModel(String modelType, String name) throws UMOException
     {
-        manager.setModel(ModelFactory.createModel(model));
+        UMOModel model = ModelFactory.createModel(modelType);
+        model.setName(name);
+        manager.registerModel(model);
     }
 
     /**
@@ -134,9 +139,14 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
 //        MuleManager.getConfiguration().setDefaultSynchronous(synchronous);
         if (!MODEL_NOT_SET.equals(modeltype))
         {
-            manager.setModel(ModelFactory.createModel(modeltype));
+            model = ModelFactory.createModel(modeltype);
         }
-        System.out.println("BEFORE START");
+        else
+        {
+            model = ModelFactory.createModel("seda");
+        }
+        manager.registerModel(model);
+
         manager.start();
         return manager;
     }
@@ -271,15 +281,15 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         descriptor.setImplementationInstance(component);
 
 
-        descriptor.setOutboundRouter(new OutboundMessageRouter());
+        descriptor.setOutboundRouter(new OutboundRouterCollection());
         OutboundPassThroughRouter router = new OutboundPassThroughRouter();
         router.addEndpoint(listenerEndpoint);
         descriptor.getOutboundRouter().addRouter(router);
-        descriptor.setInboundRouter(new InboundMessageRouter());
+        descriptor.setInboundRouter(new InboundRouterCollection());
         descriptor.getInboundRouter().addEndpoint(sendEndpoint);
 
         // register the components descriptor
-        manager.getModel().registerComponent(descriptor);
+        getModel().registerComponent(descriptor);
         return descriptor;
     }
 
@@ -338,7 +348,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
      */
     public UMOComponent registerComponent(UMODescriptor descriptor) throws UMOException
     {
-        return manager.getModel().registerComponent(descriptor);
+        return getModel().registerComponent(descriptor);
     }
 
     /**
@@ -426,7 +436,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     {
         UMODescriptor d = createDescriptor(implementation, name, inboundEndpointUri, outboundEndpointUri,
             properties);
-        return manager.getModel().registerComponent(d);
+        return getModel().registerComponent(d);
     }
 
     /**
@@ -527,11 +537,11 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
             descriptor.getProperties().putAll(properties);
         }
 
-        descriptor.setOutboundRouter(new OutboundMessageRouter());
+        descriptor.setOutboundRouter(new OutboundRouterCollection());
         OutboundPassThroughRouter router = new OutboundPassThroughRouter();
         router.addEndpoint(outboundEndpoint);
         descriptor.getOutboundRouter().addRouter(router);
-        descriptor.setInboundRouter(new InboundMessageRouter());
+        descriptor.setInboundRouter(new InboundRouterCollection());
         descriptor.getInboundRouter().addEndpoint(inboundEndpoint);
 
         return descriptor;
@@ -563,10 +573,10 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
      */
     public void unregisterComponent(String name) throws UMOException
     {
-        UMODescriptor descriptor = manager.getModel().getDescriptor(name);
+        UMODescriptor descriptor = model.getDescriptor(name);
         if (descriptor != null)
         {
-            manager.getModel().unregisterComponent(descriptor);
+            getModel().unregisterComponent(descriptor);
         }
     }
 
@@ -645,7 +655,8 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
 
     public void registerModel(UMOModel model) throws UMOException
     {
-        manager.setModel(model);
+        this.model = model;
+        manager.registerModel(model);
     }
 
     public UMOManager getManager()
@@ -686,5 +697,16 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     public boolean isConfigured()
     {
         return manager != null;
+    }
+
+    protected UMOModel getModel() throws UMOException
+    {
+        if(model==null)
+        {
+            model = new SedaModel();
+            model.setName("main");
+            manager.registerModel(model);
+        }
+        return model;
     }
 }

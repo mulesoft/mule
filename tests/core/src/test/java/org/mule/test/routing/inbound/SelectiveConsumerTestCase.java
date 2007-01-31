@@ -17,7 +17,7 @@ import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.filters.PayloadTypeFilter;
-import org.mule.routing.inbound.InboundMessageRouter;
+import org.mule.routing.inbound.InboundRouterCollection;
 import org.mule.routing.inbound.SelectiveConsumer;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
@@ -28,7 +28,7 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.routing.UMOInboundMessageRouter;
+import org.mule.umo.routing.UMOInboundRouterCollection;
 
 public class SelectiveConsumerTestCase extends AbstractMuleTestCase
 {
@@ -38,7 +38,7 @@ public class SelectiveConsumerTestCase extends AbstractMuleTestCase
         Mock session = MuleTestUtils.getMockSession();
         UMOComponent testComponent = getTestComponent(getTestDescriptor("test", Apple.class.getName()));
 
-        UMOInboundMessageRouter messageRouter = new InboundMessageRouter();
+        UMOInboundRouterCollection messageRouter = new InboundRouterCollection();
         SelectiveConsumer router = new SelectiveConsumer();
         messageRouter.addRouter(router);
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
@@ -83,7 +83,7 @@ public class SelectiveConsumerTestCase extends AbstractMuleTestCase
         Mock session = MuleTestUtils.getMockSession();
         UMOComponent testComponent = getTestComponent(getTestDescriptor("test", Apple.class.getName()));
 
-        UMOInboundMessageRouter messageRouter = new InboundMessageRouter();
+        UMOInboundRouterCollection messageRouter = new InboundRouterCollection();
         SelectiveConsumer router = new SelectiveConsumer();
         messageRouter.addRouter(router);
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());

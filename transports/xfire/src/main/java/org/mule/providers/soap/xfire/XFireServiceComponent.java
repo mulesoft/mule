@@ -10,23 +10,6 @@
 
 package org.mule.providers.soap.xfire;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Constructor;
-import java.util.Enumeration;
-
-import javax.xml.stream.XMLStreamException;
-
-import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.codehaus.xfire.XFire;
-import org.codehaus.xfire.service.Service;
-import org.codehaus.xfire.service.ServiceRegistry;
-import org.codehaus.xfire.transport.Transport;
-import org.codehaus.xfire.transport.TransportManager;
-import org.codehaus.xfire.transport.http.HtmlServiceWriter;
 import org.mule.MuleRuntimeException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -52,6 +35,24 @@ import org.mule.umo.lifecycle.Lifecycle;
 import org.mule.umo.manager.UMOWorkManager;
 import org.mule.umo.provider.UMOStreamMessageAdapter;
 import org.mule.util.StringUtils;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.util.Enumeration;
+
+import javax.xml.stream.XMLStreamException;
+
+import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.codehaus.xfire.XFire;
+import org.codehaus.xfire.service.Service;
+import org.codehaus.xfire.service.ServiceRegistry;
+import org.codehaus.xfire.transport.Transport;
+import org.codehaus.xfire.transport.TransportManager;
+import org.codehaus.xfire.transport.http.HtmlServiceWriter;
 
 /**
  * The Xfire service component receives requests for Xfire services it manages and
@@ -194,7 +195,7 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
         return getXfire().getTransportManager();
     }
 
-    protected void generateService(OutStreamMessageAdapter response, String serviceName)
+    protected void generateServiceX(OutStreamMessageAdapter response, String serviceName)
         throws IOException, XMLStreamException
     {
         response.setProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/html");
@@ -206,7 +207,7 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
     /**
      * @param response
      */
-    protected void generateServices(OutStreamMessageAdapter response) throws IOException, XMLStreamException
+    protected void generateServicesX(OutStreamMessageAdapter response) throws IOException, XMLStreamException
     {
         response.setProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/html");
 

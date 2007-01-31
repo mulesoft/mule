@@ -78,7 +78,7 @@ public abstract class AbstractEventResequencer extends SelectiveConsumer
                 }
 
                 // check for an existing group first
-                EventGroup group = this.getEventGroupWithId(groupId);
+                EventGroup group = this.getEventGroup(groupId);
 
                 // does the group exist?
                 if (group == null)
@@ -91,7 +91,7 @@ public abstract class AbstractEventResequencer extends SelectiveConsumer
                 synchronized (group)
                 {
                     // make sure no other thread removed the group in the meantime
-                    if (group != this.getEventGroupWithId(groupId))
+                    if (group != this.getEventGroup(groupId))
                     {
                         // if that is the (rare) case, spin
                         miss = true;
@@ -117,11 +117,7 @@ public abstract class AbstractEventResequencer extends SelectiveConsumer
     }
 
     /**
-     * TODO HH: writeme
-     * 
-     * @param event
-     * @param correlationId
-     * @return
+     * @see AbstractEventAggregator#createEventGroup(UMOEvent, Object)
      */
     protected EventGroup createEventGroup(UMOEvent event, Object groupId)
     {
@@ -129,10 +125,7 @@ public abstract class AbstractEventResequencer extends SelectiveConsumer
     }
 
     /**
-     * TODO HH: writeme
-     * 
-     * @param event
-     * @return
+     * @see AbstractEventAggregator#getEventGroupIdForEvent(UMOEvent)
      */
     protected Object getEventGroupIdForEvent(UMOEvent event)
     {
@@ -147,21 +140,15 @@ public abstract class AbstractEventResequencer extends SelectiveConsumer
     }
 
     /**
-     * TODO HH: writeme
-     * 
-     * @param groupId
-     * @return
+     * @see AbstractEventAggregator#getEventGroup(Object)
      */
-    protected EventGroup getEventGroupWithId(Object groupId)
+    protected EventGroup getEventGroup(Object groupId)
     {
         return (EventGroup)eventGroups.get(groupId);
     }
 
     /**
-     * TODO HH: writeme
-     * 
-     * @param group
-     * @return
+     * @see AbstractEventAggregator#addEventGroup(EventGroup)
      */
     protected EventGroup addEventGroup(EventGroup group)
     {
@@ -172,9 +159,7 @@ public abstract class AbstractEventResequencer extends SelectiveConsumer
     }
 
     /**
-     * TODO HH: writeme
-     * 
-     * @param group
+     * @see AbstractEventAggregator#removeEventGroup(EventGroup)
      */
     protected void removeEventGroup(EventGroup group)
     {
@@ -182,10 +167,12 @@ public abstract class AbstractEventResequencer extends SelectiveConsumer
     }
 
     /**
-     * TODO HH: writeme
+     * Reorder collected events according to the configured Comparator.
      * 
-     * @param events
-     * @return
+     * @param events the EventGroup used for collecting the events
+     * @return an array of events reordered according to the Comparator returned by
+     *         {@link #getComparator()}. If no comparator is configured, the events
+     *         are returned unsorted.
      */
     protected UMOEvent[] resequenceEvents(EventGroup events)
     {
@@ -210,10 +197,10 @@ public abstract class AbstractEventResequencer extends SelectiveConsumer
     }
 
     /**
-     * TODO HH: writeme
+     * Determines whether the events in the passed EventGroup are ready to be
+     * reordered.
      * 
-     * @param events
-     * @return
+     * @see AbstractEventAggregator#shouldAggregateEvents(EventGroup)
      */
     protected abstract boolean shouldResequenceEvents(EventGroup events);
 

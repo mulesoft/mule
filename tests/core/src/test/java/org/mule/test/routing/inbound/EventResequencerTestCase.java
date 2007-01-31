@@ -17,7 +17,7 @@ import org.mule.impl.MuleMessage;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.inbound.AbstractEventResequencer;
 import org.mule.routing.inbound.EventGroup;
-import org.mule.routing.inbound.InboundMessageRouter;
+import org.mule.routing.inbound.InboundRouterCollection;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -27,7 +27,7 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.routing.UMOInboundMessageRouter;
+import org.mule.umo.routing.UMOInboundRouterCollection;
 
 import java.util.Comparator;
 
@@ -40,7 +40,7 @@ public class EventResequencerTestCase extends AbstractMuleTestCase
         UMOComponent testComponent = getTestComponent(getTestDescriptor("test", Apple.class.getName()));
         assertNotNull(testComponent);
 
-        UMOInboundMessageRouter messageRouter = new InboundMessageRouter();
+        UMOInboundRouterCollection messageRouter = new InboundRouterCollection();
         SimpleEventResequencer router = new SimpleEventResequencer(3);
         messageRouter.addRouter(router);
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());

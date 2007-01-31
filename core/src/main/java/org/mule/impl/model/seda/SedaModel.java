@@ -45,6 +45,7 @@ public class SedaModel extends AbstractModel
      */
     protected boolean componentPerRequest = false;
 
+
     /**
      * The default pooling config for components managed by this model
      */
@@ -54,6 +55,14 @@ public class SedaModel extends AbstractModel
      * the default queue configuration for components managed by this model
      */
     protected QueueProfile queueProfile;
+
+    public SedaModel()
+    {
+        super();
+        poolingProfile = new PoolingProfile();
+        queueProfile = new QueueProfile();
+    }
+
 
     /**
      * Returns the model type name. This is a friendly identifier that is used to

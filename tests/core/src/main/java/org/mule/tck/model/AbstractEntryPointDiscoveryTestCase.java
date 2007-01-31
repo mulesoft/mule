@@ -10,8 +10,8 @@
 
 package org.mule.tck.model;
 
+import org.mule.impl.NoSatisfiableMethodsException;
 import org.mule.impl.RequestContext;
-import org.mule.model.NoSatisfiableMethodsException;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.InvalidSatsuma;
 import org.mule.umo.UMODescriptor;
@@ -19,10 +19,6 @@ import org.mule.umo.model.UMOEntryPoint;
 import org.mule.umo.model.UMOEntryPointResolver;
 import org.mule.util.ClassUtils;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public abstract class AbstractEntryPointDiscoveryTestCase extends AbstractMuleTestCase
 {
 
@@ -35,6 +31,7 @@ public abstract class AbstractEntryPointDiscoveryTestCase extends AbstractMuleTe
         UMODescriptor descriptor = getTestDescriptor("badSatsuma", InvalidSatsuma.class.getName());
 
         UMOEntryPoint ep = null;
+
         try
         {
             ep = epd.resolveEntryPoint(descriptor);
@@ -44,10 +41,11 @@ public abstract class AbstractEntryPointDiscoveryTestCase extends AbstractMuleTe
             // expected
             return;
         }
-        assertTrue(ep != null);
+
+        assertNotNull(ep);
+
         try
         {
-
             RequestContext.setEvent(getTestEvent("Hello"));
             ep.invoke(new InvalidSatsuma(), RequestContext.getEventContext());
             fail("Should have failed to find entrypoint on Satsuma");
@@ -134,9 +132,6 @@ public abstract class AbstractEntryPointDiscoveryTestCase extends AbstractMuleTe
      * <p>
      * <code>ComponentMethodMapping</code> is used to supply a component class and
      * the correct method to be resovled on the component.
-     * 
-     * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
-     * @version $Revision$
      */
     public class ComponentMethodMapping
     {
@@ -193,6 +188,7 @@ public abstract class AbstractEntryPointDiscoveryTestCase extends AbstractMuleTe
             return shouldFail;
         }
 
+        // @Override
         public String toString()
         {
             return componentClass.getName() + "." + methodName + "(" + methodArgumentType.getName()

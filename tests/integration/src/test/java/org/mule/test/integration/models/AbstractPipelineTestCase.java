@@ -25,10 +25,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public abstract class AbstractPipelineTestCase extends AbstractMuleTestCase
 {
 
@@ -36,15 +32,16 @@ public abstract class AbstractPipelineTestCase extends AbstractMuleTestCase
 
     protected int getNumberOfMessages()
     {
-        return 1000;
+        return 100;
     }
 
     public void testPipelineSynchronous() throws Exception
     {
 
         QuickConfigurationBuilder builder = new QuickConfigurationBuilder(true);
+        builder.registerModel("seda", "main");
         builder.createStartedManager(true, "", getModelType());
-        configureModel(builder.getManager().getModel());
+        configureModel(builder.getManager().lookupModel("main"));
         builder.registerComponent(EchoComponent.class.getName(), "component1", "vm://component1",
             "vm://component2", null);
         builder.registerComponent(EchoComponent.class.getName(), "component2", "vm://component2",

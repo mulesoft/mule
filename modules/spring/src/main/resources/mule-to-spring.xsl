@@ -348,6 +348,7 @@
             <xsl:apply-templates select="@outboundTransformer" mode="addTransformers"/>
             <xsl:apply-templates select="properties" mode="asMap"/>
             <xsl:apply-templates select="inbound-router"/>
+            <xsl:apply-templates select="nested-router"/>
             <xsl:apply-templates select="outbound-router"/>
             <xsl:apply-templates select="response-router"/>
             <property name="interceptors">
@@ -398,7 +399,7 @@
                 <xsl:when test="@className">
                     <xsl:value-of select="@className"/>
                 </xsl:when>
-                <xsl:otherwise>org.mule.routing.inbound.InboundMessageRouter</xsl:otherwise>
+                <xsl:otherwise>org.mule.routing.inbound.InboundRouterCollection</xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
         <property name="inboundRouter">
@@ -419,6 +420,27 @@
         </property>
     </xsl:template>
 
+    <!-- nested router Template -->
+    <xsl:template match="nested-router">
+        <xsl:variable name="type">
+            <xsl:choose>
+                <xsl:when test="@className">
+                    <xsl:value-of select="@className"/>
+                </xsl:when>
+                <xsl:otherwise>org.mule.routing.nested.NestedRouterCollection</xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+        <property name="nestedRouter">
+            <bean class="{$type}">
+                <property name="routers">
+                    <list>
+                        <xsl:apply-templates select="binding"/>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </xsl:template>
+
     <!-- Response router Template -->
     <xsl:template match="response-router">
         <xsl:variable name="type">
@@ -426,7 +448,7 @@
                 <xsl:when test="@className">
                     <xsl:value-of select="@className"/>
                 </xsl:when>
-                <xsl:otherwise>org.mule.routing.response.ResponseMessageRouter</xsl:otherwise>
+                <xsl:otherwise>org.mule.routing.response.ResponseRouterCollection</xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
         <property name="responseRouter">
@@ -456,7 +478,7 @@
                 <xsl:when test="@className">
                     <xsl:value-of select="@className"/>
                 </xsl:when>
-                <xsl:otherwise>org.mule.routing.outbound.OutboundMessageRouter</xsl:otherwise>
+                <xsl:otherwise>org.mule.routing.outbound.OutboundRouterCollection</xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
         <property name="outboundRouter">
@@ -509,6 +531,17 @@
             </property>
             <xsl:apply-templates select="properties"/>
             <xsl:apply-templates select="filter"/>
+        </bean>
+    </xsl:template>
+
+    <!-- Nested Router binding Template -->
+    <xsl:template match="binding">
+        <bean class="org.mule.routing.nested.NestedRouter">
+            <property name="endpoint">
+                <xsl:apply-templates select="endpoint"/>
+                <xsl:apply-templates select="global-endpoint"/>
+            </property>
+            <xsl:apply-templates select="@*" mode="addProperties"/>            
         </bean>
     </xsl:template>
 

@@ -14,6 +14,7 @@ import org.mule.MuleManager;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleDescriptor;
+import org.mule.impl.model.ModelHelper;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.internal.notifications.ModelNotification;
 import org.mule.impl.internal.notifications.ModelNotificationListener;
@@ -27,6 +28,7 @@ import org.mule.providers.soap.axis.extensions.WSDDFileProvider;
 import org.mule.providers.soap.axis.extensions.WSDDJavaMuleProvider;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
+import org.mule.umo.model.UMOModel;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -161,7 +163,7 @@ public class AxisConnector extends AbstractConnector implements ModelNotificatio
                 axisTransportProtocols.put(s, MuleTransport.getTransportClass(s));
                 registerSupportedProtocol(s);
             }
-            MuleManager.getInstance().registerListener(this);
+            MuleManager.getInstance().registerListener(this, ModelHelper.SYSTEM_MODEL);
         }
         catch (Exception e)
         {
@@ -342,7 +344,7 @@ public class AxisConnector extends AbstractConnector implements ModelNotificatio
             // See if the axis descriptor has already been added. This allows
             // developers to override the default configuration, say to increase
             // the threadpool
-            axisDescriptor = (MuleDescriptor)MuleManager.getInstance().getModel().getDescriptor(
+            axisDescriptor = (MuleDescriptor)MuleManager.getInstance().lookupModel(ModelHelper.SYSTEM_MODEL).getDescriptor(
                 AXIS_SERVICE_COMPONENT_NAME);
             if (axisDescriptor == null)
             {
@@ -353,7 +355,7 @@ public class AxisConnector extends AbstractConnector implements ModelNotificatio
                 // Lets unregister the 'template' instance, configure it and
                 // then register
                 // again later
-                MuleManager.getInstance().getModel().unregisterComponent(axisDescriptor);
+                MuleManager.getInstance().lookupModel(ModelHelper.SYSTEM_MODEL).unregisterComponent(axisDescriptor);
             }
             // if the axis server hasn't been set, set it now. The Axis server
             // may be set
@@ -444,7 +446,7 @@ public class AxisConnector extends AbstractConnector implements ModelNotificatio
 
     protected MuleDescriptor createAxisDescriptor()
     {
-        MuleDescriptor axisDescriptor = (MuleDescriptor)MuleManager.getInstance().getModel().getDescriptor(
+        MuleDescriptor axisDescriptor = (MuleDescriptor)MuleManager.getInstance().lookupModel(ModelHelper.SYSTEM_MODEL).getDescriptor(
             AXIS_SERVICE_COMPONENT_NAME);
         if (axisDescriptor == null)
         {
@@ -472,7 +474,7 @@ public class AxisConnector extends AbstractConnector implements ModelNotificatio
     protected void doStop() throws UMOException
     {
         axisServer.stop();
-        // UMOModel model = MuleManager.getInstance().getModel();
+        // UMOModel model = MuleManager.getInstance().lookupModel();
         // model.unregisterComponent(model.getDescriptor(AXIS_SERVICE_COMPONENT_NAME));
     }
 
@@ -627,7 +629,8 @@ public class AxisConnector extends AbstractConnector implements ModelNotificatio
             // The implication of this is that to add a new service and a
             // different http port the
             // model needs to be restarted before the listener is available
-            if (!MuleManager.getInstance().getModel().isComponentRegistered(AXIS_SERVICE_COMPONENT_NAME))
+            UMOModel systemModel = MuleManager.getInstance().lookupModel(ModelHelper.SYSTEM_MODEL);
+            if (!systemModel.isComponentRegistered(AXIS_SERVICE_COMPONENT_NAME))
             {
                 try
                 {
@@ -638,7 +641,7 @@ public class AxisConnector extends AbstractConnector implements ModelNotificatio
                         axisDescriptor = createAxisDescriptor();
                     }
                     axisDescriptor.addInterceptor(new MethodFixInterceptor());
-                    MuleManager.getInstance().getModel().registerComponent(axisDescriptor);
+                    MuleManager.getInstance().lookupModel(ModelHelper.SYSTEM_MODEL).registerComponent(axisDescriptor);
                     // We have to perform a small hack here to rewrite servlet://
                     // endpoints with the
                     // real http:// address

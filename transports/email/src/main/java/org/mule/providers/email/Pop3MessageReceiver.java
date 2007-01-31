@@ -293,7 +293,7 @@ public class Pop3MessageReceiver extends AbstractPollingMessageReceiver
      * @throws IOException If a failure happens writing the message
      * @throws MessagingException If a failure happens reading the message
      */
-    private void storeMessage(Message msg) throws IOException, MessagingException
+    protected void storeMessage(Message msg) throws IOException, MessagingException
     {
         if (backupFolder != null)
         {

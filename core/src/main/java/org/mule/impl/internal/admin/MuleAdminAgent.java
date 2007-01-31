@@ -12,6 +12,7 @@ package org.mule.impl.internal.admin;
 
 import org.mule.MuleManager;
 import org.mule.impl.AlreadyInitialisedException;
+import org.mule.impl.model.ModelHelper;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.service.TransportFactory;
 import org.mule.transformers.wire.SerializationWireFormat;
@@ -126,7 +127,7 @@ public class MuleAdminAgent implements UMOAgent
             }
 
             // Check for override
-            if (manager.getModel().isComponentRegistered(MuleManagerComponent.MANAGER_COMPONENT_NAME))
+            if (ModelHelper.isComponentRegistered(MuleManagerComponent.MANAGER_COMPONENT_NAME))
             {
                 logger.info("Mule manager component has already been initialised, ignoring server url");
             }
@@ -154,7 +155,7 @@ public class MuleAdminAgent implements UMOAgent
                 logger.info("Registering Admin listener on: " + serverUri);
                 UMODescriptor descriptor = MuleManagerComponent.getDescriptor(connector, endpointUri,
                     wireFormat);
-                manager.getModel().registerComponent(descriptor);
+                ModelHelper.registerSystemComponent(descriptor);
             }
         }
         catch (UMOException e)

@@ -13,6 +13,7 @@ package org.mule.impl.model.seda.optimised;
 import org.mule.config.pool.CommonsPoolProxyFactory;
 import org.mule.impl.MuleDescriptor;
 import org.mule.umo.UMOException;
+import org.mule.umo.model.UMOModel;
 import org.mule.umo.lifecycle.Callable;
 
 /**
@@ -21,9 +22,9 @@ import org.mule.umo.lifecycle.Callable;
  */
 public class OptimisedProxyFactory extends CommonsPoolProxyFactory
 {
-    public OptimisedProxyFactory(MuleDescriptor descriptor)
+    public OptimisedProxyFactory(MuleDescriptor descriptor, UMOModel model)
     {
-        super(descriptor);
+        super(descriptor, model);
     }
 
     protected Object createProxy(Object component) throws UMOException

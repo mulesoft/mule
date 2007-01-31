@@ -11,10 +11,8 @@
 package org.mule.tck;
 
 import org.mule.MuleManager;
-import org.mule.impl.model.seda.SedaModel;
 import org.mule.interceptors.InterceptorStack;
 import org.mule.interceptors.LoggingInterceptor;
-import org.mule.umo.UMOException;
 import org.mule.umo.UMOInterceptorStack;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.manager.UMOManager;
@@ -23,11 +21,6 @@ import org.mule.umo.transformer.UMOTransformer;
 
 import java.util.ArrayList;
 import java.util.List;
-
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 
 public abstract class AbstractUMOManagerTestCase extends AbstractMuleTestCase
 {
@@ -137,12 +130,5 @@ public abstract class AbstractUMOManagerTestCase extends AbstractMuleTestCase
         {
             // expected
         }
-    }
-
-    public void testModelSetting() throws UMOException
-    {
-        assertNotNull(MuleManager.getInstance().getModel());
-        MuleManager.getInstance().setModel(new SedaModel());
-        assertEquals("mule", MuleManager.getInstance().getModel().getName());
     }
 }

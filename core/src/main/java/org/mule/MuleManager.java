@@ -37,7 +37,6 @@ import org.mule.impl.internal.notifications.SecurityNotification;
 import org.mule.impl.internal.notifications.SecurityNotificationListener;
 import org.mule.impl.internal.notifications.ServerNotificationManager;
 import org.mule.impl.model.ModelFactory;
-import org.mule.impl.model.seda.SedaModel;
 import org.mule.impl.security.MuleSecurityManager;
 import org.mule.impl.work.MuleWorkManager;
 import org.mule.management.stats.AllStatistics;
@@ -52,13 +51,13 @@ import org.mule.umo.UMOInterceptorStack;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.FatalException;
 import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.umo.manager.UMOAgent;
 import org.mule.umo.manager.UMOContainerContext;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.manager.UMOServerNotificationListener;
 import org.mule.umo.manager.UMOWorkManager;
-import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOSecurityManager;
@@ -108,7 +107,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class MuleManager implements UMOManager
 {
-    public static final String DEFAULT_MODEL_NAME = "_default";
     /**
      * singleton instance
      */
@@ -147,7 +145,7 @@ public class MuleManager implements UMOManager
     /**
      * The model being used
      */
-    private UMOModel model;
+    private Map models = new LinkedHashMap();
 
     /**
      * the unique id for this manager
@@ -425,10 +423,12 @@ public class MuleManager implements UMOManager
         disposed.set(true);
         disposeConnectors();
 
-        if (model != null)
+        for (Iterator i = models.values().iterator(); i.hasNext();)
         {
+            UMOModel model = (UMOModel) i.next();
             model.dispose();
         }
+
         disposeAgents();
 
         transformers.clear();
@@ -663,14 +663,15 @@ public class MuleManager implements UMOManager
 
         // For now at least, we don't want a registration error to affect
         // the initialisation process.
-        try
-        {
-            transformer.register();
-        }
-        catch (RegistrationException re)
-        {
-            logger.warn(re);
-        }
+       // try
+       // {
+            //TODO LM: Method not implemented yet?
+            //transformer.register();
+       // }
+       // catch (RegistrationException re)
+       // {
+       //     logger.warn(re);
+       // }
 
         transformers.put(transformer.getName(), transformer);
         logger.info("Transformer " + transformer.getName() + " has been initialised successfully");
@@ -819,10 +820,12 @@ public class MuleManager implements UMOManager
                 initialiseConnectors();
                 initialiseEndpoints();
                 initialiseAgents();
-                if (model != null)
+                for (Iterator i = models.values().iterator(); i.hasNext();)
                 {
-                    model.register();
+                    UMOModel model = (UMOModel) i.next();
                     model.initialise();
+                    //TODO LM: Should the model be registered before or after initialisation?
+                    model.register();
                 }
 
             }
@@ -938,8 +941,9 @@ public class MuleManager implements UMOManager
             }
             startConnectors();
             startAgents();
-            if (model != null)
+            for (Iterator i = models.values().iterator(); i.hasNext();)
             {
+                UMOModel model = (UMOModel) i.next();
                 model.start();
             }
             started.set(true);
@@ -1019,8 +1023,9 @@ public class MuleManager implements UMOManager
         }
 
         logger.debug("Stopping model...");
-        if (model != null)
+        for (Iterator i = models.values().iterator(); i.hasNext();)
         {
+            UMOModel model = (UMOModel) i.next();
             model.stop();
         }
 
@@ -1075,41 +1080,20 @@ public class MuleManager implements UMOManager
         System.exit(0);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public UMOModel getModel()
+    public UMOModel lookupModel(String name)
     {
-        // TODO in version two we must not assume the model
+        // TODO LM: why are we checking if the registry is null here?  This should be done in a lifecycle phase
         if (registry == null)
         {
             createRegistry();
         }
 
-        if (model == null)
-        {
-            model = new SedaModel();
-            model.setName(DEFAULT_MODEL_NAME);
-
-            try
-            {
-                model.register();
-            }
-            catch (UMOException e)
-            {
-                logger.error("Unable to register model " + model.getName() +
-                        " with the registry");
-            }
-        }
-        return model;
+        return (UMOModel)models.get(name);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void setModel(UMOModel model) throws UMOException
+    public void registerModel(UMOModel model) throws UMOException
     {
-        this.model = model;
+        models.put(model.getName(), model);
         if (initialised.get())
         {
             model.register();
@@ -1120,6 +1104,21 @@ public class MuleManager implements UMOManager
         {
             model.start();
         }
+    }
+
+    public void unregisterModel(String name)
+    {
+        UMOModel model = lookupModel(name);
+        if(model!=null)
+        {
+            models.remove(model);
+            model.dispose();
+        }
+    }
+
+    public Map getModels()
+    {
+        return Collections.unmodifiableMap(models);
     }
 
     /**

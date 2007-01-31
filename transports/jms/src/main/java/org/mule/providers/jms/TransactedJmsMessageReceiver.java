@@ -331,6 +331,8 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
 
             // Get the durable subscriber name if there is one
             String durableName = (String)endpoint.getProperties().get("durableName");
+            // TODO AP: to be replaced with a more intelligent topic detection,
+            // instanceof does not always work as needed
             if (durableName == null && durable && dest instanceof Topic)
             {
                 durableName = "mule." + connector.getName() + "." + endpoint.getEndpointURI().getAddress();

@@ -32,9 +32,20 @@ public class Apple implements Fruit, Callable
     private boolean bitten = false;
     private boolean washed = false;
 
+    private FruitCleaner cleaner;
+
     public void wash()
     {
+        if(cleaner!= null )
+        {
+            cleaner.wash(this);
+        }
         washed = true;
+    }
+
+    public void polish()
+    {
+        cleaner.polish(this);
     }
 
     public boolean isWashed()
@@ -58,6 +69,17 @@ public class Apple implements Fruit, Callable
                         + context.getMessageAsString());
         wash();
         return null;
+    }
+
+
+    public FruitCleaner getAppleCleaner()
+    {
+        return cleaner;
+    }
+
+    public void setAppleCleaner(FruitCleaner cleaner)
+    {
+        this.cleaner = cleaner;
     }
 
     public boolean equals(Object o)

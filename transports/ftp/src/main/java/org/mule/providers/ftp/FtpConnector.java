@@ -17,14 +17,17 @@ import org.mule.providers.file.FilenameParser;
 import org.mule.providers.file.SimpleFilenameParser;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.ConnectorException;
+import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.UMOMessageReceiver;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -115,7 +118,7 @@ public class FtpConnector extends AbstractConnector
 
     public void releaseFtp(UMOEndpointURI uri, FTPClient client) throws Exception
     {
-        if (isCreateDispatcherPerRequest())
+        if (dispatcherFactory.isCreateDispatcherPerRequest())
         {
             destroyFtp(uri, client);
         }
@@ -477,6 +480,69 @@ public class FtpConnector extends AbstractConnector
         }
 
         client.setFileType(type);
+    }
+
+    /**
+     * Well get the output stream (if any) for this type of transport. Typically this
+     * will be called only when Streaming is being used on an outbound endpoint
+     *
+     * @param endpoint the endpoint that releates to this Dispatcher
+     * @param message the current message being processed
+     * @return the output stream to use for this request or null if the transport
+     *         does not support streaming
+     * @throws org.mule.umo.UMOException
+     */
+    public OutputStream getOutputStream(UMOImmutableEndpoint endpoint, UMOMessage message)
+        throws UMOException
+    {
+        FTPClient client = null;
+
+        UMOEndpointURI uri = endpoint.getEndpointURI();
+        String filename = (String)message.getProperty(FtpConnector.PROPERTY_FILENAME);
+
+        try
+        {
+            if (filename == null)
+            {
+                String outPattern = (String)endpoint.getProperty(FtpConnector.PROPERTY_OUTPUT_PATTERN);
+                if (outPattern == null){
+                    outPattern = message.getStringProperty(FtpConnector.PROPERTY_OUTPUT_PATTERN,
+                    getOutputPattern());
+                }
+                filename = generateFilename(message, outPattern);
+            }
+
+            if (filename == null)
+            {
+                throw new IOException("Filename is null");
+            }
+
+            client = getFtp(uri);
+            enterActiveOrPassiveMode(client, endpoint);
+            setupFileType(client, endpoint);
+            if (!client.changeWorkingDirectory(uri.getPath()))
+            {
+                throw new IOException("Ftp error: " + client.getReplyCode());
+            }
+            OutputStream out = client.storeFileStream(filename);
+            // We wrap the ftp outputstream to ensure that the
+            // completePendingRequest() method is called when the stream is closed
+            return new FtpOutputStreamWrapper(client, out);
+        }
+        catch (Exception e)
+        {
+            throw new DispatchException(new Message(Messages.STREAMING_FAILED_NO_STREAM), message, endpoint,
+                e);
+        }
+    }
+
+    private String generateFilename(UMOMessage message, String pattern)
+    {
+        if (pattern == null)
+        {
+            pattern = getOutputPattern();
+        }
+        return getFilenameParser().getFilename(message, pattern);
     }
 
 }

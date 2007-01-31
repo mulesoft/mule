@@ -15,16 +15,20 @@ import org.mule.config.pool.CommonsPoolProxyFactory;
 import org.mule.config.pool.CommonsPoolProxyPool;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.model.MuleProxy;
+import org.mule.impl.model.seda.SedaModel;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.umo.model.UMOModel;
 
 public class CommonsPoolProxyPoolTestCase extends AbstractMuleTestCase
 {
 
     public void testOnRemoveCallsDispose() throws Exception
     {
+        UMOModel model = new SedaModel();
         MuleDescriptor descriptor = getTestDescriptor("test", "java.lang.Object");
-        CommonsPoolProxyFactory factory = new CommonsPoolProxyFactory(descriptor);
-        CommonsPoolProxyPool pool = new CommonsPoolProxyPool(descriptor, factory, new PoolingProfile());
+        CommonsPoolProxyFactory factory = new CommonsPoolProxyFactory(descriptor, model);
+        CommonsPoolProxyPool pool = new CommonsPoolProxyPool(descriptor, model, factory, new PoolingProfile());
+
         factory.setPool(pool);
 
         Object obj = factory.makeObject();

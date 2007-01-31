@@ -13,6 +13,7 @@ package org.mule.tck.testmodels.fruit;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -74,6 +75,11 @@ public class FruitBowl
         }
     }
 
+    public void setFruit(List fruit)
+    {
+        this.setFruit((Fruit[])fruit.toArray(new Fruit[fruit.size()]));
+    }
+
     public Apple getApple()
     {
         return (Apple)bowl.get(Apple.class);
@@ -93,4 +99,5 @@ public class FruitBowl
     {
         bowl.put(Banana.class, banana);
     }
+
 }

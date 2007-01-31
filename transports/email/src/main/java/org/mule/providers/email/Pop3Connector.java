@@ -30,29 +30,26 @@ public class Pop3Connector extends AbstractMailConnector
      * Holds the time in milliseconds that the endpoint should wait before checking a
      * mailbox
      */
-    protected long checkFrequency = DEFAULT_CHECK_FREQUENCY;
+    protected volatile long checkFrequency = DEFAULT_CHECK_FREQUENCY;
 
     /**
      * holds a path where messages should be backed up to
      */
-    protected String backupFolder = null;
+    protected volatile String backupFolder = null;
 
     /**
      * Once a message has been read, should it be deleted
      */
-    protected boolean deleteReadMessages = true;
+    protected volatile boolean deleteReadMessages = true;
 
     public Pop3Connector()
     {
         super();
-        // by default, close client connections to pop3 after the request.
-        this.setCreateDispatcherPerRequest(true);
     }
-
 
     protected void doInitialise() throws InitialisationException
     {
-        //template method, nothing to do
+        // template method, nothing to do
     }
 
     protected void doDispose()

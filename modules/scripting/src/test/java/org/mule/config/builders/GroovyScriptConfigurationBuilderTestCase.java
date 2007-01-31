@@ -24,6 +24,7 @@ public class GroovyScriptConfigurationBuilderTestCase extends AbstractScriptConf
     public ConfigurationBuilder getBuilder()
     {
         return new ScriptConfigurationBuilder("groovy");
+
     }
 
 }

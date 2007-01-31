@@ -17,6 +17,7 @@ import org.mule.umo.MessagingException;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.provider.UMOMessageAdapter;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
@@ -62,7 +63,7 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
                 }
 
                 // check for an existing group first
-                EventGroup group = this.getEventGroupWithId(groupId);
+                EventGroup group = this.getEventGroup(groupId);
 
                 // does the group exist?
                 if (group == null)
@@ -75,7 +76,7 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
                 synchronized (group)
                 {
                     // make sure no other thread removed the group in the meantime
-                    if (group != this.getEventGroupWithId(groupId))
+                    if (group != this.getEventGroup(groupId))
                     {
                         // if that is the (rare) case, spin
                         miss = true;
@@ -107,11 +108,12 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
     }
 
     /**
-     * TODO HH: writeme
+     * Create a new EventGroup with the specified groupId.
      * 
-     * @param event
-     * @param groupId
-     * @return
+     * @param event the event that caused creation of this group; can be used for
+     *            additional information
+     * @param groupId the id to use for the new EventGroup
+     * @return a new EventGroup
      */
     protected EventGroup createEventGroup(UMOEvent event, Object groupId)
     {
@@ -119,10 +121,11 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
     }
 
     /**
-     * TODO HH: writeme
+     * Returns the identifier by which events will be correlated. By default this is
+     * the value as returned by {@link UMOMessageAdapter#getCorrelationId()}.
      * 
-     * @param event
-     * @return
+     * @param event the event use for determining the correlation group id
+     * @return the id used to correlate related events
      */
     protected Object getEventGroupIdForEvent(UMOEvent event)
     {
@@ -137,33 +140,42 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
     }
 
     /**
-     * TODO HH: writeme
+     * Look up the existing EventGroup with the given id.
+     * 
      * @param groupId
-     * @return
+     * @return the EventGroup with the given id or <code>null</code> if the group
+     *         does not exist.
      */
-    protected EventGroup getEventGroupWithId(Object groupId)
+    protected EventGroup getEventGroup(Object groupId)
     {
         return (EventGroup)eventGroups.get(groupId);
     }
 
     /**
-     * TODO HH: writeme
+     * Add the given EventGroup to this aggregator's "group store". Currently this is
+     * only a ConcurrentHashMap, and the group's id as returned by
+     * {@link EventGroup#getGroupId()} is used to match the group. Since group
+     * creation/lookup/storage can happen fully concurrent, we return the stored
+     * group. Callers are required to switch their method-local references when a
+     * different group is returned.
      * 
-     * @param group
-     * @return
+     * @param group the EventGroup to "store"
+     * @return the stored EventGroup (may be different from the one passed as
+     *         argument)
      */
     protected EventGroup addEventGroup(EventGroup group)
     {
         // a parallel thread might have removed the EventGroup already,
         // therefore we need to validate our current reference
         EventGroup previous = (EventGroup)eventGroups.putIfAbsent(group.getGroupId(), group);
-        return (previous != null ? previous : group);        
+        return (previous != null ? previous : group);
     }
 
     /**
-     * TODO HH: writeme
+     * Remove the group from this aggregator's "store". The group's id as returned by
+     * {@link EventGroup#getGroupId()} is used to match the group.
      * 
-     * @param group
+     * @param group the EventGroup to remove
      */
     protected void removeEventGroup(EventGroup group)
     {

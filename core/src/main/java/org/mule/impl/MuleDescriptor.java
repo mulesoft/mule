@@ -16,9 +16,10 @@ import org.mule.impl.container.DescriptorContainerKeyPair;
 import org.mule.registry.RegistrationException;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOInterceptor;
-import org.mule.umo.routing.UMOInboundMessageRouter;
-import org.mule.umo.routing.UMOOutboundMessageRouter;
-import org.mule.umo.routing.UMOResponseMessageRouter;
+import org.mule.umo.routing.UMOInboundRouterCollection;
+import org.mule.umo.routing.UMONestedRouterCollection;
+import org.mule.umo.routing.UMOOutboundRouterCollection;
+import org.mule.umo.routing.UMOResponseRouterCollection;
 import org.mule.util.FileUtils;
 
 import java.beans.ExceptionListener;
@@ -33,7 +34,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * <code>MuleDescriptor</code> describes all the properties for a Mule UMO. New
  * Mule UMOs can be initialised as needed from their descriptor.
- * 
+ *
  */
 
 public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescriptor
@@ -100,7 +101,6 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
         name = newName;
     }
 
-
     /*
      * (non-Javadoc)
      *
@@ -137,7 +137,6 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
         version = ver;
     }
 
-
     /*
      * (non-Javadoc)
      *
@@ -158,7 +157,6 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
 
     /*
      * (non-Javadoc)
-     *
      * @see org.mule.umo.UMODescriptor#setImplementation(java.lang.String)
      */
     public void setImplementation(Object reference)
@@ -180,14 +178,19 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
         setImplementation(new DescriptorContainerKeyPair(name, DEFAULT_INSTANCE_REF_NAME));
     }
 
-    public void setInboundRouter(UMOInboundMessageRouter routerList)
+    public void setInboundRouter(UMOInboundRouterCollection router)
     {
-        this.inboundRouter = routerList;
+        this.inboundRouter = router;
     }
 
-    public void setOutboundRouter(UMOOutboundMessageRouter routerList)
+    public void setOutboundRouter(UMOOutboundRouterCollection router)
     {
-        outboundRouter = routerList;
+        outboundRouter = router;
+    }
+
+    public void setNestedRouter(UMONestedRouterCollection router)
+    {
+    	nestedRouter = router;
     }
 
     public void setContainerManaged(boolean value)
@@ -208,9 +211,9 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
      * and then join before the request completes
      *
      * @param router the response router for this component
-     * @see org.mule.umo.routing.UMOResponseMessageRouter
+     * @see org.mule.umo.routing.UMOResponseRouterCollection
      */
-    public void setResponseRouter(UMOResponseMessageRouter router)
+    public void setResponseRouter(UMOResponseRouterCollection router)
     {
         this.responseRouter = router;
     }

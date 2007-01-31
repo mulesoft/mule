@@ -39,7 +39,7 @@ public class ExceptionListenerTestCase extends FunctionalTestCase
     protected ConfigurationBuilder getBuilder() throws Exception
     {
         QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
-
+        builder.registerModel("seda", "main");
         // Create VM connector that queues events
         VMConnector cnn = new VMConnector();
         cnn.setName("vmCnn");
@@ -47,7 +47,7 @@ public class ExceptionListenerTestCase extends FunctionalTestCase
         builder.getManager().registerConnector(cnn);
         DefaultComponentExceptionStrategy es = new DefaultComponentExceptionStrategy();
         es.addEndpoint(new MuleEndpoint("vm://error.queue", false));
-        builder.getManager().getModel().setExceptionListener(es);
+        builder.getManager().lookupModel("main").setExceptionListener(es);
         UMOEndpoint ep = new MuleEndpoint("vm://component1", true);
         ep.setTransformer(new FailingTransformer());
 

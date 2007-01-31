@@ -10,9 +10,9 @@
 
 package org.mule.impl.container;
 
-import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.impl.model.ModelHelper;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.manager.ContainerException;
 import org.mule.umo.manager.ObjectNotFoundException;
@@ -58,7 +58,7 @@ public class DescriptorContainerContext extends AbstractContainerContext
         {
             DescriptorContainerKeyPair dckp = (DescriptorContainerKeyPair)key;
 
-            UMODescriptor d = MuleManager.getInstance().getModel().getDescriptor(dckp.getDescriptorName());
+            UMODescriptor d = ModelHelper.getDescriptor(dckp.getDescriptorName());
             if (d == null)
             {
                 throw new ObjectNotFoundException(key.toString(), new ContainerException(new Message(

@@ -20,72 +20,71 @@ import java.util.Arrays;
 public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
 {
 
+    // @Override
     protected void doSetUp() throws Exception
     {
         // setup a dummy context for transformers that are event aware
         RequestContext.setEvent(getTestEvent("test"));
     }
 
+    // @Override
     protected void doTearDown() throws Exception
     {
         RequestContext.setEvent(null);
     }
 
+    // Remove tabs and line breaks in the passed String; this makes comparison of XML
+    // fragments easier
     protected String normalizeString(String rawString)
     {
-        return rawString.replaceAll("\r\n", "\n");
+        rawString = rawString.replaceAll("\r", "");
+        rawString = rawString.replaceAll("\n", "");
+        return rawString.replaceAll("\t", "");
     }
 
     public void testTransform() throws Exception
     {
-        Object result = getTransformer().transform(getTestData());
+        Object result = this.getTransformer().transform(getTestData());
         assertNotNull(result);
 
-        Object expectedResult = getResultData();
-        // Special case for string results
-        if (result instanceof String && expectedResult instanceof String)
-        {
-            assertEquals(normalizeString((String)expectedResult), normalizeString((String)result));
-        }
-        else
-        {
-            boolean b = compareResults(expectedResult, result);
-            assertTrue(b);
-        }
+        Object expectedResult = this.getResultData();
+        assertNotNull(expectedResult);
+
+        assertTrue(this.compareResults(expectedResult, result));
     }
 
     public void testRoundtripTransform() throws Exception
     {
-        if (getRoundTripTransformer() != null)
+        if (this.getRoundTripTransformer() != null)
         {
-            Object result = getRoundTripTransformer().transform(getResultData());
+            Object result = this.getRoundTripTransformer().transform(this.getResultData());
             assertNotNull(result);
-            boolean b = compareRoundtripResults(getTestData(), result);
-            assertTrue(b);
+
+            assertTrue(this.compareRoundtripResults(this.getTestData(), result));
         }
     }
 
     public void testBadReturnType() throws Exception
     {
-        doTestBadReturnType(getTransformer(), getTestData());
+        this.doTestBadReturnType(this.getTransformer(), this.getTestData());
     }
 
     public void testRoundtripBadReturnType() throws Exception
     {
-        if (getRoundTripTransformer() != null)
+        if (this.getRoundTripTransformer() != null)
         {
-            doTestBadReturnType(getRoundTripTransformer(), getResultData());
+            this.doTestBadReturnType(this.getRoundTripTransformer(), this.getResultData());
         }
     }
 
     public void testRoundTrip() throws Exception
     {
-        if (getRoundTripTransformer() != null)
+        if (this.getRoundTripTransformer() != null)
         {
-            UMOTransformer trans = getTransformer();
-            trans.setNextTransformer(getRoundTripTransformer());
-            Object result = trans.transform(getTestData());
-            compareRoundtripResults(getTestData(), result);
+            UMOTransformer trans = this.getTransformer();
+            trans.setNextTransformer(this.getRoundTripTransformer());
+            Object result = trans.transform(this.getTestData());
+            this.compareRoundtripResults(this.getTestData(), result);
         }
     }
 
@@ -111,35 +110,43 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
 
     public abstract Object getResultData();
 
-    public boolean compareResults(Object src, Object result)
+    public boolean compareResults(Object expected, Object result)
     {
-        if (src == null && result == null)
+        if (expected == null && result == null)
         {
             return true;
         }
-        if (src == null || result == null)
+
+        if (expected == null || result == null)
         {
             return false;
         }
-        if (src instanceof Object[] && result instanceof Object[])
+
+        if (expected instanceof Object[] && result instanceof Object[])
         {
-            return Arrays.equals((Object[])src, (Object[])result);
+            return Arrays.equals((Object[])expected, (Object[])result);
             // TODO check if RetroTranslating Mule to JDK 1.4 makes this method
             // available
             // return Arrays.deepEquals((Object[])src, (Object[])result);
         }
-        else if (src instanceof byte[] && result instanceof byte[])
+        else if (expected instanceof byte[] && result instanceof byte[])
         {
-            return Arrays.equals((byte[])src, (byte[])result);
+            return Arrays.equals((byte[])expected, (byte[])result);
         }
-        else
+
+        // Special case for Strings: normalize comparison arguments
+        if (expected instanceof String && result instanceof String)
         {
-            return src.equals(result);
+            expected = this.normalizeString((String)expected);
+            result = this.normalizeString((String)result);
         }
+
+        return expected.equals(result);
     }
 
-    public boolean compareRoundtripResults(Object src, Object result)
+    public boolean compareRoundtripResults(Object expected, Object result)
     {
-        return compareResults(src, result);
+        return compareResults(expected, result);
     }
+
 }

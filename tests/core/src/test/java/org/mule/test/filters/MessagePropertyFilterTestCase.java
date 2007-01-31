@@ -45,7 +45,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
         UMOMessage message = new MuleMessage("blah");
 
         assertTrue(!filter.accept(message));
-        message.setProperty("foo", null);
+        message.removeProperty("foo");
         assertTrue(!filter.accept(message));
         message.setProperty("foo", "car");
         assertTrue(filter.accept(message));

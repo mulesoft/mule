@@ -10,10 +10,6 @@
 
 package org.mule.providers.soap.xfire;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Vector;
-
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.extras.client.MuleClient;
@@ -23,6 +19,10 @@ import org.mule.impl.internal.notifications.MessageNotificationListener;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.manager.UMOServerNotification;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Vector;
 
 public class XFireCustomHttpHeaderTestCase extends FunctionalTestCase implements MessageNotificationListener
 {
@@ -50,7 +50,7 @@ public class XFireCustomHttpHeaderTestCase extends FunctionalTestCase implements
 
         // should have received all notifications before the reply arrives back to
         // the client
-        UMOMessage msgNotification = (UMOMessage)notifications.get(0);
+        UMOMessage msgNotification = (UMOMessage)notifications.get(1);
 
         // MULE_USER should be allowed in
         assertEquals(msgNotification.getProperty(MuleProperties.MULE_USER_PROPERTY), "alan");

@@ -10,15 +10,17 @@
 
 package org.mule.providers.jms;
 
-import javax.jms.Message;
-import javax.resource.spi.work.Work;
-
 import org.mule.impl.MuleMessage;
+import org.mule.transaction.TransactionCallback;
+import org.mule.transaction.TransactionTemplate;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
+
+import javax.jms.Message;
+import javax.resource.spi.work.Work;
 
 /**
  * Registers a single JmsMessage listener but uses a thread pool to process incoming
@@ -88,8 +90,42 @@ public class JmsMessageReceiver extends SingleJmsMessageReceiver
         {
             try
             {
-                UMOMessageAdapter adapter = connector.getMessageAdapter(message);
-                routeMessage(new MuleMessage(adapter));
+                if (message.getJMSRedelivered())
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Message with correlationId: " + message.getJMSCorrelationID()
+                                     + " has redelivered flag set, handing off to Exception Handler");
+                    }
+                    redeliveryHandler.handleRedelivery(message);
+                }
+            }
+            catch (Exception e)
+            {
+                getConnector().handleException(e);
+            }
+
+
+            TransactionTemplate tt = new TransactionTemplate(endpoint.getTransactionConfig(),
+            connector.getExceptionListener());
+
+            // Receive messages and process them in a single transaction
+            // Do not enable threading here, but serveral workers
+            // may have been started
+            TransactionCallback cb = new TransactionCallback()
+            {
+                public Object doInTransaction() throws Exception
+                {
+                    UMOMessageAdapter adapter = connector.getMessageAdapter(message);
+                    return routeMessage(new MuleMessage(adapter));
+                }
+            };
+
+            try
+            {
+                tt.execute(cb);
+//                UMOMessageAdapter adapter = connector.getMessageAdapter(message);
+//                routeMessage(new MuleMessage(adapter));
             }
             catch (Exception e)
             {

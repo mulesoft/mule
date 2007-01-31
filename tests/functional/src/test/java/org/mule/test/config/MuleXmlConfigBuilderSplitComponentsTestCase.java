@@ -36,7 +36,8 @@ public class MuleXmlConfigBuilderSplitComponentsTestCase extends FunctionalTestC
      */
     public void testSplitComponentsConfig() throws Exception
     {
-        UMOModel model = MuleManager.getInstance().getModel();
+        UMOModel model = MuleManager.getInstance().lookupModel("main");
+        assertNotNull(model);
         assertNotNull(model.getComponent("Component1"));
         assertNotNull(model.getComponent("Component2"));
         assertNotNull(model.getComponent("Component3"));

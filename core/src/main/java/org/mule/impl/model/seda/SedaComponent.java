@@ -176,7 +176,7 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
         try
         {
             // Initialise the proxy pool
-            proxyPool = getPoolingProfile().getPoolFactory().createPool(descriptor, poolingProfile);
+            proxyPool = getPoolingProfile().getPoolFactory().createPool(descriptor, model, getPoolingProfile());
 
             if (getPoolingProfile().getInitialisationPolicy() == PoolingProfile.POOL_INITIALISE_ALL_COMPONENTS)
             {
@@ -205,7 +205,7 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
         try
         {
             Object component = lookupComponent();
-            MuleProxy componentProxy = new DefaultMuleProxy(component, descriptor, null);
+            MuleProxy componentProxy = new DefaultMuleProxy(component, descriptor, model, null);
             ((SedaComponentStatistics)getStatistics()).setComponentPoolSize(-1);
             componentProxy.setStatistics(getStatistics());
             componentProxy.start();

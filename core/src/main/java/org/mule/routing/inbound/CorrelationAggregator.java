@@ -11,6 +11,7 @@
 package org.mule.routing.inbound;
 
 import org.mule.umo.UMOEvent;
+import org.mule.umo.provider.UMOMessageAdapter;
 
 /**
  * <code>CorrelationAggregator</code> uses the CorrelationID and
@@ -21,11 +22,8 @@ public abstract class CorrelationAggregator extends AbstractEventAggregator
 {
 
     /**
-     * TODO HH: writeme
-     * 
-     * @param event
-     * @param groupId
-     * @return
+     * Creates a new EventGroup that will expect the number of events as returned by
+     * {@link UMOMessageAdapter#getCorrelationGroupSize()}.
      */
     // @Override
     protected EventGroup createEventGroup(UMOEvent event, Object groupId)
@@ -34,13 +32,9 @@ public abstract class CorrelationAggregator extends AbstractEventAggregator
     }
 
     /**
-     * Determines if the event group is ready to be aggregated. if the group is ready
-     * to be aggregated (this is entirely up to the application. it could be
-     * determined by volume, last modified time or some ohter criteria based on the
-     * last event received)
-     * 
-     * @param events
-     * @return
+     * @see AbstractEventAggregator#shouldAggregateEvents(EventGroup)
+     * @return <code>true</code> if the correlation size is not set or exactly the
+     *         expected size of the event group.
      */
     protected boolean shouldAggregateEvents(EventGroup events)
     {
@@ -48,7 +42,8 @@ public abstract class CorrelationAggregator extends AbstractEventAggregator
 
         if (size == -1)
         {
-            logger.warn("Correlation Group Size not set, but CorrelationAggregator is being used.  Message is being forwarded");
+            logger.warn("Correlation Group Size not set, but CorrelationAggregator is being used."
+                            + " Message is being forwarded");
             return true;
         }
 

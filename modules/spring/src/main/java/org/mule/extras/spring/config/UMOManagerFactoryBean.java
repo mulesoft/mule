@@ -10,10 +10,6 @@
 
 package org.mule.extras.spring.config;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.mule.MuleManager;
 import org.mule.config.MuleConfiguration;
 import org.mule.umo.UMOException;
@@ -25,6 +21,11 @@ import org.mule.umo.manager.UMOTransactionManagerFactory;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.UMOTransformer;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -36,6 +37,7 @@ import org.springframework.beans.factory.InitializingBean;
  * cleaner spring configuration.
  * 
  * @see AutowireUMOManagerFactoryBean
+ * @deprecated use AutowireUMOManagerFactoryBean
  */
 public class UMOManagerFactoryBean implements FactoryBean, InitializingBean, DisposableBean
 {
@@ -124,7 +126,7 @@ public class UMOManagerFactoryBean implements FactoryBean, InitializingBean, Dis
 
     public void setModel(UMOModel model) throws UMOException
     {
-        manager.setModel(model);
+        manager.registerModel(model);
     }
 
     public void afterPropertiesSet() throws Exception

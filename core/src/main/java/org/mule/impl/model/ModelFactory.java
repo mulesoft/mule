@@ -23,6 +23,8 @@ import java.util.Properties;
  */
 public class ModelFactory
 {
+    public static final String DEFAULT_MODEL_NAME = "_default";
+
     public static final String MODEL_SERVICE_PATH = "org/mule/models";
     public static final String MODEL_SERVICE_TYPE = "model";
     public static final String MODEL_PROPERTY = "model";

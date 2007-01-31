@@ -17,7 +17,7 @@ import org.mule.impl.MuleMessage;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.filters.RegExFilter;
 import org.mule.routing.outbound.MulticastingRouter;
-import org.mule.routing.outbound.OutboundMessageRouter;
+import org.mule.routing.outbound.OutboundRouterCollection;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 import org.mule.umo.UMOMessage;
@@ -37,7 +37,7 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
     public void testMulticastingRouter() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
-        OutboundMessageRouter messageRouter = new OutboundMessageRouter();
+        OutboundRouterCollection messageRouter = new OutboundRouterCollection();
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
 
         UMOEndpoint endpoint1 = getTestEndpoint("Test1Provider", UMOEndpoint.ENDPOINT_TYPE_SENDER);

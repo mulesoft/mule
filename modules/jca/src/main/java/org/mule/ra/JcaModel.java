@@ -20,6 +20,8 @@ import org.mule.umo.UMODescriptor;
  */
 public class JcaModel extends AbstractModel
 {
+    public static final String JCA_MODEL_TYPE = "jca";
+
 
     protected UMOComponent createComponent(UMODescriptor descriptor)
     {
@@ -28,7 +30,7 @@ public class JcaModel extends AbstractModel
 
     public String getType()
     {
-        return "jca";
+        return JCA_MODEL_TYPE;
     }
 
 }

@@ -53,22 +53,31 @@ public class Mx4jAgent implements UMOAgent
 
     private static final org.apache.commons.logging.Log logger = LogFactory.getLog(Mx4jAgent.class);
 
+    private static final String PROTOCOL_PREFIX = "http://";
+    public static final String DEFAULT_HOSTNAME = "localhost";
+    public static final int DEFAULT_PORT = 9999;
+    public static final String DEFAULT_JMX_ADAPTOR_URL = PROTOCOL_PREFIX + DEFAULT_HOSTNAME + ":" + DEFAULT_PORT;
+
+    private String jmxAdaptorUrl;
+    private String host;
+    private String port;
+
     private String name = "MX4J Agent";
-    private String jmxAdaptorUrl = "http://localhost:9999";
+
     private HttpAdaptor adaptor;
     private MBeanServer mBeanServer;
     private ObjectName adaptorName;
 
     // Adaptor overrides
-    private String login = null;
+    private String login;
 
-    private String password = null;
+    private String password;
 
     private String authenticationMethod = "basic";
 
-    private String xslFilePath = null;
+    private String xslFilePath;
 
-    private String pathInJar = null;
+    private String pathInJar;
 
     private boolean cacheXsl = true;
 
@@ -135,6 +144,18 @@ public class Mx4jAgent implements UMOAgent
         {
             jmxSupport = jmxSupportFactory.newJmxSupport();
             mBeanServer = (MBeanServer) MBeanServerFactory.findMBeanServer(null).get(0);
+
+            if (StringUtils.isBlank(jmxAdaptorUrl))
+            {
+                if (StringUtils.isNotBlank(host) && StringUtils.isNotBlank(port))
+                {
+                    jmxAdaptorUrl = PROTOCOL_PREFIX + host + ":" + port;
+                }
+                else
+                {
+                    jmxAdaptorUrl = DEFAULT_JMX_ADAPTOR_URL;
+                }
+            }
 
             adaptor = createAdaptor();
             adaptorName = jmxSupport.getObjectName(jmxSupport.getDomainName() + ":" + HTTP_ADAPTER_OBJECT_NAME);
@@ -349,5 +370,26 @@ public class Mx4jAgent implements UMOAgent
     public void setCacheXsl(boolean cacheXsl)
     {
         this.cacheXsl = cacheXsl;
+    }
+
+
+    public String getHost()
+    {
+        return host;
+    }
+
+    public void setHost(String host)
+    {
+        this.host = host;
+    }
+
+    public String getPort()
+    {
+        return port;
+    }
+
+    public void setPort(String port)
+    {
+        this.port = port;
     }
 }

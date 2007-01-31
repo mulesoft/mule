@@ -131,7 +131,7 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
         HashMap props = new HashMap();
         props.put("eventCallback", callback);
         descriptor.setProperties(props);
-        UMOComponent component = MuleManager.getInstance().getModel().registerComponent(descriptor);
+        UMOComponent component = model.registerComponent(descriptor);
         return component;
     }
 

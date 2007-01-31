@@ -12,7 +12,7 @@ package org.mule.routing.response;
 
 import org.mule.config.MuleConfiguration;
 import org.mule.config.MuleProperties;
-import org.mule.management.stats.RouterStatistics;
+import org.mule.routing.AbstractRouter;
 import org.mule.routing.CorrelationPropertiesExtractor;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.routing.UMOResponseRouter;
@@ -26,25 +26,15 @@ import org.apache.commons.logging.LogFactory;
  * <code>AbstractResponseRouter</code> is a base class for all Response Routers
  */
 
-public abstract class AbstractResponseRouter implements UMOResponseRouter
+public abstract class AbstractResponseRouter extends AbstractRouter implements UMOResponseRouter
 {
     protected final Log logger = LogFactory.getLog(getClass());
 
-    private RouterStatistics routerStatistics;
-
     private int timeout = MuleConfiguration.DEFAULT_TIMEOUT;
 
+    private boolean failOnTimeout = true;
+
     protected PropertyExtractor correlationExtractor = new CorrelationPropertiesExtractor();
-
-    public RouterStatistics getRouterStatistics()
-    {
-        return routerStatistics;
-    }
-
-    public void setRouterStatistics(RouterStatistics routerStatistics)
-    {
-        this.routerStatistics = routerStatistics;
-    }
 
     public PropertyExtractor getCorrelationExtractor()
     {
@@ -112,4 +102,14 @@ public abstract class AbstractResponseRouter implements UMOResponseRouter
         return correlationExtractor.getProperty(MuleProperties.MULE_MESSAGE_ID_PROPERTY, message);
     }
 
+
+    public boolean isFailOnTimeout()
+    {
+        return failOnTimeout;
+    }
+
+    public void setFailOnTimeout(boolean failOnTimeout)
+    {
+        this.failOnTimeout = failOnTimeout;
+    }
 }

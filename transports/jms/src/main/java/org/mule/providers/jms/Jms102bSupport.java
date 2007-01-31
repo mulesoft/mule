@@ -121,7 +121,8 @@ public class Jms102bSupport extends Jms11Support
             }
             else
             {
-                return session.createDurableSubscriber((Topic) destination, durableName, messageSelector, noLocal);
+                // DO NOT REMOVE THE CAST, breaks Weblogic
+                return ((TopicSession) session).createDurableSubscriber((Topic) destination, durableName, messageSelector, noLocal);
             }
         }
         else if (session instanceof QueueSession)
@@ -225,7 +226,8 @@ public class Jms102bSupport extends Jms11Support
         }
         else if (producer instanceof QueueSender)
         {
-            producer.send(
+            // DO NOT REMOVE THIS CAST, it breaks Weblogic
+            ((QueueSender) producer).send(
                     message,
                     (persistent ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT),
                     priority,

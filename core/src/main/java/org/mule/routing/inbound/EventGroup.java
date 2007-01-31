@@ -37,7 +37,7 @@ public class EventGroup implements Comparable, Serializable
     public static final UMOEvent[] EMPTY_EVENTS_ARRAY = new UMOEvent[0];
 
     private final Object groupId;
-    // @GuardedBy("itself")
+    // @GuardedBy("this")
     private final List events;
     private final long created;
     private final int expectedSize;
@@ -56,8 +56,14 @@ public class EventGroup implements Comparable, Serializable
         this.groupId = groupId;
     }
 
-    // @Override
-    // TODO HH: document
+    /**
+     * Compare this EventGroup to another one. If the receiver and the argument both
+     * have groupIds that are {@link Comparable}, they are used for the comparison;
+     * otherwise - since the id can be any object - the group creation time stamp is
+     * used as fallback. Older groups are considered "smaller".
+     * 
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
     public int compareTo(Object o)
     {
         EventGroup other = (EventGroup)o;
@@ -74,8 +80,13 @@ public class EventGroup implements Comparable, Serializable
         }
     }
 
+    /**
+     * Compares two EventGroups for equality. EventGroups are considered equal when
+     * their groupIds (as returned by {@link #getGroupId()}) are equal.
+     * 
+     * @see java.lang.Object#equals(Object)
+     */
     // @Override
-    // TODO HH: document
     public boolean equals(Object obj)
     {
         if (this == obj)
@@ -83,12 +94,7 @@ public class EventGroup implements Comparable, Serializable
             return true;
         }
 
-        if (obj == null)
-        {
-            return false;
-        }
-
-        if (getClass() != obj.getClass())
+        if (!(obj instanceof EventGroup))
         {
             return false;
         }
@@ -96,33 +102,44 @@ public class EventGroup implements Comparable, Serializable
         final EventGroup other = (EventGroup)obj;
         if (groupId == null)
         {
-            if (other.groupId != null)
-            {
-                return false;
-            }
+            return (other.groupId == null);
         }
-        else
-        {
-            if (!groupId.equals(other.groupId))
-            {
-                return false;
-            }
-        }
-        return true;
+
+        return groupId.equals(other.groupId);
     }
 
+    /**
+     * The hashCode of an EventGroup is derived from the object returned by
+     * {@link #getGroupId()}.
+     * 
+     * @see java.lang.Object#hashCode()
+     */
     // @Override
-    // TODO HH: document
     public int hashCode()
     {
         return groupId.hashCode();
     }
 
+    /**
+     * Returns an identifier for this EventGroup. It is recommended that this id is
+     * unique and {@link Comparable} e.g. a UUID.
+     * 
+     * @return the id of this event group
+     */
     public Object getGroupId()
     {
         return groupId;
     }
 
+    /**
+     * Returns an iterator over a snapshot copy of this group's collected events. If
+     * you need to iterate over the group and e.g. remove select events, do so via
+     * {@link #removeEvent(UMOEvent)}. If you need to do so atomically in order to
+     * prevent e.g. concurrent reception/aggregation of the group during iteration,
+     * wrap the iteration in a synchronized block on the group instance.
+     * 
+     * @return an iterator over collected {@link UMOEvent}s.
+     */
     public Iterator iterator()
     {
         synchronized (this)
@@ -138,60 +155,97 @@ public class EventGroup implements Comparable, Serializable
         }
     }
 
+    /**
+     * Returns a snapshot of collected events in this group.
+     * 
+     * @return an array of collected {@link UMOEvent}s.
+     */
     public UMOEvent[] toArray()
     {
-        synchronized (events)
+        synchronized (this)
         {
             if (events.isEmpty())
             {
                 return EMPTY_EVENTS_ARRAY;
             }
+
             return (UMOEvent[])events.toArray(EMPTY_EVENTS_ARRAY);
         }
     }
 
+    /**
+     * Add the given event to this group.
+     * 
+     * @param event the event to add
+     */
     public void addEvent(UMOEvent event)
     {
-        synchronized (events)
+        synchronized (this)
         {
             events.add(event);
         }
     }
 
+    /**
+     * Remove the given event from the group.
+     * 
+     * @param event the evnt to remove
+     */
     public void removeEvent(UMOEvent event)
     {
-        synchronized (events)
+        synchronized (this)
         {
             events.remove(event);
         }
     }
 
+    /**
+     * Return the creation timestamp of the current group.
+     * 
+     * @return the timestamp when this group was instantiated.
+     * @see {@link Utils#nanoTime()}
+     */
     public long getCreated()
     {
         return created;
     }
 
+    /**
+     * Returns the number of events collected so far.
+     * 
+     * @return number of events in this group or 0 if the group is empty.
+     */
     public int size()
     {
-        synchronized (events)
+        synchronized (this)
         {
             return events.size();
         }
     }
 
-    public void clear()
-    {
-        synchronized (events)
-        {
-            events.clear();
-        }
-    }
-
+    /**
+     * Returns the number of events that this EventGroup is expecting before
+     * correlation can proceed.
+     * 
+     * @return expected number of events or -1 if no expected size was specified.
+     */
     public int expectedSize()
     {
         return expectedSize;
     }
 
+    /**
+     * Removes all events from this group.
+     */
+    public void clear()
+    {
+        synchronized (this)
+        {
+            events.clear();
+        }
+    }
+
+    // @Override
     public String toString()
     {
         StringBuffer buf = new StringBuffer(80);
@@ -200,7 +254,7 @@ public class EventGroup implements Comparable, Serializable
         buf.append("id=").append(groupId);
         buf.append(", expected size=").append(expectedSize);
 
-        synchronized (events)
+        synchronized (this)
         {
             int currentSize = events.size();
             buf.append(", current events=").append(currentSize);
@@ -221,6 +275,7 @@ public class EventGroup implements Comparable, Serializable
                 buf.append(']');
             }
         }
+
         buf.append('}');
 
         return buf.toString();

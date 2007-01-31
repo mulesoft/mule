@@ -83,4 +83,6 @@ public class StaticRecipientList extends AbstractRecipientList
         return RECIPIENT_DELIMITER;
     }
 
+
+
 }

@@ -12,6 +12,8 @@ package org.mule.components.builder;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.impl.NoSatisfiableMethodsException;
+import org.mule.impl.TooManySatisfiableMethodsException;
 import org.mule.umo.UMOMessage;
 import org.mule.util.ClassUtils;
 
@@ -47,13 +49,14 @@ public class ReflectionMessageBuilder extends AbstractMessageBuilder
         }
         if (methods.size() == 0)
         {
-            throw new MessageBuilderException(new Message(Messages.NO_MATCHING_METHODS_FOR_X_ON_X,
-                property.getClass().getName(), master.getClass().getName()), request);
+            throw new MessageBuilderException(request,
+                    new NoSatisfiableMethodsException(master, new Class[]{property.getClass()}));
         }
         else if (methods.size() > 1)
         {
-            throw new MessageBuilderException(new Message(Messages.TOO_MANY_MATCHING_METHODS_FOR_X_ON_X,
-                property.getClass().getName(), master.getClass().getName()), request);
+            throw new MessageBuilderException(request,
+                    new TooManySatisfiableMethodsException(master,
+                            new String[]{property.getClass().getName()}));
         }
         else
         {

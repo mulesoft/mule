@@ -10,6 +10,14 @@
 
 package org.mule.providers.soap.axis.extensions;
 
+import org.mule.impl.RequestContext;
+import org.mule.impl.model.ModelHelper;
+import org.mule.providers.soap.ServiceProxy;
+import org.mule.providers.soap.axis.AxisConnector;
+import org.mule.providers.soap.axis.AxisMessageReceiver;
+import org.mule.providers.soap.axis.AxisServiceProxy;
+import org.mule.umo.UMOComponent;
+
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -32,13 +40,6 @@ import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.providers.java.RPCProvider;
 import org.apache.axis.soap.SOAPConstants;
 import org.apache.axis.utils.JavaUtils;
-import org.mule.MuleManager;
-import org.mule.impl.RequestContext;
-import org.mule.providers.soap.ServiceProxy;
-import org.mule.providers.soap.axis.AxisConnector;
-import org.mule.providers.soap.axis.AxisMessageReceiver;
-import org.mule.providers.soap.axis.AxisServiceProxy;
-import org.mule.umo.UMOSession;
 
 /**
  * <code>MuleProvider</code> Is an Axis service endpoint that builds services from
@@ -85,10 +86,10 @@ public class MuleRPCProvider extends RPCProvider
     protected Class getServiceClass(String s, SOAPService soapService, MessageContext messageContext)
         throws AxisFault
     {
-        UMOSession session = MuleManager.getInstance().getModel().getComponentSession(soapService.getName());
+        UMOComponent component = ModelHelper.getComponent(soapService.getName());
         try
         {
-            Class[] classes = ServiceProxy.getInterfacesForComponent(session.getComponent());
+            Class[] classes = ServiceProxy.getInterfacesForComponent(component);
             return Proxy.getProxyClass(Thread.currentThread().getContextClassLoader(), classes);
         }
         catch (Exception e)

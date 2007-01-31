@@ -13,13 +13,13 @@ package org.mule.routing.inbound;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
-import org.mule.management.stats.RouterStatistics;
+import org.mule.routing.AbstractRouter;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.routing.RoutingException;
-import org.mule.umo.routing.UMOInboundMessageRouter;
+import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.routing.UMOInboundRouter;
 import org.mule.umo.routing.UMORouterCollection;
 import org.mule.umo.transformer.TransformerException;
@@ -33,17 +33,16 @@ import org.apache.commons.logging.LogFactory;
  * on the router.
  * 
  * @see UMOInboundRouter
- * @see UMOInboundMessageRouter
+ * @see UMOInboundRouterCollection
  * @see UMORouterCollection
  */
 
-public class SelectiveConsumer implements UMOInboundRouter
+public class SelectiveConsumer extends AbstractRouter implements UMOInboundRouter
 {
     protected final Log logger = LogFactory.getLog(getClass());
 
     private volatile UMOFilter filter;
     private volatile boolean transformFirst = true;
-    private volatile RouterStatistics routerStatistics;
 
     public boolean isMatch(UMOEvent event) throws MessagingException
     {
@@ -115,15 +114,4 @@ public class SelectiveConsumer implements UMOInboundRouter
     {
         this.transformFirst = transformFirst;
     }
-
-    public void setRouterStatistics(RouterStatistics stats)
-    {
-        this.routerStatistics = stats;
-    }
-
-    public RouterStatistics getRouterStatistics()
-    {
-        return routerStatistics;
-    }
-
 }

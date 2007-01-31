@@ -27,7 +27,7 @@
         <endpoint name="testEndpoint2" type="sender" address="vm://yet.another.queue" connector="testConnector" transformers="ObjectToXml"/>
     </global-endpoints>
 
-    <model name="model">
+    <model name="main">
 
 
         <!-- test Uri receiver endpoint specifying a provider with endpoint overrriden and

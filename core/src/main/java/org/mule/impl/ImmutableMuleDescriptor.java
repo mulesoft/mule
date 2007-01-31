@@ -20,19 +20,22 @@ import org.mule.impl.container.MuleContainerContext;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.registry.DeregistrationException;
 import org.mule.registry.RegistrationException;
-import org.mule.routing.inbound.InboundMessageRouter;
+import org.mule.routing.inbound.InboundRouterCollection;
 import org.mule.routing.inbound.InboundPassThroughRouter;
-import org.mule.routing.outbound.OutboundMessageRouter;
+import org.mule.routing.outbound.OutboundRouterCollection;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
+import org.mule.routing.response.ResponseRouterCollection;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOImmutableDescriptor;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.ContainerException;
-import org.mule.umo.routing.UMOInboundMessageRouter;
-import org.mule.umo.routing.UMOOutboundMessageRouter;
+import org.mule.umo.routing.UMOInboundRouterCollection;
+import org.mule.umo.routing.UMONestedRouter;
+import org.mule.umo.routing.UMOOutboundRouterCollection;
 import org.mule.umo.routing.UMOOutboundRouter;
-import org.mule.umo.routing.UMOResponseMessageRouter;
+import org.mule.umo.routing.UMOResponseRouterCollection;
+import org.mule.umo.routing.UMONestedRouterCollection;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
@@ -95,14 +98,15 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
      */
     protected List intecerptorList = new CopyOnWriteArrayList();
 
-    protected UMOInboundMessageRouter inboundRouter = null;
+    protected UMOInboundRouterCollection inboundRouter = null;
 
-    protected UMOOutboundMessageRouter outboundRouter = null;
+    protected UMOOutboundRouterCollection outboundRouter = null;
 
-    protected UMOResponseMessageRouter responseRouter = null;
+    protected UMONestedRouterCollection nestedRouter = null;
 
+    protected UMOResponseRouterCollection responseRouter = null;
 
-    /**
+     /**
      * The threading profile to use for this component. If this is not set a default
      * will be provided by the server
      */
@@ -111,7 +115,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     /**
      * Determines whether the component described by this descriptor is hosted in a
      * container. If the value is false the component will not be pooled by Mule.
-     * 
+     *
      * @deprecated Use <code>container</code> instead.
      * @see MULE-812
      */
@@ -142,7 +146,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     /**
      * Default constructor. Initalises common properties for the MuleConfiguration
      * object
-     * 
+     *
      * @see org.mule.config.MuleConfiguration
      */
     public ImmutableMuleDescriptor(ImmutableMuleDescriptor descriptor)
@@ -169,8 +173,12 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
      */
     protected ImmutableMuleDescriptor()
     {
-        inboundRouter = new InboundMessageRouter();
+        inboundRouter = new InboundRouterCollection();
         inboundRouter.addRouter(new InboundPassThroughRouter());
+
+        outboundRouter = new OutboundRouterCollection();
+        responseRouter = new ResponseRouterCollection();
+
     }
 
     public void initialise() throws InitialisationException
@@ -180,20 +188,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         {
             threadingProfile = config.getDefaultComponentThreadingProfile();
         }
-        //Todo RM*
-//        if (poolingProfile == null)
-//        {
-//            poolingProfile = config.getPoolingProfile();
-//        }
-//        if (queueProfile == null)
-//        {
-//            queueProfile = config.getQueueProfile();
-//        }
 
-        if (exceptionListener == null)
-        {
-            exceptionListener = MuleManager.getInstance().getModel().getExceptionListener();
-        }
         else if (exceptionListener instanceof Initialisable)
         {
             ((Initialisable)exceptionListener).initialise();
@@ -209,7 +204,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         {
             // Create Default routes that route to the default inbound and
             // outbound endpoints
-            inboundRouter = new InboundMessageRouter();
+            inboundRouter = new InboundRouterCollection();
             inboundRouter.addRouter(new InboundPassThroughRouter());
         }
         else
@@ -235,9 +230,20 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
             }
         }
 
+		if (nestedRouter!=null)
+        {
+            Iterator it = nestedRouter.getRouters().iterator();
+			while (it.hasNext()) {
+				UMONestedRouter nestedRouter =  (UMONestedRouter) it.next();
+				endpoint = (MuleEndpoint) nestedRouter.getEndpoint();
+				endpoint.initialise();
+			}
+
+		}
+
         if (outboundRouter == null)
         {
-            outboundRouter = new OutboundMessageRouter();
+            outboundRouter = new OutboundRouterCollection();
             outboundRouter.addRouter(new OutboundPassThroughRouter());
         }
         else
@@ -274,21 +280,20 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.lifecycle.Registerable#register()
      */
     public void register() throws RegistrationException
     {
         /*
-         * THIS WILL HAVE TO CHANGE
+         * TODO LM: THIS WILL HAVE TO CHANGE
          */
-        registryId = 
-            MuleManager.getInstance().getRegistry().registerMuleObject(MuleManager.getInstance().getModel(), this).getId();
+        //registryId = MuleManager.getInstance().getRegistry().registerMuleObject(MuleManager.getInstance().Model(), this).getId();
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.lifecycle.Registerable#deregister()
      */
     public void deregister() throws DeregistrationException
@@ -299,7 +304,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.lifecycle.Registerable#getRegistryId()
      */
     public String getRegistryId()
@@ -309,7 +314,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMODescriptor#getExceptionListener()
      */
     public ExceptionListener getExceptionListener()
@@ -320,7 +325,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMODescriptor#getName()
      */
     public String getName()
@@ -330,7 +335,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMODescriptor#getParams() Not HashMap is used instead of Map
      *      due to a Spring quirk where the property is not found if specified as a
      *      map
@@ -342,7 +347,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMODescriptor#getVersion()
      */
     public String getVersion()
@@ -352,7 +357,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMODescriptor#getinteceptorList()
      */
     public List getInterceptors()
@@ -362,7 +367,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMODescriptor#getImplementation()
      */
     public Object getImplementation()
@@ -370,14 +375,19 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         return implementationReference;
     }
 
-    public UMOInboundMessageRouter getInboundRouter()
+    public UMOInboundRouterCollection getInboundRouter()
     {
         return inboundRouter;
     }
 
-    public UMOOutboundMessageRouter getOutboundRouter()
+    public UMOOutboundRouterCollection getOutboundRouter()
     {
         return outboundRouter;
+    }
+
+    public UMONestedRouterCollection getNestedRouter()
+    {
+    	return nestedRouter;
     }
 
     /**
@@ -416,7 +426,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
      * A helper method that will resolved a component for a given reference id. For
      * example, for a component declared in a Spring Application context the id would
      * be the bean id, in Pico the id would be a fully qualified class name.
-     * 
+     *
      * @param reference the reference to use when resolving the component
      * @return the Implementation of the component
      */
@@ -436,8 +446,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         }
     }
 
-
-    public UMOResponseMessageRouter getResponseRouter()
+    public UMOResponseRouterCollection getResponseRouter()
     {
         return responseRouter;
     }
@@ -456,7 +465,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
      * Returns the name of the contaier where the object for this descriptor resides.
      * If this value is 'none' the 'implementaiton' attributed is expected to be a
      * fully qualified class name that will be instanciated.
-     * 
+     *
      * @return the container name, or null if it is not known - in which case each
      *         container will be queried for the component implementation.
      */
@@ -464,7 +473,6 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     {
         return container;
     }
-
 
     public String toString()
     {

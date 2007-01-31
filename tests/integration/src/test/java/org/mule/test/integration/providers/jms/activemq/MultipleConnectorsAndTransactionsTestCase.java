@@ -9,7 +9,10 @@
  */
 package org.mule.test.integration.providers.jms.activemq;
 
+import org.mule.extras.client.MuleClient;
+import org.mule.providers.NullPayload;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.umo.UMOMessage;
 
 public class MultipleConnectorsAndTransactionsTestCase extends FunctionalTestCase
 {
@@ -21,7 +24,39 @@ public class MultipleConnectorsAndTransactionsTestCase extends FunctionalTestCas
 
     public void testDispatchingToSeparateEndpoints() throws Exception
     {
-        // TODO RM: something missing here?
+        String message = "testing";
+        MuleClient client = new MuleClient();
+
+        //Clear the output queue
+        UMOMessage result = client.receive("client-endpoint3", 5000);
+        while(result != null)
+        {
+            result = client.receive("client-endpoint3", 5000);
+        }
+
+        result = client.send("client-endpoint1", message, null);
+
+        result = client.receive("client-endpoint3", 5000);
+        assertNotNull(result);
+
+        assertFalse(result.getPayload() instanceof NullPayload);
+        assertEquals(result.getPayloadAsString(), message);
+
+        result = client.send("client-endpoint2", message, null);
+
+        result = client.receive("client-endpoint3", 5000);
+        assertNotNull(result);
+        assertFalse(result.getPayload() instanceof NullPayload);
+        assertEquals(result.getPayloadAsString(), message);
+
+        //The exception should occur on this step
+        result = client.send("client-endpoint1", message, null);
+
+        result = client.receive("client-endpoint3", 5000);
+        assertNotNull(result);
+        assertFalse(result.getPayload() instanceof NullPayload);
+        assertEquals(result.getPayloadAsString(), message);
+        
     }
 
 }

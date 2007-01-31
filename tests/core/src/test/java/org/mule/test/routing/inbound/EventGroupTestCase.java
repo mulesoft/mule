@@ -58,6 +58,14 @@ public class EventGroupTestCase extends AbstractMuleTestCase
 
         assertEquals(g1, g2);
         assertFalse(g1.equals(g3));
+
+        MyEventGroup mg = new MyEventGroup("foo");
+        assertEquals(g1, mg);
+        assertEquals(mg, g1);
+
+        mg = new MyEventGroup("bar");
+        assertFalse(g1.equals(mg));
+        assertFalse(mg.equals(g1));
     }
 
     public void testHashCode()
@@ -168,6 +176,21 @@ public class EventGroupTestCase extends AbstractMuleTestCase
         es = eg.toString();
         assertTrue(es.indexOf("events=2") != -1);
         assertTrue(es.endsWith(e.getMessage().getUniqueId() + ", " + e2.getMessage().getUniqueId() + "]}"));
+    }
+
+    private static class MyEventGroup extends EventGroup
+    {
+        private static final long serialVersionUID = 1L;
+
+        public MyEventGroup(Object groupId)
+        {
+            super(groupId);
+        }
+
+        public MyEventGroup(Object groupId, int expectedSize)
+        {
+            super(groupId, expectedSize);
+        }
     }
 
 }

@@ -10,10 +10,6 @@
 
 package org.mule.extras.spring.config;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.impl.DefaultExceptionStrategy;
@@ -26,6 +22,10 @@ import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.routing.UMORouterCatchAllStrategy;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class MuleBeanDefinitionReaderTestCase extends AbstractConfigBuilderTestCase
 {
@@ -52,14 +52,14 @@ public class MuleBeanDefinitionReaderTestCase extends AbstractConfigBuilderTestC
 
     public void testEndpointPropertyBean()
     {
-        UMODescriptor d = MuleManager.getInstance().getModel().getDescriptor("appleComponent3");
+        UMODescriptor d = MuleManager.getInstance().lookupModel("main").getDescriptor("appleComponent3");
         assertNotNull(d);
         assertNotNull(d.getInboundRouter());
         UMOEndpoint e = (UMOEndpoint)d.getInboundRouter().getEndpoints().get(0);
         assertNotNull(e);
         assertEquals("Prop2", e.getProperties().get("testEndpointBeanProperty"));
 
-        d = MuleManager.getInstance().getModel().getDescriptor("orangeComponent");
+        d = MuleManager.getInstance().lookupModel("main").getDescriptor("orangeComponent");
         assertNotNull(d);
         UMORouterCatchAllStrategy strategy = d.getInboundRouter().getCatchAllStrategy();
         assertTrue(strategy instanceof ForwardingCatchAllStrategy);
@@ -76,7 +76,7 @@ public class MuleBeanDefinitionReaderTestCase extends AbstractConfigBuilderTestC
 
     public void testPropertyBeansOnDescriptors()
     {
-        UMODescriptor d = MuleManager.getInstance().getModel().getDescriptor("appleComponent3");
+        UMODescriptor d = MuleManager.getInstance().lookupModel("main").getDescriptor("appleComponent3");
         assertNotNull(d);
 
         assertTrue(d.getExceptionListener() instanceof DefaultExceptionStrategy);
@@ -86,7 +86,7 @@ public class MuleBeanDefinitionReaderTestCase extends AbstractConfigBuilderTestC
 
     public void testPropertyBeansInMaps()
     {
-        UMODescriptor d = MuleManager.getInstance().getModel().getDescriptor("appleComponent3");
+        UMODescriptor d = MuleManager.getInstance().lookupModel("main").getDescriptor("appleComponent3");
         assertNotNull(d);
         Map map = (Map)d.getProperties().get("springMap");
         assertNotNull(map);

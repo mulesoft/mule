@@ -17,7 +17,14 @@ import org.mule.umo.lifecycle.UMOLifecycleAdapterFactory;
 import org.mule.umo.model.UMOEntryPointResolver;
 
 /**
- * <code>DefaultLifecycleAdapterFactory</code> TODO (document class)
+ * <code>DefaultLifecycleAdapterFactory</code> creates a DefaultLifeCycleAdapter.  Users can
+ * implement their own LifeCycleAdapter factories to control lifecycle events on their services such
+ * as introduce other lifecycle events that are controlled by external changes.
+ *
+ * @see org.mule.umo.lifecycle.UMOLifecycleAdapter
+ * @see org.mule.umo.lifecycle.UMOLifecycleAdapterFactory
+ * @see org.mule.impl.DefaultLifecycleAdapter
+ * @see org.mule.impl.DefaultLifecycleAdapterFactory
  */
 public class DefaultLifecycleAdapterFactory implements UMOLifecycleAdapterFactory
 {

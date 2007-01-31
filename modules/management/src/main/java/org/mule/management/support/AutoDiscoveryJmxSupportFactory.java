@@ -39,7 +39,7 @@ public class AutoDiscoveryJmxSupportFactory implements JmxSupportFactory
         // TODO cache the support class instance
         Class clazz = ObjectName.class;
         // method escape() is available since JMX 1.2
-        Method method = ClassUtils.getMethod("quote", new Class[]{String.class}, clazz);
+        Method method = ClassUtils.getMethod(clazz, "quote", new Class[]{String.class});
 
         final boolean jmxModernAvailable = method == null;
         final JmxSupport jmxSupport;

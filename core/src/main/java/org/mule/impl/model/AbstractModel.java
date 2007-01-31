@@ -18,8 +18,7 @@ import org.mule.impl.DefaultLifecycleAdapterFactory;
 import org.mule.impl.ImmutableMuleDescriptor;
 import org.mule.impl.MuleSession;
 import org.mule.impl.internal.notifications.ModelNotification;
-import org.mule.model.DynamicEntryPointResolver;
-import org.mule.registry.Registration;
+import org.mule.impl.model.resolvers.DynamicEntryPointResolver;
 import org.mule.registry.DeregistrationException;
 import org.mule.registry.RegistrationException;
 import org.mule.umo.UMOComponent;
@@ -34,6 +33,10 @@ import org.mule.umo.model.ModelException;
 import org.mule.umo.model.UMOEntryPointResolver;
 import org.mule.umo.model.UMOModel;
 
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentSkipListMap;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 import java.beans.ExceptionListener;
 import java.util.Iterator;
 import java.util.List;
@@ -42,10 +45,6 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentSkipListMap;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 /**
  * <code>MuleModel</code> is the default implementation of the UMOModel. The model
  * encapsulates and manages the runtime behaviour of a Mule Server instance. It is
@@ -53,27 +52,28 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
  */
 public abstract class AbstractModel implements UMOModel
 {
+    public static final String DEFAULT_MODEL_NAME = "main";
     /**
      * logger used by this class
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    private String name;
-    private UMOEntryPointResolver entryPointResolver;
-    private UMOLifecycleAdapterFactory lifecycleAdapterFactory;
+    private String name = DEFAULT_MODEL_NAME;
+    private UMOEntryPointResolver entryPointResolver= new DynamicEntryPointResolver();
+    private UMOLifecycleAdapterFactory lifecycleAdapterFactory = new DefaultLifecycleAdapterFactory();
 
-    private Map components;
+    private Map components = new ConcurrentSkipListMap();
 
     /**
      * Collection for mule descriptors registered in this Manager
      */
-    protected Map descriptors;
+    protected Map descriptors = new ConcurrentHashMap();
 
     private AtomicBoolean initialised = new AtomicBoolean(false);
 
     private AtomicBoolean started = new AtomicBoolean(false);
 
-    private ExceptionListener exceptionListener;
+    private ExceptionListener exceptionListener = new DefaultComponentExceptionStrategy();
 
     protected String registryId = null;
 
@@ -173,6 +173,11 @@ public abstract class AbstractModel implements UMOModel
             descriptor.setExceptionListener(exceptionListener);
         }
 
+        if (initialised.get())
+        {
+            descriptor.initialise();
+        }
+
         // detect duplicate descriptor declarations
         if (descriptors.get(descriptor.getName()) != null)
         {
@@ -269,8 +274,6 @@ public abstract class AbstractModel implements UMOModel
 
         components.clear();
         descriptors.clear();
-        components = null;
-        descriptors = null;
 
         fireNotification(new ModelNotification(this, ModelNotification.MODEL_DISPOSED));
     }
@@ -281,7 +284,7 @@ public abstract class AbstractModel implements UMOModel
      * @param muleName the Name of the Mule for which the component is required
      * @return a component for the specified name
      */
-    public UMOSession getComponentSession(String muleName)
+    public UMOSession getxComponentSession(String muleName)
     {
         UMOComponent component = (UMOComponent)components.get(muleName);
         if (component == null)

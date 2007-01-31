@@ -17,7 +17,7 @@ import org.mule.impl.message.ExceptionPayload;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.filters.RegExFilter;
 import org.mule.routing.outbound.ExceptionBasedRouter;
-import org.mule.routing.outbound.OutboundMessageRouter;
+import org.mule.routing.outbound.OutboundRouterCollection;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 import org.mule.umo.UMOException;
@@ -43,7 +43,7 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
     public void testSuccessfulExceptionRouter() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
-        OutboundMessageRouter messageRouter = new OutboundMessageRouter();
+        OutboundRouterCollection messageRouter = new OutboundRouterCollection();
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
 
         UMOEndpoint endpoint1 = new MuleEndpoint("test://Dummy1", false);
@@ -89,7 +89,7 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
     public void testBothFailing() throws Exception
     {
         Mock mockSession = MuleTestUtils.getMockSession();
-        OutboundMessageRouter messageRouter = new OutboundMessageRouter();
+        OutboundRouterCollection messageRouter = new OutboundRouterCollection();
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
 
         UMOEndpoint endpoint1 = new MuleEndpoint("test://AlwaysFail", false);

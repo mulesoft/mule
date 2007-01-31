@@ -10,10 +10,6 @@
 
 package org.mule.providers.stream;
 
-import java.io.InputStream;
-import java.io.PrintStream;
-
-import org.apache.commons.lang.SystemUtils;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractPollingMessageReceiver;
 import org.mule.umo.UMOComponent;
@@ -21,6 +17,12 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
+
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.io.PushbackInputStream;
+
+import org.apache.commons.lang.SystemUtils;
 
 /**
  * <code>StreamMessageReceiver</code> is a listener for events from Mule components
@@ -94,39 +96,53 @@ public class StreamMessageReceiver extends AbstractPollingMessageReceiver
     {
         try
         {
-            byte[] inputBuffer = new byte[bufferSize];
-            int len = inputStream.read(inputBuffer);
-
-            if (len == -1)
+            if(endpoint.isStreaming())
             {
-                return;
-            }
+                PushbackInputStream in = new PushbackInputStream(inputStream);
 
-            StringBuffer fullBuffer = new StringBuffer(bufferSize);
-            while (len > 0)
-            {
-                fullBuffer.append(new String(inputBuffer, 0, len));
-                len = 0; // mark as read
-                if (inputStream.available() > 0)
-                {
-                    len = inputStream.read(inputBuffer);
-                }
-            }
-
-            // remove any trailing CR/LF
-            String finalMessageString;
-            int noCRLFLength = fullBuffer.length() - SystemUtils.LINE_SEPARATOR.length();
-            if (fullBuffer.indexOf(SystemUtils.LINE_SEPARATOR, noCRLFLength) != -1)
-            {
-                finalMessageString = fullBuffer.substring(0, noCRLFLength);
+                //Block until we have some data
+                int i = in.read();
+                //Roll back our read
+                in.unread(i);
+                UMOMessage umoMessage = new MuleMessage(connector.getStreamMessageAdapter(in, null));
+                routeMessage(umoMessage, endpoint.isSynchronous());
             }
             else
             {
-                finalMessageString = fullBuffer.toString();
-            }
+                byte[] inputBuffer = new byte[bufferSize];
+                int len = inputStream.read(inputBuffer);
 
-            UMOMessage umoMessage = new MuleMessage(connector.getMessageAdapter(finalMessageString));
-            routeMessage(umoMessage, endpoint.isSynchronous());
+                if (len == -1)
+                {
+                    return;
+                }
+
+                StringBuffer fullBuffer = new StringBuffer(bufferSize);
+                while (len > 0)
+                {
+                    fullBuffer.append(new String(inputBuffer, 0, len));
+                    len = 0; // mark as read
+                    if (inputStream.available() > 0)
+                    {
+                        len = inputStream.read(inputBuffer);
+                    }
+                }
+
+                // remove any trailing CR/LF
+                String finalMessageString;
+                int noCRLFLength = fullBuffer.length() - SystemUtils.LINE_SEPARATOR.length();
+                if (fullBuffer.indexOf(SystemUtils.LINE_SEPARATOR, noCRLFLength) != -1)
+                {
+                    finalMessageString = fullBuffer.substring(0, noCRLFLength);
+                }
+                else
+                {
+                    finalMessageString = fullBuffer.toString();
+                }
+
+                UMOMessage umoMessage = new MuleMessage(connector.getMessageAdapter(finalMessageString));
+                routeMessage(umoMessage, endpoint.isSynchronous());
+            }
 
             doConnect();
         }

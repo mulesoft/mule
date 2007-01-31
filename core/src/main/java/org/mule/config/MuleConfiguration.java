@@ -10,6 +10,7 @@
 
 package org.mule.config;
 
+import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -17,6 +18,7 @@ import org.mule.providers.ConnectionStrategy;
 import org.mule.providers.SingleAttemptConnectionStrategy;
 import org.mule.umo.manager.DefaultWorkListener;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -154,7 +156,7 @@ public class MuleConfiguration
     /**
      * Where mule will store any runtime files to disk
      */
-    private String workingDirectory = DEFAULT_WORKING_DIRECTORY;
+    private String workingDirectory;
 
     /**
      * The configuration resources used to configure the MuleManager instance
@@ -198,6 +200,7 @@ public class MuleConfiguration
     public MuleConfiguration()
     {
         super();
+        setWorkingDirectory(DEFAULT_WORKING_DIRECTORY);
     }
 
     /**
@@ -293,7 +296,8 @@ public class MuleConfiguration
 
     public void setWorkingDirectory(String workingDirectory)
     {
-        this.workingDirectory = workingDirectory;
+        this.workingDirectory = new File(workingDirectory).getAbsolutePath();
+        updateApplicationProperty(MuleProperties.MULE_WORKING_DIRECTORY_PROPERTY, this.workingDirectory);
     }
 
     public String[] getConfigResources()
@@ -542,5 +546,10 @@ public class MuleConfiguration
     public void setDomainId(String domainId)
     {
         this.domainId = domainId;
+    }
+
+    private void updateApplicationProperty(String name, Object value)
+    {
+        if(MuleManager.isInstanciated()) MuleManager.getInstance().setProperty(name, value);
     }
 }

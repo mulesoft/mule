@@ -10,6 +10,24 @@
 
 package org.mule.providers.soap.axis;
 
+import org.mule.config.MuleProperties;
+import org.mule.config.i18n.Messages;
+import org.mule.impl.MuleMessage;
+import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.providers.AbstractMessageDispatcher;
+import org.mule.providers.NullPayload;
+import org.mule.providers.soap.NamedParameter;
+import org.mule.providers.soap.SoapConstants;
+import org.mule.providers.soap.SoapMethod;
+import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.provider.DispatchException;
+import org.mule.umo.transformer.TransformerException;
+import org.mule.util.BeanUtils;
+import org.mule.util.TemplateParser;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -35,23 +53,6 @@ import org.apache.axis.constants.Use;
 import org.apache.axis.wsdl.fromJava.Namespaces;
 import org.apache.axis.wsdl.fromJava.Types;
 import org.apache.commons.lang.StringUtils;
-import org.mule.config.MuleProperties;
-import org.mule.config.i18n.Messages;
-import org.mule.impl.MuleMessage;
-import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.providers.AbstractMessageDispatcher;
-import org.mule.providers.NullPayload;
-import org.mule.providers.soap.NamedParameter;
-import org.mule.providers.soap.SoapConstants;
-import org.mule.providers.soap.SoapMethod;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.provider.DispatchException;
-import org.mule.umo.transformer.TransformerException;
-import org.mule.util.BeanUtils;
-import org.mule.util.TemplateParser;
 
 /**
  * <code>AxisMessageDispatcher</code> is used to make soap requests via the Axis
@@ -427,7 +428,6 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
     /**
      * Make a specific request to the underlying transport
      * 
-     * @param endpoint the endpoint to use when connecting to the resource
      * @param timeout the maximum time the operation should block before returning.
      *            The call should return immediately if there is data available. If
      *            no data becomes available before the timeout elapses, null will be

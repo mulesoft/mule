@@ -22,6 +22,7 @@ import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
+import org.mule.impl.model.ModelHelper;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.security.MuleCredentials;
@@ -398,7 +399,7 @@ public class MuleClient implements Disposable
     public UMOMessage sendDirect(String component, String transformers, UMOMessage message)
         throws UMOException
     {
-        boolean compregistered = getManager().getModel().isComponentRegistered(component);
+        boolean compregistered = ModelHelper.isComponentRegistered(component);
         if (!compregistered)
         {
             throw new MessagingException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER, "Component '"
@@ -416,7 +417,7 @@ public class MuleClient implements Disposable
         {
             logger.warn("The mule manager is running synchronously, a null message payload will be returned");
         }
-        UMOSession session = getManager().getModel().getComponentSession(component);
+        UMOSession session = new MuleSession(ModelHelper.getComponent(component));
         UMOEndpoint endpoint = getDefaultClientEndpoint(session.getComponent().getDescriptor(),
             message.getPayload());
         UMOEvent event = new MuleEvent(message, endpoint, session, true);
@@ -469,7 +470,7 @@ public class MuleClient implements Disposable
      */
     public void dispatchDirect(String component, UMOMessage message) throws UMOException
     {
-        boolean compregistered = getManager().getModel().isComponentRegistered(component);
+        boolean compregistered = ModelHelper.isComponentRegistered(component);
         if (!compregistered)
         {
             throw new MessagingException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER, "Component '"
@@ -477,7 +478,7 @@ public class MuleClient implements Disposable
                                                                                              + "'"), message,
                 null);
         }
-        UMOSession session = getManager().getModel().getComponentSession(component);
+        UMOSession session = new MuleSession(ModelHelper.getComponent(component));
         UMOEndpoint endpoint = getDefaultClientEndpoint(session.getComponent().getDescriptor(),
             message.getPayload());
         UMOEvent event = new MuleEvent(message, endpoint, session, true);

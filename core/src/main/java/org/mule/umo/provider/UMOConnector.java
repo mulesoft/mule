@@ -73,11 +73,10 @@ public interface UMOConnector extends Disposable, Initialisable, Registerable
     boolean isDisposing();
 
     /**
-     * Gets a {@link UMOMessageAdapter} from the connector for the given
-     * message (data)
+     * Gets a {@link UMOMessageAdapter} from the connector for the given message
+     * (data)
      * 
-     * @param message the data with which to initialise the
-     *            {@link UMOMessageAdapter}
+     * @param message the data with which to initialise the {@link UMOMessageAdapter}
      * @return the {@link UMOMessageAdapter} for the endpoint
      * @throws MessagingException if the message parameter is not supported
      * @see UMOMessageAdapter
@@ -99,17 +98,17 @@ public interface UMOConnector extends Disposable, Initialisable, Registerable
         throws MessagingException;
 
     /**
-     * @return the name associated with the endpoint
+     * @return the name associated with the connector
      */
     String getName();
 
     /**
-     * @param newName the name to associate with the endpoint
+     * @param newName the name to associate with the connector
      */
     void setName(String newName);
 
     /**
-     * @return the protocol name for the endpoint
+     * @return the primary protocol name for endpoints of this connector
      */
     String getProtocol();
 
@@ -215,5 +214,20 @@ public interface UMOConnector extends Disposable, Initialisable, Registerable
      * @throws DispatchException if the event fails to be dispatched
      */
     UMOMessage send(UMOImmutableEndpoint endpoint, UMOEvent event) throws DispatchException;
+
+
+    /**
+     * Well get the output stream for this type of transport. Typically this
+     * will be called only when Streaming is being used on an outbound endpoint.
+     * If Streaming is not supported by this transport an {@link UnsupportedOperationException}
+     * is thrown
+     *
+     * @param endpoint the endpoint that releates to this Dispatcher
+     * @param message the current message being processed
+     * @return the output stream to use for this request or null if the transport
+     *         does not support streaming
+     * @throws UMOException
+     */
+    OutputStream getOutputStream(UMOImmutableEndpoint endpoint, UMOMessage message) throws UMOException;
 
 }

@@ -18,11 +18,13 @@ public class GlueLoanBrokerSynchronousFunctionalTestCase extends AxisLoanBrokerS
         super();
     }
     
+    // @Override
     protected String getConfigResources()
     {
         return "loan-broker-glue-sync-test-config.xml";
     }
 
+    // @Override
     protected int getNumberOfRequests()
     {
         return 100;

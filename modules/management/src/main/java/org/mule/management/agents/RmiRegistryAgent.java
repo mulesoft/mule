@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOAgent;
+import org.mule.util.StringUtils;
 
 /**
  * Binds to an existing RMI registry or creates a new one on a defined URI. The
@@ -34,10 +35,15 @@ public class RmiRegistryAgent implements UMOAgent
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    public static final String DEFAULT_SERVER_URI = "rmi://localhost:1099";
+    public static final String DEFAULT_HOSTNAME = "localhost";
+    public static final int DEFAULT_PORT = 1099;
+    private static final String PROTOCOL_PREFIX = "rmi://";
+    public static final String DEFAULT_SERVER_URI = PROTOCOL_PREFIX + DEFAULT_HOSTNAME + ":" + DEFAULT_PORT;
     private String name = "RMI Agent";
     private Registry rmiRegistry;
-    private String serverUri = DEFAULT_SERVER_URI;
+    private String serverUri;
+    private String host;
+    private String port;
     private boolean createRegistry = true;
 
     public String getName()
@@ -67,7 +73,7 @@ public class RmiRegistryAgent implements UMOAgent
 
     public void start() throws UMOException
     {
-        URI uri = null;
+        URI uri;
 
         try
         {
@@ -119,7 +125,20 @@ public class RmiRegistryAgent implements UMOAgent
     }
 
     public void initialise() throws InitialisationException {
-        // nothing to do
+        if (StringUtils.isNotBlank(serverUri))
+        {
+            return;
+        }
+
+        if (StringUtils.isNotBlank(host) && StringUtils.isNotBlank(port))
+        {
+            serverUri = PROTOCOL_PREFIX + host + ":" + port;
+        }
+        else
+        {
+            serverUri = DEFAULT_SERVER_URI;
+        }
+
     }
 
     public Registry getRmiRegistry()
@@ -150,5 +169,27 @@ public class RmiRegistryAgent implements UMOAgent
     public void setCreateRegistry(boolean createRegistry)
     {
         this.createRegistry = createRegistry;
+    }
+
+
+    public String getHost()
+    {
+        return host;
+    }
+
+    public void setHost(String host)
+    {
+        this.host = host;
+    }
+
+
+    public String getPort()
+    {
+        return port;
+    }
+
+    public void setPort(String port)
+    {
+        this.port = port;
     }
 }

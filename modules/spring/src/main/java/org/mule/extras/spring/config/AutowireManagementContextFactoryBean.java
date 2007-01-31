@@ -13,6 +13,7 @@ import org.mule.MuleManager;
 import org.mule.config.MuleConfiguration;
 import org.mule.extras.spring.SpringContainerContext;
 import org.mule.impl.model.ModelFactory;
+import org.mule.impl.model.ModelHelper;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOInterceptorStack;
@@ -218,7 +219,7 @@ public class AutowireManagementContextFactoryBean
             model.setExceptionListener((ExceptionListener)listener);
         }
 
-        manager.setModel(model);
+        manager.registerModel(model);
 
     }
 
@@ -329,9 +330,10 @@ public class AutowireManagementContextFactoryBean
         for (Iterator iterator = components.iterator(); iterator.hasNext();)
         {
             d = (UMODescriptor)iterator.next();
-            if (!manager.getModel().isComponentRegistered(d.getName()))
+            if (!ModelHelper.isComponentRegistered(d.getName()))
             {
-                manager.getModel().registerComponent(d);
+                //TODO RM*: Manage model lookup correctly                
+                manager.lookupModel("main").registerComponent(d);
             }
         }
     }

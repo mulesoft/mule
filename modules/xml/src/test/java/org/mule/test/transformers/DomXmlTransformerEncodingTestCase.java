@@ -10,26 +10,28 @@
 
 package org.mule.test.transformers;
 
-import org.dom4j.DocumentHelper;
-import org.dom4j.io.DOMReader;
-import org.dom4j.io.DOMWriter;
 import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.tck.AbstractTransformerTestCase;
 import org.mule.transformers.xml.DomDocumentToXml;
 import org.mule.transformers.xml.XmlToDomDocument;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.IOUtils;
+
+import org.dom4j.DocumentHelper;
+import org.dom4j.io.DOMReader;
+import org.dom4j.io.DOMWriter;
 import org.w3c.dom.Document;
 
-public class DomXmlTransformerEncodingTestCase extends AbstractTransformerTestCase
+public class DomXmlTransformerEncodingTestCase extends AbstractXmlTransformerTestCase
 {
     private Document srcData; // Parsed XML doc
     private String resultData; // String as US-ASCII
 
+    // @Override
     protected void doSetUp() throws Exception
     {
-        org.dom4j.Document dom4jDoc = DocumentHelper.parseText(IOUtils.toString(IOUtils.getResourceAsStream("cdcatalog-utf-8.xml", getClass()), "UTF-8"));
+        org.dom4j.Document dom4jDoc = DocumentHelper.parseText(IOUtils.toString(IOUtils.getResourceAsStream(
+            "cdcatalog-utf-8.xml", getClass()), "UTF-8"));
         srcData = new DOMWriter().write(dom4jDoc);
         resultData = IOUtils.toString(IOUtils.getResourceAsStream("cdcatalog-us-ascii.xml", getClass()),
             "US-ASCII");
@@ -39,7 +41,7 @@ public class DomXmlTransformerEncodingTestCase extends AbstractTransformerTestCa
     {
         UMOTransformer trans = new DomDocumentToXml();
         trans.setReturnClass(String.class);
-        
+
         UMOEndpoint endpoint = new MuleEndpoint();
         endpoint.setEncoding("US-ASCII");
         trans.setEndpoint(endpoint);
@@ -61,26 +63,18 @@ public class DomXmlTransformerEncodingTestCase extends AbstractTransformerTestCa
         return resultData;
     }
 
-    public boolean compareResults(Object src, Object result)
+    // @Override
+    public boolean compareResults(Object expected, Object result)
     {
-    	// This is only used during roundtrip test, so it will always be Document instances
-        if (src instanceof Document)
+        // This is only used during roundtrip test, so it will always be Document
+        // instances
+        if (expected instanceof Document)
         {
-            src = new DOMReader().read((Document)src).asXML();
+            expected = new DOMReader().read((Document)expected).asXML();
             result = new DOMReader().read((Document)result).asXML();
         }
-        // src and result should be strings not
-        if (src != null)
-        {
-            src = ((String)src).replaceAll("\r", "");
-            src = ((String)src).replaceAll("\t", "");
-            src = ((String)src).replaceAll("\n", "");
-        }
-        if (result != null) {
-            result = ((String)result).replaceAll("\r", "");
-            result = ((String)result).replaceAll("\t", "");
-            result = ((String)result).replaceAll("\n", "");
-        }
-        return super.compareResults(src, result);
+
+        return super.compareResults(expected, result);
     }
+
 }

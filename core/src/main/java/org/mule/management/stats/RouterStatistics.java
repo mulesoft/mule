@@ -23,7 +23,7 @@ import java.util.Map;
 
 /**
  * <code>RouterStatistics</code> TODO
- * 
+ *
  * @author <a href="mailto:S.Vanmeerhaege@gfdi.be">Vanmeerhaeghe Stéphane</a>
  * @version $Revision$
  */
@@ -38,6 +38,7 @@ public class RouterStatistics implements Statistics
     public static final int TYPE_INBOUND = 1;
     public static final int TYPE_OUTBOUND = 2;
     public static final int TYPE_RESPONSE = 3;
+    public static final int TYPE_NESTED = 4;
 
     private boolean enabled;
     private long notRouted;
@@ -97,7 +98,7 @@ public class RouterStatistics implements Statistics
 
     /**
      * Increment routed message for multiple endpoints
-     * 
+     *
      * @param endpoints The endpoint collection
      */
     public void incrementRoutedMessage(Collection endpoints)
@@ -118,7 +119,7 @@ public class RouterStatistics implements Statistics
 
     /**
      * Increment routed message for an endpoint
-     * 
+     *
      * @param endpoint The endpoint
      */
     public synchronized void incrementRoutedMessage(UMOImmutableEndpoint endpoint)

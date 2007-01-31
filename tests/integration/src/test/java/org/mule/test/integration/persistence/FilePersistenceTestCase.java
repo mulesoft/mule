@@ -42,7 +42,7 @@ public class FilePersistenceTestCase extends FunctionalTestCase
         assertNotNull(files);
         assertEquals(1, files.length);
 
-        MuleManager.getInstance().getModel().startComponent("TestComponent");
+        MuleManager.getInstance().lookupModel("main").startComponent("TestComponent");
         // give the component some time to initialise
         Thread.sleep(2000);
         files = store.listFiles();

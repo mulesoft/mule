@@ -23,6 +23,18 @@ import org.apache.commons.pool.KeyedPoolableObjectFactory;
  */
 public interface UMOMessageDispatcherFactory
 {
+
+    /**
+     * Controls whether dispatchers are cached or created per request. Note that if
+     * an exception occurs in the dispatcher, it is automatically disposed of and a
+     * new one is created for the next request. This allows dispatchers to recover
+     * from loss of connection and other faults. When invoked by
+     * {@link #validate(UMOImmutableEndpoint, UMOMessageDispatcher)} it takes
+     * precedence over the dispatcher's own return value of
+     * {@link UMOMessageDispatcher#validate()}.
+     */
+    boolean isCreateDispatcherPerRequest();
+
     /**
      * Creates a new message dispatcher instance, initialised with the passed
      * endpoint. The returned instance should be immediately useable.
@@ -73,4 +85,5 @@ public interface UMOMessageDispatcherFactory
      * @param dispatcher the dispatcher to be validated
      */
     void destroy(UMOImmutableEndpoint endpoint, UMOMessageDispatcher dispatcher);
+
 }

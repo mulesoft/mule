@@ -27,20 +27,20 @@ import org.mule.config.parsers.SourceTypeDefinitionParser;
 import org.mule.config.parsers.ThreadingProfileDefinitionParser;
 import org.mule.impl.DefaultComponentExceptionStrategy;
 import org.mule.impl.DefaultExceptionStrategy;
+import org.mule.impl.model.resolvers.CallableEntryPointResolver;
 import org.mule.impl.container.JndiContainerContext;
 import org.mule.impl.container.PropertiesContainerContext;
 import org.mule.impl.container.RmiContainerContext;
-import org.mule.model.CallableEntryPointResolver;
 import org.mule.routing.ForwardingCatchAllStrategy;
 import org.mule.routing.inbound.CorrelationAggregator;
 import org.mule.routing.inbound.CorrelationEventResequencer;
 import org.mule.routing.inbound.IdempotentReceiver;
 import org.mule.routing.inbound.IdempotentSecureHashReceiver;
-import org.mule.routing.inbound.InboundMessageRouter;
 import org.mule.routing.inbound.InboundPassThroughRouter;
 import org.mule.routing.inbound.MessageChunkingAggregator;
 import org.mule.routing.inbound.SelectiveConsumer;
 import org.mule.routing.inbound.WireTap;
+import org.mule.routing.inbound.InboundRouterCollection;
 import org.mule.routing.outbound.ChainingRouter;
 import org.mule.routing.outbound.EndpointSelector;
 import org.mule.routing.outbound.ExceptionBasedRouter;
@@ -48,11 +48,11 @@ import org.mule.routing.outbound.FilteringListMessageSplitter;
 import org.mule.routing.outbound.FilteringOutboundRouter;
 import org.mule.routing.outbound.MessageChunkingRouter;
 import org.mule.routing.outbound.MulticastingRouter;
-import org.mule.routing.outbound.OutboundMessageRouter;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.routing.outbound.StaticRecipientList;
 import org.mule.routing.outbound.TemplateEndpointRouter;
-import org.mule.routing.response.ResponseMessageRouter;
+import org.mule.routing.outbound.OutboundRouterCollection;
+import org.mule.routing.response.ResponseRouterCollection;
 import org.mule.transformers.NoActionTransformer;
 import org.mule.transformers.codec.Base64Decoder;
 import org.mule.transformers.codec.Base64Encoder;
@@ -156,9 +156,9 @@ public class MuleNamespaceHandler extends AbstractHierarchicalNamespaceHandler
 
         //Service Elements
         registerBeanDefinitionParser("service", new ServiceDescriptorDefinitionParser());
-        registerBeanDefinitionParser("inbound-router", new SimpleChildDefinitionParser("inboundRouter", InboundMessageRouter.class));
-        registerBeanDefinitionParser("outbound-router", new SimpleChildDefinitionParser("outboundRouter", OutboundMessageRouter.class));
-        registerBeanDefinitionParser("response-router", new SimpleChildDefinitionParser("responseRouter", ResponseMessageRouter.class));
+        registerBeanDefinitionParser("inbound-router", new SimpleChildDefinitionParser("inboundRouter", InboundRouterCollection.class));
+        registerBeanDefinitionParser("outbound-router", new SimpleChildDefinitionParser("outboundRouter", OutboundRouterCollection.class));
+        registerBeanDefinitionParser("response-router", new SimpleChildDefinitionParser("responseRouter", ResponseRouterCollection.class));
 
         //Inbound Routers
         //TODO RM*

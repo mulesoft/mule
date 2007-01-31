@@ -10,8 +10,6 @@
 
 package org.mule.providers.stream;
 
-import java.io.OutputStream;
-
 import org.mule.config.i18n.Message;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.umo.UMOEvent;
@@ -19,6 +17,8 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
 import org.mule.util.StringUtils;
+
+import java.io.OutputStream;
 
 /**
  * <code>StreamMessageDispatcher</code> is a simple stream dispatcher that obtains
@@ -57,25 +57,11 @@ public class StreamMessageDispatcher extends AbstractMessageDispatcher
      */
     protected synchronized void doDispatch(UMOEvent event) throws Exception
     {
-        OutputStream out;
-        String streamName = event.getEndpoint().getEndpointURI().getAddress();
-
-        if (StreamConnector.STREAM_SYSTEM_OUT.equalsIgnoreCase(streamName))
-        {
-            out = System.out;
-        }
-        else if (StreamConnector.STREAM_SYSTEM_ERR.equalsIgnoreCase(streamName))
-        {
-            out = System.err;
-        }
-        else
-        {
-            out = connector.getOutputStream();
-        }
+        OutputStream out = connector.getOutputStream();
 
         if (out == null)
         {
-            throw new DispatchException(new Message("stream", 1, streamName), event.getMessage(),
+            throw new DispatchException(new Message("stream", 1, event.getEndpoint().getEndpointURI().getAddress()), event.getMessage(),
                 event.getEndpoint());
         }
 
@@ -84,7 +70,7 @@ public class StreamMessageDispatcher extends AbstractMessageDispatcher
             SystemStreamConnector ssc = (SystemStreamConnector)connector;
             if (StringUtils.isNotBlank(ssc.getOutputMessage()))
             {
-                out.write(ssc.getOutputMessage().toString().getBytes());
+                out.write(ssc.getOutputMessage().getBytes());
             }
         }
 
@@ -115,7 +101,6 @@ public class StreamMessageDispatcher extends AbstractMessageDispatcher
     /**
      * Make a specific request to the underlying transport
      * 
-     * @param endpoint the endpoint to use when connecting to the resource
      * @param timeout the maximum time the operation should block before returning.
      *            The call should return immediately if there is data available. If
      *            no data becomes available before the timeout elapses, null will be
@@ -143,5 +128,7 @@ public class StreamMessageDispatcher extends AbstractMessageDispatcher
     {
         // template method
     }
+
+
 
 }

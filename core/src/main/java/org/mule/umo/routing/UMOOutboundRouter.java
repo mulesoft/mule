@@ -14,6 +14,7 @@ import org.mule.umo.MessagingException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.UMOTransactionConfig;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.endpoint.UMOEndpoint;
 
 import java.util.List;
@@ -21,10 +22,10 @@ import java.util.List;
 /**
  * <code>UMOOutboundRouter</code> is used to control outbound routing behaviour for
  * an event. One or more Outbound routers can be associated with an
- * <code>UMOOutboundMessageRouter</code> and will be selected based on the filters
+ * <code>UMOOutboundRouterCollection</code> and will be selected based on the filters
  * set on the individual Outbound Router.
  * 
- * @see UMOOutboundMessageRouter
+ * @see UMOOutboundRouterCollection
  */
 
 public interface UMOOutboundRouter extends UMORouter
@@ -56,7 +57,7 @@ public interface UMOOutboundRouter extends UMORouter
      * @param endpoint the endpoint to remove
      * @return true if the endpoint was removed
      */
-    boolean removeEndpoint(UMOEndpoint endpoint);
+    boolean removeEndpoint(UMOImmutableEndpoint endpoint);
 
     /**
      * This method is responsible for routing the Message via the Session. The logic

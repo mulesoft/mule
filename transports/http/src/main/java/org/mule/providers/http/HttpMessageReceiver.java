@@ -235,11 +235,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                     HttpResponse response;
                     if (receiver != null)
                     {
-                        UMOMessage returnMessage = receiver.routeMessage(message, endpoint.isSynchronous(), /*
-                                                                                                             * TODO
-                                                                                                             * streaming
-                                                                                                             */
-                        null);
+                        UMOMessage returnMessage = receiver.routeMessage(message, endpoint.isSynchronous(), null);
                         Object tempResponse;
                         if (returnMessage != null)
                         {

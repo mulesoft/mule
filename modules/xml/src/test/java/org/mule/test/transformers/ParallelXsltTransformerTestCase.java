@@ -28,6 +28,7 @@ public class ParallelXsltTransformerTestCase extends AbstractMuleTestCase
     private String resultData;
     private Collection actualResults = Collections.synchronizedCollection(new LinkedList());
 
+    // @Override
     protected void doSetUp() throws Exception
     {
         srcData = IOUtils.toString(IOUtils.getResourceAsStream("cdcatalog-utf-8.xml", getClass()), "UTF-8");
@@ -106,16 +107,12 @@ public class ParallelXsltTransformerTestCase extends AbstractMuleTestCase
 
     private int getParallelThreadCount()
     {
-        return 20;
+        return 10;
     }
 
     private int getCallsPerThread()
     {
-        return 100;
+        return 50;
     }
 
-    protected static String normalizeString(String rawString)
-    {
-        return rawString.replaceAll("\r\n", "\n");
-    }
 }

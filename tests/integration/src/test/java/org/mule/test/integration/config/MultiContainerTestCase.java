@@ -75,7 +75,7 @@ public class MultiContainerTestCase extends FunctionalTestCase
         UMODescriptor d = builder.createDescriptor("Orange", "myOrange", "test://foo", null, null);
         d.setContainer("spring2");
         builder.registerComponent(d);
-        UMOComponent c = builder.getManager().getModel().getComponent("myOrange");
+        UMOComponent c = builder.getManager().lookupModel("main").getComponent("myOrange");
         assertNotNull(c);
         Object o = c.getInstance();
         assertTrue(o instanceof Orange);
@@ -85,7 +85,7 @@ public class MultiContainerTestCase extends FunctionalTestCase
         d = builder.createDescriptor("Orange", "myOrange2", "test://bar", null, null);
         d.setContainer("spring1");
         builder.registerComponent(d);
-        c = builder.getManager().getModel().getComponent("myOrange2");
+        c = builder.getManager().lookupModel("main").getComponent("myOrange2");
         assertNotNull(c);
         o = c.getInstance();
         assertTrue(o instanceof Orange);

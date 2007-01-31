@@ -10,7 +10,7 @@
 
 package org.mule.test.mule.model;
 
-import org.mule.model.CallableEntryPointResolver;
+import org.mule.impl.model.resolvers.CallableEntryPointResolver;
 import org.mule.tck.model.AbstractEntryPointDiscoveryTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.WaterMelon;

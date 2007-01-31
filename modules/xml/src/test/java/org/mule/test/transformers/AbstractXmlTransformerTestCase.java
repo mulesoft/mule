@@ -10,9 +10,10 @@
 
 package org.mule.test.transformers;
 
-import org.custommonkey.xmlunit.XMLAssert;
-import org.custommonkey.xmlunit.XMLUnit;
 import org.mule.tck.AbstractTransformerTestCase;
+
+import org.custommonkey.xmlunit.XMLUnit;
+import org.w3c.dom.Document;
 
 /**
  * Use this superclass if you intend to compare Xml contents.
@@ -26,25 +27,29 @@ public abstract class AbstractXmlTransformerTestCase extends AbstractTransformer
         XMLUnit.setIgnoreWhitespace(true);
     }
 
-    /**
-     * Different JVMs serialize fields to XML in a different order. Make sure we DO
-     * NOT use direct (and too strict String comparison). Instead, compare xml
-     * contents, while the position of the node may differ in scope of the same node
-     * level (still, it does not violate xml spec). Overridden from the superclass.
-     * 
-     * @throws Exception if any error
-     */
-    public void testTransform() throws Exception
+    // @Override
+    public boolean compareResults(Object expected, Object result)
     {
-        Object result = getTransformer().transform(getTestData());
-        assertNotNull(result);
-        XMLAssert.assertXMLEqual("Xml documents have different data.", (String)getResultData(),
-            (String)result);
-    }
+        if (expected instanceof Document && result instanceof Document)
+        {
+            return XMLUnit.compareXML((Document)expected, (Document)result).similar();
+        }
+        else if (expected instanceof String && result instanceof String)
+        {
+            try
+            {
+                String expectedString = this.normalizeString((String)expected);
+                String resultString = this.normalizeString((String)result);
+                return XMLUnit.compareXML(expectedString, resultString).similar();
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
 
-    protected String normalizeString(String rawString)
-    {
-        return rawString.replaceAll("\r\n", "").replaceAll("\n", "");
+        // all other comparisons are passed up
+        return super.compareResults(expected, result);
     }
 
 }

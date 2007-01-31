@@ -11,15 +11,15 @@
 package org.mule.umo.model;
 
 import org.mule.umo.UMODescriptor;
+import org.mule.impl.TooManySatisfiableMethodsException;
+import org.mule.impl.NoSatisfiableMethodsException;
 
 /**
  * <code>UMOEntryPointResolver</code> resolves a method to call on the given
  * UMODescriptor when an event is received for the component
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public interface UMOEntryPointResolver
 {
-    UMOEntryPoint resolveEntryPoint(UMODescriptor componentDescriptor) throws ModelException;
+    UMOEntryPoint resolveEntryPoint(UMODescriptor componentDescriptor) throws TooManySatisfiableMethodsException, NoSatisfiableMethodsException, ModelException;
 }

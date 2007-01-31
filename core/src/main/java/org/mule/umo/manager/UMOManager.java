@@ -162,14 +162,18 @@ public interface UMOManager extends Lifecycle, Registerable
      * 
      * @return The model used for managing components for this server
      */
-    UMOModel getModel();
+    UMOModel lookupModel(String name);
+
+    void registerModel(UMOModel model) throws UMOException;
+
+    void unregisterModel(String name);
 
     /**
      * The model used for managing components for this server
      * 
-     * @param model The model used for managing components for this server
+     * @return The models set on this manager instance
      */
-    void setModel(UMOModel model) throws UMOException;
+     Map getModels();
 
     /**
      * Gets all properties associated with the UMOManager

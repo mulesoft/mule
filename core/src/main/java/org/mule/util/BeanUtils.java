@@ -37,7 +37,7 @@ public class BeanUtils extends org.apache.commons.beanutils.BeanUtils
     {
         // Check to see if our object has a setProperties method where the properties
         // map should be set
-        if (ClassUtils.getMethod(SET_PROPERTIES_METHOD, new Class[]{Map.class}, object.getClass()) != null)
+        if (ClassUtils.getMethod(object.getClass(), SET_PROPERTIES_METHOD, new Class[]{Map.class}) != null)
         {
             try
             {

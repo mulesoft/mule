@@ -10,26 +10,29 @@
 
 package org.mule.tck.providers;
 
-import com.mockobjects.dynamic.C;
-import com.mockobjects.dynamic.Mock;
-
-import java.beans.ExceptionListener;
-import java.util.HashMap;
-
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.impl.model.seda.SedaModel;
 import org.mule.providers.AbstractConnector;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.manager.UMOManager;
+import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
+
+import com.mockobjects.dynamic.C;
+import com.mockobjects.dynamic.Mock;
+
+import java.beans.ExceptionListener;
+import java.util.HashMap;
 
 /**
  * <code>AbstractConnectorTestCase</code> tests common behaviour of all endpoints
@@ -41,6 +44,8 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
 
     protected UMOConnector connector;
 
+    protected UMOModel model;
+
     /*
      * (non-Javadoc)
      * 
@@ -48,7 +53,10 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
      */
     protected void doSetUp() throws Exception
     {
-        getManager(true);
+        UMOManager manager = getManager(true);
+        model = new SedaModel();
+        model.setName("default");
+        manager.registerModel(model);
         descriptor = getTestDescriptor("apple", Apple.class.getName());
         MuleManager.getInstance().start();
         connector = getConnector();
@@ -129,7 +137,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
 
         MuleDescriptor d = getTestDescriptor("anApple", Apple.class.getName());
 
-        UMOComponent component = MuleManager.getInstance().getModel().registerComponent(d);
+        UMOComponent component = model.registerComponent(d);
         UMOEndpoint endpoint = new MuleEndpoint("test", new MuleEndpointURI(getTestEndpointURI()), connector,
             null, UMOEndpoint.ENDPOINT_TYPE_SENDER, 0, null, new HashMap());
 
@@ -194,7 +202,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
             // expected
         }
         connector.unregisterListener(component, endpoint);
-        MuleManager.getInstance().getModel().unregisterComponent(d);
+        model.unregisterComponent(d);
     }
 
     public void testConnectorBeanProps() throws Exception

@@ -10,19 +10,18 @@
 
 package org.mule.umo.model;
 
-import org.mule.config.PoolingProfile;
 import org.mule.umo.UMODescriptor;
 import org.mule.util.ObjectFactory;
 import org.mule.util.ObjectPool;
+import org.mule.config.PoolingProfile;
 
 /**
  * <code>UMOPoolFactory</code> is a factory interface for created a component pool
  * instance
- * 
  */
 public interface UMOPoolFactory
 {
-    ObjectPool createPool(UMODescriptor descriptor, ObjectFactory factory, PoolingProfile poolingProfile);
+    ObjectPool createPool(UMODescriptor descriptor, UMOModel model, ObjectFactory factory, PoolingProfile pp);
 
-    ObjectPool createPool(UMODescriptor descriptor, PoolingProfile poolingProfile);
+    ObjectPool createPool(UMODescriptor descriptor, UMOModel model, PoolingProfile pp);
 }

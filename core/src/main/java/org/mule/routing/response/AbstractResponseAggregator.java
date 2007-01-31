@@ -12,6 +12,7 @@ package org.mule.routing.response;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.routing.inbound.AbstractEventAggregator;
 import org.mule.routing.inbound.EventGroup;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
@@ -45,13 +46,13 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
     /**
      * A map of locks used to wait for response messages for a given message id
      */
-    protected ConcurrentMap locks = new ConcurrentHashMap();
+    protected final ConcurrentMap locks = new ConcurrentHashMap();
 
     /**
      * The collection of messages that are ready to be returned to the callee. Keyed
      * by Message ID
      */
-    protected ConcurrentMap responseMessages = new ConcurrentHashMap();
+    protected final ConcurrentMap responseMessages = new ConcurrentHashMap();
 
     public void process(UMOEvent event) throws RoutingException
     {
@@ -64,12 +65,12 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
         }
 
         // indicates interleaved EventGroup removal (very rare)
-        boolean miss = false;
+        boolean lookupMiss = false;
 
         // spinloop for the EventGroup lookup
         while (true)
         {
-            if (miss)
+            if (lookupMiss)
             {
                 try
                 {
@@ -83,7 +84,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
             }
 
             // check for an existing group first
-            EventGroup group = this.getEventGroupWithId(groupId);
+            EventGroup group = this.getEventGroup(groupId);
 
             // does the group exist?
             if (group == null)
@@ -96,10 +97,10 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
             synchronized (group)
             {
                 // make sure no other thread removed the group in the meantime
-                if (group != this.getEventGroupWithId(groupId))
+                if (group != this.getEventGroup(groupId))
                 {
                     // if that is the (rare) case, spin
-                    miss = true;
+                    lookupMiss = true;
                     continue;
                 }
 
@@ -118,29 +119,25 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
                     UMOMessage returnMessage = this.aggregateEvents(group);
 
                     // remove the eventGroup as no further message will be received
-                    // for this
-                    // group once we aggregate
+                    // for this group once we aggregate
                     this.removeEventGroup(group);
 
                     // add the new response message so that it can be collected by
-                    // the
-                    // response Thread
+                    // the response Thread
                     UMOMessage previousResult = (UMOMessage)responseMessages.putIfAbsent(groupId,
                         returnMessage);
                     if (previousResult != null)
                     {
                         // this would indicate that we need a better way to prevent
-                        // continued
-                        // aggregation for a group that is currently being processed.
-                        // Can
-                        // this actually happen?
+                        // continued aggregation for a group that is currently being
+                        // processed. Can this actually happen?
                         throw new IllegalStateException(
                             "Detected duplicate aggregation result message with id: " + groupId);
                     }
 
                     // will get/create a latch for the response Message ID and
-                    // release it,
-                    // notifying other threads that the response message is available
+                    // release it, notifying other threads that the response message
+                    // is available
                     Latch l = (Latch)locks.get(groupId);
                     if (l == null)
                     {
@@ -167,11 +164,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
     }
 
     /**
-     * TODO HH: writeme
-     * 
-     * @param event
-     * @param correlationId
-     * @return
+     * @see AbstractEventAggregator#createEventGroup(UMOEvent, Object)
      */
     protected EventGroup createEventGroup(UMOEvent event, Object groupId)
     {
@@ -179,25 +172,20 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
         {
             logger.debug("Creating new event group: " + groupId + " in " + this);
         }
+
         return new EventGroup(groupId);
     }
 
     /**
-     * TODO HH: writeme
-     * 
-     * @param groupId
-     * @return
+     * @see AbstractEventAggregator#getEventGroup(Object)
      */
-    protected EventGroup getEventGroupWithId(Object groupId)
+    protected EventGroup getEventGroup(Object groupId)
     {
         return (EventGroup)eventGroups.get(groupId);
     }
 
     /**
-     * TODO HH: writeme
-     * 
-     * @param group
-     * @return
+     * @see AbstractEventAggregator#addEventGroup(EventGroup)
      */
     protected EventGroup addEventGroup(EventGroup group)
     {
@@ -208,9 +196,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
     }
 
     /**
-     * TODO HH: writeme
-     * 
-     * @param group
+     * @see AbstractEventAggregator#removeEventGroup(EventGroup)
      */
     protected void removeEventGroup(EventGroup group)
     {
@@ -263,6 +249,10 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
         // timeout interval
         boolean resultAvailable = false;
 
+        // flag for catching the interrupted status of the Thread waiting for a
+        // result
+        boolean interruptedWhileWaiting = false;
+
         try
         {
             if (logger.isDebugEnabled())
@@ -283,16 +273,17 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
         }
         catch (InterruptedException e)
         {
-            // TODO HH: what should we really do when we are interrupted while
-            // waiting? this relates to the finally block below - should
-            // lock/response message still be removed?
-            logger.error(e.getMessage(), e);
+            interruptedWhileWaiting = true;
         }
         finally
         {
-            // TODO HH: what about other exceptions? is this really correct?
             locks.remove(responseId);
             result = (UMOMessage)responseMessages.remove(responseId);
+
+            if (interruptedWhileWaiting)
+            {
+                Thread.currentThread().interrupt();
+            }
         }
 
         if (!resultAvailable)
@@ -322,26 +313,12 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
     }
 
     /**
-     * Determines if the event group is ready to be aggregated. if the group is ready
-     * to be aggregated (this is entirely up to the application. it could be
-     * determined by volume, last modified time or some oher criteria based on the
-     * last event received)
-     * 
-     * @param events
-     * @return true if the event gorep is ready for aggregation
+     * @see AbstractEventAggregator#shouldAggregateEvents(EventGroup)
      */
     protected abstract boolean shouldAggregateEvents(EventGroup events);
 
     /**
-     * This method is invoked if the shouldAggregate method is called and returns
-     * true. Once this method returns an aggregated message the event group is
-     * removed from the router
-     * 
-     * @param events the event group for this request
-     * @return an aggregated message
-     * @throws RoutingException if the aggregation fails. in this scenario the whole
-     *             event group is removed and passed to the exception handler for
-     *             this componenet
+     * @see AbstractEventAggregator#aggregateEvents(EventGroup)
      */
     protected abstract UMOMessage aggregateEvents(EventGroup events) throws RoutingException;
 

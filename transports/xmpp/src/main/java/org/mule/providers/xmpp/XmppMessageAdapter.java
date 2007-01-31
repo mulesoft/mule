@@ -10,19 +10,24 @@
 
 package org.mule.providers.xmpp;
 
+import org.mule.providers.AbstractMessageAdapter;
+import org.mule.umo.MessagingException;
+import org.mule.umo.provider.MessageTypeNotSupportedException;
+import org.mule.util.StringUtils;
+
 import java.util.Iterator;
 
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
-import org.mule.providers.AbstractMessageAdapter;
-import org.mule.umo.MessagingException;
-import org.mule.umo.provider.MessageTypeNotSupportedException;
 
 /**
  * <code>XmppMessageAdapter</code> wraps a Smack XMPP packet
  */
 public class XmppMessageAdapter extends AbstractMessageAdapter
 {
+    public static final String DEFAULT_SUBJECT = "(no subject)";
+    public static final String DEFAULT_THREAD = "(no thread)";
+
     /**
      * Serial version
      */
@@ -35,15 +40,19 @@ public class XmppMessageAdapter extends AbstractMessageAdapter
         if (message instanceof Packet)
         {
             this.message = (Packet)message;
+
             for (Iterator iter = this.message.getPropertyNames(); iter.hasNext();)
             {
                 String name = (String)iter.next();
-                setProperty(name, this.message.getProperty(name));
+                this.setProperty(name, this.message.getProperty(name));
             }
+
             if (this.message instanceof Message)
             {
-                setProperty("subject", ((Message)this.message).getSubject());
-                setProperty("thread", ((Message)this.message).getThread());
+                this.setProperty("subject", StringUtils.defaultIfEmpty(((Message)this.message).getSubject(),
+                    DEFAULT_SUBJECT));
+                this.setProperty("thread", StringUtils.defaultIfEmpty(((Message)this.message).getThread(),
+                    DEFAULT_THREAD));
             }
         }
         else
@@ -89,8 +98,10 @@ public class XmppMessageAdapter extends AbstractMessageAdapter
         return message;
     }
 
+    // @Override
     public String getUniqueId()
     {
         return message.getPacketID();
     }
+
 }

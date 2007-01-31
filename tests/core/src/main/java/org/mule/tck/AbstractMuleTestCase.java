@@ -19,6 +19,7 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOSession;
+import org.mule.umo.model.UMOModel;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.manager.UMOManager;
@@ -33,14 +34,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import junit.framework.TestCase;
-
 /**
  * <code>AbstractMuleTestCase</code> is a base class for Mule testcases. This
  * implementation provides services to test code for creating mock and test objects.
  */
 public abstract class AbstractMuleTestCase extends TestCase
 {
-    protected transient final Log logger = LogFactory.getLog(getClass());
+    protected final Log logger = LogFactory.getLog(getClass());
 
     // This should be set to a string message describing any prerequisites not met
     protected String prereqs = null;
@@ -273,6 +273,11 @@ public abstract class AbstractMuleTestCase extends TestCase
         return MuleTestUtils.getManager(disableAdminAgent);
     }
 
+    public static UMOModel getDefaultModel() throws UMOException
+    {
+        return MuleTestUtils.getDefaultModel();
+    }
+
     public static UMOEndpoint getTestEndpoint(String name, String type) throws Exception
     {
         return MuleTestUtils.getTestEndpoint(name, type);
@@ -329,9 +334,9 @@ public abstract class AbstractMuleTestCase extends TestCase
         return MuleTestUtils.getTestDescriptor(name, implementation);
     }
 
-    public static UMOManager getTestManager() throws UMOException
+    public static UMOManager getTestManager() throws Exception
     {
-        return MuleTestUtils.getTestManager();
+        return MuleTestUtils.getManager(true);
     }
 
     protected void finalize() throws Throwable

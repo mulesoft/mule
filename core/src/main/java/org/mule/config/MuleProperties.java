@@ -104,4 +104,6 @@ public interface MuleProperties
     public final String CONNECTOR_SERVICE_ERROR = "service.error";
     public final String CONNECTOR_SESSION_HANDLER = "session.handler";
     // End Connector Service descriptor properties
+
+    public static final String MULE_WORKING_DIRECTORY_PROPERTY = "mule.working.dir";
 }

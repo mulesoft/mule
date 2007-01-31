@@ -48,6 +48,14 @@
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
+                    <groupId>activemq</groupId>
+                    <artifactId>activemq-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>activemq</groupId>
+                    <artifactId>activemq-core-test</artifactId>
+                </exclusion>
+                <exclusion>
                     <groupId>commons-dbcp</groupId>
                     <artifactId>commons-dbcp</artifactId>
                 </exclusion>
@@ -88,11 +96,11 @@
                     <artifactId>activecluster</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>incubator-derby</groupId>
+                    <groupId>org.apache.derby</groupId>
                     <artifactId>derby</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>incubator-derby</groupId>
+                    <groupId>org.apache.derby</groupId>
                     <artifactId>derbynet</artifactId>
                 </exclusion>
                 <exclusion>
@@ -104,8 +112,8 @@
                     <artifactId>xmlParserAPIs</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>activemq</groupId>
-                    <artifactId>activemq-core-test</artifactId>
+                    <groupId>xerces</groupId>
+                    <artifactId>xercesImpl</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>org.springframework</groupId>

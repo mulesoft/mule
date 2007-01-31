@@ -15,6 +15,7 @@ import com.mockobjects.dynamic.Mock;
 
 import org.mule.config.pool.CommonsPoolProxyFactory;
 import org.mule.impl.MuleDescriptor;
+import org.mule.impl.model.seda.SedaModel;
 import org.mule.tck.model.AbstractProxyPoolFactoryTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.util.ObjectFactory;
@@ -29,7 +30,7 @@ public class CommonsPoolProxyFactoryTestCase extends AbstractProxyPoolFactoryTes
 {
     public ObjectFactory getProxyFactory(MuleDescriptor descriptor, ObjectPool pool)
     {
-        CommonsPoolProxyFactory factory = new CommonsPoolProxyFactory(descriptor);
+        CommonsPoolProxyFactory factory = new CommonsPoolProxyFactory(descriptor, new SedaModel());
         factory.setPool(pool);
         return factory;
     }

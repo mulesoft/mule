@@ -43,7 +43,7 @@ public class EjbConnector extends RmiConnector
         {
             Object ref = getRemoteRef(endpoint);
 
-            Method method = ClassUtils.getMethod("create", null, ref.getClass());
+            Method method = ClassUtils.getMethod(ref.getClass(), "create", null);
 
             remoteObj = (EJBObject)method.invoke(ref, ClassUtils.NO_ARGS);
         }

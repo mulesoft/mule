@@ -10,7 +10,6 @@
 
 package org.mule.management.mbeans;
 
-import org.mule.MuleManager;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.model.UMOModel;
@@ -26,9 +25,9 @@ public class ModelService implements ModelServiceMBean
 {
     private UMOModel model;
 
-    public ModelService()
+    public ModelService(UMOModel model)
     {
-        model = MuleManager.getInstance().getModel();
+        this.model = model;
 
     }
 

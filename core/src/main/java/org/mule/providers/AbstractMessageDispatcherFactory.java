@@ -12,6 +12,7 @@ package org.mule.providers;
 
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
@@ -28,6 +29,19 @@ public abstract class AbstractMessageDispatcherFactory implements UMOMessageDisp
     public AbstractMessageDispatcherFactory()
     {
         super();
+    }
+
+    /**
+     * This default implementation of
+     * {@link UMOConnector#isCreateDispatcherPerRequest()} returns <code>false</code>,
+     * which means that dispatchers are pooled according to their lifecycle as
+     * described in {@link UMOMessageDispatcher}.
+     * 
+     * @return <code>false</code> by default, unless overwritten by a subclass.
+     */
+    public boolean isCreateDispatcherPerRequest()
+    {
+        return false;
     }
 
     public abstract UMOMessageDispatcher create(UMOImmutableEndpoint endpoint) throws UMOException;
@@ -49,16 +63,10 @@ public abstract class AbstractMessageDispatcherFactory implements UMOMessageDisp
 
     public boolean validate(UMOImmutableEndpoint endpoint, UMOMessageDispatcher dispatcher)
     {
-        // should dispatchers be disposed after every request?
-        // TODO HH: remove evil cast, move method into interface
-        if (((AbstractConnector)endpoint.getConnector()).isCreateDispatcherPerRequest())
-        {
-            return false;
-        }
-
-        // is the dispatcher still valid or has it e.g. disposed itself after an
-        // exception?
-        return dispatcher.validate();
+        // Unless dispatchers are to be disposed of after every request, we check if
+        // the dispatcher is still valid or has e.g. disposed itself after an
+        // exception.
+        return (this.isCreateDispatcherPerRequest() ? false : dispatcher.validate());
     }
 
 }

@@ -10,8 +10,6 @@
 
 package org.mule.tck.testmodels.fruit;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.Callable;
@@ -19,6 +17,9 @@ import org.mule.umo.lifecycle.Callable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class Orange implements Fruit, Callable
 {
@@ -36,6 +37,8 @@ public class Orange implements Fruit, Callable
     private Integer segments = new Integer(10);
     private Double radius = new Double(4.34);
     private String brand;
+
+    private FruitCleaner cleaner;
 
     private Map mapProperties;
 
@@ -175,6 +178,27 @@ public class Orange implements Fruit, Callable
     public void setArrayProperties(List arrayProperties)
     {
         this.arrayProperties = arrayProperties;
+    }
+
+
+    public FruitCleaner getCleaner()
+    {
+        return cleaner;
+    }
+
+    public void setCleaner(FruitCleaner cleaner)
+    {
+        this.cleaner = cleaner;
+    }
+
+    public void wash()
+    {
+        cleaner.wash(this);
+    }
+
+    public void polish()
+    {
+        cleaner.polish(this);
     }
 
     public int hashCode()

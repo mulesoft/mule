@@ -17,7 +17,7 @@ import org.mule.routing.ForwardingCatchAllStrategy;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.routing.outbound.FilteringOutboundRouter;
-import org.mule.routing.outbound.OutboundMessageRouter;
+import org.mule.routing.outbound.OutboundRouterCollection;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 import org.mule.transformers.AbstractTransformer;
@@ -139,7 +139,7 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         final int[] count2 = new int[]{0};
         final int[] catchAllCount = new int[]{0};
 
-        OutboundMessageRouter messageRouter = new OutboundMessageRouter();
+        OutboundRouterCollection messageRouter = new OutboundRouterCollection();
 
         FilteringOutboundRouter filterRouter1 = new FilteringOutboundRouter()
         {

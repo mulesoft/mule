@@ -10,22 +10,12 @@
 
 package org.mule.providers.file;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
-
-import org.apache.commons.io.IOUtils;
 import org.mule.MuleException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
-import org.mule.providers.ConnectException;
 import org.mule.providers.AbstractPollingMessageReceiver;
+import org.mule.providers.ConnectException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -34,6 +24,19 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.routing.RoutingException;
 import org.mule.util.FileUtils;
+
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+
+import org.apache.commons.io.IOUtils;
 
 /**
  * <code>FileMessageReceiver</code> is a polling listener that reads files from a
@@ -48,6 +51,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     private File moveDirectory = null;
     private String moveToPattern = null;
     private FilenameFilter filenameFilter = null;
+    private FileFilter fileFilter = null;
 
     public FileMessageReceiver(UMOConnector connector,
                                UMOComponent component,
@@ -66,6 +70,14 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         if (endpoint.getFilter() instanceof FilenameFilter)
         {
             filenameFilter = (FilenameFilter)endpoint.getFilter();
+        }
+        else if (endpoint.getFilter() instanceof FileFilter)
+        {
+            fileFilter = (FileFilter)endpoint.getFilter();
+        }
+        else if(endpoint.getFilter()!=null)
+        {
+            throw new InitialisationException(new Message("file", 6, endpoint.getEndpointURI()), this);
         }
     }
 
@@ -123,6 +135,9 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
 
     public synchronized void processFile(final File sourceFile) throws UMOException
     {
+        //TODO RM*: This can be put in a Filter. Also we can add an AndFileFilter/OrFileFilter to allow users to
+        //combine file filters (since we can only pass a single filter to File.listFiles, we would need to wrap
+        //the current And/Or filters to extend {@link FilenameFilter}
         boolean checkFileAge = ((FileConnector)connector).getCheckFileAge();
         if (checkFileAge)
         {
@@ -143,7 +158,25 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
 
         File destinationFile = null;
         String sourceFileOriginalName = sourceFile.getName();
-        UMOMessageAdapter msgAdapter = connector.getMessageAdapter(sourceFile);
+        //Create a message adapter here to pass to the fileName parser
+        UMOMessageAdapter msgAdapter;
+        if(endpoint.isStreaming())
+        {
+            try
+            {
+                msgAdapter = connector.getStreamMessageAdapter(new FileInputStream(sourceFile), null);
+            }
+            catch (FileNotFoundException e)
+            {
+                //we can ignore since we did manage to acquire a lock, but just in case
+                logger.error("File being read disappeared!", e);
+                return;
+            }
+        }
+        else
+        {
+            msgAdapter = connector.getMessageAdapter(sourceFile);
+        }
         msgAdapter.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
 
         // set up destination file
@@ -171,6 +204,8 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                 throw new MuleException(new Message(Messages.FILE_X_DOES_NOT_EXIST, sourceFileOriginalName));
             }
 
+            //If we are moving the file to a read directory, move it there now and hand over a reference to the
+            //File in its moved location
             if (destinationFile != null)
             {
                 // move sourceFile to new destination
@@ -184,7 +219,14 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                 }
 
                 // create new MessageAdapter for destinationFile
-                msgAdapter = connector.getMessageAdapter(destinationFile);
+                if(endpoint.isStreaming())
+                {
+                    msgAdapter = connector.getStreamMessageAdapter(new FileInputStream(destinationFile), null);
+                }
+                else
+                {
+                    msgAdapter = connector.getMessageAdapter(destinationFile);
+                }
                 msgAdapter.setProperty(FileConnector.PROPERTY_FILENAME, destinationFile.getName());
                 msgAdapter.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
             }
@@ -199,7 +241,6 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                     // delete source
                     if (!sourceFile.delete())
                     {
-                        // TODO better message
                         throw new MuleException(new Message("file", 3, sourceFile.getAbsolutePath()));
                     }
                 }
@@ -357,10 +398,18 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     {
         try
         {
-            File[] TODOFiles = readDirectory.listFiles(filenameFilter);
+            File[] todoFiles = null;
+            if(fileFilter!=null)
+            {
+                todoFiles = readDirectory.listFiles(fileFilter);
+            }
+            else
+            {
+                todoFiles = readDirectory.listFiles(filenameFilter);
+            }
             // logger.trace("Reading directory " + readDirectory.getAbsolutePath() +
             // " -> " + TODOFiles.length + " file(s)");
-            return (TODOFiles == null ? new File[0] : TODOFiles);
+            return (todoFiles == null ? new File[0] : todoFiles);
         }
         catch (Exception e)
         {

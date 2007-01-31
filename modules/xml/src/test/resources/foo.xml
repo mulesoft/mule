@@ -377,7 +377,7 @@
             </map>
         </property>
         <property name="inboundRouter">
-            <bean class="org.mule.routing.inbound.InboundMessageRouter">
+            <bean class="org.mule.routing.inbound.InboundRouterCollection">
                 <property name="endpoints">
                     <list>
                         <bean class="org.mule.impl.endpoint.MuleEndpoint" name="Orange">
@@ -456,7 +456,7 @@
             </bean>
         </property>
         <property name="outboundRouter">
-            <bean class="org.mule.routing.outbound.OutboundMessageRouter">
+            <bean class="org.mule.routing.outbound.OutboundRouterCollection">
                 <property name="matchAll">
                     <value>false</value>
                 </property>
@@ -490,7 +490,7 @@
             </bean>
         </property>
         <property name="responseRouter">
-            <bean class="org.mule.routing.response.ResponseMessageRouter">
+            <bean class="org.mule.routing.response.ResponseRouterCollection">
                 <property name="timeout">
                     <value>10001</value>
                 </property>
@@ -558,7 +558,7 @@
             <value>true</value>
         </property>
         <property name="inboundRouter">
-            <bean class="org.mule.routing.inbound.InboundMessageRouter">
+            <bean class="org.mule.routing.inbound.InboundRouterCollection">
                 <property name="endpoints">
                     <list>
                         <bean class="org.mule.impl.endpoint.MuleEndpoint" factory-method="getEndpointFromUri">
@@ -589,7 +589,7 @@
             </bean>
         </property>
         <property name="outboundRouter">
-            <bean class="org.mule.routing.outbound.OutboundMessageRouter">
+            <bean class="org.mule.routing.outbound.OutboundRouterCollection">
                 <property name="matchAll">
                     <value>false</value>
                 </property>

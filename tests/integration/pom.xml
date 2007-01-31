@@ -49,7 +49,7 @@
         </plugins>
     </build>
 
-        <profiles>
+    <profiles>
         <profile>
             <id>java14</id>
             <activation>
@@ -113,11 +113,11 @@
                             <artifactId>activecluster</artifactId>
                         </exclusion>
                         <exclusion>
-                            <groupId>incubator-derby</groupId>
+                            <groupId>org.apache.derby</groupId>
                             <artifactId>derby</artifactId>
                         </exclusion>
                         <exclusion>
-                            <groupId>incubator-derby</groupId>
+                            <groupId>org.apache.derby</groupId>
                             <artifactId>derbynet</artifactId>
                         </exclusion>
                         <exclusion>
@@ -188,11 +188,11 @@
                             <artifactId>activecluster</artifactId>
                         </exclusion>
                         <exclusion>
-                            <groupId>incubator-derby</groupId>
+                            <groupId>org.apache.derby</groupId>
                             <artifactId>derby</artifactId>
                         </exclusion>
                         <exclusion>
-                            <groupId>incubator-derby</groupId>
+                            <groupId>org.apache.derby</groupId>
                             <artifactId>derbynet</artifactId>
                         </exclusion>
                         <exclusion>

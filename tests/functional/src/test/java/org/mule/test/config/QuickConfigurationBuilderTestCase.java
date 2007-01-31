@@ -21,12 +21,15 @@ import org.mule.interceptors.TimerInterceptor;
 import org.mule.management.agents.JmxAgent;
 import org.mule.providers.SimpleRetryConnectionStrategy;
 import org.mule.routing.ForwardingCatchAllStrategy;
+import org.mule.routing.nested.NestedRouterCollection;
+import org.mule.routing.nested.NestedRouter;
 import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.routing.filters.xml.JXPathFilter;
-import org.mule.routing.inbound.InboundMessageRouter;
-import org.mule.routing.response.ResponseMessageRouter;
+import org.mule.routing.inbound.InboundRouterCollection;
+import org.mule.routing.response.ResponseRouterCollection;
 import org.mule.tck.AbstractScriptConfigBuilderTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
+import org.mule.tck.testmodels.fruit.FruitCleaner;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.tck.testmodels.mule.TestDefaultLifecycleAdapterFactory;
@@ -41,8 +44,9 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.manager.UMOAgent;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.model.UMOModel;
-import org.mule.umo.routing.UMOInboundMessageRouter;
-import org.mule.umo.routing.UMOResponseMessageRouter;
+import org.mule.umo.routing.UMOInboundRouterCollection;
+import org.mule.umo.routing.UMOResponseRouterCollection;
+import org.mule.umo.routing.UMONestedRouterCollection;
 import org.mule.util.StringUtils;
 
 import java.util.ArrayList;
@@ -128,13 +132,13 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
 
             // register model
             UMOModel model = new SedaModel();
-            model.setName("test-model");
+            model.setName("main");
             TestExceptionStrategy es = new TestExceptionStrategy();
             es.addEndpoint(new MuleEndpoint("test://component.exceptions", false));
             model.setExceptionListener(es);
             model.setLifecycleAdapterFactory(new TestDefaultLifecycleAdapterFactory());
             model.setEntryPointResolver(new TestEntryPointResolver());
-            m.setModel(model);
+            m.registerModel(model);
 
             // register components
             UMOEndpoint ep1 = m.lookupEndpoint("appleInEndpoint");
@@ -145,7 +149,7 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             dces.addEndpoint(new MuleEndpoint("test://orange.exceptions", false));
             d.setExceptionListener(dces);
             // Create the inbound router
-            UMOInboundMessageRouter inRouter = new InboundMessageRouter();
+            UMOInboundRouterCollection inRouter = new InboundRouterCollection();
             inRouter.setCatchAllStrategy(new ForwardingCatchAllStrategy());
             inRouter.getCatchAllStrategy().setEndpoint(new MuleEndpoint("test://catch.all", false));
             UMOEndpoint ep2 = builder.createEndpoint("test://orange/", "Orange", true,
@@ -161,8 +165,23 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             inRouter.addEndpoint(ep3);
             d.setInboundRouter(inRouter);
 
+            //Nested Router
+            UMONestedRouterCollection nestedRouter = new NestedRouterCollection();
+            NestedRouter nr1 = new NestedRouter();
+            nr1.setEndpoint(new MuleEndpoint("test://do.wash", false));
+            nr1.setInterface(FruitCleaner.class);
+            nr1.setMethod("wash");
+            nestedRouter.addRouter(nr1);
+            NestedRouter nr2 = new NestedRouter();
+            nr2.setEndpoint(new MuleEndpoint("test://do.polish", false));
+            nr2.setInterface(FruitCleaner.class);
+            nr2.setMethod("polish");
+            nestedRouter.addRouter(nr2);
+
+            d.setNestedRouter(nestedRouter);
+            
             // Response Router
-            UMOResponseMessageRouter responseRouter = new ResponseMessageRouter();
+            UMOResponseRouterCollection responseRouter = new ResponseRouterCollection();
             responseRouter.addEndpoint(new MuleEndpoint("test://response1", true));
             responseRouter.addEndpoint(m.lookupEndpoint("appleResponseEndpoint"));
             responseRouter.addRouter(new TestResponseAggregator());
@@ -197,7 +216,7 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             d.setProperties(cprops);
 
             // register components
-            m.getModel().registerComponent(d);
+            m.lookupModel("main").registerComponent(d);
             if (StringUtils.isBlank(m.getId()))
             {
                 // if running with JMX agent, manager ID is mandatory

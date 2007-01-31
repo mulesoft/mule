@@ -1,36 +1,41 @@
-import org.mule.config.ConfigurationBuilder;
-import org.mule.config.builders.QuickConfigurationBuilder;
-import org.mule.impl.DefaultComponentExceptionStrategy;
+import org.mule.tck.testmodels.mule.TestTransactionManagerFactory;
+import org.mule.tck.testmodels.mule.TestExceptionStrategy;
+import org.mule.tck.testmodels.mule.TestConnector;
+import org.mule.tck.testmodels.mule.TestCompressionTransformer;
+import org.mule.tck.testmodels.mule.TestEntryPointResolver;
+import org.mule.tck.testmodels.mule.TestDefaultLifecycleAdapterFactory;
+import org.mule.tck.testmodels.mule.TestResponseAggregator;
+import org.mule.tck.testmodels.fruit.FruitCleaner;
+import org.mule.tck.testmodels.fruit.Orange;
+import org.mule.umo.manager.UMOAgent;
+import org.mule.umo.model.UMOModel;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOInterceptorStack;
+import org.mule.umo.routing.UMOInboundRouterCollection;
+import org.mule.umo.routing.UMONestedRouterCollection;
+import org.mule.umo.routing.UMOResponseRouterCollection;
+import org.mule.MuleManager;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.model.seda.SedaModel;
+import org.mule.impl.DefaultComponentExceptionStrategy;
 import org.mule.interceptors.InterceptorStack;
 import org.mule.interceptors.LoggingInterceptor;
 import org.mule.interceptors.TimerInterceptor;
-import org.mule.management.agents.JmxAgent;
-import org.mule.providers.SimpleRetryConnectionStrategy;
-import org.mule.routing.ForwardingCatchAllStrategy;
-import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.routing.filters.xml.JXPathFilter;
-import org.mule.routing.inbound.InboundMessageRouter;
-import org.mule.routing.response.ResponseMessageRouter;
-import org.mule.tck.AbstractScriptConfigBuilderTestCase;
-import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.tck.testmodels.mule.TestCompressionTransformer;
-import org.mule.tck.testmodels.mule.TestConnector;
-import org.mule.tck.testmodels.mule.TestDefaultLifecycleAdapterFactory;
-import org.mule.tck.testmodels.mule.TestEntryPointResolver;
-import org.mule.tck.testmodels.mule.TestExceptionStrategy;
-import org.mule.tck.testmodels.mule.TestResponseAggregator;
-import org.mule.tck.testmodels.mule.TestTransactionManagerFactory;
-import org.mule.transformers.NoActionTransformer;
-import org.mule.umo.UMODescriptor;
-import org.mule.umo.UMOInterceptorStack;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.manager.UMOAgent;
-import org.mule.umo.manager.UMOManager;
-import org.mule.umo.model.UMOModel;
-import org.mule.umo.routing.UMOInboundMessageRouter;
-import org.mule.umo.routing.UMOResponseMessageRouter;
+import org.mule.routing.filters.PayloadTypeFilter;
+import org.mule.routing.ForwardingCatchAllStrategy;
+import org.mule.routing.response.ResponseRouterCollection;
+import org.mule.routing.nested.NestedRouter;
+import org.mule.routing.nested.NestedRouterCollection;
+import org.mule.routing.inbound.InboundRouterCollection;
+import org.mule.providers.SimpleRetryConnectionStrategy;
+import org.mule.management.agents.JmxAgent;
+
+import java.util.List;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 // need this when running with JMX
 manager.setId("GroovyScriptTestCase");
@@ -96,13 +101,13 @@ manager.registerInterceptorStack("default", stack);
 
 //register model
 UMOModel model = new SedaModel();
-model.setName("test-model");
+model.setName("main");
 TestExceptionStrategy es = new TestExceptionStrategy();
 es.addEndpoint(new MuleEndpoint("test://component.exceptions", false));
 model.setExceptionListener(es);
 model.setLifecycleAdapterFactory(new TestDefaultLifecycleAdapterFactory());
 model.setEntryPointResolver(new TestEntryPointResolver());
-manager.setModel(model);
+manager.registerModel(model);
 
 //register components
 UMOEndpoint ep1 = manager.lookupEndpoint("appleInEndpoint");
@@ -113,7 +118,7 @@ DefaultComponentExceptionStrategy dces = new DefaultComponentExceptionStrategy()
 dces.addEndpoint(new MuleEndpoint("test://orange.exceptions", false));
 d.setExceptionListener(dces);
 //Create the inbound router
-UMOInboundMessageRouter inRouter = new InboundMessageRouter();
+UMOInboundRouterCollection inRouter = new InboundRouterCollection();
 inRouter.setCatchAllStrategy(new ForwardingCatchAllStrategy());
 inRouter.getCatchAllStrategy().setEndpoint(new MuleEndpoint("test://catch.all", false));
 UMOEndpoint ep2 = builder.createEndpoint("test://orange/", "Orange", true, "TestCompressionTransformer");
@@ -128,8 +133,22 @@ ep3.setProperties(props2);
 inRouter.addEndpoint(ep3);
 d.setInboundRouter(inRouter);
 
+//Nested Router
+UMONestedRouterCollection nestedRouter = new NestedRouterCollection();
+NestedRouter nr1 = new NestedRouter();
+nr1.setEndpoint(new MuleEndpoint("test://do.wash", false));
+nr1.setInterface(FruitCleaner.class);
+nr1.setMethod("wash");
+nestedRouter.addRouter(nr1);
+NestedRouter nr2 = new NestedRouter();
+nr2.setEndpoint(new MuleEndpoint("test://do.polish", false));
+nr2.setInterface(FruitCleaner.class);
+nr2.setMethod("polish");
+nestedRouter.addRouter(nr2);
+d.setNestedRouter(nestedRouter);
+
 //Response Router
-UMOResponseMessageRouter responseRouter = new ResponseMessageRouter();
+UMOResponseRouterCollection responseRouter = new ResponseRouterCollection();
 responseRouter.addEndpoint(new MuleEndpoint("test://response1", true));
 responseRouter.addEndpoint(manager.lookupEndpoint("appleResponseEndpoint"));
 responseRouter.addRouter(new TestResponseAggregator());
@@ -164,5 +183,5 @@ cprops.put("arrayProperties", nested3);
 d.setProperties(cprops);
 
 //register components
-manager.getModel().registerComponent(d);
-
+manager.lookupModel("main").registerComponent(d);
+        

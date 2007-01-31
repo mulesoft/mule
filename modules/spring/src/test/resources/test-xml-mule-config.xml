@@ -16,7 +16,7 @@
 
     <mule-environment-properties
         synchronous="false"
-        model="test-model">
+        model="main">
         <threading-profile id="default" maxBufferSize="0" maxThreadsActive="8"
             maxThreadsIdle="4" poolExhaustedAction="WAIT" threadTTL="60001"/>
         <pooling-profile exhaustedAction="WAIT" maxActive="8" maxIdle="4" maxWait="4000" initialisationPolicy="INITIALISE_FIRST"/>
@@ -93,7 +93,7 @@
         <interceptor className="org.mule.interceptors.TimerInterceptor"/>
     </interceptor-stack>
 
-    <model name="test-model">
+    <model name="main">
         <entry-point-resolver className="org.mule.tck.testmodels.mule.TestEntryPointResolver"/>
 
         <component-lifecycle-adapter-factory className="org.mule.tck.testmodels.mule.TestDefaultLifecycleAdapterFactory"/>
@@ -120,6 +120,15 @@
                 </global-endpoint>
             </inbound-router>
 
+            <nested-router>
+                <binding interface="org.mule.tck.testmodels.fruit.FruitCleaner" method="wash">
+                    <endpoint address="test://do.wash"/>
+                </binding>
+                <binding interface="org.mule.tck.testmodels.fruit.FruitCleaner" method="polish">
+                    <endpoint address="test://do.polish"/>
+                </binding>
+            </nested-router>
+            
             <outbound-router>
                 <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
                     <global-endpoint name="appleInEndpoint" transformers="TestCompressionTransformer"/>

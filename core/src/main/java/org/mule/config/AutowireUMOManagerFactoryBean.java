@@ -11,8 +11,6 @@
 package org.mule.config;
 
 import org.mule.MuleManager;
-import org.mule.config.MuleConfiguration;
-import org.mule.config.SpringContainerContext;
 import org.mule.impl.model.ModelFactory;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
@@ -228,7 +226,7 @@ public class AutowireUMOManagerFactoryBean
             model.setExceptionListener((ExceptionListener)listener);
         }
 
-        manager.setModel(model);
+        manager.registerModel(model);
 
     }
 
@@ -332,12 +330,13 @@ public class AutowireUMOManagerFactoryBean
     protected void setComponents(Collection components) throws UMOException
     {
         UMODescriptor d;
+        //TODO RM*: Handle model lookup
         for (Iterator iterator = components.iterator(); iterator.hasNext();)
         {
             d = (UMODescriptor)iterator.next();
-            if (!manager.getModel().isComponentRegistered(d.getName()))
+            if (!manager.lookupModel("main").isComponentRegistered(d.getName()))
             {
-                manager.getModel().registerComponent(d);
+                manager.lookupModel("main").registerComponent(d);
             }
         }
     }

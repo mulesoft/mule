@@ -20,14 +20,19 @@ import org.mule.transformers.simple.ByteArrayToSerializable;
 import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.FileUtils;
+import org.mule.util.MapUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Map;
 import java.util.Properties;
 
@@ -447,5 +452,84 @@ public class FileConnector extends AbstractConnector
     public void setMoveToPattern(String moveToPattern)
     {
         this.moveToPattern = moveToPattern;
+    }
+
+    /**
+     * Well get the output stream (if any) for this type of transport. Typically this
+     * will be called only when Streaming is being used on an outbound endpoint
+     *
+     * @param endpoint the endpoint that releates to this Dispatcher
+     * @param message the current message being processed
+     * @return the output stream to use for this request or null if the transport
+     *         does not support streaming
+     * @throws org.mule.umo.UMOException
+     */
+    public OutputStream getOutputStream(UMOImmutableEndpoint endpoint, UMOMessage message)
+        throws UMOException
+    {
+        String address = endpoint.getEndpointURI().getAddress();
+        String writeToDirectory = message.getStringProperty(
+            FileConnector.PROPERTY_WRITE_TO_DIRECTORY, null);
+        if (writeToDirectory == null)
+        {
+            writeToDirectory = getWriteToDirectory();
+        }
+        if (writeToDirectory != null)
+        {
+            address = getFilenameParser().getFilename(message, writeToDirectory);
+        }
+
+        String filename;
+        String outPattern = (String)endpoint.getProperty(FileConnector.PROPERTY_OUTPUT_PATTERN);
+        if (outPattern == null)
+        {
+            outPattern = message.getStringProperty(FileConnector.PROPERTY_OUTPUT_PATTERN, null);
+        }
+        if (outPattern == null)
+        {
+            outPattern = getOutputPattern();
+        }
+        try
+        {
+            if (outPattern != null)
+            {
+                filename = generateFilename(message, outPattern);
+            }
+            else
+            {
+                filename = message.getStringProperty(FileConnector.PROPERTY_FILENAME, null);
+                if (filename == null)
+                {
+                    filename = generateFilename(message, null);
+                }
+            }
+
+            if (filename == null)
+            {
+                throw new IOException("Filename is null");
+            }
+            File file = FileUtils.createFile(address + "/" + filename);
+            if (logger.isInfoEnabled())
+            {
+                logger.info("Writing file to: " + file.getAbsolutePath());
+            }
+
+            return new FileOutputStream(file, MapUtils.getBooleanValue(endpoint.getProperties(),
+                "outputAppend", isOutputAppend()));
+        }
+        catch (IOException e)
+        {
+            throw new DispatchException(new Message(Messages.STREAMING_FAILED_NO_STREAM), message,
+                endpoint, e);
+        }
+    }
+
+    private String generateFilename(UMOMessage message, String pattern)
+    {
+        if (pattern == null)
+        {
+            pattern = getOutputPattern();
+        }
+        return getFilenameParser().getFilename(message, pattern);
     }
 }

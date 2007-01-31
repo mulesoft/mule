@@ -13,7 +13,10 @@ package org.mule.providers.stream;
 import org.mule.registry.metadata.MetadataStore;
 import org.mule.registry.metadata.ObjectMetadata;
 import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
@@ -182,4 +185,24 @@ public class SystemStreamConnector extends StreamConnector
         this.messageDelayTime = messageDelayTime;
     }
 
+
+    public OutputStream getOutputStream(UMOImmutableEndpoint endpoint, UMOMessage message) throws UMOException
+    {
+        OutputStream out;
+        String streamName = endpoint.getEndpointURI().getAddress();
+
+        if (STREAM_SYSTEM_OUT.equalsIgnoreCase(streamName))
+        {
+            out = System.out;
+        }
+        else if (STREAM_SYSTEM_ERR.equalsIgnoreCase(streamName))
+        {
+            out = System.err;
+        }
+        else
+        {
+            out = getOutputStream();
+        }
+        return out;
+    }
 }

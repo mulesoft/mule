@@ -20,9 +20,6 @@ import java.io.Serializable;
  * <code>UMOComponent</code> is the interal repesentation of a Mule Managed
  * component. It is responsible for managing the interaction of events to and from
  * the component as well as managing pooled resources.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public interface UMOComponent extends Serializable, Lifecycle, Initialisable, Registerable

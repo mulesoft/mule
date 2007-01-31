@@ -17,7 +17,7 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.routing.RoutingException;
-import org.mule.umo.routing.UMOOutboundMessageRouter;
+import org.mule.umo.routing.UMOOutboundRouterCollection;
 
 /**
  * <code>ForwardingConsumer</code> is used to forward an incoming event over
@@ -31,10 +31,10 @@ public class ForwardingConsumer extends SelectiveConsumer
     {
         if (super.process(event) != null)
         {
-            UMOOutboundMessageRouter router = event.getComponent().getDescriptor().getOutboundRouter();
+            UMOOutboundRouterCollection router = event.getComponent().getDescriptor().getOutboundRouter();
 
             // Set the stopFurtherProcessing flag to true to inform the
-            // InboundMessageRouter not to route these events to the component
+            // InboundRouterCollection not to route these events to the component
             event.setStopFurtherProcessing(true);
 
             if (router == null)

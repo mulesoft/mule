@@ -28,7 +28,7 @@ import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.ReceiveException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOSessionHandler;
-import org.mule.umo.routing.UMOOutboundMessageRouter;
+import org.mule.umo.routing.UMOOutboundRouterCollection;
 import org.mule.umo.security.UMOSecurityContext;
 import org.mule.util.UUID;
 
@@ -131,7 +131,7 @@ public final class MuleSession implements UMOSession
             throw new IllegalStateException(new Message(Messages.X_IS_NULL, "Component").getMessage());
         }
 
-        UMOOutboundMessageRouter router = component.getDescriptor().getOutboundRouter();
+        UMOOutboundRouterCollection router = component.getDescriptor().getOutboundRouter();
         if (router == null)
         {
             throw new EndpointNotFoundException(new Message(Messages.NO_OUTBOUND_ROUTER_SET_ON_X,
@@ -176,7 +176,7 @@ public final class MuleSession implements UMOSession
         {
             throw new IllegalStateException(new Message(Messages.X_IS_NULL, "Component").getMessage());
         }
-        UMOOutboundMessageRouter router = component.getDescriptor().getOutboundRouter();
+        UMOOutboundRouterCollection router = component.getDescriptor().getOutboundRouter();
         if (router == null)
         {
             throw new EndpointNotFoundException(new Message(Messages.NO_OUTBOUND_ROUTER_SET_ON_X,

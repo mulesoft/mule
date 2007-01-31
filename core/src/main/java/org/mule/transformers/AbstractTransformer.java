@@ -14,7 +14,6 @@ import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.NullPayload;
-import org.mule.registry.Registration;
 import org.mule.registry.DeregistrationException;
 import org.mule.registry.RegistrationException;
 import org.mule.registry.Registry;
@@ -36,29 +35,38 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * <code>AbstractTransformer</code> Is a base class for all transformers.
+ * <code>AbstractTransformer</code> is a base class for all transformers.
  * Transformations transform one object into another.
  */
 
 public abstract class AbstractTransformer implements UMOTransformer
 {
     /**
-     * The fully qualified class name of the fallback <code>Transformer</code>
-     * implementation class to use, if no other can be found.
-     */
-    public static final String TRANSFORMER_DEFAULT = "org.mule.transformers.NoActionTransformer";
-
-    /**
      * logger used by this class
      */
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient final Log logger = LogFactory.getLog(getClass());
 
+    /**
+     * The return type that will be returned by the {@link #transform} method is
+     * called
+     */
     protected Class returnClass = null;
 
+    /**
+     * The name that identifies this transformer. If none is set the class name of
+     * the transformer is used
+     */
     protected String name = null;
 
+    /**
+     * The endpoint that this transformer instance is configured on
+     */
     protected UMOImmutableEndpoint endpoint = null;
 
+    /**
+     * A list of support Class types that the source payload passed into this
+     * transformer
+     */
     protected List sourceTypes = new ArrayList();
 
     /**
@@ -66,6 +74,10 @@ public abstract class AbstractTransformer implements UMOTransformer
      */
     protected UMOTransformer nextTransformer;
 
+    /**
+     * Determines whether the transformer will throw an exception if the message
+     * passed is is not supported or the return tye is incorrect
+     */
     private boolean ignoreBadInput = false;
 
     /**
@@ -114,14 +126,6 @@ public abstract class AbstractTransformer implements UMOTransformer
     protected synchronized void unregisterSourceType(Class aClass)
     {
         sourceTypes.remove(aClass);
-    }
-
-    /**
-     * @deprecated simply iterate over sourceTypes directly
-     */
-    protected Iterator getSourceTypeClassesIterator()
-    {
-        return sourceTypes.iterator();
     }
 
     /**
@@ -235,7 +239,8 @@ public abstract class AbstractTransformer implements UMOTransformer
             else
             {
                 throw new TransformerException(new Message(Messages.TRANSFORM_X_UNSUPORTED_TYPE_X_ENDPOINT_X,
-                    getName(), src.getClass().getName(), (endpoint != null ? endpoint.getEndpointURI() : null)), this);
+                    getName(), src.getClass().getName(),
+                    (endpoint != null ? endpoint.getEndpointURI() : null)), this);
             }
         }
 
@@ -475,12 +480,13 @@ public abstract class AbstractTransformer implements UMOTransformer
 
     public String toString()
     {
-        return "Transformer{" + "name='" + name + "'" + ", ignoreBadInput=" + ignoreBadInput + ", returnClass="
-                        + returnClass + ", sourceTypes=" + sourceTypes + "}";
+        return "Transformer{" + "name='" + name + "'" + ", ignoreBadInput=" + ignoreBadInput
+                        + ", returnClass=" + returnClass + ", sourceTypes=" + sourceTypes + "}";
     }
 
     public boolean isAcceptNull()
     {
         return false;
     }
+
 }

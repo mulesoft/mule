@@ -13,7 +13,6 @@ package org.mule.providers.file;
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.providers.file.filters.FilenameWildcardFilter;
@@ -21,15 +20,11 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.provider.DispatchException;
 import org.mule.util.FileUtils;
-import org.mule.util.MapUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URLDecoder;
 
 /**
@@ -65,7 +60,13 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
         {
             buf = data.toString().getBytes(event.getEncoding());
         }
-        FileOutputStream fos = (FileOutputStream)getOutputStream(event.getEndpoint(), message);
+
+        FileOutputStream fos = (FileOutputStream)connector.getOutputStream(event.getEndpoint(), message);
+        if (event.getMessage().getStringProperty(FileConnector.PROPERTY_FILENAME, null) == null)
+        {
+            event.getMessage().setStringProperty(FileConnector.PROPERTY_FILENAME,
+                message.getStringProperty(FileConnector.PROPERTY_FILENAME, ""));
+        }
         try
         {
             fos.write(buf);
@@ -75,79 +76,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
             fos.close();
         }
     }
-
-    /**
-     * Well get the output stream (if any) for this type of transport. Typically this
-     * will be called only when Streaming is being used on an outbound endpoint
-     * 
-     * @param endpoint the endpoint that releates to this Dispatcher
-     * @param message the current message being processed
-     * @return the output stream to use for this request or null if the transport
-     *         does not support streaming
-     * @throws org.mule.umo.UMOException
-     */
-    public OutputStream getOutputStream(UMOImmutableEndpoint endpoint, UMOMessage message)
-        throws UMOException
-    {
-        String address = endpoint.getEndpointURI().getAddress();
-        String writeToDirectory = message.getStringProperty(
-            FileConnector.PROPERTY_WRITE_TO_DIRECTORY, null);
-        if (writeToDirectory == null)
-        {
-            writeToDirectory = connector.getWriteToDirectory();
-        }
-        if (writeToDirectory != null)
-        {
-            address = connector.getFilenameParser().getFilename(message, writeToDirectory);
-        }
-
-        String filename;
-        // TODO MERGE check if it were a recent bugfix or smth
-        String outPattern = message.getStringProperty(FileConnector.PROPERTY_OUTPUT_PATTERN, null);
-        // String outPattern = (String)endpoint.getProperty(FileConnector.PROPERTY_OUTPUT_PATTERN);
-        // if (outPattern == null)
-        // {
-        //    outPattern = message.getStringProperty(FileConnector.PROPERTY_OUTPUT_PATTERN, null);
-        //}
-        if (outPattern == null)
-        {
-            outPattern = connector.getOutputPattern();
-        }
-        try
-        {
-            if (outPattern != null)
-            {
-                filename = generateFilename(message, outPattern);
-            }
-            else
-            {
-                filename = message.getStringProperty(FileConnector.PROPERTY_FILENAME, null);
-                if (filename == null)
-                {
-                    filename = generateFilename(message, null);
-                }
-            }
-
-            if (filename == null)
-            {
-                throw new IOException("Filename is null");
-            }
-            File file = FileUtils.createFile(address + "/" + filename);
-            if (logger.isInfoEnabled())
-            {
-                logger.info("Writing file to: " + file.getAbsolutePath());
-            }
-
-            return new FileOutputStream(file, MapUtils.getBooleanValue(endpoint.getProperties(),
-                "outputAppend", connector.isOutputAppend()));
-        }
-        catch (IOException e)
-        {
-            throw new DispatchException(new Message(Messages.STREAMING_FAILED_NO_STREAM), message,
-                endpoint, e);
-        }
-    }
-
+    
     /**
      * There is no associated session for a file connector
      * 
@@ -162,7 +91,6 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
      * Will attempt to do a receive from a directory, if the endpointUri resolves to
      * a file name the file will be returned, otherwise the first file in the
      * directory according to the filename filter configured on the connector.
-     * 
      * @param timeout this is ignored when doing a receive on this dispatcher
      * @return a message containing file contents or null if there was notthing to
      *         receive
@@ -270,15 +198,6 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
     {
         doDispatch(event);
         return event.getMessage();
-    }
-
-    private String generateFilename(UMOMessage message, String pattern)
-    {
-        if (pattern == null)
-        {
-            pattern = connector.getOutputPattern();
-        }
-        return connector.getFilenameParser().getFilename(message, pattern);
     }
 
     protected void doDispose()

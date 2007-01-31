@@ -30,11 +30,11 @@ import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.manager.UMOAgent;
 import org.mule.umo.model.UMOModel;
-import org.mule.umo.routing.UMOInboundMessageRouter;
-import org.mule.umo.routing.UMOOutboundMessageRouter;
 import org.mule.umo.routing.UMOOutboundRouter;
-import org.mule.umo.routing.UMOResponseMessageRouter;
 import org.mule.umo.routing.UMOResponseRouter;
+import org.mule.umo.routing.UMOOutboundRouterCollection;
+import org.mule.umo.routing.UMOInboundRouterCollection;
+import org.mule.umo.routing.UMOResponseRouterCollection;
 import org.mule.umo.transformer.UMOTransformer;
 
 import java.util.List;
@@ -92,7 +92,7 @@ public class SpringNamespaceConfigBuilderTestCase extends AbstractScriptConfigBu
         assertNotNull(endpoint);
         assertEquals("test.queue", endpoint.getEndpointURI().getAddress());
 
-        UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("orangeComponent");
+        UMODescriptor descriptor = MuleManager.getInstance().lookupModel("main").getDescriptor("orangeComponent");
         UMOEndpoint endpoint2 = descriptor.getInboundRouter().getEndpoint("Orange");
         assertNotNull(endpoint2);
         assertNotNull(endpoint2.getResponseTransformer());
@@ -101,8 +101,8 @@ public class SpringNamespaceConfigBuilderTestCase extends AbstractScriptConfigBu
 
     public void testExceptionStrategy()
     {
-        UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("orangeComponent");
-        assertNotNull(MuleManager.getInstance().getModel().getExceptionListener());
+        UMODescriptor descriptor = MuleManager.getInstance().lookupModel("main").getDescriptor("orangeComponent");
+        assertNotNull(MuleManager.getInstance().lookupModel("main").getExceptionListener());
         assertNotNull(descriptor.getExceptionListener());
 
         assertTrue(((AbstractExceptionListener)descriptor.getExceptionListener()).getEndpoints().size() > 0);
@@ -123,7 +123,7 @@ public class SpringNamespaceConfigBuilderTestCase extends AbstractScriptConfigBu
 
     public void testModelConfig() throws Exception
     {
-        UMOModel model = MuleManager.getInstance().getModel();
+        UMOModel model = MuleManager.getInstance().lookupModel("main");
         assertNotNull(model);
         assertEquals("test-model", model.getName());
         assertTrue(model.getEntryPointResolver() instanceof TestEntryPointResolver);
@@ -142,7 +142,7 @@ public class SpringNamespaceConfigBuilderTestCase extends AbstractScriptConfigBu
 
     public void testPropertiesConfig() throws Exception
     {
-        UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("orangeComponent");
+        UMODescriptor descriptor = MuleManager.getInstance().lookupModel("main").getDescriptor("orangeComponent");
 
         Map props = descriptor.getProperties();
         assertNotNull(props);
@@ -178,9 +178,9 @@ public class SpringNamespaceConfigBuilderTestCase extends AbstractScriptConfigBu
     public void testOutboundRouterConfig()
     {
         // test outbound message router
-        UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("orangeComponent");
+        UMODescriptor descriptor = MuleManager.getInstance().lookupModel("main").getDescriptor("orangeComponent");
         assertNotNull(descriptor.getOutboundRouter());
-        UMOOutboundMessageRouter router = descriptor.getOutboundRouter();
+        UMOOutboundRouterCollection router = descriptor.getOutboundRouter();
         assertNull(router.getCatchAllStrategy());
         assertEquals(1, router.getRouters().size());
         // check first Router
@@ -191,7 +191,7 @@ public class SpringNamespaceConfigBuilderTestCase extends AbstractScriptConfigBu
 
     public void testDescriptorEndpoints()
     {
-        UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("orangeComponent");
+        UMODescriptor descriptor = MuleManager.getInstance().lookupModel("main").getDescriptor("orangeComponent");
         assertEquals(1, descriptor.getOutboundRouter().getRouters().size());
         UMOOutboundRouter router = (UMOOutboundRouter)descriptor.getOutboundRouter().getRouters().get(0);
         assertEquals(1, router.getEndpoints().size());
@@ -230,9 +230,9 @@ public class SpringNamespaceConfigBuilderTestCase extends AbstractScriptConfigBu
 
     public void testInboundRouterConfig()
     {
-        UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("orangeComponent");
+        UMODescriptor descriptor = MuleManager.getInstance().lookupModel("main").getDescriptor("orangeComponent");
         assertNotNull(descriptor.getInboundRouter());
-        UMOInboundMessageRouter messageRouter = descriptor.getInboundRouter();
+        UMOInboundRouterCollection messageRouter = descriptor.getInboundRouter();
         assertNotNull(messageRouter.getCatchAllStrategy());
         assertEquals(0, messageRouter.getRouters().size());
         assertTrue(messageRouter.getCatchAllStrategy() instanceof ForwardingCatchAllStrategy);
@@ -241,9 +241,9 @@ public class SpringNamespaceConfigBuilderTestCase extends AbstractScriptConfigBu
 
     public void testResponseRouterConfig()
     {
-        UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("orangeComponent");
+        UMODescriptor descriptor = MuleManager.getInstance().lookupModel("main").getDescriptor("orangeComponent");
         assertNotNull(descriptor.getResponseRouter());
-        UMOResponseMessageRouter messageRouter = descriptor.getResponseRouter();
+        UMOResponseRouterCollection messageRouter = descriptor.getResponseRouter();
         assertNull(messageRouter.getCatchAllStrategy());
         assertEquals(10001, messageRouter.getTimeout());
         assertEquals(1, messageRouter.getRouters().size());
@@ -262,7 +262,7 @@ public class SpringNamespaceConfigBuilderTestCase extends AbstractScriptConfigBu
     //TODO RM*: This is no longer relivant
     public void testObjectReferences() throws UMOException
     {
-        MuleDescriptor descriptor = (MuleDescriptor)MuleManager.getInstance().getModel().getDescriptor(
+        MuleDescriptor descriptor = (MuleDescriptor)MuleManager.getInstance().lookupModel("main").getDescriptor(
             "orangeComponent");
         assertEquals(new ContainerKeyPair(null, "orange"),
             descriptor.getImplementation());

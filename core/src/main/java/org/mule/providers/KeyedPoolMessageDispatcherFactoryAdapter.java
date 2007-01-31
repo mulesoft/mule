@@ -69,6 +69,11 @@ public class KeyedPoolMessageDispatcherFactoryAdapter
         return factory.validate((UMOImmutableEndpoint)key, (UMOMessageDispatcher)obj);
     }
 
+    public boolean isCreateDispatcherPerRequest()
+    {
+        return factory.isCreateDispatcherPerRequest();
+    }
+
     public UMOMessageDispatcher create(UMOImmutableEndpoint endpoint) throws UMOException
     {
         return factory.create(endpoint);

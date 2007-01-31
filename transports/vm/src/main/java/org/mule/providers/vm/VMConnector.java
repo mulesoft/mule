@@ -261,6 +261,7 @@ public class VMConnector extends AbstractConnector
         return null;
     }
 
+    // @Override
     public boolean isRemoteSyncEnabled()
     {
         return true;

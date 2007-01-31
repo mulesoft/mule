@@ -6,7 +6,7 @@
 <mule-configuration id="DirectModelConfiguration" version="1.0">
 
 
-    <model name="foo" type="direct">
+    <model name="main" type="direct">
 
     </model>
 </mule-configuration>

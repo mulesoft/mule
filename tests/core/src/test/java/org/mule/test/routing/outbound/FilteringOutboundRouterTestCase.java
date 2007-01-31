@@ -10,15 +10,12 @@
 
 package org.mule.test.routing.outbound;
 
-import com.mockobjects.dynamic.C;
-import com.mockobjects.dynamic.Mock;
-
 import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.routing.outbound.FilteringOutboundRouter;
-import org.mule.routing.outbound.OutboundMessageRouter;
+import org.mule.routing.outbound.OutboundRouterCollection;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 import org.mule.transformers.AbstractTransformer;
@@ -26,6 +23,9 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.transformer.TransformerException;
+
+import com.mockobjects.dynamic.C;
+import com.mockobjects.dynamic.Mock;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,7 +42,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
     public void testFilteringOutboundRouter() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
-        OutboundMessageRouter messageRouter = new OutboundMessageRouter();
+        OutboundRouterCollection messageRouter = new OutboundRouterCollection();
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
 
         UMOEndpoint endpoint1 = getTestEndpoint("Test1Provider", UMOEndpoint.ENDPOINT_TYPE_SENDER);
@@ -97,7 +97,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
 
     public void testFilteringOutboundRouterWithTemplates() throws Exception
     {
-        OutboundMessageRouter messageRouter = new OutboundMessageRouter();
+        OutboundRouterCollection messageRouter = new OutboundRouterCollection();
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
 
         UMOEndpoint endpoint1 = getTestEndpoint("Test1Provider", UMOEndpoint.ENDPOINT_TYPE_SENDER);
