@@ -223,15 +223,10 @@ public class JcaComponent implements UMOComponent
      */
     public void register() throws RegistrationException
     {
-        // TODO LM: broken compilation, fix this
-        //ComponentReference ref = 
-        //    MuleManager.getInstance().getRegistry().getComponentReferenceInstance();
-        //ref.setParentId(MuleManager.getInstance().getModel().getRegistryId());
-        //ref.setType("UMOComponent");
-        //ref.setComponent(this);
-        //
-        //registryId =
-        //    MuleManager.getInstance().getRegistry().registerComponent(ref);
+        /* TODO: LM
+        registryId = 
+           MuleManager.getInstance().getRegistry().registerMuleObject(MuleManager.getInstance().getModel(), this).getId();
+           */
     }
 
     /*
