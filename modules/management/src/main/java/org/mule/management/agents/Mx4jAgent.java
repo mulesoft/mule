@@ -45,7 +45,9 @@ import org.mule.util.SystemUtils;
 
 /**
  * <code>Mx4jAgent</code> configures an Mx4J Http Adaptor for Jmx management,
- * statistics and configuration viewing of a Mule instance..
+ * statistics and configuration viewing of a Mule instance.
+ * <p/>
+ * TODO MULE-1353
  */
 public class Mx4jAgent implements UMOAgent
 {

@@ -13,11 +13,11 @@ package org.mule.providers.soap.xfire;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.impl.MuleDescriptor;
-import org.mule.impl.model.ModelHelper;
 import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.impl.internal.notifications.ModelNotification;
-import org.mule.impl.internal.notifications.ModelNotificationListener;
+import org.mule.impl.internal.notifications.ManagerNotification;
+import org.mule.impl.internal.notifications.ManagerNotificationListener;
 import org.mule.impl.internal.notifications.NotificationException;
+import org.mule.impl.model.ModelHelper;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
@@ -46,7 +46,7 @@ import org.codehaus.xfire.service.binding.ObjectServiceFactory;
  * Configures Xfire to provide STaX-based Web Servies support to Mule.
  */
 public class XFireConnector extends AbstractConnector
-    implements ModelNotificationListener
+    implements ManagerNotificationListener
 {
     public static final String XFIRE_SERVICE_COMPONENT_NAME = "_xfireServiceComponent";
     public static final String DEFAULT_MULE_NAMESPACE_URI = "http://www.muleumo.org";
@@ -208,7 +208,7 @@ public class XFireConnector extends AbstractConnector
         // this will be registered with Mule when the Connector starts
         if (xfireDescriptor == null)
         {
-            // See if the axis descriptor has already been added. This allows
+            // See if the xfire descriptor has already been added. This allows
             // developers to override the default configuration, say to increase
             // the threadpool
             xfireDescriptor = (MuleDescriptor)MuleManager.getInstance().lookupModel(ModelHelper.SYSTEM_MODEL).getDescriptor(
@@ -402,7 +402,7 @@ public class XFireConnector extends AbstractConnector
 
     public void onNotification(UMOServerNotification event)
     {
-        if (event.getAction() == ModelNotification.MODEL_STARTED)
+        if (event.getAction() == ManagerNotification.MANAGER_STARTED_MODELS)
         {
             // We need to register the xfire service component once the model
             // starts because

@@ -34,6 +34,10 @@ public class RequestLine
         String protocol = null;
         try
         {
+            if(l==null)
+            {
+                System.out.println("");
+            }
             StringTokenizer st = new StringTokenizer(l, " ");
             method = st.nextToken();
             uri = st.nextToken();

@@ -13,8 +13,8 @@ import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.impl.internal.notifications.ModelNotification;
-import org.mule.impl.internal.notifications.ModelNotificationListener;
+import org.mule.impl.internal.notifications.ManagerNotification;
+import org.mule.impl.internal.notifications.ManagerNotificationListener;
 import org.mule.impl.internal.notifications.NotificationException;
 import org.mule.management.mbeans.ComponentService;
 import org.mule.management.mbeans.ComponentServiceMBean;
@@ -51,6 +51,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
+import java.util.Collections;
 
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.MBeanRegistrationException;
@@ -72,6 +74,9 @@ import org.apache.commons.logging.LogFactory;
  */
 public class JmxAgent implements UMOAgent
 {
+    public static final String DEFAULT_REMOTING_URI = "service:jmx:rmi:///jndi/rmi://localhost:1099/server";
+    // populated with values below in a static initializer
+    public static final Map DEFAULT_CONNECTOR_SERVER_PROPERTIES;
 
     /**
      * Logger used by this class
@@ -96,6 +101,12 @@ public class JmxAgent implements UMOAgent
 
     private JmxSupportFactory jmxSupportFactory = new AutoDiscoveryJmxSupportFactory();
     private JmxSupport jmxSupport;
+
+    static {
+        Map props = new HashMap(1);
+        props.put("jmx.remote.jndi.rebind", "true");
+        DEFAULT_CONNECTOR_SERVER_PROPERTIES = Collections.unmodifiableMap(props);
+    }
 
     /** {@inheritDoc}
     *
@@ -160,6 +171,10 @@ public class JmxAgent implements UMOAgent
         if (connectorServerUrl != null) {
             try {
                 JMXServiceURL url = new JMXServiceURL(connectorServerUrl);
+                if (connectorServerProperties == null)
+                {
+                    connectorServerProperties = new HashMap(DEFAULT_CONNECTOR_SERVER_PROPERTIES);
+                }
                 connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url, connectorServerProperties, mBeanServer);
             } catch (Exception e) {
                 throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X, "Jmx Connector"), e, this);
@@ -169,10 +184,10 @@ public class JmxAgent implements UMOAgent
         jmxSupport = jmxSupportFactory.newJmxSupport();
 
         // We need to register all the services once the server has initialised
-        ModelNotificationListener l = new ModelNotificationListener() {
+        ManagerNotificationListener l = new ManagerNotificationListener() {
             public void onNotification(UMOServerNotification notification)
             {
-                if (notification.getAction() == ModelNotification.MODEL_STARTED) {
+                if (notification.getAction() == ManagerNotification.MANAGER_STARTED_MODELS) {
                     try {
                         registerWrapperService();
                         registerStatisticsService();
@@ -529,7 +544,9 @@ public class JmxAgent implements UMOAgent
     }
 
     /**
-     * Setter for property 'connectorServerProperties'.
+     * Setter for property 'connectorServerProperties'. Set to
+     * {@code null} to use defaults ({@link #DEFAULT_CONNECTOR_SERVER_PROPERTIES}).
+     * Pass in an empty map to use no parameters.
      *
      * @param connectorServerProperties Value to set for property 'connectorServerProperties'.
      */

@@ -941,11 +941,14 @@ public class MuleManager implements UMOManager
             }
             startConnectors();
             startAgents();
+            fireSystemEvent(new ManagerNotification(id, null, null, ManagerNotification.MANAGER_STARTING_MODELS));
             for (Iterator i = models.values().iterator(); i.hasNext();)
             {
                 UMOModel model = (UMOModel) i.next();
                 model.start();
             }
+            fireSystemEvent(new ManagerNotification(id, null, null, ManagerNotification.MANAGER_STARTED_MODELS));
+
             started.set(true);
             starting.set(false);
 
@@ -958,8 +961,7 @@ public class MuleManager implements UMOManager
                 System.out.println(getStartSplash());
             }
 
-            // TODO MERGE no such method?
-            //fireSystemEvent(new ManagerNotification(this, ManagerNotification.MANAGER_STARTED));
+            fireSystemEvent(new ManagerNotification(id, null, null, ManagerNotification.MANAGER_STARTED));
         }
     }
 
@@ -1023,11 +1025,13 @@ public class MuleManager implements UMOManager
         }
 
         logger.debug("Stopping model...");
+        fireSystemEvent(new ManagerNotification(id, null, null, ManagerNotification.MANAGER_STOPPING_MODELS));
         for (Iterator i = models.values().iterator(); i.hasNext();)
         {
             UMOModel model = (UMOModel) i.next();
             model.stop();
         }
+        fireSystemEvent(new ManagerNotification(id, null, null, ManagerNotification.MANAGER_STOPPED_MODELS));
 
         if (registry != null)
         {
@@ -1606,6 +1610,8 @@ public class MuleManager implements UMOManager
      * Fires a server notification to all registered
      * {@link org.mule.impl.internal.notifications.CustomNotificationListener}
      * notificationManager.
+     *
+     * TODO RM: This method now duplicates #fireSystemEvent() completely
      *
      * @param notification the notification to fire. This must be of type
      *                     {@link org.mule.impl.internal.notifications.CustomNotification}

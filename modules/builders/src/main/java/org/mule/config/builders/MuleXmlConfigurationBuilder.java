@@ -170,8 +170,11 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration
         addAgentRules(digester, path);
 
         addModelRules(digester, path);
-        // Threse rules allow for individual component configurations
-        addMuleDescriptorRules(digester, path);
+        // These rules allow for individual component configurations
+        //RM* this is no longer required since Mule supports Multiple models and can inherit existing models.
+        // This means that every mule-descriptor should be wrapped with a model element if its a stand alone
+        //component config
+        //addMuleDescriptorRules(digester, path);
     }
 
     public String getRootName()
@@ -790,6 +793,7 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration
                 UMODescriptor descriptor = (UMODescriptor)digester.peek();
                 Object obj = digester.peek(1);
                 final UMOModel model = (UMOModel)obj;
+                descriptor.setModelName(model.getName());
                 model.registerComponent(descriptor);
             }
         });

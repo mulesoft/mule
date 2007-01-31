@@ -13,10 +13,10 @@ package org.mule.config.pool;
 import org.mule.config.PoolingProfile;
 import org.mule.impl.MuleDescriptor;
 import org.mule.umo.UMOException;
-import org.mule.umo.model.UMOModel;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Startable;
 import org.mule.umo.lifecycle.Stoppable;
+import org.mule.umo.model.UMOModel;
 import org.mule.util.ObjectFactory;
 import org.mule.util.ObjectPool;
 
@@ -54,7 +54,7 @@ public class CommonsPoolProxyPool implements ObjectPool
 
     /**
      * Creates a new pool and an Object factory with the UMODescriptor
-     * 
+     *
      * @param descriptor the descriptor to use when constructing MuleProxy objects in
      *            the pool
      */
@@ -103,7 +103,7 @@ public class CommonsPoolProxyPool implements ObjectPool
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.model.pool.ObjectPool#borrowObject()
      */
     public Object borrowObject() throws Exception
@@ -113,7 +113,7 @@ public class CommonsPoolProxyPool implements ObjectPool
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.model.pool.ObjectPool#returnObject(java.lang.Object)
      */
     public void returnObject(Object object) throws Exception
@@ -123,7 +123,7 @@ public class CommonsPoolProxyPool implements ObjectPool
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.model.pool.ObjectPool#getSize()
      */
     public int getSize()
@@ -133,7 +133,7 @@ public class CommonsPoolProxyPool implements ObjectPool
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.model.pool.ObjectPool#getMaxSize()
      */
     public int getMaxSize()
@@ -143,7 +143,7 @@ public class CommonsPoolProxyPool implements ObjectPool
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.model.pool.ObjectPool#setFactory(org.mule.model.pool.ProxyFactory)
      */
     public void setFactory(ObjectFactory factory)
@@ -153,7 +153,7 @@ public class CommonsPoolProxyPool implements ObjectPool
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.model.pool.ObjectPool#clearPool()
      */
     public void clearPool()

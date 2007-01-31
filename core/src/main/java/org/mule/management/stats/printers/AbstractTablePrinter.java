@@ -90,10 +90,11 @@ public class AbstractTablePrinter extends PrintWriter
 
 
         col[0] = stats.getName();
+
         //TODO RM* Handling custom stats objects
         if(stats instanceof SedaComponentStatistics)
         {
-            col[1] = ((SedaComponentStatistics)stats).getComponentPoolMaxSize() + "/" 
+            col[1] = ((SedaComponentStatistics)stats).getComponentPoolMaxSize() + "/"
                     + ((SedaComponentStatistics)stats).getComponentPoolAbsoluteMaxSize();
             col[2] = String.valueOf(((SedaComponentStatistics)stats).getComponentPoolSize());
         }

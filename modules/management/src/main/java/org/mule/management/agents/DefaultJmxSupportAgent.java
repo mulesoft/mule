@@ -24,8 +24,6 @@ import org.mule.umo.manager.UMOAgent;
 public class DefaultJmxSupportAgent implements UMOAgent
 {
 
-    public static final String DEFAULT_REMOTING_URI = "service:jmx:rmi:///jndi/rmi://localhost:1099/server";
-
     private String name = "Default Jmx";
     private boolean loadJdmkAgent = false;
     private boolean loadMx4jAgent = false;
@@ -157,10 +155,7 @@ public class DefaultJmxSupportAgent implements UMOAgent
     protected JmxAgent createJmxAgent()
     {
         JmxAgent agent = new JmxAgent();
-        agent.setConnectorServerUrl(DEFAULT_REMOTING_URI);
-        Map props = new HashMap();
-        props.put("jmx.remote.jndi.rebind", "true");
-        agent.setConnectorServerProperties(props);
+        agent.setConnectorServerUrl(JmxAgent.DEFAULT_REMOTING_URI);
         return agent;
     }
 

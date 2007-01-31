@@ -19,7 +19,6 @@ import org.mule.impl.RequestContext;
 import org.mule.impl.internal.notifications.ComponentNotification;
 import org.mule.management.stats.ComponentStatistics;
 import org.mule.providers.AbstractConnector;
-import org.mule.registry.Registration;
 import org.mule.registry.DeregistrationException;
 import org.mule.registry.RegistrationException;
 import org.mule.umo.ComponentException;
@@ -150,6 +149,7 @@ public abstract class AbstractComponent implements UMOComponent
 
         // initialise statistics
         stats = createStatistics();
+
         stats.setEnabled(((MuleManager)MuleManager.getInstance()).getStatistics().isEnabled());
         ((MuleManager) MuleManager.getInstance()).getStatistics().add(stats);
         stats.setOutboundRouterStat(getDescriptor().getOutboundRouter().getStatistics());

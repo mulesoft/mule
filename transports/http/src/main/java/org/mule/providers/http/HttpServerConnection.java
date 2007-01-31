@@ -126,8 +126,11 @@ public class HttpServerConnection
         try
         {
             String line = readLine();
-            return new HttpRequest(RequestLine.parseLine(line), HttpParser.parseHeaders(this.in, encoding),
-                this.in);
+            if(line==null)
+            {
+                return null;
+            }
+            return new HttpRequest(RequestLine.parseLine(line), HttpParser.parseHeaders(this.in, encoding), this.in);
         }
         catch (IOException e)
         {
@@ -152,7 +155,7 @@ public class HttpServerConnection
 
     private String readLine() throws IOException
     {
-        String line = null;
+        String line;
 
         do
         {

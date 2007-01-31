@@ -48,7 +48,7 @@ public class ComponentStatistics implements Statistics
 
     /**
      * The constructor
-     * 
+     *
      * @param name
      */
     public ComponentStatistics(String name, int threadPoolSize)

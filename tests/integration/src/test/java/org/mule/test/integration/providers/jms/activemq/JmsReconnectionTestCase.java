@@ -81,7 +81,7 @@ public class JmsReconnectionTestCase extends AbstractJmsFunctionalTestCase
         model.setName("main");
         model.getPoolingProfile().setInitialisationPolicy(
             PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
-        MuleManager.getInstance().setModel(model);
+        MuleManager.getInstance().registerModel(model);
         
         callbackCalled = false;
         MuleManager.getInstance().registerConnector(createConnector());

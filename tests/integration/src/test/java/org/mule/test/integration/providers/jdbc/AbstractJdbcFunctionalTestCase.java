@@ -62,7 +62,7 @@ public abstract class AbstractJdbcFunctionalTestCase extends AbstractMuleTestCas
         model.setName("main");
         model.getPoolingProfile().setInitialisationPolicy(
             PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
-        MuleManager.getInstance().setModel(model);
+        MuleManager.getInstance().registerModel(model);
         // Create and register connector
         connector = createConnector();
         MuleManager.getInstance().registerConnector(connector);

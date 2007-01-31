@@ -13,9 +13,9 @@ package org.mule.umo;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.Registerable;
 import org.mule.umo.routing.UMOInboundRouterCollection;
+import org.mule.umo.routing.UMONestedRouterCollection;
 import org.mule.umo.routing.UMOOutboundRouterCollection;
 import org.mule.umo.routing.UMOResponseRouterCollection;
-import org.mule.umo.routing.UMONestedRouterCollection;
 
 import java.beans.ExceptionListener;
 import java.util.List;
@@ -144,4 +144,11 @@ public interface UMOImmutableDescriptor extends Initialisable, Registerable
      *         container will be queried for the component implementation.
      */
     String getContainer();
+
+    /**
+     * Returns the name of the model that this descriptor is registered with.
+     * @return the name of the model that this descriptor is registered with or null
+     * if this descriptor has not been registered with a model yet
+     */
+    String getModelName();
 }

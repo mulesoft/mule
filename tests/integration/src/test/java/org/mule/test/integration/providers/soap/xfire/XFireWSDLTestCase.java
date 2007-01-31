@@ -1,5 +1,5 @@
 /*
- * $Id:$
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.providers.soap.xfire;
+package org.mule.test.integration.providers.soap.xfire;
 
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.AbstractMuleTestCase;

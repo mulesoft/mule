@@ -96,26 +96,18 @@ public class HttpRequestToSoapRequest extends AbstractEventAwareTransformer
         StringBuffer result = new StringBuffer(8192);
         String header = StringMessageUtils.getFormattedMessage(SOAP_HEADER, new Object[]{encoding});
 
-        if (p.size() > 0)
+        result.append(header);
+        result.append('<').append(method).append(" xmlns=\"");
+        result.append(DEFAULT_NAMESPACE).append("\">");
+        for (Iterator iterator = p.entrySet().iterator(); iterator.hasNext();)
         {
-            result.append(header);
-            result.append('<').append(method).append(" xmlns=\"");
-            result.append(DEFAULT_NAMESPACE).append("\">");
-            for (Iterator iterator = p.entrySet().iterator(); iterator.hasNext();)
-            {
-                Map.Entry entry = (Map.Entry)iterator.next();
-                result.append('<').append(entry.getKey()).append('>');
-                result.append(entry.getValue());
-                result.append("</").append(entry.getKey()).append('>');
-            }
-            result.append("</").append(method).append('>');
-            result.append(SOAP_FOOTER);
+            Map.Entry entry = (Map.Entry)iterator.next();
+            result.append('<').append(entry.getKey()).append('>');
+            result.append(entry.getValue());
+            result.append("</").append(entry.getKey()).append('>');
         }
-        else
-        {
-            throw new TransformerException(new Message(Messages.PROPERTIES_X_NOT_SET,
-                MuleProperties.MULE_METHOD_PROPERTY), this);
-        }
+        result.append("</").append(method).append('>');
+        result.append(SOAP_FOOTER);
 
         return result.toString();
     }

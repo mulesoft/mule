@@ -14,10 +14,10 @@ import org.mule.MuleManager;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleDescriptor;
-import org.mule.impl.model.ModelHelper;
 import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.impl.internal.notifications.ModelNotification;
-import org.mule.impl.internal.notifications.ModelNotificationListener;
+import org.mule.impl.internal.notifications.ManagerNotification;
+import org.mule.impl.internal.notifications.ManagerNotificationListener;
+import org.mule.impl.model.ModelHelper;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.http.servlet.ServletConnector;
 import org.mule.providers.service.TransportFactory;
@@ -28,11 +28,11 @@ import org.mule.providers.soap.axis.extensions.WSDDFileProvider;
 import org.mule.providers.soap.axis.extensions.WSDDJavaMuleProvider;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
-import org.mule.umo.model.UMOModel;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOServerNotification;
+import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.ClassUtils;
 
@@ -63,7 +63,7 @@ import org.apache.axis.wsdl.fromJava.Types;
  * Some of the Axis specific service initialisation code was adapted from the Ivory
  * project (http://ivory.codehaus.org). Thanks guys :)
  */
-public class AxisConnector extends AbstractConnector implements ModelNotificationListener
+public class AxisConnector extends AbstractConnector implements ManagerNotificationListener
 {
     /* Register the AxisFault Exception reader if this class gets loaded */
     static
@@ -163,7 +163,7 @@ public class AxisConnector extends AbstractConnector implements ModelNotificatio
                 axisTransportProtocols.put(s, MuleTransport.getTransportClass(s));
                 registerSupportedProtocol(s);
             }
-            MuleManager.getInstance().registerListener(this, ModelHelper.SYSTEM_MODEL);
+            MuleManager.getInstance().registerListener(this);
         }
         catch (Exception e)
         {
@@ -617,7 +617,7 @@ public class AxisConnector extends AbstractConnector implements ModelNotificatio
 
     public void onNotification(UMOServerNotification notification)
     {
-        if (notification.getAction() == ModelNotification.MODEL_STARTED)
+        if (notification.getAction() == ManagerNotification.MANAGER_STARTED_MODELS)
         {
             // We need to register the Axis service component once the model
             // starts because

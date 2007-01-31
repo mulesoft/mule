@@ -11,12 +11,12 @@
 package org.mule.test.integration.client;
 
 import org.mule.MuleManager;
+import org.mule.routing.inbound.InboundRouterCollection;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.routing.inbound.InboundMessageRouter;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.test.integration.service.TestReceiver;
 import org.mule.transformers.simple.ByteArrayToString;
@@ -68,7 +68,7 @@ public class MuleClientListenerTestCase extends FunctionalTestCase
         MuleEndpoint endpoint = new MuleEndpoint(urlString, true);
         // We get a byte[] from a tcp endpoint so we need to convert it
         endpoint.setTransformer(new ByteArrayToString());
-        descriptor.setInboundRouter(new InboundMessageRouter());
+        descriptor.setInboundRouter(new InboundRouterCollection());
         descriptor.getInboundRouter().addEndpoint(endpoint);
         client.registerComponent(descriptor);
 

@@ -37,10 +37,14 @@ public class ManagerNotification extends UMOServerNotification implements Blocki
     public static final int MANAGER_DISPOSED = MANAGER_EVENT_ACTION_START_RANGE + 8;
     public static final int MANAGER_DISPOSING_CONNECTORS = MANAGER_EVENT_ACTION_START_RANGE + 9;
     public static final int MANAGER_DISPOSED_CONNECTORS = MANAGER_EVENT_ACTION_START_RANGE + 10;
+    public static final int MANAGER_STARTING_MODELS = MANAGER_EVENT_ACTION_START_RANGE + 11;
+    public static final int MANAGER_STARTED_MODELS = MANAGER_EVENT_ACTION_START_RANGE + 12;
+    public static final int MANAGER_STOPPING_MODELS = MANAGER_EVENT_ACTION_START_RANGE + 13;
+    public static final int MANAGER_STOPPED_MODELS = MANAGER_EVENT_ACTION_START_RANGE + 14;
 
     private static final transient String[] ACTIONS = new String[]{"initialising", "initialised", "starting",
-            "started", "stopping", "stopped", "disposing", "disposed", "disposing connectors",
-            "disposed connectors"};
+        "started", "stopping", "stopped", "disposing", "disposed", "disposing connectors",
+        "disposed connectors", "starting models", "started models", "stopping models", "stopped models"};
 
     private String clusterId;
     private String domain;

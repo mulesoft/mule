@@ -219,26 +219,29 @@ public class TcpConnector extends AbstractConnector
 
     /**
      * Well get the output stream (if any) for this type of transport. Typically this
-     * will be called only when Streaming is being used on an outbound endpoint.
-     * If Streaming is not supported by this transport an {@link UnsupportedOperationException}
-     * is thrown
-     *
+     * will be called only when Streaming is being used on an outbound endpoint. If
+     * Streaming is not supported by this transport an
+     * {@link UnsupportedOperationException} is thrown
+     * 
      * @param endpoint the endpoint that releates to this Dispatcher
      * @param message the current message being processed
      * @return the output stream to use for this request or null if the transport
      *         does not support streaming
      * @throws org.mule.umo.UMOException
      */
-    //TODO HH: Is this the right thing to do? not sure how else to get the outputstream
-    public OutputStream getOutputStream(UMOImmutableEndpoint endpoint, UMOMessage message) throws UMOException
+    // TODO HH: Is this the right thing to do? not sure how else to get the
+    // outputstream
+    public OutputStream getOutputStream(UMOImmutableEndpoint endpoint, UMOMessage message)
+        throws UMOException
     {
         try
         {
             Socket socket = getSocket(endpoint);
-            if(socket==null)
+            if (socket == null)
             {
-                //This shouldn't happen
-                throw new IllegalStateException("could not get socket for endpoint: " + endpoint.getEndpointURI().getAddress());
+                // This shouldn't happen
+                throw new IllegalStateException("could not get socket for endpoint: "
+                                + endpoint.getEndpointURI().getAddress());
             }
             return new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
         }
@@ -252,19 +255,32 @@ public class TcpConnector extends AbstractConnector
         }
     }
 
-    Socket getSocket(UMOImmutableEndpoint endpoint) throws IOException, URISyntaxException
+    /**
+     * Lookup a socket in the list of dispatcher sockets but don't create a new
+     * socket
+     * 
+     * @param endpoint
+     * @return
+     */
+    Socket lookupSocket(UMOImmutableEndpoint endpoint)
     {
-
         Socket socket;
-        synchronized(dispatcherSockets)
+        synchronized (dispatcherSockets)
         {
             socket = (Socket)dispatcherSockets.remove(endpoint.getEndpointURI().getAddress());
         }
-        if(socket==null)
+        return socket;
+    }
+
+    Socket getSocket(UMOImmutableEndpoint endpoint) throws IOException, URISyntaxException
+    {
+        Socket socket = lookupSocket(endpoint);
+
+        if (socket == null)
         {
             socket = initSocket(endpoint.getEndpointURI().getUri());
         }
-        else if(!socket.isConnected() || socket.isClosed())
+        else if (!socket.isConnected() || socket.isClosed())
         {
             logger.debug("The current socket connection for this endpoint is closed. Creating new connection");
             socket = initSocket(endpoint.getEndpointURI().getUri());
@@ -274,31 +290,31 @@ public class TcpConnector extends AbstractConnector
 
     void releaseSocket(Socket socket, UMOImmutableEndpoint endpoint)
     {
-        boolean keepSocketOpen = MapUtils.getBooleanValue(endpoint.getProperties(), KEEP_SEND_SOCKET_OPEN_PROPERTY,
-            isKeepSendSocketOpen());
-        if(!keepSocketOpen)
+        boolean keepSocketOpen = MapUtils.getBooleanValue(endpoint.getProperties(),
+            KEEP_SEND_SOCKET_OPEN_PROPERTY, isKeepSendSocketOpen());
+        if (!keepSocketOpen)
         {
             try
             {
-                if(socket!=null)
+                if (socket != null)
                 {
                     socket.close();
                 }
             }
             catch (IOException e)
             {
-                logger.debug("Fialed to close socket after dispatch", e);
+                logger.debug("Failed to close socket after dispatch", e);
             }
         }
-        else if(socket!=null && !socket.isClosed())
+        else if (socket != null && !socket.isClosed())
         {
-            synchronized(dispatcherSockets)
+            synchronized (dispatcherSockets)
             {
                 dispatcherSockets.put(endpoint.getEndpointURI().getAddress(), socket);
             }
         }
     }
-    
+
     protected Socket initSocket(URI endpoint) throws IOException, URISyntaxException
     {
         int port = endpoint.getPort();
@@ -306,17 +322,17 @@ public class TcpConnector extends AbstractConnector
         Socket socket = createSocket(port, inetAddress);
         socket.setReuseAddress(true);
         if (getBufferSize() != UMOConnector.INT_VALUE_NOT_SET
-            && socket.getReceiveBufferSize() != getBufferSize())
+                        && socket.getReceiveBufferSize() != getBufferSize())
         {
             socket.setReceiveBufferSize(getBufferSize());
         }
         if (getBufferSize() != UMOConnector.INT_VALUE_NOT_SET
-            && socket.getSendBufferSize() != getBufferSize())
+                        && socket.getSendBufferSize() != getBufferSize())
         {
             socket.setSendBufferSize(getBufferSize());
         }
         if (getReceiveTimeout() != UMOConnector.INT_VALUE_NOT_SET
-            && socket.getSoTimeout() != getReceiveTimeout())
+                        && socket.getSoTimeout() != getReceiveTimeout())
         {
             socket.setSoTimeout(getReceiveTimeout());
         }

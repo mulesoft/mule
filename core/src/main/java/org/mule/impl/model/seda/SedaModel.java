@@ -31,30 +31,31 @@ public class SedaModel extends AbstractModel
     public static ObjectMetadata objectMetadata = new ObjectMetadata(SedaModel.class, 2, new String[] { "name" });
 
     /**
-     * The time out used for taking from the Seda Queue
+     * The time out used for taking from the Seda Queue.
      */
     private int queueTimeout = MuleManager.getConfiguration().getDefaultSynchronousEventTimeout();
 
     /**
-     * Whether components in this model should be pooled or not
+     * Whether components in this model should be pooled or not.
      */
     private boolean enablePooling = true;
 
     /**
-     * Whether to create a new component for every request
+     * Whether to create a new component for every request.
      */
     protected boolean componentPerRequest = false;
 
-
     /**
-     * The default pooling config for components managed by this model
+     * the pooling configuration used when initialising the component described by
+     * this descriptor.
      */
     protected PoolingProfile poolingProfile;
 
     /**
-     * the default queue configuration for components managed by this model
+     * The queuing profile for events received for this component
      */
     protected QueueProfile queueProfile;
+
 
     public SedaModel()
     {
@@ -94,7 +95,7 @@ public class SedaModel extends AbstractModel
 
     protected UMOComponent createComponent(UMODescriptor descriptor)
     {
-        return new SedaComponent((MuleDescriptor)descriptor, this);
+        return new SedaComponent((MuleDescriptor) descriptor, this);
     }
 
     public int getQueueTimeout()

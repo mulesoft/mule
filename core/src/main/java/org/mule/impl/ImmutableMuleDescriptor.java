@@ -20,10 +20,10 @@ import org.mule.impl.container.MuleContainerContext;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.registry.DeregistrationException;
 import org.mule.registry.RegistrationException;
-import org.mule.routing.inbound.InboundRouterCollection;
 import org.mule.routing.inbound.InboundPassThroughRouter;
-import org.mule.routing.outbound.OutboundRouterCollection;
+import org.mule.routing.inbound.InboundRouterCollection;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
+import org.mule.routing.outbound.OutboundRouterCollection;
 import org.mule.routing.response.ResponseRouterCollection;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOImmutableDescriptor;
@@ -32,10 +32,10 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.ContainerException;
 import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.routing.UMONestedRouter;
-import org.mule.umo.routing.UMOOutboundRouterCollection;
-import org.mule.umo.routing.UMOOutboundRouter;
-import org.mule.umo.routing.UMOResponseRouterCollection;
 import org.mule.umo.routing.UMONestedRouterCollection;
+import org.mule.umo.routing.UMOOutboundRouter;
+import org.mule.umo.routing.UMOOutboundRouterCollection;
+import org.mule.umo.routing.UMOResponseRouterCollection;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
@@ -69,14 +69,14 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     /**
      * holds the exception stategy for this UMO
      */
-    protected ExceptionListener exceptionListener = null;
+    protected ExceptionListener exceptionListener;
 
     /**
      * The implementationReference used to create the Object UMO instance. Can either
      * be a string such as a container reference or classname or can be an instance
      * of the implementation.
      */
-    protected Object implementationReference = null;
+    protected Object implementationReference;
 
     /**
      * The descriptor name
@@ -98,15 +98,15 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
      */
     protected List intecerptorList = new CopyOnWriteArrayList();
 
-    protected UMOInboundRouterCollection inboundRouter = null;
+    protected UMOInboundRouterCollection inboundRouter;
 
-    protected UMOOutboundRouterCollection outboundRouter = null;
+    protected UMOOutboundRouterCollection outboundRouter;
 
-    protected UMONestedRouterCollection nestedRouter = null;
+    protected UMONestedRouterCollection nestedRouter;
 
-    protected UMOResponseRouterCollection responseRouter = null;
+    protected UMOResponseRouterCollection responseRouter;
 
-     /**
+    /**
      * The threading profile to use for this component. If this is not set a default
      * will be provided by the server
      */
@@ -142,6 +142,11 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     protected String container = null;
 
     protected String registryId = null;
+
+    /**
+     * The name of the model that this descriptor is associated with
+     */
+    protected String modelName;
 
     /**
      * Default constructor. Initalises common properties for the MuleConfiguration
@@ -230,16 +235,15 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
             }
         }
 
-		if (nestedRouter!=null)
+        if (nestedRouter != null)
         {
-            Iterator it = nestedRouter.getRouters().iterator();
-			while (it.hasNext()) {
-				UMONestedRouter nestedRouter =  (UMONestedRouter) it.next();
-				endpoint = (MuleEndpoint) nestedRouter.getEndpoint();
-				endpoint.initialise();
-			}
-
-		}
+            for (Iterator it = nestedRouter.getRouters().iterator(); it.hasNext();)
+            {
+                UMONestedRouter nestedRouter = (UMONestedRouter) it.next();
+                endpoint = (MuleEndpoint) nestedRouter.getEndpoint();
+                endpoint.initialise();
+            }
+        }
 
         if (outboundRouter == null)
         {
@@ -251,9 +255,9 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
             if (outboundRouter.getCatchAllStrategy() != null
                 && outboundRouter.getCatchAllStrategy().getEndpoint() != null)
             {
-                ((MuleEndpoint)outboundRouter.getCatchAllStrategy().getEndpoint()).initialise();
+                outboundRouter.getCatchAllStrategy().getEndpoint().initialise();
             }
-            UMOOutboundRouter router = null;
+            UMOOutboundRouter router;
             for (Iterator iterator = outboundRouter.getRouters().iterator(); iterator.hasNext();)
             {
                 router = (UMOOutboundRouter)iterator.next();
@@ -387,12 +391,12 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 
     public UMONestedRouterCollection getNestedRouter()
     {
-    	return nestedRouter;
+        return nestedRouter;
     }
 
     /**
-     * The threading profile used but the UMO when managing a component. can be used
-     * to allocate more or less resources to this particular umo component
+     * The threading profile used by the UMO when managing a component. Can be used
+     * to allocate more or less resources to this particular umo component.
      */
     public ThreadingProfile getThreadingProfile()
     {
@@ -407,7 +411,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     public Class getImplementationClass() throws UMOException
     {
         // check for other types of references
-        Class implClass = null;
+        Class implClass;
         if (implementationReference instanceof String || implementationReference instanceof ContainerKeyPair)
         {
             Object object = MuleManager.getInstance().getContainerContext().getComponent(
@@ -489,5 +493,10 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         sb.append(", container='").append(container).append('\'');
         sb.append('}');
         return sb.toString();
+    }
+
+    public String getModelName()
+    {
+        return modelName;
     }
 }

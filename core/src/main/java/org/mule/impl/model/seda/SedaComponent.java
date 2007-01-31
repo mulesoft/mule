@@ -27,6 +27,7 @@ import org.mule.management.stats.ComponentStatistics;
 import org.mule.management.stats.SedaComponentStatistics;
 import org.mule.registry.metadata.MetadataStore;
 import org.mule.registry.metadata.ObjectMetadata;
+
 import org.mule.umo.ComponentException;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
@@ -56,8 +57,9 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
 
     public static final String QUEUE_PROFILE_PROPERTY = "queueProfile";
     public static final String POOLING_PROFILE_PROPERTY = "poolingProfile";
+
     /**
-     * Serial version
+     * Serial version/
      */
     private static final long serialVersionUID = 7711976708670893015L;
 
@@ -65,48 +67,48 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
      * A pool of available Mule Proxies. Component pooling has been disabled on the
      * SEDAModel, this pool will be null anf the 'componentProxy' will be used.
      */
-    protected ObjectPool proxyPool = null;
+    protected ObjectPool proxyPool;
 
     /**
-     * Is created only if component pooling is turned off on the SEDAModel. in this
+     * Is created only if component pooling is turned off on the SEDAModel. In this
      * scenario all requests are serviced by this component, unless
-     * 'componentPerRequest' flag is set on the model
+     * {@link #componentPerRequest} flag is set on the model.
      */
-    protected MuleProxy componentProxy = null;
+    protected MuleProxy componentProxy;
 
     protected UMOWorkManager workManager;
 
     protected String descriptorQueueName;
 
     /**
-     * The time out used for taking from the Seda Queue
+     * The time out used for taking from the Seda Queue.
      */
     protected int queueTimeout = 0;
 
     /**
-     * Whether component objects should be pooled or a single instance should be used
+     * Whether component objects should be pooled or a single instance should be used.
      */
     protected boolean enablePooling = true;
 
     /**
-     * If this is set to true a new component will be created for every request
+     * If this is set to true a new component will be created for every request.
      */
     protected boolean componentPerRequest = false;
 
     /**
-     * the pooling configuration used when initialising the component described by
+     * The pooling configuration used when initialising the component described by
      * this descriptor.
      */
     protected PoolingProfile poolingProfile;
 
     /**
-     * The queuing profile for events received for this component
+     * The queuing profile for events received for this component.
      */
     protected QueueProfile queueProfile;
 
     /**
-     * Creates a new SEDA component
-     * 
+     * Creates a new SEDA component.
+     *
      * @param descriptor The descriptor of the component to creat
      * @param model the model in which the component is registered
      */
@@ -121,13 +123,15 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
         queueTimeout = model.getQueueTimeout();
         enablePooling = model.isEnablePooling();
         componentPerRequest = model.isComponentPerRequest();
+        poolingProfile = model.getPoolingProfile();
+        queueProfile = model.getQueueProfile();
     }
 
     /**
      * Initialise the component. The component will first create a Mule UMO from the
      * UMODescriptor and then initialise a pool based on the attributes in the
      * UMODescriptor.
-     * 
+     *
      * @throws org.mule.umo.lifecycle.InitialisationException if the component fails
      *             to initialise
      * @see org.mule.umo.UMODescriptor
@@ -421,7 +425,7 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
 
     /**
      * While the component isn't stopped this runs a continuous loop checking for new
-     * events in the queue
+     * events in the queue.
      */
     public void run()
     {

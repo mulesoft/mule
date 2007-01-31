@@ -254,7 +254,11 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
      * to it, it is assumed that the event was dispatched by Mule and will be
      * delivered to any listeners subscribed to the event.
      * 
+<<<<<<< .working
      * @param e the application event received by the context
+=======
+     * @param e application event received by the context
+>>>>>>> .merge-right.r4952
      */
     public void multicastEvent(ApplicationEvent e)
     {

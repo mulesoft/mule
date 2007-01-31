@@ -17,6 +17,7 @@ import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
 import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.transformers.AbstractEventAwareTransformer;
@@ -27,6 +28,7 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.UMOComponent;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.transformer.TransformerException;
 
@@ -39,10 +41,6 @@ import java.util.Map;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class EventMetaDataPropagationTestCase extends FunctionalTestCase implements Callable
 {
     private Apple testObjectProperty = new Apple();
@@ -71,9 +69,8 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase impleme
         UMOComponent component = MuleManager.getInstance().lookupModel("main").getComponent("component1");
         UMOSession session = new MuleSession(component);
 
-        UMOEvent event = new MuleEvent(new MuleMessage("Test Event"), component
-            .getDescriptor()
-            .getInboundEndpoint(), session, true);
+        UMOEvent event = new MuleEvent(new MuleMessage("Test Event"), (UMOImmutableEndpoint)component.getDescriptor()
+                .getInboundRouter().getEndpoints().get(0), session, true);
         session.sendEvent(event);
     }
 

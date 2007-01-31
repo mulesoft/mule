@@ -68,24 +68,34 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
         Object payload = event.getTransformedMessage();
 
         String jobClass = jobDataMap.getString(QuartzConnector.PROPERTY_JOB_CLASS);
+        // If the payload is a Job instance, then we are going to save it in
+        // the jobDataMap under the key "jobObject". The actual Job that will 
+        // execute will be the DelegatingJob
         if (payload instanceof Job)
         {
             job = (Job)payload;
             jobDataMap.put(QuartzConnector.PROPERTY_JOB_OBJECT, job);
             jobDetail.setJobClass(DelegatingJob.class);
         }
+        // If the payload is not a Job instance, but the jobClass has been set
+        // on the Message under the property "jobClass", then set the execution 
+        // Job to be that class.
         else if (jobClass != null)
         {
             jobDetail.setJobClass(ClassUtils.loadClass(jobClass, getClass()));
         }
+        // Otherwise, we have to find the job some other way
         else
         {
+            // See if the Message has the job stored under "jobObject"
             Object tempJob = jobDataMap.get(QuartzConnector.PROPERTY_JOB_OBJECT);
             if (tempJob == null)
             {
+                // See if the Message has the job stored under "jobRef"
                 tempJob = jobDataMap.get(QuartzConnector.PROPERTY_JOB_REF);
                 if (tempJob == null)
                 {
+                    // Now we'll give up
                     throw new DispatchException(new Message("quartz", 2), event.getMessage(),
                         event.getEndpoint());
                 }
@@ -103,9 +113,13 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
             {
                 throw new DispatchException(new Message("quartz", 3), event.getMessage(), event.getEndpoint());
             }
+            // If we have a job at this point, then the execution Job
+            // will be the DelegatingJob
             jobDetail.setJobClass(DelegatingJob.class);
         }
 
+        // The payload will be ignored by the DelegatingJob - don't know why
+        // we need it here
         jobDataMap.put(QuartzConnector.PROPERTY_PAYLOAD, payload);
 
         Trigger trigger = null;
@@ -157,7 +171,7 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
             start += Long.parseLong(startDelay);
         }
         trigger.setStartTime(new Date(start));
-        trigger.setName(event.getEndpoint().getEndpointURI().toString());
+        trigger.setName(event.getEndpoint().getEndpointURI().toString() + "-" + event.getId());
         trigger.setGroup(groupName);
         trigger.setJobName(jobDetail.getName());
         trigger.setJobGroup(jobGroupName);

@@ -265,4 +265,10 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
     {
         super.register();
     }
+
+
+    public void setModelName(String modelName)
+    {
+        this.modelName = modelName;
+    }
 }

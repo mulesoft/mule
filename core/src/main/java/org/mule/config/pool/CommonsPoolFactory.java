@@ -10,6 +10,7 @@
 
 package org.mule.config.pool;
 
+import org.mule.config.PoolingProfile;
 import org.mule.impl.MuleDescriptor;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.model.UMOModel;

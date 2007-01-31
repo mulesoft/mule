@@ -22,7 +22,6 @@ import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.model.UMOModel;
 
 import java.util.HashMap;
 
@@ -54,7 +53,7 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
     protected Connection cnn;
     protected Message currentMsg;
     protected int eventCount = 0;
-    protected UMOModel model;
+    protected SedaModel model;
 
     protected final transient Log logger = LogFactory.getLog(getClass());
 
@@ -69,7 +68,7 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
         model.setName("main");
         model.getPoolingProfile().setInitialisationPolicy(
             PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
-        MuleManager.getInstance().setModel(model);
+        MuleManager.getInstance().registerModel(model);
 
         callbackCalled = false;
         ConnectionFactory cf = getConnectionFactory();

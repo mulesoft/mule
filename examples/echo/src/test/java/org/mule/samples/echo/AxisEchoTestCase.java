@@ -10,16 +10,17 @@
 
 package org.mule.samples.echo;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.custommonkey.xmlunit.XMLAssert;
 import org.mule.extras.client.MuleClient;
 import org.mule.providers.NullPayload;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 import org.mule.util.IOUtils;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.custommonkey.xmlunit.XMLAssert;
 
 /**
  * Tests the Echo example using Axis
@@ -90,7 +91,7 @@ public class AxisEchoTestCase extends FunctionalTestCase
         UMOMessage result = client.send("http://localhost:8081/services/EchoUMO?method=echo", "hello", props);
         assertNotNull(result);
         // TODO: MULE-1113
-        if (!(this instanceof XFireEchoTestCase))
+        if ((this instanceof XFireEchoTestCase))
         {
             assertNull(result.getExceptionPayload());
         }
@@ -104,11 +105,7 @@ public class AxisEchoTestCase extends FunctionalTestCase
         UMOMessage result = client.send(
             getProtocol() + ":http://localhost:8082/services/EchoUMO?method=echo", "hello", null);
         assertNotNull(result);
-        // TODO: MULE-1113
-        if (!(this instanceof XFireEchoTestCase))
-        {
-            assertNull(result.getExceptionPayload());
-        }
+        assertNull(result.getExceptionPayload());
         assertFalse(result.getPayload() instanceof NullPayload);
         assertEquals("hello", result.getPayload());
     }

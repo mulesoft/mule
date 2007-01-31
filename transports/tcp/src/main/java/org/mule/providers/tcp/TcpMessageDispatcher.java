@@ -225,7 +225,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
 
     protected void doDisconnect() throws Exception
     {
-        Socket socket = connector.getSocket(endpoint);
+        Socket socket = connector.lookupSocket(endpoint);
 
         if (null != socket && !socket.isClosed())
         {
