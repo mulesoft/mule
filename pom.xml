@@ -250,6 +250,9 @@
                             !sun.misc,
                             *
                         </Import-Package>
+                        <Private-Package>
+                            META-INF.services.org.mule.*
+                        </Private-Package>
                     </instructions>
 		        </configuration>
 		    </plugin>
