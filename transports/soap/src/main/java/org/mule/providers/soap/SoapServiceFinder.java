@@ -12,30 +12,31 @@ package org.mule.providers.soap;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.providers.service.TransportFactory;
-import org.mule.providers.service.TransportFactoryException;
-import org.mule.providers.service.TransportServiceDescriptor;
-import org.mule.providers.service.TransportServiceException;
-import org.mule.providers.service.TransportServiceFinder;
+import org.mule.registry.ServiceDescriptor;
+import org.mule.registry.ServiceException;
+import org.mule.registry.ServiceFinder;
 import org.mule.util.ClassUtils;
 import org.mule.util.PropertiesUtils;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Properties;
 import java.util.TreeMap;
 
 /**
  * <code>SoapServiceFinder</code> finds a the connector service to use by checking
  * the classpath for jars required for each of the soap connector implementations
  */
-public class SoapServiceFinder implements TransportServiceFinder
+public class SoapServiceFinder implements ServiceFinder
 {
-
-    public TransportServiceDescriptor findService(String service, TransportServiceDescriptor csd)
-        throws TransportFactoryException
+    /**
+     * @deprecated We can use a more intelligent strategy for locating the service using the OSGi registry.
+     */
+    // @Override
+    public String findService(String service, ServiceDescriptor descriptor, Properties props) throws ServiceException
     {
         Map finders = new TreeMap();
-        PropertiesUtils.getPropertiesWithPrefix(csd.getProperties(), "finder.class", finders);
+        PropertiesUtils.getPropertiesWithPrefix(props, "finder.class", finders);
 
         StringBuffer buf = new StringBuffer();
         for (Iterator iterator = finders.entrySet().iterator(); iterator.hasNext();)
@@ -44,8 +45,7 @@ public class SoapServiceFinder implements TransportServiceFinder
             try
             {
                 ClassUtils.loadClass(entry.getValue().toString(), getClass());
-                String protocol = getProtocolFromKey(entry.getKey().toString());
-                return TransportFactory.getServiceDescriptor(protocol);
+                return getProtocolFromKey(entry.getKey().toString());
             }
             catch (ClassNotFoundException e1)
             {
@@ -53,8 +53,7 @@ public class SoapServiceFinder implements TransportServiceFinder
                     ")").append(", ");
             }
         }
-        throw new TransportServiceException(new Message(Messages.COULD_NOT_FIND_SOAP_PROVIDER_X,
-            buf.toString()));
+        throw new ServiceException(new Message(Messages.COULD_NOT_FIND_SOAP_PROVIDER_X, buf.toString()));
     }
 
     protected String getProtocolFromKey(String key)
