@@ -199,8 +199,8 @@ public class FileConnector extends AbstractConnector
         }
         catch (Exception e)
         {
-            throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X,
-                "Message Receiver", serviceDescriptor.getMessageReceiver()), e, this);
+            throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X,
+                "Message Receiver"), e, this);
         }
     }
 

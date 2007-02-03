@@ -13,7 +13,6 @@ package org.mule.providers.vm;
 import org.mule.MuleManager;
 import org.mule.config.QueueProfile;
 import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractConnector;
@@ -28,10 +27,8 @@ import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UMOMessageReceiver;
-import org.mule.util.ClassUtils;
 import org.mule.util.queue.QueueManager;
 import org.mule.util.queue.QueueSession;
 
@@ -46,7 +43,6 @@ public class VMConnector extends AbstractConnector
 {
     private boolean queueEvents = false;
     private QueueProfile queueProfile;
-    private Class adapterClass = null;
     private int queueTimeout = 1000;
 
     /*
@@ -67,16 +63,6 @@ public class VMConnector extends AbstractConnector
                     logger.debug("created default QueueProfile for VM connector: " + queueProfile);
                 }
             }
-        }
-
-        try
-        {
-            adapterClass = ClassUtils.loadClass(serviceDescriptor.getMessageAdapter(), getClass());
-        }
-        catch (ClassNotFoundException e)
-        {
-            throw new InitialisationException(new Message(Messages.FAILED_LOAD_X,
-                "Message Adapter: " + serviceDescriptor.getMessageAdapter()), e);
         }
     }
 
@@ -129,7 +115,7 @@ public class VMConnector extends AbstractConnector
     {
         if (message == null)
         {
-            throw new MessageTypeNotSupportedException(null, adapterClass);
+            throw new MessagingException(Message.createStaticMessage("Message is null."), null);
         }
         else if (message instanceof MuleMessage)
         {
@@ -141,7 +127,7 @@ public class VMConnector extends AbstractConnector
         }
         else
         {
-            throw new MessageTypeNotSupportedException(message, adapterClass);
+            throw new MessagingException(Message.createStaticMessage("Message is not a Mule Message."), null);
         }
     }
 
