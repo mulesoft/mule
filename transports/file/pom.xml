@@ -22,9 +22,11 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
+                        <Mule-Transports>
+                            file
+                        </Mule-Transports>
                         <Export-Package>
-                            org.mule.providers.file.*,
-                            META-INF/services/org/mule/providers
+                            org.mule.providers.file.*
                         </Export-Package>
                     </instructions>
                 </configuration>

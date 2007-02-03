@@ -20,9 +20,11 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
+                        <Mule-Transports>
+                            tcp
+                        </Mule-Transports>
                         <Export-Package>
-                            org.mule.providers.tcp.*,
-                            META-INF/services/org/mule/providers
+                            org.mule.providers.tcp.*
                         </Export-Package>
                     </instructions>
                 </configuration>

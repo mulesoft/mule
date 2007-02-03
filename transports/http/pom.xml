@@ -20,11 +20,17 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
+                        <Mule-Transports>
+                            http,
+                            https,
+                            servlet,
+                            jetty
+                        </Mule-Transports>
                         <Export-Package>
-                            org.mule.providers.http.*,
-                            META-INF/services/org/mule/providers
+                            org.mule.providers.http.*
                         </Export-Package>
                         <Private-Package>
+                            org.mule.modules.osgi,
                             org.apache.commons.codec.*,
                             org.apache.commons.httpclient.*,
                             org.mortbay.http.*,
