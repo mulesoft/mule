@@ -10,7 +10,7 @@
 package org.mule.config.parsers;
 
 import org.mule.impl.model.ModelFactory;
-import org.mule.impl.model.ModelServiceNotFoundException;
+import org.mule.registry.ServiceException;
 
 import org.w3c.dom.Element;
 
@@ -32,7 +32,7 @@ public class ModelDefinitionParser extends AbstractMuleSingleBeanDefinitionParse
         {
             return ModelFactory.getModelClass(type);
         }
-        catch (ModelServiceNotFoundException e)
+        catch (ServiceException e)
         {
             logger.error(e.getMessage(), e);
             return null;

@@ -11,69 +11,36 @@
 package org.mule.impl.model;
 
 import org.mule.MuleManager;
+import org.mule.registry.ServiceDescriptorFactory;
+import org.mule.registry.ServiceException;
 import org.mule.umo.model.UMOModel;
-import org.mule.util.BeanUtils;
-import org.mule.util.ClassUtils;
-
-import java.util.Properties;
 
 /**
- * Will locate the model service in META-INF/service using the model type as the key
- * and construct the model.
+ * Will locate the model service using the model type as the key and construct the model.
  */
 public class ModelFactory
 {
     public static final String DEFAULT_MODEL_NAME = "main";
-
-    public static final String MODEL_SERVICE_PATH = "org/mule/models";
-    public static final String MODEL_SERVICE_TYPE = "model";
-    public static final String MODEL_PROPERTY = "model";
-
-    public static UMOModel createModel(String type) throws ModelServiceNotFoundException
+    
+    public static UMOModel createModel(String type) throws ServiceException
     {
-        try
+        ModelServiceDescriptor sd = (ModelServiceDescriptor) 
+            MuleManager.getInstance().lookupServiceDescriptor(ServiceDescriptorFactory.MODEL_SERVICE_TYPE, type, null);
+        if (sd != null)
         {
-            Properties props = getModelDescriptor(type);
-
-            String clazz = props.getProperty(MODEL_PROPERTY);
-            UMOModel model = (UMOModel)ClassUtils.instanciateClass(clazz, ClassUtils.NO_ARGS,
-            ModelFactory.class);
-            BeanUtils.populateWithoutFail(model, props, false);
-            return model;
+            return sd.createModel();
         }
-        catch (Exception e)
-        {
-            throw new ModelServiceNotFoundException(type, e);
-        }
+        else return null;
     }
-
-    public static Class getModelClass(String type) throws ModelServiceNotFoundException
+    
+    public static Class getModelClass(String type) throws ServiceException
     {
-
-        Properties props = getModelDescriptor(type);
-
-        String clazz = props.getProperty(MODEL_PROPERTY);
-        try
+        ModelServiceDescriptor sd = (ModelServiceDescriptor) 
+            MuleManager.getInstance().lookupServiceDescriptor(ServiceDescriptorFactory.MODEL_SERVICE_TYPE, type, null);
+        if (sd != null)
         {
-            Class modelClass = ClassUtils.loadClass(clazz, ModelFactory.class);
-            return modelClass;
+            return sd.getModelClass();
         }
-        catch (ClassNotFoundException e)
-        {
-            throw new ModelServiceNotFoundException(type, e);
-        }
-    }
-
-    public static Properties getModelDescriptor(String type) throws ModelServiceNotFoundException
-    {
-        Properties props = MuleManager.getInstance().lookupServiceDescriptor(MODEL_SERVICE_TYPE, type);
-        if (props != null)
-        {
-            return props;
-        }
-        else
-        {
-            throw new ModelServiceNotFoundException(type);
-        }
+        else return null;
     }
 }

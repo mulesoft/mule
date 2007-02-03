@@ -85,7 +85,17 @@ public interface MuleProperties
     // End Event Level properties
 
     /********************************************************************************
-     * Connector Service descriptor properties
+     * Generic Service descriptor properties
+     *******************************************************************************/
+    public final String SERVICE_FINDER = "service.finder";
+    
+    /********************************************************************************
+     * Model Service descriptor properties
+     *******************************************************************************/
+    public final String MODEL_CLASS = "model";
+
+    /********************************************************************************
+     * Transport Service descriptor properties
      *******************************************************************************/
     public final String CONNECTOR_CLASS = "connector";
     public final String CONNECTOR_MESSAGE_RECEIVER_CLASS = "message.receiver";
@@ -100,8 +110,6 @@ public interface MuleProperties
     public final String CONNECTOR_OUTBOUND_TRANSFORMER = "outbound.transformer";
     public final String CONNECTOR_RESPONSE_TRANSFORMER = "response.transformer";
     public final String CONNECTOR_ENDPOINT_BUILDER = "endpoint.builder";
-    public final String CONNECTOR_SERVICE_FINDER = "service.finder";
-    public final String CONNECTOR_SERVICE_ERROR = "service.error";
     public final String CONNECTOR_SESSION_HANDLER = "session.handler";
     // End Connector Service descriptor properties
 

@@ -14,6 +14,7 @@ import org.mule.MuleManager;
 import org.mule.providers.service.TransportFactory;
 import org.mule.providers.service.TransportFactoryException;
 import org.mule.providers.service.TransportServiceDescriptor;
+import org.mule.registry.ServiceDescriptorFactory;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.util.PropertiesUtils;
@@ -155,7 +156,8 @@ public class MuleEndpointURI implements UMOEndpointURI
         try
         {
             String scheme = (schemeMetaInfo == null ? this.uri.getScheme() : schemeMetaInfo);
-            TransportServiceDescriptor csd = TransportFactory.getServiceDescriptor(scheme);
+            TransportServiceDescriptor csd = (TransportServiceDescriptor) 
+                MuleManager.getInstance().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, scheme, null);
             EndpointBuilder builder = csd.createEndpointBuilder();
             UMOEndpointURI built = builder.build(this.uri);
             initialise(built);

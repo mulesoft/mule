@@ -56,7 +56,7 @@ public class ServiceOverridesDefinitionParser extends AbstractChildBeanDefinitio
         addOverride(overrides, element, "outboundTransformer", MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER);
         addOverride(overrides, element, "responseTransformer", MuleProperties.CONNECTOR_RESPONSE_TRANSFORMER);
         addOverride(overrides, element, "endpointBuilder", MuleProperties.CONNECTOR_ENDPOINT_BUILDER);
-        addOverride(overrides, element, "serviceFinder", MuleProperties.CONNECTOR_SERVICE_FINDER);
+        addOverride(overrides, element, "serviceFinder", MuleProperties.SERVICE_FINDER);
         builder.setSource(overrides);
     }
 

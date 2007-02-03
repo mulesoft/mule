@@ -13,14 +13,14 @@ package org.mule.config;
 import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
 import org.mule.config.i18n.Message;
+import org.mule.providers.service.TransportServiceDescriptor;
+import org.mule.registry.ServiceDescriptorFactory;
 import org.mule.umo.UMOException;
 import org.mule.util.ClassUtils;
 import org.mule.util.MapUtils;
 import org.mule.util.SpiUtils;
 import org.mule.util.StringUtils;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -54,8 +54,6 @@ public class ExceptionHelper
      * applied to
      */
     public static final String APPLY_TO_PROPERTY = "apply.to";
-
-    public static final String EXCEPTION_SERVICE_TYPE = "exception";
     
     /**
      * logger used by this class
@@ -103,14 +101,14 @@ public class ExceptionHelper
         registerExceptionReader(new NamingExceptionReader());
         J2SE_VERSION = System.getProperty("java.specification.version");
 
-        errorCodes = MuleManager.getInstance().lookupServiceDescriptor(EXCEPTION_SERVICE_TYPE, "mule-exception-codes");
+        errorCodes = SpiUtils.findServiceDescriptor(ServiceDescriptorFactory.EXCEPTION_SERVICE_TYPE, "mule-exception-codes");
         if (errorCodes == null)
         {
             throw new MuleRuntimeException(Message.createStaticMessage("Failed to load Exception resource: mule-exception-codes.properties"));
         }
         reverseErrorCodes = MapUtils.invertMap(errorCodes);
 
-        errorDocs = MuleManager.getInstance().lookupServiceDescriptor(EXCEPTION_SERVICE_TYPE, "mule-exception-config");
+        errorDocs = SpiUtils.findServiceDescriptor(ServiceDescriptorFactory.EXCEPTION_SERVICE_TYPE, "mule-exception-config");
         if (errorDocs == null)
         {
             throw new MuleRuntimeException(Message.createStaticMessage("Failed to load Exception resource: mule-exception-config.properties"));
@@ -183,38 +181,26 @@ public class ExceptionHelper
         }
         else
         {
-            InputStream is = SpiUtils.findServiceDescriptor("org/mule/config",
-                protocol + "-exception-mappings.properties", ExceptionHelper.class);
-            if (is == null)
+            TransportServiceDescriptor sd = (TransportServiceDescriptor) MuleManager.getInstance().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, protocol, null);
+            if (sd != null)
             {
-                errorMappings.put(protocol, "not found");
-                logger.warn("Failed to load error mappings from: META-INF/services/org/mule/config/"
-                            + protocol
-                            + "-exception-mappings.properties. This may be because there are no error code mappings for protocol: "
-                            + protocol);
+                Properties p = sd.getExceptionMappings();
+                errorMappings.put(protocol, p);
+                String applyTo = p.getProperty(APPLY_TO_PROPERTY, null);
+                if (applyTo != null)
+                {
+                    String[] protocols = StringUtils.splitAndTrim(applyTo, ",");
+                    for (int i = 0; i < protocols.length; i++)
+                    {
+                        errorMappings.put(protocols[i], p);
+                    }
+                }
+                return p;
+            }
+            else 
+            {
                 return null;
             }
-            Properties p = new Properties();
-            try
-            {
-                p.load(is);
-            }
-            catch (IOException e)
-            {
-                throw new MuleRuntimeException(
-                    Message.createStaticMessage("Failed to load Exception resources"), e);
-            }
-            errorMappings.put(protocol, p);
-            String applyTo = p.getProperty(APPLY_TO_PROPERTY, null);
-            if (applyTo != null)
-            {
-                String[] protocols = StringUtils.splitAndTrim(applyTo, ",");
-                for (int i = 0; i < protocols.length; i++)
-                {
-                    errorMappings.put(protocols[i], p);
-                }
-            }
-            return p;
         }
     }
 

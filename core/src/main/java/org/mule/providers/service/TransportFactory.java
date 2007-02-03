@@ -16,6 +16,7 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.AbstractConnector;
+import org.mule.registry.ServiceDescriptorFactory;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
@@ -23,9 +24,7 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.BeanUtils;
-import org.mule.util.ClassUtils;
 import org.mule.util.MuleObjectHelper;
-import org.mule.util.ObjectFactory;
 import org.mule.util.ObjectNameHelper;
 import org.mule.util.PropertiesUtils;
 
@@ -44,12 +43,8 @@ import org.apache.commons.logging.LogFactory;
  * the Mule Manager.
  * 
  */
-
 public class TransportFactory
 {
-    public static final String PROVIDER_SERVICES_PATH = "org/mule/providers";
-    public static final String PROVIDER_SERVICE_TYPE = "transport";
-
     /**
      * logger used by this class
      */
@@ -59,9 +54,6 @@ public class TransportFactory
     public static final int ALWAYS_CREATE_CONNECTOR = 1;
     public static final int NEVER_CREATE_CONNECTOR = 2;
     public static final int USE_CONNECTOR = 3;
-
-    // @GuardedBy("TransportFactory.class")
-    private static Map csdCache = new HashMap();
 
     public static UMOEndpoint createEndpoint(UMOEndpointURI uri, String type) throws EndpointException
     {
@@ -184,7 +176,8 @@ public class TransportFactory
 
             String scheme = url.getSchemeMetaInfo();
 
-            TransportServiceDescriptor csd = getServiceDescriptor(scheme, overrides);
+            TransportServiceDescriptor csd = (TransportServiceDescriptor) 
+                MuleManager.getInstance().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, scheme, overrides);
             if (type == 0)
             {
                 trans = csd.createInboundTransformer();
@@ -216,47 +209,26 @@ public class TransportFactory
      */
     public static UMOConnector createConnector(UMOEndpointURI url) throws TransportFactoryException
     {
+        UMOConnector connector;
         String scheme = url.getSchemeMetaInfo();
 
-        UMOConnector connector = null;
-        TransportServiceDescriptor csd = getServiceDescriptor(scheme);
-        // Make sure we can create the endpoint/connector using this service
-        // method
-        if (csd.getServiceError() != null)
-        {
-            throw new TransportServiceException(Message.createStaticMessage(csd.getServiceError()));
-        }
-
-        // If this is a fineder service, lets find it before trying to create it
-        if (csd.getServiceFinder() != null)
-        {
-            csd = csd.createServiceFinder().findService(scheme, csd);
-        }
-        // if there is a factory, use it
+        TransportServiceDescriptor sd = (TransportServiceDescriptor) 
+            MuleManager.getInstance().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, scheme, null);
+        
         try
         {
-            if (csd.getConnectorFactory() != null)
+            connector = sd.createConnector();
+            if (connector != null)
             {
-                ObjectFactory factory = (ObjectFactory)ClassUtils.loadClass(csd.getConnectorFactory(),
-                    TransportFactory.class).newInstance();
-                connector = (UMOConnector)factory.create();
+                if (connector instanceof AbstractConnector)
+                {
+                    ((AbstractConnector)connector).initialiseFromUrl(url);
+                }
             }
             else
             {
-                if (csd.getConnector() != null)
-                {
-                    connector = (UMOConnector)ClassUtils.loadClass(csd.getConnector(), TransportFactory.class)
-                        .newInstance();
-                    if (connector instanceof AbstractConnector)
-                    {
-                        ((AbstractConnector)connector).initialiseFromUrl(url);
-                    }
-                }
-                else
-                {
-                    throw new TransportFactoryException(new Message(Messages.X_NOT_SET_IN_SERVICE_X,
-                        "Connector", scheme));
-                }
+                throw new TransportFactoryException(new Message(Messages.X_NOT_SET_IN_SERVICE_X,
+                    "Connector", scheme));
             }
         }
         catch (TransportFactoryException e)
@@ -284,40 +256,6 @@ public class TransportFactory
         }
 
         return connector;
-    }
-
-    public static TransportServiceDescriptor getServiceDescriptor(String protocol)
-        throws TransportFactoryException
-    {
-        return getServiceDescriptor(protocol, null);
-    }
-
-    public static synchronized TransportServiceDescriptor getServiceDescriptor(String protocol, Properties overrides)
-        throws TransportFactoryException
-    {
-        TransportServiceDescriptor csd = (TransportServiceDescriptor)csdCache.get(new CSDKey(protocol,
-            overrides));
-        if (csd == null)
-        {
-            Properties props = MuleManager.getInstance().lookupServiceDescriptor(PROVIDER_SERVICE_TYPE, protocol);
-            if (props != null)
-            {
-                csd = new TransportServiceDescriptor(protocol, props);
-                // set any overides on the descriptor
-                csd.setOverrides(overrides);
-                if (csd.getServiceFinder() != null)
-                {
-                    TransportServiceFinder finder = csd.createServiceFinder();
-                    csd = finder.findService(protocol, csd);
-                }
-                csdCache.put(new CSDKey(csd.getProtocol(), overrides), csd);
-            }
-            else
-            {
-                throw new TransportServiceNotFoundException(protocol);
-            }
-        }
-        return csd;
     }
 
     public static UMOConnector getOrCreateConnectorByProtocol(UMOEndpointURI uri)
@@ -373,49 +311,5 @@ public class TransportFactory
             }
         }
         return null;
-    }
-
-    private static class CSDKey
-    {
-        private final Map overrides;
-        private final String protocol;
-
-        public CSDKey(String protocol, Map overrides)
-        {
-            this.overrides = overrides;
-            this.protocol = protocol;
-        }
-
-        // @Override
-        public boolean equals(Object o)
-        {
-            if (this == o)
-            {
-                return true;
-            }
-            if (!(o instanceof CSDKey))
-            {
-                return false;
-            }
-
-            final CSDKey csdKey = (CSDKey)o;
-
-            if (overrides != null ? !overrides.equals(csdKey.overrides) : csdKey.overrides != null)
-            {
-                return false;
-            }
-            if (!protocol.equals(csdKey.protocol))
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        // @Override
-        public int hashCode()
-        {
-            return 29 * (overrides != null ? overrides.hashCode() : 0) + protocol.hashCode();
-        }
     }
 }

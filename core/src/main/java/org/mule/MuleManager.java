@@ -11,7 +11,6 @@
 package org.mule;
 
 import org.mule.config.ConfigurationException;
-import org.mule.config.ExceptionHelper;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.MuleProperties;
 import org.mule.config.ThreadingProfile;
@@ -36,14 +35,16 @@ import org.mule.impl.internal.notifications.NotificationException;
 import org.mule.impl.internal.notifications.SecurityNotification;
 import org.mule.impl.internal.notifications.SecurityNotificationListener;
 import org.mule.impl.internal.notifications.ServerNotificationManager;
-import org.mule.impl.model.ModelFactory;
 import org.mule.impl.security.MuleSecurityManager;
 import org.mule.impl.work.MuleWorkManager;
 import org.mule.management.stats.AllStatistics;
-import org.mule.providers.service.TransportFactory;
+import org.mule.registry.AbstractServiceDescriptor;
 import org.mule.registry.DeregistrationException;
 import org.mule.registry.RegistrationException;
 import org.mule.registry.Registry;
+import org.mule.registry.ServiceDescriptor;
+import org.mule.registry.ServiceDescriptorFactory;
+import org.mule.registry.ServiceException;
 import org.mule.registry.impl.DummyRegistry;
 import org.mule.registry.impl.RegistryNotificationListener;
 import org.mule.umo.UMOException;
@@ -77,8 +78,6 @@ import org.mule.util.queue.TransactionalQueueManager;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
@@ -106,7 +105,15 @@ import org.apache.commons.logging.LogFactory;
  * <code>MuleManager</code> maintains and provides services for a Mule instance.
  */
 public class MuleManager implements UMOManager
-{
+{   
+    /**
+     * Service descriptor cache. 
+     * 
+     * @deprecated This needs to be redesigned for an OSGi environment where ServiceDescriptors may change.
+     */
+    // @GuardedBy("this")
+    protected static Map sdCache = new HashMap();
+
     /**
      * singleton instance
      */
@@ -1544,47 +1551,40 @@ public class MuleManager implements UMOManager
     }
 
     /**
-     * {@inheritDoc}
+     * Looks up the service descriptor from a singleton cache and creates a new one if not found.
      */
-    public Properties lookupServiceDescriptor(String type, String name)
+    public ServiceDescriptor lookupServiceDescriptor(String type, String name, Properties overrides)
     {
-        InputStream is = null;
-        if (type.equals(TransportFactory.PROVIDER_SERVICE_TYPE)) 
+        AbstractServiceDescriptor.Key key = new AbstractServiceDescriptor.Key(name, overrides);
+        ServiceDescriptor sd = (ServiceDescriptor) sdCache.get(key);
+      
+        synchronized (this)
         {
-            is = SpiUtils.findServiceDescriptor(TransportFactory.PROVIDER_SERVICES_PATH, name, TransportFactory.class);
-        }
-        else if (type.equals(ModelFactory.MODEL_SERVICE_TYPE))
-        {
-            is = SpiUtils.findServiceDescriptor(ModelFactory.MODEL_SERVICE_PATH, name, ModelFactory.class);
-        }
-        else if (type.equals(ExceptionHelper.EXCEPTION_SERVICE_TYPE))
-        {
-            is = SpiUtils.findServiceDescriptor("org/mule/config", name, ExceptionHelper.class);
-        }
-        else 
-        {
-            logger.warn("Attempt to lookup unrecognized service type: " + type);
-            return null;
-        }
-
-        if (is != null)
-        {
-            Properties props = new Properties();
-            try 
+            if (sd == null)
             {
-                props.load(is);
-                return props;
-            }
-            catch (IOException e)
-            {
-                logger.warn("Descriptor found but unable to load properties for service " + name + " of type " + type);
-                return null;
+                try 
+                {
+                    sd = createServiceDescriptor(type, name, overrides);
+                }
+                catch (ServiceException e)
+                {
+                    logger.info("Unable to create service descriptor: " + e.getMessage());
+                    return null;
+                }
+                sdCache.put(key, sd);
             }
         }
-        else 
-        {
-            return null;
-        }
+        return sd;
+    }
+        
+    /**
+     * @deprecated ServiceDescriptors will be created upon bundle startup for OSGi.
+     */
+    protected ServiceDescriptor createServiceDescriptor(String type, String name, Properties overrides)
+        throws ServiceException
+    {
+        Properties props = SpiUtils.findServiceDescriptor(type, name);
+        return ServiceDescriptorFactory.create(type, name, props, overrides);
     }
 
     /**

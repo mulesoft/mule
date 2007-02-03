@@ -12,6 +12,7 @@ package org.mule.umo.manager;
 
 import org.mule.impl.internal.notifications.NotificationException;
 import org.mule.registry.Registry;
+import org.mule.registry.ServiceDescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOInterceptorStack;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -319,11 +320,11 @@ public interface UMOManager extends Lifecycle, Registerable
     void unregisterListener(UMOServerNotificationListener l);
 
     /**
-     * Searches for and returns the service descriptor for a transport, model, or any other entity.
+     * Searches for and returns the ServiceDescriptor for a transport, model, or any other entity.
      * 
-     * @return properties describing the service or null if service not found.
+     * @return ServiceDescriptor or null if ServiceDescriptor not found.
      */
-    Properties lookupServiceDescriptor(String type, String name);
+    ServiceDescriptor lookupServiceDescriptor(String type, String name, Properties overrides);
 
     /**
      * Fires a server notification to all regiistered listeners
