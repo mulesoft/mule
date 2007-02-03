@@ -26,13 +26,15 @@
                         <Import-Package>
                             org.mule.config,
                             org.mule.config.i18n,
+                            org.mule.impl,
+                            org.mule.impl.endpoint,
+                            org.mule.modules.osgi,
                             org.mule.providers.file,
                             org.mule.providers.http,
+                            org.mule.providers.service,
                             org.mule.transformers,
                             org.mule.transformers.simple,
-                            org.mule.umo.transformer,
-                            org.mule.impl,
-                            org.mule.impl.endpoint
+                            org.mule.umo.transformer
                         </Import-Package>
                         <Private-Package>
                             org.mule.samples.hello.*
