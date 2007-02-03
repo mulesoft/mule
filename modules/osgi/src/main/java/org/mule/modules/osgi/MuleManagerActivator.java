@@ -22,7 +22,9 @@ public class MuleManagerActivator implements BundleActivator {
     MuleSoaManager manager;
 
     public void start(BundleContext bc) throws Exception {
-        manager = new MuleSoaManager(bc);
+        manager = new MuleSoaManager();
+        manager.setBundleContext(bc);
+        
         MuleManager.setInstance(manager);
         manager.start();
     }

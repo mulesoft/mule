@@ -11,42 +11,79 @@
 package org.mule.modules.osgi;
 
 import org.mule.MuleManager;
-import org.mule.impl.internal.notifications.ManagerNotification;
-import org.mule.modules.osgi.util.OsgiUtils;
+import org.mule.providers.service.TransportServiceDescriptor;
+import org.mule.registry.ServiceDescriptor;
 import org.mule.umo.UMOException;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.provider.UMOConnector;
-import org.mule.umo.transformer.UMOTransformer;
+
+import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
+import org.springframework.osgi.context.BundleContextAware;
 
 /**
  * Service-based Mule Manager to be used in an OSGi environment.
  */
-public class MuleSoaManager extends MuleManager 
+public class MuleSoaManager extends MuleManager implements BundleContextAware
 {
-    private static Log logger = LogFactory.getLog(MuleSoaManager.class);
     BundleContext context;
     
     ServiceTracker connectors;
     ServiceTracker endpoints;
     ServiceTracker transformers;
     
-    private MuleSoaManager()
-    {
-        // Do not call
-    }
+    private static Log logger = LogFactory.getLog(MuleSoaManager.class);
     
-    public MuleSoaManager(BundleContext context)
+    public void setBundleContext(BundleContext arg0)
     {
         this.context = context;
     }
 
+    /**
+     * Looks up the service descriptor from the OSGi registry each time, does not use a cache.
+     */
+    // @Override
+    public ServiceDescriptor lookupServiceDescriptor(String type, String name, Properties overrides)
+    {
+        // Get all services which match the interface.
+        ServiceReference[] services;
+        try 
+        {
+            services = context.getServiceReferences(TransportServiceDescriptor.class.getName(), null);
+        }
+        catch (InvalidSyntaxException e)
+        {
+            logger.info(e.getMessage());
+            return null;
+        }
+
+        // Match the service by name.
+        String servicePid;
+        for (int i=0; i<services.length; ++i)
+        {
+            servicePid = (String) services[i].getProperty(Constants.SERVICE_PID);
+            if (servicePid != null && servicePid.endsWith(name))
+            {
+                return (ServiceDescriptor) context.getService(services[i]);
+            }
+        }
+        return null;
+    }
+        
     public synchronized void initialise() throws UMOException
     {
+        MuleManager.setInstance(this);
+    }
+    
+    /*
+    public synchronized void initialise() throws UMOException
+    {
+        MuleManager.setInstance(manager);
         connectors = new ServiceTracker(context, UMOConnector.class.getName(), null);
         connectors.open();
         endpoints = new ServiceTracker(context, UMOEndpoint.class.getName(), null);
@@ -87,4 +124,5 @@ public class MuleSoaManager extends MuleManager
     {
         // TODO 
     }
+    */
 }
