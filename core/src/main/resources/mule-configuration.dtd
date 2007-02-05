@@ -962,7 +962,7 @@ Jndi
     the component should be loaded from. Also you can specify to not load the component from a Container
     context by setting this value to 'none'.
 -->
-<!ATTLIST mule-descriptor container			NMTOKEN		#IMPLIED>
+<!ATTLIST mule-descriptor container            NMTOKEN        #IMPLIED>
 
 <!--
     Determines if only a single instance of this component is created.  This is useful when a
@@ -975,6 +975,13 @@ Jndi
     Determines the running state of a component when the model starts up
 -->
 <!ATTLIST mule-descriptor initialState            (started | stopped )            "started">
+
+<!--
+    TODO RM at the moment there seems to be no way to customise the model name,
+    as it's forcefully set in MuleXmlConfigurationBuilder.
+    A model name this service belongs to
+-->
+<!-- <!ATTLIST mule-descriptor modelName            CDATA            #IMPLIED> -->
 
 <!--
     A message router configures different routing paths for events that are dispatched for a UMO

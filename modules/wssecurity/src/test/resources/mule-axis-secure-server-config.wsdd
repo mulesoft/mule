@@ -12,20 +12,20 @@
         <parameter name="dotNetSoapEncFix" value="true"/>
     
         <requestFlow>
-   			<handler type="java:org.apache.ws.axis.security.WSDoAllReceiver" >
-				<!--<parameter name="action" value="UsernameToken"/>
-    			<parameter name="user" value="gooduser"/>
-    			<parameter name="passwordCallbackClass" value="org.mule.extras.wssecurity.callbackhandlers.MuleWsSecurityCallbackHandler"/>
-    			<parameter name="passwordType" value="PasswordDigest"/>-->
-    			
-    			<parameter name="action" value="Encrypt"/>
-    			<parameter name="user" value="mulealias"/>
-    			<parameter name="passwordCallbackClass" value="org.mule.extras.wssecurity.callbackhandlers.MuleWsSecurityCallbackHandler"/>
-    			<parameter name="passwordType" value="PasswordDigest"/>
-    			<parameter name="decryptionPropFile" value="in-encrypted-security.properties"/>
-    		</handler>	
-  		</requestFlow>
-   	
+               <handler type="java:org.apache.ws.axis.security.WSDoAllReceiver" >
+                <!--<parameter name="action" value="UsernameToken"/>
+                <parameter name="user" value="gooduser"/>
+                <parameter name="passwordCallbackClass" value="org.mule.extras.wssecurity.callbackhandlers.MuleWsSecurityCallbackHandler"/>
+                <parameter name="passwordType" value="PasswordDigest"/>-->
+
+                <parameter name="action" value="Encrypt"/>
+                <parameter name="user" value="mulealias"/>
+                <parameter name="passwordCallbackClass" value="org.mule.extras.wssecurity.callbackhandlers.MuleWsSecurityCallbackHandler"/>
+                <parameter name="passwordType" value="PasswordDigest"/>
+                <parameter name="decryptionPropFile" value="in-encrypted-security.properties"/>
+            </handler>
+          </requestFlow>
+
     </globalConfiguration>
 
     <handler name="LocalResponder" type="java:org.apache.axis.transport.local.LocalResponder"/>

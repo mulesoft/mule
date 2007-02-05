@@ -10,10 +10,10 @@
 package org.mule.impl.model;
 
 import org.mule.MuleManager;
-import org.mule.umo.model.UMOModel;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
+import org.mule.umo.model.UMOModel;
 
 import java.util.Iterator;
 
@@ -24,6 +24,11 @@ public class ModelHelper
 {
     public static final String SYSTEM_MODEL = "_system";
 
+    public static String getSystemModelType()
+    {
+        return "seda";
+    }
+    
     public static boolean isComponentRegistered(String name)
     {
         for (Iterator iterator = MuleManager.getInstance().getModels().values().iterator(); iterator.hasNext();)

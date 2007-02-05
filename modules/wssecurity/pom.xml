@@ -123,7 +123,7 @@
             <artifactId>mule-module-spring</artifactId>
             <version>${version}</version>
         </dependency>
-		
+
 		<!-- Axis -->
 		<dependency>
             <groupId>axis</groupId>
@@ -148,7 +148,7 @@
 				</exclusion>
 			</exclusions>
         </dependency>
-				
+
 		<!-- XFire dependencies -->
         <dependency>
             <groupId>org.codehaus.xfire</groupId>
@@ -236,13 +236,13 @@
             <artifactId>wss4j</artifactId>
             <version>1.5.0</version>
         </dependency>
-        
+
 		<dependency>
 			<groupId>xalan</groupId>
 			<artifactId>xalan</artifactId>
 			<version>2.7.0</version>
 		</dependency>
-		
+
         <!-- For unit tests only -->
         <dependency>
             <groupId>org.mule.modules</groupId>

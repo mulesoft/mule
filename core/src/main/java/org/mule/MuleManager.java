@@ -37,6 +37,8 @@ import org.mule.impl.internal.notifications.SecurityNotificationListener;
 import org.mule.impl.internal.notifications.ServerNotificationManager;
 import org.mule.impl.security.MuleSecurityManager;
 import org.mule.impl.work.MuleWorkManager;
+import org.mule.impl.model.ModelHelper;
+import org.mule.impl.model.ModelFactory;
 import org.mule.management.stats.AllStatistics;
 import org.mule.registry.AbstractServiceDescriptor;
 import org.mule.registry.DeregistrationException;
@@ -315,7 +317,11 @@ public class MuleManager implements UMOManager
             logger.info("Creating new MuleManager instance");
             try
             {
+                //There should always be a defualt system model registered
                 instance = new MuleManager();
+                UMOModel model = ModelFactory.createModel(ModelHelper.getSystemModelType());
+                model.setName(ModelHelper.SYSTEM_MODEL);
+                instance.registerModel(model);
             }
             catch (Exception e)
             {

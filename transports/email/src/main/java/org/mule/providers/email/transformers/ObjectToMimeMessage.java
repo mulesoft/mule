@@ -22,6 +22,8 @@ import java.util.Iterator;
 import java.util.Map;
 
 import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
 import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -93,7 +95,14 @@ public class ObjectToMimeMessage extends StringToEmailMessage
         BodyPart part = new MimeBodyPart();
         part.setDataHandler(handler);
         part.setDescription(name);
-        part.setFileName(StringUtils.defaultString(handler.getName(), name));
+
+        DataSource source = handler.getDataSource();
+
+        // Only set the file name if the DataSource is a file
+        if (source instanceof FileDataSource)
+        {
+            part.setFileName(StringUtils.defaultString(handler.getName(), name));
+        }
         return part;
     }
 

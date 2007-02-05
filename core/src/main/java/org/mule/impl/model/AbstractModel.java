@@ -284,7 +284,7 @@ public abstract class AbstractModel implements UMOModel
      * @param muleName the Name of the Mule for which the component is required
      * @return a component for the specified name
      */
-    public UMOSession getxComponentSession(String muleName)
+    public UMOSession getComponentSession(String muleName)
     {
         UMOComponent component = (UMOComponent)components.get(muleName);
         if (component == null)

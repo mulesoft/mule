@@ -13,7 +13,9 @@ package org.mule.providers.quartz.jobs;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
+import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
+import org.mule.providers.AbstractConnector;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.NullPayload;
 import org.mule.providers.quartz.QuartzConnector;
@@ -38,7 +40,23 @@ public class MuleReceiverJob implements Job
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException
     {
         JobDataMap map = jobExecutionContext.getJobDetail().getJobDataMap();
-        AbstractMessageReceiver receiver = (AbstractMessageReceiver)map.get(QuartzMessageReceiver.QUARTZ_RECEIVER_PROPERTY);
+
+        String receiverKey = (String)map.get(QuartzMessageReceiver.QUARTZ_RECEIVER_PROPERTY);
+        if (receiverKey == null)
+            throw new JobExecutionException(new Message("quartz", 5).getMessage());
+
+        String connectorName = (String)map.get(QuartzMessageReceiver.QUARTZ_CONNECTOR_PROPERTY);
+        if (connectorName == null)
+            throw new JobExecutionException(new Message("quartz", 6).getMessage());
+
+        AbstractConnector connector = (AbstractConnector)MuleManager.getInstance().lookupConnector(connectorName);
+        if (connector == null)
+            throw new JobExecutionException(new Message("quartz", 7, connectorName).getMessage());
+
+        AbstractMessageReceiver receiver = (AbstractMessageReceiver)connector.lookupReceiver(receiverKey);
+        if (receiver == null)
+            throw new JobExecutionException(new Message("quartz", 8, connectorName, receiverKey).getMessage());
+
         Object payload = jobExecutionContext.getJobDetail().getJobDataMap().get(
             QuartzConnector.PROPERTY_PAYLOAD);
 
@@ -57,7 +75,14 @@ public class MuleReceiverJob implements Job
                 }
                 try
                 {
-                    payload = MuleManager.getInstance().getContainerContext().getComponent(ref);
+                    if (ref == null)
+                    {
+                        payload = new NullPayload();
+                    }
+                    else 
+                    {
+                        payload = MuleManager.getInstance().getContainerContext().getComponent(ref);
+                    }
                 }
                 catch (ObjectNotFoundException e)
                 {

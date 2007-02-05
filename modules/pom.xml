@@ -49,7 +49,7 @@
             <version>${version}</version>
             <scope>test</scope>
         </dependency>
-        <!-- TODO Creates cyclic dependency: mule-tests-functional -> mule-module-builders -> mule-tests-functional 
+        <!-- TODO Creates cyclic dependency: mule-tests-functional -> mule-module-builders -> mule-tests-functional
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
@@ -58,10 +58,10 @@
         </dependency>
         -->
 
-		<!-- Note: Ideally, the following list of libraries should be in the Mule project's top-level 
-			POM, but Maven has visibility problems when dependencies are more than 2 levels away, so 
+		<!-- Note: Ideally, the following list of libraries should be in the Mule project's top-level
+			POM, but Maven has visibility problems when dependencies are more than 2 levels away, so
             this list is repeated in core/pom.xml, modules/pom.xml, transports/pom.xml, examples/pom.xml -->
-			
+
 		<!-- The following libraries are provided by the mule-module-util bundle -->
         <dependency>
             <groupId>backport-util-concurrent</groupId>
@@ -135,7 +135,7 @@
                 <module>osgi</module>
             </modules>
         </profile>
-        
+
         <profile>
             <id>java14</id>
             <activation>

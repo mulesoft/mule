@@ -782,7 +782,10 @@ public abstract class AbstractConnector
         else
         {
             receiver = createReceiver(component, endpoint);
-            receivers.put(getReceiverKey(component, endpoint), receiver);
+            Object receiverKey = getReceiverKey(component, endpoint);
+            receiver.setReceiverKey(receiverKey.toString());
+            receivers.put(receiverKey, receiver);
+            //receivers.put(getReceiverKey(component, endpoint), receiver);
         }
 
         return receiver;
@@ -1373,11 +1376,6 @@ public abstract class AbstractConnector
     public void setSessionHandler(UMOSessionHandler sessionHandler)
     {
         this.sessionHandler = sessionHandler;
-    }
-
-    public Object getDelegateSession(UMOImmutableEndpoint endpoint, Object args) throws UMOException
-    {
-        return null;
     }
 
     public void workAccepted(WorkEvent event)

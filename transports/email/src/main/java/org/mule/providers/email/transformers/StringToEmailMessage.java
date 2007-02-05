@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.mail.Message;
-import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.lang.StringUtils;
@@ -121,7 +120,7 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
 
         try
         {
-            Message email = new MimeMessage((Session)endpoint.getConnector().getDelegateSession(endpoint, null));
+            Message email = new MimeMessage(((SmtpConnector)endpoint.getConnector()).getMailSession(endpoint));
 
             email.setRecipients(Message.RecipientType.TO, MailUtils.stringToInternetAddresses(to));
 

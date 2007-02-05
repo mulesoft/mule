@@ -49,7 +49,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
     public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous)
         throws RoutingException
     {
-        List list = getRecipients(message);
+        List recipients = this.getRecipients(message);
         List results = new ArrayList();
 
         if (enableCorrelation != ENABLE_CORRELATION_NEVER)
@@ -62,7 +62,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
             else
             {
                 // the correlationId will be set by the AbstractOutboundRouter
-                message.setCorrelationGroupSize(list.size());
+                message.setCorrelationGroupSize(recipients.size());
             }
         }
 
@@ -70,20 +70,20 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         UMOEndpoint endpoint;
         UMOMessage request;
 
-        for (Iterator iterator = list.iterator(); iterator.hasNext();)
+        for (Iterator iterator = recipients.iterator(); iterator.hasNext();)
         {
             String recipient = (String)iterator.next();
             // Make a copy of the message. Question is do we do a proper clone? in
             // which case there
             // would potentially be multiple messages with the same id...
             request = new MuleMessage(message.getPayload(), message);
-            endpoint = getRecipientEndpoint(request, recipient);
+            endpoint = this.getRecipientEndpoint(request, recipient);
 
             try
             {
                 if (synchronous)
                 {
-                    result = send(session, request, endpoint);
+                    result = this.send(session, request, endpoint);
                     if (result != null)
                     {
                         results.add(result.getPayload());
@@ -99,7 +99,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
                 }
                 else
                 {
-                    dispatch(session, request, endpoint);
+                    this.dispatch(session, request, endpoint);
                 }
             }
             catch (UMOException e)

@@ -99,7 +99,7 @@ public class Scriptable implements Initialisable
                 }
                 else
                 {
-                    InputStream is = null;
+                    InputStream is;
                     try
                     {
                         is = IOUtils.getResourceAsStream(scriptFile, getClass());
@@ -200,7 +200,7 @@ public class Scriptable implements Initialisable
 
     public Object runScript(Bindings bindings) throws ScriptException
     {
-        Object result = null;
+        Object result;
         if (compiledScript != null)
         {
             result = compiledScript.eval(bindings);

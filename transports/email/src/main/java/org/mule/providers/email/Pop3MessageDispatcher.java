@@ -57,7 +57,7 @@ public class Pop3MessageDispatcher extends AbstractMessageDispatcher
             URLName url = new URLName(uri.getScheme(), uri.getHost(), uri.getPort(), inbox,
                 uri.getUsername(), uri.getPassword());
 
-            Session session = (Session)connector.getDelegateSession(endpoint, url);
+            Session session = connector.getMailSession(url);
             session.setDebug(logger.isDebugEnabled());
 
             Store store = session.getStore(url);

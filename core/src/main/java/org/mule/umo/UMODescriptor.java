@@ -147,7 +147,7 @@ public interface UMODescriptor extends UMOImmutableDescriptor
 
     /**
      * Sets the Model name that this descriptor is registered within.
-     * @param modelName
+     * @param modelName name of the model
      */
     void setModelName(String modelName);
 }

@@ -296,7 +296,8 @@ public class MuleConfiguration
 
     public void setWorkingDirectory(String workingDirectory)
     {
-        this.workingDirectory = new File(workingDirectory).getAbsolutePath();
+        // fix windows backslashes in absolute paths, convert them to forward ones 
+        this.workingDirectory = new File(workingDirectory).getAbsolutePath().replaceAll("\\\\", "/");
         updateApplicationProperty(MuleProperties.MULE_WORKING_DIRECTORY_PROPERTY, this.workingDirectory);
     }
 

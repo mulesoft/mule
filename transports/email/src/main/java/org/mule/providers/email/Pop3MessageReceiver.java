@@ -109,7 +109,7 @@ public class Pop3MessageReceiver extends AbstractPollingMessageReceiver
         URLName url = new URLName(uri.getScheme(), uri.getHost(), uri.getPort(), inbox, uri.getUsername(),
             uri.getPassword());
 
-        session = (Session)connector.getDelegateSession(endpoint, url);
+        session = connector.getMailSession(url);
         session.setDebug(logger.isDebugEnabled());
 
         Store store = session.getStore(url);

@@ -69,4 +69,7 @@ public interface UMOMessageReceiver extends Lifecycle, Registerable, UMOConnecta
      */
     UMOEndpointURI getEndpointURI();
 
+    String getReceiverKey();
+
+    void setReceiverKey(String key);
 }

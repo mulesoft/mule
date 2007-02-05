@@ -13,8 +13,8 @@ package org.mule.routing.outbound;
 import org.mule.umo.UMOMessage;
 import org.mule.util.StringUtils;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -29,7 +29,7 @@ public class StaticRecipientList extends AbstractRecipientList
     public static final String RECIPIENTS_PROPERTY = "recipients";
     public static final String RECIPIENT_DELIMITER = ",";
 
-    private volatile CopyOnWriteArrayList recipients = new CopyOnWriteArrayList();
+    private volatile List recipients = Collections.EMPTY_LIST;
 
     protected List getRecipients(UMOMessage message)
     {
@@ -41,12 +41,11 @@ public class StaticRecipientList extends AbstractRecipientList
         }
         else if (msgRecipients instanceof String)
         {
-            return new CopyOnWriteArrayList(StringUtils.splitAndTrim(msgRecipients.toString(),
-                getListDelimiter()));
+            return Arrays.asList(StringUtils.splitAndTrim(msgRecipients.toString(), this.getListDelimiter()));
         }
         else if (msgRecipients instanceof List)
         {
-            return new CopyOnWriteArrayList((List)msgRecipients);
+            return new ArrayList((List)msgRecipients);
         }
         else
         {
@@ -64,11 +63,11 @@ public class StaticRecipientList extends AbstractRecipientList
     {
         if (recipients != null)
         {
-            this.recipients = new CopyOnWriteArrayList(recipients);
+            this.recipients = new ArrayList(recipients);
         }
         else
         {
-            this.recipients = null;
+            this.recipients = Collections.EMPTY_LIST;
         }
     }
 

@@ -8,22 +8,42 @@
     <mule-environment-properties serverUrl="" />
 
     <global-endpoints>
-        <endpoint name="quartz.in" address="quartz:/myService">
+        <endpoint name="quartz.in.1" address="quartz:/myService1">
             <properties>
                 <property name="repeatInterval" value="1000" />
                 <property name="repeatCount" value="3" />
                 <property name="payload" value="quartz test" />
             </properties>
         </endpoint>
+
+        <endpoint name="quartz.in.2" address="quartz:/myService2">
+            <properties>
+                <property name="repeatInterval" value="1000" />
+                <property name="repeatCount" value="1" />
+            </properties>
+        </endpoint>
     </global-endpoints>
 
     <model name="quartz">
 
-        <mule-descriptor name="quartzService" implementation="org.mule.providers.quartz.TestComponent">
+        <mule-descriptor
+            name="quartzService1"
+            implementation="org.mule.providers.quartz.TestComponent"
+            inboundEndpoint="quartz.in.1">
 
-            <inbound-router>
-                <endpoint address="quartz.in"/>
-            </inbound-router>
+        <!--
+            we want exactly one TestComponent for this test,
+            otherwise counter bookkeeping would be more difficult
+            than necessary.
+        -->
+        <pooling-profile maxActive="1" exhaustedAction="WAIT" />
+
+        </mule-descriptor>
+
+        <mule-descriptor
+            name="quartzService2"
+            implementation="org.mule.providers.quartz.TestComponent"
+            inboundEndpoint="quartz.in.2">
 
         <!--
             we want exactly one TestComponent for this test,

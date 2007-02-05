@@ -81,7 +81,7 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
 
             try
             {
-                session = (Session)connector.getDelegateSession(endpoint, url);
+                session = connector.getMailSession(url);
                 session.setDebug(logger.isDebugEnabled());
 
                 transport = session.getTransport(url);

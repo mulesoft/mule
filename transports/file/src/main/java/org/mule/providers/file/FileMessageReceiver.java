@@ -231,6 +231,9 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                 msgAdapter.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
             }
 
+            // finally deliver the file message
+            this.routeMessage(new MuleMessage(msgAdapter), endpoint.isSynchronous());
+            
             // at this point msgAdapter either points to the old sourceFile
             // or the new destinationFile.
             if (((FileConnector) connector).isAutoDelete())
@@ -250,9 +253,6 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                     // the source file for us
                 }
             }
-
-            // finally deliver the file message
-            this.routeMessage(new MuleMessage(msgAdapter), endpoint.isSynchronous());
         }
         catch (Exception e)
         {

@@ -36,7 +36,7 @@ public class ConnectorServiceTestCase extends AbstractMuleJmxTestCase
 
         final String query = JmxSupport.DEFAULT_JMX_DOMAIN_PREFIX + "." + configId + ":*";
         Set mbeans = mBeanServer.queryMBeans(ObjectName.getInstance(query), null);
-        assertEquals("Unexpected number of components registered in the domain.", 5, mbeans.size());
+        assertEquals("Unexpected number of components registered in the domain.", 6, mbeans.size());
 
         manager.dispose();
 

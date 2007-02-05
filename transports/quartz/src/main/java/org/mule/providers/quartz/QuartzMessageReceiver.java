@@ -28,6 +28,7 @@ import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
+import org.quartz.ObjectAlreadyExistsException;
 
 /**
  * Listens for Quartz sheduled events using the Receiver Job and fires events to the
@@ -37,6 +38,7 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
 {
 
     public static final String QUARTZ_RECEIVER_PROPERTY = "mule.quartz.receiver";
+    public static final String QUARTZ_CONNECTOR_PROPERTY = "mule.quartz.connector";
 
     private final QuartzConnector connector;
 
@@ -62,7 +64,8 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
             jobDetail.setName(endpoint.getEndpointURI().toString());
             jobDetail.setJobClass(MuleReceiverJob.class);
             JobDataMap jobDataMap = new JobDataMap();
-            jobDataMap.put(QUARTZ_RECEIVER_PROPERTY, this);
+            jobDataMap.put(QUARTZ_RECEIVER_PROPERTY, this.getReceiverKey());
+            jobDataMap.put(QUARTZ_CONNECTOR_PROPERTY, this.connector.getName());
             jobDataMap.putAll(endpoint.getProperties());
             jobDetail.setJobDataMap(jobDataMap);
 
@@ -120,7 +123,17 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
             trigger.setJobName(endpoint.getEndpointURI().toString());
             trigger.setJobGroup(jobGroupName);
 
-            scheduler.scheduleJob(jobDetail, trigger);
+            // We need to handle cases when the job has already been
+            // persisted
+            try
+            {
+                scheduler.scheduleJob(jobDetail, trigger);
+            }
+            catch (ObjectAlreadyExistsException oaee)
+            {
+                // Do anything here?
+            }
+
             scheduler.start();
         }
         catch (Exception e)

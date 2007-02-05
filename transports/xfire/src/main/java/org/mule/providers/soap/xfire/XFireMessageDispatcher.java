@@ -10,6 +10,25 @@
 
 package org.mule.providers.soap.xfire;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
+import javax.activation.DataHandler;
+import javax.xml.namespace.QName;
+
+import org.apache.commons.lang.StringUtils;
+import org.codehaus.xfire.XFire;
+import org.codehaus.xfire.client.Client;
+import org.codehaus.xfire.handler.Handler;
+import org.codehaus.xfire.service.OperationInfo;
+import org.codehaus.xfire.service.Service;
+import org.codehaus.xfire.transport.Transport;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
@@ -25,35 +44,16 @@ import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.TemplateParser;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
-import javax.activation.DataHandler;
-import javax.xml.namespace.QName;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.pool.ObjectPool;
-import org.apache.commons.pool.impl.StackObjectPool;
-import org.codehaus.xfire.XFire;
-import org.codehaus.xfire.client.Client;
-import org.codehaus.xfire.handler.Handler;
-import org.codehaus.xfire.service.OperationInfo;
-import org.codehaus.xfire.service.Service;
-
 /**
  * The XFireMessageDispatcher is used for making Soap client requests to remote
  * services.
  */
 public class XFireMessageDispatcher extends AbstractMessageDispatcher
 {
+    // Since the MessageDispatcher is guaranteed to serve a single thread,
+    // the Dispatcher can own the xfire Client as an instance variable
+    protected Client client = null;
     protected final XFireConnector connector;
-    protected volatile ObjectPool clientPool;
     private final TemplateParser soapActionTemplateParser = TemplateParser.createAntStyleParser();
 
     public XFireMessageDispatcher(UMOImmutableEndpoint endpoint)
@@ -64,7 +64,7 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
 
     protected void doConnect() throws Exception
     {
-        if (clientPool == null)
+        if (client == null)
         {
             final XFire xfire = connector.getXfire();
             final String serviceName = getServiceName(endpoint);
@@ -74,7 +74,7 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
             {
                 throw new FatalConnectException(new Message("xfire", 8, serviceName), this);
             }
-            
+
             List inList = connector.getServerInHandlers();
             if(inList != null)
             {
@@ -85,7 +85,7 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
                     service.addInHandler(handler);
                 }
             }
-            
+
             List outList = connector.getServerOutHandlers();
             if(outList != null)
             {
@@ -99,8 +99,7 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
 
             try
             {
-                clientPool = new StackObjectPool(new XFireClientPoolFactory(endpoint, service, xfire));
-                clientPool.addObject();
+                this.client = createXFireClient(endpoint, service, xfire);
             }
             catch (Exception ex)
             {
@@ -110,13 +109,48 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
+    protected Client createXFireClient(UMOImmutableEndpoint endpoint, Service service, XFire xfire) throws Exception
+    {
+    	Class transportClazz;
+    	if(connector.getClientTransport() == null)
+    		transportClazz = MuleUniversalTransport.class;
+    	else
+    		transportClazz = Class.forName(connector.getClientTransport());
+
+    	Transport transport = (Transport)transportClazz.getConstructor(null).newInstance(null);
+        Client client = new Client(transport, service, endpoint.getEndpointURI().toString());
+        client.setXFire(xfire);
+        client.setEndpointUri(endpoint.getEndpointURI().toString());
+        client.addInHandler(new MuleHeadersInHandler());
+        client.addOutHandler(new MuleHeadersOutHandler());
+
+        List inList = connector.getClientInHandlers();
+        if(inList != null)
+        {
+            for(int i = 0; i < inList.size(); i++)
+            {
+            	Class clazz = Class.forName(inList.get(i).toString());
+            	Handler handler = (Handler)clazz.getConstructor(null).newInstance(null);
+                client.addInHandler(handler);
+            }
+        }
+
+        List outList = connector.getClientOutHandlers();
+        if(outList != null)
+        {
+            for(int i = 0; i < outList.size(); i++)
+            {
+            	Class clazz = Class.forName(outList.get(i).toString());
+            	Handler handler = (Handler)clazz.getConstructor(null).newInstance(null);
+                client.addOutHandler(handler);
+            }
+        }
+        return client;
+    }
+
     protected void doDisconnect() throws Exception
     {
-        if (clientPool != null)
-        {
-            clientPool.clear();
-            clientPool = null;
-        }
+        client = null;
     }
 
     protected void doDispose()
@@ -126,25 +160,25 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
 
     protected String getMethod(UMOEvent event) throws DispatchException
     {
-        String method = (String)event.getMessage().getProperty(MuleProperties.MULE_METHOD_PROPERTY);     
-                
+        String method = (String)event.getMessage().getProperty(MuleProperties.MULE_METHOD_PROPERTY);
+
         if (method == null)
         {
             UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
             method = (String)endpointUri.getParams().get(MuleProperties.MULE_METHOD_PROPERTY);
         }
-        
+
         if (method == null)
         {
             method = (String)event.getEndpoint().getProperties().get(MuleProperties.MULE_METHOD_PROPERTY);
-        }   
-        
+        }
+
         if (method == null)
         {
             throw new DispatchException(new org.mule.config.i18n.Message("soap", 4), event.getMessage(),
                event.getEndpoint());
         }
-                
+
         return method;
     }
 
@@ -181,82 +215,59 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
 
     protected UMOMessage doSend(UMOEvent event) throws Exception
     {
-        Client client = null;
-                
-        try
+        this.client.setTimeout(event.getTimeout());
+        this.client.setProperty(MuleProperties.MULE_EVENT_PROPERTY, event);
+        String method = getMethod(event);
+
+        // Set custom soap action if set on the event or endpoint
+        String soapAction = (String)event.getMessage().getProperty(SoapConstants.SOAP_ACTION_PROPERTY);
+        if (soapAction != null)
         {
-            client = (Client)clientPool.borrowObject();
-            client.setTimeout(event.getTimeout());
-            client.setProperty(MuleProperties.MULE_EVENT_PROPERTY, event);
-            String method = getMethod(event);
-            // Set custom soap action if set on the event or endpoint
-            String soapAction = (String)event.getMessage().getProperty(SoapConstants.SOAP_ACTION_PROPERTY);
-            if (soapAction != null)
-            {
-                soapAction = parseSoapAction(soapAction, new QName(method), event);
-                client.setProperty(org.codehaus.xfire.soap.SoapConstants.SOAP_ACTION, soapAction);
-            }
-
-            // Set Custom Headers on the client
-            Object[] arr = event.getMessage().getPropertyNames().toArray();
-            String head;
-            for (int i = 0; i < arr.length; i++){
-                head = "";
-                head = (String)arr[i];
-                if ((head != null)&&(!head.startsWith("MULE"))){
-                    client.setProperty((String)arr[i], event.getMessage().getProperty((String)arr[i]));
-                }
-            }
-
-            Object[] response = client.invoke(method, getArgs(event));
-
-            UMOMessage result = null;
-            if (response != null && response.length <= 1)
-            {
-                if (response.length == 1)
-                {
-                    result = new MuleMessage(response[0], event.getMessage());
-                }
-            }
-            else
-            {
-                result = new MuleMessage(response, event.getMessage());
-            }
-
-            return result;
+            soapAction = parseSoapAction(soapAction, new QName(method), event);
+            this.client.setProperty(org.codehaus.xfire.soap.SoapConstants.SOAP_ACTION, soapAction);
         }
-        finally
+
+        // Set Custom Headers on the client
+        Object[] arr = event.getMessage().getPropertyNames().toArray();
+        String head;
+
+        for (int i = 0; i < arr.length; i++)
         {
-            if (client != null)
-            {
-                clientPool.returnObject(client);
+            head = "";
+            head = (String)arr[i];
+            if ((head != null)&&(!head.startsWith("MULE"))){
+                this.client.setProperty((String)arr[i], event.getMessage().getProperty((String)arr[i]));
             }
         }
+
+        Object[] response = client.invoke(method, getArgs(event));
+
+        UMOMessage result = null;
+        if (response != null && response.length <= 1)
+        {
+            if (response.length == 1)
+            {
+                result = new MuleMessage(response[0], event.getMessage());
+            }
+        }
+        else
+        {
+            result = new MuleMessage(response, event.getMessage());
+        }
+
+        return result;
     }
 
     protected void doDispatch(UMOEvent event) throws Exception
     {
-        Client client = null;
-
-        try
-        {
-            client = (Client)clientPool.borrowObject();
-            client.setTimeout(event.getTimeout());
-            client.setProperty(MuleProperties.MULE_EVENT_PROPERTY, event);
-            client.invoke(getMethod(event), getArgs(event));
-        }
-        finally
-        {
-            if (client != null)
-            {
-                clientPool.returnObject(client);
-            }
-        }
+        this.client.setTimeout(event.getTimeout());
+        this.client.setProperty(MuleProperties.MULE_EVENT_PROPERTY, event);
+        this.client.invoke(getMethod(event), getArgs(event));
     }
 
     /**
      * Make a specific request to the underlying transport
-     * 
+     *
      * @param endpoint the endpoint to use when connecting to the resource
      * @param timeout the maximum time the operation should block before returning.
      *            The call should return immediately if there is data available. If

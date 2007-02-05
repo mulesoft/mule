@@ -3,11 +3,11 @@
 
 <beans>
    <bean id="passwords" class="org.mule.extras.wssecurity.callbackhandlers.PasswordContainer">
-	   <constructor-arg>
-		   <props>
-			   <prop key="mulealias">mulePassword</prop>
-			   <prop key="gooduser">goodUserPassword</prop>
-		   </props>
-	   </constructor-arg>
+       <constructor-arg>
+           <props>
+               <prop key="mulealias">mulePassword</prop>
+               <prop key="gooduser">goodUserPassword</prop>
+           </props>
+       </constructor-arg>
    </bean>
 </beans>

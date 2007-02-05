@@ -412,9 +412,8 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         }
     }
 
-    // TODO AP: merge this and the various getSession(..) methods, make clients use
-    // getDelegateSession(..) only
-    public Object getDelegateSession(UMOImmutableEndpoint endpoint, Object args) throws UMOException
+    // TODO AP: merge this and the various getSession(..) methods
+    public Session getDelegateSession(UMOImmutableEndpoint endpoint) throws UMOException
     {
         try
         {

@@ -21,6 +21,7 @@ import org.mule.util.StringUtils;
 
 import java.util.Properties;
 
+import javax.mail.Session;
 import javax.mail.URLName;
 
 /**
@@ -251,53 +252,43 @@ public class SmtpConnector extends AbstractMailConnector
     }
 
     /**
-     * We override the base implementation in AbstractMailConnector to create a
-     * proper URLName if none was given. This allows javax.mail.Message creation
-     * without access to connection information in the caller (see
-     * StringToEmailMessage). This is a workaround for the dependency of
-     * StringToEmailMessage on the connection information which only available in
-     * this class.
+     * Create a javax.mail.Message creation without access to connection information
+     * in the caller. This is a workaround for the dependency of StringToEmailMessage
+     * on the connection information which is only available in this class.
      */
-    public Object getDelegateSession(UMOImmutableEndpoint endpoint, Object args)
+    public Session getMailSession(UMOImmutableEndpoint endpoint)
     {
-        URLName url = (URLName)args;
+        // build required URLName
+        UMOEndpointURI uri = endpoint.getEndpointURI();
 
-        // build required URLName unless already provided
-        if (url == null)
+        // Try to get the properties from the endpoint and use the connector
+        // properties if they are not given.
+
+        String host = uri.getHost();
+        if (host == null)
         {
-            UMOEndpointURI uri = endpoint.getEndpointURI();
-
-            // Try to get the properties from the endpoint and use the connector
-            // properties if they are not given.
-
-            String host = uri.getHost();
-            if (host == null)
-            {
-                host = this.getHost();
-            }
-
-            int port = uri.getPort();
-            if (port == -1)
-            {
-                port = this.getPort();
-            }
-
-            String username = uri.getUsername();
-            if (StringUtils.isBlank(username))
-            {
-                username = this.getUsername();
-            }
-
-            String password = uri.getPassword();
-            if (StringUtils.isBlank(password))
-            {
-                password = this.getPassword();
-            }
-
-            url = new URLName(this.getProtocol(), host, port, null, username, password);
+            host = this.getHost();
         }
 
-        return super.getDelegateSession(endpoint, url);
+        int port = uri.getPort();
+        if (port == -1)
+        {
+            port = this.getPort();
+        }
+
+        String username = uri.getUsername();
+        if (StringUtils.isBlank(username))
+        {
+            username = this.getUsername();
+        }
+
+        String password = uri.getPassword();
+        if (StringUtils.isBlank(password))
+        {
+            password = this.getPassword();
+        }
+
+        return this.getMailSession(new URLName(this.getProtocol(), host, port, null, username, password));
     }
 
 }

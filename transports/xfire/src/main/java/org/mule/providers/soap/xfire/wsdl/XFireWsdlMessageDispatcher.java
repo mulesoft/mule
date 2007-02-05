@@ -17,7 +17,6 @@ import java.net.URL;
 
 import javax.xml.namespace.QName;
 
-import org.apache.commons.pool.impl.StackObjectPool;
 import org.codehaus.xfire.XFire;
 import org.codehaus.xfire.client.Client;
 import org.codehaus.xfire.service.Service;
@@ -50,8 +49,17 @@ public class XFireWsdlMessageDispatcher extends XFireMessageDispatcher
                 xfire.getServiceRegistry().register(service);
             }
 
-            clientPool = new StackObjectPool(new XFireWsdlClientPoolFactory(endpoint, service, xfire));
-            clientPool.addObject();
+            try
+            {
+                this.client = new Client(new URL(endpoint.getEndpointURI().getAddress()));
+                this.client.setXFire(xfire);
+                this.client.setEndpointUri(endpoint.getEndpointURI().toString());
+            }
+            catch (Exception ex)
+            {
+                disconnect();
+                throw ex;
+            }
         }
         catch (Exception ex)
         {

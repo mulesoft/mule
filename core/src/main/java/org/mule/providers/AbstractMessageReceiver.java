@@ -89,6 +89,12 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
     protected AtomicBoolean connecting = new AtomicBoolean(false);
 
     /**
+     * Stores the key to this receiver, as used by the Connector to
+     * store the receiver.
+     */
+    protected String receiverKey = null;
+
+    /**
      * Stores the endpointUri that this receiver listens on. This enpoint can be
      * different to the endpointUri in the endpoint stored on the receiver as
      * endpoint endpointUri may get rewritten if this endpointUri is a wildcard
@@ -675,6 +681,16 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
             }
         }
         return returnMessage;
+    }
+
+    public void setReceiverKey(String receiverKey)
+    {
+        this.receiverKey = receiverKey;
+    }
+
+    public String getReceiverKey()
+    {
+        return receiverKey;
     }
 
     protected abstract void doStart() throws UMOException;

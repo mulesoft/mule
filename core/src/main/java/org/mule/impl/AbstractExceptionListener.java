@@ -122,17 +122,18 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
         handleStandardException(e);
     }
 
-    protected Throwable getExceptionType(Exception e, Class exceptionType)
+    protected Throwable getExceptionType(Throwable t, Class exceptionType)
     {
-        Throwable current = e;
-        while (current != null)
+        while (t != null)
         {
-            if (exceptionType.isAssignableFrom(e.getClass()))
+            if (exceptionType.isAssignableFrom(t.getClass()))
             {
-                return current;
+                return t;
             }
-            current = current.getCause();
+
+            t = t.getCause();
         }
+
         return null;
     }
 

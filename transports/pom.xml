@@ -22,7 +22,6 @@
         <module>file</module>
         <module>ftp</module>
         <module>glue</module>
-        <module>gs</module>
         <module>http</module>
         <module>jbi</module>
         <module>jdbc</module>
@@ -32,7 +31,6 @@
         <module>quartz</module>
         <module>rmi</module>
         <module>soap</module>
-        <module>space</module>
         <module>ssl</module>
         <module>stream</module>
         <module>tcp</module>

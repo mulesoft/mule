@@ -12,7 +12,6 @@ package org.mule.providers;
 
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
@@ -33,9 +32,9 @@ public abstract class AbstractMessageDispatcherFactory implements UMOMessageDisp
 
     /**
      * This default implementation of
-     * {@link UMOConnector#isCreateDispatcherPerRequest()} returns <code>false</code>,
-     * which means that dispatchers are pooled according to their lifecycle as
-     * described in {@link UMOMessageDispatcher}.
+     * {@link UMOMessageDispatcherFactory#isCreateDispatcherPerRequest()} returns
+     * <code>false</code>, which means that dispatchers are pooled according to
+     * their lifecycle as described in {@link UMOMessageDispatcher}.
      * 
      * @return <code>false</code> by default, unless overwritten by a subclass.
      */

@@ -12,7 +12,6 @@ package org.mule.providers.email;
 
 import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractConnector;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 import java.util.Properties;
 
@@ -54,18 +53,14 @@ public abstract class AbstractMailConnector extends AbstractConnector
     public abstract int getDefaultPort();
 
     /**
-     * This implementation of UMOConnector.getDelegateSession() creates a new
-     * javax.mail Session based on a URL. If a password is set on the URL it also
-     * adds an SMTP authenticator.
+     * Creates a new javax.mail Session based on a URL. If a password is set on the
+     * URL it also adds an SMTP authenticator.
      * 
-     * @param endpoint the endpoint for which the session is needed
-     * @param args a javax.mail.URLName providing additional properties of the
-     *            required Session (host, port etc.)
+     * @param args a javax.mail.URLName providing properties of the required Session
+     *            (host, port etc.)
      */
-    public Object getDelegateSession(UMOImmutableEndpoint endpoint, Object args)
+    public Session getMailSession(URLName url)
     {
-        URLName url = (URLName)args;
-
         if (url == null)
         {
             throw new IllegalArgumentException(new org.mule.config.i18n.Message(Messages.X_IS_NULL, "URL")
