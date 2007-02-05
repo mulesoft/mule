@@ -21,13 +21,13 @@
                 <configuration>
                     <instructions>
                         <!-- The org.mule.providers.service package doesn't get added to the
-                            auto-generated imports list for some reason.  
+                            auto-generated imports list for some reason. -->  
                         <Import-Package>
                             org.mule.providers.service,
                             *
                         </Import-Package>-->
                         <Export-Package>
-                            org.mule.modules.osgi;uses:="org.mule.providers.service",
+                            org.mule.modules.osgi,
                             org.mule.modules.osgi.util
                         </Export-Package>
                     </instructions>
@@ -47,6 +47,7 @@
                 <artifactId>osgi_R4_compendium</artifactId>
                 <version>1.0</version>
         </dependency>
+        <!-- Needed for BundleContextAware interface -->
         <dependency>
           <groupId>org.springframework.osgi</groupId>
           <artifactId>spring-osgi-core</artifactId>
