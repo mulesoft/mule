@@ -105,6 +105,9 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>MuleManager</code> maintains and provides services for a Mule instance.
+ * 
+ * @deprecated There is no more singleton MuleManager in Mule 2.0, this functionality will be replaced by 
+ * the MuleManagementContext or the MuleRegistry.
  */
 public class MuleManager implements UMOManager
 {   
@@ -1559,7 +1562,7 @@ public class MuleManager implements UMOManager
     /**
      * Looks up the service descriptor from a singleton cache and creates a new one if not found.
      */
-    public ServiceDescriptor lookupServiceDescriptor(String type, String name, Properties overrides)
+    public ServiceDescriptor lookupServiceDescriptor(String type, String name, Properties overrides) throws ServiceException
     {
         AbstractServiceDescriptor.Key key = new AbstractServiceDescriptor.Key(name, overrides);
         ServiceDescriptor sd = (ServiceDescriptor) sdCache.get(key);
@@ -1765,6 +1768,8 @@ public class MuleManager implements UMOManager
 
     /**
      * The shutdown thread used by the server when its main thread is terminated
+     * 
+     * @deprecated This is now handled by the OSGi lifecycle or the Service Wrapper
      */
     private class ShutdownThread extends Thread
     {

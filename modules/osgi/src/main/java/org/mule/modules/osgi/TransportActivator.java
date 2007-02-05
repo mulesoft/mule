@@ -53,7 +53,7 @@ public class TransportActivator implements BundleActivator {
             URL descriptorUrl = bc.getBundle().getEntry(descriptorPath);
             if (descriptorUrl == null)
             {
-                throw new ConfigurationException(Message.createStaticMessage("TESTING: Unable to locate service descriptor file: " + descriptorPath));
+                throw new ConfigurationException(Message.createStaticMessage("Unable to locate service descriptor file: " + descriptorPath));
             }
             Properties props = new Properties();
             props.load(descriptorUrl.openStream());

@@ -11,10 +11,12 @@
 package org.mule.impl.endpoint;
 
 import org.mule.MuleManager;
+import org.mule.config.i18n.Message;
 import org.mule.providers.service.TransportFactory;
-import org.mule.providers.service.TransportFactoryException;
 import org.mule.providers.service.TransportServiceDescriptor;
 import org.mule.registry.ServiceDescriptorFactory;
+import org.mule.registry.ServiceException;
+import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.util.PropertiesUtils;
@@ -123,7 +125,7 @@ public class MuleEndpointURI implements UMOEndpointURI
         this.filterAddress = filterAddress;
     }
 
-    public MuleEndpointURI(String uri) throws MalformedEndpointException
+    public MuleEndpointURI(String uri) throws EndpointException
     {
         String uriIdentifier = MuleManager.getInstance().lookupEndpointIdentifier(uri, uri);
         if (!uriIdentifier.equals(uri))
@@ -156,15 +158,19 @@ public class MuleEndpointURI implements UMOEndpointURI
         try
         {
             String scheme = (schemeMetaInfo == null ? this.uri.getScheme() : schemeMetaInfo);
-            TransportServiceDescriptor csd = (TransportServiceDescriptor) 
+            TransportServiceDescriptor sd = (TransportServiceDescriptor) 
                 MuleManager.getInstance().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, scheme, null);
-            EndpointBuilder builder = csd.createEndpointBuilder();
+            if (sd == null)
+            {
+                throw new ServiceException(Message.createStaticMessage("No service descriptor found for transport: " + scheme + ".  This transport does not appear to be installed."));
+            }
+            EndpointBuilder builder = sd.createEndpointBuilder();
             UMOEndpointURI built = builder.build(this.uri);
             initialise(built);
         }
-        catch (TransportFactoryException e)
+        catch (Exception e)
         {
-            throw new MalformedEndpointException(e);
+            throw new EndpointException(e);
         }
     }
 

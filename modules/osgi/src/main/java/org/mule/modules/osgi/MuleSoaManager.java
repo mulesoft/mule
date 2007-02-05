@@ -11,9 +11,12 @@
 package org.mule.modules.osgi;
 
 import org.mule.MuleManager;
+import org.mule.config.i18n.Message;
 import org.mule.providers.service.TransportServiceDescriptor;
 import org.mule.registry.ServiceDescriptor;
+import org.mule.registry.ServiceException;
 import org.mule.umo.UMOException;
+import org.mule.umo.lifecycle.InitialisationException;
 
 import java.util.Properties;
 
@@ -21,7 +24,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
-import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 import org.springframework.osgi.context.BundleContextAware;
@@ -46,33 +48,41 @@ public class MuleSoaManager extends MuleManager implements BundleContextAware
 
     /**
      * Looks up the service descriptor from the OSGi registry each time, does not use a cache.
+     * 
+     * @return The service descriptor or null if not found.
      */
     // @Override
-    public ServiceDescriptor lookupServiceDescriptor(String type, String name, Properties overrides)
+    public ServiceDescriptor lookupServiceDescriptor(String type, String name, Properties overrides) throws ServiceException
     {
-        // Get all services which match the interface.
-        ServiceReference[] services;
         try 
         {
-            services = context.getServiceReferences(TransportServiceDescriptor.class.getName(), null);
-        }
-        catch (InvalidSyntaxException e)
-        {
-            logger.info(e.getMessage());
+            // Get all services which match the interface.
+            ServiceReference[] services;
+            if (context != null)
+            {
+                services = context.getServiceReferences(TransportServiceDescriptor.class.getName(), null);
+            }
+            else 
+            {
+                throw new InitialisationException(Message.createStaticMessage("BundleContext has not been set for Manager."), this);
+            }
+    
+            // Match the service by name.
+            String servicePid;
+            for (int i=0; i<services.length; ++i)
+            {
+                servicePid = (String) services[i].getProperty(Constants.SERVICE_PID);
+                if (servicePid != null && servicePid.endsWith(name))
+                {
+                    return (ServiceDescriptor) context.getService(services[i]);
+                }
+            }
             return null;
         }
-
-        // Match the service by name.
-        String servicePid;
-        for (int i=0; i<services.length; ++i)
+        catch (Exception e)
         {
-            servicePid = (String) services[i].getProperty(Constants.SERVICE_PID);
-            if (servicePid != null && servicePid.endsWith(name))
-            {
-                return (ServiceDescriptor) context.getService(services[i]);
-            }
+            throw new ServiceException(Message.createStaticMessage("Exception while looking up the service descriptor."), e);
         }
-        return null;
     }
         
     public synchronized void initialise() throws UMOException

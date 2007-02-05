@@ -26,6 +26,7 @@ import org.mule.providers.service.TransportServiceException;
 import org.mule.registry.DeregistrationException;
 import org.mule.registry.RegistrationException;
 import org.mule.registry.ServiceDescriptorFactory;
+import org.mule.registry.ServiceException;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOComponent;
@@ -1561,12 +1562,16 @@ public abstract class AbstractConnector
         {
             serviceDescriptor = (TransportServiceDescriptor) 
                 MuleManager.getInstance().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, getProtocol().toLowerCase(), serviceOverrides);
-
-            //if (serviceDescriptor.getDispatcherFactory() != null)
-            //{
-                //logger.debug("Loading DispatcherFactory: " + serviceDescriptor.getDispatcherFactory());
-                this.setDispatcherFactory(serviceDescriptor.createDispatcherFactory());
-            //}
+            if (serviceDescriptor == null)
+            {
+                throw new ServiceException(Message.createStaticMessage("No service descriptor found for transport: " + getProtocol() + ".  This transport does not appear to be installed."));
+            }
+            
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Loading DispatcherFactory for connector: " + getName() + " (" + getClass().getName() + ")");
+            }
+            this.setDispatcherFactory(serviceDescriptor.createDispatcherFactory());
 
             defaultInboundTransformer = serviceDescriptor.createInboundTransformer();
             defaultOutboundTransformer = serviceDescriptor.createOutboundTransformer();

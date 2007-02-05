@@ -13,6 +13,7 @@ package org.mule.umo.manager;
 import org.mule.impl.internal.notifications.NotificationException;
 import org.mule.registry.Registry;
 import org.mule.registry.ServiceDescriptor;
+import org.mule.registry.ServiceException;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOInterceptorStack;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -324,7 +325,7 @@ public interface UMOManager extends Lifecycle, Registerable
      * 
      * @return ServiceDescriptor or null if ServiceDescriptor not found.
      */
-    ServiceDescriptor lookupServiceDescriptor(String type, String name, Properties overrides);
+    ServiceDescriptor lookupServiceDescriptor(String type, String name, Properties overrides) throws ServiceException;
 
     /**
      * Fires a server notification to all regiistered listeners

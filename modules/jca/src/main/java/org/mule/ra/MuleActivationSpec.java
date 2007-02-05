@@ -19,7 +19,7 @@ import javax.resource.spi.InvalidPropertyException;
 import javax.resource.spi.ResourceAdapter;
 
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.umo.endpoint.MalformedEndpointException;
+import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.util.StringUtils;
 
@@ -122,7 +122,7 @@ public class MuleActivationSpec implements ActivationSpec, Serializable
         {
             this.endpointURI = new MuleEndpointURI(endpoint);
         }
-        catch (MalformedEndpointException e)
+        catch (EndpointException e)
         {
             throw new InvalidPropertyException(e);
         }

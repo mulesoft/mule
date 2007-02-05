@@ -15,6 +15,7 @@ import org.mule.MuleRuntimeException;
 import org.mule.config.i18n.Message;
 import org.mule.providers.service.TransportServiceDescriptor;
 import org.mule.registry.ServiceDescriptorFactory;
+import org.mule.registry.ServiceException;
 import org.mule.umo.UMOException;
 import org.mule.util.ClassUtils;
 import org.mule.util.MapUtils;
@@ -181,9 +182,14 @@ public class ExceptionHelper
         }
         else
         {
-            TransportServiceDescriptor sd = (TransportServiceDescriptor) MuleManager.getInstance().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, protocol, null);
-            if (sd != null)
+            TransportServiceDescriptor sd;
+            try 
             {
+                sd = (TransportServiceDescriptor) MuleManager.getInstance().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, protocol, null);
+                if (sd == null)
+                {
+                    throw new ServiceException(Message.createStaticMessage("No service descriptor found for transport: " + protocol + ".  This transport does not appear to be installed."));
+                }
                 Properties p = sd.getExceptionMappings();
                 errorMappings.put(protocol, p);
                 String applyTo = p.getProperty(APPLY_TO_PROPERTY, null);
@@ -197,8 +203,9 @@ public class ExceptionHelper
                 }
                 return p;
             }
-            else 
+            catch (ServiceException e)
             {
+                logger.warn(e.getMessage());
                 return null;
             }
         }

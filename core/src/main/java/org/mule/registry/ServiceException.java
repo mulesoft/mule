@@ -13,6 +13,9 @@ package org.mule.registry;
 import org.mule.config.i18n.Message;
 import org.mule.umo.UMOException;
 
+/**
+ * Any service-related exception: service not found, service lookup error, etc.
+ */
 public class ServiceException extends UMOException
 {
     public ServiceException(Message message)

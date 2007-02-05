@@ -10,13 +10,13 @@
 
 package org.mule.providers.service;
 
-import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.AbstractConnector;
 import org.mule.registry.ServiceDescriptorFactory;
+import org.mule.registry.ServiceException;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
@@ -139,59 +139,66 @@ public class TransportFactory
     private static UMOTransformer getTransformer(UMOEndpointURI url, UMOConnector cnn, int type)
         throws TransportFactoryException
     {
-        UMOTransformer trans = null;
-        String transId = null;
-        if (type == 2)
+        try 
         {
-            transId = url.getResponseTransformers();
-        }
-        else
-        {
-            transId = url.getTransformers();
-        }
-
-        if (transId != null)
-        {
-            try
+            UMOTransformer trans = null;
+            String transId = null;
+            if (type == 2)
             {
-                trans = MuleObjectHelper.getTransformer(transId, ",");
-            }
-            catch (MuleException e)
-            {
-                throw new TransportFactoryException(e);
-            }
-        }
-        else
-        {
-            // Get connector specific overrides to set on the descriptor
-            Properties overrides = new Properties();
-            if (cnn instanceof AbstractConnector)
-            {
-                Map so = ((AbstractConnector)cnn).getServiceOverrides();
-                if (so != null)
-                {
-                    overrides.putAll(so);
-                }
-            }
-
-            String scheme = url.getSchemeMetaInfo();
-
-            TransportServiceDescriptor csd = (TransportServiceDescriptor) 
-                MuleManager.getInstance().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, scheme, overrides);
-            if (type == 0)
-            {
-                trans = csd.createInboundTransformer();
-            }
-            else if (type == 1)
-            {
-                trans = csd.createOutboundTransformer();
+                transId = url.getResponseTransformers();
             }
             else
             {
-                trans = csd.createResponseTransformer();
+                transId = url.getTransformers();
             }
+    
+            if (transId != null)
+            {
+                trans = MuleObjectHelper.getTransformer(transId, ",");
+            }
+            else
+            {
+                // Get connector specific overrides to set on the descriptor
+                Properties overrides = new Properties();
+                if (cnn instanceof AbstractConnector)
+                {
+                    Map so = ((AbstractConnector)cnn).getServiceOverrides();
+                    if (so != null)
+                    {
+                        overrides.putAll(so);
+                    }
+                }
+    
+                String scheme = url.getSchemeMetaInfo();
+    
+                TransportServiceDescriptor sd = (TransportServiceDescriptor) 
+                    MuleManager.getInstance().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, scheme, overrides);
+                if (sd != null)
+                {
+                    if (type == 0)
+                    {
+                        trans = sd.createInboundTransformer();
+                    }
+                    else if (type == 1)
+                    {
+                        trans = sd.createOutboundTransformer();
+                    }
+                    else
+                    {
+                        trans = sd.createResponseTransformer();
+                    }
+                }
+                else 
+                {
+                    throw new ServiceException(Message.createStaticMessage("No service descriptor found for transport: " + scheme + ".  This transport does not appear to be installed."));
+                }
+            }
+            return trans;
         }
-        return trans;
+        catch (Exception e)
+        {
+            throw new TransportFactoryException(e);
+        }
     }
 
     /**
@@ -209,14 +216,18 @@ public class TransportFactory
      */
     public static UMOConnector createConnector(UMOEndpointURI url) throws TransportFactoryException
     {
-        UMOConnector connector;
-        String scheme = url.getSchemeMetaInfo();
-
-        TransportServiceDescriptor sd = (TransportServiceDescriptor) 
-            MuleManager.getInstance().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, scheme, null);
-        
         try
         {
+            UMOConnector connector;
+            String scheme = url.getSchemeMetaInfo();
+    
+            TransportServiceDescriptor sd = (TransportServiceDescriptor) 
+                MuleManager.getInstance().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, scheme, null);
+            if (sd == null)
+            {
+                throw new ServiceException(Message.createStaticMessage("No service descriptor found for transport: " + scheme + ".  This transport does not appear to be installed."));
+            }
+            
             connector = sd.createConnector();
             if (connector != null)
             {
@@ -230,32 +241,27 @@ public class TransportFactory
                 throw new TransportFactoryException(new Message(Messages.X_NOT_SET_IN_SERVICE_X,
                     "Connector", scheme));
             }
-        }
-        catch (TransportFactoryException e)
-        {
-            throw e;
+            connector.setName(ObjectNameHelper.getConnectorName(connector));
+
+            // set any manager default properties for the connector
+            // these are set on the Manager with a protocol i.e.
+            // jms.specification=1.1
+            Map props = new HashMap();
+            PropertiesUtils.getPropertiesWithPrefix(MuleManager.getInstance().getProperties(),
+                connector.getProtocol().toLowerCase(), props);
+            if (props.size() > 0)
+            {
+                props = PropertiesUtils.removeNamespaces(props);
+                BeanUtils.populateWithoutFail(connector, props, true);
+            }
+
+            return connector;
         }
         catch (Exception e)
         {
             throw new TransportFactoryException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X, "Endpoint",
                 url), e);
         }
-
-        connector.setName(ObjectNameHelper.getConnectorName(connector));
-
-        // set any manager default properties for the connector
-        // these are set on the Manager with a protocol i.e.
-        // jms.specification=1.1
-        Map props = new HashMap();
-        PropertiesUtils.getPropertiesWithPrefix(MuleManager.getInstance().getProperties(),
-            connector.getProtocol().toLowerCase(), props);
-        if (props.size() > 0)
-        {
-            props = PropertiesUtils.removeNamespaces(props);
-            BeanUtils.populateWithoutFail(connector, props, true);
-        }
-
-        return connector;
     }
 
     public static UMOConnector getOrCreateConnectorByProtocol(UMOEndpointURI uri)

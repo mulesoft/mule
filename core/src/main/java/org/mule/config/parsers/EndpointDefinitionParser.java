@@ -13,7 +13,7 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.umo.endpoint.MalformedEndpointException;
+import org.mule.umo.endpoint.EndpointException;
 
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -99,7 +99,7 @@ public class EndpointDefinitionParser extends AbstractChildBeanDefinitionParser
                 {
                     builder.addPropertyValue("endpointURI", new MuleEndpointURI(address));
                 }
-                catch (MalformedEndpointException e)
+                catch (EndpointException e)
                 {
                     throw new BeanCreationException(new Message(Messages.ENPOINT_X_IS_MALFORMED, address).getMessage(), e);
                 }
