@@ -42,6 +42,7 @@
                             org.mule.persistence.*,
                             org.mule.providers.*,
                             org.mule.registry.*,
+                            org.mule.registry.metadata,
                             org.mule.routing.*,
                             org.mule.transaction.*,
                             org.mule.transformers.*,
