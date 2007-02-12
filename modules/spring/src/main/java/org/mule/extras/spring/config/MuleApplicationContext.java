@@ -11,6 +11,7 @@
 package org.mule.extras.spring.config;
 
 import org.mule.config.MuleObjectNameProcessor;
+import org.mule.registry.metadata.MetadataProcessor;
 import org.mule.umo.transformer.UMOTransformer;
 
 import java.io.IOException;
@@ -61,6 +62,7 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
         beanFactory.registerBeanDefinition("_MuleManagemenetContextFactoryBean", new RootBeanDefinition(AutowireManagementContextFactoryBean.class, true));
         beanFactory.registerBeanDefinition("_springContainerContext", new RootBeanDefinition(SpringContainerContextFactoryBean.class, true));
         beanFactory.addBeanPostProcessor(new MuleObjectNameProcessor());
+        beanFactory.addBeanPostProcessor(new MetadataProcessor());
         beanFactory.registerCustomEditor(UMOTransformer.class, new TransformerPropertyEditor(beanFactory));
 
         XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
