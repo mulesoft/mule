@@ -53,7 +53,7 @@ import javax.resource.spi.work.WorkManager;
  */
 public class SedaComponent extends AbstractComponent implements Work, WorkListener
 {
-    public static ObjectMetadata objectMetadata = new ObjectMetadata(SedaComponent.class, 0, new String[] { });
+    public static ObjectMetadata objectMetadata = new ObjectMetadata(SedaComponent.class);
 
     public static final String QUEUE_PROFILE_PROPERTY = "queueProfile";
     public static final String POOLING_PROFILE_PROPERTY = "poolingProfile";
@@ -115,9 +115,6 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
     public SedaComponent(MuleDescriptor descriptor, SedaModel model)
     {
         super(descriptor, model);
-
-        // Spring should do this
-        MetadataStore.addObjectMetadata(objectMetadata);
 
         descriptorQueueName = descriptor.getName() + ".component";
         queueTimeout = model.getQueueTimeout();

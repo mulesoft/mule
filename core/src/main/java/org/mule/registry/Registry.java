@@ -12,6 +12,7 @@ package org.mule.registry;
 
 import java.util.Map;
 
+import org.mule.registry.metadata.ObjectMetadata;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Registerable;
@@ -51,6 +52,10 @@ public interface Registry extends Startable, Stoppable, Disposable {
      * will take care of the rest
      */
     Registration registerMuleObject(Registerable parent, Registerable object) throws RegistrationException;
+
+    /**
+     * Testing this - maybe this is a better way to register the Metadata
+    Registration registerMuleObject(Registerable parent, Registerable object, ObjectMetadata metadata) throws RegistrationException;
 
     /**
      * Experimental OSGI registration - not yet tested

@@ -14,6 +14,7 @@ import java.util.Map;
 
 public class ObjectMetadata extends Metadata
 {
+    protected boolean persistable = true;
     protected String className = null;
     protected Map properties = null;
 
@@ -22,21 +23,36 @@ public class ObjectMetadata extends Metadata
         properties = new HashMap();
     }
 
-    public ObjectMetadata(String className, Map properties)
+    // This will probably go
+    public ObjectMetadata(Class clazz)
     {
-        this.className = className;
-        this.properties = properties;
+        this(clazz, true, new String[] {});
     }
 
-    public ObjectMetadata(Class clazz, int flags, String[] propertyNames)
+    public ObjectMetadata(String[] propertyNames)
+    {
+        this(true, propertyNames);
+    }
+
+    public ObjectMetadata(boolean isPersistable, String[] propertyNames)
+    {
+        this(null, true, propertyNames);
+    }
+
+    public ObjectMetadata(Class clazz, boolean persistable, String[] propertyNames)
     {
         this.properties = new HashMap();
-        this.className = clazz.getName();
-        this.flags = flags;
+
+        if (clazz != null)
+        {
+            this.className = clazz.getName();
+        }
+
+        setPersistable(persistable);
 
         for (int i = 0; i < propertyNames.length; i++)
         {
-            setProperty(new PropertyMetadata(propertyNames[i], 2));
+            setProperty(new PropertyMetadata(propertyNames[i], PropertyMetadata.PROPERTY_PERSISTABLE));
         }
     }
 
@@ -64,6 +80,17 @@ public class ObjectMetadata extends Metadata
     {
         return className;
     }
+
+    public void setPersistable(boolean persistable)
+    {
+        this.persistable = persistable;
+    }
+
+    public boolean getPersistable()
+    {
+	return persistable;
+    }
+
 
 }
 

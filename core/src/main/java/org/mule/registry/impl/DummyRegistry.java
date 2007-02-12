@@ -17,6 +17,7 @@ import java.util.Random;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.registry.*;
+import org.mule.registry.metadata.ObjectMetadata;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.Registerable;
 
@@ -55,6 +56,11 @@ public class DummyRegistry implements Registry {
     */
 
     public Registration registerMuleObject(Registerable parent, Registerable object) throws RegistrationException
+    {
+        return registerMuleObject(parent, object, null);
+    }
+
+    public Registration registerMuleObject(Registerable parent, Registerable object, ObjectMetadata metadata) throws RegistrationException
     {
         String newId = "" + getRandomId();
         Registration registration = new MuleRegistration();

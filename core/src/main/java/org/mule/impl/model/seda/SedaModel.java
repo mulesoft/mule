@@ -28,7 +28,7 @@ import org.mule.umo.lifecycle.InitialisationException;
  */
 public class SedaModel extends AbstractModel
 {
-    public static ObjectMetadata objectMetadata = new ObjectMetadata(SedaModel.class, 2, new String[] { "name" });
+    public static ObjectMetadata objectMetadata = new ObjectMetadata(SedaModel.class, true, new String[] { "name" });
 
     /**
      * The time out used for taking from the Seda Queue.
@@ -79,9 +79,6 @@ public class SedaModel extends AbstractModel
 
     public void initialise() throws InitialisationException
     {
-
-        // Spring should do this
-        MetadataStore.addObjectMetadata(objectMetadata);
 
         if(queueProfile==null) {
             queueProfile = new QueueProfile();

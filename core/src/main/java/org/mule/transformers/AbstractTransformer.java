@@ -17,6 +17,7 @@ import org.mule.providers.NullPayload;
 import org.mule.registry.DeregistrationException;
 import org.mule.registry.RegistrationException;
 import org.mule.registry.Registry;
+import org.mule.registry.metadata.ObjectMetadata;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -41,6 +42,8 @@ import org.apache.commons.logging.LogFactory;
 
 public abstract class AbstractTransformer implements UMOTransformer
 {
+    public static ObjectMetadata objectMetadata = new ObjectMetadata(new String[] { "returnClass", "sourceTypes" });
+
     /**
      * logger used by this class
      */
@@ -466,6 +469,11 @@ public abstract class AbstractTransformer implements UMOTransformer
             c = Object.class;
         }
         return c.getName();
+    }
+
+    public List getSourceTypes()
+    {
+        return sourceTypes;
     }
 
     public boolean isIgnoreBadInput()

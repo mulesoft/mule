@@ -289,10 +289,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
      */
     public void register() throws RegistrationException
     {
-        /*
-         * TODO LM: THIS WILL HAVE TO CHANGE
-         */
-        //registryId = MuleManager.getInstance().getRegistry().registerMuleObject(MuleManager.getInstance().Model(), this).getId();
+        //registryId = MuleManager.getInstance().getRegistry().registerMuleObject(MuleManager.lookupModel(modelName), this).getId();
     }
 
     /*

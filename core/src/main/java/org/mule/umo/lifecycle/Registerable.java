@@ -32,6 +32,11 @@ public interface Registerable
     void register() throws RegistrationException;
 
     /**
+     * Sets a property for monitoring
+     */
+    //void setRegistryListenerProperty(String propertyName);
+
+    /**
      * Degister this component from the registry
      */
     void deregister() throws DeregistrationException;
