@@ -10,7 +10,6 @@
 
 package org.mule.providers.stream;
 
-import org.mule.registry.metadata.MetadataStore;
 import org.mule.registry.metadata.ObjectMetadata;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
@@ -31,7 +30,7 @@ import java.io.OutputStream;
 public class SystemStreamConnector extends StreamConnector
 {
 
-    public static ObjectMetadata objectMetadata = new ObjectMetadata(SystemStreamConnector.class, 2, new String[] { "promptMessage", "outputMessage", "messageDelayTime", "firstTime" });
+    public static ObjectMetadata objectMetadata = new ObjectMetadata(SystemStreamConnector.class, true, new String[] { "promptMessage", "outputMessage", "messageDelayTime", "firstTime" });
 
     private String promptMessage;
     private String outputMessage;
@@ -42,9 +41,6 @@ public class SystemStreamConnector extends StreamConnector
     {
         super();
         
-        // Spring should do this
-        MetadataStore.addObjectMetadata(objectMetadata);
-
         inputStream = System.in;
         outputStream = System.out;
     }
