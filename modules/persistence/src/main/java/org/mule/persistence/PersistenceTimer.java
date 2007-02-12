@@ -19,7 +19,7 @@ package org.mule.persistence;
 public class PersistenceTimer extends Thread
 {
 
-    // How long to wait for before checking is we need to persist
+    // How long to wait for before checking if we need to persist
     private int checkInterval = 20000;
     private int sleepInterval = 500;
     // Minimum interval between persist() calls
