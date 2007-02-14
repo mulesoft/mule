@@ -24,7 +24,8 @@
                             tcp
                         </Mule-Transports>
                         <Export-Package>
-                            org.mule.providers.tcp.*
+                            org.mule.providers.tcp.*,
+                            META-INF.services.org.mule.i18n
                         </Export-Package>
                     </instructions>
                 </configuration>

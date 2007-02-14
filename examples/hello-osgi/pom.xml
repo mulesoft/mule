@@ -31,6 +31,7 @@
                             org.mule.modules.osgi,
                             org.mule.providers.file,
                             org.mule.providers.http,
+                            org.mule.providers.http.transformers,
                             org.mule.providers.service,
                             org.mule.transformers,
                             org.mule.transformers.simple,

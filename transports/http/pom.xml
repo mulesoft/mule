@@ -26,6 +26,27 @@
                             servlet,
                             jetty
                         </Mule-Transports>
+                        <!-- Needed for tcp-messages -->
+                        <Import-Package>
+                            META-INF.services.org.mule.i18n,
+                            !com.ccg.net.ethernet,
+                            !com.sun.activation.registries,
+                            !com.sun.net.ssl,
+                            !com.sun.net.ssl.internal.ssl,
+                            !javax.crypto,
+                            !javax.crypto.spec,
+                            !javax.naming,
+                            !javax.naming.spi,
+                            !javax.net,
+                            !javax.net.ssl,
+                            !javax.security.auth,
+                            !javax.security.cert,
+                            !javax.xml.namespace,
+                            !javax.xml.transform,
+                            !org.xml.sax,
+                            !sun.misc,
+                            *
+                        </Import-Package>
                         <Export-Package>
                             org.mule.providers.http.*
                         </Export-Package>
