@@ -7,7 +7,6 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.extras.spring.config;
 
 import org.mule.MuleManager;
@@ -34,7 +33,7 @@ import java.util.Properties;
  * sure that the DTD definitions for each of the document types are declared in the
  * documents.
  */
-public class SpringConfigurationBuilder implements ConfigurationBuilder
+public class Spring2ConfigurationBuilder implements ConfigurationBuilder
 {
     /**
      * Will configure a UMOManager based on the configurations made available through
@@ -97,7 +96,7 @@ public class SpringConfigurationBuilder implements ConfigurationBuilder
             true, true);
 
         MuleManager.getConfiguration().setConfigResources(resources);
-        new MuleApplicationContext(resources);
+        new Mule2ApplicationContext(resources);
         try
         {
             if (System.getProperty(MuleProperties.MULE_START_AFTER_CONFIG_SYSTEM_PROPERTY, "true")

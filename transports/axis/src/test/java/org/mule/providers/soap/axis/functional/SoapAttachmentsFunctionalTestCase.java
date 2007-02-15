@@ -21,7 +21,7 @@ import org.mule.providers.soap.axis.AxisConnector;
 import org.mule.providers.soap.axis.AxisMessageDispatcher;
 import org.mule.tck.functional.AbstractProviderFunctionalTestCase;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.MalformedEndpointException;
+import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
@@ -55,7 +55,7 @@ public class SoapAttachmentsFunctionalTestCase extends AbstractProviderFunctiona
         {
             return new MuleEndpointURI("axis:http://localhost:60198/mule/services");
         }
-        catch (MalformedEndpointException e)
+        catch (EndpointException e)
         {
             fail(e.getMessage());
             return null;

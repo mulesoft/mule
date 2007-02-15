@@ -10,9 +10,6 @@
 
 package org.mule.transaction.lookup;
 
-/**
- * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
- */
 public class WeblogicTransactionManagerLookupFactory extends GenericTransactionManagerLookupFactory
 {
     public WeblogicTransactionManagerLookupFactory()

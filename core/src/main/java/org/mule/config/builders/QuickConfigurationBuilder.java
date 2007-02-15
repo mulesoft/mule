@@ -538,11 +538,17 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         }
 
         descriptor.setOutboundRouter(new OutboundRouterCollection());
-        OutboundPassThroughRouter router = new OutboundPassThroughRouter();
-        router.addEndpoint(outboundEndpoint);
-        descriptor.getOutboundRouter().addRouter(router);
+        if(outboundEndpoint!=null)
+        {
+            OutboundPassThroughRouter router = new OutboundPassThroughRouter();
+            router.addEndpoint(outboundEndpoint);
+            descriptor.getOutboundRouter().addRouter(router);
+        }
         descriptor.setInboundRouter(new InboundRouterCollection());
-        descriptor.getInboundRouter().addEndpoint(inboundEndpoint);
+        if(inboundEndpoint!=null)
+        {
+            descriptor.getInboundRouter().addEndpoint(inboundEndpoint);
+        }
 
         return descriptor;
     }

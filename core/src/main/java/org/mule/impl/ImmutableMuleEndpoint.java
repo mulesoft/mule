@@ -19,7 +19,6 @@ import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.service.TransportFactory;
 import org.mule.providers.service.TransportFactoryException;
-import org.mule.registry.Registration;
 import org.mule.registry.DeregistrationException;
 import org.mule.registry.RegistrationException;
 import org.mule.umo.UMOEvent;
@@ -443,15 +442,17 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     public String toString()
     {
-        return ClassUtils.getClassName(this.getClass()) + "{connector=" + connector + ", endpointUri="
+        return ClassUtils.getClassName(this.getClass()) + "{hash=" + hashCode() + ", endpointUri="
                + endpointUri + ", transformer=" + transformer + ", name='" + name + "'" + ", type='" + type
                + "'" + ", properties=" + properties + ", transactionConfig=" + transactionConfig
                + ", filter=" + filter + ", deleteUnacceptedMessages=" + deleteUnacceptedMessages
                + ", initialised=" + initialised + ", securityFilter=" + securityFilter + ", synchronous="
                + synchronous + ", initialState=" + initialState + ", createConnector=" + createConnector
                + ", remoteSync=" + remoteSync + ", remoteSyncTimeout=" + remoteSyncTimeout
-               + ", endpointEncoding=" + endpointEncoding + "}";
+               + ", endpointEncoding=" + endpointEncoding + ", connector=" + connector + "}";
     }
+
+
 
     /*
      * (non-Javadoc)

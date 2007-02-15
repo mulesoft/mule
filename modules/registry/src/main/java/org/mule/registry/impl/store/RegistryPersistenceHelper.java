@@ -1,24 +1,24 @@
 package org.mule.registry.impl.store;
 
-import java.util.HashMap;
-import java.util.Iterator;
-
 import org.mule.persistence.PersistenceHelper;
-import org.mule.registry.Registration;
 import org.mule.registry.Registry;
 import org.mule.registry.impl.MuleRegistration;
 import org.mule.registry.metadata.MetadataStore;
+import org.mule.registry.metadata.MissingMetadataException;
 import org.mule.registry.metadata.ObjectMetadata;
 import org.mule.registry.metadata.PropertyMetadata;
-import org.mule.registry.metadata.MissingMetadataException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+
+import java.util.HashMap;
+import java.util.Iterator;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class RegistryPersistenceHelper implements PersistenceHelper, Converter 
 {
@@ -61,7 +61,7 @@ public class RegistryPersistenceHelper implements PersistenceHelper, Converter
             logger.warn("No metadata found for " + className);
         }
 
-        if (persistAll || (metadata != null && metadata.getIsPersistable())) 
+        if (persistAll || (metadata != null && metadata.getPersistable()))
         {
             writer.startNode("bean");
             if (ref.getProperty("name") != null)
@@ -112,7 +112,7 @@ public class RegistryPersistenceHelper implements PersistenceHelper, Converter
             context.convertAnother(child);
         }
 
-        if (persistAll || (metadata != null && metadata.getIsPersistable())) 
+        if (persistAll || (metadata != null && metadata.getPersistable())) 
         {
             writer.endNode();
         }

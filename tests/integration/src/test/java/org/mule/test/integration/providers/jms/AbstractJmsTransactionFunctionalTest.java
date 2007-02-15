@@ -36,7 +36,7 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.UMOTransactionFactory;
-import org.mule.umo.endpoint.MalformedEndpointException;
+import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.manager.UMOManager;
@@ -356,7 +356,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
                 return new MuleEndpointURI(DEFAULT_IN_TOPIC);
             }
         }
-        catch (MalformedEndpointException e)
+        catch (EndpointException e)
         {
             fail(e.getMessage());
             return null;
@@ -376,7 +376,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
                 return new MuleEndpointURI(DEFAULT_OUT_TOPIC);
             }
         }
-        catch (MalformedEndpointException e)
+        catch (EndpointException e)
         {
             fail(e.getMessage());
             return null;
@@ -396,7 +396,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
                 return new MuleEndpointURI(DEFAULT_DL_TOPIC);
             }
         }
-        catch (MalformedEndpointException e)
+        catch (EndpointException e)
         {
             fail(e.getMessage());
             return null;

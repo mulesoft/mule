@@ -16,8 +16,6 @@ import javax.transaction.TransactionManager;
  * <code>TranactionManagerFactory</code> is a factory class for creating a
  * transaction manager for the MuleServer.
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public interface UMOTransactionManagerFactory
 {

@@ -10,6 +10,16 @@
 
 package org.mule.providers.http.functional;
 
+import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.providers.http.HttpConnector;
+import org.mule.providers.http.HttpConstants;
+import org.mule.tck.functional.AbstractProviderFunctionalTestCase;
+import org.mule.tck.functional.EventCallback;
+import org.mule.umo.UMOEventContext;
+import org.mule.umo.endpoint.EndpointException;
+import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.provider.UMOConnector;
+
 import java.net.URI;
 
 import org.apache.commons.httpclient.HttpConnection;
@@ -17,15 +27,6 @@ import org.apache.commons.httpclient.HttpState;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.protocol.Protocol;
-import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.providers.http.HttpConnector;
-import org.mule.providers.http.HttpConstants;
-import org.mule.tck.functional.AbstractProviderFunctionalTestCase;
-import org.mule.tck.functional.EventCallback;
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.endpoint.MalformedEndpointException;
-import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.provider.UMOConnector;
 
 
 public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
@@ -43,7 +44,7 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
         {
             return new MuleEndpointURI("http://localhost:60198");
         }
-        catch (MalformedEndpointException e)
+        catch (EndpointException e)
         {
             fail(e.getMessage());
             return null;

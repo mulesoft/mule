@@ -13,7 +13,7 @@ package org.mule.test.integration.providers.xmpp;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.xmpp.XmppConnector;
 import org.mule.tck.functional.AbstractProviderFunctionalTestCase;
-import org.mule.umo.endpoint.MalformedEndpointException;
+import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
 
@@ -51,7 +51,7 @@ public class XmppFunctionalTestCase extends AbstractProviderFunctionalTestCase
         {
             return new MuleEndpointURI("xmpp://mule1:mule@jabber.org.au/foo");
         }
-        catch (MalformedEndpointException e)
+        catch (EndpointException e)
         {
             fail(e.getMessage());
             return null;
@@ -64,7 +64,7 @@ public class XmppFunctionalTestCase extends AbstractProviderFunctionalTestCase
         {
             return new MuleEndpointURI("xmpp://mule2:mule@jabber.org.au/foobar");
         }
-        catch (MalformedEndpointException e)
+        catch (EndpointException e)
         {
             fail(e.getMessage());
             return null;

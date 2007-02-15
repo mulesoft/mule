@@ -15,6 +15,7 @@ import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
@@ -32,7 +33,8 @@ import org.w3c.dom.NamedNodeMap;
 public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBeanDefinitionParser
 {
     public static final String ATTRIBUTE_ID = "id";
-    public static final String ATTRIBUTE_IDREF = "idref";
+    public static final String ATTRIBUTE_NAME = "name";
+    public static final String ATTRIBUTE_IDREF = "nameref";
     public static final String ATTRIBUTE_CLASS = "class";
     /**
      * logger used by this class
@@ -44,13 +46,13 @@ public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBea
 
     protected Properties attributeMappings;
     protected Map valueMappings;
+    protected ParserContext parserContext;
 
     protected AbstractMuleSingleBeanDefinitionParser()
-    {
-        attributeMappings = new Properties();
-        valueMappings = new HashMap();
-        registerAttributeMapping(ATTRIBUTE_ID, "name");
-    }
+         {
+             attributeMappings = new Properties();
+             valueMappings = new HashMap();
+         }
 
     public void registerValueMapping(ValueMap mapping)
     {
@@ -77,30 +79,13 @@ public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBea
         return attributeMappings.getProperty(alias, alias);
     }
 
-    protected final void doParse(Element element, BeanDefinitionBuilder builder)
+    protected void processProperty(Attr attribute, BeanDefinitionBuilder builder)
     {
-        NamedNodeMap attributes = element.getAttributes();
-        for (int x = 0; x < attributes.getLength(); x++)
-        {
-            Attr attribute = (Attr) attributes.item(x);
-            String name = attribute.getLocalName();
-            //If we set an attribute manually, we pick up the name using getName()
-            if (name == null)
-            {
-                name = attribute.getNodeName();
-            }
-
-            if (ATTRIBUTE_ID.equals(name) || ATTRIBUTE_IDREF.equals(name))
-            {
-                continue;
-            }
-            String propertyName = extractPropertyName(name);
-            String propertyValue = extractPropertyValue(name, attribute.getValue());
+        String propertyName = extractPropertyName(attribute.getNodeName());
+            String propertyValue = extractPropertyValue(propertyName, attribute.getValue());
             Assert.state(StringUtils.hasText(propertyName),
                     "Illegal property name returned from 'extractPropertyName(String)': cannot be null or empty.");
             builder.addPropertyValue(propertyName, propertyValue);
-        }
-        postProcess(builder, element);
     }
 
     /**
@@ -163,6 +148,7 @@ public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBea
      */
     protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext)
     {
+        this.parserContext = parserContext;
         Class beanClass = getBeanClass(element);
         Assert.state(beanClass != null, "Class returned from getBeanClass(Element) must not be null, element is: " + element.getNodeName());
         BeanDefinitionBuilder builder = createBeanDefinitionBuilder(element, beanClass);
@@ -200,13 +186,41 @@ public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBea
      * @param element       the XML element being parsed
      * @param parserContext the object encapsulating the current state of the parsing process
      * @param builder       used to define the <code>BeanDefinition</code>
-     * @see #doParse(Element,BeanDefinitionBuilder)
      */
     protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
-        doParse(element, builder);
+        NamedNodeMap attributes = element.getAttributes();
+        for (int x = 0; x < attributes.getLength(); x++)
+        {
+            Attr attribute = (Attr) attributes.item(x);
+            String name = attribute.getLocalName();
+            //If we set an attribute manually, we pick up the name using getName()
+            if (name == null)
+            {
+                name = attribute.getNodeName();
+            }
+
+            if (ATTRIBUTE_ID.equals(name) || ATTRIBUTE_IDREF.equals(name))
+            {
+                continue;
+            }
+
+            processProperty(attribute, builder);
+        }
+        postProcess(builder, element);
     }
 
+
+    @Override
+    protected String resolveId(Element element, AbstractBeanDefinition definition, ParserContext parserContext) throws BeanDefinitionStoreException
+    {
+        String name = element.getAttribute(ATTRIBUTE_NAME);
+        if(StringUtils.hasText(name))
+        {
+            return name;
+        }
+        return super.resolveId(element, definition, parserContext);
+    }
 
     public static class ValueMap
     {

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:mgmt="http://www.mulesource.org/schema/mule/management/2.0"
+       xmlns:xm="http://www.mulesource.org/schema/mule/xml/2.0"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 META-INF/mule.xsd
+       http://www.mulesource.org/schema/mule/xml/2.0 META-INF/mule-xml.xsd
+       http://www.mulesource.org/schema/mule/management/2.0 META-INF/mule-management.xsd">
+
+
+    <mule:model-inherited name="main">
+        <mule:service name="appleComponent2"
+            implementation="org.mule.tck.testmodels.fruit.Apple">
+
+
+            <mule:inbound-router>
+                <mule:endpoint name="nonTransactedInboundEndpoint" address="test://endpoint.in3"/>
+                <mule:endpoint name="transactedInboundEndpoint" createConnector="ALWAYS_CREATE" address="test://endpoint.in2">
+                    <mule:transaction factory="org.mule.tck.testmodels.mule.TestTransactionFactory" action="ALWAYS_BEGIN"/>
+                    <property name="properties">
+                        <map>
+                            <entry key="testEndpointProperty" value="Prop1"/>
+                        </map>
+                    </property>
+                </mule:endpoint>
+            </mule:inbound-router>
+
+            <mule:outbound-router>
+                <mule:filtering-router>
+                    <mule:endpoint name="transactedOutboundEndpoint" address="test://endpoint.out"/>
+                </mule:filtering-router>
+            </mule:outbound-router>
+
+            <mule:threading-profile maxBufferSize="6" maxThreadsActive="12" maxThreadsIdle="6"/>
+            <!--<mule:pooling-profile exhaustedAction="WAIT" initialisationPolicy="INITIALISE_ALL"/>-->
+            <!--<mule:queue-profile maxOutstandingMessages="102"/>-->
+        </mule:service>
+    </mule:model-inherited>
+</beans>

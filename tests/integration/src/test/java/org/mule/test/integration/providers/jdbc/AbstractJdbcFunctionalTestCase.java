@@ -19,10 +19,10 @@ import org.mule.providers.jdbc.JdbcUtils;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.umo.UMOEventContext;
-import org.mule.umo.model.UMOModel;
-import org.mule.umo.endpoint.MalformedEndpointException;
+import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.manager.UMOManager;
+import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 
 import java.sql.Connection;
@@ -170,7 +170,7 @@ public abstract class AbstractJdbcFunctionalTestCase extends AbstractMuleTestCas
         {
             return new MuleEndpointURI(DEFAULT_IN_URI);
         }
-        catch (MalformedEndpointException e)
+        catch (EndpointException e)
         {
             fail(e.getMessage());
             return null;

@@ -34,7 +34,6 @@ import org.apache.commons.logging.LogFactory;
  * namespace, so your only bet is to run Mule in the same JVM as the application
  * server.
  * 
- * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
  */
 public class GenericTransactionManagerLookupFactory implements UMOTransactionManagerFactory
 {

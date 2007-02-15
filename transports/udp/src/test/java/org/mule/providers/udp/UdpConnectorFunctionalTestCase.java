@@ -10,18 +10,18 @@
 
 package org.mule.providers.udp;
 
+import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.tck.functional.AbstractProviderFunctionalTestCase;
+import org.mule.umo.endpoint.EndpointException;
+import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.provider.UMOConnector;
+
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.tck.functional.AbstractProviderFunctionalTestCase;
-import org.mule.umo.endpoint.MalformedEndpointException;
-import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.provider.UMOConnector;
 
 public class UdpConnectorFunctionalTestCase extends AbstractProviderFunctionalTestCase
 {
@@ -94,7 +94,7 @@ public class UdpConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
         {
             return new MuleEndpointURI("udp://localhost:60131");
         }
-        catch (MalformedEndpointException e)
+        catch (EndpointException e)
         {
             fail(e.getMessage());
             return null;
@@ -107,7 +107,7 @@ public class UdpConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
         {
             return new MuleEndpointURI("udp://localhost:60132");
         }
-        catch (MalformedEndpointException e)
+        catch (EndpointException e)
         {
             fail(e.getMessage());
             return null;

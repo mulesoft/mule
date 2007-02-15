@@ -38,7 +38,7 @@ public class PropertiesContainerContext extends AbstractContainerContext
 
     protected Map systemProperties;
     protected Map properties;
-    protected boolean loadSystemProperties = true;
+    protected boolean includeSystemProperties = true;
     protected boolean enableTemplates = false;
 
     protected TemplateParser templateParser = TemplateParser.createAntStyleParser();
@@ -104,7 +104,7 @@ public class PropertiesContainerContext extends AbstractContainerContext
             }
         }
 
-        if (loadSystemProperties)
+        if (includeSystemProperties)
         {
             Map props = System.getProperties();
 
@@ -138,5 +138,26 @@ public class PropertiesContainerContext extends AbstractContainerContext
                 MuleManager.getInstance().setProperty(entry.getKey(), value);
             }
         }
+    }
+
+
+    public boolean isIncludeSystemProperties()
+    {
+        return includeSystemProperties;
+    }
+
+    public void setIncludeSystemProperties(boolean includeSystemProperties)
+    {
+        this.includeSystemProperties = includeSystemProperties;
+    }
+
+    public boolean isEnableTemplates()
+    {
+        return enableTemplates;
+    }
+
+    public void setEnableTemplates(boolean enableTemplates)
+    {
+        this.enableTemplates = enableTemplates;
     }
 }

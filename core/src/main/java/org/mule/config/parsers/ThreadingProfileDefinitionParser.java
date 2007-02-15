@@ -10,6 +10,7 @@
 package org.mule.config.parsers;
 
 import org.mule.config.ThreadingProfile;
+import org.mule.util.StringUtils;
 
 import org.w3c.dom.Element;
 
@@ -40,7 +41,7 @@ public class ThreadingProfileDefinitionParser extends AbstractChildBeanDefinitio
         {
             return "dispatcherThreadingProfile";
         }
-        else if (name.startsWith("default-"))
+        else if (name.startsWith("default-threading-profile"))
         {
             //If this is one of the default profiles they should just be made available in the contianer
             // and retrieved via the Registry
@@ -64,5 +65,16 @@ public class ThreadingProfileDefinitionParser extends AbstractChildBeanDefinitio
         {
             return "threadingProfile";
         }
+    }
+
+    protected String getParentBeanName(Element element)
+    {
+        String name = super.getParentBeanName(element);
+        if(StringUtils.isBlank(name))
+        {
+            //The parent may be the global configuration
+            name = ((Element) element.getParentNode()).getAttribute("serverId");
+        }
+        return name;
     }
 }

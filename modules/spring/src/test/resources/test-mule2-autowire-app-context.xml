@@ -2,12 +2,6 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 
 <beans>
-    <bean id="muleManager" class="org.mule.config.AutowireUMOManagerFactoryBean">
-        <property name="managerId" value="SpringAutowireTestCase"/>
-    </bean>
-
-    <bean id="muleNameProcessor" class="org.mule.config.MuleObjectNameProcessor"/>
-
     <bean id="muleEnvironmentProperties" class="java.util.HashMap">
         <constructor-arg>
             <map>
@@ -82,7 +76,16 @@
 
     <bean id="transactionManagerFactory" class="org.mule.tck.testmodels.mule.TestTransactionManagerFactory"/>
 
-    <bean id="jmxAgent" class="org.mule.management.agents.JmxAgent"/>
+    <bean id="rmiAgent" class="org.mule.management.agents.RmiRegistryAgent"/>
+
+    <bean id="jmxAgent" class="org.mule.management.agents.JmxAgent">
+        <property name="connectorServerUrl"  value="service:jmx:rmi:///jndi/rmi://localhost:1099/server"/>
+        <property name="connectorServerProperties">
+            <map>
+                <entry key="jmx.remote.jndi.rebind" value="true"/>
+            </map>
+        </property>
+    </bean>
 
     <bean id="dummyConnector" class="org.mule.tck.testmodels.mule.TestConnector">
         <property name="exceptionListener">
@@ -328,10 +331,8 @@
     specify a different context config if you want -->
     <bean id="containerContext" class="org.mule.extras.spring.SpringContainerContext"/>
 
-    <bean id="orange" class="org.mule.tck.testmodels.fruit.Orange"/>
-
     <bean id="orangeComponent" class="org.mule.impl.MuleDescriptor">
-        <property name="implementation" value="orange"></property>
+        <property name="implementation"><bean class="org.mule.tck.testmodels.fruit.Orange"/></property>
         <property name="inboundRouter">
             <bean id="orangeInboundMessageRouter" class="org.mule.routing.inbound.InboundRouterCollection">
                 <property name="catchAllStrategy">
@@ -351,7 +352,7 @@
                 </property>
                 <property name="endpoints">
                     <list>
-                        <!--<ref local="appleInEndpoint"/>-->
+                        <ref local="appleInEndpoint"/>
                         <bean name="orangeEndpoint" singleton="false" class="org.mule.impl.endpoint.MuleEndpoint">
                             <property name="connector">
                                 <ref local="dummyConnector"/>
@@ -368,7 +369,7 @@
                             </property>
                         </bean>
 
-                        <bean singleton="false" class="org.mule.impl.endpoint.MuleEndpoint">
+                        <bean id="Orange" singleton="false" class="org.mule.impl.endpoint.MuleEndpoint">
                             <property name="connector">
                                 <ref local="dummyConnector"/>
                             </property>
@@ -453,31 +454,6 @@
             </bean>
         </property>
 
-        <property name="outboundRouter">
-            <bean id="orangeoutboundMessageRouter" class="org.mule.routing.outbound.OutboundRouterCollection">
-                <property name="routers">
-                    <list>
-                        <bean class="org.mule.routing.outbound.OutboundPassThroughRouter">
-                            <property name="endpoints">
-                                <bean class="org.mule.impl.endpoint.MuleEndpoint">
-                                    <constructor-arg index="0">
-                                        <value>test://foo.bar</value>
-                                    </constructor-arg>
-                                    <constructor-arg index="1">
-                                        <value>false</value>
-                                    </constructor-arg>
-                                    <property name="name" value="appleInEndpoint"/>
-                                    <property name="transformer">
-                                        <ref local="TestCompressionTransformer"/>
-                                    </property>
-                                </bean>
-                            </property>
-                        </bean>
-                    </list>
-                </property>
-                </bean>
-        </property>
-
         <property name="interceptors">
             <list>
                 <ref local="default"/>
@@ -486,6 +462,9 @@
         </property>
         <property name="properties">
             <map>
+                <entry key="orange">
+                    <bean id="orangeRef" class="org.mule.tck.testmodels.fruit.Orange"/>
+                </entry>
                 <entry key="brand">
                     <value>Juicy Baby!</value>
                 </entry>
@@ -669,16 +648,15 @@
                     </property>
                     <property name="filter">
                         <bean id="outfilter1" class="org.mule.routing.filters.logic.AndFilter">
-                            <property name="filters">
-                                <list>
-                                    <bean id="router2.left.filter" class="org.mule.routing.filters.RegExFilter">
-                                        <property name="expression" value="the quick brown (.*)"/>
-                                    </bean>
-                                    <bean id="router2.right.filter" class="org.mule.routing.filters.RegExFilter">
-                                        <property name="expression"><value>(.*) brown (.*)</value></property>
-                                    </bean>
-                                </list>
-
+                            <property name="leftFilter">
+                                <bean id="router2.left.filter" class="org.mule.routing.filters.RegExFilter">
+                                    <property name="expression"><value>the quick brown (.*)</value></property>
+                                </bean>
+                            </property>
+                            <property name="rightFilter">
+                                <bean id="router2.right.filter" class="org.mule.routing.filters.RegExFilter">
+                                    <property name="expression"><value>(.*) brown (.*)</value></property>
+                                </bean>
                             </property>
                         </bean>
                     </property>

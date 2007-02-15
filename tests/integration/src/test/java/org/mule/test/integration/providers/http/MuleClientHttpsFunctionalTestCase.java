@@ -15,7 +15,7 @@ import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.http.HttpsConnector;
 import org.mule.tck.functional.AbstractProviderFunctionalTestCase;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.MalformedEndpointException;
+import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
 
@@ -39,7 +39,7 @@ public class MuleClientHttpsFunctionalTestCase extends AbstractProviderFunctiona
         {
             return new MuleEndpointURI("https://localhost:50198");
         }
-        catch (MalformedEndpointException e)
+        catch (EndpointException e)
         {
             fail(e.getMessage());
             return null;

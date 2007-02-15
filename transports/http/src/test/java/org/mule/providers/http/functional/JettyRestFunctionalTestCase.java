@@ -9,17 +9,18 @@
  */
 package org.mule.providers.http.functional;
 
+import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.providers.http.jetty.JettyConnector;
+import org.mule.umo.endpoint.EndpointException;
+import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.provider.UMOConnector;
+
 import java.net.URI;
 
 import org.apache.commons.httpclient.HttpConnection;
 import org.apache.commons.httpclient.HttpState;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
-import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.providers.http.jetty.JettyConnector;
-import org.mule.umo.endpoint.MalformedEndpointException;
-import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.provider.UMOConnector;
 
 
 public class JettyRestFunctionalTestCase extends HttpFunctionalTestCase
@@ -34,7 +35,7 @@ public class JettyRestFunctionalTestCase extends HttpFunctionalTestCase
         {
             return new MuleEndpointURI("jetty:rest://localhost:60198/rest/Echo");
         }
-        catch (MalformedEndpointException e)
+        catch (EndpointException e)
         {
             fail(e.getMessage());
             return null;

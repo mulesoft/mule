@@ -36,7 +36,7 @@ public class SimpleChildDefinitionParser extends AbstractChildBeanDefinitionPars
             String cls = element.getAttribute(ATTRIBUTE_CLASS);
             try
             {
-                //RM* Todo probably need to use OSGi Loader here
+                //TODO TC: probably need to use OSGi Loader here
                 clazz = ClassUtils.loadClass(cls, getClass());
             }
             catch (ClassNotFoundException e)

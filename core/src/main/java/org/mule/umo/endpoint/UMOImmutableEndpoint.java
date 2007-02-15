@@ -41,6 +41,9 @@ public interface UMOImmutableEndpoint extends Serializable, Cloneable, Initialis
     /** The endpoint is either and will be set depending on how it is used */
     public static final String ENDPOINT_TYPE_SENDER_AND_RECEIVER = "senderAndReceiver";
 
+    /** The endpoit is a global endpoint */
+    public static final String ENDPOINT_TYPE_GLOBAL = "global";
+
     /** The endpoint is a receive endpoint set on a response router */
     public static final String ENDPOINT_TYPE_RESPONSE = "response";
 

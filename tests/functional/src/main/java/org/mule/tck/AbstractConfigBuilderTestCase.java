@@ -15,11 +15,9 @@ import org.mule.MuleManager;
 import org.mule.config.ThreadingProfile;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.MuleDescriptor;
+import org.mule.impl.container.ContainerKeyPair;
 import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.interceptors.LoggingInterceptor;
-import org.mule.interceptors.TimerInterceptor;
 import org.mule.providers.AbstractConnector;
-import org.mule.providers.SimpleRetryConnectionStrategy;
 import org.mule.providers.service.TransportFactory;
 import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.routing.filters.RegExFilter;
@@ -28,21 +26,23 @@ import org.mule.routing.filters.xml.JXPathFilter;
 import org.mule.routing.inbound.IdempotentReceiver;
 import org.mule.routing.inbound.SelectiveConsumer;
 import org.mule.routing.outbound.FilteringOutboundRouter;
+import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.mule.TestCatchAllStrategy;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
 import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOException;
 import org.mule.umo.UMOFilter;
-import org.mule.umo.UMOInterceptorStack;
 import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.umo.model.UMOModel;
-import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.routing.UMOInboundRouter;
-import org.mule.umo.routing.UMOOutboundRouterCollection;
+import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.routing.UMOOutboundRouter;
+import org.mule.umo.routing.UMOOutboundRouterCollection;
 import org.mule.umo.transformer.UMOTransformer;
 
 import java.util.Map;
@@ -61,10 +61,11 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertNotNull(c);
         assertNotNull(c.getExceptionListener());
         assertTrue(c.getExceptionListener() instanceof TestExceptionStrategy);
-        assertNotNull(c.getConnectionStrategy());
-        assertTrue(c.getConnectionStrategy() instanceof SimpleRetryConnectionStrategy);
-        assertEquals(4, ((SimpleRetryConnectionStrategy)c.getConnectionStrategy()).getRetryCount());
-        assertEquals(3000, ((SimpleRetryConnectionStrategy)c.getConnectionStrategy()).getFrequency());
+        //TODO RM* Move to the endpoint
+//        assertNotNull(c.getConnectionStrategy());
+//        assertTrue(c.getConnectionStrategy() instanceof SimpleRetryConnectionStrategy);
+//        assertEquals(4, ((SimpleRetryConnectionStrategy)c.getConnectionStrategy()).getRetryCount());
+//        assertEquals(3000, ((SimpleRetryConnectionStrategy)c.getConnectionStrategy()).getFrequency());
     }
 
     public void testGlobalEndpointConfig()
@@ -76,6 +77,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         JXPathFilter filter = (JXPathFilter)endpoint.getFilter();
         assertEquals("name", filter.getExpression());
         assertEquals("bar", filter.getExpectedValue());
+        assertNotNull(filter.getNamespaces());
         assertEquals("http://foo.com", filter.getNamespaces().get("foo"));
     }
 
@@ -88,15 +90,6 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
 
         UMODescriptor descriptor = MuleManager.getInstance().lookupModel("main").getDescriptor("appleComponent2");
         assertNotNull(descriptor);
-    }
-
-    public void testInterceptorStacks()
-    {
-        UMOInterceptorStack stack = MuleManager.getInstance().lookupInterceptorStack("default");
-        assertNotNull(stack);
-        assertEquals(2, stack.getInterceptors().size());
-        assertTrue(stack.getInterceptors().get(0) instanceof LoggingInterceptor);
-        assertTrue(stack.getInterceptors().get(1) instanceof TimerInterceptor);
     }
 
     public void testExceptionStrategy2()
@@ -136,8 +129,8 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         // check first Router
         UMOOutboundRouter route1 = (UMOOutboundRouter)router.getRouters().get(0);
         assertTrue(route1 instanceof FilteringOutboundRouter);
-        // TODO don't currently support "transformer" property
-        // assertNotNull(((FilteringOutboundRouter) route1).getTransformer());
+        assertNotNull(((FilteringOutboundRouter) route1).getTransformer());
+        assertTrue(((FilteringOutboundRouter) route1).getTransformer() instanceof TestCompressionTransformer);
 
         UMOFilter filter = ((FilteringOutboundRouter)route1).getFilter();
         assertNotNull(filter);
@@ -307,5 +300,21 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertNotNull(props.get("beanProperty1"));
         assertEquals("this was set from the manager properties!", props.get("beanProperty1"));
         assertNotNull(props.get("OS Version"));
+    }
+
+    public void testObjectReferences() throws UMOException
+    {
+        MuleDescriptor descriptor = (MuleDescriptor)MuleManager.getInstance().lookupModel("main").getDescriptor(
+            "orangeComponent");
+        assertEquals(new ContainerKeyPair(null, "orange"), descriptor.getImplementation());
+        assertEquals(Orange.class, descriptor.getImplementationClass());
+    }
+
+    public void testNestedRouterProxyCreation() throws ObjectNotFoundException
+    {
+        //Test that the proxy object was created and set on the service object
+        Orange orange = (Orange)MuleManager.getInstance().getContainerContext().getComponent("orange");
+        assertNotNull(orange);
+        assertNotNull(orange.getCleaner());
     }
 }

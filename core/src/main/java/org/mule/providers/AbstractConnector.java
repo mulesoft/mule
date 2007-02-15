@@ -290,7 +290,7 @@ public abstract class AbstractConnector
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.providers.UMOConnector#getName()
      */
     public String getName()
@@ -300,7 +300,7 @@ public abstract class AbstractConnector
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.providers.UMOConnector#setName(java.lang.String)
      */
     public void setName(String newName)
@@ -320,7 +320,7 @@ public abstract class AbstractConnector
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.providers.UMOConnector#create(java.util.HashMap)
      */
     public final synchronized void initialise() throws InitialisationException
@@ -363,7 +363,7 @@ public abstract class AbstractConnector
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.lifecycle.Registerable#register()
      */
     public void register() throws RegistrationException
@@ -373,7 +373,7 @@ public abstract class AbstractConnector
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.lifecycle.Registerable#deregister()
      */
     public void deregister() throws DeregistrationException
@@ -384,7 +384,7 @@ public abstract class AbstractConnector
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.lifecycle.Registerable#getRegistryId()
      */
     public String getRegistryId()
@@ -396,7 +396,7 @@ public abstract class AbstractConnector
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.provider.UMOConnector#start()
      */
     public final synchronized void startConnector() throws UMOException
@@ -449,7 +449,7 @@ public abstract class AbstractConnector
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.provider.UMOConnector#isStarted()
      */
     public boolean isStarted()
@@ -459,7 +459,7 @@ public abstract class AbstractConnector
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.provider.UMOConnector#stop()
      */
     public final synchronized void stopConnector() throws UMOException
@@ -519,7 +519,7 @@ public abstract class AbstractConnector
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.provider.UMOConnector#shutdown()
      */
     public final synchronized void dispose()
@@ -598,7 +598,7 @@ public abstract class AbstractConnector
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.provider.UMOConnector#isAlive()
      */
     public boolean isDisposed()
@@ -608,7 +608,7 @@ public abstract class AbstractConnector
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.provider.UMOConnector#handleException(java.lang.Object,
      *      java.lang.Throwable)
      */
@@ -627,7 +627,7 @@ public abstract class AbstractConnector
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.util.ExceptionListener#onException(java.lang.Throwable)
      */
     public void exceptionThrown(Exception e)
@@ -794,7 +794,7 @@ public abstract class AbstractConnector
 
     /**
      * The method determines the key used to store the receiver against.
-     * 
+     *
      * @param component the component for which the endpoint is being registered
      * @param endpoint the endpoint being registered for the component
      * @return the key to store the newly created receiver against
@@ -886,14 +886,14 @@ public abstract class AbstractConnector
 
     /**
      * Template method to perform any work when starting the connectoe
-     * 
+     *
      * @throws UMOException if the method fails
      */
     protected abstract void doStart() throws UMOException;
 
     /**
      * Template method to perform any work when stopping the connectoe
-     * 
+     *
      * @throws UMOException if the method fails
      */
     protected abstract void doStop() throws UMOException;
@@ -973,7 +973,7 @@ public abstract class AbstractConnector
      * Fires a server notification to all registered
      * {@link org.mule.impl.internal.notifications.CustomNotificationListener}
      * eventManager.
-     * 
+     *
      * @param notification the notification to fire. This must be of type
      *            {@link org.mule.impl.internal.notifications.CustomNotification}
      *            otherwise an exception will be thrown.
@@ -1147,7 +1147,7 @@ public abstract class AbstractConnector
 
     /**
      * Template method where any connections should be made for the connector
-     * 
+     *
      * @throws Exception
      */
     protected abstract void doConnect() throws Exception;
@@ -1155,14 +1155,14 @@ public abstract class AbstractConnector
     /**
      * Template method where any connected resources used by the connector should be
      * disconnected
-     * 
+     *
      * @throws Exception
      */
     protected abstract void doDisconnect() throws Exception;
 
     /**
      * The resource id used when firing ConnectEvents from this connector
-     * 
+     *
      * @return the resource id used when firing ConnectEvents from this connector
      */
     protected String getConnectEventId()
@@ -1176,7 +1176,7 @@ public abstract class AbstractConnector
      * {@link #getNumberOfConcurrentTransactedReceivers()}. This property is used by
      * transports that support transactions, specifically receivers that extend the
      * TransactedPollingMessageReceiver.
-     * 
+     *
      * @return true if multiple receivers will be enabled for this connection
      */
     public boolean isCreateMultipleTransactedReceivers()
@@ -1225,7 +1225,7 @@ public abstract class AbstractConnector
     /**
      * Whether to fire message notifications for every message that is sent or
      * received from this connector
-     * 
+     *
      * @param enableMessageEvents
      */
     public void setEnableMessageEvents(boolean enableMessageEvents)
@@ -1240,7 +1240,7 @@ public abstract class AbstractConnector
      * be axis:jms. Here, 'axis' is the scheme meta info and 'jms' is the protocol.
      * If the protocol argument does not start with the connector's protocol, it will
      * be appended.
-     * 
+     *
      * @param protocol the supported protocol to register
      */
     public void registerSupportedProtocol(String protocol)
@@ -1265,7 +1265,7 @@ public abstract class AbstractConnector
      * 'finder' transport that will use Axis, Xfire or Glue to create the WSDL
      * client. These transport protocols would be wsdl-axis, wsdl-xfire and
      * wsdl-glue, but they can all support 'wsdl' protocol too.
-     * 
+     *
      * @param protocol the supported protocol to register
      */
     protected void registerSupportedProtocolWithoutPrefix(String protocol)
@@ -1296,7 +1296,7 @@ public abstract class AbstractConnector
 
     /**
      * Returns an unmodifiable list of the protocols supported by this connector
-     * 
+     *
      * @return an unmodifiable list of the protocols supported by this connector
      */
     public List getSupportedProtocols()
@@ -1306,7 +1306,7 @@ public abstract class AbstractConnector
 
     /**
      * Sets A list of protocols that the connector can accept
-     * 
+     *
      * @param supportedProtocols
      */
     public void setSupportedProtocols(List supportedProtocols)
@@ -1507,7 +1507,7 @@ public abstract class AbstractConnector
      * determine the connector type is passed to this method so that any properties
      * set on the endpoint that can be used to initialise the connector are made
      * available.
-     * 
+     *
      * @param endpointUri the {@link UMOEndpointURI} use to create this connector
      * @throws InitialisationException If there are any problems with the
      *             configuration set on the Endpoint or if another exception is
@@ -1551,7 +1551,7 @@ public abstract class AbstractConnector
     /**
      * Initialises this connector from its {@link TransportServiceDescriptor} This
      * will be called before the {@link #doInitialise()} method is called.
-     * 
+     *
      * @throws InitialisationException InitialisationException If there are any
      *             problems with the configuration or if another exception is thrown
      *             it is wrapped in an InitialisationException.
@@ -1560,18 +1560,27 @@ public abstract class AbstractConnector
     {
         try
         {
-            serviceDescriptor = (TransportServiceDescriptor) 
+            serviceDescriptor = (TransportServiceDescriptor)
                 MuleManager.getInstance().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, getProtocol().toLowerCase(), serviceOverrides);
             if (serviceDescriptor == null)
             {
                 throw new ServiceException(Message.createStaticMessage("No service descriptor found for transport: " + getProtocol() + ".  This transport does not appear to be installed."));
             }
-            
+
             if (logger.isDebugEnabled())
             {
                 logger.debug("Loading DispatcherFactory for connector: " + getName() + " (" + getClass().getName() + ")");
             }
             this.setDispatcherFactory(serviceDescriptor.createDispatcherFactory());
+
+                try
+                {
+                    this.setDispatcherFactory(serviceDescriptor.createDispatcherFactory());
+                }
+                catch (TransportServiceException e)
+                {
+                    logger.debug("Transport '" + getProtocol() + "' will not support outbound endpoints: " + e.getMessage());
+                }
 
             defaultInboundTransformer = serviceDescriptor.createInboundTransformer();
             defaultOutboundTransformer = serviceDescriptor.createOutboundTransformer();
@@ -1603,7 +1612,7 @@ public abstract class AbstractConnector
      * null if the connector was created by the developer. To create a connector the
      * proper way the developer should use the {@link TransportFactory} and pass in
      * an endpoint.
-     * 
+     *
      * @return the {@link TransportServiceDescriptor} for this connector
      */
     protected TransportServiceDescriptor getServiceDescriptor()
@@ -1617,7 +1626,7 @@ public abstract class AbstractConnector
 
     /**
      * Create a Message receiver for this connector
-     * 
+     *
      * @param component the component that will receive events from this receiver,
      *            the listener
      * @param endpoint the endpoint that defies this inbound communication
@@ -1637,7 +1646,7 @@ public abstract class AbstractConnector
     /**
      * Gets a <code>UMOMessageAdapter</code> for the endpoint for the given message
      * (data)
-     * 
+     *
      * @param message the data with which to initialise the
      *            <code>UMOMessageAdapter</code>
      * @return the <code>UMOMessageAdapter</code> for the endpoint
@@ -1662,7 +1671,7 @@ public abstract class AbstractConnector
      * Gets a {@link UMOStreamMessageAdapter} from the connector for the given
      * message. This Adapter will correctly handle data streaming for this type of
      * connector
-     * 
+     *
      * @param in the input stream to read the data from
      * @param out the outputStream to write data to. This can be null.
      * @return the {@link UMOStreamMessageAdapter} for the endpoint
@@ -1686,7 +1695,7 @@ public abstract class AbstractConnector
     /**
      * A map of fully qualified class names that should override those in the
      * connectors' service descriptor This map will be null if there are no overrides
-     * 
+     *
      * @return a map of override values or null
      */
     public Map getServiceOverrides()
@@ -1696,7 +1705,7 @@ public abstract class AbstractConnector
 
     /**
      * Set the Service overrides on this connector.
-     * 
+     *
      * @param serviceOverrides the override values to use
      */
     public void setServiceOverrides(Map serviceOverrides)
@@ -1721,5 +1730,24 @@ public abstract class AbstractConnector
         throws UMOException
     {
         throw new UnsupportedOperationException(new Message(Messages.STREAMING_NOT_SUPPORTED_FOR_X, getProtocol()).toString());
+    }
+
+
+    public String toString()
+    {
+        final StringBuffer sb = new StringBuffer();
+        sb.append("AbstractConnector");
+        sb.append("{started=").append(started);
+        sb.append(", initialised=").append(initialised);
+        sb.append(", name='").append(name).append('\'');
+        sb.append(", disposed=").append(disposed);
+        sb.append(", numberOfConcurrentTransactedReceivers=").append(numberOfConcurrentTransactedReceivers);
+        sb.append(", createMultipleTransactedReceivers=").append(createMultipleTransactedReceivers);
+        sb.append(", connected=").append(connected);
+        sb.append(", supportedProtocols=").append(supportedProtocols);
+        sb.append(", serviceOverrides=").append(serviceOverrides);
+        sb.append(", registryId='").append(registryId).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

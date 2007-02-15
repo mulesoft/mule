@@ -9,15 +9,16 @@
  */
 package org.mule.config.parsers;
 
+import org.mule.util.ClassUtils;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.w3c.dom.Element;
 
 /**
  * TODO
  */
-public class SingleElementDefinitionParser extends AbstractSingleBeanDefinitionParser
+public class SingleElementDefinitionParser extends AbstractMuleSingleBeanDefinitionParser
 {
     /**
      * logger used by this class
@@ -34,6 +35,20 @@ public class SingleElementDefinitionParser extends AbstractSingleBeanDefinitionP
 
     protected Class getBeanClass(Element element)
     {
+        if(beanClass==null)
+        {
+            String cls = element.getAttribute("class");
+            try
+            {
+                //TODO TC: probably need to use OSGi Loader here
+                beanClass = ClassUtils.loadClass(cls, getClass());
+            }
+            catch (ClassNotFoundException e)
+            {
+                logger.error("could not load class: " + cls, e);
+            }
+        }
+        element.removeAttribute("class");
         return beanClass;
     }
 }

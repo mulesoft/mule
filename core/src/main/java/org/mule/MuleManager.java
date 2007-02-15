@@ -35,10 +35,10 @@ import org.mule.impl.internal.notifications.NotificationException;
 import org.mule.impl.internal.notifications.SecurityNotification;
 import org.mule.impl.internal.notifications.SecurityNotificationListener;
 import org.mule.impl.internal.notifications.ServerNotificationManager;
+import org.mule.impl.model.ModelFactory;
+import org.mule.impl.model.ModelHelper;
 import org.mule.impl.security.MuleSecurityManager;
 import org.mule.impl.work.MuleWorkManager;
-import org.mule.impl.model.ModelHelper;
-import org.mule.impl.model.ModelFactory;
 import org.mule.management.stats.AllStatistics;
 import org.mule.registry.AbstractServiceDescriptor;
 import org.mule.registry.DeregistrationException;
@@ -54,7 +54,6 @@ import org.mule.umo.UMOInterceptorStack;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.FatalException;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.umo.manager.UMOAgent;
 import org.mule.umo.manager.UMOContainerContext;
 import org.mule.umo.manager.UMOManager;
@@ -596,14 +595,7 @@ public class MuleManager implements UMOManager
      */
     public UMOTransformer lookupTransformer(String name)
     {
-        try
-        {
-            return (UMOTransformer)getContainerContext().getComponent(name);
-        }
-        catch (ObjectNotFoundException e)
-        {
-            return null;
-        }
+         return (UMOTransformer)transformers.get(name);
     }
 
     /**

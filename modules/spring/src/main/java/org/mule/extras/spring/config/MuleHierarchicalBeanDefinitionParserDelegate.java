@@ -15,13 +15,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
+import org.springframework.beans.factory.parsing.BeanComponentDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.NamespaceHandler;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.beans.factory.xml.XmlReaderContext;
-import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
-import org.springframework.beans.factory.parsing.BeanComponentDefinition;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 
@@ -43,38 +44,12 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
 
     public BeanDefinition parseCustomElement(Element ele, BeanDefinition containingBd)
     {
-
+        System.out.println("" + writeNode(ele));        
         BeanDefinition root;
         String namespaceUri = ele.getNamespaceURI();
         NamespaceHandler handler = getReaderContext().getNamespaceHandlerResolver().resolve(namespaceUri);
         if (handler == null)
         {
-          //  if (isDefaultNamespace(namespaceUri))
-          //  {
-          //      if(PROPERTY_ELEMENT.equals(ele.getLocalName()))
-          //      {
-          //          parsePropertyElements(ele, containingBd);
-                    //return null;
-           //     }
-//                else if(PROPERTY_ELEMENT.equals(ele.getParentNode().getLocalName()))
-//                {
-//                   parsePropertySubElement(ele, containingBd);
-//                    return null;
-//                }
-//                else
-//                {
-//                    BeanDefinitionHolder bdh = parseBeanDefinitionElement(ele, containingBd);
-//                    if (bdh != null)
-//                    {
-//                        return bdh.getBeanDefinition();
-//                    }
-//                    else
-//                    {
-//                        return null;
-//                    }
-//                }
-            //    return null;
-            //}
             getReaderContext().error("Unable to locate NamespaceHandler for namespace [" + namespaceUri + "]", ele);
             return null;
         }
@@ -82,25 +57,57 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
         registerBean(ele, bd);
         root = bd;
         //Grab all nested elements lised as children to this element
-        NodeList list = ele.getElementsByTagNameNS("*", "*");
-        for (int i = 0; i < list.getLength(); i++)
+        NodeList list = ele.getChildNodes();
+        for (int i = 0; i < list.getLength() ; i++)
         {
-            Element element = (Element) list.item(i);
-            if (logger.isDebugEnabled()) {
-                logger.debug(element.toString());
-            }
-            if (isDefaultNamespace(element.getNamespaceURI()) && (PROPERTY_ELEMENT.equals(element.getLocalName())))
+            if(list.item(i) instanceof Element)
             {
-                parsePropertyElements(element, bd);
-                break;
-            }
-            else
-            {
-                bd = parseCustomElement(element, bd);
-                //registerBean(element, bd);
+                Element element = (Element) list.item(i);
+                System.out.println("-- " + writeNode(element));
+                
+                if (logger.isDebugEnabled()) {
+                    logger.debug("parsing: " + writeNode(element));
+                }
+                if (isDefaultNamespace(element.getNamespaceURI()))
+                {
+                    if(PROPERTY_ELEMENT.equals(element.getLocalName()))
+                    {
+                        parsePropertyElement(element, root);
+                    }
+                    else if(MAP_ELEMENT.equals(element.getLocalName()))
+                    {
+                        parseMapElement(element, root);
+                    }
+                    else if(LIST_ELEMENT.equals(element.getLocalName()))
+                    {
+                        parseListElement(element, root);
+                    }
+                    else if(SET_ELEMENT.equals(element.getLocalName()))
+                    {
+                        parseSetElement(element, root);
+                    } 
+                }
+                else
+                {
+                    bd = parseCustomElement(element, bd);
+                }
             }
         }
         return root;
+    }
+
+    private String writeNode(Element e)
+    {
+        StringBuffer buf = new StringBuffer();
+        buf.append(e.getTagName()).append("{");
+        for (int i = 0; i < e.getAttributes().getLength(); i++)
+        {
+             Node n = e.getAttributes().item(i);
+            buf.append(n.getLocalName()).append("=").append(n.getNodeValue()).append(", ");
+
+        }
+        buf.append("}");
+        return buf.toString();
     }
 
     protected void registerBean(Element ele, BeanDefinition bd)
@@ -121,11 +128,10 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
 
     protected String generateChildBeanName(Element e)
     {
-        String parentId = ((Element) e.getParentNode()).getAttribute("id");
-        //String parentBean = e.getLocalName() + ":" + ((Element) e.getParentNode()).getAttribute("id");
-        String id = e.getAttribute("id");
+        String id = e.getAttribute("name");
         if (StringUtils.isBlank(id))
         {
+            String parentId = ((Element) e.getParentNode()).getAttribute("name");
             id = e.getLocalName();
             return "." + parentId + ":" + id;
         }

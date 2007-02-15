@@ -3,23 +3,23 @@
 <xsd:schema xmlns="http://www.mulesource.org/schema/mule/management/2.0"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+            xmlns:spring="http://www.springframework.org/schema/beans"
             targetNamespace="http://www.mulesource.org/schema/mule/management/2.0"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
 
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"/>
+    <xsd:import namespace="http://www.springframework.org/schema/beans"
+                schemaLocation="http://www.springframework.org/schema/beans"/>
 
     <!-- JMX -->
 
     <xsd:element name="jmx-server">
         <xsd:complexType mixed="true">
-            <xsd:complexContent>
-                <xsd:extension base="mule:muleObjectType">
-                    <xsd:choice>
-                        <xsd:element name="connector-server" type="connectorServerType" minOccurs="0" maxOccurs="1"/>
-                    </xsd:choice>
-                </xsd:extension>
-            </xsd:complexContent>
+            <xsd:choice>
+                <xsd:element name="connector-server" type="connectorServerType" minOccurs="0" maxOccurs="1"/>
+            </xsd:choice>
+            <xsd:attribute name="name" type="xsd:string" use="required"/>
         </xsd:complexType>
     </xsd:element>
 
@@ -30,78 +30,57 @@
 
     <xsd:element name="jmx-mx4j-adapter">
         <xsd:complexType  mixed="true">
-            <xsd:complexContent>
-                <xsd:extension base="mule:muleObjectType">
                     <xsd:attribute name="jmxAdaptorUrl" type="xsd:string"/>
                     <xsd:attribute name="adaptor" type="xsd:string"/>
                     <xsd:attribute name="mBeanServer" type="xsd:string"/>
-                </xsd:extension>
-            </xsd:complexContent>
+                    <xsd:attribute name="name" type="xsd:string" use="required"/>
         </xsd:complexType>
     </xsd:element>
 
     <xsd:element name="jmx-log4j">
         <xsd:complexType mixed="true">
-            <xsd:complexContent>
-                <xsd:extension base="mule:muleObjectType">
-                </xsd:extension>
-            </xsd:complexContent>
+            <xsd:attribute name="name" type="xsd:string" use="required"/>
         </xsd:complexType>
     </xsd:element>
 
     <xsd:element name="jmx-default-config">
         <xsd:complexType mixed="true">
-            <xsd:complexContent>
-                <xsd:extension base="mule:muleObjectType">
                     <xsd:attribute name="registerMx4jAdapter" type="xsd:boolean"/>
-                </xsd:extension>
-            </xsd:complexContent>
+                    <xsd:attribute name="name" type="xsd:string" use="required"/>
         </xsd:complexType>
     </xsd:element>
 
     <xsd:element name="jmx-notifications">
         <xsd:complexType mixed="true">
-            <xsd:complexContent>
-                <xsd:extension base="mule:muleObjectType">
                     <xsd:attribute name="registerdefaultListner" type="xsd:boolean"/>
-                </xsd:extension>
-            </xsd:complexContent>
+                    <xsd:attribute name="name" type="xsd:string" use="required"/>
         </xsd:complexType>
     </xsd:element>
 
 
     <xsd:element name="log4j-notifications">
         <xsd:complexType mixed="true">
-            <xsd:complexContent>
-                <xsd:extension base="mule:muleObjectType">
                     <xsd:attribute name="logName" type="xsd:string"/>
                     <xsd:attribute name="logConfigFile" type="xsd:string"/>
-                </xsd:extension>
-            </xsd:complexContent>
+                    <xsd:attribute name="name" type="xsd:string" use="required"/>
         </xsd:complexType>
     </xsd:element>
 
     <xsd:element name="chainsaw-notifications">
         <xsd:complexType mixed="true">
-            <xsd:complexContent>
-                <xsd:extension base="mule:muleObjectType">
                     <xsd:choice minOccurs="0" maxOccurs="1">
-                        <xsd:element name="level-mappings" type="mule:propertiesType"/>
+                        <xsd:element name="level-mappings" type="spring:mapType"/>
                     </xsd:choice>
                     <xsd:attribute name="chainsawHost" type="xsd:string" use="required"/>
                     <xsd:attribute name="chainsawPort" type="xsd:int" use="required"/>
-                </xsd:extension>
-            </xsd:complexContent>
+                    <xsd:attribute name="name" type="xsd:string" use="required"/>
         </xsd:complexType>
     </xsd:element>
 
     <xsd:element name="publish-notifications">
         <xsd:complexType mixed="true">
-            <xsd:complexContent>
-                <xsd:extension base="mule:muleObjectType">
                     <xsd:attribute name="endpointAddress" type="xsd:string" use="required"/>
-                </xsd:extension>
-            </xsd:complexContent>
+                    <xsd:attribute name="name" type="xsd:string" use="required"/>
         </xsd:complexType>
     </xsd:element>
 
@@ -109,12 +88,9 @@
     <!-- Rmi Agent -->
     <xsd:element name="rmi-server">
         <xsd:complexType mixed="true">
-            <xsd:complexContent>
-                <xsd:extension base="mule:muleObjectType">
                     <xsd:attribute name="serverUri" type="xsd:string"/>
                     <xsd:attribute name="createRegistry" type="xsd:boolean"/>
-                </xsd:extension>
-            </xsd:complexContent>
+                    <xsd:attribute name="name" type="xsd:string" use="required"/>
         </xsd:complexType>
     </xsd:element>
 

@@ -11,8 +11,11 @@ package org.mule.config.parsers;
 
 import org.mule.config.MuleConfiguration;
 
+import org.springframework.beans.factory.BeanDefinitionStoreException;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
 /**
@@ -27,7 +30,7 @@ public class ConfigurationDefinitionParser extends AbstractMuleSingleBeanDefinit
 
     public ConfigurationDefinitionParser()
     {
-        registerAttributeMapping(ATTRIBUTE_SERVER_ID, ATTRIBUTE_ID);
+       registerAttributeMapping(ATTRIBUTE_SERVER_ID, ATTRIBUTE_ID);
     }
 
     protected Class getBeanClass(Element element)
@@ -36,10 +39,20 @@ public class ConfigurationDefinitionParser extends AbstractMuleSingleBeanDefinit
     }
 
 
-    protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
+    @Override
+    protected void processProperty(Attr attribute, BeanDefinitionBuilder builder)
     {
-        String serverId = element.getAttribute(ATTRIBUTE_SERVER_ID);
-        element.setAttribute(ATTRIBUTE_ID, serverId + CONFIG_POSTFIX);
-        super.doParse(element, parserContext, builder);
+        if(attribute.getNodeName().equals(ATTRIBUTE_SERVER_ID))
+        {
+            attribute.setValue(attribute.getValue() + CONFIG_POSTFIX);
+        }
+            super.processProperty(attribute, builder);
+    }
+
+
+    @Override
+    protected String resolveId(Element element, AbstractBeanDefinition definition, ParserContext parserContext) throws BeanDefinitionStoreException
+    {
+        return element.getAttribute(ATTRIBUTE_SERVER_ID);
     }
 }

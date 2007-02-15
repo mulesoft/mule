@@ -12,25 +12,22 @@ package org.mule.extras.spring.config;
 import org.mule.MuleManager;
 import org.mule.config.MuleConfiguration;
 import org.mule.extras.spring.SpringContainerContext;
-import org.mule.impl.model.ModelFactory;
 import org.mule.impl.model.ModelHelper;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOInterceptorStack;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.lifecycle.UMOLifecycleAdapterFactory;
 import org.mule.umo.manager.UMOAgent;
 import org.mule.umo.manager.UMOContainerContext;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.manager.UMOTransactionManagerFactory;
-import org.mule.umo.model.UMOEntryPointResolver;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.transformer.UMOTransformer;
 
-import java.beans.ExceptionListener;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
@@ -73,13 +70,13 @@ import org.springframework.context.support.AbstractApplicationContext;
  * the key and a list of interceptors is the value. Accessible using from your code
  * using AutowireUMOManagerFactoryBean.MULE_INTERCEPTOR_STACK_BEAN_NAME.
  */
-public class AutowireManagementContextFactoryBean
+public class ManagementContextFactoryBean
         implements FactoryBean, InitializingBean, DisposableBean, ApplicationContextAware
 {
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(AutowireManagementContextFactoryBean.class);
+    protected static Log logger = LogFactory.getLog(ManagementContextFactoryBean.class);
 
     public static final String MULE_MODEL_EXCEPTION_STRATEGY_BEAN_NAME = "muleModelExceptionStrategy";
 
@@ -87,7 +84,7 @@ public class AutowireManagementContextFactoryBean
 
     private AbstractApplicationContext context;
 
-    public AutowireManagementContextFactoryBean() throws Exception
+    public ManagementContextFactoryBean() throws Exception
     {
         this.manager = MuleManager.getInstance();
     }
@@ -153,15 +150,10 @@ public class AutowireManagementContextFactoryBean
             Map containers = context.getBeansOfType(UMOContainerContext.class, true, true);
             setContainerContext(containers);
 
-            // interceptors
-            Map interceptors = context.getBeansOfType(UMOInterceptorStack.class, true, true);
-            setInterceptorStacks(interceptors);
-            // create the model
-            createModel();
+            // add the models
+            Map models = context.getBeansOfType(UMOModel.class, true, true);
+            setModels(models);
 
-            // set Components
-            //Map components = context.getBeansOfType(UMODescriptor.class, true, true);
-            //setComponents(components.values());
         }
         catch (Exception e)
         {
@@ -174,54 +166,54 @@ public class AutowireManagementContextFactoryBean
         manager.setId(managerId);
     }
 
-    protected void createModel() throws UMOException
-    {
-        // set the model
-        Map temp = context.getBeansOfType(UMOModel.class, false, true);
-        UMOModel model;
-        if (temp.size() > 0)
-        {
-            Map.Entry entry = (Map.Entry)temp.entrySet().iterator().next();
-            model = (UMOModel)entry.getValue();
-            //model.setName(entry.getKey().toString());
-        }
-        else
-        {
-            // create a defaultModel
-            model = ModelFactory.createModel(UMOModel.DEFAULT_MODEL_NAME);
-        }
-
-        // autowire the model so any ExceptionStrategy or PoolingStrategy beans
-        // can be set
-        // context.getBeanFactory().autowireBeanProperties(model,
-        // AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
-        // RM we cant autowire the model by type as some list properties
-        // conflict with each other
-
-        // Entry point resolver
-        Map epr = context.getBeansOfType(UMOEntryPointResolver.class, true, true);
-        if (epr.size() > 0)
-        {
-            model.setEntryPointResolver((UMOEntryPointResolver)epr.values().iterator().next());
-        }
-
-        // Life cycle adapter factory
-        Map lcaf = context.getBeansOfType(UMOLifecycleAdapterFactory.class, true, true);
-        if (lcaf.size() > 0)
-        {
-            model.setLifecycleAdapterFactory((UMOLifecycleAdapterFactory)lcaf.values().iterator().next());
-        }
-
-        // Model exception strategy
-        Object listener = getBean(MULE_MODEL_EXCEPTION_STRATEGY_BEAN_NAME, ExceptionListener.class);
-        if (listener != null)
-        {
-            model.setExceptionListener((ExceptionListener)listener);
-        }
-
-        manager.registerModel(model);
-
-    }
+//    protected void createModel() throws UMOException
+//    {
+//        // set the model
+//        Map temp = context.getBeansOfType(UMOModel.class, false, true);
+//        UMOModel model;
+//        if (temp.size() > 0)
+//        {
+//            Map.Entry entry = (Map.Entry)temp.entrySet().iterator().next();
+//            model = (UMOModel)entry.getValue();
+//            model.setName(entry.getKey().toString());
+//        }
+//        else
+//        {
+//            // create a defaultModel
+//            model = ModelFactory.createModel(UMOModel.DEFAULT_MODEL_NAME);
+//        }
+//
+//        // autowire the model so any ExceptionStrategy or PoolingStrategy beans
+//        // can be set
+//        // context.getBeanFactory().autowireBeanProperties(model,
+//        // AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
+//        // RM we cant autowire the model by type as some list properties
+//        // conflict with each other
+//
+//        // Entry point resolver
+//        Map epr = context.getBeansOfType(UMOEntryPointResolver.class, true, true);
+//        if (epr.size() > 0)
+//        {
+//            model.setEntryPointResolver((UMOEntryPointResolver)epr.values().iterator().next());
+//        }
+//
+//        // Life cycle adapter factory
+//        Map lcaf = context.getBeansOfType(UMOLifecycleAdapterFactory.class, true, true);
+//        if (lcaf.size() > 0)
+//        {
+//            model.setLifecycleAdapterFactory((UMOLifecycleAdapterFactory)lcaf.values().iterator().next());
+//        }
+//
+//        // Model exception strategy
+//        Object listener = getBean(MULE_MODEL_EXCEPTION_STRATEGY_BEAN_NAME, ExceptionListener.class);
+//        if (listener != null)
+//        {
+//            model.setExceptionListener((ExceptionListener)listener);
+//        }
+//
+//        manager.registerModel(model);
+//
+//    }
 
     private Object getBean(String name, Class clazz)
     {
@@ -259,18 +251,19 @@ public class AutowireManagementContextFactoryBean
         }
     }
 
-    protected void setMessageEndpointIdentifiers(Map endpoints) throws InitialisationException
+    protected void setModels(Map models) throws UMOException
     {
-        if (endpoints == null)
+        if (models == null)
         {
             return;
         }
         Map.Entry entry;
-        for (Iterator iterator = endpoints.entrySet().iterator(); iterator.hasNext();)
+        for (Iterator iterator = models.entrySet().iterator(); iterator.hasNext();)
         {
             entry = (Map.Entry)iterator.next();
-            manager.registerEndpointIdentifier(entry.getKey().toString(), entry.getValue().toString());
-
+            UMOModel model = (UMOModel)entry.getValue();
+            model.setName(entry.getKey().toString());
+            manager.registerModel(model);
         }
     }
 
@@ -317,7 +310,7 @@ public class AutowireManagementContextFactoryBean
         for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
         {
             UMOEndpoint ep  = (UMOEndpoint)iterator.next();
-            if(!ep.getName().startsWith("."))
+            if(UMOImmutableEndpoint.ENDPOINT_TYPE_GLOBAL.equals(ep.getType()))
             {
                 manager.registerEndpoint(ep);
             }

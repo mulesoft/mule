@@ -176,11 +176,11 @@ public class JXPathFilter implements UMOFilter
      * Initializes the JXPathContext based on any relevant properties set for the
      * filter.
      * 
-     * @param the JXPathContext to initialize
+     * @param context the JXPathContext to initialize
      */
     protected void initialise(JXPathContext context)
     {
-        Map.Entry entry = null;
+        Map.Entry entry;
         if (namespaces != null)
         {
             if (logger.isDebugEnabled())

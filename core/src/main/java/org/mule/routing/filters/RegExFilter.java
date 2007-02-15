@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 
 public class RegExFilter implements UMOFilter, ObjectFilter
 {
-    private Pattern pattern;
+    private Pattern expression;
 
     public RegExFilter()
     {
@@ -31,7 +31,7 @@ public class RegExFilter implements UMOFilter, ObjectFilter
 
     public RegExFilter(String pattern)
     {
-        this.pattern = Pattern.compile(pattern);
+        this.expression = Pattern.compile(pattern);
     }
 
     public boolean accept(UMOMessage message)
@@ -46,17 +46,17 @@ public class RegExFilter implements UMOFilter, ObjectFilter
             return false;
         }
 
-        return (pattern != null && pattern.matcher(object.toString()).find());
+        return (expression != null && expression.matcher(object.toString()).find());
     }
 
     public String getExpression()
     {
-        return (pattern == null ? null : pattern.pattern());
+        return (expression == null ? null : expression.pattern());
     }
 
     public void setExpression(String expression)
     {
-        this.pattern = (pattern != null ? Pattern.compile(expression) : null);
+        this.expression = (expression != null ? Pattern.compile(expression) : null);
     }
 
 }

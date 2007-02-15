@@ -71,7 +71,10 @@ public class ContainerKeyPair
 
         final ContainerKeyPair that = (ContainerKeyPair)o;
 
-        if (!containerName.equals(that.containerName)) return false;
+        if(containerName!=null)
+        {
+            if (!containerName.equals(that.containerName)) return false;
+        }
         if (!key.equals(that.key)) return false;
 
         return true;
@@ -79,6 +82,6 @@ public class ContainerKeyPair
 
     public int hashCode()
     {
-        return 29 * containerName.hashCode() + key.hashCode();
+        return 29 * (containerName == null ? 0 : containerName.hashCode()) + key.hashCode();
     }
 }

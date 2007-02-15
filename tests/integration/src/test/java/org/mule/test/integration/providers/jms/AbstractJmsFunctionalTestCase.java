@@ -20,7 +20,7 @@ import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
-import org.mule.umo.endpoint.MalformedEndpointException;
+import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 
 import java.util.HashMap;
@@ -145,7 +145,7 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
                 return new MuleEndpointURI(DEFAULT_IN_TOPIC);
             }
         }
-        catch (MalformedEndpointException e)
+        catch (EndpointException e)
         {
             fail(e.getMessage());
             return null;

@@ -26,7 +26,6 @@ import org.w3c.dom.Element;
  */
 public class FilterDefinitionParser extends AbstractChildBeanDefinitionParser
 {
-
     protected Class getBeanClass(Element element)
     {
         if (element.getLocalName().equals("and-filter"))

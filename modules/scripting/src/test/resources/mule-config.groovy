@@ -31,6 +31,7 @@ import org.mule.routing.nested.NestedRouterCollection;
 import org.mule.routing.inbound.InboundRouterCollection;
 import org.mule.providers.SimpleRetryConnectionStrategy;
 import org.mule.management.agents.JmxAgent;
+import org.mule.management.agents.RmiRegistryAgent;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -43,14 +44,22 @@ manager.setId("GroovyScriptTestCase");
 //set global properties
 manager.setProperty("doCompression", "true");
 //disable the admin agent
-manager.getConfiguration().setServerUrl("");
+//manager.getConfiguration().setServerUrl("");
 
 //Set a dummy TX manager
 manager.setTransactionManager(new TestTransactionManagerFactory().create());
 
 //register agents
-UMOAgent agent = new JmxAgent();
+RmiRegistryAgent rmiAgent = new RmiRegistryAgent();
+rmiAgent.setName("rmiAgent");
+manager.registerAgent(rmiAgent);
+
+JmxAgent agent = new JmxAgent();
 agent.setName("jmxAgent");
+agent.setConnectorServerUrl("service:jmx:rmi:///jndi/rmi://localhost:1099/server");
+Map p = new HashMap();
+p.put("jmx.remote.jndi.rebind", "true");
+agent.setConnectorServerProperties(p);
 manager.registerAgent(agent);
 
 //register connector
@@ -64,9 +73,9 @@ c.setConnectionStrategy(cs);
 manager.registerConnector(c);
 
 //Endpoint identifiers
-manager.registerEndpointIdentifier("AppleQueue", "test://apple.queue");
-manager.registerEndpointIdentifier("Banana_Queue", "test://banana.queue");
-manager.registerEndpointIdentifier("Test Queue", "test://test.queue");
+//manager.registerEndpointIdentifier("AppleQueue", "test://apple.queue");
+//manager.registerEndpointIdentifier("Banana_Queue", "test://banana.queue");
+//manager.registerEndpointIdentifier("Test Queue", "test://test.queue");
 
 //Register transformers
 TestCompressionTransformer t = new TestCompressionTransformer();
@@ -83,21 +92,15 @@ Map ns = new HashMap();
 ns.put("foo", "http://foo.com");
 filter.setNamespaces(ns);
 builder.registerEndpoint( "test://fruitBowlPublishQ", "fruitBowlEndpoint", false, null, filter);
-builder.registerEndpoint("Test Queue", "waterMelonEndpoint", false);
+//builder.registerEndpoint("Test Queue", "waterMelonEndpoint", false);
 builder.registerEndpoint("test://AppleQueue", "appleInEndpoint", true);
 builder.registerEndpoint("test://AppleResponseQueue", "appleResponseEndpoint", false);
+builder.registerEndpoint("test://apple.queue", "AppleQueue", false);
+builder.registerEndpoint("test://banana.queue", "Banana_Queue", false);
+builder.registerEndpoint("test://test.queue", "waterMelonEndpoint", false);
 Map props = new HashMap();
 props.put("testGlobal", "value1");
 builder.registerEndpoint( "test://orangeQ", "orangeEndpoint",false, props);
-
-
-//Register Interceptors
-InterceptorStack stack = new InterceptorStack();
-List interceptors = new ArrayList();
-interceptors.add(new LoggingInterceptor());
-interceptors.add(new TimerInterceptor());
-stack.setInterceptors(interceptors);
-manager.registerInterceptorStack("default", stack);
 
 //register model
 UMOModel model = new SedaModel();
@@ -112,8 +115,8 @@ manager.registerModel(model);
 //register components
 UMOEndpoint ep1 = manager.lookupEndpoint("appleInEndpoint");
 ep1.setTransformer(manager.lookupTransformer("TestCompressionTransformer"));
-UMODescriptor d = builder.createDescriptor("orange", "orangeComponent", null, ep1, props);
-d.setContainer("descriptor");
+UMODescriptor d = builder.createDescriptor(Orange.class.getName(), "orangeComponent", null, ep1, props);
+
 DefaultComponentExceptionStrategy dces = new DefaultComponentExceptionStrategy();
 dces.addEndpoint(new MuleEndpoint("test://orange.exceptions", false));
 d.setExceptionListener(dces);
@@ -155,14 +158,8 @@ responseRouter.addRouter(new TestResponseAggregator());
 responseRouter.setTimeout(10001);
 d.setResponseRouter(responseRouter);
 
-//Interceptors
-UMOInterceptorStack stack2 = manager.lookupInterceptorStack("default");
-d.setInterceptors(new ArrayList(stack2.getInterceptors()));
-d.getInterceptors().add(new TimerInterceptor());
-
 //properties
 Map cprops = new HashMap();
-cprops.put("orange", new Orange());
 cprops.put("brand", "Juicy Baby!");
 cprops.put("segments", "9");
 cprops.put("radius", "4.21");

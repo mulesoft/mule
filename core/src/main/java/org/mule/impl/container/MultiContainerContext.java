@@ -41,7 +41,6 @@ public class MultiContainerContext implements UMOContainerContext
     public MultiContainerContext()
     {
         addContainer(new MuleContainerContext());
-        addContainer(new DescriptorContainerContext());
     }
 
     public void setName(String name)

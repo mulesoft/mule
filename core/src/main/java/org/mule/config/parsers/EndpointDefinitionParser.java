@@ -14,14 +14,13 @@ import org.mule.config.i18n.Messages;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.umo.endpoint.EndpointException;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.util.Assert;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
 
 /**
  * TODO
@@ -34,6 +33,7 @@ public class EndpointDefinitionParser extends AbstractChildBeanDefinitionParser
     {
         registerAttributeMapping("transformers", "transformer");
         registerAttributeMapping("responseTransformers", "responseTransformer");
+        registerValueMapping("createConnector", "GET_OR_CREATE=0,ALWAYS_CREATE=1,NEVER_CREATE=2");
     }
 
     /**
@@ -77,24 +77,19 @@ public class EndpointDefinitionParser extends AbstractChildBeanDefinitionParser
         {
             return false;
         }
+        else if ("nestedBindingType".equals(parent.getSchemaTypeInfo().getTypeName()))
+        {
+            return false;
+        }
         return true;
     }
 
-    protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
+    @Override
+    protected void processProperty(Attr attribute, BeanDefinitionBuilder builder)
     {
-        registry = parserContext.getRegistry();
-        NamedNodeMap attributes = element.getAttributes();
-        for (int x = 0; x < attributes.getLength(); x++)
-        {
-            Attr attribute = (Attr) attributes.item(x);
-            String name = attribute.getName();
-            if (ATTRIBUTE_IDREF.equals(name))
+         if (ADDRESS_ATTRIBUTE.equals(attribute.getNodeName()))
             {
-                continue;
-            }
-            else if (ADDRESS_ATTRIBUTE.equals(name))
-            {
-                String address = element.getAttribute("address");
+                String address = attribute.getNodeValue();
                 try
                 {
                     builder.addPropertyValue("endpointURI", new MuleEndpointURI(address));
@@ -103,18 +98,24 @@ public class EndpointDefinitionParser extends AbstractChildBeanDefinitionParser
                 {
                     throw new BeanCreationException(new Message(Messages.ENPOINT_X_IS_MALFORMED, address).getMessage(), e);
                 }
-                continue;
             }
-
-            String propertyName = extractPropertyName(name);
-            Assert.state(org.springframework.util.StringUtils.hasText(propertyName),
-                    "Illegal property name returned from 'extractPropertyName(String)': cannot be null or empty.");
-            builder.addPropertyValue(propertyName, attribute.getValue());
-        }
-        postProcess(builder, element);
+        else {
+            super.processProperty(attribute, builder);
+         }
     }
 
 
+    @Override
+    protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
+    {
+        //Check to see if this is a global endpoint
+        Element parent = (Element) element.getParentNode();
+        if (parent.getNodeName().equals("beans"))
+        {
+            builder.addPropertyValue("type", UMOImmutableEndpoint.ENDPOINT_TYPE_GLOBAL);
+        }
+        super.parseChild(element, parserContext, builder);
+    }
 
     protected Class getBeanClass(Element element)
     {

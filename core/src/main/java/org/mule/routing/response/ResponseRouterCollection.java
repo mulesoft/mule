@@ -17,8 +17,8 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.RoutingException;
-import org.mule.umo.routing.UMOResponseRouterCollection;
 import org.mule.umo.routing.UMOResponseRouter;
+import org.mule.umo.routing.UMOResponseRouterCollection;
 import org.mule.umo.routing.UMORouter;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
@@ -145,11 +145,14 @@ public class ResponseRouterCollection extends AbstractRouterCollection implement
             this.endpoints.clear();
             this.endpoints.addAll(endpoints);
 
+            UMOEndpoint endpoint;
             // Force all endpoints' type to RESPONSE just in case.
             for (Iterator it = this.endpoints.iterator(); it.hasNext();)
             {
-                ((UMOEndpoint)it.next()).setType(UMOEndpoint.ENDPOINT_TYPE_RESPONSE);
+                endpoint = (UMOEndpoint)it.next();
+                endpoint.setType(UMOEndpoint.ENDPOINT_TYPE_RESPONSE);
             }
+
         }
         else
         {

@@ -25,7 +25,7 @@
     file to a given version of this dtd. This will help to
     avoid versions conflicts.
 -->
-<!ATTLIST mule-configuration version    (2.0)           #REQUIRED>
+<!ATTLIST mule-configuration version    (1.0)           #REQUIRED>
 
 <!--
     <i>mule-environment-params</i> are prarameters used by the Mule run-time. If none or not all

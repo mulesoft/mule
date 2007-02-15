@@ -45,15 +45,16 @@ public abstract class AbstractChildBeanDefinitionParser extends AbstractMuleSing
 
     protected void postProcess(BeanDefinitionBuilder builder, Element element)
     {
-        String parentBean = ((Element) element.getParentNode()).getAttribute(ATTRIBUTE_ID);
+        String parentBean = getParentBeanName(element);
         if (StringUtils.isBlank(parentBean))
         {
+            //TODO RM*: This should probably be an exception
             logger.info("Bean: " + element.getNodeName() + " has no parent");
             return;
         }
 
         String name = generateChildBeanName(element);
-        element.setAttribute(ATTRIBUTE_ID, name);
+        element.setAttribute(ATTRIBUTE_NAME, name);
         BeanDefinition parent = registry.getBeanDefinition(parentBean);
 
         String propertyName = getPropertyName(element);
@@ -95,14 +96,19 @@ public abstract class AbstractChildBeanDefinitionParser extends AbstractMuleSing
         parent.getPropertyValues().addPropertyValue(pv);
     }
 
+    protected String getParentBeanName(Element element)
+    {
+        return ((Element) element.getParentNode()).getAttribute(ATTRIBUTE_NAME);
+    }
+
     protected String generateChildBeanName(Element e)
     {
-        String parentId = ((Element) e.getParentNode()).getAttribute("id");
+        String parentId = ((Element) e.getParentNode()).getAttribute(ATTRIBUTE_NAME);
         //String parentBean = e.getLocalName() + ":" + ((Element) e.getParentNode()).getAttribute("id");
-        String id = e.getAttribute("id");
+        String id = e.getAttribute(ATTRIBUTE_NAME);
         if (StringUtils.isBlank(id))
         {
-            String idref = e.getAttribute("idref");
+            String idref = e.getAttribute(ATTRIBUTE_IDREF);
             if(StringUtils.isBlank(idref))
             {
                 id = e.getLocalName();

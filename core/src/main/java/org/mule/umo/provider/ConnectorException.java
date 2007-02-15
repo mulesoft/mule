@@ -61,7 +61,7 @@ public class ConnectorException extends UMOException
         {
             message.setNextMessage(m);
         }
-        return m;
+        return message;
     }
 
     public UMOConnector getConnector()
