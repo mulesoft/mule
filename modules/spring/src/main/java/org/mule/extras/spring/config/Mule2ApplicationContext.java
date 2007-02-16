@@ -56,7 +56,6 @@ public class Mule2ApplicationContext extends AbstractXmlApplicationContext
 
     protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException
     {
-        beanFactory.registerBeanDefinition("_springContainerContext", new RootBeanDefinition(SpringContainerContextFactoryBean.class, true));
         beanFactory.registerBeanDefinition("_MuleManagemenetContextFactoryBean", new RootBeanDefinition(ManagementContextFactoryBean.class, true));
 //        beanFactory.addBeanPostProcessor(new MuleObjectNameProcessor());
         beanFactory.registerCustomEditor(UMOTransformer.class, new TransformerPropertyEditor(beanFactory));
@@ -66,8 +65,5 @@ public class Mule2ApplicationContext extends AbstractXmlApplicationContext
         beanDefinitionReader.setDocumentReaderClass(MuleBeanDefinitionDocumentReader.class);
 
         beanDefinitionReader.loadBeanDefinitions(configLocations);
-        //initBeanDefinitionReader(beanDefinitionReader);
-        //loadBeanDefinitions(beanDefinitionReader);
-
     }
 }
