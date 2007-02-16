@@ -57,8 +57,10 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
         setValidationMode(VALIDATION_DTD);
         setEntityResolver(createEntityResolver());
         this.configCount = configCount;
+
+        //Register Any custom property editors here
         ((DefaultListableBeanFactory)beanDefinitionRegistry).registerCustomEditor(UMOTransformer.class,
-            new TransformerEditor());
+            new TransformerPropertyEditor((DefaultListableBeanFactory)beanDefinitionRegistry));
     }
 
     public int registerBeanDefinitions(Document document, Resource resource) throws BeansException
