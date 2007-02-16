@@ -10,17 +10,6 @@
 
 package org.mule.providers.jms;
 
-import javax.jms.DeliveryMode;
-import javax.jms.Destination;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageListener;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
-import javax.jms.TemporaryQueue;
-import javax.jms.TemporaryTopic;
-
-import org.apache.commons.collections.MapUtils;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
@@ -35,6 +24,18 @@ import org.mule.util.concurrent.Latch;
 import org.mule.util.concurrent.WaitableBoolean;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
+import javax.jms.DeliveryMode;
+import javax.jms.Destination;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageListener;
+import javax.jms.MessageProducer;
+import javax.jms.Session;
+import javax.jms.TemporaryQueue;
+import javax.jms.TemporaryTopic;
+
+import org.apache.commons.collections.MapUtils;
 
 /**
  * <code>JmsMessageDispatcher</code> is responsible for dispatching messages to JMS

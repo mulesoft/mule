@@ -10,15 +10,15 @@
 
 package org.mule.providers.jms;
 
-import javax.jms.Connection;
-import javax.jms.JMSException;
-import javax.jms.Session;
-
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.transaction.AbstractSingleResourceTransaction;
 import org.mule.transaction.IllegalTransactionStateException;
 import org.mule.umo.TransactionException;
+
+import javax.jms.Connection;
+import javax.jms.JMSException;
+import javax.jms.Session;
 
 /**
  * <code>JmsTransaction</code> is a wrapper for a JMS local transaction. This

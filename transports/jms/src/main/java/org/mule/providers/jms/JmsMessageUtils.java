@@ -10,6 +10,9 @@
 
 package org.mule.providers.jms;
 
+import org.mule.util.ArrayUtils;
+import org.mule.util.StringUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
@@ -34,8 +37,6 @@ import javax.jms.TextMessage;
 import javax.jms.Topic;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.mule.util.ArrayUtils;
-import org.mule.util.StringUtils;
 
 /**
  * <code>JmsMessageUtils</code> contains helper method for dealing with JMS

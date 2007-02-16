@@ -9,12 +9,14 @@
  */
 package org.mule.management.support;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.util.ClassUtils;
 
-import javax.management.ObjectName;
 import java.lang.reflect.Method;
+
+import javax.management.ObjectName;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Will discover if newer JMX version is available, otherwise fallback to JMX 1.1
@@ -34,7 +36,7 @@ public class AutoDiscoveryJmxSupportFactory implements JmxSupportFactory
      * @return matching support class instance
      * @see JmxLegacySupport
      */
-    public JmxSupport newJmxSupport()
+    public JmxSupport getJmxSupport()
     {
         // TODO cache the support class instance
         Class clazz = ObjectName.class;

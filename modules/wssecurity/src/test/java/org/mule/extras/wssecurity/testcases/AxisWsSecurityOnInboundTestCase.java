@@ -10,12 +10,13 @@
 
 package org.mule.extras.wssecurity.testcases;
 
-import java.util.Properties;
-
-import org.apache.ws.security.handler.WSHandlerConstants;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
+
+import java.util.Properties;
+
+import org.apache.ws.security.handler.WSHandlerConstants;
 
 public class AxisWsSecurityOnInboundTestCase extends FunctionalTestCase
 {         

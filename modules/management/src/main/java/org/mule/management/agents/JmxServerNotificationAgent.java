@@ -9,6 +9,15 @@
  */
 package org.mule.management.agents;
 
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.impl.internal.admin.AbstractNotificationLoggerAgent;
+import org.mule.management.support.AutoDiscoveryJmxSupportFactory;
+import org.mule.management.support.JmxSupport;
+import org.mule.management.support.JmxSupportFactory;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.manager.UMOServerNotification;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,15 +27,6 @@ import javax.management.Notification;
 import javax.management.NotificationBroadcasterSupport;
 import javax.management.NotificationEmitter;
 import javax.management.ObjectName;
-
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.impl.internal.admin.AbstractNotificationLoggerAgent;
-import org.mule.management.support.AutoDiscoveryJmxSupportFactory;
-import org.mule.management.support.JmxSupport;
-import org.mule.management.support.JmxSupportFactory;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.UMOServerNotification;
 
 /**
  * An agent that propergates Mule Server notifications to Jmx.
@@ -64,7 +64,7 @@ public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent
     {
         try
         {
-            jmxSupport = jmxSupportFactory.newJmxSupport();
+            jmxSupport = jmxSupportFactory.getJmxSupport();
             mBeanServer = (MBeanServer) MBeanServerFactory.findMBeanServer(null).get(0);
             broadcasterObjectName = ObjectName.getInstance(jmxSupport.getDomainName() + ":" + BROADCASTER_JMX_OBJECT_NAME);
             broadcastNotificationMbean = new BroadcastNotificationService();

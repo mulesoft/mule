@@ -61,25 +61,6 @@ public class MuleConfiguration
      */
     public static final String DEFAULT_OS_ENCODING = System.getProperty("file.encoding");
 
-    // /**
-    // * Determines the default inboundProvider that Mule uses to communicate
-    // between MuelUMO's when an
-    // * inboundProvider is not specified on a mule.
-    // * If this value is not specifed, Mule will create a default VM connection
-    // * called 'muleVMInboundProvider' which will use a VMConnector.
-    // */
-    // public static final String DEFAULT_INBOUND_PROVIDER_PROPERTY =
-    // "defaultInboundProvider";
-    //
-    // /**
-    // * Determines the default outboundProvider that Mule uses to communicate
-    // between MuelUMO's when an
-    // * outboundProvider is not specified on a mule.
-    // * If this value is not specifed, Mule will create a default VM connection
-    // * called 'muleVMOutbound' which will use a VMConnector.
-    // */
-    // public static final String DEFAULT_OUTBOUND_PROVIDER_PROPERTY =
-    // "defaultOutboundProvider";
 
     /**
      * Default value for SYNCHRONOUS_PROPERTY
@@ -93,6 +74,8 @@ public class MuleConfiguration
     public static final int DEFAULT_TIMEOUT = 10000;
 
     public static final int DEFAULT_TRANSACTION_TIMEOUT = 30000;
+
+    public static final String DEFAULT_SYSTEM_MODEL_TYPE = "seda";
 
     /**
      * Where Mule stores any runtime files to disk
@@ -108,6 +91,11 @@ public class MuleConfiguration
      * holds the value for SYNCHRONOUS
      */
     private boolean synchronous = DEFAULT_SYNCHRONOUS;
+
+    /**
+     * The type of model used for the internal system model where system created services are registered
+     */
+    private String systemModelType = DEFAULT_SYSTEM_MODEL_TYPE;
 
     private String encoding = DEFAULT_ENCODING;
 
@@ -138,7 +126,7 @@ public class MuleConfiguration
      * The default transaction timeout value used if no specific transaction time out
      * has been set on the transaction config
      */
-    private int transactionTimeout = DEFAULT_TRANSACTION_TIMEOUT;
+    private int defaultTransactionTimeout = DEFAULT_TRANSACTION_TIMEOUT;
 
     /**
      * Determines whether when running synchronously, return events are received
@@ -215,7 +203,7 @@ public class MuleConfiguration
     {
         this.synchronous = synchronous;
     }
-
+    
     public ThreadingProfile getDefaultMessageDispatcherThreadingProfile()
     {
         return getThreadingProfile(messageDispatcherThreadingProfile);
@@ -434,14 +422,14 @@ public class MuleConfiguration
         return getManifest().getMainAttributes().getValue(new Attributes.Name(name));
     }
 
-    public int getTransactionTimeout()
+    public int getDefaultTransactionTimeout()
     {
-        return transactionTimeout;
+        return defaultTransactionTimeout;
     }
 
-    public void setTransactionTimeout(int transactionTimeout)
+    public void setDefaultTransactionTimeout(int defaultTransactionTimeout)
     {
-        this.transactionTimeout = transactionTimeout;
+        this.defaultTransactionTimeout = defaultTransactionTimeout;
     }
 
     public boolean isClientMode()
@@ -552,5 +540,16 @@ public class MuleConfiguration
     private void updateApplicationProperty(String name, Object value)
     {
         if(MuleManager.isInstanciated()) MuleManager.getInstance().setProperty(name, value);
+    }
+
+
+    public String getSystemModelType()
+    {
+        return systemModelType;
+    }
+
+    public void setSystemModelType(String systemModelType)
+    {
+        this.systemModelType = systemModelType;
     }
 }

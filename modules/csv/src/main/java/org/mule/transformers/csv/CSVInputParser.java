@@ -85,9 +85,20 @@ public class CSVInputParser implements CSVParser
                 }
                 else
                 {
-                    Map row = new HashMap(line.length);
+                    int cols = line.length;
 
-                    for (int i = 0; i < line.length; i++)
+                    // We have to handle cases where the user defines extra columns, 
+                    // or defines columns where sometimes both the column value and 
+                    // the delimiter are missing (bad csv, in other words)
+                    if (labels != null && labels.size() > cols)
+                    {
+                        cols = labels.size();
+                    }
+
+                    Map row = new HashMap(cols);
+                    int i = 0;
+
+                    for (; i < line.length; i++)
                     {
                         if (labels != null)
                         {
@@ -96,6 +107,15 @@ public class CSVInputParser implements CSVParser
                         else
                         {
                             row.put(String.valueOf(i), line[i]);
+                        }
+                    }
+
+                    // Now populate those extra columns, if we created them
+                    if (labels != null && i < cols)
+                    {
+                        for (; i < cols; i++)
+                        {
+                            row.put(labels.get(i), "");
                         }
                     }
 

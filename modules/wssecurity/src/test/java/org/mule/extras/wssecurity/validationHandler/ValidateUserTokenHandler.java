@@ -1,5 +1,5 @@
 /*
- * $Id: 
+ * $Id$ 
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -20,13 +20,12 @@ import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
 import org.codehaus.xfire.MessageContext;
 import org.codehaus.xfire.handler.AbstractHandler;
-
 import sun.security.x509.X500Name;
 
 public class ValidateUserTokenHandler extends AbstractHandler
 {
 
-    public void invoke(MessageContext context)throws Exception
+    public void invoke (MessageContext context) throws Exception
     {
         Vector result = (Vector) context.getProperty(WSHandlerConstants.RECV_RESULTS);
         for (int i = 0; i < result.size(); i++)
@@ -35,22 +34,24 @@ public class ValidateUserTokenHandler extends AbstractHandler
             for (int j = 0; j < res.getResults().size(); j++)
             {
                 WSSecurityEngineResult secRes = (WSSecurityEngineResult) res.getResults().get(j);
-                int action  = secRes.getAction();
+                int action = secRes.getAction();
                 // USER TOKEN
-                if( (action &  WSConstants.UT )>0   ){
-                WSUsernameTokenPrincipal principal = (WSUsernameTokenPrincipal) secRes
-                        .getPrincipal();
-                // Set user property to user from UT to allow response encryption
-                context.setProperty(WSHandlerConstants.ENCRYPTION_USER,principal.getName());
-                System.out.print("User : " + principal.getName() + " password : "
-                        + principal.getPassword() + "\n");
+                if ((action & WSConstants.UT) > 0)
+                {
+                    WSUsernameTokenPrincipal principal = (WSUsernameTokenPrincipal) secRes
+                            .getPrincipal();
+                    // Set user property to user from UT to allow response encryption
+                    context.setProperty(WSHandlerConstants.ENCRYPTION_USER, principal.getName());
+                    System.out.print("User : " + principal.getName() + " password : "
+                                     + principal.getPassword() + "\n");
                 }
                 // SIGNATURE
-                if( ( action & WSConstants.SIGN ) > 0 ){
+                if ((action & WSConstants.SIGN) > 0)
+                {
                     X509Certificate cert = secRes.getCertificate();
                     X500Name principal = (X500Name) secRes.getPrincipal();
                     // Do something with cert
-                    System.out.print("Signature for : "  + principal.getCommonName());
+                    System.out.print("Signature for : " + principal.getCommonName());
                 }
             }
         }

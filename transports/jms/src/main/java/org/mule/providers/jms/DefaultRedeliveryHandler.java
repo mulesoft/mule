@@ -10,6 +10,8 @@
 
 package org.mule.providers.jms;
 
+import org.mule.umo.MessagingException;
+
 import java.util.Collections;
 import java.util.Map;
 
@@ -19,7 +21,6 @@ import javax.jms.Message;
 import org.apache.commons.collections.map.LRUMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.umo.MessagingException;
 
 /**
  * <code>DefaultRedeliveryHandler</code> TODO

@@ -15,6 +15,6 @@ package org.mule.transformers.csv;
  */
 public interface CSVParser
 {
-    public static char DEFAULT_SEPARATOR = ';';
+    public static char DEFAULT_SEPARATOR = ',';
     public static char DEFAULT_QUOTE_CHARACTER = '"';
 }

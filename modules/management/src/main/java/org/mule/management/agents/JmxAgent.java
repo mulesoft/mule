@@ -28,12 +28,11 @@ import org.mule.management.mbeans.MuleConfigurationService;
 import org.mule.management.mbeans.MuleConfigurationServiceMBean;
 import org.mule.management.mbeans.MuleService;
 import org.mule.management.mbeans.MuleServiceMBean;
-import org.mule.management.mbeans.RegistryService;
-import org.mule.management.mbeans.RegistryServiceMBean;
 import org.mule.management.mbeans.StatisticsService;
 import org.mule.management.support.AutoDiscoveryJmxSupportFactory;
 import org.mule.management.support.JmxSupport;
 import org.mule.management.support.JmxSupportFactory;
+import org.mule.management.support.SimplePasswordJmxAuthenticator;
 import org.mule.providers.AbstractConnector;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -43,16 +42,17 @@ import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
+import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
-import java.util.Collections;
 
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.MBeanRegistrationException;
@@ -61,9 +61,11 @@ import javax.management.MBeanServerFactory;
 import javax.management.MalformedObjectNameException;
 import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
+import javax.management.remote.JMXAuthenticator;
 import javax.management.remote.JMXConnectorServer;
 import javax.management.remote.JMXConnectorServerFactory;
 import javax.management.remote.JMXServiceURL;
+import javax.management.remote.rmi.RMIConnectorServer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -77,6 +79,11 @@ public class JmxAgent implements UMOAgent
     public static final String DEFAULT_REMOTING_URI = "service:jmx:rmi:///jndi/rmi://localhost:1099/server";
     // populated with values below in a static initializer
     public static final Map DEFAULT_CONNECTOR_SERVER_PROPERTIES;
+
+    /**
+     * Default JMX Authenticator to use for securing remote access.
+     */
+    public static final String DEFAULT_JMX_AUTHENTICATOR = SimplePasswordJmxAuthenticator.class.getName();
 
     /**
      * Logger used by this class
@@ -100,11 +107,17 @@ public class JmxAgent implements UMOAgent
     private final AtomicBoolean initialized = new AtomicBoolean(false);
 
     private JmxSupportFactory jmxSupportFactory = new AutoDiscoveryJmxSupportFactory();
-    private JmxSupport jmxSupport;
+    private JmxSupport jmxSupport = jmxSupportFactory.getJmxSupport();
+
+    /**
+     * Username/password combinations for JMX Remoting
+     * authentication.
+     */
+    private Map credentials = new HashMap();
 
     static {
         Map props = new HashMap(1);
-        props.put("jmx.remote.jndi.rebind", "true");
+        props.put(RMIConnectorServer.JNDI_REBIND_ATTRIBUTE, "true");
         DEFAULT_CONNECTOR_SERVER_PROPERTIES = Collections.unmodifiableMap(props);
     }
 
@@ -144,7 +157,7 @@ public class JmxAgent implements UMOAgent
 
     /** {@inheritDoc}
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.lifecycle.Initialisable#initialise()
      */
     public void initialise() throws InitialisationException
@@ -175,13 +188,20 @@ public class JmxAgent implements UMOAgent
                 {
                     connectorServerProperties = new HashMap(DEFAULT_CONNECTOR_SERVER_PROPERTIES);
                 }
+                // TODO custom authenticator may have its own security config, refactor
+                if (!credentials.isEmpty())
+                {
+                    JMXAuthenticator jmxAuthenticator = (JMXAuthenticator) ClassUtils.instanciateClass(
+                                                                    DEFAULT_JMX_AUTHENTICATOR, ClassUtils.NO_ARGS);
+                    // TODO support for custom authenticators
+                    ((SimplePasswordJmxAuthenticator) jmxAuthenticator).setCredentials(credentials);
+                    connectorServerProperties.put(JMXConnectorServer.AUTHENTICATOR, jmxAuthenticator);
+                }
                 connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url, connectorServerProperties, mBeanServer);
             } catch (Exception e) {
                 throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X, "Jmx Connector"), e, this);
             }
         }
-
-        jmxSupport = jmxSupportFactory.newJmxSupport();
 
         // We need to register all the services once the server has initialised
         ManagerNotificationListener l = new ManagerNotificationListener() {
@@ -197,7 +217,6 @@ public class JmxAgent implements UMOAgent
                         registerComponentServices();
                         registerEndpointServices();
                         registerConnectorServices();
-                        registerRegistryService();
                     } catch (Exception e) {
                         throw new MuleRuntimeException(new Message(Messages.X_FAILED_TO_INITIALISE, "MBeans"), e);
                     }
@@ -225,7 +244,7 @@ public class JmxAgent implements UMOAgent
 
     /** {@inheritDoc}
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.lifecycle.Startable#start()
      */
     public void start() throws UMOException
@@ -242,7 +261,7 @@ public class JmxAgent implements UMOAgent
 
     /** {@inheritDoc}
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.lifecycle.Stoppable#stop()
      */
     public void stop() throws UMOException
@@ -258,7 +277,7 @@ public class JmxAgent implements UMOAgent
 
     /** {@inheritDoc}
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.lifecycle.Disposable#dispose()
      */
     public void dispose()
@@ -283,7 +302,7 @@ public class JmxAgent implements UMOAgent
 
     /** {@inheritDoc}
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.manager.UMOAgent#registered()
      */
     public void registered()
@@ -293,7 +312,7 @@ public class JmxAgent implements UMOAgent
 
     /** {@inheritDoc}
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.manager.UMOAgent#unregistered()
      */
     public void unregistered()
@@ -443,17 +462,6 @@ public class JmxAgent implements UMOAgent
         }
     }
 
-    protected void registerRegistryService() throws NotCompliantMBeanException, MBeanRegistrationException,
-            InstanceAlreadyExistsException, MalformedObjectNameException
-    {
-        RegistryServiceMBean serviceMBean = new RegistryService();
-        String rawName = serviceMBean.getName();
-        String name = jmxSupport.escape(rawName);
-        ObjectName on = jmxSupport.getObjectName(jmxSupport.getDomainName() + ":type=org.mule.registry,name=" + name);
-        logger.debug("Registering registry with name: " + on);
-        mBeanServer.registerMBean(serviceMBean, on);
-        registeredMBeans.add(on);
-    }
     /**
      * @return Returns the createServer.
      */
@@ -573,5 +581,20 @@ public class JmxAgent implements UMOAgent
     public void setJmxSupportFactory(JmxSupportFactory jmxSupportFactory)
     {
         this.jmxSupportFactory = jmxSupportFactory;
+    }
+
+
+    /**
+     * Setter for property 'credentials'.
+     *
+     * @param newCredentials Value to set for property 'credentials'.
+     */
+    public void setCredentials(final Map newCredentials)
+    {
+        this.credentials.clear();
+        if (newCredentials != null && !newCredentials.isEmpty())
+        {
+            this.credentials.putAll(newCredentials);
+        }
     }
 }

@@ -13,7 +13,10 @@ package org.mule.tck.functional;
 import org.mule.umo.UMOEventContext;
 
 /**
- * <code>EventCallback</code> TODO (document class)
+ * The scope of the Event Callback is to be able to get a component we are using
+ * and to control it. This is especially useful when we have beans configured in
+ * Spring that we need to exercise some form of control on, example setting
+ * properties at runtime instead of in the configuration.
  */
 
 public interface EventCallback

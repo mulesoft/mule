@@ -45,7 +45,7 @@ public class MuleTransactionConfig implements UMOTransactionConfig
 
     public MuleTransactionConfig()
     {
-        timeout = MuleManager.getConfiguration().getTransactionTimeout();
+        timeout = MuleManager.getConfiguration().getDefaultTransactionTimeout();
     }
 
     /*

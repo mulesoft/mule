@@ -10,17 +10,17 @@
 
 package org.mule.providers.jms;
 
-import javax.jms.JMSException;
-import javax.jms.Queue;
-import javax.jms.Session;
-import javax.jms.Topic;
-
 import org.mule.tck.AbstractMuleTestCase;
 
 import com.mockobjects.constraint.Constraint;
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.FullConstraintMatcher;
 import com.mockobjects.dynamic.Mock;
+
+import javax.jms.JMSException;
+import javax.jms.Queue;
+import javax.jms.Session;
+import javax.jms.Topic;
 
 public class Jms11SupportTestCase extends AbstractMuleTestCase
 {

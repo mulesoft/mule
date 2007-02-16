@@ -64,12 +64,12 @@ public class MuleContainerContextTestCase extends AbstractContainerContextTestCa
     // {
     // // expected
     // }
-    // d.getObjectReferences().clear();
+    // d.getObjectReferences().clearErrors();
     // //Should work as the ref is not required
     // d.addObjectReference(new ObjectReference("foo", "bar", false));
     // resolver.resolveComponents(new Object(), d.getObjectReferences());
     //
-    // d.getObjectReferences().clear();
+    // d.getObjectReferences().clearErrors();
     // FruitBowl fb = new FruitBowl();
     // d.addObjectReference(new ObjectReference("banana",
     // Banana.class.getName(), true));

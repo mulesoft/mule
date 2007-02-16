@@ -98,7 +98,11 @@ public class Jms102bSupport extends Jms11Support
         }
         else if (connection instanceof QueueConnection)
         {
-            return ((QueueConnection) connection).createQueueSession(transacted, ackMode);
+            // for transacted sessions the ackMode is always ignored, but
+            // set it for readability (SESSION_TRANSACTION is recommented
+            // for this case).
+            return ((QueueConnection) connection).createQueueSession(
+                    transacted, (transacted ? Session.SESSION_TRANSACTED : ackMode));
         }
         else
         {
@@ -188,11 +192,13 @@ public class Jms102bSupport extends Jms11Support
 
         if (topic)
         {
-            return session.createTopic(name);
+            // DO NOT REMOVE THE CAST, BREAKS WEBLOGIC 8.X
+            return ((TopicSession) session).createTopic(name);
         }
         else
         {
-            return session.createQueue(name);
+            // DO NOT REMOVE THE CAST, BREAKS WEBLOGIC 8.X
+            return ((QueueSession) session).createQueue(name);
         }
     }
 
@@ -205,11 +211,13 @@ public class Jms102bSupport extends Jms11Support
 
         if (topic)
         {
-            return session.createTemporaryTopic();
+            // DO NOT REMOVE THE CAST, BREAKS WEBLOGIC 8.X
+            return ((TopicSession) session).createTemporaryTopic();
         }
         else
         {
-            return session.createTemporaryQueue();
+            // DO NOT REMOVE THE CAST, BREAKS WEBLOGIC 8.X
+            return ((QueueSession) session).createTemporaryQueue();
         }
     }
 

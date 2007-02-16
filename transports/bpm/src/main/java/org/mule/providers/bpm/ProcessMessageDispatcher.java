@@ -231,11 +231,6 @@ public class ProcessMessageDispatcher extends AbstractMessageDispatcher
             "doReceive() is not implemented by the ProcessMessageDispatcher");
     }
 
-    public Object getDelegateSession() throws UMOException
-    {
-        return null;
-    }
-
     protected void doConnect() throws Exception
     {
         /* nop */

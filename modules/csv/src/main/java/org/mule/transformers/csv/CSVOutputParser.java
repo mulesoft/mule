@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
 /**
  * Parser to write CSV data using the OpenCSV writer
@@ -27,6 +28,16 @@ public class CSVOutputParser implements CSVParser
      * The OpenCVS writer
      */
     private CSVWriter writer = null;
+
+    /**
+     * Holds a list of field names
+     */
+    private List labels = null;
+
+    /**
+     * Whether to print labels or not
+     */
+    private boolean printLabels = false;
 
     /**
      * Constructor
@@ -58,7 +69,7 @@ public class CSVOutputParser implements CSVParser
         }
         else if (o instanceof Map)
         {
-            this.writeRow((Map)o);
+            this.writeRow((Map)o, 0);
         }
     }
 
@@ -69,13 +80,14 @@ public class CSVOutputParser implements CSVParser
      * @param l the List of Maps
      * @throws Exception
      */
-    public void write(List l) throws Exception
+    protected void write(List l) throws Exception
     {
         try
         {
+            int rowPos = 0;
             for (Iterator i = l.iterator(); i.hasNext();)
             {
-                writeRow((Map)i.next());
+                writeRow((Map)i.next(), rowPos);
             }
         }
         finally
@@ -89,16 +101,59 @@ public class CSVOutputParser implements CSVParser
      * 
      * @param row the Map containing row data
      */
-    public void writeRow(Map row) throws Exception
+    protected void writeRow(Map row, int rowPos) throws Exception
     {
-        Collection values = row.values();
-        String[] stringValues = new String[values.size()];
+        Collection actualLabels;
+
+        if (labels != null)
+        {
+            actualLabels = labels;
+        }
+        else
+        {
+            actualLabels = new TreeSet(row.keySet());
+        }
+
+        // If required, print the labels first
+        if (rowPos == 0 && printLabels)
+        {
+            writeRowLabels(actualLabels);
+        }
+
+        // Now write the row, with columns ordered by the labels
+        writeOrderedRow(row, actualLabels);
+    }
+
+    /**
+     * Write the row Map as a CSV string as ordered by the column labels.
+     *
+     * Label ordering is provided either by the labels, as defined in the transformer 
+     * properties, or by the keys of the data Map itself.
+     *
+     * If the keys are used for the ordering, then simple alphanumeric ordering is 
+     * used.
+     *
+     * Note that if a label is defined, but there is no corresponding value, then an 
+     * empty column will be printed.
+     *
+     * Note that if a field is defined in the Map AND the labels were defined in the
+     * transformer properties AND the labels do not contain the field name, it will be
+     * skipped.
+     * 
+     * @param row the Map containing row data
+     * @param labels the Collection of the labels
+     */
+    private void writeOrderedRow(Map row, Collection labels)
+    {
+        String[] stringValues = new String[labels.size()];
 
         int i = 0;
-        for (Iterator v = values.iterator(); v.hasNext(); i++)
-        {
-            Object value = v.next();
 
+        for (Iterator iter = labels.iterator(); iter.hasNext(); i++)
+        {
+            Object label = iter.next();
+            Object value = row.get(label);
+            
             if (value != null)
             {
                 stringValues[i] = value.toString();
@@ -110,6 +165,71 @@ public class CSVOutputParser implements CSVParser
         }
 
         writer.writeNext(stringValues);
+    }
+
+    /**
+     * Write the row labels.
+     * 
+     * @param row the Collection containing the labels
+     */
+    public void writeRowLabels(Collection labels) throws Exception
+    {
+        String[] stringValues = new String[labels.size()];
+
+        int i = 0;
+
+        for (Iterator iter = labels.iterator(); iter.hasNext(); i++)
+        {
+            Object value = iter.next();
+            if (value != null)
+            {
+                stringValues[i] = value.toString();
+            }
+            else
+            {
+                stringValues[i] = "";
+            }
+        }
+
+        writer.writeNext(stringValues);
+    }
+
+    /**
+     * Gets whether or not to extract field names
+     * 
+     * @return true of extracting field names from the first line
+     */
+    public void setLabels(List labels)
+    {
+        this.labels = labels;
+    }
+
+    /**
+     * Returns the List of field names
+     * 
+     * @return the List
+     */
+    public List getLabels()
+    {
+        return labels;
+    }
+
+    /**
+     * Sets whether to print field names as the first line of output or not
+     * 
+     * @param printLabels boolean yes/no
+     */
+    public void setPrintLabels(boolean printLabels)
+    {
+        this.printLabels = printLabels;
+    }
+
+    /**
+     * Gets whether to print field names as the first line of output or not
+     */
+    public boolean getPrintLabels()
+    {
+        return printLabels;
     }
 
 }

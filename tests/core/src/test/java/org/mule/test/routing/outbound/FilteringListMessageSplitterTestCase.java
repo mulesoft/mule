@@ -22,10 +22,6 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a> $Id:
- *         FilteringListMessageSplitterTestCase.java 3589 2006-10-16 16:44:50Z holger $
- */
 public class FilteringListMessageSplitterTestCase extends AbstractMuleTestCase
 {
     public void testCorrelationGroupSizePropertySet() throws Exception

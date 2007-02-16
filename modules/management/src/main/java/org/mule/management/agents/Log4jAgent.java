@@ -10,6 +10,15 @@
 
 package org.mule.management.agents;
 
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.management.support.AutoDiscoveryJmxSupportFactory;
+import org.mule.management.support.JmxSupport;
+import org.mule.management.support.JmxSupportFactory;
+import org.mule.umo.UMOException;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.manager.UMOAgent;
+
 import java.util.Iterator;
 import java.util.Set;
 
@@ -22,11 +31,6 @@ import javax.management.ObjectInstance;
 import javax.management.ObjectName;
 
 import org.apache.log4j.jmx.HierarchyDynamicMBean;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.umo.UMOException;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.UMOAgent;
 
 /**
  * <code>Log4jAgent</code> exposes the configuration of the Log4J instance running
@@ -38,6 +42,10 @@ public class Log4jAgent implements UMOAgent
     private String name = "Log4j Agent";
     private MBeanServer mBeanServer;
     public static final String JMX_OBJECT_NAME = "log4j:type=Hierarchy";
+
+    private JmxSupportFactory jmxSupportFactory = new AutoDiscoveryJmxSupportFactory();
+    private JmxSupport jmxSupport = jmxSupportFactory.getJmxSupport();
+
 
     /*
      * (non-Javadoc)
@@ -79,7 +87,7 @@ public class Log4jAgent implements UMOAgent
         try
         {
             mBeanServer = (MBeanServer)MBeanServerFactory.findMBeanServer(null).get(0);
-            final ObjectName objectName = ObjectName.getInstance(JMX_OBJECT_NAME);
+            final ObjectName objectName = jmxSupport.getObjectName(JMX_OBJECT_NAME);
             // unregister existing Log4j MBean first if required
             unregisterMBeansIfNecessary();
             mBeanServer.registerMBean(new HierarchyDynamicMBean(), objectName);
@@ -96,10 +104,10 @@ public class Log4jAgent implements UMOAgent
     protected void unregisterMBeansIfNecessary()
         throws MalformedObjectNameException, InstanceNotFoundException, MBeanRegistrationException
     {
-        if (mBeanServer.isRegistered(ObjectName.getInstance(JMX_OBJECT_NAME)))
+        if (mBeanServer.isRegistered(jmxSupport.getObjectName(JMX_OBJECT_NAME)))
         {
             // unregister all log4jMBeans and loggers
-            Set log4jMBeans = mBeanServer.queryMBeans(ObjectName.getInstance("log4j*:*"), null);
+            Set log4jMBeans = mBeanServer.queryMBeans(jmxSupport.getObjectName("log4j*:*"), null);
             for (Iterator it = log4jMBeans.iterator(); it.hasNext();)
             {
                 ObjectInstance objectInstance = (ObjectInstance)it.next();

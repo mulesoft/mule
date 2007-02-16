@@ -1,5 +1,6 @@
+
 /*
- * $Id:
+ * $Id$ 
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -10,13 +11,14 @@
 
 package org.mule.extras.wssecurity.testcases;
 
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.handler.WSHandlerConstants;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
 import java.util.Properties;
+
+import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.handler.WSHandlerConstants;
 
 public class XfireWsSecurityOnOutboundTestCase extends FunctionalTestCase
 {

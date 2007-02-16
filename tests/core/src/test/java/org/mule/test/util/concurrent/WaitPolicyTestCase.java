@@ -26,9 +26,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.lang.StringUtils;
+
+import junit.framework.TestCase;
 
 public class WaitPolicyTestCase extends TestCase
 {

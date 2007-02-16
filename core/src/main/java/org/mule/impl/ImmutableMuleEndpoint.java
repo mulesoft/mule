@@ -30,6 +30,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOEndpointSecurityFilter;
@@ -556,13 +557,17 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         return TransportFactory.createEndpoint(uri, type);
     }
 
-    public static UMOEndpoint getEndpointFromUri(String uri)
+    public static UMOEndpoint getEndpointFromUri(String uri) throws ObjectNotFoundException
     {
         UMOEndpoint endpoint = null;
         if (uri != null)
         {
             String endpointString = MuleManager.getInstance().lookupEndpointIdentifier(uri, uri);
             endpoint = MuleManager.getInstance().lookupEndpoint(endpointString);
+            if(endpoint==null)
+            {
+                endpoint = (UMOEndpoint)MuleManager.getInstance().getContainerContext().getComponent(endpointString);
+            }
         }
         return endpoint;
     }

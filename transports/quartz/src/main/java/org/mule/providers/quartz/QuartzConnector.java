@@ -58,13 +58,13 @@ public class QuartzConnector extends AbstractConnector
 
     private Properties factoryProperties;
 
-    private Scheduler scheduler;
+    private Scheduler quartzScheduler;
 
     protected void doInitialise() throws InitialisationException
     {
         try
         {
-            if (scheduler == null)
+            if (quartzScheduler == null)
             {
                 if (factory == null)
                 {
@@ -75,7 +75,7 @@ public class QuartzConnector extends AbstractConnector
                     }
                     factory = (SchedulerFactory)ClassUtils.instanciateClass(factoryClassName, args);
                 }
-                scheduler = factory.getScheduler();
+                quartzScheduler = factory.getScheduler();
             }
         }
         catch (Exception e)
@@ -104,7 +104,7 @@ public class QuartzConnector extends AbstractConnector
     {
         try
         {
-            scheduler.start();
+            quartzScheduler.start();
         }
         catch (Exception e)
         {
@@ -116,9 +116,9 @@ public class QuartzConnector extends AbstractConnector
     {
         try
         {
-            if (scheduler != null)
+            if (quartzScheduler != null)
             {
-                scheduler.shutdown();
+                quartzScheduler.shutdown();
             }
         }
         catch (Exception e)
@@ -142,14 +142,14 @@ public class QuartzConnector extends AbstractConnector
         this.factory = factory;
     }
 
-    public Scheduler getScheduler()
+    public Scheduler getQuartzScheduler()
     {
-        return scheduler;
+        return quartzScheduler;
     }
 
-    public void setScheduler(Scheduler scheduler)
+    public void setQuartzScheduler(Scheduler scheduler)
     {
-        this.scheduler = scheduler;
+        this.quartzScheduler = scheduler;
     }
 
     public String getFactoryClassName()

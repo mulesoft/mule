@@ -10,9 +10,9 @@
 
 package org.mule.providers.jms;
 
-import javax.jms.Message;
-
 import org.mule.transaction.TransactionCallback;
+
+import javax.jms.Message;
 
 public abstract class MessageTransactionCallback implements TransactionCallback
 {

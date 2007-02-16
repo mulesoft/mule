@@ -295,7 +295,7 @@ public class DynamicEntryPoint implements UMOEntryPoint
         // this would break the LoanBroker, which passes a BankQuoteRequest in an
         // array even though the correct method only takes a single non-Array
         // argument. This is most likely SOAP behaviour; see the JIRA for more.
-        // It is not entirely clear to me whether this is a bug in the LoanBroker or
+        // It is not entirely clearErrors to me whether this is a bug in the LoanBroker or
         // intended behaviour, and what the check for Object[] assignment
         // compatibility is supposed to do/prevent in the first place?
         // Any kind of interpretation/rewriting of the array argument is pretty

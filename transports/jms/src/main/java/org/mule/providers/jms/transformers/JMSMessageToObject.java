@@ -10,9 +10,9 @@
 
 package org.mule.providers.jms.transformers;
 
-import javax.jms.Message;
-
 import org.mule.umo.transformer.TransformerException;
+
+import javax.jms.Message;
 
 /**
  * <code>JMSMessageToObject</code> Will convert a <code>javax.jms.Message</code>

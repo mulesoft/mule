@@ -20,11 +20,7 @@ import org.mule.umo.provider.UMOMessageDispatcher;
  */
 public class HttpClientMessageDispatcherFactory extends AbstractMessageDispatcherFactory
 {
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.provider.UMOConnectorSessionFactory#create(org.mule.umo.provider.UMOConnector)
-     */
+    /** {@inheritDoc} */
     public UMOMessageDispatcher create(UMOImmutableEndpoint endpoint) throws UMOException
     {
         return new HttpClientMessageDispatcher(endpoint);

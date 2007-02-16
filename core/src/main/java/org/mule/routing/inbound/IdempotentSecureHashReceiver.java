@@ -38,15 +38,16 @@ public class IdempotentSecureHashReceiver extends IdempotentReceiver
 {
     private static final String messageDigestAlgorithm = "SHA-256";
 
-    private SerializableToByteArray objectToByteArray = new SerializableToByteArray();
-    private ByteArrayToHexString byteArrayToHexString = new ByteArrayToHexString();
+    private final SerializableToByteArray objectToByteArray = new SerializableToByteArray();
+    private final ByteArrayToHexString byteArrayToHexString = new ByteArrayToHexString();
 
-    protected String getIdForEvent(UMOEvent event) throws MessagingException
+    // @Override
+    protected Object getIdForEvent(UMOEvent event) throws MessagingException
     {
         try
         {
             MessageDigest md = MessageDigest.getInstance(messageDigestAlgorithm);
-            return (String)byteArrayToHexString.transform(md.digest((byte[])objectToByteArray.transform(event.getMessage()
+            return byteArrayToHexString.transform(md.digest((byte[])objectToByteArray.transform(event.getMessage()
                 .getPayload())));
         }
         catch (NoSuchAlgorithmException nsa)

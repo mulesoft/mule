@@ -10,7 +10,6 @@
 
 package org.mule.routing.outbound;
 
-import org.dom4j.Document;
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleMessage;
 import org.mule.umo.UMOException;
@@ -24,6 +23,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.dom4j.Document;
 
 /**
  * This router will split the Xml message into parts based on the xpath expression

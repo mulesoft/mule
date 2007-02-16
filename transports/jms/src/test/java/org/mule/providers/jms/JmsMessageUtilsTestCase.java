@@ -10,13 +10,13 @@
 
 package org.mule.providers.jms;
 
-import javax.jms.BytesMessage;
-import javax.jms.TextMessage;
-
 import org.mule.tck.AbstractMuleTestCase;
 
 import com.mockobjects.constraint.IsInstanceOf;
 import com.mockobjects.dynamic.Mock;
+
+import javax.jms.BytesMessage;
+import javax.jms.TextMessage;
 
 public class JmsMessageUtilsTestCase extends AbstractMuleTestCase
 {

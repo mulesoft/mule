@@ -10,10 +10,6 @@
 
 package org.mule.test.routing.outbound;
 
-import com.mockobjects.constraint.Constraint;
-import com.mockobjects.dynamic.C;
-import com.mockobjects.dynamic.Mock;
-
 import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.routing.filters.PayloadTypeFilter;
@@ -25,6 +21,10 @@ import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
+
+import com.mockobjects.constraint.Constraint;
+import com.mockobjects.dynamic.C;
+import com.mockobjects.dynamic.Mock;
 
 import java.util.ArrayList;
 import java.util.List;

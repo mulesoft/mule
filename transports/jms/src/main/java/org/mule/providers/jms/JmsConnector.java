@@ -10,9 +10,7 @@
 
 package org.mule.providers.jms;
 
-import org.mule.MuleException;
 import org.mule.MuleManager;
-import org.mule.MuleRuntimeException;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -43,6 +41,7 @@ import org.mule.util.ClassUtils;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 
 import java.lang.reflect.InvocationTargetException;
+import java.text.MessageFormat;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -124,9 +123,12 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
     private boolean recoverJmsConnections = true;
 
+    private JmsTopicResolver topicResolver;
+
     public JmsConnector()
     {
         receivers = new ConcurrentHashMap();
+        topicResolver = new DefaultJmsTopicResolver(this);
     }
 
     protected void doInitialise() throws InitialisationException
@@ -399,42 +401,6 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         return component.getDescriptor().getName() + "~" + endpoint.getEndpointURI().getAddress();
     }
 
-    public Object getSessionFactory(UMOEndpoint endpoint)
-    {
-        if (endpoint.getTransactionConfig() != null
-            && endpoint.getTransactionConfig().getFactory() instanceof JmsClientAcknowledgeTransactionFactory)
-        {
-            throw new MuleRuntimeException(new org.mule.config.i18n.Message("jms", 9));
-        }
-        else
-        {
-            return connection;
-        }
-    }
-
-    // TODO AP: merge this and the various getSession(..) methods
-    public Session getDelegateSession(UMOImmutableEndpoint endpoint) throws UMOException
-    {
-        try
-        {
-            // Return the session bound to the current transaction, if possible
-            Session session = this.getSessionFromTransaction();
-            if (session != null)
-            {
-                return session;
-            }
-            else
-            {
-                // TODO AP: this does not handle topics under 1.0.2b, address it ASAP! 
-                return this.getSession(false, false);
-            }
-        }
-        catch (Exception e)
-        {
-            throw new MuleException(new org.mule.config.i18n.Message("jms", 3), e);
-        }
-    }
-
     public Session getSessionFromTransaction()
     {
         UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
@@ -442,16 +408,20 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         {
             if (tx.hasResource(connection))
             {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Retrieving jms session from current transaction " + tx);
+                }
+
                 return (Session)tx.getResource(connection);
             }
         }
         return null;
     }
 
-    public Session getSession(UMOImmutableEndpoint endpoint) throws Exception
+    public Session getSession(UMOImmutableEndpoint endpoint) throws JMSException
     {
-        String resourceInfo = endpoint.getEndpointURI().getResourceInfo();
-        boolean topic = (resourceInfo != null && JmsConstants.TOPIC_PROPERTY.equalsIgnoreCase(resourceInfo));
+        final boolean topic = getTopicResolver().isTopic(endpoint);
         return getSession(endpoint.getTransactionConfig().isTransacted(), topic);
     }
 
@@ -461,18 +431,23 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         {
             throw new JMSException("Not connected");
         }
-        UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
         Session session = getSessionFromTransaction();
         if (session != null)
         {
-            logger.debug("Retrieving jms session from current transaction");
             return session;
         }
+
+        UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
+
         if (logger.isDebugEnabled())
         {
-            logger.debug("Retrieving new jms session from connection: topic=" + topic + ", transacted="
-                         + (transacted || tx != null) + ", ack mode=" + acknowledgementMode + ", nolocal="
-                         + noLocal);
+            logger.debug(MessageFormat.format(
+                    "Retrieving new jms session from connection: " +
+                    "topic={0}, transacted={1}, ack mode={2}, nolocal={3}",
+                    new Object[]{Boolean.valueOf(topic),
+                                 Boolean.valueOf(transacted || tx != null),
+                                 new Integer(acknowledgementMode),
+                                 Boolean.valueOf(noLocal)}));
         }
 
         session = jmsSupport.createSession(connection, topic, transacted || tx != null, acknowledgementMode,
@@ -812,6 +787,27 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     public boolean isRemoteSyncEnabled()
     {
         return true;
+    }
+
+
+    /**
+     * Getter for property 'topicResolver'.
+     *
+     * @return Value for property 'topicResolver'.
+     */
+    public JmsTopicResolver getTopicResolver ()
+    {
+        return topicResolver;
+    }
+
+    /**
+     * Setter for property 'topicResolver'.
+     *
+     * @param topicResolver Value to set for property 'topicResolver'.
+     */
+    public void setTopicResolver (final JmsTopicResolver topicResolver)
+    {
+        this.topicResolver = topicResolver;
     }
 
     public void onNotification(UMOServerNotification notification)

@@ -9,6 +9,12 @@
  */
 package org.mule.management.support;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
+import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
@@ -44,5 +50,20 @@ public class JmxLegacySupport extends AbstractJmxSupport
     public ObjectName getObjectName(String name) throws MalformedObjectNameException
     {
         return new ObjectName(name);
+    }
+
+
+    /** {@inheritDoc} */
+    protected Collection getDomains(final MBeanServer server)
+    {
+        // list all MBean names and collect unique domains
+        Set set = server.queryNames(null, null);
+        Set domains = new HashSet();
+        for (Iterator it = set.iterator(); it.hasNext();)
+        {
+            ObjectName objectName = (ObjectName) it.next();
+            domains.add(objectName.getDomain());
+        }
+        return domains;
     }
 }

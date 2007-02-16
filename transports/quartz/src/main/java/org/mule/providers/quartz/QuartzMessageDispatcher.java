@@ -10,9 +10,6 @@
 
 package org.mule.providers.quartz;
 
-import java.util.Date;
-import java.util.Iterator;
-
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.providers.AbstractMessageDispatcher;
@@ -22,6 +19,10 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
 import org.mule.util.ClassUtils;
+
+import java.util.Date;
+import java.util.Iterator;
+
 import org.quartz.CronTrigger;
 import org.quartz.Job;
 import org.quartz.JobDataMap;

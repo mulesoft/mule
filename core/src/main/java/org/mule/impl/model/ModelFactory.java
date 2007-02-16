@@ -24,7 +24,7 @@ public class ModelFactory
     
     public static UMOModel createModel(String type) throws ServiceException
     {
-        ModelServiceDescriptor sd = (ModelServiceDescriptor) 
+        ModelServiceDescriptor sd = (ModelServiceDescriptor)
             MuleManager.getInstance().lookupServiceDescriptor(ServiceDescriptorFactory.MODEL_SERVICE_TYPE, type, null);
         if (sd != null)
         {

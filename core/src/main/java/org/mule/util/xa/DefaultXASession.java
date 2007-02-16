@@ -330,7 +330,7 @@ public class DefaultXASession implements XAResource
     /*
      * (non-Javadoc)
      * 
-     * @see javax.transaction.xa.XAResource#getTransactionTimeout()
+     * @see javax.transaction.xa.XAResource#getDefaultTransactionTimeout()
      */
     public int getTransactionTimeout() throws XAException
     {
@@ -340,7 +340,7 @@ public class DefaultXASession implements XAResource
     /*
      * (non-Javadoc)
      * 
-     * @see javax.transaction.xa.XAResource#setTransactionTimeout(int)
+     * @see javax.transaction.xa.XAResource#setDefaultTransactionTimeout(int)
      */
     public boolean setTransactionTimeout(int timeout) throws XAException
     {

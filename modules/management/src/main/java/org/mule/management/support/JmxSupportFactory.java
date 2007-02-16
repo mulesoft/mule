@@ -18,5 +18,5 @@ public interface JmxSupportFactory
      * Create an instance of a JMX support class.
      * @return class instance
      */
-    JmxSupport newJmxSupport();
+    JmxSupport getJmxSupport ();
 }

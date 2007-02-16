@@ -337,7 +337,7 @@ public abstract class AbstractConnector
         // Initialise the structure of this connector
         initFromServiceDescriptor();
 
-        // we clear out any registered dispatchers and receivers without resetting
+        // we clearErrors out any registered dispatchers and receivers without resetting
         // the actual containers since this it might actually be a re-initialise
         // (e.g. as in JmsConnector)
         this.disposeDispatchers();

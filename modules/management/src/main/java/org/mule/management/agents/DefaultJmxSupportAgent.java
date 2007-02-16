@@ -10,9 +10,6 @@
 
 package org.mule.management.agents;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.mule.MuleManager;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.InitialisationException;

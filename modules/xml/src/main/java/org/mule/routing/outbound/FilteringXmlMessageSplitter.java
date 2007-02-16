@@ -18,9 +18,9 @@ import org.mule.util.StringUtils;
 
 import java.io.InputStream;
 import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -57,8 +57,8 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
     public static final String JAXP_PROPERTIES_SCHEMA_LANGUAGE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
     public static final String JAXP_PROPERTIES_SCHEMA_LANGUAGE_VALUE = "http://www.w3.org/2001/XMLSchema";
 
-    protected static final ThreadLocal properties = new ThreadLocal();
-    protected static final ThreadLocal nodes = new ThreadLocal();
+    protected static final ThreadLocal propertiesContext = new ThreadLocal();
+    protected static final ThreadLocal nodesContext = new ThreadLocal();
 
     protected volatile String splitExpression = "";
     protected volatile Map namespaces = null;
@@ -151,7 +151,7 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
             }
             else
             {
-                logger.error("Non-xml message payload: " + src.getClass().toString());
+                logger.error("Non-XML message payload: " + src.getClass().toString());
                 return;
             }
 
@@ -164,12 +164,14 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
                     {
                         xpath.setNamespaceURIs(namespaces);
                     }
+
                     List foundNodes = xpath.selectNodes(dom4jDoc);
                     if (logger.isDebugEnabled())
                     {
                         logger.debug("Split into " + foundNodes.size());
                     }
-                    List parts = new ArrayList();
+
+                    List parts = new LinkedList();
                     // Rather than reparsing these when individual messages are
                     // created, lets do it now
                     // We can also avoid parsing the Xml again altogether
@@ -189,7 +191,7 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
                                         + " is not an element and thus is not a valid part");
                         }
                     }
-                    FilteringXmlMessageSplitter.nodes.set(parts);
+                    nodesContext.set(parts);
                 }
             }
             else
@@ -209,7 +211,7 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
             String propertyKey = (String)iterator.next();
             theProperties.put(propertyKey, message.getProperty(propertyKey));
         }
-        properties.set(theProperties);
+        propertiesContext.set(theProperties);
     }
 
     /**
@@ -223,7 +225,7 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
      */
     protected UMOMessage getMessagePart(UMOMessage message, UMOEndpoint endpoint)
     {
-        List nodes = (List)FilteringXmlMessageSplitter.nodes.get();
+        List nodes = (List)nodesContext.get();
 
         if (nodes == null)
         {
@@ -231,13 +233,13 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
             return null;
         }
 
-        for (int i = 0; i < nodes.size(); i++)
+        for (Iterator i = nodes.iterator(); i.hasNext();)
         {
-            Document doc = (Document)nodes.get(i);
+            Document doc = (Document)i.next();
 
             try
             {
-                Map theProperties = (Map)properties.get();
+                Map theProperties = (Map)propertiesContext.get();
                 UMOMessage result = new MuleMessage(doc, new HashMap(theProperties));
 
                 if (endpoint.getFilter() == null || endpoint.getFilter().accept(result))
@@ -247,7 +249,7 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
                         logger.debug("Endpoint filter matched for node " + i + " of " + nodes.size()
                                      + ". Routing message over: " + endpoint.getEndpointURI().toString());
                     }
-                    nodes.remove(i);
+                    i.remove();
                     return result;
                 }
                 else

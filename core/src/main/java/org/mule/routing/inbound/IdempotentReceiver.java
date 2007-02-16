@@ -52,17 +52,19 @@ public class IdempotentReceiver extends SelectiveConsumer
         setStorePath(DEFAULT_STORE_PATH);
     }
 
+    // @Override
     public boolean isMatch(UMOEvent event) throws MessagingException
     {
         if (idStore == null)
         {
             // we need to load this of fist request as we need the component
             // name
-            load(event);
+            this.load(event);
         }
-        return !messageIds.contains(event.getMessage().getUniqueId());
+        return !messageIds.contains(this.getIdForEvent(event));
     }
 
+    // @Override
     public UMOEvent[] process(UMOEvent event) throws MessagingException
     {
         if (isMatch(event))
@@ -75,10 +77,11 @@ public class IdempotentReceiver extends SelectiveConsumer
             {
                 throw new RoutingException(event.getMessage(), event.getEndpoint());
             }
-            String id = event.getMessage().getUniqueId();
+
+            Object id = this.getIdForEvent(event);
             try
             {
-                storeId(id);
+                this.storeId(id);
                 return new UMOEvent[]{event};
             }
             catch (IOException e)
@@ -91,6 +94,11 @@ public class IdempotentReceiver extends SelectiveConsumer
         {
             return null;
         }
+    }
+
+    protected Object getIdForEvent(UMOEvent event) throws MessagingException
+    {
+        return event.getMessage().getUniqueId();
     }
 
     private void checkComponentName(String name) throws IllegalArgumentException
@@ -107,11 +115,17 @@ public class IdempotentReceiver extends SelectiveConsumer
     protected synchronized void load(UMOEvent event) throws RoutingException
     {
         this.componentName = event.getComponent().getDescriptor().getName();
-        idStore = FileUtils.newFile(storePath + "/muleComponent_" + componentName + ".store");
+        
+        if (idStore == null)
+        {
+            idStore = FileUtils.newFile(storePath + "/muleComponent_" + componentName + ".store");
+        }
+
         if (disablePersistence)
         {
             return;
         }
+
         try
         {
             if (idStore.exists())
@@ -187,4 +201,5 @@ public class IdempotentReceiver extends SelectiveConsumer
             this.storePath = storePath;
         }
     }
+
 }

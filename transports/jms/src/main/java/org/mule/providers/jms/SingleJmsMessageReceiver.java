@@ -10,15 +10,6 @@
 
 package org.mule.providers.jms;
 
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageListener;
-import javax.jms.Session;
-import javax.jms.Topic;
-
-import org.apache.commons.collections.MapUtils;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.ConnectException;
@@ -30,6 +21,14 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
+
+import javax.jms.Destination;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageListener;
+import javax.jms.Session;
+import javax.jms.Topic;
 
 /**
  * Registers a single Jms MessageListener for an endpoint
@@ -183,16 +182,9 @@ public class SingleJmsMessageReceiver extends AbstractMessageReceiver implements
                 session = this.connector.getSession(endpoint);
             }
 
+            boolean topic = connector.getTopicResolver().isTopic(endpoint, true);
+
             // Create destination
-            String resourceInfo = endpoint.getEndpointURI().getResourceInfo();
-            boolean topic = (resourceInfo != null && JmsConstants.TOPIC_PROPERTY.equalsIgnoreCase(resourceInfo));
-
-            // TODO MULE20 remove resource Info support
-            if (!topic)
-            {
-                topic = MapUtils.getBooleanValue(endpoint.getProperties(), JmsConstants.TOPIC_PROPERTY, false);
-            }
-
             Destination dest = jmsSupport.createDestination(session, endpoint.getEndpointURI().getAddress(),
                 topic);
 

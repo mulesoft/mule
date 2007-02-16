@@ -1,5 +1,5 @@
 /*
- * $Id:
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -10,11 +10,12 @@
 
 package org.mule.extras.wssecurity.headers;
 
+import org.mule.umo.UMOMessage;
+
 import java.util.Properties;
 
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.handler.WSHandlerConstants;
-import org.mule.umo.UMOMessage;
 
 public class WsSecurityHeadersSetter
 {
@@ -32,7 +33,7 @@ public class WsSecurityHeadersSetter
             .getProperty(WSHandlerConstants.ACTION));
 
         String passwordType;
-        if ((String)message.getProperty(WSConstants.PW_DIGEST) != null)
+        if (message.getProperty(WSConstants.PW_DIGEST) != null)
         {
             passwordType = WSConstants.PW_DIGEST;
         }
@@ -93,8 +94,8 @@ public class WsSecurityHeadersSetter
         }
 
         // if username token
-        if (((String)message.getProperty(WSHandlerConstants.ACTION))
-            .equals(WSHandlerConstants.USERNAME_TOKEN))
+        if (message.getProperty(WSHandlerConstants.ACTION)
+                .equals(WSHandlerConstants.USERNAME_TOKEN))
         {
             if (message.getProperty(WSHandlerConstants.ADD_UT_ELEMENTS) != null)
             {
@@ -104,8 +105,8 @@ public class WsSecurityHeadersSetter
         }
 
         // if timestamp
-        if (((String)message.getProperty(WSHandlerConstants.ACTION))
-            .equals(WSHandlerConstants.TIMESTAMP))
+        if (message.getProperty(WSHandlerConstants.ACTION)
+                .equals(WSHandlerConstants.TIMESTAMP))
         {
             if (message.getProperty(WSHandlerConstants.TIMESTAMP_PRECISION) != null)
             {
@@ -125,40 +126,40 @@ public class WsSecurityHeadersSetter
         }
 
         // if encrypted
-        if (((String)message.getProperty(WSHandlerConstants.ACTION))
-            .equals(WSHandlerConstants.ENCRYPT))
+        if (message.getProperty(WSHandlerConstants.ACTION)
+                .equals(WSHandlerConstants.ENCRYPT))
         {
-            if ((String)message.getProperty(WSHandlerConstants.ENC_PROP_FILE) != null)
+            if (message.getProperty(WSHandlerConstants.ENC_PROP_FILE) != null)
             {
                 props.setProperty(WSHandlerConstants.ENC_PROP_FILE, (String)message
                     .getProperty(WSHandlerConstants.ENC_PROP_FILE));
             }
-            if ((String)message.getProperty(WSHandlerConstants.ENC_CALLBACK_CLASS) != null)
+            if (message.getProperty(WSHandlerConstants.ENC_CALLBACK_CLASS) != null)
             {
                 props.setProperty(WSHandlerConstants.ENC_CALLBACK_CLASS, (String)message
                     .getProperty(WSHandlerConstants.ENC_CALLBACK_CLASS));
             }
-            if ((String)message.getProperty(WSHandlerConstants.ENC_CALLBACK_REF) != null)
+            if (message.getProperty(WSHandlerConstants.ENC_CALLBACK_REF) != null)
             {
                 props.setProperty(WSHandlerConstants.ENC_CALLBACK_REF, (String)message
                     .getProperty(WSHandlerConstants.ENC_CALLBACK_REF));
             }
-            if ((String)message.getProperty(WSHandlerConstants.ENC_KEY_ID) != null)
+            if (message.getProperty(WSHandlerConstants.ENC_KEY_ID) != null)
             {
                 props.setProperty(WSHandlerConstants.ENC_KEY_ID, (String)message
                     .getProperty(WSHandlerConstants.ENC_KEY_ID));
             }
-            if ((String)message.getProperty(WSHandlerConstants.ENC_KEY_NAME) != null)
+            if (message.getProperty(WSHandlerConstants.ENC_KEY_NAME) != null)
             {
                 props.setProperty(WSHandlerConstants.ENC_KEY_NAME, (String)message
                     .getProperty(WSHandlerConstants.ENC_KEY_NAME));
             }
-            if ((String)message.getProperty(WSHandlerConstants.ENC_KEY_TRANSPORT) != null)
+            if (message.getProperty(WSHandlerConstants.ENC_KEY_TRANSPORT) != null)
             {
                 props.setProperty(WSHandlerConstants.ENC_KEY_TRANSPORT, (String)message
                     .getProperty(WSHandlerConstants.ENC_KEY_TRANSPORT));
             }
-            if ((String)message.getProperty(WSHandlerConstants.ENC_SYM_ALGO) != null)
+            if (message.getProperty(WSHandlerConstants.ENC_SYM_ALGO) != null)
             {
                 props.setProperty(WSHandlerConstants.ENC_SYM_ALGO, (String)message
                     .getProperty(WSHandlerConstants.ENC_SYM_ALGO));
@@ -183,16 +184,16 @@ public class WsSecurityHeadersSetter
         }
 
         // Saml
-        if ((String)message.getProperty(WSHandlerConstants.SAML_PROP_FILE) != null)
+        if (message.getProperty(WSHandlerConstants.SAML_PROP_FILE) != null)
         {
             props.setProperty(WSHandlerConstants.SAML_PROP_FILE, (String)message
                 .getProperty(WSHandlerConstants.SAML_PROP_FILE));
         }
 
         // if signed
-        if (((String)message.getProperty(WSHandlerConstants.ACTION))
-            .equals(WSHandlerConstants.SIGNATURE)
-            || ((String)message.getProperty(WSHandlerConstants.ACTION))
+        if (message.getProperty(WSHandlerConstants.ACTION)
+                .equals(WSHandlerConstants.SIGNATURE)
+            || message.getProperty(WSHandlerConstants.ACTION)
                 .equals(WSHandlerConstants.SAML_TOKEN_SIGNED))
         {
             if (message.getProperty(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION) != null)
@@ -201,25 +202,25 @@ public class WsSecurityHeadersSetter
                     .getProperty(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION));
             }
 
-            if ((String)message.getProperty(WSHandlerConstants.SIG_KEY_ID) != null)
+            if (message.getProperty(WSHandlerConstants.SIG_KEY_ID) != null)
             {
                 props.setProperty(WSHandlerConstants.SIG_KEY_ID, (String)message
                     .getProperty(WSHandlerConstants.SIG_KEY_ID));
             }
 
-            if ((String)message.getProperty(WSHandlerConstants.SIG_ALGO) != null)
+            if (message.getProperty(WSHandlerConstants.SIG_ALGO) != null)
             {
                 props.setProperty(WSHandlerConstants.SIG_ALGO, (String)message
                     .getProperty(WSHandlerConstants.SIG_ALGO));
             }
 
-            if ((String)message.getProperty(WSHandlerConstants.SIG_CONF_DONE) != null)
+            if (message.getProperty(WSHandlerConstants.SIG_CONF_DONE) != null)
             {
                 props.setProperty(WSHandlerConstants.SIG_CONF_DONE, (String)message
                     .getProperty(WSHandlerConstants.SIG_CONF_DONE));
             }
 
-            if ((String)message.getProperty(WSHandlerConstants.SIG_PROP_FILE) != null)
+            if (message.getProperty(WSHandlerConstants.SIG_PROP_FILE) != null)
             {
                 props.setProperty(WSHandlerConstants.SIG_PROP_FILE, (String)message
                     .getProperty(WSHandlerConstants.SIG_PROP_FILE));

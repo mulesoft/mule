@@ -430,16 +430,6 @@ public class JdbcConnector extends AbstractConnector
         this.providerProperties = providerProperties;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.providers.TransactionEnabledConnector#getSessionFactory(org.mule.umo.endpoint.UMOEndpoint)
-     */
-    public Object getSessionFactory(UMOEndpoint endpoint) throws Exception
-    {
-        return dataSource;
-    }
-
     public Connection getConnection() throws Exception
     {
         UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();

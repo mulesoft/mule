@@ -27,12 +27,12 @@ import javax.jms.Topic;
 import javax.jms.TopicConnection;
 import javax.jms.TopicSession;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import oracle.jms.AQjmsConnection;
 import oracle.jms.AQjmsQueueConnectionFactory;
 import oracle.jms.AQjmsTopicConnectionFactory;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class OracleJmsConnection implements TopicConnection, QueueConnection
 {

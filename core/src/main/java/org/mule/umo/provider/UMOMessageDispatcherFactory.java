@@ -32,6 +32,8 @@ public interface UMOMessageDispatcherFactory
      * {@link #validate(UMOImmutableEndpoint, UMOMessageDispatcher)} it takes
      * precedence over the dispatcher's own return value of
      * {@link UMOMessageDispatcher#validate()}.
+     *
+     * @return true if created per request
      */
     boolean isCreateDispatcherPerRequest();
 

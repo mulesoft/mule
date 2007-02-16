@@ -47,7 +47,6 @@ public interface UMOMessageDispatching
     /**
      * Make a specific request to the underlying transport
      * 
-     * @param endpoint the endpoint to use when connecting to the resource
      * @param timeout the maximum time the operation should block before returning.
      *            The call should return immediately if there is data available. If
      *            no data becomes available before the timeout elapses, null will be

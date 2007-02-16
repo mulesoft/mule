@@ -39,7 +39,11 @@ public class ServiceDescriptorFactory
      */
     public static ServiceDescriptor create(String type, String name, Properties props, Properties overrides) throws ServiceException
     {       
-        String serviceFinderClass = (String) props.remove(MuleProperties.SERVICE_FINDER);
+        String serviceFinderClass = null;
+        if(overrides!=null)
+        {
+            serviceFinderClass = (String) props.remove(MuleProperties.SERVICE_FINDER);
+        }
         
         ServiceDescriptor sd;
         if (type.equals(PROVIDER_SERVICE_TYPE)) 

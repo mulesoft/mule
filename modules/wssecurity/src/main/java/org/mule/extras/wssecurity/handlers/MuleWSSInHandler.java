@@ -10,6 +10,8 @@
 
 package org.mule.extras.wssecurity.handlers;
 
+import org.mule.umo.security.SecurityException;
+
 import java.security.cert.X509Certificate;
 import java.util.Properties;
 import java.util.Vector;
@@ -35,7 +37,6 @@ import org.codehaus.xfire.security.wss4j.AbstractWSS4JHandler;
 import org.codehaus.xfire.soap.handler.ReadHeadersHandler;
 import org.codehaus.xfire.util.dom.DOMInHandler;
 import org.w3c.dom.Document;
-import org.mule.umo.security.SecurityException;
 
 public class MuleWSSInHandler extends AbstractWSS4JHandler implements Handler
 {

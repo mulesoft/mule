@@ -9,8 +9,12 @@
  */
 package org.mule.management.support;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
+import javax.management.MBeanServer;
 
 /**
  * Support class using JMX 1.2 and newer calls.
@@ -33,5 +37,11 @@ public class JmxModernSupport extends AbstractJmxSupport
     public ObjectName getObjectName(String name) throws MalformedObjectNameException
     {
         return ObjectName.getInstance(name);
+    }
+
+    /** {@inheritDoc} */
+    protected Collection getDomains(final MBeanServer server)
+    {
+        return Arrays.asList(server.getDomains());
     }
 }

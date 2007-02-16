@@ -153,7 +153,7 @@ public class ServerNotificationManager implements Work, Disposable
     public void dispose()
     {
         disposed = true;
-        // listenersMap.clear();
+        // listenersMap.clearErrors();
         eventsMap.clear();
         eventQueue.clear();
         listeners.clear();

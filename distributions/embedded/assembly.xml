@@ -19,13 +19,10 @@ Assembly descriptor for the composite Mule library (jar).
         <!-- Transports -->
         <include>org.mule.transports:mule-transport-axis</include>
         <include>org.mule.transports:mule-transport-bpm</include>
-        <include>org.mule.transports:mule-transport-dq</include>
         <include>org.mule.transports:mule-transport-ejb</include>
         <include>org.mule.transports:mule-transport-email</include>
         <include>org.mule.transports:mule-transport-file</include>
         <include>org.mule.transports:mule-transport-ftp</include>
-        <include>org.mule.transports:mule-transport-gigaspaces</include>
-        <include>org.mule.transports:mule-transport-glue</include>
         <include>org.mule.transports:mule-transport-http</include>
         <include>org.mule.transports:mule-transport-jbi</include>
         <include>org.mule.transports:mule-transport-jdbc</include>
@@ -35,7 +32,6 @@ Assembly descriptor for the composite Mule library (jar).
         <include>org.mule.transports:mule-transport-quartz</include>
         <include>org.mule.transports:mule-transport-rmi</include>
         <include>org.mule.transports:mule-transport-soap</include>
-        <include>org.mule.transports:mule-transport-space</include>
         <include>org.mule.transports:mule-transport-ssl</include>
         <include>org.mule.transports:mule-transport-stream</include>
         <include>org.mule.transports:mule-transport-tcp</include>

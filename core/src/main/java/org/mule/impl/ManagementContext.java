@@ -380,7 +380,7 @@ public class ManagementContext implements UMOManagementContext
         disposed = true;
         containerContext.dispose();
         containerContext = null;
-        // props.clear();
+        // props.clearErrors();
         fireSystemEvent(new ManagerNotification(id, clusterId, domain, ManagerNotification.MANAGER_DISPOSED));
 
         if (registry != null)

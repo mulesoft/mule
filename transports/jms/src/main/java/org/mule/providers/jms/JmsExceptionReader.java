@@ -10,12 +10,12 @@
 
 package org.mule.providers.jms;
 
+import org.mule.config.ExceptionReader;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.jms.JMSException;
-
-import org.mule.config.ExceptionReader;
 
 /**
  * This reader will ensure that the LinkedException and JMS code is not lost when

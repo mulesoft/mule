@@ -10,16 +10,16 @@
 
 package org.mule.providers.jms;
 
+import org.mule.MuleException;
+import org.mule.config.ExceptionHelper;
+import org.mule.config.i18n.Message;
+import org.mule.tck.AbstractMuleTestCase;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 import javax.jms.JMSException;
-
-import org.mule.MuleException;
-import org.mule.config.ExceptionHelper;
-import org.mule.config.i18n.Message;
-import org.mule.tck.AbstractMuleTestCase;
 
 public class JmsExceptionReaderTestCase extends AbstractMuleTestCase
 {

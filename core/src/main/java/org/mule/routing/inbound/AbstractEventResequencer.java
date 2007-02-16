@@ -24,7 +24,7 @@ import java.util.Comparator;
  * resequence them and forward them on to their destination
  */
 
-// TODO HH: much of the code here (like the spinloop) is *exactly* the same as in
+// TODO MULE-841: much of the code here (like the spinloop) is *exactly* the same as in
 // AbstractEventAggregator, obviously we should unify this
 public abstract class AbstractEventResequencer extends SelectiveConsumer
 {

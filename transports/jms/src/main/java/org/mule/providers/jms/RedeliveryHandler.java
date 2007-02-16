@@ -10,10 +10,10 @@
 
 package org.mule.providers.jms;
 
+import org.mule.umo.MessagingException;
+
 import javax.jms.JMSException;
 import javax.jms.Message;
-
-import org.mule.umo.MessagingException;
 
 /**
  * <code>RedeliveryHandler</code> is used to control how redelivered messages are

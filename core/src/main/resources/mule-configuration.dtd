@@ -76,13 +76,13 @@
      Determines whether when running synchronously, return events are received before
      returning the call. i.e. in jms wait for a replyTo. Vm queues do this automatically
 -->
-<!ATTLIST mule-environment-properties remoteSync          (true | false)          "false">
+<!ATTLIST mule-environment-properties remoteSync          (true | false)          #IMPLIED>
 
 <!--
      Determines if Mule is running embedded and can be used to disable certain services and also hide the
      start splash
 -->
-<!ATTLIST mule-environment-properties embedded          (true | false)          "false">
+<!ATTLIST mule-environment-properties embedded          (true | false)           #IMPLIED>
 
 <!--
      Is the default endpointUri where Mule can receive Action requests such as running a
@@ -99,7 +99,7 @@
      Determines whether Mule's internal queues are persisted.  If the server dies unexpectedly Mule
      can resume processing when the server starts
 -->
-<!ATTLIST mule-environment-properties recoverableMode           (true | false)          "false">
+<!ATTLIST mule-environment-properties recoverableMode           (true | false)          #IMPLIED>
 
 <!--
      Determines whether Mule amule instance is runnig in client mode.  client mode means that
@@ -107,12 +107,12 @@
      event manager.  The only time a user would need to set variable explicitly is if they
      where configuring a Mule instance via Xml config for client-only usage.
 -->
-<!ATTLIST mule-environment-properties clientMode           (true | false)          "false">
+<!ATTLIST mule-environment-properties clientMode           (true | false)          #IMPLIED>
 
 <!--
     Whether mule should fire message events for every message sent and received
 -->
-<!ATTLIST mule-environment-properties enableMessageEvents           (true | false)          "false">
+<!ATTLIST mule-environment-properties enableMessageEvents           (true | false)          #IMPLIED>
 
 <!--
     The type of model used for the internal system model where system created services are registered

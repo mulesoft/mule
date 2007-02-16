@@ -10,18 +10,20 @@
 
 package org.mule.extras.wssecurity.callbackhandlers;
 
+import org.mule.MuleException;
+import org.mule.MuleManager;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.umo.manager.ObjectNotFoundException;
+
 import java.io.IOException;
 import java.util.Properties;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
+
 import org.apache.ws.security.WSPasswordCallback;
-import org.mule.MuleException;
-import org.mule.MuleManager;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.umo.manager.ObjectNotFoundException;
 
 public class MuleWsSecurityCallbackHandler implements CallbackHandler
 {

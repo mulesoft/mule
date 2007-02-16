@@ -75,12 +75,12 @@ public class MuleConfigurationService implements MuleConfigurationServiceMBean
 
     public int getTransactionTimeout()
     {
-        return muleConfiguration.getTransactionTimeout();
+        return muleConfiguration.getDefaultTransactionTimeout();
     }
 
     public void setTransactionTimeout(int transactionTimeout)
     {
-        muleConfiguration.setTransactionTimeout(transactionTimeout);
+        muleConfiguration.setDefaultTransactionTimeout(transactionTimeout);
     }
 
     public boolean isClientMode()

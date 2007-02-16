@@ -451,7 +451,7 @@ public class MuleManager implements UMOManager
         endpointIdentifiers.clear();
         containerContext.dispose();
         containerContext = null;
-        // props.clear();
+        // props.clearErrors();
         fireSystemEvent(new ManagerNotification(id, null, null, ManagerNotification.MANAGER_DISPOSED));
 
         if (registry != null)
@@ -1563,15 +1563,8 @@ public class MuleManager implements UMOManager
         {
             if (sd == null)
             {
-                try 
-                {
-                    sd = createServiceDescriptor(type, name, overrides);
-                }
-                catch (ServiceException e)
-                {
-                    logger.info("Unable to create service descriptor: " + e.getMessage());
-                    return null;
-                }
+                sd = createServiceDescriptor(type, name, overrides);
+
                 sdCache.put(key, sd);
             }
         }
@@ -1581,10 +1574,13 @@ public class MuleManager implements UMOManager
     /**
      * @deprecated ServiceDescriptors will be created upon bundle startup for OSGi.
      */
-    protected ServiceDescriptor createServiceDescriptor(String type, String name, Properties overrides)
-        throws ServiceException
+    protected ServiceDescriptor createServiceDescriptor(String type, String name, Properties overrides) throws ServiceException
     {
         Properties props = SpiUtils.findServiceDescriptor(type, name);
+        if(props==null)
+        {
+            throw new ServiceException(new Message(Messages.FAILED_LOAD_X, type + " " +name));
+        }
         return ServiceDescriptorFactory.create(type, name, props, overrides);
     }
 

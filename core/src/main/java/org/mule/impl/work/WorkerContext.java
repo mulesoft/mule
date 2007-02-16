@@ -325,7 +325,7 @@ public class WorkerContext implements Work
             {
                 // try {
                 // long transactionTimeout =
-                // executionContext.getTransactionTimeout();
+                // executionContext.getDefaultTransactionTimeout();
                 // //translate -1 value to 0 to indicate default transaction
                 // timeout.
                 // transactionContextManager.begin(executionContext.getXid(),

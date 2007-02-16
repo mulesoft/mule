@@ -7,6 +7,23 @@
     things which can be specified in this file.
 -->
 <settings>
+
+    <!-- Required for WIN only.
+         RMI will fail to resolve libraries in folders containing spaces,
+         which is the default case for M2 installation on Windows.
+         Repository MUST be moved to a different location. Otherwise, some
+         Mule (and not only Mule) tests will fail.
+         
+         See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4496398
+    -->
+    
+         
+         
+    <!-- settings>
+        <localRepository>c:/.m2/repository</localRepository>
+    </settings -->
+    
+    
     <!-- Enable this if your machine is behind a firewall.
     <proxies>
         <proxy>

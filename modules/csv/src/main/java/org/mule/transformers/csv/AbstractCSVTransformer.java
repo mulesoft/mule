@@ -23,6 +23,7 @@ public abstract class AbstractCSVTransformer extends AbstractTransformer
     protected char separator = '\u0000';
     protected char quoteCharacter = '\u0000';
     protected boolean firstLineLabels = false;
+    protected boolean printLabels = false;
     protected int startLine = 0;
 
     public AbstractCSVTransformer()
@@ -68,6 +69,16 @@ public abstract class AbstractCSVTransformer extends AbstractTransformer
     public boolean getFirstLineLabels()
     {
         return firstLineLabels;
+    }
+
+    public void setPrintLabels(boolean printLabels)
+    {
+        this.printLabels = printLabels;
+    }
+
+    public boolean getPrintLabels()
+    {
+        return printLabels;
     }
 
 }

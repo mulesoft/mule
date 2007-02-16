@@ -16,12 +16,10 @@
     <modules>
         <module>axis</module>
         <module>bpm</module>
-        <module>dq</module>
         <module>ejb</module>
         <module>email</module>
         <module>file</module>
         <module>ftp</module>
-        <module>glue</module>
         <module>http</module>
         <module>jbi</module>
         <module>jdbc</module>

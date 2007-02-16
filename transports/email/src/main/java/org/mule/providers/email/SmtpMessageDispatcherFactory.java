@@ -21,11 +21,7 @@ import org.mule.umo.provider.UMOMessageDispatcher;
  */
 public class SmtpMessageDispatcherFactory extends AbstractMessageDispatcherFactory
 {
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.provider.UMOConnectorSessionFactory#create(org.mule.umo.provider.UMOConnector)
-     */
+    /** {@inheritDoc} */
     public UMOMessageDispatcher create(UMOImmutableEndpoint endpoint) throws UMOException
     {
         return new SmtpMessageDispatcher(endpoint);

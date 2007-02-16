@@ -33,6 +33,8 @@ import javax.activation.FileDataSource;
 
 public class SoapAttachmentsFunctionalTestCase extends AbstractProviderFunctionalTestCase
 {
+
+    // @Override
     protected void doSetUp() throws Exception
     {
         manager = MuleManager.getInstance();
@@ -43,7 +45,8 @@ public class SoapAttachmentsFunctionalTestCase extends AbstractProviderFunctiona
         model.getPoolingProfile().setInitialisationPolicy(
             PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
 
-        manager.registerModel(new SedaModel());
+        model.setName("main");
+        manager.registerModel(model);
         callbackCalled = false;
         callbackCount = 0;
         connector = createConnector();
@@ -75,10 +78,11 @@ public class SoapAttachmentsFunctionalTestCase extends AbstractProviderFunctiona
         return connector;
     }
 
+    // @Override
     public void testSend() throws Exception
     {
-        descriptor = getTestDescriptor("testComponent",
-            SoapAttachmentsFunctionalTestComponent.class.getName());
+        descriptor = getTestDescriptor("testComponent", SoapAttachmentsFunctionalTestComponent.class
+            .getName());
 
         initialiseComponent(descriptor, null);
         // Start the server

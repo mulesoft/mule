@@ -10,13 +10,6 @@
 
 package org.mule.providers.jms.transformers;
 
-import java.util.Iterator;
-
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.Session;
-
 import org.mule.config.MuleProperties;
 import org.mule.impl.RequestContext;
 import org.mule.providers.jms.JmsConnector;
@@ -29,6 +22,13 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.TransformerException;
+
+import java.util.Iterator;
+
+import javax.jms.Destination;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.Session;
 
 /**
  * <code>AbstractJmsTransformer</code> is an abstract class that should be used for

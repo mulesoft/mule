@@ -10,15 +10,15 @@
 
 package org.mule.management.mbeans;
 
-import java.util.Set;
-
-import javax.management.ObjectName;
-
 import org.mule.management.AbstractMuleJmxTestCase;
 import org.mule.management.agents.JmxAgent;
 import org.mule.management.support.JmxSupport;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.UMOConnector;
+
+import java.util.Set;
+
+import javax.management.ObjectName;
 
 public class ConnectorServiceTestCase extends AbstractMuleJmxTestCase
 {

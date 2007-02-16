@@ -43,28 +43,27 @@
     <model name="httpSample">
         <!--
             A Mule descriptor defines all the necessary information about
-how your components will
-            interact with the framework, other components in the system and
-external sources.
+            how your components will interact with the framework, other
+            components in the system and external sources.
             Please refer to the Configuration Guide for a full description
-of all the parameters.
+            of all the parameters.
         -->
-<mule-descriptor name="HTTPPostSample"
-    implementation="org.mule.components.rest.RestServiceWrapper">
-    <inbound-router>
-        <endpoint address="stream://System.in"/>
-    </inbound-router>
-    <outbound-router>
-        <router className="org.mule.routing.outbound.FilteringOutboundRouter">
-            <endpoint address="stream://System.out" transformers="XmlDecoder Xslt XmlToObject"/>
-        </router>
-    </outbound-router>
-    <properties>
-        <property name="serviceUrl" value="http://www.webservicex.net/stockquote.asmx/GetQuote"/>
-        <property name="payloadParameterName" value="symbol"/>
-        <property name="httpMethod" value="POST"/>
-    </properties>
-</mule-descriptor>
+        <mule-descriptor name="HTTPPostSample"
+            implementation="org.mule.components.rest.RestServiceWrapper">
+            <inbound-router>
+                <endpoint address="stream://System.in"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
+                    <endpoint address="stream://System.out" transformers="XmlDecoder Xslt XmlToObject"/>
+                </router>
+            </outbound-router>
+            <properties>
+                <property name="serviceUrl" value="http://www.webservicex.net/stockquote.asmx/GetQuote"/>
+                <property name="payloadParameterName" value="symbol"/>
+                <property name="httpMethod" value="POST"/>
+            </properties>
+        </mule-descriptor>
 
     </model>
 </mule-configuration>

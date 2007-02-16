@@ -26,10 +26,7 @@ import java.util.List;
  * split the contents of a received message into sup parts that can be processed by
  * other components. Each Part is fired as a separate event to each endpoint on the
  * router. The endpoints can have filters on them to receive only certain message
- * parts
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * parts.
  */
 
 public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
@@ -47,7 +44,8 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
     {
         String correlationId = (String)propertyExtractor.getProperty(
             MuleProperties.MULE_CORRELATION_ID_PROPERTY, message);
-        initialise(message);
+
+        this.initialise(message);
 
         UMOEndpoint endpoint;
         UMOMessage result = null;
@@ -57,11 +55,13 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
         {
             endpoint = (UMOEndpoint)iterator.next();
             message = getMessagePart(message, endpoint);
+            // TODO MULE-1378
             if (message == null)
             {
                 // Log a warning if there are no messages for a given endpoint
                 logger.warn("Message part is null for endpoint: " + endpoint.getEndpointURI().toString());
             }
+
             // We'll keep looping to get all messages for the current endpoint
             // before moving to the next endpoint
             // This can be turned off by setting the multimatch flag to false

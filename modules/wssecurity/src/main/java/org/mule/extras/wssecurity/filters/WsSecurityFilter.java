@@ -10,6 +10,21 @@
 
 package org.mule.extras.wssecurity.filters;
 
+import org.mule.MuleManager;
+import org.mule.extras.wssecurity.handlers.MuleWSSInHandler;
+import org.mule.extras.wssecurity.headers.WsSecurityHeadersSetter;
+import org.mule.impl.security.AbstractEndpointSecurityFilter;
+import org.mule.providers.soap.axis.AxisConnector;
+import org.mule.providers.soap.axis.extensions.MuleConfigProvider;
+import org.mule.providers.soap.xfire.XFireConnector;
+import org.mule.umo.UMOEvent;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.security.CryptoFailureException;
+import org.mule.umo.security.EncryptionStrategyNotFoundException;
+import org.mule.umo.security.SecurityException;
+import org.mule.umo.security.SecurityProviderNotFoundException;
+import org.mule.umo.security.UnknownAuthenticationTypeException;
+
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -25,25 +40,11 @@ import org.apache.axis.server.AxisServer;
 import org.apache.ws.axis.security.WSDoAllReceiver;
 import org.apache.ws.axis.security.WSDoAllSender;
 import org.apache.ws.security.handler.WSHandlerConstants;
+import org.codehaus.xfire.XFire;
 import org.codehaus.xfire.security.wss4j.WSS4JOutHandler;
 import org.codehaus.xfire.service.Service;
-import org.codehaus.xfire.XFire;
 import org.codehaus.xfire.util.dom.DOMInHandler;
 import org.codehaus.xfire.util.dom.DOMOutHandler;
-import org.mule.extras.wssecurity.handlers.MuleWSSInHandler;
-import org.mule.extras.wssecurity.headers.WsSecurityHeadersSetter;
-import org.mule.impl.security.AbstractEndpointSecurityFilter;
-import org.mule.providers.soap.axis.AxisConnector;
-import org.mule.providers.soap.axis.extensions.MuleConfigProvider;
-import org.mule.providers.soap.xfire.XFireConnector;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.security.CryptoFailureException;
-import org.mule.umo.security.EncryptionStrategyNotFoundException;
-import org.mule.umo.security.SecurityException;
-import org.mule.umo.security.SecurityProviderNotFoundException;
-import org.mule.umo.security.UnknownAuthenticationTypeException;
-import org.mule.MuleManager;
 
 public class WsSecurityFilter extends AbstractEndpointSecurityFilter
 {
