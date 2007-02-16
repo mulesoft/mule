@@ -37,6 +37,8 @@ import java.io.OutputStream;
 public class TestConnector extends AbstractConnector
 {
 
+    private String someProperty;
+
     public TestConnector()
     {
         super();
@@ -93,6 +95,17 @@ public class TestConnector extends AbstractConnector
         throws MessagingException
     {
         return new DummyMessageAdapter(in);
+    }
+
+
+    public String getSomeProperty()
+    {
+        return someProperty;
+    }
+
+    public void setSomeProperty(String someProperty)
+    {
+        this.someProperty = someProperty;
     }
 
     public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception

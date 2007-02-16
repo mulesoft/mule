@@ -63,10 +63,9 @@
         </mule-descriptor>
     </model>
 
-    <!--TODO RM* : Put this test back in -->
-    <!--<bean id="beanConnector" class="org.mule.providers.vm.VMConnector">-->
-        <!--<spring-property name="queueEvents">-->
-            <!--<value>true</value>-->
-        <!--</spring-property>-->
-    <!--</bean>-->
+    <bean id="beanConnector" class="org.mule.tck.testmodels.mule.TestConnector">
+        <spring-property name="someProperty">
+            <value>hello</value>
+        </spring-property>
+    </bean>
 </mule-configuration>

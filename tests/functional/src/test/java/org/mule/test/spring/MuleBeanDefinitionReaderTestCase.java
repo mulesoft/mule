@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id:MuleBeanDefinitionReaderTestCase.java 5187 2007-02-16 18:00:42Z rossmason $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -47,12 +47,12 @@ public class MuleBeanDefinitionReaderTestCase extends AbstractConfigBuilderTestC
 
     // Test spring bean configs
     //TODO
-//    public void testConnectorBean()
-//    {
-//        VMConnector c = (VMConnector)MuleManager.getInstance().lookupConnector("beanConnector");
-//        assertNotNull(c);
-//        assertTrue(c.isQueueEvents());
-//    }
+    public void testConnectorBean()
+    {
+        TestConnector c = (TestConnector)MuleManager.getInstance().lookupConnector("beanConnector");
+        assertNotNull(c);
+        assertEquals("hello",c.getSomeProperty());
+    }
 
     public void testEndpointPropertyBean()
     {
