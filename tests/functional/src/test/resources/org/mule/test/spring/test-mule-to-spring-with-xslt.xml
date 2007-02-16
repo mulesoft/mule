@@ -10,7 +10,7 @@
          <mule-descriptor name="TestComponent"
           implementation="org.mule.tck.functional.FunctionalTestComponent">
               <inbound-router>
-                   <endpoint address="vm://in"/>
+                   <endpoint address="test://in"/>
               </inbound-router>
           </mule-descriptor>
     </model>

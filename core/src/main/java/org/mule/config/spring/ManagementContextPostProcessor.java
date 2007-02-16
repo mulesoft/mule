@@ -11,8 +11,6 @@ package org.mule.config.spring;
 
 import org.mule.umo.UMOManagementContext;
 
-import java.util.Map;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.ApplicationContext;
@@ -53,18 +51,20 @@ public class ManagementContextPostProcessor implements BeanPostProcessor, Applic
 
     protected UMOManagementContext getManagementContext()
     {
-        if(context==null)
-        {
-            Map mContexts = applicationContext.getBeansOfType(UMOManagementContext.class, false, true);
-            if(mContexts.size()==1)
-            {
-                context = (UMOManagementContext)mContexts.values().iterator().next();
-            }
-            else
-            {
-                throw new IllegalStateException("There must be exactly one MAnagementContext. Currently there are " + mContexts.size() + " registered");
-            }
-        }
-        return context;
+        //TODO RM* This will not work until we can migrate the ManagementContextFactory Bean to use a ManagementContext not the MuleManager
+        return null;
+//        if(context==null)
+//        {
+//            Map mContexts = applicationContext.getBeansOfType(UMOManagementContext.class, false, true);
+//            if(mContexts.size()==1)
+//            {
+//                context = (UMOManagementContext)mContexts.values().iterator().next();
+//            }
+//            else
+//            {
+//                throw new IllegalStateException("There must be exactly one MAnagementContext. Currently there are " + mContexts.size() + " registered");
+//            }
+//        }
+//        return context;
     }
 }

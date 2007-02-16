@@ -14,7 +14,7 @@ package org.mule.extras.spring;
  * {@inheritDoc}
  * 
  */
-public class SpringContainerContext extends org.mule.config.SpringContainerContext 
+public class SpringContainerContext extends org.mule.config.spring.SpringContainerContext
 {
     // Spring configuration has moved into mule-core, this class is left for backwards compatibility only.
 }

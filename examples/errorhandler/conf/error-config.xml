@@ -15,7 +15,7 @@
         <file-properties location="email.properties" />
     </environment-properties>
 
-    <container-context className="org.mule.config.SpringContainerContext">
+    <container-context className="org.mule.config.spring.SpringContainerContext">
         <properties>
             <property name="configFile" value="error-beans.xml"/>
         </properties>

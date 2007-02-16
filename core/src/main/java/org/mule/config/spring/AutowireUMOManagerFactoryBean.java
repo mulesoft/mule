@@ -12,7 +12,6 @@ package org.mule.config.spring;
 
 import org.mule.MuleManager;
 import org.mule.config.MuleConfiguration;
-import org.mule.config.SpringContainerContext;
 import org.mule.impl.model.ModelFactory;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;

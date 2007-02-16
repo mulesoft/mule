@@ -6,7 +6,7 @@
 <!-- my local test config -->
 <mule-configuration id="Test_Mule_Properties" version="1.0">
 
-    <container-context className="org.mule.config.SpringContainerContext">
+    <container-context className="org.mule.config.spring.SpringContainerContext">
         <properties>
             <property name="configFile" value="error-beans.xml"/>
         </properties>

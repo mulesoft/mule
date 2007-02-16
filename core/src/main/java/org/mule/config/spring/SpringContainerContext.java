@@ -8,9 +8,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config;
+package org.mule.config.spring;
 
 import org.mule.MuleManager;
+import org.mule.config.CachedResource;
+import org.mule.config.ConfigurationException;
+import org.mule.config.ReaderInputStream;
 import org.mule.config.i18n.CoreMessageConstants;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;

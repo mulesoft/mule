@@ -11,7 +11,6 @@ package org.mule.config.spring;
 
 import org.mule.MuleManager;
 import org.mule.config.MuleConfiguration;
-import org.mule.config.SpringContainerContext;
 import org.mule.impl.model.ModelHelper;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
@@ -76,6 +75,8 @@ public class ManagementContextFactoryBean
      * logger used by this class
      */
     protected static Log logger = LogFactory.getLog(ManagementContextFactoryBean.class);
+
+    //TODO RM* URGENT replace this woth MUMOanagementContext
 
     private UMOManager manager;
 

@@ -329,7 +329,7 @@
 
     <!-- by default the componet builder will use this context to resolve objects, though you can
     specify a different context config if you want -->
-    <bean id="containerContext" class="org.mule.extras.spring.SpringContainerContext"/>
+    <bean id="containerContext" class="org.mule.config.spring.SpringContainerContext"/>
 
     <bean id="orangeComponent" class="org.mule.impl.MuleDescriptor">
         <property name="implementation"><bean class="org.mule.tck.testmodels.fruit.Orange"/></property>

@@ -11,17 +11,17 @@
 
     <container-context
             name="spring-1"
-            className="org.mule.extras.spring.SpringContainerContext">
+            className="org.mule.config.spring.SpringContainerContext">
         <properties>
-            <property name="configFile" value="test-application-context.xml"/>
+            <property name="configFile" value="org/mule/test/spring/test-application-context.xml"/>
         </properties>
     </container-context>
 
     <container-context
             name="spring-2"
-            className="org.mule.extras.spring.SpringContainerContext">
+            className="org.mule.config.spring.SpringContainerContext">
         <properties>
-            <property name="configFile" value="test-application-context-2.xml"/>
+            <property name="configFile" value="org/mule/test/spring/test-application-context-2.xml"/>
         </properties>
     </container-context>
 

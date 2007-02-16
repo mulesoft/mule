@@ -7,7 +7,7 @@
 
     <mule-environment-properties serverUrl=""/>
     
-    <container-context className="org.mule.extras.spring.SpringContainerContext">
+    <container-context className="org.mule.config.spring.SpringContainerContext">
         <properties>
             <property name="configFile" value="mule-events-app-context-with-ref-props.xml"/>
         </properties>
