@@ -11,15 +11,13 @@
 -->
 <!ELEMENT mule-configuration (description?,environment-properties?,mule-environment-properties?,container-context*,security-manager?,
  transaction-manager?,agents?,connector*,endpoint-identifiers?,transformers?,global-endpoints?,
-            interceptor-stack*,model*,(import | alias | bean)*)>
+            interceptor-stack*,model?,mule-descriptor*,(import | alias | bean)*)>
 
 <!--
     The id attribute allows for a unique id for this file as it is often the case that
     distributed Mule environments have their own properties
 -->
-<!ATTLIST mule-configuration id              NMTOKEN         #REQUIRED>
-<!ATTLIST mule-configuration clusterId              NMTOKEN         #IMPLIED>
-<!ATTLIST mule-configuration domain              NMTOKEN         #IMPLIED>
+<!ATTLIST mule-configuration id              NMTOKEN         #IMPLIED>
 <!--
     The version attribute is used to bind a mule_props.xml
     file to a given version of this dtd. This will help to
@@ -31,7 +29,7 @@
     <i>mule-environment-params</i> are prarameters used by the Mule run-time. If none or not all
     parameters are specified defaults will be used
 -->
-<!ELEMENT mule-environment-properties (threading-profile?, connection-strategy?)>
+<!ELEMENT mule-environment-properties (threading-profile*, pooling-profile?, queue-profile?, persistence-strategy?, connection-strategy?)>
 
 <!--
     Specifies whether mule should process messages sysnchonously, i.e. that a mule-model
@@ -39,7 +37,14 @@
     'false'.
 -->
 
-<!ATTLIST mule-environment-properties defaultSynchronousEndpoints                     (true | false)          "false">
+<!ATTLIST mule-environment-properties synchronous                     (true | false)          "false">
+<!--
+    A property file can specify more than one mule-model.  In the situation when more than
+    one is difined this property tells Mule which model to load.  If this is not specifed
+    the first model is used.
+    <strong>This property currently is not used</strong>
+-->
+<!ATTLIST mule-environment-properties model                            CDATA                    #IMPLIED>
 
 <!--
      The directory where mule can write any temporary files or persist messages
@@ -50,33 +55,60 @@
      When running sychonously, return events can be received over transports that support ack or replyTo
      This property determines how long to wait for a receive
 -->
-<!ATTLIST mule-environment-properties defaultSynchronousEventTimeout          NMTOKEN                 #IMPLIED>
+<!ATTLIST mule-environment-properties synchronousEventTimeout          NMTOKEN                 #IMPLIED>
 
 <!--
      Added default encoding to use for general parsing of strings
 -->
-<!ATTLIST mule-environment-properties defaultEncoding          CDATA                 #IMPLIED>
-<!--
-     Added default os encoding to use for general system message formatting and web service and servlet encoding
--->
-<!ATTLIST mule-environment-properties defaultOsEncoding          CDATA                 #IMPLIED>
+<!ATTLIST mule-environment-properties encoding          CDATA                 #IMPLIED>
 
 <!--
      Default transaction timeout
 -->
-<!ATTLIST mule-environment-properties defaultTransactionTimeout          NMTOKEN                 #IMPLIED>
+<!ATTLIST mule-environment-properties transactionTimeout          NMTOKEN                 #IMPLIED>
 
 <!--
      Determines whether when running synchronously, return events are received before
      returning the call. i.e. in jms wait for a replyTo. Vm queues do this automatically
 -->
-<!ATTLIST mule-environment-properties defaultRemoteSync          (true | false)          "false">
+<!ATTLIST mule-environment-properties remoteSync          (true | false)          "false">
 
+<!--
+     Determines if Mule is running embedded and can be used to disable certain services and also hide the
+     start splash
+-->
+<!ATTLIST mule-environment-properties embedded          (true | false)          #IMPLIED>
+
+<!--
+     Is the default endpointUri where Mule can receive Action requests such as running a
+     send, dispatch or receive request from a remote client. If not specified the default will
+     be used of tcp://localhost:60504.
+     Note users can explicitly configure the MuleManagerComponent that serves these type of
+     requests and this variable need not be set. Setting this to an empty string
+     "" will disable the server admin component.  Often client only and test configurations
+     will want to do this.
+-->
+<!ATTLIST mule-environment-properties serverUrl                      CDATA          #IMPLIED>
+
+<!--
+     Determines whether Mule's internal queues are persisted.  If the server dies unexpectedly Mule
+     can resume processing when the server starts
+-->
+<!ATTLIST mule-environment-properties recoverableMode           (true | false)          #IMPLIED>
+
+<!--
+     Determines whether Mule amule instance is runnig in client mode.  client mode means that
+     certain Mule Manager services are not started suhc as the the Admin component and the Server
+     event manager.  The only time a user would need to set variable explicitly is if they
+     where configuring a Mule instance via Xml config for client-only usage.
+-->
+<!ATTLIST mule-environment-properties clientMode           (true | false)          #IMPLIED>
 
 <!--
     Whether mule should fire message events for every message sent and received
 -->
-<!ATTLIST mule-environment-properties enableMessageEvents           (true | false)          "false">
+<!ATTLIST mule-environment-properties enableMessageEvents           (true | false)          #IMPLIED>
+
 <!--
 A pooling profile is used to configure the pooling behaviour of UMO components.
 each descriptor can set it's own pooling profile or a default one can be set
@@ -816,7 +848,7 @@ The type of Model to use for component processing for this Mule instance.  The d
 at http://mule.codehaus.org/Models
 The custom model can be used to specify a custom model type.  In which case you must supply a className.
 -->
-<!ATTLIST model type           (seda | direct | pipeline | jms | streaming | inherited | custom)             "seda">
+<!ATTLIST model type           (seda | direct | pipeline | jms | jms-clustered | inherited | custom)             "seda">
 
 <!--
     The class used for instanciate the model if a custom model type is being used.  The class must implement
@@ -903,19 +935,6 @@ The ref name of this object if it is to be loaded from a container such as sprin
 Jndi
 -->
 <!ATTLIST mule-descriptor ref                     CDATA                 #IMPLIED>
-
-<!--
-    The transformer to use when receiving events on the specified inboundProvider.
--->
-<!ATTLIST mule-descriptor inboundTransformer            CDATA            #IMPLIED>
-<!--
-    The transformer to use when receiving events on the specified outboundProvider.
--->
-<!ATTLIST mule-descriptor outboundTransformer            CDATA            #IMPLIED>
-<!--
-    The transformer to use when sending events back.
--->
-<!ATTLIST mule-descriptor responseTransformer            CDATA            #IMPLIED>
 <!--
     The class of the object or an object reference of the component being registered as an UMO.
     If the implementation is an object reference then it will be resolved using the component resolver
@@ -923,25 +942,10 @@ Jndi
 -->
 <!ATTLIST mule-descriptor implementation                CDATA         #REQUIRED>
 <!--
-    The default subject that the Mule UMO sends events.
--->
-<!ATTLIST mule-descriptor inboundEndpoint                CDATA            #IMPLIED>
-<!--
-    The default subject that the Mule UMO receive events.
--->
-<!ATTLIST mule-descriptor outboundEndpoint                    CDATA            #IMPLIED>
-<!--
     The version on the Mule UMO.  This is currently not used by the mule run-time but may
     be used in future
 -->
 <!ATTLIST mule-descriptor version                         NMTOKEN         #IMPLIED>
-
-<!--
-    If an IoC container is being used this property can be set to determine if this component
-    is constructed (and contained in) the container or is instanciated by Mule.
-    This is being deprecated in favour of the 'ontainer' property below.
--->
-<!ATTLIST mule-descriptor containerManaged            (true | false)            "true">
 
 <!--
     If an IoC container is being used this property can be set to determine which container explicitly
@@ -989,31 +993,6 @@ Whether every configured router will be matched
 <!ATTLIST inbound-router matchAll               (true | false)           "false">
 
 <!--
-   A message router configures how a resonse message will be routed to a client when
-   using request/response message processing.
--->
-<!ELEMENT response-router ((endpoint)*,(global-endpoint)*,(router)*)>
-
-<!--
-   This attibute defines the response transformers (if any) that will be applied
-   to the response message before returning to the client. Developers can define
-   a response-router with only a transformer and no actual routers to configure a
-   response transformer.  Note that the connector can have a default Response transformer
-   associated with it meaning that marshaling from transport specific MEssage types such as
-   Jms will be done automatically.
--->
-<!--
-    Defines the timeout for routers configure on this response-router
--->
-<!ATTLIST response-router timeout        CDATA         #IMPLIED>
-
-<!--
-//TODO
-If a timeout occurs, should an error be thrown or allow the events to be passed on regardless
--->
-<!--<!ATTLIST response-router failOnTimeout        (true | false)         "true">-->
-
-<!--
  A nested router allows for mule orchestration of component dependencies
 -->
 <!ELEMENT nested-router ((binding)*)>
@@ -1033,6 +1012,26 @@ The fully qualified name of the interface class that will be proxied to call out
 The name of the method that will be bound to the endpoint
 -->
 <!ATTLIST binding method NMTOKEN #IMPLIED>
+
+<!--
+   A message router configures how a resonse message will be routed to a client when
+   using request/response message processing.
+-->
+<!ELEMENT response-router ((endpoint)*,(global-endpoint)*,(router)*)>
+
+<!--
+   This attibute defines the response transformers (if any) that will be applied
+   to the response message before returning to the client. Developers can define
+   a response-router with only a transformer and no actual routers to configure a
+   response transformer.  Note that the connector can have a default Response transformer
+   associated with it meaning that marshaling from transport specific MEssage types such as
+   Jms will be done automatically.
+-->
+<!--
+    Defines the timeout for routers configure on this response-router
+-->
+<!ATTLIST response-router timeout        CDATA         #IMPLIED>
+
 <!--
 A catch-all-strategy is invoked to route an event when an event is not accepted by any of the configured
 routers.

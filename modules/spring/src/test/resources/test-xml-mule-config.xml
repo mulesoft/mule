@@ -14,14 +14,9 @@
         <system-property name="system-prop2" key="system-prop2" defaultValue="default"/>
     </environment-properties>
 
-    <mule-environment-properties
-        synchronous="false"
-        model="main">
+    <mule-environment-properties synchronous="false">
         <threading-profile id="default" maxBufferSize="0" maxThreadsActive="8"
             maxThreadsIdle="4" poolExhaustedAction="WAIT" threadTTL="60001"/>
-        <pooling-profile exhaustedAction="WAIT" maxActive="8" maxIdle="4" maxWait="4000" initialisationPolicy="INITIALISE_FIRST"/>
-        <queue-profile maxOutstandingMessages="100" persistent="true"/>
-        <persistence-strategy className="org.mule.util.queue.FilePersistenceStrategy"/>
     </mule-environment-properties>
 
     <transaction-manager factory="org.mule.tck.testmodels.mule.TestTransactionManagerFactory"/>
@@ -48,12 +43,6 @@
         </exception-strategy>
     </connector>
 
-    <endpoint-identifiers>
-        <endpoint-identifier name="AppleQueue" value="test://apple.queue"/>
-        <endpoint-identifier name="Banana_Queue" value="test://banana.queue"/>
-        <endpoint-identifier name="Test Queue" value="test://test.queue"/>
-    </endpoint-identifiers>
-
     <transformers>
         <transformer name="TestCompressionTransformer" className="org.mule.tck.testmodels.mule.TestCompressionTransformer"
             returnClass="java.lang.String">
@@ -78,20 +67,17 @@
                 </properties>
             </filter>
         </endpoint>
-        <endpoint name="waterMelonEndpoint" address="Test Queue"/>
-        <endpoint name="appleInEndpoint" type="receiver" address="test://AppleQueue"/>
-        <endpoint name="appleResponseEndpoint" type="receiver" address="test://AppleResponseQueue"/>
+        <endpoint name="waterMelonEndpoint" address="test://test.queue"/>
+        <endpoint name="appleInEndpoint" address="test://AppleQueue"/>
+        <endpoint name="appleResponseEndpoint" address="test://AppleResponseQueue"/>
+        <endpoint name="AppleQueue" address="test://apple.queue"/>
+        <endpoint name="Banana_Queue" address="test://banana.queue"/>
         <endpoint name="orangeEndpoint" address="test://orangeQ">
             <properties>
                 <property name="testGlobal" value="value1"/>
             </properties>
         </endpoint>
     </global-endpoints>
-
-    <interceptor-stack name="default">
-        <interceptor className="org.mule.interceptors.LoggingInterceptor"/>
-        <interceptor className="org.mule.interceptors.TimerInterceptor"/>
-    </interceptor-stack>
 
     <model name="main">
         <entry-point-resolver className="org.mule.tck.testmodels.mule.TestEntryPointResolver"/>
@@ -102,15 +88,12 @@
             <endpoint address=" test://component.exceptions "/>
         </exception-strategy>
 
-        <mule-descriptor name="orangeComponent"
-            implementation="orange"
-            container="descriptor">
+        <mule-descriptor name="orangeComponent" implementation="orange">
 
             <inbound-router>
                 <catch-all-strategy className="org.mule.routing.ForwardingCatchAllStrategy">
                     <endpoint connector="dummyConnector2" address="test://catch.all"/>
                 </catch-all-strategy>
-                <endpoint address="Test Queue"/>
                 <endpoint name="Orange" type="receiver" address="test://orange/" transformers="TestCompressionTransformer" responseTransformers="TestCompressionTransformer"/>
                 <global-endpoint name="orangeEndpoint" transformers="TestCompressionTransformer">
                     <filter className="org.mule.routing.filters.PayloadTypeFilter" expectedType="java.lang.String"/>
@@ -149,7 +132,6 @@
             </exception-strategy>
 
             <properties>
-                <factory-property name="orange" factory="org.mule.tck.testmodels.fruit.Orange"/>
                 <property name="brand" value="Juicy Baby!"/>
                 <property name="segments" value="9"/>
                 <property name="radius" value="4.21"/>
@@ -193,15 +175,16 @@
                 <router className="org.mule.routing.outbound.FilteringOutboundRouter">
                     <global-endpoint name="waterMelonEndpoint"/>
                     <filter className="org.mule.routing.filters.logic.AndFilter">
-                        <left-filter pattern="the quick brown (.*)" className="org.mule.routing.filters.RegExFilter"/>
-                        <right-filter pattern="(.*) brown (.*)" className="org.mule.routing.filters.RegExFilter"/>
+                        <left-filter expression="the quick brown (.*)" className="org.mule.routing.filters.RegExFilter"/>
+                        <right-filter expression="(.*) brown (.*)" className="org.mule.routing.filters.RegExFilter"/>
                     </filter>
                 </router>
             </outbound-router>
 
-            <interceptor className="org.mule.interceptors.LoggingInterceptor"/>
-
             <exception-strategy className="org.mule.impl.DefaultExceptionStrategy"/>
         </mule-descriptor>
     </model>
+
+    <bean name="orange" class="org.mule.tck.testmodels.fruit.Orange"/>
+    
 </mule-configuration>

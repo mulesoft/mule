@@ -67,11 +67,6 @@ public class MuleBeanDefinitionReaderTestCase extends AbstractConfigBuilderTestC
         assertTrue(conn instanceof TestConnector);
         assertEquals("dummyConnector2", conn.getName());
         
-        // e = d.getInboundEndpoint();
-        // assertNotNull(e);
-        // assertEquals(e.getEndpointURI().toString(), MuleManager.getInstance()
-        // .getEndpointIdentifiers()
-        // .get("Test Queue"));
     }
 
     public void testPropertyBeansOnDescriptors()
@@ -102,6 +97,6 @@ public class MuleBeanDefinitionReaderTestCase extends AbstractConfigBuilderTestC
 
     public void testConvertedSpringBeans() throws UMOException
     {
-        assertNotNull(MuleManager.getInstance().getContainerContext().getComponent("TestComponent"));
+        assertNotNull(MuleManager.getInstance().lookupModel("main").getComponent("TestComponent"));
     }
 }

@@ -10,6 +10,7 @@
 package org.mule.extras.spring.config;
 
 import org.mule.config.SpringContainerContext;
+
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.ApplicationContext;
@@ -17,7 +18,7 @@ import org.springframework.context.ApplicationContextAware;
 
 /**
  * A temporary factory bean thst will associate the currenct Application context with a MuleContainer context
- * //This can be removed when we plug the registry in
+ * This can be removed when we plug the registry in
  */
 public class SpringContainerContextFactoryBean implements FactoryBean, ApplicationContextAware
 {

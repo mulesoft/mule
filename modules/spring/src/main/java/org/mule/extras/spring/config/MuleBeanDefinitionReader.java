@@ -10,6 +10,10 @@
 
 package org.mule.extras.spring.config;
 
+import org.mule.config.MuleDtdResolver;
+import org.mule.config.XslHelper;
+import org.mule.umo.transformer.UMOTransformer;
+
 import java.io.IOException;
 
 import javax.xml.transform.Source;
@@ -22,8 +26,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
 
 import org.dom4j.io.DOMReader;
-import org.mule.config.MuleDtdResolver;
-import org.mule.umo.transformer.UMOTransformer;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -87,10 +89,25 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
     {
         if (getXslResource() != null)
         {
-            Transformer transformer = createTransformer(createXslSource());
-            DOMResult result = new DOMResult();
-            transformer.setParameter("firstContext", Boolean.valueOf(isFirstContext()));
-            transformer.transform(new DOMSource(document), result);
+            DOMResult result;
+            try
+            {
+                Transformer transformer = createTransformer(createXslSource());
+                result = new DOMResult();
+                transformer.setParameter("firstContext", Boolean.valueOf(isFirstContext()));
+                transformer.transform(new DOMSource(document), result);
+            }
+            finally
+            {
+                //If there are any configuration errors i.e. Some elements are no longer supported in Mule
+                //Lets spit them out here
+                if(XslHelper.hasErrorReport())
+                {
+                    String report = XslHelper.getErrorReport();
+                    XslHelper.clearErrors();
+                    throw new IOException(report);
+                }
+            }
             if (logger.isDebugEnabled())
             {
                 try

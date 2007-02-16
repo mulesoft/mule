@@ -81,7 +81,7 @@ public class UMOManagerFactoryBean implements FactoryBean, InitializingBean, Dis
         }
     }
 
-    public void setConfiguration(MuleConfiguration config)
+    public void setConfiguration(MuleConfiguration config) throws UMOException
     {
         MuleManager.setConfiguration(config);
     }

@@ -13,7 +13,6 @@ package org.mule.extras.spring;
 /**
  * {@inheritDoc}
  * 
- * @deprecated Spring is the default container for Mule 2.x, therefore this class is likely to disappear.
  */
 public class SpringContainerContext extends org.mule.config.SpringContainerContext 
 {

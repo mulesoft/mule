@@ -543,7 +543,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
     {
         try
         {
-            // endpointsCache.clear();
+            // endpointsCache.clearErrors();
             // See if there has been a discriptor explicitly configured
             if (applicationContext.containsBean(EVENT_MULTICASTER_DESCRIPTOR_NAME))
             {

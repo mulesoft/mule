@@ -44,7 +44,9 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
 
     public BeanDefinition parseCustomElement(Element ele, BeanDefinition containingBd)
     {
-        System.out.println("" + writeNode(ele));        
+        if (logger.isDebugEnabled()) {
+            logger.debug("parsing: " + writeNode(ele));
+        }
         BeanDefinition root;
         String namespaceUri = ele.getNamespaceURI();
         NamespaceHandler handler = getReaderContext().getNamespaceHandlerResolver().resolve(namespaceUri);
@@ -63,8 +65,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
             if(list.item(i) instanceof Element)
             {
                 Element element = (Element) list.item(i);
-                System.out.println("-- " + writeNode(element));
-                
+
                 if (logger.isDebugEnabled()) {
                     logger.debug("parsing: " + writeNode(element));
                 }

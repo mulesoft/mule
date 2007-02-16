@@ -52,11 +52,6 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
         return configLocations;
     }
 
-    protected void initBeanDefinitionReader(XmlBeanDefinitionReader xmlBeanDefinitionReader)
-    {
-        super.initBeanDefinitionReader(xmlBeanDefinitionReader);
-    }
-
     protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException
     {
         XmlBeanDefinitionReader beanDefinitionReader = new MuleBeanDefinitionReader(beanFactory,

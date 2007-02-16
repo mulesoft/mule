@@ -11,9 +11,6 @@
 package org.mule.config;
 
 import org.mule.MuleManager;
-import org.mule.config.CachedResource;
-import org.mule.config.ConfigurationException;
-import org.mule.config.ReaderInputStream;
 import org.mule.config.i18n.CoreMessageConstants;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -42,6 +39,7 @@ import org.springframework.core.io.InputStreamResource;
 public class SpringContainerContext extends AbstractContainerContext implements BeanFactoryAware
 {
     public static final String SPRING_DOCTYPE_REF = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE beans PUBLIC \"-//SPRING//DTD BEAN//EN\" \"http://www.springframework.org/dtd/spring-beans.dtd\">\n";
+    public static final String DEFAULT_CONTAINER_NAME = "spring";
 
     /**
      * the application contect to use when resolving components
@@ -56,7 +54,7 @@ public class SpringContainerContext extends AbstractContainerContext implements 
 
     public SpringContainerContext()
     {
-        super("spring");
+        super(DEFAULT_CONTAINER_NAME);
     }
 
     /**
