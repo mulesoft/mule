@@ -9,6 +9,7 @@
  */
 package org.mule.extras.spring.config;
 
+import org.mule.config.support.InheritedModel;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
