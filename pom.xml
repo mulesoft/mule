@@ -76,11 +76,6 @@
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-dq</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-ejb</artifactId>
             <version>${version}</version>
         </dependency>
@@ -97,16 +92,6 @@
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-ftp</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-gigaspaces</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-glue</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
@@ -152,11 +137,6 @@
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-soap</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-space</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
