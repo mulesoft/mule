@@ -17,6 +17,8 @@ import java.util.StringTokenizer;
 
 import org.apache.commons.lang.StringUtils;
 
+import org.mule.management.stats.RouterStatistics;
+
 /**
  * <code>HtmlTablePrinter</code> prints event processing stats as a HTML table
  * 
@@ -36,14 +38,90 @@ public class HtmlTablePrinter extends AbstractTablePrinter
         super(out);
     }
 
+    public String[] getHeaders()
+    {
+        String[] column = new String[32];
+        column[0] = "Component Name";
+        column[1] = "Component Pool Max Size";
+        column[2] = "Component Pool Size";
+        column[3] = "Thread Pool Size";
+        column[4] = "Current Queue Size";
+        column[5] = "Max Queue Size";
+        column[6] = "Avg Queue Size";
+        column[7] = "Sync Events Received";
+        column[8] = "Async Events Received";
+        column[9] = "Total Events Received";
+        column[10] = "Sync Events Sent";
+        column[11] = "Async Events Sent";
+        column[12] = "ReplyTo Events Sent";
+        column[13] = "Total Events Sent";
+        column[14] = "Executed Events";
+        column[15] = "Execution Messages";
+        column[16] = "Fatal Messages";
+        column[17] = "Min Execution Time";
+        column[18] = "Max Execution Time";
+        column[19] = "Avg Execution Time";
+        column[20] = "Total Execution Time";
+        column[21] = "Inbound Router Statistics";
+        column[22] = "Total Received";
+        column[23] = "Total Routed";
+        column[24] = "Not Routed";
+        column[25] = "Caught Events";
+        column[26] = "Outbound Router Statistics";
+        column[27] = "Total Received";
+        column[28] = "Total Routed";
+        column[29] = "Not Routed";
+        column[30] = "Caught Events";
+        column[31] = "Sample Period";
+        return column;
+    }
+
+    protected int getRouterInfo(RouterStatistics stats, String[] col, int index)
+    {
+        if (stats.isInbound())
+        {
+            col[index++] = "-";
+        }
+        else
+        {
+            col[index++] = "-";
+        }
+
+        col[index++] = String.valueOf(stats.getTotalReceived());
+        col[index++] = String.valueOf(stats.getTotalRouted());
+        col[index++] = String.valueOf(stats.getNotRouted());
+        col[index++] = String.valueOf(stats.getCaughtMessages());
+
+        return index;
+    }
+
     public void print(Collection stats)
     {
-        println("<font size='8'><table valign='top'>");
+        println("<table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\">");
         String[][] table = getTable(stats);
-        boolean endpointStats = false;
-        for (int i = 0; i < table[0].length; i++)
+        // boolean endpointStats = false;
+        println("<tr>");
+        for (int i = 0; i < table.length; i++)
         {
-            println("<tr valign='top'>");
+            println("<td class=\"mbeans\">" + table[i][0] + "</td>");
+        }
+        println("</tr>");
+        for (int i = 1; i < table[0].length; i++)
+        {
+            println("<tr class=\"" + ((i % 2 == 0) ? "darkline" : "clearline") + "\">");
+            for (int j = 0; j < table.length; j++)
+            {
+                if (j == 0 && StringUtils.equals(table[1][i], "-"))
+                {
+                    println("<td class=\"mbean_row\"><div class=\"tableheader\">" + table[j][i] + "</div></td>");
+                }
+                else
+                {
+                    println("<td class=\"mbean_row\">" + ((StringUtils.equals(table[1][i], "-")) ? "" : table[j][i]) + "</td>");
+                }
+            }
+            println("</tr>");
+            /*
             boolean bold = false;
 
             for (int j = 0; j < table.length; j++)
@@ -84,8 +162,9 @@ public class HtmlTablePrinter extends AbstractTablePrinter
             {
                 endpointStats = false;
             }
+            */
         }
-        println("</table></font>");
+        println("</table>");
     }
 
     protected String getProviderStatsHtml(String stats)

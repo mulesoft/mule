@@ -10,11 +10,11 @@
         <mule-descriptor name="ScriptService" implementation="org.mule.components.script.jsr223.ScriptComponent">
             <inbound-router>
                 <endpoint address="stream://System.in">
-			        <properties>
-			            <property name="promptMessage" value="Please enter a message: "/>
-			            <property name="messageDelayTime" value="1000"/>
-			        </properties>
-			    </endpoint>
+                    <properties>
+                        <property name="promptMessage" value="Please enter a message: "/>
+                        <property name="messageDelayTime" value="1000"/>
+                    </properties>
+                </endpoint>
             </inbound-router>
             <properties>
                 <property name="scriptEngineName" value="groovy"/>

@@ -15,13 +15,13 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
     <bean id="jmsConnectionFactory"
-        class="org.activemq.ActiveMQConnectionFactory">
+        class="org.apache.activemq.ActiveMQConnectionFactory">
         <property name="brokerURL"><value>vm://localhost</value></property>
         <property name="useEmbeddedBroker"><value>true</value></property>
         <property name="brokerContainerFactory">
             <bean id="bcf" class="org.activemq.broker.impl.BrokerContainerFactoryImpl">
                 <constructor-arg index="0">
-                    <bean id="vmp" class="org.activemq.store.vm.VMPersistenceAdapter"/>
+                    <bean id="vmp" class="org.apache.activemq.store.memory.MemoryPersistenceAdapter"/>
                 </constructor-arg>
             </bean>
         </property>
@@ -39,11 +39,11 @@
             <property name="specification" value="1.1"/>
         </properties>
     </connector>
-	
-	<transformers>
-		<transformer name="jmsmessagetoobject" className="org.mule.providers.jms.transformers.JMSMessageToObject"/>
-		<transformer name="inboundtransformer" className="org.mule.transformers.simple.ByteArrayToString"/>
-		<transformer name="responsetransformer" className="org.mule.transformers.simple.StringToByteArray"/>
+
+    <transformers>
+        <transformer name="jmsmessagetoobject" className="org.mule.providers.jms.transformers.JMSMessageToObject"/>
+        <transformer name="inboundtransformer" className="org.mule.transformers.simple.ByteArrayToString"/>
+        <transformer name="responsetransformer" className="org.mule.transformers.simple.StringToByteArray"/>
     </transformers>
 
     <model name="model">

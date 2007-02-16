@@ -12,8 +12,7 @@ package org.mule.samples.loanbroker.esb;
 
 import java.io.IOException;
 
-import org.activemq.broker.BrokerContainer;
-import org.activemq.broker.impl.BrokerContainerImpl;
+import org.apache.activemq.broker.BrokerService;
 import org.mule.MuleManager;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
@@ -28,12 +27,12 @@ import org.mule.umo.UMOMessage;
 public class Main
 {
     private MuleClient client = null;
-    private BrokerContainer msgBroker = null;
+    private BrokerService msgBroker = null;
 
     public Main(String config) throws Exception
     {
         // Start up the ActiveMQ message broker.
-        msgBroker = new BrokerContainerImpl("ActiveMQ");
+        msgBroker = new BrokerService();
         msgBroker.addConnector("tcp://localhost:61616");
         msgBroker.start();
 

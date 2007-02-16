@@ -11,8 +11,8 @@
     <bean id="inMemoryDaoImpl" class="org.acegisecurity.userdetails.memory.InMemoryDaoImpl">
         <property name="userMap">
             <value>
-			  ross=ross,ROLE_ADMIN
-			  anon=anon,ROLE_ANONYMOUS
+              ross=ross,ROLE_ADMIN
+              anon=anon,ROLE_ANONYMOUS
             </value>
         </property>
     </bean>

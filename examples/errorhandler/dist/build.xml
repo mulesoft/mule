@@ -17,6 +17,8 @@
     <property name="dir.classes" value="build/classes"/>
 
     <property name="url.maven.repo" value="http://www.ibiblio.org/maven2"/>
+    
+    <property name="url.apache.repo" value="http://people.apache.org/repo/m2-incubating-repository"/>
 
     <target name="clean"
             description="Clean the output directory (start from scratch).">
@@ -26,8 +28,8 @@
     <!-- Download any additional libraries needed to run the application -->
     <target name="get.libraries">
 
-        <get src="${url.maven.repo}/activemq/activemq/3.2.4/activemq-3.2.4.jar"
-             dest="${dir.user.lib}/activemq-3.2.4.jar"
+        <get src="${url.apache.repo}/org/apache/activemq/apache-activemq/4.1.0-incubator/apache-activemq-4.1.0-incubator.jar"
+             dest="${dir.user.lib}/apache-activemq-4.1.0-incubator.jar"
              verbose="true"
              usetimestamp="true"/>
         <!-- Used by ActiveMQ -->
@@ -35,7 +37,7 @@
              dest="${dir.user.lib}/concurrent-1.3.4.jar"
              verbose="true"
              usetimestamp="true"/>
-    	<!-- Used by Email connector -->
+        <!-- Used by Email connector -->
         <get src="${url.maven.repo}/javax/mail/mail/1.4/mail-1.4.jar"
              dest="${dir.user.lib}/mail-1.4.jar"
              verbose="true"

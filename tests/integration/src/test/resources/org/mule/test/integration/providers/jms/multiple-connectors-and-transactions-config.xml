@@ -10,14 +10,13 @@
             <text-property name="configuration">
                 <![CDATA[
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-                <beans>
-                <bean id="jmsConnectionFactory"
-        class="org.activemq.ActiveMQConnectionFactory">
-        <property name="brokerURL"><value>vm://localhost</value></property>
-        <property name="useEmbeddedBroker"><value>true</value></property>
+<beans>
+    <bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+        <constructor-arg>
+            <value>vm://localhost?broker.persistent=false&amp;broker.useJmx=false</value>
+        </constructor-arg>
     </bean>
-                </beans>
-                ]]>
+</beans>                ]]>
             </text-property>
         </properties>
     </container-context>
@@ -104,7 +103,7 @@
                 <router className="org.mule.routing.outbound.StaticRecipientList" enableCorrelation="ALWAYS">
                     <properties>
                         <list name="recipients">
-                            <entry value="jms://cn=endpoint3connector=jmsConnector1"/>
+                            <entry value="jms://cn=endpoint3?connector=jmsConnector1"/>
                         </list>
                     </properties>
                 </router>

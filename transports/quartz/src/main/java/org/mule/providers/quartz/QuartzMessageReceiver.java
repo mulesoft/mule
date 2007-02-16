@@ -59,7 +59,7 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
     {
         try
         {
-            Scheduler scheduler = connector.getScheduler();
+            Scheduler scheduler = connector.getQuartzScheduler();
 
             JobDetail jobDetail = new JobDetail();
             jobDetail.setName(endpoint.getEndpointURI().toString());

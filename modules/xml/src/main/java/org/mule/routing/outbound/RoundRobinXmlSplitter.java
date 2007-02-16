@@ -49,7 +49,7 @@ public class RoundRobinXmlSplitter extends FilteringXmlMessageSplitter
             UMOEndpoint endpoint;
             UMOMessage result = null;
             Document part;
-            List parts = (List)nodes.get();
+            List parts = (List)nodesContext.get();
             if (parts == null)
             {
                 logger.error("There are no parts for current message. No events were routed: " + message);
@@ -65,7 +65,7 @@ public class RoundRobinXmlSplitter extends FilteringXmlMessageSplitter
                     epCounter = 0;
                 }
                 // Create the message
-                Map theProperties = (Map)properties.get();
+                Map theProperties = (Map)propertiesContext.get();
                 message = new MuleMessage(part, new HashMap(theProperties));
 
                 if (enableEndpointFiltering)
@@ -119,8 +119,8 @@ public class RoundRobinXmlSplitter extends FilteringXmlMessageSplitter
         }
         finally
         {
-            nodes.set(null);
-            properties.set(null);
+            nodesContext.set(null);
+            propertiesContext.set(null);
         }
     }
 

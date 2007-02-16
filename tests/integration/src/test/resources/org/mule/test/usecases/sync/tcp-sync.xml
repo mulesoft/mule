@@ -13,7 +13,7 @@
 
     <transformers>
         <transformer name="transformer" className="org.mule.transformers.xml.ObjectToXml"></transformer>
-		<transformer name="inboundtransformer" className="org.mule.transformers.simple.ByteArrayToString"></transformer>
+        <transformer name="inboundtransformer" className="org.mule.transformers.simple.ByteArrayToString"></transformer>
     </transformers>
 
     <model name="model">

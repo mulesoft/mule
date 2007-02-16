@@ -36,9 +36,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 import javax.jms.ConnectionFactory;
 
-import org.activemq.ActiveMQConnectionFactory;
-import org.activemq.broker.impl.BrokerContainerFactoryImpl;
-import org.activemq.store.vm.VMPersistenceAdapter;
+import org.apache.activemq.ActiveMQConnectionFactory;
 
 /**
  * This test needs the path to an ActiveMQ distribution.
@@ -61,10 +59,11 @@ public class JmsReconnectionTestCase extends AbstractJmsFunctionalTestCase
     {
         if (factory == null)
         {
+            // TODO should be non-persistent
             factory = new ActiveMQConnectionFactory();
-            factory.setBrokerContainerFactory(new BrokerContainerFactoryImpl(new VMPersistenceAdapter()));
+            //factory.setBrokerContainerFactory(new BrokerContainerFactoryImpl(new VMPersistenceAdapter()));
             factory.setBrokerURL(BROKER_URL);
-            factory.start();
+            //factory.start();
         }
         return factory;
     }

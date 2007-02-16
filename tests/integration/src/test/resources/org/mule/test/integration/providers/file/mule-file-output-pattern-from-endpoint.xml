@@ -4,10 +4,10 @@
                                 "http://mule.mulesource.org/dtds/mule-configuration.dtd">
 
 <mule-configuration id="FileReader" version="1.0">
-	<connector name="FileConnector" className="org.mule.providers.file.FileConnector"/>
+    <connector name="FileConnector" className="org.mule.providers.file.FileConnector"/>
 
-    <model name="model"> 		
-		<mule-descriptor name="TestUMO" implementation="org.mule.components.simple.BridgeComponent">
+    <model name="model">
+        <mule-descriptor name="TestUMO" implementation="org.mule.components.simple.BridgeComponent">
             <inbound-router>
                 <endpoint address="vm://filesend"/>
             </inbound-router>      
@@ -26,6 +26,6 @@
                 </router>
             </outbound-router>           
         </mule-descriptor>
-	</model>	
+    </model>
 </mule-configuration>
 

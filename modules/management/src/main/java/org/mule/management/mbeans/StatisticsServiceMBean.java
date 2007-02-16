@@ -31,4 +31,8 @@ public interface StatisticsServiceMBean extends Statistics
     String printHtmlSummary();
 
     String getHtmlSummary();
+
+    String printXMLSummary();
+
+    String getXMLSummary();
 }

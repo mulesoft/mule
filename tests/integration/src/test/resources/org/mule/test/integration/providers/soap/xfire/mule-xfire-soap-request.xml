@@ -4,7 +4,7 @@
 
 <mule-configuration id="XFire_Soap_Request" version="1.0">
     <description>
-		Testing Xfire Soap Request
+        Testing Xfire Soap Request
     </description>
 
     <mule-environment-properties synchronous="true"/>

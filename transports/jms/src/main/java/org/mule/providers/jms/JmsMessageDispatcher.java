@@ -131,17 +131,8 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 }
             }
 
-            // Add a reference to the JMS session used so that an
-            // EventAwareTransformer
-            // can later retrieve it.
-            // TODO Figure out a better way to accomplish this: MULE-1079
-            // event.getMessage().setProperty(MuleProperties.MULE_JMS_SESSION,
-            // session);
-
             UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
 
-            // determine if endpointUri is a queue or topic
-            // the format is topic:destination
             boolean topic = false;
             String resourceInfo = endpointUri.getResourceInfo();
             topic = (resourceInfo != null && JmsConstants.TOPIC_PROPERTY.equalsIgnoreCase(resourceInfo));

@@ -17,7 +17,6 @@ import org.mule.providers.jms.JmsConstants;
 import org.mule.providers.jms.JmsMessageUtils;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.UMOEventContext;
-import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
@@ -150,13 +149,13 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer
         }
     }
 
-    protected Session getSession() throws UMOException
+    protected Session getSession() throws Exception
     {
         if (endpoint != null)
         {
             // TODO AP: use the right JMS session creation method, throw when
             // the endpoint's connector is not a JmsConnector
-            return ((JmsConnector)endpoint.getConnector()).getDelegateSession(endpoint);
+            return ((JmsConnector)endpoint.getConnector()).getSession(endpoint);
         }
         else
         {

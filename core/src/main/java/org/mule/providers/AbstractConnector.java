@@ -1355,7 +1355,7 @@ public abstract class AbstractConnector
      * use. Note: getScheduler() currently conflicts with the same method in the
      * Quartz transport
      */
-    synchronized ScheduledExecutorService getScheduler()
+    public synchronized ScheduledExecutorService getScheduler()
     {
         if (scheduler == null)
         {

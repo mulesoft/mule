@@ -4,22 +4,22 @@
                                 "http://mule.mulesource.org/dtds/mule-configuration.dtd">
 
 <mule-configuration id="axis_https_test" version="1.0">
-	<connector name="myHttpsConnector" className="org.mule.providers.http.HttpsConnector">
-		<properties>
-			<property name="keyStore" value="serverKeystore"/>			
-			<property name="storePassword" value="mulepassword" /> 
+    <connector name="myHttpsConnector" className="org.mule.providers.http.HttpsConnector">
+        <properties>
+            <property name="keyStore" value="serverKeystore"/>
+            <property name="storePassword" value="mulepassword" />
             <property name="keyPassword" value="mulepassword" /> 
             <property name="trustStorePassword" value="mulepassword" /> 
             <property name="trustStore" value="trustStore"/> 
             <property name="requireClientAuthentication" value="false" /> 
-		</properties>
-	</connector>
-	
-	<model name="Https_Test_Model">
-		<mule-descriptor name="TestUMO" implementation="org.mule.components.simple.EchoComponent">
-			<inbound-router>
-				<endpoint address="axis:https://localhost:8000"/>
-			</inbound-router>
-		</mule-descriptor>
-	</model>
+        </properties>
+    </connector>
+
+    <model name="Https_Test_Model">
+        <mule-descriptor name="TestUMO" implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <endpoint address="axis:https://localhost:8000"/>
+            </inbound-router>
+        </mule-descriptor>
+    </model>
 </mule-configuration>

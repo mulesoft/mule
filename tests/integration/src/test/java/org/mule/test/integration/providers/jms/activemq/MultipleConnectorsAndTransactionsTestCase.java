@@ -16,6 +16,7 @@ import org.mule.umo.UMOMessage;
 
 public class MultipleConnectorsAndTransactionsTestCase extends FunctionalTestCase
 {
+    private static final int TIMEOUT = 20000;
 
     protected String getConfigResources()
     {
@@ -34,25 +35,25 @@ public class MultipleConnectorsAndTransactionsTestCase extends FunctionalTestCas
             result = client.receive("client-endpoint3", 5000);
         }
 
-        result = client.send("client-endpoint1", message, null);
+        client.dispatch("client-endpoint1", message, null);
 
-        result = client.receive("client-endpoint3", 5000);
+        result = client.receive("client-endpoint3", TIMEOUT);
         assertNotNull(result);
 
         assertFalse(result.getPayload() instanceof NullPayload);
         assertEquals(result.getPayloadAsString(), message);
 
-        result = client.send("client-endpoint2", message, null);
+        client.dispatch("client-endpoint2", message, null);
 
-        result = client.receive("client-endpoint3", 5000);
+        result = client.receive("client-endpoint3", TIMEOUT);
         assertNotNull(result);
         assertFalse(result.getPayload() instanceof NullPayload);
         assertEquals(result.getPayloadAsString(), message);
 
         //The exception should occur on this step
-        result = client.send("client-endpoint1", message, null);
+        client.dispatch("client-endpoint1", message, null);
 
-        result = client.receive("client-endpoint3", 5000);
+        result = client.receive("client-endpoint3", TIMEOUT);
         assertNotNull(result);
         assertFalse(result.getPayload() instanceof NullPayload);
         assertEquals(result.getPayloadAsString(), message);

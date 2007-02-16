@@ -17,9 +17,8 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
                 <beans>
                 <bean id="jmsConnectionFactory"
-        class="org.activemq.ActiveMQConnectionFactory">
-        <property name="brokerURL"><value>vm://localhost</value></property>
-        <property name="useEmbeddedBroker"><value>true</value></property>
+        class="org.apache.activemq.ActiveMQConnectionFactory">
+        <property name="brokerURL"><value>vm://localhost?broker.persistence=true</value></property>
     </bean>
                 </beans>
                 ]]>

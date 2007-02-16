@@ -22,13 +22,49 @@
 
         <!-- ActiveMQ for JMS -->
         <dependency>
-            <groupId>activemq</groupId>
-            <artifactId>activemq</artifactId>
-            <version>3.2.4</version>
+            <groupId>org.apache.activemq</groupId> 
+            <artifactId>apache-activemq</artifactId> 
+            <version>4.1.0-incubator</version>
             <scope>provided</scope>
             <!-- These transitive dependencies are not found on ibiblio and cause
                 the build to fail. -->
             <exclusions>
+                <exclusion>
+                    <groupId>org.apache.activemq</groupId>
+                    <artifactId>activemq-console</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.activemq</groupId>
+                    <artifactId>activemq-jaas</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.activemq</groupId>
+                    <artifactId>activemq-optional</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.activemq</groupId>
+                    <artifactId>activemq-web</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.activemq</groupId>
+                    <artifactId>activemq-web-demo</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.activemq</groupId>
+                    <artifactId>activemq-core-test</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.activemq</groupId>
+                    <artifactId>activemq-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>activemq</groupId>
+                    <artifactId>jmdns</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>activesoap</groupId>
+                    <artifactId>jaxp-api</artifactId>
+                </exclusion>
                 <exclusion>
                     <groupId>javacc</groupId>
                     <artifactId>javacc</artifactId>
@@ -38,24 +74,88 @@
                     <artifactId>activecluster</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>incubator-derby</groupId>
+                    <groupId>org.apache.derby</groupId>
                     <artifactId>derby</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>incubator-derby</groupId>
+                    <groupId>org.apache.derby</groupId>
                     <artifactId>derbynet</artifactId>
+                </exclusion>
+                <!-- m2 bug - if this transient dependency is excluded, the normal
+                     dependency for spring is not included either.
+                 -->
+                <!--<exclusion>-->
+                    <!--<groupId>org.springframework</groupId>-->
+                    <!--<artifactId>spring</artifactId>-->
+                <!--</exclusion>-->
+                <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xmlParserAPIs</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xercesImpl</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>xmlbeans</groupId>
                     <artifactId>xmlbeans-jsr173-api</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>xerces</groupId>
-                    <artifactId>xmlParserAPIs</artifactId>
+                    <groupId>xstream</groupId>
+                    <artifactId>xstream</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>activemq</groupId>
-                    <artifactId>activemq-core-test</artifactId>
+                    <groupId>xmlpull</groupId>
+                    <artifactId>xmlpull</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>mx4j</groupId>
+                    <artifactId>mx4j</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>mx4j</groupId>
+                    <artifactId>mx4j-remote</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>backport-util-concurrent</groupId>
+                    <artifactId>backport-util-concurrent</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-jsp_2.0_spec</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-j2ee-jacc_1.0_spec</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-jms_1.1_spec</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.mortbay.jetty</groupId>
+                    <artifactId>jetty</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.mortbay.jetty</groupId>
+                    <artifactId>jetty-util</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+                <!-- This exclusion is to force use of the new cglib -->
+                <exclusion>
+                    <groupId>cglib</groupId>
+                    <artifactId>cglib-full</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

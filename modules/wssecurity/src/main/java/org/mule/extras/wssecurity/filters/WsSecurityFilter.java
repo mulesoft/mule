@@ -11,8 +11,10 @@
 package org.mule.extras.wssecurity.filters;
 
 import org.mule.MuleManager;
+import org.mule.config.i18n.Message;
 import org.mule.extras.wssecurity.handlers.MuleWSSInHandler;
 import org.mule.extras.wssecurity.headers.WsSecurityHeadersSetter;
+import org.mule.impl.MuleMessage;
 import org.mule.impl.security.AbstractEndpointSecurityFilter;
 import org.mule.providers.soap.axis.AxisConnector;
 import org.mule.providers.soap.axis.extensions.MuleConfigProvider;
@@ -24,6 +26,7 @@ import org.mule.umo.security.EncryptionStrategyNotFoundException;
 import org.mule.umo.security.SecurityException;
 import org.mule.umo.security.SecurityProviderNotFoundException;
 import org.mule.umo.security.UnknownAuthenticationTypeException;
+import org.mule.umo.security.UnsupportedAuthenticationSchemeException;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -41,10 +44,8 @@ import org.apache.ws.axis.security.WSDoAllReceiver;
 import org.apache.ws.axis.security.WSDoAllSender;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.codehaus.xfire.XFire;
-import org.codehaus.xfire.security.wss4j.WSS4JOutHandler;
 import org.codehaus.xfire.service.Service;
 import org.codehaus.xfire.util.dom.DOMInHandler;
-import org.codehaus.xfire.util.dom.DOMOutHandler;
 
 public class WsSecurityFilter extends AbstractEndpointSecurityFilter
 {
@@ -111,60 +112,55 @@ public class WsSecurityFilter extends AbstractEndpointSecurityFilter
                 }
             }
 
-            Object[] outhandlers = service.getOutHandlers().toArray();
-            for (i = 0; i < outhandlers.length; i++)
-            {
-                if (outhandlers[i] instanceof DOMOutHandler)
+            if (connector != null){
+                Object[] outhandlers = service.getOutHandlers().toArray();
+                for (i = 0; i < outhandlers.length; i++)
                 {
                     connector.getClientOutHandlers().remove(i);
                 }
-                if (outhandlers[i] instanceof WSS4JOutHandler)
+    
+                // add security out handlers if not present
+                Object[] handlers = service.getInHandlers().toArray();
+                boolean isDomInHandlerPresent = false;
+                boolean isWss4jInHandlerPresent = false;
+                for (i = 0; i < handlers.length; i++)
                 {
-                    connector.getClientOutHandlers().remove(i);
+                    if (handlers[i] instanceof DOMInHandler)
+                    {
+                        isDomInHandlerPresent = true;
+                    }
+                    if (handlers[i] instanceof MuleWSSInHandler)
+                    {
+                        isWss4jInHandlerPresent = true;
+                    }
                 }
-            }
-
-            // add security out handlers if not present
-            Object[] handlers = service.getInHandlers().toArray();
-            boolean isDomInHandlerPresent = false;
-            boolean isWss4jInHandlerPresent = false;
-            for (i = 0; i < handlers.length; i++)
-            {
-                if (handlers[i] instanceof DOMInHandler)
+    
+                if (!isDomInHandlerPresent)
                 {
-                    isDomInHandlerPresent = true;
+                    service.addInHandler(new DOMInHandler());
                 }
-                if (handlers[i] instanceof MuleWSSInHandler)
+    
+                if (!isWss4jInHandlerPresent)
                 {
-                    isWss4jInHandlerPresent = true;
+                    service.addInHandler(new MuleWSSInHandler());
                 }
-            }
-
-            if (!isDomInHandlerPresent)
-            {
-                service.addInHandler(new DOMInHandler());
-            }
-
-            if (!isWss4jInHandlerPresent)
-            {
-                service.addInHandler(new MuleWSSInHandler());
-            }
-
-            // look for security properties in the message
-            Properties props = new Properties();
-            if (event.getMessage().getProperty("action") != null)
-            {
-                props.putAll(getProperties(event));
-            }
-
-            // put the security properties found in the message, if any, in the
-            // service
-            if (!props.isEmpty())
-            {
-                Object[] keys = props.keySet().toArray();
-                for (i = 0; i < keys.length; i++)
+    
+                // look for security properties in the message
+                Properties props = new Properties();
+                if (event.getMessage().getProperty("action") != null)
                 {
-                    service.setProperty((String)keys[i], props.getProperty((String)keys[i]));
+                    props.putAll(getProperties(event));
+                }
+    
+                // put the security properties found in the message, if any, in the
+                // service
+                if (!props.isEmpty())
+                {
+                    Object[] keys = props.keySet().toArray();
+                    for (i = 0; i < keys.length; i++)
+                    {
+                        service.setProperty((String)keys[i], props.getProperty((String)keys[i]));
+                    }
                 }
             }
         }
@@ -194,8 +190,7 @@ public class WsSecurityFilter extends AbstractEndpointSecurityFilter
             }
             catch (ConfigurationException e)
             {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                throw new UnsupportedAuthenticationSchemeException(Message.createStaticMessage("A Configurtation Exception occured while configuring WS-Security on Axis "),new MuleMessage(e.getMessage()));
             }
         }
     }

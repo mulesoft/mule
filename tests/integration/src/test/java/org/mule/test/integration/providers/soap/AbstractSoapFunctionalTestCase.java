@@ -127,7 +127,7 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
 
         client.dispatch(getDispatchAsyncComplexEndpoint1(), new Person("Betty", "Rubble"), null);
-        Thread.sleep(4000);
+        Thread.sleep(4500);
 
         // lets get our newly added person
         UMOMessage result = client.receive(getDispatchAsyncComplexEndpoint2(), 0);

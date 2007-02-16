@@ -16,8 +16,8 @@ import java.io.File;
 
 import javax.jms.JMSException;
 
-import org.activemq.ActiveMQConnection;
-import org.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.ActiveMQConnection;
+import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.Project;
@@ -49,24 +49,21 @@ public class ServerTools
 
     public static ActiveMQConnectionFactory launchEmbeddedActiveMq() throws JMSException
     {
-        embeddedFactory = new ActiveMQConnectionFactory();
-        embeddedFactory.setUseEmbeddedBroker(true);
-        embeddedFactory.start();
-        return embeddedFactory;
+        return new ActiveMQConnectionFactory("vm://localhost?broker.persistent=false&broker.useJmx=false");
     }
 
     public static void killEmbeddedActiveMq()
     {
         if (embeddedFactory != null)
         {
-            try
+         /*   try
             {
                 embeddedFactory.stop();
             }
             catch (JMSException e)
             {
                 throw new RuntimeException("Could not stop embedded ActiveMQ!", e);
-            }
+            }*/
             embeddedFactory = null;
         }
     }

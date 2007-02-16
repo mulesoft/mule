@@ -19,10 +19,8 @@ import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.transaction.TransactionManager;
 
-import org.activemq.ActiveMQConnectionFactory;
-import org.activemq.ActiveMQXAConnectionFactory;
-import org.activemq.broker.impl.BrokerContainerFactoryImpl;
-import org.activemq.store.vm.VMPersistenceAdapter;
+import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.ActiveMQXAConnectionFactory;
 import org.objectweb.jotm.Current;
 import org.objectweb.jotm.Jotm;
 
@@ -34,21 +32,14 @@ public class ActiveMQJmsXaTransactionFunctionalTestCase extends ActiveMQJmsTrans
     {
         if (factory == null)
         {
-            factory = new ActiveMQXAConnectionFactory();
-            factory.setBrokerContainerFactory(new BrokerContainerFactoryImpl(new VMPersistenceAdapter()));
-            factory.setUseEmbeddedBroker(true);
-            factory.setBrokerURL("vm://localhost");
-            factory.start();
+            factory = new ActiveMQXAConnectionFactory("vm://localhost?broker.persistent=false&broker.useJmx=false");
         }
         return factory;
     }
 
     public Connection getSenderConnection() throws Exception
     {
-        ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory();
-        factory.setBrokerContainerFactory(new BrokerContainerFactoryImpl(new VMPersistenceAdapter()));
-        factory.setUseEmbeddedBroker(true);
-        factory.setBrokerURL("vm://localhost");
+        factory = new ActiveMQConnectionFactory("vm://localhost?broker.persistent=false&broker.useJmx=false");
         return factory.createConnection();
     }
 

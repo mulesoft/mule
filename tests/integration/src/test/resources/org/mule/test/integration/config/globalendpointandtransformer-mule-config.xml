@@ -4,20 +4,20 @@
                                 "http://mule.mulesource.org/dtds/mule-configuration.dtd">
 
 <mule-configuration id="GlobalEndpointandTransformerTest" version="1.0">
-	
-	<transformers>
-		<transformer name="StringtoByteArray" className="org.mule.transformers.simple.StringToByteArray"/>
-	</transformers>
-	
-	<global-endpoints>
-		<endpoint name="in" address="vm://in" transformers="StringtoByteArray"/>
-	</global-endpoints>
-	
-	<model name="test">
-		<mule-descriptor name="Bridge" implementation="org.mule.components.simple.BridgeComponent">
-			<inbound-router>
-				<global-endpoint name="in"/>
-			</inbound-router>
-		</mule-descriptor>
+
+    <transformers>
+        <transformer name="StringtoByteArray" className="org.mule.transformers.simple.StringToByteArray"/>
+    </transformers>
+
+    <global-endpoints>
+        <endpoint name="in" address="vm://in" transformers="StringtoByteArray"/>
+    </global-endpoints>
+
+    <model name="test">
+        <mule-descriptor name="Bridge" implementation="org.mule.components.simple.BridgeComponent">
+            <inbound-router>
+                <global-endpoint name="in"/>
+            </inbound-router>
+        </mule-descriptor>
     </model>
 </mule-configuration>

@@ -29,9 +29,7 @@ import javax.jms.ObjectMessage;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
-import org.activemq.ActiveMQConnectionFactory;
-import org.activemq.broker.impl.BrokerContainerFactoryImpl;
-import org.activemq.store.vm.VMPersistenceAdapter;
+import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 
 /**
@@ -45,12 +43,7 @@ public class JmsTransformersTestCase extends AbstractMuleTestCase
 
     protected void suitePreSetUp() throws Exception
     {
-        factory = new ActiveMQConnectionFactory();
-        factory.setBrokerContainerFactory(new BrokerContainerFactoryImpl(new VMPersistenceAdapter()));
-        factory.setUseEmbeddedBroker(true);
-        factory.setBrokerURL("vm://localhost");
-        factory.setDoMessageCompression(false);
-        factory.start();
+        factory = new ActiveMQConnectionFactory("vm://localhost?broker.persistent=false&broker.useJmx=false");
 
         session = factory.createConnection().createSession(false, Session.AUTO_ACKNOWLEDGE);
     }
@@ -64,7 +57,6 @@ public class JmsTransformersTestCase extends AbstractMuleTestCase
     {
         session.close();
         session = null;
-        factory.stop();
         factory = null;
     }
 
@@ -151,7 +143,7 @@ public class JmsTransformersTestCase extends AbstractMuleTestCase
     // be fixed in 4.x.
     // For more information why this is VERY BAD read:
     // http://en.wikipedia.org/wiki/Zip_of_death
-    public void _testCompressedBytesMessage() throws Exception
+    public void testCompressedBytesMessage() throws Exception
     {
         RequestContext.setEvent(getTestEvent("test"));
 

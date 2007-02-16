@@ -22,9 +22,7 @@ import java.util.Map;
 
 import javax.jms.ConnectionFactory;
 
-import org.activemq.ActiveMQConnectionFactory;
-import org.activemq.broker.impl.BrokerContainerFactoryImpl;
-import org.activemq.store.vm.VMPersistenceAdapter;
+import org.apache.activemq.ActiveMQConnectionFactory;
 
 public class ActiveMQJmsSingleResourceTransactionFunctionalTestCase extends
     AbstractJmsTransactionFunctionalTest
@@ -35,18 +33,13 @@ public class ActiveMQJmsSingleResourceTransactionFunctionalTestCase extends
     {
         if (factory == null)
         {
-            factory = new ActiveMQConnectionFactory();
-            factory.setBrokerContainerFactory(new BrokerContainerFactoryImpl(new VMPersistenceAdapter()));
-            factory.setUseEmbeddedBroker(true);
-            factory.setBrokerURL("vm://localhost");
-            factory.start();
+            factory = new ActiveMQConnectionFactory("vm://localhost?broker.persistent=false&broker.useJmx=false");
         }
         return factory;
     }
 
     protected void doTearDown() throws Exception
     {
-        factory.stop();
         factory = null;
         super.doTearDown();
     }

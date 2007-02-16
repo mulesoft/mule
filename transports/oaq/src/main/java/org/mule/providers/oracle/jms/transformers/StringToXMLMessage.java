@@ -53,6 +53,9 @@ public class StringToXMLMessage extends AbstractEventAwareTransformer
         AdtMessage message = null;
         XMLType xmltype = null;
 
+        // TODO TC figure out the mess below. The session can now be obtained with this call:
+        // session = ((JmsConnector) endpoint.getConnector()).getSession(endpoint);
+
         throw new TransformerException(
             Message.createStaticMessage("This transformer is currently unsupported until issue MULE-1079 is resolved."),
             this);

@@ -36,14 +36,14 @@ public class XFireConnectorHttpFunctionalTestCase extends AbstractSoapUrlEndpoin
     }
     
     public void testBinding() throws Exception
-	{
-    	String url = "http://localhost:38008/";
-    	String folder = "mule/";
-    	String componentName = "mycomponent";
-    	String fullPath = url + folder + componentName;
-    	
-		MuleClient client = new MuleClient();
-    	Map props = new HashMap();
+    {
+        String url = "http://localhost:38008/";
+        String folder = "mule/";
+        String componentName = "mycomponent";
+        String fullPath = url + folder + componentName;
+
+        MuleClient client = new MuleClient();
+        Map props = new HashMap();
         props.put("http.method", "GET");
         UMOMessage reply = client.send(fullPath+"?wsdl", folder+componentName+"?wsdl", props);
         
@@ -63,18 +63,18 @@ public class XFireConnectorHttpFunctionalTestCase extends AbstractSoapUrlEndpoin
         
         for(Iterator i = nodes.iterator(); i.hasNext();)
         {
-        	element = (Element) i.next();
-        	
-        	if ((element.attribute("name").getStringValue().compareTo(componentName + "MulePort") == 0)
-        			|| (element.attribute("name").getStringValue().compareTo(componentName + "LocalPort") == 0))
-        	{
-        		Element tempElement = (Element) element.elements().get(0);        		
-        		String mulePort = tempElement.attribute("location").getStringValue();
-        		assertEquals(fullPath, mulePort);
-        	}
+            element = (Element) i.next();
+
+            if ((element.attribute("name").getStringValue().compareTo(componentName + "MulePort") == 0)
+                    || (element.attribute("name").getStringValue().compareTo(componentName + "LocalPort") == 0))
+            {
+                Element tempElement = (Element) element.elements().get(0);
+                String mulePort = tempElement.attribute("location").getStringValue();
+                assertEquals(fullPath, mulePort);
+            }
         }
         
-	}
+    }
 
     public String getConfigResources()
     {

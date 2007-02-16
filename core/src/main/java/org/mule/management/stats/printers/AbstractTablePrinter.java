@@ -43,7 +43,7 @@ public class AbstractTablePrinter extends PrintWriter
     {
         String[] column = new String[36];
         column[0] = "Component Name";
-        column[1] = "Component-Pool-Max-Size";
+        column[1] = "Component Pool Max Size";
         column[2] = "Component Pool Size";
         column[3] = "Thread Pool Size";
         column[4] = "Current Queue Size";

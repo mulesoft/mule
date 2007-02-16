@@ -4,23 +4,23 @@
                                 "http://mule.mulesource.org/dtds/mule-configuration.dtd">
 
 <mule-configuration id="fileAppendConnectorTest" version="1.0">
-	
-	<connector name="FileConnector" className="org.mule.providers.file.FileConnector">
-		<properties>
-			<property value="true" name="outputAppend"/>
-			<property value="out.txt" name="outputPattern"/>
-		</properties>
-	</connector>
-	<model name="fileAppend">
-		<mule-descriptor name="Bridge" implementation="org.mule.components.simple.BridgeComponent">
-			<inbound-router>
-				<endpoint address="vm://fileappend"/>
-			</inbound-router>
-			<outbound-router>
-				<router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-					<endpoint address="file://myout"/>
-				</router>
-			</outbound-router>
-		</mule-descriptor>
+
+    <connector name="FileConnector" className="org.mule.providers.file.FileConnector">
+        <properties>
+            <property value="true" name="outputAppend"/>
+            <property value="out.txt" name="outputPattern"/>
+        </properties>
+    </connector>
+    <model name="fileAppend">
+        <mule-descriptor name="Bridge" implementation="org.mule.components.simple.BridgeComponent">
+            <inbound-router>
+                <endpoint address="vm://fileappend"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="file://myout"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
     </model>
 </mule-configuration>

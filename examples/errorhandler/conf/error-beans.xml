@@ -1,7 +1,7 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 
 <beans>
-    <bean id="activeMqConnectionFactory" class="org.activemq.ActiveMQConnectionFactory">
+    <bean id="activeMqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
         <property name="useEmbeddedBroker" value="true"/>
     </bean>
 

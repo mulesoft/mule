@@ -19,6 +19,7 @@ import org.mule.MuleManager;
 import org.mule.management.stats.AllStatistics;
 import org.mule.management.stats.printers.CSVPrinter;
 import org.mule.management.stats.printers.HtmlTablePrinter;
+import org.mule.management.stats.printers.XMLPrinter;
 import org.mule.umo.manager.UMOManager;
 
 /**
@@ -110,5 +111,18 @@ public class StatisticsService implements StatisticsServiceMBean
     public String getHtmlSummary()
     {
         return printHtmlSummary();
+    }
+
+    public String printXMLSummary()
+    {
+        StringWriter w = new StringWriter();
+        XMLPrinter printer = new XMLPrinter(w);
+        stats.logSummary(printer);
+        return w.toString();
+    }
+
+    public String getXMLSummary()
+    {
+        return printXMLSummary();
     }
 }

@@ -13,20 +13,13 @@
             <text-property name="configuration">
                 <![CDATA[
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-                <beans>
-                <bean id="jmsConnectionFactory"
-        class="org.activemq.ActiveMQConnectionFactory">
-        <property name="brokerURL"><value>vm://localhost</value></property>
-        <property name="useEmbeddedBroker"><value>true</value></property>
-        <property name="brokerContainerFactory">
-            <bean id="bcf" class="org.activemq.broker.impl.BrokerContainerFactoryImpl">
-                <constructor-arg index="0">
-                    <bean id="vmp" class="org.activemq.store.vm.VMPersistenceAdapter"/>
-                </constructor-arg>
-            </bean>
-        </property>
+<beans>
+    <bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+        <constructor-arg>
+            <value>vm://localhost?broker.persistent=false&amp;broker.useJmx=false</value>
+        </constructor-arg>
     </bean>
-                </beans>
+</beans>
                 ]]>
             </text-property>
         </properties>
@@ -59,15 +52,15 @@
                 <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
                     <endpoint address="jms://out.queue"/>
                 </router>
-            </outbound-router>			
-			<!-- this exception strategy will forward the current message to a jms queue
-        	and will do so in the current transaction if it is available
-			-->
-			<exception-strategy className="org.mule.impl.DefaultExceptionStrategy">
-				<endpoint address="jms://DLQ">
-					<transaction action="JOIN_IF_POSSIBLE"/>
-				</endpoint>
-			</exception-strategy>
+            </outbound-router>
+            <!-- this exception strategy will forward the current message to a jms queue
+            and will do so in the current transaction if it is available
+            -->
+            <exception-strategy className="org.mule.impl.DefaultExceptionStrategy">
+                <endpoint address="jms://DLQ">
+                    <transaction action="JOIN_IF_POSSIBLE"/>
+                </endpoint>
+            </exception-strategy>
         </mule-descriptor>
     </model>
 </mule-configuration>
