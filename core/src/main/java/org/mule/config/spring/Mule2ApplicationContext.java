@@ -7,8 +7,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extras.spring.config;
+package org.mule.config.spring;
 
+import org.mule.config.spring.editors.TransformerPropertyEditor;
 import org.mule.umo.transformer.UMOTransformer;
 
 import java.io.IOException;
@@ -24,7 +25,7 @@ import org.springframework.context.support.AbstractXmlApplicationContext;
  * that allows rosurces to be loaded from the Classpath of file system using the
  * MuleBeanDefinitionReader.
  *
- * @see org.mule.extras.spring.config.MuleBeanDefinitionReader
+ * @see org.mule.config.spring.MuleBeanDefinitionReader
  */
 public class Mule2ApplicationContext extends AbstractXmlApplicationContext
 {

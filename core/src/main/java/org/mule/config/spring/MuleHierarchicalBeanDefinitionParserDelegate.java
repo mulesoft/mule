@@ -7,7 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extras.spring.config;
+package org.mule.config.spring;
 
 import org.mule.util.StringUtils;
 
@@ -27,7 +27,7 @@ import org.w3c.dom.NodeList;
 
 
 /**
- * TODO
+ * This parser enables Mule to parse heirarchical bean structures using spring Namespace handling
  */
 public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinitionParserDelegate
 {

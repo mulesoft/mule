@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.extras.spring.config;
+package org.mule.config.spring;
 
 import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;

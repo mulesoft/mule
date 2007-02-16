@@ -15,7 +15,7 @@ public class AsyncSpringEventsTestCase extends SpringEventsTestCase
 
     protected String getConfigResources()
     {
-        return "async-mule-events-app-context.xml";
+        return "../../../../../../../../../../tests/functional/src/test/resources/org/mule/test/spring/async-mule-events-app-context.xml";
     }
 
     // The code works just we have no synchronisation for the test case

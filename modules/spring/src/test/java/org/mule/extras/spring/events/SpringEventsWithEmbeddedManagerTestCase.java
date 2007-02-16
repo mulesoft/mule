@@ -17,7 +17,7 @@ public class SpringEventsWithEmbeddedManagerTestCase extends SpringEventsTestCas
 
     protected String getConfigResources()
     {
-        return "mule-events-app-with-embedded-manager.xml";
+        return "../../../../../../../../../../tests/functional/src/test/resources/org/mule/test/spring/mule-events-app-with-embedded-manager.xml";
     }
 
     public void testCorrectManagerLoaded()

@@ -37,7 +37,7 @@ public class SpringContainerContextTestCase extends AbstractContainerContextTest
     protected void doSetUp() throws Exception
     {
         context = new SpringContainerContext();
-        context.setConfigFile("test-application-context.xml");
+        context.setConfigFile("../../../../../../../../../tests/functional/src/test/resources/org/mule/test/spring/test-application-context.xml");
     }
 
     public void testContainerContext() throws Exception

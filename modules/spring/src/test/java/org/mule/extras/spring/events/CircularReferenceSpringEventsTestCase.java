@@ -13,6 +13,7 @@ package org.mule.extras.spring.events;
 import org.mule.MuleManager;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.manager.UMOManager;
+
 import org.springframework.context.support.AbstractApplicationContext;
 
 public class CircularReferenceSpringEventsTestCase extends FunctionalTestCase
@@ -20,7 +21,7 @@ public class CircularReferenceSpringEventsTestCase extends FunctionalTestCase
 
     protected String getConfigResources()
     {
-        return "mule-events-with-manager.xml";
+        return "../../../../../../../../../../tests/functional/src/test/resources/org/mule/test/spring/mule-events-with-manager.xml";
     }
 
     public void testManagerIsInstanciated() throws Exception

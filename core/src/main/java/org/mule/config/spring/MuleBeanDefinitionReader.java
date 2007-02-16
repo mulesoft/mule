@@ -8,10 +8,11 @@
  * LICENSE.txt file.
  */
 
-package org.mule.extras.spring.config;
+package org.mule.config.spring;
 
 import org.mule.config.MuleDtdResolver;
 import org.mule.config.XslHelper;
+import org.mule.config.spring.editors.TransformerPropertyEditor;
 import org.mule.umo.transformer.UMOTransformer;
 
 import java.io.IOException;
@@ -25,7 +26,6 @@ import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
 
-import org.dom4j.io.DOMReader;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -114,11 +114,8 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
             {
                 try
                 {
-                    String xml = new DOMReader().read((Document)result.getNode()).asXML();
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Transformed document is:\n" + xml);
-                    }
+                    //If we have Dom4J on the classpath we can print out the generated XML
+                    printResult(result);
                 }
                 catch (Exception e)
                 {
@@ -134,6 +131,17 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
 
     }
 
+    protected void printResult(DOMResult result)
+    {
+        //If we have Dom4J on the classpath we can print out the generated XML
+        //TODO this relies on Dom4j which is not in core, either we scrap this or do some reflection
+        // trickery to print the XML. This is definitely useful for debugging
+//        String xml = new DOMReader().read((Document)result.getNode()).asXML();
+//        if (logger.isDebugEnabled())
+//        {
+//            logger.debug("Transformed document is:\n" + xml);
+//        }
+    }
     protected Source createXslSource() throws IOException
     {
         return new StreamSource(getXslResource().getInputStream(), getXslResource().getURL().toString());

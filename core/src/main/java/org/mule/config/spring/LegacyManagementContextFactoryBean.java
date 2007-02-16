@@ -7,7 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extras.spring.config;
+package org.mule.config.spring;
 
 import org.mule.config.support.InheritedModel;
 import org.mule.umo.UMODescriptor;
@@ -30,7 +30,7 @@ import org.apache.commons.logging.LogFactory;
  * Users will have no need to use this class themselves as it gets created automatically depending on the
  * type of configuration being used to create the Mule instance.
  *
- * @see org.mule.extras.spring.config.ManagementContextFactoryBean
+ * @see org.mule.config.spring.ManagementContextFactoryBean
  * @see org.mule.umo.UMOManagementContext
  */
 public class LegacyManagementContextFactoryBean extends ManagementContextFactoryBean

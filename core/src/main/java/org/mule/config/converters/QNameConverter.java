@@ -23,6 +23,8 @@ import org.apache.commons.beanutils.Converter;
 /**
  * <code>QNameConverter</code> TODO document properly; see QNameConverterTestCase
  * for now
+ * @deprecated use QNamePropertyEditor instead
+ * @see org.mule.config.spring.editors.QNamePropertyEditor
  */
 public class QNameConverter implements Converter
 {

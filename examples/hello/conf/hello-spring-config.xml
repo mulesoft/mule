@@ -7,10 +7,10 @@
     is responsible for determining the UMOManager to implement, creates a default UMOModel
     and autowires the components to the model and all other global objects to the MuleManager.
     -->
-    <bean id="muleManager" class="org.mule.config.AutowireUMOManagerFactoryBean"/>
+    <bean id="muleManager" class="org.mule.config.spring.AutowireUMOManagerFactoryBean"/>
 
     <!-- Used to set mule object names to their corresponding bean id -->
-    <bean id="muleNameProcessor" class="org.mule.config.MuleObjectNameProcessor"/>
+    <bean id="muleNameProcessor" class="org.mule.config.spring.MuleObjectNameProcessor"/>
     <!--
         The system stream connector is used to send and receive information via the
         System.in and System.out. Note this connector is only really useful for testing

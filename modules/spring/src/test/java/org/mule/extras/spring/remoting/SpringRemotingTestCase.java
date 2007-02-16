@@ -11,6 +11,7 @@
 package org.mule.extras.spring.remoting;
 
 import org.mule.tck.FunctionalTestCase;
+
 import org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean;
 
 public class SpringRemotingTestCase extends FunctionalTestCase
@@ -19,7 +20,7 @@ public class SpringRemotingTestCase extends FunctionalTestCase
 
     protected String getConfigResources()
     {
-        return "spring-remoting-mule-config.xml";
+        return "../../../../../../../../../../tests/functional/src/test/resources/org/mule/test/spring/spring-remoting-mule-config.xml";
     }
 
     public void testHttpInvokeSpringService() throws Exception

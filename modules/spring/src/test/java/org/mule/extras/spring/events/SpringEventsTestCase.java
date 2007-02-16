@@ -10,9 +10,6 @@
 
 package org.mule.extras.spring.events;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import org.mule.MuleManager;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.AbstractMuleTestCase;
@@ -20,6 +17,10 @@ import org.mule.tck.functional.EventCallback;
 import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.transformer.TransformerException;
+
+import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -41,7 +42,7 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
 
     protected String getConfigResources()
     {
-        return "mule-events-app-context.xml";
+        return "../../../../../../../../../../tests/functional/src/test/resources/org/mule/test/spring/mule-events-app-context.xml";
     }
 
     public void testRemovingListeners() throws Exception
