@@ -10,8 +10,8 @@
 
 package org.mule.registry.impl;
 
-import org.mule.registry.Registry;
 import org.mule.impl.internal.notifications.ModelNotification;
+import org.mule.registry.UMORegistry;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.manager.UMOServerNotificationListener;
 import org.mule.umo.model.UMOModel;
@@ -20,9 +20,9 @@ import org.mule.umo.model.UMOModel;
  */
 public class RegistryNotificationListener implements UMOServerNotificationListener
 {
-    private Registry registry;
+    private UMORegistry registry;
 
-    public RegistryNotificationListener(Registry registry)
+    public RegistryNotificationListener(UMORegistry registry)
     {
         this.registry = registry;
     }
@@ -37,7 +37,7 @@ public class RegistryNotificationListener implements UMOServerNotificationListen
             UMOModel model = (UMOModel)notification.getSource();
             //System.out.println("Model name: " + model.getName());
             //System.out.println("Model type: " + model.getType());
-            registry.notifyStateChange(model.getRegistryId(), notification.getAction());
+            registry.notifyStateChange(model.getId(), notification.getAction());
         }
 
     }

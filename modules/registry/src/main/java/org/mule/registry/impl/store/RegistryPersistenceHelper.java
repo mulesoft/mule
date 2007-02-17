@@ -1,7 +1,7 @@
 package org.mule.registry.impl.store;
 
 import org.mule.persistence.PersistenceHelper;
-import org.mule.registry.Registry;
+import org.mule.registry.UMORegistry;
 import org.mule.registry.impl.MuleRegistration;
 import org.mule.registry.metadata.MetadataStore;
 import org.mule.registry.metadata.MissingMetadataException;
@@ -22,7 +22,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class RegistryPersistenceHelper implements PersistenceHelper, Converter 
 {
-    private Registry registry;
+    private UMORegistry registry;
     private boolean persistAll = false;
 
     /**
@@ -30,7 +30,7 @@ public class RegistryPersistenceHelper implements PersistenceHelper, Converter
      */
     private static transient Log logger = LogFactory.getLog(RegistryPersistenceHelper.class);
 
-    public RegistryPersistenceHelper(Registry registry) 
+    public RegistryPersistenceHelper(UMORegistry registry) 
     {
         this.registry = registry;
     }
@@ -61,7 +61,7 @@ public class RegistryPersistenceHelper implements PersistenceHelper, Converter
             logger.warn("No metadata found for " + className);
         }
 
-        if (persistAll || (metadata != null && metadata.getPersistable()))
+        if (persistAll || (metadata != null && metadata.isPersistable())) 
         {
             writer.startNode("bean");
             if (ref.getProperty("name") != null)
@@ -112,7 +112,7 @@ public class RegistryPersistenceHelper implements PersistenceHelper, Converter
             context.convertAnother(child);
         }
 
-        if (persistAll || (metadata != null && metadata.getPersistable())) 
+        if (persistAll || (metadata != null && metadata.isPersistable())) 
         {
             writer.endNode();
         }

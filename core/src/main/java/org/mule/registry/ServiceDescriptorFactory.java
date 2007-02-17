@@ -80,7 +80,7 @@ public class ServiceDescriptorFactory
             if (realService != null)
             {
                 // Recursively look up the service descriptor for the real service.
-                return MuleManager.getInstance().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, realService, overrides);
+                return MuleManager.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, realService, overrides);
             }
             else 
             {

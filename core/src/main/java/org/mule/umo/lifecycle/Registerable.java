@@ -10,26 +10,20 @@
 
 package org.mule.umo.lifecycle;
 
-import org.mule.registry.DeregistrationException;
-import org.mule.registry.RegistrationException;
-import org.mule.registry.Registration;
 
 /**
  * <code>Registerable</code> is a lifecycle interface that gets called at the
  * register lifecycle stage of the implementing component.
- * 
- * @author 
- * @version $Revision: 3649 $
  */
 public interface Registerable
 {
     /**
      * Method used to perform any registration of the component
-     * to the registry
+     * to the registry.
      *
-     * @throws RegistrationException if the registration fails
+     * @throws RegistryException if the registration fails
      */
-    void register() throws RegistrationException;
+    //void register() throws RegistryException;
 
     /**
      * Sets a property for monitoring
@@ -37,16 +31,15 @@ public interface Registerable
     //void setRegistryListenerProperty(String propertyName);
 
     /**
-     * Degister this component from the registry
+     * Deregister this component from the registry.
+     *
+     * @throws RegistryException if the deregistration fails
      */
-    void deregister() throws DeregistrationException;
+    //void deregister() throws RegistryException;
 
     /**
-     * Returns the registry id.
-     * 
-     * @return the registry ID
+     * Returns a unique ID for the entity which will be used to unequivocally identify it in the registry.
      */
-    String getRegistryId();
-
+    String getId();
 }
 
