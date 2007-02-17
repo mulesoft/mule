@@ -21,15 +21,11 @@ import org.mule.umo.lifecycle.UMOLifecycleAdapterFactory;
 
 import java.beans.ExceptionListener;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * The <code>UMOModel</code> encapsulates and manages the runtime behaviour of a
  * Mule Server instance. It is responsible for maintaining the UMOs instances and
  * their configuration.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public interface UMOModel extends Lifecycle, Initialisable, Registerable
 {
@@ -78,23 +74,9 @@ public interface UMOModel extends Lifecycle, Initialisable, Registerable
      */
     void setEntryPointResolver(UMOEntryPointResolver entryPointResolver);
 
-    /**
-     * Registers a <code>UMODescriptor</code> with the <code>MuleManager</code>.
-     * The manager will take care of creating the Mule UMO and, it's component and
-     * proxies.
-     * 
-     * @param descriptor the <code>UMODescriptor</code> to register
-     */
-    UMOComponent registerComponent(UMODescriptor descriptor) throws UMOException;
+    void addComponent(UMODescriptor descriptor, UMOComponent component);
 
-    /**
-     * Unregisters a component From the model
-     * 
-     * @param descriptor the descriptor of the componnt to remove
-     * @throws UMOException if the component is not registered or it failed to be
-     *             disposing or the descriptor is null
-     */
-    void unregisterComponent(UMODescriptor descriptor) throws UMOException;
+    UMOComponent removeComponent(String name);
 
     /**
      * Determines if a UMO component descriptor by the given name is regestered with
@@ -145,7 +127,7 @@ public interface UMOModel extends Lifecycle, Initialisable, Registerable
      * @param descriptors
      * @throws UMOException
      */
-    void setServiceDescriptors(List descriptors) throws UMOException;
+    //void setServiceDescriptors(List descriptors) throws UMOException;
 
     /**
      * The exception strategy to use by components managed by the model. The
@@ -241,4 +223,9 @@ public interface UMOModel extends Lifecycle, Initialisable, Registerable
      * @return an iterator of all component names
      */
     Iterator getComponentNames();
+
+    /*
+     * Creates an UMOComponent based on a component's descriptor.
+     */
+    UMOComponent createComponent(UMODescriptor descriptor);
 }
