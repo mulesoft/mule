@@ -10,6 +10,7 @@
 
 package org.mule.test.config;
 
+import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.impl.DefaultComponentExceptionStrategy;
@@ -20,16 +21,17 @@ import org.mule.interceptors.LoggingInterceptor;
 import org.mule.interceptors.TimerInterceptor;
 import org.mule.management.agents.JmxAgent;
 import org.mule.providers.SimpleRetryConnectionStrategy;
+import org.mule.registry.UMORegistry;
 import org.mule.routing.ForwardingCatchAllStrategy;
-import org.mule.routing.nested.NestedRouterCollection;
-import org.mule.routing.nested.NestedRouter;
 import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.routing.filters.xml.JXPathFilter;
 import org.mule.routing.inbound.InboundRouterCollection;
+import org.mule.routing.nested.NestedRouter;
+import org.mule.routing.nested.NestedRouterCollection;
 import org.mule.routing.response.ResponseRouterCollection;
 import org.mule.tck.AbstractScriptConfigBuilderTestCase;
-import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.fruit.FruitCleaner;
+import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.tck.testmodels.mule.TestDefaultLifecycleAdapterFactory;
@@ -45,8 +47,8 @@ import org.mule.umo.manager.UMOAgent;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.routing.UMOInboundRouterCollection;
-import org.mule.umo.routing.UMOResponseRouterCollection;
 import org.mule.umo.routing.UMONestedRouterCollection;
+import org.mule.umo.routing.UMOResponseRouterCollection;
 import org.mule.util.StringUtils;
 
 import java.util.ArrayList;
@@ -67,6 +69,7 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
 
         QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
         UMOManager m = builder.getManager();
+        UMORegistry r = MuleManager.getRegistry();
         // Disable the admin agent
         //MuleManager.getConfiguration().setServerUrl(StringUtils.EMPTY);
         try
@@ -79,7 +82,7 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             // register agents
             UMOAgent agent = new JmxAgent();
             agent.setName("jmxAgent");
-            m.registerAgent(agent);
+            r.registerAgent(agent);
 
             // register connector
             TestConnector c = new TestConnector();
@@ -89,12 +92,12 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             cs.setRetryCount(4);
             cs.setFrequency(3000);
             c.setConnectionStrategy(cs);
-            m.registerConnector(c);
+            r.registerConnector(c);
 
             // Endpoint identifiers
-            m.registerEndpointIdentifier("AppleQueue", "test://apple.queue");
-            m.registerEndpointIdentifier("Banana_Queue", "test://banana.queue");
-            m.registerEndpointIdentifier("Test Queue", "test://test.queue");
+            r.registerEndpointIdentifier("AppleQueue", "test://apple.queue");
+            r.registerEndpointIdentifier("Banana_Queue", "test://banana.queue");
+            r.registerEndpointIdentifier("Test Queue", "test://test.queue");
 
             // Register transformers
             TestCompressionTransformer t = new TestCompressionTransformer();
@@ -102,11 +105,11 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             t.setBeanProperty2(12);
             t.setContainerProperty("");
             t.setBeanProperty1("this was set from the manager properties!");
-            m.registerTransformer(t);
+            r.registerTransformer(t);
 
             NoActionTransformer t2 = new NoActionTransformer();
             t2.setReturnClass(byte[].class);
-            m.registerTransformer(t2);
+            r.registerTransformer(t2);
 
             // Register endpoints
             JXPathFilter filter = new JXPathFilter("name");
@@ -128,7 +131,7 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             interceptors.add(new LoggingInterceptor());
             interceptors.add(new TimerInterceptor());
             stack.setInterceptors(interceptors);
-            m.registerInterceptorStack("default", stack);
+            r.registerInterceptorStack("default", stack);
 
             // register model
             UMOModel model = new SedaModel();
@@ -138,11 +141,11 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             model.setExceptionListener(es);
             model.setLifecycleAdapterFactory(new TestDefaultLifecycleAdapterFactory());
             model.setEntryPointResolver(new TestEntryPointResolver());
-            m.registerModel(model);
+            r.registerModel(model);
 
             // register components
-            UMOEndpoint ep1 = m.lookupEndpoint("appleInEndpoint");
-            ep1.setTransformer(m.lookupTransformer("TestCompressionTransformer"));
+            UMOEndpoint ep1 = r.lookupEndpoint("appleInEndpoint");
+            ep1.setTransformer(r.lookupTransformer("TestCompressionTransformer"));
             UMODescriptor d = builder.createDescriptor("orange", "orangeComponent", null, ep1, props);
             d.setContainer("descriptor");
             DefaultComponentExceptionStrategy dces = new DefaultComponentExceptionStrategy();
@@ -154,11 +157,11 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             inRouter.getCatchAllStrategy().setEndpoint(new MuleEndpoint("test://catch.all", false));
             UMOEndpoint ep2 = builder.createEndpoint("test://orange/", "Orange", true,
                 "TestCompressionTransformer");
-            ep2.setResponseTransformer(m.lookupTransformer("TestCompressionTransformer"));
+            ep2.setResponseTransformer(r.lookupTransformer("TestCompressionTransformer"));
             inRouter.addEndpoint(ep2);
-            UMOEndpoint ep3 = m.lookupEndpoint("orangeEndpoint");
+            UMOEndpoint ep3 = r.lookupEndpoint("orangeEndpoint");
             ep3.setFilter(new PayloadTypeFilter(String.class));
-            ep3.setTransformer(m.lookupTransformer("TestCompressionTransformer"));
+            ep3.setTransformer(r.lookupTransformer("TestCompressionTransformer"));
             Map props2 = new HashMap();
             props2.put("testLocal", "value1");
             ep3.setProperties(props2);
@@ -183,13 +186,13 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             // Response Router
             UMOResponseRouterCollection responseRouter = new ResponseRouterCollection();
             responseRouter.addEndpoint(new MuleEndpoint("test://response1", true));
-            responseRouter.addEndpoint(m.lookupEndpoint("appleResponseEndpoint"));
+            responseRouter.addEndpoint(r.lookupEndpoint("appleResponseEndpoint"));
             responseRouter.addRouter(new TestResponseAggregator());
             responseRouter.setTimeout(10001);
             d.setResponseRouter(responseRouter);
 
             // Interceptors
-            UMOInterceptorStack stack2 = m.lookupInterceptorStack("default");
+            UMOInterceptorStack stack2 = r.lookupInterceptorStack("default");
             d.setInterceptors(new ArrayList(stack2.getInterceptors()));
             d.getInterceptors().add(new TimerInterceptor());
 
@@ -216,7 +219,8 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             d.setProperties(cprops);
 
             // register components
-            m.lookupModel("main").registerComponent(d);
+            UMOModel mainModel = r.lookupModel("main");
+            r.registerComponent(d, mainModel.getName());
             if (StringUtils.isBlank(m.getId()))
             {
                 // if running with JMX agent, manager ID is mandatory

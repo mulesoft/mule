@@ -10,14 +10,16 @@
 
 package org.mule.test.mule;
 
+import org.mule.MuleManager;
 import org.mule.management.agents.JmxAgent;
 import org.mule.management.agents.Mx4jAgent;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.manager.UMOManager;
 
+import java.util.List;
+
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
-import java.util.List;
 
 public class MuleAgentsTestCase extends AbstractMuleTestCase
 {
@@ -41,7 +43,7 @@ public class MuleAgentsTestCase extends AbstractMuleTestCase
 
     public void testRemoveNonExistentAgent() throws Exception
     {
-        manager.unregisterAgent("DOES_NOT_EXIST");
+        MuleManager.getRegistry().unregisterAgent("DOES_NOT_EXIST");
         // should not throw NPE
     }
 
@@ -55,11 +57,11 @@ public class MuleAgentsTestCase extends AbstractMuleTestCase
         // before proceeding, otherwise it is not able to find any
         // MBeanServer.
         agentFirst.setName("jmxAgent");
-        manager.registerAgent(agentFirst);
+        MuleManager.getRegistry().registerAgent(agentFirst);
 
         Mx4jAgent agentSecond = new Mx4jAgent();
         agentSecond.setName("mx4jAgent");
-        manager.registerAgent(agentSecond);
+        MuleManager.getRegistry().registerAgent(agentSecond);
 
         manager.start();
 
@@ -83,7 +85,7 @@ public class MuleAgentsTestCase extends AbstractMuleTestCase
         jmxAgent.setCreateServer(false);
         jmxAgent.setLocateServer(false);
         jmxAgent.setMBeanServer(server);
-        manager.registerAgent(jmxAgent);
+        MuleManager.getRegistry().registerAgent(jmxAgent);
         manager.start();
     }
 }

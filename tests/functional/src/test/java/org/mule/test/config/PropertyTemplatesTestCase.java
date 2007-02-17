@@ -29,26 +29,26 @@ public class PropertyTemplatesTestCase extends FunctionalTestCase
         return "test-xml-property-templates.xml";
     }
 
-    public void testProperties()
+    public void testProperties() throws Exception
     {
         //RM* assertEquals("blah", MuleManager.getConfiguration().getModel());
-        assertEquals("blah", MuleManager.getInstance().lookupModel("blah").getName());
+        assertEquals("blah", MuleManager.getRegistry().lookupModel("blah").getName());
 
-        AbstractConnector c = (AbstractConnector)MuleManager.getInstance().lookupConnector("myTestConnector");
+        AbstractConnector c = (AbstractConnector)MuleManager.getRegistry().lookupConnector("myTestConnector");
         assertNotNull(c);
         assertTrue(c.getConnectionStrategy() instanceof SimpleRetryConnectionStrategy);
         assertEquals(4, ((SimpleRetryConnectionStrategy)c.getConnectionStrategy()).getRetryCount());
 
-        UMODescriptor d = MuleManager.getInstance().lookupModel("blah").getDescriptor("test-from-env-props");
+        UMODescriptor d = MuleManager.getRegistry().lookupModel("blah").getDescriptor("test-from-env-props");
         assertNotNull(d);
         assertEquals(((UMOEndpoint)d.getInboundRouter().getEndpoints().get(0)).getEndpointURI().toString(), "test://test.1");
         assertEquals(((UMOEndpoint)((UMOOutboundRouter)d.getOutboundRouter().getRouters().get(0)).getEndpoints().get(0)).getEndpointURI().toString(), "test://test.2");
     }
 
-    public void testPropertyWithoutOverrides()
+    public void testPropertyWithoutOverrides() throws Exception
     {
 
-        UMODescriptor d = MuleManager.getInstance().lookupModel("blah").getDescriptor("test2");
+        UMODescriptor d = MuleManager.getRegistry().lookupModel("blah").getDescriptor("test2");
         assertNotNull(d);
         UMOEndpoint endpoint = d.getInboundRouter().getEndpoint("ep1");
         assertNotNull(endpoint);
@@ -59,10 +59,10 @@ public class PropertyTemplatesTestCase extends FunctionalTestCase
         assertEquals("value3", endpoint.getProperties().get("prop3"));
     }
 
-    public void testPropertyWithOverrides()
+    public void testPropertyWithOverrides() throws Exception
     {
 
-        UMODescriptor d = MuleManager.getInstance().lookupModel("blah").getDescriptor("test3");
+        UMODescriptor d = MuleManager.getRegistry().lookupModel("blah").getDescriptor("test3");
         assertNotNull(d);
         UMOEndpoint endpoint = d.getInboundRouter().getEndpoint("ep2");
         assertNotNull(endpoint);
@@ -74,10 +74,10 @@ public class PropertyTemplatesTestCase extends FunctionalTestCase
         assertEquals("value3", endpoint.getProperties().get("prop3"));
     }
 
-    public void testPropertyMapsListsEtc()
+    public void testPropertyMapsListsEtc() throws Exception
     {
 
-        UMODescriptor d = MuleManager.getInstance().lookupModel("blah").getDescriptor("test3");
+        UMODescriptor d = MuleManager.getRegistry().lookupModel("blah").getDescriptor("test3");
         assertNotNull(d);
         Map props = (Map)d.getProperties().get("testMap");
         assertNotNull(props);
