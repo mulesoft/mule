@@ -20,8 +20,6 @@ import org.mule.impl.RequestContext;
 import org.mule.impl.internal.notifications.ConnectionNotification;
 import org.mule.impl.internal.notifications.MessageNotification;
 import org.mule.impl.internal.notifications.SecurityNotification;
-import org.mule.registry.DeregistrationException;
-import org.mule.registry.RegistrationException;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.TransactionException;
 import org.mule.umo.UMOEvent;
@@ -101,47 +99,6 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
                 throw new MuleRuntimeException(new Message(Messages.FAILED_TO_START_X, "WorkManager"), e);
             }
         }
-
-        try 
-        {
-            register();
-        }
-        catch (RegistrationException re)
-        {
-            logger.error("Unable to register: " + re.toString());
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.lifecycle.Registerable#register()
-     */
-    public void register() throws RegistrationException
-    {
-        registryId = 
-            MuleManager.getInstance().getRegistry().registerMuleObject(connector, this).getId();
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.lifecycle.Registerable#deregister()
-     */
-    public void deregister() throws DeregistrationException
-    {
-        MuleManager.getInstance().getRegistry().deregisterComponent(registryId);
-        registryId = null;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.lifecycle.Registerable#getRegistryId()
-     */
-    public String getRegistryId()
-    {
-        return registryId;
     }
 
     /*
@@ -167,7 +124,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
             catch (org.mule.umo.security.SecurityException e)
             {
                 logger.warn("Outbound Request was made but was not authenticated: " + e.getMessage(), e);
-                connector.fireNotification(new SecurityNotification(e,
+                MuleManager.getInstance().fireNotification(new SecurityNotification(e,
                     SecurityNotification.ADMIN_EVENT_ACTION_START_RANGE));
                 connector.handleException(e);
                 return;
@@ -201,7 +158,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
                     {
                         component = event.getComponent().getDescriptor().getName();
                     }
-                    connector.fireNotification(new MessageNotification(event.getMessage(), event
+                    MuleManager.getInstance().fireNotification(new MessageNotification(event.getMessage(), event
                         .getEndpoint(), component, MessageNotification.MESSAGE_DISPATCHED));
                 }
             }
@@ -242,7 +199,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
             catch (org.mule.umo.security.SecurityException e)
             {
                 logger.warn("Outbound Request was made but was not authenticated: " + e.getMessage(), e);
-                connector.fireNotification(new SecurityNotification(e,
+                MuleManager.getInstance().fireNotification(new SecurityNotification(e,
                     SecurityNotification.SECURITY_AUTHENTICATION_FAILED));
                 connector.handleException(e);
                 return event.getMessage();
@@ -270,7 +227,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
                 {
                     component = event.getComponent().getDescriptor().getName();
                 }
-                connector.fireNotification(new MessageNotification(event.getMessage(), event.getEndpoint(),
+                MuleManager.getInstance().fireNotification(new MessageNotification(event.getMessage(), event.getEndpoint(),
                     component, MessageNotification.MESSAGE_SENT));
             }
 
@@ -314,7 +271,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
             UMOMessage result = doReceive(timeout);
             if (result != null && connector.isEnableMessageEvents())
             {
-                connector.fireNotification(new MessageNotification(result, endpoint, null,
+                MuleManager.getInstance().fireNotification(new MessageNotification(result, endpoint, null,
                     MessageNotification.MESSAGE_RECEIVED));
             }
             return result;
@@ -473,12 +430,12 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
         try
         {
             doConnect();
-            connector.fireNotification(new ConnectionNotification(this, getConnectEventId(endpoint),
+            MuleManager.getInstance().fireNotification(new ConnectionNotification(this, getConnectEventId(endpoint),
                 ConnectionNotification.CONNECTION_CONNECTED));
         }
         catch (Exception e)
         {
-            connector.fireNotification(new ConnectionNotification(this, getConnectEventId(endpoint),
+            MuleManager.getInstance().fireNotification(new ConnectionNotification(this, getConnectEventId(endpoint),
                 ConnectionNotification.CONNECTION_FAILED));
             if (e instanceof ConnectException)
             {
@@ -501,7 +458,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
             logger.debug("Disconnecting from: " + endpoint.getEndpointURI());
         }
 
-        connector.fireNotification(new ConnectionNotification(this, getConnectEventId(endpoint),
+        MuleManager.getInstance().fireNotification(new ConnectionNotification(this, getConnectEventId(endpoint),
             ConnectionNotification.CONNECTION_DISCONNECTED));
         connected = false;
         doDisconnect();
@@ -586,7 +543,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
                     {
                         component = event.getComponent().getDescriptor().getName();
                     }
-                    connector.fireNotification(new MessageNotification(event.getMessage(), event
+                    MuleManager.getInstance().fireNotification(new MessageNotification(event.getMessage(), event
                         .getEndpoint(), component, MessageNotification.MESSAGE_DISPATCHED));
                 }
             }

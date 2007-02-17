@@ -22,9 +22,6 @@ import org.mule.impl.ResponseOutputStream;
 import org.mule.impl.internal.notifications.ConnectionNotification;
 import org.mule.impl.internal.notifications.MessageNotification;
 import org.mule.impl.internal.notifications.SecurityNotification;
-import org.mule.registry.Registration;
-import org.mule.registry.DeregistrationException;
-import org.mule.registry.RegistrationException;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
@@ -143,47 +140,6 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
         }
 
         connectionStrategy = this.connector.getConnectionStrategy();
-
-        try 
-        {
-            register();
-        }
-        catch (RegistrationException re)
-        {
-            logger.error("Unable to register: " + re.toString());
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.lifecycle.Registerable#register()
-     */
-    public void register() throws RegistrationException
-    {
-        registryId = 
-            MuleManager.getInstance().getRegistry().registerMuleObject(connector, this).getId();
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.lifecycle.Registerable#deregister()
-     */
-    public void deregister() throws DeregistrationException
-    {
-        MuleManager.getInstance().getRegistry().deregisterComponent(registryId);
-        registryId = null;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.lifecycle.Registerable#getRegistryId()
-     */
-    public String getRegistryId()
-    {
-        return registryId;
     }
 
     /*
@@ -323,7 +279,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
 
         if (connector.isEnableMessageEvents())
         {
-            connector.fireNotification(new MessageNotification(message, endpoint, component.getDescriptor()
+            MuleManager.getInstance().fireNotification(new MessageNotification(message, endpoint, component.getDescriptor()
                 .getName(), MessageNotification.MESSAGE_RECEIVED));
         }
 
@@ -443,12 +399,12 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
         try
         {
             doConnect();
-            connector.fireNotification(new ConnectionNotification(this, getConnectEventId(),
+            MuleManager.getInstance().fireNotification(new ConnectionNotification(this, getConnectEventId(),
                 ConnectionNotification.CONNECTION_CONNECTED));
         }
         catch (Exception e)
         {
-            connector.fireNotification(new ConnectionNotification(this, getConnectEventId(),
+            MuleManager.getInstance().fireNotification(new ConnectionNotification(this, getConnectEventId(),
                 ConnectionNotification.CONNECTION_FAILED));
             if (e instanceof ConnectException)
             {
@@ -469,7 +425,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
         {
             logger.debug("Disconnecting from: " + endpoint.getEndpointURI());
         }
-        connector.fireNotification(new ConnectionNotification(this, getConnectEventId(),
+        MuleManager.getInstance().fireNotification(new ConnectionNotification(this, getConnectEventId(),
             ConnectionNotification.CONNECTION_DISCONNECTED));
         connected.set(false);
         doDisconnect();
@@ -574,7 +530,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
                 catch (SecurityException e)
                 {
                     logger.warn("Request was made but was not authenticated: " + e.getMessage(), e);
-                    connector.fireNotification(new SecurityNotification(e,
+                    MuleManager.getInstance().fireNotification(new SecurityNotification(e,
                         SecurityNotification.SECURITY_AUTHENTICATION_FAILED));
                     handleException(e);
                     resultMessage = message;
