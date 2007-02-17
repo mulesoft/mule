@@ -23,7 +23,7 @@ public class JcaModel extends AbstractModel
     public static final String JCA_MODEL_TYPE = "jca";
 
 
-    protected UMOComponent createComponent(UMODescriptor descriptor)
+    public UMOComponent createComponent(UMODescriptor descriptor)
     {
         return new JcaComponent((MuleDescriptor)descriptor);
     }

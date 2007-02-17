@@ -10,10 +10,11 @@
 
 package org.mule.management.mbeans;
 
+import org.mule.MuleManager;
 import org.mule.impl.model.AbstractComponent;
-import org.mule.impl.model.ModelHelper;
 import org.mule.impl.model.seda.SedaComponent;
 import org.mule.management.stats.ComponentStatistics;
+import org.mule.registry.RegistryException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 
@@ -27,9 +28,6 @@ import org.apache.commons.logging.LogFactory;
 /**
  * <code>ComponentService</code> exposes service information about a Mule Managed
  * component
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class ComponentService implements ComponentServiceMBean, MBeanRegistration, ComponentStatsMBean
 {
@@ -49,14 +47,14 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
 
     private ComponentStatistics statistics;
 
-    public ComponentService(String name)
+    public ComponentService(String name) throws RegistryException
     {
         this.name = name;
         this.statistics = getComponent().getStatistics();
 
     }
 
-    public int getQueueSize()
+    public int getQueueSize() throws UMOException
     {
         UMOComponent c = getComponent();
         if (c instanceof SedaComponent)
@@ -96,12 +94,12 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
         getComponent().resume();
     }
 
-    public boolean isPaused()
+    public boolean isPaused() throws UMOException
     {
         return getComponent().isPaused();
     }
 
-    public boolean isStopped()
+    public boolean isStopped() throws UMOException
     {
         return getComponent().isStopped();
     }
@@ -116,7 +114,7 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
         getComponent().forceStop();
     }
 
-    public boolean isStopping()
+    public boolean isStopping() throws UMOException
     {
         return getComponent().isStopping();
     }
@@ -212,9 +210,9 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
         // nothing to do
     }
 
-    private AbstractComponent getComponent()
+    private AbstractComponent getComponent() throws RegistryException
     {
-        return (AbstractComponent)ModelHelper.getComponent(getName());
+        return (AbstractComponent)MuleManager.getRegistry().lookupComponent(getName());
     }
 
     // ///// Component stats impl /////////

@@ -20,12 +20,11 @@ import org.mule.providers.soap.axis.AxisConnector;
 import org.mule.providers.soap.axis.extensions.MuleConfigProvider;
 import org.mule.providers.soap.xfire.XFireConnector;
 import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.CryptoFailureException;
-import org.mule.umo.security.EncryptionStrategyNotFoundException;
 import org.mule.umo.security.SecurityException;
 import org.mule.umo.security.SecurityProviderNotFoundException;
-import org.mule.umo.security.UnknownAuthenticationTypeException;
 import org.mule.umo.security.UnsupportedAuthenticationSchemeException;
 
 import java.util.ArrayList;
@@ -77,9 +76,7 @@ public class WsSecurityFilter extends AbstractEndpointSecurityFilter
      * the service. Secondly, it checks the properties in the message and if there
      * are security properties among them, it sets them on the service.
      */
-    protected void authenticateInbound(UMOEvent event)
-        throws SecurityException, CryptoFailureException, SecurityProviderNotFoundException,
-        EncryptionStrategyNotFoundException, UnknownAuthenticationTypeException
+    protected void authenticateInbound(UMOEvent event) throws UMOException
     {
         Map properties = event.getSession().getComponent().getDescriptor().getProperties();
         if (properties.containsKey("xfire"))
@@ -102,7 +99,7 @@ public class WsSecurityFilter extends AbstractEndpointSecurityFilter
             Service service = server.getServiceRegistry().getService(serviceName);
 
             // remove security in handlers if present
-            Object[] connectorArray = MuleManager.getInstance().getConnectors().values().toArray();
+            Object[] connectorArray = MuleManager.getRegistry().getConnectors().values().toArray();
             XFireConnector connector = null;
             for (i = 0; i < connectorArray.length; i++)
             {

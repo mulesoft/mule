@@ -22,7 +22,7 @@ public class ConnectorService implements ConnectorServiceMBean
     private final UMOConnector connector;
     private final String name;
 
-    public ConnectorService(final UMOConnector connector)
+    public ConnectorService(final UMOConnector connector) throws Exception
     {
         this.connector = connector;
         name = ObjectNameHelper.getConnectorName(connector);

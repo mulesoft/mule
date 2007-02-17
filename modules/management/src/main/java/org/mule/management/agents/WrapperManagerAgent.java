@@ -91,7 +91,7 @@ public class WrapperManagerAgent implements UMOAgent {
             try
             {
                 // remove the agent from the list, it's not functional
-                MuleManager.getInstance().unregisterAgent(this.getName());
+                MuleManager.getRegistry().unregisterAgent(this.getName());
             }
             catch (UMOException e) {
                 // not interested, really

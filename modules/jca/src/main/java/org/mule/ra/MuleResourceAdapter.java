@@ -177,7 +177,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
                 MuleDescriptor descriptor = new MuleDescriptor(name);
                 descriptor.getInboundRouter().addEndpoint(endpoint);
                 descriptor.setImplementationInstance(messageEndpoint);
-                MuleManager.getInstance().lookupModel(JcaModel.JCA_MODEL_TYPE).registerComponent(descriptor);
+                MuleManager.getRegistry().registerComponent(descriptor, JcaModel.JCA_MODEL_TYPE);
 
                 MuleEndpointKey key = new MuleEndpointKey(endpointFactory, (MuleActivationSpec)activationSpec);
 
@@ -214,7 +214,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
             }
             try
             {
-                manager.lookupModel(JcaModel.JCA_MODEL_TYPE).unregisterComponent(descriptor);
+                MuleManager.getRegistry().unregisterComponent(descriptor.getName());
             }
             catch (UMOException e)
             {

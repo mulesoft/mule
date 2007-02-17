@@ -329,9 +329,9 @@ public class JmxAgent implements UMOAgent
         // WrapperManager to support restarts
         final WrapperManagerAgent wmAgent = new WrapperManagerAgent();
         final UMOManager manager = MuleManager.getInstance();
-        if (manager.lookupAgent(wmAgent.getName()) == null)
+        if (MuleManager.getRegistry().lookupAgent(wmAgent.getName()) == null)
         {
-            manager.registerAgent(wmAgent);
+            MuleManager.getRegistry().registerAgent(wmAgent);
         }
     }
 
@@ -348,10 +348,9 @@ public class JmxAgent implements UMOAgent
         registeredMBeans.add(on);
     }
 
-    protected void registerModelServices() throws NotCompliantMBeanException, MBeanRegistrationException,
-            InstanceAlreadyExistsException, MalformedObjectNameException
+    protected void registerModelServices() throws Exception
     {
-        for (Iterator iterator = MuleManager.getInstance().getModels().values().iterator(); iterator.hasNext();)
+        for (Iterator iterator = MuleManager.getRegistry().getModels().values().iterator(); iterator.hasNext();)
         {
             UMOModel model = (UMOModel) iterator.next();
             ModelServiceMBean serviceMBean = new ModelService(model);
@@ -384,10 +383,9 @@ public class JmxAgent implements UMOAgent
         registeredMBeans.add(on);
     }
 
-    protected void registerComponentServices() throws NotCompliantMBeanException, MBeanRegistrationException,
-            InstanceAlreadyExistsException, MalformedObjectNameException
+    protected void registerComponentServices() throws Exception
     {
-        for (Iterator iterator = MuleManager.getInstance().getModels().values().iterator(); iterator.hasNext();)
+        for (Iterator iterator = MuleManager.getRegistry().getModels().values().iterator(); iterator.hasNext();)
         {
             UMOModel model = (UMOModel) iterator.next();
             Iterator iter = model.getComponentNames();
@@ -406,10 +404,9 @@ public class JmxAgent implements UMOAgent
 
     }
 
-    protected void registerEndpointServices() throws NotCompliantMBeanException, MBeanRegistrationException,
-            InstanceAlreadyExistsException, MalformedObjectNameException
+    protected void registerEndpointServices() throws Exception
     {
-        Iterator iter = MuleManager.getInstance().getConnectors().values().iterator();
+        Iterator iter = MuleManager.getRegistry().getConnectors().values().iterator();
         UMOConnector connector;
         while (iter.hasNext()) {
             connector = (UMOConnector) iter.next();
@@ -439,13 +436,9 @@ public class JmxAgent implements UMOAgent
         }
     }
 
-    protected void registerConnectorServices() throws
-                                                MalformedObjectNameException,
-                                                NotCompliantMBeanException,
-                                                MBeanRegistrationException,
-                                                InstanceAlreadyExistsException
+    protected void registerConnectorServices() throws Exception
     {
-        Iterator iter = MuleManager.getInstance().getConnectors().values().iterator();
+        Iterator iter = MuleManager.getRegistry().getConnectors().values().iterator();
         while (iter.hasNext()) {
             UMOConnector connector = (UMOConnector) iter.next();
             ConnectorServiceMBean mBean = new ConnectorService(connector);

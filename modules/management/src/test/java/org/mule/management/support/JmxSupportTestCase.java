@@ -9,14 +9,16 @@
  */
 package org.mule.management.support;
 
+import org.mule.MuleManager;
 import org.mule.management.AbstractMuleJmxTestCase;
 import org.mule.management.agents.JmxAgent;
 import org.mule.management.mbeans.StatisticsService;
 import org.mule.umo.manager.UMOManager;
 
-import javax.management.ObjectName;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.management.ObjectName;
 
 public class JmxSupportTestCase extends AbstractMuleJmxTestCase
 {
@@ -33,7 +35,7 @@ public class JmxSupportTestCase extends AbstractMuleJmxTestCase
         UMOManager manager = getManager(true);
         manager.setId(managerId);
         JmxAgent agent = new JmxAgent();
-        manager.registerAgent(agent);
+        MuleManager.getRegistry().registerAgent(agent);
         manager.start();
 
         List domains = Arrays.asList(mBeanServer.getDomains());
@@ -63,7 +65,7 @@ public class JmxSupportTestCase extends AbstractMuleJmxTestCase
         UMOManager manager = getManager(true);
         manager.setId(managerId);
         JmxAgent agent = new JmxAgent();
-        manager.registerAgent(agent);
+        MuleManager.getRegistry().registerAgent(agent);
         manager.start();
 
         List domains = Arrays.asList(mBeanServer.getDomains());
@@ -80,7 +82,7 @@ public class JmxSupportTestCase extends AbstractMuleJmxTestCase
     {
         UMOManager manager = getManager(true);
         JmxAgent jmxAgent = new JmxAgent();
-        manager.registerAgent(jmxAgent);
+        MuleManager.getRegistry().registerAgent(jmxAgent);
         manager.setId(null);
         try
         {

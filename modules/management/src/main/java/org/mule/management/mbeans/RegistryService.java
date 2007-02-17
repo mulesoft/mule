@@ -11,8 +11,7 @@
 package org.mule.management.mbeans;
 
 import org.mule.MuleManager;
-import org.mule.registry.Registry;
-import org.mule.umo.UMOException;
+import org.mule.registry.UMORegistry;
 
 /**
  * <code>RegistryService</code> exposes service information and actions on 
@@ -20,21 +19,11 @@ import org.mule.umo.UMOException;
  */
 public class RegistryService implements RegistryServiceMBean
 {
-    private Registry registry;
+    private UMORegistry registry;
 
     public RegistryService()
     {
-        registry = MuleManager.getInstance().getRegistry();
-    }
-
-    public void start() throws UMOException
-    {
-        registry.start();
-    }
-
-    public void stop() throws UMOException
-    {
-        registry.stop();
+        registry = MuleManager.getRegistry();
     }
 
     /*

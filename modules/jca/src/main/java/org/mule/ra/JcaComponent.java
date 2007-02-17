@@ -19,8 +19,6 @@ import org.mule.impl.RequestContext;
 import org.mule.impl.container.ContainerKeyPair;
 import org.mule.impl.internal.notifications.ComponentNotification;
 import org.mule.management.stats.ComponentStatistics;
-import org.mule.registry.DeregistrationException;
-import org.mule.registry.RegistrationException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
@@ -58,8 +56,6 @@ public class JcaComponent implements UMOComponent
      * Determines if the component has been started
      */
     private final AtomicBoolean started = new AtomicBoolean(false);
-
-    protected String registryId;
 
     public JcaComponent(MuleDescriptor descriptor)
     {
@@ -143,7 +139,7 @@ public class JcaComponent implements UMOComponent
         descriptor.initialise();
         try
         {
-            entryPoint = MuleManager.getInstance().lookupModel(JcaModel.JCA_MODEL_TYPE).getEntryPointResolver().resolveEntryPoint(
+            entryPoint = MuleManager.getRegistry().lookupModel(JcaModel.JCA_MODEL_TYPE).getEntryPointResolver().resolveEntryPoint(
                 descriptor);
         }
         catch (UMOException e)
@@ -215,39 +211,9 @@ public class JcaComponent implements UMOComponent
     {
         return component;
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.lifecycle.Registerable#register()
-     */
-    public void register() throws RegistrationException
+    
+    public String getId()
     {
-        /* TODO: LM
-        registryId = 
-           MuleManager.getInstance().getRegistry().registerMuleObject(MuleManager.getInstance().getModel(), this).getId();
-           */
+        return getClass().getName() + (descriptor != null ? "." + descriptor.getName() : "");
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.lifecycle.Registerable#deregister()
-     */
-    public void deregister() throws DeregistrationException
-    {
-        MuleManager.getInstance().getRegistry().deregisterComponent(registryId);
-        registryId = null;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.lifecycle.Registerable#getRegistryId()
-     */
-    public String getRegistryId()
-    {
-        return registryId;
-    }
-
 }
