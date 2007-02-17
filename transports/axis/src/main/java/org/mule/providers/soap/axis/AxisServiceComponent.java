@@ -23,7 +23,6 @@ import org.mule.providers.soap.axis.extensions.MuleConfigProvider;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Initialisable;
@@ -657,7 +656,7 @@ public class AxisServiceComponent implements Initialisable, Callable
         }
     }
 
-    private UMOEndpointURI getEndpoint(UMOEventContext context) throws EndpointException
+    private UMOEndpointURI getEndpoint(UMOEventContext context) throws UMOException
     {
         String endpoint = context.getEndpointURI().getAddress();
         String request = context.getMessage().getStringProperty(HttpConnector.HTTP_REQUEST_PROPERTY, null);

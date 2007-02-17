@@ -16,7 +16,7 @@ import org.mule.providers.http.HttpConstants;
 import org.mule.tck.functional.AbstractProviderFunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.umo.UMOEventContext;
-import org.mule.umo.endpoint.EndpointException;
+import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
 
@@ -44,7 +44,7 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
         {
             return new MuleEndpointURI("http://localhost:60198");
         }
-        catch (EndpointException e)
+        catch (UMOException e)
         {
             fail(e.getMessage());
             return null;

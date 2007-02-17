@@ -18,10 +18,6 @@ import org.mule.registry.ServiceDescriptorFactory;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.UMOEndpointURI;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class AxisEndpointTestCase extends AbstractMuleTestCase
 {
     public void testEndpoint() throws Exception
@@ -73,14 +69,11 @@ public class AxisEndpointTestCase extends AbstractMuleTestCase
         assertEquals("getSomething", endpointUri.getParams().getProperty(MuleProperties.MULE_METHOD_PROPERTY));
         assertEquals(3, endpointUri.getParams().size());
 
-        TransportServiceDescriptor sd = (TransportServiceDescriptor)
-                MuleManager.getInstance().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, "soap", null);
+        TransportServiceDescriptor sd = (TransportServiceDescriptor) MuleManager.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, "soap", null);
         if (sd != null)
         {
-            //TODO TC: How do we assert this state in the new model?
-            //assertEquals("axis", sd.getProtocol());
+            assertEquals("axis", sd.getService());
             //assertEquals("org.mule.providers.soap.axis.AxisConnector", sd.getConnector());
         }
-
     }
 }

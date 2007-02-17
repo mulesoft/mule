@@ -24,7 +24,6 @@ import org.mule.routing.filters.WildcardFilter;
 import org.mule.routing.filters.logic.NotFilter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOException;
-import org.mule.umo.model.UMOModel;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -59,10 +58,10 @@ public class HttpRequestWildcardFilterTestCase extends AbstractMuleTestCase
         model.setPoolingProfile(new PoolingProfile());
         model.getPoolingProfile().setInitialisationPolicy(PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
         model.setName("main");
-        manager.registerModel(model);
+        MuleManager.getRegistry().registerModel(model);
 
         MuleDescriptor descriptor = createInDescriptor("httpIn", EchoComponent.class.getName());
-        model.registerComponent(descriptor);
+        MuleManager.getRegistry().registerComponent(descriptor, model.getName());
         manager.start();
     }
 
@@ -92,7 +91,7 @@ public class HttpRequestWildcardFilterTestCase extends AbstractMuleTestCase
     {
         HttpConnector connector = (HttpConnector) TransportFactory.createConnector(new MuleEndpointURI(urlStr));
         connector.getDispatcherThreadingProfile().setDoThreading(false);
-        MuleManager.getInstance().registerConnector(connector);
+        MuleManager.getRegistry().registerConnector(connector);
         return connector;
     }
 

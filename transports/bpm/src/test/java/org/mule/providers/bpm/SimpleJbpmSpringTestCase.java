@@ -34,7 +34,7 @@ public class SimpleJbpmSpringTestCase extends SimpleJbpmTestCase {
 
     protected void doPostFunctionalSetUp() throws Exception {
         connector =
-            (ProcessConnector) MuleManager.getInstance().lookupConnector("jBpmConnector");
+            (ProcessConnector) MuleManager.getRegistry().lookupConnector("jBpmConnector");
         bpms = connector.getBpms();
         connector.setAllowGlobalReceiver(true);
         super.doPostFunctionalSetUp();

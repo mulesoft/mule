@@ -17,11 +17,11 @@ import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.internal.notifications.ManagerNotification;
 import org.mule.impl.internal.notifications.ManagerNotificationListener;
 import org.mule.impl.internal.notifications.NotificationException;
-import org.mule.impl.model.ModelHelper;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
 import org.mule.providers.soap.MethodFixInterceptor;
+import org.mule.registry.RegistryException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -211,8 +211,7 @@ public class XFireConnector extends AbstractConnector
             // See if the xfire descriptor has already been added. This allows
             // developers to override the default configuration, say to increase
             // the threadpool
-            xfireDescriptor = (MuleDescriptor)MuleManager.getInstance().lookupModel(ModelHelper.SYSTEM_MODEL).getDescriptor(
-                XFIRE_SERVICE_COMPONENT_NAME + getName());
+            xfireDescriptor = (MuleDescriptor)MuleManager.getRegistry().lookupComponent(XFIRE_SERVICE_COMPONENT_NAME + getName()).getDescriptor();
             if (xfireDescriptor == null)
             {
                 xfireDescriptor = createxfireDescriptor();
@@ -222,7 +221,7 @@ public class XFireConnector extends AbstractConnector
                 // Lets unregister the 'template' instance, configure it and
                 // then register
                 // again later
-                MuleManager.getInstance().lookupModel(ModelHelper.SYSTEM_MODEL).unregisterComponent(xfireDescriptor);
+                MuleManager.getRegistry().unregisterComponent(xfireDescriptor.getName());
             }
             // if the axis server hasn't been set, set it now. The Axis server
             // may be set externally
@@ -299,8 +298,15 @@ public class XFireConnector extends AbstractConnector
 
     protected MuleDescriptor createxfireDescriptor()
     {
-        MuleDescriptor xfireDescriptor = (MuleDescriptor)MuleManager.getInstance().lookupModel(ModelHelper.SYSTEM_MODEL)
-            .getDescriptor(XFIRE_SERVICE_COMPONENT_NAME + getName());
+        MuleDescriptor xfireDescriptor = null;
+        try
+        {
+            xfireDescriptor = (MuleDescriptor)MuleManager.getRegistry().lookupComponent(XFIRE_SERVICE_COMPONENT_NAME + getName()).getDescriptor();
+        }
+        catch (RegistryException e)
+        {
+            logger.info("Unable to look up model: " + e.getMessage());
+        }
         if (xfireDescriptor == null)
         {
             xfireDescriptor = new MuleDescriptor(XFIRE_SERVICE_COMPONENT_NAME + getName());
@@ -413,10 +419,9 @@ public class XFireConnector extends AbstractConnector
             // new service and a
             // different http port the model needs to be restarted before the
             // listener is available
-            if (!MuleManager.getInstance().lookupModel(ModelHelper.SYSTEM_MODEL).isComponentRegistered(
-                XFIRE_SERVICE_COMPONENT_NAME + getName()))
+            try
             {
-                try
+                if (MuleManager.getRegistry().lookupComponent(XFIRE_SERVICE_COMPONENT_NAME + getName()) == null)
                 {
                     // Descriptor might be null if no inbound endpoints have
                     // been register for the xfire connector
@@ -430,12 +435,12 @@ public class XFireConnector extends AbstractConnector
                     {
                         xfireDescriptor.getProperties().put("xfire", xfire);
                     }
-                    MuleManager.getInstance().lookupModel(ModelHelper.SYSTEM_MODEL).registerComponent(xfireDescriptor);
+                    MuleManager.getRegistry().registerSystemComponent(xfireDescriptor);
                 }
-                catch (UMOException e)
-                {
-                    handleException(e);
-                }
+            }
+            catch (UMOException e)
+            {
+                handleException(e);
             }
         }
     }

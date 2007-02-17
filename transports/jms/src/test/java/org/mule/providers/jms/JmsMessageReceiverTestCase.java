@@ -30,7 +30,7 @@ public class JmsMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 
     protected void doSetUp() throws Exception
     {
-        MuleManager.getInstance().registerConnector(getConnector());
+        MuleManager.getRegistry().registerConnector(getConnector());
         super.doSetUp();
     }
 

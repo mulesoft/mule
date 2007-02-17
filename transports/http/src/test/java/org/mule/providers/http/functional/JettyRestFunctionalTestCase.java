@@ -11,7 +11,7 @@ package org.mule.providers.http.functional;
 
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.http.jetty.JettyConnector;
-import org.mule.umo.endpoint.EndpointException;
+import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
 
@@ -35,7 +35,7 @@ public class JettyRestFunctionalTestCase extends HttpFunctionalTestCase
         {
             return new MuleEndpointURI("jetty:rest://localhost:60198/rest/Echo");
         }
-        catch (EndpointException e)
+        catch (UMOException e)
         {
             fail(e.getMessage());
             return null;

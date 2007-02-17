@@ -10,8 +10,8 @@
 
 package org.mule.providers.soap.axis.extensions;
 
+import org.mule.MuleManager;
 import org.mule.impl.RequestContext;
-import org.mule.impl.model.ModelHelper;
 import org.mule.providers.soap.ServiceProxy;
 import org.mule.providers.soap.axis.AxisConnector;
 import org.mule.providers.soap.axis.AxisMessageReceiver;
@@ -32,9 +32,6 @@ import org.apache.commons.logging.LogFactory;
 /**
  * <code>MuleMsgProvider</code> Is an Axis service endpoint that builds services
  * from Mule managed components
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class MuleMsgProvider extends MsgProvider
 {
@@ -80,15 +77,15 @@ public class MuleMsgProvider extends MsgProvider
     protected Class getServiceClass(String s, SOAPService soapService, MessageContext messageContext)
         throws AxisFault
     {
-        UMOComponent component = ModelHelper.getComponent(soapService.getName());
         try
         {
+            UMOComponent component = MuleManager.getRegistry().lookupComponent(soapService.getName());
             Class[] classes = ServiceProxy.getInterfacesForComponent(component);
             return Proxy.getProxyClass(Thread.currentThread().getContextClassLoader(), classes);
         }
         catch (Exception e)
         {
-            throw new AxisFault("Failed to implementation class for component: " + e.getMessage(), e);
+            throw new AxisFault("Failed to get implementation class for component: " + e.getMessage(), e);
         }
     }
 

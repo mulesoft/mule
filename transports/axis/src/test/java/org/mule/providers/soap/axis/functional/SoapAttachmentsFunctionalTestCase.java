@@ -20,8 +20,8 @@ import org.mule.impl.model.seda.SedaModel;
 import org.mule.providers.soap.axis.AxisConnector;
 import org.mule.providers.soap.axis.AxisMessageDispatcher;
 import org.mule.tck.functional.AbstractProviderFunctionalTestCase;
+import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
@@ -44,9 +44,9 @@ public class SoapAttachmentsFunctionalTestCase extends AbstractProviderFunctiona
         SedaModel model = new SedaModel();
         model.getPoolingProfile().setInitialisationPolicy(
             PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
-
         model.setName("main");
-        manager.registerModel(model);
+        MuleManager.getRegistry().registerModel(model);
+        
         callbackCalled = false;
         callbackCount = 0;
         connector = createConnector();
@@ -58,7 +58,7 @@ public class SoapAttachmentsFunctionalTestCase extends AbstractProviderFunctiona
         {
             return new MuleEndpointURI("axis:http://localhost:60198/mule/services");
         }
-        catch (EndpointException e)
+        catch (UMOException e)
         {
             fail(e.getMessage());
             return null;

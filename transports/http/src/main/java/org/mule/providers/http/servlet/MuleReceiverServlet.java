@@ -17,6 +17,8 @@ import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.service.TransportFactory;
+import org.mule.registry.RegistryException;
+import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.provider.NoReceiverForEndpointException;
@@ -51,25 +53,30 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
 
     protected void doInit(ServletConfig servletConfig) throws ServletException
     {
-        String servletConnectorName = servletConfig.getInitParameter(SERVLET_CONNECTOR_NAME_PROPERTY);
-        if(servletConnectorName==null)
+        try
         {
-            connector = (ServletConnector) TransportFactory.getConnectorByProtocol("servlet");
-            if (connector == null)
+            String servletConnectorName = servletConfig.getInitParameter(SERVLET_CONNECTOR_NAME_PROPERTY);
+            if(servletConnectorName==null)
             {
-                throw new ServletException(new Message("http", 9).toString());
+                connector = (ServletConnector) TransportFactory.getConnectorByProtocol("servlet");
+                if (connector == null)
+                {
+                    throw new ServletException(new Message("http", 9).toString());
+                }
+            }
+            else
+            {
+                connector = (ServletConnector)MuleManager.getRegistry().lookupConnector(servletConnectorName);
+                if (connector == null)
+                {
+                    throw new ServletException(new Message("http", 10, servletConnectorName).toString());
+                }
             }
         }
-        else
+        catch (RegistryException e)
         {
-            connector = (ServletConnector)MuleManager.getInstance().lookupConnector(servletConnectorName);
-            if (connector == null)
-            {
-                throw new ServletException(new Message("http", 10, servletConnectorName).toString());
-            }
+            throw new ServletException(e);
         }
-
-
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -112,7 +119,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     }
 
     protected AbstractMessageReceiver getReceiverForURI(HttpServletRequest httpServletRequest)
-        throws EndpointException
+        throws UMOException
     {
         String uri = getReceiverName(httpServletRequest);
         if (uri == null)

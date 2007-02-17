@@ -19,8 +19,6 @@ import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.InternalMessageListener;
 import org.mule.providers.jbi.JbiMessageAdapter;
 import org.mule.providers.jbi.JbiUtils;
-import org.mule.registry.DeregistrationException;
-import org.mule.registry.RegistrationException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
@@ -233,7 +231,7 @@ public class MuleReceiver extends AbstractEndpointComponent implements InternalM
      */
     class NullUMOComponent implements UMOComponent
     {
-		/**
+        /**
          * Serial version
          */
         private static final long serialVersionUID = 6446394166371870045L;
@@ -309,36 +307,14 @@ public class MuleReceiver extends AbstractEndpointComponent implements InternalM
             return null;
         }
 
-        /*
-         * (non-Javadoc)
-         * 
-        * @see org.mule.umo.lifecycle.Registerable#register()
-        */
-        public void register() throws RegistrationException
+        public String getId()
         {
-            registryId = 
-                MuleManager.getInstance().getRegistry().registerMuleObject(descriptor, this).getId();
+            return getClass().getName() + "." + getName();
         }
 
-        /*
-        * (non-Javadoc)
-        * 
-        * @see org.mule.umo.lifecycle.Registerable#deregister()
-        */
-        public void deregister() throws DeregistrationException
+        public String getModelName()
         {
-            MuleManager.getInstance().getRegistry().deregisterComponent(registryId);
-            registryId = null;
-		}
-
-        /**
-         * Returns the registry id.
-         *
-         * @return the registry ID
-         */
-        public String getRegistryId()
-        {
-            return registryId;
+            return "main";
         }
     }
 }

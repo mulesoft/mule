@@ -43,7 +43,7 @@ public class SimpleJbpmTestCase extends FunctionalTestCase {
         bpms = new Jbpm(JbpmConfiguration.getInstance());
         connector.setBpms(bpms);
 
-        MuleManager.getInstance().registerConnector(connector);
+        MuleManager.getRegistry().registerConnector(connector);
     }
 
     public void testSimpleProcess() throws Exception {

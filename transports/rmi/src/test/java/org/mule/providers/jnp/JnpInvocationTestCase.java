@@ -10,11 +10,7 @@
 
 package org.mule.providers.jnp;
 
-import java.util.Hashtable;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
-
+import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.config.i18n.Messages;
@@ -29,6 +25,11 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
+
+import java.util.Hashtable;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
 
 /**
  * test RMI object invocations
@@ -66,7 +67,7 @@ public class JnpInvocationTestCase extends FunctionalTestCase
         ic.bind("TestService", new MatchingMethodsComponent());
 
         jnpConnector.setJndiContext(ic);
-        builder.getManager().registerConnector(jnpConnector);
+        MuleManager.getRegistry().registerConnector(jnpConnector);
         return builder;
     }
 
