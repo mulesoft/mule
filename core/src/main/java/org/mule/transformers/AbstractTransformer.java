@@ -14,14 +14,10 @@ import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.NullPayload;
-import org.mule.registry.DeregistrationException;
-import org.mule.registry.RegistrationException;
-import org.mule.registry.Registry;
 import org.mule.registry.metadata.ObjectMetadata;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.lifecycle.Registerable;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
@@ -366,47 +362,9 @@ public abstract class AbstractTransformer implements UMOTransformer
         // nothing to do
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.lifecycle.Registerable#register()
-     */
-    public void register() throws RegistrationException
+    public String getId()
     {
-        Registry registry = MuleManager.getInstance().getRegistry();
-        if (registry == null) throw new RegistrationException("No registry available");
-        Registerable parent = null;
-        if (endpoint != null)
-        {
-            parent = endpoint;
-        }
-        else 
-        {
-            parent = MuleManager.getInstance();
-        }
-
-        registryId = MuleManager.getInstance().getRegistry().registerMuleObject(parent, this).getId();
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.lifecycle.Registerable#deregister()
-     */
-    public void deregister() throws DeregistrationException
-    {
-        MuleManager.getInstance().getRegistry().deregisterComponent(registryId);
-        registryId = null;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.lifecycle.Registerable#getRegistryId()
-     */
-    public String getRegistryId()
-    {
-        return registryId;
+        return getClass().getName() + "." + getName();
     }
 
     protected String generateTransformerName()

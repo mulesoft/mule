@@ -23,8 +23,7 @@ import org.mule.impl.internal.notifications.ConnectionNotification;
 import org.mule.providers.service.TransportFactory;
 import org.mule.providers.service.TransportServiceDescriptor;
 import org.mule.providers.service.TransportServiceException;
-import org.mule.registry.DeregistrationException;
-import org.mule.registry.RegistrationException;
+import org.mule.registry.RegistryException;
 import org.mule.registry.ServiceDescriptorFactory;
 import org.mule.registry.ServiceException;
 import org.mule.routing.filters.WildcardFilter;
@@ -254,11 +253,7 @@ public abstract class AbstractConnector
      */
     protected UMOSessionHandler sessionHandler = new MuleSessionHandler();
 
-    /**
-     * Registry ID
-     */
-    protected String registryId = null;
-
+    
     public AbstractConnector()
     {
         super();
@@ -286,6 +281,11 @@ public abstract class AbstractConnector
 
         // container for receivers
         receivers = new ConcurrentHashMap();
+    }
+
+    public String getId()
+    {
+        return getClass().getName() + "." + getName();
     }
 
     /*
@@ -351,45 +351,6 @@ public abstract class AbstractConnector
         }
 
         initialised.set(true);
-
-        try
-        {
-            register();
-        }
-        catch (RegistrationException re)
-        {
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.lifecycle.Registerable#register()
-     */
-    public void register() throws RegistrationException
-    {
-		registryId = MuleManager.getInstance().getRegistry().registerMuleObject(MuleManager.getInstance(), this).getId();
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.lifecycle.Registerable#deregister()
-     */
-    public void deregister() throws DeregistrationException
-    {
-        MuleManager.getInstance().getRegistry().deregisterComponent(registryId);
-        registryId = null;
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.lifecycle.Registerable#getRegistryId()
-     */
-    public String getRegistryId()
-    {
-        return registryId;
     }
 
     public abstract String getProtocol();
@@ -1545,7 +1506,14 @@ public abstract class AbstractConnector
 
         org.mule.util.BeanUtils.populateWithoutFail(this, props, true);
 
-        setName(ObjectNameHelper.getConnectorName(this));
+        try
+        {
+            setName(ObjectNameHelper.getConnectorName(this));
+        }
+        catch (RegistryException e)
+        {
+            throw new InitialisationException(e, this);
+        }
     }
 
     /**
@@ -1561,7 +1529,7 @@ public abstract class AbstractConnector
         try
         {
             serviceDescriptor = (TransportServiceDescriptor)
-                MuleManager.getInstance().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, getProtocol().toLowerCase(), serviceOverrides);
+                MuleManager.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, getProtocol().toLowerCase(), serviceOverrides);
             if (serviceDescriptor == null)
             {
                 throw new ServiceException(Message.createStaticMessage("No service descriptor found for transport: " + getProtocol() + ".  This transport does not appear to be installed."));
@@ -1746,7 +1714,7 @@ public abstract class AbstractConnector
         sb.append(", connected=").append(connected);
         sb.append(", supportedProtocols=").append(supportedProtocols);
         sb.append(", serviceOverrides=").append(serviceOverrides);
-        sb.append(", registryId='").append(registryId).append('\'');
+        sb.append(", registryId='").append(getId()).append('\'');
         sb.append('}');
         return sb.toString();
     }

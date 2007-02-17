@@ -17,8 +17,7 @@ import org.mule.umo.UMODescriptor;
 
 public class DirectModel extends AbstractModel
 {
-
-    protected UMOComponent createComponent(UMODescriptor descriptor)
+    public UMOComponent createComponent(UMODescriptor descriptor)
     {
         return new DirectComponent((MuleDescriptor)descriptor, this);
     }

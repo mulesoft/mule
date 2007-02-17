@@ -18,7 +18,6 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.routing.CouldNotRouteOutboundMessageException;
@@ -180,7 +179,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
                 }
                 ep.setEndpointURI(newUri);
             }
-            catch (EndpointException e)
+            catch (UMOException e)
             {
                 throw new CouldNotRouteOutboundMessageException(new Message(
                     Messages.TEMPLATE_X_CAUSED_MALFORMED_ENDPOINT_X, uri, newUriString), message, ep, e);

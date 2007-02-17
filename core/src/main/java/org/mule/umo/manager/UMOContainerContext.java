@@ -17,10 +17,7 @@ import java.io.Reader;
 
 /**
  * <code>UMOContainerContext</code> defines the contract between Mule and an
- * underlying container such as String or Pico.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * underlying container such as Hivemind or Pico.
  */
 public interface UMOContainerContext extends Initialisable, Disposable
 {

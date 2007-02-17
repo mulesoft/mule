@@ -55,13 +55,13 @@ public class LegacyManagementContextFactoryBean extends ManagementContextFactory
      * @param endpoints
      * @throws InitialisationException
      */
-    @Override
-    protected void setEndpoints(Collection endpoints) throws InitialisationException
+    //@Override
+    protected void setEndpoints(Collection endpoints) throws UMOException
     {
         for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
         {
             UMOEndpoint ep  = (UMOEndpoint)iterator.next();
-            getManager().registerEndpoint(ep);
+            registry.registerEndpoint(ep);
         }
     }
 
@@ -71,7 +71,7 @@ public class LegacyManagementContextFactoryBean extends ManagementContextFactory
      * @param models
      * @throws UMOException
      */
-    @Override
+    //@Override
     protected void setModels(Map models) throws UMOException
     {
         if (models == null)
@@ -92,13 +92,13 @@ public class LegacyManagementContextFactoryBean extends ManagementContextFactory
                 {
                     String name = (String)iterator1.next();
                     UMODescriptor descriptor = model.getDescriptor(name);
-                    realModel.registerComponent(descriptor);
+                    registry.registerComponent(descriptor, realModel.getName());
                 }
             }
             else
             {
                 model.setName(entry.getKey().toString());
-                getManager().registerModel(model);
+                registry.registerModel(model);
             }
         }
     }

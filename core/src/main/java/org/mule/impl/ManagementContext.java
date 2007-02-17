@@ -38,9 +38,10 @@ import org.mule.impl.internal.notifications.ServerNotificationManager;
 import org.mule.impl.security.MuleSecurityManager;
 import org.mule.impl.work.MuleWorkManager;
 import org.mule.management.stats.AllStatistics;
-import org.mule.registry.Registry;
+import org.mule.registry.UMORegistry;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
+import org.mule.umo.lifecycle.DisposeException;
 import org.mule.umo.lifecycle.FatalException;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.LifecycleException;
@@ -176,7 +177,7 @@ public class ManagementContext implements UMOManagementContext
      */
     protected Map properties = new HashMap();
 
-    protected Registry registry;
+    protected UMORegistry registry;
 
     protected Directories directories;
 
@@ -191,66 +192,58 @@ public class ManagementContext implements UMOManagementContext
         //registry = new NullRegistry(this);
     }
 
-    public void initialise() throws UMOException
+    public void initialise() throws InitialisationException
     {
-        validateEncoding();
-
-        directories = new Directories(new File(config.getWorkingDirectory()));
-        if (!initialised)
+        try
         {
-            initialising = true;
-            // if no work manager has been set create a default one
-            if (workManager == null)
+            validateEncoding();
+    
+            directories = new Directories(new File(config.getWorkingDirectory()));
+            if (!initialised)
             {
-                ThreadingProfile tp = config.getDefaultThreadingProfile();
-                logger.debug("Creating default work manager using default threading profile: " + tp);
-                workManager = new MuleWorkManager(tp, "UMOManager");
-                workManager.start();
-            }
-
-            // create the event manager
-            notificationManager = new ServerNotificationManager();
-            //Todo these should be configurable
-            notificationManager.registerEventType(ManagerNotification.class, ManagerNotificationListener.class);
-            notificationManager.registerEventType(ModelNotification.class, ModelNotificationListener.class);
-            notificationManager.registerEventType(ComponentNotification.class, ComponentNotificationListener.class);
-            notificationManager.registerEventType(SecurityNotification.class, SecurityNotificationListener.class);
-            notificationManager.registerEventType(ManagementNotification.class, ManagementNotificationListener.class);
-            notificationManager.registerEventType(AdminNotification.class, AdminNotificationListener.class);
-            notificationManager.registerEventType(CustomNotification.class, CustomNotificationListener.class);
-            notificationManager.registerEventType(ConnectionNotification.class, ConnectionNotificationListener.class);
-            // TODO MERGE no such method?
-            //if (config.isEnableMessageEvents())
-            //{
-            //    notificationManager.registerEventType(MessageNotification.class, MessageNotificationListener.class);
-            //}
-
-            fireSystemEvent(new ManagerNotification(id, clusterId, domain, ManagerNotification.MANAGER_INITIALISNG));
-            if (id == null)
-            {
-                logger.warn("No unique id has been set on this manager");
-            }
-            try
-            {
+                initialising = true;
+                // if no work manager has been set create a default one
+                if (workManager == null)
+                {
+                    ThreadingProfile tp = config.getDefaultThreadingProfile();
+                    logger.debug("Creating default work manager using default threading profile: " + tp);
+                    workManager = new MuleWorkManager(tp, "UMOManager");
+                    workManager.start();
+                }
+    
+                // create the event manager
+                notificationManager = new ServerNotificationManager();
+                //Todo these should be configurable
+                notificationManager.registerEventType(ManagerNotification.class, ManagerNotificationListener.class);
+                notificationManager.registerEventType(ModelNotification.class, ModelNotificationListener.class);
+                notificationManager.registerEventType(ComponentNotification.class, ComponentNotificationListener.class);
+                notificationManager.registerEventType(SecurityNotification.class, SecurityNotificationListener.class);
+                notificationManager.registerEventType(ManagementNotification.class, ManagementNotificationListener.class);
+                notificationManager.registerEventType(AdminNotification.class, AdminNotificationListener.class);
+                notificationManager.registerEventType(CustomNotification.class, CustomNotificationListener.class);
+                notificationManager.registerEventType(ConnectionNotification.class, ConnectionNotificationListener.class);
+                // TODO MERGE no such method?
+                //if (config.isEnableMessageEvents())
+                //{
+                //    notificationManager.registerEventType(MessageNotification.class, MessageNotificationListener.class);
+                //}
+    
+                fireSystemEvent(new ManagerNotification(id, clusterId, domain, ManagerNotification.MANAGER_INITIALISNG));
+                if (id == null)
+                {
+                    logger.warn("No unique id has been set on this manager");
+                }
                 if (securityManager != null)
                 {
                     securityManager.initialise();
                 }
                 if (queueManager == null)
                 {
-                    try
-                    {
-                        TransactionalQueueManager queueMgr = new TransactionalQueueManager();
-                        // TODO RM: The persistence strategy should come from the user's config.
-                        QueuePersistenceStrategy ps = new CachingPersistenceStrategy(new MemoryPersistenceStrategy()/*config.getPersistenceStrategy()*/);
-                        queueMgr.setPersistenceStrategy(ps);
-                        queueManager = queueMgr;
-                    }
-                    catch (Exception e)
-                    {
-                        throw new InitialisationException(new Message(Messages.INITIALISATION_FAILURE_X, "QueueManager"),
-                                e);
-                    }
+                    TransactionalQueueManager queueMgr = new TransactionalQueueManager();
+                    // TODO RM: The persistence strategy should come from the user's config.
+                    QueuePersistenceStrategy ps = new CachingPersistenceStrategy(new MemoryPersistenceStrategy()/*config.getPersistenceStrategy()*/);
+                    queueMgr.setPersistenceStrategy(ps);
+                    queueManager = queueMgr;
                 }
 
                 directories.createDirectories();
@@ -281,55 +274,54 @@ public class ManagementContext implements UMOManagementContext
 
                 systemName = domain + "." + clusterId + "." + id;
             }
-            catch (UMOException e)
-            {
-                initialising = false;
-
-                throw e;
-            }
-            catch (Exception e)
-            {
-                initialising = false;
-                throw new LifecycleException(e, this);
-            }
-            finally
-            {
-                fireSystemEvent(new ManagerNotification(id, clusterId, domain, ManagerNotification.MANAGER_INITIALISED));
-            }
+            initialised = true;
         }
-        initialised = true;
+        catch (Exception e)
+        {
+            throw new InitialisationException(e, this);
+        }
+        finally
+        {
+            initialising = false;
+            fireSystemEvent(new ManagerNotification(id, clusterId, domain, ManagerNotification.MANAGER_INITIALISED));
+        }
     }
 
 
-    public synchronized void start() throws UMOException
+    public synchronized void start() throws LifecycleException
     {
-        initialise();
-
-        if (!started)
+        try
         {
-            starting = true;
-            fireSystemEvent(new ManagerNotification(id, clusterId, domain, ManagerNotification.MANAGER_STARTING));
-            if (queueManager != null)
+            initialise();
+    
+            if (!started)
             {
-                queueManager.start();
+                starting = true;
+                fireSystemEvent(new ManagerNotification(id, clusterId, domain, ManagerNotification.MANAGER_STARTING));
+                if (queueManager != null)
+                {
+                    queueManager.start();
+                }
+    
+                directories.deleteMarkedDirectories();
+                //TODO LM: remove this one objects are accessible from the registry
+                MuleManager.getInstance().start();
+                starting = false;
+                started = true;
+                if (logger.isInfoEnabled())
+                {
+                    logger.info(getStartSplash());
+                }
+                else
+                {
+                    System.out.println(getStartSplash());
+                }
+                fireSystemEvent(new ManagerNotification(id, clusterId, domain, ManagerNotification.MANAGER_STARTED));
             }
-
-            //TODO LM: start the registry
-            getRegistry().start();
-            directories.deleteMarkedDirectories();
-            //TODO LM: remove this one objects are accessible from the registry
-            MuleManager.getInstance().start();
-            starting = false;
-            started = true;
-            if (logger.isInfoEnabled())
-            {
-                logger.info(getStartSplash());
-            }
-            else
-            {
-                System.out.println(getStartSplash());
-            }
-            fireSystemEvent(new ManagerNotification(id, clusterId, domain, ManagerNotification.MANAGER_STARTED));
+        }
+        catch (UMOException e)
+        {
+            throw new LifecycleException(e, this);
         }
     }
 
@@ -340,24 +332,31 @@ public class ManagementContext implements UMOManagementContext
      * @throws UMOException if either any of the sessions or connectors fail to
      *                      stop
      */
-    public synchronized void stop() throws UMOException
+    public synchronized void stop() throws LifecycleException
     {
-        started = false;
-        stopping = true;
-        fireSystemEvent(new ManagerNotification(id, clusterId, domain, ManagerNotification.MANAGER_STOPPING));
-
-        if (queueManager != null)
+        try 
         {
-            queueManager.stop();
+            started = false;
+            stopping = true;
+            fireSystemEvent(new ManagerNotification(id, clusterId, domain, ManagerNotification.MANAGER_STOPPING));
+    
+            if (queueManager != null)
+            {
+                queueManager.stop();
+            }
+    
+            //TODO registry.stop();
+    
+            stopping = false;
+            fireSystemEvent(new ManagerNotification(id, clusterId, domain, ManagerNotification.MANAGER_STOPPED));
         }
-
-        //TODO registry.stop();
-
-        stopping = false;
-        fireSystemEvent(new ManagerNotification(id, clusterId, domain, ManagerNotification.MANAGER_STOPPED));
+        catch (UMOException e)
+        {
+            throw new LifecycleException(e, this);
+        }
     }
 
-    public void dispose()
+    public void dispose() throws DisposeException
     {
         fireSystemEvent(new ManagerNotification(id, clusterId, domain, ManagerNotification.MANAGER_DISPOSING));
 
@@ -437,12 +436,12 @@ public class ManagementContext implements UMOManagementContext
         }
     }
 
-    public Registry getRegistry()
+    public UMORegistry getRegistry()
     {
         return registry;
     }
 
-    public void setRegistry(Registry registry)
+    public void setRegistry(UMORegistry registry)
     {
         this.registry = registry;
     }
@@ -469,10 +468,10 @@ public class ManagementContext implements UMOManagementContext
         return null;
     }
 
-    public void removeStore(UMOStore store)
+    public void removeStore(UMOStore store) throws DisposeException
     {
         //TODO LM: get store from registry
-        store.dispose();
+        //store.dispose();
     }
 
     /**

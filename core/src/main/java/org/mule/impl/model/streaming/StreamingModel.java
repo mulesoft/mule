@@ -30,7 +30,7 @@ public class StreamingModel extends AbstractModel
         setEntryPointResolver(new StreamingEntryPointResolver());
     }
 
-    protected UMOComponent createComponent(UMODescriptor descriptor)
+    public UMOComponent createComponent(UMODescriptor descriptor)
     {
         return new StreamingComponent((MuleDescriptor)descriptor, this);
     }

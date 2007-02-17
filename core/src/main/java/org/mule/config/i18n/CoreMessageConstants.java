@@ -232,7 +232,7 @@ public interface CoreMessageConstants
     // post Mule 1.3-rc2
     int FAILED_TO_INITIALIZE_SECURITY_PROVIDER = 208;
 
-    //post MUle 1.3.3
+    //post Mule 1.3.3
     int STREAMING_NOT_SUPPORTED_FOR_X = 209;
     int STREAMING_COMPONENT_X_MUST_HAVE_ONE_ENDPOINT = 210;
     int STREAMING_ENDPOINT_X_HAS_NO_RESPONSE_STREAM = 211;
@@ -246,4 +246,6 @@ public interface CoreMessageConstants
     int CANNOT_FINDE_BINDING_FOR_METHOD_X = 219;
     int NO_MATCHING_METHODS_WHICH_RETURN_X_ON_X = 220;
 
+    // Mule 2.0
+    int FAILED_TO_CREATE_REGISTRY_INSTANCE_X = 221;
 }

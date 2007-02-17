@@ -13,9 +13,11 @@ import org.mule.config.MuleConfiguration;
 import org.mule.impl.Directories;
 import org.mule.impl.internal.notifications.NotificationException;
 import org.mule.management.stats.AllStatistics;
-import org.mule.registry.Registry;
+import org.mule.registry.UMORegistry;
+import org.mule.umo.lifecycle.DisposeException;
+import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.lifecycle.Lifecycle;
+import org.mule.umo.lifecycle.Startable;
 import org.mule.umo.manager.UMOContainerContext;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.manager.UMOServerNotificationListener;
@@ -31,12 +33,12 @@ import javax.transaction.TransactionManager;
 /**
  * TODO document
  */
-public interface UMOManagementContext extends Lifecycle
+public interface UMOManagementContext extends Initialisable, Startable
 {
 
-    Registry getRegistry();
+    UMORegistry getRegistry();
 
-    void setRegistry(Registry registry);
+    void setRegistry(UMORegistry registry);
 
     String getSystemName();
 
@@ -44,7 +46,7 @@ public interface UMOManagementContext extends Lifecycle
 
     UMOStore createStore(String name) throws UMOException;
 
-    void removeStore(UMOStore store);
+    void removeStore(UMOStore store) throws DisposeException;
 
     Directories getDirectories();
 
@@ -258,6 +260,4 @@ public interface UMOManagementContext extends Lifecycle
     public AllStatistics getStatistics();
 
     public void setStatistics(AllStatistics stats);
-
-    public void initialise() throws UMOException;
 }

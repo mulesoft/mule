@@ -142,7 +142,7 @@ public final class MuleSession implements UMOSession
 
     public void dispatchEvent(UMOMessage message, String endpointName) throws UMOException
     {
-        dispatchEvent(message, MuleManager.getInstance().lookupEndpoint(endpointName));
+        dispatchEvent(message, MuleManager.getRegistry().lookupEndpoint(endpointName));
     }
 
     public void dispatchEvent(UMOMessage message, UMOImmutableEndpoint endpoint) throws UMOException
@@ -167,7 +167,7 @@ public final class MuleSession implements UMOSession
 
     public UMOMessage sendEvent(UMOMessage message, String endpointName) throws UMOException
     {
-        return sendEvent(message, MuleManager.getInstance().lookupEndpoint(endpointName));
+        return sendEvent(message, MuleManager.getRegistry().lookupEndpoint(endpointName));
     }
 
     public UMOMessage sendEvent(UMOMessage message) throws UMOException

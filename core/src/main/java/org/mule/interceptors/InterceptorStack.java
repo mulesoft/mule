@@ -25,8 +25,7 @@ import java.util.List;
 /**
  * Maintains a list of interceptors that can be applied to components
  * 
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
+ * @deprecated Interceptors will be implemented using Spring AOP for Mule 2.0
  */
 public class InterceptorStack implements UMOInterceptorStack, Initialisable, Disposable
 {

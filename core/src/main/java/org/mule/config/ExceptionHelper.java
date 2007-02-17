@@ -185,7 +185,7 @@ public class ExceptionHelper
             TransportServiceDescriptor sd;
             try 
             {
-                sd = (TransportServiceDescriptor) MuleManager.getInstance().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, protocol, null);
+                sd = (TransportServiceDescriptor) MuleManager.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, protocol, null);
                 if (sd == null)
                 {
                     throw new ServiceException(Message.createStaticMessage("No service descriptor found for transport: " + protocol + ".  This transport does not appear to be installed."));

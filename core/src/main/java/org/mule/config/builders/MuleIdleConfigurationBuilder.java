@@ -10,7 +10,6 @@
 
 package org.mule.config.builders;
 
-import org.mule.MuleServer;
 import org.mule.config.ConfigurationException;
 import org.mule.umo.UMOException;
 import org.mule.umo.manager.UMOAgent;
@@ -59,17 +58,17 @@ public class MuleIdleConfigurationBuilder extends QuickConfigurationBuilder
         {
             Class scannerAgentClass = ClassUtils.loadClass("org.mule.impl.internal.admin.ConfigScannerAgent", MuleIdleConfigurationBuilder.class);
             UMOAgent scannerAgent = (UMOAgent)scannerAgentClass.newInstance();
-            manager.registerAgent(scannerAgent);
+            registry.registerAgent(scannerAgent);
 
             Class jmxAgentClass = ClassUtils.loadClass("org.mule.management.agents.JmxAgent", MuleIdleConfigurationBuilder.class);
             UMOAgent jmxAgent = (UMOAgent)jmxAgentClass.newInstance();
             jmxAgent.setName("jmxAgent");
-            manager.registerAgent(jmxAgent);
+            registry.registerAgent(jmxAgent);
 
             Class mx4jAgentClass = ClassUtils.loadClass("org.mule.management.agents.Mx4jAgent", MuleIdleConfigurationBuilder.class);
             UMOAgent mx4jAgent = (UMOAgent)mx4jAgentClass.newInstance();
             mx4jAgent.setName("mx4jAgent");
-            manager.registerAgent(mx4jAgent);
+            registry.registerAgent(mx4jAgent);
         }
         catch (Exception e)
         {

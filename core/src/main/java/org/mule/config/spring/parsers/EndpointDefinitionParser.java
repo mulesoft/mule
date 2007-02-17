@@ -13,7 +13,7 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.umo.endpoint.EndpointException;
+import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 import org.springframework.beans.factory.BeanCreationException;
@@ -84,7 +84,7 @@ public class EndpointDefinitionParser extends AbstractChildBeanDefinitionParser
         return true;
     }
 
-    @Override
+    //@Override
     protected void processProperty(Attr attribute, BeanDefinitionBuilder builder)
     {
          if (ADDRESS_ATTRIBUTE.equals(attribute.getNodeName()))
@@ -94,7 +94,7 @@ public class EndpointDefinitionParser extends AbstractChildBeanDefinitionParser
                 {
                     builder.addPropertyValue("endpointURI", new MuleEndpointURI(address));
                 }
-                catch (EndpointException e)
+                catch (UMOException e)
                 {
                     throw new BeanCreationException(new Message(Messages.ENPOINT_X_IS_MALFORMED, address).getMessage(), e);
                 }
@@ -105,7 +105,7 @@ public class EndpointDefinitionParser extends AbstractChildBeanDefinitionParser
     }
 
 
-    @Override
+    //@Override
     protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
         //Check to see if this is a global endpoint

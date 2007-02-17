@@ -18,9 +18,8 @@ import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
-import org.mule.impl.RequestContext;
 import org.mule.impl.MuleSession;
-import org.mule.impl.model.ModelHelper;
+import org.mule.impl.RequestContext;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.internal.notifications.AdminNotification;
@@ -127,7 +126,7 @@ public class MuleManagerComponent implements Callable, Initialisable
 
         if (destComponent != null)
         {
-            UMOSession session = new MuleSession(ModelHelper.getComponent(destComponent));
+            UMOSession session = new MuleSession(MuleManager.getRegistry().lookupComponent(destComponent));
             // Need to do this otherise when the event is invoked the
             // transformer associated with the Mule Admin queue will be invoked, but
             // the

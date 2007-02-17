@@ -18,8 +18,6 @@ import org.mule.impl.container.DescriptorContainerContext;
 import org.mule.impl.container.DescriptorContainerKeyPair;
 import org.mule.impl.container.MuleContainerContext;
 import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.registry.DeregistrationException;
-import org.mule.registry.RegistrationException;
 import org.mule.routing.inbound.InboundPassThroughRouter;
 import org.mule.routing.inbound.InboundRouterCollection;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
@@ -280,37 +278,6 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
                 implementationReference = new ContainerKeyPair(container, implementationReference);
             }
         }
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.lifecycle.Registerable#register()
-     */
-    public void register() throws RegistrationException
-    {
-        //registryId = MuleManager.getInstance().getRegistry().registerMuleObject(MuleManager.lookupModel(modelName), this).getId();
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.lifecycle.Registerable#deregister()
-     */
-    public void deregister() throws DeregistrationException
-    {
-        MuleManager.getInstance().getRegistry().deregisterComponent(registryId);
-        registryId = null;
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.lifecycle.Registerable#getRegistryId()
-     */
-    public String getRegistryId()
-    {
-        return registryId;
     }
 
     /*

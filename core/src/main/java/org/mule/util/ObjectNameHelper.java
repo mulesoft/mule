@@ -11,6 +11,7 @@
 package org.mule.util;
 
 import org.mule.MuleManager;
+import org.mule.registry.RegistryException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 
@@ -25,7 +26,7 @@ public class ObjectNameHelper
     public static final String CONNECTOR_PREFIX = "connector";
     public static final String ENDPOINT_PREFIX = "endpoint";
 
-    public static String getEndpointName(UMOImmutableEndpoint endpoint)
+    public static String getEndpointName(UMOImmutableEndpoint endpoint) throws RegistryException
     {
         String name = endpoint.getName();
         if (name != null)
@@ -55,7 +56,7 @@ public class ObjectNameHelper
         }
     }
 
-    protected static String ensureUniqueEndpoint(String name)
+    protected static String ensureUniqueEndpoint(String name) throws RegistryException
     {
         int i = 0;
         String tempName = name;
@@ -64,7 +65,7 @@ public class ObjectNameHelper
         // We can't check local edpoints right now but the chances of conflict are
         // very small and will be
         // reported during JMX object registration
-        while (MuleManager.getInstance().lookupEndpoint(tempName) != null)
+        while (MuleManager.getRegistry().lookupEndpoint(tempName) != null)
         {
             i++;
             tempName = name + SEPARATOR + i;
@@ -72,7 +73,7 @@ public class ObjectNameHelper
         return tempName;
     }
 
-    protected static String ensureUniqueConnector(String name)
+    protected static String ensureUniqueConnector(String name) throws RegistryException
     {
         int i = 0;
         String tempName = name;
@@ -81,7 +82,7 @@ public class ObjectNameHelper
         // We can't check local edpoints right now but the chances of conflict are
         // very small and will be
         // reported during JMX object registration
-        while (MuleManager.getInstance().lookupConnector(tempName) != null)
+        while (MuleManager.getRegistry().lookupConnector(tempName) != null)
         {
             i++;
             tempName = name + SEPARATOR + i;
@@ -89,7 +90,7 @@ public class ObjectNameHelper
         return tempName;
     }
 
-    public static String getConnectorName(UMOConnector connector)
+    public static String getConnectorName(UMOConnector connector) throws RegistryException
     {
         if (connector.getName() != null && connector.getName().indexOf('#') == -1)
         {

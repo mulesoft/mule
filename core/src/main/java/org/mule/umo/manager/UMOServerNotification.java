@@ -19,9 +19,6 @@ import java.util.EventObject;
 /**
  * <code>UMOServerNotification</code> is an event triggered by something happening
  * in the Server itself such as the server starting or a component being registered
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public abstract class UMOServerNotification extends EventObject
 {

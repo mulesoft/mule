@@ -11,7 +11,6 @@
 package org.mule.umo;
 
 import org.mule.umo.lifecycle.Initialisable;
-import org.mule.umo.lifecycle.Registerable;
 import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.routing.UMONestedRouterCollection;
 import org.mule.umo.routing.UMOOutboundRouterCollection;
@@ -25,7 +24,7 @@ import java.util.Map;
  * <code>UMODescriptor</code> describes all the properties for a Mule UMO. New Mule
  * UMOs can be initialised as needed from their descriptor.
  */
-public interface UMOImmutableDescriptor extends Initialisable, Registerable
+public interface UMOImmutableDescriptor extends Initialisable
 {
     /**
      * The exception strategy to use to handle exceptions in the Mule UMO.

@@ -25,7 +25,7 @@ import org.mule.umo.model.UMOModel;
 public class InheritedModel extends AbstractModel
 {
 
-    protected UMOComponent createComponent(UMODescriptor descriptor)
+    public UMOComponent createComponent(UMODescriptor descriptor)
     {
         //throw new UnsupportedOperationException("createComponent()");
         return new InheritedComponent((MuleDescriptor)descriptor,  this);
@@ -42,7 +42,7 @@ public class InheritedModel extends AbstractModel
     *
     * @see org.mule.umo.UMOModel#getName()
     */
-    @Override
+    //@Override
     public String getName()
     {
         return super.getName() + "#" + hashCode();

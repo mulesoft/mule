@@ -104,7 +104,7 @@ public class DefaultReplyToHandler implements ReplyToHandler
         UMOEndpoint endpoint = (UMOEndpoint)endpointCache.get(endpointUri);
         if (endpoint == null)
         {
-            endpoint = MuleManager.getInstance().lookupEndpoint(endpointUri);
+            endpoint = MuleManager.getRegistry().lookupEndpoint(endpointUri);
             if (endpoint == null)
             {
                 UMOEndpointURI ep = new MuleEndpointURI(endpointUri);

@@ -12,6 +12,7 @@ package org.mule.routing.outbound;
 
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
+import org.mule.registry.RegistryException;
 import org.mule.routing.AbstractRouter;
 import org.mule.routing.CorrelationPropertiesExtractor;
 import org.mule.umo.UMOException;
@@ -247,7 +248,15 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements U
     {
         if (replyTo != null)
         {
-            this.replyTo = MuleManager.getInstance().lookupEndpointIdentifier(replyTo, replyTo);
+            try
+            {
+                this.replyTo = MuleManager.getRegistry().lookupEndpointIdentifier(replyTo, replyTo);
+            }
+            catch (RegistryException e)
+            {
+                logger.info("Unable to look up endpoint identifier: " + e.getMessage());
+                this.replyTo = null;
+            }
         }
         else
         {

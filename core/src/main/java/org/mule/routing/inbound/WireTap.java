@@ -64,7 +64,7 @@ public class WireTap extends SelectiveConsumer
         this.endpoint = endpoint;
         if (this.endpoint != null)
         {
-            tap = MuleManager.getInstance().lookupEndpoint(this.endpoint);
+            tap = MuleManager.getRegistry().lookupEndpoint(this.endpoint);
             if (tap == null)
             {
                 tap = new ImmutableMuleEndpoint(this.endpoint, false);

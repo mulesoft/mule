@@ -14,6 +14,7 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.lifecycle.DisposeException;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
@@ -84,7 +85,7 @@ public class KeyedPoolMessageDispatcherFactoryAdapter
         factory.activate(endpoint, dispatcher);
     }
 
-    public void destroy(UMOImmutableEndpoint endpoint, UMOMessageDispatcher dispatcher)
+    public void destroy(UMOImmutableEndpoint endpoint, UMOMessageDispatcher dispatcher) throws DisposeException
     {
         factory.destroy(endpoint, dispatcher);
     }
