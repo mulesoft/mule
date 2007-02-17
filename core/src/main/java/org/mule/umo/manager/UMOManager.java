@@ -11,23 +11,14 @@
 package org.mule.umo.manager;
 
 import org.mule.impl.internal.notifications.NotificationException;
-import org.mule.registry.Registry;
-import org.mule.registry.ServiceDescriptor;
-import org.mule.registry.ServiceException;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOInterceptorStack;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.Lifecycle;
 import org.mule.umo.lifecycle.Registerable;
-import org.mule.umo.model.UMOModel;
-import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOSecurityManager;
-import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.queue.QueueManager;
 
 import java.util.Map;
-import java.util.Properties;
 
 import javax.transaction.TransactionManager;
 
@@ -44,95 +35,6 @@ public interface UMOManager extends Lifecycle, Registerable
      * @return the property value
      */
     Object getProperty(Object key);
-
-    /**
-     * @param logicalName the name of the endpoint to retrieve
-     * @return the endpoint instnace if it exists
-     */
-    UMOConnector lookupConnector(String logicalName);
-
-    /**
-     * @param logicalName the logical mapping name for an endpointUri i.e. rather
-     *            than specifing an endpointUri to be someone@my.com you can supply a
-     *            more descriptive name such as <i>The System Administrator</i>
-     * @param defaultName
-     * @return the actual endpointUri value or null if it is not found
-     */
-    String lookupEndpointIdentifier(String logicalName, String defaultName);
-
-    /**
-     * Getter for a global endpoint. Any endpoints returned from this method can be
-     * modified, as they are clones of the registered endpoints.
-     * 
-     * @param logicalName the name of the endpoint
-     * @return the <code>UMOEndpoint</code> or null if it doesn't exist
-     */
-    UMOEndpoint lookupEndpoint(String logicalName);
-
-    /**
-     * Getter method for a Transformer.
-     * 
-     * @param name the name of the transformer
-     * @return the Transformer instance if found, otherwise null
-     */
-    UMOTransformer lookupTransformer(String name);
-
-    /**
-     * Registers a <code>UMOConnector</code> with the <code>MuleManager</code>.
-     * 
-     * @param connector the <code>UMOConnector</code> to register
-     */
-    void registerConnector(UMOConnector connector) throws UMOException;
-
-    /**
-     * UnRegisters a <code>UMOConnector</code> with the <code>MuleManager</code>.
-     * 
-     * @param connectorName the name of the <code>UMOConnector</code> to unregister
-     */
-    void unregisterConnector(String connectorName) throws UMOException;
-
-    /**
-     * Registers an endpointUri with a logical name
-     * 
-     * @param logicalName the name of the endpointUri
-     * @param endpoint the physical endpointUri value
-     */
-    void registerEndpointIdentifier(String logicalName, String endpoint) throws InitialisationException;
-
-    /**
-     * unregisters an endpointUri with a logical name
-     * 
-     * @param logicalName the name of the endpointUri
-     */
-    void unregisterEndpointIdentifier(String logicalName);
-
-    /**
-     * Registers a shared/global endpoint with the <code>MuleManager</code>.
-     * 
-     * @param endpoint the <code>UMOEndpoint</code> to register.
-     */
-    void registerEndpoint(UMOEndpoint endpoint) throws InitialisationException;
-
-    /**
-     * unregisters a shared/global endpoint with the <code>MuleManager</code>.
-     * 
-     * @param endpointName the <code>UMOEndpoint</code> name to unregister.
-     */
-    void unregisterEndpoint(String endpointName);
-
-    /**
-     * Registers a transformer with the <code>MuleManager</code>.
-     * 
-     * @param transformer the <code>UMOTransformer</code> to register.
-     */
-    void registerTransformer(UMOTransformer transformer) throws InitialisationException;
-
-    /**
-     * UnRegisters a transformer with the <code>MuleManager</code>.
-     * 
-     * @param transformerName the <code>UMOTransformer</code> name to register.
-     */
-    void unregisterTransformer(String transformerName);
 
     /**
      * Sets an Mule environment parameter in the <code>MuleManager</code>.
@@ -160,83 +62,13 @@ public interface UMOManager extends Lifecycle, Registerable
     TransactionManager getTransactionManager();
 
     /**
-     * The model used for managing components for this server
-     * 
-     * @return The model used for managing components for this server
-     */
-    UMOModel lookupModel(String name);
-
-    void registerModel(UMOModel model) throws UMOException;
-
-    void unregisterModel(String name);
-
-    /**
-     * The model used for managing components for this server
-     * 
-     * @return The models set on this manager instance
-     */
-     Map getModels();
-
-    /**
      * Gets all properties associated with the UMOManager
      * 
      * @return a map of properties on the Manager
+     * 
+     * @deprecated Returning a Map is bad for encapsulation.
      */
     Map getProperties();
-
-    /**
-     * Gets an unmodifiable collection of Connectors registered with the UMOManager
-     * 
-     * @return All connectors registered on the Manager
-     * @see UMOConnector
-     */
-    Map getConnectors();
-
-    /**
-     * Gets an unmodifiable collection of endpoints registered with the UMOManager
-     * 
-     * @return All endpoints registered on the Manager
-     */
-    Map getEndpointIdentifiers();
-
-    /**
-     * Gets an unmodifiable collection of endpoints registered with the UMOManager
-     * 
-     * @return All endpoints registered on the Manager
-     * @see org.mule.umo.endpoint.UMOEndpoint
-     */
-    Map getEndpoints();
-
-    /**
-     * Gets an unmodifiable collection of transformers registered with the UMOManager
-     * 
-     * @return All transformers registered on the Manager
-     * @see UMOTransformer
-     */
-    Map getTransformers();
-
-    /**
-     * Returns a reference to the Mule registry
-     */
-    Registry getRegistry();
-
-    /**
-     * registers a interceptor stack list that can be referenced by other components
-     * 
-     * @param name the referenceable name for this stack
-     * @param stack a List of interceptors
-     * @see org.mule.umo.UMOInterceptor
-     */
-    void registerInterceptorStack(String name, UMOInterceptorStack stack);
-
-    /**
-     * Retrieves a configured interceptor stack.
-     * 
-     * @param name the name of the stack
-     * @return the interceptor stack requested or null if there wasn't one configured
-     *         for the given name
-     */
-    UMOInterceptorStack lookupInterceptorStack(String name);
 
     /**
      * Determines if the server has been started
@@ -258,31 +90,6 @@ public interface UMOManager extends Lifecycle, Registerable
      * @return the long date when the server was started
      */
     long getStartDate();
-
-    /**
-     * Will register an agent object on this model. Agents can be server plugins such
-     * as Jms support
-     * 
-     * @param agent
-     */
-    void registerAgent(UMOAgent agent) throws UMOException;
-
-    /**
-     * Will find a registered agent using its name, which is unique for all
-     * registered agents
-     * 
-     * @param name the name of the Agent to find
-     * @return the Agent or null if there is not agent registered with the given name
-     */
-    UMOAgent lookupAgent(String name);
-
-    /**
-     * Removes and destroys a registered agent
-     * 
-     * @param name the agent name
-     * @return the destroyed agent or null if the agent doesn't exist
-     */
-    UMOAgent unregisterAgent(String name) throws UMOException;
 
     /**
      * Registers an intenal server event listener. The listener will be notified when
@@ -319,13 +126,6 @@ public interface UMOManager extends Lifecycle, Registerable
      * @param l the listener to unregister
      */
     void unregisterListener(UMOServerNotificationListener l);
-
-    /**
-     * Searches for and returns the ServiceDescriptor for a transport, model, or any other entity.
-     * 
-     * @return ServiceDescriptor or null if ServiceDescriptor not found.
-     */
-    ServiceDescriptor lookupServiceDescriptor(String type, String name, Properties overrides) throws ServiceException;
 
     /**
      * Fires a server notification to all regiistered listeners
@@ -420,11 +220,4 @@ public interface UMOManager extends Lifecycle, Registerable
      * @return
      */
     QueueManager getQueueManager();
-
-    /**
-     * Returns the registry id.
-     * 
-     * @return the registry ID
-     */
-    String getRegistryId();
 }
