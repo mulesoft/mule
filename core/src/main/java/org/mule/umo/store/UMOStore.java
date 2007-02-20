@@ -9,13 +9,13 @@
  */
 package org.mule.umo.store;
 
-import org.mule.umo.lifecycle.Initialisable;
+import org.mule.umo.lifecycle.Disposable;
 
 /**
  * represents a store that any object can write state to. Stores can be
  * a database a cache, a repository, in memory or file
  */
-public interface UMOStore extends Initialisable
+public interface UMOStore extends Disposable
 {
     public Object getObject(Object query) throws StoreException;
 

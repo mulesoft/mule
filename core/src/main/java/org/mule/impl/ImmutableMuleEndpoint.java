@@ -10,6 +10,7 @@
 
 package org.mule.impl;
 
+import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -18,6 +19,8 @@ import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.service.TransportFactory;
 import org.mule.providers.service.TransportFactoryException;
+import org.mule.registry.DeregistrationException;
+import org.mule.registry.RegistrationException;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOFilter;
@@ -27,6 +30,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOEndpointSecurityFilter;
@@ -236,11 +240,6 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         String type = (receiver ? UMOEndpoint.ENDPOINT_TYPE_RECEIVER : UMOEndpoint.ENDPOINT_TYPE_SENDER);
         UMOEndpoint p = getOrCreateEndpointForUri(new MuleEndpointURI(endpointName), type);
         this.initFromDescriptor(p);
-    }
-    
-    public String getId()
-    {
-        return getClass().getName() + "." + getName();
     }
 
     protected void initFromDescriptor(UMOImmutableEndpoint source)
@@ -558,13 +557,13 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         return TransportFactory.createEndpoint(uri, type);
     }
 
-    public static UMOEndpoint getEndpointFromUri(String uri) throws UMOException
+    public static UMOEndpoint getEndpointFromUri(String uri) throws ObjectNotFoundException
     {
         UMOEndpoint endpoint = null;
         if (uri != null)
         {
-            String endpointString = MuleManager.getRegistry().lookupEndpointIdentifier(uri, uri);
-            endpoint = MuleManager.getRegistry().lookupEndpoint(endpointString);
+            String endpointString = MuleManager.getInstance().lookupEndpointIdentifier(uri, uri);
+            endpoint = MuleManager.getInstance().lookupEndpoint(endpointString);
             if(endpoint==null)
             {
                 endpoint = (UMOEndpoint)MuleManager.getInstance().getContainerContext().getComponent(endpointString);
@@ -578,9 +577,9 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         String endpointName = uri.getEndpointName();
         if (endpointName != null)
         {
-            String endpointString = MuleManager.getRegistry().lookupEndpointIdentifier(endpointName,
+            String endpointString = MuleManager.getInstance().lookupEndpointIdentifier(endpointName,
                 endpointName);
-            UMOEndpoint endpoint = MuleManager.getRegistry().lookupEndpoint(endpointString);
+            UMOEndpoint endpoint = MuleManager.getInstance().lookupEndpoint(endpointString);
             if (endpoint != null)
             {
                 if (StringUtils.isNotEmpty(uri.getAddress()))
@@ -641,124 +640,180 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
             logger.debug("Already initialised: " + toString());
             return;
         }
-        try
+        if (connector == null)
         {
-            if (connector == null)
+            if (endpointUri.getConnectorName() != null)
             {
-                if (endpointUri.getConnectorName() != null)
+                connector = MuleManager.getInstance().lookupConnector(endpointUri.getConnectorName());
+                if (connector == null)
                 {
-                    connector = MuleManager.getRegistry().lookupConnector(endpointUri.getConnectorName());
+                    throw new IllegalArgumentException("Connector not found: "
+                                                       + endpointUri.getConnectorName());
+                }
+            }
+            else
+            {
+                try
+                {
+                    connector = TransportFactory.getOrCreateConnectorByProtocol(this);
                     if (connector == null)
                     {
-                        throw new IllegalArgumentException("Connector not found: "
-                                                           + endpointUri.getConnectorName());
-                    }
-                }
-                else
-                {
-                    try
-                    {
-                        connector = TransportFactory.getOrCreateConnectorByProtocol(this);
-                        if (connector == null)
-                        {
-                            throw new InitialisationException(new Message(
-                                Messages.CONNECTOR_WITH_PROTOCOL_X_NOT_REGISTERED, endpointUri.getScheme()), this);
-                        }
-                    }
-                    catch (TransportFactoryException e)
-                    {
                         throw new InitialisationException(new Message(
-                            Messages.FAILED_TO_CREATE_CONNECTOR_FROM_URI_X, endpointUri), e, this);
+                            Messages.CONNECTOR_WITH_PROTOCOL_X_NOT_REGISTERED, endpointUri.getScheme()), this);
                     }
                 }
-    
-                if (endpointUri.getEndpointName() != null && name == null)
+                catch (TransportFactoryException e)
                 {
-                    name = endpointUri.getEndpointName();
+                    throw new InitialisationException(new Message(
+                        Messages.FAILED_TO_CREATE_CONNECTOR_FROM_URI_X, endpointUri), e, this);
                 }
             }
-            name = ObjectNameHelper.getEndpointName(this);
-    
-            String sync = endpointUri.getParams().getProperty("synchronous", null);
-            if (sync != null)
+
+            if (endpointUri.getEndpointName() != null && name == null)
             {
-                synchronous = Boolean.valueOf(sync);
+                name = endpointUri.getEndpointName();
             }
-            if (properties != null && endpointUri.getParams() != null)
-            {
-                properties.putAll(endpointUri.getParams());
-            }
-    
-            if (endpointUri.getTransformers() != null)
+        }
+        name = ObjectNameHelper.getEndpointName(this);
+
+        String sync = endpointUri.getParams().getProperty("synchronous", null);
+        if (sync != null)
+        {
+            synchronous = Boolean.valueOf(sync);
+        }
+        if (properties != null && endpointUri.getParams() != null)
+        {
+            properties.putAll(endpointUri.getParams());
+        }
+
+        if (endpointUri.getTransformers() != null)
+        {
+            try
             {
                 transformer = MuleObjectHelper.getTransformer(endpointUri.getTransformers(), ",");
             }
-    
-            if (transformer == null)
+            catch (MuleException e)
             {
-                if (connector instanceof AbstractConnector)
-                {
-                    if (UMOEndpoint.ENDPOINT_TYPE_SENDER.equals(type))
-                    {
-                        transformer = ((AbstractConnector)connector).getDefaultOutboundTransformer();
-                    }
-                    else if (UMOEndpoint.ENDPOINT_TYPE_SENDER_AND_RECEIVER.equals(type))
-                    {
-                    	transformer = ((AbstractConnector)connector).getDefaultOutboundTransformer();
-                    	responseTransformer = ((AbstractConnector)connector).getDefaultInboundTransformer();
-                    }
-                    else
-                    {
-                        transformer = ((AbstractConnector)connector).getDefaultInboundTransformer();
-                    }
-                }
-            }
-            if (transformer != null)
-            {
-                transformer.setEndpoint(this);
-            }
-    
-            if (endpointUri.getResponseTransformers() != null)
-            {
-                responseTransformer = MuleObjectHelper.getTransformer(endpointUri.getResponseTransformers(), ",");
-            }
-            if (responseTransformer == null)
-            {
-                if (connector instanceof AbstractConnector)
-                {
-                    responseTransformer = ((AbstractConnector)connector).getDefaultResponseTransformer();
-                }
-            }
-            if (responseTransformer != null)
-            {
-                responseTransformer.setEndpoint(this);
-            }
-    
-            if (securityFilter != null)
-            {
-                securityFilter.setEndpoint(this);
-                securityFilter.initialise();
-            }
-    
-            // Allow remote sync values to be set as params on the endpoint URI
-            String rs = (String)endpointUri.getParams().remove("remoteSync");
-            if (rs != null)
-            {
-                remoteSync = Boolean.valueOf(rs);
-            }
-    
-            String rsTimeout = (String)endpointUri.getParams().remove("remoteSyncTimeout");
-            if (rsTimeout != null)
-            {
-                remoteSyncTimeout = Integer.valueOf(rsTimeout);
+                throw new InitialisationException(e, this);
             }
         }
-        catch (UMOException e)
+
+        if (transformer == null)
         {
-            throw new InitialisationException(e, this);
+            if (connector instanceof AbstractConnector)
+            {
+                if (UMOEndpoint.ENDPOINT_TYPE_SENDER.equals(type))
+                {
+                    transformer = ((AbstractConnector)connector).getDefaultOutboundTransformer();
+                }
+                else if (UMOEndpoint.ENDPOINT_TYPE_SENDER_AND_RECEIVER.equals(type))
+                {
+                	transformer = ((AbstractConnector)connector).getDefaultOutboundTransformer();
+                	responseTransformer = ((AbstractConnector)connector).getDefaultInboundTransformer();
+                }
+                else
+                {
+                    transformer = ((AbstractConnector)connector).getDefaultInboundTransformer();
+                }
+            }
         }
-        
+        if (transformer != null)
+        {
+            transformer.setEndpoint(this);
+        }
+
+        if (endpointUri.getResponseTransformers() != null)
+        {
+            try
+            {
+                responseTransformer = MuleObjectHelper.getTransformer(endpointUri.getResponseTransformers(),
+                    ",");
+            }
+            catch (MuleException e)
+            {
+                throw new InitialisationException(e, this);
+            }
+        }
+        if (responseTransformer == null)
+        {
+            if (connector instanceof AbstractConnector)
+            {
+                responseTransformer = ((AbstractConnector)connector).getDefaultResponseTransformer();
+            }
+        }
+        if (responseTransformer != null)
+        {
+            responseTransformer.setEndpoint(this);
+        }
+
+        if (securityFilter != null)
+        {
+            securityFilter.setEndpoint(this);
+            securityFilter.initialise();
+        }
+
+        // Allow remote sync values to be set as params on the endpoint URI
+        String rs = (String)endpointUri.getParams().remove("remoteSync");
+        if (rs != null)
+        {
+            remoteSync = Boolean.valueOf(rs);
+        }
+
+        String rsTimeout = (String)endpointUri.getParams().remove("remoteSyncTimeout");
+        if (rsTimeout != null)
+        {
+            remoteSyncTimeout = Integer.valueOf(rsTimeout);
+        }
+
         initialised.set(true);
+
+        // For now at least, we don't want a registration error to affect
+        // the initialisation process.
+        try
+        {
+            register();
+            if (transformer != null && transformer.getRegistryId() == null) transformer.register();
+            if (responseTransformer != null && responseTransformer.getRegistryId() == null) responseTransformer.register();
+        }
+        catch (RegistrationException re)
+        {
+            logger.warn(re);
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.lifecycle.Registerable#register()
+     */
+    public void register() throws RegistrationException
+    {
+        if (connector == null || connector.getRegistryId() == null)
+            throw new RegistrationException("Unable to find the endpoint's connector registryId");
+
+        registryId = 
+            MuleManager.getInstance().getRegistry().registerMuleObject(connector, this).getId();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.lifecycle.Registerable#deregister()
+     */
+    public void deregister() throws DeregistrationException
+    {
+        MuleManager.getInstance().getRegistry().deregisterComponent(registryId);
+        registryId = null;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.lifecycle.Registerable#getRegistryId()
+     */
+    public String getRegistryId()
+    {
+        return registryId;
     }
 
     /**

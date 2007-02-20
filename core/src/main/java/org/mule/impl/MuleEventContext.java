@@ -449,7 +449,7 @@ public class MuleEventContext implements UMOEventContext
      */
     public UMOMessage sendEvent(UMOMessage message, String endpointName) throws UMOException
     {
-        UMOEndpoint endpoint = MuleManager.getRegistry().lookupEndpoint(endpointName);
+        UMOEndpoint endpoint = MuleManager.getInstance().lookupEndpoint(endpointName);
         setRemoteSync(message, endpoint);
         return session.sendEvent(message, endpoint);
     }

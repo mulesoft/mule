@@ -52,7 +52,7 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
 
         UMOModel model = new SedaModel();
         model.setName("main");
-        MuleManager.getRegistry().registerModel(model);
+        manager.registerModel(model);
         callbackCalled = false;
         callbackCount = 0;
         connector = createConnector();
@@ -100,9 +100,8 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
         HashMap props = new HashMap();
         props.put("eventCallback", callback);
         descriptor.setProperties(props);
-        MuleManager.getRegistry().registerConnector(connector);
-        UMOModel model = MuleManager.getRegistry().lookupModel("main");
-        UMOComponent component = MuleManager.getRegistry().registerComponent(descriptor, model.getName());
+        MuleManager.getInstance().registerConnector(connector);
+        UMOComponent component = MuleManager.getInstance().lookupModel("main").registerComponent(descriptor);
         descriptor.initialise();
         return component;
     }

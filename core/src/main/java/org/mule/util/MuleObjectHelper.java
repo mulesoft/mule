@@ -15,13 +15,12 @@ import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.registry.RegistryException;
-import org.mule.registry.UMORegistry;
 import org.mule.routing.filters.EqualsFilter;
 import org.mule.routing.filters.ObjectFilter;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.manager.UMOManager;
 import org.mule.umo.transformer.UMOTransformer;
 
 import java.util.Iterator;
@@ -45,21 +44,21 @@ public class MuleObjectHelper
      *         next transformer in the list.
      * @throws MuleException
      */
-    public static UMOTransformer getTransformer(String list, String delim) throws RegistryException
+    public static UMOTransformer getTransformer(String list, String delim) throws MuleException
     {
         StringTokenizer st = new StringTokenizer(list, delim);
-        UMORegistry registry = MuleManager.getRegistry();
+        UMOManager manager = MuleManager.getInstance();
         UMOTransformer currentTrans = null;
         UMOTransformer returnTrans = null;
 
         while (st.hasMoreTokens())
         {
             String key = st.nextToken().trim();
-            UMOTransformer tempTrans = registry.lookupTransformer(key);
+            UMOTransformer tempTrans = manager.lookupTransformer(key);
 
             if (tempTrans == null)
             {
-                throw new RegistryException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER, "Transformer: "
+                throw new MuleException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER, "Transformer: "
                                                                                             + key));
             }
 
@@ -78,10 +77,10 @@ public class MuleObjectHelper
         return returnTrans;
     }
 
-    public static UMOEndpoint getEndpointByProtocol(String protocol) throws RegistryException
+    public static UMOEndpoint getEndpointByProtocol(String protocol)
     {
         UMOImmutableEndpoint iprovider;
-        Map endpoints = MuleManager.getRegistry().getEndpoints();
+        Map endpoints = MuleManager.getInstance().getEndpoints();
         for (Iterator iterator = endpoints.values().iterator(); iterator.hasNext();)
         {
             iprovider = (UMOImmutableEndpoint)iterator.next();
@@ -93,7 +92,7 @@ public class MuleObjectHelper
         return null;
     }
 
-    public static UMOEndpoint getEndpointByEndpointUri(String endpointUri, boolean wildcardMatch) throws RegistryException
+    public static UMOEndpoint getEndpointByEndpointUri(String endpointUri, boolean wildcardMatch)
     {
         ObjectFilter filter;
 
@@ -107,7 +106,7 @@ public class MuleObjectHelper
         }
 
         UMOImmutableEndpoint iprovider;
-        Map endpoints = MuleManager.getRegistry().getEndpoints();
+        Map endpoints = MuleManager.getInstance().getEndpoints();
 
         for (Iterator iterator = endpoints.values().iterator(); iterator.hasNext();)
         {

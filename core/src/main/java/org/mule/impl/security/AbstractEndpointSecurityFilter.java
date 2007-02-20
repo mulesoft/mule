@@ -14,14 +14,18 @@ import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.security.CryptoFailureException;
+import org.mule.umo.security.EncryptionStrategyNotFoundException;
+import org.mule.umo.security.SecurityException;
+import org.mule.umo.security.SecurityProviderNotFoundException;
 import org.mule.umo.security.UMOCredentialsAccessor;
 import org.mule.umo.security.UMOEndpointSecurityFilter;
 import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.security.UMOSecurityProvider;
+import org.mule.umo.security.UnknownAuthenticationTypeException;
 import org.mule.util.StringUtils;
 
 import org.apache.commons.logging.Log;
@@ -142,7 +146,9 @@ public abstract class AbstractEndpointSecurityFilter implements UMOEndpointSecur
         this.endpoint = endpoint;
     }
 
-    public void authenticate(UMOEvent event) throws UMOException
+    public void authenticate(UMOEvent event)
+        throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
+        SecurityProviderNotFoundException, EncryptionStrategyNotFoundException
     {
         if (inbound)
         {
@@ -164,9 +170,12 @@ public abstract class AbstractEndpointSecurityFilter implements UMOEndpointSecur
         this.credentialsAccessor = credentialsAccessor;
     }
 
-    protected abstract void authenticateInbound(UMOEvent event) throws UMOException;
+    protected abstract void authenticateInbound(UMOEvent event)
+        throws SecurityException, CryptoFailureException, SecurityProviderNotFoundException,
+        EncryptionStrategyNotFoundException, UnknownAuthenticationTypeException;
 
-    protected abstract void authenticateOutbound(UMOEvent event) throws UMOException;
+    protected abstract void authenticateOutbound(UMOEvent event)
+        throws SecurityException, SecurityProviderNotFoundException, CryptoFailureException;
 
     protected abstract void doInitialise() throws InitialisationException;
 

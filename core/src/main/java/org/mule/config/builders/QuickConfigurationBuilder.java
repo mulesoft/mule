@@ -23,7 +23,6 @@ import org.mule.impl.internal.admin.MuleAdminAgent;
 import org.mule.impl.model.ModelFactory;
 import org.mule.impl.model.seda.SedaModel;
 import org.mule.providers.service.TransportFactory;
-import org.mule.registry.UMORegistry;
 import org.mule.routing.inbound.InboundRouterCollection;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.routing.outbound.OutboundRouterCollection;
@@ -43,9 +42,6 @@ import org.mule.util.MuleObjectHelper;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * <code>QuickConfigurationBuilder</code> is a configuration helper that can be
  * used by clients, configuration scripts or test cases to quickly configure a
@@ -55,10 +51,8 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
 {
     private static final String MODEL_NOT_SET = "not set";
 
-    protected transient final Log logger = LogFactory.getLog(QuickConfigurationBuilder.class);
-    
     protected UMOManager manager;
-    protected UMORegistry registry;
+
     private UMOModel model;
 
     /**
@@ -66,7 +60,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
      */
     public QuickConfigurationBuilder()
     {
-        this(/*disposeCurrent*/false);
+        manager = MuleManager.getInstance();
     }
 
     /**
@@ -81,8 +75,8 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         {
             disposeCurrent();
         }
+
         manager = MuleManager.getInstance();
-        registry = MuleManager.getRegistry();
     }
 
     /**
@@ -93,18 +87,17 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         if (MuleManager.isInstanciated())
         {
             MuleManager.getInstance().dispose();
-            MuleManager.getRegistry().dispose();
         }
     }
 
     public void disableAdminAgent()
     {
         //RM* MuleManager.getConfiguration().setServerUrl(StringUtils.EMPTY);
-        if (registry != null)
+        if (manager != null)
         {
             try
             {
-                registry.unregisterAgent(MuleAdminAgent.AGENT_NAME);
+                manager.unregisterAgent(MuleAdminAgent.AGENT_NAME);
             }
             catch (UMOException e)
             {
@@ -117,7 +110,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     {
         UMOModel model = ModelFactory.createModel(modelType);
         model.setName(name);
-        registry.registerModel(model);
+        manager.registerModel(model);
     }
 
     /**
@@ -133,7 +126,6 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     public UMOManager createStartedManager(boolean synchronous, String serverUrl, String modeltype)
         throws UMOException
     {
-        UMOManager manager = MuleManager.getInstance();
         if (manager.isStarted())
         {
             throw new InitialisationException(new Message(Messages.MANAGER_ALREADY_STARTED), this);
@@ -153,7 +145,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         {
             model = ModelFactory.createModel("seda");
         }
-        registry.registerModel(model);
+        manager.registerModel(model);
 
         manager.start();
         return manager;
@@ -190,7 +182,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     {
         if (serverConnector != null)
         {
-            registry.registerConnector(serverConnector);
+            manager.registerConnector(serverConnector);
         }
         else
         {
@@ -297,7 +289,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         descriptor.getInboundRouter().addEndpoint(sendEndpoint);
 
         // register the components descriptor
-        registry.registerComponent(descriptor, getModel().getName());
+        getModel().registerComponent(descriptor);
         return descriptor;
     }
 
@@ -311,7 +303,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         UMOEndpoint outEndpoint = null;
         if (inboundEndpoint != null)
         {
-            inEndpoint = registry.lookupEndpoint(inboundEndpoint);
+            inEndpoint = manager.lookupEndpoint(inboundEndpoint);
             if (inEndpoint == null)
             {
                 inEndpoint = createEndpoint(inboundEndpoint, null, true);
@@ -319,7 +311,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         }
         if (outboundEndpoint != null)
         {
-            outEndpoint = registry.lookupEndpoint(outboundEndpoint);
+            outEndpoint = manager.lookupEndpoint(outboundEndpoint);
             if (outEndpoint == null)
             {
                 outEndpoint = createEndpoint(outboundEndpoint, null, false);
@@ -356,7 +348,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
      */
     public UMOComponent registerComponent(UMODescriptor descriptor) throws UMOException
     {
-        return registry.registerComponent(descriptor, getModel().getName());
+        return getModel().registerComponent(descriptor);
     }
 
     /**
@@ -444,7 +436,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     {
         UMODescriptor d = createDescriptor(implementation, name, inboundEndpointUri, outboundEndpointUri,
             properties);
-        return registry.registerComponent(d, getModel().getName());
+        return getModel().registerComponent(d);
     }
 
     /**
@@ -587,7 +579,11 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
      */
     public void unregisterComponent(String name) throws UMOException
     {
-        registry.unregisterComponent(name);
+        UMODescriptor descriptor = model.getDescriptor(name);
+        if (descriptor != null)
+        {
+            getModel().unregisterComponent(descriptor);
+        }
     }
 
     public UMOEndpoint createEndpoint(String uri, String name, boolean inbound) throws UMOException
@@ -629,7 +625,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     {
         UMOEndpoint ep = createEndpoint(uri, name, inbound);
         ep.initialise();
-        registry.registerEndpoint(ep);
+        manager.registerEndpoint(ep);
         return ep;
     }
 
@@ -639,7 +635,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         UMOEndpoint ep = createEndpoint(uri, name, inbound);
         ep.getProperties().putAll(properties);
         ep.initialise();
-        registry.registerEndpoint(ep);
+        manager.registerEndpoint(ep);
         return ep;
     }
 
@@ -659,14 +655,14 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
             ep.setFilter(filter);
         }
         ep.initialise();
-        registry.registerEndpoint(ep);
+        manager.registerEndpoint(ep);
         return ep;
     }
 
     public void registerModel(UMOModel model) throws UMOException
     {
         this.model = model;
-        registry.registerModel(model);
+        manager.registerModel(model);
     }
 
     public UMOManager getManager()
@@ -715,7 +711,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         {
             model = new SedaModel();
             model.setName("main");
-            registry.registerModel(model);
+            manager.registerModel(model);
         }
         return model;
     }

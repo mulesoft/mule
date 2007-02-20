@@ -39,7 +39,7 @@ public class ConfigurationDefinitionParser extends AbstractMuleSingleBeanDefinit
     }
 
 
-    //@Override
+    @Override
     protected void processProperty(Attr attribute, BeanDefinitionBuilder builder)
     {
         if(attribute.getNodeName().equals(ATTRIBUTE_SERVER_ID))
@@ -50,7 +50,7 @@ public class ConfigurationDefinitionParser extends AbstractMuleSingleBeanDefinit
     }
 
 
-    //@Override
+    @Override
     protected String resolveId(Element element, AbstractBeanDefinition definition, ParserContext parserContext) throws BeanDefinitionStoreException
     {
         return element.getAttribute(ATTRIBUTE_SERVER_ID);

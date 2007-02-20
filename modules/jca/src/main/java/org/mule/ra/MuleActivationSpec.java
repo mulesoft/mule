@@ -10,11 +10,6 @@
 
 package org.mule.ra;
 
-import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.umo.UMOException;
-import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.util.StringUtils;
-
 import java.io.Serializable;
 import java.util.Properties;
 
@@ -22,6 +17,11 @@ import javax.resource.ResourceException;
 import javax.resource.spi.ActivationSpec;
 import javax.resource.spi.InvalidPropertyException;
 import javax.resource.spi.ResourceAdapter;
+
+import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.umo.endpoint.EndpointException;
+import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.util.StringUtils;
 
 /**
  * <code>MuleActivationSpec</code> defines the contract between a Message Driven
@@ -122,7 +122,7 @@ public class MuleActivationSpec implements ActivationSpec, Serializable
         {
             this.endpointURI = new MuleEndpointURI(endpoint);
         }
-        catch (UMOException e)
+        catch (EndpointException e)
         {
             throw new InvalidPropertyException(e);
         }

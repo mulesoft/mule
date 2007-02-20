@@ -15,22 +15,21 @@ import org.mule.config.ConfigurationBuilder;
 import org.mule.config.ConfigurationException;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.MuleProperties;
+import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.config.spring.SpringConfigurationBuilder;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
+import org.mule.impl.model.ModelHelper;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.security.MuleCredentials;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.service.TransportFactory;
-import org.mule.registry.UMORegistry;
 import org.mule.umo.FutureMessageResult;
 import org.mule.umo.MessagingException;
-import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
@@ -99,7 +98,6 @@ public class MuleClient implements Disposable
      * the local UMOManager instance
      */
     private UMOManager manager;
-    private UMORegistry registry;
 
     /**
      * an Executor for async messages (optional), currently always delegated to
@@ -138,8 +136,8 @@ public class MuleClient implements Disposable
     }
 
     /**
-     * Configures a Mule Client instance using the the default
-     * SpringConfigurationBuilder to parse the config resources
+     * Configures a Mule CLient instance using the the default
+     * MuleXmlConfigurationBuilder to parse the config resources
      * 
      * @param configResources a config resource location to configure this client
      *            with
@@ -149,7 +147,7 @@ public class MuleClient implements Disposable
      */
     public MuleClient(String configResources) throws UMOException
     {
-        this(configResources, new SpringConfigurationBuilder());
+        this(configResources, new MuleXmlConfigurationBuilder());
     }
 
     /**
@@ -185,11 +183,10 @@ public class MuleClient implements Disposable
         if (builder == null)
         {
             logger.info("Builder passed in was null, using default builder: "
-                        + SpringConfigurationBuilder.class.getName());
-            builder = new SpringConfigurationBuilder();
+                        + MuleXmlConfigurationBuilder.class.getName());
+            builder = new MuleXmlConfigurationBuilder();
         }
         manager = builder.configure(configResources, null);
-        registry = MuleManager.getRegistry();
     }
 
     /**
@@ -239,7 +236,6 @@ public class MuleClient implements Disposable
         }
 
         manager = MuleManager.getInstance();
-        registry = MuleManager.getRegistry();
         asyncExecutor = manager.getWorkManager();
         builder = new QuickConfigurationBuilder();
 
@@ -400,14 +396,16 @@ public class MuleClient implements Disposable
      * @throws org.mule.umo.UMOException if the dispatch fails or the components or
      *             transfromers cannot be found
      */
-    public UMOMessage sendDirect(String componentName, String transformers, UMOMessage message)
+    public UMOMessage sendDirect(String component, String transformers, UMOMessage message)
         throws UMOException
     {
-        UMOComponent component = MuleManager.getRegistry().lookupComponent(componentName);
-        if (component == null)
+        boolean compregistered = ModelHelper.isComponentRegistered(component);
+        if (!compregistered)
         {
-            throw new MessagingException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER, 
-                "Component '" + componentName + "'"), message, null);
+            throw new MessagingException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER, "Component '"
+                                                                                             + component
+                                                                                             + "'"), message,
+                null);
         }
         UMOTransformer trans = null;
         if (transformers != null)
@@ -419,14 +417,14 @@ public class MuleClient implements Disposable
         {
             logger.warn("The mule manager is running synchronously, a null message payload will be returned");
         }
-        UMOSession session = new MuleSession(component);
+        UMOSession session = new MuleSession(ModelHelper.getComponent(component));
         UMOEndpoint endpoint = getDefaultClientEndpoint(session.getComponent().getDescriptor(),
             message.getPayload());
         UMOEvent event = new MuleEvent(message, endpoint, session, true);
 
         if (logger.isDebugEnabled())
         {
-            logger.debug("MuleClient sending event direct to: " + componentName + ". Event is: " + event);
+            logger.debug("MuleClient sending event direct to: " + component + ". Event is: " + event);
         }
 
         UMOMessage result = event.getComponent().sendEvent(event);
@@ -470,22 +468,24 @@ public class MuleClient implements Disposable
      * @throws org.mule.umo.UMOException if the dispatch fails or the components or
      *             transfromers cannot be found
      */
-    public void dispatchDirect(String componentName, UMOMessage message) throws UMOException
+    public void dispatchDirect(String component, UMOMessage message) throws UMOException
     {
-        UMOComponent component = MuleManager.getRegistry().lookupComponent(componentName);
-        if (component == null)
+        boolean compregistered = ModelHelper.isComponentRegistered(component);
+        if (!compregistered)
         {
-            throw new MessagingException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER, 
-                    "Component '" + componentName + "'"), message, null);
+            throw new MessagingException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER, "Component '"
+                                                                                             + component
+                                                                                             + "'"), message,
+                null);
         }
-        UMOSession session = new MuleSession(component);
+        UMOSession session = new MuleSession(ModelHelper.getComponent(component));
         UMOEndpoint endpoint = getDefaultClientEndpoint(session.getComponent().getDescriptor(),
             message.getPayload());
         UMOEvent event = new MuleEvent(message, endpoint, session, true);
 
         if (logger.isDebugEnabled())
         {
-            logger.debug("MuleClient dispatching event direct to: " + componentName + ". Event is: " + event);
+            logger.debug("MuleClient dispatching event direct to: " + component + ". Event is: " + event);
         }
 
         event.getComponent().dispatchEvent(event);
@@ -863,7 +863,7 @@ public class MuleClient implements Disposable
 
     protected UMOEndpoint getEndpoint(String uri, String type) throws UMOException
     {
-        UMOEndpoint endpoint = registry.lookupEndpoint(uri);
+        UMOEndpoint endpoint = manager.lookupEndpoint(uri);
         if (endpoint == null)
         {
             endpoint = MuleEndpoint.getOrCreateEndpointForUri(uri, type);
@@ -901,13 +901,13 @@ public class MuleClient implements Disposable
             UMOConnector connector = null;
             UMOEndpointURI defaultEndpointUri = new MuleEndpointURI("vm://mule.client");
             connector = TransportFactory.createConnector(defaultEndpointUri);
-            registry.registerConnector(connector);
+            manager.registerConnector(connector);
             connector.startConnector();
             endpoint = new MuleEndpoint("muleClientProvider", defaultEndpointUri, connector, null,
                 UMOEndpoint.ENDPOINT_TYPE_RECEIVER, 0, null, null);
         }
 
-        registry.registerEndpoint(endpoint);
+        manager.registerEndpoint(endpoint);
         return endpoint;
     }
 

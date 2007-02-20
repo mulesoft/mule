@@ -90,7 +90,7 @@ public class SedaModel extends AbstractModel
         super.initialise(); 
     }
 
-    public UMOComponent createComponent(UMODescriptor descriptor)
+    protected UMOComponent createComponent(UMODescriptor descriptor)
     {
         return new SedaComponent((MuleDescriptor) descriptor, this);
     }

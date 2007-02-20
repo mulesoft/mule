@@ -34,7 +34,7 @@ public class QNamePropertyEditor extends PropertyEditorSupport
         this.explicit = explicit;
     }
 
-    //@Override
+    @Override
     public void setAsText(String text) throws IllegalArgumentException
     {
 

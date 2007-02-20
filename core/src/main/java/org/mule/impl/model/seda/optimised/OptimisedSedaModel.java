@@ -33,7 +33,7 @@ public class OptimisedSedaModel extends SedaModel
         return "seda-optimised";
     }
 
-    public UMOComponent createComponent(UMODescriptor descriptor)
+    protected UMOComponent createComponent(UMODescriptor descriptor)
     {
         return new OptimisedSedaComponent((MuleDescriptor)descriptor, this);
     }

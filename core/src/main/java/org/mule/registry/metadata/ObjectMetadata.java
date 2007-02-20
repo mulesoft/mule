@@ -86,9 +86,9 @@ public class ObjectMetadata extends Metadata
         this.persistable = persistable;
     }
 
-    public boolean isPersistable()
+    public boolean getPersistable()
     {
-        return persistable;
+	return persistable;
     }
 
 

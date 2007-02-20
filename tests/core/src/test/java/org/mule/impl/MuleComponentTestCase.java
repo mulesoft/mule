@@ -10,7 +10,6 @@
 
 package org.mule.impl;
 
-import org.mule.MuleManager;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.providers.AbstractConnector;
 import org.mule.tck.AbstractMuleTestCase;
@@ -100,7 +99,7 @@ public class MuleComponentTestCase extends AbstractMuleTestCase
     {
         QuickConfigurationBuilder builder = new QuickConfigurationBuilder(true);
         // Test connector
-        MuleManager.getRegistry().registerConnector(getTestConnector());
+        builder.getManager().registerConnector(getTestConnector());
         // Test component
         UMODescriptor d = builder.createDescriptor(Orange.class.getName(), "orangeComponent",
             builder.createEndpoint("test://in", null, true), null, null);
@@ -117,7 +116,7 @@ public class MuleComponentTestCase extends AbstractMuleTestCase
         assertFalse(c.isStarted());
 
         // The connector should be started, but with no listeners registered.
-        AbstractConnector connector = (AbstractConnector)MuleManager.getRegistry().lookupConnector("testConnector");
+        AbstractConnector connector = (AbstractConnector)manager.lookupConnector("testConnector");
         assertTrue(connector.isStarted());
         assertTrue(connector.getReceivers().isEmpty());
 
@@ -141,7 +140,7 @@ public class MuleComponentTestCase extends AbstractMuleTestCase
     {
         QuickConfigurationBuilder builder = new QuickConfigurationBuilder(true);
         // Test connector
-        MuleManager.getRegistry().registerConnector(getTestConnector());
+        builder.getManager().registerConnector(getTestConnector());
         // Test component
         builder.registerComponent(Orange.class.getName(), "orangeComponent", "test://in", "test://out", null);
 
@@ -153,7 +152,7 @@ public class MuleComponentTestCase extends AbstractMuleTestCase
         assertTrue(c.isStarted());
 
         // The listeners should be registered and started.
-        AbstractConnector connector = (AbstractConnector)MuleManager.getRegistry().lookupConnector("testConnector");
+        AbstractConnector connector = (AbstractConnector)manager.lookupConnector("testConnector");
         assertTrue(connector.isStarted());
         assertFalse(connector.getReceivers().isEmpty());
 

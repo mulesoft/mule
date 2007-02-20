@@ -12,7 +12,6 @@ package org.mule.umo.provider;
 
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.lifecycle.DisposeException;
 
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
 
@@ -87,6 +86,6 @@ public interface UMOMessageDispatcherFactory
      * @param endpoint the endpoint of the dispatcher
      * @param dispatcher the dispatcher to be validated
      */
-    void destroy(UMOImmutableEndpoint endpoint, UMOMessageDispatcher dispatcher) throws DisposeException;
+    void destroy(UMOImmutableEndpoint endpoint, UMOMessageDispatcher dispatcher);
 
 }

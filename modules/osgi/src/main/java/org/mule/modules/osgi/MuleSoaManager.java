@@ -41,7 +41,7 @@ public class MuleSoaManager extends MuleManager implements BundleContextAware
     
     private static Log logger = LogFactory.getLog(MuleSoaManager.class);
     
-    public void setBundleContext(BundleContext context)
+    public void setBundleContext(BundleContext arg0)
     {
         this.context = context;
     }

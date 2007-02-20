@@ -17,7 +17,7 @@ import org.mule.tck.functional.AbstractProviderFunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.umo.UMOEventContext;
-import org.mule.umo.UMOException;
+import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
 
@@ -42,7 +42,7 @@ public class SslConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
         {
             return new MuleEndpointURI("ssl://localhost:" + port);
         }
-        catch (UMOException e)
+        catch (EndpointException e)
         {
             fail(e.getMessage());
             return null;

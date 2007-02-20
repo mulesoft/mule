@@ -25,7 +25,7 @@ public class ModelFactory
     public static UMOModel createModel(String type) throws ServiceException
     {
         ModelServiceDescriptor sd = (ModelServiceDescriptor)
-            MuleManager.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.MODEL_SERVICE_TYPE, type, null);
+            MuleManager.getInstance().lookupServiceDescriptor(ServiceDescriptorFactory.MODEL_SERVICE_TYPE, type, null);
         if (sd != null)
         {
             return sd.createModel();
@@ -36,7 +36,7 @@ public class ModelFactory
     public static Class getModelClass(String type) throws ServiceException
     {
         ModelServiceDescriptor sd = (ModelServiceDescriptor) 
-            MuleManager.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.MODEL_SERVICE_TYPE, type, null);
+            MuleManager.getInstance().lookupServiceDescriptor(ServiceDescriptorFactory.MODEL_SERVICE_TYPE, type, null);
         if (sd != null)
         {
             return sd.getModelClass();

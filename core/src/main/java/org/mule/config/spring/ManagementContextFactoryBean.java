@@ -11,11 +11,12 @@ package org.mule.config.spring;
 
 import org.mule.MuleManager;
 import org.mule.config.MuleConfiguration;
-import org.mule.registry.UMORegistry;
+import org.mule.impl.model.ModelHelper;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOAgent;
 import org.mule.umo.manager.UMOContainerContext;
 import org.mule.umo.manager.UMOManager;
@@ -77,8 +78,7 @@ public class ManagementContextFactoryBean
 
     //TODO RM* URGENT replace this woth MUMOanagementContext
 
-    protected UMOManager manager;
-    protected UMORegistry registry;
+    private UMOManager manager;
 
     private AbstractApplicationContext context;
 
@@ -86,7 +86,6 @@ public class ManagementContextFactoryBean
     {
         //TODO really we should initialise the registry here, but for now we're using the MuleManager for the registry
         this.manager = MuleManager.getInstance();
-        this.registry = MuleManager.getRegistry();
     }
 
     public Object getObject() throws Exception
@@ -201,7 +200,7 @@ public class ManagementContextFactoryBean
             entry = (Map.Entry)iterator.next();
             UMOModel model = (UMOModel)entry.getValue();
             model.setName(entry.getKey().toString());
-            registry.registerModel(model);
+            manager.registerModel(model);
         }
     }
 
@@ -209,7 +208,7 @@ public class ManagementContextFactoryBean
     {
         for (Iterator iterator = agents.iterator(); iterator.hasNext();)
         {
-            registry.registerAgent((UMOAgent)iterator.next());
+            manager.registerAgent((UMOAgent)iterator.next());
         }
     }
 
@@ -231,26 +230,26 @@ public class ManagementContextFactoryBean
     {
         for (Iterator iterator = connectors.iterator(); iterator.hasNext();)
         {
-            registry.registerConnector((UMOConnector)iterator.next());
+            manager.registerConnector((UMOConnector)iterator.next());
         }
     }
 
-    protected void setTransformers(Collection transformers) throws UMOException
+    protected void setTransformers(Collection transformers) throws InitialisationException
     {
         for (Iterator iterator = transformers.iterator(); iterator.hasNext();)
         {
-            registry.registerTransformer((UMOTransformer)iterator.next());
+            manager.registerTransformer((UMOTransformer)iterator.next());
         }
     }
 
-    protected void setEndpoints(Collection endpoints) throws UMOException
+    protected void setEndpoints(Collection endpoints) throws InitialisationException
     {
         for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
         {
             UMOEndpoint ep  = (UMOEndpoint)iterator.next();
             if(UMOImmutableEndpoint.ENDPOINT_TYPE_GLOBAL.equals(ep.getType()))
             {
-                registry.registerEndpoint(ep);
+                manager.registerEndpoint(ep);
             }
         }
     }
@@ -261,10 +260,10 @@ public class ManagementContextFactoryBean
         for (Iterator iterator = components.iterator(); iterator.hasNext();)
         {
             d = (UMODescriptor)iterator.next();
-            if (registry.lookupComponent(d.getName()) == null)
+            if (!ModelHelper.isComponentRegistered(d.getName()))
             {
                 //TODO RM*: Manage model lookup correctly                
-                registry.registerComponent(d, "main");
+                manager.lookupModel("main").registerComponent(d);
             }
         }
     }

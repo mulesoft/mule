@@ -10,18 +10,23 @@
 
 package org.mule.registry.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.persistence.PersistenceManager;
 import org.mule.persistence.PersistenceNotificationListener;
 import org.mule.persistence.manager.ObjectPersistenceManager;
 import org.mule.registry.Registration;
-import org.mule.registry.RegistryException;
+import org.mule.registry.DeregistrationException;
+import org.mule.registry.RegistrationException;
+import org.mule.registry.Registry;
 import org.mule.registry.RegistryStore;
-import org.mule.registry.UMORegistry;
+import org.mule.registry.ReregistrationException;
 import org.mule.registry.impl.store.InMemoryStore;
-import org.mule.registry.metadata.MetadataStore;
-import org.mule.registry.metadata.MissingMetadataException;
-import org.mule.registry.metadata.ObjectMetadata;
-import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.registry.metadata.*;
+import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.Registerable;
 import org.mule.util.StringUtils;
 
@@ -30,17 +35,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * The MuleRegistry implements the Registry interface
  */
-public abstract class AbstractMuleRegistry implements UMORegistry {
+public class MuleRegistry implements Registry {
 
-    public static final String SYSTEM_MODEL = "_system";
-    public static final String SYSTEM_MODEL_TYPE = "seda";
-    
     // Temporary
     protected static String[] GETTERS_TO_GET = {
         "java.lang.Boolean", "java.lang.Date", 
@@ -62,14 +61,14 @@ public abstract class AbstractMuleRegistry implements UMORegistry {
     /**
      * logger used by this class
      */
-    protected transient final Log logger = LogFactory.getLog(getClass());
-    
+    private static transient Log logger = LogFactory.getLog(MuleRegistry.class);
+
     private String registryId = null;
 
     /**
      * 
      */
-    public AbstractMuleRegistry() 
+    public MuleRegistry() 
     {
         persistenceManager = new ObjectPersistenceManager();
         registryStore = new InMemoryStore(this);
@@ -126,7 +125,7 @@ public abstract class AbstractMuleRegistry implements UMORegistry {
         return registryStore;
     }
 
-    public Registration registerMuleObject(Registerable parent, Registerable object) throws RegistryException
+    public Registration registerMuleObject(Registerable parent, Registerable object) throws RegistrationException
     {
         Registration registration = 
             registrationFactory.getInstance(RegistrationFactory.REF_MULE_COMPONENT);
@@ -147,7 +146,7 @@ public abstract class AbstractMuleRegistry implements UMORegistry {
 
         if (parent != null)
         {
-            if (parent.getId() == null) 
+            if (parent.getRegistryId() == null) 
             {
                 // We really should throw an exception here
                 // but for now lets see where this happens
@@ -155,7 +154,7 @@ public abstract class AbstractMuleRegistry implements UMORegistry {
             }
             else 
             {
-                registration.setParentId(parent.getId());
+                registration.setParentId(parent.getRegistryId());
             }
         }
 
@@ -186,7 +185,7 @@ public abstract class AbstractMuleRegistry implements UMORegistry {
         return registration;
     }
 
-    public void deregisterComponent(String registryId) throws RegistryException
+    public void deregisterComponent(String registryId) throws DeregistrationException
     {
         registryStore.deregisterComponent(registryId);
     }
@@ -224,13 +223,29 @@ public abstract class AbstractMuleRegistry implements UMORegistry {
     /**
      * (non-Javadoc)
      *
-     * @see org.mule.registry.Registry#initialise
+     * @see org.mule.registry.Registry#start
      */
-    public void initialise() throws InitialisationException
+    public void start() throws UMOException
     {
         counter = System.currentTimeMillis();
-        registryStore.initialise();
-        persistenceManager.initialise();
+        persistenceManager.start();
+        registryStore.start();
+
+        logger.info("Started");
+    }
+
+    /**
+     * (non-Javadoc)
+     *
+     * @see org.mule.registry.Registry#stop
+     */
+    public void stop() throws UMOException
+    {
+        // Stop the persistence manager first, in case it is
+        // in the middle of requesting something from the store
+        persistenceManager.stop();
+        registryStore.stop();
+        logger.info("Stopped");
     }
 
     /**
@@ -238,7 +253,7 @@ public abstract class AbstractMuleRegistry implements UMORegistry {
      *
      * @see org.mule.registry.Registry#dispose
      */
-    public void dispose() 
+    public void dispose()
     {
         registryStore.dispose();
         persistenceManager.dispose();

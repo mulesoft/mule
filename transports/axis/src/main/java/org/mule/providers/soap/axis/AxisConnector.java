@@ -17,6 +17,7 @@ import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.internal.notifications.ManagerNotification;
 import org.mule.impl.internal.notifications.ManagerNotificationListener;
+import org.mule.impl.model.ModelHelper;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.http.servlet.ServletConnector;
 import org.mule.providers.service.TransportFactory;
@@ -25,13 +26,13 @@ import org.mule.providers.soap.axis.extensions.MuleConfigProvider;
 import org.mule.providers.soap.axis.extensions.MuleTransport;
 import org.mule.providers.soap.axis.extensions.WSDDFileProvider;
 import org.mule.providers.soap.axis.extensions.WSDDJavaMuleProvider;
-import org.mule.registry.RegistryException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOServerNotification;
+import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.ClassUtils;
 
@@ -343,7 +344,8 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
             // See if the axis descriptor has already been added. This allows
             // developers to override the default configuration, say to increase
             // the threadpool
-            axisDescriptor = (MuleDescriptor)MuleManager.getRegistry().lookupComponent(AXIS_SERVICE_COMPONENT_NAME).getDescriptor();
+            axisDescriptor = (MuleDescriptor)MuleManager.getInstance().lookupModel(ModelHelper.SYSTEM_MODEL).getDescriptor(
+                AXIS_SERVICE_COMPONENT_NAME);
             if (axisDescriptor == null)
             {
                 axisDescriptor = createAxisDescriptor();
@@ -353,7 +355,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
                 // Lets unregister the 'template' instance, configure it and
                 // then register
                 // again later
-                MuleManager.getRegistry().unregisterComponent(axisDescriptor.getName());
+                MuleManager.getInstance().lookupModel(ModelHelper.SYSTEM_MODEL).unregisterComponent(axisDescriptor);
             }
             // if the axis server hasn't been set, set it now. The Axis server
             // may be set
@@ -444,15 +446,8 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
 
     protected MuleDescriptor createAxisDescriptor()
     {
-        MuleDescriptor axisDescriptor = null;
-        try
-        {
-            axisDescriptor = (MuleDescriptor)MuleManager.getRegistry().lookupComponent(AXIS_SERVICE_COMPONENT_NAME).getDescriptor();
-        }
-        catch (RegistryException e)
-        {
-            logger.info("Unable to look up descriptor: " + e.getMessage());
-        }
+        MuleDescriptor axisDescriptor = (MuleDescriptor)MuleManager.getInstance().lookupModel(ModelHelper.SYSTEM_MODEL).getDescriptor(
+            AXIS_SERVICE_COMPONENT_NAME);
         if (axisDescriptor == null)
         {
             axisDescriptor = new MuleDescriptor(AXIS_SERVICE_COMPONENT_NAME);
@@ -634,9 +629,10 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
             // The implication of this is that to add a new service and a
             // different http port the
             // model needs to be restarted before the listener is available
-            try
+            UMOModel systemModel = MuleManager.getInstance().lookupModel(ModelHelper.SYSTEM_MODEL);
+            if (!systemModel.isComponentRegistered(AXIS_SERVICE_COMPONENT_NAME))
             {
-                if (MuleManager.getRegistry().lookupComponent(AXIS_SERVICE_COMPONENT_NAME) == null)
+                try
                 {
                     // Descriptor might be null if no inbound endpoints have been
                     // register for the Axis connector
@@ -645,7 +641,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
                         axisDescriptor = createAxisDescriptor();
                     }
                     axisDescriptor.addInterceptor(new MethodFixInterceptor());
-                    MuleManager.getRegistry().registerSystemComponent(axisDescriptor);
+                    MuleManager.getInstance().lookupModel(ModelHelper.SYSTEM_MODEL).registerComponent(axisDescriptor);
                     // We have to perform a small hack here to rewrite servlet://
                     // endpoints with the
                     // real http:// address
@@ -666,11 +662,12 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
                     }
                     servletServices.clear();
                     servletServices = null;
+
                 }
-            }
-            catch (UMOException e)
-            {
-                handleException(e);
+                catch (UMOException e)
+                {
+                    handleException(e);
+                }
             }
         }
     }

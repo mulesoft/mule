@@ -19,6 +19,8 @@ import org.mule.impl.RequestContext;
 import org.mule.impl.internal.notifications.ComponentNotification;
 import org.mule.management.stats.ComponentStatistics;
 import org.mule.providers.AbstractConnector;
+import org.mule.registry.DeregistrationException;
+import org.mule.registry.RegistrationException;
 import org.mule.umo.ComponentException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
@@ -28,8 +30,6 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.lifecycle.LifecycleNotifications;
-import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.model.ModelException;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.DispatchException;
@@ -49,8 +49,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * A base implementation for all UMOComponents in Mule
  */
-public abstract class AbstractComponent implements UMOComponent, LifecycleNotifications
-//TODO the LifecycleNotifications should be fired using AOP
+public abstract class AbstractComponent implements UMOComponent
 {
     /**
      * logger used by this class
@@ -100,6 +99,8 @@ public abstract class AbstractComponent implements UMOComponent, LifecycleNotifi
      */
     protected WaitableBoolean paused = new WaitableBoolean(false);
 
+    protected String registryId = null;
+
     /**
      * Default constructor
      */
@@ -130,6 +131,16 @@ public abstract class AbstractComponent implements UMOComponent, LifecycleNotifi
                 "Component '" + descriptor.getName() + "'"), this);
         }
 
+        try 
+        {
+            descriptor.register();
+        }
+        catch (UMOException e)
+        {
+            logger.error("Unable to register descriptor " + 
+                    descriptor.getName() + " with the registry");
+        }
+
         descriptor.initialise();
 
         this.exceptionListener = descriptor.getExceptionListener();
@@ -145,7 +156,8 @@ public abstract class AbstractComponent implements UMOComponent, LifecycleNotifi
         stats.setInboundRouterStat(getDescriptor().getInboundRouter().getStatistics());
         
         initialised.set(true);
-        MuleManager.getInstance().fireNotification(getNotificationInitialised());
+        fireComponentNotification(ComponentNotification.COMPONENT_INITIALISED);
+
     }
 
     protected ComponentStatistics createStatistics()
@@ -153,9 +165,41 @@ public abstract class AbstractComponent implements UMOComponent, LifecycleNotifi
         return new ComponentStatistics(getName(), descriptor.getThreadingProfile().getMaxThreadsActive());
     }
 
-    public String getId()
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.lifecycle.Registerable#register()
+     */
+    public void register() throws RegistrationException
     {
-        return getClass().getName() + "." + getName();
+        registryId = 
+            MuleManager.getInstance().getRegistry().registerMuleObject(model, this).getId();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.lifecycle.Registerable#deregister()
+     */
+    public void deregister() throws DeregistrationException
+    {
+        MuleManager.getInstance().getRegistry().deregisterComponent(registryId);
+        registryId = null;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.lifecycle.Registerable#getRegistryId()
+     */
+    public String getRegistryId()
+    {
+        return registryId;
+    }
+
+    protected void fireComponentNotification(int action)
+    {
+        MuleManager.getInstance().fireNotification(new ComponentNotification(descriptor, action));
     }
 
     void finaliseEvent(UMOEvent event)
@@ -171,11 +215,11 @@ public abstract class AbstractComponent implements UMOComponent, LifecycleNotifi
         {
             logger.debug("Stopping UMOComponent");
             stopping.set(true);
-            MuleManager.getInstance().fireNotification(getNotificationStopping());
+            fireComponentNotification(ComponentNotification.COMPONENT_STOPPING);
             doForceStop();
             stopped.set(true);
             stopping.set(false);
-            MuleManager.getInstance().fireNotification(getNotificationStopped());
+            fireComponentNotification(ComponentNotification.COMPONENT_STOPPED);
         }
     }
 
@@ -185,7 +229,7 @@ public abstract class AbstractComponent implements UMOComponent, LifecycleNotifi
         {
             logger.debug("Stopping UMOComponent");
             stopping.set(true);
-            MuleManager.getInstance().fireNotification(getNotificationStopping());
+            fireComponentNotification(ComponentNotification.COMPONENT_STOPPING);
 
             // Unregister Listeners for the component
             unregisterListeners();
@@ -204,7 +248,7 @@ public abstract class AbstractComponent implements UMOComponent, LifecycleNotifi
 
             doStop();
             stopped.set(true);
-            MuleManager.getInstance().fireNotification(getNotificationStopped());
+            fireComponentNotification(ComponentNotification.COMPONENT_STOPPED);
         }
     }
 
@@ -240,7 +284,7 @@ public abstract class AbstractComponent implements UMOComponent, LifecycleNotifi
             paused.set(false);
             doStart();
         }
-        MuleManager.getInstance().fireNotification(getNotificationStarted());
+        fireComponentNotification(ComponentNotification.COMPONENT_STARTED);
         if (startPaused)
         {
             pause();
@@ -263,7 +307,7 @@ public abstract class AbstractComponent implements UMOComponent, LifecycleNotifi
 
         doPause();
         paused.set(true);
-        MuleManager.getInstance().fireNotification(getNotificationPaused());
+        fireComponentNotification(ComponentNotification.COMPONENT_PAUSED);
     }
 
     /**
@@ -274,7 +318,7 @@ public abstract class AbstractComponent implements UMOComponent, LifecycleNotifi
     {
         doResume();
         paused.set(false);
-        MuleManager.getInstance().fireNotification(getNotificationResumed());
+        fireComponentNotification(ComponentNotification.COMPONENT_RESUMED);
     }
 
     /**
@@ -325,7 +369,7 @@ public abstract class AbstractComponent implements UMOComponent, LifecycleNotifi
             logger.error("Failed to stop component: " + descriptor.getName(), e);
         }
         doDispose();
-        MuleManager.getInstance().fireNotification(getNotificationDisposed());
+        fireComponentNotification(ComponentNotification.COMPONENT_DISPOSED);
         ((MuleManager)MuleManager.getInstance()).getStatistics().remove(stats);
     }
 
@@ -695,61 +739,4 @@ public abstract class AbstractComponent implements UMOComponent, LifecycleNotifi
         return endpoints;
     }
 
-    /**
-     * Returns the logical name (not type) of the model associated with this component.
-     */
-    public String getModelName()
-    {
-        return model != null ? model.getName() : null;
-    }
-    
-    public UMOServerNotification getNotificationInitialised()
-    {
-        return new ComponentNotification(descriptor, ComponentNotification.COMPONENT_INITIALISED);
-    }
-
-    public UMOServerNotification getNotificationInitialising()
-    {
-        return new ComponentNotification(descriptor, ComponentNotification.COMPONENT_INITIALISING);
-    }
-
-    public UMOServerNotification getNotificationDisposed()
-    {
-        return new ComponentNotification(descriptor, ComponentNotification.COMPONENT_DISPOSED);
-    }
-
-    public UMOServerNotification getNotificationDisposing()
-    {
-        return new ComponentNotification(descriptor, ComponentNotification.COMPONENT_DISPOSING);
-    }
-
-    public UMOServerNotification getNotificationStarted()
-    {
-        return new ComponentNotification(descriptor, ComponentNotification.COMPONENT_STARTED);
-    }
-
-    public UMOServerNotification getNotificationStarting()
-    {
-        return new ComponentNotification(descriptor, ComponentNotification.COMPONENT_STARTING);
-    }
-
-    public UMOServerNotification getNotificationStopped()
-    {
-        return new ComponentNotification(descriptor, ComponentNotification.COMPONENT_STOPPED);
-    }
-
-    public UMOServerNotification getNotificationStopping()
-    {
-        return new ComponentNotification(descriptor, ComponentNotification.COMPONENT_STOPPING);
-    }
-    
-    public UMOServerNotification getNotificationPaused()
-    {
-        return new ComponentNotification(descriptor, ComponentNotification.COMPONENT_PAUSED);
-    }
-
-    public UMOServerNotification getNotificationResumed()
-    {
-        return new ComponentNotification(descriptor, ComponentNotification.COMPONENT_RESUMED);
-    }
 }

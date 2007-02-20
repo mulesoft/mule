@@ -10,8 +10,6 @@
 
 package org.mule.util;
 
-import org.mule.umo.lifecycle.DisposeException;
-
 /**
  * <code>ObjectPool</code> is a simple pooling interface for objects
  */
@@ -38,7 +36,7 @@ public interface ObjectPool
 
     void setFactory(ObjectFactory factory);
 
-    void clearPool() throws DisposeException;
+    void clearPool();
 
     void start() throws Exception;
 
@@ -46,6 +44,6 @@ public interface ObjectPool
 
     void onAdd(Object obj);
 
-    void onRemove(Object obj) throws DisposeException;
+    void onRemove(Object obj);
 
 }

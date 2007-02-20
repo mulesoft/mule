@@ -39,7 +39,7 @@ public class MessagingJbpmSpringTestCase extends FunctionalTestCase {
 
     protected void doPostFunctionalSetUp() throws Exception {
         connector =
-            (ProcessConnector) MuleManager.getRegistry().lookupConnector("jBpmConnector");
+            (ProcessConnector) MuleManager.getInstance().lookupConnector("jBpmConnector");
         bpms = connector.getBpms();
         connector.setAllowGlobalReceiver(true);
         super.doPostFunctionalSetUp();

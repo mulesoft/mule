@@ -19,13 +19,14 @@ import org.mule.impl.ImmutableMuleDescriptor;
 import org.mule.impl.MuleSession;
 import org.mule.impl.internal.notifications.ModelNotification;
 import org.mule.impl.model.resolvers.DynamicEntryPointResolver;
+import org.mule.registry.DeregistrationException;
+import org.mule.registry.RegistrationException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOSession;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.lifecycle.LifecycleNotifications;
 import org.mule.umo.lifecycle.UMOLifecycleAdapterFactory;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.model.ModelException;
@@ -38,6 +39,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 import java.beans.ExceptionListener;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -48,8 +50,7 @@ import org.apache.commons.logging.LogFactory;
  * encapsulates and manages the runtime behaviour of a Mule Server instance. It is
  * responsible for maintaining the UMOs instances and their configuration.
  */
-public abstract class AbstractModel implements UMOModel, LifecycleNotifications 
-// TODO the LifecycleNotifications should be fired using AOP
+public abstract class AbstractModel implements UMOModel
 {
     public static final String DEFAULT_MODEL_NAME = "main";
     /**
@@ -74,6 +75,8 @@ public abstract class AbstractModel implements UMOModel, LifecycleNotifications
 
     private ExceptionListener exceptionListener = new DefaultComponentExceptionStrategy();
 
+    protected String registryId = null;
+
     /**
      * Default constructor
      */
@@ -86,11 +89,6 @@ public abstract class AbstractModel implements UMOModel, LifecycleNotifications
         components = new ConcurrentSkipListMap();
         descriptors = new ConcurrentHashMap();
         exceptionListener = new DefaultComponentExceptionStrategy();
-    }
-
-    public String getId()
-    {
-        return getClass().getName() + "." + getName();
     }
 
     /*
@@ -146,6 +144,96 @@ public abstract class AbstractModel implements UMOModel, LifecycleNotifications
     /*
      * (non-Javadoc)
      * 
+     * @see org.mule.umo.UMOModel#registerUMO(org.mule.umo.UMODescriptor)
+     */
+    public UMOComponent registerComponent(UMODescriptor descriptor) throws UMOException
+    {
+        if (descriptor == null)
+        {
+            throw new ModelException(new Message(Messages.X_IS_NULL, "UMO Descriptor"));
+        }
+
+        if (initialised.get())
+        {
+            try 
+            {
+                descriptor.register();
+            }
+            catch (UMOException e)
+            {
+                logger.error("Unable to register descriptor " + 
+                    descriptor.getName() + " with the registry");
+            }
+
+            descriptor.initialise();
+        }
+        // Set the es if one wasn't set in the configuration
+        if (descriptor.getExceptionListener() == null)
+        {
+            descriptor.setExceptionListener(exceptionListener);
+        }
+
+        if (initialised.get())
+        {
+            descriptor.initialise();
+        }
+
+        // detect duplicate descriptor declarations
+        if (descriptors.get(descriptor.getName()) != null)
+        {
+            throw new ModelException(new Message(Messages.DESCRIPTOR_X_ALREADY_EXISTS, descriptor.getName()));
+        }
+
+        UMOComponent component = (UMOComponent)components.get(descriptor.getName());
+
+        if (component == null)
+        {
+            component = createComponent(descriptor);
+            descriptors.put(descriptor.getName(), descriptor);
+            components.put(descriptor.getName(), component);
+        }
+
+        logger.debug("Added Mule UMO: " + descriptor.getName());
+
+        if (initialised.get())
+        {
+            logger.info("Initialising component: " + descriptor.getName());
+            component.initialise();
+        }
+        if (started.get())
+        {
+            logger.info("Starting component: " + descriptor.getName());
+            component.start();
+        }
+        return component;
+    }
+
+    public void unregisterComponent(UMODescriptor descriptor) throws UMOException
+    {
+        if (descriptor == null)
+        {
+            throw new ModelException(new Message(Messages.X_IS_NULL, "UMO Descriptor"));
+        }
+
+        if (!isComponentRegistered(descriptor.getName()))
+        {
+            throw new ModelException(new Message(Messages.COMPONENT_X_NOT_REGISTERED, descriptor.getName()));
+        }
+        UMOComponent component = (UMOComponent)components.remove(descriptor.getName());
+
+        if (component != null)
+        {
+            component.stop();
+            descriptors.remove(descriptor.getName());
+            component.dispose();
+            component.deregister();
+            logger.info("The component: " + descriptor.getName() + " has been unregistered and disposing");
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.model.UMOModel#getLifecycleAdapterFactory()
      */
     public UMOLifecycleAdapterFactory getLifecycleAdapterFactory()
@@ -168,7 +256,7 @@ public abstract class AbstractModel implements UMOModel, LifecycleNotifications
      */
     public void dispose()
     {
-        MuleManager.getInstance().fireNotification(getNotificationDisposing());
+        fireNotification(new ModelNotification(this, ModelNotification.MODEL_DISPOSING));
 
         for (Iterator i = components.values().iterator(); i.hasNext();)
         {
@@ -187,7 +275,7 @@ public abstract class AbstractModel implements UMOModel, LifecycleNotifications
         components.clear();
         descriptors.clear();
 
-        MuleManager.getInstance().fireNotification(getNotificationDisposed());
+        fireNotification(new ModelNotification(this, ModelNotification.MODEL_DISPOSED));
     }
 
     /**
@@ -217,14 +305,14 @@ public abstract class AbstractModel implements UMOModel, LifecycleNotifications
      */
     public void stop() throws UMOException
     {
-        MuleManager.getInstance().fireNotification(getNotificationStopping());
+        fireNotification(new ModelNotification(this, ModelNotification.MODEL_STOPPING));
         for (Iterator i = components.values().iterator(); i.hasNext();)
         {
             UMOComponent component = (UMOComponent)i.next();
             component.stop();
             logger.info("Component " + component + " has been stopped successfully");
         }
-        MuleManager.getInstance().fireNotification(getNotificationStopped());
+        fireNotification(new ModelNotification(this, ModelNotification.MODEL_STOPPED));
     }
 
     /**
@@ -241,7 +329,7 @@ public abstract class AbstractModel implements UMOModel, LifecycleNotifications
 
         if (!started.get())
         {
-            MuleManager.getInstance().fireNotification(getNotificationStarting());
+            fireNotification(new ModelNotification(this, ModelNotification.MODEL_STARTING));
 
             for (Iterator i = components.values().iterator(); i.hasNext();)
             {
@@ -267,7 +355,7 @@ public abstract class AbstractModel implements UMOModel, LifecycleNotifications
                 }
             }
             started.set(true);
-            MuleManager.getInstance().fireNotification(getNotificationStarted());
+            fireNotification(new ModelNotification(this, ModelNotification.MODEL_STARTED));
         }
         else
         {
@@ -369,19 +457,19 @@ public abstract class AbstractModel implements UMOModel, LifecycleNotifications
         }
     }
 
-//    public void setServiceDescriptors(List descriptors) throws UMOException
-//    {
-//        for (Iterator iterator = descriptors.iterator(); iterator.hasNext();)
-//        {
-//            registerComponent((UMODescriptor)iterator.next());
-//        }
-//    }
+    public void setServiceDescriptors(List descriptors) throws UMOException
+    {
+        for (Iterator iterator = descriptors.iterator(); iterator.hasNext();)
+        {
+            registerComponent((UMODescriptor)iterator.next());
+        }
+    }
 
     public void initialise() throws InitialisationException
     {
         if (!initialised.get())
         {
-            MuleManager.getInstance().fireNotification(getNotificationInitialising());
+            fireNotification(new ModelNotification(this, ModelNotification.MODEL_INITIALISING));
 
             if (exceptionListener instanceof Initialisable)
             {
@@ -392,18 +480,57 @@ public abstract class AbstractModel implements UMOModel, LifecycleNotifications
             {
                 component = (UMOComponent)i.next();
 
+                try 
+                {
+                    component.register();
+                } catch (RegistrationException re)
+                {
+                    logger.info("Unable to register component");
+                }
+
                 component.initialise();
 
                 logger.info("Component " + component.getDescriptor().getName()
                             + " has been started successfully");
             }
             initialised.set(true);
-            MuleManager.getInstance().fireNotification(getNotificationInitialised());
+            fireNotification(new ModelNotification(this, ModelNotification.MODEL_INITIALISED));
         }
         else
         {
             logger.debug("Model already initialised");
         }
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.lifecycle.Registerable#register()
+     */
+    public void register() throws RegistrationException
+    {
+        registryId = MuleManager.getInstance().getRegistry().registerMuleObject(MuleManager.getInstance(), this).getId();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.lifecycle.Registerable#deregister()
+     */
+    public void deregister() throws DeregistrationException
+    {
+        MuleManager.getInstance().getRegistry().deregisterComponent(registryId);
+        registryId = null;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.lifecycle.Registerable#getRegistryId()
+     */
+    public String getRegistryId()
+    {
+        return registryId;
     }
 
     public ExceptionListener getExceptionListener()
@@ -426,18 +553,6 @@ public abstract class AbstractModel implements UMOModel, LifecycleNotifications
         return (UMOComponent)components.get(name);
     }
 
-    public void addComponent(UMODescriptor descriptor, UMOComponent component)
-    {
-        descriptors.put(descriptor.getName(), descriptor);
-        components.put(descriptor.getName(), component);
-    }
-
-    public UMOComponent removeComponent(String name)
-    {
-        descriptors.remove(name);
-        return (UMOComponent) components.remove(name);
-    }
-    
     /**
      * Gets an iterator of all component names registered in the model
      * 
@@ -448,53 +563,10 @@ public abstract class AbstractModel implements UMOModel, LifecycleNotifications
         return components.keySet().iterator();
     }
 
-    public UMOServerNotification getNotificationInitialised()
+    void fireNotification(UMOServerNotification notification)
     {
-        return new ModelNotification(this, ModelNotification.MODEL_INITIALISED);
+        MuleManager.getInstance().fireNotification(notification);
     }
 
-    public UMOServerNotification getNotificationInitialising()
-    {
-        return new ModelNotification(this, ModelNotification.MODEL_INITIALISING);
-    }
-
-    public UMOServerNotification getNotificationDisposed()
-    {
-        return new ModelNotification(this, ModelNotification.MODEL_DISPOSED);
-    }
-
-    public UMOServerNotification getNotificationDisposing()
-    {
-        return new ModelNotification(this, ModelNotification.MODEL_DISPOSING);
-    }
-
-    public UMOServerNotification getNotificationStarted()
-    {
-        return new ModelNotification(this, ModelNotification.MODEL_STARTED);
-    }
-
-    public UMOServerNotification getNotificationStarting()
-    {
-        return new ModelNotification(this, ModelNotification.MODEL_STARTING);
-    }
-
-    public UMOServerNotification getNotificationStopped()
-    {
-        return new ModelNotification(this, ModelNotification.MODEL_STOPPED);
-    }
-
-    public UMOServerNotification getNotificationStopping()
-    {
-        return new ModelNotification(this, ModelNotification.MODEL_STOPPING);
-    }
-
-    public UMOServerNotification getNotificationPaused()
-    {
-        return null;
-    }
-
-    public UMOServerNotification getNotificationResumed()
-    {
-        return null;
-    }
+    protected abstract UMOComponent createComponent(UMODescriptor descriptor);
 }

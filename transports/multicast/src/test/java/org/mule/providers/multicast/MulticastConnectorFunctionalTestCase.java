@@ -13,7 +13,7 @@ package org.mule.providers.multicast;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.udp.UdpMessageAdapter;
 import org.mule.tck.functional.AbstractProviderFunctionalTestCase;
-import org.mule.umo.UMOException;
+import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
 
@@ -100,7 +100,7 @@ public class MulticastConnectorFunctionalTestCase extends AbstractProviderFuncti
         {
             return new MuleEndpointURI("multicast://228.8.9.10:6677");
         }
-        catch (UMOException e)
+        catch (EndpointException e)
         {
             fail(e.getMessage());
             return null;

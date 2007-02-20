@@ -130,7 +130,7 @@ public class EndpointReference
     {
         try
         {
-            MuleEndpoint ep = (MuleEndpoint)MuleManager.getRegistry().lookupEndpoint(endpointName);
+            MuleEndpoint ep = (MuleEndpoint)MuleManager.getInstance().lookupEndpoint(endpointName);
             if (ep == null)
             {
                 throw new InitialisationException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER,

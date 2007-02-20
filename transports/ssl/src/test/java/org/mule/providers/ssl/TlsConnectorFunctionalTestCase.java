@@ -11,7 +11,7 @@
 package org.mule.providers.ssl;
 
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.umo.UMOException;
+import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 
 public class TlsConnectorFunctionalTestCase extends SslConnectorFunctionalTestCase
@@ -24,7 +24,7 @@ public class TlsConnectorFunctionalTestCase extends SslConnectorFunctionalTestCa
         {
             return new MuleEndpointURI("tls://localhost:" + port);
         }
-        catch (UMOException e)
+        catch (EndpointException e)
         {
             fail(e.getMessage());
             return null;

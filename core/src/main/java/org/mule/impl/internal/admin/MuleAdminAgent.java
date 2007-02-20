@@ -12,9 +12,9 @@ package org.mule.impl.internal.admin;
 
 import org.mule.MuleManager;
 import org.mule.impl.AlreadyInitialisedException;
+import org.mule.impl.model.ModelHelper;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.service.TransportFactory;
-import org.mule.registry.UMORegistry;
 import org.mule.transformers.wire.SerializationWireFormat;
 import org.mule.transformers.wire.WireFormat;
 import org.mule.umo.UMODescriptor;
@@ -22,6 +22,7 @@ import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOAgent;
+import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.UMOConnector;
 
 import org.apache.commons.lang.StringUtils;
@@ -109,7 +110,7 @@ public class MuleAdminAgent implements UMOAgent
             wireFormat = new SerializationWireFormat();
         }
         //TODO RM* serverUri = MuleManager.getConfiguration().getServerUrl();
-        UMORegistry registry = MuleManager.getRegistry();
+        UMOManager manager = MuleManager.getInstance();
 
         try
         {
@@ -120,41 +121,41 @@ public class MuleAdminAgent implements UMOAgent
                             + "<mule:admin-agent serverUri=\"tcp://example.com:60504\"/> ");
 
                 // abort the agent registration process
-                registry.unregisterAgent(this.getName());
+                manager.unregisterAgent(this.getName());
 
                 return;
             }
 
             // Check for override
-            if (MuleManager.getRegistry().lookupComponent(MuleManagerComponent.MANAGER_COMPONENT_NAME) != null)
+            if (ModelHelper.isComponentRegistered(MuleManagerComponent.MANAGER_COMPONENT_NAME))
             {
                 logger.info("Mule manager component has already been initialised, ignoring server url");
             }
             else
             {
-                if (registry.lookupConnector(DEFAULT_MANAGER_ENDPOINT) != null)
+                if (manager.lookupConnector(DEFAULT_MANAGER_ENDPOINT) != null)
                 {
                     throw new AlreadyInitialisedException("Server Components", this);
                 }
 
                 // Check to see if we have an endpoint identifier
-                serverUri = registry.lookupEndpointIdentifier(serverUri,
+                serverUri = MuleManager.getInstance().lookupEndpointIdentifier(serverUri,
                     serverUri);
                 UMOEndpointURI endpointUri = new MuleEndpointURI(serverUri);
                 UMOConnector connector = TransportFactory.getOrCreateConnectorByProtocol(endpointUri);
                 // If this connector has already been initialised i.e. it's a
                 // pre-existing connector not not reinit
-                if (registry.lookupConnector(connector.getName()) == null)
+                if (manager.lookupConnector(connector.getName()) == null)
                 {
                     connector.setName(DEFAULT_MANAGER_ENDPOINT);
                     connector.initialise();
-                    registry.registerConnector(connector);
+                    manager.registerConnector(connector);
                 }
 
                 logger.info("Registering Admin listener on: " + serverUri);
                 UMODescriptor descriptor = MuleManagerComponent.getDescriptor(connector, endpointUri,
                     wireFormat);
-                MuleManager.getRegistry().registerSystemComponent(descriptor);
+                ModelHelper.registerSystemComponent(descriptor);
             }
         }
         catch (UMOException e)

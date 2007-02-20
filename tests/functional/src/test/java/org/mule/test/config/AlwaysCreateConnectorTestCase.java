@@ -22,6 +22,6 @@ public class AlwaysCreateConnectorTestCase extends FunctionalTestCase
 
     public void testConnectorConfig() throws Exception
     {
-        assertEquals(2, MuleManager.getRegistry().getConnectors().size());
+        assertEquals(2, MuleManager.getInstance().getConnectors().size());
     }
 }

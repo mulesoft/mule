@@ -15,11 +15,9 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.AbstractConnector;
-import org.mule.registry.RegistryException;
 import org.mule.registry.ServiceDescriptorFactory;
 import org.mule.registry.ServiceException;
-import org.mule.registry.UMORegistry;
-import org.mule.umo.UMOException;
+import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
@@ -57,9 +55,8 @@ public class TransportFactory
     public static final int NEVER_CREATE_CONNECTOR = 2;
     public static final int USE_CONNECTOR = 3;
 
-    public static UMOEndpoint createEndpoint(UMOEndpointURI uri, String type) throws UMOException
+    public static UMOEndpoint createEndpoint(UMOEndpointURI uri, String type) throws EndpointException
     {
-        UMORegistry registry = MuleManager.getRegistry();
         String scheme = uri.getFullScheme();
         UMOConnector connector = null;
         try
@@ -67,7 +64,7 @@ public class TransportFactory
             if (uri.getCreateConnector() == ALWAYS_CREATE_CONNECTOR)
             {
                 connector = createConnector(uri);
-                registry.registerConnector(connector);
+                MuleManager.getInstance().registerConnector(connector);
             }
             else if (uri.getCreateConnector() == NEVER_CREATE_CONNECTOR)
             {
@@ -75,7 +72,7 @@ public class TransportFactory
             }
             else if (uri.getConnectorName() != null)
             {
-                connector = registry.lookupConnector(uri.getConnectorName());
+                connector = MuleManager.getInstance().lookupConnector(uri.getConnectorName());
                 if (connector == null)
                 {
                     throw new TransportFactoryException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER,
@@ -88,7 +85,7 @@ public class TransportFactory
                 if (connector == null)
                 {
                     connector = createConnector(uri);
-                    registry.registerConnector(connector);
+                    MuleManager.getInstance().registerConnector(connector);
                 }
             }
         }
@@ -175,7 +172,7 @@ public class TransportFactory
                 String scheme = url.getSchemeMetaInfo();
     
                 TransportServiceDescriptor sd = (TransportServiceDescriptor) 
-                    MuleManager.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, scheme, overrides);
+                    MuleManager.getInstance().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, scheme, overrides);
                 if (sd != null)
                 {
                     if (type == 0)
@@ -225,7 +222,7 @@ public class TransportFactory
             String scheme = url.getSchemeMetaInfo();
     
             TransportServiceDescriptor sd = (TransportServiceDescriptor) 
-                MuleManager.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, scheme, null);
+                MuleManager.getInstance().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, scheme, null);
             if (sd == null)
             {
                 throw new ServiceException(Message.createStaticMessage("No service descriptor found for transport: " + scheme + ".  This transport does not appear to be installed."));
@@ -268,19 +265,19 @@ public class TransportFactory
     }
 
     public static UMOConnector getOrCreateConnectorByProtocol(UMOEndpointURI uri)
-        throws UMOException
+        throws TransportFactoryException
     {
         return getOrCreateConnectorByProtocol(uri, uri.getCreateConnector());
     }
 
     public static UMOConnector getOrCreateConnectorByProtocol(UMOImmutableEndpoint endpoint)
-        throws UMOException
+        throws TransportFactoryException
     {
         return getOrCreateConnectorByProtocol(endpoint.getEndpointURI(), endpoint.getCreateConnector());
     }
 
     private static UMOConnector getOrCreateConnectorByProtocol(UMOEndpointURI uri, int create)
-        throws UMOException
+        throws TransportFactoryException
     {
         UMOConnector connector = getConnectorByProtocol(uri.getFullScheme());
         if (ALWAYS_CREATE_CONNECTOR == create
@@ -290,7 +287,7 @@ public class TransportFactory
             try
             {
                 BeanUtils.populate(connector, uri.getParams());
-                MuleManager.getRegistry().registerConnector(connector);
+                MuleManager.getInstance().registerConnector(connector);
 
             }
             catch (Exception e)
@@ -307,10 +304,10 @@ public class TransportFactory
         return connector;
     }
 
-    public static UMOConnector getConnectorByProtocol(String protocol) throws RegistryException
+    public static UMOConnector getConnectorByProtocol(String protocol)
     {
         UMOConnector connector;
-        Map connectors = MuleManager.getRegistry().getConnectors();
+        Map connectors = MuleManager.getInstance().getConnectors();
         for (Iterator iterator = connectors.values().iterator(); iterator.hasNext();)
         {
             connector = (UMOConnector)iterator.next();

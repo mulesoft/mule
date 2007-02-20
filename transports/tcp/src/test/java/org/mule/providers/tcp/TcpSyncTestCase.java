@@ -10,6 +10,8 @@
 
 package org.mule.providers.tcp;
 
+import java.util.Arrays;
+
 import org.mule.MuleManager;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
@@ -20,8 +22,6 @@ import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
-
-import java.util.Arrays;
 
 public class TcpSyncTestCase extends FunctionalTestCase
 {
@@ -54,7 +54,7 @@ public class TcpSyncTestCase extends FunctionalTestCase
 
     public void testSyncResponseOfBufferSize() throws Exception
     {
-        TcpConnector tcp = (TcpConnector)MuleManager.getRegistry().lookupConnector("tcpConnector");
+        TcpConnector tcp = (TcpConnector)MuleManager.getInstance().lookupConnector("tcpConnector");
         tcp.setBufferSize(1024 * 16);
         byte[] data = new byte[tcp.getBufferSize()];
         UMOMessage message = send(data);

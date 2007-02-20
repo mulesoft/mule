@@ -14,7 +14,6 @@ import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageReceiver;
-import org.mule.registry.RegistryException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.EndpointNotFoundException;
@@ -172,7 +171,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
     }
 
     protected UMOEndpoint getEndpointForURI(HttpServletRequest httpServletRequest)
-        throws EndpointException, MalformedEndpointException, RegistryException
+        throws EndpointException, MalformedEndpointException
     {
         String endpointName = httpServletRequest.getParameter("endpoint");
         if (endpointName == null)
@@ -180,7 +179,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
             throw new EndpointException(new Message("http", 8, "endpoint"));
         }
 
-        UMOEndpoint endpoint = MuleManager.getRegistry().lookupEndpoint(endpointName);
+        UMOEndpoint endpoint = MuleManager.getInstance().lookupEndpoint(endpointName);
         if (endpoint == null)
         {
             // if we dont find an endpoint for the given name, lets check the

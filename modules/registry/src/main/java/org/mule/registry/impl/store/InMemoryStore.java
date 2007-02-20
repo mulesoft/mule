@@ -14,11 +14,14 @@ import org.mule.persistence.PersistenceHelper;
 import org.mule.persistence.PersistenceNotification;
 import org.mule.persistence.PersistenceNotificationListener;
 import org.mule.registry.Registration;
-import org.mule.registry.RegistryException;
+import org.mule.registry.DeregistrationException;
+import org.mule.registry.RegistrationException;
+import org.mule.registry.Registry;
 import org.mule.registry.RegistryStore;
-import org.mule.registry.UMORegistry;
+import org.mule.registry.ReregistrationException;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.manager.UMOServerNotificationListener;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -65,7 +68,7 @@ public class InMemoryStore implements RegistryStore
      */
     private RegistryPersistenceHelper helper = null;
 
-    public InMemoryStore(UMORegistry registry) 
+    public InMemoryStore(Registry registry) 
     {
         helper = new RegistryPersistenceHelper(registry);
         helper.setPersistAll(true);
@@ -76,7 +79,7 @@ public class InMemoryStore implements RegistryStore
         helper.setPersistAll(persistAll);
     }
 
-    public void registerComponent(Registration component) throws RegistryException
+    public void registerComponent(Registration component) throws RegistrationException
     {
         if (component.getId().equals("0")) 
         {
@@ -112,7 +115,7 @@ public class InMemoryStore implements RegistryStore
         store.put(component.getId(), component);
     }
 
-    public void deregisterComponent(Registration component) throws RegistryException
+    public void deregisterComponent(Registration component) throws DeregistrationException
     {
         logger.info("Received deregistration of " + component.getType() + "/" + component.getId());
         Registration ref = 
@@ -122,7 +125,7 @@ public class InMemoryStore implements RegistryStore
         store.remove(ref);
     }
 
-    public void deregisterComponent(String registryId) throws RegistryException
+    public void deregisterComponent(String registryId) throws DeregistrationException
     {
         Registration ref = (Registration)store.get(registryId);
         // We will throw an exception here
@@ -130,7 +133,7 @@ public class InMemoryStore implements RegistryStore
         store.remove(ref);
     }
 
-    public void reregisterComponent(Registration component) throws RegistryException
+    public void reregisterComponent(Registration component) throws ReregistrationException
     {
         Registration ref = 
             (Registration)store.get(component.getId());
@@ -170,6 +173,22 @@ public class InMemoryStore implements RegistryStore
     public void initialise() throws InitialisationException 
     {
         store = new HashMap();
+    }
+
+    /**
+     * Start the registry store
+     */
+    public void start() throws UMOException
+    {
+        logger.info("Started");
+    }
+
+    /**
+     * Stop the registry store
+     */
+    public void stop() throws UMOException 
+    {
+        logger.info("Stopped");
     }
 
     /**

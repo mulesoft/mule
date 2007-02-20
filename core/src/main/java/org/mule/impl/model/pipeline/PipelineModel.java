@@ -17,7 +17,7 @@ import org.mule.umo.UMODescriptor;
 
 public class PipelineModel extends AbstractModel
 {
-    public UMOComponent createComponent(UMODescriptor descriptor)
+    protected UMOComponent createComponent(UMODescriptor descriptor)
     {
         return new PipelineComponent((MuleDescriptor)descriptor, this);
     }

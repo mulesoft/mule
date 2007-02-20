@@ -12,7 +12,7 @@ package org.mule.providers.udp;
 
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.tck.functional.AbstractProviderFunctionalTestCase;
-import org.mule.umo.UMOException;
+import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
 
@@ -94,7 +94,7 @@ public class UdpConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
         {
             return new MuleEndpointURI("udp://localhost:60131");
         }
-        catch (UMOException e)
+        catch (EndpointException e)
         {
             fail(e.getMessage());
             return null;
@@ -107,7 +107,7 @@ public class UdpConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
         {
             return new MuleEndpointURI("udp://localhost:60132");
         }
-        catch (UMOException e)
+        catch (EndpointException e)
         {
             fail(e.getMessage());
             return null;

@@ -13,11 +13,11 @@ package org.mule.config.spring;
 import org.mule.MuleManager;
 import org.mule.config.MuleConfiguration;
 import org.mule.impl.model.ModelFactory;
-import org.mule.registry.UMORegistry;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOInterceptorStack;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.UMOLifecycleAdapterFactory;
 import org.mule.umo.manager.UMOAgent;
 import org.mule.umo.manager.UMOContainerContext;
@@ -89,14 +89,12 @@ public class AutowireUMOManagerFactoryBean
     public static final String MULE_MODEL_EXCEPTION_STRATEGY_BEAN_NAME = "muleModelExceptionStrategy";
 
     private UMOManager manager;
-    private UMORegistry registry;
 
     private AbstractApplicationContext context;
 
     public AutowireUMOManagerFactoryBean() throws Exception
     {
         this.manager = MuleManager.getInstance();
-        this.registry = MuleManager.getRegistry();
     }
 
     public Object getObject() throws Exception
@@ -232,7 +230,7 @@ public class AutowireUMOManagerFactoryBean
             model.setExceptionListener((ExceptionListener)listener);
         }
 
-        registry.registerModel(model);
+        manager.registerModel(model);
 
     }
 
@@ -272,7 +270,7 @@ public class AutowireUMOManagerFactoryBean
         }
     }
 
-    protected void setMessageEndpointIdentifiers(Map endpoints) throws UMOException
+    protected void setMessageEndpointIdentifiers(Map endpoints) throws InitialisationException
     {
         if (endpoints == null)
         {
@@ -282,7 +280,7 @@ public class AutowireUMOManagerFactoryBean
         for (Iterator iterator = endpoints.entrySet().iterator(); iterator.hasNext();)
         {
             entry = (Map.Entry)iterator.next();
-            registry.registerEndpointIdentifier(entry.getKey().toString(), entry.getValue().toString());
+            manager.registerEndpointIdentifier(entry.getKey().toString(), entry.getValue().toString());
 
         }
     }
@@ -291,7 +289,7 @@ public class AutowireUMOManagerFactoryBean
     {
         for (Iterator iterator = agents.iterator(); iterator.hasNext();)
         {
-            registry.registerAgent((UMOAgent)iterator.next());
+            manager.registerAgent((UMOAgent)iterator.next());
         }
     }
 
@@ -313,23 +311,23 @@ public class AutowireUMOManagerFactoryBean
     {
         for (Iterator iterator = connectors.iterator(); iterator.hasNext();)
         {
-            registry.registerConnector((UMOConnector)iterator.next());
+            manager.registerConnector((UMOConnector)iterator.next());
         }
     }
 
-    protected void setTransformers(Collection transformers) throws UMOException
+    protected void setTransformers(Collection transformers) throws InitialisationException
     {
         for (Iterator iterator = transformers.iterator(); iterator.hasNext();)
         {
-            registry.registerTransformer((UMOTransformer)iterator.next());
+            manager.registerTransformer((UMOTransformer)iterator.next());
         }
     }
 
-    protected void setEndpoints(Collection endpoints) throws UMOException
+    protected void setEndpoints(Collection endpoints) throws InitialisationException
     {
         for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
         {
-            registry.registerEndpoint((UMOEndpoint)iterator.next());
+            manager.registerEndpoint((UMOEndpoint)iterator.next());
         }
     }
 
@@ -340,14 +338,14 @@ public class AutowireUMOManagerFactoryBean
         for (Iterator iterator = components.iterator(); iterator.hasNext();)
         {
             d = (UMODescriptor)iterator.next();
-            if (registry.lookupComponent(d.getName()) == null)
+            if (!manager.lookupModel("main").isComponentRegistered(d.getName()))
             {
-                registry.registerComponent(d, "main");
+                manager.lookupModel("main").registerComponent(d);
             }
         }
     }
 
-    protected void setInterceptorStacks(Map stacks) throws UMOException
+    protected void setInterceptorStacks(Map stacks)
     {
         if (stacks == null)
         {
@@ -357,7 +355,7 @@ public class AutowireUMOManagerFactoryBean
         {
             Map.Entry entry = (Map.Entry)iterator.next();
             String name = entry.getKey().toString();
-            registry.registerInterceptorStack(name, (UMOInterceptorStack)entry.getValue());
+            manager.registerInterceptorStack(name, (UMOInterceptorStack)entry.getValue());
         }
     }
 

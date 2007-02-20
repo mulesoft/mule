@@ -17,6 +17,9 @@ import org.mule.umo.model.UMOModel;
 /**
  * <code>ModelService</code> exposes service information and actions on the Mule
  * Model
+ * 
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
+ * @version $Revision$
  */
 public class ModelService implements ModelServiceMBean
 {
@@ -60,7 +63,7 @@ public class ModelService implements ModelServiceMBean
 
     public void unregisterComponent(String name) throws UMOException
     {
-        model.removeComponent(name);
+        model.unregisterComponent(model.getDescriptor(name));
     }
 
     public boolean isComponentRegistered(String name)

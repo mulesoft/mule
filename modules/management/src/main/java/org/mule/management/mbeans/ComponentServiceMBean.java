@@ -10,17 +10,18 @@
 
 package org.mule.management.mbeans;
 
+import javax.management.ObjectName;
+
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.Startable;
 import org.mule.umo.lifecycle.Stoppable;
-
-import javax.management.ObjectName;
 
 /**
  * <code>ComponentServiceMBean</code> defines the management interface for a mule
  * managed component
  * 
- * Note: all methods can throw an exception in the case that the component is not found in the registry.
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
+ * @version $Revision$
  */
 public interface ComponentServiceMBean extends Stoppable, Startable, ComponentStatsMBean
 {
@@ -30,21 +31,21 @@ public interface ComponentServiceMBean extends Stoppable, Startable, ComponentSt
      * @return statistics for this component
      * @see ComponentStats
      */
-    ObjectName getStatistics() throws UMOException;
+    ObjectName getStatistics();
 
     /**
      * The name of this component
      * 
      * @return The name of this component
      */
-    String getName() throws UMOException;
+    String getName();
 
     /**
      * The number of queued events for this component
      * 
      * @return The number of queued events for this component
      */
-    int getQueueSize() throws UMOException;
+    int getQueueSize();
 
     /**
      * Pauses event processing for theComponent. Unlike stop(), a paused component
@@ -67,9 +68,9 @@ public interface ComponentServiceMBean extends Stoppable, Startable, ComponentSt
      */
     void resume() throws UMOException;
 
-    boolean isPaused() throws UMOException;
+    boolean isPaused();
 
-    boolean isStopped() throws UMOException;
+    boolean isStopped();
 
     void dispose() throws UMOException;
 
@@ -78,5 +79,5 @@ public interface ComponentServiceMBean extends Stoppable, Startable, ComponentSt
      */
     void forceStop() throws UMOException;
 
-    boolean isStopping() throws UMOException;
+    boolean isStopping();
 }

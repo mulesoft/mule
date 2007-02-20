@@ -10,18 +10,20 @@
 
 package org.mule.management.mbeans;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.ObjectNameHelper;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * The EndpointServiceMBean allows you to check the confiugration of an endpoint and
  * conect/disconnect endpoints manually.
+ * 
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
+ * @version $Revision$
  */
 public class EndpointService implements EndpointServiceMBean
 {
@@ -38,14 +40,7 @@ public class EndpointService implements EndpointServiceMBean
     public EndpointService(UMOEndpoint endpoint)
     {
         this.endpoint = endpoint;
-        try 
-        {
-            init();
-        }
-        catch (Exception e)
-        {
-            logger.info("Exception ocurred during initialisation: " + e.getMessage());
-        }
+        init();
     }
 
     public EndpointService(UMOMessageReceiver receiver)
@@ -57,17 +52,10 @@ public class EndpointService implements EndpointServiceMBean
         this.endpoint = receiver.getEndpoint();
         this.receiver = receiver;
         this.componentName = receiver.getComponent().getDescriptor().getName();
-        try 
-        {
-            init();
-        }
-        catch (Exception e)
-        {
-            logger.info("Exception ocurred during initialisation: " + e.getMessage());
-        }
+        init();
     }
 
-    private void init() throws Exception
+    private void init()
     {
         if (endpoint == null)
         {

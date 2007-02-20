@@ -10,6 +10,8 @@
 
 package org.mule.providers.quartz.jobs;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
@@ -18,11 +20,7 @@ import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.NullPayload;
 import org.mule.providers.quartz.QuartzConnector;
 import org.mule.providers.quartz.QuartzMessageReceiver;
-import org.mule.registry.RegistryException;
 import org.mule.umo.manager.ObjectNotFoundException;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -51,15 +49,7 @@ public class MuleReceiverJob implements Job
         if (connectorName == null)
             throw new JobExecutionException(new Message("quartz", 6).getMessage());
 
-        AbstractConnector connector = null;
-        try
-        {
-            connector = (AbstractConnector)MuleManager.getRegistry().lookupConnector(connectorName);
-        }
-        catch (RegistryException e)
-        {
-            logger.info("Unable to look up connector " + connectorName + " : " + e.getMessage());
-        }
+        AbstractConnector connector = (AbstractConnector)MuleManager.getInstance().lookupConnector(connectorName);
         if (connector == null)
             throw new JobExecutionException(new Message("quartz", 7, connectorName).getMessage());
 

@@ -56,7 +56,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         UMOManager manager = getManager(true);
         model = new SedaModel();
         model.setName("default");
-        MuleManager.getRegistry().registerModel(model);
+        manager.registerModel(model);
         descriptor = getTestDescriptor("apple", Apple.class.getName());
         MuleManager.getInstance().start();
         connector = getConnector();
@@ -137,7 +137,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
 
         MuleDescriptor d = getTestDescriptor("anApple", Apple.class.getName());
 
-        UMOComponent component = MuleManager.getRegistry().registerComponent(d, model.getName());
+        UMOComponent component = model.registerComponent(d);
         UMOEndpoint endpoint = new MuleEndpoint("test", new MuleEndpointURI(getTestEndpointURI()), connector,
             null, UMOEndpoint.ENDPOINT_TYPE_SENDER, 0, null, new HashMap());
 
@@ -202,7 +202,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
             // expected
         }
         connector.unregisterListener(component, endpoint);
-        MuleManager.getRegistry().unregisterComponent(d.getName());
+        model.unregisterComponent(d);
     }
 
     public void testConnectorBeanProps() throws Exception

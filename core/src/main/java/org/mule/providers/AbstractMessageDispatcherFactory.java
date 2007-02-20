@@ -12,7 +12,6 @@ package org.mule.providers;
 
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.lifecycle.DisposeException;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
@@ -51,7 +50,7 @@ public abstract class AbstractMessageDispatcherFactory implements UMOMessageDisp
         dispatcher.activate();
     }
 
-    public void destroy(UMOImmutableEndpoint endpoint, UMOMessageDispatcher dispatcher) throws DisposeException
+    public void destroy(UMOImmutableEndpoint endpoint, UMOMessageDispatcher dispatcher)
     {
         dispatcher.dispose();
     }

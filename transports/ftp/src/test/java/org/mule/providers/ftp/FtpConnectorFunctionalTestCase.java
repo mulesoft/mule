@@ -15,7 +15,7 @@ import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.NullPayload;
 import org.mule.tck.functional.AbstractProviderFunctionalTestCase;
 import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
+import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
@@ -59,7 +59,7 @@ public class FtpConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
         {
             return new MuleEndpointURI("ftp://" + USERNAME + ":" + PASSWORD + "@" + HOSTNAME + "/" + ADDRESS);
         }
-        catch (UMOException e)
+        catch (EndpointException e)
         {
             fail(e.getMessage());
             return null;

@@ -10,21 +10,18 @@
 
 package org.mule.registry;
 
-import org.mule.config.i18n.Message;
-import org.mule.umo.UMOException;
+import org.mule.MuleException;
 
 /**
- * Any registry-related exception: unable to register/deregister an entity, etc.
+ * @author
+ * @version $Revision: $
  */
-public class RegistryException extends UMOException
+public class DeregistrationException extends MuleException
 {
-    public RegistryException(Message message)
+    public DeregistrationException()
     {
-        super(message);
-    }
-
-    public RegistryException(Message message, Throwable cause)
-    {
-        super(message, cause);
+        super("");
     }
 }
+
+

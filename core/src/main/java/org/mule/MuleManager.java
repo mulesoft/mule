@@ -35,13 +35,23 @@ import org.mule.impl.internal.notifications.NotificationException;
 import org.mule.impl.internal.notifications.SecurityNotification;
 import org.mule.impl.internal.notifications.SecurityNotificationListener;
 import org.mule.impl.internal.notifications.ServerNotificationManager;
+import org.mule.impl.model.ModelFactory;
+import org.mule.impl.model.ModelHelper;
 import org.mule.impl.security.MuleSecurityManager;
 import org.mule.impl.work.MuleWorkManager;
 import org.mule.management.stats.AllStatistics;
-import org.mule.registry.RegistryException;
-import org.mule.registry.UMORegistry;
+import org.mule.registry.AbstractServiceDescriptor;
+import org.mule.registry.DeregistrationException;
+import org.mule.registry.RegistrationException;
+import org.mule.registry.Registry;
+import org.mule.registry.ServiceDescriptor;
+import org.mule.registry.ServiceDescriptorFactory;
+import org.mule.registry.ServiceException;
+import org.mule.registry.impl.DummyRegistry;
 import org.mule.registry.impl.RegistryNotificationListener;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOInterceptorStack;
+import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.FatalException;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOAgent;
@@ -50,9 +60,15 @@ import org.mule.umo.manager.UMOManager;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.manager.UMOServerNotificationListener;
 import org.mule.umo.manager.UMOWorkManager;
+import org.mule.umo.model.UMOModel;
+import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOSecurityManager;
+import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
+import org.mule.util.CollectionUtils;
 import org.mule.util.DateUtils;
+import org.mule.util.MapUtils;
+import org.mule.util.SpiUtils;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.UUID;
 import org.mule.util.queue.CachingPersistenceStrategy;
@@ -68,15 +84,20 @@ import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.jar.Manifest;
 
 import javax.transaction.TransactionManager;
 
+import org.apache.commons.collections.list.CursorableLinkedList;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -89,17 +110,18 @@ import org.apache.commons.logging.LogFactory;
  */
 public class MuleManager implements UMOManager
 {   
-    private static final String MULE_REGISTRY_CLASS = "org.mule.registry.impl.SingletonMuleRegistry";
-    
     /**
-     * Singleton Manager instance
+     * Service descriptor cache. 
+     * 
+     * @deprecated This needs to be redesigned for an OSGi environment where ServiceDescriptors may change.
      */
-    private static UMOManager instance = null;
+    // @GuardedBy("this")
+    protected static Map sdCache = new HashMap();
 
     /**
-     * Singleton Registry instance
+     * singleton instance
      */
-    private static UMORegistry registry = null;
+    private static UMOManager instance = null;
 
     /**
      * Default configuration
@@ -107,9 +129,34 @@ public class MuleManager implements UMOManager
     private static MuleConfiguration config = new MuleConfiguration();
 
     /**
+     * Connectors registry
+     */
+    private Map connectors = new HashMap();
+
+    /**
+     * Endpoints registry
+     */
+    private Map endpointIdentifiers = new HashMap();
+
+    /**
      * Holds any application scoped environment properties set in the config
      */
     private Map applicationProps = new HashMap();
+
+    /**
+     * Holds any registered agents
+     */
+    private Map agents = new LinkedHashMap();
+
+    /**
+     * Holds a list of global endpoints accessible to any client code
+     */
+    private Map endpoints = new HashMap();
+
+    /**
+     * The model being used
+     */
+    private Map models = new LinkedHashMap();
 
     /**
      * the unique id for this manager
@@ -120,6 +167,11 @@ public class MuleManager implements UMOManager
      * The transaction Manager to use for global transactions
      */
     private TransactionManager transactionManager = null;
+
+    /**
+     * Collection for transformers registered in this component
+     */
+    private Map transformers = new HashMap();
 
     /**
      * True once the Mule Manager is initialised
@@ -157,6 +209,11 @@ public class MuleManager implements UMOManager
     private static MuleServer server = null;
 
     /**
+     * Maintains a reference to any interceptor stacks configured on the manager
+     */
+    private Map interceptorsMap = new HashMap();
+
+    /**
      * the date in milliseconds from when the server was started
      */
     private long startDate = 0;
@@ -183,6 +240,11 @@ public class MuleManager implements UMOManager
     private UMOWorkManager workManager;
 
     /**
+     * Registry
+     */
+    private Registry registry;
+
+    /**
      * Registration ID for this Manager
      */
     private String registryId = null;
@@ -192,9 +254,6 @@ public class MuleManager implements UMOManager
      */
     private static Log logger = LogFactory.getLog(MuleManager.class);
 
-    /**
-     * @deprecated This is now handled by the OSGi lifecycle or the Service Wrapper
-     */
     private ShutdownContext shutdownContext = new ShutdownContext(true, null);
 
     /**
@@ -260,39 +319,22 @@ public class MuleManager implements UMOManager
             logger.info("Creating new MuleManager instance");
             try
             {
+                //There should always be a defualt system model registered
                 instance = new MuleManager();
+                UMOModel model = ModelFactory.createModel(ModelHelper.getSystemModelType());
+                model.setName(ModelHelper.SYSTEM_MODEL);
+                instance.registerModel(model);
             }
             catch (Exception e)
             {
                 throw new MuleRuntimeException(new Message(Messages.FAILED_TO_CREATE_MANAGER_INSTANCE_X,
                     MuleManager.class.getName()), e);
             }
-
-            logger.info("Creating new MuleRegistry instance");
-            try
-            {
-                registry = (UMORegistry) ClassUtils.instanciateClass(MULE_REGISTRY_CLASS, new Object[]{});
-            }
-            catch (Exception e)
-            {
-                throw new MuleRuntimeException(new Message(Messages.FAILED_TO_CREATE_REGISTRY_INSTANCE_X,
-                    MULE_REGISTRY_CLASS), e);
-            }
         }
 
         return instance;
     }
 
-    public static UMORegistry getRegistry()
-    {
-        if (registry == null)
-        {
-            // The MuleManager and MuleRegistry are both singletons which get initialized together.
-            getInstance();
-        }
-        return registry;
-    }
-    
     /**
      * A static method to determine if there is an instance of the MuleManager. This
      * should be used instead of <code>
@@ -394,10 +436,22 @@ public class MuleManager implements UMOManager
             logger.error("Failed to stop manager: " + e.getMessage(), e);
         }
         disposed.set(true);
+        disposeConnectors();
 
+        for (Iterator i = models.values().iterator(); i.hasNext();)
+        {
+            UMOModel model = (UMOModel) i.next();
+            model.dispose();
+        }
+
+        disposeAgents();
+
+        transformers.clear();
+        endpoints.clear();
+        endpointIdentifiers.clear();
         containerContext.dispose();
         containerContext = null;
-        // props.clear();
+        // props.clearErrors();
         fireSystemEvent(new ManagerNotification(id, null, null, ManagerNotification.MANAGER_DISPOSED));
 
         if (registry != null)
@@ -406,6 +460,9 @@ public class MuleManager implements UMOManager
             registry = null;
         }
 
+        transformers = null;
+        endpoints = null;
+        endpointIdentifiers = null;
         // props = null;
         initialised.set(false);
         if (notificationManager != null)
@@ -440,6 +497,20 @@ public class MuleManager implements UMOManager
     }
 
     /**
+     * Destroys all connectors
+     */
+    private synchronized void disposeConnectors()
+    {
+        fireSystemEvent(new ManagerNotification(id, null, null, ManagerNotification.MANAGER_DISPOSING_CONNECTORS));
+        for (Iterator iterator = connectors.values().iterator(); iterator.hasNext();)
+        {
+            UMOConnector c = (UMOConnector) iterator.next();
+            c.dispose();
+        }
+        fireSystemEvent(new ManagerNotification(id, null, null, ManagerNotification.MANAGER_DISPOSED_CONNECTORS));
+    }
+
+    /**
      * {@inheritDoc}
      */
     public Object getProperty(Object key)
@@ -461,6 +532,165 @@ public class MuleManager implements UMOManager
     public TransactionManager getTransactionManager()
     {
         return transactionManager;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public UMOConnector lookupConnector(String name)
+    {
+        return (UMOConnector) connectors.get(name);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String lookupEndpointIdentifier(String logicalName, String defaultName)
+    {
+        String name = (String) endpointIdentifiers.get(logicalName);
+        if (name == null)
+        {
+            return defaultName;
+        }
+        return name;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public UMOEndpoint lookupEndpoint(String logicalName)
+    {
+        UMOEndpoint endpoint = (UMOEndpoint) endpoints.get(logicalName);
+        if (endpoint != null)
+        {
+            return (UMOEndpoint) endpoint.clone();
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public UMOEndpoint lookupEndpointByAddress(String address)
+    {
+        UMOEndpoint endpoint = null;
+        if (address != null)
+        {
+            boolean found = false;
+            Iterator iterator = endpoints.keySet().iterator();
+            while (!found && iterator.hasNext())
+            {
+                endpoint = (UMOEndpoint) endpoints.get(iterator.next());
+                found = (address.equals(endpoint.getEndpointURI().toString()));
+            }
+        }
+        return endpoint;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public UMOTransformer lookupTransformer(String name)
+    {
+         return (UMOTransformer)transformers.get(name);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void registerConnector(UMOConnector connector) throws UMOException
+    {
+        connectors.put(connector.getName(), connector);
+        if (initialised.get() || initialising.get())
+        {
+            connector.initialise();
+        }
+        if ((started.get() || starting.get()) && !connector.isStarted())
+        {
+            connector.startConnector();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void unregisterConnector(String connectorName) throws UMOException
+    {
+        UMOConnector c = (UMOConnector) connectors.remove(connectorName);
+        if (c != null)
+        {
+            c.dispose();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void registerEndpointIdentifier(String logicalName, String endpoint)
+    {
+        endpointIdentifiers.put(logicalName, endpoint);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void unregisterEndpointIdentifier(String logicalName)
+    {
+        endpointIdentifiers.remove(logicalName);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void registerEndpoint(UMOEndpoint endpoint)
+    {
+        endpoints.put(endpoint.getName(), endpoint);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void unregisterEndpoint(String endpointName)
+    {
+        UMOEndpoint p = (UMOEndpoint) endpoints.get(endpointName);
+        if (p != null)
+        {
+            endpoints.remove(p);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void registerTransformer(UMOTransformer transformer) throws InitialisationException
+    {
+        transformer.initialise();
+
+        // For now at least, we don't want a registration error to affect
+        // the initialisation process.
+       // try
+       // {
+            //TODO LM: Method not implemented yet?
+            //transformer.register();
+       // }
+       // catch (RegistrationException re)
+       // {
+       //     logger.warn(re);
+       // }
+
+        transformers.put(transformer.getName(), transformer);
+        logger.info("Transformer " + transformer.getName() + " has been initialised successfully");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void unregisterTransformer(String transformerName)
+    {
+        transformers.remove(transformerName);
     }
 
     /**
@@ -488,9 +718,42 @@ public class MuleManager implements UMOManager
         transactionManager = newManager;
     }
 
-    public void setRegistry(UMORegistry registry)
+    /**
+     */
+    public void setRegistry(Registry registry)
     {
         this.registry = registry;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.lifecycle.Registerable#register()
+     */
+    public void register() throws RegistrationException
+    {
+        registryId = getRegistry().registerMuleObject(null, this).getId();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.lifecycle.Registerable#deregister()
+     */
+    public void deregister() throws DeregistrationException
+    {
+        getRegistry().deregisterComponent(registryId);
+        registryId = null;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.lifecycle.Registerable#getRegistryId()
+     */
+    public String getRegistryId()
+    {
+        return registryId;
     }
 
     /**
@@ -498,8 +761,6 @@ public class MuleManager implements UMOManager
      */
     public synchronized void initialise() throws UMOException
     {
-        registerListener(new RegistryNotificationListener(registry));
-
         validateEncoding();
         validateOSEncoding();
 
@@ -507,6 +768,12 @@ public class MuleManager implements UMOManager
         {
             initialising.set(true);
             startDate = System.currentTimeMillis();
+
+            // Start the registry
+            if (registry == null)
+            {
+                createRegistry();
+            }
 
             // if no work manager has been set create a default one
             if (workManager == null)
@@ -557,6 +824,18 @@ public class MuleManager implements UMOManager
                                 "QueueManager"), e);
                     }
                 }
+
+                initialiseConnectors();
+                initialiseEndpoints();
+                initialiseAgents();
+                for (Iterator i = models.values().iterator(); i.hasNext();)
+                {
+                    UMOModel model = (UMOModel) i.next();
+                    model.initialise();
+                    //TODO LM: Should the model be registered before or after initialisation?
+                    model.register();
+                }
+
             }
             finally
             {
@@ -607,6 +886,48 @@ public class MuleManager implements UMOManager
         }
     }
 
+    protected void registerAdminAgent() throws UMOException
+    {
+        // Allows users to disable all server components and connections
+        // this can be useful for testing
+        boolean disable = MapUtils.getBooleanValue(System.getProperties(),
+                MuleProperties.DISABLE_SERVER_CONNECTIONS_SYSTEM_PROPERTY, false);
+
+        // if endpointUri is blanked out do not setup server components
+        //TODO RM* Admin agent should be explicit
+//        if (StringUtils.isBlank(config.getServerUrl()))
+//        {
+//            logger.info("Server endpointUri is null, not registering Mule Admin agent");
+//            disable = true;
+//        }
+//
+//        if (disable)
+//        {
+//            unregisterAgent(MuleAdminAgent.AGENT_NAME);
+//        }
+//        else
+//        {
+//            if (lookupAgent(MuleAdminAgent.AGENT_NAME) == null)
+//            {
+//                registerAgent(new MuleAdminAgent());
+//            }
+//        }
+    }
+
+    protected void initialiseEndpoints() throws InitialisationException
+    {
+        UMOEndpoint ep;
+        for (Iterator iterator = this.endpoints.values().iterator(); iterator.hasNext();)
+        {
+            ep = (UMOEndpoint) iterator.next();
+            ep.initialise();
+            // the connector has been created for this endpoint so lets
+            // set the create connector to 0 so that every time this endpoint
+            // is referenced we don't create another connector
+            ep.setCreateConnector(0);
+        }
+    }
+
     /**
      * Start the <code>MuleManager</code>. This will start the connectors and
      * sessions.
@@ -621,10 +942,20 @@ public class MuleManager implements UMOManager
         {
             starting.set(true);
             fireSystemEvent(new ManagerNotification(id, null, null, ManagerNotification.MANAGER_STARTING));
+            registerAdminAgent();
             if (queueManager != null)
             {
                 queueManager.start();
             }
+            startConnectors();
+            startAgents();
+            fireSystemEvent(new ManagerNotification(id, null, null, ManagerNotification.MANAGER_STARTING_MODELS));
+            for (Iterator i = models.values().iterator(); i.hasNext();)
+            {
+                UMOModel model = (UMOModel) i.next();
+                model.start();
+            }
+            fireSystemEvent(new ManagerNotification(id, null, null, ManagerNotification.MANAGER_STARTED_MODELS));
 
             started.set(true);
             starting.set(false);
@@ -658,6 +989,31 @@ public class MuleManager implements UMOManager
     }
 
     /**
+     * Starts the connectors
+     *
+     * @throws MuleException if the connectors fail to start
+     */
+    private void startConnectors() throws UMOException
+    {
+        for (Iterator iterator = connectors.values().iterator(); iterator.hasNext();)
+        {
+            UMOConnector c = (UMOConnector) iterator.next();
+            c.startConnector();
+        }
+        logger.info("Connectors have been started successfully");
+    }
+
+    private void initialiseConnectors() throws InitialisationException
+    {
+        for (Iterator iterator = connectors.values().iterator(); iterator.hasNext();)
+        {
+            UMOConnector c = (UMOConnector) iterator.next();
+            c.initialise();
+        }
+        logger.info("Connectors have been initialised successfully");
+    }
+
+    /**
      * Stops the <code>MuleManager</code> which stops all sessions and connectors
      *
      * @throws UMOException if either any of the sessions or connectors fail to stop
@@ -668,13 +1024,46 @@ public class MuleManager implements UMOManager
         stopping.set(true);
         fireSystemEvent(new ManagerNotification(id, null, null, ManagerNotification.MANAGER_STOPPING));
 
+        stopConnectors();
+        stopAgents();
+
         if (queueManager != null)
         {
             queueManager.stop();
         }
 
+        logger.debug("Stopping model...");
+        fireSystemEvent(new ManagerNotification(id, null, null, ManagerNotification.MANAGER_STOPPING_MODELS));
+        for (Iterator i = models.values().iterator(); i.hasNext();)
+        {
+            UMOModel model = (UMOModel) i.next();
+            model.stop();
+        }
+        fireSystemEvent(new ManagerNotification(id, null, null, ManagerNotification.MANAGER_STOPPED_MODELS));
+
+        if (registry != null)
+        {
+            registry.stop();
+        }
+
         stopping.set(false);
         fireSystemEvent(new ManagerNotification(id, null, null, ManagerNotification.MANAGER_STOPPED));
+    }
+
+    /**
+     * Stops the connectors
+     *
+     * @throws MuleException if any of the connectors fail to stop
+     */
+    private void stopConnectors() throws UMOException
+    {
+        logger.debug("Stopping connectors...");
+        for (Iterator iterator = connectors.values().iterator(); iterator.hasNext();)
+        {
+            UMOConnector c = (UMOConnector) iterator.next();
+            c.stopConnector();
+        }
+        logger.info("Connectors have been stopped successfully");
     }
 
     /**
@@ -701,6 +1090,103 @@ public class MuleManager implements UMOManager
     {
         shutdownContext = new ShutdownContext(aggressive, e);
         System.exit(0);
+    }
+
+    public UMOModel lookupModel(String name)
+    {
+        // TODO LM: why are we checking if the registry is null here?  This should be done in a lifecycle phase
+        if (registry == null)
+        {
+            createRegistry();
+        }
+
+        return (UMOModel)models.get(name);
+    }
+
+    public void registerModel(UMOModel model) throws UMOException
+    {
+        models.put(model.getName(), model);
+        if (initialised.get())
+        {
+            model.register();
+            model.initialise();
+        }
+
+        if (started.get())
+        {
+            model.start();
+        }
+    }
+
+    public void unregisterModel(String name)
+    {
+        UMOModel model = lookupModel(name);
+        if(model!=null)
+        {
+            models.remove(model);
+            model.dispose();
+        }
+    }
+
+    public Map getModels()
+    {
+        return Collections.unmodifiableMap(models);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void registerInterceptorStack(String name, UMOInterceptorStack stack)
+    {
+        interceptorsMap.put(name, stack);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public UMOInterceptorStack lookupInterceptorStack(String name)
+    {
+        return (UMOInterceptorStack) interceptorsMap.get(name);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Map getConnectors()
+    {
+        return Collections.unmodifiableMap(connectors);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Map getEndpointIdentifiers()
+    {
+        return Collections.unmodifiableMap(endpointIdentifiers);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Map getEndpoints()
+    {
+        return Collections.unmodifiableMap(endpoints);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Map getTransformers()
+    {
+        return Collections.unmodifiableMap(transformers);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Registry getRegistry()
+    {
+        return registry;
     }
 
     /**
@@ -752,7 +1238,7 @@ public class MuleManager implements UMOManager
      *
      * @return a string summary of the server information
      */
-    protected String getStartSplash() throws RegistryException
+    protected String getStartSplash()
     {
         String notset = new Message(Messages.NOT_SET).getMessage();
 
@@ -796,7 +1282,6 @@ public class MuleManager implements UMOManager
         }
 
         // Mule Agents
-        Map agents = registry.getAgents();
         message.add(" ");
         if (agents.size() == 0)
         {
@@ -830,6 +1315,174 @@ public class MuleManager implements UMOManager
         message.add(new Message(Messages.SERVER_WAS_UP_FOR_X, DateUtils.getFormattedDuration(duration)).getMessage());
 
         return StringMessageUtils.getBoilerPlate(message, '*', 78);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void registerAgent(UMOAgent agent) throws UMOException
+    {
+        logger.info("Adding agent " + agent.getName());
+        agents.put(agent.getName(), agent);
+        agent.registered();
+        // Don't allow initialisation while the server is being initalised,
+        // only when we are done. Otherwise the agent registration
+        // order can be corrupted.
+        if (initialised.get())
+        {
+            logger.info("Initialising agent " + agent.getName());
+            agent.initialise();
+        }
+        if ((started.get() || starting.get()))
+        {
+            logger.info("Starting agent " + agent.getName());
+            agent.start();
+        }
+    }
+
+    public UMOAgent lookupAgent(String name)
+    {
+        return (UMOAgent) agents.get(name);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public UMOAgent unregisterAgent(String name) throws UMOException
+    {
+        if (name == null)
+        {
+            return null;
+        }
+        UMOAgent agent = (UMOAgent) agents.remove(name);
+        if (agent != null)
+        {
+            agent.dispose();
+            agent.unregistered();
+        }
+        return agent;
+    }
+
+    /**
+     * Initialises all registered agents
+     *
+     * @throws InitialisationException
+     */
+    protected void initialiseAgents() throws InitialisationException
+    {
+        logger.info("Initialising agents...");
+
+        // Do not iterate over the map directly, as 'complex' agents
+        // may spawn extra agents during initialisation. This will
+        // cause a ConcurrentModificationException.
+        // Use a cursorable iteration, which supports on-the-fly underlying
+        // data structure changes.
+        Collection agentsSnapshot = agents.values();
+        CursorableLinkedList agentRegistrationQueue = new CursorableLinkedList(agentsSnapshot);
+        CursorableLinkedList.Cursor cursor = agentRegistrationQueue.cursor();
+
+        // the actual agent object refs are the same, so we are just
+        // providing different views of the same underlying data
+
+        try
+        {
+            while (cursor.hasNext())
+            {
+                UMOAgent umoAgent = (UMOAgent) cursor.next();
+
+                int originalSize = agentsSnapshot.size();
+                logger.debug("Initialising agent: " + umoAgent.getName());
+                umoAgent.initialise();
+                // thank you, we are done with you
+                cursor.remove();
+
+                // Direct calls to MuleManager.registerAgent() modify the original
+                // agents map, re-check if the above agent registered any
+                // 'child' agents.
+                int newSize = agentsSnapshot.size();
+                int delta = newSize - originalSize;
+                if (delta > 0)
+                {
+                    // TODO there's some mess going on in
+                    // http://issues.apache.org/jira/browse/COLLECTIONS-219
+                    // watch out when upgrading the commons-collections.
+                    Collection tail = CollectionUtils.retainAll(agentsSnapshot, agentRegistrationQueue);
+                    Collection head = CollectionUtils.subtract(agentsSnapshot, tail);
+
+                    // again, above are only refs, all going back to the original agents map
+
+                    // re-order the queue
+                    agentRegistrationQueue.clear();
+                    // 'spawned' agents first
+                    agentRegistrationQueue.addAll(head);
+                    // and the rest
+                    agentRegistrationQueue.addAll(tail);
+
+                    // update agents map with a new order in case we want to re-initialise
+                    // MuleManager on the fly
+                    this.agents.clear();
+                    for (Iterator it = agentRegistrationQueue.iterator(); it.hasNext();)
+                    {
+                        UMOAgent theAgent = (UMOAgent) it.next();
+                        this.agents.put(theAgent.getName(), theAgent);
+                    }
+                }
+            }
+        }
+        finally
+        {
+            // close the cursor as per JavaDoc
+            cursor.close();
+        }
+        logger.info("Agents Successfully Initialised");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected void startAgents() throws UMOException
+    {
+        UMOAgent umoAgent;
+        logger.info("Starting agents...");
+        for (Iterator iterator = agents.values().iterator(); iterator.hasNext();)
+        {
+            umoAgent = (UMOAgent) iterator.next();
+            logger.info("Starting agent: " + umoAgent.getDescription());
+            umoAgent.start();
+
+        }
+        logger.info("Agents Successfully Started");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected void stopAgents() throws UMOException
+    {
+        logger.info("Stopping agents...");
+        for (Iterator iterator = agents.values().iterator(); iterator.hasNext();)
+        {
+            UMOAgent umoAgent = (UMOAgent) iterator.next();
+            logger.debug("Stopping agent: " + umoAgent.getName());
+            umoAgent.stop();
+        }
+        logger.info("Agents Successfully Stopped");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected void disposeAgents()
+    {
+        UMOAgent umoAgent;
+        logger.info("disposing agents...");
+        for (Iterator iterator = agents.values().iterator(); iterator.hasNext();)
+        {
+            umoAgent = (UMOAgent) iterator.next();
+            logger.debug("Disposing agent: " + umoAgent.getName());
+            umoAgent.dispose();
+        }
+        logger.info("Agents Successfully Disposed");
     }
 
     /**
@@ -896,6 +1549,39 @@ public class MuleManager implements UMOManager
         {
             notificationManager.unregisterListener(l);
         }
+    }
+
+    /**
+     * Looks up the service descriptor from a singleton cache and creates a new one if not found.
+     */
+    public ServiceDescriptor lookupServiceDescriptor(String type, String name, Properties overrides) throws ServiceException
+    {
+        AbstractServiceDescriptor.Key key = new AbstractServiceDescriptor.Key(name, overrides);
+        ServiceDescriptor sd = (ServiceDescriptor) sdCache.get(key);
+      
+        synchronized (this)
+        {
+            if (sd == null)
+            {
+                sd = createServiceDescriptor(type, name, overrides);
+
+                sdCache.put(key, sd);
+            }
+        }
+        return sd;
+    }
+        
+    /**
+     * @deprecated ServiceDescriptors will be created upon bundle startup for OSGi.
+     */
+    protected ServiceDescriptor createServiceDescriptor(String type, String name, Properties overrides) throws ServiceException
+    {
+        Properties props = SpiUtils.findServiceDescriptor(type, name);
+        if(props==null)
+        {
+            throw new ServiceException(new Message(Messages.FAILED_LOAD_X, type + " " +name));
+        }
+        return ServiceDescriptorFactory.create(type, name, props, overrides);
     }
 
     /**
@@ -1041,6 +1727,33 @@ public class MuleManager implements UMOManager
         this.queueManager = queueManager;
     }
 
+    private void createRegistry()
+    {
+        try
+        {
+            Class clazz = Class.forName("org.mule.registry.impl.MuleRegistry");
+            Object o = clazz.newInstance();
+            registry = (Registry) o;
+            registry.start();
+            registerListener(new RegistryNotificationListener(registry));
+        }
+        catch (Exception e)
+        {
+            logger.warn("Couldn't create MuleRegistry: " + e.toString());
+            logger.warn("Creating dummy registry so that things will run");
+            registry = new DummyRegistry();
+        }
+
+        try
+        {
+            register();
+        }
+        catch (RegistrationException e)
+        {
+            logger.warn("Unable to register the manager: " + e.toString());
+        }
+    }
+
     /**
      * The shutdown thread used by the server when its main thread is terminated
      * 
@@ -1086,9 +1799,6 @@ public class MuleManager implements UMOManager
         }
     }
 
-    /**
-     * @deprecated This is now handled by the OSGi lifecycle or the Service Wrapper
-     */
     private class ShutdownContext
     {
         private boolean aggressive = false;

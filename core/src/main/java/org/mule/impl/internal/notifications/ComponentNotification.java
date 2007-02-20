@@ -35,12 +35,9 @@ public class ComponentNotification extends UMOServerNotification
     public static final int COMPONENT_RESUMED = COMPONENT_EVENT_ACTION_START_RANGE + 5;
     public static final int COMPONENT_DISPOSED = COMPONENT_EVENT_ACTION_START_RANGE + 6;
     public static final int COMPONENT_STOPPING = COMPONENT_EVENT_ACTION_START_RANGE + 7;
-    public static final int COMPONENT_INITIALISING = COMPONENT_EVENT_ACTION_START_RANGE + 8;
-    public static final int COMPONENT_DISPOSING = COMPONENT_EVENT_ACTION_START_RANGE + 9;
-    public static final int COMPONENT_STARTING = COMPONENT_EVENT_ACTION_START_RANGE + 10;
 
     private static final transient String[] ACTIONS = new String[]{"initialised", "started", "stopped",
-        "paused", "resumed", "disposed", "stopping", "initialising", "disposing", "starting"};
+        "paused", "resumed", "disposed", "stopping"};
 
     public ComponentNotification(UMODescriptor message, int action)
     {

@@ -10,13 +10,16 @@
 
 package org.mule.persistence;
 
+import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.Initialisable;
+import org.mule.umo.lifecycle.Disposable;
+import org.mule.umo.manager.UMOServerNotificationListener;
 
 /**
  * <code>PersistenceStore</code> is the actual store where persisted
  * objects are stored. It is owned by the PersistenceManager.
  */
-public interface PersistenceStore extends Initialisable
+public interface PersistenceStore extends Initialisable, Disposable
 {
     /**
      * Asks the store to store a Persistable object. 

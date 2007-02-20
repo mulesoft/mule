@@ -10,7 +10,6 @@
 
 package org.mule.management;
 
-import org.mule.MuleManager;
 import org.mule.impl.internal.notifications.ComponentNotification;
 import org.mule.impl.internal.notifications.ComponentNotificationListener;
 import org.mule.impl.internal.notifications.CustomNotification;
@@ -83,8 +82,8 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
             }
         }, "component1");
 
-        MuleManager.getRegistry().registerComponent(getTestDescriptor("component2", Apple.class.getName()), model.getName());
-        MuleManager.getRegistry().registerComponent(getTestDescriptor("component1", Apple.class.getName()), model.getName());
+        model.registerComponent(getTestDescriptor("component2", Apple.class.getName()));
+        model.registerComponent(getTestDescriptor("component1", Apple.class.getName()));
 
         // Wait for the notifcation event to be fired as they are queue
         latch.await(20000, TimeUnit.MILLISECONDS);
@@ -108,9 +107,9 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
             }
         }, "component*");
 
-        MuleManager.getRegistry().registerComponent(getTestDescriptor("component2", Apple.class.getName()), model.getName());
-        MuleManager.getRegistry().registerComponent(getTestDescriptor("component1", Apple.class.getName()), model.getName());
-        MuleManager.getRegistry().registerComponent(getTestDescriptor("noMatchComponent", Apple.class.getName()), model.getName());
+        model.registerComponent(getTestDescriptor("component2", Apple.class.getName()));
+        model.registerComponent(getTestDescriptor("component1", Apple.class.getName()));
+        model.registerComponent(getTestDescriptor("noMatchComponent", Apple.class.getName()));
 
         // Wait for the notifcation event to be fired as they are queue
         latch.await(2000, TimeUnit.MILLISECONDS);

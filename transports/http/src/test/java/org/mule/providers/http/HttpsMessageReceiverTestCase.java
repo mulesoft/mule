@@ -21,11 +21,16 @@ import org.mule.umo.provider.UMOMessageReceiver;
 
 import com.mockobjects.dynamic.Mock;
 
+/**
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
+ * @version $Revision$
+ */
+
 public class HttpsMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
     protected void doSetUp() throws Exception
     {
-        MuleManager.getRegistry().registerConnector(HttpsConnectorTestCase.createConnector(false));
+        MuleManager.getInstance().registerConnector(HttpsConnectorTestCase.createConnector(false));
         super.doSetUp();
     }
 

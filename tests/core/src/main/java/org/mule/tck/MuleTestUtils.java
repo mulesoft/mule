@@ -68,7 +68,7 @@ public class MuleTestUtils
 
         UMOModel model = new SedaModel();
         model.setName(DEFAULT_MODEL_NAME);
-        MuleManager.getRegistry().registerModel(model);
+        manager.registerModel(model);
         MuleManager.getConfiguration().setDefaultSynchronousEndpoints(true);
         
         return manager;
@@ -76,12 +76,12 @@ public class MuleTestUtils
 
     public static UMOModel getDefaultModel() throws UMOException
     {
-        UMOModel m = MuleManager.getRegistry().lookupModel(DEFAULT_MODEL_NAME);
+        UMOModel m = MuleManager.getInstance().lookupModel(DEFAULT_MODEL_NAME);
         if(m==null)
         {
             m = new SedaModel();
             m.setName(DEFAULT_MODEL_NAME);
-            MuleManager.getRegistry().registerModel(m);
+            MuleManager.getInstance().registerModel(m);
         }
         return m;
 

@@ -10,6 +10,8 @@
 
 package org.mule.persistence;
 
+import org.mule.umo.lifecycle.Startable;
+import org.mule.umo.lifecycle.Stoppable;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
 
@@ -20,8 +22,11 @@ import org.mule.umo.lifecycle.Initialisable;
  * XStream, and persist it to a file or xml database.
  *
  * In the future, we might have different kinds of persistence managers.
+ * 
+ * @author 
+ * @version $Revision: 3649 $
  */
-public interface PersistenceManager extends Initialisable, Disposable
+public interface PersistenceManager extends Initialisable, Startable, Stoppable, Disposable
 {
     /*
      * Temporary method!

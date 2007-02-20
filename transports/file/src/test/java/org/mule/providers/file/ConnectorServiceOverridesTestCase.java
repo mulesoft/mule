@@ -17,6 +17,7 @@ import org.mule.providers.AbstractConnector;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transformers.simple.ByteArrayToSerializable;
 import org.mule.transformers.simple.SerializableToByteArray;
+import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 
@@ -28,11 +29,11 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
         return "test-connector-config.xml";
     }
 
-    public void testServiceOverrides() throws Exception
+    public void testServiceOverrides() throws InterruptedException
     {
         // TODO initialised wait?
         Thread.sleep(1000);
-        FileConnector c = (FileConnector)MuleManager.getRegistry().lookupConnector("fileConnector2");
+        FileConnector c = (FileConnector)MuleManager.getInstance().lookupConnector("fileConnector2");
         assertNotNull(c);
         assertNotNull(c.getServiceOverrides());
         assertEquals("org.mule.transformers.simple.ByteArrayToSerializable", c.getServiceOverrides().get(
@@ -43,22 +44,22 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
         assertTrue(c.getDefaultOutboundTransformer() instanceof SerializableToByteArray);
     }
 
-    public void testServiceOverrides2() throws Exception
+    public void testServiceOverrides2() throws InterruptedException
     {
-        FileConnector c = (FileConnector)MuleManager.getRegistry().lookupConnector("fileConnector1");
+        FileConnector c = (FileConnector)MuleManager.getInstance().lookupConnector("fileConnector1");
         assertNotNull(c);
         assertNull(c.getServiceOverrides());
 
-        c = (FileConnector)MuleManager.getRegistry().lookupConnector("fileConnector2");
+        c = (FileConnector)MuleManager.getInstance().lookupConnector("fileConnector2");
         assertNotNull(c);
         assertNotNull(c.getServiceOverrides());
 
-        c = (FileConnector)MuleManager.getRegistry().lookupConnector("fileConnector3");
+        c = (FileConnector)MuleManager.getInstance().lookupConnector("fileConnector3");
         assertNotNull(c);
         assertNull(c.getServiceOverrides());
     }
 
-    public void testServiceOverrides3() throws Exception
+    public void testServiceOverrides3() throws InterruptedException, UMOException
     {
         UMOEndpointURI uri = new MuleEndpointURI("file:///temp");
         UMOEndpoint endpoint = MuleEndpoint.createEndpointFromUri(uri, UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
@@ -69,7 +70,7 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
 
         endpoint = new MuleEndpoint("file:///temp", true);
 
-        FileConnector c = (FileConnector)MuleManager.getRegistry().lookupConnector("fileConnector2");
+        FileConnector c = (FileConnector)MuleManager.getInstance().lookupConnector("fileConnector2");
         assertNotNull(c);
         assertNotNull(c.getServiceOverrides());
         endpoint.setConnector(c);

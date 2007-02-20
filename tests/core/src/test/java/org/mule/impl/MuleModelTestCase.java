@@ -10,9 +10,8 @@
 
 package org.mule.impl;
 
-import org.mule.MuleManager;
-import org.mule.registry.RegistryException;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.umo.model.ModelException;
 import org.mule.umo.model.UMOModel;
 
 import java.util.Iterator;
@@ -30,18 +29,18 @@ public class MuleModelTestCase extends AbstractMuleTestCase
         MuleDescriptor descriptor = getTestDescriptor(descriptorName, "java.lang.Object");
         MuleDescriptor duplicateDescriptor = getTestDescriptor(descriptorName, "java.lang.Object");
         final UMOModel model = getDefaultModel();
-        MuleManager.getRegistry().registerComponent(descriptor, model.getName());
+        model.registerComponent(descriptor);
         try
         {
             // register it again with the same name
-            MuleManager.getRegistry().registerComponent(duplicateDescriptor, model.getName());
+            model.registerComponent(duplicateDescriptor);
             fail("Trying to register a component descriptor with the same name "
                  + "must have thrown an exception.");
         }
-        catch (RegistryException e)
+        catch (ModelException mex)
         {
             // expected
-            final String message = e.getMessage();
+            final String message = mex.getMessage();
             assertTrue("Exception message should contain our descriptor name.",
                 (message.indexOf("\"" + descriptorName + "\"") > -1));
         }
