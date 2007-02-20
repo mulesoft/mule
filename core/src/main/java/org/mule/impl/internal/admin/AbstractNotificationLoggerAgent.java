@@ -10,7 +10,7 @@
 
 package org.mule.impl.internal.admin;
 
-import org.mule.MuleManager;
+import org.mule.impl.AbstractAgent;
 import org.mule.impl.internal.notifications.AdminNotificationListener;
 import org.mule.impl.internal.notifications.ComponentNotificationListener;
 import org.mule.impl.internal.notifications.ConnectionNotificationListener;
@@ -22,9 +22,8 @@ import org.mule.impl.internal.notifications.ModelNotificationListener;
 import org.mule.impl.internal.notifications.NotificationException;
 import org.mule.impl.internal.notifications.SecurityNotificationListener;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.UMOAgent;
-import org.mule.umo.manager.UMOManager;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.manager.UMOServerNotificationListener;
 
@@ -39,14 +38,12 @@ import org.apache.commons.logging.LogFactory;
  * <code>AbstractNotificationLoggerAgent</code> Receives Mule server notifications
  * and logs them and can optionally route them to an endpoint
  */
-public abstract class AbstractNotificationLoggerAgent implements UMOAgent
+public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
 {
     /**
      * The logger used for this class
      */
     protected transient Log logger = LogFactory.getLog(getClass());
-
-    private String name;
 
     private boolean ignoreManagerNotifications = false;
     private boolean ignoreModelNotifications = false;
@@ -60,24 +57,10 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
 
     private Set listeners = new HashSet();
 
-    /**
-     * Gets the name of this agent
-     * 
-     * @return the agent name
-     */
-    public String getName()
-    {
-        return name;
-    }
 
-    /**
-     * Sets the name of this agent
-     * 
-     * @param name the name of the agent
-     */
-    public void setName(String name)
+    protected AbstractNotificationLoggerAgent(String name)
     {
-        this.name = name;
+        super(name);
     }
 
     public void start() throws UMOException
@@ -105,7 +88,7 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
         for (Iterator iterator = listeners.iterator(); iterator.hasNext();)
         {
             UMOServerNotificationListener listener = (UMOServerNotificationListener)iterator.next();
-            MuleManager.getInstance().unregisterListener(listener);
+            managementContext.unregisterListener(listener);
         }
     }
 
@@ -189,10 +172,9 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
         this.ignoreConnectionNotifications = ignoreConnectionNotifications;
     }
 
-    public final void initialise() throws InitialisationException
+    public final void doInitialise(UMOManagementContext managementContext) throws InitialisationException
     {
         doInitialise();
-        UMOManager manager = MuleManager.getInstance();
         if (!ignoreManagerNotifications)
         {
             UMOServerNotificationListener l = new ManagerNotificationListener()
@@ -204,7 +186,7 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
             };
             try
             {
-                manager.registerListener(l);
+               managementContext.registerListener(l);
             }
             catch (NotificationException e)
             {
@@ -223,7 +205,7 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
             };
             try
             {
-                manager.registerListener(l);
+               managementContext.registerListener(l);
             }
             catch (NotificationException e)
             {
@@ -242,7 +224,7 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
             };
             try
             {
-                manager.registerListener(l);
+               managementContext.registerListener(l);
             }
             catch (NotificationException e)
             {
@@ -261,7 +243,7 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
             };
             try
             {
-                manager.registerListener(l);
+               managementContext.registerListener(l);
             }
             catch (NotificationException e)
             {
@@ -281,7 +263,7 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
             };
             try
             {
-                manager.registerListener(l);
+               managementContext.registerListener(l);
             }
             catch (NotificationException e)
             {
@@ -301,7 +283,7 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
             };
             try
             {
-                manager.registerListener(l);
+               managementContext.registerListener(l);
             }
             catch (NotificationException e)
             {
@@ -321,7 +303,7 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
             };
             try
             {
-                manager.registerListener(l);
+               managementContext.registerListener(l);
             }
             catch (NotificationException e)
             {
@@ -341,7 +323,7 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
             };
             try
             {
-                manager.registerListener(l);
+               managementContext.registerListener(l);
             }
             catch (NotificationException e)
             {
@@ -350,7 +332,7 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
             listeners.add(l);
         }
 
-        if (!ignoreMessageNotifications /** &&  TODO RM* !MuleManager.getConfiguration().isEnableMessageEvents() **/)
+        if (!ignoreMessageNotifications /** &&  TODO RM* !RegistryContext.getConfiguration().isEnableMessageEvents() **/)
         {
             logger.warn("EventLogger agent has been asked to log message notifications, but the MuleManager is configured not to fire Message notifications");
         }
@@ -365,7 +347,7 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
             };
             try
             {
-                manager.registerListener(l);
+               managementContext.registerListener(l);
             }
             catch (NotificationException e)
             {

@@ -10,7 +10,6 @@
 
 package org.mule.extras.spring.events;
 
-import org.mule.MuleManager;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.functional.EventCallback;
@@ -259,7 +258,7 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
 
         DummyTrans trans = new DummyTrans();
         trans.setLatch(latch);
-        MuleManager.getInstance().registerTransformer(trans);
+        managementContext.getRegistry().registerTransformer(trans);
         MuleApplicationEvent event = new MuleApplicationEvent("Event from a spring bean",
             "vm://testBean2?transformers=dummyTrans");
 

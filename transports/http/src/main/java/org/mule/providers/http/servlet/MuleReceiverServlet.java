@@ -10,7 +10,7 @@
 
 package org.mule.providers.http.servlet;
 
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpointURI;
@@ -62,7 +62,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
         }
         else
         {
-            connector = (ServletConnector)MuleManager.getInstance().lookupConnector(servletConnectorName);
+            connector = (ServletConnector) RegistryContext.getRegistry().lookupConnector(servletConnectorName);
             if (connector == null)
             {
                 throw new ServletException(new Message("http", 10, servletConnectorName).toString());

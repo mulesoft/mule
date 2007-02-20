@@ -16,6 +16,7 @@ import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
 import org.mule.extras.client.RemoteDispatcher;
 import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.impl.internal.admin.MuleAdminAgent;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.transformers.simple.ByteArrayToString;
@@ -42,7 +43,7 @@ public class RemoteExceptionTestCase extends FunctionalTestCase
 
     protected ConfigurationBuilder getBuilder() throws Exception
     {
-        QuickConfigurationBuilder builder = new QuickConfigurationBuilder(true);
+        QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
         // Test component 1. Will be used to create a transformer exceotion
         MuleEndpoint ep = new MuleEndpoint("vm://test.queue.1", true);
         ep.setTransformer(new ByteArrayToString());
@@ -55,7 +56,9 @@ public class RemoteExceptionTestCase extends FunctionalTestCase
         props.put("throwException", "true");
         builder.registerComponent(FunctionalTestComponent.class.getName(), "testComponent2", ep2, null, props);
 
-        builder.createStartedManager(true, "http://localhost:5555");
+        MuleAdminAgent agent = new MuleAdminAgent();
+        agent.setServerUri("http://localhost:5555");
+        builder.getManagementContext().getRegistry().registerAgent(agent);
         return builder;
     }
 

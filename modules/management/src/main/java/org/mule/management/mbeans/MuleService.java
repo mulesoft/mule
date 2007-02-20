@@ -10,6 +10,12 @@
 
 package org.mule.management.mbeans;
 
+import org.mule.RegistryContext;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
+import org.mule.util.IOUtils;
+import org.mule.util.StringMessageUtils;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -17,10 +23,6 @@ import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.MuleManager;
-import org.mule.umo.UMOException;
-import org.mule.util.IOUtils;
-import org.mule.util.StringMessageUtils;
 
 /**
  * <code>MuleService</code> exposes certain Mule server functions for management
@@ -46,8 +48,11 @@ public class MuleService implements MuleServiceMBean
     private String copyright = "Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com";
     private String license;
 
-    public MuleService()
+    private UMOManagementContext managementContext;
+
+    public MuleService(UMOManagementContext managementContext)
     {
+        this.managementContext = managementContext;
         String patch = System.getProperty("sun.os.patch.level", null);
         jdk = System.getProperty("java.version") + " (" + System.getProperty("java.vm.info") + ")";
         os = System.getProperty("os.name");
@@ -57,7 +62,7 @@ public class MuleService implements MuleServiceMBean
         }
         os += " (" + System.getProperty("os.version") + ", " + System.getProperty("os.arch") + ")";
 
-        buildDate = MuleManager.getConfiguration().getBuildDate();
+        buildDate = RegistryContext.getConfiguration().getBuildDate();
         try
         {
             InetAddress iad = InetAddress.getLocalHost();
@@ -70,26 +75,21 @@ public class MuleService implements MuleServiceMBean
         }
     }
 
-    public boolean isInstanciated()
-    {
-        return MuleManager.isInstanciated();
-    }
-
     public boolean isInitialised()
     {
-        return isInstanciated() && MuleManager.getInstance().isInitialised();
+        return managementContext!=null && managementContext.isInitialised();
     }
 
     public boolean isStopped()
     {
-        return isInstanciated() && !MuleManager.getInstance().isStarted();
+        return managementContext!=null && !managementContext.isStarted();
     }
 
     public Date getStartTime()
     {
         if (!isStopped())
         {
-            return new Date(MuleManager.getInstance().getStartDate());
+            return new Date(managementContext.getStartDate());
         }
         else
         {
@@ -101,7 +101,7 @@ public class MuleService implements MuleServiceMBean
     {
         if (version == null)
         {
-            version = MuleManager.getConfiguration().getProductVersion();
+            version = RegistryContext.getConfiguration().getProductVersion();
             if (version == null)
             {
                 version = "Mule Version Info Not Set";
@@ -114,7 +114,7 @@ public class MuleService implements MuleServiceMBean
     {
         if (vendor == null)
         {
-            vendor = MuleManager.getConfiguration().getVendorName();
+            vendor = RegistryContext.getConfiguration().getVendorName();
             if (vendor == null)
             {
                 vendor = "Mule Vendor Info Not Set";
@@ -125,17 +125,17 @@ public class MuleService implements MuleServiceMBean
 
     public void start() throws UMOException
     {
-        MuleManager.getInstance().start();
+        managementContext.start();
     }
 
     public void stop() throws UMOException
     {
-        MuleManager.getInstance().stop();
+        managementContext.stop();
     }
 
     public void dispose() throws UMOException
     {
-        MuleManager.getInstance().dispose();
+        managementContext.dispose();
     }
 
     public long getFreeMemory()
@@ -155,7 +155,7 @@ public class MuleService implements MuleServiceMBean
 
     public String getServerId()
     {
-        return MuleManager.getInstance().getId();
+        return managementContext.getId();
     }
 
     public String getHostname()
@@ -211,6 +211,6 @@ public class MuleService implements MuleServiceMBean
 
     public String getInstanceId()
     {
-        return MuleManager.getInstance().getId();
+        return managementContext.getId();
     }
 }

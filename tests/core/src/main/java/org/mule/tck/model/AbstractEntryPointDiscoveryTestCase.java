@@ -188,7 +188,7 @@ public abstract class AbstractEntryPointDiscoveryTestCase extends AbstractMuleTe
             return shouldFail;
         }
 
-        // @Override
+        // //@Override
         public String toString()
         {
             return componentClass.getName() + "." + methodName + "(" + methodArgumentType.getName()

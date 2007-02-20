@@ -12,12 +12,13 @@ package org.mule.management.agents;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.impl.AbstractAgent;
 import org.mule.management.support.AutoDiscoveryJmxSupportFactory;
 import org.mule.management.support.JmxSupport;
 import org.mule.management.support.JmxSupportFactory;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.UMOAgent;
 import org.mule.util.BeanUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.SystemUtils;
@@ -50,7 +51,7 @@ import mx4j.tools.adaptor.ssl.SSLAdaptorServerSocketFactoryMBean;
  * <p/>
  * TODO MULE-1353
  */
-public class Mx4jAgent implements UMOAgent
+public class Mx4jAgent extends AbstractAgent
 {
     public static final String HTTP_ADAPTER_OBJECT_NAME = "name=Mx4jHttpAdapter";
 
@@ -64,8 +65,6 @@ public class Mx4jAgent implements UMOAgent
     private String jmxAdaptorUrl;
     private String host;
     private String port;
-
-    private String name = "MX4J Agent";
 
     private HttpAdaptor adaptor;
     private MBeanServer mBeanServer;
@@ -89,6 +88,12 @@ public class Mx4jAgent implements UMOAgent
 
     private JmxSupportFactory jmxSupportFactory = new AutoDiscoveryJmxSupportFactory();
     private JmxSupport jmxSupport;
+
+
+    public Mx4jAgent()
+    {
+        super("MX4J Agent");
+    }
 
     protected HttpAdaptor createAdaptor() throws Exception
     {
@@ -141,7 +146,7 @@ public class Mx4jAgent implements UMOAgent
     }
 
     /* @see org.mule.umo.lifecycle.Initialisable#initialise() */
-    public void initialise() throws InitialisationException
+    public void doInitialise(UMOManagementContext managementContext) throws InitialisationException
     {
         try
         {
@@ -161,7 +166,7 @@ public class Mx4jAgent implements UMOAgent
             }
 
             adaptor = createAdaptor();
-            adaptorName = jmxSupport.getObjectName(jmxSupport.getDomainName() + ":" + HTTP_ADAPTER_OBJECT_NAME);
+            adaptorName = jmxSupport.getObjectName(jmxSupport.getDomainName(managementContext) + ":" + HTTP_ADAPTER_OBJECT_NAME);
 
             unregisterMBeansIfNecessary();
             mBeanServer.registerMBean(adaptor, adaptorName);
@@ -279,18 +284,6 @@ public class Mx4jAgent implements UMOAgent
     public String getDescription()
     {
         return "MX4J Http adaptor: " + jmxAdaptorUrl;
-    }
-
-    /* @see org.mule.umo.manager.UMOAgent#getName() */
-    public String getName()
-    {
-        return this.name;
-    }
-
-    /* @see org.mule.umo.manager.UMOAgent#setName(java.lang.String) */
-    public void setName(String name)
-    {
-        this.name = name;
     }
 
     /** @return Returns the jmxAdaptorUrl. */

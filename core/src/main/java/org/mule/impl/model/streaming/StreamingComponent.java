@@ -76,7 +76,7 @@ public class StreamingComponent extends AbstractComponent
         }
         if (component instanceof Initialisable)
         {
-            ((Initialisable)component).initialise();
+            ((Initialisable)component).initialise(managementContext);
         }
 
         try

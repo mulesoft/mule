@@ -24,7 +24,7 @@ public class ConfigureModelTestCase extends FunctionalTestCase
 
     public void testConfigure()
     {
-        assertTrue(MuleManager.getInstance().lookupModel("main") instanceof DirectModel);
-        assertEquals("main", MuleManager.getInstance().lookupModel("main").getName());
+        assertTrue(managementContext.getRegistry().lookupModel("main") instanceof DirectModel);
+        assertEquals("main", managementContext.getRegistry().lookupModel("main").getName());
     }
 }

@@ -10,11 +10,6 @@
 
 package org.mule.providers.rmi;
 
-import java.util.Hashtable;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
-
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.config.i18n.Messages;
@@ -28,6 +23,11 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
+
+import java.util.Hashtable;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
 
 /**
  * test RMI object invocations
@@ -54,7 +54,7 @@ public class RmiInvocationTestCase extends FunctionalTestCase
         rmiConnector.setSecurityPolicy("rmi.policy");
 
         // Required if connectoring to a Remote Jndi context
-        // builder.getManager().registerAgent(new RmiRegistryAgent());
+        // builder.getManagementContext().registerAgent(new RmiRegistryAgent());
 
         // Create a local Jndi Context
         Hashtable env = new Hashtable();
@@ -65,7 +65,7 @@ public class RmiInvocationTestCase extends FunctionalTestCase
         ic.bind("TestService", new MatchingMethodsComponent());
 
         rmiConnector.setJndiContext(ic);
-        builder.getManager().registerConnector(rmiConnector);
+        builder.getManagementContext().getRegistry().registerConnector(rmiConnector);
         return builder;
     }
 

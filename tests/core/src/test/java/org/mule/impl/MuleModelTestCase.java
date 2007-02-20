@@ -16,10 +16,6 @@ import org.mule.umo.model.UMOModel;
 
 import java.util.Iterator;
 
-/**
- * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
- * @version $Revision$
- */
 public class MuleModelTestCase extends AbstractMuleTestCase
 {
 
@@ -28,7 +24,7 @@ public class MuleModelTestCase extends AbstractMuleTestCase
         final String descriptorName = "TEST_COMPONENT_1";
         MuleDescriptor descriptor = getTestDescriptor(descriptorName, "java.lang.Object");
         MuleDescriptor duplicateDescriptor = getTestDescriptor(descriptorName, "java.lang.Object");
-        final UMOModel model = getDefaultModel();
+        final UMOModel model = getDefaultModel(managementContext);
         model.registerComponent(descriptor);
         try
         {

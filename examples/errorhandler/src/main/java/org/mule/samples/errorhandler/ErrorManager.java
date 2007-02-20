@@ -10,16 +10,16 @@
 
 package org.mule.samples.errorhandler;
 
+import org.mule.samples.errorhandler.handlers.DefaultHandler;
+import org.mule.samples.errorhandler.handlers.FatalHandler;
+import org.mule.umo.UMOException;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.MuleManager;
-import org.mule.samples.errorhandler.handlers.DefaultHandler;
-import org.mule.samples.errorhandler.handlers.FatalHandler;
-import org.mule.umo.UMOException;
 
 /**
  * <code>ErrorManager</code> TODO (document class)
@@ -100,7 +100,8 @@ public class ErrorManager
             else if (eh instanceof FatalHandler)
             {
                 logger.fatal("Exception caught handling Fatal exception: " + e);
-                ((MuleManager)MuleManager.getInstance()).shutdown(e, false);
+                //TODO Fix this
+                //managementContext.shutdown(e, false);
             }
             else
             {
@@ -147,6 +148,7 @@ public class ErrorManager
         // this is all we can do
         logger.fatal("An exception has been caught be the Fatal Exception Behaviour");
         logger.fatal("Exception is: " + t, t);
-        ((MuleManager)MuleManager.getInstance()).shutdown(t, false);
+        //TODO fix this
+        //managementContext.shutdown(t, false);
     }
 }

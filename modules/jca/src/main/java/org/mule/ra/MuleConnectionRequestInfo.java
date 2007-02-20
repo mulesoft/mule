@@ -10,28 +10,28 @@
 
 package org.mule.ra;
 
+import org.mule.config.builders.MuleXmlConfigurationBuilder;
+import org.mule.impl.ManagementContextAware;
+import org.mule.umo.UMOManagementContext;
+import org.mule.util.StringUtils;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 
 import javax.resource.spi.ConnectionRequestInfo;
 
-import org.mule.MuleManager;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
-import org.mule.umo.manager.UMOManager;
-import org.mule.util.StringUtils;
-
 /**
  * <code>MuleConnectionRequestInfo</code> TODO
  */
-public class MuleConnectionRequestInfo implements ConnectionRequestInfo, Cloneable, Serializable
+public class MuleConnectionRequestInfo implements ConnectionRequestInfo, Cloneable, Serializable, ManagementContextAware
 {
     /**
      * Serial version
      */
     private static final long serialVersionUID = 910828075890304726L;
 
-    private transient UMOManager manager;
+    private transient UMOManagementContext managementContext;
 
     private String configurationBuilder = MuleXmlConfigurationBuilder.class.getName();
     private String configurations;
@@ -46,7 +46,6 @@ public class MuleConnectionRequestInfo implements ConnectionRequestInfo, Cloneab
     private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException
     {
         ois.defaultReadObject();
-        this.manager = MuleManager.getInstance();
     }
 
     public String getConfigurationBuilder()
@@ -94,14 +93,14 @@ public class MuleConnectionRequestInfo implements ConnectionRequestInfo, Cloneab
         this.password = password;
     }
 
-    public UMOManager getManager()
+    public UMOManagementContext getManagementContext()
     {
-        return manager;
+        return managementContext;
     }
 
-    public void setManager(UMOManager manager)
+    public void setManagementContext(UMOManagementContext managementContext)
     {
-        this.manager = manager;
+        this.managementContext = managementContext;
     }
 
     public boolean equals(Object obj)

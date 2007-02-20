@@ -12,7 +12,6 @@ package org.mule.impl;
 
 import org.mule.config.MuleConfiguration;
 import org.mule.config.ThreadingProfile;
-import org.mule.impl.container.DescriptorContainerKeyPair;
 import org.mule.registry.RegistrationException;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOInterceptor;
@@ -39,7 +38,6 @@ import org.apache.commons.logging.LogFactory;
 
 public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescriptor
 {
-    public static final String DEFAULT_INSTANCE_REF_NAME = "_instanceRef";
     /**
      * logger used by this class
      */
@@ -174,8 +172,7 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
         {
             throw new NullPointerException("UMODescriptor.name");
         }
-        properties.put(DEFAULT_INSTANCE_REF_NAME, instance);
-        setImplementation(new DescriptorContainerKeyPair(name, DEFAULT_INSTANCE_REF_NAME));
+        setImplementationInstance(instance);
     }
 
     public void setInboundRouter(UMOInboundRouterCollection router)
@@ -191,11 +188,6 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
     public void setNestedRouter(UMONestedRouterCollection router)
     {
     	nestedRouter = router;
-    }
-
-    public void setContainerManaged(boolean value)
-    {
-        containerManaged = value;
     }
 
     public void addInitialisationCallback(InitialisationCallback callback)

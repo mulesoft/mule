@@ -15,6 +15,8 @@ import org.mule.config.i18n.Messages;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.util.FileUtils;
+import org.mule.util.MapUtils;
+import org.mule.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,8 +30,6 @@ import org.apache.log4j.PatternLayout;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.RollingFileAppender;
 import org.apache.log4j.xml.DOMConfigurator;
-import org.mule.util.MapUtils;
-import org.mule.util.StringUtils;
 
 /**
  * <code>AbstractNotificationLoggerAgent</code> Receives Mule server notifications
@@ -46,6 +46,12 @@ public class Log4jNotificationLoggerAgent extends AbstractNotificationLoggerAgen
     private String chainsawHost = "localhost";
     private int chainsawPort = -1;
     private Map levelMappings = new HashMap();
+
+
+    public Log4jNotificationLoggerAgent()
+    {
+        super("Log4J Notification Agent");
+    }
 
     /**
      * Should be a 1 line description of the agent

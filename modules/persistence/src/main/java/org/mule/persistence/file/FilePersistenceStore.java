@@ -10,28 +10,28 @@
 
 package org.mule.persistence.file;
 
-import java.io.File;
-import java.io.IOException;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import org.mule.MuleManager;
 import org.mule.MuleException;
+import org.mule.RegistryContext;
+import org.mule.impl.ManagementContextAware;
 import org.mule.persistence.Persistable;
 import org.mule.persistence.PersistenceException;
 import org.mule.persistence.PersistenceHelper;
 import org.mule.persistence.PersistenceSerializer;
 import org.mule.persistence.PersistenceStore;
 import org.mule.persistence.serializers.XStreamSerializer;
-import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.util.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  */
-public class FilePersistenceStore implements PersistenceStore 
+public class FilePersistenceStore implements PersistenceStore, ManagementContextAware
 {
     /**
      * Indicates whether the store is ready to save stuff or not
@@ -63,6 +63,8 @@ public class FilePersistenceStore implements PersistenceStore
      */
     private PersistenceSerializer serializer = null;
 
+    private UMOManagementContext managementContext;
+
     /**
      * logger used by this class
      */
@@ -72,14 +74,20 @@ public class FilePersistenceStore implements PersistenceStore
     {
     }
 
+
+    public void setManagementContext(UMOManagementContext context)
+    {
+        this.managementContext = context;
+    }
+
     /**
      * {@inheritDoc}
+     * @param managmentContext
      */
-    public void initialise() throws InitialisationException, RecoverableException
+    public void initialise(UMOManagementContext managementContext) throws InitialisationException
     {
         logger.info("Initialising");
-        MuleManager manager = (MuleManager)MuleManager.getInstance();
-        String workDir = manager.getConfiguration().getWorkingDirectory();
+        String workDir = RegistryContext.getConfiguration().getWorkingDirectory();
         String fileName = workDir + "/" + (fileStoreDirectory != null ? fileStoreDirectory : DEFAULT_FILESTORE_DIRECTORY);
         serializer = new XStreamSerializer();
 
@@ -87,7 +95,7 @@ public class FilePersistenceStore implements PersistenceStore
         {
             logger.info("Creating directory " + fileName);
             storeDir = FileUtils.openDirectory(fileName);
-            serializer.initialise();
+            serializer.initialise(managementContext);
             ready = true;
         } 
         catch (IOException ieo)

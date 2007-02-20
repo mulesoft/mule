@@ -10,7 +10,6 @@
 
 package org.mule.impl.security;
 
-import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -18,7 +17,6 @@ import org.mule.umo.UMOEncryptionStrategy;
 import org.mule.umo.security.CryptoFailureException;
 import org.mule.umo.security.EncryptionStrategyNotFoundException;
 import org.mule.umo.security.UMOCredentials;
-import org.mule.umo.security.UMOSecurityManager;
 import org.mule.util.ArrayUtils;
 
 import java.util.StringTokenizer;
@@ -68,9 +66,9 @@ public class MuleCredentials implements UMOCredentials
 
         if (!scheme.equalsIgnoreCase("plain"))
         {
-            UMOSecurityManager sm = MuleManager.getInstance().getSecurityManager();
+            //TODO RM*: Not sure how to deal with this UMOSecurityManager sm = managementContext.getSecurityManager();
 
-            UMOEncryptionStrategy es = sm.getEncryptionStrategy(scheme);
+            UMOEncryptionStrategy es = null; // sm.getEncryptionStrategy(scheme);
             if (es == null)
             {
                 throw new EncryptionStrategyNotFoundException(scheme);

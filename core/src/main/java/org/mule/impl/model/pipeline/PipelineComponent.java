@@ -65,7 +65,7 @@ public class PipelineComponent extends DirectComponent
 
         if (component instanceof Initialisable)
         {
-            ((Initialisable)component).initialise();
+            ((Initialisable)component).initialise(managementContext);
         }
 
     }

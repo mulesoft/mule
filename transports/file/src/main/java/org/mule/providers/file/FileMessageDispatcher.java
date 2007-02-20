@@ -11,7 +11,7 @@
 package org.mule.providers.file;
 
 import org.mule.MuleException;
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
@@ -105,7 +105,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
         String filter = (String)endpoint.getProperty("filter");
         if (filter != null)
         {
-            filter = URLDecoder.decode(filter, MuleManager.getConfiguration().getDefaultEncoding());
+            filter = URLDecoder.decode(filter, RegistryContext.getConfiguration().getDefaultEncoding());
             filenameFilter = new FilenameWildcardFilter(filter);
         }
         if (file.exists())

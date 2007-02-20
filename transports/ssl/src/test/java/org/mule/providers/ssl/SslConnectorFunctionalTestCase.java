@@ -10,7 +10,7 @@
 
 package org.mule.providers.ssl;
 
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.impl.ResponseOutputStream;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.tck.functional.AbstractProviderFunctionalTestCase;
@@ -87,7 +87,7 @@ public class SslConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
 
     protected void sendTestData(int iterations) throws Exception
     {
-        MuleManager.getConfiguration().setDefaultSynchronousEndpoints(false);
+        RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(false);
         URI uri = getInDest().getUri();
         for (int i = 0; i < iterations; i++)
         {
@@ -109,7 +109,7 @@ public class SslConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
 
     public void testDispatchAndReply() throws Exception
     {
-        MuleManager.getConfiguration().setDefaultSynchronousEndpoints(false);
+        RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(false);
         descriptor = getTestDescriptor("testComponent", FunctionalTestComponent.class.getName());
 
         initialiseComponent(descriptor, new EventCallback()
@@ -130,7 +130,7 @@ public class SslConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
             }
         });
         // Start the server
-        MuleManager.getInstance().start();
+        managementContext.start();
 
         URI uri = getInDest().getUri();
         s = createSocket(uri);

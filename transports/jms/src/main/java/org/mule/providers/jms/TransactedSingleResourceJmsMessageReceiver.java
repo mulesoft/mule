@@ -215,7 +215,7 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
             try
             {
                 TransactionTemplate tt = new TransactionTemplate(endpoint.getTransactionConfig(),
-                    connector.getExceptionListener());
+                    connector.getExceptionListener(), connector.getManagementContext());
 
                 if (receiveMessagesInTransaction)
                 {

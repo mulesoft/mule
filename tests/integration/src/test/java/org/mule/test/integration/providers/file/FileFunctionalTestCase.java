@@ -33,12 +33,12 @@ public class FileFunctionalTestCase extends FunctionalTestCase implements Functi
     {
         super.doPostFunctionalSetUp();
         super.setDisposeManagerPerSuite(true);
-        MuleManager.getInstance().registerListener(this);
+        managementContext.registerListener(this);
     }
 
     protected void doFunctionalTearDown() throws Exception
     {
-        MuleManager.getInstance().unregisterListener(this);
+        managementContext.unregisterListener(this);
         super.doFunctionalTearDown();
     }
 

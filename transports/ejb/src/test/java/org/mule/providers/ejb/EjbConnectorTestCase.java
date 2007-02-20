@@ -20,7 +20,7 @@ public class EjbConnectorTestCase extends AbstractConnectorTestCase
         EjbConnector c = new EjbConnector();
         c.setName("EjbConnector");
         c.setSecurityManager(null);
-        c.initialise();
+        c.initialise(managementContext);
         return c;
     }
 

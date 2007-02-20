@@ -19,6 +19,7 @@ import org.mule.umo.TransactionException;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -144,23 +145,24 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
      * <code>doInitialise()</code> method.
      * 
      * @throws InitialisationException
+     * @param managementContext
      */
-    public synchronized final void initialise() throws InitialisationException
+    public synchronized final void initialise(UMOManagementContext managementContext) throws InitialisationException
     {
         if (!initialised.get())
         {
-            doInitialise();
+            doInitialise(managementContext);
             initialised.set(true);
         }
     }
 
-    protected void doInitialise() throws InitialisationException
+    protected void doInitialise(UMOManagementContext managementContext) throws InitialisationException
     {
         logger.info("Initialising exception listener: " + toString());
         for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
         {
             UMOEndpoint umoEndpoint = (UMOEndpoint)iterator.next();
-            umoEndpoint.initialise();
+            umoEndpoint.initialise(managementContext);
         }
     }
 

@@ -32,7 +32,7 @@ public class SoapServiceFinder implements ServiceFinder
     /**
      * @deprecated We can use a more intelligent strategy for locating the service using the OSGi registry.
      */
-    // @Override
+    // //@Override
     public String findService(String service, ServiceDescriptor descriptor, Properties props) throws ServiceException
     {
         Map finders = new TreeMap();

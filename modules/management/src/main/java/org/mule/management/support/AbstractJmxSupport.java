@@ -9,7 +9,7 @@
  */
 package org.mule.management.support;
 
-import org.mule.MuleManager;
+import org.mule.umo.UMOManagementContext;
 import org.mule.util.StringUtils;
 
 import java.util.Collection;
@@ -65,17 +65,17 @@ public abstract class AbstractJmxSupport implements JmxSupport
     protected abstract Collection getDomains(MBeanServer server);
 
     /** {@inheritDoc} */
-    public String getDomainName()
+    public String getDomainName(UMOManagementContext context)
     {
         // TODO add some config options to the JmxAgent
         String domain = DEFAULT_JMX_DOMAIN_PREFIX;
-        String instanceId = StringUtils.defaultString(MuleManager.getInstance().getId());
+        String instanceId = StringUtils.defaultString(context.getId());
         if (instanceId.length() > 0)
         {
             domain += "." + instanceId;
         }
 
-        JmxRegistrationContext ctx = JmxRegistrationContext.getCurrent();
+        JmxRegistrationContext ctx = JmxRegistrationContext.getCurrent(context);
 
         String resolvedDomain = ctx.getResolvedDomain();
         if (StringUtils.isBlank(resolvedDomain))

@@ -14,10 +14,6 @@ import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.UMOEndpointURI;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class HttpEndpointTestCase extends AbstractMuleTestCase
 {
     public void testHostPortOnlyUrl() throws Exception

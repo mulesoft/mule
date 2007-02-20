@@ -10,7 +10,7 @@
 
 package org.mule.config;
 
-import org.mule.umo.manager.UMOManager;
+import org.mule.umo.UMOManagementContext;
 
 import java.util.Properties;
 
@@ -29,7 +29,7 @@ public interface ConfigurationBuilder
      * @return A configured UMOManager
      * @throws ConfigurationException
      */
-    UMOManager configure(String configResources) throws ConfigurationException;
+    UMOManagementContext configure(String configResources) throws ConfigurationException;
 
     /**
      * Will configure a UMOManager based on the configuration file(s) provided.
@@ -42,7 +42,7 @@ public interface ConfigurationBuilder
      * @return A configured UMOManager
      * @throws ConfigurationException
      */
-    UMOManager configure(String configResources, String startupPropertiesFile) throws ConfigurationException;
+    UMOManagementContext configure(String configResources, String startupPropertiesFile) throws ConfigurationException;
 
     /**
      * Will configure a UMOManager based on the configurations made available through
@@ -56,7 +56,7 @@ public interface ConfigurationBuilder
      * @return A configured UMOManager
      * @throws ConfigurationException
      */
-    UMOManager configure(ReaderResource[] configResources, Properties startupProperties)
+    UMOManagementContext configure(ReaderResource[] configResources, Properties startupProperties)
         throws ConfigurationException;
 
     boolean isConfigured();

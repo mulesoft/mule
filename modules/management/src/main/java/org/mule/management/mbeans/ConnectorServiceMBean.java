@@ -11,11 +11,11 @@
 package org.mule.management.mbeans;
 
 import org.mule.umo.UMOException;
-import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.Initialisable;
 
 import java.beans.ExceptionListener;
 
-public interface ConnectorServiceMBean
+public interface ConnectorServiceMBean extends Initialisable
 {
 
     boolean isStarted();
@@ -36,6 +36,5 @@ public interface ConnectorServiceMBean
 
     void dispose();
 
-    void initialise() throws InitialisationException;
 
 }

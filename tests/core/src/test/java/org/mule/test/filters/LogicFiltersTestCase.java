@@ -30,9 +30,9 @@ public class LogicFiltersTestCase extends AbstractMuleTestCase
         // both null
         assertFalse(filter.accept(new MuleMessage("foo")));
 
-        // left set, right null
+        // only one filter set
         filter.setLeftFilter(new EqualsFilter("foo"));
-        assertFalse(filter.accept(new MuleMessage("foo")));
+        assertTrue(filter.accept(new MuleMessage("foo")));
 
         // right set too, but does not accept
         filter.setRightFilter(new EqualsFilter("foo"));

@@ -91,6 +91,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
                 else
                 {
                     bd = parseCustomElement(element, bd);
+                    registerBean(element, bd);
                 }
             }
         }

@@ -10,7 +10,7 @@
 
 package org.mule.routing.inbound;
 
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.MessagingException;
@@ -48,11 +48,10 @@ public class IdempotentReceiver extends SelectiveConsumer
     public IdempotentReceiver()
     {
         messageIds = new HashSet();
-        DEFAULT_STORE_PATH = MuleManager.getConfiguration().getWorkingDirectory() + "/idempotent";
-        setStorePath(DEFAULT_STORE_PATH);
+        setStorePath(RegistryContext.getConfiguration().getWorkingDirectory() + DEFAULT_STORE_PATH);
     }
 
-    // @Override
+    // //@Override
     public boolean isMatch(UMOEvent event) throws MessagingException
     {
         if (idStore == null)
@@ -64,7 +63,7 @@ public class IdempotentReceiver extends SelectiveConsumer
         return !messageIds.contains(this.getIdForEvent(event));
     }
 
-    // @Override
+    // //@Override
     public UMOEvent[] process(UMOEvent event) throws MessagingException
     {
         if (isMatch(event))

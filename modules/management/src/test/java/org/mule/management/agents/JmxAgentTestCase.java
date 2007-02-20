@@ -10,7 +10,6 @@
 
 package org.mule.management.agents;
 
-import org.mule.MuleManager;
 import org.mule.tck.AbstractMuleTestCase;
 
 import java.util.Arrays;
@@ -27,7 +26,6 @@ public class JmxAgentTestCase extends AbstractMuleTestCase
     private static final String[] VALID_AUTH_TOKEN = {"mule", "mulepassword"};
     private static final String DOMAIN = "JmxAgentTest";
 
-    private MuleManager manager;
     private JmxAgent jmxAgent;
 
     protected void doSetUp () throws Exception
@@ -36,16 +34,15 @@ public class JmxAgentTestCase extends AbstractMuleTestCase
         RmiRegistryAgent rmiRegistryAgent = new RmiRegistryAgent();
         jmxAgent = new JmxAgent();
         jmxAgent.setConnectorServerUrl(JmxAgent.DEFAULT_REMOTING_URI);
-        manager = (MuleManager) getManager(true);
-        manager.registerAgent(rmiRegistryAgent);
-        manager.setId(DOMAIN);
+       managementContext.getRegistry().registerAgent(rmiRegistryAgent);
+       managementContext.setId(DOMAIN);
     }
 
     public void testSuccessfulRemoteConnection() throws Exception
     {
         jmxAgent.setCredentials(getValidCredentials());
-        manager.registerAgent(jmxAgent);
-        manager.start();
+       managementContext.getRegistry().registerAgent(jmxAgent);
+       managementContext.start();
 
         JMXServiceURL serviceUrl = new JMXServiceURL(JmxAgent.DEFAULT_REMOTING_URI);
         Map props = new HashMap(1);
@@ -59,8 +56,8 @@ public class JmxAgentTestCase extends AbstractMuleTestCase
     public void testNoCredentialsProvided() throws Exception
     {
         jmxAgent.setCredentials(getValidCredentials());
-        manager.registerAgent(jmxAgent);
-        manager.start();
+       managementContext.getRegistry().registerAgent(jmxAgent);
+       managementContext.start();
 
         JMXServiceURL serviceUrl = new JMXServiceURL(JmxAgent.DEFAULT_REMOTING_URI);
         try
@@ -76,8 +73,8 @@ public class JmxAgentTestCase extends AbstractMuleTestCase
     public void testNonRestrictedAccess() throws Exception
     {
         jmxAgent.setCredentials(null);
-        manager.registerAgent(jmxAgent);
-        manager.start();
+       managementContext.getRegistry().registerAgent(jmxAgent);
+       managementContext.start();
 
         JMXServiceURL serviceUrl = new JMXServiceURL(JmxAgent.DEFAULT_REMOTING_URI);
         JMXConnector connector = JMXConnectorFactory.connect(serviceUrl);

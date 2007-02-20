@@ -10,9 +10,8 @@
 
 package org.mule.config.builders;
 
-import org.mule.MuleManager;
 import org.mule.config.ConfigurationException;
-import org.mule.umo.manager.UMOManager;
+import org.mule.umo.UMOManagementContext;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -29,14 +28,14 @@ import javax.servlet.ServletContextListener;
  * <i>/mule-config.xml</i> will be used.
  * </p>
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  * @see MuleXmlConfigurationBuilder
  */
 
 public class MuleXmlBuilderContextListener implements ServletContextListener
 {
     public static final String CONFIG_INIT_PARAMETER = "org.mule.config";
+
+    private UMOManagementContext managementContext;
 
     public void contextInitialized(ServletContextEvent event)
     {
@@ -69,11 +68,12 @@ public class MuleXmlBuilderContextListener implements ServletContextListener
      *            local file system or on the classpath.
      * @return A configured UMOManager instance
      */
-    protected UMOManager createManager(String configResource, ServletContext context)
+    protected UMOManagementContext createManager(String configResource, ServletContext context)
         throws ConfigurationException
     {
         WebappMuleXmlConfigurationBuilder builder = new WebappMuleXmlConfigurationBuilder(context);
-        return builder.configure(configResource, null);
+        managementContext = builder.configure(configResource, null);
+        return managementContext;
     }
 
     /**
@@ -89,6 +89,6 @@ public class MuleXmlBuilderContextListener implements ServletContextListener
 
     public void contextDestroyed(ServletContextEvent event)
     {
-        MuleManager.getInstance().dispose();
+        managementContext.dispose();
     }
 }

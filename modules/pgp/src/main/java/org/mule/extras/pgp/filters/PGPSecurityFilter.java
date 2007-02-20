@@ -10,7 +10,6 @@
 
 package org.mule.extras.pgp.filters;
 
-import org.mule.MuleManager;
 import org.mule.config.i18n.Messages;
 import org.mule.extras.pgp.PGPAuthentication;
 import org.mule.extras.pgp.PGPCryptInfo;
@@ -27,17 +26,17 @@ import org.mule.umo.security.UMOSecurityContext;
 import org.mule.umo.security.UnauthorisedException;
 import org.mule.umo.security.UnknownAuthenticationTypeException;
 
-import cryptix.message.LiteralMessage;
-import cryptix.message.Message;
-import cryptix.message.MessageFactory;
-import cryptix.message.SignedMessage;
-import cryptix.pki.KeyBundle;
-
 import java.io.ByteArrayInputStream;
 import java.util.Collection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import cryptix.message.LiteralMessage;
+import cryptix.message.Message;
+import cryptix.message.MessageFactory;
+import cryptix.message.SignedMessage;
+import cryptix.pki.KeyBundle;
 
 public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
 {
@@ -214,7 +213,7 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
     {
         if (strategyName != null)
         {
-            strategy = MuleManager.getInstance().getSecurityManager().getEncryptionStrategy(strategyName);
+            strategy = endpoint.getManagementContext().getSecurityManager().getEncryptionStrategy(strategyName);
         }
 
         if (strategy == null)

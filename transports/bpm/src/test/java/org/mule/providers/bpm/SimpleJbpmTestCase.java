@@ -10,9 +10,9 @@
 
 package org.mule.providers.bpm;
 
-import org.mule.MuleManager;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.util.NumberUtils;
 
@@ -23,30 +23,36 @@ import org.jbpm.msg.mule.Jbpm;
  * Tests the connector against jBPM with 2 simple processes.
  * jBPM is instantiated programatically via JbpmConfiguration.getInstance()
  */
-public class SimpleJbpmTestCase extends FunctionalTestCase {
+public class SimpleJbpmTestCase extends FunctionalTestCase
+{
 
     ProcessConnector connector;
     BPMS bpms;
 
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "jbpm-config.xml";
     }
 
-    protected void setupManager() throws Exception {
-        doSetupManager();
-        super.setupManager();
+    protected UMOManagementContext createManagementContext() throws Exception
+    {
+        UMOManagementContext context = super.createManagementContext();
+        doSetupManager(context);
+        return context;
     }
 
-    protected void doSetupManager() throws Exception {
+    protected void doSetupManager(UMOManagementContext context) throws Exception
+    {
         // Configure the BPM connector programmatically so that we are able to pass it the jBPM instance.
         connector = new ProcessConnector();
         bpms = new Jbpm(JbpmConfiguration.getInstance());
         connector.setBpms(bpms);
 
-        MuleManager.getInstance().registerConnector(connector);
+        context.getRegistry().registerConnector(connector);
     }
 
-    public void testSimpleProcess() throws Exception {
+    public void testSimpleProcess() throws Exception
+    {
         // Deploy the process definition.
         ((Jbpm) bpms).deployProcess("dummyProcess.xml");
 
@@ -54,7 +60,8 @@ public class SimpleJbpmTestCase extends FunctionalTestCase {
         Object process;
         BPMS bpms = connector.getBpms();
         MuleClient client = new MuleClient();
-        try {
+        try
+        {
             // Create a new process.
             response = client.send("bpm://dummyProcess", "data", null);
             process = response.getPayload();
@@ -70,12 +77,15 @@ public class SimpleJbpmTestCase extends FunctionalTestCase {
 
             // The process should have ended.
             assertTrue(bpms.hasEnded(process));
-        } finally {
+        }
+        finally
+        {
             client.dispose();
         }
     }
 
-    public void testSimpleProcessWithParameters() throws Exception {
+    public void testSimpleProcessWithParameters() throws Exception
+    {
         // Deploy the process definition.
         ((Jbpm) bpms).deployProcess("dummyProcess.xml");
 
@@ -83,15 +93,16 @@ public class SimpleJbpmTestCase extends FunctionalTestCase {
         Object process;
         BPMS bpms = connector.getBpms();
         MuleClient client = new MuleClient();
-        try {
+        try
+        {
             // Create a new process.
             response = client.send("bpm://?" +
-                ProcessConnector.PROPERTY_ACTION + "=" + ProcessConnector.ACTION_START +
-                "&" + ProcessConnector.PROPERTY_PROCESS_TYPE + "=dummyProcess", "data", null);
+                    ProcessConnector.PROPERTY_ACTION + "=" + ProcessConnector.ACTION_START +
+                    "&" + ProcessConnector.PROPERTY_PROCESS_TYPE + "=dummyProcess", "data", null);
             process = response.getPayload();
 
             long processId =
-                response.getLongProperty(ProcessConnector.PROPERTY_PROCESS_ID, -1);
+                    response.getLongProperty(ProcessConnector.PROPERTY_PROCESS_ID, -1);
             // The process should be started and in a wait state.
             assertFalse(processId == -1);
             assertEquals("dummyState", bpms.getState(process));
@@ -105,7 +116,9 @@ public class SimpleJbpmTestCase extends FunctionalTestCase {
 
             // The process should have ended.
             assertTrue(bpms.hasEnded(process));
-        } finally {
+        }
+        finally
+        {
             client.dispose();
         }
     }

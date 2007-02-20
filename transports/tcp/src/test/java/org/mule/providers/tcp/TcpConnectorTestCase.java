@@ -24,7 +24,7 @@ public class TcpConnectorTestCase extends AbstractConnectorTestCase
     {
         TcpConnector c = new TcpConnector();
         c.setName("TcpConnector");
-        c.initialise();
+        c.initialise(managementContext);
         return c;
     }
 

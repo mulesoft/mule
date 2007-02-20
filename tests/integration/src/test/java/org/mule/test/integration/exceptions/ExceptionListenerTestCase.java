@@ -44,10 +44,10 @@ public class ExceptionListenerTestCase extends FunctionalTestCase
         VMConnector cnn = new VMConnector();
         cnn.setName("vmCnn");
         cnn.setQueueEvents(true);
-        builder.getManager().registerConnector(cnn);
+        builder.getManagementContext().getRegistry().registerConnector(cnn);
         DefaultComponentExceptionStrategy es = new DefaultComponentExceptionStrategy();
         es.addEndpoint(new MuleEndpoint("vm://error.queue", false));
-        builder.getManager().lookupModel("main").setExceptionListener(es);
+        builder.getManagementContext().getRegistry().lookupModel("main").setExceptionListener(es);
         UMOEndpoint ep = new MuleEndpoint("vm://component1", true);
         ep.setTransformer(new FailingTransformer());
 

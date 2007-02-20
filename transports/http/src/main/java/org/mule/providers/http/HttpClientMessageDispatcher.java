@@ -26,6 +26,7 @@ import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UMOStreamMessageAdapter;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
+import org.mule.util.StringUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -49,12 +50,10 @@ import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.HeadMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.io.IOUtils;
-import org.mule.util.StringUtils;
 
 /**
  * <code>HttpClientMessageDispatcher</code> dispatches Mule events over HTTP.
@@ -89,10 +88,10 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             client.setHttpConnectionManager(new MultiThreadedHttpConnectionManager());
 
             // test the connection
-             HeadMethod method = new
-             HeadMethod(endpoint.getEndpointURI().getAddress());
-             client.executeMethod(getHostConfig(endpoint.getEndpointURI().getUri()),
-             method);
+//             HeadMethod method = new
+//             HeadMethod(endpoint.getEndpointURI().getAddress());
+//             client.executeMethod(getHostConfig(endpoint.getEndpointURI().getUri()),
+//             method);
         }
 
     }

@@ -10,7 +10,7 @@
 
 package org.mule.providers.email;
 
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractPollingMessageReceiver;
@@ -119,7 +119,7 @@ public class Pop3MessageReceiver extends AbstractPollingMessageReceiver
         // If user explicitly sets backup folder to "" it will disable email back up
         if (backupFolder == null)
         {
-            this.backupFolder = MuleManager.getConfiguration().getWorkingDirectory() + "/mail/"
+            this.backupFolder = RegistryContext.getConfiguration().getWorkingDirectory() + "/mail/"
                                 + folder.getName();
         }
         else if (StringUtils.EMPTY.equals(backupFolder))

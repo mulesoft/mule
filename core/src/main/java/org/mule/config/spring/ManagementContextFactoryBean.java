@@ -9,17 +9,17 @@
  */
 package org.mule.config.spring;
 
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.config.MuleConfiguration;
+import org.mule.impl.ManagementContext;
+import org.mule.impl.model.ModelFactory;
 import org.mule.impl.model.ModelHelper;
-import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOAgent;
 import org.mule.umo.manager.UMOContainerContext;
-import org.mule.umo.manager.UMOManager;
 import org.mule.umo.manager.UMOTransactionManagerFactory;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
@@ -30,16 +30,18 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.transaction.TransactionManager;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.support.AbstractApplicationContext;
 
 /**
  * <code>UMOManagerFactoryBean</code> is a MuleManager factory bean that is used to
@@ -68,57 +70,83 @@ import org.springframework.context.support.AbstractApplicationContext;
  * the key and a list of interceptors is the value. Accessible using from your code
  * using AutowireUMOManagerFactoryBean.MULE_INTERCEPTOR_STACK_BEAN_NAME.
  */
-public class ManagementContextFactoryBean
-        implements FactoryBean, InitializingBean, DisposableBean, ApplicationContextAware
+public class ManagementContextFactoryBean extends AbstractFactoryBean
+        implements InitializingBean, DisposableBean, ApplicationContextAware
 {
     /**
      * logger used by this class
      */
     protected static Log logger = LogFactory.getLog(ManagementContextFactoryBean.class);
 
-    //TODO RM* URGENT replace this woth MUMOanagementContext
+    protected UMOManagementContext managementContext;
 
-    private UMOManager manager;
+    //TODO LM: Replace
+    protected RegistryFacade registry;
 
-    private AbstractApplicationContext context;
+    private ApplicationContext context;
 
     public ManagementContextFactoryBean() throws Exception
     {
-        //TODO really we should initialise the registry here, but for now we're using the MuleManager for the registry
-        this.manager = MuleManager.getInstance();
+        this.managementContext = new ManagementContext();
+
+        //Maybe we need to crate this some other way?
+        this.registry =managementContext.getRegistry();
     }
 
-    public Object getObject() throws Exception
+
+    protected Object createInstance() throws Exception
     {
-        return manager;
+        initialise();
+        return managementContext;
     }
 
     public Class getObjectType()
     {
-        return UMOManager.class;
+        return ManagementContext.class;
     }
 
-    public boolean isSingleton()
+    protected UMOManagementContext getManagementContext()
     {
-        return true;
-    }
-
-    protected UMOManager getManager()
-    {
-        return manager;
+        return managementContext;
     }
 
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
     {
-        context = (AbstractApplicationContext)applicationContext;
+        this.context = applicationContext;
+        //TODO where do I get this from
+        //registry = new DefaultRegistryFacade();
+        //Add the Spring Container context by default
+        SpringContainerContext container = new SpringContainerContext();
+        container.setBeanFactory(context);
+        managementContext.setRegistry(registry);
+        
+        try
+        {
+            registry.registerContainerContext(container);
+        }
+        catch (UMOException e)
+        {
+            throw new BeanCreationException("failed to register default spring container", e);
+        }
+
+        RegistryContext.setRegistry(registry);
+    }
+
+    protected void initialise()
+    {
         try
         {
             // set mule configuration
             Map temp = context.getBeansOfType(MuleConfiguration.class, true, false);
             if (temp.size() > 0)
             {
-                MuleManager.setConfiguration((MuleConfiguration)temp.values().iterator().next());
+               registry.setConfiguration((MuleConfiguration)temp.values().iterator().next());
             }
+
+            //Register the system model
+            UMOModel system = ModelFactory.createModel(registry.getConfiguration().getSystemModelType());
+            system.setName(ModelHelper.SYSTEM_MODEL);
+            managementContext.getRegistry().registerModel(system);
 
             // Set the container Context
             Map containers = context.getBeansOfType(UMOContainerContext.class, true, false);
@@ -132,14 +160,22 @@ public class ManagementContextFactoryBean
             temp = context.getBeansOfType(UMOTransactionManagerFactory.class, true, false);
             if (temp.size() > 0)
             {
-                manager.setTransactionManager(((UMOTransactionManagerFactory)temp.values().iterator().next()).create());
+                managementContext.setTransactionManager(((UMOTransactionManagerFactory)temp.values().iterator().next()).create());
+            }
+            else
+            {
+                temp = context.getBeansOfType(TransactionManager.class, true, false);
+                if (temp.size() > 0)
+                {
+                    managementContext.setTransactionManager(((TransactionManager)temp.values().iterator().next()));
+                }
             }
 
             // set security manager
             temp = context.getBeansOfType(UMOSecurityManager.class, true, false);
             if (temp.size() > 0)
             {
-                manager.setSecurityManager((UMOSecurityManager)temp.values().iterator().next());
+               managementContext.setSecurityManager((UMOSecurityManager)temp.values().iterator().next());
             }
 
             // set Transformers
@@ -158,6 +194,8 @@ public class ManagementContextFactoryBean
             Map models = context.getBeansOfType(UMOModel.class, true, false);
             setModels(models);
 
+            managementContext.initialise();
+
         }
         catch (Exception e)
         {
@@ -165,25 +203,23 @@ public class ManagementContextFactoryBean
         }
     }
 
+    public void destroy() throws Exception
+    {
+       managementContext.dispose();
+    }
+
     public void setManagerId(String managerId)
     {
-        manager.setId(managerId);
+       managementContext.setId(managerId);
     }
 
     protected void setContainerContext(Map containers) throws UMOException
     {
-        if(!containers.containsKey(SpringContainerContext.DEFAULT_CONTAINER_NAME))
-        {
-            //Add the Spring Container context by default
-            SpringContainerContext container = new SpringContainerContext();
-            container.setBeanFactory(context);
-            containers.put(container.getName(), container);
-        }
 
         for (Iterator iter = containers.values().iterator(); iter.hasNext();)
         {
             UMOContainerContext context =  (UMOContainerContext)iter.next();
-            manager.setContainerContext(context);
+            registry.registerContainerContext(context);
 
         }
     }
@@ -200,7 +236,8 @@ public class ManagementContextFactoryBean
             entry = (Map.Entry)iterator.next();
             UMOModel model = (UMOModel)entry.getValue();
             model.setName(entry.getKey().toString());
-            manager.registerModel(model);
+            //TODO LM: Registry Lookup
+            registry.registerModel(model);
         }
     }
 
@@ -208,21 +245,9 @@ public class ManagementContextFactoryBean
     {
         for (Iterator iterator = agents.iterator(); iterator.hasNext();)
         {
-            manager.registerAgent((UMOAgent)iterator.next());
-        }
-    }
+            //TODO registry.registerMuleObject(null, (UMOAgent)iterator.next());
+        registry.registerAgent((UMOAgent)iterator.next());
 
-    protected void setProperties(Map props)
-    {
-        if (props == null)
-        {
-            return;
-        }
-        Map.Entry entry;
-        for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();)
-        {
-            entry = (Map.Entry)iterator.next();
-            manager.setProperty(entry.getKey(), entry.getValue());
         }
     }
 
@@ -230,51 +255,35 @@ public class ManagementContextFactoryBean
     {
         for (Iterator iterator = connectors.iterator(); iterator.hasNext();)
         {
-            manager.registerConnector((UMOConnector)iterator.next());
+            //TODO LM: Registry Lookup
+            //manager.registerConnector((UMOConnector)iterator.next());
+            registry.registerConnector((UMOConnector)iterator.next());
         }
     }
 
-    protected void setTransformers(Collection transformers) throws InitialisationException
+    protected void setTransformers(Collection transformers) throws UMOException
     {
         for (Iterator iterator = transformers.iterator(); iterator.hasNext();)
         {
-            manager.registerTransformer((UMOTransformer)iterator.next());
+            //TODO LM: Registry Lookup
+            //manager.registerTransformer((UMOTransformer)iterator.next());
+            registry.registerTransformer((UMOTransformer)iterator.next());
+
         }
     }
 
-    protected void setEndpoints(Collection endpoints) throws InitialisationException
+    protected void setEndpoints(Collection endpoints) throws UMOException
     {
         for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
         {
             UMOEndpoint ep  = (UMOEndpoint)iterator.next();
             if(UMOImmutableEndpoint.ENDPOINT_TYPE_GLOBAL.equals(ep.getType()))
             {
-                manager.registerEndpoint(ep);
+                //TODO LM: Registry Lookup
+
+                //manager.registerEndpoint(ep);
+                registry.registerEndpoint((UMOEndpoint)iterator.next());
             }
         }
-    }
-
-    protected void setComponents(Collection components) throws UMOException
-    {
-        UMODescriptor d;
-        for (Iterator iterator = components.iterator(); iterator.hasNext();)
-        {
-            d = (UMODescriptor)iterator.next();
-            if (!ModelHelper.isComponentRegistered(d.getName()))
-            {
-                //TODO RM*: Manage model lookup correctly                
-                manager.lookupModel("main").registerComponent(d);
-            }
-        }
-    }
-
-    public void afterPropertiesSet() throws Exception
-    {
-        manager.start();
-    }
-
-    public void destroy() throws Exception
-    {
-        manager.dispose();
     }
 }

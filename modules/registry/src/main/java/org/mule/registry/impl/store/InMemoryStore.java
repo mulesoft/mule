@@ -13,15 +13,15 @@ package org.mule.registry.impl.store;
 import org.mule.persistence.PersistenceHelper;
 import org.mule.persistence.PersistenceNotification;
 import org.mule.persistence.PersistenceNotificationListener;
-import org.mule.registry.Registration;
 import org.mule.registry.DeregistrationException;
+import org.mule.registry.Registration;
 import org.mule.registry.RegistrationException;
 import org.mule.registry.Registry;
 import org.mule.registry.RegistryStore;
 import org.mule.registry.ReregistrationException;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.UMOServerNotificationListener;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -169,8 +169,9 @@ public class InMemoryStore implements RegistryStore
 
     /**
      * {@inheritDoc}
+     * @param managementContext
      */
-    public void initialise() throws InitialisationException 
+    public void initialise(UMOManagementContext managementContext) throws InitialisationException
     {
         store = new HashMap();
     }

@@ -14,8 +14,6 @@ package org.mule.umo;
  * <p>
  * <code>UMOTransactionFactory</code> creates a transaction.
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public interface UMOTransactionFactory
 {
@@ -24,8 +22,9 @@ public interface UMOTransactionFactory
      * 
      * @return a new Transaction
      * @throws TransactionException if the transaction cannot be created or begun
+     * @param managementContext
      */
-    UMOTransaction beginTransaction() throws TransactionException;
+    UMOTransaction beginTransaction(UMOManagementContext managementContext) throws TransactionException;
 
     /**
      * Determines whether this transaction factory creates transactions that are

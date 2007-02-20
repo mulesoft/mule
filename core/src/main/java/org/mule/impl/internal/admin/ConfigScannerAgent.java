@@ -10,12 +10,13 @@
 
 package org.mule.impl.internal.admin;
 
-import org.mule.MuleManager;
 import org.mule.MuleServer;
+import org.mule.RegistryContext;
 import org.mule.config.ConfigurationBuilder;
+import org.mule.impl.AbstractAgent;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.UMOAgent;
 import org.mule.util.ClassUtils;
 import org.mule.util.FileUtils;
 
@@ -38,9 +39,14 @@ import org.apache.commons.logging.LogFactory;
  *
  * This agent should also respond to wire transfers (tcp, multicast).
  */
-public class ConfigScannerAgent implements UMOAgent 
+public class ConfigScannerAgent extends AbstractAgent
 {
     public static final String AGENT_NAME = "Mule Config Scanner";
+
+    /**
+     * logger used by this class
+     */
+    protected static Log logger = LogFactory.getLog(ConfigScannerAgent.class);
 
     private String configDirName = null;
 
@@ -52,29 +58,9 @@ public class ConfigScannerAgent implements UMOAgent
 
     private ScannerThread scannerThread = null;
 
-    /**
-     * logger used by this class
-     */
-    protected static Log logger = LogFactory.getLog(ConfigScannerAgent.class);
-
-    /**
-     * Gets the name of this agent
-     * 
-     * @return the agent name
-     */
-    public String getName()
+    public ConfigScannerAgent()
     {
-        return AGENT_NAME;
-    }
-
-    /**
-     * Sets the name of this agent
-     * 
-     * @param name the name of the agent
-     */
-    public void setName(String name)
-    {
-        // not allowed
+        super(AGENT_NAME);
     }
 
     public String getConfigDirName()
@@ -119,12 +105,11 @@ public class ConfigScannerAgent implements UMOAgent
     {
     }
 
-    public void initialise() throws InitialisationException
+    public void doInitialise(UMOManagementContext managementContext) throws InitialisationException
     {
         if (configDirName == null)
         {
-            MuleManager manager = (MuleManager)MuleManager.getInstance();
-            String workDir = manager.getConfiguration().getWorkingDirectory();
+            String workDir = RegistryContext.getConfiguration().getWorkingDirectory();
             configDirName = workDir + "/conf";
         }
 

@@ -12,11 +12,14 @@ package org.mule.management.agents;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.impl.AbstractAgent;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.UMOAgent;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
+
+import java.net.URI;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
@@ -24,7 +27,6 @@ import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
-import java.net.URI;
 
 /**
  * <code>JdmkAgent</code> configures an Jdmk Http Adaptor for Jmx management,
@@ -32,7 +34,7 @@ import java.net.URI;
 * <p/>
  * TODO MULE-1353 
  */
-public class JdmkAgent implements UMOAgent
+public class JdmkAgent extends AbstractAgent
 {
     /** A FQN of the adaptor class to instantiate via reflection. */
     public static final String CLASSNAME_ADAPTER = "com.sun.jdmk.comm.HtmlAdaptorServer";
@@ -46,9 +48,14 @@ public class JdmkAgent implements UMOAgent
     private String host;
     private String port;
 
-    private String name = "JDMK Agent";
     private MBeanServer mBeanServer;
     private ObjectName adaptorName;
+
+
+    public JdmkAgent()
+    {
+        super("JDMK Agent");
+    }
 
     protected Object createAdaptor() throws Exception
     {
@@ -56,26 +63,6 @@ public class JdmkAgent implements UMOAgent
         final int port = uri.getPort();
         return ClassUtils.instanciateClass(CLASSNAME_ADAPTER,
                                            new Object[] {new Integer(port)}, this.getClass());
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.manager.UMOAgent#getName()
-     */
-    public String getName()
-    {
-        return this.name;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.manager.UMOAgent#setName(java.lang.String)
-     */
-    public void setName(String name)
-    {
-        this.name = name;
     }
 
     /*
@@ -189,7 +176,7 @@ public class JdmkAgent implements UMOAgent
      * 
      * @see org.mule.umo.lifecycle.Initialisable#initialise()
      */
-    public void initialise() throws InitialisationException
+    public void doInitialise(UMOManagementContext managementContext) throws InitialisationException
     {
         try
         {

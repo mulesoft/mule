@@ -25,7 +25,7 @@ public class DomXmlTransformersTestCase extends AbstractXmlTransformerTestCase
     private String srcData;
     private Document resultData;
 
-    // @Override
+    // //@Override
     protected void doSetUp() throws Exception
     {
         srcData = IOUtils.getResourceAsString("cdcatalog.xml", getClass());

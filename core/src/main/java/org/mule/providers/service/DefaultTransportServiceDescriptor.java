@@ -61,7 +61,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
     private UMOTransformer responseTransformer;
     // private EndpointBuilder endpointBuilderImpl;
     
-    private Properties exceptionMappings;
+    private Properties exceptionMappings = new Properties();
 
     public DefaultTransportServiceDescriptor(String service, Properties props)
     {
@@ -308,8 +308,10 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         }
         else
         {
-            throw new TransportServiceException(new Message(Messages.X_NOT_SET_IN_SERVICE_X,
-                "Message Dispatcher Factory", getService()));
+            //Its valide not to have a Dispatcher factory on the transport
+            return null;
+//            throw new TransportServiceException(new Message(Messages.X_NOT_SET_IN_SERVICE_X,
+//                "Message Dispatcher Factory", getService()));
         }
     }
 

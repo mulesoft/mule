@@ -36,7 +36,7 @@ public class MuleClientRemotingJmsTestCase extends FunctionalTestCase
     {
         // Will connect to the server using tcp://localhost:60504
         MuleClient client = new MuleClient();
-        MuleManager.getConfiguration().setDefaultSynchronousEndpoints(true);
+        RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(true);
 
         RemoteDispatcher dispatcher = client.getRemoteDispatcher(getServerUrl());
         UMOMessage message = dispatcher.sendToRemoteComponent("TestReceiverUMO", "Test Client Send message",
@@ -50,7 +50,7 @@ public class MuleClientRemotingJmsTestCase extends FunctionalTestCase
         String remoteEndpoint = "vm://vmRemoteProvider/remote.queue";
         // Will connect to the server using tcp://localhost:60504
         MuleClient client = new MuleClient();
-        MuleManager.getConfiguration().setDefaultSynchronousEndpoints(true);
+        RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(true);
 
         RemoteDispatcher dispatcher = client.getRemoteDispatcher(getServerUrl());
         UMOMessage message = dispatcher.receiveRemote(remoteEndpoint, 1000);

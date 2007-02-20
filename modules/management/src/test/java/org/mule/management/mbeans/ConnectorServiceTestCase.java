@@ -13,7 +13,6 @@ package org.mule.management.mbeans;
 import org.mule.management.AbstractMuleJmxTestCase;
 import org.mule.management.agents.JmxAgent;
 import org.mule.management.support.JmxSupport;
-import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.UMOConnector;
 
 import java.util.Set;
@@ -24,21 +23,20 @@ public class ConnectorServiceTestCase extends AbstractMuleJmxTestCase
 {
     public void testUndeploy() throws Exception
     {
-        final UMOManager manager = getManager(true);
         final String configId = "ConnectorServiceTest";
-        manager.setId(configId);
+       managementContext.setId(configId);
         final UMOConnector connector = getTestConnector();
         connector.setName("TEST_CONNECTOR");
         final JmxAgent jmxAgent = new JmxAgent();
-        manager.registerConnector(connector);
-        manager.registerAgent(jmxAgent);
-        manager.start();
+       managementContext.getRegistry().registerConnector(connector);
+       managementContext.getRegistry().registerAgent(jmxAgent);
+       managementContext.start();
 
         final String query = JmxSupport.DEFAULT_JMX_DOMAIN_PREFIX + "." + configId + ":*";
         Set mbeans = mBeanServer.queryMBeans(ObjectName.getInstance(query), null);
         assertEquals("Unexpected number of components registered in the domain.", 6, mbeans.size());
 
-        manager.dispose();
+       managementContext.dispose();
 
         mbeans = mBeanServer.queryMBeans(ObjectName.getInstance(query), null);
         assertEquals("There should be no MBeans left in the domain", 0, mbeans.size());

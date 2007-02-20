@@ -32,7 +32,7 @@ public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
     {
         strat = new PasswordBasedEncryptionStrategy();
         strat.setPassword("mule");
-        strat.initialise();
+        strat.initialise(managementContext);
     }
 
     /*
@@ -74,7 +74,7 @@ public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
         transformer.setStrategy(strat);
         try
         {
-            transformer.initialise();
+            transformer.initialise(managementContext);
         }
         catch (InitialisationException e)
         {
@@ -101,7 +101,7 @@ public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
         transformer.setReturnClass(String.class);
         try
         {
-            transformer.initialise();
+            transformer.initialise(managementContext);
         }
         catch (InitialisationException e)
         {

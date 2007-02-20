@@ -30,7 +30,7 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
     {
         HttpConnector c = new HttpConnector();
         c.setName("HttpConnector");
-        c.initialise();
+        c.initialise(managementContext);
         return c;
     }
 

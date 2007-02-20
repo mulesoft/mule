@@ -42,7 +42,7 @@ public class InheritedModel extends AbstractModel
     *
     * @see org.mule.umo.UMOModel#getName()
     */
-    @Override
+    //@Override
     public String getName()
     {
         return super.getName() + "#" + hashCode();

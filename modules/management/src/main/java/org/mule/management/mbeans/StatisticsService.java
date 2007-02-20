@@ -10,17 +10,16 @@
 
 package org.mule.management.mbeans;
 
+import org.mule.management.stats.AllStatistics;
+import org.mule.management.stats.printers.CSVPrinter;
+import org.mule.management.stats.printers.HtmlTablePrinter;
+import org.mule.umo.UMOManagementContext;
+
 import java.io.StringWriter;
 import java.util.Collection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.MuleManager;
-import org.mule.management.stats.AllStatistics;
-import org.mule.management.stats.printers.CSVPrinter;
-import org.mule.management.stats.printers.HtmlTablePrinter;
-import org.mule.management.stats.printers.XMLPrinter;
-import org.mule.umo.manager.UMOManager;
 
 /**
  * <code>StatisicsService</code> exposes Mule processing statistics
@@ -38,18 +37,18 @@ public class StatisticsService implements StatisticsServiceMBean
     protected static final Log logger = LogFactory.getLog(StatisticsService.class);
 
     private AllStatistics stats = new AllStatistics();
-    private MuleManager manager = null;
+    private UMOManagementContext managementContext = null;
 
-    public void setManager(UMOManager manager)
+    public void setManagementContext(UMOManagementContext context)
     {
-        this.manager = (MuleManager)manager;
-        if (manager == null)
+        this.managementContext = context;
+        if (managementContext == null)
         {
             stats = new AllStatistics();
         }
         else
         {
-            stats = this.manager.getStatistics();
+            stats = this.managementContext.getStatistics();
         }
 
     }
@@ -108,21 +107,22 @@ public class StatisticsService implements StatisticsServiceMBean
         return w.toString();
     }
 
+
     public String getHtmlSummary()
     {
         return printHtmlSummary();
     }
 
+
     public String printXMLSummary()
     {
-        StringWriter w = new StringWriter();
-        XMLPrinter printer = new XMLPrinter(w);
-        stats.logSummary(printer);
-        return w.toString();
+        //TODO
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public String getXMLSummary()
     {
-        return printXMLSummary();
+        //TODO
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 }

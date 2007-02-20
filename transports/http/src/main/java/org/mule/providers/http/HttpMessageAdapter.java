@@ -10,15 +10,14 @@
 
 package org.mule.providers.http;
 
-import org.mule.MuleManager;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.umo.transformer.UMOTransformer;
 
-import java.util.Map;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HeaderElement;
@@ -100,10 +99,6 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
         if (charset != null)
         {
             encoding = charset;
-        }
-        else
-        {
-            encoding = MuleManager.getConfiguration().getDefaultEncoding();
         }
     }
 

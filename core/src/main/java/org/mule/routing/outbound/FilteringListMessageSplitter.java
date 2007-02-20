@@ -36,7 +36,7 @@ public class FilteringListMessageSplitter extends AbstractMessageSplitter
      * 
      * @param message the message being routed
      */
-    // @Override
+    // //@Override
     protected void initialise(UMOMessage message)
     {
         if (message.getPayload() instanceof List)

@@ -10,13 +10,13 @@
 
 package org.mule.providers;
 
-import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.transformer.TransformerException;
+import org.mule.util.FileUtils;
 import org.mule.util.MapUtils;
 import org.mule.util.UUID;
 
@@ -51,7 +51,7 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
 
     protected ConcurrentMap properties = new ConcurrentHashMap();
     protected ConcurrentMap attachments = new ConcurrentHashMap();
-    protected String encoding = MuleManager.getConfiguration().getDefaultEncoding();
+    protected String encoding = FileUtils.DEFAULT_ENCODING;
 
     protected UMOExceptionPayload exceptionPayload;
     protected String id = UUID.getUUID();

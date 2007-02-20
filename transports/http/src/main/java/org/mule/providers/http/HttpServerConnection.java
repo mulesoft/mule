@@ -10,8 +10,6 @@
 
 package org.mule.providers.http;
 
-import org.mule.MuleManager;
-
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,11 +39,6 @@ public class HttpServerConnection
     private final OutputStream out;
     private boolean keepAlive = false;
     private final String encoding;
-
-    public HttpServerConnection(final Socket socket) throws IOException
-    {
-        this(socket, MuleManager.getConfiguration().getDefaultEncoding());
-    }
 
     public HttpServerConnection(final Socket socket, String encoding) throws IOException
     {

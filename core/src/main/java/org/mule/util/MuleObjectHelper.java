@@ -11,7 +11,7 @@
 package org.mule.util;
 
 import org.mule.MuleException;
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.endpoint.MuleEndpoint;
@@ -20,7 +20,6 @@ import org.mule.routing.filters.ObjectFilter;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.manager.UMOManager;
 import org.mule.umo.transformer.UMOTransformer;
 
 import java.util.Iterator;
@@ -30,6 +29,7 @@ import java.util.StringTokenizer;
 /**
  * <code>MuleObjectHelper</code> is a helper class to assist in finding mule server
  * objects, such as endpoint and transformers
+ * @deprecated these methods are bad and need to be removed
  */
 // @ThreadSafe
 public class MuleObjectHelper
@@ -47,14 +47,13 @@ public class MuleObjectHelper
     public static UMOTransformer getTransformer(String list, String delim) throws MuleException
     {
         StringTokenizer st = new StringTokenizer(list, delim);
-        UMOManager manager = MuleManager.getInstance();
         UMOTransformer currentTrans = null;
         UMOTransformer returnTrans = null;
 
         while (st.hasMoreTokens())
         {
             String key = st.nextToken().trim();
-            UMOTransformer tempTrans = manager.lookupTransformer(key);
+            UMOTransformer tempTrans = RegistryContext.getRegistry().lookupTransformer(key);
 
             if (tempTrans == null)
             {
@@ -80,7 +79,7 @@ public class MuleObjectHelper
     public static UMOEndpoint getEndpointByProtocol(String protocol)
     {
         UMOImmutableEndpoint iprovider;
-        Map endpoints = MuleManager.getInstance().getEndpoints();
+        Map endpoints = RegistryContext.getRegistry().getEndpoints();
         for (Iterator iterator = endpoints.values().iterator(); iterator.hasNext();)
         {
             iprovider = (UMOImmutableEndpoint)iterator.next();
@@ -106,7 +105,7 @@ public class MuleObjectHelper
         }
 
         UMOImmutableEndpoint iprovider;
-        Map endpoints = MuleManager.getInstance().getEndpoints();
+        Map endpoints = RegistryContext.getRegistry().getEndpoints();
 
         for (Iterator iterator = endpoints.values().iterator(); iterator.hasNext();)
         {

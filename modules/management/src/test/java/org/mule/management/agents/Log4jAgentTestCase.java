@@ -10,10 +10,11 @@
 
 package org.mule.management.agents;
 
+import org.mule.management.AbstractMuleJmxTestCase;
+
 import javax.management.ObjectName;
 
 import org.apache.log4j.jmx.HierarchyDynamicMBean;
-import org.mule.management.AbstractMuleJmxTestCase;
 
 public class Log4jAgentTestCase extends AbstractMuleJmxTestCase
 {
@@ -23,6 +24,6 @@ public class Log4jAgentTestCase extends AbstractMuleJmxTestCase
             ObjectName.getInstance(Log4jAgent.JMX_OBJECT_NAME));
 
         Log4jAgent agent = new Log4jAgent();
-        agent.initialise();
+        agent.initialise(managementContext);
     }
 }

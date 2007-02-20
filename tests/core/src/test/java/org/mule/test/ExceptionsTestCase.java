@@ -13,29 +13,14 @@ package org.mule.test;
 import org.mule.MuleException;
 import org.mule.config.i18n.Message;
 import org.mule.impl.ImmutableMuleEndpoint;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.manager.ManagerException;
 import org.mule.umo.routing.RoutingException;
 
-import junit.framework.TestCase;
-
-/**
- * @author Ross Mason
- */
-public class ExceptionsTestCase extends TestCase
+public class ExceptionsTestCase extends AbstractMuleTestCase
 {
-
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-    }
-
-    protected void tearDown() throws Exception
-    {
-        super.tearDown();
-    }
-
     public void testExceptionChaining()
     {
         String rootMsg = "Root Test Exception Message";

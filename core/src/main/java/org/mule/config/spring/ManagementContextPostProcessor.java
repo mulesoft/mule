@@ -9,7 +9,10 @@
  */
 package org.mule.config.spring;
 
+import org.mule.impl.ManagementContextAware;
 import org.mule.umo.UMOManagementContext;
+
+import java.util.Map;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -20,7 +23,7 @@ import org.springframework.context.ApplicationContextAware;
  * Responsible for passing in the ManagementContext instance for all objects in the registry that want it.
  * For an object to get an instance of the ManagementContext it must implement ManagementContextAware.
  *
- * @see org.mule.config.spring.ManagementContextAware
+ * @see org.mule.config.ManagementContextAware
  * @see org.mule.umo.UMOManagementContext
  */
 public class ManagementContextPostProcessor implements BeanPostProcessor, ApplicationContextAware
@@ -41,9 +44,13 @@ public class ManagementContextPostProcessor implements BeanPostProcessor, Applic
 
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException
     {
-        getManagementContext();
         if(bean instanceof ManagementContextAware)
         {
+            if(getManagementContext()==null)
+            {
+                return bean;
+            }
+
             ((ManagementContextAware)bean).setManagementContext(getManagementContext());
         }
         return bean;
@@ -52,19 +59,21 @@ public class ManagementContextPostProcessor implements BeanPostProcessor, Applic
     protected UMOManagementContext getManagementContext()
     {
         //TODO RM* This will not work until we can migrate the ManagementContextFactory Bean to use a ManagementContext not the MuleManager
-        return null;
-//        if(context==null)
-//        {
-//            Map mContexts = applicationContext.getBeansOfType(UMOManagementContext.class, false, true);
-//            if(mContexts.size()==1)
-//            {
-//                context = (UMOManagementContext)mContexts.values().iterator().next();
-//            }
-//            else
-//            {
-//                throw new IllegalStateException("There must be exactly one MAnagementContext. Currently there are " + mContexts.size() + " registered");
-//            }
-//        }
-//        return context;
+        if(context==null)
+        {
+            Map mContexts = applicationContext.getBeansOfType(UMOManagementContext.class, false, true);
+            if(mContexts.size()==1)
+            {
+                context = (UMOManagementContext)mContexts.values().iterator().next();
+            }
+            else
+            {
+                return null;
+                //throw new IllegalStateException("There must be exactly one MAnagementContext. Currently there are " + mContexts.size() + " registered");
+            }
+        }
+        return context;
     }
+
+    
 }

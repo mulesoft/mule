@@ -49,7 +49,7 @@ public abstract class AbstractJmsQueueFunctionalTestCase extends AbstractJmsFunc
 
         initialiseComponent(callback);
         // Start the server
-        MuleManager.getInstance().start();
+        managementContext.start();
 
         MessageConsumer mc;
         // check replyTo
@@ -96,7 +96,7 @@ public abstract class AbstractJmsQueueFunctionalTestCase extends AbstractJmsFunc
 
         initialiseComponent(callback);
         // Start the server
-        MuleManager.getInstance().start();
+        managementContext.start();
 
         MessageConsumer mc;
         // check replyTo

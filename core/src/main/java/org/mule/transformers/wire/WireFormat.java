@@ -23,5 +23,5 @@ public interface WireFormat
 {
     public Object read(InputStream is) throws UMOException;
 
-    public void write(OutputStream out, Object o) throws UMOException;
+    public void write(OutputStream out, Object o, String encoding) throws UMOException;
 }

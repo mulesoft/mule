@@ -10,8 +10,8 @@
 
 package org.mule.tck;
 
-import org.mule.MuleManager;
 import org.mule.impl.DefaultExceptionStrategy;
+import org.mule.impl.ManagementContext;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
@@ -30,13 +30,13 @@ import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOSession;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.UMOTransactionFactory;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.manager.UMOManager;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
@@ -54,40 +54,21 @@ import java.util.HashMap;
  */
 public class MuleTestUtils
 {
-
-    public static final String DEFAULT_MODEL_NAME = "main";
-
-    public static UMOManager getManager(boolean disableAdminService) throws Exception
+    public static UMOModel getDefaultModel(UMOManagementContext context) throws UMOException
     {
-        if (MuleManager.isInstanciated())
-        {
-            MuleManager.getInstance().dispose();
-        }
 
-        UMOManager manager = MuleManager.getInstance();
-
-        UMOModel model = new SedaModel();
-        model.setName(DEFAULT_MODEL_NAME);
-        manager.registerModel(model);
-        MuleManager.getConfiguration().setDefaultSynchronousEndpoints(true);
-        
-        return manager;
-    }
-
-    public static UMOModel getDefaultModel() throws UMOException
-    {
-        UMOModel m = MuleManager.getInstance().lookupModel(DEFAULT_MODEL_NAME);
+        UMOModel m = context.getRegistry().lookupModel(UMOModel.DEFAULT_MODEL_NAME);
         if(m==null)
         {
             m = new SedaModel();
-            m.setName(DEFAULT_MODEL_NAME);
-            MuleManager.getInstance().registerModel(m);
+            m.setName(UMOModel.DEFAULT_MODEL_NAME);
+            m.initialise(context);
         }
         return m;
 
     }
 
-    public static UMOEndpoint getTestEndpoint(String name, String type) throws Exception
+    public static UMOEndpoint getTestEndpoint(String name, String type, UMOManagementContext context) throws Exception
     {
         UMOEndpoint endpoint = new MuleEndpoint();
         // need to build endpoint this way to avoid depenency to any endpoint jars
@@ -96,26 +77,28 @@ public class MuleTestUtils
             AbstractMuleTestCase.class).newInstance();
 
         connector.setName("testConnector");
+        connector.initialise(context);
         endpoint.setConnector(connector);
         endpoint.setEndpointURI(new MuleEndpointURI("test://test"));
         endpoint.setName(name);
         endpoint.setType(type);
+        endpoint.initialise(context);
         return endpoint;
     }
 
-    public static UMOEvent getTestEvent(Object data) throws Exception
+    public static UMOEvent getTestEvent(Object data, UMOManagementContext context) throws Exception
     {
-        UMOComponent component = getTestComponent(getTestDescriptor("string", String.class.getName()));
+        UMOComponent component = getTestComponent(getTestDescriptor("string", String.class.getName(), context));
         UMOSession session = getTestSession(component);
         return new MuleEvent(new MuleMessage(data, new HashMap()), getTestEndpoint("test1",
-            UMOEndpoint.ENDPOINT_TYPE_SENDER), session, true);
+            UMOEndpoint.ENDPOINT_TYPE_SENDER, context), session, true);
     }
 
-    public static UMOEventContext getTestEventContext(Object data) throws Exception
+    public static UMOEventContext getTestEventContext(Object data, UMOManagementContext context) throws Exception
     {
         try
         {
-            UMOEvent event = getTestEvent(data);
+            UMOEvent event = getTestEvent(data, context);
             RequestContext.setEvent(event);
             return RequestContext.getEventContext();
         }
@@ -130,21 +113,21 @@ public class MuleTestUtils
         return new TestCompressionTransformer();
     }
 
-    public static UMOEvent getTestEvent(Object data, MuleDescriptor descriptor) throws Exception
+    public static UMOEvent getTestEvent(Object data, MuleDescriptor descriptor, UMOManagementContext context) throws Exception
     {
         UMOComponent component = getTestComponent(descriptor);
 
         UMOSession session = getTestSession(component);
 
-        UMOEndpoint endpoint = getTestEndpoint("test1", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        UMOEndpoint endpoint = getTestEndpoint("test1", UMOEndpoint.ENDPOINT_TYPE_SENDER, context);
 
         return new MuleEvent(new MuleMessage(data, new HashMap()), endpoint, session, true);
     }
 
-    public static UMOEvent getTestEvent(Object data, UMOImmutableEndpoint endpoint) throws Exception
+    public static UMOEvent getTestEvent(Object data, UMOImmutableEndpoint endpoint, UMOManagementContext context) throws Exception
     {
         UMOSession session = getTestSession(getTestComponent(getTestDescriptor("string", String.class
-            .getName())));
+            .getName(), context)));
         return new MuleEvent(new MuleMessage(data, new HashMap()), endpoint, session, true);
     }
 
@@ -178,16 +161,16 @@ public class MuleTestUtils
         return new SedaComponent(descriptor, new SedaModel());
     }
 
-    public static MuleDescriptor getTestDescriptor(String name, String implementation) throws Exception
+    public static MuleDescriptor getTestDescriptor(String name, String implementation, UMOManagementContext context) throws Exception
     {
         MuleDescriptor descriptor = new MuleDescriptor();
         descriptor.setExceptionListener(new DefaultExceptionStrategy());
         descriptor.setName(name);
         descriptor.setImplementation(implementation);
         UMOOutboundRouter router = new OutboundPassThroughRouter();
-        router.addEndpoint(getTestEndpoint("test1", UMOEndpoint.ENDPOINT_TYPE_SENDER));
+        router.addEndpoint(getTestEndpoint("test1", UMOEndpoint.ENDPOINT_TYPE_SENDER, context));
         descriptor.getOutboundRouter().addRouter(router);
-        descriptor.initialise();
+        descriptor.initialise(context);
 
         return descriptor;
     }
@@ -223,9 +206,9 @@ public class MuleTestUtils
         return new Mock(UMOEvent.class, "umoEvent");
     }
 
-    public static Mock getMockManager()
+    public static Mock getMockManagementContext()
     {
-        return new Mock(MuleManager.class, "muleManager");
+        return new Mock(ManagementContext.class, "muleManagementContext");
     }
 
     public static Mock getMockEndpoint()

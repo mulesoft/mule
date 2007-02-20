@@ -20,7 +20,7 @@ public class SmtpConnectorTestCase extends Pop3ConnectorTestCase
     {
         SmtpConnector c = new SmtpConnector();
         c.setName("Smtpconnector");
-        c.initialise();
+        c.initialise(managementContext);
         return c;
     }
 

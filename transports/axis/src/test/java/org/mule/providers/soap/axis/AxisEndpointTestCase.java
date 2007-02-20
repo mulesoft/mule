@@ -10,7 +10,6 @@
 
 package org.mule.providers.soap.axis;
 
-import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.service.TransportServiceDescriptor;
@@ -74,7 +73,7 @@ public class AxisEndpointTestCase extends AbstractMuleTestCase
         assertEquals(3, endpointUri.getParams().size());
 
         TransportServiceDescriptor sd = (TransportServiceDescriptor)
-                MuleManager.getInstance().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, "soap", null);
+                managementContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, "soap", null);
         if (sd != null)
         {
             //TODO TC: How do we assert this state in the new model?

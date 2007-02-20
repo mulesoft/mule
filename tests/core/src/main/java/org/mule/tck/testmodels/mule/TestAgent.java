@@ -11,6 +11,7 @@
 package org.mule.tck.testmodels.mule;
 
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOAgent;
 
@@ -34,7 +35,7 @@ public class TestAgent implements UMOAgent
         return "Test JMX Agent";
     }
 
-    public void initialise() throws InitialisationException
+    public void initialise(UMOManagementContext managementContext) throws InitialisationException
     {
         // nothing to do
     }

@@ -10,14 +10,15 @@
 
 package org.mule.providers.file;
 
+import org.mule.RegistryContext;
+import org.mule.tck.providers.AbstractMessageAdapterTestCase;
+import org.mule.umo.MessagingException;
+import org.mule.umo.provider.UMOMessageAdapter;
+
 import java.io.File;
 import java.util.Arrays;
 
 import org.apache.commons.io.FileUtils;
-import org.mule.MuleManager;
-import org.mule.tck.providers.AbstractMessageAdapterTestCase;
-import org.mule.umo.MessagingException;
-import org.mule.umo.provider.UMOMessageAdapter;
 
 public class FileContentsMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 {
@@ -35,7 +36,7 @@ public class FileContentsMessageAdapterTestCase extends AbstractMessageAdapterTe
         super.doSetUp();
 
         // The working directory is deleted on tearDown
-        File dir = new File(MuleManager.getConfiguration().getWorkingDirectory(), "tmp");
+        File dir = new File(RegistryContext.getConfiguration().getWorkingDirectory(), "tmp");
         if (!dir.exists())
         {
             dir.mkdirs();

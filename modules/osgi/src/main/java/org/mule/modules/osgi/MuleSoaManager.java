@@ -51,7 +51,7 @@ public class MuleSoaManager extends MuleManager implements BundleContextAware
      * 
      * @return The service descriptor or null if not found.
      */
-    // @Override
+    // //@Override
     public ServiceDescriptor lookupServiceDescriptor(String type, String name, Properties overrides) throws ServiceException
     {
         try 

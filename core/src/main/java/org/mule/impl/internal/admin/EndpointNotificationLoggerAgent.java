@@ -38,6 +38,12 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
     private UMOEndpoint logEndpoint = null;
     private UMOSession session;
 
+
+    public EndpointNotificationLoggerAgent()
+    {
+        super("Endpoint Logger Agent");
+    }
+
     protected void doInitialise() throws InitialisationException
     {
         // first see if we're logging notifications to an endpoint

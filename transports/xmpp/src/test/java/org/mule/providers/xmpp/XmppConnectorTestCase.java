@@ -10,9 +10,10 @@
 
 package org.mule.providers.xmpp;
 
-import org.jivesoftware.smack.packet.Message;
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.umo.provider.UMOConnector;
+
+import org.jivesoftware.smack.packet.Message;
 
 public class XmppConnectorTestCase extends AbstractConnectorTestCase
 {
@@ -20,7 +21,7 @@ public class XmppConnectorTestCase extends AbstractConnectorTestCase
     {
         XmppConnector cnn = new XmppConnector();
         cnn.setName("xmppConnector");
-        cnn.initialise();
+        cnn.initialise(managementContext);
         return cnn;
     }
 

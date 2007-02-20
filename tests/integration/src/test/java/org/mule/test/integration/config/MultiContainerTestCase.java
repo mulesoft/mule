@@ -10,7 +10,6 @@
 
 package org.mule.test.integration.config;
 
-import org.mule.MuleManager;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.impl.container.ContainerKeyPair;
 import org.mule.tck.FunctionalTestCase;
@@ -33,7 +32,7 @@ public class MultiContainerTestCase extends FunctionalTestCase
 
     public void testContainer() throws Exception
     {
-        UMOContainerContext context = MuleManager.getInstance().getContainerContext();
+        UMOContainerContext context = managementContext.getRegistry().getContainerContext();
         assertNotNull(context);
         assertNotNull(context.getComponent("spring2-Apple"));
         assertNotNull(context.getComponent("spring-Apple"));
@@ -53,7 +52,7 @@ public class MultiContainerTestCase extends FunctionalTestCase
 
     public void testSpecificContainerAddressing() throws Exception
     {
-        UMOContainerContext context = MuleManager.getInstance().getContainerContext();
+        UMOContainerContext context = managementContext.getRegistry().getContainerContext();
         assertNotNull(context);
         Orange o = (Orange)context.getComponent(new ContainerKeyPair("spring1", "Orange"));
         assertNotNull(o);
@@ -75,7 +74,7 @@ public class MultiContainerTestCase extends FunctionalTestCase
         UMODescriptor d = builder.createDescriptor("Orange", "myOrange", "test://foo", null, null);
         d.setContainer("spring2");
         builder.registerComponent(d);
-        UMOComponent c = builder.getManager().lookupModel("main").getComponent("myOrange");
+        UMOComponent c = builder.getManagementContext().getRegistry().lookupModel("main").getComponent("myOrange");
         assertNotNull(c);
         Object o = c.getInstance();
         assertTrue(o instanceof Orange);
@@ -85,7 +84,7 @@ public class MultiContainerTestCase extends FunctionalTestCase
         d = builder.createDescriptor("Orange", "myOrange2", "test://bar", null, null);
         d.setContainer("spring1");
         builder.registerComponent(d);
-        c = builder.getManager().lookupModel("main").getComponent("myOrange2");
+        c = builder.getManagementContext().getRegistry().lookupModel("main").getComponent("myOrange2");
         assertNotNull(c);
         o = c.getInstance();
         assertTrue(o instanceof Orange);

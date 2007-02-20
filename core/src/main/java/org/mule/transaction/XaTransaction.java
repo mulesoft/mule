@@ -10,7 +10,6 @@
 
 package org.mule.transaction;
 
-import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.TransactionException;
@@ -39,12 +38,11 @@ public class XaTransaction extends AbstractTransaction
      */
     private Map resources = null;
 
-    /**
-     * Default constructor
-     */
-    public XaTransaction()
+    private TransactionManager txManager;
+
+    public XaTransaction(TransactionManager txManager)
     {
-        super();
+        this.txManager = txManager;
     }
 
     /*
@@ -54,8 +52,6 @@ public class XaTransaction extends AbstractTransaction
      */
     protected void doBegin() throws TransactionException
     {
-        TransactionManager txManager = MuleManager.getInstance().getTransactionManager();
-
         if (txManager == null)
         {
             throw new IllegalStateException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER,

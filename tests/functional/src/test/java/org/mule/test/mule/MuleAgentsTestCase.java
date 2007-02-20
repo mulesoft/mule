@@ -13,41 +13,23 @@ package org.mule.test.mule;
 import org.mule.management.agents.JmxAgent;
 import org.mule.management.agents.Mx4jAgent;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.umo.manager.UMOManager;
+
+import java.util.List;
 
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
-import java.util.List;
 
 public class MuleAgentsTestCase extends AbstractMuleTestCase
 {
-    private UMOManager manager;
-
-    /**
-     * Print the name of this test to standard output
-     */
-    protected void doSetUp() throws Exception
-    {
-        manager = getManager(true);
-    }
-
-
-    protected void doTearDown () throws Exception {
-        if (manager != null)
-        {
-            manager.dispose();
-        }
-    }
-
     public void testRemoveNonExistentAgent() throws Exception
     {
-        manager.unregisterAgent("DOES_NOT_EXIST");
+       managementContext.getRegistry().unregisterAgent("DOES_NOT_EXIST");
         // should not throw NPE
     }
 
     public void testAgentsRegistrationOrder() throws Exception
     {
-        manager.setId("MuleAgentsTestCase.agentsRegistrationOrder");
+       managementContext.setId("MuleAgentsTestCase.agentsRegistrationOrder");
         JmxAgent agentFirst = new JmxAgent();
         // If you specified "JmxAgent", it was the first one in the map,
         // but for "jmxAgent" the order was not preserved.
@@ -55,13 +37,13 @@ public class MuleAgentsTestCase extends AbstractMuleTestCase
         // before proceeding, otherwise it is not able to find any
         // MBeanServer.
         agentFirst.setName("jmxAgent");
-        manager.registerAgent(agentFirst);
+       managementContext.getRegistry().registerAgent(agentFirst);
 
         Mx4jAgent agentSecond = new Mx4jAgent();
         agentSecond.setName("mx4jAgent");
-        manager.registerAgent(agentSecond);
+       managementContext.getRegistry().registerAgent(agentSecond);
 
-        manager.start();
+       managementContext.start();
 
         // should not throw an exception
     }
@@ -73,7 +55,7 @@ public class MuleAgentsTestCase extends AbstractMuleTestCase
      */
     public void testJmxAgentInjectedMBeanServer() throws Exception
     {
-        manager.setId("MuleAgentsTestCase.jmxAgentInjectedMBeanServer");
+       managementContext.setId("MuleAgentsTestCase.jmxAgentInjectedMBeanServer");
         JmxAgent jmxAgent = new JmxAgent();
         List servers = MBeanServerFactory.findMBeanServer(null);
         MBeanServer server = null;
@@ -83,7 +65,7 @@ public class MuleAgentsTestCase extends AbstractMuleTestCase
         jmxAgent.setCreateServer(false);
         jmxAgent.setLocateServer(false);
         jmxAgent.setMBeanServer(server);
-        manager.registerAgent(jmxAgent);
-        manager.start();
+       managementContext.getRegistry().registerAgent(jmxAgent);
+       managementContext.start();
     }
 }

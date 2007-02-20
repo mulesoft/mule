@@ -10,14 +10,15 @@
 
 package org.mule.transformers;
 
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.config.spring.RegistryFacade;
 import org.mule.providers.NullPayload;
 import org.mule.registry.DeregistrationException;
 import org.mule.registry.RegistrationException;
-import org.mule.registry.Registry;
 import org.mule.registry.metadata.ObjectMetadata;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -25,13 +26,13 @@ import org.mule.umo.lifecycle.Registerable;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
+import org.mule.util.FileUtils;
 import org.mule.util.StringMessageUtils;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -225,11 +226,9 @@ public abstract class AbstractTransformer implements UMOTransformer
         {
             encoding = endpoint.getEncoding();
         }
-
-        // last resort
-        if (encoding == null)
+        else if (encoding == null)
         {
-            encoding = MuleManager.getConfiguration().getDefaultEncoding();
+            encoding = FileUtils.DEFAULT_ENCODING;
         }
 
         if (!isSourceTypeSupported(src.getClass()))
@@ -321,23 +320,6 @@ public abstract class AbstractTransformer implements UMOTransformer
         this.nextTransformer = nextTransformer;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#clone()
-     */
-    public Object clone() throws CloneNotSupportedException
-    {
-        try
-        {
-            return BeanUtils.cloneBean(this);
-        }
-        catch (Exception e)
-        {
-            throw new CloneNotSupportedException("Failed to clone transformer: " + e.getMessage());
-        }
-    }
-
     /**
      * Will return the return type for the last transformer in the chain
      * 
@@ -360,8 +342,9 @@ public abstract class AbstractTransformer implements UMOTransformer
      * properties have been set on this transformer
      * 
      * @throws InitialisationException
+     * @param managementContext
      */
-    public void initialise() throws InitialisationException
+    public void initialise(UMOManagementContext managementContext) throws InitialisationException
     {
         // nothing to do
     }
@@ -373,7 +356,7 @@ public abstract class AbstractTransformer implements UMOTransformer
      */
     public void register() throws RegistrationException
     {
-        Registry registry = MuleManager.getInstance().getRegistry();
+        RegistryFacade registry = RegistryContext.getRegistry();
         if (registry == null) throw new RegistrationException("No registry available");
         Registerable parent = null;
         if (endpoint != null)
@@ -382,10 +365,11 @@ public abstract class AbstractTransformer implements UMOTransformer
         }
         else 
         {
-            parent = MuleManager.getInstance();
+            //TODO LM: what should the parent be
+            parent = null;
         }
 
-        registryId = MuleManager.getInstance().getRegistry().registerMuleObject(parent, this).getId();
+        registryId = registry.registerMuleObject(parent, this).getId();
     }
 
     /*
@@ -395,7 +379,7 @@ public abstract class AbstractTransformer implements UMOTransformer
      */
     public void deregister() throws DeregistrationException
     {
-        MuleManager.getInstance().getRegistry().deregisterComponent(registryId);
+        RegistryContext.getRegistry().deregisterComponent(registryId);
         registryId = null;
     }
 

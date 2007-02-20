@@ -10,7 +10,7 @@
 
 package org.mule.registry;
 
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -80,7 +80,7 @@ public class ServiceDescriptorFactory
             if (realService != null)
             {
                 // Recursively look up the service descriptor for the real service.
-                return MuleManager.getInstance().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, realService, overrides);
+                return RegistryContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, realService, overrides);
             }
             else 
             {

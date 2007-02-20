@@ -10,20 +10,15 @@
 
 package org.mule.persistence.serializers;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.converters.Converter;
+import org.mule.persistence.PersistenceHelper;
+import org.mule.persistence.PersistenceSerializer;
+import org.mule.umo.UMOManagementContext;
+import org.mule.umo.lifecycle.InitialisationException;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
-
-import org.mule.MuleException;
-import org.mule.persistence.PersistenceHelper;
-import org.mule.persistence.PersistenceSerializer;
-import org.mule.transformers.xml.XStreamFactory;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.util.IOUtils;
 
 /**
  * The JavaSerializer is just an interface to serialize an object
@@ -37,8 +32,9 @@ public class JavaSerializer implements PersistenceSerializer
 
     /**
      * {@inheritDoc}
+     * @param managementContext
      */
-    public void initialise() throws InitialisationException 
+    public void initialise(UMOManagementContext managementContext) throws InitialisationException
     {
     }
 

@@ -10,7 +10,6 @@
 
 package org.mule.providers.jms;
 
-import org.mule.MuleManager;
 import org.mule.tck.AbstractMuleTestCase;
 
 import java.util.HashMap;
@@ -34,7 +33,7 @@ public class JmsConnectionFactoryTestCase extends AbstractMuleTestCase
         // needed so that when the connecotr is initialsied the manage eventing
         // model will be available. This is used by Jms for reconnection
         // notifications
-        ((MuleManager)MuleManager.getInstance()).initialise();
+        managementContext.initialise();
 
         JmsConnector connector = new JmsConnector();
         Map providerProperties = new HashMap(1);
@@ -46,7 +45,7 @@ public class JmsConnectionFactoryTestCase extends AbstractMuleTestCase
         ConnectionFactory cf = new TestConnectionFactory();
         connector.setConnectionFactory(cf);
 
-        connector.initialise();
+        connector.initialise(managementContext);
 
         assertEquals("Provider properties should not be passed to the ConnectionFactory.", "NOT_SET",
             ((TestConnectionFactory)cf).getProviderProperty());
@@ -61,7 +60,7 @@ public class JmsConnectionFactoryTestCase extends AbstractMuleTestCase
         // needed so that when the connecotr is initialsied the manage eventing
         // model will be available. This is used by Jms for reconnection
         // notifications
-        ((MuleManager)MuleManager.getInstance()).initialise();
+        managementContext.initialise();
 
         JmsConnector connector = new JmsConnector();
         Map connectionFactoryProperties = new HashMap(1);
@@ -73,8 +72,8 @@ public class JmsConnectionFactoryTestCase extends AbstractMuleTestCase
         ConnectionFactory cf = new TestConnectionFactory();
         connector.setConnectionFactory(cf);
 
-        connector.initialise();
-        connector.startConnector();
+        connector.initialise(managementContext);
+        connector.start();
 
         assertEquals("ConnectionFactory properties should be passed to the ConnectionFactory.", "TEST_VALUE",
             ((TestConnectionFactory)cf).getConnectionFactoryProperty());

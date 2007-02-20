@@ -21,7 +21,7 @@ public class SecretKeyEncryptionStrategyTestCase extends AbstractMuleTestCase
         SecretKeyEncryptionStrategy ske = new SecretKeyEncryptionStrategy();
         ske.setAlgorithm("Blowfish");
         ske.setKey("shhhhh");
-        ske.initialise();
+        ske.initialise(managementContext);
 
         byte[] b = ske.encrypt("hello".getBytes(), null);
 
@@ -36,7 +36,7 @@ public class SecretKeyEncryptionStrategyTestCase extends AbstractMuleTestCase
         ske.setAlgorithm("TripleDES");
         ske.setKey("shhhhh");
 
-        ske.initialise();
+        ske.initialise(managementContext);
 
         byte[] b = ske.encrypt("hello".getBytes(), null);
 

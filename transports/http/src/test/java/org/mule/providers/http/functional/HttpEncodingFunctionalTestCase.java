@@ -10,9 +10,6 @@
 
 package org.mule.providers.http.functional;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -30,10 +27,9 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
 
-/**
- * @author <a href="mailto:jesper@selskabet.org">Jesper Steen Møller</a>
- * @version $Revision$
- */
+import java.util.HashMap;
+import java.util.Map;
+
 public class HttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
 {
     UMOMessage reply;
@@ -73,9 +69,9 @@ public class HttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
     {
         UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(uri,
             UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER);
-        if (!endpoint.getConnector().isStarted() && manager.isStarted())
+        if (!endpoint.getConnector().isStarted() &&managementContext.isStarted())
         {
-            endpoint.getConnector().startConnector();
+            endpoint.getConnector().start();
         }
         endpoint.setStreaming(streaming);
         try

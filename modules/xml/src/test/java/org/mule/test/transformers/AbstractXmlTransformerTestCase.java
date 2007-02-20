@@ -27,7 +27,7 @@ public abstract class AbstractXmlTransformerTestCase extends AbstractTransformer
         XMLUnit.setIgnoreWhitespace(true);
     }
 
-    // @Override
+    // //@Override
     public boolean compareResults(Object expected, Object result)
     {
         if (expected instanceof Document && result instanceof Document)

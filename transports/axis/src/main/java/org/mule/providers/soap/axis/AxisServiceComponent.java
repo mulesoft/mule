@@ -10,7 +10,7 @@
 
 package org.mule.providers.soap.axis;
 
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
@@ -22,6 +22,7 @@ import org.mule.providers.soap.SoapConstants;
 import org.mule.providers.soap.axis.extensions.MuleConfigProvider;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
@@ -135,7 +136,7 @@ public class AxisServiceComponent implements Initialisable, Callable
         return new MuleMessage(response);
     }
 
-    public void initialise() throws InitialisationException
+    public void initialise(UMOManagementContext managementContext) throws InitialisationException
     {
         // template method
     }
@@ -458,7 +459,7 @@ public class AxisServiceComponent implements Initialisable, Callable
         AxisEngine engine = getAxisServer();
         response.setProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/html");
         response.write("<h2>And now... Some Services</h2>");
-        String version = MuleManager.getConfiguration().getProductVersion();
+        String version = RegistryContext.getConfiguration().getProductVersion();
         if (version == null)
         {
             version = "Version Not Set";
@@ -898,7 +899,8 @@ public class AxisServiceComponent implements Initialisable, Callable
     {
         if (homeDir == null)
         {
-            homeDir = MuleManager.getConfiguration().getWorkingDirectory() + DEFAULT_AXIS_HOME;
+            //TODO fix homeDir = RegistryContext.getConfiguration().getWorkingDirectory() + DEFAULT_AXIS_HOME;
+            homeDir = DEFAULT_AXIS_HOME;
         }
         return homeDir;
     }

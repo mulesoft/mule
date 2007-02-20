@@ -463,4 +463,6 @@ public interface UMOEventContext
     public String getEncoding();
 
     UMOSession getSession();
+
+    UMOManagementContext getManagmentContext();
 }

@@ -24,7 +24,7 @@ public class SystemStreamConnectorTestCase extends AbstractConnectorTestCase
     {
         UMOConnector connector = new SystemStreamConnector();
         connector.setName("TestStream");
-        connector.initialise();
+        connector.initialise(managementContext);
         return connector;
     }
 
@@ -37,7 +37,7 @@ public class SystemStreamConnectorTestCase extends AbstractConnectorTestCase
     {
         UMOConnector cnn = new SystemStreamConnector();
         cnn.setName("TestStream");
-        cnn.initialise();
+        cnn.initialise(managementContext);
         return cnn;
     }
 

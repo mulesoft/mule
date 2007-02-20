@@ -62,7 +62,7 @@ public class MuleServer implements Runnable
      * the core doesn't depend on mule-module-spring. TODO this may not be a problem
      * for Mule 2.x
      */
-    protected static final String CLASSNAME_SPRING_CONFIG_BUILDER = "org.mule.extras.spring.config.SpringConfigurationBuilder";
+    protected static final String CLASSNAME_SPRING_CONFIG_BUILDER = "org.mule.extras.spring.config.MuleXmlConfigurationBuilder";
 
     /**
      * logger used by this class
@@ -337,7 +337,7 @@ public class MuleServer implements Runnable
         msgs.add(root.getMessage() + " (" + root.getClass().getName() + ")");
         msgs.add(" ");
         msgs.add(new Message(Messages.FATAL_ERROR_SHUTDOWN));
-        msgs.add(new Message(Messages.SERVER_STARTED_AT_X, new Date(MuleManager.getInstance().getStartDate())));
+        //TODO msgs.add(new Message(Messages.SERVER_STARTED_AT_X, new Date(managementContext.getStartDate())));
         msgs.add(new Message(Messages.SERVER_SHUTDOWN_AT_X, new Date().toString()));
 
         shutdownMessage = StringMessageUtils.getBoilerPlate(msgs, '*', 80);
@@ -353,7 +353,7 @@ public class MuleServer implements Runnable
         logger.info("Mule server shutting down due to normal shutdown request");
         List msgs = new ArrayList();
         msgs.add(new Message(Messages.NORMAL_SHUTDOWN).getMessage());
-        msgs.add(new Message(Messages.SERVER_STARTED_AT_X, new Date(MuleManager.getInstance().getStartDate())).getMessage());
+        //TODO msgs.add(new Message(Messages.SERVER_STARTED_AT_X, new Date(managementContext.getStartDate())).getMessage());
         msgs.add(new Message(Messages.SERVER_SHUTDOWN_AT_X, new Date().toString()).getMessage());
         shutdownMessage = StringMessageUtils.getBoilerPlate(msgs, '*', 80);
 

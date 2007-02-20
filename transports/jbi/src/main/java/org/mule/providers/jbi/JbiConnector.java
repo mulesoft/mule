@@ -25,7 +25,7 @@ import javax.management.ObjectName;
  * <code>JbiConnector</code> can bind to a JBI container allowing components to
  * send events via Mule.
  */
-public class JbiConnector extends AbstractConnector implements ComponentLifeCycle
+public class JbiConnector extends AbstractConnector // TODO need to introduce this interface  runtime due to conflict implements ComponentLifeCycle
 {
     private ObjectName extensionMBeanName;
     private ComponentContext context;
@@ -103,36 +103,6 @@ public class JbiConnector extends AbstractConnector implements ComponentLifeCycl
         this.context = componentContext;
         this.deliveryChannel = context.getDeliveryChannel();
         this.exchangeFactory = deliveryChannel.createExchangeFactory();
-    }
-
-    /**
-     * @see ComponentLifeCycle#start()
-     */
-    public void start()
-    {
-        try
-        {
-            startConnector();
-        }
-        catch (UMOException e)
-        {
-            handleException(e);
-        }
-    }
-
-    /**
-     * @see ComponentLifeCycle#stop()
-     */
-    public void stop()
-    {
-        try
-        {
-            stopConnector();
-        }
-        catch (UMOException e)
-        {
-            handleException(e);
-        }
     }
 
     /**

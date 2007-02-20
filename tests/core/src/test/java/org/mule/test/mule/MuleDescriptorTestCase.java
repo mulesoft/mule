@@ -24,7 +24,7 @@ public class MuleDescriptorTestCase extends AbstractMuleTestCase
     public void testDescriptorDefaults() throws Exception
     {
         MuleDescriptor descriptor = new MuleDescriptor();
-        descriptor.initialise();
+        descriptor.initialise(managementContext);
         MuleConfiguration config = new MuleConfiguration();
 
         assertNotNull(descriptor.getInterceptors());

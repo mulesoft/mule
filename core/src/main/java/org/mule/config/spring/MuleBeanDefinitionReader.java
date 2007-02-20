@@ -12,8 +12,6 @@ package org.mule.config.spring;
 
 import org.mule.config.MuleDtdResolver;
 import org.mule.config.XslHelper;
-import org.mule.config.spring.editors.TransformerPropertyEditor;
-import org.mule.umo.transformer.UMOTransformer;
 
 import java.io.IOException;
 
@@ -29,8 +27,8 @@ import javax.xml.transform.stream.StreamSource;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.BeansDtdResolver;
+import org.springframework.beans.factory.xml.ResourceEntityResolver;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -51,16 +49,7 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
     public MuleBeanDefinitionReader(BeanDefinitionRegistry beanDefinitionRegistry, int configCount)
     {
         super(beanDefinitionRegistry);
-        // default resource loader
-        setResourceLoader(new MuleResourceLoader());
-        // TODO Make this configurable as a property somehow.
-        setValidationMode(VALIDATION_DTD);
-        setEntityResolver(createEntityResolver());
         this.configCount = configCount;
-
-        //Register Any custom property editors here
-        ((DefaultListableBeanFactory)beanDefinitionRegistry).registerCustomEditor(UMOTransformer.class,
-            new TransformerPropertyEditor((DefaultListableBeanFactory)beanDefinitionRegistry));
     }
 
     public int registerBeanDefinitions(Document document, Resource resource) throws BeansException
@@ -77,6 +66,8 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
         finally
         {
             incConfigCount();
+            //reset validation mode
+            setValidationMode(VALIDATION_AUTO);
         }
     }
 
@@ -110,6 +101,7 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
                     throw new IOException(report);
                 }
             }
+
             if (logger.isDebugEnabled())
             {
                 try
@@ -149,15 +141,15 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
 
     protected ClassPathResource getXslResource()
     {
-        String xsl = dtdResolver.getXslForDtd();
-        if (xsl != null)
+        if(dtdResolver!=null)
         {
-            return new ClassPathResource(xsl);
+            String xsl = dtdResolver.getXslForDtd();
+            if (xsl != null)
+            {
+                return new ClassPathResource(xsl);
+            }
         }
-        else
-        {
-            return null;
-        }
+        return null;
     }
 
     protected EntityResolver createEntityResolver()
@@ -184,5 +176,21 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
         {
             contextCount = 0;
         }
+    }
+
+
+    //@Override
+    protected int detectValidationMode(Resource resource)
+    {
+        int i = super.detectValidationMode(resource);
+        if(i==VALIDATION_DTD)
+        {
+            setEntityResolver(createEntityResolver());
+        }
+        else
+        {
+            setEntityResolver(new ResourceEntityResolver(getResourceLoader()));
+        }
+        return i;
     }
 }

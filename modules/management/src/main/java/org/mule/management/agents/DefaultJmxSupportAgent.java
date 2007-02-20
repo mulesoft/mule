@@ -10,39 +10,24 @@
 
 package org.mule.management.agents;
 
-import org.mule.MuleManager;
+import org.mule.impl.AbstractAgent;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOAgent;
 
 /**
  * TODO document.
  */
-public class DefaultJmxSupportAgent implements UMOAgent
+public class DefaultJmxSupportAgent extends AbstractAgent
 {
-
-    private String name = "Default Jmx";
     private boolean loadJdmkAgent = false;
     private boolean loadMx4jAgent = false;
 
-    /**
-     * Gets the name of this agent
-     * 
-     * @return the agent name
-     */
-    public String getName()
-    {
-        return name;
-    }
 
-    /**
-     * Sets the name of this agent
-     * 
-     * @param name the name of the agent
-     */
-    public void setName(String name)
+    public DefaultJmxSupportAgent()
     {
-        this.name = name;
+        super("Default Jmx Config");
     }
 
     /**
@@ -97,37 +82,38 @@ public class DefaultJmxSupportAgent implements UMOAgent
      *             causing the Mule instance to shutdown
      * @throws org.mule.umo.lifecycle.RecoverableException if an error occurs that
      *             can be recovered from
+     * @param managementContext
      */
-    public void initialise() throws InitialisationException {
+    public void doInitialise(UMOManagementContext managementContext) throws InitialisationException {
 
         try
         {
             UMOAgent agent = createRmiAgent();
             if (!isAgentRegistered(agent))
             {
-                MuleManager.getInstance().registerAgent(agent);
+                managementContext.getRegistry().registerAgent(agent);
             }
             agent = createJmxAgent();
             if (!isAgentRegistered(agent))
             {
-                MuleManager.getInstance().registerAgent(agent);
+                managementContext.getRegistry().registerAgent(agent);
             }
             agent = createLog4jAgent();
             if (!isAgentRegistered(agent))
             {
-                MuleManager.getInstance().registerAgent(agent);
+                managementContext.getRegistry().registerAgent(agent);
             }
             agent = createJmxNotificationAgent();
             if (!isAgentRegistered(agent))
             {
-                MuleManager.getInstance().registerAgent(agent);
+                managementContext.getRegistry().registerAgent(agent);
             }
             if (loadJdmkAgent)
             {
                 agent = createJdmkAgent();
                 if (!isAgentRegistered(agent))
                 {
-                    MuleManager.getInstance().registerAgent(agent);
+                    managementContext.getRegistry().registerAgent(agent);
                 }
             }
 
@@ -136,12 +122,12 @@ public class DefaultJmxSupportAgent implements UMOAgent
                 agent = createMx4jAgent();
                 if (!isAgentRegistered(agent))
                 {
-                    MuleManager.getInstance().registerAgent(agent);
+                    managementContext.getRegistry().registerAgent(agent);
                 }
             }
 
             // remove this agent once t has registered the other agents
-            MuleManager.getInstance().unregisterAgent(name);
+            managementContext.getRegistry().unregisterAgent(name);
         }
         catch (UMOException e)
         {
@@ -183,7 +169,7 @@ public class DefaultJmxSupportAgent implements UMOAgent
 
     protected boolean isAgentRegistered(UMOAgent agent)
     {
-        return MuleManager.getInstance().lookupAgent(agent.getName()) != null;
+        return managementContext.getRegistry().lookupAgent(agent.getName()) != null;
     }
 
     public boolean isLoadJdmkAgent()

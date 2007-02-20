@@ -10,7 +10,7 @@
 
 package org.mule.providers.http.servlet;
 
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageReceiver;
@@ -119,7 +119,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
             httpServletRequest.setAttribute(PAYLOAD_PARAMETER_NAME, payloadParameterName);
             UMOMessage message = new MuleMessage(receiver.getConnector()
                 .getMessageAdapter(httpServletRequest));
-            receiver.routeMessage(message, MuleManager.getConfiguration().isDefaultSynchronousEndpoints());
+            receiver.routeMessage(message, RegistryContext.getConfiguration().isDefaultSynchronousEndpoints());
 
             httpServletResponse.setStatus(HttpServletResponse.SC_CREATED);
             if (feedback)
@@ -179,7 +179,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
             throw new EndpointException(new Message("http", 8, "endpoint"));
         }
 
-        UMOEndpoint endpoint = MuleManager.getInstance().lookupEndpoint(endpointName);
+        UMOEndpoint endpoint = RegistryContext.getRegistry().lookupEndpoint(endpointName);
         if (endpoint == null)
         {
             // if we dont find an endpoint for the given name, lets check the

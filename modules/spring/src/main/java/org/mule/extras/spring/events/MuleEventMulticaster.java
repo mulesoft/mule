@@ -10,13 +10,13 @@
 
 package org.mule.extras.spring.events;
 
-import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
-import org.mule.config.MuleConfiguration;
+import org.mule.RegistryContext;
 import org.mule.config.ThreadingProfile;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.config.i18n.Message;
 import org.mule.extras.spring.SpringContainerContext;
+import org.mule.impl.ManagementContextAware;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
@@ -33,19 +33,17 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.UMOManager;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
-import org.mule.util.MapUtils;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArraySet;
 import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
@@ -117,7 +115,7 @@ import org.springframework.context.support.AbstractApplicationContext;
  * @see ApplicationEventMulticaster
  */
 
-public class MuleEventMulticaster implements ApplicationEventMulticaster, ApplicationContextAware
+public class MuleEventMulticaster implements ApplicationEventMulticaster, ApplicationContextAware, ManagementContextAware
 {
     public static final String EVENT_MULTICASTER_DESCRIPTOR_NAME = "muleEventMulticasterDescriptor";
 
@@ -181,6 +179,14 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
      * Used to store parsed endpoints
      */
     protected ExceptionListener exceptionListener = new LoggingExceptionListener();
+
+    protected UMOManagementContext managementContext;
+
+
+    public void setManagementContext(UMOManagementContext context)
+    {
+        this.managementContext = context;
+    }
 
     /**
      * Adds a listener to the the Multicaster. If asynchronous is set to true, an
@@ -254,11 +260,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
      * to it, it is assumed that the event was dispatched by Mule and will be
      * delivered to any listeners subscribed to the event.
      * 
-<<<<<<< .working
      * @param e the application event received by the context
-=======
-     * @param e application event received by the context
->>>>>>> .merge-right.r4952
      */
     public void multicastEvent(ApplicationEvent e)
     {
@@ -268,7 +270,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
         {
             // If the manager is being initialised from another context
             // don't try and initialise Mule
-            if (MuleManager.isInstanciated() && !MuleManager.getInstance().isInitialised())
+            if (managementContext!=null && !managementContext.isInitialised())
             {
                 try
                 {
@@ -286,7 +288,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
         }
         else if (e instanceof ContextClosedEvent)
         {
-            MuleManager.getInstance().dispose();
+            managementContext.dispose();
             return;
         }
         else if (e instanceof MuleApplicationEvent)
@@ -387,8 +389,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
     {
         for (int i = 0; i < subscriptions.length; i++)
         {
-            String subscription = MapUtils.getString(MuleManager.getInstance().getEndpointIdentifiers(),
-                subscriptions[i], subscriptions[i]);
+            String subscription = subscriptions[i];
 
             // Subscriptions can be full Mule Urls or resource specific such as
             // my.queue
@@ -438,7 +439,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
         {
             if (asyncPool == null)
             {
-                asyncPool = MuleManager.getConfiguration().getDefaultThreadingProfile().createPool(
+                asyncPool = RegistryContext.getConfiguration().getDefaultThreadingProfile().createPool(
                     "spring-events");
             }
         }
@@ -557,23 +558,18 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                 registerMulticasterDescriptor();
                 return;
             }
-            UMOManager manager = MuleManager.getInstance();
-            Map map = applicationContext.getBeansOfType(MuleConfiguration.class);
-            if (map != null && map.size() > 0)
+
+            if (!managementContext.isStarted())
             {
-                MuleManager.setConfiguration((MuleConfiguration)map.values().iterator().next());
-            }
-            if (!manager.isStarted())
-            {
-                MuleManager.getConfiguration().setDefaultSynchronousEndpoints(!asynchronous);
+                RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(!asynchronous);
                 // register any endpointUri mappings
                 registerEndpointMappings();
             }
             // tell mule to load component definitions from spring
             SpringContainerContext containerContext = new SpringContainerContext();
             containerContext.setBeanFactory(applicationContext);
-            manager.setContainerContext(null);
-            manager.setContainerContext(containerContext);
+           managementContext.getRegistry().registerContainerContext(null);
+           managementContext.getRegistry().registerContainerContext(containerContext);
 
             // see if there are any UMOConnectors to register
             registerConnectors();
@@ -586,9 +582,9 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
             // Register the multicaster descriptor
             registerMulticasterDescriptor();
 
-            if (!manager.isStarted())
+            if (!managementContext.isStarted())
             {
-                manager.start();
+               managementContext.start();
             }
         }
         catch (UMOException e)
@@ -604,7 +600,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
         {
             descriptor = getDefaultDescriptor();
             setSubscriptionsOnDescriptor((MuleDescriptor)descriptor);
-            component = MuleManager.getInstance().lookupModel(ModelHelper.SYSTEM_MODEL).registerComponent(descriptor);
+            component = managementContext.getRegistry().lookupModel(ModelHelper.SYSTEM_MODEL).registerComponent(descriptor);
         }
     }
 
@@ -649,7 +645,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
 
     private boolean registerAsSoap(String endpoint, Object listener) throws UMOException
     {
-        if (endpoint.startsWith("glue") || endpoint.startsWith("soap") || endpoint.startsWith("axis"))
+        if (endpoint.startsWith("glue") || endpoint.startsWith("soap") || endpoint.startsWith("axis") || endpoint.startsWith("xfire"))
         {
             UMOEndpointURI ep = new MuleEndpointURI(endpoint);
             QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
@@ -686,7 +682,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
         }
     }
 
-    protected void registerEndpointMappings() throws InitialisationException
+    protected void registerEndpointMappings() throws UMOException
     {
         // register any endpointUri mappings
         if (endpointMappings != null)
@@ -695,15 +691,14 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
             for (Iterator iterator = endpointMappings.entrySet().iterator(); iterator.hasNext();)
             {
                 entry = (Map.Entry)iterator.next();
-                MuleManager.getInstance().registerEndpointIdentifier((String)entry.getKey(),
-                    (String)entry.getValue());
+                managementContext.getRegistry().registerEndpoint(new MuleEndpoint((String)entry.getKey(), true));
             }
         }
     }
 
     protected void registerConnectors() throws UMOException
     {
-        if (!MuleManager.getInstance().isInitialised())
+        if (!managementContext.isInitialised())
         {
             // Next see if there are any UMOConnectors to register
             Map connectors = applicationContext.getBeansOfType(UMOConnector.class, true, true);
@@ -719,7 +714,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                     {
                         c.setName(entry.getKey().toString());
                     }
-                    MuleManager.getInstance().registerConnector(c);
+                    managementContext.getRegistry().registerConnector(c);
                 }
             }
         }
@@ -727,7 +722,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
 
     protected void registerGlobalEndpoints() throws UMOException
     {
-        if (!MuleManager.getInstance().isInitialised())
+        if (!managementContext.isInitialised())
         {
             // Next see if there are any UMOConnectors to register
             Map endpoints = applicationContext.getBeansOfType(UMOEndpoint.class, true, true);
@@ -743,7 +738,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                     {
                         endpoint.setName(entry.getKey().toString());
                     }
-                    MuleManager.getInstance().registerEndpoint(endpoint);
+                    managementContext.getRegistry().registerEndpoint(endpoint);
                 }
             }
         }
@@ -751,7 +746,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
 
     protected void registerTransformers() throws UMOException
     {
-        if (!MuleManager.getInstance().isInitialised())
+        if (!managementContext.isInitialised())
         {
             // Next see if there are any UMOConnectors to register
             Map transformers = applicationContext.getBeansOfType(UMOTransformer.class, true, true);
@@ -767,7 +762,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                     {
                         t.setName(entry.getKey().toString());
                     }
-                    MuleManager.getInstance().registerTransformer(t);
+                    managementContext.getRegistry().registerTransformer(t);
                 }
             }
         }
@@ -777,12 +772,12 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
     {
         // When the the beanFactory is refreshed all the beans get
         // reloaded so we need to unregister the component from Mule
-        UMOModel model = MuleManager.getInstance().lookupModel(ModelHelper.SYSTEM_MODEL);
+        UMOModel model = managementContext.getRegistry().lookupModel(ModelHelper.SYSTEM_MODEL);
         if(model==null)
         {
             model = new SedaModel();
             model.setName(ModelHelper.SYSTEM_MODEL);
-            MuleManager.getInstance().registerModel(model);
+            managementContext.getRegistry().registerModel(model);
         }
         UMODescriptor descriptor = model.getDescriptor(EVENT_MULTICASTER_DESCRIPTOR_NAME);
         if (descriptor != null)

@@ -10,7 +10,7 @@
 
 package org.mule.providers.http.transformers;
 
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.config.MuleProperties;
 import org.mule.providers.NullPayload;
 import org.mule.providers.http.HttpConnector;
@@ -19,7 +19,9 @@ import org.mule.providers.http.HttpResponse;
 import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.UMOEventContext;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.StringUtils;
 
@@ -58,19 +60,24 @@ public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
     {
         registerSourceType(Object.class);
         setReturnClass(Object.class);
+    }
 
+
+    //@Override
+    public void initialise(UMOManagementContext managementContext) throws InitialisationException
+    {
         format = new SimpleDateFormat(HttpConstants.DATE_FORMAT, Locale.US);
 
         // When running with the source code, Meta information is not set
         // so product name and version are not available, hence we hard code
-        if (MuleManager.getConfiguration().getProductName() == null)
+        if (RegistryContext.getConfiguration().getProductName() == null)
         {
             server = "Mule/SNAPSHOT";
         }
         else
         {
-            server = MuleManager.getConfiguration().getProductName() + "/"
-                     + MuleManager.getConfiguration().getProductVersion();
+            server = RegistryContext.getConfiguration().getProductName() + "/"
+                     + RegistryContext.getConfiguration().getProductVersion();
         }
         serializableToByteArray = new SerializableToByteArray();
     }

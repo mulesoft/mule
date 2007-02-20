@@ -10,6 +10,8 @@
 
 package org.mule.umo.lifecycle;
 
+import org.mule.umo.UMOManagementContext;
+
 /**
  * <code>Initialisable</code> is a lifecycle interface that gets called at the
  * initialise lifecycle stage of the implementing component.
@@ -27,6 +29,7 @@ public interface Initialisable
      * @throws InitialisationException if a fatal error occurs causing the Mule
      *             instance to shutdown
      * @throws RecoverableException if an error occurs that can be recovered from
+     * @param managementContext
      */
-    void initialise() throws InitialisationException;
+    void initialise(UMOManagementContext managementContext) throws InitialisationException;
 }

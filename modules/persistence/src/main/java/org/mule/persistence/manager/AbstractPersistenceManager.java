@@ -10,11 +10,6 @@
 
 package org.mule.persistence.manager;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentLinkedQueue;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.persistence.Persistable;
 import org.mule.persistence.PersistenceManager;
 import org.mule.persistence.PersistenceStore;
 import org.mule.persistence.PersistenceTimer;
@@ -53,7 +48,7 @@ public abstract class AbstractPersistenceManager implements PersistenceManager
         
         if (store != null)
         {
-            store.initialise();
+            store.initialise(null);
         }
     }
 

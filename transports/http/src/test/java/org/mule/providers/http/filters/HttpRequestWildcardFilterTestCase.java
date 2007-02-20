@@ -10,7 +10,7 @@
 
 package org.mule.providers.http.filters;
 
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.components.simple.EchoComponent;
 import org.mule.config.PoolingProfile;
 import org.mule.impl.DefaultExceptionStrategy;
@@ -24,11 +24,9 @@ import org.mule.routing.filters.WildcardFilter;
 import org.mule.routing.filters.logic.NotFilter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOException;
-import org.mule.umo.model.UMOModel;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.UMOConnector;
 
 import java.io.IOException;
@@ -52,18 +50,17 @@ public class HttpRequestWildcardFilterTestCase extends AbstractMuleTestCase
     protected void doSetUp() throws Exception
     {
 
-        UMOManager manager = getManager(true);
-        MuleManager.getConfiguration().setDefaultSynchronousEndpoints(true);
+        RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(true);
 
         SedaModel model = new SedaModel();
         model.setPoolingProfile(new PoolingProfile());
         model.getPoolingProfile().setInitialisationPolicy(PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
         model.setName("main");
-        manager.registerModel(model);
+       managementContext.getRegistry().registerModel(model);
 
         MuleDescriptor descriptor = createInDescriptor("httpIn", EchoComponent.class.getName());
         model.registerComponent(descriptor);
-        manager.start();
+       managementContext.start();
     }
 
     private MuleDescriptor createInDescriptor(String name, String implementation) throws UMOException
@@ -92,7 +89,7 @@ public class HttpRequestWildcardFilterTestCase extends AbstractMuleTestCase
     {
         HttpConnector connector = (HttpConnector) TransportFactory.createConnector(new MuleEndpointURI(urlStr));
         connector.getDispatcherThreadingProfile().setDoThreading(false);
-        MuleManager.getInstance().registerConnector(connector);
+        managementContext.getRegistry().registerConnector(connector);
         return connector;
     }
 

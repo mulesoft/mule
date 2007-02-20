@@ -10,9 +10,7 @@
 
 package org.mule.providers.jbi.components;
 
-import org.mule.MuleManager;
 import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 
 import java.util.Map;
@@ -35,17 +33,7 @@ public abstract class AbstractEndpointComponent extends AbstractJbiComponent
 
     protected AbstractEndpointComponent()
     {
-        if (!MuleManager.isInstanciated())
-        {
-            try
-            {
-                MuleManager.getInstance().start();
-            }
-            catch (UMOException e)
-            {
-                e.printStackTrace();
-            }
-        }
+        
     }
 
     public UMOEndpoint getMuleEndpoint()
@@ -98,7 +86,7 @@ public abstract class AbstractEndpointComponent extends AbstractJbiComponent
             {
                 muleEndpoint.getProperties().putAll(endpointProperties);
             }
-            muleEndpoint.initialise();
+            //TODO Fix muleEndpoint.initialise(managementContext);
 
         }
         catch (Exception e)

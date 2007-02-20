@@ -10,17 +10,16 @@
 
 package org.mule.persistence.manager;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.persistence.Persistable;
 import org.mule.persistence.PersistenceException;
-import org.mule.persistence.PersistenceManager;
-import org.mule.persistence.PersistenceStore;
 import org.mule.persistence.PersistenceTimer;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.RecoverableException;
-import org.mule.util.StringUtils;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * 
@@ -60,8 +59,9 @@ public class ObjectPersistenceManager extends AbstractPersistenceManager
 
     /**
      * {@inheritDoc}
+     * @param managementContext
      */
-    public void initialise() throws InitialisationException, RecoverableException
+    public void initialise(UMOManagementContext managementContext) throws InitialisationException, RecoverableException
     {
         persistenceTimer = new PersistenceTimer(this);
         lastRequest = System.currentTimeMillis();

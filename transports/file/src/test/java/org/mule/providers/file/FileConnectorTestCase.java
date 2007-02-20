@@ -10,7 +10,7 @@
 
 package org.mule.providers.file;
 
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.impl.ImmutableMuleEndpoint;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.providers.AbstractConnectorTestCase;
@@ -38,7 +38,7 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
     {
         super.doSetUp();
         // The working directory is deleted on tearDown
-        File tempDir = new File(MuleManager.getConfiguration().getWorkingDirectory(), "tmp");
+        File tempDir = new File(RegistryContext.getConfiguration().getWorkingDirectory(), "tmp");
         if (!tempDir.exists())
         {
             tempDir.mkdirs();
@@ -64,13 +64,13 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
     {
         UMOConnector connector = new FileConnector();
         connector.setName("testFile");
-        connector.initialise();
+        connector.initialise(managementContext);
         return connector;
     }
 
     public String getTestEndpointURI()
     {
-        return "file://" + MuleManager.getConfiguration().getWorkingDirectory();
+        return "file://" + RegistryContext.getConfiguration().getWorkingDirectory();
     }
 
     /*
@@ -88,7 +88,7 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
         UMOEvent event = getTestEvent("TestData");
 
         connector.registerListener(component, endpoint);
-        connector.startConnector();
+        connector.start();
         connector.dispatch(new ImmutableMuleEndpoint("file:/foo", false), event);
 
         session.verify();
@@ -108,7 +108,7 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
         UMOComponent component = getTestComponent(descriptor);
 
         connector.registerListener(component, endpoint);
-        connector.startConnector();
+        connector.start();
         connector.send(new ImmutableMuleEndpoint("file:/foo", false), event);
 
     }

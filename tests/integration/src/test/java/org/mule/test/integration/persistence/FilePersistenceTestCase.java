@@ -32,7 +32,7 @@ public class FilePersistenceTestCase extends FunctionalTestCase
 
         // Note that the FunctionalTestCase will remove the working directory after
         // each execution
-        String path = MuleManager.getConfiguration().getWorkingDirectory() + "/queuestore/test.queue";
+        String path = RegistryContext.getConfiguration().getWorkingDirectory() + "/queuestore/test.queue";
         File store = new File(path);
         assertFalse(store.exists());
 
@@ -42,7 +42,7 @@ public class FilePersistenceTestCase extends FunctionalTestCase
         assertNotNull(files);
         assertEquals(1, files.length);
 
-        MuleManager.getInstance().lookupModel("main").startComponent("TestComponent");
+        managementContext.getRegistry().lookupModel("main").startComponent("TestComponent");
         // give the component some time to initialise
         Thread.sleep(2000);
         files = store.listFiles();

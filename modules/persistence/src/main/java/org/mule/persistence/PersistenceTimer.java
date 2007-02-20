@@ -11,7 +11,7 @@
 package org.mule.persistence;
 
 /**
- * THe PersistenceTimer optionally helps the PersistenceManager schedule
+ * The PersistenceTimer optionally helps the PersistenceManager schedule
  * persistence.
  *
  * Possibly this can be replaced by the util/timer
@@ -50,7 +50,7 @@ public class PersistenceTimer extends Thread
                 currInterval = 0;
                 if (mustPersist())
                 {
-                    manager.persist();
+                   manager.persist();
                 }
             }
 
@@ -77,9 +77,9 @@ public class PersistenceTimer extends Thread
         */
 
         if (manager.isReady())
-        if (now - manager.getLastRequestTime() > minInterval && manager.getRequestCount() > 0)
+        if (now -manager.getLastRequestTime() > minInterval &&manager.getRequestCount() > 0)
             return true;
-        else if (now - manager.getLastRequestTime() > maxInterval)
+        else if (now -manager.getLastRequestTime() > maxInterval)
             return true;
 
         return false;

@@ -10,7 +10,7 @@
 
 package org.mule.impl.model;
 
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.registry.ServiceDescriptorFactory;
 import org.mule.registry.ServiceException;
 import org.mule.umo.model.UMOModel;
@@ -25,7 +25,7 @@ public class ModelFactory
     public static UMOModel createModel(String type) throws ServiceException
     {
         ModelServiceDescriptor sd = (ModelServiceDescriptor)
-            MuleManager.getInstance().lookupServiceDescriptor(ServiceDescriptorFactory.MODEL_SERVICE_TYPE, type, null);
+            RegistryContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.MODEL_SERVICE_TYPE, type, null);
         if (sd != null)
         {
             return sd.createModel();
@@ -36,7 +36,7 @@ public class ModelFactory
     public static Class getModelClass(String type) throws ServiceException
     {
         ModelServiceDescriptor sd = (ModelServiceDescriptor) 
-            MuleManager.getInstance().lookupServiceDescriptor(ServiceDescriptorFactory.MODEL_SERVICE_TYPE, type, null);
+            RegistryContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.MODEL_SERVICE_TYPE, type, null);
         if (sd != null)
         {
             return sd.getModelClass();

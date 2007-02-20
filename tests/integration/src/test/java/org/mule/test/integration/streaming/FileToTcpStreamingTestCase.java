@@ -19,7 +19,7 @@ public class FileToTcpStreamingTestCase extends FunctionalTestCase
 {
     protected void doFunctionalTearDown() throws Exception
     {
-        FileUtils.deleteDirectory(new File(MuleManager.getConfiguration().getWorkingDirectory() + "/test-data"));
+        FileUtils.deleteDirectory(new File(RegistryContext.getConfiguration().getWorkingDirectory() + "/test-data"));
     }
 
     protected String getConfigResources()
@@ -34,7 +34,7 @@ public class FileToTcpStreamingTestCase extends FunctionalTestCase
                 "\nblah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah " +
                 "\nblah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah\n\n";
 
-        String basepath = MuleManager.getConfiguration().getWorkingDirectory() + "/test-data";
+        String basepath = RegistryContext.getConfiguration().getWorkingDirectory() + "/test-data";
         FileUtils.stringToFile(basepath + "/in/foo.txt", text);
 
         Thread.sleep(3000);

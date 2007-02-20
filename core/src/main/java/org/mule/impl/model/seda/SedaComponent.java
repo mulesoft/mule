@@ -10,7 +10,6 @@
 
 package org.mule.impl.model.seda;
 
-import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
 import org.mule.config.PoolingProfile;
 import org.mule.config.QueueProfile;
@@ -25,9 +24,7 @@ import org.mule.impl.model.DefaultMuleProxy;
 import org.mule.impl.model.MuleProxy;
 import org.mule.management.stats.ComponentStatistics;
 import org.mule.management.stats.SedaComponentStatistics;
-import org.mule.registry.metadata.MetadataStore;
 import org.mule.registry.metadata.ObjectMetadata;
-
 import org.mule.umo.ComponentException;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
@@ -153,7 +150,7 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
         try
         {
             // Setup event Queue (used for VM execution)
-            queueProfile.configureQueue(descriptor.getName());
+            queueProfile.configureQueue(descriptor.getName(), managementContext.getQueueManager());
         }
         catch (InitialisationException e)
         {
@@ -416,7 +413,7 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
 
     public int getQueueSize()
     {
-        QueueSession queueSession = MuleManager.getInstance().getQueueManager().getQueueSession();
+        QueueSession queueSession = managementContext.getQueueManager().getQueueSession();
         return queueSession.getQueue(descriptor.getName()).size();
     }
 
@@ -428,7 +425,7 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
     {
         MuleEvent event = null;
         MuleProxy proxy = null;
-        QueueSession queueSession = MuleManager.getInstance().getQueueManager().getQueueSession();
+        QueueSession queueSession = managementContext.getQueueManager().getQueueSession();
 
         while (!stopped.get())
         {
@@ -484,6 +481,10 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
             }
             catch (Exception e)
             {
+                if(isStopped() || isStopping())
+                {
+                    break;
+                }
                 if (proxy != null && proxyPool != null)
                 {
                     try
@@ -540,14 +541,13 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
 
     protected void enqueue(UMOEvent event) throws Exception
     {
-        QueueSession session = MuleManager.getInstance().getQueueManager().getQueueSession();
+        QueueSession session = managementContext.getQueueManager().getQueueSession();
         session.getQueue(descriptorQueueName).put(event);
     }
 
     protected UMOEvent dequeue() throws Exception
     {
-        // Wait until an event is available
-        QueueSession queueSession = MuleManager.getInstance().getQueueManager().getQueueSession();
+        QueueSession queueSession = managementContext.getQueueManager().getQueueSession();
         return (UMOEvent)queueSession.getQueue(descriptorQueueName).poll(queueTimeout);
     }
 

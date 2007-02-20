@@ -10,7 +10,6 @@
 
 package org.mule.impl.model;
 
-import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.DefaultComponentExceptionStrategy;
@@ -26,6 +25,7 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
@@ -101,6 +101,8 @@ public abstract class AbstractComponent implements UMOComponent
 
     protected String registryId = null;
 
+    protected UMOManagementContext managementContext;
+
     /**
      * Default constructor
      */
@@ -112,6 +114,7 @@ public abstract class AbstractComponent implements UMOComponent
         }
         this.descriptor = descriptor;
         this.model = model;
+        this.managementContext = descriptor.getManagementContext();
     }
 
     /**
@@ -122,8 +125,9 @@ public abstract class AbstractComponent implements UMOComponent
      * @throws org.mule.umo.lifecycle.InitialisationException if the component fails
      *             to initialise
      * @see org.mule.umo.UMODescriptor
+     * @param managementContext
      */
-    public final synchronized void initialise() throws InitialisationException
+    public final synchronized void initialise(UMOManagementContext managementContext) throws InitialisationException
     {
         if (initialised.get())
         {
@@ -131,7 +135,17 @@ public abstract class AbstractComponent implements UMOComponent
                 "Component '" + descriptor.getName() + "'"), this);
         }
 
-        try 
+        this.managementContext = managementContext;
+
+        try
+        {
+            register();
+        } catch (RegistrationException re)
+        {
+            logger.info("Unable to register component");
+        }
+        
+        try
         {
             descriptor.register();
         }
@@ -141,7 +155,7 @@ public abstract class AbstractComponent implements UMOComponent
                     descriptor.getName() + " with the registry");
         }
 
-        descriptor.initialise();
+        descriptor.initialise(managementContext);
 
         this.exceptionListener = descriptor.getExceptionListener();
 
@@ -150,8 +164,8 @@ public abstract class AbstractComponent implements UMOComponent
         // initialise statistics
         stats = createStatistics();
 
-        stats.setEnabled(((MuleManager)MuleManager.getInstance()).getStatistics().isEnabled());
-        ((MuleManager) MuleManager.getInstance()).getStatistics().add(stats);
+        stats.setEnabled(managementContext.getStatistics().isEnabled());
+        managementContext.getStatistics().add(stats);
         stats.setOutboundRouterStat(getDescriptor().getOutboundRouter().getStatistics());
         stats.setInboundRouterStat(getDescriptor().getInboundRouter().getStatistics());
         
@@ -173,7 +187,7 @@ public abstract class AbstractComponent implements UMOComponent
     public void register() throws RegistrationException
     {
         registryId = 
-            MuleManager.getInstance().getRegistry().registerMuleObject(model, this).getId();
+            managementContext.getRegistry().registerMuleObject(model, this).getId();
     }
 
     /*
@@ -183,7 +197,7 @@ public abstract class AbstractComponent implements UMOComponent
      */
     public void deregister() throws DeregistrationException
     {
-        MuleManager.getInstance().getRegistry().deregisterComponent(registryId);
+        managementContext.getRegistry().deregisterComponent(registryId);
         registryId = null;
     }
 
@@ -199,7 +213,7 @@ public abstract class AbstractComponent implements UMOComponent
 
     protected void fireComponentNotification(int action)
     {
-        MuleManager.getInstance().fireNotification(new ComponentNotification(descriptor, action));
+        managementContext.fireNotification(new ComponentNotification(descriptor, action));
     }
 
     void finaliseEvent(UMOEvent event)
@@ -233,7 +247,7 @@ public abstract class AbstractComponent implements UMOComponent
 
             // Unregister Listeners for the component
             unregisterListeners();
-            if (MuleManager.getInstance().getQueueManager().getQueueSession().getQueue(
+            if (managementContext.getQueueManager().getQueueSession().getQueue(
                 descriptor.getName() + ".component").size() > 0)
             {
                 try
@@ -263,7 +277,7 @@ public abstract class AbstractComponent implements UMOComponent
      * @param startPaused - Start component in a "paused" state (messages are
      *            received but not processed).
      */
-    protected void start(boolean startPaused) throws UMOException
+    void start(boolean startPaused) throws UMOException
     {
 
         // Create the receivers for the component but do not start them yet.
@@ -370,7 +384,7 @@ public abstract class AbstractComponent implements UMOComponent
         }
         doDispose();
         fireComponentNotification(ComponentNotification.COMPONENT_DISPOSED);
-        ((MuleManager)MuleManager.getInstance()).getStatistics().remove(stats);
+        managementContext.getStatistics().remove(stats);
     }
 
     public ComponentStatistics getStatistics()

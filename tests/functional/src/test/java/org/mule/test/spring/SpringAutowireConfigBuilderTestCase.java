@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id:SpringAutowireConfigBuilderTestCase.java 5187 2007-02-16 18:00:42Z rossmason $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -10,13 +10,11 @@
 
 package org.mule.test.spring;
 
-import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
-import org.mule.config.spring.SpringConfigurationBuilder;
+import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.impl.container.ContainerKeyPair;
 import org.mule.tck.AbstractConfigBuilderTestCase;
 import org.mule.tck.testmodels.fruit.FruitBowl;
-import org.mule.umo.manager.UMOManager;
 
 public class SpringAutowireConfigBuilderTestCase extends AbstractConfigBuilderTestCase
 {
@@ -29,16 +27,15 @@ public class SpringAutowireConfigBuilderTestCase extends AbstractConfigBuilderTe
 
     public ConfigurationBuilder getBuilder()
     {
-        return new SpringConfigurationBuilder();
+        return new MuleXmlConfigurationBuilder();
     }
 
     public void testComponentResolverConfig() throws Exception
     {
         // test container init
-        UMOManager manager = MuleManager.getInstance();
-        assertNotNull(manager.getContainerContext());
+        assertNotNull(managementContext.getRegistry().getContainerContext());
 
-        Object object = manager.getContainerContext().getComponent(
+        Object object =managementContext.getRegistry().getContainerContext().getComponent(
             new ContainerKeyPair("spring", "org.mule.tck.testmodels.fruit.FruitBowl"));
         assertNotNull(object);
         assertTrue(object instanceof FruitBowl);

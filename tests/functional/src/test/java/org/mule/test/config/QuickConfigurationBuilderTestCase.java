@@ -12,24 +12,22 @@ package org.mule.test.config;
 
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.QuickConfigurationBuilder;
+import org.mule.config.spring.RegistryFacade;
 import org.mule.impl.DefaultComponentExceptionStrategy;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.model.seda.SedaModel;
-import org.mule.interceptors.InterceptorStack;
-import org.mule.interceptors.LoggingInterceptor;
-import org.mule.interceptors.TimerInterceptor;
 import org.mule.management.agents.JmxAgent;
 import org.mule.providers.SimpleRetryConnectionStrategy;
 import org.mule.routing.ForwardingCatchAllStrategy;
-import org.mule.routing.nested.NestedRouterCollection;
-import org.mule.routing.nested.NestedRouter;
 import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.routing.filters.xml.JXPathFilter;
 import org.mule.routing.inbound.InboundRouterCollection;
+import org.mule.routing.nested.NestedRouter;
+import org.mule.routing.nested.NestedRouterCollection;
 import org.mule.routing.response.ResponseRouterCollection;
 import org.mule.tck.AbstractScriptConfigBuilderTestCase;
-import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.fruit.FruitCleaner;
+import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.tck.testmodels.mule.TestDefaultLifecycleAdapterFactory;
@@ -39,14 +37,12 @@ import org.mule.tck.testmodels.mule.TestResponseAggregator;
 import org.mule.tck.testmodels.mule.TestTransactionManagerFactory;
 import org.mule.transformers.NoActionTransformer;
 import org.mule.umo.UMODescriptor;
-import org.mule.umo.UMOInterceptorStack;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.manager.UMOAgent;
-import org.mule.umo.manager.UMOManager;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.routing.UMOInboundRouterCollection;
-import org.mule.umo.routing.UMOResponseRouterCollection;
 import org.mule.umo.routing.UMONestedRouterCollection;
+import org.mule.umo.routing.UMOResponseRouterCollection;
 import org.mule.util.StringUtils;
 
 import java.util.ArrayList;
@@ -64,13 +60,12 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
 
     public ConfigurationBuilder getBuilder()
     {
-
-        QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
-        UMOManager m = builder.getManager();
-        // Disable the admin agent
-        //MuleManager.getConfiguration().setServerUrl(StringUtils.EMPTY);
+        QuickConfigurationBuilder builder=null;
         try
         {
+
+            builder = new QuickConfigurationBuilder();
+            RegistryFacade m = builder.getManagementContext().getRegistry();
             // set global properties
             m.setProperty("doCompression", "true");
 
@@ -91,10 +86,9 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             c.setConnectionStrategy(cs);
             m.registerConnector(c);
 
-            // Endpoint identifiers
-            m.registerEndpointIdentifier("AppleQueue", "test://apple.queue");
-            m.registerEndpointIdentifier("Banana_Queue", "test://banana.queue");
-            m.registerEndpointIdentifier("Test Queue", "test://test.queue");
+//            m.registerEndpointIdentifier("AppleQueue", "test://apple.queue");
+//            m.registerEndpointIdentifier("Banana_Queue", "test://banana.queue");
+//            m.registerEndpointIdentifier("Test Queue", "test://test.queue");
 
             // Register transformers
             TestCompressionTransformer t = new TestCompressionTransformer();
@@ -115,20 +109,12 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             ns.put("foo", "http://foo.com");
             filter.setNamespaces(ns);
             builder.registerEndpoint("test://fruitBowlPublishQ", "fruitBowlEndpoint", false, null, filter);
-            builder.registerEndpoint("Test Queue", "waterMelonEndpoint", false);
+            builder.registerEndpoint("test://test.queue", "waterMelonEndpoint", false);
             builder.registerEndpoint("test://AppleQueue", "appleInEndpoint", true);
             builder.registerEndpoint("test://AppleResponseQueue", "appleResponseEndpoint", false);
             Map props = new HashMap();
             props.put("testGlobal", "value1");
             builder.registerEndpoint("test://orangeQ", "orangeEndpoint", false, props);
-
-            // Register Interceptors
-            InterceptorStack stack = new InterceptorStack();
-            List interceptors = new ArrayList();
-            interceptors.add(new LoggingInterceptor());
-            interceptors.add(new TimerInterceptor());
-            stack.setInterceptors(interceptors);
-            m.registerInterceptorStack("default", stack);
 
             // register model
             UMOModel model = new SedaModel();
@@ -188,11 +174,6 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             responseRouter.setTimeout(10001);
             d.setResponseRouter(responseRouter);
 
-            // Interceptors
-            UMOInterceptorStack stack2 = m.lookupInterceptorStack("default");
-            d.setInterceptors(new ArrayList(stack2.getInterceptors()));
-            d.getInterceptors().add(new TimerInterceptor());
-
             // properties
             Map cprops = new HashMap();
             cprops.put("orange", new Orange());
@@ -217,10 +198,10 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
 
             // register components
             m.lookupModel("main").registerComponent(d);
-            if (StringUtils.isBlank(m.getId()))
+            if (StringUtils.isBlank(builder.getManagementContext().getId()))
             {
                 // if running with JMX agent, manager ID is mandatory
-                m.setId("" + System.currentTimeMillis());
+                builder.getManagementContext().setId("" + System.currentTimeMillis());
             }
             m.start();
         }

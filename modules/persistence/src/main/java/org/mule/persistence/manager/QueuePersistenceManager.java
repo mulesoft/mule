@@ -10,16 +10,16 @@
 
 package org.mule.persistence.manager;
 
+import org.mule.persistence.Persistable;
+import org.mule.persistence.PersistenceTimer;
+import org.mule.umo.UMOManagementContext;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.RecoverableException;
+
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.persistence.Persistable;
-import org.mule.persistence.PersistenceStore;
-import org.mule.persistence.PersistenceTimer;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.lifecycle.RecoverableException;
-import org.mule.util.StringUtils;
 
 /**
  * 
@@ -41,8 +41,9 @@ public class QueuePersistenceManager extends AbstractPersistenceManager
 
     /**
      * {@inheritDoc}
+     * @param managementContext
      */
-    public void initialise() throws InitialisationException, RecoverableException
+    public void initialise(UMOManagementContext managementContext) throws InitialisationException, RecoverableException
     {
         queue = new ConcurrentLinkedQueue();
         persistenceTimer = new PersistenceTimer(this);

@@ -10,7 +10,7 @@
 
 package org.mule.providers;
 
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -104,7 +104,7 @@ public class DefaultReplyToHandler implements ReplyToHandler
         UMOEndpoint endpoint = (UMOEndpoint)endpointCache.get(endpointUri);
         if (endpoint == null)
         {
-            endpoint = MuleManager.getInstance().lookupEndpoint(endpointUri);
+            endpoint = RegistryContext.getRegistry().lookupEndpoint(endpointUri);
             if (endpoint == null)
             {
                 UMOEndpointURI ep = new MuleEndpointURI(endpointUri);

@@ -10,7 +10,6 @@
 
 package org.mule.providers.http.transformers;
 
-import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -175,7 +174,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
                                 }
                             }
                             if (mimeType == null) mimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
-                            if (encoding == null) encoding = MuleManager.getConfiguration().getDefaultEncoding();
+
                             postMethod.setRequestEntity(new StringRequestEntity(src.toString(), mimeType,
                                 encoding));
                         }

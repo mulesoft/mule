@@ -10,6 +10,10 @@
 
 package org.mule.ra;
 
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.impl.security.MuleCredentials;
+
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -27,10 +31,6 @@ import javax.resource.spi.ManagedConnectionMetaData;
 import javax.resource.spi.security.PasswordCredential;
 import javax.security.auth.Subject;
 import javax.transaction.xa.XAResource;
-
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.impl.security.MuleCredentials;
 
 /**
  * <code>MuleManagedConnection</code> TODO
@@ -115,7 +115,7 @@ public class MuleManagedConnection implements ManagedConnection
             creds = new MuleCredentials(user, password.toCharArray());
         }
 
-        MuleConnection connection = new DefaultMuleConnection(this, info.getManager(), creds);
+        MuleConnection connection = new DefaultMuleConnection(this, info.getManagementContext(), creds);
         addConnection(connection);
         return connection;
     }

@@ -11,7 +11,7 @@
 package org.mule.ra;
 
 import org.mule.MuleException;
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleDescriptor;
@@ -25,6 +25,7 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.ObjectNotFoundException;
@@ -130,20 +131,20 @@ public class JcaComponent implements UMOComponent
 
     public void dispose()
     {
-        ((MuleManager)MuleManager.getInstance()).getStatistics().remove(stats);
+        descriptor.getManagementContext().getStatistics().remove(stats);
     }
 
-    public synchronized void initialise() throws InitialisationException
+    public synchronized void initialise(UMOManagementContext managementContext) throws InitialisationException
     {
         if (initialised.get())
         {
             throw new InitialisationException(new Message(Messages.OBJECT_X_ALREADY_INITIALISED,
                 "Component '" + descriptor.getName() + "'"), this);
         }
-        descriptor.initialise();
+        descriptor.initialise(managementContext);
         try
         {
-            entryPoint = MuleManager.getInstance().lookupModel(JcaModel.JCA_MODEL_TYPE).getEntryPointResolver().resolveEntryPoint(
+            entryPoint = managementContext.getRegistry().lookupModel(JcaModel.JCA_MODEL_TYPE).getEntryPointResolver().resolveEntryPoint(
                 descriptor);
         }
         catch (UMOException e)
@@ -154,28 +155,28 @@ public class JcaComponent implements UMOComponent
         // initialise statistics
         stats = new ComponentStatistics(descriptor.getName(), -1);
 
-        stats.setEnabled(((MuleManager)MuleManager.getInstance()).getStatistics().isEnabled());
-        ((MuleManager)MuleManager.getInstance()).getStatistics().add(stats);
+        stats.setEnabled(managementContext.getStatistics().isEnabled());
+        managementContext.getStatistics().add(stats);
         stats.setOutboundRouterStat(getDescriptor().getOutboundRouter().getStatistics());
         stats.setInboundRouterStat(getDescriptor().getInboundRouter().getStatistics());
 
         component = descriptor.getImplementation();
 
         initialised.set(true);
-        MuleManager.getInstance().fireNotification(
+        managementContext.fireNotification(
             new ComponentNotification(descriptor, ComponentNotification.COMPONENT_INITIALISED));
     }
 
     protected Object getDelegateComponent() throws InitialisationException
     {
         Object impl = descriptor.getImplementation();
-        Object component = null;
+        Object component;
 
         try
         {
             if (impl instanceof ContainerKeyPair)
             {
-                component = MuleManager.getInstance().getContainerContext().getComponent(impl);
+                component = RegistryContext.getRegistry().getContainerContext().getComponent(impl);
 
                 if (descriptor.isSingleton())
                 {
@@ -223,10 +224,7 @@ public class JcaComponent implements UMOComponent
      */
     public void register() throws RegistrationException
     {
-        /* TODO: LM
-        registryId = 
-           MuleManager.getInstance().getRegistry().registerMuleObject(MuleManager.getInstance().getModel(), this).getId();
-           */
+        //TODO LM: registryId = RegistryContext.getRegistry().registerMuleObject(managementContext.getModel(), this).getId();
     }
 
     /*
@@ -236,7 +234,7 @@ public class JcaComponent implements UMOComponent
      */
     public void deregister() throws DeregistrationException
     {
-        MuleManager.getInstance().getRegistry().deregisterComponent(registryId);
+        RegistryContext.getRegistry().deregisterComponent(registryId);
         registryId = null;
     }
 

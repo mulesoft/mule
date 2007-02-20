@@ -10,7 +10,7 @@
 
 package org.mule.providers.jbi.components;
 
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.config.converters.QNameConverter;
 import org.mule.config.i18n.Message;
 import org.mule.impl.MuleDescriptor;
@@ -25,6 +25,7 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -46,8 +47,6 @@ import org.apache.commons.lang.SystemUtils;
  * Can receive events over Mule transports. Given an muleEndpoint (or endpoint string
  * i.e. jms://my.queue) This component will set up the necessary bindings with Mule
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class MuleReceiver extends AbstractEndpointComponent implements InternalMessageListener
 {
@@ -192,7 +191,7 @@ public class MuleReceiver extends AbstractEndpointComponent implements InternalM
             me.setMessage(nmessage, IN);
             if (synchronous)
             {
-                deliveryChannel.sendSync(me, MuleManager.getConfiguration().getDefaultSynchronousEventTimeout());
+                deliveryChannel.sendSync(me, RegistryContext.getConfiguration().getDefaultSynchronousEventTimeout());
                 NormalizedMessage result;
 
                 result = me.getMessage(OUT);
@@ -295,7 +294,7 @@ public class MuleReceiver extends AbstractEndpointComponent implements InternalM
             // nothing to do
         }
 
-        public void initialise() throws InitialisationException {
+        public void initialise(UMOManagementContext managementContext) throws InitialisationException {
             // nothing to do
         }
 
@@ -317,7 +316,7 @@ public class MuleReceiver extends AbstractEndpointComponent implements InternalM
         public void register() throws RegistrationException
         {
             registryId = 
-                MuleManager.getInstance().getRegistry().registerMuleObject(descriptor, this).getId();
+                RegistryContext.getRegistry().registerMuleObject(descriptor, this).getId();
         }
 
         /*
@@ -327,7 +326,7 @@ public class MuleReceiver extends AbstractEndpointComponent implements InternalM
         */
         public void deregister() throws DeregistrationException
         {
-            MuleManager.getInstance().getRegistry().deregisterComponent(registryId);
+            RegistryContext.getRegistry().deregisterComponent(registryId);
             registryId = null;
 		}
 

@@ -107,7 +107,7 @@ public class JmsMessageReceiver extends SingleJmsMessageReceiver
 
 
             TransactionTemplate tt = new TransactionTemplate(endpoint.getTransactionConfig(),
-            connector.getExceptionListener());
+            connector.getExceptionListener(), connector.getManagementContext());
 
             // Receive messages and process them in a single transaction
             // Do not enable threading here, but serveral workers

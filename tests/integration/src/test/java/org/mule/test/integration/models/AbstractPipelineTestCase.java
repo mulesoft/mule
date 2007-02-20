@@ -38,10 +38,9 @@ public abstract class AbstractPipelineTestCase extends AbstractMuleTestCase
     public void testPipelineSynchronous() throws Exception
     {
 
-        QuickConfigurationBuilder builder = new QuickConfigurationBuilder(true);
+        QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
         builder.registerModel("seda", "main");
-        builder.createStartedManager(true, "", getModelType());
-        configureModel(builder.getManager().lookupModel("main"));
+        configureModel(builder.getManagementContext().getRegistry().lookupModel("main"));
         builder.registerComponent(EchoComponent.class.getName(), "component1", "vm://component1",
             "vm://component2", null);
         builder.registerComponent(EchoComponent.class.getName(), "component2", "vm://component2",
@@ -70,17 +69,16 @@ public abstract class AbstractPipelineTestCase extends AbstractMuleTestCase
 
     public void testPipelineAsynchronous() throws Exception
     {
-        QuickConfigurationBuilder builder = new QuickConfigurationBuilder(true);
-        builder.createStartedManager(false, "", getModelType());
+        QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
 
         VMConnector c = new VMConnector();
         c.setName("queuingConnector");
         c.setQueueEvents(true);
-        builder.getManager().registerConnector(c);
+        builder.getManagementContext().getRegistry().registerConnector(c);
 
         VMConnector c2 = new VMConnector();
         c2.setName("vmNoQueue");
-        builder.getManager().registerConnector(c2);
+        builder.getManagementContext().getRegistry().registerConnector(c2);
 
         builder.registerComponent(EchoComponent.class.getName(), "component1",
             "vm://component1?connector=vmNoQueue", "vm://component2?connector=vmNoQueue", null);

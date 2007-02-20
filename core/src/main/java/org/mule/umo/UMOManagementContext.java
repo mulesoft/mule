@@ -9,14 +9,13 @@
  */
 package org.mule.umo;
 
-import org.mule.config.MuleConfiguration;
+import org.mule.config.spring.RegistryFacade;
 import org.mule.impl.Directories;
 import org.mule.impl.internal.notifications.NotificationException;
 import org.mule.management.stats.AllStatistics;
-import org.mule.registry.Registry;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.Lifecycle;
-import org.mule.umo.manager.UMOContainerContext;
+import org.mule.umo.lifecycle.Registerable;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.manager.UMOServerNotificationListener;
 import org.mule.umo.manager.UMOWorkManager;
@@ -31,12 +30,13 @@ import javax.transaction.TransactionManager;
 /**
  * TODO document
  */
-public interface UMOManagementContext extends Lifecycle
+public interface UMOManagementContext extends Lifecycle, Registerable
 {
 
-    Registry getRegistry();
+    //TODO LM: Replce with Real Registry
+    RegistryFacade getRegistry();
 
-    void setRegistry(Registry registry);
+    void setRegistry(RegistryFacade registry);
 
     String getSystemName();
 
@@ -222,7 +222,7 @@ public interface UMOManagementContext extends Lifecycle
      * both components and vm provider.
      *
      * @param queueManager
-     * @deprecated
+     * 
      */
     void setQueueManager(QueueManager queueManager);
 
@@ -231,29 +231,9 @@ public interface UMOManagementContext extends Lifecycle
      * both components and vm provider.
      *
      * @return
-     * @deprecated
+     *
      */
     QueueManager getQueueManager();
-
-    void setConfiguration(MuleConfiguration confg);
-
-    MuleConfiguration getConfiguration();
-
-    /**
-     * associates a Dependency Injector container with Mule. This can be used to
-     * integrate container managed resources with Mule resources
-     *
-     * @param context a Container context to use.
-     */
-    void setContainerContext(UMOContainerContext context) throws UMOException;
-
-    /**
-     * associates a Dependency Injector container with Mule. This can be used to
-     * integrate container managed resources with Mule resources
-     *
-     * @return the container associated with the Manager
-     */
-    UMOContainerContext getContainerContext();
 
     public AllStatistics getStatistics();
 

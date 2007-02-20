@@ -37,7 +37,7 @@ public class FilteringXmlMessageSplitterTestCase extends AbstractMuleTestCase
     private UMOEndpoint endpoint3;
     private FilteringXmlMessageSplitter xmlSplitter;
 
-    // @Override
+    // //@Override
     protected void doSetUp() throws Exception
     {
         // setup endpoints

@@ -10,15 +10,15 @@
 
 package org.mule.impl.model.seda;
 
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.config.PoolingProfile;
 import org.mule.config.QueueProfile;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.model.AbstractModel;
-import org.mule.registry.metadata.MetadataStore;
 import org.mule.registry.metadata.ObjectMetadata;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
 
 /**
@@ -33,7 +33,7 @@ public class SedaModel extends AbstractModel
     /**
      * The time out used for taking from the Seda Queue.
      */
-    private int queueTimeout = MuleManager.getConfiguration().getDefaultSynchronousEventTimeout();
+    private int queueTimeout;
 
     /**
      * Whether components in this model should be pooled or not.
@@ -77,9 +77,10 @@ public class SedaModel extends AbstractModel
     }
 
 
-    public void initialise() throws InitialisationException
+    public void initialise(UMOManagementContext managementContext) throws InitialisationException
     {
 
+        queueTimeout = RegistryContext.getConfiguration().getDefaultSynchronousEventTimeout();
         if(queueProfile==null) {
             queueProfile = new QueueProfile();
         }
@@ -87,7 +88,7 @@ public class SedaModel extends AbstractModel
         {
             poolingProfile = new PoolingProfile();
         }
-        super.initialise(); 
+        super.initialise(managementContext);
     }
 
     protected UMOComponent createComponent(UMODescriptor descriptor)

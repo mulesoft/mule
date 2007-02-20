@@ -43,7 +43,7 @@ public class StreamMessageReceiverTestCase extends AbstractMessageReceiverTestCa
         UMOComponent component = getTestComponent(descriptor);
         assertNotNull(component);
 
-        endpoint.getConnector().startConnector();
+        endpoint.getConnector().start();
         Mock connector = new Mock(UMOConnector.class);
         connector.expectAndReturn("getExceptionListener", new DefaultExceptionStrategy());
 

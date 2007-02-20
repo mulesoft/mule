@@ -20,14 +20,14 @@ import java.util.Arrays;
 public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
 {
 
-    // @Override
+    // //@Override
     protected void doSetUp() throws Exception
     {
         // setup a dummy context for transformers that are event aware
         RequestContext.setEvent(getTestEvent("test"));
     }
 
-    // @Override
+    // //@Override
     protected void doTearDown() throws Exception
     {
         RequestContext.setEvent(null);

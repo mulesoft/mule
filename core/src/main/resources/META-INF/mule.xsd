@@ -594,7 +594,6 @@
         <xsd:attribute name="name" type="xsd:string" use="required"/>
         <xsd:attribute name="implementation" type="xsd:string"/>
         <xsd:attribute name="version" type="xsd:string"/>
-        <xsd:attribute name="containerManaged" type="xsd:boolean" default="true"/>
         <xsd:attribute name="singleton" type="xsd:boolean" default="false"/>
         <xsd:attribute name="initialState" default="started">
             <xsd:simpleType>

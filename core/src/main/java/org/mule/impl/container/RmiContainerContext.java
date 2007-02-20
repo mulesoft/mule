@@ -10,6 +10,7 @@
 
 package org.mule.impl.container;
 
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.util.ClassUtils;
@@ -35,9 +36,9 @@ public class RmiContainerContext extends JndiContainerContext
         super("rmi");
     }
 
-    public void initialise() throws InitialisationException
+    public void doInitialise(UMOManagementContext managementContext) throws InitialisationException
     {
-        super.initialise();
+        super.initialise(managementContext);
         if (securityPolicy != null)
         {
             if (ClassUtils.getResource(securityPolicy, getClass()) != null)

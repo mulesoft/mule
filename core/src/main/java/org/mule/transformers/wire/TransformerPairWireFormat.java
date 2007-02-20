@@ -11,7 +11,6 @@
 package org.mule.transformers.wire;
 
 import org.mule.MuleException;
-import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOException;
@@ -66,7 +65,7 @@ public class TransformerPairWireFormat implements WireFormat
         }
     }
 
-    public void write(OutputStream out, Object o) throws UMOException
+    public void write(OutputStream out, Object o, String encoding) throws UMOException
     {
         if (outboundTransformer == null)
         {
@@ -90,7 +89,7 @@ public class TransformerPairWireFormat implements WireFormat
                 }
                 else
                 {
-                    bytes = result.toString().getBytes(MuleManager.getConfiguration().getDefaultEncoding());
+                    bytes = result.toString().getBytes(encoding);
                 }
 
                 out.write(bytes);
@@ -103,7 +102,7 @@ public class TransformerPairWireFormat implements WireFormat
             else if (returnClass.equals(String.class))
             {
                 String s = (String)outboundTransformer.transform(o);
-                out.write(s.getBytes(MuleManager.getConfiguration().getDefaultEncoding()));
+                out.write(s.getBytes(encoding));
             }
             else
             {

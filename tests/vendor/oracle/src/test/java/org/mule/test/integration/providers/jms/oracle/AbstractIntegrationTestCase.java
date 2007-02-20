@@ -51,15 +51,15 @@ public abstract class AbstractIntegrationTestCase extends XMLTestCase {
             (getConfigurationFiles().equals(configurationFiles) == false)){
 
             if (manager != null) {
-                //if (manager.isStarted()) manager.stop();
-                manager.dispose();
+                //if (manager.isStarted())managementContext.stop();
+               managementContext.dispose();
             }
             configurationFiles = getConfigurationFiles();
             manager = new MuleXmlConfigurationBuilder().configure(configurationFiles);
-            manager.start();
+           managementContext.start();
 
             // Get these reference variables once the Mule server has started.
-            jmsConnector = ((OracleJmsConnector) manager.lookupConnector("oracleJmsConnector"));
+            jmsConnector = ((OracleJmsConnector) managementContext.getRegistry().lookupConnector("oracleJmsConnector"));
             if (jmsConnector == null) {
                 throw new ConfigurationException(Message.createStaticMessage("Unable to lookup the Oracle JMS Connector."));
             }

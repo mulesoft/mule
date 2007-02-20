@@ -12,7 +12,6 @@ package org.mule.management.mbeans;
 
 import org.mule.impl.MuleDescriptor;
 import org.mule.management.AbstractMuleJmxTestCase;
-import org.mule.umo.manager.UMOManager;
 
 import java.util.Set;
 
@@ -24,12 +23,11 @@ public class ComponentServiceTestCase extends AbstractMuleJmxTestCase
     {
         final String domainOriginal = "TEST_DOMAIN_1";
 
-        UMOManager manager = getManager(true);
         final MuleDescriptor descriptor = new MuleDescriptor("TEST_SERVICE");
         descriptor.setImplementation(new Object());
-        getDefaultModel().registerComponent(descriptor);
+        getDefaultModel(managementContext).registerComponent(descriptor);
 
-        manager.start();
+       managementContext.start();
         final ComponentService service = new ComponentService("TEST_SERVICE");
         final ObjectName name = ObjectName.getInstance(domainOriginal + ":type=TEST_SERVICE");
         mBeanServer.registerMBean(service, name);

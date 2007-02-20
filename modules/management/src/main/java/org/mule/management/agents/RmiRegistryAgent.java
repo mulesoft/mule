@@ -10,6 +10,12 @@
 
 package org.mule.management.agents;
 
+import org.mule.impl.AbstractAgent;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.util.StringUtils;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.rmi.RemoteException;
@@ -19,16 +25,12 @@ import java.rmi.server.ExportException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.umo.UMOException;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.UMOAgent;
-import org.mule.util.StringUtils;
 
 /**
  * Binds to an existing RMI registry or creates a new one on a defined URI. The
  * default is <code>rmi://localhost:1099</code>
  */
-public class RmiRegistryAgent implements UMOAgent
+public class RmiRegistryAgent extends AbstractAgent
 {
     /**
      * logger used by this class
@@ -39,21 +41,16 @@ public class RmiRegistryAgent implements UMOAgent
     public static final int DEFAULT_PORT = 1099;
     private static final String PROTOCOL_PREFIX = "rmi://";
     public static final String DEFAULT_SERVER_URI = PROTOCOL_PREFIX + DEFAULT_HOSTNAME + ":" + DEFAULT_PORT;
-    private String name = "RMI Agent";
     private Registry rmiRegistry;
     private String serverUri;
     private String host;
     private String port;
     private boolean createRegistry = true;
 
-    public String getName()
-    {
-        return name;
-    }
 
-    public void setName(String name)
+    public RmiRegistryAgent()
     {
-        this.name = name;
+        super("RMI Agent");
     }
 
     public String getDescription()
@@ -124,7 +121,7 @@ public class RmiRegistryAgent implements UMOAgent
         // nothing to do
     }
 
-    public void initialise() throws InitialisationException {
+    public void doInitialise(UMOManagementContext managementContext) throws InitialisationException {
         if (StringUtils.isNotBlank(serverUri))
         {
             return;

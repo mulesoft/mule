@@ -13,6 +13,7 @@ package org.mule.components.script.jsr223;
 import org.mule.components.builder.AbstractMessageBuilder;
 import org.mule.components.builder.MessageBuilderException;
 import org.mule.umo.UMOEventContext;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -57,8 +58,8 @@ public class ScriptMessageBuilder extends AbstractMessageBuilder implements Init
         return result;
     }
 
-    public void initialise() throws InitialisationException {
-        scriptable.initialise();
+    public void initialise(UMOManagementContext managementContext) throws InitialisationException {
+        scriptable.initialise(managementContext);
     }
 
     protected void populateBindings(Bindings namespace, UMOMessage request, UMOMessage response)

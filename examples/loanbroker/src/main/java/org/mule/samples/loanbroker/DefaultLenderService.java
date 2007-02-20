@@ -10,15 +10,17 @@
 
 package org.mule.samples.loanbroker;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.impl.RequestContext;
 import org.mule.routing.outbound.StaticRecipientList;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.endpoint.UMOEndpoint;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>DefaultLenderService</code> is responsible for contacting the relevant
@@ -91,7 +93,13 @@ public class DefaultLenderService
      */
     private String getEndpoint(String name)
     {
-        String endpoint = MuleManager.getInstance().lookupEndpointIdentifier(name, null);
+        UMOEndpoint ep = RegistryContext.getRegistry().lookupEndpoint(name);
+        if(ep==null)
+        {
+            throw new IllegalArgumentException("No endpoint registered called: " + name);
+        }
+
+        String endpoint = ep.getEndpointURI().getAddress();
 
         if (endpoint.startsWith("axis") || endpoint.startsWith("xfire") || endpoint.startsWith("glue")
                         || endpoint.startsWith("soap"))

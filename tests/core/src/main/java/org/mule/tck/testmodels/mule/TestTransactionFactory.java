@@ -10,11 +10,12 @@
 
 package org.mule.tck.testmodels.mule;
 
-import com.mockobjects.dynamic.Mock;
-
 import org.mule.umo.TransactionException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.UMOTransactionFactory;
+
+import com.mockobjects.dynamic.Mock;
 
 /**
  * <code>TestTransactionFactory</code> TODO
@@ -25,7 +26,7 @@ import org.mule.umo.UMOTransactionFactory;
 
 public class TestTransactionFactory implements UMOTransactionFactory
 {
-    public UMOTransaction beginTransaction() throws TransactionException
+    public UMOTransaction beginTransaction(UMOManagementContext managementContext) throws TransactionException
     {
         return (UMOTransaction)new Mock(UMOTransaction.class).proxy();
     }

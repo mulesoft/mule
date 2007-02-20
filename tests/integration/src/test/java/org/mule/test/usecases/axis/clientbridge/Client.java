@@ -13,8 +13,8 @@ package org.mule.test.usecases.axis.clientbridge;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.manager.UMOManager;
 
 public class Client
 {
@@ -23,21 +23,21 @@ public class Client
 
     public static void main(String[] args) throws Exception
     {
-        UMOManager manager = null;
+        UMOManagementContext managementContext = null;
 
         try
         {
             MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
-            manager = builder.configure("clientbridge/conf/client-mule-config.xml");
+            managementContext = builder.configure("clientbridge/conf/client-mule-config.xml");
 
             Client c = new Client();
             c.execute();
         }
         finally
         {
-            if (manager != null)
+            if (managementContext != null)
             {
-                manager.dispose();
+               managementContext.dispose();
             }
         }
     }

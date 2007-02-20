@@ -40,7 +40,7 @@ public class ActiveMQJmsXaTransactionFunctionalTestCase extends ActiveMQJmsTrans
         }
         txManager.setTransactionTimeout(15000);
         super.doSetUp();
-        MuleManager.getInstance().setTransactionManager(txManager);
+        managementContext.setTransactionManager(txManager);
     }
 
     public UMOConnector createConnector() throws Exception

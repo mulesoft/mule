@@ -10,7 +10,6 @@
 
 package org.mule.test.transformers.compression;
 
-import org.apache.commons.lang.SerializationUtils;
 import org.mule.tck.AbstractTransformerTestCase;
 import org.mule.transformers.compression.GZipCompressTransformer;
 import org.mule.transformers.compression.GZipUncompressTransformer;
@@ -20,6 +19,8 @@ import org.mule.util.compression.GZipCompression;
 
 import java.io.Serializable;
 import java.util.Arrays;
+
+import org.apache.commons.lang.SerializationUtils;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -90,7 +91,7 @@ public class GZipTransformerTestCase extends AbstractTransformerTestCase
         transformer.setReturnClass(String.class);
         try
         {
-            transformer.initialise();
+            transformer.initialise(managementContext);
         }
         catch (InitialisationException e)
         {

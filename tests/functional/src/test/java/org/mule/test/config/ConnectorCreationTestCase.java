@@ -22,7 +22,7 @@ public class ConnectorCreationTestCase extends AbstractMuleTestCase
 
     public void testAlwaysCreateUsingParamString() throws Exception
     {
-        QuickConfigurationBuilder builder = new QuickConfigurationBuilder(true);
+        QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
         builder.registerEndpoint("test://inbound?createConnector=ALWAYS", "in", true);
         builder.registerEndpoint("test://outbound?createConnector=ALWAYS", "out", false);
         UMOComponent c = builder.registerComponent(EchoComponent.class.getName(), "echo", "in", "out", null);
@@ -32,7 +32,7 @@ public class ConnectorCreationTestCase extends AbstractMuleTestCase
 
     public void testCreateOnce() throws Exception
     {
-        QuickConfigurationBuilder builder = new QuickConfigurationBuilder(true);
+        QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
         builder.registerEndpoint("test://inbound", "in", true);
         builder.registerEndpoint("test://outbound", "out", false);
         UMOComponent c = builder.registerComponent(EchoComponent.class.getName(), "echo", "in", "out", null);
@@ -42,7 +42,7 @@ public class ConnectorCreationTestCase extends AbstractMuleTestCase
 
     public void testCreateNeverUsingParamString() throws Exception
     {
-        QuickConfigurationBuilder builder = new QuickConfigurationBuilder(true);
+        QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
         try
         {
             builder.registerEndpoint("test://inbound?createConnector=NEVER", "in", true);

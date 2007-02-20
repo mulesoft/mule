@@ -10,7 +10,6 @@
 
 package org.mule.test.integration.providers.jms;
 
-import org.mule.MuleManager;
 import org.mule.config.PoolingProfile;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.impl.endpoint.MuleEndpointURI;
@@ -63,12 +62,12 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
         // pass in other configs using the property below
 
         // Make sure we are running synchronously
-        MuleManager.getConfiguration().setDefaultSynchronousEndpoints(true);
+        RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(true);
         model = new SedaModel();
         model.setName("main");
         model.getPoolingProfile().setInitialisationPolicy(
             PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
-        MuleManager.getInstance().registerModel(model);
+        managementContext.getRegistry().registerModel(model);
 
         callbackCalled = false;
         ConnectionFactory cf = getConnectionFactory();
@@ -78,7 +77,7 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
         // drainDestinations();
         connector = createConnector();
         connector.setConnectionFactory(cf);
-        MuleManager.getInstance().registerConnector(connector);
+        managementContext.getRegistry().registerConnector(connector);
         currentMsg = null;
         eventCount = 0;
     }

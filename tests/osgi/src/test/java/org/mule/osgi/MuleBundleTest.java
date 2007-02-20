@@ -95,7 +95,7 @@ public class MuleBundleTest extends ConfigurableBundleCreatorTests {
 //            UMOManager manager = (UMOManager) context.getService(ref);
 //            assertNotNull("Cannot find the service", manager);
 //            // TODO What do we test for?
-//            //assertEquals("something", manager.getSomething());
+//            //assertEquals("something",managementContext.getSomething());
 //        } finally {
 //            context.ungetService(ref);
 //        }

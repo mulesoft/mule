@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id:EmbeddedBeansXmlTestCase.java 5187 2007-02-16 18:00:42Z rossmason $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -10,7 +10,6 @@
 
 package org.mule.test.spring;
 
-import org.mule.MuleManager;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.umo.manager.UMOContainerContext;
@@ -35,7 +34,7 @@ public class EmbeddedBeansXmlTestCase extends FunctionalTestCase
 
     public void testContainer() throws Exception
     {
-        UMOContainerContext context = MuleManager.getInstance().getContainerContext();
+        UMOContainerContext context = managementContext.getRegistry().getContainerContext();
         assertNotNull(context);
         assertNotNull(context.getComponent("Apple"));
         assertNotNull(context.getComponent("Banana"));

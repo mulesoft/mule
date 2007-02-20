@@ -10,7 +10,7 @@
 
 package org.mule.config.spring;
 
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.config.CachedResource;
 import org.mule.config.ConfigurationException;
 import org.mule.config.ReaderInputStream;
@@ -18,6 +18,7 @@ import org.mule.config.i18n.CoreMessageConstants;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.container.AbstractContainerContext;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.ContainerException;
 import org.mule.umo.manager.ObjectNotFoundException;
@@ -158,7 +159,7 @@ public class SpringContainerContext extends AbstractContainerContext implements 
      */
     public void configure(String configurationXmlAsString) throws ContainerException
     {
-        final String encoding = MuleManager.getConfiguration().getDefaultEncoding();
+        final String encoding = RegistryContext.getConfiguration().getDefaultEncoding();
         try
         {
             BeanFactory bf = new XmlBeanFactory(new CachedResource(configurationXmlAsString, encoding));
@@ -172,7 +173,7 @@ public class SpringContainerContext extends AbstractContainerContext implements 
         }
     }
 
-    public void initialise() throws InitialisationException
+    public void doInitialise(UMOManagementContext managementContext) throws InitialisationException
     {
         if (configFile == null)
         {

@@ -10,7 +10,6 @@
 
 package org.mule.impl.endpoint;
 
-import org.mule.MuleManager;
 import org.mule.providers.service.TransportFactory;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
@@ -150,7 +149,8 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     {
         try
         {
-            return URLDecoder.decode(string, MuleManager.getConfiguration().getDefaultEncoding());
+            //TODO RM* URGENT:
+            return URLDecoder.decode(string, "UTF-8" /*RegistryContext.getConfiguration().getDefaultEncoding()*/);
         }
         catch (UnsupportedEncodingException e)
         {

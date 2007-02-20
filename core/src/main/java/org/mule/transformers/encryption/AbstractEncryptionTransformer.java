@@ -10,11 +10,11 @@
 
 package org.mule.transformers.encryption;
 
-import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.UMOEncryptionStrategy;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.CryptoFailureException;
 import org.mule.umo.transformer.TransformerException;
@@ -25,8 +25,6 @@ import java.io.UnsupportedEncodingException;
  * <code>EncryptionTransformer</code> will transform an array of bytes or string
  * into an encrypted array of bytes
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public abstract class AbstractEncryptionTransformer extends AbstractTransformer
 {
@@ -90,12 +88,13 @@ public abstract class AbstractEncryptionTransformer extends AbstractTransformer
      * properties have been set on this transformer
      * 
      * @throws org.mule.umo.lifecycle.InitialisationException
+     * @param managmentContext
      */
-    public void initialise() throws InitialisationException
+    public void initialise(UMOManagementContext managementContext) throws InitialisationException
     {
         if (strategyName != null)
         {
-            if (MuleManager.getInstance().getSecurityManager() == null)
+            if (endpoint.getManagementContext().getSecurityManager() == null)
             {
                 if (strategy == null)
                 {
@@ -106,7 +105,7 @@ public abstract class AbstractEncryptionTransformer extends AbstractTransformer
             }
             else
             {
-                strategy = MuleManager.getInstance().getSecurityManager().getEncryptionStrategy(strategyName);
+                strategy = endpoint.getManagementContext().getSecurityManager().getEncryptionStrategy(strategyName);
             }
         }
         if (strategy == null)

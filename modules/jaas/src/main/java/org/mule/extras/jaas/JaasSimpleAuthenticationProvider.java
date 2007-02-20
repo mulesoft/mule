@@ -10,6 +10,17 @@
 
 package org.mule.extras.jaas;
 
+import org.mule.config.i18n.Messages;
+import org.mule.impl.security.MuleAuthentication;
+import org.mule.umo.UMOManagementContext;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.security.UMOAuthentication;
+import org.mule.umo.security.UMOSecurityContext;
+import org.mule.umo.security.UMOSecurityContextFactory;
+import org.mule.umo.security.UMOSecurityProvider;
+import org.mule.umo.security.UnauthorisedException;
+import org.mule.umo.security.UnknownAuthenticationTypeException;
+
 import java.io.IOException;
 import java.security.Security;
 import java.util.HashMap;
@@ -19,16 +30,6 @@ import javax.security.auth.login.AppConfigurationEntry;
 import javax.security.auth.login.Configuration;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
-
-import org.mule.config.i18n.Messages;
-import org.mule.impl.security.MuleAuthentication;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.security.UMOAuthentication;
-import org.mule.umo.security.UMOSecurityContext;
-import org.mule.umo.security.UMOSecurityContextFactory;
-import org.mule.umo.security.UMOSecurityProvider;
-import org.mule.umo.security.UnauthorisedException;
-import org.mule.umo.security.UnknownAuthenticationTypeException;
 
 /**
  * @author Marie.Rizzo This is the Provider for Mule's Jaas Security
@@ -257,8 +258,9 @@ public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider
      * JaasSecurityContextFactory.
      * 
      * @throws InitialisationException
+     * @param managementContext
      */
-    public final void initialise() throws InitialisationException
+    public final void initialise(UMOManagementContext managementContext) throws InitialisationException
     {
         // configure jaas from properties passed to the provider from the Mule XML
         // configuration file

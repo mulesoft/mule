@@ -10,21 +10,24 @@
 
 package org.mule.management.mbeans;
 
-import org.mule.MuleManager;
 import org.mule.config.MuleConfiguration;
 
 /**
  * <code>MuleConfigurationService</code> exposes the MuleConfiguration settings as
  * a management service
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class MuleConfigurationService implements MuleConfigurationServiceMBean
 {
 
 
-    private final MuleConfiguration muleConfiguration = MuleManager.getConfiguration();
+    private  MuleConfiguration muleConfiguration;
+
+
+    public MuleConfigurationService(MuleConfiguration muleConfiguration)
+    {
+        this.muleConfiguration = muleConfiguration;
+    }
 
     public boolean isSynchronous()
     {

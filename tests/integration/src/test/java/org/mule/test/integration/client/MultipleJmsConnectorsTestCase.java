@@ -15,10 +15,6 @@ import org.mule.tck.AbstractMuleTestCase;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 
-/**
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
- * @version $Revision$
- */
 public class MultipleJmsConnectorsTestCase extends AbstractMuleTestCase
 {
     public void testMultipleJmsClientConnections() throws Exception
@@ -29,10 +25,10 @@ public class MultipleJmsConnectorsTestCase extends AbstractMuleTestCase
         MuleClient client = new MuleClient();
         client.setProperty("jms.connectionFactory", factory);
         client.setProperty("jms.specification", "1.1");
-        client.getManager().start();
+        client.getManagementContext().start();
         client.dispatch("jms://admin:admin@admin.queue?createConnector=ALWAYS", "testing", null);
         client.dispatch("jms://ross:ross@ross.queue?createConnector=ALWAYS", "testing", null);
 
-        assertEquals(2, client.getManager().getConnectors().size());
+        assertEquals(2, client.getManagementContext().getRegistry().getConnectors().size());
     }
 }

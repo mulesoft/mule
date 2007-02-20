@@ -10,7 +10,7 @@
 
 package org.mule.impl;
 
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -22,6 +22,7 @@ import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.UMOTransaction;
@@ -449,7 +450,7 @@ public class MuleEventContext implements UMOEventContext
      */
     public UMOMessage sendEvent(UMOMessage message, String endpointName) throws UMOException
     {
-        UMOEndpoint endpoint = MuleManager.getInstance().lookupEndpoint(endpointName);
+        UMOEndpoint endpoint = RegistryContext.getRegistry().lookupEndpoint(endpointName);
         setRemoteSync(message, endpoint);
         return session.sendEvent(message, endpoint);
     }
@@ -723,4 +724,9 @@ public class MuleEventContext implements UMOEventContext
         return event.toString();
     }
 
+
+    public UMOManagementContext getManagmentContext()
+    {
+        return event.getManagementContext();
+    }
 }

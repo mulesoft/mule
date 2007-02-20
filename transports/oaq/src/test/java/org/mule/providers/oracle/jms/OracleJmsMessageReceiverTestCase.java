@@ -34,7 +34,7 @@ public class OracleJmsMessageReceiverTestCase extends AbstractMessageReceiverTes
             connector.setUrl("jdbc:oracle:oci:@TEST_DB");
             connector.setUsername("scott");
             connector.setPassword("tiger");
-            connector.initialise();
+            connector.initialise(managementContext);
         }
         return connector;
     }

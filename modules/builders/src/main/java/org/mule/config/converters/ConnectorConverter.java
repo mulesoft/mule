@@ -10,10 +10,11 @@
 
 package org.mule.config.converters;
 
+import org.mule.RegistryContext;
+import org.mule.umo.provider.UMOConnector;
+
 import org.apache.commons.beanutils.ConversionException;
 import org.apache.commons.beanutils.Converter;
-import org.mule.MuleManager;
-import org.mule.umo.provider.UMOConnector;
 
 /**
  * <code>ConnectorConverter</code> TODO
@@ -43,7 +44,7 @@ public class ConnectorConverter implements Converter
         }
         try
         {
-            UMOConnector c = MuleManager.getInstance().lookupConnector(value.toString());
+            UMOConnector c = RegistryContext.getRegistry().lookupConnector(value.toString());
             if (c == null)
             {
                 throw new ConversionException("UMOConnector: " + value.toString()

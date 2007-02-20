@@ -10,10 +10,15 @@
 
 package org.mule.config.spring;
 
+import org.mule.config.spring.editors.TransformerPropertyEditor;
+import org.mule.umo.UMOManagementContext;
+import org.mule.umo.transformer.UMOTransformer;
+
 import java.io.IOException;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.AbstractXmlApplicationContext;
 
@@ -54,10 +59,20 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
 
     protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException
     {
-        XmlBeanDefinitionReader beanDefinitionReader = new MuleBeanDefinitionReader(beanFactory,
-            configLocations.length);
-        initBeanDefinitionReader(beanDefinitionReader);
-        loadBeanDefinitions(beanDefinitionReader);
+        beanFactory.registerBeanDefinition("_muleManagementContextFactoryBean", new RootBeanDefinition(ManagementContextFactoryBean.class, true));
+//        beanFactory.addBeanPostProcessor(new MuleObjectNameProcessor());
+        beanFactory.registerCustomEditor(UMOTransformer.class, new TransformerPropertyEditor(beanFactory));
+
+        XmlBeanDefinitionReader beanDefinitionReader = new MuleBeanDefinitionReader(beanFactory, configLocations.length);
+        //hook in our customheirarchical reader
+        beanDefinitionReader.setDocumentReaderClass(MuleBeanDefinitionDocumentReader.class);
+
+        beanDefinitionReader.loadBeanDefinitions(configLocations);
+
+    }
+    public UMOManagementContext getManagementContext()
+    {
+        return (UMOManagementContext)getBeanFactory().getBean("_muleManagementContextFactoryBean");
 
     }
 }

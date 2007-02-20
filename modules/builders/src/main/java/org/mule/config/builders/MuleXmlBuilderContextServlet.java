@@ -10,17 +10,16 @@
 
 package org.mule.config.builders;
 
+import org.mule.config.ConfigurationException;
+import org.mule.umo.UMOManagementContext;
+
+import java.io.IOException;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import java.io.IOException;
-
-import org.mule.MuleManager;
-import org.mule.config.ConfigurationException;
-import org.mule.umo.manager.UMOManager;
 
 /**
  * @author EAF Team
@@ -33,6 +32,8 @@ public class MuleXmlBuilderContextServlet extends HttpServlet
     private static final long serialVersionUID = -2446689032349402434L;
 
     public static final String CONFIG_INIT_PARAMETER = "org.mule.config";
+
+    private UMOManagementContext managementContext;
 
     public void init() throws ServletException
     {
@@ -65,11 +66,12 @@ public class MuleXmlBuilderContextServlet extends HttpServlet
      *            local file system or on the classpath.
      * @return A configured UMOManager instance
      */
-    protected UMOManager createManager(String configResource, ServletContext context)
+    protected UMOManagementContext createManager(String configResource, ServletContext context)
         throws ConfigurationException
     {
         WebappMuleXmlConfigurationBuilder builder = new WebappMuleXmlConfigurationBuilder(context);
-        return builder.configure(configResource, null);
+        managementContext = builder.configure(configResource, null);
+        return managementContext;
     }
 
     /**
@@ -96,6 +98,6 @@ public class MuleXmlBuilderContextServlet extends HttpServlet
 
     public void destroy()
     {
-        MuleManager.getInstance().dispose();
+        managementContext.dispose();
     }
 }

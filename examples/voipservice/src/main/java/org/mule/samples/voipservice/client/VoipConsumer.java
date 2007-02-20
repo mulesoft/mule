@@ -10,9 +10,6 @@
 
 package org.mule.samples.voipservice.client;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.MuleManager;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
 import org.mule.impl.MuleMessage;
@@ -25,6 +22,9 @@ import org.mule.umo.UMOMessage;
 import org.mule.util.StringMessageUtils;
 
 import java.io.IOException;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * @author Binildas Christudas
@@ -56,7 +56,7 @@ public class VoipConsumer
 
     public void close()
     {
-        MuleManager.getInstance().dispose();
+        muleClient.dispose();
     }
 
     public void requestSend(String endpoint) throws Exception

@@ -10,7 +10,6 @@
 
 package org.mule.providers.vm;
 
-import org.mule.MuleManager;
 import org.mule.config.QueueProfile;
 import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
@@ -101,7 +100,7 @@ public class VMConnector extends AbstractConnector
     {
         if (queueEvents)
         {
-            queueProfile.configureQueue(endpoint.getEndpointURI().getAddress());
+            queueProfile.configureQueue(endpoint.getEndpointURI().getAddress(), managementContext.getQueueManager());
         }
         return serviceDescriptor.createMessageReceiver(this, component, endpoint);
     }
@@ -168,7 +167,7 @@ public class VMConnector extends AbstractConnector
 
     QueueSession getQueueSession() throws InitialisationException
     {
-        QueueManager qm = MuleManager.getInstance().getQueueManager();
+        QueueManager qm = managementContext.getQueueManager();
         UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
         if (tx != null)
         {
@@ -247,7 +246,7 @@ public class VMConnector extends AbstractConnector
         return null;
     }
 
-    // @Override
+    // //@Override
     public boolean isRemoteSyncEnabled()
     {
         return true;

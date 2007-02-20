@@ -65,6 +65,7 @@ public abstract class AbstractFilterCollection implements UMOFilter
      */
     public UMOFilter getLeftFilter()
     {
+        if(filters.size()==0) return null;
         return (UMOFilter)filters.get(0);
     }
 
@@ -77,7 +78,10 @@ public abstract class AbstractFilterCollection implements UMOFilter
         if(filters.size() > 1)
         {
             return (UMOFilter)filters.get(1);
-        } else
+        } else if(filters.size()==0) {
+            return null;
+        }
+        else
         {
             return (UMOFilter)filters.get(0);
 

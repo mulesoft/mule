@@ -10,15 +10,15 @@
 
 package org.mule.providers.soap.axis.extensions;
 
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
 import org.mule.impl.RequestContext;
-import org.mule.impl.model.ModelHelper;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.impl.model.ModelHelper;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.http.HttpConstants;
 import org.mule.providers.soap.axis.AxisConnector;
@@ -31,8 +31,8 @@ import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.routing.UMOOutboundRouterCollection;
 import org.mule.umo.routing.UMOOutboundRouter;
+import org.mule.umo.routing.UMOOutboundRouterCollection;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -218,7 +218,7 @@ public class UniversalSender extends BasicHandler
 
     protected UMOEndpoint lookupEndpoint(String uri) throws UMOException
     {
-        UMODescriptor axis = MuleManager.getInstance().lookupModel(ModelHelper.SYSTEM_MODEL).getDescriptor(
+        UMODescriptor axis = RegistryContext.getRegistry().lookupModel(ModelHelper.SYSTEM_MODEL).getDescriptor(
             AxisConnector.AXIS_SERVICE_COMPONENT_NAME);
         UMOEndpointURI endpoint = new MuleEndpointURI(uri);
         UMOEndpoint ep;

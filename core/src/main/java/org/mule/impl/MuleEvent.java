@@ -11,7 +11,6 @@
 package org.mule.impl;
 
 import org.mule.MuleException;
-import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -20,6 +19,7 @@ import org.mule.impl.security.MuleCredentials;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -27,8 +27,8 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.security.UMOCredentials;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.util.UUID;
 import org.mule.util.MapUtils;
+import org.mule.util.UUID;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -719,11 +719,13 @@ public class MuleEvent extends EventObject implements UMOEvent
         {
             encoding = message.getEncoding();
         }
-        if (encoding == null)
-        {
-            encoding = MuleManager.getConfiguration().getDefaultEncoding();
-        }
+      
         return encoding;
     }
 
+
+    public UMOManagementContext getManagementContext()
+    {
+        return endpoint.getManagementContext();
+    }
 }

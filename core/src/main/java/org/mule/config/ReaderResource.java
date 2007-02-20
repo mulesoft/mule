@@ -10,7 +10,7 @@
 
 package org.mule.config;
 
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 
@@ -49,7 +49,7 @@ public class ReaderResource
     public static ReaderResource[] parseResources(String configResources, String encoding) throws IOException
     {
         String[] resources = StringUtils.splitAndTrim(configResources, ",");
-        MuleManager.getConfiguration().setConfigResources(resources);
+        RegistryContext.getConfiguration().setConfigResources(resources);
         ReaderResource[] readers = new ReaderResource[resources.length];
         for (int i = 0; i < resources.length; i++)
         {
@@ -61,10 +61,5 @@ public class ReaderResource
             readers[i] = new ReaderResource(resources[i].trim(), new InputStreamReader(is, encoding));
         }
         return readers;
-    }
-
-    public static ReaderResource[] parseResources(String configResources) throws IOException
-    {
-        return parseResources(configResources, MuleManager.getConfiguration().getDefaultEncoding());
     }
 }

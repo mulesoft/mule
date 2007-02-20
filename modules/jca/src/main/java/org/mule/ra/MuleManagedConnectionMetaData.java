@@ -10,12 +10,11 @@
 
 package org.mule.ra;
 
-import javax.resource.ResourceException;
-import javax.resource.spi.ManagedConnectionMetaData;
-
-import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+
+import javax.resource.ResourceException;
+import javax.resource.spi.ManagedConnectionMetaData;
 
 /**
  * <code>MuleManagedConnectionMetaData</code> TODO
@@ -31,12 +30,14 @@ public class MuleManagedConnectionMetaData implements ManagedConnectionMetaData
 
     public String getEISProductName() throws ResourceException
     {
-        return MuleManager.getConfiguration().getVendorName();
+        //TODO RM* return RegistryContext.getConfiguration().getVendorName();
+        return null;
     }
 
     public String getEISProductVersion() throws ResourceException
     {
-        return MuleManager.getConfiguration().getProductVersion();
+        //TODO return RegistryContext.getConfiguration().getProductVersion();
+        return null;
     }
 
     // TODO

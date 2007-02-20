@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id:AbstractMuleSingleBeanDefinitionParser.java 5187 2007-02-16 18:00:42Z rossmason $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -211,7 +211,7 @@ public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBea
     }
 
 
-    @Override
+    //@Override
     protected String resolveId(Element element, AbstractBeanDefinition definition, ParserContext parserContext) throws BeanDefinitionStoreException
     {
         String name = element.getAttribute(ATTRIBUTE_NAME);

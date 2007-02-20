@@ -23,7 +23,7 @@ public class PbeEncryptionStrategyTestCase extends AbstractMuleTestCase
     {
         PasswordBasedEncryptionStrategy pbe = new PasswordBasedEncryptionStrategy();
         pbe.setPassword("test");
-        pbe.initialise();
+        pbe.initialise(managementContext);
 
         byte[] b = pbe.encrypt("hello".getBytes(), null);
 

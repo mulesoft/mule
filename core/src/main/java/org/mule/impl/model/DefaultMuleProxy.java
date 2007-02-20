@@ -121,7 +121,7 @@ public class DefaultMuleProxy implements MuleProxy
             {
                 try
                 {
-                    ((Initialisable)interceptor).initialise();
+                    ((Initialisable)interceptor).initialise(descriptor.getManagementContext());
                 }
                 catch (Exception e)
                 {

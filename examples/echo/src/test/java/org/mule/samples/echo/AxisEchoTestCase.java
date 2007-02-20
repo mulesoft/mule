@@ -36,10 +36,9 @@ public class AxisEchoTestCase extends FunctionalTestCase
         this.setDisposeManagerPerSuite(true);
     }
 
-    protected void doPreFunctionalSetUp() throws Exception
-    {
-        super.doPreFunctionalSetUp();
 
+    protected void doSetUp() throws Exception
+    {
         try
         {
             expectedGetResponse = IOUtils.getResourceAsString(getExpectedGetResponseResource(),

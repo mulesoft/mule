@@ -32,7 +32,7 @@ public class XFireWsdlMessageDispatcher extends XFireMessageDispatcher
         super(endpoint);
     }
 
-    // @Override
+    // //@Override
     protected void doConnect() throws Exception
     {
         try

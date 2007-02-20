@@ -65,7 +65,7 @@ public class DynamicEntryPointDiscoveryTestCase extends AbstractEntryPointDiscov
         return mappings;
     }
 
-    // @Override
+    // //@Override
     public UMODescriptor getDescriptorToResolve(String className) throws Exception
     {
         UMODescriptor descriptor = super.getDescriptorToResolve(className);

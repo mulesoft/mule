@@ -10,9 +10,9 @@
 
 package org.mule.config;
 
-import org.mule.MuleManager;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.queue.QueueConfiguration;
+import org.mule.util.queue.QueueManager;
 
 /**
  * <code>QueueProfile</code> determines how an internal queue for a component will
@@ -73,10 +73,10 @@ public class QueueProfile
         this.persistent = persistent;
     }
 
-    public void configureQueue(String component) throws InitialisationException
+    public void configureQueue(String component, QueueManager queueManager) throws InitialisationException
     {
         QueueConfiguration qc = new QueueConfiguration(maxOutstandingMessages, persistent);
-        MuleManager.getInstance().getQueueManager().setQueueConfiguration(component, qc);
+        queueManager.setQueueConfiguration(component, qc);
     }
 
     public String toString()

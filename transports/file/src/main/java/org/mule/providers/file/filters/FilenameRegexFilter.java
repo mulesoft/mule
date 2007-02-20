@@ -31,7 +31,7 @@ public class FilenameRegexFilter extends FilenameWildcardFilter
      * @param name The name of the file to apply the filter to.
      * @return indication of acceptance as boolean.
      */
-    // @Override
+    // //@Override
     public boolean accept(Object object)
     {
         if (object == null)
@@ -68,7 +68,7 @@ public class FilenameRegexFilter extends FilenameWildcardFilter
      * 
      * @see org.mule.routing.filters.WildcardFilter#setCaseSensitive(boolean)
      */
-    // @Override
+    // //@Override
     public void setCaseSensitive(boolean caseSensitive)
     {
         super.setCaseSensitive(caseSensitive);
@@ -80,7 +80,7 @@ public class FilenameRegexFilter extends FilenameWildcardFilter
      * 
      * @see org.mule.routing.filters.WildcardFilter#setPattern(java.lang.String)
      */
-    // @Override
+    // //@Override
     public void setPattern(String pattern)
     {
         super.setPattern(pattern);

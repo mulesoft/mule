@@ -10,7 +10,7 @@
 
 package org.mule.extras.client;
 
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
@@ -183,7 +183,7 @@ public class RemoteDispatcher implements Disposable
 
     public UMOMessage sendRemote(String endpoint, Object payload, Map messageProperties) throws UMOException
     {
-        return doToRemote(endpoint, payload, messageProperties, true, MuleManager.getConfiguration()
+        return doToRemote(endpoint, payload, messageProperties, true, RegistryContext.getConfiguration()
             .getDefaultSynchronousEventTimeout());
     }
 
@@ -256,7 +256,7 @@ public class RemoteDispatcher implements Disposable
         setCredentials(message);
         AdminNotification action = new AdminNotification(message, AdminNotification.ACTION_INVOKE,
             "mule://" + component);
-        UMOMessage result = dispatchAction(action, synchronous, MuleManager.getConfiguration()
+        UMOMessage result = dispatchAction(action, synchronous, RegistryContext.getConfiguration()
             .getDefaultSynchronousEventTimeout());
         return result;
     }
@@ -287,7 +287,7 @@ public class RemoteDispatcher implements Disposable
         updateContext(new MuleMessage(action), endpoint, synchronous);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        wireFormat.write(out, action);
+        wireFormat.write(out, action, serverEndpoint.getEncoding());
         byte[] payload = out.toByteArray();
 
         UMOMessage message = action.getMessage();

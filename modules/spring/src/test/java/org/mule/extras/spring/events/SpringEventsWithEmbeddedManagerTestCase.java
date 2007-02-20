@@ -10,8 +10,6 @@
 
 package org.mule.extras.spring.events;
 
-import org.mule.MuleManager;
-
 public class SpringEventsWithEmbeddedManagerTestCase extends SpringEventsTestCase
 {
 
@@ -22,6 +20,6 @@ public class SpringEventsWithEmbeddedManagerTestCase extends SpringEventsTestCas
 
     public void testCorrectManagerLoaded()
     {
-        assertNotNull(MuleManager.getInstance().getProperty("embeddedManager"));
+        assertNotNull(managementContext.getRegistry().getProperty("embeddedManager"));
     }
 }

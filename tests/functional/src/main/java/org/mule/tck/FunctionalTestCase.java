@@ -10,10 +10,11 @@
 
 package org.mule.tck;
 
-import org.mule.MuleManager;
-import org.mule.util.ClassUtils;
+import org.mule.RegistryContext;
 import org.mule.config.ConfigurationBuilder;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.manager.DefaultWorkListener;
+import org.mule.util.ClassUtils;
 
 import javax.resource.spi.work.WorkEvent;
 
@@ -32,35 +33,21 @@ public abstract class FunctionalTestCase extends AbstractMuleTestCase
 
     public static final String DEFAULT_BUILDER_CLASS = "org.mule.config.builders.MuleXmlConfigurationBuilder";
 
-    protected final void doSetUp() throws Exception
+    protected UMOManagementContext createManagementContext() throws Exception
     {
-        doPreFunctionalSetUp();
         // Should we set up te manager for every method?
-        if (!getTestInfo().isDisposeManagerPerSuite())
+        UMOManagementContext context;
+        if (getTestInfo().isDisposeManagerPerSuite() && managementContext!=null)
         {
-            setupManager();
+            context = managementContext;
         }
-        doPostFunctionalSetUp();
-    }
-
-    protected void suitePreSetUp() throws Exception
-    {
-        if (getTestInfo().isDisposeManagerPerSuite())
+        else
         {
-            setupManager();
+            ConfigurationBuilder builder = getBuilder();
+            context = builder.configure(getConfigResources(), null);
+            RegistryContext.getConfiguration().setDefaultWorkListener(new TestingWorkListener());
         }
-    }
-
-    protected void setupManager() throws Exception
-    {
-        MuleManager.getConfiguration().setDefaultWorkListener(new TestingWorkListener());
-        ConfigurationBuilder builder = getBuilder();
-        builder.configure(getConfigResources(), null);
-    }
-
-    protected final void doTearDown() throws Exception
-    {
-        doFunctionalTearDown();
+        return context;
     }
 
     protected ConfigurationBuilder getBuilder() throws Exception
@@ -81,21 +68,6 @@ public abstract class FunctionalTestCase extends AbstractMuleTestCase
                                 + "check your functional test.", e);
         }
 
-    }
-
-    protected void doPreFunctionalSetUp() throws Exception
-    {
-        // template method
-    }
-
-    protected void doPostFunctionalSetUp() throws Exception
-    {
-        // template method
-    }
-
-    protected void doFunctionalTearDown() throws Exception
-    {
-        // template method
     }
 
     protected abstract String getConfigResources();

@@ -10,13 +10,12 @@
 
 package org.mule.config.converters;
 
-import org.apache.commons.beanutils.ConversionException;
-import org.apache.commons.beanutils.Converter;
-import org.mule.MuleManager;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.manager.UMOManager;
 import org.mule.util.XMLEntityCodec;
+
+import org.apache.commons.beanutils.ConversionException;
+import org.apache.commons.beanutils.Converter;
 
 /**
  * <code>EndpointURIConverter</code> TODO
@@ -47,9 +46,7 @@ public class EndpointURIConverter implements Converter
 
         try
         {
-            UMOManager manager = MuleManager.getInstance();
-            String endpoint = manager.lookupEndpointIdentifier(value.toString(), value.toString());
-            endpoint = XMLEntityCodec.decodeString(endpoint);
+            String endpoint = XMLEntityCodec.decodeString(value.toString());
             return new MuleEndpointURI(endpoint);
         }
         catch (Exception e)

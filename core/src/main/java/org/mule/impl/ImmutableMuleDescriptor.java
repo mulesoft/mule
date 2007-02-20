@@ -10,13 +10,10 @@
 
 package org.mule.impl;
 
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.ThreadingProfile;
 import org.mule.impl.container.ContainerKeyPair;
-import org.mule.impl.container.DescriptorContainerContext;
-import org.mule.impl.container.DescriptorContainerKeyPair;
-import org.mule.impl.container.MuleContainerContext;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.registry.DeregistrationException;
 import org.mule.registry.RegistrationException;
@@ -27,6 +24,7 @@ import org.mule.routing.outbound.OutboundRouterCollection;
 import org.mule.routing.response.ResponseRouterCollection;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOImmutableDescriptor;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.ContainerException;
@@ -113,15 +111,6 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     protected ThreadingProfile threadingProfile;
 
     /**
-     * Determines whether the component described by this descriptor is hosted in a
-     * container. If the value is false the component will not be pooled by Mule.
-     *
-     * @deprecated Use <code>container</code> instead.
-     * @see MULE-812
-     */
-    protected boolean containerManaged = true;
-
-    /**
      * Determines the initial state of this component when the model starts. Can be
      * 'stopped' or 'started' (default)
      */
@@ -148,6 +137,8 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
      */
     protected String modelName;
 
+    protected UMOManagementContext managementContext;
+
     /**
      * Default constructor. Initalises common properties for the MuleConfiguration
      * object
@@ -169,7 +160,6 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         exceptionListener = descriptor.getExceptionListener();
         initialState = descriptor.getInitialState();
         singleton = descriptor.isSingleton();
-        containerManaged = descriptor.isContainerManaged();
     }
 
     /**
@@ -186,9 +176,10 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 
     }
 
-    public void initialise() throws InitialisationException
+    public void initialise(UMOManagementContext managementContext) throws InitialisationException
     {
-        MuleConfiguration config = MuleManager.getConfiguration();
+        this.managementContext = managementContext;
+        MuleConfiguration config = RegistryContext.getConfiguration();
         if (threadingProfile == null)
         {
             threadingProfile = config.getDefaultComponentThreadingProfile();
@@ -196,12 +187,12 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 
         else if (exceptionListener instanceof Initialisable)
         {
-            ((Initialisable)exceptionListener).initialise();
+            ((Initialisable)exceptionListener).initialise(managementContext);
         }
 
         if (exceptionListener instanceof Initialisable)
         {
-            ((Initialisable)exceptionListener).initialise();
+            ((Initialisable)exceptionListener).initialise(managementContext);
         }
 
         MuleEndpoint endpoint;
@@ -217,12 +208,12 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
             if (inboundRouter.getCatchAllStrategy() != null
                 && inboundRouter.getCatchAllStrategy().getEndpoint() != null)
             {
-                ((MuleEndpoint)inboundRouter.getCatchAllStrategy().getEndpoint()).initialise();
+                inboundRouter.getCatchAllStrategy().getEndpoint().initialise(managementContext);
             }
             for (Iterator iterator = inboundRouter.getEndpoints().iterator(); iterator.hasNext();)
             {
                 endpoint = (MuleEndpoint)iterator.next();
-                endpoint.initialise();
+                endpoint.initialise(managementContext);
             }
         }
 
@@ -231,7 +222,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
             for (Iterator iterator = responseRouter.getEndpoints().iterator(); iterator.hasNext();)
             {
                 endpoint = (MuleEndpoint)iterator.next();
-                endpoint.initialise();
+                endpoint.initialise(managementContext);
             }
         }
 
@@ -241,7 +232,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
             {
                 UMONestedRouter nestedRouter = (UMONestedRouter) it.next();
                 endpoint = (MuleEndpoint) nestedRouter.getEndpoint();
-                endpoint.initialise();
+                endpoint.initialise(managementContext);
             }
         }
 
@@ -255,7 +246,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
             if (outboundRouter.getCatchAllStrategy() != null
                 && outboundRouter.getCatchAllStrategy().getEndpoint() != null)
             {
-                outboundRouter.getCatchAllStrategy().getEndpoint().initialise();
+                outboundRouter.getCatchAllStrategy().getEndpoint().initialise(managementContext);
             }
             UMOOutboundRouter router;
             for (Iterator iterator = outboundRouter.getRouters().iterator(); iterator.hasNext();)
@@ -264,21 +255,14 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
                 for (Iterator iterator1 = router.getEndpoints().iterator(); iterator1.hasNext();)
                 {
                     endpoint = (MuleEndpoint)iterator1.next();
-                    endpoint.initialise();
+                    endpoint.initialise(managementContext);
                 }
             }
         }
         // Is a reference of an implementation object?
         if (implementationReference instanceof String)
         {
-            if (DescriptorContainerContext.DESCRIPTOR_CONTAINER_NAME.equals(container))
-            {
-                implementationReference = new DescriptorContainerKeyPair(name, implementationReference);
-            }
-            else
-            {
-                implementationReference = new ContainerKeyPair(container, implementationReference);
-            }
+            implementationReference = new ContainerKeyPair(container, implementationReference);
         }
     }
 
@@ -289,7 +273,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
      */
     public void register() throws RegistrationException
     {
-        //registryId = MuleManager.getInstance().getRegistry().registerMuleObject(MuleManager.lookupModel(modelName), this).getId();
+        //registryId = managementContext.getRegistry().registerMuleObject(MulemanagementContext.getRegistry().lookupModel(modelName), this).getId();
     }
 
     /*
@@ -299,7 +283,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
      */
     public void deregister() throws DeregistrationException
     {
-        MuleManager.getInstance().getRegistry().deregisterComponent(registryId);
+        managementContext.getRegistry().deregisterComponent(registryId);
         registryId = null;
     }
 
@@ -400,19 +384,13 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         return threadingProfile;
     }
 
-    public boolean isContainerManaged()
-    {
-        return !MuleContainerContext.MULE_CONTAINER_NAME.equalsIgnoreCase(container);
-    }
-
     public Class getImplementationClass() throws UMOException
     {
         // check for other types of references
         Class implClass;
         if (implementationReference instanceof String || implementationReference instanceof ContainerKeyPair)
         {
-            Object object = MuleManager.getInstance().getContainerContext().getComponent(
-                implementationReference);
+            Object object = RegistryContext.getRegistry().lookupObject(implementationReference);
             implClass = object.getClass();
         }
         else
@@ -433,7 +411,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
      */
     protected Class getImplementationForReference(String reference) throws ContainerException
     {
-        Object object = MuleManager.getInstance().getContainerContext().getComponent(reference);
+        Object object = RegistryContext.getRegistry().lookupObject(reference);
         return object.getClass();
     }
 
@@ -475,6 +453,17 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         return container;
     }
 
+
+    public UMOManagementContext getManagementContext()
+    {
+        return managementContext;
+    }
+
+    public String getModelName()
+    {
+        return modelName;
+    }
+
     public String toString()
     {
         final StringBuffer sb = new StringBuffer();
@@ -490,10 +479,5 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         sb.append(", container='").append(container).append('\'');
         sb.append('}');
         return sb.toString();
-    }
-
-    public String getModelName()
-    {
-        return modelName;
     }
 }

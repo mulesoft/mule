@@ -10,7 +10,6 @@
 
 package org.mule.impl.security.filters;
 
-import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.security.AbstractEndpointSecurityFilter;
@@ -122,7 +121,7 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecuri
     {
         if (strategyName != null)
         {
-            strategy = MuleManager.getInstance().getSecurityManager().getEncryptionStrategy(strategyName);
+            strategy = endpoint.getManagementContext().getSecurityManager().getEncryptionStrategy(strategyName);
         }
 
         if (strategy == null)

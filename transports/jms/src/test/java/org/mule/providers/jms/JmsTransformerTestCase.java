@@ -15,7 +15,6 @@ import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
 import org.mule.providers.jms.transformers.ObjectToJMSMessage;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.tck.MuleTestUtils;
 import org.mule.umo.UMOMessage;
 
 import com.mockobjects.constraint.Constraint;
@@ -76,7 +75,7 @@ public class JmsTransformerTestCase extends AbstractMuleTestCase
         // The AbstractJMSTransformer will only apply JMS properties to the
         // underlying message when a "current event" is available, so we need to set
         // one.
-        RequestContext.setEvent(new MuleEvent(msg, MuleTestUtils.getTestEvent("previous")));
+        RequestContext.setEvent(new MuleEvent(msg, getTestEvent("previous")));
 
         // The transformer we are going to use is ObjectToJMSMessage, which will
         // return the same (but mockingly modified!) JMS message that is used as

@@ -11,16 +11,12 @@
 package org.mule.test.integration.spring;
 
 import org.mule.config.ConfigurationBuilder;
+import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
 import org.mule.extras.client.RemoteDispatcher;
-import org.mule.extras.spring.config.SpringConfigurationBuilder;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
-/**
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
- */
 public class MuleAdminTestCase extends FunctionalTestCase
 {
 
@@ -31,7 +27,7 @@ public class MuleAdminTestCase extends FunctionalTestCase
 
     protected ConfigurationBuilder getBuilder()
     {
-        return new SpringConfigurationBuilder();
+        return new MuleXmlConfigurationBuilder();
     }
 
     public void testMuleAdminChannelInSpring() throws Exception

@@ -10,10 +10,6 @@
 
 package org.mule.ra;
 
-import java.util.Map;
-
-import javax.resource.ResourceException;
-
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -26,14 +22,18 @@ import org.mule.impl.security.MuleCredentials;
 import org.mule.providers.AbstractConnector;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.ReceiveException;
 import org.mule.umo.provider.UMOConnector;
+
+import java.util.Map;
+
+import javax.resource.ResourceException;
 
 /**
  * <code>MuleConnection</code> TODO
@@ -41,14 +41,14 @@ import org.mule.umo.provider.UMOConnector;
 public class DefaultMuleConnection implements MuleConnection
 {
     private final MuleCredentials credentials;
-    private final UMOManager manager;
+    private final UMOManagementContext managementContext;
     private MuleManagedConnection managedConnection;
 
     public DefaultMuleConnection(MuleManagedConnection managedConnection,
-                                 UMOManager manager,
+                                 UMOManagementContext managementContext,
                                  MuleCredentials credentials)
     {
-        this.manager = manager;
+        this.managementContext = managementContext;
         this.credentials = credentials;
         this.managedConnection = managedConnection;
     }
@@ -162,9 +162,9 @@ public class DefaultMuleConnection implements MuleConnection
         UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(uri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
         UMOConnector connector = endpoint.getConnector();
 
-        if (!connector.isStarted() && manager.isStarted())
+        if (!connector.isStarted() &&managementContext.isStarted())
         {
-            connector.startConnector();
+            connector.start();
         }
 
         try

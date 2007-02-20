@@ -10,8 +10,6 @@
 
 package org.mule.providers.multicast;
 
-import java.net.DatagramPacket;
-
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.tck.providers.AbstractConnectorTestCase;
@@ -20,6 +18,8 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
 
+import java.net.DatagramPacket;
+
 public class MulticastConnectorTestCase extends AbstractConnectorTestCase
 {
 
@@ -27,7 +27,7 @@ public class MulticastConnectorTestCase extends AbstractConnectorTestCase
     {
         MulticastConnector c = new MulticastConnector();
         c.setName("MulticastConnector");
-        c.initialise();
+        c.initialise(managementContext);
         return c;
     }
 
@@ -44,7 +44,7 @@ public class MulticastConnectorTestCase extends AbstractConnectorTestCase
     public void testValidListener() throws Exception
     {
         MulticastConnector connector = new MulticastConnector();
-        connector.initialise();
+        connector.initialise(managementContext);
         MuleDescriptor d = getTestDescriptor("orange", Orange.class.getName());
         UMOComponent component = getTestComponent(d);
         UMOEndpoint endpoint = getTestEndpoint("Test", UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
@@ -85,7 +85,7 @@ public class MulticastConnectorTestCase extends AbstractConnectorTestCase
     public void testProperties() throws Exception
     {
         MulticastConnector c = new MulticastConnector();
-        c.initialise();
+        c.initialise(managementContext);
         c.setBufferSize(1024);
         assertEquals(1024, c.getBufferSize());
         c.setBufferSize(0);

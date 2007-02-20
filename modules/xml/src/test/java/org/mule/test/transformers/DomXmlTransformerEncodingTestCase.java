@@ -27,7 +27,7 @@ public class DomXmlTransformerEncodingTestCase extends AbstractXmlTransformerTes
     private Document srcData; // Parsed XML doc
     private String resultData; // String as US-ASCII
 
-    // @Override
+    // //@Override
     protected void doSetUp() throws Exception
     {
         org.dom4j.Document dom4jDoc = DocumentHelper.parseText(IOUtils.toString(IOUtils.getResourceAsStream(
@@ -63,7 +63,7 @@ public class DomXmlTransformerEncodingTestCase extends AbstractXmlTransformerTes
         return resultData;
     }
 
-    // @Override
+    // //@Override
     public boolean compareResults(Object expected, Object result)
     {
         // This is only used during roundtrip test, so it will always be Document

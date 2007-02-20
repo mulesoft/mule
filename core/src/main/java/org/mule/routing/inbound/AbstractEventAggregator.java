@@ -33,7 +33,7 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
 
     private final ConcurrentMap eventGroups = new ConcurrentHashMap();
 
-    // @Override
+    // //@Override
     public UMOEvent[] process(UMOEvent event) throws MessagingException
     {
         UMOEvent[] result = null;

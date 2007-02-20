@@ -10,7 +10,6 @@
 
 package org.mule.providers.email.transformers;
 
-import org.mule.MuleManager;
 import org.mule.providers.email.MailProperties;
 import org.mule.providers.email.MailUtils;
 import org.mule.providers.email.SmtpConnector;
@@ -93,7 +92,7 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
         Properties otherHeaders = (Properties)eventMsg.getProperty(MailProperties.CUSTOM_HEADERS_MAP_PROPERTY);
         if (otherHeaders != null && !otherHeaders.isEmpty())
         {
-            Map props = new HashMap(MuleManager.getInstance().getProperties());
+            Map props = new HashMap(context.getManagmentContext().getProperties());
             for (Iterator iterator = eventMsg.getPropertyNames().iterator(); iterator.hasNext();)
             {
                 String propertyKey = (String)iterator.next();

@@ -10,8 +10,8 @@
 
 package org.mule.providers;
 
-import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
+import org.mule.RegistryContext;
 import org.mule.config.ThreadingProfile;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -32,6 +32,7 @@ import org.mule.umo.MessagingException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
@@ -184,24 +185,6 @@ public abstract class AbstractConnector
      */
     protected int numberOfConcurrentTransactedReceivers = 4;
 
-    /**
-     * The service descriptor can define a default inbound transformer to be used on
-     * an endpoint if no other is set
-     */
-    protected UMOTransformer defaultInboundTransformer = null;
-
-    /**
-     * The service descriptor can define a default outbound transformer to be used on
-     * an endpoint if no other is set
-     */
-    protected UMOTransformer defaultOutboundTransformer = null;
-
-    /**
-     * For some connectors such as http, a response transformer is required or where
-     * a replyTo needs a trnasformer
-     */
-    protected UMOTransformer defaultResponseTransformer = null;
-
     private ConnectionStrategy connectionStrategy;
 
     protected WaitableBoolean connected = new WaitableBoolean(false);
@@ -259,15 +242,16 @@ public abstract class AbstractConnector
      */
     protected String registryId = null;
 
+    protected UMOManagementContext managementContext;
+
     public AbstractConnector()
     {
         super();
 
         // make sure we always have an exception strategy
         exceptionListener = new DefaultExceptionStrategy();
-        connectionStrategy = MuleManager.getConfiguration().getDefaultConnectionStrategy();
         //Todo RM*
-        //enableMessageEvents = MuleManager.getConfiguration().isEnableMessageEvents();
+        //enableMessageEvents = RegistryContext.getConfiguration().isEnableMessageEvents();
 
         // always add at least the default protocol
         supportedProtocols = new ArrayList();
@@ -323,17 +307,21 @@ public abstract class AbstractConnector
      *
      * @see org.mule.providers.UMOConnector#create(java.util.HashMap)
      */
-    public final synchronized void initialise() throws InitialisationException
+    public final synchronized void initialise(UMOManagementContext managementContext) throws InitialisationException
     {
         if (initialised.get())
         {
             throw new AlreadyInitialisedException("Connector '" + getName() + "'", this);
         }
 
+        this.managementContext = managementContext;
+
         if (logger.isInfoEnabled())
         {
             logger.info("Initialising " + getClass().getName());
         }
+        connectionStrategy = RegistryContext.getConfiguration().getDefaultConnectionStrategy();
+        
         // Initialise the structure of this connector
         initFromServiceDescriptor();
 
@@ -347,7 +335,7 @@ public abstract class AbstractConnector
 
         if (exceptionListener instanceof Initialisable)
         {
-            ((Initialisable)exceptionListener).initialise();
+            ((Initialisable)exceptionListener).initialise(managementContext);
         }
 
         initialised.set(true);
@@ -368,7 +356,8 @@ public abstract class AbstractConnector
      */
     public void register() throws RegistrationException
     {
-		registryId = MuleManager.getInstance().getRegistry().registerMuleObject(MuleManager.getInstance(), this).getId();
+		//TODO
+        registryId = managementContext.getRegistry().registerMuleObject(managementContext, this).getId();
     }
 
     /*
@@ -378,7 +367,7 @@ public abstract class AbstractConnector
      */
     public void deregister() throws DeregistrationException
     {
-        MuleManager.getInstance().getRegistry().deregisterComponent(registryId);
+        managementContext.getRegistry().deregisterComponent(registryId);
         registryId = null;
     }
 
@@ -399,7 +388,7 @@ public abstract class AbstractConnector
      *
      * @see org.mule.umo.provider.UMOConnector#start()
      */
-    public final synchronized void startConnector() throws UMOException
+    public final synchronized void start() throws UMOException
     {
         checkDisposed();
 
@@ -418,7 +407,7 @@ public abstract class AbstractConnector
                 logger.info("Starting Connector: " + getClass().getName());
             }
 
-            // the scheduler is recreated after stopConnector()
+            // the scheduler is recreated after stop()
             if (scheduler == null || scheduler.isShutdown())
             {
                 scheduler = this.getScheduler();
@@ -462,7 +451,7 @@ public abstract class AbstractConnector
      *
      * @see org.mule.umo.provider.UMOConnector#stop()
      */
-    public final synchronized void stopConnector() throws UMOException
+    public final synchronized void stop() throws UMOException
     {
         if (isDisposed())
         {
@@ -533,7 +522,7 @@ public abstract class AbstractConnector
 
         try
         {
-            this.stopConnector();
+            this.stop();
         }
         catch (UMOException e)
         {
@@ -782,6 +771,7 @@ public abstract class AbstractConnector
         }
         else
         {
+            endpoint.initialise(getManagementContext());
             receiver = createReceiver(component, endpoint);
             Object receiverKey = getReceiverKey(component, endpoint);
             receiver.setReceiverKey(receiverKey.toString());
@@ -846,8 +836,7 @@ public abstract class AbstractConnector
     {
         if (dispatcherThreadingProfile == null)
         {
-            dispatcherThreadingProfile = MuleManager.getConfiguration()
-                .getDefaultMessageDispatcherThreadingProfile();
+            dispatcherThreadingProfile = RegistryContext.getConfiguration().getDefaultMessageDispatcherThreadingProfile();
         }
         return dispatcherThreadingProfile;
     }
@@ -861,7 +850,7 @@ public abstract class AbstractConnector
     {
         if (receiverThreadingProfile == null)
         {
-            receiverThreadingProfile = MuleManager.getConfiguration().getDefaultMessageReceiverThreadingProfile();
+            receiverThreadingProfile = RegistryContext.getConfiguration().getDefaultMessageReceiverThreadingProfile();
         }
 
         return receiverThreadingProfile;
@@ -900,73 +889,57 @@ public abstract class AbstractConnector
 
     public UMOTransformer getDefaultInboundTransformer()
     {
-        if (defaultInboundTransformer != null)
+        try
         {
-            try
-            {
-                return (UMOTransformer)defaultInboundTransformer.clone();
-            }
-            catch (CloneNotSupportedException e)
-            {
-                logger.error("Failed to clone default Inbound transformer");
-            }
+            UMOTransformer transformer = serviceDescriptor.createInboundTransformer();
+            if(transformer==null) return null;
+            transformer.initialise(getManagementContext());
+            return transformer;
         }
-
-        return null;
+        catch (UMOException e)
+        {
+            logger.debug(e.getMessage(), e);
+            return null;
+        }
     }
 
-    public void setDefaultInboundTransformer(UMOTransformer defaultInboundTransformer)
-    {
-        this.defaultInboundTransformer = defaultInboundTransformer;
-    }
 
     public UMOTransformer getDefaultResponseTransformer()
     {
-        if (defaultResponseTransformer != null)
+        try
         {
-            try
-            {
-                return (UMOTransformer)defaultResponseTransformer.clone();
-            }
-            catch (CloneNotSupportedException e)
-            {
-                logger.error("Failed to clone default Outbound transformer");
-            }
+            UMOTransformer transformer = serviceDescriptor.createResponseTransformer();
+            if(transformer==null) return null;
+            transformer.initialise(getManagementContext());
+            return transformer;
         }
-
-        return null;
+        catch (UMOException e)
+        {
+            logger.debug(e.getMessage(), e);
+            return null;
+        }
     }
 
     public UMOTransformer getDefaultOutboundTransformer()
     {
-        if (defaultOutboundTransformer != null)
+        try
         {
-            try
-            {
-                return (UMOTransformer)defaultOutboundTransformer.clone();
-            }
-            catch (CloneNotSupportedException e)
-            {
-                logger.error("Failed to clone default Outbound transformer");
-            }
+            UMOTransformer transformer = serviceDescriptor.createOutboundTransformer();
+            if(transformer==null) return null;
+            transformer.initialise(getManagementContext());
+            return transformer;
+        }
+        catch (UMOException e)
+        {
+            logger.debug(e.getMessage(), e);
+            return null;
         }
 
-        return null;
-    }
-
-    public void setDefaultOutboundTransformer(UMOTransformer defaultOutboundTransformer)
-    {
-        this.defaultOutboundTransformer = defaultOutboundTransformer;
-    }
-
-    public void setDefaultResponseTransformer(UMOTransformer defaultResponseTransformer)
-    {
-        this.defaultResponseTransformer = defaultResponseTransformer;
     }
 
     public ReplyToHandler getReplyToHandler()
     {
-        return new DefaultReplyToHandler(defaultResponseTransformer);
+        return new DefaultReplyToHandler(getDefaultResponseTransformer());
     }
 
     /**
@@ -982,7 +955,7 @@ public abstract class AbstractConnector
      */
     public void fireNotification(UMOServerNotification notification)
     {
-        MuleManager.getInstance().fireNotification(notification);
+        managementContext.fireNotification(notification);
     }
 
     public ConnectionStrategy getConnectionStrategy()
@@ -1098,7 +1071,7 @@ public abstract class AbstractConnector
 
         if (startOnConnect.get())
         {
-            this.startConnector();
+            this.start();
         }
         else
         {
@@ -1129,7 +1102,7 @@ public abstract class AbstractConnector
         }
         finally
         {
-            stopConnector();
+            stop();
         }
 
         logger.info("Disconnected: " + getConnectionDescription());
@@ -1561,7 +1534,7 @@ public abstract class AbstractConnector
         try
         {
             serviceDescriptor = (TransportServiceDescriptor)
-                MuleManager.getInstance().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, getProtocol().toLowerCase(), serviceOverrides);
+                managementContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, getProtocol().toLowerCase(), serviceOverrides);
             if (serviceDescriptor == null)
             {
                 throw new ServiceException(Message.createStaticMessage("No service descriptor found for transport: " + getProtocol() + ".  This transport does not appear to be installed."));
@@ -1571,20 +1544,17 @@ public abstract class AbstractConnector
             {
                 logger.debug("Loading DispatcherFactory for connector: " + getName() + " (" + getClass().getName() + ")");
             }
-            this.setDispatcherFactory(serviceDescriptor.createDispatcherFactory());
 
-                try
-                {
-                    this.setDispatcherFactory(serviceDescriptor.createDispatcherFactory());
-                }
-                catch (TransportServiceException e)
-                {
-                    logger.debug("Transport '" + getProtocol() + "' will not support outbound endpoints: " + e.getMessage());
-                }
+            UMOMessageDispatcherFactory df = serviceDescriptor.createDispatcherFactory();
+            if(df!=null)
+            {
+                this.setDispatcherFactory(df);
+            }
+            else if (logger.isDebugEnabled())
+            {
+                logger.debug("Transport '" + getProtocol() + "' will not support outbound endpoints: ");
+            }
 
-            defaultInboundTransformer = serviceDescriptor.createInboundTransformer();
-            defaultOutboundTransformer = serviceDescriptor.createOutboundTransformer();
-            defaultResponseTransformer = serviceDescriptor.createResponseTransformer();
 
             sessionHandler = serviceDescriptor.createSessionHandler();
 
@@ -1593,7 +1563,7 @@ public abstract class AbstractConnector
             // This provides a really convenient way to set properties on an object
             // from unit tests
             Map props = new HashMap();
-            PropertiesUtils.getPropertiesWithPrefix(MuleManager.getInstance().getProperties(), getProtocol()
+            PropertiesUtils.getPropertiesWithPrefix(managementContext.getProperties(), getProtocol()
                 .toLowerCase(), props);
             if (props.size() > 0)
             {
@@ -1732,6 +1702,11 @@ public abstract class AbstractConnector
         throw new UnsupportedOperationException(new Message(Messages.STREAMING_NOT_SUPPORTED_FOR_X, getProtocol()).toString());
     }
 
+
+    public UMOManagementContext getManagementContext()
+    {
+        return managementContext;
+    }
 
     public String toString()
     {

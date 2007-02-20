@@ -11,7 +11,6 @@
 package org.mule.tck.functional;
 
 import org.mule.MuleException;
-import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.impl.RequestContext;
 import org.mule.umo.UMOEventContext;
@@ -61,7 +60,7 @@ public class FunctionalTestComponent implements Callable
             replyMessage = contents + " Received";
         }
 
-        MuleManager.getInstance().fireNotification(
+        context.getManagmentContext().fireNotification(
             new FunctionalTestNotification(context, replyMessage, FunctionalTestNotification.EVENT_RECEIVED));
 
         if (throwException)
@@ -98,7 +97,7 @@ public class FunctionalTestComponent implements Callable
             replyMessage = contents + " Received";
         }
 
-        MuleManager.getInstance().fireNotification(
+        context.getManagmentContext().fireNotification(
             new FunctionalTestNotification(context, replyMessage, FunctionalTestNotification.EVENT_RECEIVED));
 
         if (throwException)

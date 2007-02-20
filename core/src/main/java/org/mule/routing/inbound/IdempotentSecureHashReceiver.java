@@ -41,7 +41,7 @@ public class IdempotentSecureHashReceiver extends IdempotentReceiver
     private final SerializableToByteArray objectToByteArray = new SerializableToByteArray();
     private final ByteArrayToHexString byteArrayToHexString = new ByteArrayToHexString();
 
-    // @Override
+    // //@Override
     protected Object getIdForEvent(UMOEvent event) throws MessagingException
     {
         try

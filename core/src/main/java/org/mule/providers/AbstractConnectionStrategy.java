@@ -10,7 +10,7 @@
 
 package org.mule.providers;
 
-import org.mule.MuleManager;
+import org.mule.umo.manager.UMOWorkManager;
 import org.mule.umo.provider.UMOConnectable;
 import org.mule.umo.provider.UMOMessageReceiver;
 
@@ -32,13 +32,15 @@ public abstract class AbstractConnectionStrategy implements ConnectionStrategy
 
     private volatile boolean doThreading = false;
 
+    private UMOWorkManager workManager;
+
     public final void connect(final UMOConnectable connectable) throws FatalConnectException
     {
         if (doThreading)
         {
             try
             {
-                MuleManager.getInstance().getWorkManager().scheduleWork(new Work()
+                getWorkManager().scheduleWork(new Work()
                 {
                     public void release()
                     {
@@ -105,6 +107,17 @@ public abstract class AbstractConnectionStrategy implements ConnectionStrategy
     public void setDoThreading(boolean doThreading)
     {
         this.doThreading = doThreading;
+    }
+
+
+    public UMOWorkManager getWorkManager()
+    {
+        return workManager;
+    }
+
+    public void setWorkManager(UMOWorkManager workManager)
+    {
+        this.workManager = workManager;
     }
 
     protected abstract void doConnect(UMOConnectable connectable) throws FatalConnectException;

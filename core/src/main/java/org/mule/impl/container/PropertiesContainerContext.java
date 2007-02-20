@@ -10,7 +10,9 @@
 
 package org.mule.impl.container;
 
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
+import org.mule.umo.UMOManagementContext;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.ContainerException;
 import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.util.TemplateParser;
@@ -48,6 +50,23 @@ public class PropertiesContainerContext extends AbstractContainerContext
         super("properties");
     }
 
+    //@Override
+    public void doInitialise(UMOManagementContext managementContext) throws InitialisationException
+    {
+        if (properties != null)
+        {
+            Map.Entry entry;
+            String value;
+            for (Iterator iterator = properties.entrySet().iterator(); iterator.hasNext();)
+            {
+                entry = (Map.Entry)iterator.next();
+                value = entry.getValue().toString();
+                value = templateParser.parse(managementContext.getProperties(), value);
+                managementContext.getRegistry().setProperty(entry.getKey(), value);
+            }
+        }
+    }
+
     public void configure(Reader configuration) throws ContainerException
     {
         throw new UnsupportedOperationException("configure");
@@ -70,14 +89,14 @@ public class PropertiesContainerContext extends AbstractContainerContext
         {
             throw new ObjectNotFoundException("null");
         }
-        Object value = MuleManager.getInstance().getProperty(key.toString());
+        Object value = RegistryContext.getRegistry().getProperty(key.toString());
         if (value == null)
         {
             throw new ObjectNotFoundException(key.toString());
         }
         if (value instanceof String && enableTemplates)
         {
-            value = templateParser.parse(MuleManager.getInstance().getProperties(), value.toString());
+            value = templateParser.parse(managementContext.getProperties(), value.toString());
         }
         return value;
     }
@@ -99,7 +118,7 @@ public class PropertiesContainerContext extends AbstractContainerContext
                 entry = (Map.Entry)iterator.next();
                 value = entry.getValue().toString();
                 value = templateParser.parse(systemProperties, value);
-                value = templateParser.parse(MuleManager.getInstance().getProperties(), value);
+                value = templateParser.parse(managementContext.getProperties(), value);
                 System.setProperty(entry.getKey().toString(), value);
             }
         }
@@ -112,8 +131,8 @@ public class PropertiesContainerContext extends AbstractContainerContext
             {
                 entry = (Map.Entry)iterator.next();
                 value = entry.getValue().toString();
-                value = templateParser.parse(MuleManager.getInstance().getProperties(), value.toString());
-                MuleManager.getInstance().setProperty(entry.getKey(), value);
+                value = templateParser.parse(managementContext.getProperties(), value.toString());
+                managementContext.getRegistry().setProperty(entry.getKey(), value);
             }
         }
     }
@@ -126,18 +145,6 @@ public class PropertiesContainerContext extends AbstractContainerContext
     public void setProperties(Map properties)
     {
         this.properties = properties;
-        if (properties != null)
-        {
-            Map.Entry entry;
-            String value;
-            for (Iterator iterator = properties.entrySet().iterator(); iterator.hasNext();)
-            {
-                entry = (Map.Entry)iterator.next();
-                value = entry.getValue().toString();
-                value = templateParser.parse(MuleManager.getInstance().getProperties(), value);
-                MuleManager.getInstance().setProperty(entry.getKey(), value);
-            }
-        }
     }
 
 

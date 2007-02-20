@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id:MultipleSpringContextsTestCase.java 5187 2007-02-16 18:00:42Z rossmason $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -10,10 +10,8 @@
 
 package org.mule.test.spring;
 
-import org.mule.MuleManager;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.manager.UMOContainerContext;
-import org.mule.umo.manager.UMOManager;
 
 public class MultipleSpringContextsTestCase extends FunctionalTestCase
 {
@@ -25,10 +23,7 @@ public class MultipleSpringContextsTestCase extends FunctionalTestCase
 
     public void testMultiptleSpringContexts() throws Exception
     {
-        // initialize the manager
-        UMOManager manager = MuleManager.getInstance();
-
-        UMOContainerContext context = manager.getContainerContext();
+        UMOContainerContext context =managementContext.getRegistry().getContainerContext();
         assertNotNull(context);
         Object bowl1 = context.getComponent("org.mule.tck.testmodels.fruit.FruitBowl");
         assertNotNull(bowl1);

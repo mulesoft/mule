@@ -10,19 +10,21 @@
 
 package org.mule.impl.internal.admin;
 
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
+import org.mule.impl.AbstractAgent;
 import org.mule.impl.AlreadyInitialisedException;
-import org.mule.impl.model.ModelHelper;
+import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.impl.model.ModelHelper;
 import org.mule.providers.service.TransportFactory;
 import org.mule.transformers.wire.SerializationWireFormat;
 import org.mule.transformers.wire.WireFormat;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
+import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.UMOAgent;
-import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.UMOConnector;
 
 import org.apache.commons.lang.StringUtils;
@@ -33,7 +35,7 @@ import org.apache.commons.logging.LogFactory;
  * <code>MuleAdminAgent</code> manages the server endpoint that receives Admin and
  * remote client requests
  */
-public class MuleAdminAgent implements UMOAgent
+public class MuleAdminAgent extends AbstractAgent
 {
     public static final String DEFAULT_MANAGER_ENDPOINT = "_muleManagerEndpoint";
 
@@ -48,24 +50,10 @@ public class MuleAdminAgent implements UMOAgent
 
     private String serverUri;
 
-    /**
-     * Gets the name of this agent
-     * 
-     * @return the agent name
-     */
-    public String getName()
-    {
-        return AGENT_NAME;
-    }
 
-    /**
-     * Sets the name of this agent
-     * 
-     * @param name the name of the agent
-     */
-    public void setName(String name)
+    public MuleAdminAgent()
     {
-        // not allowed
+        super(AGENT_NAME);
     }
 
     /**
@@ -103,14 +91,12 @@ public class MuleAdminAgent implements UMOAgent
         // nothing to do (yet?)
     }
 
-    public void initialise() throws InitialisationException
+    public void doInitialise(UMOManagementContext managementContext) throws InitialisationException
     {
         if (wireFormat == null)
         {
             wireFormat = new SerializationWireFormat();
         }
-        //TODO RM* serverUri = MuleManager.getConfiguration().getServerUrl();
-        UMOManager manager = MuleManager.getInstance();
 
         try
         {
@@ -121,7 +107,7 @@ public class MuleAdminAgent implements UMOAgent
                             + "<mule:admin-agent serverUri=\"tcp://example.com:60504\"/> ");
 
                 // abort the agent registration process
-                manager.unregisterAgent(this.getName());
+               managementContext.getRegistry().unregisterAgent(this.getName());
 
                 return;
             }
@@ -133,28 +119,37 @@ public class MuleAdminAgent implements UMOAgent
             }
             else
             {
-                if (manager.lookupConnector(DEFAULT_MANAGER_ENDPOINT) != null)
+                if (managementContext.getRegistry().lookupConnector(DEFAULT_MANAGER_ENDPOINT) != null)
                 {
                     throw new AlreadyInitialisedException("Server Components", this);
                 }
 
+
                 // Check to see if we have an endpoint identifier
-                serverUri = MuleManager.getInstance().lookupEndpointIdentifier(serverUri,
-                    serverUri);
-                UMOEndpointURI endpointUri = new MuleEndpointURI(serverUri);
-                UMOConnector connector = TransportFactory.getOrCreateConnectorByProtocol(endpointUri);
-                // If this connector has already been initialised i.e. it's a
-                // pre-existing connector not not reinit
-                if (manager.lookupConnector(connector.getName()) == null)
+                UMOEndpoint endpoint = managementContext.getRegistry().lookupEndpoint(serverUri);
+                if(endpoint==null)
                 {
-                    connector.setName(DEFAULT_MANAGER_ENDPOINT);
-                    connector.initialise();
-                    manager.registerConnector(connector);
+                    UMOEndpointURI endpointUri = new MuleEndpointURI(serverUri);
+                    UMOConnector connector = TransportFactory.getOrCreateConnectorByProtocol(endpointUri);
+                    // If this connector has already been initialised i.e. it's a
+                    // pre-existing connector not not reinit
+                    if (managementContext.getRegistry().lookupConnector(connector.getName()) == null)
+                    {
+                        connector.setName(DEFAULT_MANAGER_ENDPOINT);
+                        connector.initialise(managementContext);
+                        managementContext.getRegistry().registerConnector(connector);
+                    }
+                    endpoint = new MuleEndpoint();
+                    endpoint.setConnector(connector);
+                    endpoint.setEndpointURI(endpointUri);
                 }
 
+
                 logger.info("Registering Admin listener on: " + serverUri);
-                UMODescriptor descriptor = MuleManagerComponent.getDescriptor(connector, endpointUri,
-                    wireFormat);
+                UMODescriptor descriptor = MuleManagerComponent.getDescriptor(endpoint, wireFormat,
+                        RegistryContext.getConfiguration().getDefaultEncoding(),
+                        RegistryContext.getConfiguration().getDefaultSynchronousEventTimeout());
+
                 ModelHelper.registerSystemComponent(descriptor);
             }
         }

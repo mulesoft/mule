@@ -38,7 +38,7 @@ public class SimpleRetryConnectionStrategy extends AbstractConnectionStrategy
             ((AtomicInteger)get()).set(0);
         }
 
-        // @Override
+        // //@Override
         protected Object initialValue()
         {
             return new AtomicInteger(0);

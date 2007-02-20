@@ -16,12 +16,13 @@ public class SpiUtilsTestCase extends TestCase
 {
     //TODO TC: Add equivilent test cases for the new service discovery stuff
 
-//    public void testDiscoverDefault() throws Exception
-//    {
+    public void testDiscoverDefault() throws Exception
+    {
+        assertTrue(true);
 //        Class c = SpiUtils.findService(Fruit.class, Banana.class.getName(), getClass());
 //        assertNotNull(c);
 //        assertEquals(Banana.class.getName(), c.getName());
-//    }
+    }
 //
 //    public void testDiscoverNotFound() throws Exception
 //    {

@@ -11,7 +11,7 @@
 package org.mule.providers.http;
 
 
-import org.mule.MuleManager;
+import org.mule.util.FileUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -190,7 +190,8 @@ public class HttpRequest
         }
         else
         {
-            return MuleManager.getConfiguration().getDefaultEncoding();
+            //TODO return RegistryContext.getConfiguration().getDefaultEncoding();
+            return FileUtils.DEFAULT_ENCODING;
         }
     }
 

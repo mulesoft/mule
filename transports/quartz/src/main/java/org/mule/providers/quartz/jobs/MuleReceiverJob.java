@@ -10,9 +10,7 @@
 
 package org.mule.providers.quartz.jobs;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractConnector;
@@ -21,6 +19,9 @@ import org.mule.providers.NullPayload;
 import org.mule.providers.quartz.QuartzConnector;
 import org.mule.providers.quartz.QuartzMessageReceiver;
 import org.mule.umo.manager.ObjectNotFoundException;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -49,7 +50,7 @@ public class MuleReceiverJob implements Job
         if (connectorName == null)
             throw new JobExecutionException(new Message("quartz", 6).getMessage());
 
-        AbstractConnector connector = (AbstractConnector)MuleManager.getInstance().lookupConnector(connectorName);
+        AbstractConnector connector = (AbstractConnector) RegistryContext.getRegistry().lookupConnector(connectorName);
         if (connector == null)
             throw new JobExecutionException(new Message("quartz", 7, connectorName).getMessage());
 
@@ -81,7 +82,7 @@ public class MuleReceiverJob implements Job
                     }
                     else 
                     {
-                        payload = MuleManager.getInstance().getContainerContext().getComponent(ref);
+                        payload = RegistryContext.getRegistry().getContainerContext().getComponent(ref);
                     }
                 }
                 catch (ObjectNotFoundException e)

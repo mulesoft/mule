@@ -15,12 +15,13 @@ import org.mule.routing.AbstractRouterCollection;
 import org.mule.transaction.TransactionCallback;
 import org.mule.transaction.TransactionTemplate;
 import org.mule.umo.MessagingException;
+import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.RoutingException;
-import org.mule.umo.routing.UMOOutboundRouterCollection;
 import org.mule.umo.routing.UMOOutboundRouter;
+import org.mule.umo.routing.UMOOutboundRouterCollection;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -56,8 +57,9 @@ public class OutboundRouterCollection extends AbstractRouterCollection implement
                 matchfound = true;
                 // Manage outbound only transactions here
                 final UMOOutboundRouter router = umoOutboundRouter;
+                UMODescriptor descriptor = session.getComponent().getDescriptor();
                 TransactionTemplate tt = new TransactionTemplate(umoOutboundRouter.getTransactionConfig(),
-                    session.getComponent().getDescriptor().getExceptionListener());
+                    descriptor.getExceptionListener(), descriptor.getManagementContext());
 
                 TransactionCallback cb = new TransactionCallback()
                 {

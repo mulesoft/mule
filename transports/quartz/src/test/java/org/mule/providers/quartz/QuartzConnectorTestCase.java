@@ -31,7 +31,7 @@ public class QuartzConnectorTestCase extends AbstractConnectorTestCase
     {
         QuartzConnector c = new QuartzConnector();
         c.setName("QuartzConnector");
-        c.initialise();
+        c.initialise(managementContext);
         return c;
     }
 

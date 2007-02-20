@@ -27,7 +27,7 @@ public class Pop3MessageDispatcherFactory extends AbstractMessageDispatcherFacto
     /**
      * By default client connections to POP3 are closed after the request.
      */
-    // @Override
+    // //@Override
     public boolean isCreateDispatcherPerRequest()
     {
         return true;

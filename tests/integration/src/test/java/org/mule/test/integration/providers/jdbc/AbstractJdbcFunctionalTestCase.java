@@ -10,7 +10,6 @@
 
 package org.mule.test.integration.providers.jdbc;
 
-import org.mule.MuleManager;
 import org.mule.config.PoolingProfile;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.model.seda.SedaModel;
@@ -54,18 +53,16 @@ public abstract class AbstractJdbcFunctionalTestCase extends AbstractMuleTestCas
 
     protected void doSetUp() throws Exception
     {
-        // Create a new mule manager
-        manager = MuleManager.getInstance();
         // Make sure we are running synchronously
-        MuleManager.getConfiguration().setDefaultSynchronousEndpoints(true);
+        RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(true);
         SedaModel model = new SedaModel();
         model.setName("main");
         model.getPoolingProfile().setInitialisationPolicy(
             PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
-        MuleManager.getInstance().registerModel(model);
+        managementContext.getRegistry().registerModel(model);
         // Create and register connector
         connector = createConnector();
-        MuleManager.getInstance().registerConnector(connector);
+        managementContext.getRegistry().registerConnector(connector);
         // Empty table
         emptyTable();
     }

@@ -13,7 +13,11 @@ package org.mule.umo.lifecycle;
 import org.mule.umo.UMOException;
 
 /**
- * <code>Startable</code> TODO (document class)
+ * <code>Startable</code> provides an object with a {@link #start()} method
+ * which gets called when the Mule instance gets started.  This is mostly used by
+ * infrastructure components, but can also be implemented by service objects
+ *
+ * @see UMOLifecycleAdapter
  */
 public interface Startable
 {

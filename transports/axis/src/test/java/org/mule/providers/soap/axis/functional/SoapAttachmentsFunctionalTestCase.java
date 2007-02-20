@@ -10,7 +10,7 @@
 
 package org.mule.providers.soap.axis.functional;
 
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.config.PoolingProfile;
 import org.mule.impl.ImmutableMuleEndpoint;
 import org.mule.impl.MuleEvent;
@@ -34,19 +34,18 @@ import javax.activation.FileDataSource;
 public class SoapAttachmentsFunctionalTestCase extends AbstractProviderFunctionalTestCase
 {
 
-    // @Override
+    // //@Override
     protected void doSetUp() throws Exception
     {
-        manager = MuleManager.getInstance();
         // Make sure we are running synchronously
-        MuleManager.getConfiguration().setDefaultSynchronousEndpoints(true);
+        RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(true);
 
         SedaModel model = new SedaModel();
         model.getPoolingProfile().setInitialisationPolicy(
             PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
 
         model.setName("main");
-        manager.registerModel(model);
+       managementContext.getRegistry().registerModel(model);
         callbackCalled = false;
         callbackCount = 0;
         connector = createConnector();
@@ -78,7 +77,7 @@ public class SoapAttachmentsFunctionalTestCase extends AbstractProviderFunctiona
         return connector;
     }
 
-    // @Override
+    // //@Override
     public void testSend() throws Exception
     {
         descriptor = getTestDescriptor("testComponent", SoapAttachmentsFunctionalTestComponent.class
@@ -86,7 +85,7 @@ public class SoapAttachmentsFunctionalTestCase extends AbstractProviderFunctiona
 
         initialiseComponent(descriptor, null);
         // Start the server
-        MuleManager.getInstance().start();
+        managementContext.start();
 
         sendTestData(5);
 

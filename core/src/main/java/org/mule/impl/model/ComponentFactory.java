@@ -10,7 +10,6 @@
 
 package org.mule.impl.model;
 
-import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleDescriptor;
@@ -18,7 +17,6 @@ import org.mule.impl.container.ContainerKeyPair;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.UMOManager;
 import org.mule.util.BeanUtils;
 
 /**
@@ -36,7 +34,6 @@ public class ComponentFactory
      */
     public static Object createComponent(UMODescriptor descriptor) throws UMOException
     {
-        UMOManager manager = MuleManager.getInstance();
         Object impl = descriptor.getImplementation();
         Object component;
 
@@ -46,7 +43,7 @@ public class ComponentFactory
         }
         if (impl instanceof ContainerKeyPair)
         {
-            component = manager.getContainerContext().getComponent(impl);
+            component = descriptor.getManagementContext().getRegistry().lookupObject(impl);
 
             if (descriptor.isSingleton())
             {

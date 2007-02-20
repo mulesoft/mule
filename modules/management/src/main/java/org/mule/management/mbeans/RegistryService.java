@@ -10,7 +10,6 @@
 
 package org.mule.management.mbeans;
 
-import org.mule.MuleManager;
 import org.mule.registry.Registry;
 import org.mule.umo.UMOException;
 
@@ -22,9 +21,9 @@ public class RegistryService implements RegistryServiceMBean
 {
     private Registry registry;
 
-    public RegistryService()
+    public RegistryService(Registry registry)
     {
-        registry = MuleManager.getInstance().getRegistry();
+        this.registry = registry;
     }
 
     public void start() throws UMOException

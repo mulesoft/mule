@@ -10,6 +10,14 @@
 
 package org.mule.transformers.xml;
 
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.umo.UMOManagementContext;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.transformer.TransformerException;
+import org.mule.umo.transformer.UMOTransformer;
+import org.mule.util.IOUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -24,12 +32,6 @@ import javax.xml.transform.stream.StreamSource;
 import org.apache.commons.pool.BasePoolableObjectFactory;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.impl.StackObjectPool;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.transformer.TransformerException;
-import org.mule.umo.transformer.UMOTransformer;
-import org.mule.util.IOUtils;
 
 /**
  * <code>XsltTransformer</code> performs an XSLT transform on a DOM (or other
@@ -58,9 +60,10 @@ public class XsltTransformer extends AbstractXmlTransformer
     }
 
     /**
-     * @see org.mule.umo.lifecycle.Initialisable#initialise()
+     *
+     * @param managementContext
      */
-    public void initialise() throws InitialisationException
+    public void initialise(UMOManagementContext managementContext) throws InitialisationException
     {
         try
         {
@@ -180,22 +183,6 @@ public class XsltTransformer extends AbstractXmlTransformer
         }
     }
 
-    public Object clone() throws CloneNotSupportedException
-    {
-        XsltTransformer x = (XsltTransformer)super.clone();
-        try
-        {
-            if (x.nextTransformer == null)
-            {
-                x.initialise();
-            }
-        }
-        catch (Exception e)
-        {
-            throw new CloneNotSupportedException(e.getMessage());
-        }
-        return x;
-    }
 
     private class DefaultErrorListener implements ErrorListener
     {

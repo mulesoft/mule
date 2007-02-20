@@ -10,7 +10,6 @@
 
 package org.mule.providers.jms;
 
-import org.mule.MuleManager;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -136,7 +135,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
         try
         {
-            MuleManager.getInstance().registerListener(this, getName());
+            managementContext.registerListener(this, getName());
         }
         catch (NotificationException nex)
         {
@@ -235,9 +234,9 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
         if (connectionFactory != null && connectionFactory instanceof XAConnectionFactory)
         {
-            if (MuleManager.getInstance().getTransactionManager() != null)
+            if (managementContext.getTransactionManager() != null)
             {
-                connectionFactory = new ConnectionFactoryWrapper(connectionFactory, MuleManager.getInstance()
+                connectionFactory = new ConnectionFactoryWrapper(connectionFactory, managementContext
                     .getTransactionManager());
             }
         }
@@ -270,7 +269,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
                     final JmsConnector jmsConnector = JmsConnector.this;
                     try
                     {
-                        jmsConnector.stopConnector();
+                        jmsConnector.stop();
                         jmsConnector.initialised.set(false);
                     }
                     catch (UMOException e)
@@ -281,8 +280,8 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
                     try
                     {
                         connectionStrategy.connect(jmsConnector);
-                        jmsConnector.initialise();
-                        jmsConnector.startConnector();
+                        jmsConnector.initialise(managementContext);
+                        jmsConnector.start();
                     }
                     catch (FatalConnectException fcex)
                     {
@@ -723,7 +722,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
     public ReplyToHandler getReplyToHandler()
     {
-        return new JmsReplyToHandler(this, defaultResponseTransformer);
+        return new JmsReplyToHandler(this, getDefaultResponseTransformer());
     }
 
     public String getUsername()

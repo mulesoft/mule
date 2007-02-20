@@ -32,14 +32,14 @@ public class PollingTestCase extends AbstractIntegrationTestCase {
 
         // We have to start the model _after_ the queues have been created, otherwise
         // the connector will try to create them dynamically.
-        manager.getModel().startComponent("PassThrough");
+       managementContext.getModel().startComponent("PassThrough");
     }
 
     public synchronized void tearDown() throws Exception {
         // We delete the receivers in order to drop all connections to the Oracle queues.
         // Otherwise we'll get an "ORA-00054: resource busy and acquire with NOWAIT specified"
         // exception when trying to drop the queues.
-        manager.dispose();
+       managementContext.dispose();
         wait(2000);
 
         // TODO For some reason there are still open connections at this point which

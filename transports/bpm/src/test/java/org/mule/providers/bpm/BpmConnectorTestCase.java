@@ -33,7 +33,7 @@ public class BpmConnectorTestCase extends AbstractConnectorTestCase {
         Mock bpms = new Mock(BPMS.class);
         bpms.expect("setMessageService", c);
         c.setBpms((BPMS) bpms.proxy());
-        c.initialise();
+        c.initialise(managementContext);
         bpms.verify();
 
         return c;

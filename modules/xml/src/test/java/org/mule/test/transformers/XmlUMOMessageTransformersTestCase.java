@@ -29,14 +29,14 @@ public class XmlUMOMessageTransformersTestCase extends AbstractXmlTransformerTes
 {
     private UMOMessage testObject = null;
 
-    // @Override
+    // //@Override
     protected void doSetUp() throws Exception
     {
         RequestContext.setEvent(new MuleEvent(testObject, getTestEndpoint("test", "sender"), MuleTestUtils
             .getTestSession(), true));
     }
 
-    // @Override
+    // //@Override
     protected void doTearDown() throws Exception
     {
         RequestContext.clear();
@@ -103,7 +103,7 @@ public class XmlUMOMessageTransformersTestCase extends AbstractXmlTransformerTes
      * generated XML and compare them as objects. An alternative approach would be to
      * use XPath via XMLUnit - if I knew XPath..
      */
-    // @Override
+    // //@Override
     public boolean compareResults(Object expected, Object result)
     {
         if (!super.compareResults(expected, result))
@@ -125,7 +125,7 @@ public class XmlUMOMessageTransformersTestCase extends AbstractXmlTransformerTes
         return true;
     }
 
-    // @Override
+    // //@Override
     public boolean compareRoundtripResults(Object expected, Object result)
     {
         if (expected == null && result == null)

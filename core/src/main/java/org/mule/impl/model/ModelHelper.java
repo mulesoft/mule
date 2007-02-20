@@ -9,7 +9,7 @@
  */
 package org.mule.impl.model;
 
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
@@ -31,7 +31,7 @@ public class ModelHelper
     
     public static boolean isComponentRegistered(String name)
     {
-        for (Iterator iterator = MuleManager.getInstance().getModels().values().iterator(); iterator.hasNext();)
+        for (Iterator iterator = RegistryContext.getRegistry().getModels().values().iterator(); iterator.hasNext();)
         {
             UMOModel m =  (UMOModel)iterator.next();
             if(m.isComponentRegistered(name))
@@ -44,7 +44,7 @@ public class ModelHelper
 
     public static UMOComponent getComponent(String name)
     {
-        for (Iterator iterator = MuleManager.getInstance().getModels().values().iterator(); iterator.hasNext();)
+        for (Iterator iterator = RegistryContext.getRegistry().getModels().values().iterator(); iterator.hasNext();)
         {
             UMOModel m =  (UMOModel)iterator.next();
             if(m.isComponentRegistered(name))
@@ -57,7 +57,7 @@ public class ModelHelper
 
     public static UMODescriptor getDescriptor(String name)
     {
-        for (Iterator iterator = MuleManager.getInstance().getModels().values().iterator(); iterator.hasNext();)
+        for (Iterator iterator = RegistryContext.getRegistry().getModels().values().iterator(); iterator.hasNext();)
         {
             UMOModel m =  (UMOModel)iterator.next();
             if(m.isComponentRegistered(name))
@@ -71,12 +71,12 @@ public class ModelHelper
     //TODO RM*: Move this method
     public static void registerSystemComponent(UMODescriptor d) throws UMOException
     {
-        UMOModel model = MuleManager.getInstance().lookupModel(SYSTEM_MODEL);
+        UMOModel model = RegistryContext.getRegistry().lookupModel(SYSTEM_MODEL);
         if(model==null)
         {
             model = ModelFactory.createModel("seda");
             model.setName(SYSTEM_MODEL);
-            MuleManager.getInstance().registerModel(model);
+            RegistryContext.getRegistry().registerModel(model);
         }
         model.registerComponent(d);
     }

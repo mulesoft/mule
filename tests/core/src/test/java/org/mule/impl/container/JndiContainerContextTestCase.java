@@ -18,11 +18,11 @@ import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.manager.UMOContainerContext;
 
-import javax.naming.Context;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.naming.Context;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -53,7 +53,7 @@ public class JndiContainerContextTestCase extends AbstractContainerContextTestCa
         Map env = new HashMap();
         env.put(Context.INITIAL_CONTEXT_FACTORY, MuleInitialContextFactory.class.getName());
         context.setEnvironment(env);
-        context.initialise();
+        context.initialise(managementContext);
         Context ic = context.getContext();
         ic.bind(FruitBowl.class.getName(), new FruitBowl(new Apple(), new Banana()));
         ic.bind(Apple.class.getName(), new Apple());
@@ -82,7 +82,7 @@ public class JndiContainerContextTestCase extends AbstractContainerContextTestCa
         // reset initial context
         context.setEnvironment(null);
         context.setContext(null);
-        context.initialise();
+        context.initialise(managementContext);
         Context icDefault = context.getContext();
         assertNotNull(icDefault);
         assertNotSame(icEnv, icDefault);
@@ -90,7 +90,7 @@ public class JndiContainerContextTestCase extends AbstractContainerContextTestCa
         // reset initial context (same, but empty map)
         context.setEnvironment(Collections.EMPTY_MAP);
         context.setContext(null);
-        context.initialise();
+        context.initialise(managementContext);
         icDefault = context.getContext();
         assertNotNull(icDefault);
 

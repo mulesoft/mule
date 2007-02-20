@@ -36,7 +36,7 @@ public class MuleClientJmsTestCase extends FunctionalTestCase
     // public void testClientSendDirect() throws Exception
     // {
     // MuleClient client = new MuleClient();
-    // MuleManager.getConfiguration().setSynchronous(true);
+    // RegistryContext.getConfiguration().setSynchronous(true);
     //
     // UMOMessage message = client.sendDirect("TestReceiverUMO", null, "Test Client
     // Send message", null);
@@ -47,7 +47,7 @@ public class MuleClientJmsTestCase extends FunctionalTestCase
     // public void testClientDispatchDirect() throws Exception
     // {
     // MuleClient client = new MuleClient();
-    // MuleManager.getConfiguration().setSynchronous(true);
+    // RegistryContext.getConfiguration().setSynchronous(true);
     //
     // client.dispatchDirect("TestReceiverUMO", "Test Client dispatch message",
     // null);
@@ -56,8 +56,8 @@ public class MuleClientJmsTestCase extends FunctionalTestCase
     // public void testClientSend() throws Exception
     // {
     // MuleClient client = new MuleClient();
-    // MuleManager.getConfiguration().setSynchronous(true);
-    // MuleManager.getConfiguration().setRemoteSync(true);
+    // RegistryContext.getConfiguration().setSynchronous(true);
+    // RegistryContext.getConfiguration().setRemoteSync(true);
     //
     // UMOMessage message = client.send(getDispatchUrl(), "Test Client Send message",
     // null);
@@ -68,8 +68,8 @@ public class MuleClientJmsTestCase extends FunctionalTestCase
     // public void testClientMultiSend() throws Exception
     // {
     // MuleClient client = new MuleClient();
-    // MuleManager.getConfiguration().setSynchronous(true);
-    // MuleManager.getConfiguration().setRemoteSync(true);
+    // RegistryContext.getConfiguration().setSynchronous(true);
+    // RegistryContext.getConfiguration().setRemoteSync(true);
     //
     // for (int i = 0; i < INTERATIONS; i++)
     // {
@@ -83,7 +83,7 @@ public class MuleClientJmsTestCase extends FunctionalTestCase
     // public void testClientMultiDispatch() throws Exception
     // {
     // MuleClient client = new MuleClient();
-    // MuleManager.getConfiguration().setSynchronous(false);
+    // RegistryContext.getConfiguration().setSynchronous(false);
     //
     // int i = 0;
     // // to init
@@ -101,7 +101,7 @@ public class MuleClientJmsTestCase extends FunctionalTestCase
     public void testClientDispatchAndReceiveOnReplyTo() throws Exception
     {
         MuleClient client = new MuleClient();
-        MuleManager.getConfiguration().setDefaultSynchronousEndpoints(false);
+        RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(false);
 
         Map props = new HashMap();
         props.put(JmsConstants.JMS_REPLY_TO, "replyTo.queue");

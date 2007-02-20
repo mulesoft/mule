@@ -25,7 +25,7 @@ public abstract class CorrelationAggregator extends AbstractEventAggregator
      * Creates a new EventGroup that will expect the number of events as returned by
      * {@link UMOMessageAdapter#getCorrelationGroupSize()}.
      */
-    // @Override
+    // //@Override
     protected EventGroup createEventGroup(UMOEvent event, Object groupId)
     {
         return new EventGroup(groupId, event.getMessage().getCorrelationGroupSize());

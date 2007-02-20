@@ -10,10 +10,12 @@
 
 package org.mule.impl.internal.notifications;
 
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.impl.ManagementContextAware;
 import org.mule.routing.filters.WildcardFilter;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.manager.UMOServerNotification;
@@ -42,7 +44,7 @@ import org.apache.commons.logging.LogFactory;
  * <code>ServerNotificationManager</code> manages all server listeners for a Mule
  * instance.
  */
-public class ServerNotificationManager implements Work, Disposable
+public class ServerNotificationManager implements Work, Disposable, ManagementContextAware
 {
     /**
      * logger used by this class
@@ -56,6 +58,7 @@ public class ServerNotificationManager implements Work, Disposable
     private List listeners;
     private WorkListener workListener;
     private volatile boolean disposed = false;
+    private UMOManagementContext managementContext;
 
     public ServerNotificationManager()
     {
@@ -63,7 +66,13 @@ public class ServerNotificationManager implements Work, Disposable
         eventsMap = new ConcurrentHashMap();
         eventQueue = new LinkedBlockingDeque();
         listeners = new CopyOnWriteArrayList();
-        workListener = MuleManager.getConfiguration().getDefaultWorkListener();
+    }
+
+
+    public void setManagementContext(UMOManagementContext context)
+    {
+        this.managementContext = context;
+        workListener = RegistryContext.getConfiguration().getDefaultWorkListener();
     }
 
     public void start(UMOWorkManager workManager) throws LifecycleException

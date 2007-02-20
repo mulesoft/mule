@@ -59,7 +59,7 @@ public class JdbcNonTransactionalFunctionalTestCase extends AbstractJdbcFunction
     public void testDirectSql() throws Exception
     {
         // Start the server
-        MuleManager.getInstance().start();
+        managementContext.start();
 
         MuleEndpoint muleEndpoint = new MuleEndpoint("jdbc://?sql=SELECT * FROM TEST", true);
         UMOMessage message = muleEndpoint.receive(1000);
@@ -75,7 +75,7 @@ public class JdbcNonTransactionalFunctionalTestCase extends AbstractJdbcFunction
     public void testSend() throws Exception
     {
         // Start the server
-        MuleManager.getInstance().start();
+        managementContext.start();
 
         UMOEndpointURI muleEndpoint = new MuleEndpointURI(DEFAULT_OUT_URI);
         UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(muleEndpoint,
@@ -94,7 +94,7 @@ public class JdbcNonTransactionalFunctionalTestCase extends AbstractJdbcFunction
     public void testReceive() throws Exception
     {
         // Start the server
-        MuleManager.getInstance().start();
+        managementContext.start();
 
         MuleEndpoint muleEndpoint = new MuleEndpoint(DEFAULT_IN_URI, true);
         UMOMessage message = muleEndpoint.receive(1000);
@@ -112,7 +112,7 @@ public class JdbcNonTransactionalFunctionalTestCase extends AbstractJdbcFunction
     {
         // Start the server
         initialiseComponent(null);
-        MuleManager.getInstance().start();
+        managementContext.start();
 
         execSqlUpdate("INSERT INTO TEST(ID, TYPE, DATA, ACK, RESULT) VALUES (NULL, 1, '" + DEFAULT_MESSAGE
                         + "', NULL, NULL)");

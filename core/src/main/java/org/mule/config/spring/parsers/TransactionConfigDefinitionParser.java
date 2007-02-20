@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id:TransactionConfigDefinitionParser.java 5187 2007-02-16 18:00:42Z rossmason $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -33,13 +33,13 @@ public class TransactionConfigDefinitionParser extends SimpleChildDefinitionPars
     }
 
 
-    @Override
+    //@Override
     protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
         super.parseChild(element, parserContext, builder);    //To change body of overridden methods use File | Settings | File Templates.
     }
 
-    @Override
+    //@Override
     protected void processProperty(Attr attribute, BeanDefinitionBuilder builder)
     {
          if ("factory".equals(attribute.getNodeName()))

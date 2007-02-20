@@ -10,15 +10,14 @@
 
 package org.mule.test.transaction;
 
+import org.mule.tck.AbstractMuleTestCase;
+import org.mule.transaction.XaTransaction;
+import org.mule.umo.UMOTransaction;
+
 import com.mockobjects.dynamic.Mock;
 
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
-
-import org.mule.MuleManager;
-import org.mule.tck.AbstractMuleTestCase;
-import org.mule.transaction.XaTransaction;
-import org.mule.umo.UMOTransaction;
 
 public class XaTransactionTestCase extends AbstractMuleTestCase
 {
@@ -27,7 +26,7 @@ public class XaTransactionTestCase extends AbstractMuleTestCase
     protected void doSetUp() throws Exception
     {
         TransactionManager tm = (TransactionManager)mockTm.proxy();
-        MuleManager.getInstance().setTransactionManager(tm);
+        managementContext.setTransactionManager(tm);
     }
 
     public void testBeginCommit() throws Exception
@@ -36,7 +35,7 @@ public class XaTransactionTestCase extends AbstractMuleTestCase
         mockTm.expect("begin");
         mockTm.expectAndReturn("getTransaction", mockTx.proxy());
 
-        XaTransaction tx = new XaTransaction();
+        XaTransaction tx = new XaTransaction(managementContext.getTransactionManager());
         assertFalse(tx.isBegun());
         assertEquals(UMOTransaction.STATUS_NO_TRANSACTION, tx.getStatus());
         tx.begin();

@@ -78,7 +78,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
     public void poll() throws Exception
     {
         TransactionTemplate tt = new TransactionTemplate(endpoint.getTransactionConfig(),
-            connector.getExceptionListener());
+            connector.getExceptionListener(), connector.getManagementContext());
 
         if (receiveMessagesInTransaction)
         {

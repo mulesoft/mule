@@ -12,17 +12,15 @@ package org.mule.config.builders;
 
 import org.mule.config.ConfigurationException;
 
-import javax.servlet.ServletContext;
-
 import java.io.InputStream;
+
+import javax.servlet.ServletContext;
 
 /**
  * <code>WebappMuleXmlConfigurationBuilder</code> will first try and load config
  * resources from the Servlet context. If this fails it fails back to the methods
  * used by the MuleXmlConfigurationBuilder.
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  * @see org.mule.config.builders.MuleXmlConfigurationBuilder
  */
 public class WebappMuleXmlConfigurationBuilder extends MuleXmlConfigurationBuilder

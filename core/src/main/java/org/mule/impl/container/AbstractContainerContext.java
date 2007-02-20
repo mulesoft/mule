@@ -10,7 +10,8 @@
 
 package org.mule.impl.container;
 
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.ContainerException;
 import org.mule.umo.manager.UMOContainerContext;
@@ -36,6 +37,8 @@ public abstract class AbstractContainerContext implements UMOContainerContext
 
     private String name;
 
+    protected UMOManagementContext managementContext;
+
     protected AbstractContainerContext(String name)
     {
         this.name = name;
@@ -51,9 +54,15 @@ public abstract class AbstractContainerContext implements UMOContainerContext
         this.name = name;
     }
 
-    public void initialise() throws InitialisationException
+    public final void initialise(UMOManagementContext managementContext) throws InitialisationException
     {
-        // noop
+        this.managementContext = managementContext;
+        doInitialise(managementContext);
+    }
+
+    public void doInitialise(UMOManagementContext managementContext) throws InitialisationException
+    {
+        
     }
 
     public void dispose()
@@ -104,7 +113,7 @@ public abstract class AbstractContainerContext implements UMOContainerContext
 
     protected String getDefaultEncoding()
     {
-        return MuleManager.getConfiguration().getDefaultEncoding();
+        return RegistryContext.getConfiguration().getDefaultEncoding();
     }
 
     public abstract void configure(Reader configuration) throws ContainerException;

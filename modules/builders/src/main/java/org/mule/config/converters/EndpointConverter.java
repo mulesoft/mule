@@ -10,15 +10,15 @@
 
 package org.mule.config.converters;
 
-import org.apache.commons.beanutils.ConversionException;
-import org.apache.commons.beanutils.Converter;
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.manager.UMOManager;
+
+import org.apache.commons.beanutils.ConversionException;
+import org.apache.commons.beanutils.Converter;
 
 /**
  * <code>EndpointConverter</code> TODO
@@ -38,7 +38,6 @@ public class EndpointConverter implements Converter
      */
     public Object convert(Class type, Object value)
     {
-        UMOManager manager = MuleManager.getInstance();
         if (value == null)
         {
             throw new ConversionException("No value specified");
@@ -49,8 +48,8 @@ public class EndpointConverter implements Converter
         }
         try
         {
-            String endpointString = manager.lookupEndpointIdentifier(value.toString(), value.toString());
-            UMOImmutableEndpoint globalEndpoint = (UMOImmutableEndpoint)manager.getEndpoints().get(
+            String endpointString = value.toString();
+            UMOImmutableEndpoint globalEndpoint = (UMOImmutableEndpoint)RegistryContext.getRegistry().getEndpoints().get(
                 endpointString);
             if (globalEndpoint == null)
             {

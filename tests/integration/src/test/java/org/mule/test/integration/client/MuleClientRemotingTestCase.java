@@ -37,7 +37,7 @@ public class MuleClientRemotingTestCase extends FunctionalTestCase
     // {
     // // Will connect to the server using tcp://localhost:60504
     // MuleClient client = new MuleClient();
-    // MuleManager.getConfiguration().setSynchronous(true);
+    // RegistryContext.getConfiguration().setSynchronous(true);
     //
     // RemoteDispatcher dispatcher = client.getRemoteDispatcher(getServerUrl());
     // UMOMessage message = dispatcher.sendToRemoteComponent("TestReceiverUMO", "Test
@@ -50,7 +50,7 @@ public class MuleClientRemotingTestCase extends FunctionalTestCase
     {
         // Will connect to the server using tcp://localhost:60504
         MuleClient client = new MuleClient();
-        MuleManager.getConfiguration().setDefaultSynchronousEndpoints(true);
+        RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(true);
 
         RemoteDispatcher dispatcher = client.getRemoteDispatcher(getServerUrl());
         UMOMessage message = dispatcher.sendRemote("vm://remote.endpoint?connector=vmRemoteConnector", "foo",
@@ -64,7 +64,7 @@ public class MuleClientRemotingTestCase extends FunctionalTestCase
     // String remoteEndpoint = "vm://remote.queue";
     // // Will connect to the server using tcp://localhost:60504
     // MuleClient client = new MuleClient();
-    // MuleManager.getConfiguration().setSynchronous(true);
+    // RegistryContext.getConfiguration().setSynchronous(true);
     //
     // RemoteDispatcher dispatcher = client.getRemoteDispatcher(getServerUrl());
     // UMOMessage message = dispatcher.receiveRemote(remoteEndpoint, 1000);

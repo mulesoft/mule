@@ -57,14 +57,13 @@ public class JmsReconnectionTestCase extends AbstractJmsFunctionalTestCase
 
     public ConnectionFactory getConnectionFactory() throws Exception
     {
-        if (factory == null)
-        {
-            // TODO should be non-persistent
-            factory = new ActiveMQConnectionFactory();
-            //factory.setBrokerContainerFactory(new BrokerContainerFactoryImpl(new VMPersistenceAdapter()));
-            factory.setBrokerURL(BROKER_URL);
-            //factory.start();
-        }
+//        if (factory == null)
+//        {
+//            factory = new ActiveMQConnectionFactory();
+//            factory.setBrokerContainerFactory(new BrokerContainerFactoryImpl(new VMPersistenceAdapter()));
+//            factory.setBrokerURL(BROKER_URL);
+//            factory.start();
+//        }
         return factory;
     }
 
@@ -75,15 +74,15 @@ public class JmsReconnectionTestCase extends AbstractJmsFunctionalTestCase
         // in other configs using the property below
 
         // Make sure we are running synchronously
-        MuleManager.getConfiguration().setDefaultSynchronousEndpoints(true);
+        RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(true);
         SedaModel model = new SedaModel();
         model.setName("main");
         model.getPoolingProfile().setInitialisationPolicy(
             PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
-        MuleManager.getInstance().registerModel(model);
+        //managementContext.registerModel(model);
         
         callbackCalled = false;
-        MuleManager.getInstance().registerConnector(createConnector());
+        //managementContext.registerConnector(createConnector());
         currentMsg = null;
         eventLatch1 = new Latch();
         eventLatch2 = new Latch();
@@ -147,8 +146,8 @@ public class JmsReconnectionTestCase extends AbstractJmsFunctionalTestCase
             return;
         }
 
-        MuleManager.getInstance().start();
-        MuleManager.getInstance().registerListener(this);
+        managementContext.start();
+        managementContext.registerListener(this);
 
         // Start time
         long t0, t1;
@@ -195,7 +194,7 @@ public class JmsReconnectionTestCase extends AbstractJmsFunctionalTestCase
         Thread.sleep(3000);
         MuleClient client = new MuleClient();
 
-        MuleManager.getInstance().registerListener(new FunctionalTestNotificationListener()
+        managementContext.registerListener(new FunctionalTestNotificationListener()
         {
             public void onNotification(UMOServerNotification notification)
             {

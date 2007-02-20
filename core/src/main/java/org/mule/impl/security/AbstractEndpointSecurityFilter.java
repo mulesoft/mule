@@ -10,10 +10,10 @@
 
 package org.mule.impl.security;
 
-import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -43,18 +43,18 @@ public abstract class AbstractEndpointSecurityFilter implements UMOEndpointSecur
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    private UMOSecurityManager securityManager;
+    protected UMOSecurityManager securityManager;
     private String securityProviders;
-    private UMOImmutableEndpoint endpoint;
+    protected UMOImmutableEndpoint endpoint;
     private boolean inbound = false;
     private boolean authenticate;
     private UMOCredentialsAccessor credentialsAccessor;
 
-    public final void initialise() throws InitialisationException
+    public final void initialise(UMOManagementContext managementContext) throws InitialisationException
     {
         if (securityManager == null)
         {
-            securityManager = MuleManager.getInstance().getSecurityManager();
+            securityManager = endpoint.getManagementContext().getSecurityManager();
         }
         if (securityManager == null)
         {

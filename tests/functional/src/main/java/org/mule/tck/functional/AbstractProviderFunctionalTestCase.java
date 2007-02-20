@@ -10,7 +10,7 @@
 
 package org.mule.tck.functional;
 
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
@@ -22,7 +22,6 @@ import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.manager.UMOManager;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 
@@ -33,7 +32,6 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
     protected static final int NUM_MESSAGES_TO_SEND = 100;
 
     protected UMOConnector connector;
-    protected static UMOManager manager;
     protected boolean callbackCalled = false;
     protected int callbackCount = 0;
     protected boolean transacted = false;
@@ -44,21 +42,19 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
 
     protected void doSetUp() throws Exception
     {
-        manager = MuleManager.getInstance();
         // Make sure we are running synchronously
-        MuleManager.getConfiguration().setDefaultSynchronousEndpoints(true);
-//       TODO RM* MuleManager.getConfiguration().getPoolingProfile().setInitialisationPolicy(
+        RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(true);
+//       TODO RM* RegistryContext.getConfiguration().getPoolingProfile().setInitialisationPolicy(
 //            PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
 
         UMOModel model = new SedaModel();
         model.setName("main");
-        manager.registerModel(model);
+       managementContext.getRegistry().registerModel(model);
         callbackCalled = false;
         callbackCount = 0;
         connector = createConnector();
         // Start the server
-       //TODO RM* MuleManager.getConfiguration().setServerUrl("");
-        manager.start();
+       managementContext.start();
     }
 
     protected void doTearDown() throws Exception
@@ -100,9 +96,8 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
         HashMap props = new HashMap();
         props.put("eventCallback", callback);
         descriptor.setProperties(props);
-        MuleManager.getInstance().registerConnector(connector);
-        UMOComponent component = MuleManager.getInstance().lookupModel("main").registerComponent(descriptor);
-        descriptor.initialise();
+        managementContext.getRegistry().registerConnector(connector);
+        UMOComponent component = managementContext.getRegistry().lookupModel("main").registerComponent(descriptor);
         return component;
     }
 

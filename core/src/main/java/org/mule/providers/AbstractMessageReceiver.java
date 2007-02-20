@@ -10,7 +10,7 @@
 
 package org.mule.providers;
 
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -22,7 +22,6 @@ import org.mule.impl.ResponseOutputStream;
 import org.mule.impl.internal.notifications.ConnectionNotification;
 import org.mule.impl.internal.notifications.MessageNotification;
 import org.mule.impl.internal.notifications.SecurityNotification;
-import org.mule.registry.Registration;
 import org.mule.registry.DeregistrationException;
 import org.mule.registry.RegistrationException;
 import org.mule.transaction.TransactionCoordination;
@@ -162,7 +161,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
     public void register() throws RegistrationException
     {
         registryId = 
-            MuleManager.getInstance().getRegistry().registerMuleObject(connector, this).getId();
+            RegistryContext.getRegistry().registerMuleObject(connector, this).getId();
     }
 
     /*
@@ -172,7 +171,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
      */
     public void deregister() throws DeregistrationException
     {
-        MuleManager.getInstance().getRegistry().deregisterComponent(registryId);
+        RegistryContext.getRegistry().deregisterComponent(registryId);
         registryId = null;
     }
 

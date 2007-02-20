@@ -12,6 +12,7 @@ package org.mule.transaction;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.UMOTransactionConfig;
 
@@ -26,11 +27,13 @@ public class TransactionTemplate
 
     private final UMOTransactionConfig config;
     private final ExceptionListener exceptionListener;
+    private final UMOManagementContext context;
 
-    public TransactionTemplate(UMOTransactionConfig config, ExceptionListener listener)
+    public TransactionTemplate(UMOTransactionConfig config, ExceptionListener listener, UMOManagementContext context)
     {
         this.config = config;
         exceptionListener = listener;
+        this.context = context;
     }
 
     public Object execute(TransactionCallback callback) throws Exception
@@ -64,7 +67,7 @@ public class TransactionTemplate
                             || action == UMOTransactionConfig.ACTION_BEGIN_OR_JOIN)
             {
                 logger.debug("Beginning transaction");
-                tx = config.getFactory().beginTransaction();
+                tx = config.getFactory().beginTransaction(context);
                 logger.debug("Transaction successfully started");
             }
             else

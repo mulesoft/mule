@@ -10,13 +10,13 @@
 
 package org.mule.impl.internal.notifications;
 
-import org.mule.umo.manager.UMOManager;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.manager.UMOServerNotification;
 
 /**
  * <code>ManagerNotification</code> is fired when an event such as the manager
  * starting occurs. The payload of this event will always be a reference to the
- * manager.
+ *managementContext.
  *
  * @see org.mule.MuleManager
  * @see org.mule.umo.manager.UMOManager
@@ -71,7 +71,7 @@ public class ManagerNotification extends UMOServerNotification implements Blocki
 
     protected String getPayloadToString()
     {
-        return ((UMOManager) source).getId();
+        return ((UMOManagementContext) source).getId();
     }
 
     protected String getActionName(int action)

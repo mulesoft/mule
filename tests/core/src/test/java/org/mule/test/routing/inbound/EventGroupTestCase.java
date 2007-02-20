@@ -14,7 +14,6 @@ import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.routing.inbound.EventGroup;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.tck.MuleTestUtils;
 import org.mule.umo.UMOEvent;
 import org.mule.util.UUID;
 
@@ -34,16 +33,16 @@ public class EventGroupTestCase extends AbstractMuleTestCase
         assertFalse(eg.iterator().hasNext());
 
         // add to events to start with
-        eg.addEvent(MuleTestUtils.getTestEvent("foo1"));
-        eg.addEvent(MuleTestUtils.getTestEvent("foo2"));
+        eg.addEvent(getTestEvent("foo1"));
+        eg.addEvent(getTestEvent("foo2"));
         assertTrue(eg.iterator().hasNext());
 
         // now add events while we iterate over the group
         Iterator i = eg.iterator();
         assertNotNull(i.next());
-        eg.addEvent(MuleTestUtils.getTestEvent("foo3"));
+        eg.addEvent(getTestEvent("foo3"));
         assertNotNull(i.next());
-        eg.addEvent(MuleTestUtils.getTestEvent("foo4"));
+        eg.addEvent(getTestEvent("foo4"));
         assertFalse(i.hasNext());
 
         // the added events should be in there though
@@ -151,8 +150,8 @@ public class EventGroupTestCase extends AbstractMuleTestCase
     public void testToArray() throws Exception
     {
         EventGroup eg = new EventGroup(UUID.getUUID());
-        eg.addEvent(MuleTestUtils.getTestEvent("foo1"));
-        eg.addEvent(MuleTestUtils.getTestEvent("foo2"));
+        eg.addEvent(getTestEvent("foo1"));
+        eg.addEvent(getTestEvent("foo2"));
 
         Object[] array1 = IteratorUtils.toArray(eg.iterator());
         UMOEvent[] array2 = eg.toArray();
@@ -165,7 +164,7 @@ public class EventGroupTestCase extends AbstractMuleTestCase
         String es = eg.toString();
         assertTrue(es.endsWith("events=0}"));
 
-        UMOEvent e = MuleTestUtils.getTestEvent("foo");
+        UMOEvent e = getTestEvent("foo");
         eg.addEvent(e);
         es = eg.toString();
         assertTrue(es.indexOf("events=1") != -1);

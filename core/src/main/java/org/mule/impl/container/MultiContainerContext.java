@@ -12,6 +12,7 @@ package org.mule.impl.container;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.ContainerException;
 import org.mule.umo.manager.ObjectNotFoundException;
@@ -28,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
  * <code>MultiContainerContext</code> is a container that hosts other containers
  * from which components are queried.
  */
-public class MultiContainerContext implements UMOContainerContext
+public class MultiContainerContext extends AbstractContainerContext
 {
     /**
      * logger used by this class
@@ -40,6 +41,7 @@ public class MultiContainerContext implements UMOContainerContext
 
     public MultiContainerContext()
     {
+        super("multi");
         addContainer(new MuleContainerContext());
     }
 
@@ -139,10 +141,6 @@ public class MultiContainerContext implements UMOContainerContext
         return component;
     }
 
-    public void configure(Reader configuration, String doctype, String encoding) throws ContainerException
-    {
-        // noop
-    }
 
     public void dispose()
     {
@@ -156,9 +154,19 @@ public class MultiContainerContext implements UMOContainerContext
         containers = null;
     }
 
-    public void initialise() throws InitialisationException
+
+    //@Override
+    public void doInitialise(UMOManagementContext managementContext) throws InitialisationException
     {
-        // no op
+        for (Iterator iterator = containers.values().iterator(); iterator.hasNext();)
+        {
+            UMOContainerContext context = (UMOContainerContext) iterator.next();
+            context.initialise(managementContext);
+        }
     }
 
+    public void configure(Reader configuration) throws ContainerException
+    {
+        //noop
+    }
 }

@@ -10,7 +10,7 @@
 
 package org.mule.providers.quartz;
 
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.config.i18n.Message;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.providers.quartz.jobs.DelegatingJob;
@@ -102,7 +102,7 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
                 }
                 else
                 {
-                    tempJob = MuleManager.getInstance().getContainerContext().getComponent(tempJob);
+                    tempJob = RegistryContext.getRegistry().getContainerContext().getComponent(tempJob);
                     if (!(tempJob instanceof Job))
                     {
                         throw new DispatchException(new Message("quartz", 3), event.getMessage(),

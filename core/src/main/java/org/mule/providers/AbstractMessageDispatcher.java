@@ -10,8 +10,8 @@
 
 package org.mule.providers;
 
-import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
+import org.mule.RegistryContext;
 import org.mule.config.MuleProperties;
 import org.mule.config.ThreadingProfile;
 import org.mule.config.i18n.Message;
@@ -119,8 +119,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
      */
     public void register() throws RegistrationException
     {
-        registryId = 
-            MuleManager.getInstance().getRegistry().registerMuleObject(connector, this).getId();
+        registryId = RegistryContext.getRegistry().registerMuleObject(connector, this).getId();
     }
 
     /*
@@ -130,7 +129,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
      */
     public void deregister() throws DeregistrationException
     {
-        MuleManager.getInstance().getRegistry().deregisterComponent(registryId);
+        RegistryContext.getRegistry().deregisterComponent(registryId);
         registryId = null;
     }
 

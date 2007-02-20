@@ -10,7 +10,7 @@
 
 package org.mule.providers.service;
 
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.endpoint.MuleEndpoint;
@@ -64,7 +64,7 @@ public class TransportFactory
             if (uri.getCreateConnector() == ALWAYS_CREATE_CONNECTOR)
             {
                 connector = createConnector(uri);
-                MuleManager.getInstance().registerConnector(connector);
+                RegistryContext.getRegistry().registerConnector(connector);
             }
             else if (uri.getCreateConnector() == NEVER_CREATE_CONNECTOR)
             {
@@ -72,7 +72,7 @@ public class TransportFactory
             }
             else if (uri.getConnectorName() != null)
             {
-                connector = MuleManager.getInstance().lookupConnector(uri.getConnectorName());
+                connector = RegistryContext.getRegistry().lookupConnector(uri.getConnectorName());
                 if (connector == null)
                 {
                     throw new TransportFactoryException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER,
@@ -85,7 +85,7 @@ public class TransportFactory
                 if (connector == null)
                 {
                     connector = createConnector(uri);
-                    MuleManager.getInstance().registerConnector(connector);
+                    RegistryContext.getRegistry().registerConnector(connector);
                 }
             }
         }
@@ -172,7 +172,7 @@ public class TransportFactory
                 String scheme = url.getSchemeMetaInfo();
     
                 TransportServiceDescriptor sd = (TransportServiceDescriptor) 
-                    MuleManager.getInstance().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, scheme, overrides);
+                    RegistryContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, scheme, overrides);
                 if (sd != null)
                 {
                     if (type == 0)
@@ -222,7 +222,7 @@ public class TransportFactory
             String scheme = url.getSchemeMetaInfo();
     
             TransportServiceDescriptor sd = (TransportServiceDescriptor) 
-                MuleManager.getInstance().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, scheme, null);
+                RegistryContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, scheme, null);
             if (sd == null)
             {
                 throw new ServiceException(Message.createStaticMessage("No service descriptor found for transport: " + scheme + ".  This transport does not appear to be installed."));
@@ -247,7 +247,7 @@ public class TransportFactory
             // these are set on the Manager with a protocol i.e.
             // jms.specification=1.1
             Map props = new HashMap();
-            PropertiesUtils.getPropertiesWithPrefix(MuleManager.getInstance().getProperties(),
+            PropertiesUtils.getPropertiesWithPrefix(RegistryContext.getRegistry().getProperties(),
                 connector.getProtocol().toLowerCase(), props);
             if (props.size() > 0)
             {
@@ -287,7 +287,7 @@ public class TransportFactory
             try
             {
                 BeanUtils.populate(connector, uri.getParams());
-                MuleManager.getInstance().registerConnector(connector);
+                RegistryContext.getRegistry().registerConnector(connector);
 
             }
             catch (Exception e)
@@ -307,7 +307,7 @@ public class TransportFactory
     public static UMOConnector getConnectorByProtocol(String protocol)
     {
         UMOConnector connector;
-        Map connectors = MuleManager.getInstance().getConnectors();
+        Map connectors = RegistryContext.getRegistry().getConnectors();
         for (Iterator iterator = connectors.values().iterator(); iterator.hasNext();)
         {
             connector = (UMOConnector)iterator.next();

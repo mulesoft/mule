@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id:EndpointDefinitionParser.java 5187 2007-02-16 18:00:42Z rossmason $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -69,22 +69,22 @@ public class EndpointDefinitionParser extends AbstractChildBeanDefinitionParser
         {
             return false;
         }
-        else if ("forwardingCatchAllStrategyType".equals(parent.getSchemaTypeInfo().getTypeName()))
+        else if ("forwarding-catch-all-strategy".equals(parent.getLocalName()))
         {
             return false;
         }
-        else if ("wireTapType".equals(parent.getSchemaTypeInfo().getTypeName()))
+        else if ("wire-tap".equals(parent.getLocalName()))
         {
             return false;
         }
-        else if ("nestedBindingType".equals(parent.getSchemaTypeInfo().getTypeName()))
+        else if ("binding".equals(parent.getLocalName()))
         {
             return false;
         }
         return true;
     }
 
-    @Override
+    //@Override
     protected void processProperty(Attr attribute, BeanDefinitionBuilder builder)
     {
          if (ADDRESS_ATTRIBUTE.equals(attribute.getNodeName()))
@@ -105,7 +105,7 @@ public class EndpointDefinitionParser extends AbstractChildBeanDefinitionParser
     }
 
 
-    @Override
+    //@Override
     protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
         //Check to see if this is a global endpoint

@@ -10,7 +10,6 @@
 
 package org.mule.impl;
 
-import org.mule.MuleManager;
 import org.mule.transaction.constraints.ConstraintFilter;
 import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.UMOTransactionFactory;
@@ -45,7 +44,7 @@ public class MuleTransactionConfig implements UMOTransactionConfig
 
     public MuleTransactionConfig()
     {
-        timeout = MuleManager.getConfiguration().getDefaultTransactionTimeout();
+        // todo timeout = RegistryContext.getConfiguration().getDefaultTransactionTimeout();
     }
 
     /*

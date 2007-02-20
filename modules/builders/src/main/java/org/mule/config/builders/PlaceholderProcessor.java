@@ -10,26 +10,19 @@
 
 package org.mule.config.builders;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.MuleManager;
 import org.mule.config.ConfigurationException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.security.PasswordBasedEncryptionStrategy;
-import org.mule.umo.UMOEncryptionStrategy;
-import org.mule.util.BeanUtils;
-import org.mule.util.ClassUtils;
-import org.mule.util.PropertiesUtils;
 import org.mule.util.TemplateParser;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
-
-import java.io.File;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  * Placeholders are ant-like tags that are embedded in Mule Xml configuration i.e.
@@ -86,14 +79,16 @@ public class PlaceholderProcessor
 
     public String processValue(String value) throws ConfigurationException
     {
-        return parser.parse(MuleManager.getInstance().getProperties(), value);
+        //TODO RM*
+        return null;
+        //return parser.parse(managementContext.getProperties(), value);
     }
 
     // public String processValue(String value) throws ConfigurationException {
     // String realValue = null;
     // String key = null;
     //
-    // UMOManager manager = MuleManager.getInstance();
+    // UMOManager manager = managementContext;
     //
     // parser.parse(manager.getProperties(), value);
     // int x = value.indexOf("${");
@@ -127,82 +122,5 @@ public class PlaceholderProcessor
     // return value;
     // }
 
-    protected String processEncryptedValue(String value) throws ConfigurationException
-    {
-        String scheme;
-        int x = value.indexOf("{encrypt:");
-        if (x > -1)
-        {
-            logger.debug("Value contains encrypted data.");
-            int y = value.indexOf("}");
-            if (y == -1)
-            {
-                logger.error("Encryption tag is malformed: " + value);
-                return null;
-            }
-            else
-            {
-                scheme = value.substring((x + 9), y);
-                logger.debug("look up encryption scheme: " + scheme);
-                try
-                {
-                    UMOEncryptionStrategy strategy = getEncryptionStrategy(scheme);
-                    String data = value.substring(y + 1);
-                    byte[] decrypted = strategy.decrypt(data.getBytes(), null);
-                    return new String(decrypted);
-                }
-                catch (Exception e)
-                {
-                    throw new ConfigurationException(e);
-                }
-            }
-        }
-        else
-        {
-            return value;
-        }
-    }
 
-    public UMOEncryptionStrategy getEncryptionStrategy(String scheme) throws Exception
-    {
-        if (!strategiesLoaded)
-        {
-            loadStrategies();
-        }
-        return (UMOEncryptionStrategy)schemes.get(scheme);
-    }
-
-    private void loadStrategies() throws Exception
-    {
-        String path = System.getProperty(MULE_ENCRYPTION_PROPERTIES, MuleManager.getConfiguration()
-            .getWorkingDirectory()
-                                                                     + File.separator
-                                                                     + DEFAULT_ENCRYPTION_PROPERTIES_FILE);
-
-        logger.info("Attempting to load encryption properties from: " + path);
-        Properties props = PropertiesUtils.loadProperties(path, getClass());
-
-        Map names = new HashMap();
-        PropertiesUtils.getPropertiesWithPrefix(props, "name", names);
-        String name;
-        for (Iterator iterator = names.values().iterator(); iterator.hasNext();)
-        {
-            name = (String)iterator.next();
-            Map schemeConfig = new HashMap();
-            PropertiesUtils.getPropertiesWithPrefix(props, name + ".", schemeConfig);
-            schemeConfig = PropertiesUtils.removeNamespaces(schemeConfig);
-
-            String type = (String)schemeConfig.get("type");
-            String clazz = (String)types.get(type);
-            if (clazz == null)
-            {
-                throw new IllegalArgumentException("Unknown encryption type: " + type);
-            }
-            logger.debug("Found Class: " + clazz + " for type: " + type);
-            UMOEncryptionStrategy strat = (UMOEncryptionStrategy)ClassUtils.instanciateClass(clazz,
-                ClassUtils.NO_ARGS, PlaceholderProcessor.class);
-            BeanUtils.populateWithoutFail(strat, schemeConfig, true);
-            schemes.put(name, strat);
-        }
-    }
 }

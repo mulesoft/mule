@@ -62,18 +62,6 @@
                 <jdk>1.5</jdk>
             </activation>
             <dependencies>
-                <!-- Used by MuleXmlConfigurationBuilder -->
-                <dependency>
-                    <groupId>commons-digester</groupId>
-                    <artifactId>commons-digester</artifactId>
-                    <version>1.7</version>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>xml-apis</groupId>
-                            <artifactId>xml-apis</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
             </dependencies>
         </profile>
     </profiles>

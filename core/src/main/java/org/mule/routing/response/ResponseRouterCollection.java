@@ -62,7 +62,10 @@ public class ResponseRouterCollection extends AbstractRouterCollection implement
         UMOMessage result = null;
         if (routers.size() == 0)
         {
-            logger.warn("There are no routers configured on the response router. Returning the current message");
+            if(logger.isDebugEnabled())
+            {
+                logger.debug("There are no routers configured on the response router. Returning the current message");
+            }
             result = message;
         }
         else

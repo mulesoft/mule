@@ -10,13 +10,14 @@
 
 package org.mule.config;
 
-import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
+import org.mule.RegistryContext;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.ConnectionStrategy;
 import org.mule.providers.SingleAttemptConnectionStrategy;
 import org.mule.umo.manager.DefaultWorkListener;
+import org.mule.util.UUID;
 
 import java.io.File;
 import java.io.IOException;
@@ -189,6 +190,8 @@ public class MuleConfiguration
     {
         super();
         setWorkingDirectory(DEFAULT_WORKING_DIRECTORY);
+        setId(UUID.getUUID());
+        setDomainId("org.mule");
     }
 
     /**
@@ -539,7 +542,10 @@ public class MuleConfiguration
 
     private void updateApplicationProperty(String name, Object value)
     {
-        if(MuleManager.isInstanciated()) MuleManager.getInstance().setProperty(name, value);
+        if(RegistryContext.getRegistry()!=null)
+        {
+            RegistryContext.getRegistry().setProperty(name, value);
+        }
     }
 
 

@@ -10,6 +10,8 @@
 
 package org.mule.management.support;
 
+import org.mule.umo.UMOManagementContext;
+
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
@@ -37,7 +39,7 @@ public interface JmxSupport
      * </ul>
      * @return JMX domain name
      */
-    String getDomainName();
+    String getDomainName(UMOManagementContext context);
 
     /**
      * Create an object name. May cache the result.

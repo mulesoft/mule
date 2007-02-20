@@ -205,7 +205,7 @@ public class JmsTransformersTestCase extends AbstractMuleTestCase
             transformerSession = session;
         }
 
-        // @Override
+        // //@Override
         protected Session getSession()
         {
             return transformerSession;

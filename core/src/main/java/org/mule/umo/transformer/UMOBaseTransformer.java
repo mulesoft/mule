@@ -20,7 +20,7 @@ import java.io.Serializable;
  * object type to another.
 
  */
-public interface UMOBaseTransformer extends Initialisable, Serializable, Cloneable, Registerable
+public interface UMOBaseTransformer extends Initialisable, Serializable, Registerable
 {
     /**
      * The endpoint that this transformer is attached to
@@ -43,8 +43,5 @@ public interface UMOBaseTransformer extends Initialisable, Serializable, Cloneab
      * @return the logical name of the transformer
      */
     String getName();
-
-    // TODO RM*: This can be removed for Mule 2.0 (we'll use Spring bean prototypes)
-    Object clone() throws CloneNotSupportedException;
 
 }

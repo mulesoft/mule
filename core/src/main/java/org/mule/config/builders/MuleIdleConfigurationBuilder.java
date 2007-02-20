@@ -10,11 +10,10 @@
 
 package org.mule.config.builders;
 
-import org.mule.MuleServer;
 import org.mule.config.ConfigurationException;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.manager.UMOAgent;
-import org.mule.umo.manager.UMOManager;
 import org.mule.util.ClassUtils;
 
 /**
@@ -33,18 +32,10 @@ public class MuleIdleConfigurationBuilder extends QuickConfigurationBuilder
     private boolean configured = false;
 
     /**
-     * Constructs a default builder
      */
-    public MuleIdleConfigurationBuilder()
+    public MuleIdleConfigurationBuilder() throws UMOException
     {
         super();
-    }
-
-    /**
-     */
-    public MuleIdleConfigurationBuilder(boolean disposeCurrent)
-    {
-        super(disposeCurrent);
     }
 
     public boolean isConfigured()
@@ -52,34 +43,33 @@ public class MuleIdleConfigurationBuilder extends QuickConfigurationBuilder
         return configured;
     }
 
-    public UMOManager configure(String configResources, String startupPropertiesFile)
+    public UMOManagementContext configure(String configResources, String startupPropertiesFile)
         throws ConfigurationException
     {
         try
         {
             Class scannerAgentClass = ClassUtils.loadClass("org.mule.impl.internal.admin.ConfigScannerAgent", MuleIdleConfigurationBuilder.class);
             UMOAgent scannerAgent = (UMOAgent)scannerAgentClass.newInstance();
-            manager.registerAgent(scannerAgent);
+           managementContext.getRegistry().registerAgent(scannerAgent);
 
             Class jmxAgentClass = ClassUtils.loadClass("org.mule.management.agents.JmxAgent", MuleIdleConfigurationBuilder.class);
             UMOAgent jmxAgent = (UMOAgent)jmxAgentClass.newInstance();
             jmxAgent.setName("jmxAgent");
-            manager.registerAgent(jmxAgent);
+           managementContext.getRegistry().registerAgent(jmxAgent);
 
             Class mx4jAgentClass = ClassUtils.loadClass("org.mule.management.agents.Mx4jAgent", MuleIdleConfigurationBuilder.class);
             UMOAgent mx4jAgent = (UMOAgent)mx4jAgentClass.newInstance();
             mx4jAgent.setName("mx4jAgent");
-            manager.registerAgent(mx4jAgent);
+           managementContext.getRegistry().registerAgent(mx4jAgent);
         }
         catch (Exception e)
         {
-            // TODO: change
-            System.err.println(e.toString());
+            throw new ConfigurationException(e);
         }
 
         try
         {
-            manager.start();
+           managementContext.start();
         }
         catch (UMOException umoe)
         {
@@ -87,7 +77,7 @@ public class MuleIdleConfigurationBuilder extends QuickConfigurationBuilder
         }
 
         configured = true;
-        return manager;
+        return managementContext;
     }
 }
 

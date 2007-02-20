@@ -10,7 +10,6 @@
 
 package org.mule.providers.jms;
 
-import org.mule.MuleManager;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.tck.providers.AbstractMessageReceiverTestCase;
@@ -30,7 +29,7 @@ public class JmsMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 
     protected void doSetUp() throws Exception
     {
-        MuleManager.getInstance().registerConnector(getConnector());
+        managementContext.getRegistry().registerConnector(getConnector());
         super.doSetUp();
     }
 

@@ -10,8 +10,8 @@
 
 package org.mule.config;
 
-import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
+import org.mule.RegistryContext;
 import org.mule.config.i18n.Message;
 import org.mule.providers.service.TransportServiceDescriptor;
 import org.mule.registry.ServiceDescriptorFactory;
@@ -185,21 +185,28 @@ public class ExceptionHelper
             TransportServiceDescriptor sd;
             try 
             {
-                sd = (TransportServiceDescriptor) MuleManager.getInstance().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, protocol, null);
+                sd = (TransportServiceDescriptor) RegistryContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, protocol, null);
                 if (sd == null)
                 {
                     throw new ServiceException(Message.createStaticMessage("No service descriptor found for transport: " + protocol + ".  This transport does not appear to be installed."));
                 }
                 Properties p = sd.getExceptionMappings();
-                errorMappings.put(protocol, p);
-                String applyTo = p.getProperty(APPLY_TO_PROPERTY, null);
-                if (applyTo != null)
+                if(p!=null)
                 {
-                    String[] protocols = StringUtils.splitAndTrim(applyTo, ",");
-                    for (int i = 0; i < protocols.length; i++)
+                    errorMappings.put(protocol, p);
+                    String applyTo = p.getProperty(APPLY_TO_PROPERTY, null);
+                    if (applyTo != null)
                     {
-                        errorMappings.put(protocols[i], p);
+                        String[] protocols = StringUtils.splitAndTrim(applyTo, ",");
+                        for (int i = 0; i < protocols.length; i++)
+                        {
+                            errorMappings.put(protocols[i], p);
+                        }
                     }
+                }
+                else
+                {
+                    p = new Properties();
                 }
                 return p;
             }

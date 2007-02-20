@@ -34,7 +34,6 @@ public class AttachmentsPropagationTestCase extends TestCase implements EventCal
     protected void setUp() throws Exception
     {
         builder = new QuickConfigurationBuilder();
-        builder.createStartedManager(false, null);
 
         UMOEndpoint vmSingle = builder.createEndpoint("vm://Single", "SingleEndpoint", true);
         UMOEndpoint vmChained = builder.createEndpoint("vm://Chained", "ChainedEndpoint", true);
@@ -51,7 +50,7 @@ public class AttachmentsPropagationTestCase extends TestCase implements EventCal
 
     protected void tearDown() throws Exception
     {
-        builder.disposeCurrent();
+        builder.getManagementContext().dispose();
     }
 
     public void eventReceived(UMOEventContext context, Object Component) throws Exception

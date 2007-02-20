@@ -11,7 +11,6 @@
 package org.mule.tck.providers;
 
 import org.mule.MuleException;
-import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
@@ -22,7 +21,6 @@ import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.manager.UMOManager;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
@@ -53,12 +51,11 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
      */
     protected void doSetUp() throws Exception
     {
-        UMOManager manager = getManager(true);
         model = new SedaModel();
         model.setName("default");
-        manager.registerModel(model);
+       managementContext.getRegistry().registerModel(model);
         descriptor = getTestDescriptor("apple", Apple.class.getName());
-        MuleManager.getInstance().start();
+        managementContext.start();
         connector = getConnector();
     }
 
@@ -110,10 +107,10 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
 
         assertTrue(!connector.isStarted());
         assertTrue(!connector.isDisposed());
-        connector.startConnector();
+        connector.start();
         assertTrue(connector.isStarted());
         assertTrue(!connector.isDisposed());
-        connector.stopConnector();
+        connector.stop();
         assertTrue(!connector.isStarted());
         assertTrue(!connector.isDisposed());
         connector.dispose();
@@ -122,7 +119,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
 
         try
         {
-            connector.startConnector();
+            connector.start();
             fail("Connector cannot be restarted after being disposing");
         }
         catch (Exception e)
@@ -248,7 +245,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
 
         try
         {
-            connector.initialise();
+            connector.initialise(managementContext);
             fail("A connector cannot be initialised more than once");
         }
         catch (Exception e)

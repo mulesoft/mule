@@ -36,7 +36,7 @@ public class XFireWsdlCallTestCase extends FunctionalTestCase
 
     private Server httpServer;
 
-    // @Override
+    // //@Override
     protected void suitePostSetUp() throws Exception
     {
         httpServer = new Server();
@@ -54,7 +54,7 @@ public class XFireWsdlCallTestCase extends FunctionalTestCase
         httpServer.start();
     }
 
-    // @Override
+    // //@Override
     protected void suitePostTearDown() throws Exception
     {
         httpServer.stop();

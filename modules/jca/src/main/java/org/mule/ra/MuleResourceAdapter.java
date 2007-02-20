@@ -10,7 +10,6 @@
 
 package org.mule.ra;
 
-import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.ConfigurationException;
 import org.mule.config.ThreadingProfile;
@@ -20,9 +19,9 @@ import org.mule.providers.AbstractConnector;
 import org.mule.providers.service.TransportFactory;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.manager.UMOManager;
 import org.mule.umo.manager.UMOWorkManager;
 import org.mule.util.ClassUtils;
 
@@ -60,7 +59,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
      */
     protected transient Log logger = LogFactory.getLog(this.getClass());
 
-    private transient UMOManager manager;
+    private transient UMOManagementContext managementContext;
 
     private transient BootstrapContext bootstrapContext;
     private MuleConnectionRequestInfo info = new MuleConnectionRequestInfo();
@@ -74,7 +73,6 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
     {
         ois.defaultReadObject();
         this.logger = LogFactory.getLog(this.getClass());
-        this.manager = MuleManager.getInstance();
     }
 
     /**
@@ -85,7 +83,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
         this.bootstrapContext = bootstrapContext;
         if (info.getConfigurations() != null)
         {
-            if (MuleManager.isInstanciated())
+            if (managementContext!=null)
             {
                 throw new ResourceAdapterInternalException(
                     "A manager is already configured, cannot configure a new one using the configurations set on the Resource Adapter");
@@ -109,7 +107,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
                 try
                 {
 
-                    manager = builder.configure(info.getConfigurations(), null);
+                    managementContext = builder.configure(info.getConfigurations(), null);
                 }
                 catch (ConfigurationException e)
                 {
@@ -118,7 +116,6 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
                 }
             }
         }
-        manager = MuleManager.getInstance();
     }
 
     /**
@@ -126,8 +123,8 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
      */
     public void stop()
     {
-        manager.dispose();
-        manager = null;
+        managementContext.dispose();
+        managementContext = null;
         bootstrapContext = null;
     }
 
@@ -177,7 +174,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
                 MuleDescriptor descriptor = new MuleDescriptor(name);
                 descriptor.getInboundRouter().addEndpoint(endpoint);
                 descriptor.setImplementationInstance(messageEndpoint);
-                MuleManager.getInstance().lookupModel(JcaModel.JCA_MODEL_TYPE).registerComponent(descriptor);
+                managementContext.getRegistry().lookupModel(JcaModel.JCA_MODEL_TYPE).registerComponent(descriptor);
 
                 MuleEndpointKey key = new MuleEndpointKey(endpointFactory, (MuleActivationSpec)activationSpec);
 
@@ -214,7 +211,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
             }
             try
             {
-                manager.lookupModel(JcaModel.JCA_MODEL_TYPE).unregisterComponent(descriptor);
+                managementContext.getRegistry().lookupModel(JcaModel.JCA_MODEL_TYPE).unregisterComponent(descriptor);
             }
             catch (UMOException e)
             {

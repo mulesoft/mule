@@ -12,12 +12,13 @@ package org.mule.management.agents;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.impl.AbstractAgent;
 import org.mule.management.support.AutoDiscoveryJmxSupportFactory;
 import org.mule.management.support.JmxSupport;
 import org.mule.management.support.JmxSupportFactory;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.UMOAgent;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -36,10 +37,8 @@ import org.apache.log4j.jmx.HierarchyDynamicMBean;
  * <code>Log4jAgent</code> exposes the configuration of the Log4J instance running
  * in Mule for Jmx management
  */
-public class Log4jAgent implements UMOAgent
+public class Log4jAgent extends AbstractAgent
 {
-
-    private String name = "Log4j Agent";
     private MBeanServer mBeanServer;
     public static final String JMX_OBJECT_NAME = "log4j:type=Hierarchy";
 
@@ -47,42 +46,18 @@ public class Log4jAgent implements UMOAgent
     private JmxSupport jmxSupport = jmxSupportFactory.getJmxSupport();
 
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.manager.UMOAgent#getName()
-     */
-    public String getName()
+    public Log4jAgent()
     {
-        return this.name;
+        super("Log4j JMX Agent");
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.manager.UMOAgent#setName(java.lang.String)
-     */
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.manager.UMOAgent#getDescription()
-     */
-    public String getDescription()
-    {
-        return "Log4j JMX Agent";
-    }
+    
 
     /*
      * (non-Javadoc)
      * 
      * @see org.mule.umo.lifecycle.Initialisable#initialise()
      */
-    public void initialise() throws InitialisationException
+    public void doInitialise(UMOManagementContext managementContext) throws InitialisationException
     {
         try
         {

@@ -10,7 +10,6 @@
 
 package org.mule.providers.soap.xfire;
 
-import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
@@ -97,7 +96,7 @@ public class XFireConnector extends AbstractConnector
 
         try
         {
-            MuleManager.getInstance().registerListener(this);
+            managementContext.registerListener(this);
         }
         catch (NotificationException e)
         {
@@ -211,7 +210,7 @@ public class XFireConnector extends AbstractConnector
             // See if the xfire descriptor has already been added. This allows
             // developers to override the default configuration, say to increase
             // the threadpool
-            xfireDescriptor = (MuleDescriptor)MuleManager.getInstance().lookupModel(ModelHelper.SYSTEM_MODEL).getDescriptor(
+            xfireDescriptor = (MuleDescriptor)managementContext.getRegistry().lookupModel(ModelHelper.SYSTEM_MODEL).getDescriptor(
                 XFIRE_SERVICE_COMPONENT_NAME + getName());
             if (xfireDescriptor == null)
             {
@@ -222,7 +221,7 @@ public class XFireConnector extends AbstractConnector
                 // Lets unregister the 'template' instance, configure it and
                 // then register
                 // again later
-                MuleManager.getInstance().lookupModel(ModelHelper.SYSTEM_MODEL).unregisterComponent(xfireDescriptor);
+                managementContext.getRegistry().lookupModel(ModelHelper.SYSTEM_MODEL).unregisterComponent(xfireDescriptor);
             }
             // if the axis server hasn't been set, set it now. The Axis server
             // may be set externally
@@ -235,7 +234,6 @@ public class XFireConnector extends AbstractConnector
             {
                 xfireDescriptor.getProperties().put(XFIRE_TRANSPORT, serviceTransport);
             }
-            xfireDescriptor.setContainerManaged(false);
         }
         String serviceName = receiver.getComponent().getDescriptor().getName();
 
@@ -299,7 +297,7 @@ public class XFireConnector extends AbstractConnector
 
     protected MuleDescriptor createxfireDescriptor()
     {
-        MuleDescriptor xfireDescriptor = (MuleDescriptor)MuleManager.getInstance().lookupModel(ModelHelper.SYSTEM_MODEL)
+        MuleDescriptor xfireDescriptor = (MuleDescriptor)managementContext.getRegistry().lookupModel(ModelHelper.SYSTEM_MODEL)
             .getDescriptor(XFIRE_SERVICE_COMPONENT_NAME + getName());
         if (xfireDescriptor == null)
         {
@@ -413,7 +411,7 @@ public class XFireConnector extends AbstractConnector
             // new service and a
             // different http port the model needs to be restarted before the
             // listener is available
-            if (!MuleManager.getInstance().lookupModel(ModelHelper.SYSTEM_MODEL).isComponentRegistered(
+            if (!managementContext.getRegistry().lookupModel(ModelHelper.SYSTEM_MODEL).isComponentRegistered(
                 XFIRE_SERVICE_COMPONENT_NAME + getName()))
             {
                 try
@@ -430,7 +428,7 @@ public class XFireConnector extends AbstractConnector
                     {
                         xfireDescriptor.getProperties().put("xfire", xfire);
                     }
-                    MuleManager.getInstance().lookupModel(ModelHelper.SYSTEM_MODEL).registerComponent(xfireDescriptor);
+                    managementContext.getRegistry().lookupModel(ModelHelper.SYSTEM_MODEL).registerComponent(xfireDescriptor);
                 }
                 catch (UMOException e)
                 {

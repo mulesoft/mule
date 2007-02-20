@@ -10,7 +10,6 @@
 
 package org.mule.test.integration.providers.jms.activemq;
 
-import org.mule.MuleManager;
 import org.mule.providers.jms.JmsConnector;
 import org.mule.transaction.XaTransactionFactory;
 import org.mule.umo.UMOTransactionFactory;
@@ -19,8 +18,6 @@ import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.transaction.TransactionManager;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.ActiveMQXAConnectionFactory;
 import org.objectweb.jotm.Current;
 import org.objectweb.jotm.Jotm;
 
@@ -30,16 +27,23 @@ public class ActiveMQJmsXaTransactionFunctionalTestCase extends ActiveMQJmsTrans
 
     public ConnectionFactory getConnectionFactory() throws Exception
     {
-        if (factory == null)
-        {
-            factory = new ActiveMQXAConnectionFactory("vm://localhost?broker.persistent=false&broker.useJmx=false");
-        }
+//        if (factory == null)
+//        {
+//            factory = new ActiveMQXAConnectionFactory();
+//            factory.setBrokerContainerFactory(new BrokerContainerFactoryImpl(new VMPersistenceAdapter()));
+//            factory.setUseEmbeddedBroker(true);
+//            factory.setBrokerURL("vm://localhost");
+//            factory.start();
+//        }
         return factory;
     }
 
     public Connection getSenderConnection() throws Exception
     {
-        factory = new ActiveMQConnectionFactory("vm://localhost?broker.persistent=false&broker.useJmx=false");
+//        ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory();
+//        factory.setBrokerContainerFactory(new BrokerContainerFactoryImpl(new VMPersistenceAdapter()));
+//        factory.setUseEmbeddedBroker(true);
+//        factory.setBrokerURL("vm://localhost");
         return factory.createConnection();
     }
 
@@ -55,7 +59,7 @@ public class ActiveMQJmsXaTransactionFunctionalTestCase extends ActiveMQJmsTrans
         }
         txManager.setTransactionTimeout(15000);
         super.doSetUp();
-        MuleManager.getInstance().setTransactionManager(txManager);
+        managementContext.setTransactionManager(txManager);
     }
 
     public JmsConnector createConnector() throws Exception

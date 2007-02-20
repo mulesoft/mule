@@ -45,7 +45,7 @@ public class OracleJmsConnectorTestCase extends AbstractConnectorTestCase
             connection.expect("stop");
             connection.expect("setClientID", "mule.TestConnector");
             connector.setConnectionFactory((ConnectionFactory)connectionFactory.proxy());
-            connector.initialise();
+            connector.initialise(managementContext);
         }
         return connector;
     }

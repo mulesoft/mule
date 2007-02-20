@@ -46,7 +46,7 @@ public class MailMessageTransformersTestCase extends AbstractTransformerTestCase
         // case
         try
         {
-            endpoint.getConnector().initialise();
+            endpoint.getConnector().initialise(managementContext);
         }
         catch (AlreadyInitialisedException e)
         {

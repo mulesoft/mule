@@ -10,7 +10,6 @@
 
 package org.mule.providers.file;
 
-import org.mule.MuleManager;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractConnector;
@@ -33,7 +32,7 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
     {
         // TODO initialised wait?
         Thread.sleep(1000);
-        FileConnector c = (FileConnector)MuleManager.getInstance().lookupConnector("fileConnector2");
+        FileConnector c = (FileConnector)managementContext.getRegistry().lookupConnector("fileConnector2");
         assertNotNull(c);
         assertNotNull(c.getServiceOverrides());
         assertEquals("org.mule.transformers.simple.ByteArrayToSerializable", c.getServiceOverrides().get(
@@ -46,15 +45,15 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
 
     public void testServiceOverrides2() throws InterruptedException
     {
-        FileConnector c = (FileConnector)MuleManager.getInstance().lookupConnector("fileConnector1");
+        FileConnector c = (FileConnector)managementContext.getRegistry().lookupConnector("fileConnector1");
         assertNotNull(c);
         assertNull(c.getServiceOverrides());
 
-        c = (FileConnector)MuleManager.getInstance().lookupConnector("fileConnector2");
+        c = (FileConnector)managementContext.getRegistry().lookupConnector("fileConnector2");
         assertNotNull(c);
         assertNotNull(c.getServiceOverrides());
 
-        c = (FileConnector)MuleManager.getInstance().lookupConnector("fileConnector3");
+        c = (FileConnector)managementContext.getRegistry().lookupConnector("fileConnector3");
         assertNotNull(c);
         assertNull(c.getServiceOverrides());
     }
@@ -70,20 +69,20 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
 
         endpoint = new MuleEndpoint("file:///temp", true);
 
-        FileConnector c = (FileConnector)MuleManager.getInstance().lookupConnector("fileConnector2");
+        FileConnector c = (FileConnector)managementContext.getRegistry().lookupConnector("fileConnector2");
         assertNotNull(c);
         assertNotNull(c.getServiceOverrides());
         endpoint.setConnector(c);
 
-        endpoint.initialise();
+        endpoint.initialise(managementContext);
         assertNotNull(((AbstractConnector)endpoint.getConnector()).getServiceOverrides());
 
         endpoint = new MuleEndpoint("file:///temp?connector=fileConnector3", true);
-        endpoint.initialise();
+        endpoint.initialise(managementContext);
         assertNull(((AbstractConnector)endpoint.getConnector()).getServiceOverrides());
 
         endpoint = new MuleEndpoint("file:///temp?connector=fileConnector2", true);
-        endpoint.initialise();
+        endpoint.initialise(managementContext);
         assertNotNull(((AbstractConnector)endpoint.getConnector()).getServiceOverrides());
 
     }

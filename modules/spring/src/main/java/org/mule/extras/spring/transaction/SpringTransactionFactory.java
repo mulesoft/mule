@@ -12,8 +12,10 @@ package org.mule.extras.spring.transaction;
 
 import org.mule.transaction.AbstractSingleResourceTransaction;
 import org.mule.umo.TransactionException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.UMOTransactionFactory;
+
 import org.springframework.jdbc.datasource.ConnectionHolder;
 import org.springframework.jms.connection.JmsResourceHolder;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -33,7 +35,7 @@ public class SpringTransactionFactory implements UMOTransactionFactory
         super();
     }
 
-    public UMOTransaction beginTransaction() throws TransactionException
+    public UMOTransaction beginTransaction(UMOManagementContext managementContext) throws TransactionException
     {
         return new SpringTransaction();
     }
@@ -78,12 +80,12 @@ public class SpringTransactionFactory implements UMOTransactionFactory
 
         protected void doCommit() throws TransactionException
         {
-            manager.commit(status);
+           manager.commit(status);
         }
 
         protected void doRollback() throws TransactionException
         {
-            manager.rollback(status);
+           manager.rollback(status);
         }
 
         public Object getResource(Object key)

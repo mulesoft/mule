@@ -10,15 +10,15 @@
 
 package org.mule.management.agents;
 
-import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.impl.AbstractAgent;
 import org.mule.management.support.AutoDiscoveryJmxSupportFactory;
 import org.mule.management.support.JmxSupport;
 import org.mule.management.support.JmxSupportFactory;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.UMOAgent;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
 
@@ -41,7 +41,8 @@ import org.tanukisoftware.wrapper.jmx.WrapperManagerMBean;
  * <a href="http://wrapper.tanukisoftware.org">http://wrapper.tanukisoftware.org</a>
  * for more details.
  */
-public class WrapperManagerAgent implements UMOAgent {
+public class WrapperManagerAgent extends AbstractAgent
+{
     /**
      * MBean name to register under.
      */
@@ -54,7 +55,6 @@ public class WrapperManagerAgent implements UMOAgent {
      */
     private static final String WRAPPER_SYSTEM_PROPERTY_NAME = "wrapper.native_library";
 
-    private String name = "Wrapper Manager";
     private MBeanServer mBeanServer;
     private ObjectName wrapperName;
 
@@ -65,8 +65,13 @@ public class WrapperManagerAgent implements UMOAgent {
     private final AtomicReference/*<WrapperManagerMBean>*/ wrapperManagerRef = new AtomicReference();
 
 
+    public WrapperManagerAgent()
+    {
+        super("Wrapper Manager");
+    }
+
     /* @see org.mule.umo.lifecycle.Initialisable#initialise() */
-    public void initialise() throws InitialisationException {
+    public void doInitialise(UMOManagementContext managementContext) throws InitialisationException {
 
         /*
            Perform an extra check ourselves. If 'wrapper.native_library' property has
@@ -91,7 +96,7 @@ public class WrapperManagerAgent implements UMOAgent {
             try
             {
                 // remove the agent from the list, it's not functional
-                MuleManager.getInstance().unregisterAgent(this.getName());
+                managementContext.getRegistry().unregisterAgent(this.getName());
             }
             catch (UMOException e) {
                 // not interested, really
@@ -112,7 +117,7 @@ public class WrapperManagerAgent implements UMOAgent {
         {
             mBeanServer = (MBeanServer) servers.get(0);
 
-            wrapperName = jmxSupport.getObjectName(jmxSupport.getDomainName() + ":" + WRAPPER_OBJECT_NAME);
+            wrapperName = jmxSupport.getObjectName(jmxSupport.getDomainName(managementContext) + ":" + WRAPPER_OBJECT_NAME);
 
             unregisterMBeansIfNecessary();
             mBeanServer.registerMBean(wrapperManagerRef.get(), wrapperName);
@@ -202,17 +207,5 @@ public class WrapperManagerAgent implements UMOAgent {
         }
         else return "Wrapper Manager: Mule PID #" + wm.getJavaPID() +
                 ", Wrapper PID #" + wm.getWrapperPID();
-    }
-
-    /* @see org.mule.umo.manager.UMOAgent#getName() */
-    public String getName()
-    {
-        return this.name;
-    }
-
-    /* @see org.mule.umo.manager.UMOAgent#setName(java.lang.String) */
-    public void setName(String name)
-    {
-        this.name = name;
     }
 }

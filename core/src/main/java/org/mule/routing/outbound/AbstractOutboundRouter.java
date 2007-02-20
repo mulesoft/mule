@@ -10,7 +10,6 @@
 
 package org.mule.routing.outbound;
 
-import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.routing.AbstractRouter;
 import org.mule.routing.CorrelationPropertiesExtractor;
@@ -245,14 +244,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements U
 
     public void setReplyTo(String replyTo)
     {
-        if (replyTo != null)
-        {
-            this.replyTo = MuleManager.getInstance().lookupEndpointIdentifier(replyTo, replyTo);
-        }
-        else
-        {
-            this.replyTo = null;
-        }
+        this.replyTo = replyTo;
     }
 
     public int getEnableCorrelation()

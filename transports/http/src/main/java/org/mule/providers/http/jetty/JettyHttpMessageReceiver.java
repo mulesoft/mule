@@ -10,12 +10,7 @@
 
 package org.mule.providers.http.jetty;
 
-import org.mortbay.http.HttpContext;
-import org.mortbay.http.SocketListener;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.servlet.ServletHandler;
-import org.mortbay.util.InetAddrPort;
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.config.ThreadingProfile;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -30,6 +25,12 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.util.StringUtils;
+
+import org.mortbay.http.HttpContext;
+import org.mortbay.http.SocketListener;
+import org.mortbay.jetty.Server;
+import org.mortbay.jetty.servlet.ServletHandler;
+import org.mortbay.util.InetAddrPort;
 
 /**
  * <code>HttpMessageReceiver</code> is a simple http server that can be used to
@@ -51,7 +52,7 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
         {
             //We need to a Servlet Connecotor pointing to our servlet so the Servlets can
             //find the listeners for incoming requests
-            ServletConnector scon = (ServletConnector) MuleManager.getInstance().lookupConnector(JETTY_SERVLET_CONNECTOR_NAME);
+            ServletConnector scon = (ServletConnector) RegistryContext.getRegistry().lookupConnector(JETTY_SERVLET_CONNECTOR_NAME);
             if(scon!=null) {
                 throw new InitialisationException(new Message("http", 10), this);
             }
@@ -61,7 +62,7 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
             scon.setServletUrl(endpoint.getEndpointURI().getAddress());
             try
             {
-                MuleManager.getInstance().registerConnector(scon);
+                RegistryContext.getRegistry().registerConnector(scon);
                 String path = endpoint.getEndpointURI().getPath();
                 if (StringUtils.isEmpty(path))
                 {

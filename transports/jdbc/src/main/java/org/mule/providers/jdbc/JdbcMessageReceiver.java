@@ -10,12 +10,6 @@
 
 package org.mule.providers.jdbc;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.mule.MuleManager;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.ConnectException;
 import org.mule.providers.TransactedPollingMessageReceiver;
@@ -27,6 +21,11 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * TODO
@@ -118,7 +117,7 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
         }
         finally
         {
-            if (MuleManager.getInstance().getTransactionManager() != null || tx == null)
+            if (endpoint.getManagementContext().getTransactionManager() != null || tx == null)
             {
                 // We are running in an XA transaction.
                 // This call is required here for compatibility with strict XA

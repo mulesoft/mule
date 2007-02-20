@@ -10,24 +10,23 @@
 
 package org.mule.test.integration;
 
-import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
-import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.transformers.AbstractEventAwareTransformer;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
-import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.transformer.TransformerException;
@@ -52,9 +51,8 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase impleme
 
     protected ConfigurationBuilder getBuilder() throws Exception
     {
-        QuickConfigurationBuilder builder = new QuickConfigurationBuilder(true);
+        QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
         builder.registerModel("seda", "main");
-        builder.createStartedManager(true, null);
         MuleEndpoint out = new MuleEndpoint("vm://component2", false);
         out.setTransformer(new DummyTransformer());
         UMODescriptor c1 = builder.registerComponentInstance(this, "component1", new MuleEndpoint(
@@ -66,7 +64,7 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase impleme
 
     public void testEventMetaDataPropagation() throws UMOException
     {
-        UMOComponent component = MuleManager.getInstance().lookupModel("main").getComponent("component1");
+        UMOComponent component = managementContext.getRegistry().lookupModel("main").getComponent("component1");
         UMOSession session = new MuleSession(component);
 
         UMOEvent event = new MuleEvent(new MuleMessage("Test Event"), (UMOImmutableEndpoint)component.getDescriptor()

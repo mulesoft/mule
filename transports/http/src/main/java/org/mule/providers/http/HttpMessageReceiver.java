@@ -10,6 +10,7 @@
 
 package org.mule.providers.http;
 
+import org.mule.RegistryContext;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleEvent;
@@ -98,14 +99,13 @@ public class HttpMessageReceiver extends TcpMessageReceiver
 
         public HttpWorker(Socket socket) throws IOException
         {
-            if (endpoint.getEncoding() != null)
+            String encoding = endpoint.getEncoding();
+            if (encoding == null)
             {
-                conn = new HttpServerConnection(socket, endpoint.getEncoding());
+                encoding = RegistryContext.getConfiguration().getDefaultEncoding();
             }
-            else
-            {
-                conn = new HttpServerConnection(socket);
-            }
+
+            conn = new HttpServerConnection(socket, encoding);
 
             cookieSpec = MapUtils.getString(endpoint.getProperties(),
                 HttpConnector.HTTP_COOKIE_SPEC_PROPERTY, ((HttpConnector)connector).getCookieSpec());

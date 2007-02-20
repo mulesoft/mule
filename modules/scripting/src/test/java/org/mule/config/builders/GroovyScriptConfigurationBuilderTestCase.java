@@ -12,6 +12,7 @@ package org.mule.config.builders;
 
 import org.mule.config.ConfigurationBuilder;
 import org.mule.tck.AbstractScriptConfigBuilderTestCase;
+import org.mule.umo.UMOException;
 
 public class GroovyScriptConfigurationBuilderTestCase extends AbstractScriptConfigBuilderTestCase
 {
@@ -23,7 +24,15 @@ public class GroovyScriptConfigurationBuilderTestCase extends AbstractScriptConf
 
     public ConfigurationBuilder getBuilder()
     {
-        return new ScriptConfigurationBuilder("groovy");
+        try
+        {
+            return new ScriptConfigurationBuilder("groovy");
+        }
+        catch (UMOException e)
+        {
+            fail(e.getMessage());
+            return null;
+        }
 
     }
 

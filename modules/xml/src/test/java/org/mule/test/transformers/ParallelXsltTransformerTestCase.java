@@ -10,17 +10,18 @@
 
 package org.mule.test.transformers;
 
+import org.mule.tck.AbstractMuleTestCase;
+import org.mule.transformers.xml.XsltTransformer;
+import org.mule.umo.transformer.TransformerException;
+import org.mule.umo.transformer.UMOTransformer;
+import org.mule.util.IOUtils;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.custommonkey.xmlunit.XMLAssert;
-import org.mule.tck.AbstractMuleTestCase;
-import org.mule.transformers.xml.XsltTransformer;
-import org.mule.umo.transformer.TransformerException;
-import org.mule.umo.transformer.UMOTransformer;
-import org.mule.util.IOUtils;
 
 public class ParallelXsltTransformerTestCase extends AbstractMuleTestCase
 {
@@ -28,7 +29,7 @@ public class ParallelXsltTransformerTestCase extends AbstractMuleTestCase
     private String resultData;
     private Collection actualResults = Collections.synchronizedCollection(new LinkedList());
 
-    // @Override
+    // //@Override
     protected void doSetUp() throws Exception
     {
         srcData = IOUtils.toString(IOUtils.getResourceAsStream("cdcatalog-utf-8.xml", getClass()), "UTF-8");
@@ -40,7 +41,7 @@ public class ParallelXsltTransformerTestCase extends AbstractMuleTestCase
     {
         XsltTransformer transformer = new XsltTransformer();
         transformer.setXslFile("cdcatalog.xsl");
-        transformer.initialise();
+        transformer.initialise(managementContext);
         return transformer;
     }
 

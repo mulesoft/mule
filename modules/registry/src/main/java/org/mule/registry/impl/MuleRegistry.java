@@ -10,22 +10,18 @@
 
 package org.mule.registry.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.persistence.PersistenceManager;
 import org.mule.persistence.PersistenceNotificationListener;
 import org.mule.persistence.manager.ObjectPersistenceManager;
-import org.mule.registry.Registration;
 import org.mule.registry.DeregistrationException;
+import org.mule.registry.Registration;
 import org.mule.registry.RegistrationException;
 import org.mule.registry.Registry;
 import org.mule.registry.RegistryStore;
-import org.mule.registry.ReregistrationException;
 import org.mule.registry.impl.store.InMemoryStore;
-import org.mule.registry.metadata.*;
+import org.mule.registry.metadata.MetadataStore;
+import org.mule.registry.metadata.MissingMetadataException;
+import org.mule.registry.metadata.ObjectMetadata;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.Registerable;
 import org.mule.util.StringUtils;
@@ -34,6 +30,9 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * The MuleRegistry implements the Registry interface
@@ -82,14 +81,14 @@ public class MuleRegistry implements Registry {
             new PersistenceNotificationListener(persistenceManager);
 
         try {
-            persistenceManager.initialise();
+            persistenceManager.initialise(null);
         } catch (Exception e) { 
             logger.info("Unable to initialize PersistenceManager: " + 
                     e.toString());
         }
 
         try {
-            registryStore.initialise();
+            registryStore.initialise(null);
             registryStore.registerPersistenceRequestListener(listener);
         } catch (Exception e) { 
             logger.info(e);

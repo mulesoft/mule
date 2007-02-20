@@ -18,13 +18,13 @@ public class VMLoanBrokerSynchronousFunctionalTestCase extends AxisLoanBrokerSyn
         super();
     }
 
-    // @Override
+    // //@Override
     protected String getConfigResources()
     {
         return "loan-broker-vm-sync-test-config.xml";
     }
 
-    // @Override
+    // //@Override
     protected int getNumberOfRequests()
     {
         return 1000;

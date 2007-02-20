@@ -10,18 +10,17 @@
 
 package org.mule.persistence.xmldb;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.mule.persistence.Persistable;
 import org.mule.persistence.PersistenceException;
 import org.mule.persistence.PersistenceStore;
-import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.RecoverableException;
 
-import org.xmldb.api.base.Collection;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.xmldb.api.DatabaseManager;
+import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.Database;
 
 /**
@@ -48,8 +47,9 @@ public class XmlDbPersistenceStore implements PersistenceStore
 
     /**
      * {@inheritDoc}
+     * @param managementContext
      */
-    public void initialise() throws InitialisationException, RecoverableException
+    public void initialise(UMOManagementContext managementContext) throws InitialisationException, RecoverableException
     {
         try 
         {

@@ -13,6 +13,7 @@ package org.mule.impl.security;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOEncryptionStrategy;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.CryptoFailureException;
 import org.mule.util.Base64;
@@ -47,7 +48,7 @@ public abstract class AbstractJCEEncryptionStrategy implements UMOEncryptionStra
 
     protected boolean base64Encoding = true;
 
-    public void initialise() throws InitialisationException
+    public void initialise(UMOManagementContext managementContext) throws InitialisationException
     {
         if (algorithm == null)
         {

@@ -10,7 +10,6 @@
 
 package org.mule.config.builders;
 
-import org.mule.MuleManager;
 import org.mule.components.script.jsr223.Scriptable;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.ConfigurationException;
@@ -18,7 +17,9 @@ import org.mule.config.MuleProperties;
 import org.mule.config.ReaderResource;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.umo.manager.UMOManager;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
+import org.mule.util.FileUtils;
 import org.mule.util.PropertiesUtils;
 
 import java.io.IOException;
@@ -35,14 +36,14 @@ public class ScriptConfigurationBuilder extends Scriptable implements Configurat
 
     public static final String SCRIPT_ENGINE_NAME_PROPERTY = "org.mule.script.engine";
 
-    protected UMOManager manager = null;
+    protected UMOManagementContext managementContext = null;
     protected QuickConfigurationBuilder builder = null;
     protected boolean initialised = false;
 
-    public ScriptConfigurationBuilder()
+    public ScriptConfigurationBuilder() throws UMOException
     {
-        builder = new QuickConfigurationBuilder(false);
-        manager = MuleManager.getInstance();
+        builder = new QuickConfigurationBuilder();
+        managementContext = builder.getManagementContext();
         String scriptName = System.getProperty(SCRIPT_ENGINE_NAME_PROPERTY);
         if (scriptName == null)
         {
@@ -55,16 +56,16 @@ public class ScriptConfigurationBuilder extends Scriptable implements Configurat
         }
     }
 
-    public ScriptConfigurationBuilder(String scriptEngineName)
+    public ScriptConfigurationBuilder(String scriptEngineName) throws UMOException
     {
-        builder = new QuickConfigurationBuilder(false);
-        manager = MuleManager.getInstance();
+        builder = new QuickConfigurationBuilder();
+        managementContext = builder.getManagementContext();
         this.setScriptEngineName(scriptEngineName);
     }
 
-    public UMOManager configure(String configResources) throws ConfigurationException
+    public UMOManagementContext configure(String configResources) throws ConfigurationException
     {
-        return configure(configResources, null);
+        return configure(configResources, FileUtils.DEFAULT_ENCODING);
     }
 
     /**
@@ -75,12 +76,12 @@ public class ScriptConfigurationBuilder extends Scriptable implements Configurat
      * @return A configured UMOManager
      * @throws org.mule.config.ConfigurationException
      */
-    public UMOManager configure(String configResources, String startupPropertiesFile)
+    public UMOManagementContext configure(String configResources, String startupPropertiesFile)
         throws ConfigurationException
     {
         try
         {
-            ReaderResource[] readers = ReaderResource.parseResources(configResources);
+            ReaderResource[] readers = ReaderResource.parseResources(configResources, FileUtils.DEFAULT_ENCODING);
 
             // Load startup properties if any.
             if (startupPropertiesFile != null)
@@ -106,12 +107,12 @@ public class ScriptConfigurationBuilder extends Scriptable implements Configurat
      * @return A configured UMOManager
      * @throws org.mule.config.ConfigurationException
      */
-    public UMOManager configure(ReaderResource[] configResources, Properties startupProperties)
+    public UMOManagementContext configure(ReaderResource[] configResources, Properties startupProperties)
         throws ConfigurationException
     {
         if (startupProperties != null)
         {
-            ((MuleManager)MuleManager.getInstance()).addProperties(startupProperties);
+            managementContext.getRegistry().addProperties(startupProperties);
         }
 
         try
@@ -120,7 +121,7 @@ public class ScriptConfigurationBuilder extends Scriptable implements Configurat
             {
                 ReaderResource configResource = configResources[i];
                 setScriptFile(configResource.getDescription());
-                initialise();
+                initialise(managementContext);
                 Bindings ns = getScriptEngine().createBindings();
                 populateBindings(ns);
                 CompiledScript script = compileScript(configResource.getReader());
@@ -130,9 +131,9 @@ public class ScriptConfigurationBuilder extends Scriptable implements Configurat
             if (System.getProperty(MuleProperties.MULE_START_AFTER_CONFIG_SYSTEM_PROPERTY, "true")
                 .equalsIgnoreCase("true"))
             {
-                if (!manager.isStarted())
+                if (!managementContext.isStarted())
                 {
-                    manager.start();
+                   managementContext.start();
                 }
             }
 
@@ -141,18 +142,18 @@ public class ScriptConfigurationBuilder extends Scriptable implements Configurat
         {
             throw new ConfigurationException(e);
         }
-        return manager;
+        return managementContext;
     }
 
     protected void populateBindings(Bindings bindings)
     {
-        bindings.put("manager", manager);
+        bindings.put("managementContext", managementContext);
         bindings.put("builder", builder);
     }
 
     public boolean isConfigured()
     {
-        return manager != null;
+        return managementContext != null;
     }
 
 }

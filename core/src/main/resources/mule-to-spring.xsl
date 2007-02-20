@@ -15,12 +15,12 @@
     <xsl:template match="mule-configuration">
         <beans>
             <xsl:if test="$firstContext">
-                <bean id="_MuleManagemenetContextFactoryBean"
+                <bean id="_muleManagementContextFactoryBean"
                       class="org.mule.config.spring.LegacyManagementContextFactoryBean"/>
                 <bean id="_muleNameProcessor" class="org.mule.config.spring.MuleObjectNameProcessor"/>
-                <bean id="_managementContextProcessor" class="org.mule.config.spring.ManagementContextPostProcessor"/>
             </xsl:if>
             <xsl:apply-templates/>
+            <bean id="_managementContextProcessor" class="org.mule.config.spring.ManagementContextPostProcessor"/>            
         </beans>
     </xsl:template>
 
@@ -201,6 +201,31 @@
 
 
     <!-- Endpoint Template -->
+    <!--<xsl:template match="endpoint|global-endpoint">-->
+        <!--<xsl:element name="bean">-->
+            <!--<xsl:if test="@name">-->
+                <!--<xsl:attribute name="name">-->
+                    <!--<xsl:value-of select="@name"/>-->
+                <!--</xsl:attribute>-->
+            <!--</xsl:if>-->
+            <!--<xsl:attribute name="class">org.mule.config.spring.EndpointFactoryBean</xsl:attribute>-->
+            <!--<xsl:attribute name="scope">prototype</xsl:attribute>-->
+
+            <!--<xsl:apply-templates select="@transformers" mode="addTransformers"/>-->
+            <!--<xsl:apply-templates select="@responseTransformers" mode="addTransformers"/>-->
+            <!--<!-<xsl:apply-templates select="@address" mode="addEndpointURI"/>-->
+            <!--<xsl:apply-templates select="@createConnector"/>-->
+            <!--<xsl:apply-templates select="@connector"/>-->
+            <!--<xsl:apply-templates-->
+                    <!--select="@*[local-name() != 'transformers' and local-name() != 'createConnector' and local-name() != 'responseTransformers' and local-name() != 'connector']"-->
+                    <!--mode="addProperties"/>-->
+            <!--<xsl:apply-templates select="properties" mode="asMap"/>-->
+            <!--<xsl:apply-templates select="transaction"/>-->
+            <!--<xsl:apply-templates select="filter"/>-->
+            <!--<xsl:apply-templates select="security-filter"/>-->
+        <!--</xsl:element>-->
+    <!--</xsl:template>-->
+
     <xsl:template match="endpoint|global-endpoint">
         <xsl:element name="bean">
             <xsl:if test="@name">
@@ -209,6 +234,7 @@
                 </xsl:attribute>
             </xsl:if>
             <xsl:attribute name="class">org.mule.impl.endpoint.MuleEndpoint</xsl:attribute>
+            <xsl:attribute name="scope">prototype</xsl:attribute>
             <xsl:apply-templates select="@transformers" mode="addTransformers"/>
             <xsl:apply-templates select="@responseTransformers" mode="addTransformers"/>
             <xsl:apply-templates select="@address" mode="addEndpointURI"/>
@@ -548,18 +574,26 @@
     </xsl:template>
 
     <!-- Global Endpoint Template -->
+    <!--<xsl:template match="global-endpoint">-->
+        <!--<bean class="org.mule.impl.endpoint.MuleEndpoint"-->
+              <!--factory-method="getEndpointFromUri">-->
+            <!--<constructor-arg index="0" type="java.lang.String">-->
+                <!--<value>-->
+                    <!--<xsl:value-of select="@name"/>-->
+                <!--</value>-->
+            <!--</constructor-arg>-->
+            <!--<xsl:apply-templates select="@transformers" mode="addTransformers"/>-->
+            <!--<xsl:apply-templates select="@responseTransformers" mode="addTransformers"/>-->
+            <!--<xsl:apply-templates select="@address" mode="addEndpointURI"/>-->
+        <!--</bean>-->
+    <!--</xsl:template>-->
+
     <xsl:template match="global-endpoint">
-        <bean class="org.mule.impl.endpoint.MuleEndpoint"
-              factory-method="getEndpointFromUri">
-            <constructor-arg index="0" type="java.lang.String">
-                <value>
-                    <xsl:value-of select="@name"/>
-                </value>
-            </constructor-arg>
+        <ref local="{@name}">
             <xsl:apply-templates select="@transformers" mode="addTransformers"/>
             <xsl:apply-templates select="@responseTransformers" mode="addTransformers"/>
             <xsl:apply-templates select="@address" mode="addEndpointURI"/>
-        </bean>
+        </ref>
     </xsl:template>
 
     <!-- Router Template -->
@@ -856,20 +890,26 @@
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
+        <!--<property name="{$propertyName}">-->
+            <!--<bean class="org.mule.util.MuleObjectHelper"-->
+                  <!--factory-method="getTransformer">-->
+                <!--<constructor-arg index="0" type="java.lang.String">-->
+                    <!--<value>-->
+                        <!--<xsl:value-of select="."/>-->
+                    <!--</value>-->
+                <!--</constructor-arg>-->
+                <!--<constructor-arg index="1">-->
+                    <!--<value>-->
+                        <!--<xsl:value-of select="' '"/>-->
+                    <!--</value>-->
+                <!--</constructor-arg>-->
+            <!--</bean>-->
+        <!--</property>-->
         <property name="{$propertyName}">
-            <bean class="org.mule.util.MuleObjectHelper"
-                  factory-method="getTransformer">
-                <constructor-arg index="0" type="java.lang.String">
                     <value>
                         <xsl:value-of select="."/>
                     </value>
-                </constructor-arg>
-                <constructor-arg index="1">
-                    <value>
-                        <xsl:value-of select="' '"/>
-                    </value>
-                </constructor-arg>
-            </bean>
+               
         </property>
     </xsl:template>
 

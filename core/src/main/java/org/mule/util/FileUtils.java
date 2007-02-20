@@ -10,7 +10,6 @@
 
 package org.mule.util;
 
-import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
 import org.mule.config.i18n.Message;
 
@@ -36,6 +35,9 @@ import java.util.zip.ZipFile;
 // @ThreadSafe
 public class FileUtils extends org.apache.commons.io.FileUtils
 {
+
+    public static final String DEFAULT_ENCODING = "UTF-8";
+
     public static synchronized void copyStreamToFile(InputStream input, File destination) throws IOException {
         if (destination.exists() && !destination.canWrite()) {
             throw new IOException("Destination file does not exist or is not writeable");
@@ -144,7 +146,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
     // TODO Document me!
     public static String getResourcePath(String resourceName, Class callingClass) throws IOException
     {
-        return getResourcePath(resourceName, callingClass, MuleManager.getConfiguration().getDefaultEncoding());
+        return getResourcePath(resourceName, callingClass, DEFAULT_ENCODING);
     }
 
     // TODO Document me!

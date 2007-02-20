@@ -33,7 +33,7 @@ public class Pop3ConnectorTestCase extends AbstractConnectorTestCase
     {
         Pop3Connector c = new Pop3Connector();
         c.setName("Pop3connector");
-        c.initialise();
+        c.initialise(managementContext);
         return c;
     }
 

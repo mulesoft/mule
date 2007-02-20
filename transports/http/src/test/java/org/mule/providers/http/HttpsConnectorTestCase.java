@@ -10,32 +10,28 @@
 
 package org.mule.providers.http;
 
-import java.io.IOException;
-
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.providers.http.transformers.UMOMessageToHttpResponse;
 import org.mule.providers.tcp.TcpConnector;
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
+import java.io.IOException;
+
 
 public class HttpsConnectorTestCase extends AbstractConnectorTestCase
 {
     public UMOConnector getConnector() throws Exception
     {
-        return createConnector(true);
+        return createConnector(managementContext, true);
     }
 
-    public static HttpsConnector createConnector(boolean initialised)
+    public static HttpsConnector createConnector(UMOManagementContext context, boolean initialised)
         throws IOException, InitialisationException
     {
         HttpsConnector cnn = new HttpsConnector();
@@ -47,11 +43,11 @@ public class HttpsConnectorTestCase extends AbstractConnectorTestCase
         cnn.setStorePassword("mulepassword");
         cnn.setTrustStore("trustStore");
         cnn.setTrustStorePassword("mulepassword");
-        cnn.setDefaultResponseTransformer(new UMOMessageToHttpResponse());
         cnn.getDispatcherThreadingProfile().setDoThreading(false);
+
         if (initialised)
         {
-            cnn.initialise();
+            cnn.initialise(context);
         }
         return cnn;
     }

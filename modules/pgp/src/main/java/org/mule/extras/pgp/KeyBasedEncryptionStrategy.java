@@ -10,6 +10,18 @@
 
 package org.mule.extras.pgp;
 
+import org.mule.config.i18n.Messages;
+import org.mule.umo.UMOEncryptionStrategy;
+import org.mule.umo.UMOManagementContext;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.security.CryptoFailureException;
+
+import java.io.ByteArrayInputStream;
+import java.util.Collection;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import cryptix.message.EncryptedMessage;
 import cryptix.message.EncryptedMessageBuilder;
 import cryptix.message.LiteralMessageBuilder;
@@ -18,16 +30,6 @@ import cryptix.message.MessageFactory;
 import cryptix.message.SignedMessageBuilder;
 import cryptix.openpgp.PGPArmouredMessage;
 import cryptix.pki.KeyBundle;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.config.i18n.Messages;
-import org.mule.umo.UMOEncryptionStrategy;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.security.CryptoFailureException;
-
-import java.io.ByteArrayInputStream;
-import java.util.Collection;
 
 public class KeyBasedEncryptionStrategy implements UMOEncryptionStrategy
 {
@@ -117,7 +119,7 @@ public class KeyBasedEncryptionStrategy implements UMOEncryptionStrategy
      * 
      * @see org.mule.umo.lifecycle.Initialisable#initialise()
      */
-    public void initialise() throws InitialisationException
+    public void initialise(UMOManagementContext managementContext) throws InitialisationException
     {
         try
         {

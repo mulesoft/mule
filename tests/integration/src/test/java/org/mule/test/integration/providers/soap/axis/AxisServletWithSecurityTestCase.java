@@ -32,7 +32,7 @@ public class AxisServletWithSecurityTestCase extends FunctionalTestCase
 
     private Server httpServer;
 
-    // @Override
+    // //@Override
     protected void suitePostSetUp() throws Exception
     {
         httpServer = new Server();
@@ -50,7 +50,7 @@ public class AxisServletWithSecurityTestCase extends FunctionalTestCase
         httpServer.start();
     }
 
-    // @Override
+    // //@Override
     protected void suitePostTearDown() throws Exception
     {
         httpServer.stop();

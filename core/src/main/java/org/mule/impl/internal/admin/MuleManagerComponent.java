@@ -11,20 +11,19 @@
 package org.mule.impl.internal.admin;
 
 import org.mule.MuleException;
-import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
-import org.mule.impl.RequestContext;
 import org.mule.impl.MuleSession;
-import org.mule.impl.model.ModelHelper;
+import org.mule.impl.RequestContext;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.internal.notifications.AdminNotification;
 import org.mule.impl.message.ExceptionPayload;
+import org.mule.impl.model.ModelHelper;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.NullPayload;
 import org.mule.transformers.wire.WireFormat;
@@ -32,6 +31,7 @@ import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -39,7 +39,6 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.MapUtils;
 
@@ -73,7 +72,11 @@ public class MuleManagerComponent implements Callable, Initialisable
      */
     protected WireFormat wireFormat;
 
-    public void initialise() throws InitialisationException
+    protected String encoding;
+
+    protected int synchronousEventTimeout = 5000;
+
+    public void initialise(UMOManagementContext managementContext) throws InitialisationException
     {
         if (wireFormat == null)
         {
@@ -142,7 +145,7 @@ public class MuleManagerComponent implements Callable, Initialisable
             {
                 result = session.getComponent().sendEvent(event);
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
-                wireFormat.write(out, result);
+                wireFormat.write(out, result, getEncoding());
                 return out.toByteArray();
             }
             else
@@ -181,7 +184,7 @@ public class MuleManagerComponent implements Callable, Initialisable
                 else
                 {
                     ByteArrayOutputStream out = new ByteArrayOutputStream();
-                    wireFormat.write(out, result);
+                    wireFormat.write(out, result, getEncoding());
                     return out.toByteArray();
                 }
             }
@@ -202,8 +205,7 @@ public class MuleManagerComponent implements Callable, Initialisable
                 UMOEndpoint.ENDPOINT_TYPE_SENDER);
 
             long timeout = MapUtils.getLongValue(action.getProperties(),
-                MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, MuleManager.getConfiguration()
-                    .getDefaultSynchronousEventTimeout());
+                MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, getSynchronousEventTimeout());
 
             UMOEndpointURI ep = new MuleEndpointURI(action.getResourceIdentifier());
             result = endpoint.getConnector().receive(ep, timeout);
@@ -217,7 +219,7 @@ public class MuleManagerComponent implements Callable, Initialisable
                     result = new MuleMessage(payload, result);
                 }
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
-                wireFormat.write(out, result);
+                wireFormat.write(out, result, getEncoding());
                 return out.toByteArray();
             }
             else
@@ -232,13 +234,13 @@ public class MuleManagerComponent implements Callable, Initialisable
 
     }
 
-    public static final UMODescriptor getDescriptor(UMOConnector connector,
-                                                    UMOEndpointURI endpointUri,
-                                                    WireFormat wireFormat) throws UMOException
+
+    public static final UMODescriptor getDescriptor(UMOEndpoint endpoint,
+                                                    WireFormat wireFormat,
+                                                    String encoding,
+                                                    int eventTimeout) throws UMOException
     {
-        UMOEndpoint endpoint = new MuleEndpoint();
-        endpoint.setConnector(connector);
-        endpoint.setEndpointURI(endpointUri);
+
         endpoint.setName(MANAGER_ENDPOINT_NAME);
         endpoint.setType(UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
 
@@ -247,9 +249,10 @@ public class MuleManagerComponent implements Callable, Initialisable
 
         descriptor.getInboundRouter().addEndpoint(endpoint);
         descriptor.setImplementation(MuleManagerComponent.class.getName());
-        descriptor.setContainerManaged(false);
         Map props = new HashMap();
         props.put("wireFormat", wireFormat);
+        props.put("encoding", encoding);
+        props.put("synchronousEventTimeout", new Integer(eventTimeout));
         descriptor.setProperties(props);
         return descriptor;
     }
@@ -274,8 +277,8 @@ public class MuleManagerComponent implements Callable, Initialisable
         try
         {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
-            wireFormat.write(out, result);
-            return out.toString(MuleManager.getConfiguration().getDefaultEncoding());
+            wireFormat.write(out, result, getEncoding());
+            return out.toString(getEncoding());
         }
         catch (Exception e1)
         {
@@ -292,5 +295,26 @@ public class MuleManagerComponent implements Callable, Initialisable
     public void setWireFormat(WireFormat wireFormat)
     {
         this.wireFormat = wireFormat;
+    }
+
+
+    public String getEncoding()
+    {
+        return encoding;
+    }
+
+    public void setEncoding(String encoding)
+    {
+        this.encoding = encoding;
+    }
+
+    public int getSynchronousEventTimeout()
+    {
+        return synchronousEventTimeout;
+    }
+
+    public void setSynchronousEventTimeout(int synchronousEventTimeout)
+    {
+        this.synchronousEventTimeout = synchronousEventTimeout;
     }
 }

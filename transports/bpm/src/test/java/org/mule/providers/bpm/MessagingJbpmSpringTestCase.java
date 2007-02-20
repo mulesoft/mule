@@ -10,10 +10,9 @@
 
 package org.mule.providers.bpm;
 
-import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
+import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
-import org.mule.extras.spring.config.SpringConfigurationBuilder;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 import org.mule.util.NumberUtils;
@@ -30,19 +29,18 @@ public class MessagingJbpmSpringTestCase extends FunctionalTestCase {
     private BPMS bpms;
 
     protected ConfigurationBuilder getBuilder() throws Exception {
-        return new SpringConfigurationBuilder();
+        return new MuleXmlConfigurationBuilder();
     }
 
     protected String getConfigResources() {
         return "jbpm-spring-config.xml";
     }
 
-    protected void doPostFunctionalSetUp() throws Exception {
+    protected void doSetUp() throws Exception {
         connector =
-            (ProcessConnector) MuleManager.getInstance().lookupConnector("jBpmConnector");
+            (ProcessConnector) managementContext.getRegistry().lookupConnector("jBpmConnector");
         bpms = connector.getBpms();
         connector.setAllowGlobalReceiver(true);
-        super.doPostFunctionalSetUp();
     }
 
     public void testSendMessageProcess() throws Exception {

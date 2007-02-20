@@ -95,7 +95,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
 
         initialiseComponent(descriptor, UMOTransactionConfig.ACTION_NONE, callback);
         addResultListener(getOutDest().getAddress(), countDown);
-        MuleManager.getInstance().start();
+        managementContext.start();
         afterInitialise();
         send(DEFAULT_MESSAGE, false, Session.AUTO_ACKNOWLEDGE);
 
@@ -133,7 +133,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
         initialiseComponent(descriptor, UMOTransactionConfig.ACTION_ALWAYS_BEGIN, callback);
 
         // Start the server
-        MuleManager.getInstance().start();
+        managementContext.start();
         addResultListener(getOutDest().getAddress(), countDown);
 
         // Send a test message first so that it is there when the component is
@@ -194,7 +194,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
                 : UMOTransactionConfig.ACTION_NONE), callback);
 
         // Start the server
-        MuleManager.getInstance().start();
+        managementContext.start();
         addResultListener(getOutDest().getAddress(), countDown);
 
         // Send a test message firstso that it is there when the component is
@@ -248,15 +248,15 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
         };
 
         initialiseComponent(descriptor, UMOTransactionConfig.ACTION_ALWAYS_BEGIN, callback);
-        UMOManager manager = MuleManager.getInstance();
+        UMOManager manager = managementContext;
         addResultListener(getOutDest().getAddress(), countDown);
 
-        UMOConnector umoCnn = manager.lookupConnector(CONNECTOR_NAME);
+        UMOConnector umoCnn = managementContext.getRegistry().lookupConnector(CONNECTOR_NAME);
         // Set the test Exception strategy
         umoCnn.setExceptionListener(new RollbackExceptionListener(countDown));
 
         // Start the server
-        manager.start();
+       managementContext.start();
 
         // Send a test message firstso that it is there when the component is
         // started
@@ -318,8 +318,8 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
         HashMap props = new HashMap();
         props.put("eventCallback", callback);
         descriptor.setProperties(props);
-        UMOComponent component = MuleManager.getInstance().getModel().registerComponent(descriptor);
-        // MuleManager.getInstance().registerConnector(connector);
+        UMOComponent component = managementContext.getModel().registerComponent(descriptor);
+        // managementContext.registerConnector(connector);
         return component;
     }
 
@@ -492,10 +492,10 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
         };
 
         initialiseComponent(descriptor, UMOTransactionConfig.ACTION_ALWAYS_BEGIN, callback);
-        UMOManager manager = MuleManager.getInstance();
+        UMOManager manager = managementContext;
         addResultListener(getDLDest().getAddress(), countDown);
 
-        JmsConnector umoCnn = (JmsConnector) manager.lookupConnector(CONNECTOR_NAME);
+        JmsConnector umoCnn = (JmsConnector) managementContext.getRegistry().lookupConnector(CONNECTOR_NAME);
 
         // After redelivery retry the message and then fail
         umoCnn.setMaxRedelivery(1);
@@ -504,7 +504,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
         umoCnn.setExceptionListener(new RollbackExceptionListener(countDown, getDLDest()));
 
         // Start the server
-        manager.start();
+       managementContext.start();
 
         // Send a test message firstso that it is there when the component is
         // started

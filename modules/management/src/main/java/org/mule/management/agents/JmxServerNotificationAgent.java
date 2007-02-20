@@ -31,8 +31,6 @@ import javax.management.ObjectName;
 /**
  * An agent that propergates Mule Server notifications to Jmx.
  *
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent
 {
@@ -53,8 +51,7 @@ public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent
 
     public JmxServerNotificationAgent()
     {
-        // set default name, overridable by config
-        setName(DEFAULT_AGENT_NAME);
+        super(DEFAULT_AGENT_NAME);
     }
 
     /**
@@ -66,12 +63,12 @@ public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent
         {
             jmxSupport = jmxSupportFactory.getJmxSupport();
             mBeanServer = (MBeanServer) MBeanServerFactory.findMBeanServer(null).get(0);
-            broadcasterObjectName = ObjectName.getInstance(jmxSupport.getDomainName() + ":" + BROADCASTER_JMX_OBJECT_NAME);
+            broadcasterObjectName = ObjectName.getInstance(jmxSupport.getDomainName(managementContext) + ":" + BROADCASTER_JMX_OBJECT_NAME);
             broadcastNotificationMbean = new BroadcastNotificationService();
             mBeanServer.registerMBean(broadcastNotificationMbean, broadcasterObjectName);
             if (registerListenerMbean)
             {
-                listenerObjectName = ObjectName.getInstance(jmxSupport.getDomainName() + ":" + LISTENER_JMX_OBJECT_NAME);
+                listenerObjectName = ObjectName.getInstance(jmxSupport.getDomainName(managementContext) + ":" + LISTENER_JMX_OBJECT_NAME);
                 NotificationListener mbean = new NotificationListener();
                 broadcastNotificationMbean.addNotificationListener(mbean, null, null);
                 mBeanServer.registerMBean(mbean, listenerObjectName);

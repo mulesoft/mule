@@ -40,14 +40,20 @@ public class AndFilter extends AbstractFilterCollection
 
     public boolean accept(UMOMessage message)
     {
+        if(getFilters().size()==0)
+        {
+            return false;
+        }
+        int counter=0;
         for (Iterator iterator = getFilters().iterator(); iterator.hasNext();)
         {
             UMOFilter umoFilter = (UMOFilter) iterator.next();
-            if(!umoFilter.accept(message))
+            if(umoFilter.accept(message))
             {
-                return false;
+                counter++;
             }
         }
-        return true;
+
+        return counter == getFilters().size();
     }
 }

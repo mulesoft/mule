@@ -10,9 +10,7 @@
 
 package org.mule.extras.spring.events;
 
-import org.mule.MuleManager;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.manager.UMOManager;
 
 import org.springframework.context.support.AbstractApplicationContext;
 
@@ -26,11 +24,10 @@ public class CircularReferenceSpringEventsTestCase extends FunctionalTestCase
 
     public void testManagerIsInstanciated() throws Exception
     {
-        UMOManager m = MuleManager.getInstance();
-        assertTrue(m.isInitialised());
-        assertTrue(m.isStarted());
-        assertNotNull(m.getContainerContext());
-        assertNotNull(m.getContainerContext().getComponent(
+        assertTrue(managementContext.isInitialised());
+        assertTrue(managementContext.isStarted());
+        assertNotNull(managementContext.getRegistry().getContainerContext());
+        assertNotNull(managementContext.getRegistry().getContainerContext().getComponent(
             AbstractApplicationContext.APPLICATION_EVENT_MULTICASTER_BEAN_NAME));
     }
 }

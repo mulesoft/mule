@@ -10,18 +10,19 @@
 
 package org.mule.tck;
 
-import org.mule.MuleManager;
-import org.mule.config.MuleConfiguration;
+import org.mule.RegistryContext;
+import org.mule.config.spring.DefaultRegistryFacade;
+import org.mule.impl.ManagementContext;
 import org.mule.impl.MuleDescriptor;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.manager.UMOManager;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.FileUtils;
@@ -50,6 +51,8 @@ public abstract class AbstractMuleTestCase extends TestCase
         "true");
 
     private static Map testCounters;
+
+    protected static UMOManagementContext managementContext;
 
     public AbstractMuleTestCase()
     {
@@ -155,8 +158,7 @@ public abstract class AbstractMuleTestCase extends TestCase
     protected final void setUp() throws Exception
     {
         System.out.println(StringMessageUtils.getBoilerPlate("Testing: " + toString(), '=', 80));
-        MuleManager.getConfiguration().getDefaultThreadingProfile().setDoThreading(false);
-        //TODO RM* MuleManager.getConfiguration().setServerUrl(StringUtils.EMPTY);
+        
 
         try
         {
@@ -179,6 +181,8 @@ public abstract class AbstractMuleTestCase extends TestCase
             {
                 return;
             }
+            managementContext = createManagementContext();
+
             doSetUp();
             if (getTestInfo().getRunCount() == 0)
             {
@@ -193,6 +197,14 @@ public abstract class AbstractMuleTestCase extends TestCase
         }
     }
 
+    protected UMOManagementContext createManagementContext() throws Exception
+    {
+        RegistryContext.setRegistry(new DefaultRegistryFacade());
+        UMOManagementContext managementContext = new ManagementContext();
+        managementContext.initialise();        
+        managementContext.getRegistry().registerModel(getDefaultModel(managementContext));
+        return managementContext;
+    }
     protected void suitePreSetUp() throws Exception
     {
         // nothing to do
@@ -250,13 +262,12 @@ public abstract class AbstractMuleTestCase extends TestCase
     protected void disposeManager()
     {
         log("disposing manager. disposeManagerPerSuite=" + getTestInfo().isDisposeManagerPerSuite());
-        if (MuleManager.isInstanciated())
+        if (managementContext!=null)
         {
-            MuleManager.getInstance().dispose();
+            FileUtils.deleteTree(FileUtils.newFile(RegistryContext.getConfiguration().getWorkingDirectory()));
+            managementContext.dispose();
         }
-        FileUtils.deleteTree(FileUtils.newFile(MuleManager.getConfiguration().getWorkingDirectory()));
         FileUtils.deleteTree(FileUtils.newFile("./ActiveMQ"));
-        MuleManager.setConfiguration(new MuleConfiguration());
     }
 
     protected void doSetUp() throws Exception
@@ -269,29 +280,24 @@ public abstract class AbstractMuleTestCase extends TestCase
         // template method
     }
 
-    public static UMOManager getManager(boolean disableAdminAgent) throws Exception
+    public static UMOModel getDefaultModel(UMOManagementContext context) throws UMOException
     {
-        return MuleTestUtils.getManager(disableAdminAgent);
-    }
-
-    public static UMOModel getDefaultModel() throws UMOException
-    {
-        return MuleTestUtils.getDefaultModel();
+        return MuleTestUtils.getDefaultModel(context);
     }
 
     public static UMOEndpoint getTestEndpoint(String name, String type) throws Exception
     {
-        return MuleTestUtils.getTestEndpoint(name, type);
+        return MuleTestUtils.getTestEndpoint(name, type, managementContext);
     }
 
     public static UMOEvent getTestEvent(Object data) throws Exception
     {
-        return MuleTestUtils.getTestEvent(data);
+        return MuleTestUtils.getTestEvent(data, managementContext);
     }
 
     public static UMOEventContext getTestEventContext(Object data) throws Exception
     {
-        return MuleTestUtils.getTestEventContext(data);
+        return MuleTestUtils.getTestEventContext(data, managementContext);
     }
 
     public static UMOTransformer getTestTransformer()
@@ -301,12 +307,12 @@ public abstract class AbstractMuleTestCase extends TestCase
 
     public static UMOEvent getTestEvent(Object data, MuleDescriptor descriptor) throws Exception
     {
-        return MuleTestUtils.getTestEvent(data, descriptor);
+        return MuleTestUtils.getTestEvent(data, descriptor, managementContext);
     }
 
     public static UMOEvent getTestEvent(Object data, UMOImmutableEndpoint endpoint) throws Exception
     {
-        return MuleTestUtils.getTestEvent(data, endpoint);
+        return MuleTestUtils.getTestEvent(data, endpoint, managementContext);
     }
 
     public static UMOEvent getTestEvent(Object data, MuleDescriptor descriptor, UMOImmutableEndpoint endpoint)
@@ -332,12 +338,7 @@ public abstract class AbstractMuleTestCase extends TestCase
 
     public static MuleDescriptor getTestDescriptor(String name, String implementation) throws Exception
     {
-        return MuleTestUtils.getTestDescriptor(name, implementation);
-    }
-
-    public static UMOManager getTestManager() throws Exception
-    {
-        return MuleTestUtils.getManager(true);
+        return MuleTestUtils.getTestDescriptor(name, implementation, managementContext);
     }
 
     protected void finalize() throws Throwable

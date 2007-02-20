@@ -10,7 +10,7 @@
 
 package org.mule.impl.endpoint;
 
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.config.i18n.Message;
 import org.mule.providers.service.TransportFactory;
 import org.mule.providers.service.TransportServiceDescriptor;
@@ -127,13 +127,6 @@ public class MuleEndpointURI implements UMOEndpointURI
 
     public MuleEndpointURI(String uri) throws EndpointException
     {
-        String uriIdentifier = MuleManager.getInstance().lookupEndpointIdentifier(uri, uri);
-        if (!uriIdentifier.equals(uri))
-        {
-            endpointName = uri;
-            uri = uriIdentifier;
-        }
-
         uri = uri.trim().replaceAll(" ", "%20");
 
         if (!validateUrl(uri))
@@ -158,8 +151,8 @@ public class MuleEndpointURI implements UMOEndpointURI
         try
         {
             String scheme = (schemeMetaInfo == null ? this.uri.getScheme() : schemeMetaInfo);
-            TransportServiceDescriptor sd = (TransportServiceDescriptor) 
-                MuleManager.getInstance().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, scheme, null);
+            TransportServiceDescriptor sd;
+            sd = (TransportServiceDescriptor)RegistryContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, scheme, null);
             if (sd == null)
             {
                 throw new ServiceException(Message.createStaticMessage("No service descriptor found for transport: " + scheme + ".  This transport does not appear to be installed."));

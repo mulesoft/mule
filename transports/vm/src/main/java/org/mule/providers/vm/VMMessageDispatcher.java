@@ -234,7 +234,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         {
             // use the default queue profile to configure this queue.
             connector.getQueueProfile().configureQueue(
-                endpoint.getEndpointURI().getAddress());
+                endpoint.getEndpointURI().getAddress(), connector.getManagementContext().getQueueManager());
         }
     }
 

@@ -12,6 +12,7 @@ package org.mule.impl.security;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.ObjectFactory;
 import org.mule.util.StringMessageUtils;
@@ -46,7 +47,7 @@ public class SecretKeyEncryptionStrategy extends AbstractJCEEncryptionStrategy
         algorithm = DEFAULT_ALGORITHM;
     }
 
-    public void initialise() throws InitialisationException
+    public void initialise(UMOManagementContext managementContext) throws InitialisationException
     {
         if (key == null)
         {
@@ -66,7 +67,7 @@ public class SecretKeyEncryptionStrategy extends AbstractJCEEncryptionStrategy
                 }
             }
         }
-        super.initialise();
+        super.initialise(managementContext);
     }
 
     protected KeySpec createKeySpec()

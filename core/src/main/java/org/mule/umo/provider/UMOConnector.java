@@ -14,15 +14,14 @@ import org.mule.umo.MessagingException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
+import org.mule.umo.lifecycle.Lifecycle;
 import org.mule.umo.lifecycle.Registerable;
-
-import edu.emory.mathcs.backport.java.util.concurrent.ScheduledExecutorService;
 
 import java.beans.ExceptionListener;
 import java.io.InputStream;
@@ -32,20 +31,19 @@ import java.io.OutputStream;
  * <code>UMOConnector</code> is the mechanism used to connect to external systems
  * and protocols in order to send and receive data.
  */
-public interface UMOConnector extends Disposable, Initialisable, Registerable
+public interface UMOConnector extends Lifecycle, Initialisable, Registerable
 {
     public static final int INT_VALUE_NOT_SET = -1;
 
     /**
      * This creates a <code>UMOMessageReceiver</code> associated with this endpoint
-     * and registers it with the connector.
+     * and registers it with the connector
      * 
      * @param component the listening component
      * @param endpoint the endpoint contains the listener endpointUri on which to
      *            listen on.
      * @throws Exception if the UMOMessageReceiver cannot be created or the Receiver
      *             cannot be registered
-     * @return message receiver
      */
     UMOMessageReceiver registerListener(UMOComponent component, UMOEndpoint endpoint) throws Exception;
 
@@ -116,7 +114,6 @@ public interface UMOConnector extends Disposable, Initialisable, Registerable
     String getProtocol();
 
     /**
-     * @param protocol protocol name
      * @return true if the protocol is supported by this connector.
      */
     boolean supportsProtocol(String protocol);
@@ -139,12 +136,6 @@ public interface UMOConnector extends Disposable, Initialisable, Registerable
     void handleException(Exception exception);
 
     /**
-     * Returns a Scheduler service for execution of periodic tasks.
-     * @return scheduler
-     */
-    ScheduledExecutorService getScheduler();
-
-    /**
      * The dispatcher factory is used to create a message dispatcher of the current
      * request
      * 
@@ -160,17 +151,12 @@ public interface UMOConnector extends Disposable, Initialisable, Registerable
      */
     UMOMessageDispatcherFactory getDispatcherFactory();
 
-    public void startConnector() throws UMOException;
-
-    public void stopConnector() throws UMOException;
-
     public boolean isRemoteSyncEnabled();
 
     /**
      * Dispatches an event from the endpoint to the external system
      * 
      * @param event The event to dispatch
-     * @param endpoint endpoint to dispatch from
      * @throws DispatchException if the event fails to be dispatched
      */
     void dispatch(UMOImmutableEndpoint endpoint, UMOEvent event) throws DispatchException;
@@ -208,7 +194,6 @@ public interface UMOConnector extends Disposable, Initialisable, Registerable
      * Sends an event from the endpoint to the external system
      * 
      * @param event The event to send
-     * @param endpoint endpoint to send from
      * @return event the response form the external system wrapped in a UMOEvent
      * @throws DispatchException if the event fails to be dispatched
      */
@@ -225,8 +210,9 @@ public interface UMOConnector extends Disposable, Initialisable, Registerable
      * @param message the current message being processed
      * @return the output stream to use for this request or null if the transport
      *         does not support streaming
-     * @throws UMOException in case of any error
+     * @throws UMOException
      */
     OutputStream getOutputStream(UMOImmutableEndpoint endpoint, UMOMessage message) throws UMOException;
 
+    UMOManagementContext getManagementContext();
 }

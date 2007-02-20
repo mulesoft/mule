@@ -10,7 +10,6 @@
 
 package org.mule.providers.soap.xfire;
 
-import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.extras.client.MuleClient;
 import org.mule.impl.MuleMessage;
@@ -34,7 +33,7 @@ public class XFireCustomHttpHeaderTestCase extends FunctionalTestCase implements
     {
         notifications = new Vector(5);
 
-        MuleManager.getInstance().registerListener(this);
+        managementContext.registerListener(this);
         MuleClient client = new MuleClient();
         HashMap props = new HashMap();
         props.put(MuleProperties.MULE_USER_PROPERTY, "alan");

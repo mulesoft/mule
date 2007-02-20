@@ -17,7 +17,7 @@ import org.mule.umo.UMOTransaction;
 public class SpringTransactionFactoryTestCase extends AbstractMuleTestCase
 {
 
-    // @Override
+    // //@Override
     protected void doTearDown() throws Exception
     {
         UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();

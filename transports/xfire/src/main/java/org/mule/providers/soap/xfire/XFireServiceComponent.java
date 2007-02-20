@@ -27,6 +27,7 @@ import org.mule.providers.streaming.StreamMessageAdapter;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Initialisable;
@@ -177,7 +178,7 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
         // template method
     }
 
-    public void initialise() throws InitialisationException
+    public void initialise(UMOManagementContext managementContext) throws InitialisationException
     {
         if (xfire == null)
         {

@@ -26,7 +26,7 @@ public class VMConnectorTestCase extends AbstractConnectorTestCase
     {
         VMConnector conn = new VMConnector();
         conn.setName("TestVM");
-        conn.initialise();
+        conn.initialise(managementContext);
         return conn;
     }
 
@@ -42,7 +42,7 @@ public class VMConnectorTestCase extends AbstractConnectorTestCase
      */
     public void testDispatch() throws Exception
     {
-        // MuleManager.getConfiguration().setSynchronous(false);
+        // RegistryContext.getConfiguration().setSynchronous(false);
         // UMOConnector connector = getConnector();
         // Mock mockComponent = new Mock(UMOComponent.class);
         // UMOEndpoint= getTestEndpoint("testProvider",
@@ -73,7 +73,7 @@ public class VMConnectorTestCase extends AbstractConnectorTestCase
      */
     public void testSend() throws Exception
     {
-        // MuleManager.getConfiguration().setSynchronous(true);
+        // RegistryContext.getConfiguration().setSynchronous(true);
         // UMOConnector connector = getConnector();
         // Mock mockComponent = new Mock(UMOComponent.class);
         // UMOEndpoint= getTestEndpoint("testProvider",

@@ -9,10 +9,10 @@
  */
 package org.mule.management.support;
 
-import org.mule.MuleManager;
 import org.mule.impl.internal.notifications.ManagerNotification;
 import org.mule.impl.internal.notifications.ManagerNotificationListener;
 import org.mule.impl.internal.notifications.NotificationException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.manager.UMOServerNotification;
 
 import org.apache.commons.logging.Log;
@@ -46,19 +46,13 @@ public class JmxRegistrationContext
     private String resolvedDomain;
 
     /** Do not instantiate JmxRegistrationContext. */
-    private JmxRegistrationContext()
+    private JmxRegistrationContext(UMOManagementContext context)
     {
-        // no manager available, bail out
-        if (!MuleManager.isInstanciated())
-        {
-            return;
-        }
-
         try
         {
             // register the cleanup hook, otherwise server stop/start cycles may produce
             // Mule JMX domains with ever increasing suffix.
-            MuleManager.getInstance().registerListener(new ManagerNotificationListener()
+            context.registerListener(new ManagerNotificationListener()
             {
                 public void onNotification(UMOServerNotification notification)
                 {
@@ -82,12 +76,12 @@ public class JmxRegistrationContext
      * Get current context or create one if none exist for the current startup cycle.
      * @return jmx registration context
      */
-    public static JmxRegistrationContext getCurrent()
+    public static JmxRegistrationContext getCurrent(UMOManagementContext context)
     {
         JmxRegistrationContext ctx = (JmxRegistrationContext) contexts.get();
         if (ctx == null)
         {
-            ctx = new JmxRegistrationContext();
+            ctx = new JmxRegistrationContext(context);
         }
         contexts.set(ctx);
         return ctx;

@@ -11,7 +11,7 @@
 package org.mule.impl;
 
 import org.mule.MuleException;
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.endpoint.MuleEndpoint;
@@ -24,6 +24,7 @@ import org.mule.registry.RegistrationException;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOFilter;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -159,7 +160,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
      */
     protected String initialState = INITIAL_STATE_STARTED;
 
-    protected String endpointEncoding = null;
+    protected String endpointEncoding;
 
     /**
      * determines if a new connector should be created for this endpoint
@@ -167,6 +168,8 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     protected int createConnector = TransportFactory.GET_OR_CREATE_CONNECTOR;
 
     protected String registryId = null;
+
+    protected UMOManagementContext managementContext;
 
     /**
      * Default ctor
@@ -383,57 +386,6 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     /*
      * (non-Javadoc)
      *
-     * @see java.lang.Object#clone()
-     */
-    // TODO this is the 'old' implementation of the clone() method which returns
-    // a MUTABLE endpoint! We need to clarify what endpoint mutability and
-    // cloning actually means
-    public Object clone()
-    {
-        UMOEndpoint clone = new MuleEndpoint(name, endpointUri, connector, transformer, type,
-            createConnector, endpointEncoding, properties);
-
-        clone.setTransactionConfig(transactionConfig);
-        clone.setFilter(filter);
-        clone.setSecurityFilter(securityFilter);
-
-        if (remoteSync != null)
-        {
-            clone.setRemoteSync(isRemoteSync());
-        }
-        if (remoteSyncTimeout != null)
-        {
-            clone.setRemoteSyncTimeout(getRemoteSyncTimeout());
-        }
-
-        if (synchronous != null)
-        {
-            clone.setSynchronous(synchronous.booleanValue());
-        }
-
-        clone.setDeleteUnacceptedMessages(deleteUnacceptedMessages);
-
-        clone.setInitialState(initialState);
-        if (initialised.get())
-        {
-            try
-            {
-                clone.initialise();
-            }
-            catch (InitialisationException e)
-            {
-                // this really should never happen as the endpoint is already
-                // initialised
-                logger.error(e.getMessage(), e);
-            }
-        }
-
-        return clone;
-    }
-
-    /*
-     * (non-Javadoc)
-     *
      * @see org.mule.umo.endpoint.UMOImmutableEndpoint#isReadOnly()
      */
     public boolean isReadOnly()
@@ -562,12 +514,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         UMOEndpoint endpoint = null;
         if (uri != null)
         {
-            String endpointString = MuleManager.getInstance().lookupEndpointIdentifier(uri, uri);
-            endpoint = MuleManager.getInstance().lookupEndpoint(endpointString);
-            if(endpoint==null)
-            {
-                endpoint = (UMOEndpoint)MuleManager.getInstance().getContainerContext().getComponent(endpointString);
-            }
+            endpoint = RegistryContext.getRegistry().lookupEndpoint(uri);
         }
         return endpoint;
     }
@@ -577,9 +524,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         String endpointName = uri.getEndpointName();
         if (endpointName != null)
         {
-            String endpointString = MuleManager.getInstance().lookupEndpointIdentifier(endpointName,
-                endpointName);
-            UMOEndpoint endpoint = MuleManager.getInstance().lookupEndpoint(endpointString);
+            UMOEndpoint endpoint = RegistryContext.getRegistry().lookupEndpoint(endpointName);
             if (endpoint != null)
             {
                 if (StringUtils.isNotEmpty(uri.getAddress()))
@@ -633,18 +578,26 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         return deleteUnacceptedMessages;
     }
 
-    public void initialise() throws InitialisationException
+    public void initialise(UMOManagementContext managementContext) throws InitialisationException
     {
         if (initialised.get())
         {
             logger.debug("Already initialised: " + toString());
             return;
         }
+
+        this.managementContext = managementContext;
+        
+        if(endpointEncoding==null)
+        {
+            endpointEncoding = RegistryContext.getConfiguration().getDefaultEncoding();
+        }
+
         if (connector == null)
         {
             if (endpointUri.getConnectorName() != null)
             {
-                connector = MuleManager.getInstance().lookupConnector(endpointUri.getConnectorName());
+                connector = managementContext.getRegistry().lookupConnector(endpointUri.getConnectorName());
                 if (connector == null)
                 {
                     throw new IllegalArgumentException("Connector not found: "
@@ -709,7 +662,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
                 else if (UMOEndpoint.ENDPOINT_TYPE_SENDER_AND_RECEIVER.equals(type))
                 {
                 	transformer = ((AbstractConnector)connector).getDefaultOutboundTransformer();
-                	responseTransformer = ((AbstractConnector)connector).getDefaultInboundTransformer();
+                	responseTransformer = ((AbstractConnector)connector).getDefaultResponseTransformer();
                 }
                 else
                 {
@@ -726,8 +679,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         {
             try
             {
-                responseTransformer = MuleObjectHelper.getTransformer(endpointUri.getResponseTransformers(),
-                    ",");
+                responseTransformer = MuleObjectHelper.getTransformer(endpointUri.getResponseTransformers(), ",");
             }
             catch (MuleException e)
             {
@@ -749,7 +701,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         if (securityFilter != null)
         {
             securityFilter.setEndpoint(this);
-            securityFilter.initialise();
+            securityFilter.initialise(managementContext);
         }
 
         // Allow remote sync values to be set as params on the endpoint URI
@@ -792,7 +744,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
             throw new RegistrationException("Unable to find the endpoint's connector registryId");
 
         registryId = 
-            MuleManager.getInstance().getRegistry().registerMuleObject(connector, this).getId();
+            managementContext.getRegistry().registerMuleObject(connector, this).getId();
     }
 
     /*
@@ -802,7 +754,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
      */
     public void deregister() throws DeregistrationException
     {
-        MuleManager.getInstance().getRegistry().deregisterComponent(registryId);
+        managementContext.getRegistry().deregisterComponent(registryId);
         registryId = null;
     }
 
@@ -841,7 +793,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     {
         if (synchronous == null)
         {
-            return MuleManager.getConfiguration().isDefaultSynchronousEndpoints();
+            return RegistryContext.getConfiguration().isDefaultSynchronousEndpoints();
         }
         return synchronous.booleanValue();
     }
@@ -870,7 +822,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         {
             if (connector == null || connector.isRemoteSyncEnabled())
             {
-                remoteSync = Boolean.valueOf(MuleManager.getConfiguration().isDefaultRemoteSync());
+                remoteSync = Boolean.FALSE;
             }
             else
             {
@@ -889,7 +841,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     {
         if (remoteSyncTimeout == null)
         {
-            remoteSyncTimeout = new Integer(MuleManager.getConfiguration().getDefaultSynchronousEventTimeout());
+            remoteSyncTimeout = new Integer(0);
         }
         return remoteSyncTimeout.intValue();
     }
@@ -972,4 +924,9 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         }
     }
 
+
+    public UMOManagementContext getManagementContext()
+    {
+        return managementContext;
+    }
 }

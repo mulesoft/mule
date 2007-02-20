@@ -10,7 +10,6 @@
 
 package org.mule.providers.http;
 
-import org.mule.MuleManager;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.AbstractConnector;
 import org.mule.tck.providers.AbstractMessageReceiverTestCase;
@@ -21,16 +20,12 @@ import org.mule.umo.provider.UMOMessageReceiver;
 
 import com.mockobjects.dynamic.Mock;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public class HttpsMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
     protected void doSetUp() throws Exception
     {
-        MuleManager.getInstance().registerConnector(HttpsConnectorTestCase.createConnector(false));
+        managementContext.getRegistry().registerConnector(
+                HttpsConnectorTestCase.createConnector(managementContext, false));
         super.doSetUp();
     }
 

@@ -12,11 +12,11 @@ package org.mule.management.support;
 import org.mule.management.AbstractMuleJmxTestCase;
 import org.mule.management.agents.JmxAgent;
 import org.mule.management.mbeans.StatisticsService;
-import org.mule.umo.manager.UMOManager;
 
-import javax.management.ObjectName;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.management.ObjectName;
 
 public class JmxSupportTestCase extends AbstractMuleJmxTestCase
 {
@@ -30,11 +30,10 @@ public class JmxSupportTestCase extends AbstractMuleJmxTestCase
         ObjectName name = ObjectName.getInstance(testDomain + ":name=TestDuplicates");
         mBeanServer.registerMBean(new StatisticsService(), name);
 
-        UMOManager manager = getManager(true);
-        manager.setId(managerId);
+       managementContext.setId(managerId);
         JmxAgent agent = new JmxAgent();
-        manager.registerAgent(agent);
-        manager.start();
+       managementContext.getRegistry().registerAgent(agent);
+       managementContext.start();
 
         List domains = Arrays.asList(mBeanServer.getDomains());
         assertTrue("Should have contained an original domain.", domains.contains(testDomain));
@@ -60,11 +59,10 @@ public class JmxSupportTestCase extends AbstractMuleJmxTestCase
         assertEquals("Wrong number of domains created.",
                      numOriginalDomains + 2, mBeanServer.getDomains().length);
 
-        UMOManager manager = getManager(true);
-        manager.setId(managerId);
+       managementContext.setId(managerId);
         JmxAgent agent = new JmxAgent();
-        manager.registerAgent(agent);
-        manager.start();
+       managementContext.getRegistry().registerAgent(agent);
+       managementContext.start();
 
         List domains = Arrays.asList(mBeanServer.getDomains());
         // one extra domain created by Mule's clash resolution
@@ -78,13 +76,12 @@ public class JmxSupportTestCase extends AbstractMuleJmxTestCase
 
     public void testDomainNoManagerIdAndJmxAgentMustFail() throws Exception
     {
-        UMOManager manager = getManager(true);
         JmxAgent jmxAgent = new JmxAgent();
-        manager.registerAgent(jmxAgent);
-        manager.setId(null);
+       managementContext.getRegistry().registerAgent(jmxAgent);
+       managementContext.setId(null);
         try
         {
-            manager.start();
+           managementContext.start();
             fail("Should have failed.");
             // TODO rework the exception, not the best one here
         } catch (IllegalArgumentException e)

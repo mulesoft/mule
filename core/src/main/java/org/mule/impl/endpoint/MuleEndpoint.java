@@ -10,7 +10,6 @@
 
 package org.mule.impl.endpoint;
 
-import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.ImmutableMuleEndpoint;
@@ -22,7 +21,6 @@ import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOEndpointSecurityFilter;
 import org.mule.umo.transformer.UMOTransformer;
@@ -72,49 +70,6 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
     public MuleEndpoint(String uri, boolean receiver) throws UMOException
     {
         super(uri, receiver);
-    }
-
-    public Object clone()
-    {
-        UMOEndpoint clone = new MuleEndpoint(name, endpointUri, connector, transformer, type,
-            createConnector, endpointEncoding, properties);
-
-        clone.setTransactionConfig(transactionConfig);
-        clone.setFilter(filter);
-        clone.setSecurityFilter(securityFilter);
-
-        if (remoteSync != null)
-        {
-            clone.setRemoteSync(isRemoteSync());
-        }
-        if (remoteSyncTimeout != null)
-        {
-            clone.setRemoteSyncTimeout(getRemoteSyncTimeout());
-        }
-
-        if (synchronous != null)
-        {
-            clone.setSynchronous(synchronous.booleanValue());
-        }
-
-        clone.setDeleteUnacceptedMessages(deleteUnacceptedMessages);
-
-        clone.setInitialState(initialState);
-        if (initialised.get())
-        {
-            try
-            {
-                clone.initialise();
-            }
-            catch (InitialisationException e)
-            {
-                // this really should never happen as the endpoint is already
-                // initialised
-                logger.error(e.getMessage(), e);
-            }
-        }
-
-        return clone;
     }
 
     /*

@@ -10,9 +10,9 @@
 
 package org.mule.providers.bpm;
 
-import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
-import org.mule.extras.spring.config.SpringConfigurationBuilder;
+import org.mule.config.builders.MuleXmlConfigurationBuilder;
+import org.mule.umo.UMOManagementContext;
 
 /**
  * Tests the connector against jBPM with 2 simple processes.
@@ -21,22 +21,21 @@ import org.mule.extras.spring.config.SpringConfigurationBuilder;
 public class SimpleJbpmSpringTestCase extends SimpleJbpmTestCase {
 
     protected ConfigurationBuilder getBuilder() throws Exception {
-        return new SpringConfigurationBuilder();
+        return new MuleXmlConfigurationBuilder();
     }
 
     protected String getConfigResources() {
         return "jbpm-spring-config.xml";
     }
 
-    protected void doSetupManager() throws Exception {
+    protected void doSetupManager(UMOManagementContext context) throws Exception {
         // Disable parent method
     }
 
-    protected void doPostFunctionalSetUp() throws Exception {
+    protected void doSetUp() throws Exception {
         connector =
-            (ProcessConnector) MuleManager.getInstance().lookupConnector("jBpmConnector");
+            (ProcessConnector) managementContext.getRegistry().lookupConnector("jBpmConnector");
         bpms = connector.getBpms();
         connector.setAllowGlobalReceiver(true);
-        super.doPostFunctionalSetUp();
     }
 }

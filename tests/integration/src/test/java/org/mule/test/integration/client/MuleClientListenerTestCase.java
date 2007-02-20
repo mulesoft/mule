@@ -72,14 +72,14 @@ public class MuleClientListenerTestCase extends FunctionalTestCase
         descriptor.getInboundRouter().addEndpoint(endpoint);
         client.registerComponent(descriptor);
 
-        assertTrue(MuleManager.getInstance().lookupModel("main").isComponentRegistered(name));
+        assertTrue(managementContext.getRegistry().lookupModel("main").isComponentRegistered(name));
 
         UMOMessage message = client.send(urlString, "Test Client Send message", null);
         assertNotNull(message);
         assertEquals("Received: Test Client Send message", message.getPayloadAsString());
         client.unregisterComponent(name);
 
-        assertTrue(!MuleManager.getInstance().lookupModel("main").isComponentRegistered(name));
+        assertTrue(!managementContext.getRegistry().lookupModel("main").isComponentRegistered(name));
 
         if (!canSendWithoutReceiver)
         {

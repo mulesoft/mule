@@ -10,7 +10,6 @@
 
 package org.mule.impl.model;
 
-import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.DefaultComponentExceptionStrategy;
@@ -24,6 +23,7 @@ import org.mule.registry.RegistrationException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOSession;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -64,6 +64,8 @@ public abstract class AbstractModel implements UMOModel
 
     private Map components = new ConcurrentSkipListMap();
 
+    protected UMOManagementContext managementContext;
+
     /**
      * Collection for mule descriptors registered in this Manager
      */
@@ -90,6 +92,7 @@ public abstract class AbstractModel implements UMOModel
         descriptors = new ConcurrentHashMap();
         exceptionListener = new DefaultComponentExceptionStrategy();
     }
+
 
     /*
      * (non-Javadoc)
@@ -164,18 +167,11 @@ public abstract class AbstractModel implements UMOModel
                 logger.error("Unable to register descriptor " + 
                     descriptor.getName() + " with the registry");
             }
-
-            descriptor.initialise();
         }
         // Set the es if one wasn't set in the configuration
         if (descriptor.getExceptionListener() == null)
         {
             descriptor.setExceptionListener(exceptionListener);
-        }
-
-        if (initialised.get())
-        {
-            descriptor.initialise();
         }
 
         // detect duplicate descriptor declarations
@@ -198,15 +194,15 @@ public abstract class AbstractModel implements UMOModel
         if (initialised.get())
         {
             logger.info("Initialising component: " + descriptor.getName());
-            component.initialise();
+            component.initialise(managementContext);
         }
         if (started.get())
         {
-            logger.info("Starting component: " + descriptor.getName());
-            component.start();
+            startComponent(descriptor.getName());
         }
         return component;
     }
+
 
     public void unregisterComponent(UMODescriptor descriptor) throws UMOException
     {
@@ -324,7 +320,8 @@ public abstract class AbstractModel implements UMOModel
     {
         if (!initialised.get())
         {
-            initialise();
+            //initialise(managementContext);
+            throw new IllegalStateException("Not Initialised");
         }
 
         if (!started.get())
@@ -334,25 +331,7 @@ public abstract class AbstractModel implements UMOModel
             for (Iterator i = components.values().iterator(); i.hasNext();)
             {
                 AbstractComponent component = (AbstractComponent)i.next();
-
-                if (component.getDescriptor().getInitialState().equals(
-                    ImmutableMuleDescriptor.INITIAL_STATE_STARTED))
-                {
-                    component.start();
-                    logger.info("Component " + component + " has been started successfully");
-                }
-                else if (component.getDescriptor().getInitialState().equals(
-                    ImmutableMuleDescriptor.INITIAL_STATE_PAUSED))
-                {
-                    component.start(true);
-                    logger.info("Component " + component
-                                + " has been started and paused (initial state = 'paused')");
-                }
-                else
-                {
-                    logger.info("Component " + component
-                                + " has not been started (initial state = 'stopped')");
-                }
+                startComponent(component.getDescriptor().getName());
             }
             started.set(true);
             fireNotification(new ModelNotification(this, ModelNotification.MODEL_STARTED));
@@ -373,14 +352,35 @@ public abstract class AbstractModel implements UMOModel
      */
     public void startComponent(String name) throws UMOException
     {
-        UMOComponent component = (UMOComponent)components.get(name);
+        AbstractComponent component = (AbstractComponent)components.get(name);
         if (component == null)
         {
             throw new ModelException(new Message(Messages.COMPONENT_X_NOT_REGISTERED, name));
         }
         else
         {
-            component.start();
+            if(component.isStarted())
+            {
+                logger.info("Component is already started: " + component);
+            }
+            else if (component.getDescriptor().getInitialState().equals(
+                ImmutableMuleDescriptor.INITIAL_STATE_STARTED))
+            {
+                component.start();
+                logger.info("Component " + component + " has been started successfully");
+            }
+            else if (component.getDescriptor().getInitialState().equals(
+                ImmutableMuleDescriptor.INITIAL_STATE_PAUSED))
+            {
+                component.start(true);
+                logger.info("Component " + component
+                            + " has been started and paused (initial state = 'paused')");
+            }
+            else
+            {
+                logger.info("Component " + component
+                            + " has not been started (initial state = 'stopped')");
+            }
             logger.info("Mule " + component.toString() + " has been started successfully");
         }
     }
@@ -465,30 +465,31 @@ public abstract class AbstractModel implements UMOModel
         }
     }
 
-    public void initialise() throws InitialisationException
+    public void initialise(UMOManagementContext managementContext) throws InitialisationException
     {
         if (!initialised.get())
         {
+            this.managementContext = managementContext;
             fireNotification(new ModelNotification(this, ModelNotification.MODEL_INITIALISING));
+            try
+            {
+                register();
+            }
+            catch (RegistrationException e)
+            {
+                throw new InitialisationException(e, this);
+            }
 
             if (exceptionListener instanceof Initialisable)
             {
-                ((Initialisable)exceptionListener).initialise();
+                ((Initialisable)exceptionListener).initialise(managementContext);
             }
             UMOComponent component = null;
             for (Iterator i = components.values().iterator(); i.hasNext();)
             {
                 component = (UMOComponent)i.next();
 
-                try 
-                {
-                    component.register();
-                } catch (RegistrationException re)
-                {
-                    logger.info("Unable to register component");
-                }
-
-                component.initialise();
+                component.initialise(managementContext);
 
                 logger.info("Component " + component.getDescriptor().getName()
                             + " has been started successfully");
@@ -509,7 +510,7 @@ public abstract class AbstractModel implements UMOModel
      */
     public void register() throws RegistrationException
     {
-        registryId = MuleManager.getInstance().getRegistry().registerMuleObject(MuleManager.getInstance(), this).getId();
+        registryId = managementContext.getRegistry().registerMuleObject(managementContext, this).getId();
     }
 
     /*
@@ -519,7 +520,7 @@ public abstract class AbstractModel implements UMOModel
      */
     public void deregister() throws DeregistrationException
     {
-        MuleManager.getInstance().getRegistry().deregisterComponent(registryId);
+        managementContext.getRegistry().deregisterComponent(registryId);
         registryId = null;
     }
 
@@ -565,7 +566,7 @@ public abstract class AbstractModel implements UMOModel
 
     void fireNotification(UMOServerNotification notification)
     {
-        MuleManager.getInstance().fireNotification(notification);
+        managementContext.fireNotification(notification);
     }
 
     protected abstract UMOComponent createComponent(UMODescriptor descriptor);

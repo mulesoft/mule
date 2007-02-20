@@ -10,12 +10,10 @@
 
 package org.mule.config.builders;
 
-import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.ConfigurationException;
 import org.mule.config.ReaderResource;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.impl.ManagementContext;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
@@ -30,14 +28,14 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOFilter;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOContainerContext;
-import org.mule.umo.manager.UMOManager;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.util.MuleObjectHelper;
+import org.mule.util.StringUtils;
 
 import java.util.Map;
 import java.util.Properties;
@@ -45,98 +43,56 @@ import java.util.Properties;
 /**
  * <code>QuickConfigurationBuilder</code> is a configuration helper that can be
  * used by clients, configuration scripts or test cases to quickly configure a
- * manager.
+ *managementContext.
  */
 public class QuickConfigurationBuilder implements ConfigurationBuilder
 {
     private static final String MODEL_NOT_SET = "not set";
 
-    protected UMOManager manager;
+    protected UMOManagementContext managementContext;
 
     private UMOModel model;
 
-    /**
-     * Constructs a default builder
-     */
-    public QuickConfigurationBuilder()
+
+    public QuickConfigurationBuilder() throws UMOException
     {
-        manager = MuleManager.getInstance();
+        this("seda", null, null);
     }
 
     /**
-     * Will construct a new Quick Config builder with the option of disposing of the
-     * current Manager if one exists
-     * 
-     * @param disposeCurrent true to dispose the current manager
-     */
-    public QuickConfigurationBuilder(boolean disposeCurrent)
-    {
-        if (disposeCurrent)
-        {
-            disposeCurrent();
-        }
-
-        manager = MuleManager.getInstance();
-    }
-
-    /**
-     * Disposes the current MuleManager if there is one.
-     */
-    public void disposeCurrent()
-    {
-        if (MuleManager.isInstanciated())
-        {
-            MuleManager.getInstance().dispose();
-        }
-    }
-
-    public void disableAdminAgent()
-    {
-        //RM* MuleManager.getConfiguration().setServerUrl(StringUtils.EMPTY);
-        if (manager != null)
-        {
-            try
-            {
-                manager.unregisterAgent(MuleAdminAgent.AGENT_NAME);
-            }
-            catch (UMOException e)
-            {
-                // ignore
-            }
-        }
-    }
-
-    public void registerModel(String modelType, String name) throws UMOException
-    {
-        UMOModel model = ModelFactory.createModel(modelType);
-        model.setName(name);
-        manager.registerModel(model);
-    }
-
-    /**
-     * Configures a started manager. This method will throw InitialisationException
-     * if the current manager is already started
-     * 
-     * @param synchronous whether to start the manager in synchronous mode
-     * @param serverUrl the url used to receive client requests, or null if the
-     *            server listening components should not be set up
-     * @return the configured manager
+     * Configures a configuration builder with a new ManagementContext.
+     *
+     * @param modeltype The type of component model to start with
      * @throws UMOException if the manager is already started or it fails to start
      */
-    public UMOManager createStartedManager(boolean synchronous, String serverUrl, String modeltype)
-        throws UMOException
+    public QuickConfigurationBuilder(String modeltype) throws UMOException
     {
-        if (manager.isStarted())
+        this(modeltype, null, null);
+    }
+
+
+    public QuickConfigurationBuilder(String modeltype, String serverUri) throws UMOException
+    {
+        this(modeltype, serverUri, null);
+    }
+
+    public QuickConfigurationBuilder(String modeltype, String serverUrl, UMOConnector serverConnector) throws UMOException
+    {
+        managementContext = new ManagementContext();
+
+        if(serverConnector!=null)
         {
-            throw new InitialisationException(new Message(Messages.MANAGER_ALREADY_STARTED), this);
+            managementContext.getRegistry().registerConnector(serverConnector);
         }
-        if (serverUrl == null)
+
+        if(!StringUtils.isBlank(serverUrl))
         {
-            serverUrl = "";
+            MuleAdminAgent agent = new MuleAdminAgent();
+            agent.setServerUri(serverUrl);
+            agent.setName("Mule Admin Agent");
+            managementContext.getRegistry().registerAgent(agent);
         }
-        //TODO RM*
-//        MuleManager.getConfiguration().setServerUrl(serverUrl);
-//        MuleManager.getConfiguration().setDefaultSynchronous(synchronous);
+
         if (!MODEL_NOT_SET.equals(modeltype))
         {
             model = ModelFactory.createModel(modeltype);
@@ -145,64 +101,42 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         {
             model = ModelFactory.createModel("seda");
         }
-        manager.registerModel(model);
+        managementContext.getRegistry().registerModel(model);
 
-        manager.start();
-        return manager;
+        managementContext.start();
     }
 
     /**
-     * Configures a started manager. This method will throw InitialisationException
-     * if the current manager is already started
+     * Will construct a new Quick Config builder with the option of disposing of the
+     * current Manager if one exists
      * 
-     * @param synchronous whether to start the manager in synchronous mode
-     * @param serverUrl the url used to receive client requests, or null if the
-     *            server listening components should not be set up
-     * @return the configured manager
-     * @throws UMOException if the manager is already started or it fails to start
+     * @param managementContext the management context to configure
      */
-    public UMOManager createStartedManager(boolean synchronous, String serverUrl) throws UMOException
+    public QuickConfigurationBuilder(UMOManagementContext managementContext)
     {
-        return createStartedManager(synchronous, serverUrl, MODEL_NOT_SET);
+        this.managementContext = managementContext;
     }
 
-    /**
-     * Configures a started manager. This method will throw InitialisationException
-     * if the current manager is already started
-     * 
-     * @param synchronous whether to start the manager in synchronous mode
-     * @param serverUrl the url used to receive client requests, or null if the
-     *            server listening components should not be set up
-     * @param serverConnector The server connector to use for the serverUrl
-     * @return the configured manager
-     * @throws UMOException if the manager is already started or it fails to start
-     */
-    public UMOManager createStartedManager(boolean synchronous, String serverUrl, UMOConnector serverConnector)
-        throws UMOException
+
+    public void disableAdminAgent()
     {
-        if (serverConnector != null)
+        try
         {
-            manager.registerConnector(serverConnector);
+            managementContext.getRegistry().unregisterAgent(MuleAdminAgent.AGENT_NAME);
         }
-        else
+        catch (UMOException e)
         {
-            throw new IllegalArgumentException("Cannot create started manager from null serverConnector");
+            // ignore
         }
-
-        // set the connector on the endpointUri
-        int param = serverUrl.indexOf('?');
-        if (param == -1)
-        {
-            serverUrl += '?';
-        }
-        else
-        {
-            serverUrl += '&';
-        }
-
-        serverUrl += UMOEndpointURI.PROPERTY_CREATE_CONNECTOR + "=" + serverConnector.getName();
-        return createStartedManager(synchronous, serverUrl);
     }
+
+    public void registerModel(String modelType, String name) throws UMOException
+    {
+        UMOModel model = ModelFactory.createModel(modelType);
+        model.setName(name);
+        managementContext.getRegistry().registerModel(model);
+    }
+
 
     /**
      * Registers a java object as a Umo pcomponent that listens for events on the
@@ -303,7 +237,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         UMOEndpoint outEndpoint = null;
         if (inboundEndpoint != null)
         {
-            inEndpoint = manager.lookupEndpoint(inboundEndpoint);
+            inEndpoint = managementContext.getRegistry().lookupEndpoint(inboundEndpoint);
             if (inEndpoint == null)
             {
                 inEndpoint = createEndpoint(inboundEndpoint, null, true);
@@ -311,7 +245,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         }
         if (outboundEndpoint != null)
         {
-            outEndpoint = manager.lookupEndpoint(outboundEndpoint);
+            outEndpoint = managementContext.getRegistry().lookupEndpoint(outboundEndpoint);
             if (outEndpoint == null)
             {
                 outEndpoint = createEndpoint(outboundEndpoint, null, false);
@@ -562,7 +496,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
      */
     public void setContainerContext(UMOContainerContext ctx) throws UMOException
     {
-        manager.setContainerContext(ctx);
+       managementContext.getRegistry().registerContainerContext(ctx);
     }
 
     /**
@@ -624,8 +558,8 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     public UMOEndpoint registerEndpoint(String uri, String name, boolean inbound) throws UMOException
     {
         UMOEndpoint ep = createEndpoint(uri, name, inbound);
-        ep.initialise();
-        manager.registerEndpoint(ep);
+        ep.initialise(managementContext);
+       managementContext.getRegistry().registerEndpoint(ep);
         return ep;
     }
 
@@ -634,8 +568,8 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     {
         UMOEndpoint ep = createEndpoint(uri, name, inbound);
         ep.getProperties().putAll(properties);
-        ep.initialise();
-        manager.registerEndpoint(ep);
+        ep.initialise(managementContext);
+       managementContext.getRegistry().registerEndpoint(ep);
         return ep;
     }
 
@@ -654,64 +588,65 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         {
             ep.setFilter(filter);
         }
-        ep.initialise();
-        manager.registerEndpoint(ep);
+        ep.initialise(managementContext);
+       managementContext.getRegistry().registerEndpoint(ep);
         return ep;
     }
 
     public void registerModel(UMOModel model) throws UMOException
     {
         this.model = model;
-        manager.registerModel(model);
+       managementContext.getRegistry().registerModel(model);
     }
 
-    public UMOManager getManager()
+    public UMOManagementContext getManagementContext()
     {
-        return manager;
+        return managementContext;
     }
 
-    public UMOManager configure(String configResources) throws ConfigurationException
+    public UMOManagementContext configure(String configResources) throws ConfigurationException
     {
         return configure(configResources, null);
     }
 
-    public UMOManager configure(String configResources, String startupPropertiesFile)
+    public UMOManagementContext configure(String configResources, String startupPropertiesFile)
         throws ConfigurationException
     {
         return configure(new ReaderResource[0], null);
     }
 
-    public UMOManager configure(ReaderResource[] configResources) throws ConfigurationException
+    public UMOManagementContext configure(ReaderResource[] configResources) throws ConfigurationException
     {
         return configure(configResources, null);
     }
 
-    public UMOManager configure(ReaderResource[] configResources, Properties startupProperties)
+    public UMOManagementContext configure(ReaderResource[] configResources, Properties startupProperties)
         throws ConfigurationException
     {
         try
         {
-            manager.start();
+           managementContext.start();
         }
         catch (UMOException e)
         {
             throw new ConfigurationException(e);
         }
-        return manager;
+        //TODO RM* URGENT return manager;
+        return null;
     }
 
     public boolean isConfigured()
     {
-        return manager != null;
+        return managementContext != null;
     }
 
-    protected UMOModel getModel() throws UMOException
+    public UMOModel getModel() throws UMOException
     {
         if(model==null)
         {
             model = new SedaModel();
             model.setName("main");
-            manager.registerModel(model);
+            managementContext.getRegistry().registerModel(model);
         }
         return model;
     }

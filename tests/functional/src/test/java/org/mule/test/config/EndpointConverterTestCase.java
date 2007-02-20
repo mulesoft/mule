@@ -10,11 +10,11 @@
 
 package org.mule.test.config;
 
-import org.apache.commons.beanutils.Converter;
 import org.mule.config.converters.EndpointConverter;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.tck.MuleTestUtils;
 import org.mule.umo.endpoint.UMOEndpoint;
+
+import org.apache.commons.beanutils.Converter;
 
 public class EndpointConverterTestCase extends AbstractMuleTestCase
 {
@@ -28,7 +28,7 @@ public class EndpointConverterTestCase extends AbstractMuleTestCase
     {
         try
         {
-            return MuleTestUtils.getTestEndpoint("test://Test", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+            return getTestEndpoint("test://Test", UMOEndpoint.ENDPOINT_TYPE_SENDER);
         }
         catch (Exception e)
         {

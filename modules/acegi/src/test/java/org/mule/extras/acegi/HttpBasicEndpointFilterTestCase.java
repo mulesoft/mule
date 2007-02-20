@@ -20,7 +20,6 @@ import org.mule.providers.http.HttpConstants;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.manager.UMOManager;
 import org.mule.umo.security.UMOSecurityProvider;
 
 import org.acegisecurity.GrantedAuthority;
@@ -48,10 +47,10 @@ public class HttpBasicEndpointFilterTestCase extends FunctionalTestCase
         MuleSecurityManager sm = new MuleSecurityManager();
         UMOSecurityProvider provider = new AcegiProviderAdapter(getTestProvider(), "testProvider");
         sm.addProvider(provider);
-        QuickConfigurationBuilder builder = null;
-        builder = new QuickConfigurationBuilder(true);
-        UMOManager manager = builder.createStartedManager(true, "");
-        manager.setSecurityManager(sm);
+        QuickConfigurationBuilder builder;
+        builder = new QuickConfigurationBuilder();
+        managementContext = builder.getManagementContext();
+       managementContext.setSecurityManager(sm);
         UMOEndpoint ep = new MuleEndpoint("http://localhost:4567", true);
         ep.setSecurityFilter(new HttpBasicAuthenticationFilter("mule-realm"));
 

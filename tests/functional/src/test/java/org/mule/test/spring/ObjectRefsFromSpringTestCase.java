@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id:ObjectRefsFromSpringTestCase.java 5187 2007-02-16 18:00:42Z rossmason $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -10,7 +10,6 @@
 
 package org.mule.test.spring;
 
-import org.mule.MuleManager;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.SimpleRetryConnectionStrategy;
 import org.mule.tck.FunctionalTestCase;
@@ -28,7 +27,7 @@ public class ObjectRefsFromSpringTestCase extends FunctionalTestCase
 
     public void testObjectCreation() throws Exception
     {
-        UMOEndpoint ep = MuleManager.getInstance().lookupEndpoint("foo");
+        UMOEndpoint ep = managementContext.getRegistry().lookupEndpoint("foo");
         assertNotNull(ep);
         assertEquals("testConnector", ep.getConnector().getName());
         assertTrue(((AbstractConnector)ep.getConnector()).getConnectionStrategy() instanceof SimpleRetryConnectionStrategy);

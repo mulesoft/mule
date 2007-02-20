@@ -9,14 +9,14 @@
  */
 package org.mule.impl;
 
-import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
+import org.mule.RegistryContext;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.MuleProperties;
 import org.mule.config.ThreadingProfile;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.impl.container.MultiContainerContext;
+import org.mule.config.spring.RegistryFacade;
 import org.mule.impl.internal.notifications.AdminNotification;
 import org.mule.impl.internal.notifications.AdminNotificationListener;
 import org.mule.impl.internal.notifications.ComponentNotification;
@@ -38,13 +38,13 @@ import org.mule.impl.internal.notifications.ServerNotificationManager;
 import org.mule.impl.security.MuleSecurityManager;
 import org.mule.impl.work.MuleWorkManager;
 import org.mule.management.stats.AllStatistics;
-import org.mule.registry.Registry;
+import org.mule.registry.DeregistrationException;
+import org.mule.registry.RegistrationException;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.FatalException;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.LifecycleException;
-import org.mule.umo.manager.UMOContainerContext;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.manager.UMOServerNotificationListener;
 import org.mule.umo.manager.UMOWorkManager;
@@ -89,7 +89,7 @@ public class ManagementContext implements UMOManagementContext
     /**
      * Default configuration
      */
-    private static MuleConfiguration config = new MuleConfiguration();
+    private MuleConfiguration config;
 
     /**
      * the unique id for this manager
@@ -154,8 +154,6 @@ public class ManagementContext implements UMOManagementContext
      */
     private ServerNotificationManager notificationManager = null;
 
-    private MultiContainerContext containerContext = null;
-
     private UMOSecurityManager securityManager;
 
     private UMOWorkManager workManager;
@@ -176,7 +174,8 @@ public class ManagementContext implements UMOManagementContext
      */
     protected Map properties = new HashMap();
 
-    protected Registry registry;
+    //TODO LM: Replace
+    protected RegistryFacade registry;
 
     protected Directories directories;
 
@@ -184,16 +183,17 @@ public class ManagementContext implements UMOManagementContext
 
     public ManagementContext()
     {
-        config = new MuleConfiguration();
-        containerContext = new MultiContainerContext();
         securityManager = new MuleSecurityManager();
         startDate = System.currentTimeMillis();
-        //registry = new NullRegistry(this);
+        registry = RegistryContext.getRegistry();
+
     }
 
     public void initialise() throws UMOException
     {
+        config = getRegistry().getConfiguration();
         validateEncoding();
+        validateOSEncoding();
 
         directories = new Directories(new File(config.getWorkingDirectory()));
         if (!initialised)
@@ -219,6 +219,7 @@ public class ManagementContext implements UMOManagementContext
             notificationManager.registerEventType(AdminNotification.class, AdminNotificationListener.class);
             notificationManager.registerEventType(CustomNotification.class, CustomNotificationListener.class);
             notificationManager.registerEventType(ConnectionNotification.class, ConnectionNotificationListener.class);
+            notificationManager.start(workManager);
             // TODO MERGE no such method?
             //if (config.isEnableMessageEvents())
             //{
@@ -226,15 +227,20 @@ public class ManagementContext implements UMOManagementContext
             //}
 
             fireSystemEvent(new ManagerNotification(id, clusterId, domain, ManagerNotification.MANAGER_INITIALISNG));
+            id = config.getId();
+            clusterId = config.getClusterId();
+            domain = config.getDomainId();
+
             if (id == null)
             {
                 logger.warn("No unique id has been set on this manager");
             }
+
             try
             {
                 if (securityManager != null)
                 {
-                    securityManager.initialise();
+                    securityManager.initialise(this);
                 }
                 if (queueManager == null)
                 {
@@ -256,11 +262,6 @@ public class ManagementContext implements UMOManagementContext
                 directories.createDirectories();
                 //TODO LM: we still need the MuleManager until the Registry Looks after these objects
                 //initialise a Mule instance that will manage our connections
-                // TODO MERGE no such method?
-                //MuleManager.getConfiguration().setEmbedded(true);
-                MuleManager.getInstance().setTransactionManager(getTransactionManager());
-                ((MuleManager) MuleManager.getInstance()).initialise();
-
                 //TODO LM: Load Registry
                 //btw the registry should handle multiple models
 
@@ -297,6 +298,8 @@ public class ManagementContext implements UMOManagementContext
                 fireSystemEvent(new ManagerNotification(id, clusterId, domain, ManagerNotification.MANAGER_INITIALISED));
             }
         }
+        registry.initialise(this);
+        
         initialised = true;
     }
 
@@ -317,8 +320,7 @@ public class ManagementContext implements UMOManagementContext
             //TODO LM: start the registry
             getRegistry().start();
             directories.deleteMarkedDirectories();
-            //TODO LM: remove this one objects are accessible from the registry
-            MuleManager.getInstance().start();
+
             starting = false;
             started = true;
             if (logger.isInfoEnabled())
@@ -351,7 +353,7 @@ public class ManagementContext implements UMOManagementContext
             queueManager.stop();
         }
 
-        //TODO registry.stop();
+        registry.stop();
 
         stopping = false;
         fireSystemEvent(new ManagerNotification(id, clusterId, domain, ManagerNotification.MANAGER_STOPPED));
@@ -378,14 +380,11 @@ public class ManagementContext implements UMOManagementContext
             logger.error("Failed to stop manager: " + e.getMessage(), e);
         }
         disposed = true;
-        containerContext.dispose();
-        containerContext = null;
         // props.clearErrors();
         fireSystemEvent(new ManagerNotification(id, clusterId, domain, ManagerNotification.MANAGER_DISPOSED));
 
         if (registry != null)
         {
-            //TODO LM
             registry.dispose();
             registry = null;
         }
@@ -437,12 +436,32 @@ public class ManagementContext implements UMOManagementContext
         }
     }
 
-    public Registry getRegistry()
+    protected void validateOSEncoding() throws FatalException
+    {
+        String encoding = System.getProperty(MuleProperties.MULE_OS_ENCODING_SYSTEM_PROPERTY);
+        if (encoding == null)
+        {
+            encoding = config.getDefaultOSEncoding();
+            System.setProperty(MuleProperties.MULE_OS_ENCODING_SYSTEM_PROPERTY, encoding);
+        }
+        else
+        {
+            config.setDefaultOSEncoding(encoding);
+        }
+        // Check we have a valid and supported encoding
+        if (!Charset.isSupported(config.getDefaultOSEncoding()))
+        {
+            throw new FatalException(new Message(Messages.PROPERTY_X_HAS_INVALID_VALUE_X, "osEncoding",
+                    config.getDefaultOSEncoding()), this);
+        }
+    }
+
+    public RegistryFacade getRegistry()
     {
         return registry;
     }
 
-    public void setRegistry(Registry registry)
+    public void setRegistry(RegistryFacade registry)
     {
         this.registry = registry;
     }
@@ -566,43 +585,6 @@ public class ManagementContext implements UMOManagementContext
     }
 
     /**
-     * associates a Dependency Injector container or Jndi container with Mule. This can be used to
-     * integrate container managed resources with Mule resources
-     *
-     * @param container a Container context to use. By default, there is a
-     *                  default Mule container <code>MuleContainerContext</code>
-     *                  that will assume that the reference key for an oblect is a
-     *                  classname and will try to instanciate it.
-     */
-    public void setContainerContext(UMOContainerContext container) throws UMOException
-    {
-        if (container == null)
-        {
-            if (containerContext != null)
-            {
-                containerContext.dispose();
-            }
-            containerContext = new MultiContainerContext();
-        }
-        else
-        {
-            container.initialise();
-            containerContext.addContainer(container);
-        }
-    }
-
-    /**
-     * associates a Dependency Injector container with Mule. This can be used to
-     * integrate container managed resources with Mule resources
-     *
-     * @return the container associated with the Manager
-     */
-    public UMOContainerContext getContainerContext()
-    {
-        return containerContext;
-    }
-
-    /**
      * Gets all statisitcs for this instance
      *
      * @return all statisitcs for this instance
@@ -697,10 +679,7 @@ public class ManagementContext implements UMOManagementContext
 
     public void setId(String id)
     {
-        if (this.id == null)
-        {
-            this.id = id;
-        }
+        this.id = id;
     }
 
     public String getId()
@@ -742,7 +721,7 @@ public class ManagementContext implements UMOManagementContext
         this.securityManager = securityManager;
         if (securityManager != null && isInitialised())
         {
-            this.securityManager.initialise();
+            this.securityManager.initialise(this);
         }
     }
 
@@ -830,39 +809,6 @@ public class ManagementContext implements UMOManagementContext
         return initialising;
     }
 
-    public void setConfiguration(MuleConfiguration config)
-    {
-        this.config = config;
-    }
-
-    public MuleConfiguration getConfiguration()
-    {
-        return config;
-    }
-
-    /**
-     * @param config
-     * @deprecated
-     */
-    public static void setConfig(MuleConfiguration config)
-    {
-        ManagementContext.config = config;
-    }
-
-    /**
-     * @return
-     * @deprecated
-     */
-    public static MuleConfiguration getConfig()
-    {
-        return config;
-    }
-
-
-    public UMOContainerContext getContainerContext(String name)
-    {
-        return containerContext;
-    }
 
 
     /**
@@ -952,4 +898,19 @@ public class ManagementContext implements UMOManagementContext
         return StringMessageUtils.getBoilerPlate(message, '*', 78);
     }
 
+
+    public void register() throws RegistrationException
+    {
+        throw new UnsupportedOperationException("register");
+    }
+
+    public void deregister() throws DeregistrationException
+    {
+        throw new UnsupportedOperationException("deregister");
+    }
+
+    public String getRegistryId()
+    {
+        throw new UnsupportedOperationException("registryId");
+    }
 }

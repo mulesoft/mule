@@ -10,7 +10,7 @@
 
 package org.mule.util;
 
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 
@@ -64,7 +64,7 @@ public class ObjectNameHelper
         // We can't check local edpoints right now but the chances of conflict are
         // very small and will be
         // reported during JMX object registration
-        while (MuleManager.getInstance().lookupEndpoint(tempName) != null)
+        while (RegistryContext.getRegistry().lookupEndpoint(tempName) != null)
         {
             i++;
             tempName = name + SEPARATOR + i;
@@ -81,7 +81,7 @@ public class ObjectNameHelper
         // We can't check local edpoints right now but the chances of conflict are
         // very small and will be
         // reported during JMX object registration
-        while (MuleManager.getInstance().lookupConnector(tempName) != null)
+        while (RegistryContext.getRegistry().lookupConnector(tempName) != null)
         {
             i++;
             tempName = name + SEPARATOR + i;

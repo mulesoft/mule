@@ -10,7 +10,6 @@
 
 package org.mule.test.integration.util;
 
-import org.mule.MuleManager;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -20,7 +19,7 @@ public class ObjectNameHelperTestCase extends AbstractMuleTestCase
     public void testEndpointAutomaticNames() throws Exception
     {
         UMOEndpoint ep = new MuleEndpoint("jms://cn=foo,name=queue", true);
-        MuleManager.getInstance().registerEndpoint(ep);
+        managementContext.getRegistry().registerEndpoint(ep);
         assertEquals("endpoint.jms.cn.foo.name.queue", ep.getName());
 
         ep = new MuleEndpoint("jms://cn=foo,name=queue", true);
@@ -36,12 +35,12 @@ public class ObjectNameHelperTestCase extends AbstractMuleTestCase
     public void testEndpointNames() throws Exception
     {
         UMOEndpoint ep = new MuleEndpoint("jms://cn=foo,name=queue?endpointName=foo", true);
-        MuleManager.getInstance().registerEndpoint(ep);
+        managementContext.getRegistry().registerEndpoint(ep);
         assertEquals("foo", ep.getName());
 
         ep = new MuleEndpoint("jms://cn=foo,name=queue?endpointName=this_is@aWierd-Name:x", true);
         assertEquals("this.is.aWierd.Name.x", ep.getName());
-        MuleManager.getInstance().registerEndpoint(ep);
+        managementContext.getRegistry().registerEndpoint(ep);
 
         // Test generating a unique name when there is a matching endpoint
         ep = new MuleEndpoint("jms://cn=foo,name=queue?endpointName=this_is@aWierd-Name:x", true);

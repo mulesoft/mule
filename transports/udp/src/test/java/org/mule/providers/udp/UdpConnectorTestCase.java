@@ -10,8 +10,6 @@
 
 package org.mule.providers.udp;
 
-import java.net.DatagramPacket;
-
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.tck.providers.AbstractConnectorTestCase;
@@ -20,6 +18,8 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
 
+import java.net.DatagramPacket;
+
 public class UdpConnectorTestCase extends AbstractConnectorTestCase
 {
 
@@ -27,7 +27,7 @@ public class UdpConnectorTestCase extends AbstractConnectorTestCase
     {
         UdpConnector c = new UdpConnector();
         c.setName("UdpConnector");
-        c.initialise();
+        c.initialise(managementContext);
         return c;
     }
 

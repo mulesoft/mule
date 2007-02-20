@@ -69,7 +69,7 @@ public class JdbcConnectionTestCase extends AbstractJdbcFunctionalTestCase
         UMOEndpoint endpoint = new MuleEndpoint("test", new MuleEndpointURI(
             "jdbc://test?sql=SELECT * FROM TABLE"), connector, null, UMOEndpoint.ENDPOINT_TYPE_SENDER, 0,
             null, new HashMap());
-        MuleManager.getInstance().start();
+        managementContext.start();
         connector.registerListener(component, endpoint);
 
         // The hsqldb instance should be put offline before starting test

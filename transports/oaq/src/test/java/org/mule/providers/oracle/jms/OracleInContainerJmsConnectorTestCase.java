@@ -10,15 +10,18 @@
 
 package org.mule.providers.oracle.jms;
 
-import com.mockobjects.dynamic.Mock;
-import oracle.jdbc.pool.OracleDataSource;
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.umo.provider.UMOConnector;
+
+import com.mockobjects.dynamic.Mock;
+
+import java.util.Enumeration;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.TextMessage;
-import java.util.Enumeration;
+
+import oracle.jdbc.pool.OracleDataSource;
 
 public class OracleInContainerJmsConnectorTestCase extends AbstractConnectorTestCase
 {
@@ -47,7 +50,7 @@ public class OracleInContainerJmsConnectorTestCase extends AbstractConnectorTest
             connection.expect("stop");
             connection.expect("setClientID", "mule.TestConnector");
             connector.setConnectionFactory((ConnectionFactory) connectionFactory.proxy());
-            connector.initialise();
+            connector.initialise(managementContext);
         }
         return connector;
     }

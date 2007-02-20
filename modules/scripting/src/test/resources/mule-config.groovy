@@ -15,7 +15,7 @@ import org.mule.umo.UMOInterceptorStack;
 import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.routing.UMONestedRouterCollection;
 import org.mule.umo.routing.UMOResponseRouterCollection;
-import org.mule.MuleManager;
+import org.mule.umo.UMOManagementContext;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.model.seda.SedaModel;
 import org.mule.impl.DefaultComponentExceptionStrategy;
@@ -39,20 +39,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 // need this when running with JMX
-manager.setId("GroovyScriptTestCase");
+managementContext.setId("GroovyScriptTestCase");
 
 //set global properties
-manager.setProperty("doCompression", "true");
+managementContext.getRegistry().setProperty("doCompression", "true");
 //disable the admin agent
 //manager.getConfiguration().setServerUrl("");
 
 //Set a dummy TX manager
-manager.setTransactionManager(new TestTransactionManagerFactory().create());
+managementContext.setTransactionManager(new TestTransactionManagerFactory().create());
 
 //register agents
 RmiRegistryAgent rmiAgent = new RmiRegistryAgent();
 rmiAgent.setName("rmiAgent");
-manager.registerAgent(rmiAgent);
+managementContext.getRegistry().registerAgent(rmiAgent);
 
 JmxAgent agent = new JmxAgent();
 agent.setName("jmxAgent");
@@ -60,7 +60,7 @@ agent.setConnectorServerUrl("service:jmx:rmi:///jndi/rmi://localhost:1099/server
 Map p = new HashMap();
 p.put("jmx.remote.jndi.rebind", "true");
 agent.setConnectorServerProperties(p);
-manager.registerAgent(agent);
+managementContext.getRegistry().registerAgent(agent);
 
 //register connector
 TestConnector c = new TestConnector();
@@ -70,7 +70,7 @@ SimpleRetryConnectionStrategy cs = new SimpleRetryConnectionStrategy();
 cs.setRetryCount(4);
 cs.setFrequency(3000);
 c.setConnectionStrategy(cs);
-manager.registerConnector(c);
+managementContext.getRegistry().registerConnector(c);
 
 //Endpoint identifiers
 //manager.registerEndpointIdentifier("AppleQueue", "test://apple.queue");
@@ -83,7 +83,7 @@ t.setReturnClass(String.class);
 t.setBeanProperty2(12);
 t.setContainerProperty("");
 t.setBeanProperty1("this was set from the manager properties!");
-manager.registerTransformer(t);
+managementContext.getRegistry().registerTransformer(t);
 
 //Register endpoints
 JXPathFilter filter = new JXPathFilter("name");
@@ -110,11 +110,11 @@ es.addEndpoint(new MuleEndpoint("test://component.exceptions", false));
 model.setExceptionListener(es);
 model.setLifecycleAdapterFactory(new TestDefaultLifecycleAdapterFactory());
 model.setEntryPointResolver(new TestEntryPointResolver());
-manager.registerModel(model);
+managementContext.getRegistry().registerModel(model);
 
 //register components
-UMOEndpoint ep1 = manager.lookupEndpoint("appleInEndpoint");
-ep1.setTransformer(manager.lookupTransformer("TestCompressionTransformer"));
+UMOEndpoint ep1 = managementContext.getRegistry().lookupEndpoint("appleInEndpoint");
+ep1.setTransformer(managementContext.getRegistry().lookupTransformer("TestCompressionTransformer"));
 UMODescriptor d = builder.createDescriptor(Orange.class.getName(), "orangeComponent", null, ep1, props);
 
 DefaultComponentExceptionStrategy dces = new DefaultComponentExceptionStrategy();
@@ -125,11 +125,11 @@ UMOInboundRouterCollection inRouter = new InboundRouterCollection();
 inRouter.setCatchAllStrategy(new ForwardingCatchAllStrategy());
 inRouter.getCatchAllStrategy().setEndpoint(new MuleEndpoint("test://catch.all", false));
 UMOEndpoint ep2 = builder.createEndpoint("test://orange/", "Orange", true, "TestCompressionTransformer");
-ep2.setResponseTransformer(manager.lookupTransformer("TestCompressionTransformer"));
+ep2.setResponseTransformer(managementContext.getRegistry().lookupTransformer("TestCompressionTransformer"));
 inRouter.addEndpoint(ep2);
-UMOEndpoint ep3 = manager.lookupEndpoint("orangeEndpoint");
+UMOEndpoint ep3 = managementContext.getRegistry().lookupEndpoint("orangeEndpoint");
 ep3.setFilter(new PayloadTypeFilter(String.class));
-ep3.setTransformer(manager.lookupTransformer("TestCompressionTransformer"));
+ep3.setTransformer(managementContext.getRegistry().lookupTransformer("TestCompressionTransformer"));
 Map props2 = new HashMap();
 props2.put("testLocal", "value1");
 ep3.setProperties(props2);
@@ -153,13 +153,14 @@ d.setNestedRouter(nestedRouter);
 //Response Router
 UMOResponseRouterCollection responseRouter = new ResponseRouterCollection();
 responseRouter.addEndpoint(new MuleEndpoint("test://response1", true));
-responseRouter.addEndpoint(manager.lookupEndpoint("appleResponseEndpoint"));
+responseRouter.addEndpoint(managementContext.getRegistry().lookupEndpoint("appleResponseEndpoint"));
 responseRouter.addRouter(new TestResponseAggregator());
 responseRouter.setTimeout(10001);
 d.setResponseRouter(responseRouter);
 
 //properties
 Map cprops = new HashMap();
+cprops.put("orange", new Orange());
 cprops.put("brand", "Juicy Baby!");
 cprops.put("segments", "9");
 cprops.put("radius", "4.21");
@@ -180,5 +181,4 @@ cprops.put("arrayProperties", nested3);
 d.setProperties(cprops);
 
 //register components
-manager.lookupModel("main").registerComponent(d);
-        
+managementContext.getRegistry().lookupModel("main").registerComponent(d);

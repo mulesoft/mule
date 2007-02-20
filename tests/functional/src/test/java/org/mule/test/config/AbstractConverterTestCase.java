@@ -10,13 +10,14 @@
 
 package org.mule.test.config;
 
-import org.apache.commons.beanutils.Converter;
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
+import org.mule.config.spring.RegistryFacade;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.umo.manager.UMOManager;
 
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
+
+import org.apache.commons.beanutils.Converter;
 
 public abstract class AbstractConverterTestCase extends AbstractMuleTestCase
 {
@@ -45,29 +46,22 @@ public abstract class AbstractConverterTestCase extends AbstractMuleTestCase
 
     public void testValidConversion()
     {
-        Mock mockManager = new Mock(UMOManager.class);
-        try
-        {
-            MuleManager.setInstance((UMOManager)mockManager.proxy());
-            Object obj = getValidConvertedType();
-            mockManager.expectAndReturn(getLookupMethod(), C.eq("test://Test"), obj);
-            Object result = getConverter().convert(obj.getClass(), "test://Test");
+        Mock mockRegistry = new Mock(RegistryFacade.class);
+        RegistryContext.setRegistry((RegistryFacade)mockRegistry.proxy());
+        Object obj = getValidConvertedType();
+        mockRegistry.expectAndReturn(getLookupMethod(), C.eq("test://Test"), obj);
+        Object result = getConverter().convert(obj.getClass(), "test://Test");
 
-            assertNotNull(result);
-            mockManager.verify();
-        }
-        finally
-        {
-            MuleManager.setInstance(null);
-        }
+        assertNotNull(result);
+        mockRegistry.verify();
     }
 
     public void testInvalidConversion()
     {
-        Mock mockManager = new Mock(UMOManager.class);
-        MuleManager.setInstance((UMOManager)mockManager.proxy());
+        Mock mockRegistry = new Mock(RegistryFacade.class);
+        RegistryContext.setRegistry((RegistryFacade)mockRegistry.proxy());
         Object obj = getValidConvertedType();
-        mockManager.expectAndReturn(getLookupMethod(), C.eq("TestBad"), null);
+        mockRegistry.expectAndReturn(getLookupMethod(), C.eq("TestBad"), null);
         try
         {
             getConverter().convert(obj.getClass(), "TestBad");
@@ -76,11 +70,7 @@ public abstract class AbstractConverterTestCase extends AbstractMuleTestCase
         catch (Exception e)
         {
             // exprected
-            mockManager.verify();
-        }
-        finally
-        {
-            MuleManager.setInstance(null);
+            mockRegistry.verify();
         }
 
     }

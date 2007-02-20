@@ -10,7 +10,6 @@
 
 package org.mule.test.integration.providers.soap.axis;
 
-import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.extras.client.MuleClient;
 import org.mule.providers.soap.NamedParameter;
@@ -78,7 +77,7 @@ public class AxisExternalServerTest extends TestCase
     public void testAxisServiceDocLitWrappedWithNamedParamsinXml() throws Exception
     {
 
-        MuleManager.getInstance().dispose();
+        //managementContext.dispose();
         MuleClient client = new MuleClient(
             "org/mule/test/integration/providers/soap/axis/axis-client-endpoint-config.xml");
 

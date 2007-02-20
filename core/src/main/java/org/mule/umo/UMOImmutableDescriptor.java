@@ -151,4 +151,11 @@ public interface UMOImmutableDescriptor extends Initialisable, Registerable
      * if this descriptor has not been registered with a model yet
      */
     String getModelName();
+
+    /**
+     * An instance of the Management context that this descriptor exists in
+     * @return
+     */
+    UMOManagementContext getManagementContext();
+
 }

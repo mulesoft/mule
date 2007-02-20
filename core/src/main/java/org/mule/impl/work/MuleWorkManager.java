@@ -27,7 +27,6 @@
 
 package org.mule.impl.work;
 
-import org.mule.MuleManager;
 import org.mule.config.ThreadingProfile;
 import org.mule.umo.UMOException;
 import org.mule.umo.manager.UMOWorkManager;
@@ -83,11 +82,6 @@ public class MuleWorkManager implements UMOWorkManager
     private final WorkExecutor scheduleWorkExecutor = new ScheduleWorkExecutor();
     private final WorkExecutor startWorkExecutor = new StartWorkExecutor();
     private final WorkExecutor syncWorkExecutor = new SyncWorkExecutor();
-
-    public MuleWorkManager()
-    {
-        this(MuleManager.getConfiguration().getDefaultThreadingProfile(), null);
-    }
 
     public MuleWorkManager(ThreadingProfile profile, String name)
     {

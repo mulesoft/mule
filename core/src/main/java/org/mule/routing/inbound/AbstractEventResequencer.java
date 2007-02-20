@@ -48,7 +48,7 @@ public abstract class AbstractEventResequencer extends SelectiveConsumer
         this.comparator = eventComparator;
     }
 
-    // @Override
+    // //@Override
     public UMOEvent[] process(UMOEvent event) throws MessagingException
     {
         UMOEvent[] result = null;

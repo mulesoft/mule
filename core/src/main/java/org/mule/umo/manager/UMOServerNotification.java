@@ -10,7 +10,7 @@
 
 package org.mule.umo.manager;
 
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.util.ClassUtils;
 
@@ -20,8 +20,6 @@ import java.util.EventObject;
  * <code>UMOServerNotification</code> is an event triggered by something happening
  * in the Server itself such as the server starting or a component being registered
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public abstract class UMOServerNotification extends EventObject
 {
@@ -66,9 +64,9 @@ public abstract class UMOServerNotification extends EventObject
     {
         super((message == null ? NULL_MESSAGE : message));
         this.action = action;
-        if (MuleManager.isInstanciated())
+        if (RegistryContext.getRegistry()!=null)
         {
-            serverId = MuleManager.getInstance().getId();
+            serverId = RegistryContext.getRegistry().getConfiguration().getId();
         }
         timestamp = System.currentTimeMillis();
     }
@@ -78,7 +76,7 @@ public abstract class UMOServerNotification extends EventObject
         super((message == null ? NULL_MESSAGE : message));
         this.action = action;
         this.resourceIdentifier = resourceIdentifier;
-        serverId = MuleManager.getInstance().getId();
+        serverId = RegistryContext.getRegistry().getConfiguration().getId();
         timestamp = System.currentTimeMillis();
     }
 

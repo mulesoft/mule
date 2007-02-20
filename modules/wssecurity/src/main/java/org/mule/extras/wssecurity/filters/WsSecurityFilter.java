@@ -10,7 +10,7 @@
 
 package org.mule.extras.wssecurity.filters;
 
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.config.i18n.Message;
 import org.mule.extras.wssecurity.handlers.MuleWSSInHandler;
 import org.mule.extras.wssecurity.headers.WsSecurityHeadersSetter;
@@ -102,7 +102,7 @@ public class WsSecurityFilter extends AbstractEndpointSecurityFilter
             Service service = server.getServiceRegistry().getService(serviceName);
 
             // remove security in handlers if present
-            Object[] connectorArray = MuleManager.getInstance().getConnectors().values().toArray();
+            Object[] connectorArray = RegistryContext.getRegistry().getConnectors().values().toArray();
             XFireConnector connector = null;
             for (i = 0; i < connectorArray.length; i++)
             {
