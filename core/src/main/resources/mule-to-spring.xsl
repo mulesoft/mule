@@ -34,7 +34,7 @@
 
     <xsl:template match="mule-environment-properties">
         <bean name="muleConfiguratrion" class="org.mule.config.MuleConfiguration">
-            <xsl:if test="@defaultEncoding">
+            <xsl:if test="@model">
 
                 <xsl:variable name="err"
                               select="helper:reportError('The @model attribute is no longer supported on the [mule-configuration] element, since Mule now supports multiple models.')"/>
