@@ -181,6 +181,10 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                         int i = reply.indexOf(":");
                         if (i > -1)
                         {
+                            // TODO MULE-1409 this check will not work for ActiveMQ 4.x,
+                            // as they have temp-queue://<destination> and temp-topic://<destination> URIs
+                            // Extract to a custom resolver for ActiveMQ4.x
+                            // The code path can be exercised, e.g. by a LoanBrokerESBTestCase
                             String qtype = reply.substring(0, i);
                             replyToTopic = "topic".equalsIgnoreCase(qtype);
                             reply = reply.substring(i + 1);
@@ -295,11 +299,10 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         }
         finally
         {
-            connector.closeQuietly(consumer);
             connector.closeQuietly(producer);
+            connector.closeQuietly(consumer);
 
-            // TODO I wonder if those temporary destinations also implement BOTH
-            // interfaces...keep it 'simple' for now
+            // TODO AP check if TopicResolver is to be utilized for temp destinations as well
             if (replyTo != null && (replyTo instanceof TemporaryQueue || replyTo instanceof TemporaryTopic))
             {
                 if (replyTo instanceof TemporaryQueue)

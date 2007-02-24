@@ -11,6 +11,7 @@
 package org.mule.umo.routing;
 
 import org.mule.management.stats.RouterStatistics;
+import org.mule.umo.lifecycle.Initialisable;
 
 import java.util.List;
 
@@ -21,7 +22,7 @@ import java.util.List;
  * set, the router just returns null.
  */
 
-public interface UMORouterCollection
+public interface UMORouterCollection extends Initialisable
 {
     void setRouters(List routers);
 

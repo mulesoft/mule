@@ -10,7 +10,6 @@
 
 package org.mule.test.config;
 
-import org.mule.providers.AbstractConnector;
 import org.mule.providers.SimpleRetryConnectionStrategy;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMODescriptor;
@@ -33,10 +32,10 @@ public class PropertyTemplatesTestCase extends FunctionalTestCase
         //RM* assertEquals("blah", RegistryContext.getConfiguration().getModel());
         assertEquals("blah", managementContext.getRegistry().lookupModel("blah").getName());
 
-        AbstractConnector c = (AbstractConnector)managementContext.getRegistry().lookupConnector("myTestConnector");
-        assertNotNull(c);
-        assertTrue(c.getConnectionStrategy() instanceof SimpleRetryConnectionStrategy);
-        assertEquals(4, ((SimpleRetryConnectionStrategy)c.getConnectionStrategy()).getRetryCount());
+        UMOEndpoint ep = managementContext.getRegistry().lookupEndpoint("inbound");
+        assertNotNull(ep);
+        assertTrue(ep.getConnectionStrategy() instanceof SimpleRetryConnectionStrategy);
+        assertEquals(4, ((SimpleRetryConnectionStrategy)ep.getConnectionStrategy()).getRetryCount());
 
         UMODescriptor d = managementContext.getRegistry().lookupModel("blah").getDescriptor("test-from-env-props");
         assertNotNull(d);

@@ -50,8 +50,8 @@ public class DefaultLenderService
         // >= 8))
         {
             lenders = new Bank[2];
-            lenders[0] = new Bank("Bank1", getEndpoint("Bank1"));
-            lenders[1] = new Bank("Bank2", getEndpoint("Bank2"));
+            lenders[0] = new Bank("Bank1", getEndpoint("Bank1Endpoint", "Bank1"));
+            lenders[1] = new Bank("Bank2", getEndpoint("Bank2Endpoint", "Bank2"));
 
         }
         else if (((loanAmount.doubleValue() >= 10000) && (loanAmount.doubleValue() <= 19999))) // &&
@@ -64,13 +64,13 @@ public class DefaultLenderService
         // 3))
         {
             lenders = new Bank[2];
-            lenders[0] = new Bank("Bank3", getEndpoint("Bank3"));
-            lenders[1] = new Bank("Bank4", getEndpoint("Bank4"));
+            lenders[0] = new Bank("Bank3", getEndpoint("Bank3Endpoint", "Bank3"));
+            lenders[1] = new Bank("Bank4", getEndpoint("Bank4Endpoint", "Bank4"));
         }
         else
         {
             lenders = new Bank[1];
-            lenders[0] = new Bank("Bank5", getEndpoint("Bank5"));
+            lenders[0] = new Bank("Bank5", getEndpoint("Bank5Endpoint", "Bank5"));
         }
 
         List recipients = new ArrayList(lenders.length);
@@ -88,30 +88,32 @@ public class DefaultLenderService
      * A helper method used to make it easier to configure this sample with differet
      * endpoints for testing purposes
      * 
-     * @param name
+     * @param endpointName
      * @return
      */
-    private String getEndpoint(String name)
+    private String getEndpoint(String endpointName, String serviceName)
     {
-        UMOEndpoint ep = RegistryContext.getRegistry().lookupEndpoint(name);
+        UMOEndpoint ep = RegistryContext.getRegistry().lookupEndpoint(endpointName);
         if(ep==null)
         {
-            throw new IllegalArgumentException("No endpoint registered called: " + name);
+            throw new IllegalArgumentException("No endpoint registered called: " + endpointName);
         }
 
         String endpoint = ep.getEndpointURI().getAddress();
 
-        if (endpoint.startsWith("axis") || endpoint.startsWith("xfire") || endpoint.startsWith("glue")
-                        || endpoint.startsWith("soap"))
+        if ("axis".equals(ep.getEndpointURI().getSchemeMetaInfo()) ||
+            "xfire".equals(ep.getEndpointURI().getSchemeMetaInfo()) ||
+            "glue".equals(ep.getEndpointURI().getSchemeMetaInfo()) ||
+            "soap".equals(ep.getEndpointURI().getSchemeMetaInfo()))
         {
             int i = endpoint.indexOf('?');
             if (i > -1)
             {
-                endpoint = endpoint.replaceFirst("\\?", "/" + name + "?method=getLoanQuote\\&");
+                endpoint = endpoint.replaceFirst("\\?", "/" + serviceName + "?method=getLoanQuote\\&");
             }
             else
             {
-                endpoint += "/" + name + "?method=getLoanQuote";
+                endpoint += "/" + serviceName + "?method=getLoanQuote";
             }
         }
 

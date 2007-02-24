@@ -37,28 +37,35 @@
             <xsl:if test="@model">
 
                 <xsl:variable name="err"
-                              select="helper:reportError('The @model attribute is no longer supported on the [mule-configuration] element, since Mule now supports multiple models.')"/>
+                              select="helper:reportWarning('The @model attribute is no longer supported on the [mule-configuration] element, since Mule now supports multiple models.')"/>
             </xsl:if>
 
             <xsl:if test="@recoverableMode">
                 <xsl:variable name="err"
-                              select="helper:reportError('The @recoverableMode attribute is no longer supported on the [mule-configuration] element.')"/>
+                              select="helper:reportWarning('The @recoverableMode attribute is no longer supported on the [mule-configuration] element.')"/>
             </xsl:if>
             <xsl:if test="@clientMode">
                 <xsl:variable name="err"
-                              select="helper:reportError('The @clientMode attribute can no longer be set by the user on the [mule-configuration] element.')"/>
+                              select="helper:reportWarning('The @clientMode attribute can no longer be set by the user on the [mule-configuration] element.')"/>
             </xsl:if>
             <xsl:if test="@embedded">
                 <xsl:variable name="err"
-                              select="helper:reportError('The @embedded attribute can no longer be set by the user on the [mule-configuration] element.')"/>
+                              select="helper:reportWarning('The @embedded attribute can no longer be set by the user on the [mule-configuration] element.')"/>
             </xsl:if>
             <xsl:if test="@serverUrl">
-                <xsl:variable name="err"
-                              select="helper:reportError('The @serverUrl attribute is no longer supported on the [mule-configuration] element. To enable the Mule Admin agent you need to configure the agent like all other agents. For mor information see http://muledocs.org/Mule+Management+Agent')"/>
-            </xsl:if>
-            <xsl:if test="@enableMessageEvents">
-                <xsl:variable name="err"
-                              select="helper:reportError('The @enableMessageEvents attribute is no longer supported on the [mule-configuration] element. To enable the Message Notification events see http://muledocs.org/Server+Notifications')"/>
+                <xsl:if test="string-length(@serverUrl) = 0">
+                    <xsl:variable name="err"
+                                  select="helper:reportWarning('The @serverUrl attribute is no longer supported on the [mule-configuration] element. However, the value is set to @serverUrl= . This means that the AdminAgent is not run and is the default for Mule 2.0.')"/>
+                </xsl:if>
+                <xsl:if test="string-length(@serverUrl) != 0">
+                    <xsl:variable name="err"
+                                  select="helper:reportError('The @serverUrl attribute is no longer supported on the [mule-configuration] element. To enable the Mule Admin agent you need to configure the agent like all other agents. For mor information see http://muledocs.org/Mule+Management+Agent')"/>
+                </xsl:if>
+                </xsl:if>
+
+                <xsl:if test="@enableMessageEvents">
+                    <xsl:variable name="err"
+                                  select="helper:reportError('The @enableMessageEvents attribute is no longer supported on the [mule-configuration] element. To enable the Message Notification events see http://muledocs.org/Server+Notifications')"/>
             </xsl:if>
             <xsl:if test="@synchronous">
                 <property name="defaultSynchronousEndpoints">
@@ -308,11 +315,11 @@
             </xsl:if>
             <property name="serviceDescriptors">
                 <list>
-                    <xsl:apply-templates select="mule-descriptor" mode="model"/>
+                    <xsl:apply-templates select="mule-descriptor"/>
                 </list>
             </property>
         </bean>
-        <xsl:apply-templates/>
+        <!--<xsl:apply-templates/>-->
     </xsl:template>
 
     <xsl:template match="entry-point-resolver">
@@ -345,7 +352,10 @@
         </property>
     </xsl:template>
 
-    <xsl:template match="mule-descriptor" mode="model">
+    <xsl:template match="model/mule-descriptor">
+        <xsl:variable name="name">
+            <xsl:value-of select="@name"/>
+        </xsl:variable>
         <xsl:variable name="type">
             <xsl:choose>
                 <xsl:when test="@className">
@@ -354,7 +364,7 @@
                 <xsl:otherwise>org.mule.impl.MuleDescriptor</xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
-        <bean name="{@name}" class="{$type}">
+        <bean name="{$name}" class="{$type}">
             <property name="implementation">
                 <value>
                     <xsl:value-of select="@implementation"/>

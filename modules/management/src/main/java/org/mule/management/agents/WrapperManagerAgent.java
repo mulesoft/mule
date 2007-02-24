@@ -58,7 +58,7 @@ public class WrapperManagerAgent extends AbstractAgent
     private MBeanServer mBeanServer;
     private ObjectName wrapperName;
 
-    private JmxSupportFactory jmxSupportFactory = new AutoDiscoveryJmxSupportFactory();
+    private JmxSupportFactory jmxSupportFactory = AutoDiscoveryJmxSupportFactory.getInstance();
     private JmxSupport jmxSupport;
 
     // atomic reference to avoid unnecessary construction calls

@@ -45,7 +45,7 @@ public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent
     private ObjectName listenerObjectName;
     private ObjectName broadcasterObjectName;
 
-    private JmxSupportFactory jmxSupportFactory = new AutoDiscoveryJmxSupportFactory();
+    private JmxSupportFactory jmxSupportFactory = AutoDiscoveryJmxSupportFactory.getInstance();
     private JmxSupport jmxSupport;
 
 

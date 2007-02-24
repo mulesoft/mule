@@ -14,6 +14,7 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.ImmutableMuleEndpoint;
 import org.mule.providers.service.TransportFactory;
+import org.mule.providers.ConnectionStrategy;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOTransactionConfig;
@@ -24,8 +25,11 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOEndpointSecurityFilter;
 import org.mule.umo.transformer.UMOTransformer;
+import org.mule.MuleRuntimeException;
 
 import java.util.Map;
+
+import org.apache.commons.beanutils.BeanUtils;
 
 /**
  * <code>MuleEndpoint</code> describes a Provider in the Mule Server. A endpoint is
@@ -310,5 +314,16 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
     public void setProperty(String key, Object value)
     {
         properties.put(key, value);
+    }
+
+
+    /**
+     * Setter for property 'connectionStrategy'.
+     *
+     * @param connectionStrategy Value to set for property 'connectionStrategy'.
+     */
+    public void setConnectionStrategy(ConnectionStrategy connectionStrategy)
+    {
+        this.connectionStrategy = connectionStrategy;
     }
 }

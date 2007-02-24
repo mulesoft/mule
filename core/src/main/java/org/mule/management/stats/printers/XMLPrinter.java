@@ -1,3 +1,4 @@
+
 /*
  * $Id$
  * --------------------------------------------------------------------------------------
@@ -10,22 +11,25 @@
 
 package org.mule.management.stats.printers;
 
-import org.apache.commons.lang.StringUtils;
+import org.mule.management.stats.RouterStatistics;
+import org.mule.util.StringUtils;
 
 import java.io.OutputStream;
 import java.io.Writer;
 import java.util.Collection;
 
-import org.mule.management.stats.RouterStatistics;
 
 /**
  * <code>XMLPrinter</code> prints event processing stats as a XML document
  * 
- * @author <a href="mailto:artashes.hovasapyan@ricston.com">Artashes Hovasapyan</a>
- * @version $Revision$
  */
 public class XMLPrinter extends AbstractTablePrinter
 {
+    /**
+     * Indentation step for XML pretty-printing.
+     */
+    protected static final int XML_INDENT_SIZE = 2;
+
     public XMLPrinter(Writer out)
     {
         super(out);
@@ -100,34 +104,50 @@ public class XMLPrinter extends AbstractTablePrinter
 
     public void print(Collection stats)
     {
+        println("<?xml version=\"1.0\" encoding=\"US-ASCII\"?>");
         println("<Components>");
         String[][] table = getTable(stats);
         boolean router = false;
+
+        int indentLevel = 1;
+
         for (int i = 1; i < table.length; i++)
         {
-            println("<Component name=\"" + table[i][0] + "\">");
+            println("<Component name=\"" + table[i][0] + "\">", indentLevel);
+            indentLevel++;
             for (int j = 1; j < table[i].length; j++)
             {
                 if (StringUtils.equals(table[0][j], "Router"))
                 {
-                    if (!router)
+                    if (!router)         
                     {
-                        println("<Router type=\"" + table[i][++j] + "\">");
+                        println("<Router type=\"" + table[i][++j] + "\">", indentLevel);
+                        indentLevel++;
                         router = true;
                     }
                     else
                     {
-                        println("</Router>");
+                        indentLevel--;
+                        println("</Router>", indentLevel);
                         router = false;
                     }
                 }
                 else
                 {
-                    println("<Statistic name=\"" + table[0][j] + "\" value=\"" + table[i][j] + "\"/>");
+                    println("<Statistic name=\"" + table[0][j] + "\" value=\"" + table[i][j] + "\"/>",
+                            indentLevel);
                 }
             }
-            println("</Component>");
+            indentLevel--;
+            println("</Component>", indentLevel);
         }
-        println("</Components>");
+        indentLevel--;
+        println("</Components>", indentLevel);
+    }
+
+    public void println(String s, int indentLevel)
+    {
+        final String indent = StringUtils.repeat(' ', indentLevel * XML_INDENT_SIZE);
+        println(indent + s);
     }
 }

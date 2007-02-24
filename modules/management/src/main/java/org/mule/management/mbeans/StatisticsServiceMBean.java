@@ -22,17 +22,9 @@ import org.mule.management.stats.Statistics;
 public interface StatisticsServiceMBean extends Statistics
 {
 
-    void logCSVSummary();
+    String printCSVSummary ();
 
-    /**
-     * @return
-     * @deprecated use getHtmlSummary
-     */
-    String printHtmlSummary();
+    String printHtmlSummary ();
 
-    String getHtmlSummary();
-
-    String printXMLSummary();
-
-    String getXMLSummary();
+    String printXmlSummary ();
 }

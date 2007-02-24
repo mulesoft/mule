@@ -1,0 +1,310 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the MuleSource MPL
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+/*
+ * Copyright (C) The MX4J Contributors.
+ * All rights reserved.
+ *
+ * This software is distributed under the terms of the MX4J License version 1.0.
+ * See the terms of the MX4J License in the documentation provided with this software.
+ * Author: Carlos Quiroz
+ * Revision: 1.2
+ */
+
+
+body {
+    background: #ffffff;
+    color: #000000;
+    font-family: tahoma,verdana,helvetica,arial,sans-serif;
+    margin-top: 5px;
+    margin-left: 5px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+
+
+/* Footer class */
+
+div.footer {
+    background: #ffffff;
+    color: #000000;
+    height: 25px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    font-weight: bold;
+    font-size: 14px;
+    text-align: center;
+}
+
+
+/* Tabs styles */
+
+td.fronttab {
+    background: #82a5d3;
+    color: #000000;
+    height: 25px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 2px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+
+td.backtab {
+    background: #c0c0c0;
+    color: #000000;
+    height: 25px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 2px;
+    font-size: 14px;
+}
+
+
+a.tabs {
+    color: #000000;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+/* End of tabs styles */
+
+
+/* Header styles */
+
+td.darker {
+    background: #808080;
+    height: 10px;
+}
+
+
+td.topheading {
+    background: #ffffff;
+    color: #000000;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* End of Header styles */
+
+
+td.domainline {
+    background: #778899;
+    color: #000000;
+    padding-left: 10px;
+}
+
+
+td.page_title {
+    background: #82a5d3;
+    color: #000000;
+    height: 30px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+
+div.subtitle {
+    font-size: 12px;
+}
+
+
+td.input_title {
+    background: #ffffff;
+    color: #000000;
+    height: 30px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+
+/* Server by domain styles */
+
+td.serverbydomain_domainline {
+    background: #778899;
+    color: #ffffff;
+    height: 20px;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+
+a.serverbydomain_statistics {
+   color: #ffffff;
+   visited: #ffffff;
+}
+
+
+tr.clearline {
+    background: #ffffff;
+    color: #000000;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+
+tr.darkline {
+    background: #e6e6fa;
+    color: #000000;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+
+td.serverbydomain_row {
+    font-size: 12px;
+    padding-left: 10px;
+}
+
+
+/* MBean section title */
+
+td.mbeans {
+    background: #778899;
+    color: #ffffff;
+    height: 20px;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+
+p.darklinebottom {
+    background: #808080;
+    color: #000000;
+    height: 20px;
+    padding-left: 10px;
+    font-weight: bold;
+}
+
+
+div.tableheader {
+    font-weight: bold;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    font-size: 14px;
+}
+
+
+td.mbean_row {
+    font-size: 12px;
+    padding-left: 10px;
+}
+
+
+td.attributes_setall {
+    background: #ffffff;
+    padding-right: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+
+/* MBean section title */
+
+td.mbeans {
+    background: #778899;
+    color: #ffffff;
+    height: 20px;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+
+div.tableheader {
+    font-weight: bold;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    font-size: 14px;
+}
+
+
+td.mbean_row {
+    font-size: 12px;
+    padding-left: 10px;
+}
+
+
+td.aggregationrow {
+    font-size: 12px;
+    padding-left: 10px;
+}
+
+
+td.constructorrow {
+    font-size: 12px;
+    padding-left: 10px;
+}
+
+
+td.attributes_setall {
+    background: #ffffff;
+    padding-right: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+
+tr.about {
+    background: #ffffff;
+}
+
+
+h1.about {
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    font-size: 18px;
+    background: #ffffff;
+    color: #000000;
+}
+
+
+h2.about {
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    font-size: 16px;
+    background: #ffffff;
+    color: #000000;
+}
+
+
+h3.about {
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    font-size: 14px;
+    background: #ffffff;
+    color: #000000;
+}
+

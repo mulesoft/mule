@@ -72,7 +72,7 @@ public class LenderService
      */
     private String getEndpoint(String endpoint)
     {
-        if (endpoint.startsWith("glue") || endpoint.startsWith("axis") || endpoint.startsWith("soap"))
+        if (endpoint.startsWith("glue") || endpoint.startsWith("axis") || endpoint.startsWith("xfire") || endpoint.startsWith("soap"))
         {
             int i = endpoint.indexOf('?');
             if (i > -1)

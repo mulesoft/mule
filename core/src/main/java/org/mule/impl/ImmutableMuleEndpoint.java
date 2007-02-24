@@ -17,6 +17,8 @@ import org.mule.config.i18n.Messages;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractConnector;
+import org.mule.providers.ConnectionStrategy;
+import org.mule.providers.SingleAttemptConnectionStrategy;
 import org.mule.providers.service.TransportFactory;
 import org.mule.providers.service.TransportFactoryException;
 import org.mule.registry.DeregistrationException;
@@ -170,6 +172,8 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     protected String registryId = null;
 
     protected UMOManagementContext managementContext;
+
+    protected ConnectionStrategy connectionStrategy;
 
     /**
      * Default ctor
@@ -717,6 +721,11 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
             remoteSyncTimeout = Integer.valueOf(rsTimeout);
         }
 
+        if(connectionStrategy==null)
+        {
+            connectionStrategy = new SingleAttemptConnectionStrategy();
+        }
+
         initialised.set(true);
 
         // For now at least, we don't want a registration error to affect
@@ -928,5 +937,15 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     public UMOManagementContext getManagementContext()
     {
         return managementContext;
+    }
+
+    /**
+     * Getter for property 'connectionStrategy'.
+     *
+     * @return Value for property 'connectionStrategy'.
+     */
+    public ConnectionStrategy getConnectionStrategy()
+    {
+        return connectionStrategy;
     }
 }

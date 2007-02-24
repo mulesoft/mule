@@ -91,7 +91,7 @@ public class MessagingException extends UMOException
             Object payload = umoMessage.getPayload();
             if (payload == null)
             {
-                payload = new NullPayload();
+                payload = NullPayload.getInstance();
             }
 
             buf.append(Messages.get(Messages.MESSAGE_IS_OF_TYPE_X, payload.getClass().getName()));
@@ -100,7 +100,7 @@ public class MessagingException extends UMOException
         else
         {
             buf.append("The current UMOMessage is null! Please report this to dev@mule.codehaus.org.");
-            addInfo("Payload", new NullPayload().toString());
+            addInfo("Payload", NullPayload.getInstance().toString());
         }
 
         return buf.toString();

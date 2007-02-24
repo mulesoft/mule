@@ -65,30 +65,26 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
         {
 
             builder = new QuickConfigurationBuilder();
-            RegistryFacade m = builder.getManagementContext().getRegistry();
+            RegistryFacade registry = builder.getManagementContext().getRegistry();
             // set global properties
-            m.setProperty("doCompression", "true");
+            registry.setProperty("doCompression", "true");
 
             // Set a dummy TX manager
-            m.setTransactionManager(new TestTransactionManagerFactory().create());
+            registry.setTransactionManager(new TestTransactionManagerFactory().create());
             // register agents
             UMOAgent agent = new JmxAgent();
             agent.setName("jmxAgent");
-            m.registerAgent(agent);
+            registry.registerAgent(agent);
 
             // register connector
             TestConnector c = new TestConnector();
             c.setName("dummyConnector");
             c.setExceptionListener(new TestExceptionStrategy());
-            SimpleRetryConnectionStrategy cs = new SimpleRetryConnectionStrategy();
-            cs.setRetryCount(4);
-            cs.setFrequency(3000);
-            c.setConnectionStrategy(cs);
-            m.registerConnector(c);
+            registry.registerConnector(c);
 
-//            m.registerEndpointIdentifier("AppleQueue", "test://apple.queue");
-//            m.registerEndpointIdentifier("Banana_Queue", "test://banana.queue");
-//            m.registerEndpointIdentifier("Test Queue", "test://test.queue");
+//            registry.registerEndpointIdentifier("AppleQueue", "test://apple.queue");
+//            registry.registerEndpointIdentifier("Banana_Queue", "test://banana.queue");
+//            registry.registerEndpointIdentifier("Test Queue", "test://test.queue");
 
             // Register transformers
             TestCompressionTransformer t = new TestCompressionTransformer();
@@ -96,11 +92,11 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             t.setBeanProperty2(12);
             t.setContainerProperty("");
             t.setBeanProperty1("this was set from the manager properties!");
-            m.registerTransformer(t);
+            registry.registerTransformer(t);
 
             NoActionTransformer t2 = new NoActionTransformer();
             t2.setReturnClass(byte[].class);
-            m.registerTransformer(t2);
+            registry.registerTransformer(t2);
 
             // Register endpoints
             JXPathFilter filter = new JXPathFilter("name");
@@ -116,6 +112,17 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             props.put("testGlobal", "value1");
             builder.registerEndpoint("test://orangeQ", "orangeEndpoint", false, props);
 
+            UMOEndpoint ep = new MuleEndpoint("test://test.queue2", false);
+            ep.setName("testEPWithCS");
+            SimpleRetryConnectionStrategy cs = new SimpleRetryConnectionStrategy();
+            cs.setRetryCount(4);
+            cs.setFrequency(3000);
+            ep.setConnectionStrategy(cs);
+            builder.getManagementContext().getRegistry().registerEndpoint(ep);
+
+            //The Testcase gives us a model by
+            builder.getManagementContext().getRegistry().unregisterModel("main");
+
             // register model
             UMOModel model = new SedaModel();
             model.setName("main");
@@ -124,11 +131,11 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             model.setExceptionListener(es);
             model.setLifecycleAdapterFactory(new TestDefaultLifecycleAdapterFactory());
             model.setEntryPointResolver(new TestEntryPointResolver());
-            m.registerModel(model);
+            registry.registerModel(model);
 
             // register components
-            UMOEndpoint ep1 = m.lookupEndpoint("appleInEndpoint");
-            ep1.setTransformer(m.lookupTransformer("TestCompressionTransformer"));
+            UMOEndpoint ep1 = registry.lookupEndpoint("appleInEndpoint");
+            ep1.setTransformer(registry.lookupTransformer("TestCompressionTransformer"));
             UMODescriptor d = builder.createDescriptor("orange", "orangeComponent", null, ep1, props);
             d.setContainer("descriptor");
             DefaultComponentExceptionStrategy dces = new DefaultComponentExceptionStrategy();
@@ -140,11 +147,11 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             inRouter.getCatchAllStrategy().setEndpoint(new MuleEndpoint("test://catch.all", false));
             UMOEndpoint ep2 = builder.createEndpoint("test://orange/", "Orange", true,
                 "TestCompressionTransformer");
-            ep2.setResponseTransformer(m.lookupTransformer("TestCompressionTransformer"));
+            ep2.setResponseTransformer(registry.lookupTransformer("TestCompressionTransformer"));
             inRouter.addEndpoint(ep2);
-            UMOEndpoint ep3 = m.lookupEndpoint("orangeEndpoint");
+            UMOEndpoint ep3 = registry.lookupEndpoint("orangeEndpoint");
             ep3.setFilter(new PayloadTypeFilter(String.class));
-            ep3.setTransformer(m.lookupTransformer("TestCompressionTransformer"));
+            ep3.setTransformer(registry.lookupTransformer("TestCompressionTransformer"));
             Map props2 = new HashMap();
             props2.put("testLocal", "value1");
             ep3.setProperties(props2);
@@ -169,7 +176,7 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             // Response Router
             UMOResponseRouterCollection responseRouter = new ResponseRouterCollection();
             responseRouter.addEndpoint(new MuleEndpoint("test://response1", true));
-            responseRouter.addEndpoint(m.lookupEndpoint("appleResponseEndpoint"));
+            responseRouter.addEndpoint(registry.lookupEndpoint("appleResponseEndpoint"));
             responseRouter.addRouter(new TestResponseAggregator());
             responseRouter.setTimeout(10001);
             d.setResponseRouter(responseRouter);
@@ -197,13 +204,13 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             d.setProperties(cprops);
 
             // register components
-            m.lookupModel("main").registerComponent(d);
+            registry.lookupModel("main").registerComponent(d);
             if (StringUtils.isBlank(builder.getManagementContext().getId()))
             {
                 // if running with JMX agent, manager ID is mandatory
                 builder.getManagementContext().setId("" + System.currentTimeMillis());
             }
-            m.start();
+            registry.start();
         }
         catch (Exception e)
         {

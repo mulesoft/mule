@@ -47,7 +47,7 @@ public class DefaultMessageAdapter extends AbstractMessageAdapter
     {
         if (message == null)
         {
-            this.message = new NullPayload();
+            this.message = NullPayload.getInstance();
         }
         else
         {
@@ -63,7 +63,7 @@ public class DefaultMessageAdapter extends AbstractMessageAdapter
 
             if (message == null)
             {
-                this.message = new NullPayload();
+                this.message = NullPayload.getInstance();
             }
             else
             {

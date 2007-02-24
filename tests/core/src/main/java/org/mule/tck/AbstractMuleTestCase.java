@@ -181,6 +181,7 @@ public abstract class AbstractMuleTestCase extends TestCase
             {
                 return;
             }
+            setupRegistry();
             managementContext = createManagementContext();
 
             doSetUp();
@@ -197,9 +198,13 @@ public abstract class AbstractMuleTestCase extends TestCase
         }
     }
 
-    protected UMOManagementContext createManagementContext() throws Exception
+    protected void setupRegistry()
     {
         RegistryContext.setRegistry(new DefaultRegistryFacade());
+    }
+
+    protected UMOManagementContext createManagementContext() throws Exception
+    {
         UMOManagementContext managementContext = new ManagementContext();
         managementContext.initialise();        
         managementContext.getRegistry().registerModel(getDefaultModel(managementContext));
@@ -261,13 +266,20 @@ public abstract class AbstractMuleTestCase extends TestCase
 
     protected void disposeManager()
     {
-        log("disposing manager. disposeManagerPerSuite=" + getTestInfo().isDisposeManagerPerSuite());
-        if (managementContext!=null)
+        try
         {
-            FileUtils.deleteTree(FileUtils.newFile(RegistryContext.getConfiguration().getWorkingDirectory()));
-            managementContext.dispose();
+            log("disposing manager. disposeManagerPerSuite=" + getTestInfo().isDisposeManagerPerSuite());
+            if (managementContext!=null)
+            {
+                FileUtils.deleteTree(FileUtils.newFile(RegistryContext.getConfiguration().getWorkingDirectory()));
+                managementContext.dispose();
+            }
+            FileUtils.deleteTree(FileUtils.newFile("./ActiveMQ"));
         }
-        FileUtils.deleteTree(FileUtils.newFile("./ActiveMQ"));
+        finally
+        {
+            managementContext = null;
+        }
     }
 
     protected void doSetUp() throws Exception

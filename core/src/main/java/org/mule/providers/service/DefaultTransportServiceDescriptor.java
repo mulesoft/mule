@@ -171,7 +171,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
     {
         if (message == null)
         {
-            message = new NullPayload();
+            message = NullPayload.getInstance();
         }
         if (messageAdapter != null)
         {

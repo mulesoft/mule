@@ -30,9 +30,9 @@ public class WildcardFilter implements UMOFilter, ObjectFilter
 {
     protected final Log logger = LogFactory.getLog(this.getClass());
 
-    protected String pattern;
-    protected String[] patterns;
-    private boolean caseSensitive = true;
+    protected volatile String pattern;
+    protected volatile String[] patterns;
+    private volatile boolean caseSensitive = true;
 
     public WildcardFilter()
     {
@@ -64,12 +64,13 @@ public class WildcardFilter implements UMOFilter, ObjectFilter
             return false;
         }
 
-        if (patterns != null)
+        String[] currentPatterns = this.patterns;
+        if (currentPatterns != null)
         {
-            for (int x = 0; x < patterns.length; x++)
+            for (int x = 0; x < currentPatterns.length; x++)
             {
                 boolean foundMatch;
-                String pattern = patterns[x];
+                String pattern = currentPatterns[x];
 
                 if ("*".equals(pattern) || "**".equals(pattern))
                 {

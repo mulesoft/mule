@@ -16,6 +16,7 @@ import org.mule.umo.UMOException;
 import org.mule.umo.model.UMOModel;
 
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * @deprecated This functionality should be moved to the registry
@@ -79,5 +80,19 @@ public class ModelHelper
             RegistryContext.getRegistry().registerModel(model);
         }
         model.registerComponent(d);
+    }
+
+    public static UMOModel getFirstUserModel() throws UMOException
+    {
+        Map models = RegistryContext.getRegistry().getModels();
+        for (Iterator iterator = models.values().iterator(); iterator.hasNext();)
+        {
+            UMOModel model = (UMOModel) iterator.next();
+            if(!model.getName().equals(SYSTEM_MODEL))
+            {
+                return model;
+            }
+        }
+        return null;
     }
 }

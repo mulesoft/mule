@@ -10,6 +10,7 @@
 
 package org.mule.util;
 
+import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -18,6 +19,51 @@ import org.apache.commons.lang.SystemUtils;
 // @ThreadSafe
 public class CollectionUtils extends org.apache.commons.collections.CollectionUtils
 {
+
+    /**
+     * Creates an array of the given Collection's elements, but with the given
+     * <code>Class</code> as element type. Useful for arrays of objects that
+     * implement multiple interfaces and a "typed view" onto these objects is
+     * required.
+     * 
+     * @param objects a Collection of objects
+     * @param clazz the desired component type of the new array
+     * @return <code>null</code> when objects is <code>null</code>, or a new
+     *         array containing the elements of the source array which is typed to
+     *         the given <code>clazz</code> parameter.
+     * @throws IllegalArgumentException if the <code>clazz</code> argument is
+     *             <code>null</code>.
+     * @throws ArrayStoreException if the elements in <code>objects</code> cannot
+     *             be cast to <code>clazz</code>.
+     */
+    public static Object[] toArrayOfComponentType(Collection objects, Class clazz)
+    {
+        if (objects == null)
+        {
+            return null;
+        }
+
+        if (clazz == null)
+        {
+            throw new IllegalArgumentException("Array target class must not be null");
+        }
+
+        if (objects.isEmpty())
+        {
+            return (Object[])Array.newInstance(clazz, 0);
+        }
+
+        int i = 0, size = objects.size();
+        Object[] result = (Object[])Array.newInstance(clazz, size);
+        Iterator iter = objects.iterator();
+
+        while (i < size && iter.hasNext())
+        {
+            result[i++] = iter.next();
+        }
+
+        return result;
+    }
 
     /**
      * Creates a String representation of the given Collection, with optional

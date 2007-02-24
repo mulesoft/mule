@@ -12,6 +12,7 @@ package org.mule.providers;
 
 import org.mule.MuleRuntimeException;
 import org.mule.RegistryContext;
+import org.mule.util.ClassUtils;
 import org.mule.config.MuleProperties;
 import org.mule.config.ThreadingProfile;
 import org.mule.config.i18n.Message;
@@ -78,7 +79,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
         this.endpoint = endpoint;
         this.connector = (AbstractConnector)endpoint.getConnector();
 
-        connectionStrategy = connector.getConnectionStrategy();
+        connectionStrategy = endpoint.getConnectionStrategy();
         if (connectionStrategy instanceof AbstractConnectionStrategy)
         {
             // We don't want to do threading in the dispatcher because we're either
@@ -374,13 +375,15 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
             {
                 try
                 {
-                    disconnect();
+                    this.disconnect();
                 }
                 catch (Exception e)
                 {
                     logger.warn(e.getMessage(), e);
                 }
-                doDispose();
+
+                this.doDispose();
+
                 if (workManager != null)
                 {
                     workManager.dispose();
@@ -446,39 +449,51 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
 
     public synchronized void connect() throws Exception
     {
-        if (connected)
-        {
-            return;
-        }
-
         if (disposed)
         {
             throw new IllegalStateException("Dispatcher has been disposed; cannot connect to resource");
         }
 
-        if (logger.isDebugEnabled())
+        if (connected)
         {
-            logger.debug("Attempting to connect to: " + endpoint.getEndpointURI());
+            return;
         }
 
         if (!connecting)
         {
             connecting = true;
+
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Connecting: " + this);
+            }
+
             connectionStrategy.connect(this);
-            logger.info("Successfully connected to: " + endpoint.getEndpointURI());
+
+            logger.info("Connected: " + this);
             return;
         }
 
         try
         {
-            doConnect();
+            //Make sure the connector has connected. If it is connected, this method does nothing
+            connectionStrategy.connect(connector);
+            
+            this.doConnect();
+            connected = true;
+            connecting = false;
+
             connector.fireNotification(new ConnectionNotification(this, getConnectEventId(endpoint),
                 ConnectionNotification.CONNECTION_CONNECTED));
         }
         catch (Exception e)
         {
+            connected = false;
+            connecting = false;
+
             connector.fireNotification(new ConnectionNotification(this, getConnectEventId(endpoint),
                 ConnectionNotification.CONNECTION_FAILED));
+
             if (e instanceof ConnectException)
             {
                 throw (ConnectException)e;
@@ -488,28 +503,32 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
                 throw new ConnectException(e, this);
             }
         }
-
-        connected = true;
-        connecting = false;
     }
 
     public synchronized void disconnect() throws Exception
     {
+        if (!connected)
+        {
+            return;
+        }
+
         if (logger.isDebugEnabled())
         {
-            logger.debug("Disconnecting from: " + endpoint.getEndpointURI());
+            logger.debug("Disconnecting: " + this);
         }
+
+        this.doDisconnect();
+        connected = false;
+
+        logger.info("Disconnected: " + this);
 
         connector.fireNotification(new ConnectionNotification(this, getConnectEventId(endpoint),
             ConnectionNotification.CONNECTION_DISCONNECTED));
-        connected = false;
-        doDisconnect();
-        logger.info("Disconnected from: " + endpoint.getEndpointURI());
     }
 
     protected String getConnectEventId(UMOImmutableEndpoint endpoint)
     {
-        return connector.getName() + ".dispatcher (" + endpoint.getEndpointURI() + ")";
+        return connector.getName() + ".dispatcher(" + endpoint.getEndpointURI() + ")";
     }
 
     public final boolean isConnected()
@@ -558,7 +577,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
 
     private class Worker implements Work
     {
-        private UMOEvent event;
+        private final UMOEvent event;
 
         public Worker(UMOEvent event)
         {
@@ -577,7 +596,8 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
                 RequestContext.setEvent(event);
                 // Make sure we are connected
                 connectionStrategy.connect(AbstractMessageDispatcher.this);
-                doDispatch(event);
+                AbstractMessageDispatcher.this.doDispatch(event);
+
                 if (connector.isEnableMessageEvents())
                 {
                     String component = null;
@@ -585,13 +605,14 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
                     {
                         component = event.getComponent().getDescriptor().getName();
                     }
+
                     connector.fireNotification(new MessageNotification(event.getMessage(), event
                         .getEndpoint(), component, MessageNotification.MESSAGE_DISPATCHED));
                 }
             }
             catch (Exception e)
             {
-                getConnector().handleException(e);
+                AbstractMessageDispatcher.this.getConnector().handleException(e);
             }
         }
 
@@ -623,11 +644,13 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
         return false;
     }
 
+    //  @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer();
-        sb.append("MessageDispatcher");
-        sb.append("{endpoint=").append(endpoint.getEndpointURI());
+        final StringBuffer sb = new StringBuffer(80);
+        sb.append(ClassUtils.getShortClassName(this.getClass()));
+        sb.append("{this=").append(Integer.toHexString(System.identityHashCode(this)));
+        sb.append(", endpoint=").append(endpoint.getEndpointURI());
         sb.append('}');
         return sb.toString();
     }

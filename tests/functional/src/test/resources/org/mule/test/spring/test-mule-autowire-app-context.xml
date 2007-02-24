@@ -88,16 +88,16 @@
         <property name="exceptionListener">
             <bean id="connectorES" class="org.mule.tck.testmodels.mule.TestExceptionStrategy"/>
         </property>
-        <property name="connectionStrategy">
-            <bean id="connectionStrategy" class="org.mule.providers.SimpleRetryConnectionStrategy">
-                <property name="retryCount">
-                    <value>4</value>
-                </property>
-                <property name="frequency">
-                    <value>3000</value>
-                </property>
-            </bean>
-        </property>
+        <!--<property name="connectionStrategy">-->
+            <!--<bean id="connectionStrategy" class="org.mule.providers.SimpleRetryConnectionStrategy">-->
+                <!--<property name="retryCount">-->
+                    <!--<value>4</value>-->
+                <!--</property>-->
+                <!--<property name="frequency">-->
+                    <!--<value>3000</value>-->
+                <!--</property>-->
+            <!--</bean>-->
+        <!--</property>-->
         <property name="dispatcherThreadingProfile">
             <bean id="vmDispatcherThreadingProfile" class="org.mule.config.ThreadingProfile">
                 <property name="maxBufferSize">

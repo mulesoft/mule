@@ -494,7 +494,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
     {
         if (result == null)
         {
-            result = new NullPayload();
+            result = NullPayload.getInstance();
         }
         Map props = new HashMap();
         Iterator iter = call.getMessageContext().getPropertyNames();

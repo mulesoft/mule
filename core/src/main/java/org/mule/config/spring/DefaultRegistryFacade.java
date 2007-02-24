@@ -231,6 +231,7 @@ public class DefaultRegistryFacade implements RegistryFacade
 
         transformers.clear();
         endpoints.clear();
+        models.clear();
         containerContext.dispose();
         containerContext = null;
         // props.clearErrors();

@@ -93,16 +93,20 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
             managementContext.getRegistry().registerAgent(agent);
         }
 
-        if (!MODEL_NOT_SET.equals(modeltype))
+        String defaultModelName = UMOModel.DEFAULT_MODEL_NAME + "-qbuilder";
+        if(managementContext.getRegistry().lookupModel(defaultModelName)==null)
         {
-            model = ModelFactory.createModel(modeltype);
+            if (!MODEL_NOT_SET.equals(modeltype))
+            {
+                model = ModelFactory.createModel(modeltype);
+            }
+            else
+            {
+                model = ModelFactory.createModel("seda");
+            }
+            model.setName(defaultModelName);
+            managementContext.getRegistry().registerModel(model);
         }
-        else
-        {
-            model = ModelFactory.createModel("seda");
-        }
-        managementContext.getRegistry().registerModel(model);
-
         managementContext.start();
     }
 

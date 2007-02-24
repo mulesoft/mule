@@ -33,15 +33,24 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
 {
 
     private final AtomicBoolean managerStopped = new AtomicBoolean(false);
+    private final AtomicInteger managerStoppedEvents = new AtomicInteger(0);
     private final AtomicBoolean modelStopped = new AtomicBoolean(false);
     private final AtomicInteger componentStartedCount = new AtomicInteger(0);
     private final AtomicInteger customNotificationCount = new AtomicInteger(0);
     private UMOModel model;
 
-
+    // @Override
     protected void doSetUp() throws Exception
     {
         model = managementContext.getRegistry().lookupModel(UMOModel.DEFAULT_MODEL_NAME);
+    }
+
+    // @Override
+    protected void doTearDown() throws Exception
+    {
+        managementContext.stop();
+        managerStopped.set(true);
+        managerStoppedEvents.set(0);
     }
 
     public void testStandardNotifications() throws Exception
@@ -52,6 +61,15 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
         assertTrue(managerStopped.get());
     }
 
+    public void testMultipleRegistrations() throws Exception
+    {
+        managementContext.registerListener(this);
+        managementContext.registerListener(this);
+        managementContext.stop();
+        assertTrue(managerStopped.get());
+        assertEquals(2, managerStoppedEvents.get());
+    }
+
     public void testUnregistering() throws Exception
     {
        managementContext.registerListener(this);
@@ -60,6 +78,18 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
         // these should still be false because we unregistered ourselves
         assertFalse(modelStopped.get());
         assertFalse(managerStopped.get());
+    }
+
+    public void testMismatchingUnregistrations() throws Exception
+    {
+        managementContext.registerListener(this);
+        managementContext.registerListener(this);
+        managementContext.unregisterListener(this);
+        managementContext.stop();
+
+        // we registered twice but unregistered only once, so this should be true
+        assertTrue(managerStopped.get());
+        assertEquals(1, managerStoppedEvents.get());
     }
 
     public void testStandardNotificationsWithSubscription() throws Exception
@@ -175,6 +205,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
         else if (notification.getAction() == ManagerNotification.MANAGER_STOPPED)
         {
             managerStopped.set(true);
+            managerStoppedEvents.incrementAndGet();
         }
     }
 

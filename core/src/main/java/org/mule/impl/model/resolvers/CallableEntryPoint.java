@@ -21,11 +21,6 @@ import org.mule.umo.model.UMOEntryPoint;
 public class CallableEntryPoint implements UMOEntryPoint
 {
 
-    public Class[] getParameterTypes()
-    {
-        return Callable.class.getMethods()[0].getParameterTypes();
-    }
-
     public Object invoke(Object component, UMOEventContext context) throws Exception
     {
         if (component instanceof Callable)
@@ -36,16 +31,6 @@ public class CallableEntryPoint implements UMOEntryPoint
         {
             throw new NoSatisfiableMethodsException(component, UMOEventContext.class);
         }
-    }
-
-    public boolean isVoid()
-    {
-        return false;
-    }
-
-    public String getMethodName()
-    {
-        return Callable.class.getMethods()[0].getName();
     }
 
 }

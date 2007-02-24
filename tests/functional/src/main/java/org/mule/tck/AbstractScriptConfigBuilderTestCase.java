@@ -12,17 +12,16 @@ package org.mule.tck;
 
 import org.mule.impl.AbstractExceptionListener;
 import org.mule.management.agents.JmxAgent;
-import org.mule.providers.SimpleRetryConnectionStrategy;
 import org.mule.routing.ForwardingCatchAllStrategy;
 import org.mule.routing.filters.xml.JXPathFilter;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.tck.testmodels.fruit.FruitCleaner;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
-import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.tck.testmodels.mule.TestDefaultLifecycleAdapterFactory;
 import org.mule.tck.testmodels.mule.TestEntryPointResolver;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.tck.testmodels.mule.TestResponseAggregator;
+import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -36,6 +35,7 @@ import org.mule.umo.routing.UMOOutboundRouterCollection;
 import org.mule.umo.routing.UMOResponseRouter;
 import org.mule.umo.routing.UMOResponseRouterCollection;
 import org.mule.umo.transformer.UMOTransformer;
+import org.mule.providers.SimpleRetryConnectionStrategy;
 
 import java.util.List;
 import java.util.Map;
@@ -54,16 +54,13 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertNotNull(managementContext.getTransactionManager());
     }
 
+
     public void testConnectorConfig() throws Exception
     {
         TestConnector c = (TestConnector)managementContext.getRegistry().lookupConnector("dummyConnector");
         assertNotNull(c);
         assertNotNull(c.getExceptionListener());
         assertTrue(c.getExceptionListener() instanceof TestExceptionStrategy);
-        assertNotNull(c.getConnectionStrategy());
-        assertTrue(c.getConnectionStrategy() instanceof SimpleRetryConnectionStrategy);
-        assertEquals(4, ((SimpleRetryConnectionStrategy)c.getConnectionStrategy()).getRetryCount());
-        assertEquals(3000, ((SimpleRetryConnectionStrategy)c.getConnectionStrategy()).getFrequency());
     }
 
     public void testGlobalEndpointConfig()
@@ -76,6 +73,13 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertEquals("name", filter.getExpression());
         assertEquals("bar", filter.getExpectedValue());
         assertEquals("http://foo.com", filter.getNamespaces().get("foo"));
+
+        UMOEndpoint ep = managementContext.getRegistry().lookupEndpoint("testEPWithCS");
+        assertNotNull(ep);
+        assertNotNull(ep.getConnectionStrategy());
+        assertTrue(ep.getConnectionStrategy() instanceof SimpleRetryConnectionStrategy);
+        assertEquals(4, ((SimpleRetryConnectionStrategy)ep.getConnectionStrategy()).getRetryCount());
+        assertEquals(3000, ((SimpleRetryConnectionStrategy)ep.getConnectionStrategy()).getFrequency());
     }
 
     public void testEndpointConfig()

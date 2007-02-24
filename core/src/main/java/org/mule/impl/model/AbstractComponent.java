@@ -216,13 +216,6 @@ public abstract class AbstractComponent implements UMOComponent
         managementContext.fireNotification(new ComponentNotification(descriptor, action));
     }
 
-    void finaliseEvent(UMOEvent event)
-    {
-        logger.debug("Finalising event for: " + descriptor.getName() + " event endpointUri is: "
-                     + event.getEndpoint().getEndpointURI());
-        // queue.remove(event);
-    }
-
     public void forceStop() throws UMOException
     {
         if (!stopped.get())
@@ -585,15 +578,6 @@ public abstract class AbstractComponent implements UMOComponent
 
     protected abstract void doDispatch(UMOEvent event) throws UMOException;
 
-    /**
-     * Gets the underlying instance form this component Where the Component
-     * implmentation provides pooling this is no 1-2-1 mapping between UMOComponent
-     * and instance, so this method will return the object in initial state. <p/> If
-     * the underlying component is Container managed in Spring or another IoC
-     * container then the object instance in the IoC container will be returned
-     * 
-     * @return the underlying instance form this component
-     */
     public Object getInstance() throws UMOException
     {
         return lookupComponent();
@@ -701,8 +685,8 @@ public abstract class AbstractComponent implements UMOComponent
                 catch (Exception e)
                 {
                     throw new ModelException(
-                        Message.createStaticMessage("Failed to connect listener for endpoint "
-                                                    + endpoint.getName()), e);
+                        Message.createStaticMessage("Failed to connect listener "
+                                    + receiver + " for endpoint " + endpoint.getName()), e);
                 }
             }
         }
@@ -726,9 +710,8 @@ public abstract class AbstractComponent implements UMOComponent
                 }
                 catch (Exception e)
                 {
-                    throw new ModelException(
-                        Message.createStaticMessage("Failed to connect listener for endpoint "
-                                                    + endpoint.getName()), e);
+                    throw new ModelException(Message.createStaticMessage("Failed to disconnect listener "
+                                    + receiver + " for endpoint " + endpoint.getName()), e);
                 }
             }
         }

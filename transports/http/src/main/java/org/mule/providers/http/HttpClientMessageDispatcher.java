@@ -68,30 +68,30 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
     {
         super(endpoint);
         this.connector = (HttpConnector)endpoint.getConnector();
-        receiveTransformer = new HttpClientMethodResponseToObject();
+        this.receiveTransformer = new HttpClientMethodResponseToObject();
     }
 
     protected void doConnect() throws Exception
     {
         if (client == null)
         {
-            client = new HttpClient();
-
             HttpState state = new HttpState();
+
             if (connector.getProxyUsername() != null)
             {
                 state.setProxyCredentials(new AuthScope(null, -1, null, null),
                     new UsernamePasswordCredentials(connector.getProxyUsername(),
                         connector.getProxyPassword()));
             }
+
+            client = new HttpClient();
             client.setState(state);
             client.setHttpConnectionManager(new MultiThreadedHttpConnectionManager());
 
-            // test the connection
-//             HeadMethod method = new
-//             HeadMethod(endpoint.getEndpointURI().getAddress());
-//             client.executeMethod(getHostConfig(endpoint.getEndpointURI().getUri()),
-//             method);
+            // test the connection via HEAD
+            // MULE-1402: disabled until we can talk to ourself without blowing up
+            // HeadMethod method = new HeadMethod(endpoint.getEndpointURI().getAddress());
+            // client.executeMethod(getHostConfig(endpoint.getEndpointURI().getUri()), method);
         }
 
     }
@@ -181,9 +181,10 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         {
             URI uri = event.getEndpoint().getEndpointURI().getUri();
 
-            processCookies(event);
-            // TODO can we use this code for better reporting?
-            int code = client.executeMethod(getHostConfig(uri), httpMethod);
+            this.processCookies(event);
+
+            // TODO can we use the return code for better reporting?
+            client.executeMethod(getHostConfig(uri), httpMethod);
 
             return httpMethod;
         }

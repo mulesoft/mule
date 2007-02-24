@@ -329,7 +329,7 @@ public class DefaultMuleProxy implements MuleProxy
 
             if (returnMessage == null)
             {
-                returnMessage = new MuleMessage(new NullPayload(), (Map)null);
+                returnMessage = new MuleMessage(NullPayload.getInstance(), (Map)null);
             }
             UMOExceptionPayload exceptionPayload = RequestContext.getExceptionPayload();
             if (exceptionPayload == null)

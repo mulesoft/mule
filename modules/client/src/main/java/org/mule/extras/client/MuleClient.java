@@ -16,7 +16,6 @@ import org.mule.config.ConfigurationException;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.MuleProperties;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
-import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.ManagementContext;
@@ -108,9 +107,6 @@ public class MuleClient implements Disposable
 
     private List dispatchers = new ArrayList();
 
-    // configuration helper for the client
-    QuickConfigurationBuilder builder = null;
-
     private MuleCredentials user;
 
     /**
@@ -121,7 +117,13 @@ public class MuleClient implements Disposable
      */
     public MuleClient() throws UMOException
     {
-        init(/* startManager */true);
+        init(true);
+    }
+
+    public MuleClient(UMOManagementContext context) throws UMOException
+    {
+        this.managementContext = context;
+        init(false);
     }
 
     /**
@@ -238,7 +240,6 @@ public class MuleClient implements Disposable
         }
 
         asyncExecutor = managementContext.getWorkManager();
-        builder = new QuickConfigurationBuilder();
 
         if (!managementContext.isInitialised() && startManager == true)
         {
@@ -869,6 +870,7 @@ public class MuleClient implements Disposable
         {
             endpoint = MuleEndpoint.getOrCreateEndpointForUri(uri, type);
         }
+        endpoint.initialise(managementContext);
         return endpoint;
     }
 
@@ -968,11 +970,13 @@ public class MuleClient implements Disposable
      *            unregister it
      * @param listenerEndpoint The url endpointUri to listen to
      * @throws UMOException
+     * @deprecated Use the RegistryContext to get the registry and register the component there
      */
     public void registerComponent(Object component, String name, UMOEndpointURI listenerEndpoint)
         throws UMOException
     {
-        builder.registerComponentInstance(component, name, listenerEndpoint, null);
+        throw new UnsupportedOperationException("registerComponent");
+        //builder.registerComponentInstance(component, name, listenerEndpoint, null);
     }
 
     /**
@@ -987,13 +991,15 @@ public class MuleClient implements Disposable
      * @param listenerEndpoint The url endpointUri to listen to
      * @param sendEndpoint The url endpointUri to dispatch to
      * @throws UMOException
+     * @deprecated Use the RegistryContext to get the registry and register the component there
      */
     public void registerComponent(Object component,
                                   String name,
                                   MuleEndpointURI listenerEndpoint,
                                   MuleEndpointURI sendEndpoint) throws UMOException
     {
-        builder.registerComponentInstance(component, name, listenerEndpoint, sendEndpoint);
+        throw new UnsupportedOperationException("registerComponent");
+        //builder.registerComponentInstance(component, name, listenerEndpoint, sendEndpoint);
     }
 
     /**
@@ -1010,10 +1016,12 @@ public class MuleClient implements Disposable
      * @throws UMOException the descriptor is invalid or cannot be initialised or
      *             started
      * @see org.mule.umo.model.UMOModel
+     * @deprecated Use the RegistryContext to get the registry and register the component there
      */
     public void registerComponent(UMODescriptor descriptor) throws UMOException
     {
-        builder.registerComponent(descriptor);
+        throw new UnsupportedOperationException("registerComponent");
+        //builder.registerComponent(descriptor);
     }
 
     /**
@@ -1027,10 +1035,13 @@ public class MuleClient implements Disposable
      *             components does not exist, this method should not throw an
      *             exception.
      * @see org.mule.umo.model.UMOModel
+     * @deprecated Use the RegistryContext to get the registry and register the component there     
      */
     public void unregisterComponent(String name) throws UMOException
     {
-        builder.unregisterComponent(name);
+        throw new UnsupportedOperationException("registerComponent");
+
+        //builder.unregisterComponent(name);
     }
 
     public RemoteDispatcher getRemoteDispatcher(String serverEndpoint) throws UMOException

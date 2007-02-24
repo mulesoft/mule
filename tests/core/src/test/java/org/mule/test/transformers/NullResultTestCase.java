@@ -28,7 +28,7 @@ public class NullResultTestCase extends AbstractTransformerTestCase
 
     public Object getResultData()
     {
-        return new NullPayload();
+        return NullPayload.getInstance();
     }
 
     public UMOTransformer getTransformer() throws Exception

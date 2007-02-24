@@ -56,13 +56,13 @@ public interface UMOComponent extends Serializable, Lifecycle, Initialisable, Re
     boolean isStarted();
 
     /**
-     * Gets the underlying instance form this component Where the Component
-     * implmentation provides pooling this is no 1-2-1 mapping between UMOComponent
-     * and instance, so this method will return the object in initial state. If the
-     * underlying component is Container managed in Spring or another IoC container
-     * then the object instance in the IoC container will be returned
+     * Gets the underlying instance for this component. When the component
+     * implementation provides pooling there is no 1:1 mapping between UMOComponent
+     * and instance, so this method would return an object in initial state. If the
+     * underlying component is managed in Spring or another IoC container, then the
+     * object instance from the corresponding container will be returned.
      * 
-     * @return the underlying instance form this component
+     * @return the underlying instance for this component
      */
     Object getInstance() throws UMOException;
 

@@ -14,6 +14,7 @@ import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
+import org.mule.util.ClassUtils;
 
 /**
  * <code>AbstractMessageDispatcherFactory</code> is a base implementation of the
@@ -66,6 +67,17 @@ public abstract class AbstractMessageDispatcherFactory implements UMOMessageDisp
         // the dispatcher is still valid or has e.g. disposed itself after an
         // exception.
         return (this.isCreateDispatcherPerRequest() ? false : dispatcher.validate());
+    }
+
+    // @Override
+    public String toString()
+    {
+        final StringBuffer sb = new StringBuffer(60);
+        sb.append(ClassUtils.getShortClassName(this.getClass()));
+        sb.append("{this=").append(Integer.toHexString(System.identityHashCode(this)));
+        sb.append(", createDispatcherPerRequest=").append(this.isCreateDispatcherPerRequest());
+        sb.append('}');
+        return sb.toString();
     }
 
 }

@@ -78,7 +78,7 @@ public class MuleReceiverJob implements Job
                 {
                     if (ref == null)
                     {
-                        payload = new NullPayload();
+                        payload = NullPayload.getInstance();
                     }
                     else 
                     {
@@ -88,7 +88,7 @@ public class MuleReceiverJob implements Job
                 catch (ObjectNotFoundException e)
                 {
                     logger.warn("There is no payload attached to this quartz job. Sending Null payload");
-                    payload = new NullPayload();
+                    payload = NullPayload.getInstance();
                 }
             }
             receiver.routeMessage(new MuleMessage(receiver.getConnector().getMessageAdapter(payload)));

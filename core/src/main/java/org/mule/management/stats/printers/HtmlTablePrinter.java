@@ -78,14 +78,7 @@ public class HtmlTablePrinter extends AbstractTablePrinter
 
     protected int getRouterInfo(RouterStatistics stats, String[] col, int index)
     {
-        if (stats.isInbound())
-        {
-            col[index++] = "-";
-        }
-        else
-        {
-            col[index++] = "-";
-        }
+        col[index++] = "-";
 
         col[index++] = String.valueOf(stats.getTotalReceived());
         col[index++] = String.valueOf(stats.getTotalRouted());

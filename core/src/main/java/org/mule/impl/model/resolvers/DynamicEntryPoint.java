@@ -17,6 +17,7 @@ import org.mule.impl.MuleMessage;
 import org.mule.impl.NoSatisfiableMethodsException;
 import org.mule.impl.RequestContext;
 import org.mule.impl.TooManySatisfiableMethodsException;
+import org.mule.impl.VoidResult;
 import org.mule.providers.NullPayload;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.lifecycle.Callable;
@@ -60,8 +61,6 @@ public class DynamicEntryPoint implements UMOEntryPoint
     // @GuardedBy(itself)
     private final ConcurrentMap entryPoints = new ConcurrentHashMap();
 
-    private volatile Method currentMethod;
-
     public DynamicEntryPoint()
     {
         super();
@@ -101,16 +100,6 @@ public class DynamicEntryPoint implements UMOEntryPoint
     {
         ConcurrentMap argumentTypes = (ConcurrentMap)entryPoints.get(methodName);
         return (argumentTypes != null ? (Method)argumentTypes.get(argumentType) : null);
-    }
-
-    public String getMethodName()
-    {
-        return (currentMethod != null ? currentMethod.getName() : null);
-    }
-
-    public Class[] getParameterTypes()
-    {
-        return (currentMethod != null ? currentMethod.getParameterTypes() : null);
     }
 
     public Object invoke(Object component, UMOEventContext context) throws Exception
@@ -257,9 +246,6 @@ public class DynamicEntryPoint implements UMOEntryPoint
             }
         }
 
-        // remember the last invoked method
-        currentMethod = method;
-
         if (payload == null)
         {
             payload = context.getTransformedMessage();
@@ -285,7 +271,7 @@ public class DynamicEntryPoint implements UMOEntryPoint
 
         if (logger.isDebugEnabled())
         {
-            methodCall = component.getClass().getName() + "." + currentMethod.getName() + "("
+            methodCall = component.getClass().getName() + "." + method.getName() + "("
                             + argument.getClass().getName() + ")";
             logger.debug("Invoking " + methodCall);
         }
@@ -326,6 +312,10 @@ public class DynamicEntryPoint implements UMOEntryPoint
         }
 
         Object result = method.invoke(component, invocationArgs);
+        if (method.getReturnType().equals(Void.TYPE))
+        {
+            result = VoidResult.getInstance();
+        }
 
         if (logger.isDebugEnabled())
         {
@@ -333,11 +323,6 @@ public class DynamicEntryPoint implements UMOEntryPoint
         }
 
         return result;
-    }
-
-    public boolean isVoid()
-    {
-        return (currentMethod != null ? currentMethod.getReturnType().getName().equals("void") : false);
     }
 
     /**

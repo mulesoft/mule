@@ -17,6 +17,8 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.UMOTransactionConfig;
+import org.mule.umo.UMOManagementContext;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.routing.UMOOutboundRouter;
@@ -37,8 +39,6 @@ import org.apache.commons.logging.LogFactory;
  * <code>AbstractOutboundRouter</code> is a base router class that tracks
  * statistics about message processing through the router.
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public abstract class AbstractOutboundRouter extends AbstractRouter implements UMOOutboundRouter
 {
@@ -59,6 +59,16 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements U
     protected PropertyExtractor propertyExtractor = new CorrelationPropertiesExtractor();
 
     protected UMOTransactionConfig transactionConfig;
+
+
+    public void doInitialise(UMOManagementContext managementContext) throws InitialisationException
+    {
+        for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
+        {
+            UMOImmutableEndpoint endpoint = (UMOImmutableEndpoint) iterator.next();
+            endpoint.initialise(managementContext);
+        }
+    }
 
     public void dispatch(UMOSession session, UMOMessage message, UMOEndpoint endpoint) throws UMOException
     {
@@ -322,7 +332,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements U
     /**
      * @param name the Endpoint identifier
      * @return the Endpoint or null if the endpointUri is not registered
-     * @see org.mule.umo.routing.UMOInboundMessageRouter
+     * @see org.mule.umo.routing.UMOInboundRouterCollection
      */
     public UMOEndpoint getEndpoint(String name)
     {

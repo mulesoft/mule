@@ -10,10 +10,7 @@
 
 package org.mule.test.integration.providers.jms.activemq;
 
-import org.mule.providers.jms.JmsConnector;
-import org.mule.providers.jms.JmsConstants;
-import org.mule.providers.jms.JmsTransactionFactory;
-import org.mule.providers.jms.TransactedJmsMessageReceiver;
+import org.mule.providers.jms.*;
 import org.mule.test.integration.providers.jms.AbstractJmsTransactionFunctionalTest;
 import org.mule.umo.UMOTransactionFactory;
 
@@ -56,7 +53,8 @@ public class ActiveMQJmsTransactionFunctionalTestCase extends AbstractJmsTransac
         connector.getDispatcherThreadingProfile().setDoThreading(false);
         /** Always use the transacted Jms Message receivers for these test cases */
         Map overrides = new HashMap();
-        overrides.put("message.receiver", TransactedJmsMessageReceiver.class.getName());
+        //overrides.put("message.receiver", TransactedJmsMessageReceiver.class.getName());
+        overrides.put("transacted.message.receiver", TransactedSingleResourceJmsMessageReceiver.class.getName());
         connector.setServiceOverrides(overrides);
 
         // The following comment seems like doesn't count anymore

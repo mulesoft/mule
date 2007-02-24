@@ -34,19 +34,19 @@ public class AggregationException extends RoutingException
 
     public AggregationException(EventGroup eventGroup, UMOImmutableEndpoint endpoint)
     {
-        super(new MuleMessage(new NullPayload()), endpoint);
+        super(new MuleMessage(NullPayload.getInstance()), endpoint);
         this.eventGroup = eventGroup;
     }
 
     public AggregationException(EventGroup eventGroup, UMOImmutableEndpoint endpoint, Throwable cause)
     {
-        super(new MuleMessage(new NullPayload()), endpoint, cause);
+        super(new MuleMessage(NullPayload.getInstance()), endpoint, cause);
         this.eventGroup = eventGroup;
     }
 
     public AggregationException(Message message, EventGroup eventGroup, UMOImmutableEndpoint endpoint)
     {
-        super(message, new MuleMessage(new NullPayload()), endpoint);
+        super(message, new MuleMessage(NullPayload.getInstance()), endpoint);
         this.eventGroup = eventGroup;
     }
 
@@ -55,7 +55,7 @@ public class AggregationException extends RoutingException
                                 UMOImmutableEndpoint endpoint,
                                 Throwable cause)
     {
-        super(message, new MuleMessage(new NullPayload()), endpoint, cause);
+        super(message, new MuleMessage(NullPayload.getInstance()), endpoint, cause);
         this.eventGroup = eventGroup;
     }
 

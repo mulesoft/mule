@@ -42,7 +42,7 @@ public class Log4jAgent extends AbstractAgent
     private MBeanServer mBeanServer;
     public static final String JMX_OBJECT_NAME = "log4j:type=Hierarchy";
 
-    private JmxSupportFactory jmxSupportFactory = new AutoDiscoveryJmxSupportFactory();
+    private JmxSupportFactory jmxSupportFactory = AutoDiscoveryJmxSupportFactory.getInstance();
     private JmxSupport jmxSupport = jmxSupportFactory.getJmxSupport();
 
 

@@ -10,7 +10,6 @@
 
 package org.mule.samples.voipservice.client;
 
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
 import org.mule.impl.MuleMessage;
 import org.mule.samples.voipservice.to.CreditCardTO;
@@ -20,6 +19,7 @@ import org.mule.samples.voipservice.to.ServiceParamTO;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.util.StringMessageUtils;
+import org.mule.config.builders.MuleXmlConfigurationBuilder;
 
 import java.io.IOException;
 
@@ -43,7 +43,6 @@ public class VoipConsumer
 
     public VoipConsumer(String config) throws UMOException
     {
-
         MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
         builder.configure(config);
         init();

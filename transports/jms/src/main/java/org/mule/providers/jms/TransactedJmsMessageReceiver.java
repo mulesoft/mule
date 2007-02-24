@@ -129,7 +129,7 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
             // consumer
             // to receive the message!
         	//Antoine Borg 08 Dec 2006 - Uncommented for MULE-1150
-             createConsumer();
+            // createConsumer();
             // if we comment this line, if one tries to restart the service through
             // JMX,
             // this will fail...
@@ -320,7 +320,7 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
             else if (endpoint.getProperties() != null)
             {
                 // still allow the selector to be set as a property on the endpoint
-                // to be backward compatable
+                // to be backward compatible
                 selector = (String)endpoint.getProperties().get(JmsConstants.JMS_SELECTOR_PROPERTY);
             }
             String tempDurable = (String)endpoint.getProperties().get("durable");

@@ -18,7 +18,6 @@ import org.mule.impl.internal.notifications.ConnectionNotificationListener;
 import org.mule.impl.internal.notifications.NotificationException;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.ConnectException;
-import org.mule.providers.ConnectionStrategy;
 import org.mule.providers.FatalConnectException;
 import org.mule.providers.ReplyToHandler;
 import org.mule.providers.jms.xa.ConnectionFactoryWrapper;
@@ -258,8 +257,8 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         // Register a JMS exception listener to detect failed connections.
         // Existing connection strategy will be used to recover.
 
-        final ConnectionStrategy connectionStrategy = getConnectionStrategy();
-        if (recoverJmsConnections && connectionStrategy != null && connection != null)
+        //TODO RM* Urgent final ConnectionStrategy connectionStrategy = getConnectionStrategy();
+        if (recoverJmsConnections /*&& connectionStrategy != null*/ && connection != null)
         {
             connection.setExceptionListener(new ExceptionListener()
             {
@@ -279,7 +278,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
                     try
                     {
-                        connectionStrategy.connect(jmsConnector);
+                        //connectionStrategy.connect(jmsConnector);
                         jmsConnector.initialise(managementContext);
                         jmsConnector.start();
                     }
@@ -991,7 +990,9 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
                 {
                     // ignore, we are just trying to get the queue name
                 }
-                logger.error("Faled to delete a temporary queue " + queueName, e);
+                logger.info(MessageFormat.format(
+                        "Faled to delete a temporary queue '{0}' Reason: {1}",
+                        new Object[] {queueName, e.getMessage()}));
             }
         }
     }

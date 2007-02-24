@@ -66,10 +66,6 @@ managementContext.getRegistry().registerAgent(agent);
 TestConnector c = new TestConnector();
 c.setName("dummyConnector");
 c.setExceptionListener(new TestExceptionStrategy());
-SimpleRetryConnectionStrategy cs = new SimpleRetryConnectionStrategy();
-cs.setRetryCount(4);
-cs.setFrequency(3000);
-c.setConnectionStrategy(cs);
 managementContext.getRegistry().registerConnector(c);
 
 //Endpoint identifiers
@@ -98,6 +94,14 @@ builder.registerEndpoint("test://AppleResponseQueue", "appleResponseEndpoint", f
 builder.registerEndpoint("test://apple.queue", "AppleQueue", false);
 builder.registerEndpoint("test://banana.queue", "Banana_Queue", false);
 builder.registerEndpoint("test://test.queue", "waterMelonEndpoint", false);
+UMOEndpoint ep = new MuleEndpoint("test://test.queue2", false);
+ep.setName("testEPWithCS");
+SimpleRetryConnectionStrategy cs = new SimpleRetryConnectionStrategy();
+cs.setRetryCount(4);
+cs.setFrequency(3000);
+ep.setConnectionStrategy(cs);
+builder.getManagementContext().getRegistry().registerEndpoint(ep);
+
 Map props = new HashMap();
 props.put("testGlobal", "value1");
 builder.registerEndpoint( "test://orangeQ", "orangeEndpoint",false, props);

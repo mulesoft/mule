@@ -136,6 +136,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         {
             endpointUri = new MuleEndpointURI(recipient);
             endpoint = MuleEndpoint.getOrCreateEndpointForUri(endpointUri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
+            endpoint.initialise(getManagementContext());
         }
         catch (UMOException e)
         {

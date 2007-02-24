@@ -20,8 +20,10 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.BeanUtils;
+import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.SystemUtils;
+import org.mule.RegistryContext;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -55,6 +57,9 @@ public class Mx4jAgent extends AbstractAgent
 {
     public static final String HTTP_ADAPTER_OBJECT_NAME = "name=Mx4jHttpAdapter";
 
+    protected static final String DEFAULT_PATH_IN_JAR = StringUtils.replaceChars(ClassUtils.getPackageName(Mx4jAgent.class), '.', '/') +
+                                                        "/http/xsl";
+
     private static final org.apache.commons.logging.Log logger = LogFactory.getLog(Mx4jAgent.class);
 
     private static final String PROTOCOL_PREFIX = "http://";
@@ -77,16 +82,18 @@ public class Mx4jAgent extends AbstractAgent
 
     private String authenticationMethod = "basic";
 
-    private String xslFilePath;
+    // TODO AH check how an embedded scenario can be handled (no mule home) 
+    private String xslFilePath = System.getProperty("mule.home") + "/lib/mule/mule-module-management-" +
+            RegistryContext.getConfiguration().getProductVersion() + ".jar";
 
-    private String pathInJar;
+    private String pathInJar = DEFAULT_PATH_IN_JAR;
 
     private boolean cacheXsl = true;
 
     // SSL/TLS socket factory config
     private Map socketFactoryProperties = new HashMap();
 
-    private JmxSupportFactory jmxSupportFactory = new AutoDiscoveryJmxSupportFactory();
+    private JmxSupportFactory jmxSupportFactory = AutoDiscoveryJmxSupportFactory.getInstance();
     private JmxSupport jmxSupport;
 
 

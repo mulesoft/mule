@@ -196,11 +196,11 @@ public class RestServiceWrapper implements Callable, Initialisable
 
         if (payloadParameterName != null)
         {
-            requestBody = new NullPayload();
+            requestBody = NullPayload.getInstance();
         }
         else if (request instanceof Map)
         {
-            requestBody = new NullPayload();
+            requestBody = NullPayload.getInstance();
         }
 
         setRESTParams(urlBuffer, eventContext.getMessage(), request, reqiredParams, false);

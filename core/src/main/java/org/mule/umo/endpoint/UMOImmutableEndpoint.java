@@ -19,6 +19,7 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatching;
 import org.mule.umo.security.UMOEndpointSecurityFilter;
 import org.mule.umo.transformer.UMOTransformer;
+import org.mule.providers.ConnectionStrategy;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -264,4 +265,10 @@ public interface UMOImmutableEndpoint extends Serializable, Initialisable, Regis
     boolean isStreaming();
 
     UMOManagementContext getManagementContext();
+
+    /**
+     * Returns the connection strategy this endpoint should use when connecting to the underlying resource
+     * @return the connection strategy this endpoint should use when connecting to the underlying resource
+     */
+    ConnectionStrategy getConnectionStrategy();
 }

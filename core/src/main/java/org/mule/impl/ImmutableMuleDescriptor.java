@@ -264,6 +264,16 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         {
             implementationReference = new ContainerKeyPair(container, implementationReference);
         }
+        inboundRouter.initialise(managementContext);
+        outboundRouter.initialise(managementContext);
+        if(responseRouter !=null)
+        {
+            responseRouter.initialise(managementContext);
+        }
+        if(nestedRouter !=null)
+        {
+            nestedRouter.initialise(managementContext);
+        }
     }
 
     /*

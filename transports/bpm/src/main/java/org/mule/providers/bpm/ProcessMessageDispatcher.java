@@ -195,7 +195,7 @@ public class ProcessMessageDispatcher extends AbstractMessageDispatcher
             if (processId != null)
             {
                 connector.getBpms().abortProcess(processId);
-                process = new NullPayload();
+                process = NullPayload.getInstance();
                 logger.info("Process aborted, ID = " + processId);
             }
             else

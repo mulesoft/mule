@@ -35,6 +35,8 @@ import org.mule.impl.internal.notifications.NotificationException;
 import org.mule.impl.internal.notifications.SecurityNotification;
 import org.mule.impl.internal.notifications.SecurityNotificationListener;
 import org.mule.impl.internal.notifications.ServerNotificationManager;
+import org.mule.impl.model.ModelFactory;
+import org.mule.impl.model.ModelHelper;
 import org.mule.impl.security.MuleSecurityManager;
 import org.mule.impl.work.MuleWorkManager;
 import org.mule.management.stats.AllStatistics;
@@ -48,6 +50,7 @@ import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.manager.UMOServerNotificationListener;
 import org.mule.umo.manager.UMOWorkManager;
+import org.mule.umo.model.UMOModel;
 import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.store.UMOStore;
 import org.mule.util.DateUtils;
@@ -58,7 +61,6 @@ import org.mule.util.queue.QueueManager;
 import org.mule.util.queue.QueuePersistenceStrategy;
 import org.mule.util.queue.TransactionalQueueManager;
 
-import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
@@ -69,6 +71,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.jar.Manifest;
+import java.io.File;
 
 import javax.transaction.TransactionManager;
 
@@ -174,9 +177,6 @@ public class ManagementContext implements UMOManagementContext
      */
     protected Map properties = new HashMap();
 
-    //TODO LM: Replace
-    protected RegistryFacade registry;
-
     protected Directories directories;
 
     protected String systemName;
@@ -185,20 +185,23 @@ public class ManagementContext implements UMOManagementContext
     {
         securityManager = new MuleSecurityManager();
         startDate = System.currentTimeMillis();
-        registry = RegistryContext.getRegistry();
-
     }
 
     public void initialise() throws UMOException
     {
-        config = getRegistry().getConfiguration();
-        validateEncoding();
-        validateOSEncoding();
-
-        directories = new Directories(new File(config.getWorkingDirectory()));
         if (!initialised)
         {
             initialising = true;
+
+            config = getRegistry().getConfiguration();
+            validateEncoding();
+            validateOSEncoding();
+            directories = new Directories(new File(config.getWorkingDirectory()));            
+
+            UMOModel system = ModelFactory.createModel(getRegistry().getConfiguration().getSystemModelType());
+            system.setName(ModelHelper.SYSTEM_MODEL);
+            getRegistry().registerModel(system);
+
             // if no work manager has been set create a default one
             if (workManager == null)
             {
@@ -298,7 +301,7 @@ public class ManagementContext implements UMOManagementContext
                 fireSystemEvent(new ManagerNotification(id, clusterId, domain, ManagerNotification.MANAGER_INITIALISED));
             }
         }
-        registry.initialise(this);
+        getRegistry().initialise(this);
         
         initialised = true;
     }
@@ -353,7 +356,7 @@ public class ManagementContext implements UMOManagementContext
             queueManager.stop();
         }
 
-        registry.stop();
+        getRegistry().stop();
 
         stopping = false;
         fireSystemEvent(new ManagerNotification(id, clusterId, domain, ManagerNotification.MANAGER_STOPPED));
@@ -383,10 +386,9 @@ public class ManagementContext implements UMOManagementContext
         // props.clearErrors();
         fireSystemEvent(new ManagerNotification(id, clusterId, domain, ManagerNotification.MANAGER_DISPOSED));
 
-        if (registry != null)
+        if (getRegistry() != null)
         {
-            registry.dispose();
-            registry = null;
+            getRegistry().dispose();
         }
 
         initialised = false;
@@ -458,12 +460,12 @@ public class ManagementContext implements UMOManagementContext
 
     public RegistryFacade getRegistry()
     {
-        return registry;
+        return RegistryContext.getRegistry();
     }
 
     public void setRegistry(RegistryFacade registry)
     {
-        this.registry = registry;
+        RegistryContext.setRegistry(registry);
     }
 
     public String getSystemName()

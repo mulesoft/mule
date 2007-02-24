@@ -10,10 +10,10 @@
 
 package org.mule.ra;
 
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.impl.ManagementContextAware;
 import org.mule.umo.UMOManagementContext;
 import org.mule.util.StringUtils;
+import org.mule.config.builders.MuleXmlConfigurationBuilder;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

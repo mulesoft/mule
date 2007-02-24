@@ -28,12 +28,13 @@
     <connector name="dummyConnector" className="org.mule.tck.testmodels.mule.TestConnector">
         <threading-profile id="dispatcher" maxBufferSize="2"/>
         <exception-strategy className="org.mule.tck.testmodels.mule.TestExceptionStrategy"/>
-        <connection-strategy className="org.mule.providers.SimpleRetryConnectionStrategy">
-            <properties>
-                <property name="retryCount" value="4"/>
-                <property name="frequency" value="3000"/>
-            </properties>
-        </connection-strategy>
+        <!-- TODO RM* URGENT -->
+        <!--<connection-strategy className="org.mule.providers.SimpleRetryConnectionStrategy">-->
+            <!--<properties>-->
+                <!--<property name="retryCount" value="4"/>-->
+                <!--<property name="frequency" value="3000"/>-->
+            <!--</properties>-->
+        <!--</connection-strategy>-->
     </connector>
 
     <connector name="dummyConnector2" className="org.mule.tck.testmodels.mule.TestConnector">

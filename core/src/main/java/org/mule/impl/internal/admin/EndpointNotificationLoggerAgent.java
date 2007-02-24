@@ -60,7 +60,7 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
                     "endpointAddress"), this);
             }
             // Create a session for sending notifications
-            session = new MuleSession(new MuleMessage(new NullPayload(), (Map)null), new NullSessionHandler());
+            session = new MuleSession(new MuleMessage(NullPayload.getInstance(), (Map)null), new NullSessionHandler());
         }
         catch (Exception e)
         {

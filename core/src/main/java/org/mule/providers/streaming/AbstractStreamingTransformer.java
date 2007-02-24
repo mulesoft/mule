@@ -115,7 +115,7 @@ public abstract class AbstractStreamingTransformer implements UMOStreamingTransf
         // Object result = doTransform(src, dest, encoding);
         // if (result == null)
         // {
-        // result = new NullPayload();
+        // result = NullPayload.getInstance();
         // }
         //
         // if (logger.isDebugEnabled())

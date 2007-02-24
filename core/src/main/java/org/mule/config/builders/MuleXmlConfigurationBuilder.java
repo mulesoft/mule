@@ -16,7 +16,6 @@ import org.mule.config.ConfigurationException;
 import org.mule.config.ReaderResource;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.config.spring.DefaultRegistryFacade;
 import org.mule.config.spring.MuleApplicationContext;
 import org.mule.umo.UMOManagementContext;
 import org.mule.util.IOUtils;
@@ -101,7 +100,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
 
         used = true;
         //TODO Registry is required for TransportServiceDescriptor lookups so the registry is required before anything else
-        RegistryContext.setRegistry(new DefaultRegistryFacade());
+        //RegistryContext.setRegistry(new DefaultRegistryFacade());
         MuleApplicationContext context = new MuleApplicationContext(resources);
 //        try
 //        {

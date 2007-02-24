@@ -17,16 +17,6 @@
                         <property name="exceptionListener">
                             <bean id="connectorES" class="org.mule.tck.testmodels.mule.TestExceptionStrategy"/>
                         </property>
-                        <property name="connectionStrategy">
-                            <bean id="connectionStrategy" class="org.mule.providers.SimpleRetryConnectionStrategy">
-                                <property name="retryCount">
-                                    <value>4</value>
-                                </property>
-                                <property name="frequency">
-                                    <value>3000</value>
-                                </property>
-                            </bean>
-                        </property>
                     </bean>
                     <!-- transaformer -->
                     <bean id="springTestTransformer" singleton="false" class="org.mule.tck.testmodels.mule.TestCompressionTransformer">
@@ -48,7 +38,14 @@
     </transformers>
 
     <global-endpoints>
-        <endpoint name="foo" address="test://foo" connector="testConnector" transformers="testTransformer"/>
+        <endpoint name="foo" address="test://foo" connector="testConnector" transformers="testTransformer">
+            <connection-strategy className="org.mule.providers.SimpleRetryConnectionStrategy">
+                <properties>
+                    <property name="retryCount" value="4"/>
+                    <property name="retryFrequency" value="3000"/>
+                </properties>
+            </connection-strategy>
+        </endpoint>
     </global-endpoints>
 
 </mule-configuration>

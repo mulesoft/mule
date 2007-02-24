@@ -56,16 +56,18 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         super(connector, component, endpoint);
     }
 
+    // @Override
     protected Work createWork(Socket socket) throws IOException
     {
         return new HttpWorker(socket);
     }
 
+    // @Override
     protected void doConnect() throws ConnectException
     {
         // If we already have an endpoint listening on this socket don't try and
         // start another serversocket
-        if (shouldConnect())
+        if (this.shouldConnect())
         {
             super.doConnect();
         }
@@ -76,23 +78,23 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         StringBuffer requestUri = new StringBuffer(80);
         requestUri.append(endpoint.getProtocol()).append("://");
         requestUri.append(endpoint.getEndpointURI().getHost());
-        requestUri.append(":").append(endpoint.getEndpointURI().getPort());
-        requestUri.append("*");
-        AbstractMessageReceiver[] temp = connector.getReceivers(requestUri.toString());
-        for (int i = 0; i < temp.length; i++)
+        requestUri.append(':').append(endpoint.getEndpointURI().getPort());
+        requestUri.append('*');
+
+        UMOMessageReceiver[] receivers = connector.getReceivers(requestUri.toString());
+        for (int i = 0; i < receivers.length; i++)
         {
-            AbstractMessageReceiver abstractMessageReceiver = temp[i];
-            if (abstractMessageReceiver.isConnected())
+            if (receivers[i].isConnected())
             {
                 return false;
             }
         }
+
         return true;
     }
 
     private class HttpWorker implements Work
     {
-
         private HttpServerConnection conn = null;
         private String cookieSpec;
         private boolean enableCookies = false;
@@ -243,7 +245,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                         }
                         else
                         {
-                            tempResponse = new NullPayload();
+                            tempResponse = NullPayload.getInstance();
                         }
                         // This removes the need for users to explicitly adding
                         // the response transformer ObjectToHttpResponse in

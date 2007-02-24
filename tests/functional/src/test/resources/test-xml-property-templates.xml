@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+        "http://mule.mulesource.org/dtds/mule-configuration.dtd">
 
 
 <mule-configuration id="Test_Mule_Properties" version="1.0">
@@ -13,18 +13,22 @@
 
     <mule-environment-properties synchronous="false" model="${model.name}" serverUrl=""/>
 
-    <connector name="myTestConnector" className="org.mule.tck.testmodels.mule.TestConnector">
-        <connection-strategy className="org.mule.providers.SimpleRetryConnectionStrategy">
-            <properties>
-                <property name="retryCount" value="${retry.count}"/>
-            </properties>
-        </connection-strategy>
-    </connector>
+    <connector name="myTestConnector" className="org.mule.tck.testmodels.mule.TestConnector"/>
+
+    <global-endpoints>
+        <endpoint name="inbound" address="${test.inbound.edpoint}">
+            <connection-strategy className="org.mule.providers.SimpleRetryConnectionStrategy">
+                <properties>
+                    <property name="retryCount" value="${retry.count}"/>
+                </properties>
+            </connection-strategy>
+        </endpoint>
+    </global-endpoints>
 
     <model name="${model.name}">
         <mule-descriptor name="${component.name}" implementation="org.mule.components.simple.EchoComponent">
             <inbound-router>
-                <endpoint address="${test.inbound.endpoint}"/>
+                <global-endpoint name="inbound"/>
             </inbound-router>
             <outbound-router>
                 <router className="org.mule.routing.outbound.OutboundPassThroughRouter">

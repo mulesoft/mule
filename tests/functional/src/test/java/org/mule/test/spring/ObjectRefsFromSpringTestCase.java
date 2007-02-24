@@ -10,12 +10,11 @@
 
 package org.mule.test.spring;
 
-import org.mule.providers.AbstractConnector;
-import org.mule.providers.SimpleRetryConnectionStrategy;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.providers.SimpleRetryConnectionStrategy;
 
 public class ObjectRefsFromSpringTestCase extends FunctionalTestCase
 {
@@ -30,7 +29,7 @@ public class ObjectRefsFromSpringTestCase extends FunctionalTestCase
         UMOEndpoint ep = managementContext.getRegistry().lookupEndpoint("foo");
         assertNotNull(ep);
         assertEquals("testConnector", ep.getConnector().getName());
-        assertTrue(((AbstractConnector)ep.getConnector()).getConnectionStrategy() instanceof SimpleRetryConnectionStrategy);
+        assertTrue(ep.getConnectionStrategy() instanceof SimpleRetryConnectionStrategy);
         assertTrue(ep.getConnector().getExceptionListener() instanceof TestExceptionStrategy);
 
         assertNotNull(ep.getTransformer());

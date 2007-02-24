@@ -10,10 +10,8 @@
 
 package org.mule.samples.loanbroker;
 
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.util.DateUtils;
 import org.mule.util.StringMessageUtils;
@@ -44,7 +42,6 @@ public class LoanConsumer
 
     private List customers = new ArrayList();
     private MuleClient client = null;
-    private UMOManagementContext managementContext;
 
     public LoanConsumer() throws UMOException
     {
@@ -53,15 +50,12 @@ public class LoanConsumer
 
     public LoanConsumer(String config) throws UMOException
     {
-        MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
-        managementContext = builder.configure(config);
+        client = new MuleClient(config);
         init();
     }
 
     private void init() throws UMOException
     {
-        client = new MuleClient();
-
         customers.add(new Customer("Jenson Button", 123));
         customers.add(new Customer("Michael Schumacker", 456));
         customers.add(new Customer("Juan Pablo Montoya", 789));
@@ -76,7 +70,7 @@ public class LoanConsumer
 
     public void close()
     {
-        managementContext.dispose();
+        client.dispose();
     }
 
     public LoanRequest createRequest()

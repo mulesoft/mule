@@ -50,6 +50,16 @@ public abstract class FunctionalTestCase extends AbstractMuleTestCase
         return context;
     }
 
+
+    protected void setupRegistry()
+    {
+        if (getTestInfo().isDisposeManagerPerSuite() && RegistryContext.getRegistry()!=null)
+        {
+            return;
+        }
+        super.setupRegistry(); 
+    }
+
     protected ConfigurationBuilder getBuilder() throws Exception
     {
 

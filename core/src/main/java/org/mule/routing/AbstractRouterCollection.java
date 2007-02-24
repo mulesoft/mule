@@ -14,6 +14,9 @@ import org.mule.management.stats.RouterStatistics;
 import org.mule.umo.routing.UMORouter;
 import org.mule.umo.routing.UMORouterCatchAllStrategy;
 import org.mule.umo.routing.UMORouterCollection;
+import org.mule.umo.lifecycle.Initialisable;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.UMOManagementContext;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
@@ -28,7 +31,7 @@ import org.apache.commons.logging.LogFactory;
  * router collections for in and outbound routers.
  */
 
-public abstract class AbstractRouterCollection implements UMORouterCollection
+public abstract class AbstractRouterCollection implements UMORouterCollection, Initialisable
 {
     /**
      * logger used by this class
@@ -46,6 +49,16 @@ public abstract class AbstractRouterCollection implements UMORouterCollection
     public AbstractRouterCollection(int type)
     {
         statistics = new RouterStatistics(type);
+    }
+
+
+    public void initialise(UMOManagementContext managementContext) throws InitialisationException
+    {
+        for (Iterator iterator = routers.iterator(); iterator.hasNext();)
+        {
+            UMORouter router = (UMORouter) iterator.next();
+            router.initialise(managementContext);
+        }
     }
 
     public void setRouters(List routers)

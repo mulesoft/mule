@@ -71,7 +71,7 @@ public class JdbcNullParamsTestCase extends AbstractJdbcFunctionalTestCase
         //execute the write query by sending a message on the jdbc://writeTest
         //the message is a nullpayload since we are not taking any params from any object
         //No other params will be sent to this endpoint
-        client.dispatch("jdbc://writeTest", new MuleMessage(new NullPayload()));
+        client.dispatch("jdbc://writeTest", new MuleMessage(NullPayload.getInstance()));
         
         //get the data which was written by the previous statement and test it
         reply = client.receive("jdbc://getTest", 1000);

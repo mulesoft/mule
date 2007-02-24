@@ -271,7 +271,7 @@ public class MuleManagerComponent implements Callable, Initialisable
         logger.error("Failed to process admin request: " + e.getMessage(), e);
         if (result == null)
         {
-            result = new MuleMessage(new NullPayload(), (Map)null);
+            result = new MuleMessage(NullPayload.getInstance(), (Map)null);
         }
         result.setExceptionPayload(new ExceptionPayload(e));
         try

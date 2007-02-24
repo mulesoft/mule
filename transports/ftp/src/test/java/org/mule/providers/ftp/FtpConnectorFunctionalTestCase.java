@@ -34,7 +34,7 @@ public class FtpConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
         FtpConnector c = (FtpConnector)createConnector();
         c.initialise(managementContext);
         UMOImmutableEndpoint endpoint = new ImmutableMuleEndpoint(getOutDest().toString(), false);
-        UMOEvent e = getTestEvent(new NullPayload(), endpoint);
+        UMOEvent e = getTestEvent(NullPayload.getInstance(), endpoint);
         endpoint.dispatch(e);
     }
 

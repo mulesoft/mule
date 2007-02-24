@@ -10,6 +10,8 @@
 package org.mule.routing;
 
 import org.mule.umo.routing.UMORouter;
+import org.mule.umo.UMOManagementContext;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.management.stats.RouterStatistics;
 
 /**
@@ -21,6 +23,25 @@ public abstract class AbstractRouter implements UMORouter
 {
     private RouterStatistics routerStatistics;
 
+    private UMOManagementContext managementContext;
+
+
+    public final void initialise(UMOManagementContext managementContext) throws InitialisationException
+    {
+        this.managementContext = managementContext;
+        doInitialise(managementContext);
+    }
+
+    public void doInitialise(UMOManagementContext managementContext) throws InitialisationException
+    {
+        //template
+    }
+
+
+    public UMOManagementContext getManagementContext()
+    {
+        return managementContext;
+    }
 
     public void setRouterStatistics(RouterStatistics stats)
     {

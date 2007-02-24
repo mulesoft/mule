@@ -10,18 +10,64 @@
 
 package org.mule.test.util;
 
+import org.mule.util.CollectionUtils;
+import org.mule.util.StringUtils;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 
 import junit.framework.TestCase;
 
 import org.apache.commons.lang.SystemUtils;
-import org.mule.util.CollectionUtils;
-import org.mule.util.StringUtils;
 
 public class CollectionUtilsTestCase extends TestCase
 {
+
+    public void testToArrayOfComponentTypeNullCollection()
+    {
+        assertNull(CollectionUtils.toArrayOfComponentType(null, String.class));
+    }
+
+    public void testToArrayOfComponentTypeNullType()
+    {
+        try
+        {
+            CollectionUtils.toArrayOfComponentType(Collections.EMPTY_LIST, null);
+            fail("should have thrown IllegalArgumentException");
+        }
+        catch (IllegalArgumentException iex)
+        {
+            // OK
+        }
+    }
+
+    public void testToArrayOfComponentTypeEmptyCollection()
+    {
+        assertTrue(Arrays.equals(new String[0], CollectionUtils.toArrayOfComponentType(
+            Collections.EMPTY_LIST, String.class)));
+    }
+
+    public void testToArrayOfComponentTypeWrongElement()
+    {
+        try
+        {
+            CollectionUtils.toArrayOfComponentType(Collections.singleton("foo"), Integer.class);
+            fail("should have thrown ArrayStoreException");
+        }
+        catch (ArrayStoreException asx)
+        {
+            // OK
+        }
+    }
+
+    public void testToArrayOfComponentTypeOK()
+    {
+        String[] objects = new String[]{"foo", "bar", "baz"};
+        assertTrue(Arrays.equals(objects, CollectionUtils.toArrayOfComponentType(Arrays.asList(objects),
+            String.class)));
+    }
 
     public void testToStringNull() throws Exception
     {
@@ -53,8 +99,8 @@ public class CollectionUtilsTestCase extends TestCase
         assertEquals("[foo, " + this.getClass().getName() + "]", CollectionUtils.toString(c, false));
 
         assertEquals("[" + SystemUtils.LINE_SEPARATOR + "foo" + SystemUtils.LINE_SEPARATOR
-                     + this.getClass().getName() + SystemUtils.LINE_SEPARATOR + "]",
-            CollectionUtils.toString(c, true));
+                        + this.getClass().getName() + SystemUtils.LINE_SEPARATOR + "]", CollectionUtils
+            .toString(c, true));
     }
 
     public void testToStringTooManyElements()

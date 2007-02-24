@@ -34,6 +34,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.w3c.dom.Document;
 import org.xml.sax.EntityResolver;
+import org.dom4j.io.DOMReader;
 
 /**
  * <code>MuleBeanDefinitionReader</code> Is a custom Spring Bean reader that will
@@ -96,23 +97,24 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
                 //Lets spit them out here
                 if(XslHelper.hasErrorReport())
                 {
-                    String report = XslHelper.getErrorReport();
-                    XslHelper.clearErrors();
+                    String report = XslHelper.getFullReport();
+                    XslHelper.clearReport();
                     throw new IOException(report);
+                }
+                else if (XslHelper.hasWarningReport())
+                {
+                    logger.warn(XslHelper.getWarningReport());
                 }
             }
 
-            if (logger.isDebugEnabled())
+            try
             {
-                try
-                {
-                    //If we have Dom4J on the classpath we can print out the generated XML
-                    printResult(result);
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
+                //If we have Dom4J on the classpath we can print out the generated XML
+                printResult(result);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
             }
             return (Document)result.getNode();
         }
@@ -128,11 +130,12 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
         //If we have Dom4J on the classpath we can print out the generated XML
         //TODO this relies on Dom4j which is not in core, either we scrap this or do some reflection
         // trickery to print the XML. This is definitely useful for debugging
-//        String xml = new DOMReader().read((Document)result.getNode()).asXML();
-//        if (logger.isDebugEnabled())
-//        {
-//            logger.debug("Transformed document is:\n" + xml);
-//        }
+        String xml = new DOMReader().read((Document)result.getNode()).asXML();
+        System.out.println(xml);
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Transformed document is:\n" + xml);
+        }
     }
     protected Source createXslSource() throws IOException
     {

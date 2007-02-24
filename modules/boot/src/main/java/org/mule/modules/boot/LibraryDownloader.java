@@ -84,6 +84,40 @@ public class LibraryDownloader
                 new UsernamePasswordCredentials(proxyUsername, proxyPassword));
         }
     }
+    
+    public LibraryDownloader(File muleHome, String proxyHostname, String proxyPort, String proxyUsername, String proxyPassword)
+    {
+        this.muleHome = muleHome;
+
+        String mavenRepoVar = System.getProperty("m2.repo");
+        if (!StringUtils.isBlank(mavenRepoVar))
+        {
+            mavenRepo = new File(mavenRepoVar).getAbsoluteFile();
+            if (!mavenRepo.exists() || !mavenRepo.isDirectory())
+            {
+                mavenRepo = null;
+            }
+        }
+
+        client = new HttpClient();
+        // Set the connection timeout to 10 seconds.
+        HttpConnectionManagerParams connParams = new HttpConnectionManagerParams();
+        connParams.setConnectionTimeout(10000);
+        client.getHttpConnectionManager().setParams(connParams);
+
+        // Configure HTTP proxy support if needed.
+        hostConfig = new HostConfiguration();
+        if (StringUtils.isNotBlank(proxyHostname))
+        {
+            hostConfig.setProxy(proxyHostname, NumberUtils.toInt(proxyPort));
+        }
+        httpState = new HttpState();
+        if (StringUtils.isNotBlank(proxyUsername))
+        {
+            httpState.setProxyCredentials(new AuthScope(null, -1, null, null),
+                new UsernamePasswordCredentials(proxyUsername, proxyPassword));
+        }
+    }
 
     public List downloadLibraries() throws IOException
     {

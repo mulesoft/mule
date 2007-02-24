@@ -323,15 +323,9 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
         }
     }
 
-    protected void afterPublishEvent()
+    protected void afterPublishEvent() throws InterruptedException
     {
-        try
-        {
-            Thread.sleep(200);
-        }
-        catch (InterruptedException e)
-        {
-            // ignore
-        }
+        Thread.sleep(200);
     }
+
 }

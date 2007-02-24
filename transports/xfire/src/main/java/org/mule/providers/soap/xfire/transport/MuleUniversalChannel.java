@@ -10,6 +10,22 @@
 
 package org.mule.providers.soap.xfire.transport;
 
+import org.mule.MuleRuntimeException;
+import org.mule.config.MuleProperties;
+import org.mule.config.i18n.CoreMessageConstants;
+import org.mule.config.i18n.Message;
+import org.mule.extras.client.MuleClient;
+import org.mule.impl.RequestContext;
+import org.mule.impl.ManagementContext;
+import org.mule.providers.http.HttpConnector;
+import org.mule.providers.http.HttpConstants;
+import org.mule.providers.streaming.StreamMessageAdapter;
+import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.provider.OutputHandler;
+import org.mule.umo.provider.UMOStreamMessageAdapter;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -42,20 +58,6 @@ import org.codehaus.xfire.transport.AbstractChannel;
 import org.codehaus.xfire.transport.Channel;
 import org.codehaus.xfire.transport.Transport;
 import org.codehaus.xfire.util.STAXUtils;
-import org.mule.MuleRuntimeException;
-import org.mule.config.MuleProperties;
-import org.mule.config.i18n.CoreMessageConstants;
-import org.mule.config.i18n.Message;
-import org.mule.extras.client.MuleClient;
-import org.mule.impl.RequestContext;
-import org.mule.providers.http.HttpConnector;
-import org.mule.providers.http.HttpConstants;
-import org.mule.providers.streaming.StreamMessageAdapter;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.provider.OutputHandler;
-import org.mule.umo.provider.UMOStreamMessageAdapter;
 
 /**
  * The MuleUniversalChannel is an XFire Channel implementation that uses
@@ -84,7 +86,7 @@ public class MuleUniversalChannel extends AbstractChannel
 
         try
         {
-            this.client = new MuleClient();
+            this.client = new MuleClient(new ManagementContext());
         }
         catch (UMOException ex)
         {
