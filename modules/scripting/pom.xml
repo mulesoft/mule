@@ -48,6 +48,13 @@
             <version>${version}</version>
         </dependency>
 
+        <!-- required for the script-api and retrotranslated JSR-223 engines -->
+        <dependency>
+            <groupId>net.sf.retrotranslator</groupId>
+            <artifactId>retrotranslator-runtime</artifactId>
+            <version>1.2.1</version>
+        </dependency>
+
         <dependency>
             <groupId>javax.script</groupId>
             <artifactId>script-api</artifactId>
@@ -56,27 +63,46 @@
             <classifier>jdk14</classifier>
         </dependency>
 
-        <!-- required for script-api and the retrotranslated groovy-engine -->
+        <!-- These are engines for JSR-223 compliance, not actual implementations -->
         <dependency>
-            <groupId>net.sf.retrotranslator</groupId>
-            <artifactId>retrotranslator-runtime</artifactId>
-            <version>1.2.1</version>
+            <groupId>javax.script</groupId>
+            <artifactId>groovy-engine</artifactId>
+            <version>1.0</version>
+            <!-- we use our own retrotranslated version -->
+            <classifier>jdk14</classifier>
         </dependency>
 
-        <!-- For unit tests only -->
         <dependency>
-            <groupId>com.sun.script</groupId>
-            <artifactId>groovy</artifactId>
-            <version>20061114</version>
+            <groupId>javax.script</groupId>
+            <artifactId>js-engine</artifactId>
+            <version>1.0</version>
+            <!-- we use our own retrotranslated version -->
             <classifier>jdk14</classifier>
-            <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>javax.script</groupId>
+            <artifactId>jython-engine</artifactId>
+            <version>1.0</version>
+            <!-- we use our own retrotranslated version -->
+            <classifier>jdk14</classifier>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.script</groupId>
+            <artifactId>jruby-engine</artifactId>
+            <version>1.0</version>
+            <!-- we use our own retrotranslated version -->
+            <classifier>jdk14</classifier>
+        </dependency>
+
+        <!-- This is the actual language implementation -->
         <dependency>
             <groupId>groovy</groupId>
             <artifactId>groovy-all</artifactId>
             <version>1.0</version>
-            <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>

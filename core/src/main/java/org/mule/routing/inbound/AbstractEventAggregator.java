@@ -16,6 +16,7 @@ import org.mule.routing.AggregationException;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOMessageAdapter;
 
@@ -89,7 +90,16 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
                     if (this.shouldAggregateEvents(group))
                     {
                         UMOMessage returnMessage = this.aggregateEvents(group);
-                        UMOEndpoint endpoint = new MuleEndpoint(event.getEndpoint());
+                        UMOEndpoint endpoint;
+
+                        try
+                        {
+                            endpoint = new MuleEndpoint(event.getEndpoint());
+                        }
+                        catch (UMOException e)
+                        {
+                            throw new MessagingException(e.getI18nMessage(), returnMessage, e);
+                        }
                         endpoint.setTransformer(null);
                         endpoint.setName(this.getClass().getName());
                         UMOEvent returnEvent = new MuleEvent(returnMessage, endpoint, event.getComponent(),
@@ -97,7 +107,6 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
                         result = new UMOEvent[]{returnEvent};
                         this.removeEventGroup(group);
                     }
-
                     // result or not: exit spinloop
                     break;
                 }

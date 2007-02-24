@@ -32,6 +32,7 @@ import javax.xml.transform.stream.StreamSource;
 import org.apache.commons.pool.BasePoolableObjectFactory;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.impl.StackObjectPool;
+import org.apache.commons.pool.impl.GenericObjectPool;
 
 /**
  * <code>XsltTransformer</code> performs an XSLT transform on a DOM (or other
@@ -46,17 +47,25 @@ public class XsltTransformer extends AbstractXmlTransformer
      */
     private static final long serialVersionUID = -6958917343589717387L;
 
-    // always keep at least 1 XSLT Transformer ready
-    private static final int MIN_IDLE = 1;
+    // keep at least 1 XSLT Transformer ready by default
+    private static final int MIN_IDLE_TRANSFORMERS = 1;
+    // keep max. 32 XSLT Transformers around by default
+    private static final int MAX_IDLE_TRANSFORMERS = 32;
+    // MAX_IDLE is also the total limit
+    private static final int MAX_ACTIVE_TRANSFORMERS = MAX_IDLE_TRANSFORMERS;
 
-    private ObjectPool transformerPool;
-    private int maxIdleTransformers = 2;
-    private String xslFile;
-    private String xslt;
+    private final GenericObjectPool transformerPool;
+
+    private volatile String xslFile;
+    private volatile String xslt;
 
     public XsltTransformer()
     {
         super();
+        this.transformerPool = new GenericObjectPool(new PooledXsltTransformerFactory());
+        transformerPool.setMinIdle(MIN_IDLE_TRANSFORMERS);
+        transformerPool.setMaxIdle(MAX_IDLE_TRANSFORMERS);
+        transformerPool.setMaxActive(MAX_ACTIVE_TRANSFORMERS);
     }
 
     /**
@@ -67,15 +76,6 @@ public class XsltTransformer extends AbstractXmlTransformer
     {
         try
         {
-            transformerPool = new StackObjectPool(new BasePoolableObjectFactory()
-            {
-                public Object makeObject() throws Exception
-                {
-                    StreamSource source = getStreamSource();
-                    TransformerFactory factory = TransformerFactory.newInstance();
-                    return factory.newTransformer(source);
-                }
-            }, Math.max(MIN_IDLE, maxIdleTransformers));
             transformerPool.addObject();
         }
         catch (Throwable te)
@@ -94,15 +94,22 @@ public class XsltTransformer extends AbstractXmlTransformer
     {
         try
         {
-            Source sourceDoc = getXmlSource(src);
-            if (sourceDoc == null) return null;
+            Source sourceDoc = this.getXmlSource(src);
+            if (sourceDoc == null)
+            {
+                return null;
+            }
 
             ResultHolder holder = getResultHolder(returnClass);
-            if (holder == null) holder = getResultHolder(src.getClass());
+            if (holder == null)
+            {
+                holder = getResultHolder(src.getClass());
+            }
 
             DefaultErrorListener errorListener = new DefaultErrorListener(this);
             Transformer transformer = null;
             Object result;
+
             try
             {
                 transformer = (Transformer)transformerPool.borrowObject();
@@ -120,8 +127,12 @@ public class XsltTransformer extends AbstractXmlTransformer
             }
             finally
             {
-                if (transformer != null) transformerPool.returnObject(transformer);
+                if (transformer != null)
+                {
+                    transformerPool.returnObject(transformer);
+                }
             }
+
             return result;
         }
         catch (Exception e)
@@ -146,13 +157,23 @@ public class XsltTransformer extends AbstractXmlTransformer
         this.xslFile = xslFile;
     }
 
+    public String getXslt()
+    {
+        return xslt;
+    }
+
+    public void setXslt(String xslt)
+    {
+        this.xslt = xslt;
+    }
+
     /**
      * Returns the StreamSource corresponding to xslFile
      * 
      * @return The StreamSource
      * @throws InitialisationException
      */
-    private StreamSource getStreamSource() throws InitialisationException
+    protected StreamSource getStreamSource() throws InitialisationException
     {
         if (xslt != null)
         {
@@ -183,12 +204,20 @@ public class XsltTransformer extends AbstractXmlTransformer
         }
     }
 
+    protected class PooledXsltTransformerFactory extends BasePoolableObjectFactory
+    {
+        public Object makeObject() throws Exception
+        {
+            StreamSource source = XsltTransformer.this.getStreamSource();
+            TransformerFactory factory = TransformerFactory.newInstance();
+            return factory.newTransformer(source);
+        }
+    }
 
-    private class DefaultErrorListener implements ErrorListener
+    protected class DefaultErrorListener implements ErrorListener
     {
         private TransformerException e = null;
-
-        private UMOTransformer trans;
+        private final UMOTransformer trans;
 
         public DefaultErrorListener(UMOTransformer trans)
         {
@@ -208,14 +237,12 @@ public class XsltTransformer extends AbstractXmlTransformer
         public void error(javax.xml.transform.TransformerException exception)
             throws javax.xml.transform.TransformerException
         {
-            logger.error(exception.getMessage(), exception);
             e = new TransformerException(trans, exception);
         }
 
         public void fatalError(javax.xml.transform.TransformerException exception)
             throws javax.xml.transform.TransformerException
         {
-            logger.fatal(exception.getMessage());
             e = new TransformerException(trans, exception);
         }
 
@@ -230,9 +257,29 @@ public class XsltTransformer extends AbstractXmlTransformer
      * @return The current maximum number of allowable idle transformer objects in
      *         the pool
      */
+    public int getMaxActiveTransformers()
+    {
+        return transformerPool.getMaxActive();
+    }
+
+    /**
+     * Sets the the current maximum number of idle transformer objects allowed in the
+     * pool
+     * 
+     * @param maxIdleTransformers New maximum size to set
+     */
+    public void setMaxActiveTransformers(int maxActiveTransformers)
+    {
+        this.transformerPool.setMaxActive(maxActiveTransformers);
+    }
+
+    /**
+     * @return The current maximum number of allowable idle transformer objects in
+     *         the pool
+     */
     public int getMaxIdleTransformers()
     {
-        return maxIdleTransformers;
+        return transformerPool.getMaxIdle();
     }
 
     /**
@@ -243,16 +290,7 @@ public class XsltTransformer extends AbstractXmlTransformer
      */
     public void setMaxIdleTransformers(int maxIdleTransformers)
     {
-        this.maxIdleTransformers = maxIdleTransformers;
+        this.transformerPool.setMaxIdle(maxIdleTransformers);
     }
 
-    public String getXslt()
-    {
-        return xslt;
-    }
-
-    public void setXslt(String xslt)
-    {
-        this.xslt = xslt;
-    }
 }

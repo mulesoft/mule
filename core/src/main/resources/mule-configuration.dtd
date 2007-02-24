@@ -864,7 +864,7 @@ Jndi
 
 <!--
 The type of Model to use for component processing for this Mule instance.  The different types of model are described
-at http://mule.codehaus.org/Models
+at http://mule.mulesource.org/wiki/display/MULE/Models
 The custom model can be used to specify a custom model type.  In which case you must supply a className.
 -->
 <!ATTLIST model type           (seda | direct | pipeline | jms | custom | streaming | inherited)             "seda">

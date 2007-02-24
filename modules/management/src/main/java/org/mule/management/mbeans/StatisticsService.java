@@ -17,7 +17,6 @@ import org.mule.management.stats.printers.XMLPrinter;
 import org.mule.umo.UMOManagementContext;
 
 import java.io.StringWriter;
-import java.io.PrintWriter;
 import java.util.Collection;
 
 import org.apache.commons.logging.Log;
@@ -96,9 +95,7 @@ public class StatisticsService implements StatisticsServiceMBean
         CSVPrinter printer = new CSVPrinter(w);
         printer.setPrintHeaders(true);
         stats.logSummary(printer);
-        final String summary = w.toString();
-        System.out.println(summary);
-        return summary;
+        return w.toString();
     }
 
     public String printHtmlSummary ()
@@ -106,8 +103,6 @@ public class StatisticsService implements StatisticsServiceMBean
         StringWriter w = new StringWriter(8192);
         HtmlTablePrinter printer = new HtmlTablePrinter(w);
         stats.logSummary(printer);
-        final String summary = w.toString();
-        System.out.println(summary);
         return w.toString();
     }
 
@@ -115,10 +110,7 @@ public class StatisticsService implements StatisticsServiceMBean
     {
         StringWriter w = new StringWriter(8192);
         XMLPrinter printer = new XMLPrinter(w);
-        stats.logSummary(new PrintWriter(System.out));
         stats.logSummary(printer);
-        final String summary = w.toString();
-        System.out.println(summary);
         return w.toString();
     }
 

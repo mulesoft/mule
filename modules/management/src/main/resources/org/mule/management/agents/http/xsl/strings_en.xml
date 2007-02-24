@@ -21,7 +21,7 @@
 
 <strings>
     <str id="none"></str>
-    <str id="common.title">Mule Open Source ESB</str>
+    <str id="common.title">Mule ESB and Integration Platform</str>
     <str id="common.subtitle">JMX Management Console</str>
     <str id="common.tabs.serverview">Server view</str>
     <str id="common.tabs.mbeanview">MBean view</str>
@@ -34,13 +34,13 @@
     <str id="common.serverview.return">Return to server view</str>
     <str id="common.bottom.banner">Built using {0} HttpAdaptor</str>
     <str id="common.mbeanview.return">Return to MBean view</str>
-    <str id="common.logo">Mule logo</str>
+    <str id="common.logo">Mule ESB and Integration Platform</str>
     <str id="common.logo.gif">logo.png</str>
     <str id="common.logo.width">100</str>
     <str id="common.logo.height">50</str>
-    <str id="common.site">http://www.mulesource.org</str>
+    <str id="common.site">http://mule.mulesource.org</str>
 
-    <str id="serverbydomain.title">Mule: JMX Management Console - Agent View</str>
+    <str id="serverbydomain.title">{0}: JMX Management Console - Agent View</str>
     <str id="serverbydomain.error.query">Exception during query: {0}</str>
     <str id="serverbydomain.domain.label">Domain: {0}</str>
     <str id="serverbydomain.server.title">MBean By Domain:</str>
@@ -48,12 +48,12 @@
     <str id="serverbydomain.server.query">Query</str>
     <str id="serverbydomain.mbean.unregister">Unregister</str>
 
-    <str id="emptymbean.title">Mule: JMX Management Console - MBean View</str>
+    <str id="emptymbean.title">{0}: JMX Management Console - MBean View</str>
     <str id="emptymbean.subtitle">MBean:</str>
     <str id="emptymbean.querycontructors">Query constructors for class: </str>
     <str id="emptymbean.query">Query</str>
 
-    <str id="mbean.title">Mule: JMX Management Console - MBean View</str>
+    <str id="mbean.title">{0}: JMX Management Console - MBean View</str>
     <str id="mbean.parameters.unknown">Unknown type</str>
     <str id="mbean.operations.title">Operations</str>
     <str id="mbean.operations.name">Name</str>
@@ -97,12 +97,12 @@
     <str id="mbean_attributes.map.null">Map is null</str>
     <str id="mbean_attributes.collection.null">Collection is null</str>
 
-    <str id="setattributes.title">Mule: JMX Management Console - MBean View</str>
+    <str id="setattributes.title">{0}: JMX Management Console - MBean View</str>
     <str id="setattributes.operation.title">MBean operation: set attributes on MBean {0}</str>
     <str id="setattributes.operation.success">Attribute {0} set to {1} </str>
     <str id="setattributes.operation.error">Exception during set attribute {0}, message: {1} </str>
 
-    <str id="error.title">Mule: JMX Management Console - Exception</str>
+    <str id="error.title">{0}: JMX Management Console - Exception</str>
     <str id="error.httpexception.title">Error during request</str>
     <str id="error.httpexception.code">Code: {0}</str>
     <str id="error.httpexception.message">Message: {0}</str>
@@ -110,7 +110,7 @@
     <str id="constructors.constructors.objectnameinput">ObjectName: </str>
     <str id="constructors.constructors.createnew">Create new</str>
     <str id="constructors.constructors.intro">Constructor for class {0}</str>
-    <str id="constructors.title">Mule: JMX Management Console - MBean Constructor's View</str>
+    <str id="constructors.title">{0}: JMX Management Console - MBean Constructor's View</str>
     <str id="constructors.main.title">Constructors for class {0}</str>
     <str id="constructors.error.exception">Exception: {0}</str>
     <str id="constructors.parameters.title">Parameters</str>
@@ -119,17 +119,17 @@
     <str id="constructors.parameters.value">Value</str>
     <str id="constructors.parameters.unknowntype">Unkown type</str>
 
-    <str id="create.title">Mule: JMX Management Console - MBean View</str>
+    <str id="create.title">{0}: JMX Management Console - MBean View</str>
     <str id="create.operation.success">MBean successfully created</str>
     <str id="create.operation.error">Error during MBean creation, message: {0}</str>
     <str id="create.operation.title">MBean operation: create MBean of class {0} and object name {1}</str>
 
-    <str id="delete.title">Mule: JMX Management Console - MBean View</str>
+    <str id="delete.title">{0}: JMX Management Console - MBean View</str>
     <str id="delete.operation.title">MBean delete, objectname {0}</str>
     <str id="delete.operation.success">MBean successfully deleted</str>
     <str id="delete.operation.error">Error during MBean deletion, message: {0}</str>
 
-    <str id="timer.title">Mule: JMX Management Console - Timer Service</str>
+    <str id="timer.title">{0}: JMX Management Console - Timer Service</str>
     <str id="timer.main.title">Timers By Domain:</str>
     <str id="timer.main.createlabel">ObjectName: </str>
     <str id="timer.main.createbutton">New timer</str>
@@ -137,13 +137,13 @@
     <str id="timer.domain.title">Timers for domain: {0}</str>
     <str id="timer.domain.objectname">ObjectName</str>
 
-    <str id="timer_create.title">Mule: JMX Management Console - Timer Creation</str>
+    <str id="timer_create.title">{0}: JMX Management Console - Timer Creation</str>
     <str id="timer_create.operation.title">Timer creation with object name {0}</str>
     <str id="timer_create.operation.success">Timer created</str>
     <str id="timer_create.operation.error">Exception during timer creation, message: {0}</str>
     <str id="timer_create.operation.mbeanview">Configure timer</str>
 
-    <str id="viewarray.title">Mule: JMX Management Console - Array View</str>
+    <str id="viewarray.title">{0}: JMX Management Console - Array View</str>
     <str id="viewarray.main.title">MBean {0}</str>
     <str id="viewarray.main.arraytitle">Array attribute {0} of type {1}</str>
     <str id="viewarray.main.index">Index</str>
@@ -153,7 +153,7 @@
     <str id="viewarray.main.navigation.next">next</str>
     <str id="viewarray.main.navigation.last">last</str>
 
-    <str id="viewcollection.title">Mule: JMX Management Console - Collection View</str>
+    <str id="viewcollection.title">{0}: JMX Management Console - Collection View</str>
     <str id="viewcollection.main.title">MBean {0}</str>
     <str id="viewcollection.main.viewcollectiontitle">Collection of class {0} on attribute {1}</str>
     <str id="viewcollection.main.index">Index</str>
@@ -164,7 +164,7 @@
     <str id="viewcollection.main.navigation.next">next</str>
     <str id="viewcollection.main.navigation.last">last</str>
 
-    <str id="viewmap.title">Mule: JMX Management Console - Map View</str>
+    <str id="viewmap.title">{0}: JMX Management Console - Map View</str>
     <str id="viewmap.main.title">MBean {0}</str>
     <str id="viewmap.main.viewmaptitle">Map of class {0} on attribute {1}</str>
     <str id="viewmap.main.key">Key</str>
@@ -176,7 +176,7 @@
     <str id="viewmap.main.navigation.next">next</str>
     <str id="viewmap.main.navigation.last">last</str>
 
-    <str id="monitor.title">Mule: JMX Management Console - Monitor Service</str>
+    <str id="monitor.title">{0}: JMX Management Console - Monitor Service</str>
     <str id="monitor.mbean.unregister">Unregister</str>
     <str id="monitor.main.title">Monitors By Domain:</str>
     <str id="monitor.main.createstring.label">ObjectName: </str>
@@ -186,7 +186,7 @@
     <str id="monitor.main.createcounter.label">ObjectName: </str>
     <str id="monitor.main.createcounter.button">New CounterMonitor</str>
 
-    <str id="monitor_create.title">Mule: JMX Management Console - Monitor Creation</str>
+    <str id="monitor_create.title">{0}: JMX Management Console - Monitor Creation</str>
     <str id="monitor_create.operation.title"> creation with object name {0}</str>
     <str id="monitor_create.operation.success">Monitor type {0} successfully created</str>
     <str id="monitor_create.operation.error">Exception during {0} creation, mesage: {1}</str>
@@ -195,11 +195,11 @@
     <str id="monitor_create.operation.gaugemonitor">GaugeMonitor</str>
     <str id="monitor_create.operation.countermonitor">CounterMonitor</str>
 
-    <str id="mlet.title">Mule: JMX Management Console - MLet Service</str>
-    <str id="mlet.mbean.unregister">Mule: JMX Management Console - MLet Service</str>
+    <str id="mlet.title">{0}: JMX Management Console - MLet Service</str>
+    <str id="mlet.mbean.unregister">{0}: JMX Management Console - MLet Service</str>
     <str id="mlet.main.title">MLet Service: (Not yet implemented)</str>
 
-    <str id="invoke.title">Mule: JMX Management Console - MBean View</str>
+    <str id="invoke.title">{0}: JMX Management Console - MBean View</str>
     <str id="invoke.operation.title">MBean operation: invoke method {0} on MBean {1}</str>
     <str id="invoke.operation.success">Invocation successful</str>
     <str id="invoke.operation.success.result">Result value: <pre>{0}</pre></str>
@@ -208,10 +208,11 @@
     <str id="invoke.operation.error.message">Message: <pre>{0}</pre></str>
     <str id="invoke.operation.error.noresult">No result</str>
 
-    <str id="about.title">Mule: JMX Management Console - About</str>
-    <str id="about.main.title">About Mule JMX Management Console:</str>
-    <str id="about.main.mule.title">{0} JMX Management Console</str>
-    <str id="about.main.mule.url">http://www.mulesource.org</str>
+    <str id="about.title">{0}: JMX Management Console - About</str>
+    <str id="about.main.title">About JMX Management Console:</str>
+    <str id="about.main.mule.title">JMX Management Console</str>
+    <str id="about.main.mule.url">http://mule.mulesource.org</str>
+    <str id="about.main.mule.version">{0} version {1}</str>
     <str id="about.main.mx4j.title">Built using {0} HttpAdaptor</str>
     <str id="about.main.mx4j.url">http://mx4j.sourceforge.net</str>
     <str id="about.main.jmx.title">Based on the {0} specification</str>
@@ -221,7 +222,7 @@
     <str id="about.main.serverid">MBeanServer ID:</str>
 
     <!-- relation service strings -->
-    <str id="relation.title">Mule: JMX Management Console - Relation Service</str>
+    <str id="relation.title">{0}: JMX Management Console - Relation Service</str>
     <str id="relation.typename.title">RelationTypeName:</str>
     <str id="relation.metadata.title">Relation Type metaData:</str>
     <str id="relation.relationids.title">RelationIds:</str>
@@ -236,23 +237,23 @@
     <str id="relation.inprogress">Relation Service: (In progress)</str>
 
     <!--MBean Server strings -->
-    <str id="server.title">Mule: JMX Management Console - Agent View</str>
+    <str id="server.title">{0}: JMX Management Console - Agent View</str>
     <str id="server.unregister">Unregister</str>
     <str id="server.mbeans.title">MBeans:</str>
     <str id="server.filter.title">Filter: </str>
 
     <!-- Set attribute stylesheet, to be deprecated -->
-    <str id="setattribute.title">Mule: JMX Management Console - MBean View</str>
+    <str id="setattribute.title">{0}: JMX Management Console - MBean View</str>
     <str id="setattribute.operation.title">MBean operation: set attribute {0} on MBean {1}</str>
     <str id="setattribute.operation.success">Attribute {0} set to {1}</str>
     <str id="setattribute.operation.error">Error during set attribute, message: {0}</str>
 
-    <str id="emptystatistics.title">Mule: JMX Management Console - Statistics</str>
+    <str id="emptystatistics.title">{0}: JMX Management Console - Statistics</str>
     <str id="emptystatistics.subtitle">Domain:</str>
     <str id="emptystatistics.querystatistics">Query domain for statistics: </str>
     <str id="emptystatistics.query">Query</str>
 
-    <str id="statistics.title">Mule: JMX Management Console - Statistics</str>
+    <str id="statistics.title">{0}: JMX Management Console - Statistics</str>
     <str id="statistics.subtitle">Domain: </str>
 
 </strings>

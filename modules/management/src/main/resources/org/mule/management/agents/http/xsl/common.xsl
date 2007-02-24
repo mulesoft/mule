@@ -23,6 +23,9 @@
    <!-- Import xalan extensions -->
    <xsl:import href="xalan-ext.xsl"/>
 
+   <!-- Import Mule extensions -->
+   <xsl:import href="mule-ext.xsl"/>
+
    <!-- Defin string variables -->
    <xsl:param name="request.locale">en</xsl:param>
 
@@ -35,6 +38,9 @@
             <xsl:call-template name="str">
                <xsl:with-param name="id">
                   <xsl:value-of select="$head.title"/>
+               </xsl:with-param>
+               <xsl:with-param name="p0">
+                  <xsl:call-template name="productDescription"/>
                </xsl:with-param>
             </xsl:call-template>
          </title>
@@ -61,9 +67,7 @@
 
          <tr>
             <td class="topheading">
-               <xsl:call-template name="str">
-                  <xsl:with-param name="id">common.title</xsl:with-param>
-               </xsl:call-template>
+               <xsl:call-template name="productDescription"/>
                <br/>
                <div class="subtitle">
                   <xsl:call-template name="str">
@@ -74,9 +78,7 @@
 
             <td class="topheading" align="right">
                <xsl:variable name="str.logo">
-                  <xsl:call-template name="str">
-                     <xsl:with-param name="id">common.logo</xsl:with-param>
-                  </xsl:call-template>
+                  <xsl:call-template name="productDescription"/>
                </xsl:variable>
                <xsl:variable name="str.logo.gif">
                   <xsl:call-template name="str">
@@ -84,9 +86,7 @@
                   </xsl:call-template>
                </xsl:variable>
                <xsl:variable name="str.site">
-                  <xsl:call-template name="str">
-                     <xsl:with-param name="id">common.site</xsl:with-param>
-                  </xsl:call-template>
+                  <xsl:call-template name="productUrl"/>
                </xsl:variable>
                <xsl:variable name="str.logo.width">
                   <xsl:call-template name="str">

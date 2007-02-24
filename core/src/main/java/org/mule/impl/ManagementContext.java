@@ -198,10 +198,12 @@ public class ManagementContext implements UMOManagementContext
             validateOSEncoding();
             directories = new Directories(new File(config.getWorkingDirectory()));            
 
-            UMOModel system = ModelFactory.createModel(getRegistry().getConfiguration().getSystemModelType());
-            system.setName(ModelHelper.SYSTEM_MODEL);
-            getRegistry().registerModel(system);
-
+            if(getRegistry().lookupModel(ModelHelper.SYSTEM_MODEL)==null)
+            {
+                UMOModel system = ModelFactory.createModel(getRegistry().getConfiguration().getSystemModelType());
+                system.setName(ModelHelper.SYSTEM_MODEL);
+                getRegistry().registerModel(system);
+            }
             // if no work manager has been set create a default one
             if (workManager == null)
             {

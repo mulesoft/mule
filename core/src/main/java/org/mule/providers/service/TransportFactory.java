@@ -41,7 +41,7 @@ import org.apache.commons.logging.LogFactory;
  * from an url. Note that for some endpoints, the url alone is not enough to create
  * the endpoint if a connector for the endpoint has not already been configured with
  * the Mule Manager.
- * 
+ *
  */
 public class TransportFactory
 {
@@ -139,7 +139,7 @@ public class TransportFactory
     private static UMOTransformer getTransformer(UMOEndpointURI url, UMOConnector cnn, int type)
         throws TransportFactoryException
     {
-        try 
+        try
         {
             UMOTransformer trans = null;
             String transId = null;
@@ -151,7 +151,7 @@ public class TransportFactory
             {
                 transId = url.getTransformers();
             }
-    
+
             if (transId != null)
             {
                 trans = MuleObjectHelper.getTransformer(transId, ",");
@@ -168,10 +168,10 @@ public class TransportFactory
                         overrides.putAll(so);
                     }
                 }
-    
+
                 String scheme = url.getSchemeMetaInfo();
-    
-                TransportServiceDescriptor sd = (TransportServiceDescriptor) 
+
+                TransportServiceDescriptor sd = (TransportServiceDescriptor)
                     RegistryContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, scheme, overrides);
                 if (sd != null)
                 {
@@ -188,7 +188,7 @@ public class TransportFactory
                         trans = sd.createResponseTransformer();
                     }
                 }
-                else 
+                else
                 {
                     throw new ServiceException(Message.createStaticMessage("No service descriptor found for transport: " + scheme + ".  This transport does not appear to be installed."));
                 }
@@ -209,7 +209,7 @@ public class TransportFactory
      * returned. This is so that developers can control when the connector
      * initialisation takes place as this is likely to initialse all connecotr
      * resources.
-     * 
+     *
      * @param url the MuleEndpointURI url to create the connector with
      * @return a new Connector
      * @throws TransportFactoryException
@@ -220,14 +220,14 @@ public class TransportFactory
         {
             UMOConnector connector;
             String scheme = url.getSchemeMetaInfo();
-    
-            TransportServiceDescriptor sd = (TransportServiceDescriptor) 
+
+            TransportServiceDescriptor sd = (TransportServiceDescriptor)
                 RegistryContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, scheme, null);
             if (sd == null)
             {
                 throw new ServiceException(Message.createStaticMessage("No service descriptor found for transport: " + scheme + ".  This transport does not appear to be installed."));
             }
-            
+
             connector = sd.createConnector();
             if (connector != null)
             {

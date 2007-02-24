@@ -675,6 +675,30 @@ public abstract class AbstractConnector
         this.dispatcherFactory = dispatcherFactory;
     }
 
+    /**
+     * Returns the maximum number of dispatchers that can be concurrently active per
+     * endpoint.
+     * 
+     * @return max. number of active dispatchers
+     */
+    public int getMaxDispatchersActive()
+    {
+        return this.dispatchers.getMaxActive();
+    }
+
+    /**
+     * Configures the maximum number of dispatchers that can be concurrently active
+     * per endpoint
+     * 
+     * @param maxActive max. number of active dispatchers
+     */
+    public void setMaxDispatchersActive(int maxActive)
+    {
+        this.dispatchers.setMaxActive(maxActive);
+        // adjust maxIdle in tandem to avoid thrashing
+        this.dispatchers.setMaxIdle(maxActive);
+    }
+
     private UMOMessageDispatcher getDispatcher(UMOImmutableEndpoint endpoint) throws UMOException
     {
         this.checkDisposed();

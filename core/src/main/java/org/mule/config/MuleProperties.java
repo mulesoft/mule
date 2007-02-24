@@ -82,6 +82,7 @@ public interface MuleProperties
     public final String MULE_REMOTE_SYNC_PROPERTY = PROPERTY_PREFIX + "REMOTE_SYNC";
     public final String MULE_SOAP_METHOD = PROPERTY_PREFIX + "SOAP_METHOD";
     public final String MULE_JMS_SESSION = PROPERTY_PREFIX + "JMS_SESSION";
+    public final String MULE_MANAGEMENT_CONTEXT_PROPERTY = PROPERTY_PREFIX + "MANAGEMENT_CONTEXT";
     // End Event Level properties
 
     /********************************************************************************

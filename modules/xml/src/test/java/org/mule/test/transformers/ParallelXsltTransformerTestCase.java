@@ -60,6 +60,8 @@ public class ParallelXsltTransformerTestCase extends AbstractMuleTestCase
     public void testParallelTransformation() throws Exception
     {
         final UMOTransformer transformer = getTransformer();
+        
+        long startTime = System.currentTimeMillis();
 
         for (int i = 0; i < getParallelThreadCount(); ++i)
         {
@@ -83,12 +85,21 @@ public class ParallelXsltTransformerTestCase extends AbstractMuleTestCase
                 }
             }).start();
         }
+
         checkResult();
+
+        long endTime = System.currentTimeMillis();
+
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Parallel transformations in " + getParallelThreadCount() + " threads with "
+                            + getCallsPerThread() + " calls/thread took " + (endTime - startTime) + " ms.");
+        }
     }
 
     private synchronized void checkResult() throws Exception
     {
-        wait();
+        this.wait();
         Object expectedResult = resultData;
         for (Iterator it = actualResults.iterator(); it.hasNext();)
         {

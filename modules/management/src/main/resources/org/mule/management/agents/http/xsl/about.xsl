@@ -45,23 +45,40 @@
                            <td colspan="2" class="page_title">
                               <xsl:call-template name="str">
                                  <xsl:with-param name="id">about.main.title</xsl:with-param>
+                                 <xsl:with-param name="p0">
+                                    <xsl:call-template name="productName"/>
+                                 </xsl:with-param>
                               </xsl:call-template>
                            </td>
                         </tr>
                         <tr class="about">
                            <td colspan="2">
                               <h1 align="center" class="about">
-                                 <xsl:variable name="str.url">
-                                    <xsl:call-template name="str">
-                                       <xsl:with-param name="id">about.main.mule.url</xsl:with-param>
-                                    </xsl:call-template>
+                                 <xsl:variable name="product.url">
+                                    <xsl:call-template name="productUrl"/>
                                  </xsl:variable>
+                                 <a href="{$product.url}">
+                                 <xsl:call-template name="str">
+                                       <xsl:with-param name="id">about.main.mule.version</xsl:with-param>
+                                    <xsl:with-param name="p0">
+                                          <xsl:call-template name="productDescription"/>
+                                    </xsl:with-param>
+                                       <xsl:with-param name="p1">
+                                          <xsl:call-template name="productVersion"/>
+                                       </xsl:with-param>
+                                    </xsl:call-template>
+                                 </a>
+                                 <br/>
                                  <xsl:call-template name="str">
                                     <xsl:with-param name="id">about.main.mule.title</xsl:with-param>
-                                    <xsl:with-param name="p0">
-                                       <a href="{$str.url}">Mule</a>
-                                    </xsl:with-param>
                                  </xsl:call-template>
+                                 <br/>
+                                 <xsl:variable name="vendor.url">
+                                    <xsl:call-template name="vendorUrl"/>
+                                 </xsl:variable>
+                                 <a href="{$vendor.url}">
+                                    <xsl:call-template name="vendorName"/>
+                                 </a>
                               </h1>
                            </td>
                         </tr>

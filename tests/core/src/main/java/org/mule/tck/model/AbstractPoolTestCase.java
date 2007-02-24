@@ -22,12 +22,6 @@ import org.mule.util.ObjectPool;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 
-/**
- * <code>AbstractPoolTestCase</code> TODO (document class)
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public abstract class AbstractPoolTestCase extends AbstractMuleTestCase
 {
     public static final byte FAIL_WHEN_EXHAUSTED = 0;

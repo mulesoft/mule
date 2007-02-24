@@ -19,50 +19,56 @@ import java.util.Properties;
 import org.apache.ws.security.handler.WSHandlerConstants;
 
 public class AxisWsSecurityOnInboundTestCase extends FunctionalTestCase
-{         
-       public void testGoodUserNameEncrypted() throws Exception{  
-            MuleClient client = new MuleClient();       
-            Properties props = new Properties();   
-            
-            // Action to perform : user token
-            props.setProperty(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
-            // User name to send
-            props.setProperty(WSHandlerConstants.USER, "mulealias");
-            // Callback used to retrive password for given user.
-            props.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, "org.mule.extras.wssecurity.callbackhandlers.MuleWsSecurityCallbackHandler");
-            // Property file containing the Encryption properties
-            props.setProperty(WSHandlerConstants.ENC_PROP_FILE,"out-encrypted-security.properties");
-                       
-            UMOMessage m = client.send("axis:http://localhost:8282/MySecuredUMO?method=echo","Test",props);
-            assertNotNull(m);
-            assertTrue(m.getPayload() instanceof String);
-            assertTrue(((String)m.getPayload()).equals("Test"));
-        }
-    
-        public void testBadUserNameEncrypted() throws Exception{  
-            MuleClient client = new MuleClient();       
-            Properties props = new Properties();   
-            
-            // Action to perform : user token
-            props.setProperty(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
-            // User name to send
-            props.setProperty(WSHandlerConstants.USER, "myBadAlias");
-            // Callback used to retrive password for given user.
-            props.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, "org.mule.extras.wssecurity.callbackhandlers.MuleWsSecurityCallbackHandler");
-            // Property file containing the Encryption properties
-            props.setProperty(WSHandlerConstants.ENC_PROP_FILE,"out-encrypted-security.properties");
-            
-            UMOMessage m = null;
-            try{
-                m = client.send("axis:http://localhost:8282/MySecuredUMO?method=echo","Test",props);
-            }
-            catch(Exception e){
-                assertNotNull(e);
-            }
-            assertNull(m);
-        }
-                    
-        protected String getConfigResources() {
-            return "axis-wssecurity-mule-config.xml";
-        } 
+{
+    public void testGoodUserNameEncrypted() throws Exception
+    {
+        MuleClient client = new MuleClient();
+        Properties props = new Properties();
+
+        // Action to perform : user token
+        props.setProperty(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
+        // User name to send
+        props.setProperty(WSHandlerConstants.USER, "mulealias");
+        // Callback used to retrive password for given user.
+        props.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, "org.mule.extras.wssecurity.callbackhandlers.MuleWsSecurityCallbackHandler");
+        // Property file containing the Encryption properties
+        props.setProperty(WSHandlerConstants.ENC_PROP_FILE, "out-encrypted-security.properties");
+
+        UMOMessage m = client.send("axis:http://localhost:8282/MySecuredUMO?method=echo", "Test", props);
+        assertNotNull(m);
+        assertTrue(m.getPayload() instanceof String);
+        assertTrue(m.getPayload().equals("Test"));
     }
+
+
+    public void testBadUserNameEncrypted() throws Exception
+    {
+        MuleClient client = new MuleClient();
+        Properties props = new Properties();
+
+        // Action to perform : user token
+        props.setProperty(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
+        // User name to send
+        props.setProperty(WSHandlerConstants.USER, "myBadAlias");
+        // Callback used to retrive password for given user.
+        props.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, "org.mule.extras.wssecurity.callbackhandlers.MuleWsSecurityCallbackHandler");
+        // Property file containing the Encryption properties
+        props.setProperty(WSHandlerConstants.ENC_PROP_FILE, "out-encrypted-security.properties");
+
+        UMOMessage m = null;
+        try
+        {
+            m = client.send("axis:http://localhost:8282/MySecuredUMO?method=echo", "Test", props);
+        }
+        catch (Exception e)
+        {
+            assertNotNull(e);
+        }
+        assertNull(m);
+    }
+
+    protected String getConfigResources()
+    {
+        return "axis-wssecurity-mule-config.xml";
+    }
+}

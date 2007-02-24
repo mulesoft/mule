@@ -235,7 +235,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         transactionConfig = new MuleTransactionConfig();
     }
 
-    public ImmutableMuleEndpoint(UMOImmutableEndpoint source)
+    public ImmutableMuleEndpoint(UMOImmutableEndpoint source) throws UMOException
     {
         this();
         this.initFromDescriptor(source);
@@ -249,7 +249,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         this.initFromDescriptor(p);
     }
 
-    protected void initFromDescriptor(UMOImmutableEndpoint source)
+    protected void initFromDescriptor(UMOImmutableEndpoint source) throws UMOException
     {
         if (this.name == null)
         {
@@ -320,6 +320,11 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
         filter = source.getFilter();
         securityFilter = source.getSecurityFilter();
+
+        if(source.getManagementContext()!=null)
+        {
+            initialise(source.getManagementContext());
+        }
     }
 
     /*

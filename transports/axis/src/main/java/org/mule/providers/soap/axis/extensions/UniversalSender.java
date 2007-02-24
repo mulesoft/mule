@@ -28,6 +28,7 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
@@ -87,10 +88,13 @@ public class UniversalSender extends BasicHandler
         // Get the dispatch endpoint
         String uri = msgContext.getStrProp(MessageContext.TRANS_URL);
         UMOImmutableEndpoint requestEndpoint = (UMOImmutableEndpoint)call.getProperty(MuleProperties.MULE_ENDPOINT_PROPERTY);
-        UMOImmutableEndpoint endpoint = null;
+        UMOManagementContext context = requestEndpoint.getManagementContext();
+        assert(context!=null);
+        
+        UMOImmutableEndpoint endpoint;
         try
         {
-            endpoint = lookupEndpoint(uri);
+            endpoint = lookupEndpoint(uri, context);
         }
         catch (UMOException e)
         {
@@ -168,21 +172,25 @@ public class UniversalSender extends BasicHandler
             UMOSession session = new MuleSession(message,
                 ((AbstractConnector)endpoint.getConnector()).getSessionHandler());
 
-            UMOEvent dispatchEvent = new MuleEvent(message, endpoint, session, sync);
             logger.info("Making Axis soap request on: " + uri);
             if (logger.isDebugEnabled())
             {
                 logger.debug("Soap request is:\n" + payload.toString());
             }
+
             if (sync)
             {
+
                 // We need to rewrite the endpoint on the event to set the
                 // reomoteSync property
-                MuleEndpoint syncEndpoint = new MuleEndpoint(dispatchEvent.getEndpoint());
-                syncEndpoint.setRemoteSync(true);
-                dispatchEvent = new MuleEvent(dispatchEvent.getMessage(), syncEndpoint,
-                    dispatchEvent.getSession(), dispatchEvent.isSynchronous());
-                UMOMessage result = session.sendEvent(dispatchEvent);
+//                MuleEndpoint syncEndpoint = new MuleEndpoint(dispatchEvent.getEndpoint());
+//                syncEndpoint.setRemoteSync(true);
+//                dispatchEvent = new MuleEvent(dispatchEvent.getMessage(), syncEndpoint,
+//                    dispatchEvent.getSession(), dispatchEvent.isSynchronous());
+//                UMOMessage result = session.sendEvent(dispatchEvent);
+                endpoint = new MuleEndpoint(endpoint);
+                UMOEvent dispatchEvent = new MuleEvent(message, endpoint, session, sync);
+                UMOMessage result = endpoint.send(dispatchEvent);
                 if (result != null)
                 {
                     byte[] response = result.getPayloadAsBytes();
@@ -202,7 +210,8 @@ public class UniversalSender extends BasicHandler
             }
             else
             {
-                session.dispatchEvent(dispatchEvent);
+                UMOEvent dispatchEvent = new MuleEvent(message, endpoint, session, sync);
+                endpoint.dispatch(dispatchEvent);
             }
         }
         catch (AxisFault axisFault)
@@ -216,7 +225,7 @@ public class UniversalSender extends BasicHandler
 
     }
 
-    protected UMOEndpoint lookupEndpoint(String uri) throws UMOException
+    protected UMOEndpoint lookupEndpoint(String uri, UMOManagementContext context) throws UMOException
     {
         UMODescriptor axis = RegistryContext.getRegistry().lookupModel(ModelHelper.SYSTEM_MODEL).getDescriptor(
             AxisConnector.AXIS_SERVICE_COMPONENT_NAME);
@@ -236,6 +245,7 @@ public class UniversalSender extends BasicHandler
                         logger.debug("Dispatch Endpoint uri: " + uri
                                      + " not found on the cache. Creating the endpoint instead.");
                         ep = new MuleEndpoint(uri, false);
+                        ep.initialise(context);
                     }
                     else
                     {
@@ -251,6 +261,7 @@ public class UniversalSender extends BasicHandler
         else
         {
             ep = new MuleEndpoint(uri, false);
+            ep.initialise(context);
         }
         return ep;
     }

@@ -24,6 +24,7 @@ public class WaitableBooleanTestCase extends TestCase
         super(name);
     }
 
+    // @Override
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -31,6 +32,7 @@ public class WaitableBooleanTestCase extends TestCase
         FALSE = new WaitableBoolean(false);
     }
 
+    // @Override
     protected void tearDown() throws Exception
     {
         super.tearDown();
@@ -167,7 +169,8 @@ public class WaitableBooleanTestCase extends TestCase
                 }
                 catch (InterruptedException iex)
                 {
-                    // ignore
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException(iex);
                 }
             }
         };
@@ -181,6 +184,7 @@ public class WaitableBooleanTestCase extends TestCase
         };
 
         new Thread(switcher).start();
+
         blocker.whenFalse(action);
         assertFalse(blocker.get());
         assertTrue(actionPerformed.get());
@@ -220,7 +224,8 @@ public class WaitableBooleanTestCase extends TestCase
                 }
                 catch (InterruptedException iex)
                 {
-                    // ignore
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException(iex);
                 }
             }
         };

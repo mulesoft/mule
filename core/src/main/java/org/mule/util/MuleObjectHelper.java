@@ -21,6 +21,7 @@ import org.mule.routing.filters.WildcardFilter;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.transformer.UMOTransformer;
+import org.mule.umo.UMOException;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -76,7 +77,7 @@ public class MuleObjectHelper
         return returnTrans;
     }
 
-    public static UMOEndpoint getEndpointByProtocol(String protocol)
+    public static UMOEndpoint getEndpointByProtocol(String protocol) throws UMOException
     {
         UMOImmutableEndpoint iprovider;
         Map endpoints = RegistryContext.getRegistry().getEndpoints();
@@ -91,7 +92,7 @@ public class MuleObjectHelper
         return null;
     }
 
-    public static UMOEndpoint getEndpointByEndpointUri(String endpointUri, boolean wildcardMatch)
+    public static UMOEndpoint getEndpointByEndpointUri(String endpointUri, boolean wildcardMatch) throws UMOException
     {
         ObjectFilter filter;
 
