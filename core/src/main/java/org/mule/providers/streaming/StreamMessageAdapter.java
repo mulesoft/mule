@@ -24,7 +24,7 @@ import java.io.OutputStream;
  * Provides a generic base class for stream based message flows in Mule. This adapter
  * represents the 3 flows of data that Mule identifies, namely inbound, outbound and
  * response flows. These are represented by three streams on the adapter.
- *
+ * 
  */
 public class StreamMessageAdapter extends AbstractMessageAdapter implements UMOStreamMessageAdapter
 {
@@ -36,7 +36,7 @@ public class StreamMessageAdapter extends AbstractMessageAdapter implements UMOS
     protected InputStream in;
     protected OutputStream out;
     protected OutputHandler handler;
-    private NullPayload nullPayload = new NullPayload();
+    private NullPayload nullPayload = NullPayload.getInstance();
 
     public StreamMessageAdapter(InputStream in)
     {
