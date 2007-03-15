@@ -14,6 +14,7 @@ import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.manager.UMOAgent;
+import org.mule.umo.manager.UMOContainerContext;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.UMOTransformer;
@@ -26,7 +27,6 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
  * <code>MuleObjectNameProcessor</code> is used to set spring ids to Mule object
  * names so the the bean id and name property on the object don't both have to be
  * set.
- * @deprecated this can be removed by Mule 2.0 final. Leaving it in because I haven't tested all config scenarios yet
  */
 
 public class MuleObjectNameProcessor implements BeanPostProcessor
@@ -75,6 +75,10 @@ public class MuleObjectNameProcessor implements BeanPostProcessor
             else if (o instanceof UMOAgent)
             {
                 ((UMOAgent)o).setName(s);
+            }
+             else if (o instanceof UMOContainerContext)
+            {
+                ((UMOContainerContext)o).setName(s);
             }
         }
         return o;

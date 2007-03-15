@@ -11,7 +11,6 @@
 package org.mule.extras.pgp;
 
 import org.mule.config.i18n.Messages;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.SecurityException;
 import org.mule.umo.security.UMOAuthentication;
@@ -128,7 +127,7 @@ public class PGPSecurityProvider implements UMOSecurityProvider
      * 
      * @see org.mule.umo.lifecycle.Initialisable#initialise()
      */
-    public void initialise(UMOManagementContext managementContext) throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         try
         {

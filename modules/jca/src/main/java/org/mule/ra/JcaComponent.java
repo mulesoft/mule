@@ -14,6 +14,7 @@ import org.mule.MuleException;
 import org.mule.RegistryContext;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.impl.ManagementContextAware;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.RequestContext;
 import org.mule.impl.container.ContainerKeyPair;
@@ -38,7 +39,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
  * inside an app server using JCA. In the future we might want to use one of the
  * existing models.
  */
-public class JcaComponent implements UMOComponent
+public class JcaComponent implements UMOComponent, ManagementContextAware
 {
 	/**
      * Serial version
@@ -62,6 +63,10 @@ public class JcaComponent implements UMOComponent
 
     protected String registryId;
 
+    protected UMOManagementContext managementContext;
+
+
+
     public JcaComponent(MuleDescriptor descriptor)
     {
         if (descriptor == null)
@@ -70,6 +75,11 @@ public class JcaComponent implements UMOComponent
         }
 
         this.descriptor = descriptor;
+    }
+
+    public void setManagementContext(UMOManagementContext context)
+    {
+        this.managementContext = context;
     }
 
     public UMODescriptor getDescriptor()
@@ -134,14 +144,14 @@ public class JcaComponent implements UMOComponent
         descriptor.getManagementContext().getStatistics().remove(stats);
     }
 
-    public synchronized void initialise(UMOManagementContext managementContext) throws InitialisationException
+    public synchronized void initialise() throws InitialisationException
     {
         if (initialised.get())
         {
             throw new InitialisationException(new Message(Messages.OBJECT_X_ALREADY_INITIALISED,
                 "Component '" + descriptor.getName() + "'"), this);
         }
-        descriptor.initialise(managementContext);
+        descriptor.initialise();
         try
         {
             entryPoint = managementContext.getRegistry().lookupModel(JcaModel.JCA_MODEL_TYPE).getEntryPointResolver().resolveEntryPoint(

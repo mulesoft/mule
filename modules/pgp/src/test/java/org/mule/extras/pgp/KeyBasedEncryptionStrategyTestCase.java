@@ -42,7 +42,7 @@ public class KeyBasedEncryptionStrategyTestCase extends AbstractMuleTestCase
 
         kbStrategy = new KeyBasedEncryptionStrategy();
         kbStrategy.setKeyManager(keyM);
-        kbStrategy.initialise(managementContext);
+        kbStrategy.initialise();
     }
 
     /*

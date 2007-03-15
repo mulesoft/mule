@@ -16,7 +16,6 @@ import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
@@ -67,7 +66,7 @@ public class HttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
     protected UMOEvent getEvent(UMOMessage message, String uri, boolean synchronous, boolean streaming)
         throws UMOException
     {
-        UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(uri,
+        UMOEndpoint endpoint = managementContext.getRegistry().getOrCreateEndpointForUri(uri,
             UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER);
         if (!endpoint.getConnector().isStarted() &&managementContext.isStarted())
         {

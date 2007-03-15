@@ -50,7 +50,7 @@ public class EjbContainerContextTestCase extends AbstractContainerContextTestCas
         env.put(Context.INITIAL_CONTEXT_FACTORY, MuleInitialContextFactory.class.getName());
         context.setEnvironment(env);
         // context.setSecurityPolicy("open-security.policy");
-        context.initialise(managementContext);
+        context.initialise();
         Context ic = context.getContext();
         ic.bind(EJB_NAME, new DummyEjbHomeProxy());
         ic.bind(Apple.class.getName(), new Apple());
@@ -104,7 +104,7 @@ public class EjbContainerContextTestCase extends AbstractContainerContextTestCas
     {
         UMOContainerContext container = getContainerContext();
         assertNotNull(container);
-        container.initialise(managementContext);
+        container.initialise();
         UMODescriptor descriptor = getTestDescriptor("some Ejb service", EJB_NAME);
         DummyEjbBean dummyEjbBean = (DummyEjbBean)container.getComponent(descriptor.getImplementation());
 
@@ -114,7 +114,7 @@ public class EjbContainerContextTestCase extends AbstractContainerContextTestCas
     public void testInvalidObjectLookup() throws Exception
     {
         UMOContainerContext container = getContainerContext();
-        container.initialise(managementContext);
+        container.initialise();
         assertNotNull(container);
 
         try

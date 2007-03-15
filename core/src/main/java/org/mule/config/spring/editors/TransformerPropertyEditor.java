@@ -9,6 +9,7 @@
  */
 package org.mule.config.spring.editors;
 
+import org.mule.RegistryContext;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.transformer.UMOTransformer;
@@ -16,21 +17,12 @@ import org.mule.umo.transformer.UMOTransformer;
 import java.beans.PropertyEditorSupport;
 import java.util.StringTokenizer;
 
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
-
 /**
- * TODO
+ * Translates a transformer name property into a transformer instance. If more than one transformer
+ * name is supplied, ech will be resolved and chained together.
  */
 public class TransformerPropertyEditor extends PropertyEditorSupport
 {
-    private DefaultListableBeanFactory beanFactory;
-
-
-    public TransformerPropertyEditor(DefaultListableBeanFactory beanFactory)
-    {
-        this.beanFactory = beanFactory;
-    }
-
     public void setAsText(String text) {
 
         StringTokenizer st = new StringTokenizer(text, " ");
@@ -39,12 +31,12 @@ public class TransformerPropertyEditor extends PropertyEditorSupport
 
         while (st.hasMoreTokens())
         {
-            //TODO RM* This should be using the registry
             String name = st.nextToken().trim();
-            UMOTransformer tempTrans = (UMOTransformer)beanFactory.getBean(name);
+            UMOTransformer tempTrans = RegistryContext.getRegistry().lookupTransformer(name);
 
             if (tempTrans == null)
             {
+                //return;
                 throw new IllegalArgumentException(new Message(Messages.OBJECT_NOT_FOUND_X, name).toString());
             }
 

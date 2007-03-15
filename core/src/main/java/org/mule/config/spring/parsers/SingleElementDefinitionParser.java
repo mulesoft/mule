@@ -28,9 +28,18 @@ public class SingleElementDefinitionParser extends AbstractMuleSingleBeanDefinit
     private Class beanClass;
 
 
-    public SingleElementDefinitionParser(Class beanClass)
+    public SingleElementDefinitionParser(Class beanClass, boolean singleton)
     {
         this.beanClass = beanClass;
+        this.singleton = singleton;
+    }
+
+    public SingleElementDefinitionParser(Class beanClass, boolean singleton, String initMethod, String destroyMethod)
+    {
+        this.beanClass = beanClass;
+        this.singleton = singleton;
+        this.initMethod = initMethod;
+        this.destroyMethod = destroyMethod;
     }
 
     protected Class getBeanClass(Element element)

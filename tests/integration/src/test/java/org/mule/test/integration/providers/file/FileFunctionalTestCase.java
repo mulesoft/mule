@@ -10,7 +10,7 @@
 
 package org.mule.test.integration.providers.file;
 
-import org.mule.MuleManager;
+
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.functional.FunctionalTestNotification;
@@ -29,17 +29,26 @@ public class FileFunctionalTestCase extends FunctionalTestCase implements Functi
 {
     private Object receivedData = null;
 
-    protected void doPostFunctionalSetUp() throws Exception
+
+    public FileFunctionalTestCase()
     {
-        super.doPostFunctionalSetUp();
         super.setDisposeManagerPerSuite(true);
+    }
+
+    //@Override
+    protected void doSetUp() throws Exception
+    {
         managementContext.registerListener(this);
     }
 
-    protected void doFunctionalTearDown() throws Exception
+    protected void doPostFunctionalSetUp() throws Exception
+    {
+        managementContext.registerListener(this);
+    }
+
+    protected void doTearDown() throws Exception
     {
         managementContext.unregisterListener(this);
-        super.doFunctionalTearDown();
     }
 
     protected String getConfigResources()

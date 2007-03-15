@@ -10,15 +10,13 @@
 
 package org.mule.test.integration.persistence;
 
-import org.mule.MuleManager;
+
+import org.mule.RegistryContext;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
 import java.io.File;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- */
 public class FilePersistenceTestCase extends FunctionalTestCase
 {
 

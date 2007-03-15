@@ -477,7 +477,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
         UMOEndpoint endpoint = null;
         try
         {
-            endpoint = MuleEndpoint.getOrCreateEndpointForUri(applicationEvent.getEndpoint(),
+            endpoint = managementContext.getRegistry().getOrCreateEndpointForUri(applicationEvent.getEndpoint(),
                 UMOEndpoint.ENDPOINT_TYPE_SENDER);
         }
         catch (UMOException e)
@@ -799,7 +799,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
             {
                 String subscription = subscriptions[i];
                 UMOEndpointURI endpointUri = new MuleEndpointURI(subscription);
-                UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(endpointUri,
+                UMOEndpoint endpoint = managementContext.getRegistry().getOrCreateEndpointForUri(endpointUri,
                     UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
                 if (!asynchronous)
                 {

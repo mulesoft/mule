@@ -19,7 +19,6 @@ import org.mule.providers.http.HttpResponse;
 import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.UMOEventContext;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.transformer.TransformerException;
@@ -64,7 +63,7 @@ public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
 
 
     //@Override
-    public void initialise(UMOManagementContext managementContext) throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         format = new SimpleDateFormat(HttpConstants.DATE_FORMAT, Locale.US);
 

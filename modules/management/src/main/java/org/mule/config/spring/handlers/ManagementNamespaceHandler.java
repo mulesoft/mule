@@ -30,15 +30,15 @@ public class ManagementNamespaceHandler extends AbstractHierarchicalNamespaceHan
     public void init()
     {
         registerBeanDefinitionParser("jmx-server", new JmxAgentDefinitionParser());
-        registerBeanDefinitionParser("jmx-log4j", new SingleElementDefinitionParser(Log4jAgent.class));
-        registerBeanDefinitionParser("jmx-mx4j-adaptor", new SingleElementDefinitionParser(Mx4jAgent.class));
-        registerBeanDefinitionParser("jmx-notifications", new SingleElementDefinitionParser(JmxServerNotificationAgent.class));
-        registerBeanDefinitionParser("jmx-default-configuration", new SingleElementDefinitionParser(DefaultJmxSupportAgent.class));
-        registerBeanDefinitionParser("chainsaw-notifications", new SingleElementDefinitionParser(Log4jNotificationLoggerAgent.class));
+        registerBeanDefinitionParser("jmx-log4j", new SingleElementDefinitionParser(Log4jAgent.class, true));
+        registerBeanDefinitionParser("jmx-mx4j-adaptor", new SingleElementDefinitionParser(Mx4jAgent.class, true));
+        registerBeanDefinitionParser("jmx-notifications", new SingleElementDefinitionParser(JmxServerNotificationAgent.class, true));
+        registerBeanDefinitionParser("jmx-default-configuration", new SingleElementDefinitionParser(DefaultJmxSupportAgent.class, true));
+        registerBeanDefinitionParser("chainsaw-notifications", new SingleElementDefinitionParser(Log4jNotificationLoggerAgent.class, true));
         registerBeanDefinitionParser("level-mappings", new PropertiesDefinitionParser("levelMappings"));
-        registerBeanDefinitionParser("log4j-notifications", new SingleElementDefinitionParser(Log4jNotificationLoggerAgent.class));
-        registerBeanDefinitionParser("publish-notifications", new SingleElementDefinitionParser(EndpointNotificationLoggerAgent.class));
-        registerBeanDefinitionParser("rmi-server", new SingleElementDefinitionParser(RmiRegistryAgent.class));
+        registerBeanDefinitionParser("log4j-notifications", new SingleElementDefinitionParser(Log4jNotificationLoggerAgent.class, true));
+        registerBeanDefinitionParser("publish-notifications", new SingleElementDefinitionParser(EndpointNotificationLoggerAgent.class, true));
+        registerBeanDefinitionParser("rmi-server", new SingleElementDefinitionParser(RmiRegistryAgent.class, true, "initialise", "dispose"));
 
         //This gets processed by the jmx-server parser
         registerIgnoredElement("connector-server");

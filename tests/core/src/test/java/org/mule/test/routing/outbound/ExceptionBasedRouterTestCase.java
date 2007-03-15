@@ -11,7 +11,6 @@
 package org.mule.test.routing.outbound;
 
 import org.mule.impl.MuleMessage;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.message.ExceptionPayload;
 import org.mule.routing.LoggingCatchAllStrategy;
@@ -46,10 +45,10 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         OutboundRouterCollection messageRouter = new OutboundRouterCollection();
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
 
-        UMOEndpoint endpoint1 = new MuleEndpoint("test://Dummy1", false);
-        UMOEndpoint endpoint2 = new MuleEndpoint("test://Dummy2", false);
+        UMOEndpoint endpoint1 = managementContext.getRegistry().getOrCreateEndpointForUri("test://Dummy1", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        UMOEndpoint endpoint2 = managementContext.getRegistry().getOrCreateEndpointForUri("test://Dummy2", UMOEndpoint.ENDPOINT_TYPE_SENDER);
 
-        UMOEndpoint endpoint3 = new MuleEndpoint("test://Dummy3", false);
+        UMOEndpoint endpoint3 = managementContext.getRegistry().getOrCreateEndpointForUri("test://Dummy3", UMOEndpoint.ENDPOINT_TYPE_SENDER);
 
         ExceptionBasedRouter router = new ExceptionBasedRouter();
         RegExFilter filter = new RegExFilter("(.*) event");
@@ -92,8 +91,8 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         OutboundRouterCollection messageRouter = new OutboundRouterCollection();
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
 
-        UMOEndpoint endpoint1 = new MuleEndpoint("test://AlwaysFail", false);
-        UMOEndpoint endpoint2 = new MuleEndpoint("test://AlwaysFail", false);
+        UMOEndpoint endpoint1 = managementContext.getRegistry().getOrCreateEndpointForUri("test://AlwaysFail", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        UMOEndpoint endpoint2 = managementContext.getRegistry().getOrCreateEndpointForUri("test://AlwaysFail", UMOEndpoint.ENDPOINT_TYPE_SENDER);
 
         ExceptionBasedRouter router = new ExceptionBasedRouter();
         RegExFilter filter = new RegExFilter("(.*) event");

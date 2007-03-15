@@ -10,7 +10,7 @@
 
 package org.mule.test.integration.providers.jms.activemq;
 
-import org.mule.MuleManager;
+
 import org.mule.providers.jms.JmsConnector;
 import org.mule.transaction.XaTransactionFactory;
 import org.mule.umo.UMOTransactionFactory;

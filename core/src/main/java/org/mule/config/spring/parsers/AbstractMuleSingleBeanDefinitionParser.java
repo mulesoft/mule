@@ -47,12 +47,17 @@ public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBea
     protected Properties attributeMappings;
     protected Map valueMappings;
     protected ParserContext parserContext;
+    //By default Mule objects are not singletons
+    protected boolean singleton = false;
+
+    protected String initMethod = null;
+    protected String destroyMethod = null;
 
     protected AbstractMuleSingleBeanDefinitionParser()
-         {
-             attributeMappings = new Properties();
-             valueMappings = new HashMap();
-         }
+     {
+         attributeMappings = new Properties();
+         valueMappings = new HashMap();
+     }
 
     public void registerValueMapping(ValueMap mapping)
     {
@@ -153,6 +158,16 @@ public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBea
         Assert.state(beanClass != null, "Class returned from getBeanClass(Element) must not be null, element is: " + element.getNodeName());
         BeanDefinitionBuilder builder = createBeanDefinitionBuilder(element, beanClass);
         builder.setSource(parserContext.extractSource(element));
+        builder.setSingleton(isSingleton());
+        builder.addDependsOn("_registry");
+        if(getInitMethodName()!=null)
+        {
+            builder.setInitMethodName(getInitMethodName());
+        }
+        if(getDisposeMethodName()!=null)
+        {
+            builder.setDestroyMethodName(getDisposeMethodName());
+        }
         if (parserContext.isNested())
         {
             // Inner bean definition must receive same singleton status as containing bean.
@@ -220,6 +235,21 @@ public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBea
             return name;
         }
         return super.resolveId(element, definition, parserContext);
+    }
+
+    protected String getInitMethodName()
+    {
+        return initMethod;
+    }
+
+    protected String getDisposeMethodName()
+    {
+        return destroyMethod;
+    }
+
+    protected boolean isSingleton()
+    {
+        return singleton;
     }
 
     public static class ValueMap

@@ -22,7 +22,6 @@ import org.mule.providers.soap.SoapConstants;
 import org.mule.providers.soap.axis.extensions.MuleConfigProvider;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
@@ -136,7 +135,7 @@ public class AxisServiceComponent implements Initialisable, Callable
         return new MuleMessage(response);
     }
 
-    public void initialise(UMOManagementContext managementContext) throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         // template method
     }

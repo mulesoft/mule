@@ -12,7 +12,6 @@ package org.mule.components.script.jsr223;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.IOUtils;
@@ -53,7 +52,7 @@ public class Scriptable implements Initialisable
     private ScriptEngine scriptEngine;
     private String scriptEngineName;
 
-    public void initialise(UMOManagementContext managementContext) throws InitialisationException {
+    public void initialise() throws InitialisationException {
         if (scriptEngine == null)
         {
             if (compiledScript == null)

@@ -12,7 +12,6 @@ package org.mule.management.agents;
 
 import org.mule.impl.AbstractAgent;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.StringUtils;
 
@@ -121,7 +120,8 @@ public class RmiRegistryAgent extends AbstractAgent
         // nothing to do
     }
 
-    public void doInitialise(UMOManagementContext managementContext) throws InitialisationException {
+    public void initialise() throws InitialisationException
+    {
         if (StringUtils.isNotBlank(serverUri))
         {
             return;

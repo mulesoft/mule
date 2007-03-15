@@ -81,14 +81,14 @@ public class MuleRegistry implements Registry {
             new PersistenceNotificationListener(persistenceManager);
 
         try {
-            persistenceManager.initialise(null);
+            persistenceManager.initialise();
         } catch (Exception e) { 
             logger.info("Unable to initialize PersistenceManager: " + 
                     e.toString());
         }
 
         try {
-            registryStore.initialise(null);
+            registryStore.initialise();
             registryStore.registerPersistenceRequestListener(listener);
         } catch (Exception e) { 
             logger.info(e);

@@ -10,12 +10,6 @@
 
 package org.mule.test.routing.outbound;
 
-import com.mockobjects.dynamic.C;
-import com.mockobjects.dynamic.Mock;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.mule.impl.MuleMessage;
 import org.mule.routing.outbound.StaticRecipientList;
 import org.mule.tck.AbstractMuleTestCase;
@@ -24,6 +18,12 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.RoutingException;
+
+import com.mockobjects.dynamic.C;
+import com.mockobjects.dynamic.Mock;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
 {
@@ -37,6 +37,7 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
         recipients.add("test://recipient1");
         recipients.add("test://recipient2");
         StaticRecipientList router = new StaticRecipientList();
+        router.setManagementContext(managementContext);
         router.setRecipients(recipients);
 
         List endpoints = new ArrayList();

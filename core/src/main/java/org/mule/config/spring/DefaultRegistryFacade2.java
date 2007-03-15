@@ -79,7 +79,7 @@ import org.springframework.context.support.StaticApplicationContext;
 /**
  * TODO
  */
-public class DefaultRegistryFacade2 extends DefaultRegistryFacade
+public class DefaultRegistryFacade2 extends SpringRegistry
 
 {
     /**
@@ -182,7 +182,7 @@ public class DefaultRegistryFacade2 extends DefaultRegistryFacade
                     {
                         try
                         {
-                            ((Initialisable)bean).initialise(managementContext);
+                            ((Initialisable)bean).initialise();
                         }
                         catch (InitialisationException e)
                         {
@@ -476,7 +476,7 @@ public class DefaultRegistryFacade2 extends DefaultRegistryFacade
     }
 
 
-    public void initialise(UMOManagementContext managementContext) throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         this.managementContext = managementContext;
 
@@ -514,7 +514,7 @@ public class DefaultRegistryFacade2 extends DefaultRegistryFacade
                             "QueueManager"), e);
                 }
 
-                getContainerContext().initialise(managementContext);
+                getContainerContext().initialise();
                 initialiseObjectsOfType(UMOConnector.class, -1, -1);
                 initialiseObjectsOfType(UMOEndpoint.class, -1, -1);
                 initialiseAgents();
@@ -673,7 +673,7 @@ public class DefaultRegistryFacade2 extends DefaultRegistryFacade
             Object o = iterator.next();
             if(o instanceof Initialisable)
             {
-                ((Initialisable)o).initialise(managementContext);
+                ((Initialisable)o).initialise();
             }
         }
         logger.info(objectName + " have been initialised successfully");
@@ -888,7 +888,7 @@ public class DefaultRegistryFacade2 extends DefaultRegistryFacade
 
                 int originalSize = agentsSnapshot.size();
                 logger.debug("Initialising agent: " + umoAgent.getName());
-                umoAgent.initialise(managementContext);
+                umoAgent.initialise();
                 // thank you, we are done with you
                 cursor.remove();
 
@@ -919,7 +919,7 @@ public class DefaultRegistryFacade2 extends DefaultRegistryFacade
                     for (Iterator it = agentRegistrationQueue.iterator(); it.hasNext();)
                     {
                         UMOAgent theAgent = (UMOAgent) it.next();
-                        theAgent.initialise(managementContext);
+                        theAgent.initialise();
                     }
                 }
             }
@@ -1028,7 +1028,7 @@ public class DefaultRegistryFacade2 extends DefaultRegistryFacade
         {
             throw new ServiceException(new Message(Messages.FAILED_LOAD_X, type + " " + name));
         }
-        return ServiceDescriptorFactory.create(type, name, props, overrides);
+        return ServiceDescriptorFactory.create(type, name, props, overrides, applicationContext);
     }
 
     /**

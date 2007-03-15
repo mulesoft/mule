@@ -14,7 +14,6 @@ import org.mule.MuleException;
 import org.mule.persistence.PersistenceHelper;
 import org.mule.persistence.PersistenceSerializer;
 import org.mule.transformers.xml.XStreamFactory;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.IOUtils;
 
@@ -39,9 +38,8 @@ public class XStreamSerializer implements PersistenceSerializer
 
     /**
      * {@inheritDoc}
-     * @param managementContext
      */
-    public void initialise(UMOManagementContext managementContext) throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         try 
         {

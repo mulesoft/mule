@@ -36,7 +36,6 @@ import org.mule.management.support.JmxSupportFactory;
 import org.mule.management.support.SimplePasswordJmxAuthenticator;
 import org.mule.providers.AbstractConnector;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.model.UMOModel;
@@ -145,9 +144,8 @@ public class JmxAgent extends AbstractAgent
     /** {@inheritDoc}
      * (non-Javadoc)
      *
-     * @param managementContext
      */
-    public void doInitialise(UMOManagementContext managementContext) throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         if (initialized.get()) {
             return;

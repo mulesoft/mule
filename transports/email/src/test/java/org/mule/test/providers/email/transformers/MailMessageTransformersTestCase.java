@@ -11,7 +11,6 @@
 package org.mule.test.providers.email.transformers;
 
 import org.mule.impl.AlreadyInitialisedException;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.email.transformers.EmailMessageToString;
 import org.mule.providers.email.transformers.StringToEmailMessage;
 import org.mule.tck.AbstractTransformerTestCase;
@@ -40,13 +39,13 @@ public class MailMessageTransformersTestCase extends AbstractTransformerTestCase
     public UMOTransformer getRoundTripTransformer() throws Exception
     {
         StringToEmailMessage trans = new StringToEmailMessage();
-        UMOEndpoint endpoint = new MuleEndpoint("smtp://a:a@a.com", false);
+        UMOEndpoint endpoint = managementContext.getRegistry().getOrCreateEndpointForUri("smtp://a:a@a.com", UMOEndpoint.ENDPOINT_TYPE_SENDER);
 
         // We need to init the connector without actually connecting for this test
         // case
         try
         {
-            endpoint.getConnector().initialise(managementContext);
+            endpoint.getConnector().initialise();
         }
         catch (AlreadyInitialisedException e)
         {

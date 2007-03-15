@@ -26,9 +26,9 @@ import org.mule.providers.soap.axis.extras.AxisCleanAndAddProperties;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
@@ -245,7 +245,6 @@ public class UniversalSender extends BasicHandler
                         logger.debug("Dispatch Endpoint uri: " + uri
                                      + " not found on the cache. Creating the endpoint instead.");
                         ep = new MuleEndpoint(uri, false);
-                        ep.initialise(context);
                     }
                     else
                     {
@@ -261,7 +260,6 @@ public class UniversalSender extends BasicHandler
         else
         {
             ep = new MuleEndpoint(uri, false);
-            ep.initialise(context);
         }
         return ep;
     }

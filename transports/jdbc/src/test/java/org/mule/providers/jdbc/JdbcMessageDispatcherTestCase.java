@@ -35,7 +35,7 @@ public class JdbcMessageDispatcherTestCase extends AbstractMuleTestCase
         connector.setQueryRunner(TestQueryRunner.class.getName());
         connector.setResultSetHandler(TestResultSetHandler.class.getName());
         connector.setDataSource(getDataSource());
-        connector.initialise(managementContext);
+        connector.initialise();
         ep.receive(0);
     }
 

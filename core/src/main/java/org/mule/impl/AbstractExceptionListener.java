@@ -47,7 +47,7 @@ import org.apache.commons.logging.LogFactory;
  * this exception listener and provides an implementation for dispatching exception
  * events from this Listener.
  */
-public abstract class AbstractExceptionListener implements ExceptionListener, Initialisable
+public abstract class AbstractExceptionListener implements ExceptionListener, Initialisable, ManagementContextAware
 {
     /**
      * logger used by this class
@@ -57,6 +57,13 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
     protected List endpoints = new CopyOnWriteArrayList();
 
     protected AtomicBoolean initialised = new AtomicBoolean(false);
+
+    protected UMOManagementContext managementContext;
+
+    public void setManagementContext(UMOManagementContext context)
+    {
+        this.managementContext = context;
+    }
 
     public List getEndpoints()
     {
@@ -145,9 +152,8 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
      * <code>doInitialise()</code> method.
      * 
      * @throws InitialisationException
-     * @param managementContext
      */
-    public synchronized final void initialise(UMOManagementContext managementContext) throws InitialisationException
+    public synchronized final void initialise() throws InitialisationException
     {
         if (!initialised.get())
         {
@@ -162,7 +168,7 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
         for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
         {
             UMOEndpoint umoEndpoint = (UMOEndpoint)iterator.next();
-            umoEndpoint.initialise(managementContext);
+            umoEndpoint.initialise();
         }
     }
 

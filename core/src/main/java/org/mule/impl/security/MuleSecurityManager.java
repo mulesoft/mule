@@ -11,7 +11,6 @@
 package org.mule.impl.security;
 
 import org.mule.umo.UMOEncryptionStrategy;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.SecurityException;
 import org.mule.umo.security.SecurityProviderNotFoundException;
@@ -47,18 +46,18 @@ public class MuleSecurityManager implements UMOSecurityManager
     private Map providers = new ConcurrentHashMap();
     private Map cryptoStrategies = new ConcurrentHashMap();
 
-    public void initialise(UMOManagementContext managementContext) throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         for (Iterator iterator = providers.values().iterator(); iterator.hasNext();)
         {
             UMOSecurityProvider provider = (UMOSecurityProvider)iterator.next();
-            provider.initialise(managementContext);
+            provider.initialise();
         }
 
         for (Iterator iterator = cryptoStrategies.values().iterator(); iterator.hasNext();)
         {
             UMOEncryptionStrategy strategy = (UMOEncryptionStrategy)iterator.next();
-            strategy.initialise(managementContext);
+            strategy.initialise();
         }
     }
 

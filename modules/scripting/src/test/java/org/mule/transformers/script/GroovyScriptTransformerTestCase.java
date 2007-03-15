@@ -25,7 +25,7 @@ public class GroovyScriptTransformerTestCase extends AbstractTransformerTestCase
         transformer.setScriptEngineName("groovy");
         transformer.setName("StringToList");
         transformer.setScriptFile("StringToList2.groovy");
-        transformer.initialise(managementContext);
+        transformer.initialise();
         return transformer;
     }
 
@@ -34,7 +34,7 @@ public class GroovyScriptTransformerTestCase extends AbstractTransformerTestCase
         ScriptTransformer transformer = new ScriptTransformer();
         transformer.setName("ListToStringTransformer");
         transformer.setScriptFile("ListToString2.groovy");
-        transformer.initialise(managementContext);
+        transformer.initialise();
         return transformer;
     }
 

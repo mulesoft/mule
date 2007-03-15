@@ -10,7 +10,8 @@
 
 package org.mule.test.integration.providers.jms.activemq;
 
-import org.mule.MuleManager;
+
+import org.mule.RegistryContext;
 import org.mule.config.PoolingProfile;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
@@ -133,7 +134,7 @@ public class JmsReconnectionTestCase extends AbstractJmsFunctionalTestCase
         strategy.setRetryCount(5);
         strategy.setFrequency(3000);
         strategy.setDoThreading(true);
-        connector.setConnectionStrategy(strategy);
+        //TODO RM* URGENT : connector.setConnectionStrategy(strategy);
 
         return connector;
     }

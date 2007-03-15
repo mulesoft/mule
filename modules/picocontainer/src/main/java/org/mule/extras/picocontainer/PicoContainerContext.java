@@ -14,7 +14,6 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.container.AbstractContainerContext;
 import org.mule.impl.container.ContainerKeyPair;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.ContainerException;
 import org.mule.umo.manager.ObjectNotFoundException;
@@ -83,7 +82,7 @@ public class PicoContainerContext extends AbstractContainerContext
 
         if (key instanceof ContainerKeyPair)
         {
-            key = ((ContainerKeyPair)key).getKey();
+            key = ((ContainerKeyPair) key).getKey();
         }
 
         Object component = null;
@@ -91,7 +90,7 @@ public class PicoContainerContext extends AbstractContainerContext
         {
             try
             {
-                Class keyClass = ClassUtils.loadClass((String)key, getClass());
+                Class keyClass = ClassUtils.loadClass((String) key, getClass());
                 component = container.getComponentInstance(keyClass);
             }
             catch (ClassNotFoundException e)
@@ -129,7 +128,7 @@ public class PicoContainerContext extends AbstractContainerContext
 
     /**
      * The config file can be a resource on the classpath on a file system.
-     * 
+     *
      * @param configFile The configFile to set.
      */
     public void setConfigFile(String configFile) throws PicoCompositionException
@@ -152,7 +151,7 @@ public class PicoContainerContext extends AbstractContainerContext
         try
         {
             scriptedContainerBuilderFactory = new ScriptedContainerBuilderFactory(configReader,
-                builderClassName, Thread.currentThread().getContextClassLoader());
+                    builderClassName, Thread.currentThread().getContextClassLoader());
         }
         catch (ClassNotFoundException e)
         {
@@ -161,7 +160,7 @@ public class PicoContainerContext extends AbstractContainerContext
 
         ContainerBuilder builder = scriptedContainerBuilderFactory.getContainerBuilder();
         builder.buildContainer(containerRef, parentContainerRef, null, false);
-        setContainer((MutablePicoContainer)containerRef.get());
+        setContainer((MutablePicoContainer) containerRef.get());
     }
 
     private String getBuilderClassName(String scriptName)
@@ -170,7 +169,8 @@ public class PicoContainerContext extends AbstractContainerContext
         return ScriptedContainerBuilderFactory.getBuilderClassName(extension);
     }
 
-    public void doInitialise(UMOManagementContext managementContext) throws InitialisationException {
+    public void initialise() throws InitialisationException
+    {
         if (configFile == null)
         {
             return;

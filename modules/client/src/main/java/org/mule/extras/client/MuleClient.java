@@ -865,13 +865,7 @@ public class MuleClient implements Disposable
 
     protected UMOEndpoint getEndpoint(String uri, String type) throws UMOException
     {
-        UMOEndpoint endpoint = managementContext.getRegistry().lookupEndpoint(uri);
-        if (endpoint == null)
-        {
-            endpoint = MuleEndpoint.getOrCreateEndpointForUri(uri, type);
-        }
-        endpoint.initialise(managementContext);
-        return endpoint;
+        return managementContext.getRegistry().getOrCreateEndpointForUri(uri, type);
     }
 
     protected UMOEndpoint getDefaultClientEndpoint(UMODescriptor descriptor, Object payload)

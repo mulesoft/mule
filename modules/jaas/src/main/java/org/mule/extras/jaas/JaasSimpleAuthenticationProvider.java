@@ -12,7 +12,6 @@ package org.mule.extras.jaas;
 
 import org.mule.config.i18n.Messages;
 import org.mule.impl.security.MuleAuthentication;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.UMOAuthentication;
 import org.mule.umo.security.UMOSecurityContext;
@@ -258,9 +257,8 @@ public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider
      * JaasSecurityContextFactory.
      * 
      * @throws InitialisationException
-     * @param managementContext
      */
-    public final void initialise(UMOManagementContext managementContext) throws InitialisationException
+    public final void initialise() throws InitialisationException
     {
         // configure jaas from properties passed to the provider from the Mule XML
         // configuration file

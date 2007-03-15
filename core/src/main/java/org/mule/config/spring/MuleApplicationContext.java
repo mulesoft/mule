@@ -17,9 +17,10 @@ import org.mule.umo.transformer.UMOTransformer;
 import java.io.IOException;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.support.AbstractBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
-import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractXmlApplicationContext;
 
 /**
@@ -32,6 +33,14 @@ import org.springframework.context.support.AbstractXmlApplicationContext;
 public class MuleApplicationContext extends AbstractXmlApplicationContext
 {
     private final String[] configLocations;
+
+
+    public MuleApplicationContext(ApplicationContext parent, String[] configLocations)
+    {
+        super(parent);
+        this.configLocations = configLocations;
+        refresh();
+    }
 
     public MuleApplicationContext(String configLocation)
     {
@@ -59,9 +68,9 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
 
     protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException
     {
-        beanFactory.registerBeanDefinition("_muleManagementContextFactoryBean", new RootBeanDefinition(ManagementContextFactoryBean.class, true));
-//        beanFactory.addBeanPostProcessor(new MuleObjectNameProcessor());
-        beanFactory.registerCustomEditor(UMOTransformer.class, new TransformerPropertyEditor(beanFactory));
+        //RM* Custom editors need to be registered outside the contaner (it seems) would be better if these were part of
+        //the default config
+        beanFactory.registerCustomEditor(UMOTransformer.class, new TransformerPropertyEditor());
 
         XmlBeanDefinitionReader beanDefinitionReader = new MuleBeanDefinitionReader(beanFactory, configLocations.length);
         //hook in our customheirarchical reader
@@ -75,4 +84,20 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
         return (UMOManagementContext)getBeanFactory().getBean("_muleManagementContextFactoryBean");
 
     }
+
+
+    //@Override
+    protected DefaultListableBeanFactory createBeanFactory()
+    {
+        //Copy all postProcessors defined in the defaultMuleConfig so that they get applied to the child container
+        DefaultListableBeanFactory bf = super.createBeanFactory(); 
+        if(getParent()!=null)
+        {
+            //Copy over all processors
+            AbstractBeanFactory beanFactory = (AbstractBeanFactory)getParent().getAutowireCapableBeanFactory();
+            bf.copyConfigurationFrom(beanFactory);
+        }
+        return bf;
+    }
+
 }

@@ -10,7 +10,8 @@
 
 package org.mule.test.integration.providers.jdbc;
 
-import org.mule.MuleManager;
+
+import org.mule.RegistryContext;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
@@ -78,7 +79,7 @@ public class JdbcNonTransactionalFunctionalTestCase extends AbstractJdbcFunction
         managementContext.start();
 
         UMOEndpointURI muleEndpoint = new MuleEndpointURI(DEFAULT_OUT_URI);
-        UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(muleEndpoint,
+        UMOEndpoint endpoint = RegistryContext.getRegistry().getOrCreateEndpointForUri(muleEndpoint,
             UMOEndpoint.ENDPOINT_TYPE_SENDER);
         UMOMessage message = new MuleMessage(DEFAULT_MESSAGE);
         UMOSession session = MuleTestUtils.getTestSession();

@@ -31,11 +31,11 @@ import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -76,7 +76,7 @@ public class MuleManagerComponent implements Callable, Initialisable
 
     protected int synchronousEventTimeout = 5000;
 
-    public void initialise(UMOManagementContext managementContext) throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         if (wireFormat == null)
         {
@@ -166,7 +166,8 @@ public class MuleManagerComponent implements Callable, Initialisable
         UMOMessage result = null;
         try
         {
-            UMOEndpoint endpoint = new MuleEndpoint(action.getResourceIdentifier(), false);
+            UMOEndpoint endpoint = context.getManagementContext().getRegistry().getOrCreateEndpointForUri(
+                    action.getResourceIdentifier(), UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER);
 
             if (AdminNotification.ACTION_DISPATCH == action.getAction())
             {
@@ -201,7 +202,7 @@ public class MuleManagerComponent implements Callable, Initialisable
         try
         {
             UMOEndpointURI endpointUri = new MuleEndpointURI(action.getResourceIdentifier());
-            UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(endpointUri,
+            UMOEndpoint endpoint = context.getManagementContext().getRegistry().getOrCreateEndpointForUri(endpointUri,
                 UMOEndpoint.ENDPOINT_TYPE_SENDER);
 
             long timeout = MapUtils.getLongValue(action.getProperties(),

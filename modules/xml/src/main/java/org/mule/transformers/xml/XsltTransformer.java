@@ -12,7 +12,6 @@ package org.mule.transformers.xml;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
@@ -30,8 +29,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.pool.BasePoolableObjectFactory;
-import org.apache.commons.pool.ObjectPool;
-import org.apache.commons.pool.impl.StackObjectPool;
 import org.apache.commons.pool.impl.GenericObjectPool;
 
 /**
@@ -70,9 +67,8 @@ public class XsltTransformer extends AbstractXmlTransformer
 
     /**
      *
-     * @param managementContext
      */
-    public void initialise(UMOManagementContext managementContext) throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         try
         {

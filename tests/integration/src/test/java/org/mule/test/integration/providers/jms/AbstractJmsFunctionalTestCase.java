@@ -10,6 +10,7 @@
 
 package org.mule.test.integration.providers.jms;
 
+import org.mule.RegistryContext;
 import org.mule.config.PoolingProfile;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.impl.endpoint.MuleEndpointURI;

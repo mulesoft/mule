@@ -32,7 +32,7 @@ public class FtpConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
     public void testClient() throws Exception
     {
         FtpConnector c = (FtpConnector)createConnector();
-        c.initialise(managementContext);
+        c.initialise();
         UMOImmutableEndpoint endpoint = new ImmutableMuleEndpoint(getOutDest().toString(), false);
         UMOEvent e = getTestEvent(NullPayload.getInstance(), endpoint);
         endpoint.dispatch(e);

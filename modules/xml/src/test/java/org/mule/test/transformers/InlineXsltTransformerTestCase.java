@@ -34,7 +34,7 @@ public class InlineXsltTransformerTestCase extends AbstractXmlTransformerTestCas
                             + "<xsl:output method='xml'/>\n" + "<xsl:template match='/'>\n"
                             + "  <some-xml>\n" + "    <xsl:copy-of select='.'/>\n" + "  </some-xml>\n"
                             + "</xsl:template>\n" + "</xsl:stylesheet>");
-        transformer.initialise(managementContext);
+        transformer.initialise();
         return transformer;
     }
 

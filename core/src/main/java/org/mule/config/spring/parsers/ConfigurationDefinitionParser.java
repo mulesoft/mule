@@ -55,4 +55,17 @@ public class ConfigurationDefinitionParser extends AbstractMuleSingleBeanDefinit
     {
         return element.getAttribute(ATTRIBUTE_SERVER_ID);
     }
+
+
+    //@Override
+    protected String getInitMethodName()
+    {
+        return null;
+    }
+
+    //@Override
+    protected String getDisposeMethodName()
+    {
+        return null;
+    }
 }

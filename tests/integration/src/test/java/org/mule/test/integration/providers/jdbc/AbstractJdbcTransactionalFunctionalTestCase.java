@@ -10,14 +10,14 @@
 
 package org.mule.test.integration.providers.jdbc;
 
-import org.mule.MuleManager;
+
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleTransactionConfig;
 import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.routing.inbound.InboundRouterCollection;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.routing.outbound.OutboundRouterCollection;
-import org.mule.routing.inbound.InboundRouterCollection;
 import org.mule.tck.functional.EventCallback;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;

@@ -17,7 +17,7 @@ import org.mule.umo.manager.UMOAgent;
  * Impleents common methods for all Agents. Improtantly, the Management context is made available to Agents that
  * extend this.
  */
-public abstract class AbstractAgent implements UMOAgent
+public abstract class AbstractAgent implements UMOAgent, ManagementContextAware
 {
 
     protected UMOManagementContext managementContext;
@@ -45,12 +45,14 @@ public abstract class AbstractAgent implements UMOAgent
     }
 
 
-    public final void initialise(UMOManagementContext managementContext) throws InitialisationException
+    public void setManagementContext(UMOManagementContext context)
     {
-        this.managementContext = managementContext;
-        doInitialise(managementContext);
+        this.managementContext = context;
     }
 
-    public abstract void doInitialise(UMOManagementContext managementContext) throws InitialisationException;
+    public void initialise() throws InitialisationException
+    {
+        //template
+    }
 
 }

@@ -176,9 +176,8 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 
     }
 
-    public void initialise(UMOManagementContext managementContext) throws InitialisationException
+    public void initialise() throws InitialisationException
     {
-        this.managementContext = managementContext;
         MuleConfiguration config = RegistryContext.getConfiguration();
         if (threadingProfile == null)
         {
@@ -187,12 +186,12 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 
         else if (exceptionListener instanceof Initialisable)
         {
-            ((Initialisable)exceptionListener).initialise(managementContext);
+            ((Initialisable)exceptionListener).initialise();
         }
 
         if (exceptionListener instanceof Initialisable)
         {
-            ((Initialisable)exceptionListener).initialise(managementContext);
+            ((Initialisable)exceptionListener).initialise();
         }
 
         MuleEndpoint endpoint;
@@ -208,12 +207,12 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
             if (inboundRouter.getCatchAllStrategy() != null
                 && inboundRouter.getCatchAllStrategy().getEndpoint() != null)
             {
-                inboundRouter.getCatchAllStrategy().getEndpoint().initialise(managementContext);
+                inboundRouter.getCatchAllStrategy().getEndpoint().initialise();
             }
             for (Iterator iterator = inboundRouter.getEndpoints().iterator(); iterator.hasNext();)
             {
                 endpoint = (MuleEndpoint)iterator.next();
-                endpoint.initialise(managementContext);
+                endpoint.initialise();
             }
         }
 
@@ -222,7 +221,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
             for (Iterator iterator = responseRouter.getEndpoints().iterator(); iterator.hasNext();)
             {
                 endpoint = (MuleEndpoint)iterator.next();
-                endpoint.initialise(managementContext);
+                endpoint.initialise();
             }
         }
 
@@ -232,7 +231,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
             {
                 UMONestedRouter nestedRouter = (UMONestedRouter) it.next();
                 endpoint = (MuleEndpoint) nestedRouter.getEndpoint();
-                endpoint.initialise(managementContext);
+                endpoint.initialise();
             }
         }
 
@@ -246,7 +245,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
             if (outboundRouter.getCatchAllStrategy() != null
                 && outboundRouter.getCatchAllStrategy().getEndpoint() != null)
             {
-                outboundRouter.getCatchAllStrategy().getEndpoint().initialise(managementContext);
+                outboundRouter.getCatchAllStrategy().getEndpoint().initialise();
             }
             UMOOutboundRouter router;
             for (Iterator iterator = outboundRouter.getRouters().iterator(); iterator.hasNext();)
@@ -255,7 +254,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
                 for (Iterator iterator1 = router.getEndpoints().iterator(); iterator1.hasNext();)
                 {
                     endpoint = (MuleEndpoint)iterator1.next();
-                    endpoint.initialise(managementContext);
+                    endpoint.initialise();
                 }
             }
         }
@@ -264,15 +263,15 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         {
             implementationReference = new ContainerKeyPair(container, implementationReference);
         }
-        inboundRouter.initialise(managementContext);
-        outboundRouter.initialise(managementContext);
+        inboundRouter.initialise();
+        outboundRouter.initialise();
         if(responseRouter !=null)
         {
-            responseRouter.initialise(managementContext);
+            responseRouter.initialise();
         }
         if(nestedRouter !=null)
         {
-            nestedRouter.initialise(managementContext);
+            nestedRouter.initialise();
         }
     }
 

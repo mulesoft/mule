@@ -17,7 +17,7 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.AlreadyInitialisedException;
 import org.mule.impl.DefaultExceptionStrategy;
-import org.mule.impl.ImmutableMuleEndpoint;
+import org.mule.impl.ManagementContextAware;
 import org.mule.impl.MuleSessionHandler;
 import org.mule.impl.internal.notifications.ConnectionNotification;
 import org.mule.providers.service.TransportFactory;
@@ -114,7 +114,7 @@ import org.apache.commons.pool.impl.GenericKeyedObjectPool;
  * </ol>
  */
 public abstract class AbstractConnector
-    implements UMOConnector, ExceptionListener, UMOConnectable, WorkListener
+    implements UMOConnector, ExceptionListener, UMOConnectable, WorkListener, ManagementContextAware
 {
     /**
      * logger used by this class
@@ -306,14 +306,12 @@ public abstract class AbstractConnector
      *
      * @see org.mule.providers.UMOConnector#create(java.util.HashMap)
      */
-    public final synchronized void initialise(UMOManagementContext managementContext) throws InitialisationException
+    public final synchronized void initialise() throws InitialisationException
     {
         if (initialised.get())
         {
             throw new AlreadyInitialisedException("Connector '" + getName() + "'", this);
         }
-
-        this.managementContext = managementContext;
 
         if (logger.isInfoEnabled())
         {
@@ -333,7 +331,7 @@ public abstract class AbstractConnector
 
         if (exceptionListener instanceof Initialisable)
         {
-            ((Initialisable)exceptionListener).initialise(managementContext);
+            ((Initialisable)exceptionListener).initialise();
         }
 
         initialised.set(true);
@@ -797,7 +795,7 @@ public abstract class AbstractConnector
         }
         else
         {
-            endpoint.initialise(getManagementContext());
+            endpoint.initialise();
             receiver = this.createReceiver(component, endpoint);
             Object receiverKey = getReceiverKey(component, endpoint);
             receiver.setReceiverKey(receiverKey.toString());
@@ -946,7 +944,7 @@ public abstract class AbstractConnector
         {
             UMOTransformer transformer = serviceDescriptor.createInboundTransformer();
             if(transformer==null) return null;
-            transformer.initialise(getManagementContext());
+            transformer.initialise();
             return transformer;
         }
         catch (UMOException e)
@@ -968,7 +966,7 @@ public abstract class AbstractConnector
         {
             UMOTransformer transformer = serviceDescriptor.createResponseTransformer();
             if(transformer==null) return null;
-            transformer.initialise(getManagementContext());
+            transformer.initialise();
             return transformer;
         }
         catch (UMOException e)
@@ -989,7 +987,7 @@ public abstract class AbstractConnector
         {
             UMOTransformer transformer = serviceDescriptor.createOutboundTransformer();
             if(transformer==null) return null;
-            transformer.initialise(getManagementContext());
+            transformer.initialise();
             return transformer;
         }
         catch (UMOException e)
@@ -1519,7 +1517,8 @@ public abstract class AbstractConnector
 
     public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception
     {
-        return this.receive(new ImmutableMuleEndpoint(endpointUri.toString(), true), timeout);
+        return this.receive(getManagementContext().getRegistry().getOrCreateEndpointForUri(
+                endpointUri.toString(), UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER), timeout);
     }
 
     public UMOMessage receive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
@@ -1607,6 +1606,7 @@ public abstract class AbstractConnector
         org.mule.util.BeanUtils.populateWithoutFail(this, props, true);
 
         setName(ObjectNameHelper.getConnectorName(this));
+        initialise();
     }
 
     /**
@@ -1622,7 +1622,7 @@ public abstract class AbstractConnector
         try
         {
             serviceDescriptor = (TransportServiceDescriptor)
-                managementContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, getProtocol().toLowerCase(), serviceOverrides);
+                RegistryContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, getProtocol().toLowerCase(), serviceOverrides);
             if (serviceDescriptor == null)
             {
                 throw new ServiceException(Message.createStaticMessage("No service descriptor found for transport: " + getProtocol() + ".  This transport does not appear to be installed."));
@@ -1791,10 +1791,14 @@ public abstract class AbstractConnector
             getProtocol()).toString());
     }
 
-
     public UMOManagementContext getManagementContext()
     {
         return managementContext;
+    }
+
+    public void setManagementContext(UMOManagementContext context)
+    {
+        this.managementContext = context;
     }
 
     // @Override

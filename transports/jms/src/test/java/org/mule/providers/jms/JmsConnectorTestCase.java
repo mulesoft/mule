@@ -50,7 +50,7 @@ public class JmsConnectorTestCase extends AbstractConnectorTestCase
             connection.expect("stop");
             connection.expect("setClientID", "mule.TestConnector");
             connector.setConnectionFactory((ConnectionFactory)connectionFactory.proxy());
-            connector.initialise(managementContext);
+            connector.initialise();
         }
         return connector;
     }

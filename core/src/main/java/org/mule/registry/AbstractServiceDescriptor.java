@@ -10,6 +10,8 @@
 
 package org.mule.registry;
 
+import org.mule.util.ClassUtils;
+
 import java.util.Map;
 import java.util.Properties;
 
@@ -52,6 +54,16 @@ public abstract class AbstractServiceDescriptor implements ServiceDescriptor
             return temp;
         }
     }
+
+    protected Class removeClassProperty(String name) throws ClassNotFoundException
+    {
+        String clazz = removeProperty(name);
+        if(clazz==null) return null;
+        
+        return ClassUtils.loadClass(clazz, getClass());
+    }
+
+    
 
     /**
      * Unique key used to cache the service descriptors.

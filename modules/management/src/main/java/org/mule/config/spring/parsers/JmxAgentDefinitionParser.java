@@ -28,7 +28,14 @@ public class JmxAgentDefinitionParser extends AbstractMuleSingleBeanDefinitionPa
 
     public static final String CONNECTOR_SERVER = "connector-server";
 
-        protected Class getBeanClass(Element element) {
+
+    public JmxAgentDefinitionParser()
+    {
+        this.initMethod = "initialise";
+        this.destroyMethod = "dispose";
+    }
+
+    protected Class getBeanClass(Element element) {
             return JmxAgent.class;
         }
 

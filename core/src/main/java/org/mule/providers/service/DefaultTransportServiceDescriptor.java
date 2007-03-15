@@ -15,7 +15,6 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleSessionHandler;
 import org.mule.impl.endpoint.EndpointBuilder;
-import org.mule.impl.endpoint.UrlEndpointBuilder;
 import org.mule.providers.NullPayload;
 import org.mule.registry.AbstractServiceDescriptor;
 import org.mule.umo.UMOComponent;
@@ -23,6 +22,8 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.UMOTransactionFactory;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.lifecycle.Initialisable;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
@@ -37,10 +38,18 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
 
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.AbstractBeanFactory;
+import org.springframework.beans.factory.support.RootBeanDefinition;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.StaticApplicationContext;
+
 /**
  * @inheritDocs
  */
-public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor implements TransportServiceDescriptor
+public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor implements TransportServiceDescriptor, Initialisable
 {
     private String connector;
     private String connectorFactory;
@@ -60,26 +69,33 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
     private UMOTransformer outboundTransformer;
     private UMOTransformer responseTransformer;
     // private EndpointBuilder endpointBuilderImpl;
-    
-    private Properties exceptionMappings = new Properties();
 
-    public DefaultTransportServiceDescriptor(String service, Properties props)
+    private Properties exceptionMappings = new Properties();
+    private Properties servicePorperties;
+
+    StaticApplicationContext context;
+
+    public DefaultTransportServiceDescriptor(String service, Properties props, ApplicationContext appContext) throws ClassNotFoundException
     {
         super(service, props);
 
-        connector = removeProperty(MuleProperties.CONNECTOR_CLASS);
-        connectorFactory = removeProperty(MuleProperties.CONNECTOR_FACTORY);
-        dispatcherFactory = removeProperty(MuleProperties.CONNECTOR_DISPATCHER_FACTORY);
-        transactionFactory = removeProperty(MuleProperties.CONNECTOR_DISPATCHER_FACTORY);
-        messageReceiver = removeProperty(MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS);
-        transactedMessageReceiver = removeProperty(MuleProperties.CONNECTOR_TRANSACTED_MESSAGE_RECEIVER_CLASS);
-        messageAdapter = removeProperty(MuleProperties.CONNECTOR_MESSAGE_ADAPTER);
-        streamMessageAdapter = removeProperty(MuleProperties.CONNECTOR_STREAM_MESSAGE_ADAPTER);
-        defaultInboundTransformer = removeProperty(MuleProperties.CONNECTOR_INBOUND_TRANSFORMER);
-        defaultOutboundTransformer = removeProperty(MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER);
-        defaultResponseTransformer = removeProperty(MuleProperties.CONNECTOR_RESPONSE_TRANSFORMER);
-        endpointBuilder = removeProperty(MuleProperties.CONNECTOR_ENDPOINT_BUILDER);
-        sessionHandler = removeProperty(MuleProperties.CONNECTOR_SESSION_HANDLER);
+        context = new StaticApplicationContext(appContext);
+
+        AbstractBeanFactory beanFactory = (AbstractBeanFactory)appContext.getAutowireCapableBeanFactory();
+        context.getBeanFactory().copyConfigurationFrom(beanFactory);
+
+        registerService(MuleProperties.CONNECTOR_CLASS, null, false);
+        registerService(MuleProperties.CONNECTOR_FACTORY, null, false);
+        registerService(MuleProperties.CONNECTOR_DISPATCHER_FACTORY, null, false);
+        registerService(MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS, null, false);
+        registerService(MuleProperties.CONNECTOR_TRANSACTED_MESSAGE_RECEIVER_CLASS, null, false);
+        registerService(MuleProperties.CONNECTOR_MESSAGE_ADAPTER, null, false);
+        registerService(MuleProperties.CONNECTOR_STREAM_MESSAGE_ADAPTER, null, false);
+        registerService(MuleProperties.CONNECTOR_INBOUND_TRANSFORMER, null, false);
+        registerService(MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER, null, false);
+        registerService(MuleProperties.CONNECTOR_RESPONSE_TRANSFORMER, null, false);
+        registerService(MuleProperties.CONNECTOR_ENDPOINT_BUILDER, null, false);
+        registerService(MuleProperties.CONNECTOR_SESSION_HANDLER, MuleSessionHandler.class, false);
     }
 
     public void setOverrides(Properties props)
@@ -88,43 +104,102 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         {
             return;
         }
-        
-        connector = props.getProperty(MuleProperties.CONNECTOR_CLASS, connector);
-        connectorFactory = props.getProperty(MuleProperties.CONNECTOR_FACTORY, connectorFactory);
-        dispatcherFactory = props.getProperty(MuleProperties.CONNECTOR_DISPATCHER_FACTORY, dispatcherFactory);
-        messageReceiver = props.getProperty(MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS, messageReceiver);
-        transactedMessageReceiver = props.getProperty(
-            MuleProperties.CONNECTOR_TRANSACTED_MESSAGE_RECEIVER_CLASS, transactedMessageReceiver);
-        messageAdapter = props.getProperty(MuleProperties.CONNECTOR_MESSAGE_ADAPTER, messageAdapter);
-
-        String temp = props.getProperty(MuleProperties.CONNECTOR_INBOUND_TRANSFORMER);
-        if (temp != null)
-        {
-            defaultInboundTransformer = temp;
-            inboundTransformer = null;
-        }
-
-        temp = props.getProperty(MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER);
-        if (temp != null)
-        {
-            defaultOutboundTransformer = temp;
-            outboundTransformer = null;
-        }
-
-        temp = props.getProperty(MuleProperties.CONNECTOR_RESPONSE_TRANSFORMER);
-        if (temp != null)
-        {
-            defaultResponseTransformer = temp;
-            responseTransformer = null;
-        }
-
-        temp = props.getProperty(MuleProperties.CONNECTOR_ENDPOINT_BUILDER);
-        if (temp != null)
-        {
-            endpointBuilder = temp;
-        }
+        this.properties.putAll(props);
+//        connector = props.getProperty(MuleProperties.CONNECTOR_CLASS, connector);
+//        connectorFactory = props.getProperty(MuleProperties.CONNECTOR_FACTORY, connectorFactory);
+//        dispatcherFactory = props.getProperty(MuleProperties.CONNECTOR_DISPATCHER_FACTORY, dispatcherFactory);
+//        messageReceiver = props.getProperty(MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS, messageReceiver);
+//        transactedMessageReceiver = props.getProperty(
+//            MuleProperties.CONNECTOR_TRANSACTED_MESSAGE_RECEIVER_CLASS, transactedMessageReceiver);
+//        messageAdapter = props.getProperty(MuleProperties.CONNECTOR_MESSAGE_ADAPTER, messageAdapter);
+//
+//        String temp = props.getProperty(MuleProperties.CONNECTOR_INBOUND_TRANSFORMER);
+//        if (temp != null)
+//        {
+//            defaultInboundTransformer = temp;
+//            inboundTransformer = null;
+//        }
+//
+//        temp = props.getProperty(MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER);
+//        if (temp != null)
+//        {
+//            defaultOutboundTransformer = temp;
+//            outboundTransformer = null;
+//        }
+//
+//        temp = props.getProperty(MuleProperties.CONNECTOR_RESPONSE_TRANSFORMER);
+//        if (temp != null)
+//        {
+//            defaultResponseTransformer = temp;
+//            responseTransformer = null;
+//        }
+//
+//        temp = props.getProperty(MuleProperties.CONNECTOR_ENDPOINT_BUILDER);
+//        if (temp != null)
+//        {
+//            endpointBuilder = temp;
+//        }
     }
 
+
+    public void initialise() throws InitialisationException
+    {
+        try
+        {
+            registerService(MuleProperties.CONNECTOR_CLASS, null, false);
+            registerService(MuleProperties.CONNECTOR_FACTORY, null, false);
+            registerService(MuleProperties.CONNECTOR_DISPATCHER_FACTORY, null, false);
+            registerService(MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS, null, false);
+            registerService(MuleProperties.CONNECTOR_TRANSACTED_MESSAGE_RECEIVER_CLASS, null, false);
+            registerService(MuleProperties.CONNECTOR_MESSAGE_ADAPTER, null, false);
+            registerService(MuleProperties.CONNECTOR_STREAM_MESSAGE_ADAPTER, null, false);
+            registerService(MuleProperties.CONNECTOR_INBOUND_TRANSFORMER, null, false);
+            registerService(MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER, null, false);
+            registerService(MuleProperties.CONNECTOR_RESPONSE_TRANSFORMER, null, false);
+            registerService(MuleProperties.CONNECTOR_ENDPOINT_BUILDER, null, false);
+            registerService(MuleProperties.CONNECTOR_SESSION_HANDLER, MuleSessionHandler.class, false);
+
+        }
+        catch (ClassNotFoundException e)
+        {
+            throw new InitialisationException(e, this);
+        }
+
+    }
+
+    protected void registerService(String name, Class defaultService, boolean useFactory) throws ClassNotFoundException
+    {
+        Class serviceClass = removeClassProperty(name);
+        if(serviceClass==null)
+        {
+            if(defaultService!=null)
+            {
+                serviceClass = defaultService;
+                logger.debug("No connector service registered for key: " + name + ". Using default: " + serviceClass);
+            }
+            else
+            {
+                logger.debug("No connector service registered for key: " + name + ". No default set either");
+            }
+        }
+//        if(useFactory && serviceClass!=null)
+//        {
+//
+//            context.getBeanFactory().registerScope();
+//            factory.setServiceClass(serviceClass);
+//        }
+        if(serviceClass!=null)
+        {
+            RootBeanDefinition bd = new RootBeanDefinition(serviceClass, false);
+           // bd.setInitMethodName("initialise");
+            bd.setDestroyMethodName("dispose");
+            bd.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+            bd.setEnforceDestroyMethod(false);
+            //bd.setEnforceInitMethod(false);
+            context.registerBeanDefinition(name, bd);
+        }
+
+    }
     /* (non-Javadoc)
      * @see org.mule.providers.service.TransportServiceDescriptor#createMessageAdapter(java.lang.Object)
      */
@@ -173,6 +248,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         {
             message = NullPayload.getInstance();
         }
+
         if (messageAdapter != null)
         {
             try
@@ -192,30 +268,34 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         }
     }
 
+    protected Object getServiceObject(String name, Class classType) throws TransportServiceException
+    {
+        Object service;
+        try
+        {
+            if(classType==null)
+            {
+                service = context.getBean(name);
+            }
+            else
+            {
+                service = context.getBean(name, classType);
+            }
+            return service;
+        }
+        catch (BeansException e)
+        {
+            throw new TransportServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X,
+                name, classType), e);
+        }
+
+    }
     /* (non-Javadoc)
      * @see org.mule.providers.service.TransportServiceDescriptor#createSessionHandler()
      */
     public UMOSessionHandler createSessionHandler() throws TransportServiceException
     {
-        if (sessionHandler == null)
-        {
-            sessionHandler = MuleSessionHandler.class.getName();
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("No session.handler set in service description, defaulting to: "
-                             + sessionHandler);
-            }
-        }
-        try
-        {
-            return (UMOSessionHandler)ClassUtils.instanciateClass(sessionHandler, ClassUtils.NO_ARGS,
-                getClass());
-        }
-        catch (Throwable e)
-        {
-            throw new TransportServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X,
-                "SessionHandler", sessionHandler), e);
-        }
+        return (UMOSessionHandler)getServiceObject(MuleProperties.CONNECTOR_SESSION_HANDLER, UMOSessionHandler.class);
     }
 
     /* (non-Javadoc)
@@ -348,18 +428,16 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         // if there is a factory, use it
         try
         {
-            if (connectorFactory != null)
+            if (context.containsBean(MuleProperties.CONNECTOR_FACTORY))
             {
-                ObjectFactory factory = (ObjectFactory)ClassUtils.loadClass(connectorFactory,
-                    TransportFactory.class).newInstance();
+                ObjectFactory factory = (ObjectFactory)context.getBean(MuleProperties.CONNECTOR_FACTORY);
                 newConnector = (UMOConnector)factory.create();
             }
             else
             {
-                if (connector != null)
+                if (context.containsBean(MuleProperties.CONNECTOR_CLASS))
                 {
-                    newConnector = (UMOConnector)ClassUtils.loadClass(connector, TransportFactory.class)
-                        .newInstance();
+                    newConnector = (UMOConnector)context.getBean(MuleProperties.CONNECTOR_CLASS);
                 }
                 else
                 {
@@ -381,7 +459,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
 
         if (newConnector.getName() == null)
         {
-            newConnector.setName("_" + newConnector.getProtocol() + "Connector#" + connector.hashCode());
+            newConnector.setName("_" + newConnector.getProtocol() + "Connector#" + newConnector.hashCode());
         }
         return newConnector;
     }
@@ -391,23 +469,19 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
      */
     public UMOTransformer createInboundTransformer() throws TransportFactoryException
     {
-        if (inboundTransformer != null)
+        if (context.containsBean(MuleProperties.CONNECTOR_INBOUND_TRANSFORMER))
         {
-            return inboundTransformer;
-        }
-        if (defaultInboundTransformer != null)
-        {
-            logger.info("Loading default inbound transformer: " + defaultInboundTransformer);
             try
             {
-                inboundTransformer = (UMOTransformer)ClassUtils.instanciateClass(
-                    defaultInboundTransformer, ClassUtils.NO_ARGS);
-                return inboundTransformer;
+                UMOTransformer t = (UMOTransformer)context.getBean(MuleProperties.CONNECTOR_INBOUND_TRANSFORMER);
+                logger.info("Loaded default inbound transformer: " + t);
+                return t;
             }
             catch (Exception e)
             {
+                //TODO Improve message
                 throw new TransportFactoryException(new Message(Messages.FAILED_LOAD_X_TRANSFORMER_X,
-                    "inbound", defaultInboundTransformer), e);
+                    "inbound", MuleProperties.CONNECTOR_INBOUND_TRANSFORMER), e);
             }
         }
         return null;
@@ -418,23 +492,19 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
      */
     public UMOTransformer createOutboundTransformer() throws TransportFactoryException
     {
-        if (outboundTransformer != null)
+        if (context.containsBean(MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER))
         {
-            return outboundTransformer;
-        }
-        if (defaultOutboundTransformer != null)
-        {
-            logger.info("Loading default outbound transformer: " + defaultOutboundTransformer);
             try
             {
-                outboundTransformer = (UMOTransformer)ClassUtils.instanciateClass(
-                    defaultOutboundTransformer, ClassUtils.NO_ARGS);
-                return outboundTransformer;
+                UMOTransformer t = (UMOTransformer)context.getBean(MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER);
+                logger.info("Loaded default outbound transformer: " + t);
+                return t;
             }
             catch (Exception e)
             {
+                //TODO Improve message
                 throw new TransportFactoryException(new Message(Messages.FAILED_LOAD_X_TRANSFORMER_X,
-                    "outbound", defaultOutboundTransformer), e);
+                    "outbound", MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER), e);
             }
         }
         return null;
@@ -445,24 +515,20 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
      */
     public UMOTransformer createResponseTransformer() throws TransportFactoryException
     {
-        if (responseTransformer != null)
+        if (context.containsBean(MuleProperties.CONNECTOR_RESPONSE_TRANSFORMER))
         {
-            return responseTransformer;
-        }
-        if (defaultResponseTransformer != null)
-        {
-            logger.info("Loading default response transformer: " + defaultResponseTransformer);
-            try
-            {
-                responseTransformer = (UMOTransformer)ClassUtils.instanciateClass(
-                    defaultResponseTransformer, ClassUtils.NO_ARGS);
-                return responseTransformer;
-            }
-            catch (Exception e)
-            {
-                throw new TransportFactoryException(new Message(Messages.FAILED_LOAD_X_TRANSFORMER_X,
-                    "response", defaultResponseTransformer), e);
-            }
+//            try
+//            {
+                UMOTransformer t = (UMOTransformer)context.getBean(MuleProperties.CONNECTOR_RESPONSE_TRANSFORMER);
+                logger.info("Loaded default response transformer: " + t);
+                return t;
+//            }
+//            catch (Exception e)
+//            {
+//                //TODO Improve message
+//                throw new TransportFactoryException(new Message(Messages.FAILED_LOAD_X_TRANSFORMER_X,
+//                    "response", MuleProperties.CONNECTOR_RESPONSE_TRANSFORMER), e);
+//            }
         }
         return null;
     }
@@ -472,25 +538,16 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
      */
     public EndpointBuilder createEndpointBuilder() throws TransportFactoryException
     {
-        if (endpointBuilder == null)
+        EndpointBuilder epb = null;
+        if (context.containsBean(MuleProperties.CONNECTOR_ENDPOINT_BUILDER))
         {
-            logger.debug("Endpoint resolver not set, Loading default resolver: "
-                         + UrlEndpointBuilder.class.getName());
-            return new UrlEndpointBuilder();
+            epb = (EndpointBuilder)context.getBean(MuleProperties.CONNECTOR_ENDPOINT_BUILDER);
         }
-        else
+        if(epb==null)
         {
-            logger.debug("Loading endpointUri resolver: " + endpointBuilder);
-            try
-            {
-                return (EndpointBuilder)ClassUtils.instanciateClass(endpointBuilder, ClassUtils.NO_ARGS);
-            }
-            catch (Exception e)
-            {
-                throw new TransportFactoryException(new Message(Messages.FAILED_LOAD_X,
-                    "Endpoint Builder: " + endpointBuilder), e);
-            }
+            throw new TransportFactoryException(new Message(Messages.FAILED_LOAD_X, "Endpointbuilder for: " + getService()));
         }
+        return epb;
     }
     
     public void setExceptionMappings(Properties props) 
@@ -501,5 +558,55 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
     public Properties getExceptionMappings() 
     {
         return this.exceptionMappings;
+    }
+
+    private class ServiceFactoryBean implements FactoryBean
+    {
+
+        private Object[] constructorArgs;
+        private Class serviceClass;
+
+
+        public Object getObject() throws Exception
+        {
+            if(getConstructorArgs()==null)
+            {
+                throw new IllegalStateException("Constructir Args not set");
+            }
+            Object o = ClassUtils.instanciateClass(serviceClass, constructorArgs);
+            setConstructorArgs(null);
+            return o;
+        }
+
+        public Class getObjectType()
+        {
+            return UMOMessageAdapter.class;
+        }
+
+        public boolean isSingleton()
+        {
+            return false;
+        }
+
+
+        public Object[] getConstructorArgs()
+        {
+            return constructorArgs;
+        }
+
+        public void setConstructorArgs(Object[] constructorArgs)
+        {
+            this.constructorArgs = constructorArgs;
+        }
+
+        public Class getServiceClass()
+        {
+            return serviceClass;
+        }
+
+        public void setServiceClass(Class serviceClass)
+        {
+            this.serviceClass = serviceClass;
+        }
     }
 }

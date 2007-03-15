@@ -21,6 +21,7 @@ import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.model.seda.SedaComponent;
 import org.mule.impl.model.seda.SedaModel;
+import org.mule.providers.AbstractConnector;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.tck.testmodels.mule.TestAgent;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
@@ -48,6 +49,9 @@ import org.mule.util.ClassUtils;
 import com.mockobjects.dynamic.Mock;
 
 import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.context.support.StaticApplicationContext;
 
 /**
  * Utilities for creating test and Mock Mule objects
@@ -62,7 +66,8 @@ public class MuleTestUtils
         {
             m = new SedaModel();
             m.setName(UMOModel.DEFAULT_MODEL_NAME);
-            m.initialise(context);
+            m.setManagementContext(context);
+            m.initialise();
         }
         return m;
 
@@ -70,20 +75,37 @@ public class MuleTestUtils
 
     public static UMOEndpoint getTestEndpoint(String name, String type, UMOManagementContext context) throws Exception
     {
-        UMOEndpoint endpoint = new MuleEndpoint();
+        StaticApplicationContext factory = getStaticApplicationContext(context);
+
+        Map props = new HashMap();
+        props.put("name", name);
+        props.put("type", type);
+        props.put("endpointURI", new MuleEndpointURI("test://test"));
+        props.put("connector", "testConnector");
+        MuleEndpoint endpoint = new MuleEndpoint();
         // need to build endpoint this way to avoid depenency to any endpoint jars
-        UMOConnector connector = null;
-        connector = (UMOConnector)ClassUtils.loadClass("org.mule.tck.testmodels.mule.TestConnector",
+        AbstractConnector connector = null;
+        connector = (AbstractConnector)ClassUtils.loadClass("org.mule.tck.testmodels.mule.TestConnector",
             AbstractMuleTestCase.class).newInstance();
 
         connector.setName("testConnector");
-        connector.initialise(context);
+        connector.setManagementContext(context);
+        connector.initialise();
         endpoint.setConnector(connector);
         endpoint.setEndpointURI(new MuleEndpointURI("test://test"));
         endpoint.setName(name);
         endpoint.setType(type);
-        endpoint.initialise(context);
+        endpoint.setManagementContext(context);
+        endpoint.initialise();
         return endpoint;
+    }
+
+    protected static StaticApplicationContext getStaticApplicationContext(UMOManagementContext context)
+    {
+        StaticApplicationContext ctx = new StaticApplicationContext();
+        ctx.getBeanFactory().registerSingleton("_muleManagementContext", context);
+        ctx.start();
+        return ctx;
     }
 
     public static UMOEvent getTestEvent(Object data, UMOManagementContext context) throws Exception
@@ -170,7 +192,8 @@ public class MuleTestUtils
         UMOOutboundRouter router = new OutboundPassThroughRouter();
         router.addEndpoint(getTestEndpoint("test1", UMOEndpoint.ENDPOINT_TYPE_SENDER, context));
         descriptor.getOutboundRouter().addRouter(router);
-        descriptor.initialise(context);
+        descriptor.setManagementContext(context);
+        descriptor.initialise();
 
         return descriptor;
     }

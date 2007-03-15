@@ -36,7 +36,7 @@ public class FTPConnectorTestCase extends AbstractConnectorTestCase
         UMOConnector connector = new FtpConnector();
         connector.setName("testFTP");
         ((FtpConnector)connector).setPollingFrequency(POLLING_FREQUENCY);
-        connector.initialise(managementContext);
+        connector.initialise();
 
         return connector;
     }

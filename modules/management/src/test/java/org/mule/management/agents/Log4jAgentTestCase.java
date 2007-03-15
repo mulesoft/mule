@@ -24,6 +24,6 @@ public class Log4jAgentTestCase extends AbstractMuleJmxTestCase
             ObjectName.getInstance(Log4jAgent.JMX_OBJECT_NAME));
 
         Log4jAgent agent = new Log4jAgent();
-        agent.initialise(managementContext);
+        agent.initialise();
     }
 }

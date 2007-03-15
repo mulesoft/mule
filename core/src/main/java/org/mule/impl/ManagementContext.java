@@ -35,8 +35,6 @@ import org.mule.impl.internal.notifications.NotificationException;
 import org.mule.impl.internal.notifications.SecurityNotification;
 import org.mule.impl.internal.notifications.SecurityNotificationListener;
 import org.mule.impl.internal.notifications.ServerNotificationManager;
-import org.mule.impl.model.ModelFactory;
-import org.mule.impl.model.ModelHelper;
 import org.mule.impl.security.MuleSecurityManager;
 import org.mule.impl.work.MuleWorkManager;
 import org.mule.management.stats.AllStatistics;
@@ -50,7 +48,6 @@ import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.manager.UMOServerNotificationListener;
 import org.mule.umo.manager.UMOWorkManager;
-import org.mule.umo.model.UMOModel;
 import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.store.UMOStore;
 import org.mule.util.DateUtils;
@@ -61,6 +58,7 @@ import org.mule.util.queue.QueueManager;
 import org.mule.util.queue.QueuePersistenceStrategy;
 import org.mule.util.queue.TransactionalQueueManager;
 
+import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
@@ -71,7 +69,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.jar.Manifest;
-import java.io.File;
 
 import javax.transaction.TransactionManager;
 
@@ -185,6 +182,7 @@ public class ManagementContext implements UMOManagementContext
     {
         securityManager = new MuleSecurityManager();
         startDate = System.currentTimeMillis();
+        queueManager = new TransactionalQueueManager();
     }
 
     public void initialise() throws UMOException
@@ -198,12 +196,23 @@ public class ManagementContext implements UMOManagementContext
             validateOSEncoding();
             directories = new Directories(new File(config.getWorkingDirectory()));            
 
-            if(getRegistry().lookupModel(ModelHelper.SYSTEM_MODEL)==null)
-            {
-                UMOModel system = ModelFactory.createModel(getRegistry().getConfiguration().getSystemModelType());
-                system.setName(ModelHelper.SYSTEM_MODEL);
-                getRegistry().registerModel(system);
-            }
+           if (queueManager == null)
+                {
+                    try
+                    {
+                        TransactionalQueueManager queueMgr = new TransactionalQueueManager();
+                        // TODO RM: The persistence strategy should come from the user's config.
+                        QueuePersistenceStrategy ps = new CachingPersistenceStrategy(new MemoryPersistenceStrategy()/*config.getPersistenceStrategy()*/);
+                        queueMgr.setPersistenceStrategy(ps);
+                        queueManager = queueMgr;
+                    }
+                    catch (Exception e)
+                    {
+                        throw new InitialisationException(new Message(Messages.INITIALISATION_FAILURE_X, "QueueManager"),
+                                e);
+                    }
+                }
+
             // if no work manager has been set create a default one
             if (workManager == null)
             {
@@ -245,24 +254,9 @@ public class ManagementContext implements UMOManagementContext
             {
                 if (securityManager != null)
                 {
-                    securityManager.initialise(this);
+                    securityManager.initialise();
                 }
-                if (queueManager == null)
-                {
-                    try
-                    {
-                        TransactionalQueueManager queueMgr = new TransactionalQueueManager();
-                        // TODO RM: The persistence strategy should come from the user's config.
-                        QueuePersistenceStrategy ps = new CachingPersistenceStrategy(new MemoryPersistenceStrategy()/*config.getPersistenceStrategy()*/);
-                        queueMgr.setPersistenceStrategy(ps);
-                        queueManager = queueMgr;
-                    }
-                    catch (Exception e)
-                    {
-                        throw new InitialisationException(new Message(Messages.INITIALISATION_FAILURE_X, "QueueManager"),
-                                e);
-                    }
-                }
+
 
                 directories.createDirectories();
                 //TODO LM: we still need the MuleManager until the Registry Looks after these objects
@@ -298,14 +292,11 @@ public class ManagementContext implements UMOManagementContext
                 initialising = false;
                 throw new LifecycleException(e, this);
             }
-            finally
-            {
-                fireSystemEvent(new ManagerNotification(id, clusterId, domain, ManagerNotification.MANAGER_INITIALISED));
-            }
+            //getRegistry().initialise();
+            initialised = true;
+            fireSystemEvent(new ManagerNotification(id, clusterId, domain, ManagerNotification.MANAGER_INITIALISED));
         }
-        getRegistry().initialise(this);
-        
-        initialised = true;
+
     }
 
 
@@ -725,7 +716,7 @@ public class ManagementContext implements UMOManagementContext
         this.securityManager = securityManager;
         if (securityManager != null && isInitialised())
         {
-            this.securityManager.initialise(this);
+            this.securityManager.initialise();
         }
     }
 

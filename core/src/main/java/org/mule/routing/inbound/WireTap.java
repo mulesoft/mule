@@ -11,7 +11,6 @@
 package org.mule.routing.inbound;
 
 import org.mule.RegistryContext;
-import org.mule.impl.ImmutableMuleEndpoint;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
@@ -64,11 +63,8 @@ public class WireTap extends SelectiveConsumer
         this.endpoint = endpoint;
         if (this.endpoint != null)
         {
-            tap = RegistryContext.getRegistry().lookupEndpoint(this.endpoint);
-            if (tap == null)
-            {
-                tap = new ImmutableMuleEndpoint(this.endpoint, false);
-            }
+            tap = RegistryContext.getRegistry().getOrCreateEndpointForUri(
+                    this.endpoint, UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER);
         }
     }
 

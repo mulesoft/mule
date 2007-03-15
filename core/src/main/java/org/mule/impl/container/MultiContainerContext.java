@@ -12,7 +12,6 @@ package org.mule.impl.container;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.ContainerException;
 import org.mule.umo.manager.ObjectNotFoundException;
@@ -47,7 +46,7 @@ public class MultiContainerContext extends AbstractContainerContext
 
     public void setName(String name)
     {
-        // noop
+        this.name = name;
     }
 
     public String getName()
@@ -110,8 +109,7 @@ public class MultiContainerContext extends AbstractContainerContext
             {
                 if (logger.isDebugEnabled())
                 {
-                    logger.debug("Object: '" + realKey + "' not found in container: " + container.getName(),
-                        e.getCause());
+                    logger.debug("Object: '" + realKey + "' not found in container: " + container.getName() + ": " + e.getMessage());
                 }
                 if (e.getCause() != null){
                     cause = cause + " " + e.getCause().toString();
@@ -156,12 +154,12 @@ public class MultiContainerContext extends AbstractContainerContext
 
 
     //@Override
-    public void doInitialise(UMOManagementContext managementContext) throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         for (Iterator iterator = containers.values().iterator(); iterator.hasNext();)
         {
             UMOContainerContext context = (UMOContainerContext) iterator.next();
-            context.initialise(managementContext);
+            context.initialise();
         }
     }
 

@@ -9,34 +9,39 @@
  */
 package org.mule.routing;
 
-import org.mule.umo.routing.UMORouter;
+import org.mule.impl.ManagementContextAware;
+import org.mule.management.stats.RouterStatistics;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.management.stats.RouterStatistics;
+import org.mule.umo.routing.UMORouter;
 
 /**
  * Implements the shared methods that all routers have. The implementations of the different
  * router types can vary depending on their usage pattern. The types of router are inbound, outbound
  * response and nested.
  */
-public abstract class AbstractRouter implements UMORouter
+public abstract class AbstractRouter implements UMORouter, ManagementContextAware
 {
     private RouterStatistics routerStatistics;
 
     private UMOManagementContext managementContext;
 
 
-    public final void initialise(UMOManagementContext managementContext) throws InitialisationException
-    {
-        this.managementContext = managementContext;
-        doInitialise(managementContext);
-    }
-
-    public void doInitialise(UMOManagementContext managementContext) throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         //template
     }
 
+    public final void doInitialise() throws InitialisationException
+    {
+        //template
+    }
+
+
+    public void setManagementContext(UMOManagementContext context)
+    {
+        this.managementContext = context;
+    }
 
     public UMOManagementContext getManagementContext()
     {

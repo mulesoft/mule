@@ -16,7 +16,6 @@ import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.security.MuleCredentials;
 import org.mule.providers.AbstractConnector;
@@ -134,7 +133,7 @@ public class DefaultMuleConnection implements MuleConnection
     {
         MuleEndpointURI muleEndpoint = new MuleEndpointURI(url);
 
-        UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(muleEndpoint,
+        UMOEndpoint endpoint = managementContext.getRegistry().getOrCreateEndpointForUri(muleEndpoint,
             UMOEndpoint.ENDPOINT_TYPE_SENDER);
 
         try
@@ -159,7 +158,7 @@ public class DefaultMuleConnection implements MuleConnection
     protected UMOEvent getEvent(UMOMessage message, UMOEndpointURI uri, boolean synchronous)
         throws UMOException
     {
-        UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(uri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        UMOEndpoint endpoint = managementContext.getRegistry().getOrCreateEndpointForUri(uri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
         UMOConnector connector = endpoint.getConnector();
 
         if (!connector.isStarted() &&managementContext.isStarted())

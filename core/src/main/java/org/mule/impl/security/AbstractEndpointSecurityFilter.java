@@ -12,9 +12,9 @@ package org.mule.impl.security;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.impl.ManagementContextAware;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOManagementContext;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.CryptoFailureException;
@@ -24,9 +24,7 @@ import org.mule.umo.security.SecurityProviderNotFoundException;
 import org.mule.umo.security.UMOCredentialsAccessor;
 import org.mule.umo.security.UMOEndpointSecurityFilter;
 import org.mule.umo.security.UMOSecurityManager;
-import org.mule.umo.security.UMOSecurityProvider;
 import org.mule.umo.security.UnknownAuthenticationTypeException;
-import org.mule.util.StringUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,7 +34,7 @@ import org.apache.commons.logging.LogFactory;
  * all security filters, namely configuring the SecurityManager for this instance
  */
 
-public abstract class AbstractEndpointSecurityFilter implements UMOEndpointSecurityFilter
+public abstract class AbstractEndpointSecurityFilter implements UMOEndpointSecurityFilter, ManagementContextAware
 {
     /**
      * logger used by this class
@@ -50,57 +48,64 @@ public abstract class AbstractEndpointSecurityFilter implements UMOEndpointSecur
     private boolean authenticate;
     private UMOCredentialsAccessor credentialsAccessor;
 
-    public final void initialise(UMOManagementContext managementContext) throws InitialisationException
+    protected UMOManagementContext managementContext;
+
+    public void setManagementContext(UMOManagementContext context)
+    {
+        this.managementContext = context;
+    }
+
+    public final void initialise() throws InitialisationException
     {
         if (securityManager == null)
         {
-            securityManager = endpoint.getManagementContext().getSecurityManager();
+            securityManager = managementContext.getSecurityManager();
         }
         if (securityManager == null)
         {
             throw new InitialisationException(new Message(Messages.AUTH_SECURITY_MANAGER_NOT_SET), this);
         }
-        if (endpoint == null)
-        {
-            throw new InitialisationException(new Message(Messages.X_IS_NULL, "Endpoint"), this);
-        }
-        // This filter may only allow authentication on a subset of registered
-        // security providers
-        if (securityProviders != null)
-        {
-            UMOSecurityManager localManager = new MuleSecurityManager();
-            String[] sp = StringUtils.splitAndTrim(securityProviders, ",");
-            for (int i = 0; i < sp.length; i++)
-            {
-                UMOSecurityProvider provider = securityManager.getProvider(sp[i]);
-                if (provider != null)
-                {
-                    localManager.addProvider(provider);
-                }
-                else
-                {
-                    throw new InitialisationException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER,
-                        "Security Provider '" + sp[i] + "'"), this);
-                }
-            }
-            securityManager = localManager;
-        }
-        if (endpoint.getType().equals(UMOEndpoint.ENDPOINT_TYPE_RECEIVER))
-        {
-            inbound = true;
-        }
-        else if (endpoint.getType().equals(UMOEndpoint.ENDPOINT_TYPE_SENDER))
-        {
-            inbound = false;
-        }
-        else
-        {
-            throw new InitialisationException(new Message(
-                Messages.AUTH_ENDPOINT_TYPE_FOR_FILTER_MUST_BE_X_BUT_IS_X,
-                UMOEndpoint.ENDPOINT_TYPE_SENDER + " or " + UMOEndpoint.ENDPOINT_TYPE_RECEIVER,
-                endpoint.getType()), this);
-        }
-        doInitialise();
+//        if (endpoint == null)
+//        {
+//            throw new InitialisationException(new Message(Messages.X_IS_NULL, "Endpoint"), this);
+//        }
+//        // This filter may only allow authentication on a subset of registered
+//        // security providers
+//        if (securityProviders != null)
+//        {
+//            UMOSecurityManager localManager = new MuleSecurityManager();
+//            String[] sp = StringUtils.splitAndTrim(securityProviders, ",");
+//            for (int i = 0; i < sp.length; i++)
+//            {
+//                UMOSecurityProvider provider = securityManager.getProvider(sp[i]);
+//                if (provider != null)
+//                {
+//                    localManager.addProvider(provider);
+//                }
+//                else
+//                {
+//                    throw new InitialisationException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER,
+//                        "Security Provider '" + sp[i] + "'"), this);
+//                }
+//            }
+//            securityManager = localManager;
+//        }
+//        if (endpoint.getType().equals(UMOEndpoint.ENDPOINT_TYPE_RECEIVER))
+//        {
+//            inbound = true;
+//        }
+//        else if (endpoint.getType().equals(UMOEndpoint.ENDPOINT_TYPE_SENDER))
+//        {
+//            inbound = false;
+//        }
+//        else
+//        {
+//            throw new InitialisationException(new Message(
+//                Messages.AUTH_ENDPOINT_TYPE_FOR_FILTER_MUST_BE_X_BUT_IS_X,
+//                UMOEndpoint.ENDPOINT_TYPE_SENDER + " or " + UMOEndpoint.ENDPOINT_TYPE_RECEIVER,
+//                endpoint.getType()), this);
+//        }
+//        doInitialise();
     }
 
     public boolean isAuthenticate()

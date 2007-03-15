@@ -25,7 +25,6 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -294,7 +293,7 @@ public class MuleReceiver extends AbstractEndpointComponent implements InternalM
             // nothing to do
         }
 
-        public void initialise(UMOManagementContext managementContext) throws InitialisationException {
+        public void initialise() throws InitialisationException {
             // nothing to do
         }
 

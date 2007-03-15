@@ -17,8 +17,6 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.UMOTransactionConfig;
-import org.mule.umo.UMOManagementContext;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.routing.UMOOutboundRouter;
@@ -59,16 +57,6 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements U
     protected PropertyExtractor propertyExtractor = new CorrelationPropertiesExtractor();
 
     protected UMOTransactionConfig transactionConfig;
-
-
-    public void doInitialise(UMOManagementContext managementContext) throws InitialisationException
-    {
-        for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
-        {
-            UMOImmutableEndpoint endpoint = (UMOImmutableEndpoint) iterator.next();
-            endpoint.initialise(managementContext);
-        }
-    }
 
     public void dispatch(UMOSession session, UMOMessage message, UMOEndpoint endpoint) throws UMOException
     {

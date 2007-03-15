@@ -29,6 +29,6 @@ public class Mx4jAgentTestCase extends AbstractMuleJmxTestCase
         mBeanServer.registerMBean(new HttpAdaptor(), ObjectName.getInstance(name));
 
         Mx4jAgent agent = new Mx4jAgent();
-        agent.initialise(managementContext);
+        agent.initialise();
     }
 }

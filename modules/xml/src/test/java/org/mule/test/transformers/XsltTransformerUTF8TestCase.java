@@ -32,7 +32,7 @@ public class XsltTransformerUTF8TestCase extends AbstractXmlTransformerTestCase
     {
         XsltTransformer transformer = new XsltTransformer();
         transformer.setXslFile("cdcatalog.xsl");
-        transformer.initialise(managementContext);
+        transformer.initialise();
         return transformer;
     }
 

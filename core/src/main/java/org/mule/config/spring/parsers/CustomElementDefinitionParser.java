@@ -25,6 +25,19 @@ public class CustomElementDefinitionParser extends AbstractMuleSingleBeanDefinit
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
+
+    public CustomElementDefinitionParser(boolean singleton)
+    {
+        this.singleton = singleton;
+    }
+
+    public CustomElementDefinitionParser(boolean singleton, String initMethod, String destroyMethod)
+    {
+        this.singleton = singleton;
+        this.initMethod = initMethod;
+        this.destroyMethod = destroyMethod;
+    }
+
     protected Class getBeanClass(Element element)
     {
         String cls = element.getAttribute(ATTRIBUTE_CLASS);

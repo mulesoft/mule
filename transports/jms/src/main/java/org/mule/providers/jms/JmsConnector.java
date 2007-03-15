@@ -21,7 +21,6 @@ import org.mule.providers.ConnectException;
 import org.mule.providers.FatalConnectException;
 import org.mule.providers.ReplyToHandler;
 import org.mule.providers.jms.xa.ConnectionFactoryWrapper;
-import org.mule.providers.service.TransportFactoryException;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.MessagingException;
 import org.mule.umo.TransactionException;
@@ -280,7 +279,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
                     try
                     {
                         //connectionStrategy.connect(jmsConnector);
-                        jmsConnector.initialise(managementContext);
+                        jmsConnector.initialise();
                         jmsConnector.start();
                     }
                     catch (FatalConnectException fcex)

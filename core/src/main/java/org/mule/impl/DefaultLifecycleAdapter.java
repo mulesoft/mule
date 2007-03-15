@@ -21,7 +21,6 @@ import org.mule.umo.Invocation;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
@@ -246,11 +245,11 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
      *
      * @see org.mule.umo.lifecycle.Initialisable#initialise()
      */
-    public void initialise(UMOManagementContext managementContext) throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         if (Initialisable.class.isInstance(component))
         {
-            ((Initialisable) component).initialise(managementContext);
+            ((Initialisable) component).initialise();
         }
     }
 

@@ -43,7 +43,7 @@ public class SpringContainerContextTestCase extends AbstractContainerContextTest
     public void testContainerContext() throws Exception
     {
         UMOContainerContext container = getContainerContext();
-        container.initialise(managementContext);
+        container.initialise();
         assertNotNull(container);
 
         try

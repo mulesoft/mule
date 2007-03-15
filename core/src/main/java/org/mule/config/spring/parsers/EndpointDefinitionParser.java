@@ -15,6 +15,7 @@ import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.util.StringUtils;
 
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -114,7 +115,35 @@ public class EndpointDefinitionParser extends AbstractChildBeanDefinitionParser
         {
             builder.addPropertyValue("type", UMOImmutableEndpoint.ENDPOINT_TYPE_GLOBAL);
         }
+
+        //Register non-descriptive deendencies i.e. string values for objects listed in the container
+        if(StringUtils.isNotBlank(element.getAttribute("connector")))
+        {
+            builder.addDependsOn(element.getAttribute("connector"));
+        }
+        processTransformerDependencies(builder, element, "transformers");
+        processTransformerDependencies(builder, element, "responseTransformers");
+
         super.parseChild(element, parserContext, builder);
+    }
+
+    protected void processTransformerDependencies(BeanDefinitionBuilder builder, Element element, String attributeName)
+    {
+        if(StringUtils.isNotBlank(element.getAttribute(attributeName)))
+        {
+            String[] trans = StringUtils.split(element.getAttribute(attributeName), " ,;");
+            for (int i = 0; i < trans.length; i++)
+            {
+                builder.addDependsOn(trans[i]);
+            }
+        }
+    }
+
+
+    //@Override
+    protected String getInitMethodName()
+    {
+        return "initialise";
     }
 
     protected Class getBeanClass(Element element)

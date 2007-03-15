@@ -21,7 +21,7 @@ public class RmiConnectorTestCase extends AbstractConnectorTestCase
         RmiConnector c = new RmiConnector();
         c.setName("RmiConnector");
         c.setSecurityManager(null);
-        c.initialise(managementContext);
+        c.initialise();
         return c;
     }
 

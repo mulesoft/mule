@@ -464,5 +464,5 @@ public interface UMOEventContext
 
     UMOSession getSession();
 
-    UMOManagementContext getManagmentContext();
+    UMOManagementContext getManagementContext();
 }

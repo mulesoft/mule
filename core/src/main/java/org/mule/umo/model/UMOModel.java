@@ -10,9 +10,11 @@
 
 package org.mule.umo.model;
 
+import org.mule.impl.ManagementContextAware;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOSession;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.Lifecycle;
@@ -27,11 +29,8 @@ import java.util.List;
  * The <code>UMOModel</code> encapsulates and manages the runtime behaviour of a
  * Mule Server instance. It is responsible for maintaining the UMOs instances and
  * their configuration.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
-public interface UMOModel extends Lifecycle, Initialisable, Registerable
+public interface UMOModel extends Lifecycle, Initialisable, Registerable, ManagementContextAware
 {
     public static final String DEFAULT_MODEL_NAME = "default";
 
@@ -241,4 +240,6 @@ public interface UMOModel extends Lifecycle, Initialisable, Registerable
      * @return an iterator of all component names
      */
     Iterator getComponentNames();
+
+    UMOManagementContext getManagementContext();
 }

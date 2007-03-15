@@ -101,8 +101,6 @@ public abstract class AbstractComponent implements UMOComponent
 
     protected String registryId = null;
 
-    protected UMOManagementContext managementContext;
-
     /**
      * Default constructor
      */
@@ -114,7 +112,11 @@ public abstract class AbstractComponent implements UMOComponent
         }
         this.descriptor = descriptor;
         this.model = model;
-        this.managementContext = descriptor.getManagementContext();
+    }
+
+    protected UMOManagementContext getManagementContext()
+    {
+        return model.getManagementContext();
     }
 
     /**
@@ -125,17 +127,14 @@ public abstract class AbstractComponent implements UMOComponent
      * @throws org.mule.umo.lifecycle.InitialisationException if the component fails
      *             to initialise
      * @see org.mule.umo.UMODescriptor
-     * @param managementContext
      */
-    public final synchronized void initialise(UMOManagementContext managementContext) throws InitialisationException
+    public final synchronized void initialise() throws InitialisationException
     {
         if (initialised.get())
         {
             throw new InitialisationException(new Message(Messages.OBJECT_X_ALREADY_INITIALISED,
                 "Component '" + descriptor.getName() + "'"), this);
         }
-
-        this.managementContext = managementContext;
 
         try
         {
@@ -155,7 +154,7 @@ public abstract class AbstractComponent implements UMOComponent
                     descriptor.getName() + " with the registry");
         }
 
-        descriptor.initialise(managementContext);
+        descriptor.initialise();
 
         this.exceptionListener = descriptor.getExceptionListener();
 
@@ -164,8 +163,8 @@ public abstract class AbstractComponent implements UMOComponent
         // initialise statistics
         stats = createStatistics();
 
-        stats.setEnabled(managementContext.getStatistics().isEnabled());
-        managementContext.getStatistics().add(stats);
+        stats.setEnabled(getManagementContext().getStatistics().isEnabled());
+        getManagementContext().getStatistics().add(stats);
         stats.setOutboundRouterStat(getDescriptor().getOutboundRouter().getStatistics());
         stats.setInboundRouterStat(getDescriptor().getInboundRouter().getStatistics());
         
@@ -186,8 +185,8 @@ public abstract class AbstractComponent implements UMOComponent
      */
     public void register() throws RegistrationException
     {
-        registryId = 
-            managementContext.getRegistry().registerMuleObject(model, this).getId();
+        registryId =
+            getManagementContext().getRegistry().registerMuleObject(model, this).getId();
     }
 
     /*
@@ -197,7 +196,7 @@ public abstract class AbstractComponent implements UMOComponent
      */
     public void deregister() throws DeregistrationException
     {
-        managementContext.getRegistry().deregisterComponent(registryId);
+        getManagementContext().getRegistry().deregisterComponent(registryId);
         registryId = null;
     }
 
@@ -213,7 +212,7 @@ public abstract class AbstractComponent implements UMOComponent
 
     protected void fireComponentNotification(int action)
     {
-        managementContext.fireNotification(new ComponentNotification(descriptor, action));
+        getManagementContext().fireNotification(new ComponentNotification(descriptor, action));
     }
 
     public void forceStop() throws UMOException
@@ -240,7 +239,7 @@ public abstract class AbstractComponent implements UMOComponent
 
             // Unregister Listeners for the component
             unregisterListeners();
-            if (managementContext.getQueueManager().getQueueSession().getQueue(
+            if (getManagementContext().getQueueManager().getQueueSession().getQueue(
                 descriptor.getName() + ".component").size() > 0)
             {
                 try
@@ -377,7 +376,7 @@ public abstract class AbstractComponent implements UMOComponent
         }
         doDispose();
         fireComponentNotification(ComponentNotification.COMPONENT_DISPOSED);
-        managementContext.getStatistics().remove(stats);
+        getManagementContext().getStatistics().remove(stats);
     }
 
     public ComponentStatistics getStatistics()
@@ -735,5 +734,4 @@ public abstract class AbstractComponent implements UMOComponent
         }
         return endpoints;
     }
-
 }

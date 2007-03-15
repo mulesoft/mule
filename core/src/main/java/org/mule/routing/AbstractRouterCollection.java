@@ -11,12 +11,11 @@
 package org.mule.routing;
 
 import org.mule.management.stats.RouterStatistics;
+import org.mule.umo.lifecycle.Initialisable;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.routing.UMORouter;
 import org.mule.umo.routing.UMORouterCatchAllStrategy;
 import org.mule.umo.routing.UMORouterCollection;
-import org.mule.umo.lifecycle.Initialisable;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.UMOManagementContext;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
@@ -52,12 +51,12 @@ public abstract class AbstractRouterCollection implements UMORouterCollection, I
     }
 
 
-    public void initialise(UMOManagementContext managementContext) throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         for (Iterator iterator = routers.iterator(); iterator.hasNext();)
         {
             UMORouter router = (UMORouter) iterator.next();
-            router.initialise(managementContext);
+            router.initialise();
         }
     }
 

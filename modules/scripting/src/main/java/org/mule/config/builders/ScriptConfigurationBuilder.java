@@ -121,7 +121,7 @@ public class ScriptConfigurationBuilder extends Scriptable implements Configurat
             {
                 ReaderResource configResource = configResources[i];
                 setScriptFile(configResource.getDescription());
-                initialise(managementContext);
+                initialise();
                 Bindings ns = getScriptEngine().createBindings();
                 populateBindings(ns);
                 CompiledScript script = compileScript(configResource.getReader());

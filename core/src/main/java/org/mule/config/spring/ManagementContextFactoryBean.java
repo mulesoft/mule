@@ -10,12 +10,12 @@
 package org.mule.config.spring;
 
 import org.mule.RegistryContext;
-import org.mule.config.MuleConfiguration;
 import org.mule.impl.ManagementContext;
+import org.mule.impl.container.MultiContainerContext;
 import org.mule.impl.model.ModelHelper;
+import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
-import org.mule.umo.UMODescriptor;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.manager.UMOAgent;
@@ -35,10 +35,7 @@ import javax.transaction.TransactionManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.BeanInitializationException;
-import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -71,38 +68,32 @@ import org.springframework.context.ApplicationContextAware;
  * using AutowireUMOManagerFactoryBean.MULE_INTERCEPTOR_STACK_BEAN_NAME.
  */
 public class ManagementContextFactoryBean extends AbstractFactoryBean
-        implements InitializingBean, DisposableBean, ApplicationContextAware
+        implements ApplicationContextAware
 {
     /**
      * logger used by this class
      */
     protected static Log logger = LogFactory.getLog(ManagementContextFactoryBean.class);
 
-    protected UMOManagementContext managementContext;
+    protected UMOManagementContext managementContext = new ManagementContext();
 
     //TODO LM: Replace
     protected RegistryFacade registry;
 
     private ApplicationContext context;
 
-    public ManagementContextFactoryBean() throws Exception
-    {
-        this.managementContext = new ManagementContext();
-
-        //Maybe we need to crate this some other way?
-        //this.registry = managementContext.getRegistry();
-    }
-
-
     protected Object createInstance() throws Exception
     {
-        initialise();
+        if(managementContext==null)
+        {
+            this.managementContext = new ManagementContext();
+        }
         return managementContext;
     }
 
     public Class getObjectType()
     {
-        return ManagementContext.class;
+        return UMOManagementContext.class;
     }
 
     protected UMOManagementContext getManagementContext()
@@ -114,43 +105,50 @@ public class ManagementContextFactoryBean extends AbstractFactoryBean
     {
         this.context = applicationContext;
         //TODO where do I get this from
-        //registry = new DefaultRegistryFacade();
+        //registry = new SpringRegistry();
         //Add the Spring Container context by default
-        SpringContainerContext container = new SpringContainerContext();
-        container.setBeanFactory(context);
-        container.setName("spring-registry");
-        if(registry==null)
-        {
-            Map m = applicationContext.getBeansOfType(RegistryFacade.class);
-            if(m.size() > 0)
-            {
-                registry = (RegistryFacade)m.values().iterator().next();
-            }
-            else
-            {
-                registry = createDefaultRegistry();
+        //SpringContainerContext container = new SpringContainerContext();
+        //container.setBeanFactory(context);
+        //container.setName("spring-registry");
+//        if(registry==null)
+//        {
+//            Map m = applicationContext.getBeansOfType(RegistryFacade.class);
+//            if(m.size() > 0)
+//            {
+//                registry = (RegistryFacade)m.values().iterator().next();
+//            }
+//            else
+//            {
+//                registry = createDefaultRegistry();
+//
+//                logger.debug("no registry has been defined in context. Created default Registry: " + registry.getClass().getName());
+//            }
+//        }
+//        managementContext.setRegistry(registry);
+        registry = RegistryContext.getRegistry();
 
-                logger.debug("no registry has been defined in context. Created default Registry: " + registry.getClass().getName());
-            }
-            RegistryContext.setRegistry(registry);
-        }
-        managementContext.setRegistry(registry);
-        
-        try
-        {
-            registry.registerContainerContext(container);
-        }
-        catch (UMOException e)
-        {
-            throw new BeanCreationException("failed to register default spring container", e);
-        }
+//        try
+//        {
+//            registry.registerContainerContext(container);
+//        }
+//        catch (UMOException e)
+//        {
+//            throw new BeanCreationException("failed to register default spring container", e);
+//        }
 
-        RegistryContext.setRegistry(registry);
+    }
+
+
+    public void afterPropertiesSet() throws Exception
+    {
+        super.afterPropertiesSet();
+        managementContext.initialise();        
+        initialise();
     }
 
     protected RegistryFacade createDefaultRegistry()
     {
-        return new DefaultRegistryFacade();
+        return new SpringRegistry();
     }
 
     protected void initialise()
@@ -160,15 +158,15 @@ public class ManagementContextFactoryBean extends AbstractFactoryBean
             boolean legacy = false;
 
             // set mule configuration
-            Map temp = context.getBeansOfType(MuleConfiguration.class, true, false);
-            if (temp.size() > 0)
-            {
-               registry.setConfiguration((MuleConfiguration)temp.values().iterator().next());
-            }
+//            Map temp = context.getBeansOfType(MuleConfiguration.class, true, false);
+//            if (temp.size() > 0)
+//            {
+//               registry.setConfiguration((MuleConfiguration)temp.values().iterator().next());
+//            }
 
             //Legacy handling.  If the context contains an AutowireUMOManagerFactoryBean, then we're dealing
             //with an old Mule config file and we change the way we deal with some of the components
-            temp = context.getBeansOfType(AutowireUMOManagerFactoryBean.LegacyManager.class);
+            Map temp = context.getBeansOfType(AutowireUMOManagerFactoryBean.LegacyManager.class);
             if(temp.size() > 0)
             {
                 legacy = true;
@@ -184,8 +182,8 @@ public class ManagementContextFactoryBean extends AbstractFactoryBean
             setContainerContext(containers);
 
             // set Connectors
-            Map connectors = context.getBeansOfType(UMOConnector.class, true, false);
-            setConnectors(connectors.values());
+//            Map connectors = context.getBeansOfType(UMOConnector.class, true, false);
+//            setConnectors(connectors.values());
 
             // set mule transaction manager
             temp = context.getBeansOfType(UMOTransactionManagerFactory.class, true, false);
@@ -210,38 +208,35 @@ public class ManagementContextFactoryBean extends AbstractFactoryBean
             }
 
             // set Transformers
-            Map transformers = context.getBeansOfType(UMOTransformer.class, true, false);
-            setTransformers(transformers.values());
+//            Map transformers = context.getBeansOfType(UMOTransformer.class, true, false);
+//            setTransformers(transformers.values());
 
             // set Endpoints
-            Map endpoints = context.getBeansOfType(UMOEndpoint.class, true, false);
-
-            if(legacy)
-            {
-                setLegacyEndpoints(endpoints.values());
-            }
-            else
-            {
-                setEndpoints(endpoints.values());
-            }
+//            Map endpoints = context.getBeansOfType(UMOEndpoint.class, true, false);
+//
+//            if(legacy)
+//            {
+//                setLegacyEndpoints(endpoints.values());
+//            }
+//            else
+//            {
+//                setEndpoints(endpoints.values());
+//            }
 
             // set Agents
-            Map agents = context.getBeansOfType(UMOAgent.class, true, false);
-            setAgents(agents.values());
-
-            // add the models
-            Map models = context.getBeansOfType(UMOModel.class, true, false);
-            if(legacy)
-            {
-                setLegacyModels(models);
-            }
-            else
-            {
-                setModels(models);
-            }
-
-            managementContext.initialise();
-
+//            Map agents = context.getBeansOfType(UMOAgent.class, true, false);
+//            setAgents(agents.values());
+//
+//            // add the models
+//            Map models = context.getBeansOfType(UMOModel.class, true, false);
+//            if(legacy)
+//            {
+//                setLegacyModels(models);
+//            }
+//            else
+//            {
+//                setModels(models);
+//            }
         }
         catch (Exception e)
         {
@@ -251,7 +246,8 @@ public class ManagementContextFactoryBean extends AbstractFactoryBean
 
     public void destroy() throws Exception
     {
-       managementContext.dispose();
+        super.destroy();
+        managementContext.dispose();
     }
 
     public void setManagerId(String managerId)
@@ -265,7 +261,10 @@ public class ManagementContextFactoryBean extends AbstractFactoryBean
         for (Iterator iter = containers.values().iterator(); iter.hasNext();)
         {
             UMOContainerContext context =  (UMOContainerContext)iter.next();
-            registry.registerContainerContext(context);
+            if(!(context instanceof MultiContainerContext))
+            {
+                registry.registerContainerContext(context);
+            }
 
         }
     }

@@ -15,7 +15,6 @@ import org.mule.RegistryContext;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.impl.AbstractAgent;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.ClassUtils;
 import org.mule.util.FileUtils;
@@ -105,7 +104,7 @@ public class ConfigScannerAgent extends AbstractAgent
     {
     }
 
-    public void doInitialise(UMOManagementContext managementContext) throws InitialisationException
+    public void initialise() throws InitialisationException    
     {
         if (configDirName == null)
         {

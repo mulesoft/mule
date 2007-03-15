@@ -24,6 +24,9 @@ public class ModelDefinitionParser extends AbstractMuleSingleBeanDefinitionParse
     public ModelDefinitionParser(String type)
     {
         this.type = type;
+        this.singleton = true;
+        this.initMethod = "initialise";
+        this.destroyMethod = "dispose";
     }
 
     protected Class getBeanClass(Element element)

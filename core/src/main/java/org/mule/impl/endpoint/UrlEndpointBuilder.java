@@ -11,6 +11,7 @@
 package org.mule.impl.endpoint;
 
 import org.mule.umo.endpoint.MalformedEndpointException;
+import org.mule.util.StringUtils;
 
 import java.net.URI;
 import java.util.Properties;
@@ -35,12 +36,12 @@ public class UrlEndpointBuilder extends AbstractEndpointBuilder
                 address += ":" + uri.getPort();
             }
         }
-        if (uri.getPath() != null)
+        if (StringUtils.isNotBlank(uri.getPath()))
         {
             address += uri.getPath();
         }
 
-        if (uri.getQuery() != null)
+        if (StringUtils.isNotBlank(uri.getQuery()))
         {
             address += "?" + uri.getQuery();
         }

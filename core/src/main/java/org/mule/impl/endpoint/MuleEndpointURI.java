@@ -19,6 +19,7 @@ import org.mule.registry.ServiceException;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.PropertiesUtils;
 
 import java.net.URI;
@@ -148,6 +149,25 @@ public class MuleEndpointURI implements UMOEndpointURI
             throw new MalformedEndpointException(uri, e);
         }
 
+//        try
+//        {
+//            String scheme = (schemeMetaInfo == null ? this.uri.getScheme() : schemeMetaInfo);
+//            TransportServiceDescriptor sd;
+//            sd = (TransportServiceDescriptor)RegistryContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, scheme, null);
+//            if (sd == null)
+//            {
+//                throw new ServiceException(Message.createStaticMessage("No service descriptor found for transport: " + scheme + ".  This transport does not appear to be installed."));
+//            }
+//        }
+//        catch (Exception e)
+//        {
+//            throw new EndpointException(e);
+//        }
+    }
+
+
+    public void initialise() throws InitialisationException
+    {
         try
         {
             String scheme = (schemeMetaInfo == null ? this.uri.getScheme() : schemeMetaInfo);
@@ -163,7 +183,7 @@ public class MuleEndpointURI implements UMOEndpointURI
         }
         catch (Exception e)
         {
-            throw new EndpointException(e);
+            throw new InitialisationException(e, this);
         }
     }
 

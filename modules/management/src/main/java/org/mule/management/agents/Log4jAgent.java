@@ -17,7 +17,6 @@ import org.mule.management.support.AutoDiscoveryJmxSupportFactory;
 import org.mule.management.support.JmxSupport;
 import org.mule.management.support.JmxSupportFactory;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
 
 import java.util.Iterator;
@@ -57,7 +56,7 @@ public class Log4jAgent extends AbstractAgent
      * 
      * @see org.mule.umo.lifecycle.Initialisable#initialise()
      */
-    public void doInitialise(UMOManagementContext managementContext) throws InitialisationException
+    public void initialise() throws InitialisationException    
     {
         try
         {

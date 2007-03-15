@@ -48,7 +48,7 @@ public abstract class AbstractPersistenceManager implements PersistenceManager
         
         if (store != null)
         {
-            store.initialise(null);
+            store.initialise();
         }
     }
 

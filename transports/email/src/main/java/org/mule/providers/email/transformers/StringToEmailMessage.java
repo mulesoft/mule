@@ -92,7 +92,7 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
         Properties otherHeaders = (Properties)eventMsg.getProperty(MailProperties.CUSTOM_HEADERS_MAP_PROPERTY);
         if (otherHeaders != null && !otherHeaders.isEmpty())
         {
-            Map props = new HashMap(context.getManagmentContext().getProperties());
+            Map props = new HashMap(context.getManagementContext().getProperties());
             for (Iterator iterator = eventMsg.getPropertyNames().iterator(); iterator.hasNext();)
             {
                 String propertyKey = (String)iterator.next();

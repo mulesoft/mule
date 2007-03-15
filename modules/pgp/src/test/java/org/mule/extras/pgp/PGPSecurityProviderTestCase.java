@@ -43,7 +43,7 @@ public class PGPSecurityProviderTestCase extends AbstractMuleTestCase
         securityProvider = new PGPSecurityProvider();
         securityProvider.setKeyManager(keyM);
 
-        securityProvider.initialise(managementContext);
+        securityProvider.initialise();
 
         MessageFactory mf = MessageFactory.getInstance("OpenPGP");
 

@@ -22,7 +22,6 @@ import org.mule.impl.internal.notifications.ModelNotificationListener;
 import org.mule.impl.internal.notifications.NotificationException;
 import org.mule.impl.internal.notifications.SecurityNotificationListener;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.manager.UMOServerNotificationListener;
@@ -172,7 +171,7 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
         this.ignoreConnectionNotifications = ignoreConnectionNotifications;
     }
 
-    public final void doInitialise(UMOManagementContext managementContext) throws InitialisationException
+    public final void initialise() throws InitialisationException    
     {
         doInitialise();
         if (!ignoreManagerNotifications)

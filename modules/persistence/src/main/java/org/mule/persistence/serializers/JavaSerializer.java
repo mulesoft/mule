@@ -12,7 +12,6 @@ package org.mule.persistence.serializers;
 
 import org.mule.persistence.PersistenceHelper;
 import org.mule.persistence.PersistenceSerializer;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
 
 import java.io.File;
@@ -32,9 +31,8 @@ public class JavaSerializer implements PersistenceSerializer
 
     /**
      * {@inheritDoc}
-     * @param managementContext
      */
-    public void initialise(UMOManagementContext managementContext) throws InitialisationException
+    public void initialise() throws InitialisationException
     {
     }
 

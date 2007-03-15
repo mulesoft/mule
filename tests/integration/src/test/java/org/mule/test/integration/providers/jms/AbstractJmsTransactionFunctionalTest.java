@@ -10,7 +10,8 @@
 
 package org.mule.test.integration.providers.jms;
 
-import org.mule.MuleManager;
+
+import org.mule.RegistryContext;
 import org.mule.config.MuleProperties;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.MuleDescriptor;
@@ -39,7 +40,6 @@ import org.mule.umo.UMOTransactionFactory;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.UMOConnector;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
@@ -461,7 +461,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
             throws UMOException
         {
             this.countDown = countDown;
-            UMOEndpoint ep = MuleEndpoint.createEndpointFromUri(deadLetter, UMOEndpoint.ENDPOINT_TYPE_SENDER);
+            UMOEndpoint ep = RegistryContext.getRegistry().createEndpointFromUri(deadLetter, UMOEndpoint.ENDPOINT_TYPE_SENDER);
             // lets include dispatch to the deadLetter queue in the sme tx.
             ep.setTransactionConfig(new MuleTransactionConfig());
             ep.getTransactionConfig().setAction(UMOTransactionConfig.ACTION_JOIN_IF_POSSIBLE);

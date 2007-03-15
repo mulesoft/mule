@@ -10,7 +10,7 @@
 
 package org.mule.test.integration.routing;
 
-import org.mule.MuleManager;
+
 import org.mule.extras.client.MuleClient;
 import org.mule.impl.internal.notifications.MessageNotification;
 import org.mule.impl.internal.notifications.MessageNotificationListener;

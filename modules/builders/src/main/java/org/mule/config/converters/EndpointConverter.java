@@ -11,7 +11,6 @@
 package org.mule.config.converters;
 
 import org.mule.RegistryContext;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
@@ -58,7 +57,8 @@ public class EndpointConverter implements Converter
                 {
                     endpointUri.setEndpointName(value.toString());
                 }
-                UMOEndpoint endpoint = MuleEndpoint.createEndpointFromUri(endpointUri, null);
+                UMOEndpoint endpoint = RegistryContext.getRegistry().createEndpointFromUri(endpointUri, UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER_AND_RECEIVER);
+
                 // If the value was an endpoint identifier reference then set
                 // the
                 // reference as the name of the endpoint

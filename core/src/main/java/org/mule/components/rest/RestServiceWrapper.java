@@ -19,7 +19,6 @@ import org.mule.routing.filters.MessagePropertyFilter;
 import org.mule.routing.filters.RegExFilter;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOFilter;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.Callable;
@@ -142,7 +141,7 @@ public class RestServiceWrapper implements Callable, Initialisable
         this.errorExpression = errorExpression;
     }
 
-    public void initialise(UMOManagementContext managementContext) throws InitialisationException {
+    public void initialise() throws InitialisationException {
         if (serviceUrl == null && !urlFromMessage)
         {
             throw new InitialisationException(new Message(Messages.X_IS_NULL, "serviceUrl"), this);

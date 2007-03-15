@@ -10,7 +10,7 @@
 
 package org.mule.test.integration.providers.jms;
 
-import org.mule.MuleManager;
+
 import org.mule.providers.jms.JmsMessageReceiver;
 import org.mule.tck.functional.EventCallback;
 import org.mule.test.integration.providers.jms.tools.JmsTestUtils;

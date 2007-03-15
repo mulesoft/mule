@@ -10,6 +10,7 @@
 
 package org.mule.test.integration.providers.jdbc;
 
+import org.mule.RegistryContext;
 import org.mule.config.PoolingProfile;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.model.seda.SedaModel;
@@ -20,7 +21,6 @@ import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.manager.UMOManager;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 
@@ -47,7 +47,6 @@ public abstract class AbstractJdbcFunctionalTestCase extends AbstractMuleTestCas
     public static final String SQL_WRITE = "INSERT INTO TEST(ID, TYPE, DATA, ACK, RESULT) VALUES(NULL, ${type}, ${payload}, NULL, NULL)";
 
     protected UMOConnector connector;
-    protected static UMOManager manager;
     protected UMOModel model;
     protected DataSource dataSource;
 

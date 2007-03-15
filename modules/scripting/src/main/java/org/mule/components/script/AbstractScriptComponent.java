@@ -13,7 +13,6 @@ package org.mule.components.script;
 import org.mule.impl.UMODescriptorAware;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -57,7 +56,7 @@ public abstract class AbstractScriptComponent
         this.descriptor = descriptor;
     }
 
-    public void initialise(UMOManagementContext managementContext) throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         if (getScript() == null && getScriptText() == null)
         {

@@ -33,7 +33,6 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOEndpointSecurityFilter;
@@ -41,7 +40,6 @@ import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
 import org.mule.util.MuleObjectHelper;
 import org.mule.util.ObjectNameHelper;
-import org.mule.util.StringUtils;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
@@ -245,7 +243,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     {
         this();
         String type = (receiver ? UMOEndpoint.ENDPOINT_TYPE_RECEIVER : UMOEndpoint.ENDPOINT_TYPE_SENDER);
-        UMOEndpoint p = getOrCreateEndpointForUri(new MuleEndpointURI(endpointName), type);
+        UMOEndpoint p = RegistryContext.getRegistry().getOrCreateEndpointForUri(new MuleEndpointURI(endpointName), type);
         this.initFromDescriptor(p);
     }
 
@@ -323,7 +321,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
         if(source.getManagementContext()!=null)
         {
-            initialise(source.getManagementContext());
+            initialise();
         }
     }
 
@@ -513,81 +511,12 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         return filter;
     }
 
-    public static UMOEndpoint createEndpointFromUri(UMOEndpointURI uri, String type) throws UMOException
-    {
-        return TransportFactory.createEndpoint(uri, type);
-    }
-
-    public static UMOEndpoint getEndpointFromUri(String uri) throws ObjectNotFoundException
-    {
-        UMOEndpoint endpoint = null;
-        if (uri != null)
-        {
-            endpoint = RegistryContext.getRegistry().lookupEndpoint(uri);
-        }
-        return endpoint;
-    }
-
-    public static UMOEndpoint getEndpointFromUri(UMOEndpointURI uri) throws UMOException
-    {
-        String endpointName = uri.getEndpointName();
-        if (endpointName != null)
-        {
-            UMOEndpoint endpoint = RegistryContext.getRegistry().lookupEndpoint(endpointName);
-            if (endpoint != null)
-            {
-                if (StringUtils.isNotEmpty(uri.getAddress()))
-                {
-                    endpoint.setEndpointURI(uri);
-                }
-            }
-            return endpoint;
-        }
-
-        return null;
-    }
-
-    public static UMOEndpoint getOrCreateEndpointForUri(String uriIdentifier, String type)
-        throws UMOException
-    {
-        UMOEndpoint endpoint = getEndpointFromUri(uriIdentifier);
-        if (endpoint == null)
-        {
-            endpoint = createEndpointFromUri(new MuleEndpointURI(uriIdentifier), type);
-        }
-        else
-        {
-            if (endpoint.getType().equals(UMOEndpoint.ENDPOINT_TYPE_SENDER_AND_RECEIVER))
-            {
-                endpoint.setType(type);
-            }
-            else if (!endpoint.getType().equals(type))
-            {
-                throw new IllegalArgumentException("Endpoint matching: " + uriIdentifier
-                                                   + " is not of type: " + type + ". It is of type: "
-                                                   + endpoint.getType());
-
-            }
-        }
-        return endpoint;
-    }
-
-    public static UMOEndpoint getOrCreateEndpointForUri(UMOEndpointURI uri, String type) throws UMOException
-    {
-        UMOEndpoint endpoint = getEndpointFromUri(uri);
-        if (endpoint == null)
-        {
-            endpoint = createEndpointFromUri(uri, type);
-        }
-        return endpoint;
-    }
-
     public boolean isDeleteUnacceptedMessages()
     {
         return deleteUnacceptedMessages;
     }
 
-    public void initialise(UMOManagementContext managementContext) throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         if (initialised.get())
         {
@@ -595,7 +524,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
             return;
         }
 
-        this.managementContext = managementContext;
+        endpointUri.initialise();
         
         if(endpointEncoding==null)
         {
@@ -710,7 +639,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         if (securityFilter != null)
         {
             securityFilter.setEndpoint(this);
-            securityFilter.initialise(managementContext);
+            securityFilter.initialise();
         }
 
         // Allow remote sync values to be set as params on the endpoint URI

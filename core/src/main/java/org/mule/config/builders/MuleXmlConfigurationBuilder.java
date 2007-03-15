@@ -37,6 +37,8 @@ import java.util.Properties;
  */
 public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
 {
+    private String defaultConfigResource = "default-mule-config.xml";
+
     private boolean used = false;
     /**
      * Will configure a UMOManager based on the configurations made available through
@@ -82,7 +84,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
                 startupPropertiesFile = StringUtils.trimToEmpty(startupPropertiesFile);
                 Properties startupProperties = PropertiesUtils.loadProperties(startupPropertiesFile,
                     getClass());
-                //TODO How do we handle this: ((MuleManager)managementContext).addProperties(startupProperties);
+                //TODO RM* URGENT How do we handle this: ((MuleManager)managementContext).addProperties(startupProperties);
             }
             catch (IOException e)
             {
@@ -98,10 +100,27 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         String[] resources = org.springframework.util.StringUtils.tokenizeToStringArray(configResource, ",;",
             true, true);
 
+        MuleApplicationContext root = null;
+        if(defaultConfigResource!=null)
+        {
+            new MuleApplicationContext(defaultConfigResource);
+        }
+
+        String[] all = new String[resources.length + 1];
+        all[0] = defaultConfigResource;
+        System.arraycopy(resources, 0, all, 1, resources.length);
+
         used = true;
-        //TODO Registry is required for TransportServiceDescriptor lookups so the registry is required before anything else
-        //RegistryContext.setRegistry(new DefaultRegistryFacade());
-        MuleApplicationContext context = new MuleApplicationContext(resources);
+        MuleApplicationContext context;
+
+//        if(root!=null)
+//        {
+//            context = new MuleApplicationContext(root, resources);
+//        }
+//        else
+//        {
+            context = new MuleApplicationContext(all);
+        //}
 //        try
 //        {
 //            if (System.getProperty(MuleProperties.MULE_START_AFTER_CONFIG_SYSTEM_PROPERTY, "true")
@@ -173,5 +192,16 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
             throw new ConfigurationException(new Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE,
                 configResource));
         }
+    }
+
+
+    public String getDefaultConfigResource()
+    {
+        return defaultConfigResource;
+    }
+
+    public void setDefaultConfigResource(String defaultConfigResource)
+    {
+        this.defaultConfigResource = defaultConfigResource;
     }
 }

@@ -9,14 +9,15 @@
  */
 package org.mule.config.spring;
 
-import org.mule.MuleException;
 import org.mule.config.ConfigurationException;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.container.MultiContainerContext;
+import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.internal.notifications.ManagerNotification;
+import org.mule.providers.service.TransportFactory;
 import org.mule.registry.AbstractServiceDescriptor;
 import org.mule.registry.DeregistrationException;
 import org.mule.registry.Registration;
@@ -29,6 +30,8 @@ import org.mule.registry.impl.MuleRegistration;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.Registerable;
 import org.mule.umo.manager.ObjectNotFoundException;
@@ -38,9 +41,9 @@ import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.util.CollectionUtils;
 import org.mule.util.MapUtils;
 import org.mule.util.SpiUtils;
+import org.mule.util.StringUtils;
 import org.mule.util.UUID;
 import org.mule.util.queue.CachingPersistenceStrategy;
 import org.mule.util.queue.MemoryPersistenceStrategy;
@@ -49,24 +52,23 @@ import org.mule.util.queue.TransactionalQueueManager;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 
 import javax.transaction.TransactionManager;
 
-import org.apache.commons.collections.list.CursorableLinkedList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 /**
  * TODO
  */
-public class DefaultRegistryFacade implements RegistryFacade
+public class SpringRegistry implements RegistryFacade, ApplicationContextAware
 
 {
     /**
@@ -77,16 +79,15 @@ public class DefaultRegistryFacade implements RegistryFacade
     // @GuardedBy("this")
     protected static Map sdCache = new HashMap();
 
-
     /**
      * Default configuration
      */
-    private MuleConfiguration config = new MuleConfiguration();
+    //  private MuleConfiguration config = new MuleConfiguration();
 
     /**
      * Connectors registry
      */
-    private Map connectors = new HashMap();
+    // private Map connectors = new HashMap();
 
     /**
      * Holds any application scoped environment properties set in the config
@@ -96,17 +97,17 @@ public class DefaultRegistryFacade implements RegistryFacade
     /**
      * Holds any registered agents
      */
-    private Map agents = new LinkedHashMap();
+    //private Map agents = new LinkedHashMap();
 
     /**
      * Holds a list of global endpoints accessible to any client code
      */
-    private Map endpoints = new HashMap();
+    //private Map endpoints = new HashMap();
 
     /**
      * The model being used
      */
-    private Map models = new LinkedHashMap();
+    //private Map models = new LinkedHashMap();
 
     /**
      * the unique id for this manager
@@ -121,7 +122,7 @@ public class DefaultRegistryFacade implements RegistryFacade
     /**
      * Collection for transformers registered in this component
      */
-    private Map transformers = new HashMap();
+    //private Map transformers = new HashMap();
 
     /**
      * True once the Mule Manager is initialised
@@ -156,21 +157,33 @@ public class DefaultRegistryFacade implements RegistryFacade
 
     private MultiContainerContext containerContext = null;
 
-    private static Log logger = LogFactory.getLog(DefaultRegistryFacade.class);
+    private static Log logger = LogFactory.getLog(SpringRegistry.class);
 
     protected UMOManagementContext managementContext;
+
+    protected ApplicationContext applicationContext;
+
+
+    public SpringRegistry(ApplicationContext applicationContext)
+    {
+        //Default to using the defaultContext in the constructor to avoid NPEs
+        //When setManagementContext is called, this reference will be overwritten
+        //And the parent will be set to the defaultCotext
+        setApplicationContext(applicationContext);
+    }
 
     /**
      * Default Constructor
      */
-    public DefaultRegistryFacade()
+    public SpringRegistry()
     {
-        if (config == null)
-        {
-            config = new MuleConfiguration();
-        }
+        //defaultContext = new ClassPathXmlApplicationContext("default-mule-config.xml");
 
-        containerContext = new MultiContainerContext();
+        //Default to using the defaultContext in the constructor to avoid NPEs
+        //When setManagementContext is called, this reference will be overwritten
+        //And the parent will be set to the defaultCotext
+        //this.applicationContext  = defaultContext;
+
     }
 
     /**
@@ -179,7 +192,12 @@ public class DefaultRegistryFacade implements RegistryFacade
      */
     public synchronized MuleConfiguration getConfiguration()
     {
-        return config;
+        Map temp = applicationContext.getBeansOfType(MuleConfiguration.class, true, false);
+        if (temp.size() > 0)
+        {
+            return (MuleConfiguration) temp.values().toArray()[temp.size()-1];
+        }
+        return null;
     }
 
     /**
@@ -198,7 +216,7 @@ public class DefaultRegistryFacade implements RegistryFacade
                     new Message(Messages.X_IS_NULL, "MuleConfiguration object").getMessage());
         }
 
-        this.config = config;
+        //this.config = config;
     }
 
     public synchronized void dispose()
@@ -221,7 +239,7 @@ public class DefaultRegistryFacade implements RegistryFacade
         disposed.set(true);
         disposeConnectors();
 
-        for (Iterator i = models.values().iterator(); i.hasNext();)
+        for (Iterator i = getModels().values().iterator(); i.hasNext();)
         {
             UMOModel model = (UMOModel) i.next();
             model.dispose();
@@ -229,20 +247,20 @@ public class DefaultRegistryFacade implements RegistryFacade
 
         disposeAgents();
 
-        transformers.clear();
-        endpoints.clear();
-        models.clear();
+        //transformers.clear();
+        //endpoints.clear();
+        //models.clear();
         containerContext.dispose();
         containerContext = null;
         // props.clearErrors();
         fireSystemEvent(new ManagerNotification(id, null, null, ManagerNotification.MANAGER_DISPOSED));
 
-        transformers = null;
-        endpoints = null;
+        //transformers = null;
+        //endpoints = null;
         // props = null;
         initialised.set(false);
 
-        config = new MuleConfiguration();
+        //config = new MuleConfiguration();
     }
 
     /**
@@ -251,7 +269,7 @@ public class DefaultRegistryFacade implements RegistryFacade
     private synchronized void disposeConnectors()
     {
         fireSystemEvent(new ManagerNotification(id, null, null, ManagerNotification.MANAGER_DISPOSING_CONNECTORS));
-        for (Iterator iterator = connectors.values().iterator(); iterator.hasNext();)
+        for (Iterator iterator = getConnectors().values().iterator(); iterator.hasNext();)
         {
             UMOConnector c = (UMOConnector) iterator.next();
             c.dispose();
@@ -288,7 +306,14 @@ public class DefaultRegistryFacade implements RegistryFacade
      */
     public UMOConnector lookupConnector(String name)
     {
-        return (UMOConnector) connectors.get(name);
+        try
+        {
+            return (UMOConnector) lookupObject(name);
+        }
+        catch (ObjectNotFoundException e)
+        {
+            return null;
+        }
     }
 
 
@@ -316,7 +341,14 @@ public class DefaultRegistryFacade implements RegistryFacade
      */
     public UMOTransformer lookupTransformer(String name)
     {
-        return (UMOTransformer) transformers.get(name);
+        try
+        {
+            return (UMOTransformer) lookupObject(name);
+        }
+        catch (ObjectNotFoundException e)
+        {
+            return null;
+        }
     }
 
     /**
@@ -324,11 +356,11 @@ public class DefaultRegistryFacade implements RegistryFacade
      */
     public void registerConnector(UMOConnector connector) throws UMOException
     {
-        connectors.put(connector.getName(), connector);
-        if (initialised.get() || initialising.get())
-        {
-            connector.initialise(managementContext);
-        }
+//        connectors.put(connector.getName(), connector);
+//        if (initialised.get() || initialising.get())
+//        {
+//            connector.initialise();
+//        }
         if ((started.get() || starting.get()) && !connector.isStarted())
         {
             connector.start();
@@ -340,11 +372,11 @@ public class DefaultRegistryFacade implements RegistryFacade
      */
     public void unregisterConnector(String connectorName) throws UMOException
     {
-        UMOConnector c = (UMOConnector) connectors.remove(connectorName);
-        if (c != null)
-        {
-            c.dispose();
-        }
+//        UMOConnector c = (UMOConnector) connectors.remove(connectorName);
+//        if (c != null)
+//        {
+//            c.dispose();
+//        }
     }
 
     /**
@@ -352,7 +384,7 @@ public class DefaultRegistryFacade implements RegistryFacade
      */
     public void registerEndpoint(UMOEndpoint endpoint) throws UMOException
     {
-        endpoints.put(endpoint.getName(), endpoint);
+        //endpoints.put(endpoint.getName(), endpoint);
     }
 
     /**
@@ -360,11 +392,11 @@ public class DefaultRegistryFacade implements RegistryFacade
      */
     public void unregisterEndpoint(String endpointName)
     {
-        UMOEndpoint p = (UMOEndpoint) endpoints.get(endpointName);
-        if (p != null)
-        {
-            endpoints.remove(p);
-        }
+//        UMOEndpoint p = (UMOEndpoint) endpoints.get(endpointName);
+//        if (p != null)
+//        {
+//            endpoints.remove(p);
+//        }
     }
 
     /**
@@ -372,7 +404,7 @@ public class DefaultRegistryFacade implements RegistryFacade
      */
     public void registerTransformer(UMOTransformer transformer) throws UMOException
     {
-        transformer.initialise(managementContext);
+        //transformer.initialise();
 
         // For now at least, we don't want a registration error to affect
         // the initialisation process.
@@ -386,8 +418,8 @@ public class DefaultRegistryFacade implements RegistryFacade
         //     logger.warn(re);
         // }
 
-        transformers.put(transformer.getName(), transformer);
-        logger.info("Transformer " + transformer.getName() + " has been initialised successfully");
+//        transformers.put(transformer.getName(), transformer);
+//        logger.info("Transformer " + transformer.getName() + " has been initialised successfully");
     }
 
     /**
@@ -395,7 +427,7 @@ public class DefaultRegistryFacade implements RegistryFacade
      */
     public void unregisterTransformer(String transformerName)
     {
-        transformers.remove(transformerName);
+        //transformers.remove(transformerName);
     }
 
     /**
@@ -424,13 +456,13 @@ public class DefaultRegistryFacade implements RegistryFacade
     }
 
 
-    public void initialise(UMOManagementContext managementContext) throws InitialisationException
+    public void initialise() throws InitialisationException
     {
-        this.managementContext = managementContext;
-
         if (!initialised.get())
         {
             initialising.set(true);
+
+            containerContext = new MultiContainerContext();
 
             // Fire message notifications if the option is set. This will fire
             // inbound and outbound message events that can
@@ -462,17 +494,17 @@ public class DefaultRegistryFacade implements RegistryFacade
                             "QueueManager"), e);
                 }
 
-                getContainerContext().initialise(managementContext);
-                initialiseConnectors();
-                initialiseEndpoints();
-                initialiseAgents();
-                for (Iterator i = models.values().iterator(); i.hasNext();)
-                {
-                    UMOModel model = (UMOModel) i.next();
-                    model.initialise(managementContext);
-                    //TODO LM: Should the model be registered before or after initialisation?
-                    model.register();
-                }
+//                getContainerContext().initialise();
+//                initialiseConnectors();
+//                initialiseEndpoints();
+//                initialiseAgents();
+//                for (Iterator i = getModels().values().iterator(); i.hasNext();)
+//                {
+//                    UMOModel model = (UMOModel) i.next();
+//                    model.initialise();
+//                    //TODO LM: Should the model be registered before or after initialisation?
+//                    model.register();
+//                }
 
             }
             catch (InitialisationException e)
@@ -521,19 +553,19 @@ public class DefaultRegistryFacade implements RegistryFacade
 //        }
     }
 
-    protected void initialiseEndpoints() throws InitialisationException
-    {
-        UMOEndpoint ep;
-        for (Iterator iterator = this.endpoints.values().iterator(); iterator.hasNext();)
-        {
-            ep = (UMOEndpoint) iterator.next();
-            ep.initialise(managementContext);
-            // the connector has been created for this endpoint so lets
-            // set the create connector to 0 so that every time this endpoint
-            // is referenced we don't create another connector
-            ep.setCreateConnector(0);
-        }
-    }
+//    protected void initialiseEndpoints() throws InitialisationException
+//    {
+//        UMOEndpoint ep;
+//        for (Iterator iterator = this.endpoints.values().iterator(); iterator.hasNext();)
+//        {
+//            ep = (UMOEndpoint) iterator.next();
+//            ep.initialise();
+//            // the connector has been created for this endpoint so lets
+//            // set the create connector to 0 so that every time this endpoint
+//            // is referenced we don't create another connector
+//            ep.setCreateConnector(0);
+//        }
+//    }
 
     /**
      * Start the <code>MuleManager</code>. This will start the connectors and
@@ -543,10 +575,10 @@ public class DefaultRegistryFacade implements RegistryFacade
      */
     public synchronized void start() throws UMOException
     {
-        if (!initialised.get())
-        {
-            throw new IllegalStateException("Not Initialised");
-        }
+//        if (!initialised.get())
+//        {
+//            throw new IllegalStateException("Not Initialised");
+//        }
 
         if (!started.get())
         {
@@ -556,7 +588,7 @@ public class DefaultRegistryFacade implements RegistryFacade
             startConnectors();
             startAgents();
             fireSystemEvent(new ManagerNotification(id, null, null, ManagerNotification.MANAGER_STARTING_MODELS));
-            for (Iterator i = models.values().iterator(); i.hasNext();)
+            for (Iterator i = getModels().values().iterator(); i.hasNext();)
             {
                 UMOModel model = (UMOModel) i.next();
                 model.start();
@@ -592,7 +624,7 @@ public class DefaultRegistryFacade implements RegistryFacade
      */
     private void startConnectors() throws UMOException
     {
-        for (Iterator iterator = connectors.values().iterator(); iterator.hasNext();)
+        for (Iterator iterator = getConnectors().values().iterator(); iterator.hasNext();)
         {
             UMOConnector c = (UMOConnector) iterator.next();
             c.start();
@@ -600,15 +632,15 @@ public class DefaultRegistryFacade implements RegistryFacade
         logger.info("Connectors have been started successfully");
     }
 
-    private void initialiseConnectors() throws InitialisationException
-    {
-        for (Iterator iterator = connectors.values().iterator(); iterator.hasNext();)
-        {
-            UMOConnector c = (UMOConnector) iterator.next();
-            c.initialise(managementContext);
-        }
-        logger.info("Connectors have been initialised successfully");
-    }
+//    private void initialiseConnectors() throws InitialisationException
+//    {
+//        for (Iterator iterator = connectors.values().iterator(); iterator.hasNext();)
+//        {
+//            UMOConnector c = (UMOConnector) iterator.next();
+//            c.initialise();
+//        }
+//        logger.info("Connectors have been initialised successfully");
+//    }
 
     /**
      * Stops the <code>MuleManager</code> which stops all sessions and connectors
@@ -626,7 +658,7 @@ public class DefaultRegistryFacade implements RegistryFacade
 
         logger.debug("Stopping model...");
         fireSystemEvent(new ManagerNotification(id, null, null, ManagerNotification.MANAGER_STOPPING_MODELS));
-        for (Iterator i = models.values().iterator(); i.hasNext();)
+        for (Iterator i = getModels().values().iterator(); i.hasNext();)
         {
             UMOModel model = (UMOModel) i.next();
             model.stop();
@@ -645,7 +677,7 @@ public class DefaultRegistryFacade implements RegistryFacade
     private void stopConnectors() throws UMOException
     {
         logger.debug("Stopping connectors...");
-        for (Iterator iterator = connectors.values().iterator(); iterator.hasNext();)
+        for (Iterator iterator = getConnectors().values().iterator(); iterator.hasNext();)
         {
             UMOConnector c = (UMOConnector) iterator.next();
             c.stop();
@@ -655,20 +687,27 @@ public class DefaultRegistryFacade implements RegistryFacade
 
     public UMOModel lookupModel(String name)
     {
-        return (UMOModel) models.get(name);
+        try
+        {
+            return (UMOModel) lookupObject(name);
+        }
+        catch (ObjectNotFoundException e)
+        {
+            return null;
+        }
     }
 
     public void registerModel(UMOModel model) throws UMOException
     {
-        if(models.get(model.getName())!=null)
-        {
-            throw new MuleException(new Message(Messages.CONTAINER_X_ALREADY_REGISTERED, "model:" + model.getName()));
-        }
-        models.put(model.getName(), model);
-        if (initialised.get())
-        {
-            model.initialise(managementContext);
-        }
+//        if(models.get(model.getName())!=null)
+//        {
+//            throw new MuleException(new Message(Messages.CONTAINER_X_ALREADY_REGISTERED, "model:" + model.getName()));
+//        }
+//        models.put(model.getName(), model);
+//        if (initialised.get())
+//        {
+//            model.initialise();
+//        }
 
         if (started.get())
         {
@@ -678,17 +717,17 @@ public class DefaultRegistryFacade implements RegistryFacade
 
     public void unregisterModel(String name)
     {
-        UMOModel model = lookupModel(name);
-        if (model != null)
-        {
-            models.remove(model);
-            model.dispose();
-        }
+//        UMOModel model = lookupModel(name);
+//        if (model != null)
+//        {
+//            models.remove(model);
+//            model.dispose();
+//        }
     }
 
     public Map getModels()
     {
-        return Collections.unmodifiableMap(models);
+        return applicationContext.getBeansOfType(UMOModel.class);
     }
 
     /**
@@ -696,7 +735,12 @@ public class DefaultRegistryFacade implements RegistryFacade
      */
     public Map getConnectors()
     {
-        return Collections.unmodifiableMap(connectors);
+        return applicationContext.getBeansOfType(UMOConnector.class);
+    }
+
+    public Map getAgents()
+    {
+        return applicationContext.getBeansOfType(UMOAgent.class);
     }
 
     /**
@@ -704,7 +748,7 @@ public class DefaultRegistryFacade implements RegistryFacade
      */
     public Map getEndpoints()
     {
-        return Collections.unmodifiableMap(endpoints);
+        return applicationContext.getBeansOfType(UMOImmutableEndpoint.class);
     }
 
     /**
@@ -712,7 +756,7 @@ public class DefaultRegistryFacade implements RegistryFacade
      */
     public Map getTransformers()
     {
-        return Collections.unmodifiableMap(transformers);
+        return applicationContext.getBeansOfType(UMOTransformer.class);
     }
 
     /**
@@ -754,27 +798,34 @@ public class DefaultRegistryFacade implements RegistryFacade
      */
     public void registerAgent(UMOAgent agent) throws UMOException
     {
-        logger.info("Adding agent " + agent.getName());
-        agents.put(agent.getName(), agent);
-        agent.registered();
-        // Don't allow initialisation while the server is being initalised,
-        // only when we are done. Otherwise the agent registration
-        // order can be corrupted.
-        if (initialised.get())
-        {
-            logger.info("Initialising agent " + agent.getName());
-            agent.initialise(managementContext);
-        }
-        if ((started.get() || starting.get()))
-        {
-            logger.info("Starting agent " + agent.getName());
-            agent.start();
-        }
+//        logger.info("Adding agent " + agent.getName());
+//        agents.put(agent.getName(), agent);
+//        agent.registered();
+//        // Don't allow initialisation while the server is being initalised,
+//        // only when we are done. Otherwise the agent registration
+//        // order can be corrupted.
+//        if (initialised.get())
+//        {
+//            logger.info("Initialising agent " + agent.getName());
+//            agent.initialise();
+//        }
+//        if ((started.get() || starting.get()))
+//        {
+//            logger.info("Starting agent " + agent.getName());
+//            agent.start();
+//        }
     }
 
     public UMOAgent lookupAgent(String name)
     {
-        return (UMOAgent) agents.get(name);
+        try
+        {
+            return (UMOAgent) lookupObject(name);
+        }
+        catch (ObjectNotFoundException e)
+        {
+            return null;
+        }
     }
 
     /**
@@ -782,17 +833,18 @@ public class DefaultRegistryFacade implements RegistryFacade
      */
     public UMOAgent unregisterAgent(String name) throws UMOException
     {
-        if (name == null)
-        {
-            return null;
-        }
-        UMOAgent agent = (UMOAgent) agents.remove(name);
-        if (agent != null)
-        {
-            agent.dispose();
-            agent.unregistered();
-        }
-        return agent;
+//        if (name == null)
+//        {
+//            return null;
+//        }
+//        UMOAgent agent = (UMOAgent) agents.remove(name);
+//        if (agent != null)
+//        {
+//            agent.dispose();
+//            agent.unregistered();
+//        }
+//        return agent;
+        return null;
     }
 
     /**
@@ -800,74 +852,74 @@ public class DefaultRegistryFacade implements RegistryFacade
      *
      * @throws InitialisationException
      */
-    protected void initialiseAgents() throws InitialisationException
-    {
-        logger.info("Initialising agents...");
-
-        // Do not iterate over the map directly, as 'complex' agents
-        // may spawn extra agents during initialisation. This will
-        // cause a ConcurrentModificationException.
-        // Use a cursorable iteration, which supports on-the-fly underlying
-        // data structure changes.
-        Collection agentsSnapshot = agents.values();
-        CursorableLinkedList agentRegistrationQueue = new CursorableLinkedList(agentsSnapshot);
-        CursorableLinkedList.Cursor cursor = agentRegistrationQueue.cursor();
-
-        // the actual agent object refs are the same, so we are just
-        // providing different views of the same underlying data
-
-        try
-        {
-            while (cursor.hasNext())
-            {
-                UMOAgent umoAgent = (UMOAgent) cursor.next();
-
-                int originalSize = agentsSnapshot.size();
-                logger.debug("Initialising agent: " + umoAgent.getName());
-                umoAgent.initialise(managementContext);
-                // thank you, we are done with you
-                cursor.remove();
-
-                // Direct calls to MuleManager.registerAgent() modify the original
-                // agents map, re-check if the above agent registered any
-                // 'child' agents.
-                int newSize = agentsSnapshot.size();
-                int delta = newSize - originalSize;
-                if (delta > 0)
-                {
-                    // TODO there's some mess going on in
-                    // http://issues.apache.org/jira/browse/COLLECTIONS-219
-                    // watch out when upgrading the commons-collections.
-                    Collection tail = CollectionUtils.retainAll(agentsSnapshot, agentRegistrationQueue);
-                    Collection head = CollectionUtils.subtract(agentsSnapshot, tail);
-
-                    // again, above are only refs, all going back to the original agents map
-
-                    // re-order the queue
-                    agentRegistrationQueue.clear();
-                    // 'spawned' agents first
-                    agentRegistrationQueue.addAll(head);
-                    // and the rest
-                    agentRegistrationQueue.addAll(tail);
-
-                    // update agents map with a new order in case we want to re-initialise
-                    // MuleManager on the fly
-                    this.agents.clear();
-                    for (Iterator it = agentRegistrationQueue.iterator(); it.hasNext();)
-                    {
-                        UMOAgent theAgent = (UMOAgent) it.next();
-                        this.agents.put(theAgent.getName(), theAgent);
-                    }
-                }
-            }
-        }
-        finally
-        {
-            // close the cursor as per JavaDoc
-            cursor.close();
-        }
-        logger.info("Agents Successfully Initialised");
-    }
+//    protected void initialiseAgents() throws InitialisationException
+//    {
+//        logger.info("Initialising agents...");
+//
+//        // Do not iterate over the map directly, as 'complex' agents
+//        // may spawn extra agents during initialisation. This will
+//        // cause a ConcurrentModificationException.
+//        // Use a cursorable iteration, which supports on-the-fly underlying
+//        // data structure changes.
+//        Collection agentsSnapshot = agents.values();
+//        CursorableLinkedList agentRegistrationQueue = new CursorableLinkedList(agentsSnapshot);
+//        CursorableLinkedList.Cursor cursor = agentRegistrationQueue.cursor();
+//
+//        // the actual agent object refs are the same, so we are just
+//        // providing different views of the same underlying data
+//
+//        try
+//        {
+//            while (cursor.hasNext())
+//            {
+//                UMOAgent umoAgent = (UMOAgent) cursor.next();
+//
+//                int originalSize = agentsSnapshot.size();
+//                logger.debug("Initialising agent: " + umoAgent.getName());
+//                umoAgent.initialise();
+//                // thank you, we are done with you
+//                cursor.remove();
+//
+//                // Direct calls to MuleManager.registerAgent() modify the original
+//                // agents map, re-check if the above agent registered any
+//                // 'child' agents.
+//                int newSize = agentsSnapshot.size();
+//                int delta = newSize - originalSize;
+//                if (delta > 0)
+//                {
+//                    // TODO there's some mess going on in
+//                    // http://issues.apache.org/jira/browse/COLLECTIONS-219
+//                    // watch out when upgrading the commons-collections.
+//                    Collection tail = CollectionUtils.retainAll(agentsSnapshot, agentRegistrationQueue);
+//                    Collection head = CollectionUtils.subtract(agentsSnapshot, tail);
+//
+//                    // again, above are only refs, all going back to the original agents map
+//
+//                    // re-order the queue
+//                    agentRegistrationQueue.clear();
+//                    // 'spawned' agents first
+//                    agentRegistrationQueue.addAll(head);
+//                    // and the rest
+//                    agentRegistrationQueue.addAll(tail);
+//
+//                    // update agents map with a new order in case we want to re-initialise
+//                    // MuleManager on the fly
+//                    this.agents.clear();
+//                    for (Iterator it = agentRegistrationQueue.iterator(); it.hasNext();)
+//                    {
+//                        UMOAgent theAgent = (UMOAgent) it.next();
+//                        this.agents.put(theAgent.getName(), theAgent);
+//                    }
+//                }
+//            }
+//        }
+//        finally
+//        {
+//            // close the cursor as per JavaDoc
+//            cursor.close();
+//        }
+//        logger.info("Agents Successfully Initialised");
+//    }
 
     /**
      * {@inheritDoc}
@@ -876,7 +928,7 @@ public class DefaultRegistryFacade implements RegistryFacade
     {
         UMOAgent umoAgent;
         logger.info("Starting agents...");
-        for (Iterator iterator = agents.values().iterator(); iterator.hasNext();)
+        for (Iterator iterator = getAgents().values().iterator(); iterator.hasNext();)
         {
             umoAgent = (UMOAgent) iterator.next();
             logger.info("Starting agent: " + umoAgent.getDescription());
@@ -892,7 +944,7 @@ public class DefaultRegistryFacade implements RegistryFacade
     protected void stopAgents() throws UMOException
     {
         logger.info("Stopping agents...");
-        for (Iterator iterator = agents.values().iterator(); iterator.hasNext();)
+        for (Iterator iterator = getAgents().values().iterator(); iterator.hasNext();)
         {
             UMOAgent umoAgent = (UMOAgent) iterator.next();
             logger.debug("Stopping agent: " + umoAgent.getName());
@@ -908,7 +960,7 @@ public class DefaultRegistryFacade implements RegistryFacade
     {
         UMOAgent umoAgent;
         logger.info("disposing agents...");
-        for (Iterator iterator = agents.values().iterator(); iterator.hasNext();)
+        for (Iterator iterator = getAgents().values().iterator(); iterator.hasNext();)
         {
             umoAgent = (UMOAgent) iterator.next();
             logger.debug("Disposing agent: " + umoAgent.getName());
@@ -928,18 +980,18 @@ public class DefaultRegistryFacade implements RegistryFacade
      */
     public void registerContainerContext(UMOContainerContext container) throws UMOException
     {
-        if (container == null)
-        {
-            if (containerContext != null)
-            {
-                containerContext.dispose();
-            }
-            containerContext = new MultiContainerContext();
-        }
-        else
-        {
+//        if (container == null)
+//        {
+//            if (containerContext != null)
+//            {
+//                containerContext.dispose();
+//            }
+//            containerContext = new MultiContainerContext();
+//        }
+//        else
+//        {
             containerContext.addContainer(container);
-        }
+       // }
     }
 
     /**
@@ -983,7 +1035,7 @@ public class DefaultRegistryFacade implements RegistryFacade
         {
             throw new ServiceException(new Message(Messages.FAILED_LOAD_X, type + " " + name));
         }
-        return ServiceDescriptorFactory.create(type, name, props, overrides);
+        return ServiceDescriptorFactory.create(type, name, props, overrides, applicationContext);
     }
 
     /**
@@ -1017,12 +1069,12 @@ public class DefaultRegistryFacade implements RegistryFacade
 
     public void deregisterComponent(String registryId) throws DeregistrationException
     {
-
+        //TODO add method for loading a transport service descriptor. Remember to pass in the registry Context
     }
 
     public Object lookupObject(Object key) throws ObjectNotFoundException
     {
-        return getContainerContext().getComponent(key);
+        return containerContext.getComponent(key);
     }
 
 
@@ -1060,5 +1112,95 @@ public class DefaultRegistryFacade implements RegistryFacade
     {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
+
+
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
+    {
+        this.applicationContext = applicationContext;
+//        SpringContainerContext c = new SpringContainerContext();
+//        c.setName("_springRegistryContainerContext");
+//        c.setBeanFactory(applicationContext);
+//        try
+//        {
+//            registerContainerContext(c);
+//        }
+//        catch (UMOException e)
+//        {
+//            throw new IllegalStateException("failed to register default Spring Registry Container Context", e);
+//        }
+    }
+
+    public UMOEndpoint createEndpointFromUri(UMOEndpointURI uri, String type) throws UMOException
+    {
+        UMOEndpoint endpoint = TransportFactory.createEndpoint(uri, type);
+
+        //TODO RM* check the container desn't already call this and see if we can make it call it for us
+        endpoint.initialise();
+        return endpoint;
+    }
+
+    public UMOEndpoint getEndpointFromUri(String uri) throws ObjectNotFoundException
+    {
+        UMOEndpoint endpoint = null;
+        if (uri != null)
+        {
+            endpoint = lookupEndpoint(uri);
+        }
+        return endpoint;
+    }
+
+    public UMOEndpoint getEndpointFromUri(UMOEndpointURI uri) throws UMOException
+    {
+        String endpointName = uri.getEndpointName();
+        if (endpointName != null)
+        {
+            UMOEndpoint endpoint = lookupEndpoint(endpointName);
+            if (endpoint != null)
+            {
+                if (StringUtils.isNotEmpty(uri.getAddress()))
+                {
+                    endpoint.setEndpointURI(uri);
+                }
+            }
+            return endpoint;
+        }
+
+        return null;
+    }
+
+    public UMOEndpoint getOrCreateEndpointForUri(String uriIdentifier, String type) throws UMOException
+    {
+        UMOEndpoint endpoint = getEndpointFromUri(uriIdentifier);
+        if (endpoint == null)
+        {
+            endpoint = createEndpointFromUri(new MuleEndpointURI(uriIdentifier), type);
+        }
+        else
+        {
+            if (endpoint.getType().equals(UMOEndpoint.ENDPOINT_TYPE_SENDER_AND_RECEIVER))
+            {
+                endpoint.setType(type);
+            }
+            else if (!endpoint.getType().equals(type))
+            {
+                throw new IllegalArgumentException("Endpoint matching: " + uriIdentifier
+                        + " is not of type: " + type + ". It is of type: "
+                        + endpoint.getType());
+
+            }
+        }
+        return endpoint;
+    }
+
+    public UMOEndpoint getOrCreateEndpointForUri(UMOEndpointURI uri, String type) throws UMOException
+    {
+        UMOEndpoint endpoint = getEndpointFromUri(uri);
+        if (endpoint == null)
+        {
+            endpoint = createEndpointFromUri(uri, type);
+        }
+        return endpoint;
+    }
+
 }
 

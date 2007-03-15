@@ -27,7 +27,7 @@ public class UdpConnectorTestCase extends AbstractConnectorTestCase
     {
         UdpConnector c = new UdpConnector();
         c.setName("UdpConnector");
-        c.initialise(managementContext);
+        c.initialise();
         return c;
     }
 

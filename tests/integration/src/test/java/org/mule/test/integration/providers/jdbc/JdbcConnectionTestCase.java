@@ -10,7 +10,7 @@
 
 package org.mule.test.integration.providers.jdbc;
 
-import org.mule.MuleManager;
+
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
@@ -48,7 +48,7 @@ public class JdbcConnectionTestCase extends AbstractJdbcFunctionalTestCase
         strategy.setRetryCount(10);
         strategy.setFrequency(1000);
         strategy.setDoThreading(true);
-        connector.setConnectionStrategy(strategy);
+        //TODO RM* URGENT : connector.setConnectionStrategy(strategy);
         return connector;
     }
 

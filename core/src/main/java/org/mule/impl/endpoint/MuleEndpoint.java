@@ -13,10 +13,12 @@ package org.mule.impl.endpoint;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.ImmutableMuleEndpoint;
+import org.mule.impl.ManagementContextAware;
 import org.mule.providers.ConnectionStrategy;
 import org.mule.providers.service.TransportFactory;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOFilter;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -32,7 +34,7 @@ import java.util.Map;
  * <code>MuleEndpoint</code> describes a Provider in the Mule Server. A endpoint is
  * a grouping of an endpoint, an endpointUri and a transformer.
  */
-public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
+public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint, ManagementContextAware
 {
     /**
      * Serial version
@@ -322,5 +324,11 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
     public void setConnectionStrategy(ConnectionStrategy connectionStrategy)
     {
         this.connectionStrategy = connectionStrategy;
+    }
+
+
+    public void setManagementContext(UMOManagementContext context)
+    {
+        this.managementContext = context;
     }
 }

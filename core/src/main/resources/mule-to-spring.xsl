@@ -20,7 +20,8 @@
                 <bean id="_muleNameProcessor" class="org.mule.config.spring.MuleObjectNameProcessor"/>
             </xsl:if>
             <xsl:apply-templates/>
-            <bean id="_managementContextProcessor" class="org.mule.config.spring.ManagementContextPostProcessor"/>            
+            <bean id="_managementContextProcessor" class="org.mule.config.spring.ManagementContextPostProcessor"/>
+            <bean id="_registry" class="org.mule.config.spring.SpringRegistry"/>
         </beans>
     </xsl:template>
 
@@ -121,7 +122,7 @@
     </xsl:template>
 
     <xsl:template match="environment-properties">
-        <bean name="muleEnvironmentProperties" class="org.mule.impl.container.PropertiesContainerContext">
+        <bean name="muleEnvironmentProperties" class="org.mule.impl.container.PropertiesContainerContext" init-method="initialise" destroy-method="dispose" scope="prototype">
             <property name="properties">
                 <map>
                     <xsl:apply-templates select="property" mode="mapProperty"/>
@@ -149,7 +150,7 @@
             </xsl:choose>
         </xsl:variable>
 
-        <bean name="{$name}" class="{$type}">
+        <bean name="{$name}" class="{$type}" init-method="initialise" destroy-method="dispose" scope="prototype">
             <xsl:apply-templates select="properties"/>
             <xsl:apply-templates select="exception-strategy"/>
             <xsl:apply-templates select="connection-strategy"/>
@@ -159,7 +160,7 @@
 
     <!-- Transaction manager Template -->
     <xsl:template match="transaction-manager">
-        <bean class="{@factory}">
+        <bean class="{@factory}" init-method="initialise" destroy-method="dispose" scope="prototype">
             <xsl:apply-templates select="properties"/>
         </bean>
     </xsl:template>
@@ -169,7 +170,7 @@
         <xsl:apply-templates select="agent"/>
     </xsl:template>
     <xsl:template match="agent">
-        <bean name="{@name}" class="{@className}">
+        <bean name="{@name}" class="{@className}" init-method="initialise" destroy-method="dispose" scope="prototype">
             <xsl:apply-templates select="properties"/>
         </bean>
     </xsl:template>
@@ -200,7 +201,7 @@
         <xsl:variable name="type">
             <xsl:value-of select="@className"/>
         </xsl:variable>
-        <bean name="{$name}" class="{$type}">
+        <bean name="{$name}" class="{$type}" init-method="initialise" destroy-method="dispose" scope="prototype">
             <xsl:apply-templates select="@returnClass" mode="addProperties"/>
             <xsl:apply-templates select="properties"/>
         </bean>
@@ -292,7 +293,7 @@
         </xsl:variable>
 
         <bean name="{$name}" class="org.mule.impl.model.ModelFactory"
-              factory-method="createModel">
+              factory-method="createModel"  init-method="initialise" destroy-method="dispose" scope="prototype">
             <constructor-arg index="0" type="java.lang.String">
                 <value>
                     <xsl:value-of select="$type"/>
@@ -323,16 +324,16 @@
     </xsl:template>
 
     <xsl:template match="entry-point-resolver">
-        <bean name="entryPointResolver" class="{@className}"/>
+        <bean name="entryPointResolver" class="{@className}" init-method="initialise" destroy-method="dispose" scope="prototype"/>
     </xsl:template>
 
     <xsl:template match="component-lifecycle-adapter-factory">
-        <bean name="componentLifecycleAdapterFactory" class="{@className}"/>
+        <bean name="componentLifecycleAdapterFactory" class="{@className}" init-method="initialise" destroy-method="dispose" scope="prototype"/>
     </xsl:template>
 
     <xsl:template match="exception-strategy">
         <property name="exceptionListener">
-            <bean class="{@className}">
+            <bean class="{@className}" init-method="initialise" destroy-method="dispose" scope="prototype">
                 <xsl:apply-templates select="properties"/>
                 <property name="endpoints">
                     <list>
@@ -346,7 +347,7 @@
 
     <xsl:template match="connection-strategy">
         <property name="connectionStrategy">
-            <bean class="{@className}">
+            <bean class="{@className}" init-method="initialise" destroy-method="dispose" scope="prototype">
                 <xsl:apply-templates select="properties"/>
             </bean>
         </property>
@@ -364,7 +365,7 @@
                 <xsl:otherwise>org.mule.impl.MuleDescriptor</xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
-        <bean name="{$name}" class="{$type}">
+        <bean name="{$name}" class="{$type}" init-method="initialise" destroy-method="dispose" scope="prototype">
             <property name="implementation">
                 <value>
                     <xsl:value-of select="@implementation"/>
@@ -460,7 +461,7 @@
         </xsl:variable>
 
         <property name="{$name}">
-            <bean class="{@className}">
+            <bean class="{@className}" init-method="initialise" destroy-method="dispose" scope="prototype">
                 <xsl:apply-templates select="@*" mode="addProperties"/>
                 <xsl:apply-templates select="properties"/>
                 <xsl:apply-templates select="left-filter"/>
@@ -481,7 +482,7 @@
             </xsl:choose>
         </xsl:variable>
         <property name="inboundRouter">
-            <bean class="{$type}">
+            <bean class="{$type}" init-method="initialise" destroy-method="dispose" scope="prototype">
                 <property name="endpoints">
                     <list>
                         <xsl:apply-templates select="endpoint"/>
@@ -509,7 +510,7 @@
             </xsl:choose>
         </xsl:variable>
         <property name="nestedRouter">
-            <bean class="{$type}">
+            <bean class="{$type}" init-method="initialise" destroy-method="dispose" scope="prototype">
                 <property name="routers">
                     <list>
                         <xsl:apply-templates select="binding"/>
@@ -530,7 +531,7 @@
             </xsl:choose>
         </xsl:variable>
         <property name="responseRouter">
-            <bean class="{$type}">
+            <bean class="{$type}" init-method="initialise" destroy-method="dispose" scope="prototype">
                 <xsl:apply-templates select="@*" mode="addProperties"/>
                 <property name="endpoints">
                     <list>
@@ -560,7 +561,7 @@
             </xsl:choose>
         </xsl:variable>
         <property name="outboundRouter">
-            <bean class="{$type}">
+            <bean class="{$type}" init-method="initialise" destroy-method="dispose" scope="prototype">
                 <xsl:apply-templates select="@*" mode="addProperties"/>
                 <xsl:apply-templates select="catch-all-strategy"/>
                 <property name="routers">
@@ -575,7 +576,7 @@
     <!-- Catch all strategy Template -->
     <xsl:template match="catch-all-strategy">
         <property name="catchAllStrategy">
-            <bean class="{@className}">
+            <bean class="{@className}" init-method="initialise" destroy-method="dispose" scope="prototype">
                 <xsl:apply-templates select="endpoint" mode="propertyEndpoint"/>
                 <xsl:apply-templates select="global-endpoint" mode="propertyEndpoint"/>
                 <xsl:apply-templates select="properties"/>
@@ -608,7 +609,7 @@
 
     <!-- Router Template -->
     <xsl:template match="router">
-        <bean class="{@className}">
+        <bean class="{@className}" init-method="initialise" destroy-method="dispose" scope="prototype">
             <property name="endpoints">
                 <list>
                     <xsl:apply-templates select="endpoint"/>
@@ -622,7 +623,7 @@
 
     <!-- Nested Router binding Template -->
     <xsl:template match="binding">
-        <bean class="org.mule.routing.nested.NestedRouter">
+        <bean class="org.mule.routing.nested.NestedRouter" init-method="initialise" destroy-method="dispose" scope="prototype">
             <property name="endpoint">
                 <xsl:apply-templates select="endpoint"/>
                 <xsl:apply-templates select="global-endpoint"/>
@@ -632,7 +633,7 @@
     </xsl:template>
 
     <xsl:template match="router" mode="inbound">
-        <bean class="{@className}">
+        <bean class="{@className}" init-method="initialise" destroy-method="dispose" scope="prototype">
             <xsl:apply-templates select="properties"/>
             <xsl:apply-templates select="filter"/>
         </bean>
@@ -641,7 +642,7 @@
     <!-- Transaction Template -->
     <xsl:template match="transaction">
         <property name="transactionConfig">
-            <bean class="org.mule.impl.MuleTransactionConfig">
+            <bean class="org.mule.impl.MuleTransactionConfig" init-method="initialise" destroy-method="dispose" scope="prototype">
                 <xsl:if test="@action">
                     <property name="actionAsString">
                         <value>
@@ -651,7 +652,7 @@
                 </xsl:if>
                 <xsl:if test="@factory">
                     <property name="factory">
-                        <bean class="{@factory}"/>
+                        <bean class="{@factory}" init-method="initialise" destroy-method="dispose" scope="prototype"/>
                     </property>
                 </xsl:if>
                 <xsl:apply-templates select="constraint"/>
@@ -680,7 +681,7 @@
         </xsl:variable>
 
         <property name="{$propertyName}">
-            <bean class="org.mule.config.ThreadingProfile">
+            <bean class="org.mule.config.ThreadingProfile" init-method="initialise" destroy-method="dispose" scope="prototype">
                 <xsl:apply-templates select="@*[local-name() !='id' and local-name() !='poolExhaustedAction']|*"
                                      mode="addProperties"/>
                 <xsl:if test="@poolExhaustedAction">
@@ -697,7 +698,7 @@
 
     <xsl:template match="threading-profile">
         <property name="threadingProfile">
-            <bean class="org.mule.config.ThreadingProfile">
+            <bean class="org.mule.config.ThreadingProfile" init-method="initialise" destroy-method="dispose" scope="prototype">
                 <xsl:apply-templates select="@*[local-name() !='id' and local-name() !='poolExhaustedAction']|*"
                                      mode="addProperties"/>
                 <xsl:if test="@poolExhaustedAction">
@@ -713,7 +714,7 @@
 
     <xsl:template match="pooling-profile">
         <property name="poolingProfile">
-            <bean name="pooling-profile" class="org.mule.config.PoolingProfile">
+            <bean name="pooling-profile" class="org.mule.config.PoolingProfile" init-method="initialise" destroy-method="dispose" scope="prototype">
                 <xsl:apply-templates
                         select="@*[local-name() !='initialisationPolicy' and local-name() !='exhaustedAction' and local-name() !='factory']|*"
                         mode="addProperties"/>
@@ -733,7 +734,7 @@
                 </xsl:if>
                 <xsl:if test="@factory">
                     <property name="poolFactory">
-                        <bean class="{@factory}"/>
+                        <bean class="{@factory}" init-method="initialise" destroy-method="dispose" scope="prototype"/>
                     </property>
                 </xsl:if>
             </bean>
@@ -742,7 +743,7 @@
 
     <xsl:template match="queue-profile">
         <property name="queueProfile">
-            <bean name="queue-profile" class="org.mule.config.QueueProfile">
+            <bean name="queue-profile" class="org.mule.config.QueueProfile" init-method="initialise" destroy-method="dispose" scope="prototype">
                 <xsl:apply-templates select="@*" mode="addProperties"/>
             </bean>
         </property>
@@ -768,7 +769,7 @@
                 <xsl:otherwise>org.mule.impl.security.MuleSecurityManager</xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
-        <bean class="{$type}">
+        <bean class="{$type}" init-method="initialise" destroy-method="dispose" scope="prototype">
             <property name="providers">
                 <list>
                     <xsl:apply-templates select="security-provider"/>
@@ -778,7 +779,7 @@
     </xsl:template>
     <xsl:template match="security-provider">
         <xsl:variable name="type" select="@className"/>
-        <bean class="{$type}">
+        <bean class="{$type}" init-method="initialise" destroy-method="dispose" scope="prototype">
             <property name="name">
                 <value>
                     <xsl:value-of select="@name"/>
@@ -789,7 +790,7 @@
     </xsl:template>
     <xsl:template match="security-filter">
         <property name="securityFilter">
-            <bean class="{@className}">
+            <bean class="{@className}" init-method="initialise" destroy-method="dispose" scope="prototype">
                 <xsl:apply-templates select="properties"/>
                 <xsl:if test="@useProviders">
                     NOT IMPLEMENTED
@@ -799,23 +800,23 @@
     </xsl:template>
 
     <!-- general utilities -->
-    <xsl:template name="makeBean">
-        <xsl:param name="defaultType"/>
-        <xsl:variable name="type">
-            <xsl:choose>
-                <xsl:when test="@className">
-                    <xsl:value-of select="@className"/>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:value-of select="$defaultType"/>
-                </xsl:otherwise>
-            </xsl:choose>
-        </xsl:variable>
+    <!--<xsl:template name="makeBean">-->
+        <!--<xsl:param name="defaultType"/>-->
+        <!--<xsl:variable name="type">-->
+            <!--<xsl:choose>-->
+                <!--<xsl:when test="@className">-->
+                    <!--<xsl:value-of select="@className"/>-->
+                <!--</xsl:when>-->
+                <!--<xsl:otherwise>-->
+                    <!--<xsl:value-of select="$defaultType"/>-->
+                <!--</xsl:otherwise>-->
+            <!--</xsl:choose>-->
+        <!--</xsl:variable>-->
 
-        <bean name="{local-name()}" class="{$type}" autowire="constructor">
-            <xsl:apply-templates select="@*|*" mode="addProperties"/>
-        </bean>
-    </xsl:template>
+        <!--<bean name="{local-name()}" class="{$type}" autowire="constructor">-->
+            <!--<xsl:apply-templates select="@*|*" mode="addProperties"/>-->
+        <!--</bean>-->
+    <!--</xsl:template>-->
 
 
     <xsl:template match="*|@*[local-name() != 'className']" mode="addProperties">
@@ -828,7 +829,7 @@
 
     <xsl:template match="persistence-strategy">
         <property name="persistenceStrategy">
-            <bean class="{@className}">
+            <bean class="{@className}" init-method="initialise" destroy-method="dispose" scope="prototype">
                 <xsl:apply-templates select="properties"/>
             </bean>
         </property>
@@ -870,7 +871,7 @@
 
     <xsl:template match="@inboundEndpoint|@outboundEndpoint" mode="addEndpointURI">
         <property name="{local-name()}">
-            <bean class="org.mule.impl.endpoint.MuleEndpoint">
+            <bean class="org.mule.impl.endpoint.MuleEndpoint" init-method="initialise" destroy-method="dispose" scope="prototype">
                 <property name="endpointURI">
                     <bean class="org.mule.impl.endpoint.MuleEndpointURI">
                         <constructor-arg index="0" type="java.lang.String">

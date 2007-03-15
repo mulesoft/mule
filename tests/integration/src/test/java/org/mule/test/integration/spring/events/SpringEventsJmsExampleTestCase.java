@@ -10,7 +10,7 @@
 
 package org.mule.test.integration.spring.events;
 
-import org.mule.MuleManager;
+import org.mule.RegistryContext;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.functional.EventCallback;

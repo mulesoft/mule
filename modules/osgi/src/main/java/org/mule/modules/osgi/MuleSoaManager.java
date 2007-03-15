@@ -10,7 +10,7 @@
 
 package org.mule.modules.osgi;
 
-import org.mule.MuleManager;
+
 import org.mule.config.i18n.Message;
 import org.mule.providers.service.TransportServiceDescriptor;
 import org.mule.registry.ServiceDescriptor;

@@ -19,7 +19,6 @@ import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.message.ExceptionPayload;
 import org.mule.management.stats.ComponentStatistics;
@@ -121,7 +120,7 @@ public class DefaultMuleProxy implements MuleProxy
             {
                 try
                 {
-                    ((Initialisable)interceptor).initialise(descriptor.getManagementContext());
+                    ((Initialisable)interceptor).initialise();
                 }
                 catch (Exception e)
                 {
@@ -416,7 +415,7 @@ public class DefaultMuleProxy implements MuleProxy
             UMOEndpointURI endpointUri = new MuleEndpointURI(returnMessage.getReplyTo().toString());
 
             // get the endpointUri for this uri
-            UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(endpointUri,
+            UMOEndpoint endpoint = descriptor.getManagementContext().getRegistry().getOrCreateEndpointForUri(endpointUri,
                 UMOEndpoint.ENDPOINT_TYPE_SENDER);
 
             // make sure remove the replyTo property as not cause a a forever

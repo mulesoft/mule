@@ -27,7 +27,7 @@ public abstract class AbstractContainerContextTestCase extends AbstractMuleTestC
     public void testContainerContext() throws Exception
     {
         UMOContainerContext container = getContainerContext();
-        container.initialise(managementContext);
+        container.initialise();
         assertNotNull(container);
 
         Object result = null;
@@ -73,10 +73,10 @@ public abstract class AbstractContainerContextTestCase extends AbstractMuleTestC
     {
         UMOContainerContext container = getContainerContext();
         assertNotNull(container);
-        container.initialise(managementContext);
+        container.initialise();
         UMODescriptor descriptor = getTestDescriptor("fruit Bowl", "org.mule.tck.testmodels.fruit.FruitBowl");
         descriptor.setContainer("plexus");
-        descriptor.initialise(managementContext);
+        descriptor.initialise();
         FruitBowl fruitBowl = (FruitBowl)container.getComponent(descriptor.getImplementation());
 
         assertNotNull(fruitBowl);

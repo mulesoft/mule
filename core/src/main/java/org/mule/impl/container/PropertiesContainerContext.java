@@ -11,7 +11,6 @@
 package org.mule.impl.container;
 
 import org.mule.RegistryContext;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.ContainerException;
 import org.mule.umo.manager.ObjectNotFoundException;
@@ -51,7 +50,7 @@ public class PropertiesContainerContext extends AbstractContainerContext
     }
 
     //@Override
-    public void doInitialise(UMOManagementContext managementContext) throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         if (properties != null)
         {
@@ -65,6 +64,7 @@ public class PropertiesContainerContext extends AbstractContainerContext
                 managementContext.getRegistry().setProperty(entry.getKey(), value);
             }
         }
+        setSystemProperties(null);
     }
 
     public void configure(Reader configuration) throws ContainerException

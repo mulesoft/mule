@@ -12,7 +12,6 @@ package org.mule.persistence.manager;
 
 import org.mule.persistence.Persistable;
 import org.mule.persistence.PersistenceTimer;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.RecoverableException;
 
@@ -41,9 +40,8 @@ public class QueuePersistenceManager extends AbstractPersistenceManager
 
     /**
      * {@inheritDoc}
-     * @param managementContext
      */
-    public void initialise(UMOManagementContext managementContext) throws InitialisationException, RecoverableException
+    public void initialise() throws InitialisationException, RecoverableException
     {
         queue = new ConcurrentLinkedQueue();
         persistenceTimer = new PersistenceTimer(this);

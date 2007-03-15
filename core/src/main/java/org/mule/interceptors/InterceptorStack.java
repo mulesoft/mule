@@ -14,7 +14,6 @@ import org.mule.umo.Invocation;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOInterceptor;
 import org.mule.umo.UMOInterceptorStack;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
@@ -88,14 +87,14 @@ public class InterceptorStack implements UMOInterceptorStack, Initialisable, Dis
         this.interceptors = interceptors;
     }
 
-    public void initialise(UMOManagementContext managementContext) throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         for (Iterator it = interceptors.iterator(); it.hasNext();)
         {
             UMOInterceptor interceptor = (UMOInterceptor)it.next();
             if (interceptor instanceof Initialisable)
             {
-                ((Initialisable)interceptor).initialise(managementContext);
+                ((Initialisable)interceptor).initialise();
             }
         }
     }

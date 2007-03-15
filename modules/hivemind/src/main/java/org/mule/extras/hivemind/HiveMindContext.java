@@ -12,7 +12,6 @@ package org.mule.extras.hivemind;
 
 import org.mule.impl.container.AbstractContainerContext;
 import org.mule.impl.container.ContainerKeyPair;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.ContainerException;
 import org.mule.umo.manager.ObjectNotFoundException;
@@ -118,9 +117,9 @@ public class HiveMindContext extends AbstractContainerContext
 
     /**
      * Here we build the registry from the standard deployment descriptors location.
-     * @param managementContext
+     * //@Override
      */
-    public void doInitialise(UMOManagementContext managementContext) throws InitialisationException {
+    public void initialise() throws InitialisationException {
         if (registry == null)
         {
             logger.debug("About to initilise the registry...");

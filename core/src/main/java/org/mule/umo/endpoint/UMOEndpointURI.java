@@ -10,6 +10,8 @@
 
 package org.mule.umo.endpoint;
 
+import org.mule.umo.lifecycle.Initialisable;
+
 import java.io.Serializable;
 import java.net.URI;
 import java.util.Properties;
@@ -25,7 +27,7 @@ import java.util.Properties;
  * endpointUri can be any endpointUri recognised by the endpoint type.
  * 
  */
-public interface UMOEndpointURI extends Serializable
+public interface UMOEndpointURI extends Serializable, Initialisable
 {
     public static final String PROPERTY_ENDPOINT_NAME = "endpointName";
     public static final String PROPERTY_ENDPOINT_URI = "address";

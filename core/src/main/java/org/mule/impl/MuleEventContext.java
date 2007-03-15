@@ -14,7 +14,6 @@ import org.mule.RegistryContext;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.FutureMessageResult;
 import org.mule.umo.TransactionException;
@@ -280,7 +279,7 @@ public class MuleEventContext implements UMOEventContext
      */
     public UMOMessage sendEvent(UMOMessage message, UMOEndpointURI endpointUri) throws UMOException
     {
-        UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(endpointUri,
+        UMOEndpoint endpoint = getManagementContext().getRegistry().getOrCreateEndpointForUri(endpointUri,
             UMOEndpoint.ENDPOINT_TYPE_SENDER);
 
         // If synchronous receive has not been explicitly set, default it to
@@ -494,7 +493,7 @@ public class MuleEventContext implements UMOEventContext
      */
     public void dispatchEvent(UMOMessage message, UMOEndpointURI endpointUri) throws UMOException
     {
-        UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(endpointUri,
+        UMOEndpoint endpoint = getManagementContext().getRegistry().getOrCreateEndpointForUri(endpointUri,
             UMOEndpoint.ENDPOINT_TYPE_SENDER);
         session.dispatchEvent(message, endpoint);
     }
@@ -569,7 +568,7 @@ public class MuleEventContext implements UMOEventContext
      */
     public UMOMessage receiveEvent(UMOEndpointURI endpointUri, long timeout) throws UMOException
     {
-        UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(endpointUri,
+        UMOEndpoint endpoint = getManagementContext().getRegistry().getOrCreateEndpointForUri(endpointUri,
             UMOEndpoint.ENDPOINT_TYPE_SENDER);
         return session.receiveEvent(endpoint, timeout);
     }
@@ -725,7 +724,7 @@ public class MuleEventContext implements UMOEventContext
     }
 
 
-    public UMOManagementContext getManagmentContext()
+    public UMOManagementContext getManagementContext()
     {
         return event.getManagementContext();
     }

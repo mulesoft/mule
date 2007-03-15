@@ -14,7 +14,6 @@ import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.config.spring.RegistryFacade;
 import org.mule.impl.DefaultComponentExceptionStrategy;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.model.seda.SedaModel;
 import org.mule.management.agents.JmxAgent;
 import org.mule.providers.SimpleRetryConnectionStrategy;
@@ -112,7 +111,7 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             props.put("testGlobal", "value1");
             builder.registerEndpoint("test://orangeQ", "orangeEndpoint", false, props);
 
-            UMOEndpoint ep = new MuleEndpoint("test://test.queue2", false);
+            UMOEndpoint ep = managementContext.getRegistry().getOrCreateEndpointForUri("test://test.queue2", UMOEndpoint.ENDPOINT_TYPE_SENDER);
             ep.setName("testEPWithCS");
             SimpleRetryConnectionStrategy cs = new SimpleRetryConnectionStrategy();
             cs.setRetryCount(4);
@@ -127,7 +126,7 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             UMOModel model = new SedaModel();
             model.setName("main");
             TestExceptionStrategy es = new TestExceptionStrategy();
-            es.addEndpoint(new MuleEndpoint("test://component.exceptions", false));
+            es.addEndpoint(managementContext.getRegistry().getOrCreateEndpointForUri("test://component.exceptions", UMOEndpoint.ENDPOINT_TYPE_SENDER));
             model.setExceptionListener(es);
             model.setLifecycleAdapterFactory(new TestDefaultLifecycleAdapterFactory());
             model.setEntryPointResolver(new TestEntryPointResolver());
@@ -139,12 +138,12 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             UMODescriptor d = builder.createDescriptor("orange", "orangeComponent", null, ep1, props);
             d.setContainer("descriptor");
             DefaultComponentExceptionStrategy dces = new DefaultComponentExceptionStrategy();
-            dces.addEndpoint(new MuleEndpoint("test://orange.exceptions", false));
+            dces.addEndpoint(managementContext.getRegistry().getOrCreateEndpointForUri("test://orange.exceptions", UMOEndpoint.ENDPOINT_TYPE_SENDER));
             d.setExceptionListener(dces);
             // Create the inbound router
             UMOInboundRouterCollection inRouter = new InboundRouterCollection();
             inRouter.setCatchAllStrategy(new ForwardingCatchAllStrategy());
-            inRouter.getCatchAllStrategy().setEndpoint(new MuleEndpoint("test://catch.all", false));
+            inRouter.getCatchAllStrategy().setEndpoint(managementContext.getRegistry().getOrCreateEndpointForUri("test://catch.all", UMOEndpoint.ENDPOINT_TYPE_SENDER));
             UMOEndpoint ep2 = builder.createEndpoint("test://orange/", "Orange", true,
                 "TestCompressionTransformer");
             ep2.setResponseTransformer(registry.lookupTransformer("TestCompressionTransformer"));
@@ -161,12 +160,12 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             //Nested Router
             UMONestedRouterCollection nestedRouter = new NestedRouterCollection();
             NestedRouter nr1 = new NestedRouter();
-            nr1.setEndpoint(new MuleEndpoint("test://do.wash", false));
+            nr1.setEndpoint(managementContext.getRegistry().getOrCreateEndpointForUri("test://do.wash", UMOEndpoint.ENDPOINT_TYPE_SENDER));
             nr1.setInterface(FruitCleaner.class);
             nr1.setMethod("wash");
             nestedRouter.addRouter(nr1);
             NestedRouter nr2 = new NestedRouter();
-            nr2.setEndpoint(new MuleEndpoint("test://do.polish", false));
+            nr2.setEndpoint(managementContext.getRegistry().getOrCreateEndpointForUri("test://do.polish", UMOEndpoint.ENDPOINT_TYPE_SENDER));
             nr2.setInterface(FruitCleaner.class);
             nr2.setMethod("polish");
             nestedRouter.addRouter(nr2);
@@ -175,7 +174,7 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             
             // Response Router
             UMOResponseRouterCollection responseRouter = new ResponseRouterCollection();
-            responseRouter.addEndpoint(new MuleEndpoint("test://response1", true));
+            responseRouter.addEndpoint(managementContext.getRegistry().getOrCreateEndpointForUri("test://response1", UMOEndpoint.ENDPOINT_TYPE_RECEIVER));
             responseRouter.addEndpoint(registry.lookupEndpoint("appleResponseEndpoint"));
             responseRouter.addRouter(new TestResponseAggregator());
             responseRouter.setTimeout(10001);

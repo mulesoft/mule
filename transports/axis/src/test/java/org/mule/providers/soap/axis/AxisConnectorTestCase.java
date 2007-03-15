@@ -27,7 +27,7 @@ public class AxisConnectorTestCase extends AbstractConnectorTestCase
     public UMOConnector getConnector() throws Exception
     {
         AxisConnector c = new AxisConnector();
-        c.initialise(managementContext);
+        c.initialise();
         return c;
     }
 

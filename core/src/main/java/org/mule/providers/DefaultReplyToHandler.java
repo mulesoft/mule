@@ -15,7 +15,6 @@ import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleEvent;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.model.AbstractComponent;
 import org.mule.umo.UMOEvent;
@@ -108,7 +107,7 @@ public class DefaultReplyToHandler implements ReplyToHandler
             if (endpoint == null)
             {
                 UMOEndpointURI ep = new MuleEndpointURI(endpointUri);
-                endpoint = MuleEndpoint.getOrCreateEndpointForUri(ep, UMOEndpoint.ENDPOINT_TYPE_SENDER);
+                endpoint = event.getManagementContext().getRegistry().getOrCreateEndpointForUri(ep, UMOEndpoint.ENDPOINT_TYPE_SENDER);
                 endpointCache.put(endpointUri, endpoint);
             }
         }

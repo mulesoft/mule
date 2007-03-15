@@ -53,7 +53,7 @@ public class JndiContainerContextTestCase extends AbstractContainerContextTestCa
         Map env = new HashMap();
         env.put(Context.INITIAL_CONTEXT_FACTORY, MuleInitialContextFactory.class.getName());
         context.setEnvironment(env);
-        context.initialise(managementContext);
+        context.initialise();
         Context ic = context.getContext();
         ic.bind(FruitBowl.class.getName(), new FruitBowl(new Apple(), new Banana()));
         ic.bind(Apple.class.getName(), new Apple());
@@ -82,7 +82,7 @@ public class JndiContainerContextTestCase extends AbstractContainerContextTestCa
         // reset initial context
         context.setEnvironment(null);
         context.setContext(null);
-        context.initialise(managementContext);
+        context.initialise();
         Context icDefault = context.getContext();
         assertNotNull(icDefault);
         assertNotSame(icEnv, icDefault);
@@ -90,7 +90,7 @@ public class JndiContainerContextTestCase extends AbstractContainerContextTestCa
         // reset initial context (same, but empty map)
         context.setEnvironment(Collections.EMPTY_MAP);
         context.setContext(null);
-        context.initialise(managementContext);
+        context.initialise();
         icDefault = context.getContext();
         assertNotNull(icDefault);
 

@@ -10,7 +10,8 @@
 
 package org.mule.test.integration.client;
 
-import org.mule.MuleManager;
+
+import org.mule.RegistryContext;
 import org.mule.extras.client.MuleClient;
 import org.mule.extras.client.RemoteDispatcher;
 import org.mule.tck.FunctionalTestCase;

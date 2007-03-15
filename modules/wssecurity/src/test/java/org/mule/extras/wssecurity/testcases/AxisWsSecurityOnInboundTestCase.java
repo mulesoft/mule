@@ -22,7 +22,7 @@ public class AxisWsSecurityOnInboundTestCase extends FunctionalTestCase
 {
     public void testGoodUserNameEncrypted() throws Exception
     {
-        MuleClient client = new MuleClient();
+        MuleClient client = new MuleClient(managementContext);
         Properties props = new Properties();
 
         // Action to perform : user token

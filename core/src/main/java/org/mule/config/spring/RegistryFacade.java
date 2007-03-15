@@ -15,6 +15,7 @@ import org.mule.registry.ServiceDescriptor;
 import org.mule.registry.ServiceException;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.umo.manager.UMOAgent;
@@ -105,4 +106,15 @@ public interface RegistryFacade extends Initialisable, Registry
     ServiceDescriptor lookupServiceDescriptor(String type, String name, Properties overrides) throws ServiceException;
 
     Object lookupObject(Object key) throws ObjectNotFoundException;
+
+    public UMOEndpoint createEndpointFromUri(UMOEndpointURI uri, String type) throws UMOException;
+
+    public UMOEndpoint getEndpointFromUri(String uri) throws ObjectNotFoundException;
+
+    public UMOEndpoint getEndpointFromUri(UMOEndpointURI uri) throws UMOException;
+
+    public UMOEndpoint getOrCreateEndpointForUri(String uriIdentifier, String type) throws UMOException;
+
+    public UMOEndpoint getOrCreateEndpointForUri(UMOEndpointURI uri, String type) throws UMOException;
+
 }

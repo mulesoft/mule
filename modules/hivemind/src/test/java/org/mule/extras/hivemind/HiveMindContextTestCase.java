@@ -29,7 +29,7 @@ public class HiveMindContextTestCase extends AbstractContainerContextTestCase
     protected void doSetUp() throws Exception
     {
         context = new HiveMindContext();
-        context.initialise(managementContext);
+        context.initialise();
     }
 
     /*
@@ -121,7 +121,7 @@ public class HiveMindContextTestCase extends AbstractContainerContextTestCase
     public void testDispose() throws Exception
     {
         HiveMindContext context = new HiveMindContext();
-        context.initialise(managementContext);
+        context.initialise();
         context.dispose();
 
         try

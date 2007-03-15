@@ -194,7 +194,7 @@ public abstract class AbstractModel implements UMOModel
         if (initialised.get())
         {
             logger.info("Initialising component: " + descriptor.getName());
-            component.initialise(managementContext);
+            component.initialise();
         }
         if (started.get())
         {
@@ -320,7 +320,6 @@ public abstract class AbstractModel implements UMOModel
     {
         if (!initialised.get())
         {
-            //initialise(managementContext);
             throw new IllegalStateException("Not Initialised");
         }
 
@@ -465,11 +464,10 @@ public abstract class AbstractModel implements UMOModel
         }
     }
 
-    public void initialise(UMOManagementContext managementContext) throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         if (!initialised.get())
         {
-            this.managementContext = managementContext;
             fireNotification(new ModelNotification(this, ModelNotification.MODEL_INITIALISING));
             try
             {
@@ -482,14 +480,14 @@ public abstract class AbstractModel implements UMOModel
 
             if (exceptionListener instanceof Initialisable)
             {
-                ((Initialisable)exceptionListener).initialise(managementContext);
+                ((Initialisable)exceptionListener).initialise();
             }
             UMOComponent component = null;
             for (Iterator i = components.values().iterator(); i.hasNext();)
             {
                 component = (UMOComponent)i.next();
 
-                component.initialise(managementContext);
+                component.initialise();
 
                 logger.info("Component " + component.getDescriptor().getName()
                             + " has been started successfully");
@@ -567,6 +565,18 @@ public abstract class AbstractModel implements UMOModel
     void fireNotification(UMOServerNotification notification)
     {
         managementContext.fireNotification(notification);
+    }
+
+
+    public void setManagementContext(UMOManagementContext context)
+    {
+        this.managementContext = context;
+    }
+
+
+    public UMOManagementContext getManagementContext()
+    {
+        return managementContext;
     }
 
     protected abstract UMOComponent createComponent(UMODescriptor descriptor);

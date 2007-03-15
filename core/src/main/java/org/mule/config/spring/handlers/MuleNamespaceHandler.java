@@ -88,9 +88,10 @@ public class MuleNamespaceHandler extends AbstractHierarchicalNamespaceHandler
     {
         //Common elements
         registerBeanDefinitionParser("configuration", new ConfigurationDefinitionParser());
+        registerBeanDefinitionParser("environment-properties", new PropertiesDefinitionParser("_muleEnvironmentProperties"));
         registerBeanDefinitionParser("default-threading-profile", new ThreadingProfileDefinitionParser());
-        registerBeanDefinitionParser("default-dispatcher-connection-straqtegy", new ConnectionStrategyDefinitionParser());
-        registerBeanDefinitionParser("default-receiver-connection-straqtegy", new ConnectionStrategyDefinitionParser());
+        registerBeanDefinitionParser("default-dispatcher-connection-strategy", new ConnectionStrategyDefinitionParser());
+        registerBeanDefinitionParser("default-receiver-connection-strategy", new ConnectionStrategyDefinitionParser());
         registerBeanDefinitionParser("properties", new PropertiesDefinitionParser());
 
         //registerBeanDefinitionParser("mule-configuration", new ManagementContextDefinitionParser());
@@ -105,43 +106,39 @@ public class MuleNamespaceHandler extends AbstractHierarchicalNamespaceHandler
         registerBeanDefinitionParser("dispatcher-connection-straqtegy", new ConnectionStrategyDefinitionParser());
         registerBeanDefinitionParser("receiver-connection-straqtegy", new ConnectionStrategyDefinitionParser());
         registerBeanDefinitionParser("service-overrides", new ServiceOverridesDefinitionParser());
-        registerBeanDefinitionParser("custom-connector", new CustomElementDefinitionParser());
+        registerBeanDefinitionParser("custom-connector", new CustomElementDefinitionParser(true, "initialise", "dispose"));
 
         //Transformer elements
-        registerBeanDefinitionParser("custom-transformer", new CustomElementDefinitionParser());
-        registerBeanDefinitionParser("transformer-no-action", new SingleElementDefinitionParser(NoActionTransformer.class));
+        registerBeanDefinitionParser("custom-transformer", new CustomElementDefinitionParser(false));
+        registerBeanDefinitionParser("transformer-no-action", new SingleElementDefinitionParser(NoActionTransformer.class, false));
         registerBeanDefinitionParser("source-type", new SourceTypeDefinitionParser());
 
-        registerBeanDefinitionParser("transformer-base64-encoder", new SingleElementDefinitionParser(Base64Encoder.class));
-        registerBeanDefinitionParser("transformer-base64-decoder", new SingleElementDefinitionParser(Base64Decoder.class));
-//        registerBeanDefinitionParser("transformer-uc-encoder", new SingleElementDefinitionParser(UCEncoder.class));
-//        registerBeanDefinitionParser("transformer-uc-decoder", new SingleElementDefinitionParser(UCDecoder.class));
-//        registerBeanDefinitionParser("transformer-uu-encoder", new SingleElementDefinitionParser(UUEncoder.class));
-//        registerBeanDefinitionParser("transformer-uu-decoder", new SingleElementDefinitionParser(UUDecoder.class));
+        registerBeanDefinitionParser("transformer-base64-encoder", new SingleElementDefinitionParser(Base64Encoder.class, false));
+        registerBeanDefinitionParser("transformer-base64-decoder", new SingleElementDefinitionParser(Base64Decoder.class, false));
 
-        registerBeanDefinitionParser("transformer-xml-entity-encoder", new SingleElementDefinitionParser(XmlEntityEncoder.class));
-        registerBeanDefinitionParser("transformer-xml-entity-decoder", new SingleElementDefinitionParser(XmlEntityDecoder.class));
-        registerBeanDefinitionParser("transformer-gzip-compress", new SingleElementDefinitionParser(GZipCompressTransformer.class));
-        registerBeanDefinitionParser("transformer-gzip-uncompress", new SingleElementDefinitionParser(GZipUncompressTransformer.class));
-        registerBeanDefinitionParser("transformer-encrypt", new SingleElementDefinitionParser(EncryptionTransformer.class));
-        registerBeanDefinitionParser("transformer-decrypt", new SingleElementDefinitionParser(DecryptionTransformer.class));
-        registerBeanDefinitionParser("transformer-byte-array-to-hex-string", new SingleElementDefinitionParser(ByteArrayToHexString.class));
-        registerBeanDefinitionParser("transformer-hex-sting-to-byte-array", new SingleElementDefinitionParser(HexStringToByteArray.class));
+        registerBeanDefinitionParser("transformer-xml-entity-encoder", new SingleElementDefinitionParser(XmlEntityEncoder.class, false));
+        registerBeanDefinitionParser("transformer-xml-entity-decoder", new SingleElementDefinitionParser(XmlEntityDecoder.class, false));
+        registerBeanDefinitionParser("transformer-gzip-compress", new SingleElementDefinitionParser(GZipCompressTransformer.class, false));
+        registerBeanDefinitionParser("transformer-gzip-uncompress", new SingleElementDefinitionParser(GZipUncompressTransformer.class, false));
+        registerBeanDefinitionParser("transformer-encrypt", new SingleElementDefinitionParser(EncryptionTransformer.class, false));
+        registerBeanDefinitionParser("transformer-decrypt", new SingleElementDefinitionParser(DecryptionTransformer.class, false));
+        registerBeanDefinitionParser("transformer-byte-array-to-hex-string", new SingleElementDefinitionParser(ByteArrayToHexString.class, false));
+        registerBeanDefinitionParser("transformer-hex-sting-to-byte-array", new SingleElementDefinitionParser(HexStringToByteArray.class, false));
 
-        registerBeanDefinitionParser("transformer-byte-array-to-object", new SingleElementDefinitionParser(ByteArrayToObject.class));
-        registerBeanDefinitionParser("transformer-object-to-byte-array", new SingleElementDefinitionParser(ObjectToByteArray.class));
-        registerBeanDefinitionParser("transformer-byte-array-to-serializable", new SingleElementDefinitionParser(ByteArrayToSerializable.class));
-        registerBeanDefinitionParser("transformer-serializable-to-byte-array", new SingleElementDefinitionParser(SerializableToByteArray.class));
+        registerBeanDefinitionParser("transformer-byte-array-to-object", new SingleElementDefinitionParser(ByteArrayToObject.class, false));
+        registerBeanDefinitionParser("transformer-object-to-byte-array", new SingleElementDefinitionParser(ObjectToByteArray.class, false));
+        registerBeanDefinitionParser("transformer-byte-array-to-serializable", new SingleElementDefinitionParser(ByteArrayToSerializable.class, false));
+        registerBeanDefinitionParser("transformer-serializable-to-byte-array", new SingleElementDefinitionParser(SerializableToByteArray.class, false));
 
         //Transaction Managers
         //TODO RM*: Better implementation of trnasaction manager properties
-        registerBeanDefinitionParser("jndi-transaction-manager", new SingleElementDefinitionParser(GenericTransactionManagerLookupFactory.class));
-        registerBeanDefinitionParser("weblogic-transaction-manager", new SingleElementDefinitionParser(WeblogicTransactionManagerLookupFactory.class));
-        registerBeanDefinitionParser("jboss-transaction-manager", new SingleElementDefinitionParser(JBossTransactionManagerLookupFactory.class));
-        registerBeanDefinitionParser("jrun-transaction-manager", new SingleElementDefinitionParser(JRunTransactionManagerLookupFactory.class));
-        registerBeanDefinitionParser("resin3-transaction-manager", new SingleElementDefinitionParser(Resin3TransactionManagerLookupFactory.class));
-        registerBeanDefinitionParser("websphere-transaction-manager", new SingleElementDefinitionParser(WebsphereTransactionManagerLookupFactory.class));
-        registerBeanDefinitionParser("custom-transaction-manager-factory", new CustomElementDefinitionParser());
+        registerBeanDefinitionParser("jndi-transaction-manager", new SingleElementDefinitionParser(GenericTransactionManagerLookupFactory.class, true));
+        registerBeanDefinitionParser("weblogic-transaction-manager", new SingleElementDefinitionParser(WeblogicTransactionManagerLookupFactory.class, true));
+        registerBeanDefinitionParser("jboss-transaction-manager", new SingleElementDefinitionParser(JBossTransactionManagerLookupFactory.class, true));
+        registerBeanDefinitionParser("jrun-transaction-manager", new SingleElementDefinitionParser(JRunTransactionManagerLookupFactory.class, true));
+        registerBeanDefinitionParser("resin3-transaction-manager", new SingleElementDefinitionParser(Resin3TransactionManagerLookupFactory.class, true));
+        registerBeanDefinitionParser("websphere-transaction-manager", new SingleElementDefinitionParser(WebsphereTransactionManagerLookupFactory.class, true));
+        registerBeanDefinitionParser("custom-transaction-manager-factory", new CustomElementDefinitionParser(true));
 
         //Endpoint elements
         registerBeanDefinitionParser("endpoint", new EndpointDefinitionParser());
@@ -149,10 +146,10 @@ public class MuleNamespaceHandler extends AbstractHierarchicalNamespaceHandler
         registerBeanDefinitionParser("transaction", new TransactionConfigDefinitionParser());
 
         //Container contexts
-        registerBeanDefinitionParser("custom-container", new CustomElementDefinitionParser());
-        registerBeanDefinitionParser("rmi-container", new SingleElementDefinitionParser(RmiContainerContext.class));
-        registerBeanDefinitionParser("jndi-container", new SingleElementDefinitionParser(JndiContainerContext.class));
-        registerBeanDefinitionParser("properties-container", new SingleElementDefinitionParser(PropertiesContainerContext.class));
+        registerBeanDefinitionParser("custom-container", new CustomElementDefinitionParser(true, "initialise", "dispose"));
+        registerBeanDefinitionParser("rmi-container", new SingleElementDefinitionParser(RmiContainerContext.class, true, "initialise", "dispose"));
+        registerBeanDefinitionParser("jndi-container", new SingleElementDefinitionParser(JndiContainerContext.class, true, "initialise", "dispose"));
+        registerBeanDefinitionParser("properties-container", new SingleElementDefinitionParser(PropertiesContainerContext.class, true, "initialise", "dispose"));
 
         //Model Elements
         registerBeanDefinitionParser("model-seda", new ModelDefinitionParser("seda"));

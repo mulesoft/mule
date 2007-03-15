@@ -11,7 +11,6 @@
 package org.mule.management.mbeans;
 
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.util.ObjectNameHelper;
@@ -75,8 +74,8 @@ public class ConnectorService implements ConnectorServiceMBean
     }
 
 
-    public void initialise(UMOManagementContext managementContext) throws InitialisationException
+    public void initialise() throws InitialisationException
     {
-        connector.initialise(managementContext);
+        connector.initialise();
     }
 }

@@ -15,7 +15,6 @@ import org.mule.config.ConfigurationException;
 import org.mule.config.ReaderResource;
 import org.mule.impl.ManagementContext;
 import org.mule.impl.MuleDescriptor;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.internal.admin.MuleAdminAgent;
 import org.mule.impl.model.ModelFactory;
@@ -547,7 +546,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
                                       String transformers,
                                       UMOFilter filter) throws UMOException
     {
-        UMOEndpoint ep = MuleEndpoint.createEndpointFromUri(new MuleEndpointURI(uri), (inbound
+        UMOEndpoint ep = managementContext.getRegistry().getOrCreateEndpointForUri(new MuleEndpointURI(uri), (inbound
                         ? UMOEndpoint.ENDPOINT_TYPE_RECEIVER : UMOEndpoint.ENDPOINT_TYPE_SENDER));
         ep.setName(name);
         if (transformers != null)
@@ -562,7 +561,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     public UMOEndpoint registerEndpoint(String uri, String name, boolean inbound) throws UMOException
     {
         UMOEndpoint ep = createEndpoint(uri, name, inbound);
-        ep.initialise(managementContext);
+        ep.initialise();
        managementContext.getRegistry().registerEndpoint(ep);
         return ep;
     }
@@ -572,7 +571,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     {
         UMOEndpoint ep = createEndpoint(uri, name, inbound);
         ep.getProperties().putAll(properties);
-        ep.initialise(managementContext);
+        ep.initialise();
        managementContext.getRegistry().registerEndpoint(ep);
         return ep;
     }
@@ -592,7 +591,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         {
             ep.setFilter(filter);
         }
-        ep.initialise(managementContext);
+        ep.initialise();
        managementContext.getRegistry().registerEndpoint(ep);
         return ep;
     }

@@ -18,7 +18,6 @@ import org.mule.providers.NullPayload;
 import org.mule.registry.DeregistrationException;
 import org.mule.registry.RegistrationException;
 import org.mule.registry.metadata.ObjectMetadata;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -342,9 +341,8 @@ public abstract class AbstractTransformer implements UMOTransformer
      * properties have been set on this transformer
      * 
      * @throws InitialisationException
-     * @param managementContext
      */
-    public void initialise(UMOManagementContext managementContext) throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         // nothing to do
     }

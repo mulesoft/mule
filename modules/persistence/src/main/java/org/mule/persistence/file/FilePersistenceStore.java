@@ -82,9 +82,8 @@ public class FilePersistenceStore implements PersistenceStore, ManagementContext
 
     /**
      * {@inheritDoc}
-     * @param managmentContext
      */
-    public void initialise(UMOManagementContext managementContext) throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         logger.info("Initialising");
         String workDir = RegistryContext.getConfiguration().getWorkingDirectory();
@@ -95,7 +94,7 @@ public class FilePersistenceStore implements PersistenceStore, ManagementContext
         {
             logger.info("Creating directory " + fileName);
             storeDir = FileUtils.openDirectory(fileName);
-            serializer.initialise(managementContext);
+            serializer.initialise();
             ready = true;
         } 
         catch (IOException ieo)

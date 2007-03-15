@@ -11,8 +11,6 @@
 package org.mule.tck;
 
 import org.mule.RegistryContext;
-import org.mule.config.spring.DefaultRegistryFacade;
-import org.mule.impl.ManagementContext;
 import org.mule.impl.MuleDescriptor;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.umo.UMOComponent;
@@ -33,6 +31,8 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import junit.framework.TestCase;
 
@@ -181,7 +181,6 @@ public abstract class AbstractMuleTestCase extends TestCase
             {
                 return;
             }
-            setupRegistry();
             managementContext = createManagementContext();
 
             doSetUp();
@@ -198,15 +197,13 @@ public abstract class AbstractMuleTestCase extends TestCase
         }
     }
 
-    protected void setupRegistry()
-    {
-        RegistryContext.setRegistry(new DefaultRegistryFacade());
-    }
-
     protected UMOManagementContext createManagementContext() throws Exception
     {
-        UMOManagementContext managementContext = new ManagementContext();
-        managementContext.initialise();        
+        //This will create the local registry too
+        ApplicationContext ctx = new ClassPathXmlApplicationContext("default-mule-config.xml");
+
+        UMOManagementContext managementContext = (UMOManagementContext)ctx.getBean("_muleManagementContextFactoryBean");
+        //Add a default model for compoennts to run in
         managementContext.getRegistry().registerModel(getDefaultModel(managementContext));
         return managementContext;
     }

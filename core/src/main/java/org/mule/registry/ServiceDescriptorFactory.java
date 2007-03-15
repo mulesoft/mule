@@ -23,6 +23,7 @@ import org.mule.util.SpiUtils;
 import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.context.ApplicationContext;
 
 /**
  * Factory used to create a new service descriptor.
@@ -37,7 +38,7 @@ public class ServiceDescriptorFactory
     /**
      * Factory method to create a new service descriptor.
      */
-    public static ServiceDescriptor create(String type, String name, Properties props, Properties overrides) throws ServiceException
+    public static ServiceDescriptor create(String type, String name, Properties props, Properties overrides, ApplicationContext context) throws ServiceException
     {       
         String serviceFinderClass = null;
         if(overrides!=null)
@@ -45,10 +46,17 @@ public class ServiceDescriptorFactory
             serviceFinderClass = (String) props.remove(MuleProperties.SERVICE_FINDER);
         }
         
-        ServiceDescriptor sd;
+        ServiceDescriptor sd = null;
         if (type.equals(PROVIDER_SERVICE_TYPE)) 
         {
-            sd = new DefaultTransportServiceDescriptor(name, props);
+            try
+            {
+                sd = new DefaultTransportServiceDescriptor(name, props, context);
+            }
+            catch (ClassNotFoundException e)
+            {
+                //TODO RM* e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
             props = SpiUtils.findServiceDescriptor(EXCEPTION_SERVICE_TYPE, name + "-exception-mappings");
             ((TransportServiceDescriptor) sd).setExceptionMappings(props);
         }

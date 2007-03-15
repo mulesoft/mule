@@ -31,7 +31,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
     {
         XsltTransformer transformer = new XsltTransformer();
         transformer.setXslFile("cdcatalog.xsl");
-        transformer.initialise(managementContext);
+        transformer.initialise();
         return transformer;
     }
 

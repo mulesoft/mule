@@ -9,7 +9,8 @@
  */
 package org.mule.test.integration.streaming;
 
-import org.mule.MuleManager;
+
+import org.mule.RegistryContext;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.util.FileUtils;
 

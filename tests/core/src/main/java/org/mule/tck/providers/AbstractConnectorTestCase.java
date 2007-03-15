@@ -245,7 +245,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
 
         try
         {
-            connector.initialise(managementContext);
+            connector.initialise();
             fail("A connector cannot be initialised more than once");
         }
         catch (Exception e)

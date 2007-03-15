@@ -21,7 +21,6 @@ import org.mule.transformers.wire.SerializationWireFormat;
 import org.mule.transformers.wire.WireFormat;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -91,7 +90,7 @@ public class MuleAdminAgent extends AbstractAgent
         // nothing to do (yet?)
     }
 
-    public void doInitialise(UMOManagementContext managementContext) throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         if (wireFormat == null)
         {
@@ -136,7 +135,7 @@ public class MuleAdminAgent extends AbstractAgent
                     if (managementContext.getRegistry().lookupConnector(connector.getName()) == null)
                     {
                         connector.setName(DEFAULT_MANAGER_ENDPOINT);
-                        connector.initialise(managementContext);
+                        connector.initialise();
                         managementContext.getRegistry().registerConnector(connector);
                     }
                     endpoint = new MuleEndpoint();

@@ -14,7 +14,6 @@ import org.mule.RegistryContext;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.AbstractConnector;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
@@ -397,7 +396,7 @@ public final class MuleSession implements UMOSession
      */
     public UMOMessage receiveEvent(String endpointName, long timeout) throws UMOException
     {
-        UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(endpointName,
+        UMOEndpoint endpoint = RegistryContext.getRegistry().getOrCreateEndpointForUri(endpointName,
             UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
         return receiveEvent(endpoint, timeout);
     }

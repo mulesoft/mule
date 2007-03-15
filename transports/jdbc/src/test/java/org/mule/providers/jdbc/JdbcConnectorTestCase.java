@@ -35,7 +35,7 @@ public class JdbcConnectorTestCase extends AbstractConnectorTestCase
         ds.setUser("sa");
         c.setDataSource(ds);
         c.setPollingFrequency(1000);
-        c.initialise(managementContext);
+        c.initialise();
         return c;
     }
 

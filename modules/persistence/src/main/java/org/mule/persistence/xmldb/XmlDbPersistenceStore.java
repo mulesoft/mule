@@ -13,7 +13,6 @@ package org.mule.persistence.xmldb;
 import org.mule.persistence.Persistable;
 import org.mule.persistence.PersistenceException;
 import org.mule.persistence.PersistenceStore;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.RecoverableException;
 
@@ -47,9 +46,8 @@ public class XmlDbPersistenceStore implements PersistenceStore
 
     /**
      * {@inheritDoc}
-     * @param managementContext
      */
-    public void initialise(UMOManagementContext managementContext) throws InitialisationException, RecoverableException
+    public void initialise() throws InitialisationException, RecoverableException
     {
         try 
         {

@@ -40,6 +40,7 @@ public abstract class AbstractChildBeanDefinitionParser extends AbstractMuleSing
 
     protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
+        builder.setSingleton(isSingleton());
         super.doParse(element, parserContext, builder);
     }
 

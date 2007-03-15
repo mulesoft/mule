@@ -14,6 +14,8 @@ import org.mule.RegistryContext;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+
 /**
  * Generates consistent objects names for Mule components
  */
@@ -81,10 +83,17 @@ public class ObjectNameHelper
         // We can't check local edpoints right now but the chances of conflict are
         // very small and will be
         // reported during JMX object registration
-        while (RegistryContext.getRegistry().lookupConnector(tempName) != null)
+        try
         {
-            i++;
-            tempName = name + SEPARATOR + i;
+            while (RegistryContext.getRegistry().lookupConnector(tempName) != null)
+            {
+                i++;
+                tempName = name + SEPARATOR + i;
+            }
+        }
+        catch (NoSuchBeanDefinitionException e)
+        {
+            //ignore
         }
         return tempName;
     }

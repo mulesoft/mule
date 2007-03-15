@@ -11,6 +11,7 @@
 package org.mule.impl.container;
 
 import org.mule.RegistryContext;
+import org.mule.impl.ManagementContextAware;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.ContainerException;
@@ -28,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
  * <code>AbstractContainerContext</code> provides base container configuration
  * functions for handling embedded configuration.
  */
-public abstract class AbstractContainerContext implements UMOContainerContext
+public abstract class AbstractContainerContext implements UMOContainerContext, ManagementContextAware
 {
     /**
      * logger used by this class
@@ -54,13 +55,12 @@ public abstract class AbstractContainerContext implements UMOContainerContext
         this.name = name;
     }
 
-    public final void initialise(UMOManagementContext managementContext) throws InitialisationException
+    public void initialise() throws InitialisationException
     {
-        this.managementContext = managementContext;
-        doInitialise(managementContext);
+
     }
 
-    public void doInitialise(UMOManagementContext managementContext) throws InitialisationException
+    public final void doInitialise(UMOManagementContext managementContext) throws InitialisationException
     {
         
     }
@@ -114,6 +114,12 @@ public abstract class AbstractContainerContext implements UMOContainerContext
     protected String getDefaultEncoding()
     {
         return RegistryContext.getConfiguration().getDefaultEncoding();
+    }
+
+
+    public void setManagementContext(UMOManagementContext context)
+    {
+        this.managementContext = context;
     }
 
     public abstract void configure(Reader configuration) throws ContainerException;

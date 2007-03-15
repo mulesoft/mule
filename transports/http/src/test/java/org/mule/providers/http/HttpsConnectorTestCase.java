@@ -47,7 +47,7 @@ public class HttpsConnectorTestCase extends AbstractConnectorTestCase
 
         if (initialised)
         {
-            cnn.initialise(context);
+            cnn.initialise();
         }
         return cnn;
     }

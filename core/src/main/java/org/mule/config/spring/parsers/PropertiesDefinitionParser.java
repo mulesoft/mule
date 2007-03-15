@@ -51,13 +51,14 @@ public class PropertiesDefinitionParser implements BeanDefinitionParser
         String parentBean = ((Element) element.getParentNode()).getAttribute("id");
         if (StringUtils.isBlank(parentBean))
         {
-            //TODO RM8 remove this
-            throw new RuntimeException();
-            //parentBean = StringUtils.EMPTY + builder.hashCode();
+            parserContext.getRegistry().registerBeanDefinition(propertyName, beanDefinition);
         }
-        BeanDefinition parent = parserContext.getRegistry().getBeanDefinition(parentBean);
-        PropertyValue pv = new PropertyValue(propertyName, builder.getBeanDefinition());
-        parent.getPropertyValues().addPropertyValue(pv);
+        else
+        {
+            BeanDefinition parent = parserContext.getRegistry().getBeanDefinition(parentBean);
+            PropertyValue pv = new PropertyValue(propertyName, builder.getBeanDefinition());
+            parent.getPropertyValues().addPropertyValue(pv);
+        }
         //parserContext.getRegistry().registerBeanDefinition(id, beanDefinition);
         // cannot be used in a 'inner-bean' setting (use plain <map>)
         return beanDefinition;

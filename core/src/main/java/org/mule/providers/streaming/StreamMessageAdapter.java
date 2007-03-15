@@ -40,7 +40,7 @@ public class StreamMessageAdapter extends AbstractMessageAdapter implements UMOS
 
     public StreamMessageAdapter(InputStream in)
     {
-        this.in = in;
+        this.in = in; 
     }
 
     public StreamMessageAdapter(InputStream in, OutputStream out)

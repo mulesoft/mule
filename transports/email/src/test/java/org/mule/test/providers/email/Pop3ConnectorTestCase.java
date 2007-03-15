@@ -11,7 +11,6 @@
 package org.mule.test.providers.email;
 
 import org.mule.impl.MuleDescriptor;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.email.Pop3Connector;
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
@@ -33,7 +32,7 @@ public class Pop3ConnectorTestCase extends AbstractConnectorTestCase
     {
         Pop3Connector c = new Pop3Connector();
         c.setName("Pop3connector");
-        c.initialise(managementContext);
+        c.initialise();
         return c;
     }
 
@@ -58,7 +57,7 @@ public class Pop3ConnectorTestCase extends AbstractConnectorTestCase
         assertNotNull(connector);
         MuleDescriptor d = getTestDescriptor("orange", Orange.class.getName());
         UMOComponent component = getTestComponent(d);
-        UMOEndpoint endpoint = new MuleEndpoint(getTestEndpointURI(), true);
+        UMOEndpoint endpoint = managementContext.getRegistry().getOrCreateEndpointForUri(getTestEndpointURI(), UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
         connector.registerListener(component, endpoint);
     }
 
@@ -69,7 +68,7 @@ public class Pop3ConnectorTestCase extends AbstractConnectorTestCase
 
         MuleDescriptor d = getTestDescriptor("orange", Orange.class.getName());
         UMOComponent component = getTestComponent(d);
-        UMOEndpoint endpoint = new MuleEndpoint(getTestEndpointURI(), true);
+        UMOEndpoint endpoint = managementContext.getRegistry().getOrCreateEndpointForUri(getTestEndpointURI(), UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
         endpoint.setConnector(connector);
 
         try

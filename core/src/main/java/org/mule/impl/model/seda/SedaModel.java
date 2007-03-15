@@ -18,7 +18,6 @@ import org.mule.impl.model.AbstractModel;
 import org.mule.registry.metadata.ObjectMetadata;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
 
 /**
@@ -77,7 +76,7 @@ public class SedaModel extends AbstractModel
     }
 
 
-    public void initialise(UMOManagementContext managementContext) throws InitialisationException
+    public void initialise() throws InitialisationException
     {
 
         queueTimeout = RegistryContext.getConfiguration().getDefaultSynchronousEventTimeout();
@@ -88,7 +87,7 @@ public class SedaModel extends AbstractModel
         {
             poolingProfile = new PoolingProfile();
         }
-        super.initialise(managementContext);
+        super.initialise();
     }
 
     protected UMOComponent createComponent(UMODescriptor descriptor)

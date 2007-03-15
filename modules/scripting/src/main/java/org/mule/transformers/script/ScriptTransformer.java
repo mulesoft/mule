@@ -13,7 +13,6 @@ package org.mule.transformers.script;
 import org.mule.components.script.jsr223.Scriptable;
 import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.UMOEventContext;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.transformer.TransformerException;
 
@@ -68,12 +67,11 @@ public class ScriptTransformer extends AbstractEventAwareTransformer
      * properties have been set on this transformer
      * 
      * @throws org.mule.umo.lifecycle.InitialisationException
-     * @param managementContext
      */
-    public void initialise(UMOManagementContext managementContext) throws InitialisationException
+    public void initialise() throws InitialisationException
     {
-        super.initialise(managementContext);
-        scriptable.initialise(managementContext);
+        super.initialise();
+        scriptable.initialise();
     }
 
     public ScriptEngine getScriptEngine()

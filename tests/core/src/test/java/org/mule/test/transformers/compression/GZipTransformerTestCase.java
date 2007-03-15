@@ -91,7 +91,7 @@ public class GZipTransformerTestCase extends AbstractTransformerTestCase
         transformer.setReturnClass(String.class);
         try
         {
-            transformer.initialise(managementContext);
+            transformer.initialise();
         }
         catch (InitialisationException e)
         {

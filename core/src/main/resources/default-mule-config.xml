@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 META-INF/mule.xsd">
+
+    <bean name="_muleManagementContextFactoryBean" class="org.mule.config.spring.ManagementContextFactoryBean"
+              depends-on="_registry"/>
+
+    <bean name="_managementContextProcessor" class="org.mule.config.spring.ManagementContextPostProcessor"/>
+
+    <bean name="_muleObjectNameProcessor" class="org.mule.config.spring.MuleObjectNameProcessor"/>
+
+    <bean name="_registry" class="org.mule.config.spring.factories.SpringRegistryFactoryBean" />
+
+    <bean name="_springRegistryContainerContext" class="org.mule.config.spring.SpringContainerContext"/>
+
+    <bean name="_system" class="org.mule.config.spring.factories.SystemModelFactoryBean" depends-on="_registry"/>
+
+    <mule:configuration
+            serverId="_default"
+            defaultSynchronousEndpoints="false"
+            domainId="org.mule"
+            defaultRemoteSync="false"
+            defaultSynchronousEventTimeout="3000"
+            defaultEncoding="UTF-8"
+            defaultTransactionTimeout="5000"
+            workingDirectory=".mule">
+
+        <mule:default-threading-profile maxBufferSize="0" maxThreadsActive="8"
+                                        maxThreadsIdle="4" poolExhaustedAction="WAIT"/>
+    </mule:configuration>
+
+    <mule:custom-container class="org.mule.impl.container.MultiContainerContext" name="_rootContainerContext"/>
+    
+    <mule:properties-container includeSystemProperties="true" name="_systemProperties"/>
+</beans>

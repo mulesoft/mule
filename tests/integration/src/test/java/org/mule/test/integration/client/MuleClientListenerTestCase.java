@@ -10,13 +10,13 @@
 
 package org.mule.test.integration.client;
 
-import org.mule.MuleManager;
-import org.mule.routing.inbound.InboundRouterCollection;
+
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.routing.inbound.InboundRouterCollection;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.test.integration.service.TestReceiver;
 import org.mule.transformers.simple.ByteArrayToString;

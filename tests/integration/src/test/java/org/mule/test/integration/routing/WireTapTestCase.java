@@ -10,7 +10,7 @@
 
 package org.mule.test.integration.routing;
 
-import org.mule.MuleManager;
+
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.FunctionalTestNotificationListener;

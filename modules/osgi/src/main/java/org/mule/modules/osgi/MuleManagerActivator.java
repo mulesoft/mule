@@ -10,7 +10,7 @@
 
 package org.mule.modules.osgi;
 
-import org.mule.MuleManager;
+
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;

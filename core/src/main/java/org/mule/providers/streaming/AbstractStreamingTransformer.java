@@ -10,7 +10,6 @@
 
 package org.mule.providers.streaming;
 
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.transformer.TransformerException;
@@ -201,9 +200,8 @@ public abstract class AbstractStreamingTransformer implements UMOStreamingTransf
      * properties have been set on this transformer
      * 
      * @throws org.mule.umo.lifecycle.InitialisationException
-     * @param managementContext
      */
-    public void initialise(UMOManagementContext managementContext) throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         // nothing to do
     }

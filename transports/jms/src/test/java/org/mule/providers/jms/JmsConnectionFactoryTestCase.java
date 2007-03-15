@@ -45,7 +45,7 @@ public class JmsConnectionFactoryTestCase extends AbstractMuleTestCase
         ConnectionFactory cf = new TestConnectionFactory();
         connector.setConnectionFactory(cf);
 
-        connector.initialise(managementContext);
+        connector.initialise();
 
         assertEquals("Provider properties should not be passed to the ConnectionFactory.", "NOT_SET",
             ((TestConnectionFactory)cf).getProviderProperty());
@@ -72,7 +72,7 @@ public class JmsConnectionFactoryTestCase extends AbstractMuleTestCase
         ConnectionFactory cf = new TestConnectionFactory();
         connector.setConnectionFactory(cf);
 
-        connector.initialise(managementContext);
+        connector.initialise();
         connector.start();
 
         assertEquals("ConnectionFactory properties should be passed to the ConnectionFactory.", "TEST_VALUE",

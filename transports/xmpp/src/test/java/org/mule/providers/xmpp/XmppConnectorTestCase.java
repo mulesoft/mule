@@ -21,7 +21,7 @@ public class XmppConnectorTestCase extends AbstractConnectorTestCase
     {
         XmppConnector cnn = new XmppConnector();
         cnn.setName("xmppConnector");
-        cnn.initialise(managementContext);
+        cnn.initialise();
         return cnn;
     }
 

@@ -15,8 +15,8 @@ import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessageConstants;
 import org.mule.config.i18n.Message;
 import org.mule.extras.client.MuleClient;
-import org.mule.impl.RequestContext;
 import org.mule.impl.ManagementContext;
+import org.mule.impl.RequestContext;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
 import org.mule.providers.streaming.StreamMessageAdapter;
@@ -86,6 +86,7 @@ public class MuleUniversalChannel extends AbstractChannel
 
         try
         {
+            //TODO RM* This aint right
             this.client = new MuleClient(new ManagementContext());
         }
         catch (UMOException ex)

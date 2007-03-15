@@ -14,7 +14,6 @@ import org.mule.MuleException;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.security.MuleCredentials;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
@@ -686,7 +685,7 @@ public class MuleEvent extends EventObject implements UMOEvent
         String uri = (String)in.readObject();
         try
         {
-            endpoint = MuleEndpoint.getOrCreateEndpointForUri(uri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
+            endpoint = getManagementContext().getRegistry().getOrCreateEndpointForUri(uri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
         }
         catch (UMOException e)
         {

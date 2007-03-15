@@ -14,7 +14,6 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.UMOEncryptionStrategy;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.CryptoFailureException;
 import org.mule.umo.transformer.TransformerException;
@@ -88,9 +87,8 @@ public abstract class AbstractEncryptionTransformer extends AbstractTransformer
      * properties have been set on this transformer
      * 
      * @throws org.mule.umo.lifecycle.InitialisationException
-     * @param managmentContext
      */
-    public void initialise(UMOManagementContext managementContext) throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         if (strategyName != null)
         {

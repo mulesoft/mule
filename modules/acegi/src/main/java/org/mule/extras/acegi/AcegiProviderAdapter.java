@@ -10,7 +10,6 @@
 
 package org.mule.extras.acegi;
 
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.SecurityException;
 import org.mule.umo.security.UMOAuthentication;
@@ -53,7 +52,7 @@ public class AcegiProviderAdapter implements UMOSecurityProvider, Authentication
         this.name = name;
     }
 
-    public void initialise(UMOManagementContext managementContext) throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         // //all initialisation should be handled in the spring
         // intitialisation hook afterPropertiesSet()

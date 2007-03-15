@@ -15,6 +15,7 @@ import org.mule.config.ThreadingProfile;
 import org.mule.registry.RegistrationException;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOInterceptor;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.routing.UMONestedRouterCollection;
 import org.mule.umo.routing.UMOOutboundRouterCollection;
@@ -36,7 +37,7 @@ import org.apache.commons.logging.LogFactory;
  *
  */
 
-public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescriptor
+public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescriptor, ManagementContextAware
 {
     /**
      * logger used by this class
@@ -262,5 +263,11 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
     public void setModelName(String modelName)
     {
         this.modelName = modelName;
+    }
+
+
+    public void setManagementContext(UMOManagementContext context)
+    {
+        this.managementContext = context;
     }
 }

@@ -20,7 +20,6 @@ import org.mule.registry.Registry;
 import org.mule.registry.RegistryStore;
 import org.mule.registry.ReregistrationException;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
 
 import java.util.HashMap;
@@ -169,9 +168,8 @@ public class InMemoryStore implements RegistryStore
 
     /**
      * {@inheritDoc}
-     * @param managementContext
      */
-    public void initialise(UMOManagementContext managementContext) throws InitialisationException
+    public void initialise() throws InitialisationException
     {
         store = new HashMap();
     }

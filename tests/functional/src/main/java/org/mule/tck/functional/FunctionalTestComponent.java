@@ -60,7 +60,7 @@ public class FunctionalTestComponent implements Callable
             replyMessage = contents + " Received";
         }
 
-        context.getManagmentContext().fireNotification(
+        context.getManagementContext().fireNotification(
             new FunctionalTestNotification(context, replyMessage, FunctionalTestNotification.EVENT_RECEIVED));
 
         if (throwException)
@@ -97,7 +97,7 @@ public class FunctionalTestComponent implements Callable
             replyMessage = contents + " Received";
         }
 
-        context.getManagmentContext().fireNotification(
+        context.getManagementContext().fireNotification(
             new FunctionalTestNotification(context, replyMessage, FunctionalTestNotification.EVENT_RECEIVED));
 
         if (throwException)
