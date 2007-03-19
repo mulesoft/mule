@@ -10,6 +10,8 @@
 
 package org.mule.examples.loanbroker.messages;
 
+import org.mule.config.i18n.Message;
+
 import java.io.Serializable;
 
 /**
@@ -53,6 +55,6 @@ public class LoanQuote implements Serializable
 
     public String toString()
     {
-        return bankName + ", rate: " + interestRate;
+        return new Message("loanbroker-example", 4, bankName, String.valueOf(interestRate)).getMessage();
     }
 }

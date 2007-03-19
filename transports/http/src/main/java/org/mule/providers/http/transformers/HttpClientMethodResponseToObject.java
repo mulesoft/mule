@@ -31,10 +31,6 @@ import org.apache.commons.io.IOUtils;
 
 public class HttpClientMethodResponseToObject extends AbstractTransformer
 {
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = 7699394620081967116L;
 
     public HttpClientMethodResponseToObject()
     {

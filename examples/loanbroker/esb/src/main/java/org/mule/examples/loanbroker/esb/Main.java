@@ -11,6 +11,8 @@
 package org.mule.examples.loanbroker.esb;
 
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
+import org.mule.config.i18n.Message;
+import org.mule.examples.loanbroker.AbstractMain;
 import org.mule.examples.loanbroker.messages.Customer;
 import org.mule.examples.loanbroker.messages.CustomerQuoteRequest;
 import org.mule.extras.client.MuleClient;
@@ -24,7 +26,7 @@ import org.apache.activemq.broker.BrokerService;
  * <code>Main</code> Executes the LoanBroker ESB application
  */
 
-public class Main
+public class Main extends AbstractMain
 {
     private MuleClient client = null;
     private BrokerService msgBroker = null;
@@ -50,16 +52,6 @@ public class Main
         }
     }
 
-    private static double getRandomAmount()
-    {
-        return Math.round(Math.random() * 18000);
-    }
-
-    private static int getRandomDuration()
-    {
-        return new Double(Math.random() * 60).intValue();
-    }
-
     public UMOMessage request(CustomerQuoteRequest request) throws Exception
     {
         return client.send("vm://customer.requests", request, null);
@@ -71,61 +63,53 @@ public class Main
         int response = 0;
         try
         {
-            System.out.println("******************"
-                               + "\nWelcome to the Mule Loan Broker ESB example. This example demonstrates using JMS, Web Services,\n Http/Rest and EJBs using an ESB architecture."
-                               + "\nFor more information see http://mule.mulesource.org/LoanBroker."
-                               + "\n\nThe example demonstrates integrating EJB applications in 2 ways -"
-                               + "\n  1. Calling out to a remote EJB using a Mule Endpoint."
-                               + "\n  2. Managing an EJB as a Mule component."
-                               + "\n\nBoth have the same behavior but the second method allows a remote EJB to be used as if it were\n a local Mule component, thereby enabling tighter integration."
-                               + "\n\nPlease select [1], [2] or [q]uit" + "\n******************");
-
-            response = getSelection();
+            System.out.println("******************\n"
+                + new Message("loanbroker-example", 30).getMessage()
+                + "\n******************");
+            response = readCharacter();
             if (response == '1')
             {
-                System.out.println("Loading 'Ejb via an Endpoint' version");
+                System.out.println(new Message("loanbroker-example", 31).getMessage());
                 loanConsumer = new Main("loan-broker-esb-mule-config.xml");
             }
             else if (response == 'q')
             {
-                System.out.println("Bye");
+                System.out.println(new Message("loanbroker-example", 32).getMessage());
                 System.exit(0);
             }
             else
             {
-                System.out.println("Loading 'Managed Ejb Component' version");
+                System.out.println(new Message("loanbroker-example", 33).getMessage());
                 loanConsumer = new Main("loan-broker-esb-mule-config-with-ejb-container.xml");
             }
 
             while (response != 'q')
             {
-                System.out.println("\n[1] make a loan request");
-                System.out.println("[q] quit");
-                System.out.println("\nPlease make your selection: ");
+                System.out.println("\n" + new Message("loanbroker-example", 34).getMessage());
 
-                response = getSelection();
+                response = readCharacter();
                 if (response == '1')
                 {
                     CustomerQuoteRequest request = getRequestFromUser();
                     UMOMessage result = loanConsumer.request(request);
                     if (result == null)
                     {
-                        System.out.println("A result was not received, an error must have occurred. Check the logs.");
+                        System.out.println(new Message("loanbroker-example", 12).getMessage());
                     }
                     else
                     {
-                        System.out.println("Loan Consumer received a Quote: " + result.getPayload());
+                        System.out.println(new Message("loanbroker-example", 13, result.getPayload()).getMessage());
                     }
                 }
                 else if (response == 'q')
                 {
-                    System.out.println("Exiting now");
+                    System.out.println(new Message("loanbroker-example", 14).getMessage());
                     loanConsumer.close();
                     System.exit(0);
                 }
                 else
                 {
-                    System.out.println("That response is not recognised, try again:");
+                    System.out.println(new Message("loanbroker-example", 15).getMessage());
                 }
             }
 
@@ -138,57 +122,4 @@ public class Main
         }
     }
 
-    private static int getSelection() throws IOException
-    {
-        byte[] buf = new byte[16];
-        System.in.read(buf);
-        return buf[0];
-    }
-
-    private static CustomerQuoteRequest getRequestFromUser() throws IOException
-    {
-        byte[] buf = new byte[128];
-        System.out.println("Enter your name:");
-        System.in.read(buf);
-        String name = new String(buf).trim();
-        System.out.println("Enter loan Amount:");
-        buf = new byte[16];
-        System.in.read(buf);
-        String amount = new String(buf).trim();
-        System.out.println("Enter loan Duration in months:");
-        buf = new byte[16];
-        System.in.read(buf);
-        String duration = new String(buf).trim();
-
-        int d = 0;
-        try
-        {
-            d = Integer.parseInt(duration);
-        }
-        catch (NumberFormatException e)
-        {
-            System.out.println("Failed to parse duration: " + duration + ". Using random default");
-            d = getRandomDuration();
-        }
-
-        double a = 0;
-        try
-        {
-            a = Double.valueOf(amount).doubleValue();
-        }
-        catch (NumberFormatException e)
-        {
-            System.out.println("Failed to parse amount: " + amount + ". Using random default");
-            a = getRandomAmount();
-        }
-
-        Customer c = new Customer(name, getRandomSsn());
-        CustomerQuoteRequest request = new CustomerQuoteRequest(c, a, d);
-        return request;
-    }
-
-    private static int getRandomSsn()
-    {
-        return new Double(Math.random() * 6000).intValue();
-    }
 }

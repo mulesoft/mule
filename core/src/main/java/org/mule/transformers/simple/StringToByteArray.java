@@ -17,16 +17,11 @@ import org.mule.umo.transformer.TransformerException;
 import java.io.UnsupportedEncodingException;
 
 /**
- * <code>StringToByteArray</code> converts a string into a byte array
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>StringToByteArray</code> converts a String into a byte array.
  */
 
 public class StringToByteArray extends AbstractTransformer
 {
-
-    private static final long serialVersionUID = 3993746463869846673L;
 
     public StringToByteArray()
     {
@@ -49,9 +44,10 @@ public class StringToByteArray extends AbstractTransformer
             }
             catch (UnsupportedEncodingException e)
             {
-                throw new TransformerException(
-                    Message.createStaticMessage("Unable to convert String to byte[]."), e);
+                throw new TransformerException(Message
+                    .createStaticMessage("Unable to convert String to byte[]."), e);
             }
         }
     }
+
 }

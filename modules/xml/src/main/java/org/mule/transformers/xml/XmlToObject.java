@@ -10,10 +10,10 @@
 
 package org.mule.transformers.xml;
 
-import java.io.ByteArrayInputStream;
-
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.transformer.TransformerException;
+
+import java.io.ByteArrayInputStream;
 
 /**
  * <code>XmlToObject</code> converts xml created by the ObjectToXml transformer in
@@ -27,10 +27,6 @@ import org.mule.umo.transformer.TransformerException;
 
 public class XmlToObject extends AbstractXStreamTransformer
 {
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = -2804761502812600068L;
 
     private final DomDocumentToXml domTransformer = new DomDocumentToXml();
 

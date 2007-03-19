@@ -35,11 +35,8 @@ import javax.mail.internet.MimeMultipart;
  */
 public class ObjectToMimeMessage extends StringToEmailMessage
 {
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = 7225142214620572674L;
 
+    // @Override
     protected void setContent(Object payload, Message msg, String contentType, UMOEventContext context)
         throws Exception
     {
@@ -70,9 +67,9 @@ public class ObjectToMimeMessage extends StringToEmailMessage
 
     protected void addBodyPartHeaders(BodyPart part, String name, UMOEventContext context)
     {
-
         Map headers = (Map)context.getMessage().getProperty(
             name + MailMessageAdapter.ATTACHMENT_HEADERS_PROPERTY_POSTFIX);
+
         if (null != headers)
         {
             for (Iterator it = headers.keySet().iterator(); it.hasNext();)

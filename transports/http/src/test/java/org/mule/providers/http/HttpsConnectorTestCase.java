@@ -78,8 +78,10 @@ public class HttpsConnectorTestCase extends AbstractConnectorTestCase
             fail("cannot register with null endpointUri");
         }
         catch (Exception e)
-        { /* expected */
+        {
+            /* expected */
         }
+
         endpoint.setEndpointURI(null);
         try
         {
@@ -87,7 +89,8 @@ public class HttpsConnectorTestCase extends AbstractConnectorTestCase
             fail("cannot register with empty endpointUri");
         }
         catch (Exception e)
-        { /* expected */
+        {
+            /* expected */
         }
 
         endpoint.setEndpointURI(new MuleEndpointURI("https://localhost:0"));
@@ -98,8 +101,10 @@ public class HttpsConnectorTestCase extends AbstractConnectorTestCase
             fail("cannot register on the same endpointUri");
         }
         catch (Exception e)
-        { /* expected */
+        {
+            /* expected */
         }
+
         connector.dispose();
     }
 
@@ -107,10 +112,10 @@ public class HttpsConnectorTestCase extends AbstractConnectorTestCase
     {
         HttpsConnector c = (HttpsConnector)getConnector();
 
-        c.setBufferSize(1024);
-        assertEquals(1024, c.getBufferSize());
-        c.setBufferSize(0);
-        assertEquals(TcpConnector.DEFAULT_BUFFER_SIZE, c.getBufferSize());
+        c.setSendBufferSize(1024);
+        assertEquals(1024, c.getSendBufferSize());
+        c.setSendBufferSize(0);
+        assertEquals(TcpConnector.DEFAULT_BUFFER_SIZE, c.getSendBufferSize());
 
         c.dispose();
         // all kinds of timeouts are tested in TcpConnectorTestCase now

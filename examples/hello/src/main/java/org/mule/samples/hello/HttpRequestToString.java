@@ -10,25 +10,18 @@
 
 package org.mule.samples.hello;
 
-import java.io.UnsupportedEncodingException;
-
 import org.mule.config.i18n.Message;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 
+import java.io.UnsupportedEncodingException;
+
 /**
  * <code>NameStringToChatString</code> This is test class only for use with the
  * Hello world test application.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class HttpRequestToString extends AbstractTransformer
 {
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = -6438813035354275131L;
 
     public HttpRequestToString()
     {
@@ -44,7 +37,8 @@ public class HttpRequestToString extends AbstractTransformer
      */
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
-        String param = null;
+        String param;
+
         if (src instanceof byte[])
         {
             if (encoding != null)
@@ -67,7 +61,8 @@ public class HttpRequestToString extends AbstractTransformer
         {
             param = src.toString();
         }
-        int equals = param.indexOf("=");
+
+        int equals = param.indexOf('=');
         if (equals > -1)
         {
             return param.substring(equals + 1);
@@ -75,7 +70,7 @@ public class HttpRequestToString extends AbstractTransformer
         else
         {
             throw new TransformerException(Message.createStaticMessage("Failed to parse param string: "
-                                                                       + param), this);
+                            + param), this);
         }
     }
 }

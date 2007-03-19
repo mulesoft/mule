@@ -25,9 +25,9 @@ public class DefaultLender implements LenderService
      */
     public void setLenderList(LoanBrokerQuoteRequest request)
     {
-        request.setLenders(
-            getLenders(request.getCreditProfile(), new Double(request.getCustomerRequest().getLoanAmount())));
-        //return request;
+        Bank[] lenders = getLenders(request.getCreditProfile(), new Double(request.getCustomerRequest()
+            .getLoanAmount()));
+        request.setLenders(lenders);
     }
 
     /**
@@ -36,7 +36,8 @@ public class DefaultLender implements LenderService
     public Bank[] getLenders(CreditProfile creditProfile, Double loanAmount)
     {
         // TODO Add creditProfile info. to the logic below.
-        // TODO Look up the existing banks from the config/registry instead of creating them programatically here.
+        // TODO Look up the existing banks from the config/registry instead of
+        // creating them programatically here.
         Bank[] lenders;
         if ((loanAmount.doubleValue() >= 20000))
         {

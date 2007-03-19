@@ -16,7 +16,6 @@ import org.mule.umo.transformer.TransformerException;
 
 public class DummyTransformer extends AbstractEventAwareTransformer
 {
-    private static final long serialVersionUID = 8536127232968197199L;
 
     public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
     {
@@ -29,4 +28,5 @@ public class DummyTransformer extends AbstractEventAwareTransformer
         logger.debug("transform() done.");
         return src;
     }
+
 }

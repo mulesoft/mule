@@ -17,22 +17,16 @@ import org.mule.umo.transformer.TransformerException;
  * <code>ObjectToByteArray</code> converts serilaizable object to a byte array but
  * treats <code>java.lang.String</code> differently by converting to bytes using
  * the <code>String.getBytrs()</code> method.
- * 
- * @author Ross Mason
  */
 public class ObjectToByteArray extends SerializableToByteArray
 {
 
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = 8111970112989435191L;
-
     public ObjectToByteArray()
     {
-        registerSourceType(Object.class);
+        this.registerSourceType(Object.class);
     }
 
+    // @Override
     public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
     {
         if (src instanceof String)

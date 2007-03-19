@@ -27,25 +27,22 @@ import org.apache.commons.lang.SerializationUtils;
  */
 public class SerializableToByteArray extends AbstractEventAwareTransformer
 {
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = 8899970312989435192L;
 
     public SerializableToByteArray()
     {
-        registerSourceType(Serializable.class);
-        registerSourceType(byte[].class);
+        this.registerSourceType(Serializable.class);
+        this.registerSourceType(byte[].class);
         this.setReturnClass(byte[].class);
     }
 
     public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
     {
-        // If the UMOMessage source type has been registered that we can assume
-        // that the whole message is to be serialised, not just the payload.
-        // This can be useful for protocols such as tcp where the protocol does
-        // not support headers, thus the whole message needs to be serialized.
-
+        /*
+         * If the UMOMessage source type has been registered that we can assume that
+         * the whole message is to be serialised, not just the payload. This can be
+         * useful for protocols such as tcp where the protocol does not support
+         * headers, thus the whole message needs to be serialized.
+         */
         if (isSourceTypeSupported(UMOMessage.class, true))
         {
             src = context.getMessage();
@@ -64,4 +61,5 @@ public class SerializableToByteArray extends AbstractEventAwareTransformer
             throw new TransformerException(this, e);
         }
     }
+
 }

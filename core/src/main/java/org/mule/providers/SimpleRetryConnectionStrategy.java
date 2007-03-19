@@ -14,6 +14,7 @@ import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.provider.UMOConnectable;
+import org.mule.util.ObjectUtils;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 
@@ -53,6 +54,8 @@ public class SimpleRetryConnectionStrategy extends AbstractConnectionStrategy
 
     protected static final RetryCounter retryCounter = new RetryCounter();
 
+    protected static final ThreadLocal called = new ThreadLocal();
+
     private volatile int retryCount = 2;
     private volatile long frequency = 2000;
 
@@ -60,7 +63,12 @@ public class SimpleRetryConnectionStrategy extends AbstractConnectionStrategy
     {
         while (true)
         {
-            retryCounter.countRetry();
+            final Boolean recursiveCallDetected = (Boolean) ObjectUtils.defaultIfNull(called.get(), Boolean.FALSE);
+            if (!recursiveCallDetected.booleanValue())
+            {
+                retryCounter.countRetry();
+            }
+            called.set(Boolean.TRUE);
 
             try
             {
@@ -76,9 +84,10 @@ public class SimpleRetryConnectionStrategy extends AbstractConnectionStrategy
                 // If we were interrupted it's probably because the server is
                 // shutting down
                 throw new FatalConnectException(
-                    new Message(Messages.RECONNECT_STRATEGY_X_FAILED_ENDPOINT_X, 
-                        getClass().getName(), getDescription(connectable)), 
-                    ie, connectable);
+                        // TODO it's not only endpoint that is reconnected, connectors too
+                        new Message(Messages.RECONNECT_STRATEGY_X_FAILED_ENDPOINT_X,
+                                    getClass().getName(), getDescription(connectable)),
+                        ie, connectable);
             }
             catch (Exception e)
             {
@@ -90,16 +99,17 @@ public class SimpleRetryConnectionStrategy extends AbstractConnectionStrategy
                 if (retryCounter.current().get() >= retryCount)
                 {
                     throw new FatalConnectException(
-                        new Message(Messages.RECONNECT_STRATEGY_X_FAILED_ENDPOINT_X, 
-                            getClass().getName(), getDescription(connectable)),
-                        e, connectable);
+                            // TODO it's not only endpoint that is reconnected, connectors too
+                            new Message(Messages.RECONNECT_STRATEGY_X_FAILED_ENDPOINT_X,
+                                        getClass().getName(), getDescription(connectable)),
+                            e, connectable);
                 }
 
                 if (logger.isErrorEnabled())
                 {
                     StringBuffer msg = new StringBuffer(512);
-                    msg.append("Failed to connect/reconnect on endpoint: ").append(
-                        getDescription(connectable));
+                    msg.append("Failed to connect/reconnect: ").append(
+                            getDescription(connectable));
                     Throwable t = ExceptionHelper.getRootException(e);
                     msg.append(". Root Exception was: ").append(ExceptionHelper.writeException(t));
                     logger.error(msg.toString(), e);
@@ -118,10 +128,15 @@ public class SimpleRetryConnectionStrategy extends AbstractConnectionStrategy
                 catch (InterruptedException e1)
                 {
                     throw new FatalConnectException(
-                        new Message(Messages.RECONNECT_STRATEGY_X_FAILED_ENDPOINT_X, 
-                            getClass().getName(), getDescription(connectable)), 
-                        e, connectable);
+                            // TODO it's not only endpoint that is reconnected, connectors too
+                            new Message(Messages.RECONNECT_STRATEGY_X_FAILED_ENDPOINT_X,
+                                        getClass().getName(), getDescription(connectable)),
+                            e, connectable);
                 }
+            }
+            finally
+            {
+                called.set(Boolean.FALSE);
             }
         }
     }

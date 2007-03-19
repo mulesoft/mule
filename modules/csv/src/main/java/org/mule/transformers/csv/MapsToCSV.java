@@ -21,7 +21,6 @@ import java.util.List;
  */
 public class MapsToCSV extends AbstractCSVTransformer
 {
-    private static final long serialVersionUID = -8424314305961170435L;
 
     public MapsToCSV()
     {

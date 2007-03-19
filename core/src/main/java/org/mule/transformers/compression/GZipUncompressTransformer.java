@@ -20,16 +20,9 @@ import org.apache.commons.lang.SerializationUtils;
 
 /**
  * <code>GZipCompressTransformer</code> TODO
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class GZipUncompressTransformer extends GZipCompressTransformer
 {
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = -861180612454404077L;
 
     public GZipUncompressTransformer()
     {
@@ -37,9 +30,9 @@ public class GZipUncompressTransformer extends GZipCompressTransformer
         this.setStrategy(new GZipCompression());
         this.registerSourceType(byte[].class);
         this.setReturnClass(byte[].class);
-
     }
 
+    // @Override
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         byte[] buffer = null;
@@ -50,8 +43,8 @@ public class GZipUncompressTransformer extends GZipCompressTransformer
         }
         catch (IOException e)
         {
-            throw new TransformerException(
-                Message.createStaticMessage("Failed to uncompress message."), this, e);
+            throw new TransformerException(Message.createStaticMessage("Failed to uncompress message."),
+                this, e);
         }
 
         if (!getReturnClass().equals(byte[].class))

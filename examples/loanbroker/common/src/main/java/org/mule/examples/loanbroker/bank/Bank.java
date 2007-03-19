@@ -69,7 +69,7 @@ public class Bank implements UMODescriptorAware, Serializable, BankService
     // programatically in DefaultLenderService (they should be looked up from the config/registry).
     public void setDescriptor(UMODescriptor descriptor) throws ConfigurationException 
     {
-        this.bankName = descriptor.getName();
+        this.bankName = descriptor.getName(); 
 
         List endpoints = descriptor.getInboundRouter().getEndpoints();
         if ((endpoints == null) || (endpoints.size() != 1))
@@ -86,7 +86,8 @@ public class Bank implements UMODescriptorAware, Serializable, BankService
         LoanQuote quote = new LoanQuote();
         quote.setBankName(getBankName());
         quote.setInterestRate(primeRate);
-        logger.info("Returning Rate is:" + quote);
+        logger.info(new Message("loanbroker-example", 3, quote.toString()).getMessage());
+        
         return quote;
     }
 

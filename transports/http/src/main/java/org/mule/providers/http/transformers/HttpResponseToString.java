@@ -32,10 +32,6 @@ import org.mule.umo.transformer.TransformerException;
  */
 public class HttpResponseToString extends AbstractTransformer
 {
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = -6700649887307138101L;
 
     public HttpResponseToString()
     {

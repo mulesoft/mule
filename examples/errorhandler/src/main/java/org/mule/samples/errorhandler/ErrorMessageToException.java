@@ -13,16 +13,8 @@ package org.mule.samples.errorhandler;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class ErrorMessageToException extends AbstractTransformer
 {
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = -4426474458155178245L;
 
     public ErrorMessageToException()
     {
@@ -45,4 +37,5 @@ public class ErrorMessageToException extends AbstractTransformer
             throw new TransformerException(this, e);
         }
     }
+
 }

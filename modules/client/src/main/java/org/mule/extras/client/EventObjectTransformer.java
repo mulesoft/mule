@@ -24,16 +24,10 @@ import java.util.EventObject;
  * @see MuleProxyListener
  * @see MuleMessage
  * @see EventObject
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class EventObjectTransformer extends AbstractEventTransformer
 {
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = -4724017409704797007L;
 
     public EventObjectTransformer()
     {
@@ -42,7 +36,7 @@ public class EventObjectTransformer extends AbstractEventTransformer
 
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
-        EventObject event = (EventObject)src;
-        return new MuleMessage(event.getSource());
+        return new MuleMessage(((EventObject)src).getSource());
     }
+
 }

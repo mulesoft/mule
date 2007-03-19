@@ -14,18 +14,11 @@ import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 
 /**
- * <code>NameStringToChatString</code> is a dummy transform used in the hello world
- * application to transform the ChatString object into a string
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>NameStringToChatString</code> is a dummy transformer used in the hello world
+ * application to transform the ChatString object into a string.
  */
 public class ChatStringToString extends AbstractTransformer
 {
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = 8633726064696217003L;
 
     public ChatStringToString()
     {
@@ -40,7 +33,7 @@ public class ChatStringToString extends AbstractTransformer
      */
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
-        ChatString string = (ChatString)src;
-        return string.toString();
+        ChatString chatString = (ChatString)src;
+        return chatString.toString();
     }
 }

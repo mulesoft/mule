@@ -33,8 +33,6 @@ public final class Messages implements CoreMessageConstants
 
     public static final String DEFAULT_BUNDLE = "core";
 
-    private static final Map BUNDLES = new HashMap();
-
     private static final Object[] EMPTY_ARGS = new Object[]{};
 
     /**
@@ -180,16 +178,11 @@ public final class Messages implements CoreMessageConstants
      */
     protected static ResourceBundle getBundle(String bundleName)
     {
-        ResourceBundle bundle = (ResourceBundle) BUNDLES.get(bundleName);
-        if (bundle == null)
-        {
-            String path = "META-INF.services.org.mule.i18n." + bundleName + "-messages";
-            logger.debug("Loading resource bundle: " + path + " for locale " +
-                    Locale.getDefault());
-            Locale locale = Locale.getDefault();
-            bundle = ResourceBundle.getBundle(path, locale);
-            BUNDLES.put(bundleName, bundle);
-        }
+        String path = "META-INF.services.org.mule.i18n." + bundleName + "-messages";
+        logger.debug("Loading resource bundle: " + path + " for locale " +
+            Locale.getDefault());
+        Locale locale = Locale.getDefault();
+        ResourceBundle bundle = ResourceBundle.getBundle(path, locale);
         return bundle;
     }
 

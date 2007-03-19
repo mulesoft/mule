@@ -33,8 +33,6 @@ import javax.jms.Session;
 public class StringToXMLMessage extends AbstractEventAwareTransformer
 {
 
-    private static final long serialVersionUID = 8476470235704172556L;
-
     public StringToXMLMessage()
     {
         super();

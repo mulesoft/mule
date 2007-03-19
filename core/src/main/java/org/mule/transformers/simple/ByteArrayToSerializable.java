@@ -25,10 +25,6 @@ import org.apache.commons.lang.SerializationUtils;
  */
 public class ByteArrayToSerializable extends AbstractTransformer
 {
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = 5305641786345530597L;
 
     public ByteArrayToSerializable()
     {

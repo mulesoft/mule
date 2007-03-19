@@ -25,10 +25,6 @@ import org.mule.umo.transformer.TransformerException;
 
 public class ObjectToXml extends AbstractXStreamTransformer
 {
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = 2231326110980980434L;
 
     public ObjectToXml()
     {
@@ -37,13 +33,12 @@ public class ObjectToXml extends AbstractXStreamTransformer
 
     public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
     {
-        // If the UMOMessage source type has been registered that we can assume that
-        // the
-        // whole message is to be serialised to Xml, nit just the payload. This can
-        // be useful
-        // for protocols such as tcp where the protocol does not support headers,
-        // thus the whole messgae
-        // needs to be serialized
+        /*
+         * If the UMOMessage source type has been registered that we can assume that
+         * the whole message is to be serialised to Xml, not just the payload. This
+         * can be useful for protocols such as tcp where the protocol does not
+         * support headers, thus the whole messgae needs to be serialized
+         */
         if (isSourceTypeSupported(UMOMessage.class, true) && context != null)
         {
             return getXStream().toXML(context.getMessage());

@@ -295,8 +295,6 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
 
     public static class DummyTrans extends AbstractEventAwareTransformer
     {
-        private static final long serialVersionUID = 3851286408555684551L;
-
         private CountDownLatch latch;
 
         public DummyTrans()

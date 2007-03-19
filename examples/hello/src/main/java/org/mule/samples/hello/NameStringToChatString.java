@@ -15,17 +15,10 @@ import org.mule.umo.transformer.TransformerException;
 
 /**
  * <code>NameStringToChatString</code> cnverts from a NameString object to a
- * ChatString object
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * ChatString object.
  */
 public class NameStringToChatString extends AbstractTransformer
 {
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = 6223698853238962982L;
 
     public NameStringToChatString()
     {
@@ -49,4 +42,5 @@ public class NameStringToChatString extends AbstractTransformer
         string.append(name);
         return string;
     }
+
 }

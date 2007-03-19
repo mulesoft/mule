@@ -32,7 +32,7 @@ import java.net.URI;
 public class TcpConnectorFunctionalTestCase extends AbstractProviderFunctionalTestCase
 {
     private Socket s;
-    private int port = 61655;
+    private int port = 61675;
 
     protected void doTearDown() throws Exception
     {

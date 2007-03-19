@@ -14,17 +14,8 @@ import org.mule.transformers.compression.AbstractCompressionTransformer;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.compression.GZipCompression;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public class TestCompressionTransformer extends AbstractCompressionTransformer
 {
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = -1742674557192926869L;
 
     private String beanProperty1;
     private String containerProperty;

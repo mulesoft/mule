@@ -38,4 +38,5 @@ public class ImapsConnector extends Pop3sConnector
     {
         this.mailboxFolder = mailboxFolder;
     }
+
 }

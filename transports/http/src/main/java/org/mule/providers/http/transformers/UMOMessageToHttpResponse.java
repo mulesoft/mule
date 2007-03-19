@@ -44,11 +44,6 @@ import org.apache.commons.httpclient.HttpVersion;
 
 public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
 {
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = 9137870668198309755L;
-
     public static final String CUSTOM_HEADER_PREFIX = "";
 
     private SimpleDateFormat format = null;

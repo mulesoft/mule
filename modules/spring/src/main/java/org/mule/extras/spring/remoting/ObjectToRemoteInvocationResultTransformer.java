@@ -19,7 +19,6 @@ import org.springframework.remoting.support.RemoteInvocationResult;
 
 public class ObjectToRemoteInvocationResultTransformer extends AbstractTransformer
 {
-    private static final long serialVersionUID = -7067819657247418549L;
 
     public ObjectToRemoteInvocationResultTransformer()
     {
@@ -58,4 +57,5 @@ public class ObjectToRemoteInvocationResultTransformer extends AbstractTransform
             throw new TransformerException(this, e);
         }
     }
+
 }

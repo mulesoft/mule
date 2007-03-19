@@ -15,10 +15,10 @@ import org.mule.umo.transformer.TransformerException;
 
 public class FailingTransformer extends AbstractTransformer
 {
-    private static final long serialVersionUID = -4399792657994495343L;
 
     protected Object doTransform(Object src, String encoding) throws TransformerException
     {
         throw new TransformerException(this, new Exception("Wrapped test exception"));
     }
+
 }

@@ -23,6 +23,7 @@ import org.mule.util.SystemUtils;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -98,6 +99,8 @@ public class MuleServer implements Runnable
      */
     private static MuleShutdownHook muleShutdownHook;
 
+    protected Map options = Collections.EMPTY_MAP;
+
     /**
      * Application entry point.
      *
@@ -154,6 +157,7 @@ public class MuleServer implements Runnable
                 System.exit(-1);
             }
         }
+
         if (config != null)
         {
             setConfigurationResources(config);

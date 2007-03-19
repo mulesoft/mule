@@ -21,16 +21,9 @@ import java.util.Map;
  * <code>ObjectToString</code> transformer is useful for debugging. It will return
  * human-readable output for various kinds of objects. Right now, it is just coded to
  * handle Map and Collection objects. Others will be added.
- * 
- * @author <a href="mailto:lajos@galatea.com">Lajos Moczar</a>
- * @version $Revision$
  */
 public class ObjectToString extends AbstractTransformer
 {
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = 1784548784479765795L;
 
     public ObjectToString()
     {
@@ -86,4 +79,5 @@ public class ObjectToString extends AbstractTransformer
 
         return output;
     }
+
 }

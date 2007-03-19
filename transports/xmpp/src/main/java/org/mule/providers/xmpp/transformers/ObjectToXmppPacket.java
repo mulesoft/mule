@@ -27,11 +27,6 @@ import org.mule.umo.transformer.TransformerException;
 public class ObjectToXmppPacket extends AbstractEventAwareTransformer
 {
 
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = -815224066829254844L;
-
     public ObjectToXmppPacket()
     {
         registerSourceType(String.class);
@@ -41,6 +36,7 @@ public class ObjectToXmppPacket extends AbstractEventAwareTransformer
     public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
     {
         Message result = null;
+
         try
         {
             result = new Message(context.getMessageAsString(encoding));

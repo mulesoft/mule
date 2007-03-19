@@ -40,6 +40,7 @@ public class SslConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
     {
         try
         {
+            logger.debug("Using port " + port);
             return new MuleEndpointURI("ssl://localhost:" + port);
         }
         catch (EndpointException e)

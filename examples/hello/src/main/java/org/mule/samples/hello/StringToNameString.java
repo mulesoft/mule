@@ -14,17 +14,10 @@ import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 
 /**
- * <code>StringToNameString</code> converts from a String to a NameString object
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>StringToNameString</code> converts from a String to a NameString object.
  */
 public class StringToNameString extends AbstractTransformer
 {
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = -408128452488674866L;
 
     public StringToNameString()
     {
@@ -40,11 +33,13 @@ public class StringToNameString extends AbstractTransformer
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         String name = (String)src;
-        int i = name.indexOf("\r");
+        int i = name.indexOf('\r');
+
         if (i > -1)
         {
             name = name.substring(0, i);
         }
+
         return new NameString(name);
     }
 

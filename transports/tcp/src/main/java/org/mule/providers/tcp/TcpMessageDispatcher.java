@@ -43,21 +43,29 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
 
     protected synchronized void doDispatch(UMOEvent event) throws Exception
     {
-        Socket socket = dispatchToSocket(event);
-        connector.releaseSocket(socket, event.getEndpoint());
+        Socket socket = connector.getSocket(event.getEndpoint());
+        try 
+        {
+            dispatchToSocket(socket, event);
+        }
+        finally 
+        {
+            connector.releaseSocket(socket, event.getEndpoint());
+        }
     }
 
     protected synchronized UMOMessage doSend(UMOEvent event) throws Exception
     {
-        Socket socket = dispatchToSocket(event);
-
+        Socket socket = connector.getSocket(event.getEndpoint());
         try
         {
+            dispatchToSocket(socket, event);
+
             if (useRemoteSync(event))
             {
                 try
                 {
-                    Object result = receive(socket, event.getTimeout());
+                    Object result = receiveFromSocket(socket, event.getTimeout());
                     if (result == null)
                     {
                         return null;
@@ -68,7 +76,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
                 {
                     // we don't necessarily expect to receive a response here
                     logger.info("Socket timed out normally while doing a synchronous receive on endpointUri: "
-                                + event.getEndpoint().getEndpointURI());
+                        + event.getEndpoint().getEndpointURI());
                     return null;
                 }
             }
@@ -83,50 +91,14 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    /**
-     * The doSend() and doDispatch() methods need to handle socket disposure
-     * differently, thus the need to extract this common code.
-     * 
-     * @param event event
-     * @throws Exception in case of any error
-     * @return the socket being written to
-     */
-    protected Socket dispatchToSocket(UMOEvent event) throws Exception
+    // Socket management (get and release) is handled outside this method
+    private void dispatchToSocket(Socket socket, UMOEvent event) throws Exception
     {
         Object payload = event.getTransformedMessage();
-
-        Socket socket;
-        try
-        {
-
-            socket = connector.getSocket(event.getEndpoint());
-            write(socket, payload);
-            return socket;
-            // If we're doing sync receive try and read return info from socket
-        }
-        catch (IOException e)
-        {
-            // TODO: Reconnects should be made posible gererically, by detecting an
-            // error in the AbstractDispatcher
-            // and dispatching the event again. It seems wrong to put it here
-            // if (connector.isKeepSendSocketOpen())
-            // {
-            // logger.warn("Write raised exception: '" + e.getMessage() + "'
-            // attempting to reconnect.");
-            // // Try reconnecting or a Fatal Connection Exception will be thrown
-            // connector.releaseSocket(socket, event.getEndpoint());
-            // reconnect();
-            // socket = connector.getSocket(event.getEndpoint());
-            // write(socket, payload);
-            // }
-            // else
-            // {
-            throw e;
-            // }
-        }
+        write(socket, payload);
     }
 
-    protected void write(Socket socket, Object data) throws IOException, TransformerException
+    private void write(Socket socket, Object data) throws IOException, TransformerException
     {
         TcpProtocol protocol = connector.getTcpProtocol();
 
@@ -137,7 +109,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
         bos.flush();
     }
 
-    protected Object receive(Socket socket, int timeout) throws IOException
+    private Object receiveFromSocket(Socket socket, int timeout) throws IOException
     {
         DataInputStream dis = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
         if (timeout >= 0)
@@ -160,29 +132,25 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
      */
     protected UMOMessage doReceive(long timeout) throws Exception
     {
-        Socket socket = null;
+        Socket socket = connector.getSocket(endpoint);
         try
         {
-            socket = connector.getSocket(endpoint);
-            try
+            Object result = receiveFromSocket(socket, (int)timeout);
+            if (result == null)
             {
-                Object result = receive(socket, (int)timeout);
-                if (result == null)
-                {
-                    return null;
-                }
-                return new MuleMessage(connector.getMessageAdapter(result));
-            }
-            catch (SocketTimeoutException e)
-            {
-                // we don't necesarily expect to receive a resonse here
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Socket timed out normally while doing a synchronous receive on endpointUri: "
-                                 + endpoint.getEndpointURI());
-                }
                 return null;
             }
+            return new MuleMessage(connector.getMessageAdapter(result));
+        }
+        catch (SocketTimeoutException e)
+        {
+            // we don't necesarily expect to receive a resonse here
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Socket timed out normally while doing a synchronous receive on endpointUri: "
+                    + endpoint.getEndpointURI());
+            }
+            return null;
         }
         finally
         {
@@ -204,7 +172,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
 
     protected void doConnect() throws Exception
     {
-        //Test the connectionw
+        //Test the connection
         Socket socket = connector.getSocket(endpoint);
         connector.releaseSocket(socket, endpoint);
     }
@@ -213,4 +181,5 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
     {
         //nothing to do
     }
+    
 }

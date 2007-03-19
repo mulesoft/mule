@@ -95,7 +95,8 @@ public class TcpConnectorTestCase extends AbstractConnectorTestCase
         assertEquals(TcpConnector.DEFAULT_SOCKET_TIMEOUT, c.getReceiveTimeout());
         c.setSendTimeout(-1);
         assertEquals(TcpConnector.DEFAULT_SOCKET_TIMEOUT, c.getSendTimeout());
-        c.setTimeout(1000); // set both
+        c.setSendTimeout(1000);
+        c.setReceiveTimeout(1000);
         assertEquals(1000, c.getReceiveTimeout());
         assertEquals(1000, c.getSendTimeout());
 

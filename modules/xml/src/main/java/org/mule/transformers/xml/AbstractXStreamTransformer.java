@@ -55,6 +55,8 @@ public abstract class AbstractXStreamTransformer extends AbstractEventAwareTrans
     public synchronized void setDriverClassName(String driverClassName)
     {
         this.driverClassName = driverClassName;
+        // force XStream instance update
+        this.xstream = null;
     }
 
     public synchronized Map getAliases()
@@ -65,6 +67,8 @@ public abstract class AbstractXStreamTransformer extends AbstractEventAwareTrans
     public synchronized void setAliases(Map aliases)
     {
         this.aliases = aliases;
+        // force XStream instance update
+        this.xstream = null;
     }
 
     public synchronized List getConverters()
@@ -75,6 +79,8 @@ public abstract class AbstractXStreamTransformer extends AbstractEventAwareTrans
     public synchronized void setConverters(List converters)
     {
         this.converters = converters;
+        // force XStream instance update
+        this.xstream = null;
     }
 
     protected boolean requiresCurrentEvent()

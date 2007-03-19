@@ -20,10 +20,6 @@ import java.io.UnsupportedEncodingException;
  */
 public class FileToString extends FileToByteArray
 {
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = -5376852963195290731L;
 
     public FileToString()
     {
@@ -40,6 +36,7 @@ public class FileToString extends FileToByteArray
      * <code>byte[]</code> is passed in as a source object this transformer accepts
      * it and tries the usual transformation.
      */
+    // @Override
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         byte[] bytes;
@@ -62,4 +59,5 @@ public class FileToString extends FileToByteArray
             throw new TransformerException(this, uee);
         }
     }
+
 }

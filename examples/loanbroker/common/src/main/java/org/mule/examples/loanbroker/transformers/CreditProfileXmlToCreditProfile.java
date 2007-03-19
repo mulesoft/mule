@@ -20,10 +20,6 @@ import org.dom4j.DocumentHelper;
 
 public class CreditProfileXmlToCreditProfile extends AbstractTransformer
 {
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = -8349744705446470225L;
 
     public CreditProfileXmlToCreditProfile()
     {
@@ -35,6 +31,7 @@ public class CreditProfileXmlToCreditProfile extends AbstractTransformer
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         Document doc = null;
+
         if (src instanceof Document)
         {
             doc = (Document)src;
@@ -50,6 +47,7 @@ public class CreditProfileXmlToCreditProfile extends AbstractTransformer
                 throw new TransformerException(this, e);
             }
         }
+
         String history = doc.valueOf("/credit-profile/customer-history");
         String score = doc.valueOf("/credit-profile/credit-score");
         CreditProfile cp = new CreditProfile();
@@ -57,4 +55,5 @@ public class CreditProfileXmlToCreditProfile extends AbstractTransformer
         cp.setCreditScore(Integer.valueOf(score).intValue());
         return cp;
     }
+
 }

@@ -16,12 +16,13 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 
 public class TlsConnectorFunctionalTestCase extends SslConnectorFunctionalTestCase
 {
-    private int port = 61655;
+    private int port = 61665;
 
     protected UMOEndpointURI getInDest()
     {
         try
         {
+            logger.debug("Using port " + port);
             return new MuleEndpointURI("tls://localhost:" + port);
         }
         catch (EndpointException e)

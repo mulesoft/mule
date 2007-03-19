@@ -19,7 +19,6 @@ import org.springframework.remoting.support.RemoteInvocation;
 
 public class ObjectToRemoteInvocationTransformer extends AbstractTransformer
 {
-    private static final long serialVersionUID = -7067819657247418549L;
 
     public ObjectToRemoteInvocationTransformer()
     {
@@ -31,10 +30,6 @@ public class ObjectToRemoteInvocationTransformer extends AbstractTransformer
 
     protected Object doTransform(Object src, String encoding) throws TransformerException
     {
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("HttpToRemoteInvocation.doTransform(" + src + ")");
-        }
         if (src instanceof RemoteInvocation)
         {
             return src;
@@ -63,4 +58,5 @@ public class ObjectToRemoteInvocationTransformer extends AbstractTransformer
             throw new TransformerException(this, e);
         }
     }
+
 }

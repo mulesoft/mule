@@ -21,10 +21,6 @@ import org.mule.util.XMLEntityCodec;
  */
 public class XmlEntityDecoder extends AbstractTransformer
 {
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = -3198566471610838679L;
 
     public XmlEntityDecoder()
     {

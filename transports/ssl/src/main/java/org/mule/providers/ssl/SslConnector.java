@@ -12,7 +12,7 @@ package org.mule.providers.ssl;
 
 import org.mule.providers.tcp.TcpConnector;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.security.TlsSupport;
+import org.mule.umo.security.TlsConfiguration;
 import org.mule.umo.security.provider.SecurityProviderFactory;
 
 import java.io.IOException;
@@ -28,16 +28,15 @@ public class SslConnector extends TcpConnector
 {
 
     // null initial keystore - see below
-    TlsSupport tlsSupport = new TlsSupport(null);
+    TlsConfiguration tls = new TlsConfiguration(null);
     
     protected void doInitialise() throws InitialisationException
     {
         // the original logic here was slightly different to other uses of the TlsSupport code -
         // it appeared to be equivalent to switching anon by whether or not a keyStore was defined
         // (which seems to make sense), so that is used here.
-        tlsSupport.initialiseFactories(null == getKeyStore());
+        tls.initialise(null == getKeyStore(), TlsConfiguration.JSSE_NAMESPACE);
         super.doInitialise();
-        tlsSupport.initialiseStores();
     }
 
     public String getProtocol()
@@ -47,187 +46,187 @@ public class SslConnector extends TcpConnector
 
     public String getClientKeyStore()
     {
-        return tlsSupport.getClientKeyStore();
+        return tls.getClientKeyStore();
     }
 
     public String getClientKeyStorePassword()
     {
-        return tlsSupport.getClientKeyStorePassword();
+        return tls.getClientKeyStorePassword();
     }
 
     public String getKeyManagerAlgorithm()
     {
-        return tlsSupport.getKeyManagerAlgorithm();
+        return tls.getKeyManagerAlgorithm();
     }
 
     public KeyManagerFactory getKeyManagerFactory()
     {
-        return tlsSupport.getKeyManagerFactory();
+        return tls.getKeyManagerFactory();
     }
 
     public String getKeyPassword()
     {
-        return tlsSupport.getKeyPassword();
+        return tls.getKeyPassword();
     }
 
     public String getKeyStore()
     {
-        return tlsSupport.getKeyStore();
+        return tls.getKeyStore();
     }
 
     public String getKeystoreType()
     {
-        return tlsSupport.getKeystoreType();
+        return tls.getKeystoreType();
     }
 
     public String getProtocolHandler()
     {
-        return tlsSupport.getProtocolHandler();
+        return tls.getProtocolHandler();
     }
 
     public Provider getProvider()
     {
-        return tlsSupport.getProvider();
+        return tls.getProvider();
     }
 
     public SecurityProviderFactory getSecurityProviderFactory()
     {
-        return tlsSupport.getSecurityProviderFactory();
+        return tls.getSecurityProviderFactory();
     }
 
     public String getSslType()
     {
-        return tlsSupport.getSslType();
+        return tls.getSslType();
     }
 
     public String getStorePassword()
     {
-        return tlsSupport.getStorePassword();
+        return tls.getStorePassword();
     }
 
     public String getTrustManagerAlgorithm()
     {
-        return tlsSupport.getTrustManagerAlgorithm();
+        return tls.getTrustManagerAlgorithm();
     }
 
     public TrustManagerFactory getTrustManagerFactory()
     {
-        return tlsSupport.getTrustManagerFactory();
+        return tls.getTrustManagerFactory();
     }
 
     public String getTrustStore()
     {
-        return tlsSupport.getTrustStore();
+        return tls.getTrustStore();
     }
 
     public String getTrustStorePassword()
     {
-        return tlsSupport.getTrustStorePassword();
+        return tls.getTrustStorePassword();
     }
 
     public String getTrustStoreType()
     {
-        return tlsSupport.getTrustStoreType();
+        return tls.getTrustStoreType();
     }
 
     public boolean isExplicitTrustStoreOnly()
     {
-        return tlsSupport.isExplicitTrustStoreOnly();
+        return tls.isExplicitTrustStoreOnly();
     }
 
     public boolean isRequireClientAuthentication()
     {
-        return tlsSupport.isRequireClientAuthentication();
+        return tls.isRequireClientAuthentication();
     }
 
     public void setClientKeyStore(String clientKeyStore) throws IOException
     {
-        tlsSupport.setClientKeyStore(clientKeyStore);
+        tls.setClientKeyStore(clientKeyStore);
     }
 
     public void setClientKeyStorePassword(String clientKeyStorePassword)
     {
-        tlsSupport.setClientKeyStorePassword(clientKeyStorePassword);
+        tls.setClientKeyStorePassword(clientKeyStorePassword);
     }
 
     public void setExplicitTrustStoreOnly(boolean explicitTrustStoreOnly)
     {
-        tlsSupport.setExplicitTrustStoreOnly(explicitTrustStoreOnly);
+        tls.setExplicitTrustStoreOnly(explicitTrustStoreOnly);
     }
 
     public void setKeyManagerAlgorithm(String keyManagerAlgorithm)
     {
-        tlsSupport.setKeyManagerAlgorithm(keyManagerAlgorithm);
+        tls.setKeyManagerAlgorithm(keyManagerAlgorithm);
     }
 
     public void setKeyPassword(String keyPassword)
     {
-        tlsSupport.setKeyPassword(keyPassword);
+        tls.setKeyPassword(keyPassword);
     }
 
-    public void setKeyStore(String keyStore)
+    public void setKeyStore(String keyStore) throws IOException
     {
-        tlsSupport.setKeyStore(keyStore);
+        tls.setKeyStore(keyStore);
     }
 
     public void setKeystoreType(String keystoreType)
     {
-        tlsSupport.setKeystoreType(keystoreType);
+        tls.setKeystoreType(keystoreType);
     }
 
     public void setProtocolHandler(String protocolHandler)
     {
-        tlsSupport.setProtocolHandler(protocolHandler);
+        tls.setProtocolHandler(protocolHandler);
     }
 
     public void setProvider(Provider provider)
     {
-        tlsSupport.setProvider(provider);
+        tls.setProvider(provider);
     }
 
     public void setRequireClientAuthentication(boolean requireClientAuthentication)
     {
-        tlsSupport.setRequireClientAuthentication(requireClientAuthentication);
+        tls.setRequireClientAuthentication(requireClientAuthentication);
     }
 
     public void setSecurityProviderFactory(SecurityProviderFactory spFactory)
     {
-        tlsSupport.setSecurityProviderFactory(spFactory);
+        tls.setSecurityProviderFactory(spFactory);
     }
 
     public void setSslType(String sslType)
     {
-        tlsSupport.setSslType(sslType);
+        tls.setSslType(sslType);
     }
 
     public void setStorePassword(String storePassword)
     {
-        tlsSupport.setStorePassword(storePassword);
+        tls.setStorePassword(storePassword);
     }
 
     public void setTrustManagerAlgorithm(String trustManagerAlgorithm)
     {
-        tlsSupport.setTrustManagerAlgorithm(trustManagerAlgorithm);
+        tls.setTrustManagerAlgorithm(trustManagerAlgorithm);
     }
 
     public void setTrustManagerFactory(TrustManagerFactory trustManagerFactory)
     {
-        tlsSupport.setTrustManagerFactory(trustManagerFactory);
+        tls.setTrustManagerFactory(trustManagerFactory);
     }
 
     public void setTrustStore(String trustStore) throws IOException
     {
-        tlsSupport.setTrustStore(trustStore);
+        tls.setTrustStore(trustStore);
     }
 
     public void setTrustStorePassword(String trustStorePassword)
     {
-        tlsSupport.setTrustStorePassword(trustStorePassword);
+        tls.setTrustStorePassword(trustStorePassword);
     }
 
     public void setTrustStoreType(String trustStoreType)
     {
-        tlsSupport.setTrustStoreType(trustStoreType);
+        tls.setTrustStoreType(trustStoreType);
     }
 
 }

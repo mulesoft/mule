@@ -20,9 +20,6 @@ import java.lang.reflect.Method;
 /**
  * <code>AbstractEventTransformer</code> adds support for adding method details to
  * the result message.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public abstract class AbstractEventTransformer extends AbstractTransformer

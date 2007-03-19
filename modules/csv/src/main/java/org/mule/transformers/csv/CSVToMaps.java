@@ -30,7 +30,6 @@ import java.util.List;
  */
 public class CSVToMaps extends AbstractCSVTransformer
 {
-    private static final long serialVersionUID = 4050673946506172890L;
 
     public CSVToMaps()
     {

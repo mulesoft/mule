@@ -22,10 +22,6 @@ import javax.mail.internet.MimeMultipart;
  */
 public class EmailMessageToString extends AbstractTransformer
 {
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = 8940364998861971795L;
 
     public EmailMessageToString()
     {
@@ -44,13 +40,13 @@ public class EmailMessageToString extends AbstractTransformer
         Message msg = (Message)src;
         try
         {
-            // Other information about the message such as cc addresses, attachments
-            // are handled
-            // By the Mail MEssage adapter. If Transformers need access to these
-            // properties
-            // they should implement the AbstractEventAwareTransformer and extract
-            // these properties
-            // from the passed UMOEventContext
+            /*
+             * Other information about the message such as cc addresses, attachments
+             * are handled by the mail message adapter. If Transformers need access
+             * to these properties they should extends from
+             * AbstractEventAwareTransformer and extract these properties from the
+             * passed UMOEventContext
+             */
 
             // For this impl we just pass back the email content
             Object result = msg.getContent();

@@ -19,21 +19,15 @@ import java.io.ObjectStreamConstants;
  * <code>ByteArrayToSerializable</code> but checks if th byte array is a serialised
  * object and if not will return a String created from the bytes is the returnType on
  * the transformer.
- * 
- * @author Ross Mason
  */
 public class ByteArrayToObject extends ByteArrayToSerializable
 {
 
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = 2105641786358330597L;
-
+    // @Override
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
-
         byte[] bytes = (byte[])src;
+
         if (bytes[0] == (byte)((ObjectStreamConstants.STREAM_MAGIC >>> 8) & 0xFF))
         {
             return super.doTransform(src, encoding);

@@ -11,6 +11,8 @@
 package org.mule.examples.loanbroker.esn;
 
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
+import org.mule.config.i18n.Message;
+import org.mule.examples.loanbroker.AbstractMain;
 import org.mule.examples.loanbroker.messages.Customer;
 import org.mule.examples.loanbroker.messages.CustomerQuoteRequest;
 import org.mule.examples.loanbroker.messages.LoanQuote;
@@ -33,7 +35,7 @@ import java.util.Map;
  * prompts to obtain loan requests
  */
 
-public class Main
+public class Main extends AbstractMain
 {
     public static final String CLI_OPTIONS[][] = {
             { "config", "true", "Configuration File" },
@@ -88,22 +90,12 @@ public class Main
         return new CustomerQuoteRequest(c, getRandomAmount(), getRandomDuration());
     }
 
-    private static double getRandomAmount()
-    {
-        return Math.round(Math.random() * 18000);
-    }
-
-    private static int getRandomDuration()
-    {
-        return new Double(Math.random() * 60).intValue();
-    }
-
     public void request(CustomerQuoteRequest request, boolean sync) throws Exception
     {
         if (!sync)
         {
             client.dispatch("vm://customer.requests", request, null);
-            System.out.println("Sent Async request");
+            System.out.println(new Message("loanbroker-example", 42).getMessage());
             // let the request catch up
             Thread.sleep(1500);
         }
@@ -112,11 +104,11 @@ public class Main
             UMOMessage result = client.send("vm://customer.requests", request, null);
             if (result == null)
             {
-                System.out.println("A result was not received, an error must have occurred. Check the logs.");
+                System.out.println(new Message("loanbroker-example", 12).getMessage());
             }
             else
             {
-                System.out.println("Loan Consumer received a Quote: " + result.getPayload());
+                System.out.println(new Message("loanbroker-example", 13, result.getPayload()).getMessage());
             }
         }
     }
@@ -173,7 +165,7 @@ public class Main
                 {
                     long start = System.currentTimeMillis();
                     List results = loanConsumer.requestSend(i, "vm://customer.requests");
-                    System.out.println("Number or quotes received: " + results.size());
+                    System.out.println(new Message("loanbroker-example", 10, String.valueOf(results.size())).getMessage());
                     List output = new ArrayList(results.size());
                     int x = 1;
                     for (Iterator iterator = results.iterator(); iterator.hasNext(); x++)
@@ -184,7 +176,7 @@ public class Main
                     System.out.println(StringMessageUtils.getBoilerPlate(output, '*', 80));
                     long cur = System.currentTimeMillis();
                     System.out.println(DateUtils.getFormattedDuration(cur - start));
-                    System.out.println("Avg request: " + ((cur - start) / x));
+                    System.out.println(new Message("loanbroker-example", 11, String.valueOf( ((cur - start) / x) )).getMessage());
                 }
                 else
                 {
@@ -208,14 +200,14 @@ public class Main
 
     protected static String getInteractiveConfig() throws IOException
     {
-        System.out.println(StringMessageUtils.getBoilerPlate("Welcome to the Mule Loan Broker example"));
-
+        System.out.println(StringMessageUtils.getBoilerPlate(new Message("loanbroker-example", 40).getMessage()));
+                    
         int response = 0;
         String provider = "axis";
 
         while (response != 'a' && response != 'x')
         {
-            System.out.println("\nWhich SOAP stack would you like to use: [a]xis or [x]fire?");
+            System.out.println("\n" + new Message("loanbroker-example", 43).getMessage());
             response = readCharacter();
             switch (response)
             {
@@ -235,20 +227,20 @@ public class Main
         response = 0;
         while (response != 'a' && response != 's')
         {
-            System.out.println("\nWould you like to run the [s]ynchronous or [a]synchronous version?");
+            System.out.println("\n" + new Message("loanbroker-example", 44).getMessage());
             response = readCharacter();
             switch (response)
             {
                 case 'a' :
                 {
-                    System.out.println("Loading Asynchronous Loan Broker");
+                    System.out.println(new Message("loanbroker-example", 45).getMessage());
                     synchronous = false;
                     break;
                 }
 
                 case 's' :
                 {
-                    System.out.println("Loading Synchronous Loan Broker");
+                    System.out.println(new Message("loanbroker-example", 46).getMessage());
                     synchronous = true;
                     break;
                 }
@@ -265,11 +257,7 @@ public class Main
         int response = 0;
         while (response != 'q')
         {
-            System.out.println("\n[1] make a loan request");
-            System.out.println("[2] send 100 random requests");
-            System.out.println("[3] send x requests");
-            System.out.println("[q] quit");
-            System.out.println("\nPlease make your selection: ");
+            System.out.println("\n" + new Message("loanbroker-example", 41).getMessage());
 
             response = readCharacter();
 
@@ -290,11 +278,11 @@ public class Main
 
                 case '3' :
                 {
-                    System.out.println("Enter number of requests: ");
+                    System.out.println(new Message("loanbroker-example", 22).getMessage());
                     int number = readInt();
                     if (number < 1)
                     {
-                        System.out.println("Number of requests must be at least 1");
+                        System.out.println(new Message("loanbroker-example", 23).getMessage());
                     }
                     else
                     {
@@ -305,14 +293,14 @@ public class Main
 
                 case 'q' :
                 {
-                    System.out.println("Exiting now.");
+                    System.out.println(new Message("loanbroker-example", 14).getMessage());
                     close();
                     System.exit(0);
                 }
 
                 default :
                 {
-                    System.out.println("That response is not recognised, try again.");
+                    System.out.println(new Message("loanbroker-example", 15).getMessage());
                 }
             }
         }
@@ -326,82 +314,13 @@ public class Main
             int i = 1;
             for (Iterator iterator = list.iterator(); iterator.hasNext(); i++)
             {
-                System.out.println("Request " + i + ": " + iterator.next().toString());
+                System.out.println(new Message("loanbroker-example", 24, String.valueOf(i), iterator.next().toString()).getMessage());
             }
         }
         else
         {
             this.requestDispatch(number, "vm://customer.requests");
         }
-    }
-
-    protected static int readCharacter() throws IOException
-    {
-        byte[] buf = new byte[16];
-        System.in.read(buf);
-        return buf[0];
-    }
-
-    protected static String readString() throws IOException
-    {
-        byte[] buf = new byte[80];
-        System.in.read(buf);
-        return new String(buf).trim();
-    }
-
-    protected static int readInt() throws IOException
-    {
-        try
-        {
-            return Integer.parseInt(readString());
-        }
-        catch (NumberFormatException nfex)
-        {
-            return 0;
-        }
-    }
-
-    protected static CustomerQuoteRequest getRequestFromUser() throws IOException
-    {
-        System.out.println("Enter your name:");
-        String name = readString();
-
-        System.out.println("Enter loan Amount:");
-        String amount = readString();
-
-        System.out.println("Enter loan Duration in months:");
-        String duration = readString();
-
-        int d = 0;
-        try
-        {
-            d = Integer.parseInt(duration);
-        }
-        catch (NumberFormatException e)
-        {
-            System.out.println("Failed to parse duration: " + duration + ". Using random default");
-            d = getRandomDuration();
-        }
-
-        double a = 0;
-        try
-        {
-            a = Double.valueOf(amount).doubleValue();
-        }
-        catch (NumberFormatException e)
-        {
-            System.out.println("Failed to parse amount: " + amount + ". Using random default");
-            a = getRandomAmount();
-        }
-
-        Customer c = new Customer(name, getRandomSsn());
-        CustomerQuoteRequest request = new CustomerQuoteRequest(c, a, d);
-        return request;
-    }
-
-    private static int getRandomSsn()
-    {
-        return new Double(Math.random() * 6000).intValue();
     }
 
 }

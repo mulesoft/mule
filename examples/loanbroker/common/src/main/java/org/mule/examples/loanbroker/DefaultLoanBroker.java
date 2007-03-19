@@ -10,6 +10,7 @@
 
 package org.mule.examples.loanbroker;
 
+import org.mule.config.i18n.Message;
 import org.mule.examples.loanbroker.messages.CustomerQuoteRequest;
 import org.mule.examples.loanbroker.messages.LoanBrokerQuoteRequest;
 import org.mule.examples.loanbroker.messages.LoanQuote;
@@ -38,9 +39,13 @@ public class DefaultLoanBroker implements LoanBrokerService
         int requests = incRequests();
         if (logger.isInfoEnabled())
         {
-            logger.info("\n***** Request #" + requests + " received: Client " + request.getCustomer().getName() + " with ssn= "
-                + request.getCustomer().getSsn() + " requests a loan of amount= "
-                + request.getLoanAmount() + " for " + request.getLoanDuration() + " months");
+            String[] params = new String[] { String.valueOf(requests), 
+                request.getCustomer().getName(), 
+                String.valueOf(request.getCustomer().getSsn()), 
+                String.valueOf(request.getLoanAmount()),
+                String.valueOf(request.getLoanDuration()) };
+
+            logger.info("\n***** " + new Message("loanbroker-example", 1, params).getMessage());
         }        
         LoanBrokerQuoteRequest bqr = new LoanBrokerQuoteRequest();
         bqr.setCustomerRequest(request);
@@ -52,7 +57,9 @@ public class DefaultLoanBroker implements LoanBrokerService
         int quotes = incQuotes();
         if (logger.isInfoEnabled())
         {
-            logger.info("\n***** Quote #" + quotes + " received: " + quote);
+            String[] params = new String[] { String.valueOf(quotes), 
+                quote.toString() };
+            logger.info("\n***** " + new Message("loanbroker-example", 2, params).getMessage());
         }
         return quote;
     }

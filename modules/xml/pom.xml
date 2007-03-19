@@ -89,6 +89,16 @@
                     <artifactId>commons-jxpath</artifactId>
                     <version>1.2</version>
                     <exclusions>
+                        <!-- we want newer collections via core -->
+                        <exclusion>
+                            <groupId>commons-collections</groupId>
+                            <artifactId>commons-collections</artifactId>
+                        </exclusion>
+                        <!-- we want newer beanutils via core -->
+                        <exclusion>
+                            <groupId>commons-beanutils</groupId>
+                            <artifactId>commons-beanutils</artifactId>
+                        </exclusion>
                         <!-- we like slf4j -->
                         <exclusion>
                             <groupId>commons-logging</groupId>
@@ -162,6 +172,16 @@
                     <artifactId>commons-jxpath</artifactId>
                     <version>1.2</version>
                     <exclusions>
+                        <!-- we want newer collections via core -->
+                        <exclusion>
+                            <groupId>commons-collections</groupId>
+                            <artifactId>commons-collections</artifactId>
+                        </exclusion>
+                        <!-- we want newer beanutils via core -->
+                        <exclusion>
+                            <groupId>commons-beanutils</groupId>
+                            <artifactId>commons-beanutils</artifactId>
+                        </exclusion>
                         <!-- we like slf4j -->
                         <exclusion>
                             <groupId>commons-logging</groupId>
@@ -199,12 +219,6 @@
     </profiles>
     
     <dependencies>
-        <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <version>3.2</version>
-        </dependency>
-
         <!-- Used for de/serialising objects -->
         <dependency>
             <groupId>com.thoughtworks.xstream</groupId>

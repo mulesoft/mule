@@ -20,10 +20,6 @@ import org.mule.umo.transformer.TransformerException;
  */
 public class LoanQuoteRequestToCreditProfileArgs extends AbstractTransformer
 {
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = -1371055512935227423L;
 
     public LoanQuoteRequestToCreditProfileArgs()
     {
@@ -38,4 +34,5 @@ public class LoanQuoteRequestToCreditProfileArgs extends AbstractTransformer
         args[1] = new Integer(request.getCustomerRequest().getCustomer().getSsn());
         return args;
     }
+
 }

@@ -19,7 +19,7 @@ import org.mule.umo.transformer.UMOTransformer;
 public class NullResultTestCase extends AbstractTransformerTestCase
 {
 
-    private NullResultTransformer transformer = new NullResultTransformer();
+    private final NullResultTransformer transformer = new NullResultTransformer();
 
     public Object getTestData()
     {
@@ -57,10 +57,6 @@ public class NullResultTestCase extends AbstractTransformerTestCase
 
     public final class NullResultTransformer extends AbstractTransformer
     {
-        /**
-         * Serial version
-         */
-        private static final long serialVersionUID = -6677554849756349271L;
 
         public NullResultTransformer()
         {
@@ -73,4 +69,5 @@ public class NullResultTestCase extends AbstractTransformerTestCase
             return null;
         }
     }
+
 }

@@ -26,26 +26,21 @@ import javax.script.ScriptException;
  */
 public class ScriptTransformer extends AbstractEventAwareTransformer
 {
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = -2384663903730064892L;
-
-    protected Scriptable scriptable;
+    protected final Scriptable scriptable = new Scriptable();
 
     public ScriptTransformer()
     {
-        scriptable = new Scriptable();
+        super();
     }
 
     public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
     {
-        Bindings ns = getScriptEngine().createBindings();
-        populateBindings(ns, context, src);
+        Bindings bindings = this.getScriptEngine().createBindings();
+        this.populateBindings(bindings, context, src);
 
         try
         {
-            return scriptable.runScript(ns);
+            return scriptable.runScript(bindings);
         }
         catch (ScriptException e)
         {
@@ -122,28 +117,6 @@ public class ScriptTransformer extends AbstractEventAwareTransformer
     public String getScriptEngineName()
     {
         return scriptable.getScriptEngineName();
-    }
-
-    Scriptable getScriptable()
-    {
-        return scriptable;
-    }
-
-    void setScriptable(Scriptable scriptable)
-    {
-        this.scriptable = scriptable;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#clone()
-     */
-    public Object clone() throws CloneNotSupportedException
-    {
-        ScriptTransformer trans = (ScriptTransformer)super.clone();
-        trans.setScriptable(scriptable);
-        return trans;
     }
 
 }

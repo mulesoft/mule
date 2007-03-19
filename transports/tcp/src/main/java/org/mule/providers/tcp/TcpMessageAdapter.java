@@ -57,7 +57,7 @@ public class TcpMessageAdapter extends AbstractMessageAdapter
      * Converts the message implementation into a String representation
      * 
      * @param encoding The encoding to use when transforming the message (if
-     *            necessary). The parameter is used when converting from a byte array
+     *         necessary). The parameter is used when converting from a byte array
      * @return String representation of the message payload
      * @throws Exception Implementation may throw an endpoint specific exception
      */

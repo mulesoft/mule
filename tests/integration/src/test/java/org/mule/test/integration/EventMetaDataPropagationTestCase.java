@@ -124,8 +124,6 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase impleme
 
     private class DummyTransformer extends AbstractEventAwareTransformer
     {
-        private static final long serialVersionUID = 2488453445525934222L;
-
         public Object transform(Object src, String encoding, UMOEventContext context)
             throws TransformerException
         {

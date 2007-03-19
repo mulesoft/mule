@@ -41,21 +41,16 @@ import org.apache.commons.logging.LogFactory;
 public class StringToEmailMessage extends AbstractEventAwareTransformer
 {
     /**
-     * Serial version
-     */
-    private static final long serialVersionUID = -2687301871292220521L;
-
-    /**
      * logger used by this class
      */
-    protected final transient Log logger = LogFactory.getLog(getClass());
+    protected final Log logger = LogFactory.getLog(getClass());
 
     protected TemplateParser templateParser = TemplateParser.createAntStyleParser();
 
     public StringToEmailMessage()
     {
-        registerSourceType(String.class);
-        setReturnClass(Message.class);
+        this.registerSourceType(String.class);
+        this.setReturnClass(Message.class);
     }
 
     /*

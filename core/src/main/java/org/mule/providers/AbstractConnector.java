@@ -405,8 +405,6 @@ public abstract class AbstractConnector
         return registryId;
     }
 
-    public abstract String getProtocol();
-
     /*
      * (non-Javadoc)
      *
@@ -418,7 +416,6 @@ public abstract class AbstractConnector
 
         if (!this.isStarted())
         {
-//<<<<<<< .working
             //TODO: Not sure about this.  Right now the connector will connect only once
             // there is an endpoint associated with it and that endpoint is connected.
             // Do we also need the option of connecting the connector without any endpoints?
@@ -429,7 +426,6 @@ public abstract class AbstractConnector
 //                // Only start once we are connected
 //                return;
 //            }
-//=======
             if (!this.isConnected())
             {
                 startOnConnect.set(true);
@@ -1405,7 +1401,7 @@ public abstract class AbstractConnector
 
     /**
      * Registers other protocols 'understood' by this connector. These must contain
-     * scheme meta info. Unlike the <code>registerSupportedProtolcol</code> method,
+     * scheme meta info. Unlike the {@link #registerSupportedProtocol(String)} method,
      * this allows you to register protocols that are not prefixed with the connector
      * protocol. This is useful where you use a Service Finder to discover which
      * Transport implementation to use. For example the 'wsdl' transport is a generic

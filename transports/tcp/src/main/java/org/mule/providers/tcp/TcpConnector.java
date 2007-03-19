@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
 
+import org.apache.commons.pool.KeyedPoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 
 /**
@@ -38,46 +39,23 @@ public class TcpConnector extends AbstractConnector
      * Property can be set on the endpoint to configure how the socket is managed
      */
     public static final String KEEP_SEND_SOCKET_OPEN_PROPERTY = "keepSendSocketOpen";
-
     public static final int DEFAULT_SOCKET_TIMEOUT = INT_VALUE_NOT_SET;
-
     public static final int DEFAULT_BUFFER_SIZE = INT_VALUE_NOT_SET;
-
     public static final int DEFAULT_BACKLOG = INT_VALUE_NOT_SET;
 
-    protected int sendTimeout = DEFAULT_SOCKET_TIMEOUT;
-
-    protected int receiveTimeout = DEFAULT_SOCKET_TIMEOUT;
-
-    protected int sendBufferSize = DEFAULT_BUFFER_SIZE;
-
-    protected int receiveBufferSize = DEFAULT_BUFFER_SIZE;
-
-    protected int receiveBacklog = DEFAULT_BACKLOG;
-
-    protected boolean sendTcpNoDelay;
-
-    protected int socketLinger = INT_VALUE_NOT_SET;
-
-    protected String tcpProtocolClassName = DefaultProtocol.class.getName();
-
-    protected TcpProtocol tcpProtocol;
-
-    protected boolean keepSendSocketOpen = false;
-
-    protected boolean keepAlive = false;
-
-    protected GenericKeyedObjectPool dispatcherSocketsPool = new GenericKeyedObjectPool();
-
-    public boolean isKeepSendSocketOpen()
-    {
-        return keepSendSocketOpen;
-    }
-
-    public void setKeepSendSocketOpen(boolean keepSendSocketOpen)
-    {
-        this.keepSendSocketOpen = keepSendSocketOpen;
-    }
+    private int sendTimeout = DEFAULT_SOCKET_TIMEOUT;
+    private int receiveTimeout = DEFAULT_SOCKET_TIMEOUT;
+    private int sendBufferSize = DEFAULT_BUFFER_SIZE;
+    private int receiveBufferSize = DEFAULT_BUFFER_SIZE;
+    private int receiveBacklog = DEFAULT_BACKLOG;
+    private boolean sendTcpNoDelay;
+    private int socketLinger = INT_VALUE_NOT_SET;
+    private String tcpProtocolClassName = DefaultProtocol.class.getName();
+    private TcpProtocol tcpProtocol;
+    private boolean keepSendSocketOpen = false;
+    private boolean keepAlive = false;
+    private KeyedPoolableObjectFactory socketFactory = new TcpSocketFactory();
+    private GenericKeyedObjectPool dispatcherSocketsPool = new GenericKeyedObjectPool();
 
     protected void doInitialise() throws InitialisationException
     {
@@ -93,7 +71,7 @@ public class TcpConnector extends AbstractConnector
                 throw new InitialisationException(new Message("tcp", 3), e);
             }
         }
-        dispatcherSocketsPool.setFactory(new TcpSocketFactory());
+        dispatcherSocketsPool.setFactory(getSocketFactory());
         dispatcherSocketsPool.setTestOnBorrow(true);
         dispatcherSocketsPool.setTestOnReturn(true);
         //There should only be one pooled instance per socket (key)        
@@ -110,6 +88,70 @@ public class TcpConnector extends AbstractConnector
         {
             logger.warn("Failed to close dispatcher socket pool: " + e.getMessage());
         }
+    }
+
+    /**
+     * Lookup a socket in the list of dispatcher sockets but don't create a new
+     * socket
+     * 
+     * @param endpoint
+     * @return
+     */
+    Socket getSocket(UMOImmutableEndpoint endpoint) throws Exception
+    {
+        return (Socket)dispatcherSocketsPool.borrowObject(endpoint);
+    }
+
+    void releaseSocket(Socket socket, UMOImmutableEndpoint endpoint) throws Exception
+    {
+        dispatcherSocketsPool.returnObject(endpoint, socket);
+    }
+
+    /**
+     * Well get the output stream (if any) for this type of transport. Typically this
+     * will be called only when Streaming is being used on an outbound endpoint. If
+     * Streaming is not supported by this transport an
+     * {@link UnsupportedOperationException} is thrown
+     * 
+     * @param endpoint the endpoint that releates to this Dispatcher
+     * @param message the current message being processed
+     * @return the output stream to use for this request or null if the transport
+     *         does not support streaming
+     * @throws org.mule.umo.UMOException
+     */
+    // TODO HH: Is this the right thing to do? not sure how else to get the outputstream
+    // acooke - what about releaseSocket?  it is not called, so will pooling fail?
+    // maybe the output stream needs to return the socket to the pool when closed?
+    // (calling release directly here will close the socket unless it is flagged
+    // to be kept open - perhaps that flag should be set for streams?)
+    public OutputStream getOutputStream(UMOImmutableEndpoint endpoint, UMOMessage message)
+        throws UMOException
+    {
+
+        Socket socket;
+        try
+        {
+            socket = getSocket(endpoint);
+        }
+        catch (Exception e)
+        {
+            throw new MessagingException(new Message(Messages.FAILED_TO_GET_OUTPUT_STREAM), message, e);
+        }
+        if (socket == null)
+        {
+            // This shouldn't happen
+            throw new IllegalStateException("could not get socket for endpoint: "
+                                            + endpoint.getEndpointURI().getAddress());
+        }
+        try
+        {
+            return new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+        }
+        catch (IOException e)
+        {
+            throw new MessagingException(new Message(Messages.FAILED_TO_GET_OUTPUT_STREAM), message, e);
+        }
+
     }
 
     protected void doConnect() throws Exception
@@ -137,6 +179,18 @@ public class TcpConnector extends AbstractConnector
         return "tcp";
     }
 
+    // getters and setters ---------------------------------------------------------
+    
+    public boolean isKeepSendSocketOpen()
+    {
+        return keepSendSocketOpen;
+    }
+
+    public void setKeepSendSocketOpen(boolean keepSendSocketOpen)
+    {
+        this.keepSendSocketOpen = keepSendSocketOpen;
+    }
+
     /**
      * A shorthand property setting timeout for both SEND and RECEIVE sockets.
      * @deprecated The time out should be set explicitly for each
@@ -154,11 +208,7 @@ public class TcpConnector extends AbstractConnector
 
     public void setSendTimeout(int timeout)
     {
-        if (timeout < 0)
-        {
-            timeout = DEFAULT_SOCKET_TIMEOUT;
-        }
-        this.sendTimeout = timeout;
+        this.sendTimeout = valueOrDefault(timeout, 0, DEFAULT_SOCKET_TIMEOUT);
     }
 
     public int getReceiveTimeout()
@@ -168,16 +218,10 @@ public class TcpConnector extends AbstractConnector
 
     public void setReceiveTimeout(int timeout)
     {
-        if (timeout < 0)
-        {
-            timeout = DEFAULT_SOCKET_TIMEOUT;
-        }
-        this.receiveTimeout = timeout;
+        this.receiveTimeout = valueOrDefault(timeout, 0, DEFAULT_SOCKET_TIMEOUT);
     }
 
     /**
-     *
-     * @return
      * @deprecated Should use {@link #getSendBufferSize()} or {@link #getReceiveBufferSize()}
      */
     public int getBufferSize()
@@ -186,32 +230,21 @@ public class TcpConnector extends AbstractConnector
     }
 
     /**
-     *
-     * @param bufferSize
      * @deprecated Should use {@link #setSendBufferSize(int)} or {@link #setReceiveBufferSize(int)}
      */
     public void setBufferSize(int bufferSize)
     {
-        if (bufferSize < 1)
-        {
-            bufferSize = DEFAULT_BUFFER_SIZE;
-        }
-        this.sendBufferSize = bufferSize;
+        sendBufferSize = valueOrDefault(bufferSize, 1, DEFAULT_BUFFER_SIZE);
     }
-
 
     public int getSendBufferSize()
     {
         return sendBufferSize;
     }
 
-    public void setSendBufferSize(int sendBufferSize)
+    public void setSendBufferSize(int bufferSize)
     {
-        if (sendBufferSize < 1)
-        {
-            sendBufferSize = DEFAULT_BUFFER_SIZE;
-        }
-        this.sendBufferSize = sendBufferSize;
+        sendBufferSize = valueOrDefault(bufferSize, 1, DEFAULT_BUFFER_SIZE);
     }
 
     public int getReceiveBufferSize()
@@ -219,13 +252,9 @@ public class TcpConnector extends AbstractConnector
         return receiveBufferSize;
     }
 
-    public void setReceiveBufferSize(int receiveBufferSize)
+    public void setReceiveBufferSize(int bufferSize)
     {
-        if (receiveBufferSize < 1)
-        {
-            receiveBufferSize = DEFAULT_BUFFER_SIZE;
-        }
-        this.receiveBufferSize = receiveBufferSize;
+        receiveBufferSize = valueOrDefault(bufferSize, 1, DEFAULT_BUFFER_SIZE);
     }
 
     public int getReceiveBacklog()
@@ -235,11 +264,7 @@ public class TcpConnector extends AbstractConnector
 
     public void setReceiveBacklog(int receiveBacklog)
     {
-        if(receiveBacklog < 0)
-        {
-            receiveBacklog = DEFAULT_BACKLOG;
-        }
-        this.receiveBacklog = receiveBacklog;
+        this.receiveBacklog = valueOrDefault(receiveBacklog, 0, DEFAULT_BACKLOG);
     }
 
     public int getSendSocketLinger()
@@ -249,11 +274,7 @@ public class TcpConnector extends AbstractConnector
 
     public void setSendSocketLinger(int soLinger)
     {
-        if(soLinger < 0)
-        {
-            soLinger = INT_VALUE_NOT_SET;
-        }
-        this.socketLinger = soLinger;
+        this.socketLinger = valueOrDefault(soLinger, 0, INT_VALUE_NOT_SET);
     }
 
     /**
@@ -311,66 +332,6 @@ public class TcpConnector extends AbstractConnector
         this.keepAlive = keepAlive;
     }
 
-    /**
-     * Well get the output stream (if any) for this type of transport. Typically this
-     * will be called only when Streaming is being used on an outbound endpoint. If
-     * Streaming is not supported by this transport an
-     * {@link UnsupportedOperationException} is thrown
-     * 
-     * @param endpoint the endpoint that releates to this Dispatcher
-     * @param message the current message being processed
-     * @return the output stream to use for this request or null if the transport
-     *         does not support streaming
-     * @throws org.mule.umo.UMOException
-     */
-    // TODO HH: Is this the right thing to do? not sure how else to get the outputstream
-    public OutputStream getOutputStream(UMOImmutableEndpoint endpoint, UMOMessage message)
-        throws UMOException
-    {
-
-        Socket socket;
-        try
-        {
-            socket = getSocket(endpoint);
-        }
-        catch (Exception e)
-        {
-            throw new MessagingException(new Message(Messages.FAILED_TO_GET_OUTPUT_STREAM), message, e);
-        }
-        if (socket == null)
-        {
-            // This shouldn't happen
-            throw new IllegalStateException("could not get socket for endpoint: "
-                                            + endpoint.getEndpointURI().getAddress());
-        }
-        try
-        {
-            return new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
-        }
-        catch (IOException e)
-        {
-            throw new MessagingException(new Message(Messages.FAILED_TO_GET_OUTPUT_STREAM), message, e);
-        }
-
-    }
-
-    /**
-     * Lookup a socket in the list of dispatcher sockets but don't create a new
-     * socket
-     * 
-     * @param endpoint
-     * @return
-     */
-    Socket getSocket(UMOImmutableEndpoint endpoint) throws Exception
-    {
-        return (Socket)dispatcherSocketsPool.borrowObject(endpoint);
-    }
-
-    void releaseSocket(Socket socket, UMOImmutableEndpoint endpoint) throws Exception
-    {
-        dispatcherSocketsPool.returnObject(endpoint, socket);
-    }
-
     public boolean isSendTcpNoDelay()
     {
         return sendTcpNoDelay;
@@ -380,4 +341,27 @@ public class TcpConnector extends AbstractConnector
     {
         this.sendTcpNoDelay = sendTcpNoDelay;
     }
+    
+    protected void setSocketFactory(KeyedPoolableObjectFactory socketFactory)
+    {
+        this.socketFactory = socketFactory;
+    }
+
+    protected KeyedPoolableObjectFactory getSocketFactory()
+    {
+        return socketFactory;
+    }
+
+    private static int valueOrDefault(int value, int threshhold, int deflt)
+    {
+        if (value < threshhold)
+        {
+            return deflt;
+        }
+        else 
+        {
+            return value;    
+        }
+    }
+    
 }

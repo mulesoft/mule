@@ -21,10 +21,6 @@ import org.mule.umo.transformer.TransformerException;
  */
 public class RestRequestToCustomerRequest extends AbstractEventAwareTransformer
 {
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = -5017931788994993161L;
 
     public RestRequestToCustomerRequest()
     {
@@ -33,11 +29,11 @@ public class RestRequestToCustomerRequest extends AbstractEventAwareTransformer
 
     public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
     {
-
         String name;
         int ssn;
         double amount;
         int duration;
+
         try
         {
             name = getParam(context, "customerName");

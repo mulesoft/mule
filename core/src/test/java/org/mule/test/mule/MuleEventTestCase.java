@@ -171,11 +171,6 @@ public class MuleEventTestCase extends AbstractMuleTestCase
 
     private class TestEventTransformer extends AbstractTransformer
     {
-        /**
-         * Serial version
-         */
-        private static final long serialVersionUID = -5380460875991797254L;
-
         /*
          * (non-Javadoc)
          * 

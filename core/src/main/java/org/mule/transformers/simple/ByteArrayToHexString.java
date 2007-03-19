@@ -15,19 +15,10 @@ import org.mule.umo.transformer.TransformerException;
 import org.mule.util.StringUtils;
 
 /**
- * Converts a Byte array to a Hex String
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * Converts a Byte array to a Hex String.
  */
 public class ByteArrayToHexString extends AbstractTransformer
 {
-
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = -7444711426569720031L;
-
     private volatile boolean upperCase = false;
 
     public ByteArrayToHexString()

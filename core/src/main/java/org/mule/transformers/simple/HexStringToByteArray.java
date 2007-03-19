@@ -18,17 +18,9 @@ import org.apache.commons.lang.ArrayUtils;
 
 /**
  * Converts a Hex String to a Byte array
- * 
- * @author <a href="mailto:holger@codehaus.org">Holger Hoffstaette</a>
- * @version $Revision$
  */
 public class HexStringToByteArray extends AbstractTransformer
 {
-
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = 8266145248111508046L;
 
     public HexStringToByteArray()
     {

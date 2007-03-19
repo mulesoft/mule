@@ -20,21 +20,22 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
 
 /**
- * Set the Recipient List property on the LoanBrokerQuoteRequest message based on the list of banks in 
- * LoanBrokerQuoteRequest.getLenders()
+ * Set the Recipient List property on the LoanBrokerQuoteRequest message based on the
+ * list of banks in LoanBrokerQuoteRequest.getLenders()
  */
 public class SetLendersAsRecipients extends AbstractEventAwareTransformer
 {
+
     public SetLendersAsRecipients()
     {
-        registerSourceType(LoanBrokerQuoteRequest.class);
-        setReturnClass(CustomerQuoteRequest.class);
+        this.registerSourceType(LoanBrokerQuoteRequest.class);
+        this.setReturnClass(CustomerQuoteRequest.class);
     }
 
     public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
     {
-        Bank[] lenders = ((LoanBrokerQuoteRequest) src).getLenders();
-        
+        Bank[] lenders = ((LoanBrokerQuoteRequest)src).getLenders();
+
         String recipients = "";
         for (int i = 0; i < lenders.length; i++)
         {
@@ -46,6 +47,5 @@ public class SetLendersAsRecipients extends AbstractEventAwareTransformer
         context.getMessage().setProperty(StaticRecipientList.RECIPIENTS_PROPERTY, recipients);
         return msg;
     }
+
 }
-
-

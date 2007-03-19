@@ -40,11 +40,6 @@ import org.apache.commons.pool.impl.GenericObjectPool;
 
 public class XsltTransformer extends AbstractXmlTransformer
 {
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = -6958917343589717387L;
-
     // keep at least 1 XSLT Transformer ready by default
     private static final int MIN_IDLE_TRANSFORMERS = 1;
     // keep max. 32 XSLT Transformers around by default

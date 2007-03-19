@@ -10,14 +10,15 @@
 
 package org.mule.providers.file.transformers;
 
+import org.mule.transformers.AbstractTransformer;
+import org.mule.umo.transformer.TransformerException;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
-import org.mule.transformers.AbstractTransformer;
-import org.mule.umo.transformer.TransformerException;
 import org.mule.util.ArrayUtils;
 
 /**
@@ -25,10 +26,6 @@ import org.mule.util.ArrayUtils;
  */
 public class FileToByteArray extends AbstractTransformer
 {
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = -2836878450595052607L;
 
     public FileToByteArray()
     {

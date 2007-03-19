@@ -7,29 +7,29 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.transformers.simple;
 
 import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.transformer.TransformerException;
 
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
 /**
  * A configurable message transformer that allows users to add, overwrite and delete
- * properties on the current message. Users can set a {@link Set} of 'deleteProperties' names
- * to remove from the message and can also set a {@link Map} of 'addProperties' that
- * will be added to the message and possibly overwrite existing properties with the same name.
+ * properties on the current message. Users can set a {@link Set} of
+ * 'deleteProperties' names to remove from the message and can also set a {@link Map}
+ * of 'addProperties' that will be added to the message and possibly overwrite
+ * existing properties with the same name.
  */
 public class MessagePropertiesTransformer extends AbstractEventAwareTransformer
 {
-    private Set deleteProperties = new HashSet();
-    private Map addProperties = new HashMap();
-
+    private Set deleteProperties = Collections.EMPTY_SET;
+    private Map addProperties = Collections.EMPTY_MAP;
 
     public MessagePropertiesTransformer()
     {
@@ -39,7 +39,7 @@ public class MessagePropertiesTransformer extends AbstractEventAwareTransformer
 
     public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
     {
-        if(deleteProperties!=null && deleteProperties.size()> 0)
+        if (deleteProperties != null && deleteProperties.size() > 0)
         {
             for (Iterator iterator = deleteProperties.iterator(); iterator.hasNext();)
             {
@@ -48,12 +48,12 @@ public class MessagePropertiesTransformer extends AbstractEventAwareTransformer
             }
         }
 
-        if(addProperties !=null && addProperties.size()> 0)
+        if (addProperties != null && addProperties.size() > 0)
         {
             for (Iterator iterator = addProperties.entrySet().iterator(); iterator.hasNext();)
             {
                 Map.Entry entry = (Map.Entry)iterator.next();
-                if(entry.getKey()==null)
+                if (entry.getKey() == null)
                 {
                     logger.error("Setting Null property keys is not supported, this entry is being ignored");
                 }
@@ -65,7 +65,6 @@ public class MessagePropertiesTransformer extends AbstractEventAwareTransformer
         }
         return context.getMessage();
     }
-
 
     public Set getDeleteProperties()
     {

@@ -23,10 +23,6 @@ import javax.xml.transform.TransformerFactory;
  */
 public class XmlToDomDocument extends AbstractXmlTransformer
 {
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = 5056464684549099908L;
 
     public XmlToDomDocument()
     {

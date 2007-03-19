@@ -17,10 +17,6 @@ import org.mule.umo.transformer.TransformerException;
  */
 public class DomDocumentToXml extends AbstractXmlTransformer
 {
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = -6452312203102491187L;
 
     public DomDocumentToXml()
     {

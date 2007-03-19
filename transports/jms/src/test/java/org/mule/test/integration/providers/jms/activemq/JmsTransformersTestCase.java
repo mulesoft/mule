@@ -195,7 +195,6 @@ public class JmsTransformersTestCase extends AbstractMuleTestCase
      */
     public static class SessionEnabledObjectToJMSMessage extends ObjectToJMSMessage
     {
-        private static final long serialVersionUID = -440672187466417761L;
         private final Session transformerSession;
 
         public SessionEnabledObjectToJMSMessage(Session session)

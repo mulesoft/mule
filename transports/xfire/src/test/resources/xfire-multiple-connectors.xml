@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="xfire_multiple_connector" version="1.0">
+
+    <connector name="XFireConnector1" className="org.mule.providers.soap.xfire.XFireConnector"/>
+    <connector name="XFireConnector2" className="org.mule.providers.soap.xfire.XFireConnector"/>
+
+    <model name="TestXfireConnectors">
+        
+        <!--Two separate components are created instead of 1 with 2 endpoints so that exceptions are not compomised-->
+        <mule-descriptor name="TestComponent1" implementation="org.mule.tck.testmodels.services.TestComponent">
+            <inbound-router>
+                <endpoint address="xfire:http://localhost:8081/services" connector="XFireConnector1"/>
+            </inbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="TestComponent2" implementation="org.mule.tck.testmodels.services.TestComponent">
+            <inbound-router>
+                <endpoint address="xfire:http://localhost:8082/services" connector="XFireConnector2"/>
+            </inbound-router>
+        </mule-descriptor>
+
+    </model>
+</mule-configuration>

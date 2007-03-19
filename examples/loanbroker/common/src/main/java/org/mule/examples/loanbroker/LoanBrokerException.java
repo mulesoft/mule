@@ -17,15 +17,15 @@ import org.mule.MuleException;
  */
 public class LoanBrokerException extends MuleException
 {
-    public LoanBrokerException(String message) 
+    private static final long serialVersionUID = -1669865702115931005L;
+
+    public LoanBrokerException(String message)
     {
         super(message);
     }
 
-    public LoanBrokerException(Exception e) 
+    public LoanBrokerException(Exception e)
     {
         super(e);
     }
 }
-
-

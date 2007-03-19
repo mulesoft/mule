@@ -11,7 +11,11 @@
     <property name="jndiInitialFactory" value="org.activemq.jndi.ActiveMQInitialContextFactory"/>
    </properties>
   </connector>
-
+  <transformers>
+     <transformer name="JMSMessageToObject" className="org.mule.providers.jms.transformers.JMSMessageToObject"/>
+     <transformer name="ObjectToJMSMessage" className="org.mule.providers.jms.transformers.ObjectToJMSMessage"/>
+    </transformers>
+  
   <global-endpoints>
     <endpoint name="TestMessage1" address="quartz:/TestMessage1">
       <properties>
@@ -39,10 +43,6 @@
     <endpoint name="Queue2Out" address="jms://second.queue" connector="JMSConnector"/>
   </global-endpoints>
 
-    <transformers>
-     <transformer name="JMSMessageToObject" className="org.mule.providers.jms.transformers.JMSMessageToObject"/>
-     <transformer name="ObjectToJMSMessage" className="org.mule.providers.jms.transformers.ObjectToJMSMessage"/>
-    </transformers>
   
     <model name="jmsSample">
       <mule-descriptor name="filterRouting" implementation="org.mule.components.simple.PassThroughComponent">

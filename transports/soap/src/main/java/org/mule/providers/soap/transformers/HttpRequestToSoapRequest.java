@@ -32,11 +32,6 @@ import java.util.Properties;
  */
 public class HttpRequestToSoapRequest extends AbstractEventAwareTransformer
 {
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = -4958196124440362142L;
-
     public static final String SOAP_HEADER = "<?xml version=\"1.0\" encoding=\"{0}\"?><soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><soap:Body>";
     public static final String SOAP_FOOTER = "</soap:Body></soap:Envelope>";
     public static final String DEFAULT_NAMESPACE = "http://www.muleumo.org/soap";

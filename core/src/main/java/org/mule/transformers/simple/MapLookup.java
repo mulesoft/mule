@@ -18,16 +18,12 @@ import java.util.Map;
 
 /**
  * <code>MapLookup</code> looks up and returns an object from a Map based on a key.
- * 
- * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>
  */
 
 public class MapLookup extends AbstractTransformer
 {
 
-    private static final long serialVersionUID = -9033005899991305309L;
-
-    protected Object key;
+    protected volatile Object key;
 
     public MapLookup()
     {
@@ -45,13 +41,13 @@ public class MapLookup extends AbstractTransformer
             }
             else
             {
-                throw new TransformerException(
-                    Message.createStaticMessage("Property 'key' must be set in order to use this transformer."));
+                throw new TransformerException(Message
+                    .createStaticMessage("Property 'key' must be set in order to use this transformer."));
             }
         }
         else
-            throw new TransformerException(
-                Message.createStaticMessage("Message to transform must be of type java.util.Map"));
+            throw new TransformerException(Message
+                .createStaticMessage("Message to transform must be of type java.util.Map"));
     }
 
     public Object getKey()
@@ -63,4 +59,5 @@ public class MapLookup extends AbstractTransformer
     {
         this.key = key;
     }
+
 }

@@ -20,17 +20,10 @@ import org.apache.commons.lang.SerializationUtils;
 
 /**
  * <code>GZipCompressTransformer</code> is a transformer compressing objects into
- * byte arrays
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * byte arrays.
  */
 public class GZipCompressTransformer extends AbstractCompressionTransformer
 {
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = 5841897266012659925L;
 
     public GZipCompressTransformer()
     {

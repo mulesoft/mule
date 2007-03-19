@@ -11,7 +11,7 @@
 package org.mule.providers.email;
 
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.security.TlsSupport;
+import org.mule.umo.security.TlsConfiguration;
 
 import java.io.IOException;
 
@@ -25,7 +25,7 @@ public class Pop3sConnector extends Pop3Connector
 
     private String socketFactory = DEFAULT_SOCKET_FACTORY;
     private String socketFactoryFallback = "false";
-    private TlsSupport tlsSupport = new TlsSupport();
+    private TlsConfiguration tls = new TlsConfiguration(TlsConfiguration.DEFAULT_KEYSTORE);
 
     public String getProtocol()
     {
@@ -39,12 +39,11 @@ public class Pop3sConnector extends Pop3Connector
 
     protected void doInitialise() throws InitialisationException
     {
-        tlsSupport.initialiseFactories(true);
+        tls.initialise(true, TlsConfiguration.JSSE_NAMESPACE);
         super.doInitialise();
         System.setProperty("mail." + getProtocol() + ".ssl", "true");
         System.setProperty("mail." + getProtocol() + ".socketFactory.class", getSocketFactory());
         System.setProperty("mail." + getProtocol() + ".socketFactory.fallback", getSocketFactoryFallback());
-        tlsSupport.initialiseStores();
     }
 
     public String getSocketFactory()
@@ -69,22 +68,22 @@ public class Pop3sConnector extends Pop3Connector
 
     public String getTrustStore()
     {
-        return tlsSupport.getTrustStore();
+        return tls.getTrustStore();
     }
 
     public String getTrustStorePassword()
     {
-        return tlsSupport.getTrustStorePassword();
+        return tls.getTrustStorePassword();
     }
 
     public void setTrustStore(String trustStore) throws IOException
     {
-        tlsSupport.setTrustStore(trustStore);
+        tls.setTrustStore(trustStore);
     }
 
     public void setTrustStorePassword(String trustStorePassword)
     {
-        tlsSupport.setTrustStorePassword(trustStorePassword);
+        tls.setTrustStorePassword(trustStorePassword);
     }
 
 }
