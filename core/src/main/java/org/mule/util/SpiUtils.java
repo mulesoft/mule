@@ -37,7 +37,7 @@ public class SpiUtils
 
     public static Properties findServiceDescriptor(String type, String name)
     {
-        if (type.equals(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE)) 
+        if (type.equals(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE))
         {
             return findServiceDescriptor(PROVIDER_SERVICE_PATH, name, TransportFactory.class);
         }
@@ -49,18 +49,21 @@ public class SpiUtils
         {
             return findServiceDescriptor(EXCEPTION_SERVICE_PATH, name, ExceptionHelper.class);
         }
-        else 
+        else
         {
             logger.warn("Attempt to lookup unrecognized service type: " + type);
             return null;
         }
 
     }
-    
+
     public static Properties findServiceDescriptor(String path, String name, Class currentClass)
     {
-        name += ".properties";
-        
+        if(!name.endsWith(".properties"))
+        {
+            name += ".properties";
+        }
+
         if (path.startsWith("/"))
         {
             path = path.substring(1);
@@ -83,7 +86,7 @@ public class SpiUtils
             if (is != null)
             {
                 Properties props = new Properties();
-                try 
+                try
                 {
                     props.load(is);
                     return props;
@@ -94,7 +97,7 @@ public class SpiUtils
                     return null;
                 }
             }
-            else 
+            else
             {
                 return null;
             }

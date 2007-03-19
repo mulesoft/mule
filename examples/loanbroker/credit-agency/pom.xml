@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.mule.examples</groupId>
+        <artifactId>mule-example-loanbroker-parent</artifactId>
+        <version>1.4-SNAPSHOT</version>
+    </parent>
+    <artifactId>mule-example-loanbroker-credit-agency</artifactId>
+    <packaging>ejb</packaging>
+    <name>Loan Broker Example: Credit Agency EJB</name>
+    
+    <dependencies>
+        <dependency>
+            <groupId>openejb</groupId>
+            <artifactId>openejb-core</artifactId>
+            <version>1.0</version>
+            <scope>provided</scope> 
+            <exclusions>
+                <!-- Tries to pull an unpublished castor version -->
+                <exclusion>
+                    <groupId>castor</groupId>
+                    <artifactId>castor</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
+</project>

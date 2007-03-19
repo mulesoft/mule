@@ -41,7 +41,7 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
 {
     private URL pollUrl;
 
-    private int defaultBufferSize = 1024 * 32;
+    private static final int DEFAULT_BUFFER_SIZE = 1024 * 32;
 
     public PollingHttpMessageReceiver(UMOConnector connector,
                                       UMOComponent component,
@@ -82,7 +82,7 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
 
     protected void doConnect() throws Exception
     {
-        URL url = null;
+        URL url;
         String connectUrl = (String)endpoint.getProperties().get("connectUrl");
         if (connectUrl == null)
         {
@@ -113,19 +113,19 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
                                                                .getBytes()));
         }
 
-        int len = 0;
+        int len;
         int bytesWritten = 0;
 
         int contentLength = connection.getContentLength();
         boolean contentLengthNotSet = false;
         if (contentLength < 0)
         {
-            contentLength = defaultBufferSize;
+            contentLength = DEFAULT_BUFFER_SIZE;
             contentLengthNotSet = true;
         }
 
         // TODO this is pretty dangerous for big payloads
-        byte[] buffer = new byte[defaultBufferSize];
+        byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
         ByteArrayOutputStream baos = new ByteArrayOutputStream(contentLength);
         InputStream is = connection.getInputStream();
 

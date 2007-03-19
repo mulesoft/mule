@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="http_fuctional_test" version="1.0">
+
+    <mule-environment-properties serverUrl=""/>
+
+    <global-endpoints>
+        <!-- for this test the client and server endponts have to be different since, Jetty is a server-only transport so
+        we still use the http transport on the client side-->
+        <endpoint name="clientEndpoint" address="http://localhost:60198" synchronous="true"/>
+        <endpoint name="serverEndpoint" address="jetty:http://localhost:60198" synchronous="true"/>
+    </global-endpoints>
+
+    <model name="main">
+        <mule-descriptor name="testComponent" implementation="org.mule.tck.functional.FunctionalTestComponent">
+            <inbound-router>
+                <global-endpoint name="serverEndpoint"/>
+            </inbound-router>
+        </mule-descriptor>
+    </model>
+    
+</mule-configuration>

@@ -37,6 +37,7 @@
             <id>java14</id>
             <activation>
                 <jdk>1.4</jdk>
+                <activeByDefault>true</activeByDefault>
             </activation>
             <dependencies>
                 <!-- see mule-module-xml -->
@@ -135,7 +136,13 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring</artifactId>
-            <version>2.0.2</version>
+            <version>2.0.3</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-logging</artifactId>
+                    <groupId>commons-logging</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Used by MuleEventMulticaster -->
@@ -166,11 +173,6 @@
 
             It seems m2 dependency visibility hierarchy is limited to 1 level deep.
         -->
-        <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-            <version>1.0.4</version>
-        </dependency>
         <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>

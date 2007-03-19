@@ -12,12 +12,13 @@ package org.mule.umo.routing;
 
 import org.mule.management.stats.RouterStatistics;
 import org.mule.umo.lifecycle.Initialisable;
+import org.mule.umo.lifecycle.Disposable;
 
 /**
  * <code>UMORouter</code> is a base interface for all routers.
  */
 //public interface UMORouter extends Registerable
-public interface UMORouter extends Initialisable
+public interface UMORouter extends Initialisable, Disposable
 {
     void setRouterStatistics(RouterStatistics stats);
 

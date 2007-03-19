@@ -20,6 +20,7 @@ import javax.management.MBeanServerConnection;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
+import javax.management.remote.rmi.RMIConnectorServer;
 
 public class JmxAgentTestCase extends AbstractMuleTestCase
 {
@@ -38,8 +39,16 @@ public class JmxAgentTestCase extends AbstractMuleTestCase
        managementContext.setId(DOMAIN);
     }
 
+    public void testDefaultProperties() throws Exception
+    {
+        jmxAgent.setCredentials(getValidCredentials());
+        managementContext.getRegistry().registerAgent(jmxAgent);
+        managementContext.start();
+    }
+
     public void testSuccessfulRemoteConnection() throws Exception
     {
+        configureProperties();
         jmxAgent.setCredentials(getValidCredentials());
        managementContext.getRegistry().registerAgent(jmxAgent);
        managementContext.start();
@@ -55,6 +64,7 @@ public class JmxAgentTestCase extends AbstractMuleTestCase
 
     public void testNoCredentialsProvided() throws Exception
     {
+        configureProperties();
         jmxAgent.setCredentials(getValidCredentials());
        managementContext.getRegistry().registerAgent(jmxAgent);
        managementContext.start();
@@ -72,6 +82,7 @@ public class JmxAgentTestCase extends AbstractMuleTestCase
 
     public void testNonRestrictedAccess() throws Exception
     {
+        configureProperties();
         jmxAgent.setCredentials(null);
        managementContext.getRegistry().registerAgent(jmxAgent);
        managementContext.start();
@@ -89,5 +100,15 @@ public class JmxAgentTestCase extends AbstractMuleTestCase
         credentials.put(VALID_AUTH_TOKEN[0], VALID_AUTH_TOKEN[1]);
 
         return credentials;
+    }
+
+    protected void configureProperties ()
+    {
+        // make multi-NIC dev box happy by sticking RMI clients to a single
+        // local ip address
+        Map props = new HashMap();
+        props.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE,
+                  new FixedHostRmiClientSocketFactory("127.0.0.1"));
+        jmxAgent.setConnectorServerProperties(props);
     }
 }

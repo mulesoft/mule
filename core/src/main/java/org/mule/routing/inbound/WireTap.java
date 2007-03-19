@@ -48,6 +48,7 @@ public class WireTap extends SelectiveConsumer
         }
         catch (UMOException e)
         {
+            // TODO MULE-863: What should we really do?
             logger.error(e.getMessage(), e);
         }
         return super.process(event);

@@ -5,7 +5,7 @@
    <bean id="passwords" class="org.mule.extras.wssecurity.callbackhandlers.PasswordContainer">
        <constructor-arg>
            <props>
-               <prop key="mulealias">mulePassword</prop>
+               <prop key="mulealias">mulepassword</prop>
                <prop key="gooduser">goodUserPassword</prop>
            </props>
        </constructor-arg>

@@ -14,11 +14,6 @@ import org.mule.tck.providers.AbstractMessageAdapterTestCase;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.UMOMessageAdapter;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public class HttpMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 {
     protected static final String TEST_MESSAGE = "Hello";

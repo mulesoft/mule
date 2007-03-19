@@ -555,7 +555,7 @@ public class MuleHttpSender extends BasicHandler
 
                 AxisFault fault = new AxisFault("HTTP", "(" + returnCode + ")" + statusMessage, null, null);
 
-                fault.setFaultDetailString(Messages.getMessage("return01", "" + returnCode, ""));
+                fault.setFaultDetailString(Messages.getMessage("return01", String.valueOf(returnCode), ""));
                 throw fault;
             }
         }
@@ -820,7 +820,7 @@ public class MuleHttpSender extends BasicHandler
             String statusMessage = msgContext.getStrProp(HTTPConstants.MC_HTTP_STATUS_MESSAGE);
             AxisFault fault = new AxisFault("HTTP", "(" + returnCode + ")" + statusMessage, null, null);
 
-            fault.setFaultDetailString(Messages.getMessage("return01", "" + returnCode, buf.toString()));
+            fault.setFaultDetailString(Messages.getMessage("return01", String.valueOf(returnCode), buf.toString()));
             fault.addFaultDetail(Constants.QNAME_FAULTDETAIL_HTTPERRORCODE, Integer.toString(returnCode));
             throw fault;
         }

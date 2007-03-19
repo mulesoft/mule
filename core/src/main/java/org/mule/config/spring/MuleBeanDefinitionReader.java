@@ -34,6 +34,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.w3c.dom.Document;
 import org.xml.sax.EntityResolver;
+import org.dom4j.io.DOMReader;
 
 /**
  * <code>MuleBeanDefinitionReader</code> Is a custom Spring Bean reader that will
@@ -97,13 +98,15 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
                 if(XslHelper.hasErrorReport())
                 {
                     String report = XslHelper.getFullReport();
+                    IOException ex = new LegacyXmlException(report, XslHelper.getWarnings(), XslHelper.getErrors());
                     XslHelper.clearReport();
-                    throw new IOException(report);
+                    throw ex;
                 }
                 else if (XslHelper.hasWarningReport())
                 {
                     logger.warn(XslHelper.getWarningReport());
                 }
+                XslHelper.clearReport();
             }
 
             try
@@ -129,8 +132,8 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
         //If we have Dom4J on the classpath we can print out the generated XML
         //TODO RM*  this relies on Dom4j which is not in core, either we scrap this or do some reflection
         // trickery to print the XML. This is definitely useful for debugging
-        //String xml = new DOMReader().read((Document)result.getNode()).asXML();
-        //System.out.println(xml);
+        String xml = new DOMReader().read((Document)result.getNode()).asXML();
+        System.out.println(xml);
         if (logger.isDebugEnabled())
         {
             //logger.debug("Transformed document is:\n" + xml);

@@ -132,8 +132,10 @@ public class StringMessageUtils
             }
             catch (UnsupportedEncodingException ueex)
             {
-                throw new MuleRuntimeException(new Message(
-                    CoreMessageConstants.FAILED_TO_CONVERT_STRING_USING_X_ENCODING, getOSEncoding()));
+                throw new MuleRuntimeException(
+                    new Message(CoreMessageConstants.FAILED_TO_CONVERT_STRING_USING_X_ENCODING, 
+                        getOSEncoding()),
+                    ueex);
             }
             if (padding > 0)
             {

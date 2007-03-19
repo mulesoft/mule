@@ -27,23 +27,27 @@
                 </configuration>
             </plugin>
 
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <!-- Disable Multicast tests unless configured -->
-                        <exclude>**/MulticastConnectorFunctionalTestCase.*</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-
         </plugins>
     </build>
+
     <dependencies>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-udp</artifactId>
             <version>${version}</version>
+        </dependency>
+        <!-- Functional testing -->
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-vm</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-client</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

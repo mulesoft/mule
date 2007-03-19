@@ -15,12 +15,17 @@ import org.mule.config.i18n.Messages;
 import org.mule.providers.tcp.TcpConnector;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import org.apache.commons.httpclient.HttpConnectionManager;
+import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
+import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 
 /**
  * <code>HttpConnector</code> provides a way of receiving and sending http requests
@@ -51,7 +56,12 @@ public class HttpConnector extends TcpConnector
     public static final String HTTP_CUSTOM_HEADERS_MAP_PROPERTY = "http.custom.headers";
     public static final String HTTP_METHOD_PROPERTY = "http.method";
     public static final String HTTP_REQUEST_PROPERTY = "http.request";
-    public static final String HTTP_PARAMS = "http.params";
+
+    /**
+     * Allows the user to set a {@link org.apache.commons.httpclient.params.HttpMethodParams} object in the client
+     * request to be set on the HttpMethod request object
+     */
+    public static final String HTTP_PARAMS_PROPERTY = "http.params";
     public static final String HTTP_GET_BODY_PARAM_PROPERTY = "http.get.body.param";
     public static final String DEFAULT_HTTP_GET_BODY_PARAM_PROPERTY = "body";
     public static final String HTTP_POST_BODY_PARAM_PROPERTY = "http.post.body.param";
@@ -74,6 +84,27 @@ public class HttpConnector extends TcpConnector
     private String cookieSpec;
 
     private boolean enableCookies = false;
+
+    protected HttpConnectionManager clientConnectionManager;
+
+
+    //@Override
+    protected void doInitialise() throws InitialisationException
+    {
+        super.doInitialise();
+        if(clientConnectionManager==null)
+        {
+            clientConnectionManager = new MultiThreadedHttpConnectionManager();
+            HttpConnectionManagerParams params = new HttpConnectionManagerParams();
+            if(getSendBufferSize()!= INT_VALUE_NOT_SET ) params.setSendBufferSize(getSendBufferSize());
+            if(getReceiveBufferSize()!= INT_VALUE_NOT_SET ) params.setReceiveBufferSize(getReceiveBufferSize());
+            if(getSendTimeout()!= INT_VALUE_NOT_SET ) params.setSoTimeout(getSendTimeout());
+            if(getSendSocketLinger()!= INT_VALUE_NOT_SET ) params.setLinger(getSendSocketLinger());
+
+            params.setTcpNoDelay(isSendTcpNoDelay());
+            params.setMaxTotalConnections(getDispatcherThreadingProfile().getMaxThreadsActive());
+        }
+    }
 
     /**
      * @see UMOConnector#registerListener(UMOComponent, UMOEndpoint)
@@ -225,5 +256,16 @@ public class HttpConnector extends TcpConnector
     public void setEnableCookies(boolean enableCookies)
     {
         this.enableCookies = enableCookies;
+    }
+
+
+    public HttpConnectionManager getClientConnectionManager()
+    {
+        return clientConnectionManager;
+    }
+
+    public void setClientConnectionManager(HttpConnectionManager clientConnectionManager)
+    {
+        this.clientConnectionManager = clientConnectionManager;
     }
 }

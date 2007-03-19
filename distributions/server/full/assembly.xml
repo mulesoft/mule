@@ -244,183 +244,79 @@ Assembly descriptor for the full Mule distribution.
             Mule Examples: Loan Broker
         ===============================
       -->
-      <!-- Maven-style example -->
-      <fileSet>
-          <directory>../../../examples/loanbroker</directory>
-          <outputDirectory>examples/maven/loanbroker</outputDirectory>
-          <includes>
-              <include>README.txt</include>
-          </includes>
-      </fileSet>
       <fileSet>
           <directory>../../../examples/loanbroker/dist</directory>
-          <outputDirectory>examples/maven/loanbroker</outputDirectory>
+          <outputDirectory>examples/loanbroker</outputDirectory>
           <includes>
+              <include>README.txt</include>
               <include>pom.xml</include>
-          </includes>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/loanbroker/dist</directory>
-          <outputDirectory>examples/maven/loanbroker</outputDirectory>
-          <includes>
-              <include>loanbroker</include>
-              <include>*.bat</include>
-          </includes>
-          <fileMode>744</fileMode>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/loanbroker/conf</directory>
-          <outputDirectory>examples/maven/loanbroker/conf</outputDirectory>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/loanbroker/src</directory>
-          <outputDirectory>examples/maven/loanbroker/src</outputDirectory>
-      </fileSet>
-
-      <!-- Ant-style example -->
-      <fileSet>
-          <directory>../../../examples/loanbroker</directory>
-          <outputDirectory>examples/ant/loanbroker</outputDirectory>
-          <includes>
-              <include>README.txt</include>
-          </includes>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/loanbroker/dist</directory>
-          <outputDirectory>examples/ant/loanbroker</outputDirectory>
-          <includes>
               <include>build.xml</include>
           </includes>
       </fileSet>
       <fileSet>
           <directory>../../../examples/loanbroker/dist</directory>
-          <outputDirectory>examples/ant/loanbroker</outputDirectory>
+          <outputDirectory>examples/loanbroker</outputDirectory>
           <includes>
               <include>loanbroker</include>
-              <include>*.bat</include>
+              <include>loanbroker.bat</include>
           </includes>
           <fileMode>744</fileMode>
       </fileSet>
       <fileSet>
-          <directory>../../../examples/loanbroker/conf</directory>
-          <outputDirectory>examples/ant/loanbroker/conf</outputDirectory>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/loanbroker/src/main/java</directory>
-          <outputDirectory>examples/ant/loanbroker/src</outputDirectory>
-      </fileSet>
-
-      <!--
-        ===================================
-            Mule Examples: Loan Broker ESB
-        ===================================
-      -->
-      <!-- Maven-style example -->
-      <fileSet>
-          <directory>../../../examples/loanbroker-esb</directory>
-          <outputDirectory>examples/maven/loanbroker-esb</outputDirectory>
+          <directory>../../../examples/loanbroker/common</directory>
+          <outputDirectory>examples/loanbroker/common</outputDirectory>
           <includes>
               <include>README.txt</include>
-          </includes>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/loanbroker-esb/dist</directory>
-          <outputDirectory>examples/maven/loanbroker-esb</outputDirectory>
-          <includes>
               <include>pom.xml</include>
           </includes>
       </fileSet>
       <fileSet>
-          <directory>../../../examples/loanbroker-esb/dist</directory>
-          <outputDirectory>examples/maven/loanbroker-esb</outputDirectory>
-          <includes>
-              <include>*.sh</include>
-              <include>*.bat</include>
-          </includes>
-          <fileMode>744</fileMode>
-      </fileSet>
-      <!-- ESB sub-project -->
-      <fileSet>
-          <directory>../../../examples/loanbroker-esb/loanbroker/dist</directory>
-          <outputDirectory>examples/maven/loanbroker-esb/loanbroker</outputDirectory>
-          <includes>
-              <include>pom.xml</include>
-          </includes>
+          <directory>../../../examples/loanbroker/common/src</directory>
+          <outputDirectory>examples/loanbroker/common/src</outputDirectory>
       </fileSet>
       <fileSet>
-          <directory>../../../examples/loanbroker-esb/loanbroker/conf</directory>
-          <outputDirectory>examples/maven/loanbroker-esb/loanbroker/conf</outputDirectory>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/loanbroker-esb/loanbroker/src</directory>
-          <outputDirectory>examples/maven/loanbroker-esb/loanbroker/src</outputDirectory>
-      </fileSet>
-      <!-- EJB sub-project -->
-      <fileSet>
-          <directory>../../../examples/loanbroker-esb/credit-agency/dist</directory>
-          <outputDirectory>examples/maven/loanbroker-esb/credit-agency</outputDirectory>
-          <includes>
-              <include>pom.xml</include>
-          </includes>
-      </fileSet>
-      <!--<fileSet>-->
-          <!--<directory>../../../examples/loanbroker-esb/credit-agency/conf</directory>-->
-          <!--<outputDirectory>examples/maven/loanbroker-esb/credit-agency/conf</outputDirectory>-->
-      <!--</fileSet>-->
-      <fileSet>
-          <directory>../../../examples/loanbroker-esb/credit-agency/src</directory>
-          <outputDirectory>examples/maven/loanbroker-esb/credit-agency/src</outputDirectory>
-      </fileSet>
-
-      <!-- Ant-style example -->
-      <fileSet>
-          <directory>../../../examples/loanbroker-esb</directory>
-          <outputDirectory>examples/ant/loanbroker-esb</outputDirectory>
+          <directory>../../../examples/loanbroker/credit-agency</directory>
+          <outputDirectory>examples/loanbroker/credit-agency</outputDirectory>
           <includes>
               <include>README.txt</include>
+              <include>pom.xml</include>
           </includes>
       </fileSet>
       <fileSet>
-          <directory>../../../examples/loanbroker-esb/dist</directory>
-          <outputDirectory>examples/ant/loanbroker-esb</outputDirectory>
+          <directory>../../../examples/loanbroker/credit-agency/src</directory>
+          <outputDirectory>examples/loanbroker/credit-agency/src</outputDirectory>
+      </fileSet>
+      <fileSet>
+          <directory>../../../examples/loanbroker/esb</directory>
+          <outputDirectory>examples/loanbroker/esb</outputDirectory>
           <includes>
-              <include>build.xml</include>
+              <include>README.txt</include>
+              <include>pom.xml</include>
           </includes>
       </fileSet>
       <fileSet>
-          <directory>../../../examples/loanbroker-esb/dist</directory>
-          <outputDirectory>examples/ant/loanbroker-esb</outputDirectory>
+          <directory>../../../examples/loanbroker/esb/conf</directory>
+          <outputDirectory>examples/loanbroker/esb/conf</outputDirectory>
+      </fileSet>
+      <fileSet>
+          <directory>../../../examples/loanbroker/esb/src</directory>
+          <outputDirectory>examples/loanbroker/esb/src</outputDirectory>
+      </fileSet>
+      <fileSet>
+          <directory>../../../examples/loanbroker/esn</directory>
+          <outputDirectory>examples/loanbroker/esn</outputDirectory>
           <includes>
-              <include>*.sh</include>
-              <include>*.bat</include>
+              <include>README.txt</include>
+              <include>pom.xml</include>
           </includes>
-          <fileMode>744</fileMode>
-      </fileSet>
-      <!-- ESB sub-project -->
-      <fileSet>
-          <directory>../../../examples/loanbroker-esb/loanbroker/conf</directory>
-          <outputDirectory>examples/ant/loanbroker-esb/loanbroker/conf</outputDirectory>
       </fileSet>
       <fileSet>
-          <directory>../../../examples/loanbroker-esb/loanbroker/src/main/java</directory>
-          <outputDirectory>examples/ant/loanbroker-esb/loanbroker/src</outputDirectory>
+          <directory>../../../examples/loanbroker/esn/conf</directory>
+          <outputDirectory>examples/loanbroker/esn/conf</outputDirectory>
       </fileSet>
       <fileSet>
-          <directory>../../../examples/loanbroker-esb/loanbroker/src/main/resources</directory>
-          <outputDirectory>examples/ant/loanbroker-esb/loanbroker/resources</outputDirectory>
-      </fileSet>
-      <!-- EJB sub-project -->
-      <!--<fileSet>-->
-          <!--<directory>../../../examples/loanbroker-esb/credit-agency/conf</directory>-->
-          <!--<outputDirectory>examples/ant/loanbroker-esb/credit-agency/conf</outputDirectory>-->
-      <!--</fileSet>-->
-      <fileSet>
-          <directory>../../../examples/loanbroker-esb/credit-agency/src/main/java</directory>
-          <outputDirectory>examples/ant/loanbroker-esb/credit-agency/src</outputDirectory>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/loanbroker-esb/credit-agency/src/main/resources</directory>
-          <outputDirectory>examples/ant/loanbroker-esb/credit-agency/resources</outputDirectory>
+          <directory>../../../examples/loanbroker/esn/src</directory>
+          <outputDirectory>examples/loanbroker/esn/src</outputDirectory>
       </fileSet>
 
       <!--
@@ -730,7 +626,7 @@ Assembly descriptor for the full Mule distribution.
 
     <!-- OpenEJB needs a direct path to the openejb.conf file (i.e., it can't find it from within a jar) -->
     <fileSet>
-      <directory>../../../examples/loanbroker-esb/loanbroker/src/main/resources</directory>
+      <directory>../../../examples/loanbroker/esb/src/main/resources</directory>
       <outputDirectory>lib/user</outputDirectory>
       <includes>
           <include>openejb.conf</include>
@@ -860,9 +756,9 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule.examples:mule-example-echo</exclude>
         <exclude>org.mule.examples:mule-example-errorhandler</exclude>
         <exclude>org.mule.examples:mule-example-hello</exclude>
-        <exclude>org.mule.examples:mule-example-loanbroker</exclude>
+        <exclude>org.mule.examples:mule-example-loanbroker-esn</exclude>
         <exclude>org.mule.examples:mule-example-loanbroker-esb</exclude>
-        <exclude>org.mule.examples:mule-example-loanbroker-esb-credit-agency</exclude>
+        <exclude>org.mule.examples:mule-example-loanbroker-credit-agency</exclude>
         <exclude>org.mule.examples:mule-example-scripting</exclude>
         <exclude>org.mule.examples:mule-example-stockquote</exclude>
         <exclude>org.mule.examples:mule-example-voipservice</exclude>
@@ -871,6 +767,8 @@ Assembly descriptor for the full Mule distribution.
         <!-- TODO Remove these -->
         <exclude>javax.activation:activation</exclude>
         <exclude>javax.mail:mail</exclude>
+
+        <exclude>commons-logging:commons-logging</exclude>
       </excludes>
     </dependencySet>
 
@@ -884,9 +782,9 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.examples:mule-example-echo</include>
         <include>org.mule.examples:mule-example-errorhandler</include>
         <include>org.mule.examples:mule-example-hello</include>
-        <include>org.mule.examples:mule-example-loanbroker</include>
+        <include>org.mule.examples:mule-example-loanbroker-esn</include>
         <include>org.mule.examples:mule-example-loanbroker-esb</include>
-        <include>org.mule.examples:mule-example-loanbroker-esb-credit-agency</include>
+        <include>org.mule.examples:mule-example-loanbroker-credit-agency</include>
         <include>org.mule.examples:mule-example-scripting</include>
         <include>org.mule.examples:mule-example-stockquote</include>
         <include>org.mule.examples:mule-example-voipservice</include>

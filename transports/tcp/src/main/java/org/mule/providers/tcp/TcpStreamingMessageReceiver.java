@@ -78,8 +78,8 @@ public class TcpStreamingMessageReceiver extends AbstractPollingMessageReceiver
             InetAddress inetAddress = InetAddress.getByName(host);
             clientSocket = new Socket(inetAddress, uri.getPort());
             TcpConnector connector = (TcpConnector)this.connector;
-            clientSocket.setReceiveBufferSize(connector.getBufferSize());
-            clientSocket.setSendBufferSize(connector.getBufferSize());
+            clientSocket.setReceiveBufferSize(connector.getReceiveBufferSize());
+            clientSocket.setSendBufferSize(connector.getSendBufferSize());
             clientSocket.setSoTimeout(connector.getReceiveTimeout());
 
             dataIn = new DataInputStream(new BufferedInputStream(clientSocket.getInputStream()));

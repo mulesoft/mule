@@ -36,6 +36,7 @@
             <id>java14</id>
             <activation>
                 <jdk>1.4</jdk>
+                <activeByDefault>true</activeByDefault>
             </activation>
             <dependencies>
                 <!--
@@ -88,6 +89,11 @@
                     <artifactId>commons-jxpath</artifactId>
                     <version>1.2</version>
                     <exclusions>
+                        <!-- we like slf4j -->
+                        <exclusion>
+                            <groupId>commons-logging</groupId>
+                            <artifactId>commons-logging</artifactId>
+                        </exclusion>
                         <!-- totally outdated -->
                         <exclusion>
                             <groupId>xerces</groupId>
@@ -156,6 +162,11 @@
                     <artifactId>commons-jxpath</artifactId>
                     <version>1.2</version>
                     <exclusions>
+                        <!-- we like slf4j -->
+                        <exclusion>
+                            <groupId>commons-logging</groupId>
+                            <artifactId>commons-logging</artifactId>
+                        </exclusion>
                         <!-- IMPORTANT for JDK5 -->
                         <exclusion>
                             <groupId>xml-apis</groupId>
@@ -213,9 +224,17 @@
             <version>1.0.1</version>
         </dependency>
         <dependency>
-            <groupId>woodstox</groupId>
+            <groupId>org.codehaus.woodstox</groupId>
             <artifactId>wstx-asl</artifactId>
-            <version>3.0.2</version>
+            <version>3.2.0</version>
+        </dependency>
+
+        <!-- Better testing of XML -->        
+        <dependency>
+            <groupId>xmlunit</groupId>
+            <artifactId>xmlunit</artifactId>
+            <version>1.0</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
    

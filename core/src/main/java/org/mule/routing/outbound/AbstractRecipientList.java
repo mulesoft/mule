@@ -123,7 +123,6 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
 
     protected UMOEndpoint getRecipientEndpoint(UMOMessage message, String recipient) throws RoutingException
     {
-        UMOEndpointURI endpointUri = null;
         UMOEndpoint endpoint = (UMOEndpoint)recipientCache.get(recipient);
 
         if (endpoint != null)
@@ -133,7 +132,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
 
         try
         {
-            endpointUri = new MuleEndpointURI(recipient);
+            UMOEndpointURI endpointUri = new MuleEndpointURI(recipient);
             endpoint = getManagementContext().getRegistry().getOrCreateEndpointForUri(
                     endpointUri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
             endpoint.initialise();

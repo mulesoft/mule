@@ -10,29 +10,31 @@
 
 package org.mule.providers.http.functional;
 
+import org.mule.extras.client.MuleClient;
 import org.mule.providers.http.HttpConnector;
+import org.mule.providers.http.HttpConstants;
 import org.mule.umo.UMOMessage;
 
-/**
- * @author <a href="mailto:jesper@selskabet.org">Jesper Steen Møller</a>
- * @version $Revision$
- */
+import java.util.HashMap;
+import java.util.Map;
+
 public class HttpBadEncodingFunctionalTestCase extends HttpEncodingFunctionalTestCase
 {
-    UMOMessage reply;
+    protected static String TEST_MESSAGE = "Test Http Request (Rødgrød), 57 = \u06f7\u06f5 in Arabic";
 
-    protected void sendTestData(int iterations) throws Exception
+    protected String getConfigResources()
     {
-        reply = send(getInDest().getAddress(), TEST_MESSAGE, "text/plain;charset=UTFF-912");
+        return "http-encoding-test.xml";
     }
 
-    protected void receiveAndTestResults() throws Exception
+    public void testSend() throws Exception
     {
+        MuleClient client = new MuleClient();
+        Map messageProperties = new HashMap();
+        messageProperties.put(HttpConstants.HEADER_CONTENT_TYPE, "text/plain;charset=UTFF-912");
+        UMOMessage reply = client.send("clientEndpoint", TEST_MESSAGE, messageProperties);
         assertNotNull(reply);
         assertEquals("500", reply.getProperty(HttpConnector.HTTP_STATUS_PROPERTY));
         assertNotNull(reply.getExceptionPayload());
-
-        callbackCalled = true;
     }
-
 }

@@ -14,6 +14,7 @@ import org.mule.registry.Registry;
 import org.mule.registry.ServiceDescriptor;
 import org.mule.registry.ServiceException;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.Initialisable;
@@ -117,4 +118,5 @@ public interface RegistryFacade extends Initialisable, Registry
 
     public UMOEndpoint getOrCreateEndpointForUri(UMOEndpointURI uri, String type) throws UMOException;
 
+    public UMOManagementContext getManagementContext();
 }

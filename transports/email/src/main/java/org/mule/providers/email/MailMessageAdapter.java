@@ -124,11 +124,9 @@ public class MailMessageAdapter extends AbstractMessageAdapter
                 BufferedReader reader = new BufferedReader(new InputStreamReader(is));
                 StringBuffer buffer = new StringBuffer(32768);
 
-                String line = reader.readLine();
-                buffer.append(line).append(SystemUtils.LINE_SEPARATOR);
-                while (line != null)
+                String line;
+                while ((line = reader.readLine()) != null)
                 {
-                    line = reader.readLine();
                     buffer.append(line).append(SystemUtils.LINE_SEPARATOR);
                 }
 

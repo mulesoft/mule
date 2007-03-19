@@ -10,11 +10,14 @@
 
 package org.mule.test.spring;
 
-import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.manager.ObjectNotFoundException;
-import org.mule.umo.manager.UMOContainerContext;
+import org.mule.config.ConfigurationBuilder;
+import org.mule.config.ExceptionHelper;
+import org.mule.config.builders.MuleXmlConfigurationBuilder;
+import org.mule.config.spring.LegacyXmlException;
+import org.mule.tck.AbstractMuleTestCase;
+import org.mule.umo.UMOManagementContext;
 
-public class EmbeddedBeansXmlTestCase extends FunctionalTestCase
+public class EmbeddedBeansXmlTestCase extends AbstractMuleTestCase
 {
 
     protected String getConfigResources()
@@ -22,31 +25,25 @@ public class EmbeddedBeansXmlTestCase extends FunctionalTestCase
         return "org/mule/test/spring/test-embedded-spring-config.xml";
     }
 
-    protected void doFunctionalSetUp() throws Exception
+
+    //@java.lang.Override
+    protected UMOManagementContext createManagementContext() throws Exception
     {
-        System.setProperty("org.mule.xml.validate", "false");
+        return null;
     }
 
-    protected void doFunctionalTearDown() throws Exception
+    public void testEmbeddedXmlNotSupported() throws Exception
     {
-        System.setProperty("org.mule.xml.validate", "true");
-    }
-
-    public void testContainer() throws Exception
-    {
-        UMOContainerContext context = managementContext.getRegistry().getContainerContext();
-        assertNotNull(context);
-        assertNotNull(context.getComponent("Apple"));
-        assertNotNull(context.getComponent("Banana"));
-
+         ConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
         try
         {
-            context.getComponent("Orange");
-            fail("Object should  not found");
+            builder.configure(getConfigResources(), null);
         }
-        catch (ObjectNotFoundException e)
+        catch (Exception e)
         {
-            // ignore
+            assertTrue(ExceptionHelper.getRootException(e) instanceof LegacyXmlException);
+            LegacyXmlException ex = (LegacyXmlException)ExceptionHelper.getRootException(e);
+            assertEquals(1, ex.getErrors().size());
         }
     }
 }

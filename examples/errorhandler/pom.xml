@@ -99,13 +99,11 @@
                     <groupId>org.apache.derby</groupId>
                     <artifactId>derbynet</artifactId>
                 </exclusion>
-                <!-- m2 bug - if this transient dependency is excluded, the normal
-                     dependency for spring is not included either.
-                 -->
-                <!--<exclusion>-->
-                    <!--<groupId>org.springframework</groupId>-->
-                    <!--<artifactId>spring</artifactId>-->
-                <!--</exclusion>-->
+                <!-- Mule ships a more recent version -->
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring</artifactId>
+                </exclusion>
                 <exclusion>
                     <groupId>xerces</groupId>
                     <artifactId>xmlParserAPIs</artifactId>
@@ -169,6 +167,10 @@
                 <exclusion>
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>commons-httpclient</groupId>
+                    <artifactId>commons-httpclient</artifactId>
                 </exclusion>
                 <!-- This exclusion is to force use of the new cglib -->
                 <exclusion>

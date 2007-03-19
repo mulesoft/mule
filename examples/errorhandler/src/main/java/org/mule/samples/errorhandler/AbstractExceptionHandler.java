@@ -10,6 +10,8 @@
 
 package org.mule.samples.errorhandler;
 
+import org.mule.config.i18n.Message;
+
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -70,15 +72,13 @@ public abstract class AbstractExceptionHandler implements ExceptionHandler
         }
         catch (Exception e)
         {
-            throw new HandlerException("Failed to retrieve exception from exception message: " + e, e);
+            throw new HandlerException(new Message("errorhandler-example", 1, e).getMessage(), e);
         }
 
         if (!isRegisteredFor(t.getClass()))
         {
-            throw new HandlerException(
-                "Exception: " + t.getClass().getName() + " was received by Exception behaviour: "
-                                + getClass().getName()
-                                + ", but the exception is not registered to be handled by this behaviour");
+            throw new HandlerException(new Message("errorhandler-example", 2, t.getClass().getName(), getClass().getName()).getMessage());
+
         }
         processException(message, t);
     }

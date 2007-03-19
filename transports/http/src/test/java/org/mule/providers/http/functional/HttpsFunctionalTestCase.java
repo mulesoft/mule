@@ -10,37 +10,10 @@
 
 package org.mule.providers.http.functional;
 
-import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.providers.http.HttpsConnector;
-import org.mule.umo.endpoint.EndpointException;
-import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.provider.UMOConnector;
-
 public class HttpsFunctionalTestCase extends HttpFunctionalTestCase
 {
-    protected UMOConnector createConnector() throws Exception
+    protected String getConfigResources()
     {
-        HttpsConnector connector = new HttpsConnector();
-        connector.setName("testHttps");
-        connector.getDispatcherThreadingProfile().setDoThreading(false);
-        connector.setKeyStore("serverKeystore");
-        connector.setStorePassword("mulepassword");
-        connector.setKeyPassword("mulepassword");
-        connector.setTrustStore("trustStore");
-        connector.setTrustStorePassword("mulepassword");
-        return connector;
-    }
-
-    protected UMOEndpointURI getInDest()
-    {
-        try
-        {
-            return new MuleEndpointURI("https://localhost:60198");
-        }
-        catch (EndpointException e)
-        {
-            fail(e.getMessage());
-            return null;
-        }
+        return "https-functional-test.xml";
     }
 }

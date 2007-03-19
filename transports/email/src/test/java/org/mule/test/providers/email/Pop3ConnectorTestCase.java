@@ -12,33 +12,37 @@ package org.mule.test.providers.email;
 
 import org.mule.impl.MuleDescriptor;
 import org.mule.providers.email.Pop3Connector;
-import org.mule.tck.providers.AbstractConnectorTestCase;
-import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.UMOComponent;
+import org.mule.tck.testmodels.fruit.Orange;
 
 import java.util.Properties;
 
-import javax.mail.Message;
 import javax.mail.Session;
+import javax.mail.Message;
 import javax.mail.internet.MimeMessage;
 
-public class Pop3ConnectorTestCase extends AbstractConnectorTestCase
+/**
+ * Simple tests for pulling from a POP3 server.
+ */
+public class Pop3ConnectorTestCase extends AbstractReceivingMailConnectorTestCase
 {
+
     private Message message;
 
     public UMOConnector getConnector() throws Exception
     {
-        Pop3Connector c = new Pop3Connector();
-        c.setName("Pop3connector");
-        c.initialise();
-        return c;
+        Pop3Connector connector = new Pop3Connector();
+        connector.setName("Pop3Connector");
+        connector.setCheckFrequency(POLL_PERIOD_MS);
+        connector.initialise();
+        return connector;
     }
 
     public String getTestEndpointURI()
     {
-        return "pop3://a:a@muleumo.com";
+        return getPop3TestEndpointURI();
     }
 
     public Object getValidMessage() throws Exception
@@ -103,5 +107,4 @@ public class Pop3ConnectorTestCase extends AbstractConnectorTestCase
 
         connector.dispose();
     }
-
 }

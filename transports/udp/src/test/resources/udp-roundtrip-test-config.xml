@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="UDPPassThrough" version="1.0">
+    
+    <mule-environment-properties embedded="true"/>
+    
+    <container-context className="org.mule.impl.container.PropertiesContainerContext">
+        <properties>
+            <factory-property name="hostname"
+                factory="org.mule.config.factories.HostNameFactory"/>
+        </properties>
+    </container-context>
+    
+    <transformers>
+        <transformer name="SerializableToByteArray"
+            className="org.mule.transformers.simple.SerializableToByteArray">
+        </transformer>
+    </transformers>
+    
+    <model name="main">
+        <mule-descriptor name="PassingThrough"
+            implementation="org.mule.components.simple.PassThroughComponent">
+            <inbound-router>
+                <!-- adding the transformer to this endpoint makes the test succeed (wrongly) -->
+                <!-- <endpoint address="udp://${hostname}:9001" transformers="SerializableToByteArray" -->
+                <endpoint address="udp://${hostname}:9001"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="udp://${hostname}:9002"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+    </model>
+</mule-configuration>

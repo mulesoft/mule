@@ -141,13 +141,14 @@ public class DeferredOutputStream extends OutputStream
                 }
                 catch (MessagingException e)
                 {
-                    throw new IOException(e.toString());
+                    throw (IOException)new IOException(e.toString()).initCause(e);
                 }
                 if (match)
                 {
                     if (router.getEndpoints().size() != 1)
                     {
-                        throw new IOException(new Message(Messages.STREAMING_COMPONENT_X_MUST_HAVE_ONE_ENDPOINT,
+                        throw new IOException(
+                            new Message(Messages.STREAMING_COMPONENT_X_MUST_HAVE_ONE_ENDPOINT, 
                                 descriptor.getName()).toString());
                     }
                     else
@@ -159,8 +160,9 @@ public class DeferredOutputStream extends OutputStream
                         }
                         catch (UMOException e)
                         {
-                            throw new IOException(new Message(Messages.STREAMING_FAILED_FOR_ENDPOINT_X,
-                                    endpoint.toString()).toString());
+                            throw (IOException)new IOException(
+                                new Message(Messages.STREAMING_FAILED_FOR_ENDPOINT_X,endpoint.toString()).toString()
+                                ).initCause(e);
                         }
                     }
                 }

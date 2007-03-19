@@ -79,6 +79,7 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
             }
             catch (Exception e1)
             {
+                // TODO MULE-863: If this is an error, do something better than this
                 logger.error("Failed to dispatch event: " + e.toString() + " over endpoint: " + logEndpoint
                              + ". Error is: " + e1.getMessage(), e1);
             }

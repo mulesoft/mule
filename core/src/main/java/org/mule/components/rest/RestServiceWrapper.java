@@ -52,7 +52,7 @@ public class RestServiceWrapper implements Callable, Initialisable
 
     private String serviceUrl;
     private boolean urlFromMessage = false;
-    private Map reqiredParams = new HashMap();
+    private Map requiredParams = new HashMap();
     private Map optionalParams = new HashMap();
     private String httpMethod = "GET";
     private String payloadParameterName;
@@ -81,14 +81,14 @@ public class RestServiceWrapper implements Callable, Initialisable
         this.urlFromMessage = urlFromMessage;
     }
 
-    public Map getReqiredParams()
+    public Map getRequiredParams()
     {
-        return reqiredParams;
+        return requiredParams;
     }
 
-    public void setReqiredParams(Map reqiredParams)
+    public void setRequiredParams(Map requiredParams)
     {
-        this.reqiredParams = reqiredParams;
+        this.requiredParams = requiredParams;
     }
 
     public Map getOptionalParams()
@@ -202,7 +202,7 @@ public class RestServiceWrapper implements Callable, Initialisable
             requestBody = NullPayload.getInstance();
         }
 
-        setRESTParams(urlBuffer, eventContext.getMessage(), request, reqiredParams, false);
+        setRESTParams(urlBuffer, eventContext.getMessage(), request, requiredParams, false);
         setRESTParams(urlBuffer, eventContext.getMessage(), request, optionalParams, true);
 
         tempUrl = urlBuffer.toString();
@@ -242,15 +242,20 @@ public class RestServiceWrapper implements Callable, Initialisable
             String exp = (String)entry.getValue();
             Object value = propertyExtractor.getProperty(exp, msg);
 
-            if (value == null && !optional)
+            if (value == null)
             {
-                throw new IllegalArgumentException(
-                    new Message(Messages.X_PROPERTY_IS_NOT_SET_ON_EVENT, exp).toString());
+                if (!optional)
+                {
+                    throw new IllegalArgumentException(
+                        new Message(Messages.X_PROPERTY_IS_NOT_SET_ON_EVENT, exp).toString());
+                }
             }
-
-            url.append(sep);
-            sep = '&';
-            url.append(name).append('=').append(value);
+            else
+            {
+                url.append(sep);
+                sep = '&';
+                url.append(name).append('=').append(value);
+            }
         }
 
         if (!optional && payloadParameterName != null)

@@ -259,7 +259,7 @@ public class MuleManagerComponent implements Callable, Initialisable
     }
 
     /**
-     * Wraps an execption into a MuleMessage with an Exception payload and returns
+     * Wraps an exception into a MuleMessage with an Exception payload and returns
      * the Xml representation of it
      * 
      * @param result the result of the invocation or null if the exception occurred
@@ -283,7 +283,10 @@ public class MuleManagerComponent implements Callable, Initialisable
         }
         catch (Exception e1)
         {
-            logger.error(e.toString(), e);
+            // TODO MULE-863: Is this sufficient?
+            // log the inner exception here since the earlier exception was logged earlier
+            logger.error("Failed to format message, using direct string (details at debug level): " + e1.getMessage());
+            logger.debug(e1.toString(), e1);
             return e.getMessage();
         }
     }

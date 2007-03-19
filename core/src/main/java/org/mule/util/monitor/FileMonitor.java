@@ -189,6 +189,7 @@ public class FileMonitor
                             }
                             catch (IOException e)
                             {
+                                // TODO MULE-863: What should we do if null?
                                 if (exceptionListener != null)
                                 {
                                     exceptionListener.exceptionThrown(e);

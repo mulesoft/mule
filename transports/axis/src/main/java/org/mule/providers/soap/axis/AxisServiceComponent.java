@@ -19,7 +19,9 @@ import org.mule.providers.WriterMessageAdapter;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
 import org.mule.providers.soap.SoapConstants;
+import org.mule.providers.soap.axis.extensions.AxisMuleSession;
 import org.mule.providers.soap.axis.extensions.MuleConfigProvider;
+import org.mule.umo.MessagingException;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
@@ -28,8 +30,10 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.util.StringUtils;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -39,10 +43,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPException;
 
 import org.apache.axis.AxisEngine;
 import org.apache.axis.AxisFault;
@@ -50,7 +51,6 @@ import org.apache.axis.ConfigurationException;
 import org.apache.axis.Constants;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
-import org.apache.axis.components.logger.LogFactory;
 import org.apache.axis.description.OperationDesc;
 import org.apache.axis.description.ServiceDesc;
 import org.apache.axis.handlers.soap.SOAPService;
@@ -61,8 +61,6 @@ import org.apache.axis.transport.http.HTTPConstants;
 import org.apache.axis.transport.http.ServletEndpointContextImpl;
 import org.apache.axis.utils.Admin;
 import org.apache.axis.utils.XMLUtils;
-import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.w3c.dom.Document;
 
@@ -80,7 +78,6 @@ import org.w3c.dom.Document;
 public class AxisServiceComponent implements Initialisable, Callable
 {
     protected static final Log logger = org.apache.commons.logging.LogFactory.getLog(AxisServiceComponent.class);
-    private static final Log exceptionLog = LogFactory.getLog("org.apache.axis.EXCEPTIONS");
 
     public static final String INIT_PROPERTY_TRANSPORT_NAME = "transport.name";
     public static final String INIT_PROPERTY_USE_SECURITY = "use-servlet-security";
@@ -160,8 +157,6 @@ public class AxisServiceComponent implements Initialisable, Callable
 
             AxisEngine engine = getAxisServer();
             String pathInfo = endpointUri.getPath();
-            // String realpath =
-            // servletContext.getRealPath(request.getServletPath());
             boolean wsdlRequested = false;
             boolean listRequested = false;
 
@@ -193,7 +188,6 @@ public class AxisServiceComponent implements Initialisable, Callable
             }
             else
             {
-                // if(realpath != null)
                 MessageContext msgContext = new MessageContext(engine);
                 populateMessageContext(msgContext, context, endpointUri);
 
@@ -206,30 +200,9 @@ public class AxisServiceComponent implements Initialisable, Callable
                 {
                     processListRequest(response);
                 }
-                else if (true /* hasParameters */)
-                {
-                    processMethodRequest(msgContext, context, response, endpointUri);
-                }
                 else
                 {
-                    String serviceName = (String)msgContext.getProperty("serviceName");
-                    if (pathInfo.startsWith("/"))
-                    {
-                        serviceName = pathInfo.substring(1);
-                    }
-                    else
-                    {
-                        serviceName = pathInfo;
-                    }
-                    SOAPService s = engine.getService(serviceName);
-                    if (s == null)
-                    {
-                        reportCantGetAxisService(context, response);
-                    }
-                    else
-                    {
-                        reportServiceInfo(response, s, serviceName);
-                    }
+                    processMethodRequest(msgContext, context, response, endpointUri);
                 }
             }
         }
@@ -257,7 +230,7 @@ public class AxisServiceComponent implements Initialisable, Callable
         }
         else
         {
-            logException(exception);
+            logger.error(exception.getMessage(), exception);
             response.write("<pre>Exception - " + exception + "<br>");
             response.write("</pre>");
         }
@@ -269,19 +242,14 @@ public class AxisServiceComponent implements Initialisable, Callable
             .lookupFaultDetail(Constants.QNAME_FAULTDETAIL_RUNTIMEEXCEPTION);
         if (runtimeException != null)
         {
-            exceptionLog.info(Messages.getMessage("axisFault00"), fault);
+            logger.info(Messages.getMessage("axisFault00"), fault);
             fault.removeFaultDetail(Constants.QNAME_FAULTDETAIL_RUNTIMEEXCEPTION);
         }
-        else if (exceptionLog.isDebugEnabled())
+        else if (logger.isDebugEnabled())
         {
-            exceptionLog.debug(Messages.getMessage("axisFault00"), fault);
+            logger.debug(Messages.getMessage("axisFault00"), fault);
         }
 
-    }
-
-    protected void logException(Exception e)
-    {
-        exceptionLog.info(Messages.getMessage("exception00"), e);
     }
 
     private void writeFault(WriterMessageAdapter response, AxisFault axisFault)
@@ -439,7 +407,7 @@ public class AxisServiceComponent implements Initialisable, Callable
         }
     }
 
-    protected void reportNoWSDL(WriterMessageAdapter response, String moreDetailCode, AxisFault axisFault)
+    private void reportNoWSDL(WriterMessageAdapter response, String moreDetailCode, AxisFault axisFault)
     {
         response.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, "404");
         response.setProperty(HTTPConstants.HEADER_CONTENT_TYPE, "text/html");
@@ -541,24 +509,20 @@ public class AxisServiceComponent implements Initialisable, Callable
         response.write("<p>" + Messages.getMessage("noService06") + "</p>");
     }
 
-    public void doPost(UMOEventContext context, WriterMessageAdapter response)
-        throws ServletException, IOException
+    protected void doPost(UMOEventContext context, WriterMessageAdapter response)
+        throws Exception
     {
-        String soapAction = null;
+        String soapAction;
+        Message responseMsg;
         AxisEngine engine = getAxisServer();
         if (engine == null)
         {
-            ServletException se = new ServletException(Messages.getMessage("noEngine00"));
-            logger.debug("No Engine!", se);
-            throw se;
+
+            throw new MessagingException(new org.mule.config.i18n.Message(org.mule.config.i18n.Messages.X_IS_NULL, "Axis Engine"), context.getMessage());
         }
         MessageContext msgContext = new MessageContext(engine);
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Enter: doPost()");
-        }
-        Message responseMsg = null;
-        String contentType = null;
+
+        String contentType;
         try
         {
             UMOEndpointURI endpointUri = getEndpoint(context);
@@ -599,8 +563,7 @@ public class AxisServiceComponent implements Initialisable, Callable
                 msgContext.setUseSOAPAction(true);
                 msgContext.setSOAPActionURI(soapAction);
             }
-            // TODO session support
-            // msgContext.setSession(new AxisHttpSession(req));
+            msgContext.setSession(new AxisMuleSession(context.getSession()));
 
             if (logger.isDebugEnabled())
             {
@@ -647,13 +610,11 @@ public class AxisServiceComponent implements Initialisable, Callable
 
         contentType = responseMsg.getContentType(msgContext.getSOAPConstants());
 
-        sendResponse(context.getMessage().getStringProperty(HttpConnector.HTTP_STATUS_PROPERTY, null),
-            contentType, response, responseMsg);
+        sendResponse(contentType, response, responseMsg);
 
         if (logger.isDebugEnabled())
         {
             logger.debug("Response sent.");
-            logger.debug("Exit: doPost()");
         }
     }
 
@@ -686,7 +647,7 @@ public class AxisServiceComponent implements Initialisable, Callable
 
     private Message convertExceptionToAxisFault(Exception exception, Message responseMsg)
     {
-        logException(exception);
+        logger.error(exception.getMessage(), exception);
         if (responseMsg == null)
         {
             AxisFault fault = AxisFault.makeFault(exception);
@@ -701,10 +662,9 @@ public class AxisServiceComponent implements Initialisable, Callable
         return af.getFaultCode().getLocalPart().startsWith("Server.Unauth") ? 401 : '\u01F4';
     }
 
-    private void sendResponse(String clientVersion,
-                              String contentType,
+    private void sendResponse(String contentType,
                               WriterMessageAdapter response,
-                              Message responseMsg) throws AxisFault, IOException
+                              Message responseMsg) throws Exception
     {
         if (responseMsg == null)
         {
@@ -720,20 +680,11 @@ public class AxisServiceComponent implements Initialisable, Callable
             {
                 logger.debug("Returned Content-Type:" + contentType);
             }
-            try
-            {
                 response.setProperty(HttpConstants.HEADER_CONTENT_TYPE, contentType);
                 ByteArrayOutputStream baos = new ByteArrayOutputStream(8192);
                 responseMsg.writeTo(baos);
                 response.write(baos.toString());
-            }
-            catch (SOAPException e)
-            {
-                logException(e);
-            }
         }
-        // if(!res.isCommitted())
-        // res.flushBuffer();
     }
 
     private void populateMessageContext(MessageContext msgContext,
@@ -751,14 +702,8 @@ public class AxisServiceComponent implements Initialisable, Callable
                             + msg.getStringProperty(HttpConstants.HEADER_CONTENT_LOCATION, null));
             logger.debug("Constants.MC_HOME_DIR:" + String.valueOf(getHomeDir()));
             logger.debug("Constants.MC_RELATIVE_PATH:" + endpointUri.getPath());
-            // logger.debug("HTTPConstants.MC_HTTP_SERVLETLOCATION:" +
-            // String.valueOf(getWebInfPath()));
-            // logger.debug("HTTPConstants.MC_HTTP_SERVLETPATHINFO:" +
-            // req.getPathInfo());
-            logger
-                .debug("HTTPConstants.HEADER_AUTHORIZATION:" + msg.getStringProperty("Authorization", null));
+            logger.debug("HTTPConstants.HEADER_AUTHORIZATION:" + msg.getStringProperty("Authorization", null));
             logger.debug("Constants.MC_REMOTE_ADDR:" + endpointUri.getHost());
-            // logger.debug("configPath:" + String.valueOf(getWebInfPath()));
         }
 
         msgContext.setTransportName(transportName);
@@ -796,11 +741,6 @@ public class AxisServiceComponent implements Initialisable, Callable
         msgContext.setProperty("remoteaddr", endpointUri.getHost());
         ServletEndpointContextImpl sec = new ServletEndpointContextImpl();
         msgContext.setProperty("servletEndpointContext", sec);
-        // String realpath =
-        // getServletConfig().getServletContext().getRealPath(req.getServletPath());
-        // if(realpath != null)
-        // msgContext.setProperty("realpath", realpath);
-        // msgContext.setProperty("configPath", getWebInfPath());
     }
 
     private String getSoapAction(UMOEventContext context) throws AxisFault
@@ -810,14 +750,7 @@ public class AxisServiceComponent implements Initialisable, Callable
         {
             logger.debug("Header Soap Action:" + soapAction);
         }
-        // if (soapAction == null) {
-        // AxisFault af = new AxisFault("Client.NoSOAPAction",
-        // Messages.getMessage("noHeader00", "SOAPAction"),
-        // null,
-        // null);
-        // exceptionLog.error(Messages.getMessage("genFault00"), af);
-        // throw af;
-        // }
+
         if (StringUtils.isEmpty(soapAction))
         {
             soapAction = context.getEndpointURI().getAddress();
@@ -839,8 +772,6 @@ public class AxisServiceComponent implements Initialisable, Callable
             }
 
         }
-        // int i = serviceName.lastIndexOf("/");
-        // if (i > -1) serviceName = serviceName.substring(0, i);
 
         int i = serviceName.lastIndexOf('/');
         if (i > -1)
@@ -853,25 +784,6 @@ public class AxisServiceComponent implements Initialisable, Callable
             serviceName = serviceName.substring(0, i);
         }
         return serviceName;
-    }
-
-    protected String getProtocolVersion(HttpServletRequest req)
-    {
-        String ret = HTTPConstants.HEADER_PROTOCOL_V10;
-        String prot = req.getProtocol();
-        if (prot != null)
-        {
-            int sindex = prot.indexOf('/');
-            if (-1 != sindex)
-            {
-                String ver = prot.substring(sindex + 1);
-                if (HTTPConstants.HEADER_PROTOCOL_V11.equals(ver.trim()))
-                {
-                    ret = HTTPConstants.HEADER_PROTOCOL_V11;
-                }
-            }
-        }
-        return ret;
     }
 
     public String getTransportName()

@@ -142,6 +142,7 @@ public class MuleWorkManager implements UMOWorkManager
         }
         catch (UMOException e)
         {
+            // TODO MULE-863: Is this serious?
             logger.warn("Error while disposing Work Manager: " + e.getMessage(), e);
         }
     }

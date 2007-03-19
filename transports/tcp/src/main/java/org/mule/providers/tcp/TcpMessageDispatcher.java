@@ -41,8 +41,6 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
         serializableToByteArray = new SerializableToByteArray();
     }
 
-
-
     protected synchronized void doDispatch(UMOEvent event) throws Exception
     {
         Socket socket = dispatchToSocket(event);
@@ -91,6 +89,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
      * 
      * @param event event
      * @throws Exception in case of any error
+     * @return the socket being written to
      */
     protected Socket dispatchToSocket(UMOEvent event) throws Exception
     {
@@ -107,46 +106,34 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
         }
         catch (IOException e)
         {
-            //TODO: Reconnects should be made posible gererically, by detecting an error in the AbstractDispatcher
-            //and dispatching the event again. It seems wrong to put it here
-//            if (connector.isKeepSendSocketOpen())
-//            {
-//                logger.warn("Write raised exception: '" + e.getMessage() + "' attempting to reconnect.");
-//                // Try reconnecting or a Fatal Connection Exception will be thrown
-//                connector.releaseSocket(socket, event.getEndpoint());
-//                reconnect();
-//                socket = connector.getSocket(event.getEndpoint());
-//                write(socket, payload);
-//            }
-//            else
-//            {
-                throw e;
-//            }
+            // TODO: Reconnects should be made posible gererically, by detecting an
+            // error in the AbstractDispatcher
+            // and dispatching the event again. It seems wrong to put it here
+            // if (connector.isKeepSendSocketOpen())
+            // {
+            // logger.warn("Write raised exception: '" + e.getMessage() + "'
+            // attempting to reconnect.");
+            // // Try reconnecting or a Fatal Connection Exception will be thrown
+            // connector.releaseSocket(socket, event.getEndpoint());
+            // reconnect();
+            // socket = connector.getSocket(event.getEndpoint());
+            // write(socket, payload);
+            // }
+            // else
+            // {
+            throw e;
+            // }
         }
     }
-
-    
 
     protected void write(Socket socket, Object data) throws IOException, TransformerException
     {
         TcpProtocol protocol = connector.getTcpProtocol();
 
-        byte[] binaryData;
-        if (data instanceof String)
-        {
-            binaryData = data.toString().getBytes();
-        }
-        else if (data instanceof byte[])
-        {
-            binaryData = (byte[])data;
-        }
-        else
-        {
-            binaryData = (byte[])serializableToByteArray.transform(data);
-        }
-
         BufferedOutputStream bos = new BufferedOutputStream(socket.getOutputStream());
-        protocol.write(bos, binaryData);
+        // TODO SF check if need to convert String to Bytes... using
+        // data.toString().getBytes() or should we send string as is?
+        protocol.write(bos, data);
         bos.flush();
     }
 
@@ -157,8 +144,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
         {
             socket.setSoTimeout(timeout);
         }
-        // TODO SF: check if this cast is ok!
-        return (byte[])connector.getTcpProtocol().read(dis);
+        return connector.getTcpProtocol().read(dis);
     }
 
     /**
@@ -190,10 +176,10 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
             catch (SocketTimeoutException e)
             {
                 // we don't necesarily expect to receive a resonse here
-                if(logger.isDebugEnabled())
+                if (logger.isDebugEnabled())
                 {
                     logger.debug("Socket timed out normally while doing a synchronous receive on endpointUri: "
-                            + endpoint.getEndpointURI());
+                                 + endpoint.getEndpointURI());
                 }
                 return null;
             }
@@ -218,29 +204,13 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
 
     protected void doConnect() throws Exception
     {
-        //Just test that we can connect. If we are keeping send sockets open, this will get cached
+        //Test the connectionw
         Socket socket = connector.getSocket(endpoint);
         connector.releaseSocket(socket, endpoint);
     }
 
     protected void doDisconnect() throws Exception
     {
-        Socket socket = connector.lookupSocket(endpoint);
-
-        if (null != socket && !socket.isClosed())
-        {
-            try
-            {
-                socket.close();
-            }
-            catch (IOException e)
-            {
-                logger.warn("ConnectedSocked.close() raised exception. Reason: " + e.getMessage());
-            }
-            finally
-            {
-                connector.releaseSocket(socket, endpoint);
-            }
-        }
+        //nothing to do
     }
 }

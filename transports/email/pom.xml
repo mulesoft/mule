@@ -36,5 +36,10 @@
             <version>1.4</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>icegreen</groupId>
+            <artifactId>greenmail</artifactId>
+            <version>1.1</version>
+        </dependency>
     </dependencies>
 </project>

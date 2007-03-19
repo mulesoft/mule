@@ -56,7 +56,7 @@ public class MuleContainerContext extends AbstractContainerContext
         }
         catch (Exception e)
         {
-            throw new ObjectNotFoundException(key.toString() + " (" + e.getMessage() + ")");
+            throw new ObjectNotFoundException(key.toString() + " (" + e.getMessage() + ")", e);
         }
     }
 

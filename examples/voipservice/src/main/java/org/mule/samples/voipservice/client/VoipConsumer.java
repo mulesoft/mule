@@ -10,6 +10,7 @@
 
 package org.mule.samples.voipservice.client;
 
+import org.mule.config.i18n.Message;
 import org.mule.extras.client.MuleClient;
 import org.mule.impl.MuleMessage;
 import org.mule.samples.voipservice.to.CreditCardTO;
@@ -78,17 +79,15 @@ public class VoipConsumer
         {
             voipConsumer = new VoipConsumer("voip-broker-sync-config.xml");
 
-            String msg = "Welcome to the Mule Voip Services Provisioning Example."
-                         + " This example was published as part of a featured article on java.net"
-                         + " titled 'Service Provisioning Through ESB' (http://today.java.net/lpt/a/233).";
+            String msg = new Message("voip-example", 1).getMessage();
 
             System.out.println(StringMessageUtils.getBoilerPlate(msg, '*', 70));
 
             while (response != 'q')
             {
-                System.out.println("\n[1] make a service request");
-                System.out.println("[q] quit");
-                System.out.println("\nPlease make your selection: ");
+                System.out.println("\n" + new Message("voip-example", 2).getMessage());
+                System.out.println(new Message("voip-example", 3).getMessage());
+                System.out.println("\n" + new Message("voip-example", 4).getMessage());
 
                 response = getSelection();
                 if (response == '1')
@@ -99,12 +98,12 @@ public class VoipConsumer
                 }
                 else if (response == 'q')
                 {
-                    System.out.println("Bye");
+                    System.out.println(new Message("voip-example", 5).getMessage());
                     System.exit(0);
                 }
                 else
                 {
-                    System.out.println("That response is not recognised, try again:");
+                    System.out.println(new Message("voip-example", 6).getMessage());
                 }
             }
 

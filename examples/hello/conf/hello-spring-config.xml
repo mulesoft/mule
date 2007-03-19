@@ -20,7 +20,8 @@
         These properties are set as bean properties on the connector.
     -->
     <bean id="systemStreamConnector" class="org.mule.providers.stream.SystemStreamConnector">
-        <property name="promptMessage"><value>Please enter your name: </value></property>
+        <property name="promptMessageCode"><value>3</value></property>
+        <property name="resourceBundle"><value>hello-example</value></property>
         <property name="messageDelayTime"><value>1000</value></property>
     </bean>
 

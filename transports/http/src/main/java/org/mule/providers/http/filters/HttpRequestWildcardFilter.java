@@ -35,7 +35,7 @@ public class HttpRequestWildcardFilter extends WildcardFilter
     {
         if (object instanceof UMOMessage)
         {
-            object = ((UMOMessage)object).getProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
+            object = ((UMOMessage) object).getProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
         }
 
         return super.accept(object);

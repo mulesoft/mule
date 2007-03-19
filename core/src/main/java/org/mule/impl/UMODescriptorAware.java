@@ -10,6 +10,7 @@
 
 package org.mule.impl;
 
+import org.mule.config.ConfigurationException;
 import org.mule.umo.UMODescriptor;
 
 /**
@@ -26,5 +27,5 @@ import org.mule.umo.UMODescriptor;
 
 public interface UMODescriptorAware
 {
-    void setDescriptor(UMODescriptor descriptor);
+    void setDescriptor(UMODescriptor descriptor) throws ConfigurationException;
 }

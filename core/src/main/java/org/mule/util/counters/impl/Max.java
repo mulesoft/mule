@@ -12,10 +12,6 @@ package org.mule.util.counters.impl;
 
 import org.mule.util.counters.CounterFactory.Type;
 
-/**
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
- */
 public class Max extends AggregateCounter
 {
 
@@ -33,12 +29,9 @@ public class Max extends AggregateCounter
 
     public void doCompute()
     {
-        double next = getBase().nextValue();
-        if (max == Double.NaN)
-        {
-            max = next;
-        }
-        else if (next > max)
+        double next = this.getBase().nextValue();
+
+        if (Double.isNaN(max) || (next > max))
         {
             max = next;
         }

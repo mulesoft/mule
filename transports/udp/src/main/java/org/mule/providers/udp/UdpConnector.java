@@ -11,29 +11,61 @@
 package org.mule.providers.udp;
 
 import org.mule.providers.AbstractConnector;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
+
+import java.net.DatagramSocket;
+
+import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 
 /**
  * <code>UdpConnector</code> can send and receive Mule events as Datagram packets.
  */
 public class UdpConnector extends AbstractConnector
 {
-    public static final int DEFAULT_SOCKET_TIMEOUT = 5000;
-    public static final int DEFAULT_BUFFER_SIZE = 64 * 1024;
+    public static final int DEFAULT_SOCKET_TIMEOUT = INT_VALUE_NOT_SET;
+    public static final int DEFAULT_BUFFER_SIZE = 1024 * 16;
 
-    private int timeout = DEFAULT_SOCKET_TIMEOUT;
-    private int bufferSize = DEFAULT_BUFFER_SIZE;
+    public static final String KEEP_SEND_SOCKET_OPEN_PROPERTY = "keepSendSocketOpen";
+
+
+    protected int sendTimeout = DEFAULT_SOCKET_TIMEOUT;
+
+    protected int receiveTimeout = DEFAULT_SOCKET_TIMEOUT;
+
+    protected int sendBufferSize = DEFAULT_BUFFER_SIZE;
+
+    protected int receiveBufferSize = DEFAULT_BUFFER_SIZE;
+
+    protected boolean keepSendSocketOpen = true;
+
+    protected boolean broadcast;
+
+    protected GenericKeyedObjectPool dispatcherSocketsPool = new GenericKeyedObjectPool();
 
 
     protected void doInitialise() throws InitialisationException
     {
-        // template method, nothing to do
+        dispatcherSocketsPool.setFactory(new UdpSocketFactory());
+        dispatcherSocketsPool.setTestOnBorrow(true);
+        dispatcherSocketsPool.setTestOnReturn(true);
+        //There should only be one pooled instance per socket (key)
+        dispatcherSocketsPool.setMaxActive(1);
     }
 
     protected void doDispose()
     {
-        // template method
+        try
+        {
+            dispatcherSocketsPool.close();
+        }
+        catch (Exception e)
+        {
+            logger.warn("Failed to close dispatcher socket pool: " + e.getMessage());
+        }
     }
 
     protected void doConnect() throws Exception
@@ -43,7 +75,7 @@ public class UdpConnector extends AbstractConnector
 
     protected void doDisconnect() throws Exception
     {
-        // template method
+        dispatcherSocketsPool.clear();
     }
 
     protected void doStart() throws UMOException
@@ -58,35 +90,140 @@ public class UdpConnector extends AbstractConnector
 
     public String getProtocol()
     {
-        return "UDP";
+        return "udp";
     }
 
-    public int getTimeout()
-    {
-        return timeout;
-    }
-
+    /**
+     * A shorthand property setting timeout for both SEND and RECEIVE sockets.
+     *
+     * @deprecated The time out should be set explicitly for each
+     */
     public void setTimeout(int timeout)
     {
-        if (timeout < 1)
+        setSendTimeout(timeout);
+        setReceiveTimeout(timeout);
+    }
+
+    public int getSendTimeout()
+    {
+        return this.sendTimeout;
+    }
+
+    public void setSendTimeout(int timeout)
+    {
+        if (timeout < 0)
         {
             timeout = DEFAULT_SOCKET_TIMEOUT;
         }
-        this.timeout = timeout;
+        this.sendTimeout = timeout;
     }
 
+    public int getReceiveTimeout()
+    {
+        return receiveTimeout;
+    }
+
+    public void setReceiveTimeout(int timeout)
+    {
+        if (timeout < 0)
+        {
+            timeout = DEFAULT_SOCKET_TIMEOUT;
+        }
+        this.receiveTimeout = timeout;
+    }
+
+    /**
+     * @return
+     * @deprecated Should use {@link #getSendBufferSize()} or {@link #getReceiveBufferSize()}
+     */
     public int getBufferSize()
     {
-        return bufferSize;
+        return sendBufferSize;
     }
 
+    /**
+     * @param bufferSize
+     * @deprecated Should use {@link #setSendBufferSize(int)} or {@link #setReceiveBufferSize(int)}
+     */
     public void setBufferSize(int bufferSize)
     {
         if (bufferSize < 1)
         {
             bufferSize = DEFAULT_BUFFER_SIZE;
         }
-        this.bufferSize = bufferSize;
+        this.sendBufferSize = bufferSize;
     }
 
+
+    public int getSendBufferSize()
+    {
+        return sendBufferSize;
+    }
+
+    public void setSendBufferSize(int sendBufferSize)
+    {
+        if (sendBufferSize < 1)
+        {
+            sendBufferSize = DEFAULT_BUFFER_SIZE;
+        }
+        this.sendBufferSize = sendBufferSize;
+    }
+
+    public int getReceiveBufferSize()
+    {
+        return receiveBufferSize;
+    }
+
+    public void setReceiveBufferSize(int receiveBufferSize)
+    {
+        if (receiveBufferSize < 1)
+        {
+            receiveBufferSize = DEFAULT_BUFFER_SIZE;
+        }
+        this.receiveBufferSize = receiveBufferSize;
+    }
+
+    public boolean isBroadcast()
+    {
+        return broadcast;
+    }
+
+    public void setBroadcast(boolean broadcast)
+    {
+        this.broadcast = broadcast;
+    }
+
+
+    public boolean isKeepSendSocketOpen()
+    {
+        return keepSendSocketOpen;
+    }
+
+    public void setKeepSendSocketOpen(boolean keepSendSocketOpen)
+    {
+        this.keepSendSocketOpen = keepSendSocketOpen;
+    }
+
+    /**
+     * Lookup a socket in the list of dispatcher sockets but don't create a new
+     * socket
+     *
+     * @param endpoint
+     * @return
+     */
+    DatagramSocket getSocket(UMOImmutableEndpoint endpoint) throws Exception
+    {
+        return (DatagramSocket) dispatcherSocketsPool.borrowObject(endpoint);
+    }
+
+    void releaseSocket(DatagramSocket socket, UMOImmutableEndpoint endpoint) throws Exception
+    {
+        dispatcherSocketsPool.returnObject(endpoint, socket);
+    }
+
+
+    protected Object getReceiverKey(UMOComponent component, UMOEndpoint endpoint)
+    {
+        return endpoint.getEndpointURI().getAddress() + "/" + component.getDescriptor().getName();
+    }
 }

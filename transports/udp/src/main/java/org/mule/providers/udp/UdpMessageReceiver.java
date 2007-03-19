@@ -51,13 +51,16 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
         throws InitialisationException
     {
         super(connector, component, endpoint);
-        bufferSize = ((UdpConnector)connector).getBufferSize();
+        bufferSize = ((UdpConnector)connector).getReceiveBufferSize();
 
         uri = endpoint.getEndpointURI().getUri();
 
         try
         {
-            inetAddress = InetAddress.getByName(uri.getHost());
+            if(!"null".equalsIgnoreCase(uri.getHost()))
+            {
+                inetAddress = InetAddress.getByName(uri.getHost());
+            }
         }
         catch (UnknownHostException e)
         {
@@ -71,10 +74,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
     {
         try
         {
-            socket = createSocket(uri, inetAddress);
-            socket.setSoTimeout(((UdpConnector)connector).getTimeout());
-            socket.setReceiveBufferSize(bufferSize);
-            socket.setSendBufferSize(bufferSize);
+            socket = ((UdpConnector)connector).getSocket(endpoint);
         }
         catch (Exception e)
         {
@@ -138,11 +138,11 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
     protected DatagramPacket createPacket()
     {
         DatagramPacket packet = new DatagramPacket(new byte[bufferSize], bufferSize);
-        if (uri.getPort() > 0)
-        {
-            packet.setPort(uri.getPort());
-        }
-        packet.setAddress(inetAddress);
+//        if (uri.getPort() > 0)
+//        {
+//            packet.setPort(uri.getPort());
+//        }
+//        packet.setAddress(inetAddress);
         return packet;
     }
 
@@ -162,7 +162,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
 
                         if (logger.isTraceEnabled())
                         {
-                            logger.trace("Received packet on: " + inetAddress.toString());
+                            logger.trace("Received packet on: " + uri);
                         }
 
                         Work work = createWork(packet);

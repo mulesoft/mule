@@ -62,7 +62,7 @@ public class SslMessageReceiver extends TcpMessageReceiver
         ssf = sslc.getServerSocketFactory();
 
         String host = StringUtils.defaultIfEmpty(uri.getHost(), "localhost");
-        int backlog = cnn.getBacklog();
+        int backlog = cnn.getReceiveBacklog();
         SSLServerSocket serverSocket;
 
         InetAddress inetAddress = InetAddress.getByName(host);
@@ -78,6 +78,6 @@ public class SslMessageReceiver extends TcpMessageReceiver
         // Authenticate the client?
         serverSocket.setNeedClientAuth(cnn.isRequireClientAuthentication());
         return serverSocket;
-
     }
+
 }

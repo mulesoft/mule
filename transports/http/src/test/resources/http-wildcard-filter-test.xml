@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="http_wildcard_filter_test" version="1.0">
+    <model name="main">
+        <mule-descriptor name="httpIn" implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <endpoint address="http://localhost:60198" synchronous="true">
+                    <filter className="org.mule.routing.filters.logic.NotFilter">
+                        <filter className="org.mule.routing.filters.WildcardFilter" pattern="*xyz*"/>
+                    </filter>
+                </endpoint>
+            </inbound-router>
+        </mule-descriptor>
+    </model>
+</mule-configuration>

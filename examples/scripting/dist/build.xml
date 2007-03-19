@@ -1,3 +1,4 @@
+
 <!--
  Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
 
@@ -15,26 +16,13 @@
     <property name="dir.classes" value="build/classes"/>
 
     <property name="url.maven.repo" value="http://www.ibiblio.org/maven2"/>
-    <property name="url.mule-deps.repo" value="http://dist.codehaus.org/mule/dependencies/maven2"/>
 
     <target name="clean"
             description="Clean the output directory (start from scratch).">
         <delete dir="${dir.build}"/>
     </target>
 
-    <!-- Download any additional libraries needed to run the application -->
-    <target name="get.libraries">
-        <get src="${url.mule-deps.repo}/com/sun/script/groovy/20061114/groovy-20061114-jdk14.jar"
-             dest="${dir.user.lib}/groovy-20061114-jdk14.jar"
-             verbose="true"
-             usetimestamp="true"/>
-        <get src="${url.maven.repo}/groovy/groovy-all/1.0/groovy-all-1.0.jar"
-             dest="${dir.user.lib}/groovy-all-1.0.jar"
-             verbose="true"
-             usetimestamp="true"/>
-    </target>
-
-    <target name="init" depends="get.libraries">
+    <target name="init">
 
         <!-- Create the build directory if it doesn't exist -->
         <mkdir dir="${dir.classes}"/>

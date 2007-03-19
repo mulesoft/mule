@@ -27,8 +27,10 @@ public class SingleAttemptConnectionStrategy extends AbstractConnectionStrategy
         }
         catch (Exception e)
         {
-            throw new FatalConnectException(new Message(Messages.RECONNECT_STRATEGY_X_FAILED_ENDPOINT_X,
-                getClass().getName(), getDescription(connectable)), e, connectable);
+            throw new FatalConnectException(
+                new Message(Messages.RECONNECT_STRATEGY_X_FAILED_ENDPOINT_X, 
+                    getClass().getName(), getDescription(connectable)), 
+                e, connectable);
 
         }
     }

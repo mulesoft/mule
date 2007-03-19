@@ -60,7 +60,7 @@ public class HttpsMessageReceiver extends HttpMessageReceiver
         ssf = sslc.getServerSocketFactory();
 
         String host = StringUtils.defaultIfEmpty(uri.getHost(), "localhost");
-        int backlog = cnn.getBacklog();
+        int backlog = cnn.getReceiveBacklog();
         SSLServerSocket serverSocket;
 
         InetAddress inetAddress = InetAddress.getByName(host);

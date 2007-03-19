@@ -60,14 +60,14 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
 
     public void testServiceOverrides3() throws InterruptedException, UMOException
     {
-        UMOEndpointURI uri = new MuleEndpointURI("file:///temp");
+        UMOEndpointURI uri = new MuleEndpointURI("file:///temp?connector=fileConnector1");
         UMOEndpoint endpoint = managementContext.getRegistry().getOrCreateEndpointForUri(uri, UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
 
         assertNotNull(endpoint);
         assertNotNull(endpoint.getConnector());
         assertNull(((AbstractConnector)endpoint.getConnector()).getServiceOverrides());
 
-        endpoint = new MuleEndpoint("file:///temp", true);
+        endpoint = new MuleEndpoint("file:///temp?connector=fileConnector1", true);
 
         FileConnector c = (FileConnector)managementContext.getRegistry().lookupConnector("fileConnector2");
         assertNotNull(c);

@@ -13,6 +13,7 @@ package org.mule.providers.soap.xfire;
 import org.mule.MuleRuntimeException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.config.ConfigurationException;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.UMODescriptorAware;
@@ -73,7 +74,7 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
     protected Transport universalTransport;
     protected String transportClass;
 
-    public void setDescriptor(UMODescriptor descriptor)
+    public void setDescriptor(UMODescriptor descriptor) throws ConfigurationException
     {
         UMOWorkManager wm = ((MuleDescriptor)descriptor).getThreadingProfile().createWorkManager(
             "xfire-local-transport");

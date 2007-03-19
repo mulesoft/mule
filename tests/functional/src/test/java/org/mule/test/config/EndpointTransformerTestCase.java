@@ -11,13 +11,12 @@
 package org.mule.test.config;
 
 import org.mule.config.builders.QuickConfigurationBuilder;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transformers.NoActionTransformer;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 
-import junit.framework.TestCase;
-
-public class EndpointTransformerTestCase extends TestCase
+public class EndpointTransformerTestCase extends AbstractMuleTestCase
 {
 
     public void testTransformerProperty() throws UMOException

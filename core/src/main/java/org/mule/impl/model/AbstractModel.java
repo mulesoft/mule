@@ -264,6 +264,7 @@ public abstract class AbstractModel implements UMOModel
             }
             catch (Exception e1)
             {
+                // TODO MULE-863: So what do we do about this?
                 logger.warn("Failed to dispose component: " + e1.getMessage());
             }
         }

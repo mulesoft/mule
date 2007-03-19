@@ -134,7 +134,7 @@ public class MuleWSSInHandler extends AbstractWSS4JHandler implements Handler
             }
             catch (WSSecurityException ex)
             {
-                throw new XFireFault("MuleWSSInHandler: security processing failed", ex,
+                throw new XFireFault("MuleWSSInHandler: security processing failed: " + ex.toString(), ex,
                     XFireFault.SENDER);
             }
 

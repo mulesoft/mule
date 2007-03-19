@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.URI;
 import java.util.Map;
 
 /**
@@ -31,9 +30,6 @@ import java.util.Map;
 public class UdpMessageDispatcher extends AbstractMessageDispatcher
 {
     protected final UdpConnector connector;
-    protected InetAddress inetAddress;
-    protected DatagramSocket socket;
-    protected int port;
 
     public UdpMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
@@ -43,46 +39,47 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
 
     protected void doConnect() throws Exception
     {
-        if (!connected)
-        {
-            URI uri = endpoint.getEndpointURI().getUri();
-            port = uri.getPort();
-            inetAddress = InetAddress.getByName(uri.getHost());
-            socket = createSocket(port, inetAddress);
-        }
+        // Test the connection
+        DatagramSocket socket = connector.getSocket(endpoint);
+        connector.releaseSocket(socket, endpoint);
     }
 
     protected void doDisconnect() throws Exception
     {
-        try
-        {
-            if (socket != null)
-            {
-                socket.close();
-            }
-        }
-        finally
-        {
-            socket = null;
-        }
+        // nothing to do
     }
 
-    protected DatagramSocket createSocket(int port, InetAddress inetAddress) throws IOException
-    {
-        DatagramSocket socket = new DatagramSocket();
-        socket.setReceiveBufferSize(connector.getBufferSize());
-        socket.setSendBufferSize(connector.getBufferSize());
-        socket.setSoTimeout(connector.getTimeout());
-        return socket;
-    }
 
     protected synchronized void doDispatch(UMOEvent event) throws Exception
     {
-        byte[] payload = event.getTransformedMessageAsBytes();
-        write(socket, payload);
+        UMOImmutableEndpoint ep = event.getEndpoint();
+
+        DatagramSocket socket = connector.getSocket(ep);
+        try
+        {
+            byte[] payload = event.getTransformedMessageAsBytes();
+
+            int port = ep.getEndpointURI().getPort();
+            InetAddress inetAddress = null;
+            //TODO, check how expensive this operation is
+            if("null".equalsIgnoreCase(ep.getEndpointURI().getHost()))
+            {
+                inetAddress = InetAddress.getLocalHost();
+            }
+            else
+            {
+                inetAddress = InetAddress.getByName(ep.getEndpointURI().getHost());
+            }
+
+            write(socket, payload, port, inetAddress);
+        }
+        finally
+        {
+            connector.releaseSocket(socket, ep);
+        }
     }
 
-    protected void write(DatagramSocket socket, byte[] data) throws IOException
+    protected void write(DatagramSocket socket, byte[] data, int port, InetAddress inetAddress) throws IOException
     {
         DatagramPacket packet = new DatagramPacket(data, data.length);
         if (port >= 0)
@@ -99,6 +96,7 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
         // If we're doing sync receive try and read return info from socket
         if (event.getEndpoint().isRemoteSync())
         {
+            DatagramSocket socket = connector.getSocket(event.getEndpoint());
             DatagramPacket result = receive(socket, event.getTimeout());
             if (result == null)
             {
@@ -117,22 +115,28 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
         int origTimeout = socket.getSoTimeout();
         try
         {
-            DatagramPacket packet = new DatagramPacket(new byte[connector.getBufferSize()],
-                connector.getBufferSize());
-            socket.setSoTimeout(timeout);
+            DatagramPacket packet = new DatagramPacket(new byte[connector.getReceiveBufferSize()],
+                connector.getReceiveBufferSize());
+
+            if(timeout > 0 && timeout != socket.getSoTimeout())
+            {
+                socket.setSoTimeout(timeout);
+            }
             socket.receive(packet);
             return packet;
         }
         finally
         {
-            socket.setSoTimeout(origTimeout);
+            if(socket.getSoTimeout()!= origTimeout)
+            {
+                socket.setSoTimeout(origTimeout);
+            }
         }
     }
 
     /**
      * Make a specific request to the underlying transport
      * 
-     * @param endpoint the endpoint to use when connecting to the resource
      * @param timeout the maximum time the operation should block before returning.
      *            The call should return immediately if there is data available. If
      *            no data becomes available before the timeout elapses, null will be
@@ -143,6 +147,7 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
      */
     protected UMOMessage doReceive(long timeout) throws Exception
     {
+        DatagramSocket socket = connector.getSocket(endpoint);
         DatagramPacket result = receive(socket, (int)timeout);
         if (result == null)
         {

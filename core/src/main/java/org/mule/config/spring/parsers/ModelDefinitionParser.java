@@ -11,7 +11,10 @@ package org.mule.config.spring.parsers;
 
 import org.mule.impl.model.ModelFactory;
 import org.mule.registry.ServiceException;
+import org.mule.util.ClassUtils;
 
+import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.w3c.dom.Element;
 
 /**
@@ -31,14 +34,40 @@ public class ModelDefinitionParser extends AbstractMuleSingleBeanDefinitionParse
 
     protected Class getBeanClass(Element element)
     {
-        try
+        return ModelFactoryBean.class;
+    }
+
+    public class ModelFactoryBean extends AbstractFactoryBean
+    {
+
+        private String type;
+
+
+        public String getType()
         {
-            return ModelFactory.getModelClass(type);
+            return type;
         }
-        catch (ServiceException e)
+
+        public void setType(String type)
         {
-            logger.error(e.getMessage(), e);
-            return null;
+            this.type = type;
+        }
+
+        public Class getObjectType()
+        {
+            try
+            {
+                return ModelFactory.getModelClass(type);
+            }
+            catch (ServiceException e)
+            {
+                throw new BeanCreationException("Failed to load model class", e);
+            }
+        }
+
+        protected Object createInstance() throws Exception
+        {
+            return ClassUtils.instanciateClass(getObjectType(), ClassUtils.NO_ARGS);
         }
     }
 }

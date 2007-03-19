@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="http_fuctional_test" version="1.0">
+    
+    <mule-environment-properties serverUrl=""/>
+
+    <connector name="httpConnector" className="org.mule.providers.http.HttpsConnector">
+        <properties>
+            <property name="keyStore" value="serverKeystore"/>
+            <property name="storePassword" value="mulepassword"/>
+            <property name="keyPassword" value="mulepassword"/>
+            <property name="trustStore" value="trustStore"/>
+            <property name="trustStorePassword" value="mulepassword"/>
+        </properties>
+    </connector>
+
+    <global-endpoints>
+        <endpoint name="clientEndpoint" address="https://localhost:60198" synchronous="true" connector="httpConnector"/>
+    </global-endpoints>
+
+    <model name="main">
+        <mule-descriptor name="testComponent" implementation="org.mule.tck.functional.FunctionalTestComponent">
+            <inbound-router>
+                <global-endpoint name="clientEndpoint"/>
+            </inbound-router>
+        </mule-descriptor>
+    </model>
+</mule-configuration>

@@ -154,7 +154,7 @@ public abstract class AbstractComponent implements UMOComponent
                     descriptor.getName() + " with the registry");
         }
 
-        descriptor.initialise();
+        //descriptor.initialise();
 
         this.exceptionListener = descriptor.getExceptionListener();
 
@@ -249,6 +249,7 @@ public abstract class AbstractComponent implements UMOComponent
                 catch (InterruptedException e)
                 {
                     // we can ignore this
+                    // TODO MULE-863: Why?
                 }
             }
 
@@ -372,6 +373,7 @@ public abstract class AbstractComponent implements UMOComponent
         }
         catch (UMOException e)
         {
+            // TODO MULE-863: If this is an error, do something!
             logger.error("Failed to stop component: " + descriptor.getName(), e);
         }
         doDispose();
@@ -600,8 +602,10 @@ public abstract class AbstractComponent implements UMOComponent
             }
             catch (Exception e)
             {
-                throw new ModelException(new Message(Messages.FAILED_TO_REGISTER_X_ON_ENDPOINT_X,
-                    getDescriptor().getName(), endpoint.getEndpointURI()), e);
+                throw new ModelException(
+                    new Message(Messages.FAILED_TO_REGISTER_X_ON_ENDPOINT_X,
+                        getDescriptor().getName(), endpoint.getEndpointURI()), 
+                    e);
             }
         }
     }
@@ -624,8 +628,10 @@ public abstract class AbstractComponent implements UMOComponent
             }
             catch (Exception e)
             {
-                throw new ModelException(new Message(Messages.FAILED_TO_UNREGISTER_X_ON_ENDPOINT_X,
-                    getDescriptor().getName(), endpoint.getEndpointURI()), e);
+                throw new ModelException(
+                    new Message(Messages.FAILED_TO_UNREGISTER_X_ON_ENDPOINT_X,
+                        getDescriptor().getName(), endpoint.getEndpointURI()), 
+                    e);
             }
         }
     }
@@ -685,7 +691,8 @@ public abstract class AbstractComponent implements UMOComponent
                 {
                     throw new ModelException(
                         Message.createStaticMessage("Failed to connect listener "
-                                    + receiver + " for endpoint " + endpoint.getName()), e);
+                                    + receiver + " for endpoint " + endpoint.getName()),
+                        e);
                 }
             }
         }
@@ -709,8 +716,10 @@ public abstract class AbstractComponent implements UMOComponent
                 }
                 catch (Exception e)
                 {
-                    throw new ModelException(Message.createStaticMessage("Failed to disconnect listener "
-                                    + receiver + " for endpoint " + endpoint.getName()), e);
+                    throw new ModelException(
+                        Message.createStaticMessage("Failed to disconnect listener "
+                                    + receiver + " for endpoint " + endpoint.getName()),
+                        e);
                 }
             }
         }

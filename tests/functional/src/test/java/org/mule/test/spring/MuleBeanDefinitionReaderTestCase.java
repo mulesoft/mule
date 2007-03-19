@@ -16,6 +16,7 @@ import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.routing.ForwardingCatchAllStrategy;
 import org.mule.tck.AbstractConfigBuilderTestCase;
 import org.mule.tck.testmodels.mule.TestConnector;
+import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -45,11 +46,11 @@ public class MuleBeanDefinitionReaderTestCase extends AbstractConfigBuilderTestC
     }
 
     // Test spring bean configs
-    public void testConnectorBean()
+    public void testTransformerBean()
     {
-        TestConnector c = (TestConnector)managementContext.getRegistry().lookupConnector("beanConnector");
+        TestCompressionTransformer c = (TestCompressionTransformer)managementContext.getRegistry().lookupTransformer("beanTransformer");
         assertNotNull(c);
-        assertEquals("hello",c.getSomeProperty());
+        assertEquals("hello",c.getBeanProperty1());
     }
 
     public void testEndpointPropertyBean()

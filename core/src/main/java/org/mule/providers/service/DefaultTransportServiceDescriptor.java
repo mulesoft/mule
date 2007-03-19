@@ -84,6 +84,9 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         AbstractBeanFactory beanFactory = (AbstractBeanFactory)appContext.getAutowireCapableBeanFactory();
         context.getBeanFactory().copyConfigurationFrom(beanFactory);
 
+        messageReceiver = props.getProperty(MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS);
+        messageAdapter = props.getProperty(MuleProperties.CONNECTOR_MESSAGE_ADAPTER);
+
         registerService(MuleProperties.CONNECTOR_CLASS, null, false);
         registerService(MuleProperties.CONNECTOR_FACTORY, null, false);
         registerService(MuleProperties.CONNECTOR_DISPATCHER_FACTORY, null, false);
@@ -96,6 +99,13 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         registerService(MuleProperties.CONNECTOR_RESPONSE_TRANSFORMER, null, false);
         registerService(MuleProperties.CONNECTOR_ENDPOINT_BUILDER, null, false);
         registerService(MuleProperties.CONNECTOR_SESSION_HANDLER, MuleSessionHandler.class, false);
+    }
+
+
+    public void initialise() throws InitialisationException
+    {
+        //To change body of implemented methods use File | Settings | File Templates.
+        System.out.println("");
     }
 
     public void setOverrides(Properties props)
@@ -141,31 +151,6 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
 //        }
     }
 
-
-    public void initialise() throws InitialisationException
-    {
-        try
-        {
-            registerService(MuleProperties.CONNECTOR_CLASS, null, false);
-            registerService(MuleProperties.CONNECTOR_FACTORY, null, false);
-            registerService(MuleProperties.CONNECTOR_DISPATCHER_FACTORY, null, false);
-            registerService(MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS, null, false);
-            registerService(MuleProperties.CONNECTOR_TRANSACTED_MESSAGE_RECEIVER_CLASS, null, false);
-            registerService(MuleProperties.CONNECTOR_MESSAGE_ADAPTER, null, false);
-            registerService(MuleProperties.CONNECTOR_STREAM_MESSAGE_ADAPTER, null, false);
-            registerService(MuleProperties.CONNECTOR_INBOUND_TRANSFORMER, null, false);
-            registerService(MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER, null, false);
-            registerService(MuleProperties.CONNECTOR_RESPONSE_TRANSFORMER, null, false);
-            registerService(MuleProperties.CONNECTOR_ENDPOINT_BUILDER, null, false);
-            registerService(MuleProperties.CONNECTOR_SESSION_HANDLER, MuleSessionHandler.class, false);
-
-        }
-        catch (ClassNotFoundException e)
-        {
-            throw new InitialisationException(e, this);
-        }
-
-    }
 
     protected void registerService(String name, Class defaultService, boolean useFactory) throws ClassNotFoundException
     {
@@ -373,25 +358,14 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
      */
     public UMOMessageDispatcherFactory createDispatcherFactory() throws TransportServiceException
     {
-        if (dispatcherFactory != null)
+        try
         {
-            try
-            {
-                return (UMOMessageDispatcherFactory)ClassUtils.instanciateClass(dispatcherFactory,
-                    ClassUtils.NO_ARGS);
-            }
-            catch (Exception e)
-            {
-                throw new TransportServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X,
-                    "Message Dispatcher Factory", dispatcherFactory), e);
-            }
+            return (UMOMessageDispatcherFactory)context.getBean(MuleProperties.CONNECTOR_DISPATCHER_FACTORY);
         }
-        else
+        catch (BeansException e)
         {
-            //Its valide not to have a Dispatcher factory on the transport
+            logger.debug(e.getMessage());
             return null;
-//            throw new TransportServiceException(new Message(Messages.X_NOT_SET_IN_SERVICE_X,
-//                "Message Dispatcher Factory", getService()));
         }
     }
 
@@ -400,21 +374,13 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
      */
     public UMOTransactionFactory createTransactionFactory() throws TransportServiceException
     {
-        if (transactionFactory != null)
+        try
         {
-            try
-            {
-                return (UMOTransactionFactory)ClassUtils.instanciateClass(transactionFactory,
-                    ClassUtils.NO_ARGS);
-            }
-            catch (Exception e)
-            {
-                throw new TransportServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X,
-                    "Transaction Factory", transactionFactory), e);
-            }
+            return (UMOTransactionFactory)context.getBean(MuleProperties.CONNECTOR_TRANSACTION_FACTORY);
         }
-        else
+        catch (BeansException e)
         {
+            logger.debug(e.getMessage());
             return null;
         }
     }

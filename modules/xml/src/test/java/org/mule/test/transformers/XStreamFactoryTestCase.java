@@ -10,15 +10,17 @@
 
 package org.mule.test.transformers;
 
-import junit.framework.TestCase;
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-import com.thoughtworks.xstream.XStream;
-import org.mule.util.StringUtils;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transformers.xml.XStreamFactory;
+import org.mule.util.StringUtils;
+
+import com.thoughtworks.xstream.XStream;
+
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 
 import java.util.Map;
 
-public class XStreamFactoryTestCase extends TestCase
+public class XStreamFactoryTestCase extends AbstractMuleTestCase
 {
 
     public void testConcurrentHashMapConverter()

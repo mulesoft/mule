@@ -16,7 +16,6 @@ import org.mule.config.spring.parsers.EndpointDefinitionParser;
 import org.mule.config.spring.parsers.EndpointRefDefinitionParser;
 import org.mule.config.spring.parsers.FilterDefinitionParser;
 import org.mule.config.spring.parsers.InheritedModelDefinitionParser;
-import org.mule.config.spring.parsers.ModelDefinitionParser;
 import org.mule.config.spring.parsers.PropertiesDefinitionParser;
 import org.mule.config.spring.parsers.RouterDefinitionParser;
 import org.mule.config.spring.parsers.ServiceDescriptorDefinitionParser;
@@ -31,7 +30,11 @@ import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.container.JndiContainerContext;
 import org.mule.impl.container.PropertiesContainerContext;
 import org.mule.impl.container.RmiContainerContext;
+import org.mule.impl.model.direct.DirectModel;
+import org.mule.impl.model.pipeline.PipelineModel;
 import org.mule.impl.model.resolvers.CallableEntryPointResolver;
+import org.mule.impl.model.seda.SedaModel;
+import org.mule.impl.model.seda.optimised.OptimisedSedaModel;
 import org.mule.routing.ForwardingCatchAllStrategy;
 import org.mule.routing.inbound.CorrelationAggregator;
 import org.mule.routing.inbound.CorrelationEventResequencer;
@@ -152,12 +155,12 @@ public class MuleNamespaceHandler extends AbstractHierarchicalNamespaceHandler
         registerBeanDefinitionParser("properties-container", new SingleElementDefinitionParser(PropertiesContainerContext.class, true, "initialise", "dispose"));
 
         //Model Elements
-        registerBeanDefinitionParser("model-seda", new ModelDefinitionParser("seda"));
+        registerBeanDefinitionParser("model-seda", new SingleElementDefinitionParser(SedaModel.class, true, "initialise", "dispose"));
         registerBeanDefinitionParser("model-inherited", new InheritedModelDefinitionParser());
-        registerBeanDefinitionParser("model-seda-optimised", new ModelDefinitionParser("seda-optimised"));
-        registerBeanDefinitionParser("model-simple", new ModelDefinitionParser("simple"));
-        registerBeanDefinitionParser("model-pipeline", new ModelDefinitionParser("pipeline"));
-        registerBeanDefinitionParser("custom-model", new ModelDefinitionParser("custom"));
+        registerBeanDefinitionParser("model-seda-optimised", new SingleElementDefinitionParser(OptimisedSedaModel.class, true, "initialise", "dispose"));
+        registerBeanDefinitionParser("model-simple", new SingleElementDefinitionParser(DirectModel.class, true, "initialise", "dispose"));
+        registerBeanDefinitionParser("model-pipeline", new SingleElementDefinitionParser(PipelineModel.class, true, "initialise", "dispose"));
+        registerBeanDefinitionParser("custom-model", new CustomElementDefinitionParser(true, "initialise", "dispose"));
 
         registerBeanDefinitionParser("component-lifecycle-adapter-factory", new SimpleChildDefinitionParser("lifecycleAdapterFactory", null));
         registerBeanDefinitionParser("callable-entrypoint-resolver", new SimpleChildDefinitionParser("entryPointResolver", CallableEntryPointResolver.class));

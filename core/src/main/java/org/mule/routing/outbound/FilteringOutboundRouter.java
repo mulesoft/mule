@@ -103,8 +103,9 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
             }
             catch (TransformerException e)
             {
-                throw new RoutingException(new Message(Messages.TRANSFORM_FAILED_BEFORE_FILTER), message,
-                    (UMOEndpoint)endpoints.get(0), e);
+                throw new RoutingException(
+                    new Message(Messages.TRANSFORM_FAILED_BEFORE_FILTER), 
+                    message, (UMOEndpoint)endpoints.get(0), e);
             }
         }
         return getFilter().accept(message);
@@ -182,8 +183,9 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
             }
             catch (EndpointException e)
             {
-                throw new CouldNotRouteOutboundMessageException(new Message(
-                    Messages.TEMPLATE_X_CAUSED_MALFORMED_ENDPOINT_X, uri, newUriString), message, ep, e);
+                throw new CouldNotRouteOutboundMessageException(
+                    new Message(Messages.TEMPLATE_X_CAUSED_MALFORMED_ENDPOINT_X, uri, newUriString), 
+                    message, ep, e);
             }
 
             return ep;

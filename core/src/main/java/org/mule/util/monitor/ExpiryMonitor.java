@@ -136,6 +136,7 @@ public class ExpiryMonitor extends TimerTask implements Disposable
             }
             catch (Exception e)
             {
+                // TODO MULE-863: What should we really do?
                 logger.debug(e.getMessage());
             }
         }

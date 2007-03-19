@@ -267,7 +267,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         MuleEndpoint inEndpoint = (MuleEndpoint)descriptor.getInboundRouter().getEndpoint(
             "transactedInboundEndpoint");
         assertNotNull(inEndpoint);
-        assertEquals(TransportFactory.ALWAYS_CREATE_CONNECTOR, inEndpoint.getCreateConnector());
+        assertEquals(TransportFactory.NEVER_CREATE_CONNECTOR, inEndpoint.getCreateConnector());
         assertNotNull(inEndpoint.getProperties());
         assertEquals("Prop1", inEndpoint.getProperties().get("testEndpointProperty"));
     }

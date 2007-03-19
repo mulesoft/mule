@@ -35,12 +35,12 @@
             <artifactId>mule-transport-rmi</artifactId>
             <version>${version}</version>
         </dependency>
-		<dependency>
+        <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-rmi</artifactId>
             <version>${version}</version>
         </dependency>
-		<dependency>
+        <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-ejb_2.1_spec</artifactId>
             <version>1.0.1</version>

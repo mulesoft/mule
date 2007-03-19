@@ -32,11 +32,11 @@ public abstract class AbstractRouter implements UMORouter, ManagementContextAwar
         //template
     }
 
-    public final void doInitialise() throws InitialisationException
-    {
-        //template
-    }
 
+    public void dispose()
+    {
+        // Template
+    }
 
     public void setManagementContext(UMOManagementContext context)
     {

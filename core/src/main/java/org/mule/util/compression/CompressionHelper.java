@@ -55,6 +55,7 @@ public class CompressionHelper
                     }
                     catch (Exception e)
                     {
+                        // TODO MULE-863: What should we really do?  Document this?
                         logger.warn("Failed to build compression strategy: " + e.getMessage());
                     }
                     return null;

@@ -49,6 +49,7 @@
             <id>java14</id>
             <activation>
                 <jdk>1.4</jdk>
+                <activeByDefault>true</activeByDefault>
             </activation>
             <dependencies>
                 <!--
@@ -259,6 +260,11 @@
                     <groupId>commons-collections</groupId>
                     <artifactId>commons-collections</artifactId>
                 </exclusion>
+                <!-- we like slf4j -->
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
                 <!-- We've already got the geronimo-jta spec -->
                 <exclusion>
                     <groupId>javax.transaction</groupId>
@@ -286,6 +292,7 @@
             <version>1.6.5</version>
         </dependency>
 
+        <!-- TODO remove it when JMS tests are moved into the transport project -->
         <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>apache-activemq</artifactId>
@@ -345,13 +352,11 @@
                     <groupId>org.apache.derby</groupId>
                     <artifactId>derbynet</artifactId>
                 </exclusion>
-                <!-- m2 bug - if this transient dependency is excluded, the normal
-                     dependency for spring is not included either.
-                 -->
-                <!--<exclusion>-->
-                    <!--<groupId>org.springframework</groupId>-->
-                    <!--<artifactId>spring</artifactId>-->
-                <!--</exclusion>-->
+                <!-- Mule ships a more recent version -->
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring</artifactId>
+                </exclusion>
                 <exclusion>
                     <groupId>xerces</groupId>
                     <artifactId>xmlParserAPIs</artifactId>
@@ -416,6 +421,10 @@
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>commons-httpclient</groupId>
+                    <artifactId>commons-httpclient</artifactId>
+                </exclusion>
                 <!-- This exclusion is to force use of the new cglib -->
                 <exclusion>
                     <groupId>cglib</groupId>
@@ -433,6 +442,21 @@
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
             <version>3.0.1</version>
+            <exclusions>
+                <!-- we like slf4j -->
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>                
+            </exclusions>
+        </dependency>
+        <!-- Better testing of XML -->        
+        <dependency>
+            <groupId>xmlunit</groupId>
+            <artifactId>xmlunit</artifactId>
+            <version>1.0</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
+
 </project>

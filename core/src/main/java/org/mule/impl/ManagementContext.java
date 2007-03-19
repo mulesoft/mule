@@ -408,6 +408,8 @@ public class ManagementContext implements UMOManagementContext
         {
             System.out.println(getEndSplash());
         }
+        getRegistry().dispose();
+        setRegistry(null);
         config = new MuleConfiguration();
     }
 

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="Default" version="1.0">
+    <description>
+        Testing Web Services
+    </description>
+
+    <mule-environment-properties serverUrl="tcp://localhost:60500"/>
+
+    <model name="Testing_an_xfire_service_using_axis">
+
+        <!--Hosting the XFire service-->
+        <mule-descriptor name="XfireService" implementation="org.mule.tck.testmodels.services.TestComponent">
+            <inbound-router>
+                <endpoint address="xfire:http://localhost:33382/services"/>
+            </inbound-router>
+        </mule-descriptor>
+
+        <!--Accessing an XFire hosted web-service using Axis-->
+        <mule-descriptor name="BridgeToXfireHello" implementation="org.mule.components.simple.BridgeComponent">
+            <inbound-router>
+                <endpoint address="vm://xfire.in"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="axis:http://localhost:33382/services/XfireService?method=receive">
+                        <properties>
+                            <property name="soapAction" value="${methodNamespace}${method}"/>
+                            <map name="soapMethods">
+                                <list name="qname{XfireService:http://www.muleumo.org/}">
+                                    <entry value="s;string;in"/>
+                                    <entry value="return;string"/>
+                                </list>
+                            </map>
+                        </properties>
+                    </endpoint>
+
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+    </model>
+    
+</mule-configuration>

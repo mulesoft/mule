@@ -24,7 +24,7 @@ import java.util.Arrays;
 public class TcpSyncTestCase extends FunctionalTestCase
 {
 
-    private static final String endpointUri = "tcp://localhost:4544";
+    private static final String endpointUri = "tcp://localhost:45441";
 
     protected String getConfigResources()
     {

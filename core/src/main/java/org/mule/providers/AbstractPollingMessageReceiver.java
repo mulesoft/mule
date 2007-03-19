@@ -17,12 +17,13 @@ import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.util.ObjectUtils;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ScheduledFuture;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.resource.spi.work.Work;
@@ -40,8 +41,8 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
 
     protected volatile long frequency = DEFAULT_POLL_FREQUENCY;
 
-    // @GuardedBy(this)
-    protected final List schedules = new ArrayList();
+    // @GuardedBy(itself)
+    protected final List schedules = new LinkedList();
 
     public AbstractPollingMessageReceiver(UMOConnector connector,
                                           UMOComponent component,
@@ -56,7 +57,7 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
     {
         try
         {
-            synchronized (this)
+            synchronized (schedules)
             {
                 // we use scheduleWithFixedDelay to prevent queue-up of tasks when
                 // polling takes longer than the specified frequency, e.g. when the
@@ -65,6 +66,13 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
                 ScheduledFuture schedule = connector.getScheduler().scheduleWithFixedDelay(this,
                     STARTUP_DELAY, frequency, TimeUnit.MILLISECONDS);
                 schedules.add(schedule);
+
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug(ObjectUtils.identityToShortString(this) + " scheduled "
+                                    + ObjectUtils.identityToShortString(schedule) + " with " + frequency
+                                    + "ms polling frequency");
+                }
             }
         }
         catch (Exception ex)
@@ -76,14 +84,21 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
 
     protected void doStop() throws UMOException
     {
-        // cancel our schedules gently: do not interrupt when polling is in progress
-        synchronized (this)
+        synchronized (schedules)
         {
+            // cancel our schedules gently: do not interrupt when polling is in
+            // progress
             for (Iterator i = schedules.iterator(); i.hasNext();)
             {
                 ScheduledFuture schedule = (ScheduledFuture)i.next();
                 schedule.cancel(false);
                 i.remove();
+
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug(ObjectUtils.identityToShortString(this) + " cancelled polling schedule: "
+                                    + ObjectUtils.identityToShortString(schedule));
+                }
             }
         }
     }
@@ -107,7 +122,7 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
             }
             catch (Exception e)
             {
-                handleException(e);
+                this.handleException(e);
             }
         }
     }

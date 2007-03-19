@@ -10,11 +10,6 @@
 
 package org.mule.providers.multicast;
 
-import java.io.IOException;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
-
 import org.mule.providers.udp.UdpMessageDispatcher;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
@@ -28,33 +23,6 @@ public class MulticastMessageDispatcher extends UdpMessageDispatcher
     public MulticastMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
         super(endpoint);
-    }
-
-    protected DatagramSocket createSocket(int port, InetAddress inetAddress) throws IOException
-    {
-        MulticastSocket socket = new MulticastSocket(port);
-        socket.setLoopbackMode(((MulticastConnector)connector).isLoopback());
-        // socket.setBroadcast(connector.getBroadcast());
-        socket.setReceiveBufferSize(connector.getBufferSize());
-        socket.setSendBufferSize(connector.getBufferSize());
-        socket.joinGroup(inetAddress);
-        return socket;
-    }
-
-    protected void doDisconnect() throws Exception
-    {
-        try
-        {
-            if (socket != null)
-            {
-                ((MulticastSocket)socket).leaveGroup(inetAddress);
-            }
-        }
-        catch (IOException e)
-        {
-            logger.error("Failed to leave group: " + inetAddress);
-        }
-        super.doDisconnect();
     }
 
 }

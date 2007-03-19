@@ -87,7 +87,7 @@ public class XFireCustomHttpHeaderTestCase extends FunctionalTestCase implements
 
     protected String getConfigResources()
     {
-        return "mule-xfire-conf.xml";
+        return "xfire-headers-conf.xml";
     }
 
 }

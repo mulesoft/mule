@@ -19,7 +19,6 @@ import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -390,7 +389,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
                 {
                     return methods[i];
                 }
-                else if (Arrays.equals(methods[i].getParameterTypes(), parameterTypes))
+                else if (compare(methods[i].getParameterTypes(), parameterTypes, true))
                 {
                     return methods[i];
                 }

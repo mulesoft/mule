@@ -88,20 +88,21 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements U
 
     public UMOMessage send(UMOSession session, UMOMessage message, UMOEndpoint endpoint) throws UMOException
     {
-
         if (replyTo != null)
         {
             logger.debug("event was dispatched synchronously, but there is a ReplyTo endpoint set, so using asynchronous dispatch");
             dispatch(session, message, endpoint);
             return null;
         }
-        setMessageProperties(session, message, endpoint);
+
+        this.setMessageProperties(session, message, endpoint);
 
         if (logger.isDebugEnabled())
         {
             logger.debug("Message being sent to: " + endpoint.getEndpointURI());
             logger.debug(message);
         }
+
         if (logger.isTraceEnabled())
         {
             try
@@ -113,7 +114,9 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements U
                 // ignore
             }
         }
+
         UMOMessage result = session.sendEvent(message, endpoint);
+
         if (getRouterStatistics() != null)
         {
             if (getRouterStatistics().isEnabled())
@@ -125,19 +128,21 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements U
         if (logger.isDebugEnabled())
         {
             logger.debug("Response message from sending to: " + endpoint.getEndpointURI());
-            logger.debug(message);
+            logger.debug(result);
         }
+
         if (logger.isTraceEnabled())
         {
             try
             {
-                logger.trace("Message payload: \n" + message.getPayloadAsString());
+                logger.trace("Message payload: \n" + result.getPayloadAsString());
             }
             catch (Exception e)
             {
                 // ignore
             }
         }
+
         return result;
     }
 
@@ -298,7 +303,9 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements U
         }
         catch (Exception ex)
         {
-            throw new IllegalArgumentException("Couldn't instanciate property extractor class " + className);
+            throw (IllegalArgumentException)new IllegalArgumentException(
+                "Couldn't instanciate property extractor class " + className
+                ).initCause(ex);
         }
     }
 

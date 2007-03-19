@@ -17,11 +17,6 @@ import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.routing.RoutingException;
 import org.mule.umo.security.UnauthorisedException;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public class StatusCodeMappingsTestCase extends AbstractMuleTestCase
 {
     public void testErrorMappings()

@@ -35,6 +35,7 @@
             <id>java14</id>
             <activation>
                 <jdk>1.4</jdk>
+                <activeByDefault>true</activeByDefault>
             </activation>
             <dependencies>
                 <!-- see mule-module-xml -->
@@ -121,9 +122,21 @@
     </profiles>
     
     <dependencies>
+        <!-- required for the SOAP TCK classes -->
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-client</artifactId>
+            <version>${version}</version>
+        </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-http</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <!-- required with compile-time scope for FunctionalTestCase subclasses -->
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>

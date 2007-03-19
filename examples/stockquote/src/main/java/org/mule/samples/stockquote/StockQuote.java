@@ -10,12 +10,18 @@
 
 package org.mule.samples.stockquote;
 
+import org.mule.config.i18n.Message;
+
+import java.io.Serializable;
+
 /**
  * A stock Quote object that is crated from the xml returned from the
  * http://www.webservicex.net/stockquote.asmx service
  */
-public class StockQuote
+public class StockQuote implements Serializable
 {
+    private static final long serialVersionUID = -3579080716991795218L;
+
     private String symbol;
     private String last;
     private String change;
@@ -129,9 +135,15 @@ public class StockQuote
 
     public String toString()
     {
+        String[] params = { symbol, name, date, last, change, open, high,
+            low, volume, previousClose };
+        return new Message("stockquote-example", 1, params).getMessage();
+
+        /*
         return "StockQuote{" + "symbol=" + symbol + ", name=" + name + ", date=" + date + ", last=" + last
                + ", change=" + change + ", open=" + open + ", high=" + high + ", low=" + low + ", volume="
                + volume + ", previousClose=" + previousClose + "}";
+        */
     }
 
 }

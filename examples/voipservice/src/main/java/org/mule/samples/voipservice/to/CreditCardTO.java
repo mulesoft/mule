@@ -10,6 +10,8 @@
 
 package org.mule.samples.voipservice.to;
 
+import org.mule.config.i18n.Message;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -111,15 +113,15 @@ public class CreditCardTO implements Serializable, Cloneable
         StringBuffer stringBuffer = new StringBuffer();
         if (this.cardNumber != null)
         {
-            stringBuffer.append("[CardNumber : " + cardNumber + "; ");
+            stringBuffer.append(new Message("voip-example", 10, cardNumber).getMessage());
         }
         if (this.validTill != null)
         {
-            stringBuffer.append("ValidTill : " + validTill + "; ");
+            stringBuffer.append(new Message("voip-example", 11, validTill).getMessage());
         }
         if (this.cardType != null)
         {
-            stringBuffer.append("CardType : " + cardType + "]");
+            stringBuffer.append(new Message("voip-example", 12, cardType).getMessage());
         }
         return stringBuffer.toString();
     }

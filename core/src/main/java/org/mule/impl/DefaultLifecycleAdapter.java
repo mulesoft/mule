@@ -122,8 +122,9 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
             }
             catch (Exception e)
             {
-                throw new MuleException(new Message(Messages.FAILED_TO_START_X, "UMO Component: "
-                        + descriptor.getName()), e);
+                throw new MuleException(
+                    new Message(Messages.FAILED_TO_START_X, "UMO Component: " + descriptor.getName()), 
+                    e);
             }
         }
         started = true;
@@ -144,8 +145,9 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
             }
             catch (Exception e)
             {
-                throw new MuleException(new Message(Messages.FAILED_TO_STOP_X, "UMO Component: "
-                        + descriptor.getName()), e);
+                throw new MuleException(
+                    new Message(Messages.FAILED_TO_STOP_X, "UMO Component: " + descriptor.getName()), 
+                    e);
             }
         }
         started = false;
@@ -166,6 +168,7 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
             }
             catch (Exception e)
             {
+                // TODO MULE-863: Handle or fail
                 logger.error("failed to dispose: " + descriptor.getName(), e);
             }
         }
@@ -216,15 +219,17 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
         catch (Exception e)
         {
             // should all Exceptions caught here be a ComponentException?!?
-            throw new ComponentException(new Message(Messages.FAILED_TO_INVOKE_X, component.getClass()
-                    .getName()), invocation.getMessage(), event.getComponent(), e);
+            // TODO MULE-863: See above
+            throw new ComponentException(
+                new Message(Messages.FAILED_TO_INVOKE_X, component.getClass().getName()),
+                invocation.getMessage(), event.getComponent(), e);
         }
 
         UMOMessage resultMessage = null;
         if (result instanceof VoidResult)
         {
-            resultMessage = new MuleMessage(event.getTransformedMessage(), RequestContext.getEventContext()
-                    .getMessage());
+            resultMessage = new MuleMessage(event.getTransformedMessage(), 
+                RequestContext.getEventContext().getMessage());
         }
         else if (result != null)
         {
@@ -277,18 +282,22 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
                     Method setterMethod;
 
 
-                    List methods = ClassUtils.getSatisfiableMethods(component.getClass(), new Class[]{nestedRouter.getInterface()}, true, false, null);
+                    List methods = 
+                        ClassUtils.getSatisfiableMethods(component.getClass(), 
+                            new Class[]{nestedRouter.getInterface()}, true, false, null);
                     if(methods.size()==1)
                     {
                         setterMethod = (Method)methods.get(0);
                     }
                     else if(methods.size() > 1)
                     {
-                        throw new TooManySatisfiableMethodsException(component.getClass(), new Class[]{nestedRouter.getInterface()});
+                        throw new TooManySatisfiableMethodsException(
+                            component.getClass(), new Class[]{nestedRouter.getInterface()});
                     }
                     else
                     {
-                        throw new NoSatisfiableMethodsException(component.getClass(), nestedRouter.getInterface());
+                        throw new NoSatisfiableMethodsException(
+                            component.getClass(), nestedRouter.getInterface());
                     }
 
                     try
@@ -297,8 +306,10 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
                     }
                     catch (Exception e)
                     {
-                        throw new InitialisationException(new Message(Messages.FAILED_TO_SET_PROXY_X_ON_SERVICE_X,
-                                nestedRouter, component.getClass().getName()), this);
+                        throw new InitialisationException(
+                            new Message(Messages.FAILED_TO_SET_PROXY_X_ON_SERVICE_X, 
+                                nestedRouter, component.getClass().getName()), 
+                            e, this);
                     }
 
                 }

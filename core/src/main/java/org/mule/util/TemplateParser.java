@@ -232,6 +232,8 @@ public class TemplateParser
 
     public boolean isContainsTemplate(String value)
     {
+        if(value==null) return false;
+
         Matcher m = pattern.matcher(value);
         return m.find();
     }

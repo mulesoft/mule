@@ -15,7 +15,6 @@ import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
 /**
@@ -25,12 +24,14 @@ public class ConfigurationDefinitionParser extends AbstractMuleSingleBeanDefinit
 {
 
     public static final String ATTRIBUTE_SERVER_ID = "serverId";
-    public static final String CONFIG_POSTFIX = ".config";
+    public static final String CONFIG_ID = "_muleConfiguration";
+    private String parent;
 
 
     public ConfigurationDefinitionParser()
     {
-       registerAttributeMapping(ATTRIBUTE_SERVER_ID, ATTRIBUTE_ID);
+        registerAttributeMapping(ATTRIBUTE_SERVER_ID, ATTRIBUTE_ID);
+        singleton=true;
     }
 
     protected Class getBeanClass(Element element)
@@ -39,21 +40,21 @@ public class ConfigurationDefinitionParser extends AbstractMuleSingleBeanDefinit
     }
 
 
-    //@Override
-    protected void processProperty(Attr attribute, BeanDefinitionBuilder builder)
+    //@java.lang.Override
+    protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
-        if(attribute.getNodeName().equals(ATTRIBUTE_SERVER_ID))
+        if(parent==null)
         {
-            attribute.setValue(attribute.getValue() + CONFIG_POSTFIX);
+            builder.addPropertyValue(ATTRIBUTE_ID, CONFIG_ID);
+            parent = CONFIG_ID;
         }
-            super.processProperty(attribute, builder);
+        super.doParse(element, parserContext, builder);
     }
-
 
     //@Override
     protected String resolveId(Element element, AbstractBeanDefinition definition, ParserContext parserContext) throws BeanDefinitionStoreException
     {
-        return element.getAttribute(ATTRIBUTE_SERVER_ID);
+        return CONFIG_ID;
     }
 
 
@@ -67,5 +68,18 @@ public class ConfigurationDefinitionParser extends AbstractMuleSingleBeanDefinit
     protected String getDisposeMethodName()
     {
         return null;
+    }
+
+    //@java.lang.Override
+    protected BeanDefinitionBuilder createBeanDefinitionBuilder(Element element, Class beanClass)
+    {
+        if(parent!=null)
+        {
+            return BeanDefinitionBuilder.childBeanDefinition(parent);
+        }
+        else
+        {
+            return super.createBeanDefinitionBuilder(element, beanClass);
+        }
     }
 }

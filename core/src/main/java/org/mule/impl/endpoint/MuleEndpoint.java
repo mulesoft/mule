@@ -20,6 +20,7 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOTransactionConfig;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
@@ -93,6 +94,17 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint, 
         if (endpointUri != null)
         {
             properties.putAll(endpointUri.getParams());
+        }
+        if(initialised.get())
+        {
+            try
+            {
+                endpointUri.initialise();
+            }
+            catch (InitialisationException e)
+            {
+                throw new EndpointException(e);
+            }
         }
     }
 

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="HTTP_Polling_Config" version="1.0">
+
+    <connector name="PollingHttpConnector" className="org.mule.providers.http.HttpConnector">
+        <properties>
+            <map name="serviceOverrides">
+                <property name="message.receiver" value="org.mule.providers.http.PollingHttpMessageReceiver"/>
+            </map>
+        </properties>
+    </connector>
+
+    <connector name="vmQueue" className="org.mule.providers.vm.VMConnector">
+        <properties>
+            <property name="queueEvents" value="true"/>
+        </properties>
+    </connector>
+
+    <!--
+        This uses the polling HTTP connector every 30 seconds
+    -->
+    <model name="http polling test model">
+
+        <mule-descriptor name="pollingUMO" implementation="org.mule.tck.functional.FunctionalTestComponent">
+            <inbound-router>
+                <endpoint address="http://marie:marie@localhost:4567" connector="PollingHttpConnector">
+                    <properties>
+                        <property value="300000" name="pollingFrequency"/>
+                    </properties>
+                </endpoint>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="vm://toclient"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+    </model>
+</mule-configuration>

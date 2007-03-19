@@ -21,6 +21,12 @@ public class TcpMessageAdapterTestCase extends AbstractMessageAdapterTestCase
         return "Hello".getBytes();
     }
 
+    public void testMessageRetrieval() throws Exception
+    {
+        // TODO SF do we really need to remove test, since now we can handle Objects
+        // so there are no invalid types
+    }
+
     public UMOMessageAdapter createAdapter(Object payload) throws MessagingException
     {
         return new TcpMessageAdapter(payload);

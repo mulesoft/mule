@@ -10,8 +10,7 @@
 
 package org.mule.samples.errorhandler;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.mule.config.i18n.Message;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.Callable;
@@ -19,6 +18,9 @@ import org.mule.util.StringMessageUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>BusinessErrorManager</code> TODO (document class)
@@ -41,9 +43,10 @@ public class BusinessErrorManager implements Callable
         ErrorMessage msg = (ErrorMessage)context.getTransformedMessage();
         // Do something with the error message
         List msgs = new ArrayList();
-        msgs.add("Received Error Message in the Sample Business Error Manager.");
-        msgs.add("Error is: " + msg.getException().getDetailMessage());
-        msgs.add("Error class: " + msg.getException().getClass().getName());
+
+        msgs.add(new Message("errorhandler-example", 3).getMessage());
+        msgs.add(new Message("errorhandler-example", 4, msg.getException().getDetailMessage()).getMessage());
+        msgs.add(new Message("errorhandler-example", 5, msg.getException().getClass().getName()).getMessage());
 
         logger.info("\n" + StringMessageUtils.getBoilerPlate(msgs, '*', 80));
         context.setStopFurtherProcessing(true);

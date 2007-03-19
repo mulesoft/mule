@@ -38,7 +38,13 @@ public class SimpleRetryConnectionStrategy extends AbstractConnectionStrategy
             ((AtomicInteger)get()).set(0);
         }
 
-        // //@Override
+        //@Override
+        public AtomicInteger current()
+        {
+            return (AtomicInteger) get();
+        }
+
+        // @Override
         protected Object initialValue()
         {
             return new AtomicInteger(0);
@@ -54,7 +60,7 @@ public class SimpleRetryConnectionStrategy extends AbstractConnectionStrategy
     {
         while (true)
         {
-            int currentCount = retryCounter.countRetry();
+            retryCounter.countRetry();
 
             try
             {
@@ -69,16 +75,24 @@ public class SimpleRetryConnectionStrategy extends AbstractConnectionStrategy
             {
                 // If we were interrupted it's probably because the server is
                 // shutting down
-                throw new FatalConnectException(new Message(Messages.RECONNECT_STRATEGY_X_FAILED_ENDPOINT_X,
-                    getClass().getName(), getDescription(connectable)), ie, connectable);
+                throw new FatalConnectException(
+                    new Message(Messages.RECONNECT_STRATEGY_X_FAILED_ENDPOINT_X, 
+                        getClass().getName(), getDescription(connectable)), 
+                    ie, connectable);
             }
             catch (Exception e)
             {
-                if (currentCount == retryCount)
+                if (e instanceof FatalConnectException)
                 {
-                    throw new FatalConnectException(new Message(
-                        Messages.RECONNECT_STRATEGY_X_FAILED_ENDPOINT_X, getClass().getName(),
-                        getDescription(connectable)), e, connectable);
+                    // rethrow
+                    throw (FatalConnectException) e;
+                }
+                if (retryCounter.current().get() >= retryCount)
+                {
+                    throw new FatalConnectException(
+                        new Message(Messages.RECONNECT_STRATEGY_X_FAILED_ENDPOINT_X, 
+                            getClass().getName(), getDescription(connectable)),
+                        e, connectable);
                 }
 
                 if (logger.isErrorEnabled())
@@ -94,7 +108,7 @@ public class SimpleRetryConnectionStrategy extends AbstractConnectionStrategy
                 if (logger.isInfoEnabled())
                 {
                     logger.info("Waiting for " + frequency + "ms before reconnecting. Failed attempt "
-                                + currentCount + " of " + retryCount);
+                                + retryCounter.current().get() + " of " + retryCount);
                 }
 
                 try
@@ -103,9 +117,10 @@ public class SimpleRetryConnectionStrategy extends AbstractConnectionStrategy
                 }
                 catch (InterruptedException e1)
                 {
-                    throw new FatalConnectException(new Message(
-                        Messages.RECONNECT_STRATEGY_X_FAILED_ENDPOINT_X, getClass().getName(),
-                        getDescription(connectable)), e, connectable);
+                    throw new FatalConnectException(
+                        new Message(Messages.RECONNECT_STRATEGY_X_FAILED_ENDPOINT_X, 
+                            getClass().getName(), getDescription(connectable)), 
+                        e, connectable);
                 }
             }
         }

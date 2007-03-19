@@ -39,12 +39,12 @@
 
     <global-endpoints>
         <endpoint name="foo" address="test://foo" connector="testConnector" transformers="testTransformer">
-            <connection-strategy className="org.mule.providers.SimpleRetryConnectionStrategy">
-                <properties>
-                    <property name="retryCount" value="4"/>
-                    <property name="retryFrequency" value="3000"/>
-                </properties>
-            </connection-strategy>
+            <!--<connection-strategy className="org.mule.providers.SimpleRetryConnectionStrategy">-->
+                <!--<properties>-->
+                    <!--<property name="retryCount" value="4"/>-->
+                    <!--<property name="retryFrequency" value="3000"/>-->
+                <!--</properties>-->
+            <!--</connection-strategy>-->
         </endpoint>
     </global-endpoints>
 

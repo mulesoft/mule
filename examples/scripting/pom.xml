@@ -30,18 +30,5 @@
             <artifactId>mule-module-scripting</artifactId>
             <version>${version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.sun.script</groupId>
-            <artifactId>groovy</artifactId>
-            <version>20061114</version>
-            <classifier>jdk14</classifier>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>groovy</groupId>
-            <artifactId>groovy-all</artifactId>
-            <version>1.0</version>
-            <scope>provided</scope>
-        </dependency>
     </dependencies>
 </project>

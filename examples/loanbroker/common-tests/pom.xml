@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.mule.examples</groupId>
+        <artifactId>mule-example-loanbroker-parent</artifactId>
+        <version>1.4-SNAPSHOT</version>
+    </parent>
+    <artifactId>mule-example-loanbroker-common-tests</artifactId>
+    <packaging>jar</packaging>
+    <name>Loan Broker Example: Shared classes for unit tests</name>
+    <dependencies>
+        <dependency>
+            <groupId>org.mule.examples</groupId>
+            <artifactId>mule-example-loanbroker-common</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <!-- This should have been pulled in as a transitive dependency from mule-tests-functional but it looks 
+        	like it's yet another m2 workaround. -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.2</version>
+        </dependency>
+    </dependencies>
+</project>

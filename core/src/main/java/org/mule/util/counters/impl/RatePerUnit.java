@@ -16,23 +16,19 @@ import java.security.InvalidParameterException;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-/**
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
- */
 public class RatePerUnit extends AggregateCounter
 {
 
     private static class Sample
     {
+        private double value;
+        private long time;
+
         public Sample(double value, long time)
         {
             this.value = value;
             this.time = time;
         }
-
-        private double value;
-        private long time;
 
         /**
          * @return the time of the sample
@@ -49,17 +45,17 @@ public class RatePerUnit extends AggregateCounter
         {
             return value;
         }
-
     }
 
-    private LinkedList samples;
-    private long unit;
-    private long length;
-    private long baseTime;
+    private final LinkedList samples;
+    private final long unit;
+    private final long length;
+    private final long baseTime;
 
     public RatePerUnit(String name, String p, Type type, AbstractCounter base)
     {
         super(name, type, base);
+
         if (type == Type.RATE_PER_SECOND)
         {
             unit = 1000;
@@ -76,20 +72,29 @@ public class RatePerUnit extends AggregateCounter
         {
             throw new InvalidParameterException();
         }
+
+        long newLength = 0;
+
         try
         {
-            length = Long.parseLong(p);
+            newLength = Long.parseLong(p);
         }
         catch (Exception e)
         {
-            length = 0;
+            newLength = 0;
         }
-        if (length <= 0)
+        finally
         {
-            length = 128;
+            if (newLength <= 0)
+            {
+                newLength = 128;
+            }
+
+            length = newLength;
         }
+
         samples = new LinkedList();
-        this.baseTime = System.currentTimeMillis();
+        baseTime = System.currentTimeMillis();
     }
 
     public double nextValue()
@@ -123,7 +128,7 @@ public class RatePerUnit extends AggregateCounter
         long t = getTime();
         if (l == null || t > l.time)
         {
-            Sample s = new Sample(getBase().nextValue(), t);
+            Sample s = new Sample(this.getBase().nextValue(), t);
             samples.addFirst(s);
         }
         else

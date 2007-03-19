@@ -245,6 +245,14 @@ div.tableheader {
 }
 
 
+div.tablesubheader {
+    font-weight: bold;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    font-size: 12px;
+}
+
+
 td.mbean_row {
     font-size: 12px;
     padding-left: 10px;
@@ -260,6 +268,31 @@ td.aggregationrow {
 td.constructorrow {
     font-size: 12px;
     padding-left: 10px;
+}
+
+
+td.statistics {
+    background: #778899;
+    color: #ffffff;
+    height: 20px;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-weight: bold;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+
+td.statisticsrow {
+    font-size: 12px;
+    white-space: nowrap;
+    padding-left: 10px;
+    vertical-align: top;
+}
+
+
+td.statisticssubrow {
+    font-size: 12px;
 }
 
 

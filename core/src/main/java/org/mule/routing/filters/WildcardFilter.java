@@ -52,6 +52,7 @@ public class WildcardFilter implements UMOFilter, ObjectFilter
         }
         catch (Exception e)
         {
+            // TODO MULE-863: If this is OK, do we need to log?
             logger.warn("An exception occured while filtering", e);
             return false;
         }

@@ -159,6 +159,7 @@ public class ServerNotificationManager implements Work, Disposable, ManagementCo
             {
                 if (!disposed)
                 {
+                    // TODO MULE-863: Is this sufficient?  Necessary?
                     logger.error("Failed to queue notification: " + notification, e);
                 }
             }
@@ -226,6 +227,7 @@ public class ServerNotificationManager implements Work, Disposable, ManagementCo
             {
                 if (!disposed)
                 {
+                    // TODO MULE-863: Is this sufficient?  Necessary? 
                     logger.error("Failed to take notification from queue", e);
                 }
             }

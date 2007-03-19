@@ -18,16 +18,16 @@ import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 
 public class TestComponent implements Callable
 {
-    protected static final CountDownLatch QuartzCounter = new CountDownLatch(4);
+    protected static final CountDownLatch QUARTZ_COUNTER = new CountDownLatch(4);
 
     public Object onCall(UMOEventContext eventContext) throws Exception
     {
         if (eventContext.getMessageAsString().equals("quartz test") ||
             (eventContext.getMessage().getPayload() instanceof NullPayload )) 
         {
-            if (QuartzCounter != null)
+            if (QUARTZ_COUNTER != null)
             {
-                QuartzCounter.countDown();
+                QUARTZ_COUNTER.countDown();
             }
             else
             {

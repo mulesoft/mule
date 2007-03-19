@@ -162,7 +162,9 @@ public class XaTransaction extends AbstractTransaction
         }
         catch (SystemException e)
         {
-            throw new IllegalStateException("Failed to set transaction to rollback only: " + e.getMessage());
+            throw (IllegalStateException)new IllegalStateException(
+                "Failed to set transaction to rollback only: " + e.getMessage()
+                ).initCause(e);
         }
     }
 

@@ -10,21 +10,16 @@
 
 package org.mule.providers.http.transformers;
 
-import junit.framework.TestCase;
-
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpVersion;
 import org.mule.providers.http.HttpConstants;
 import org.mule.providers.http.HttpResponse;
 import org.mule.providers.http.ResponseWriter;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.transformer.TransformerException;
 
-/**
- * Test case for HttpResponseToString transformer
- * 
- * @author <a href="mailto:mlusetti@gmail.com">Massimo Lusetti</a>
- */
-public class HttpResponseToStringTestCase extends TestCase
+import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HttpVersion;
+
+public class HttpResponseToStringTestCase extends AbstractMuleTestCase
 {
     private final String _statusLine = "HTTP/1.1 200 OK";
     private final String _headerCT = "Content-Type: text/plain";
@@ -41,9 +36,10 @@ public class HttpResponseToStringTestCase extends TestCase
 
     private HttpResponse _resp = null;
 
-    protected void setUp() throws Exception
+    // @Override
+    protected void doSetUp() throws Exception
     {
-        super.setUp();
+        super.doSetUp();
 
         _resp = new HttpResponse();
         _resp.setStatusLine(new HttpVersion(1, 1), 200);

@@ -114,7 +114,7 @@
             <mule:inbound-router>
 
                 <mule:forwarding-catch-all-strategy>
-                    <mule:endpoint address="test://catch.all"/>
+                    <mule:endpoint address="test2://catch.all"/>
                 </mule:forwarding-catch-all-strategy>
                 <mule:endpoint name="Orange" address="test://orange/" transformers="TestCompressionTransformer"
                                responseTransformers="TestCompressionTransformer"/>

@@ -13,14 +13,10 @@ package org.mule.util.counters.impl;
 import org.mule.util.counters.Counter;
 import org.mule.util.counters.CounterFactory.Type;
 
-/**
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
- */
 public abstract class AggregateCounter extends AbstractCounter
 {
 
-    private Counter base;
+    private final Counter base;
 
     public AggregateCounter(String name, Type type, AbstractCounter base)
     {
@@ -49,10 +45,10 @@ public abstract class AggregateCounter extends AbstractCounter
         throw new UnsupportedOperationException();
     }
 
-    public void compute()
+    public final synchronized void compute()
     {
-        doCompute();
-        propagate();
+        this.doCompute();
+        this.propagate();
     }
 
     public Counter getBase()

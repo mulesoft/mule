@@ -83,8 +83,9 @@ public abstract class AbstractJndiConnector extends AbstractConnector
         }
         catch (Exception e)
         {
-            throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X,
-                "AbstractJndiConnector"), e, this);
+            throw new InitialisationException(
+                new Message(Messages.FAILED_TO_CREATE_X, "AbstractJndiConnector"), 
+                e, this);
         }
 
         return jndiContext;

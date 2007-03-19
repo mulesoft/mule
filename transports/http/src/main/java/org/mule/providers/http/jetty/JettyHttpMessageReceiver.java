@@ -39,7 +39,7 @@ import org.mortbay.util.InetAddrPort;
  */
 public class JettyHttpMessageReceiver extends AbstractMessageReceiver
 {
-    public static final String JETTY_SERVLET_CONNECTOR_NAME= "_jettyConnector";
+    public static final String JETTY_SERVLET_CONNECTOR_NAME = "_jettyConnector";
 
     private Server httpServer;
 

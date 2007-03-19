@@ -20,7 +20,7 @@
 
             <mule:inbound-router>
                 <mule:endpoint name="nonTransactedInboundEndpoint" address="test://endpoint.in3"/>
-                <mule:endpoint name="transactedInboundEndpoint" createConnector="ALWAYS_CREATE" address="test://endpoint.in2">
+                <mule:endpoint name="transactedInboundEndpoint" createConnector="NEVER_CREATE" address="test://endpoint.in2">
                     <mule:transaction factory="org.mule.tck.testmodels.mule.TestTransactionFactory" action="ALWAYS_BEGIN"/>
                     <property name="properties">
                         <map>

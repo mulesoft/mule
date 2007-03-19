@@ -76,7 +76,7 @@ public class FTPConnectorTestCase extends AbstractConnectorTestCase
 
         Properties props = new Properties();
         // Endpoint wants String-typed properties
-        props.put(FtpConnector.PROPERTY_POLLING_FREQUENCY, "" + POLLING_FREQUENCY_OVERRIDE);
+        props.put(FtpConnector.PROPERTY_POLLING_FREQUENCY, String.valueOf(POLLING_FREQUENCY_OVERRIDE));
         endpoint.setProperties(props);
 
         UMOComponent component = getTestComponent(descriptor);

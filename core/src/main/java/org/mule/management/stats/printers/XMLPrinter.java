@@ -17,6 +17,9 @@ import org.mule.util.StringUtils;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.StringTokenizer;
 
 
 /**
@@ -42,7 +45,7 @@ public class XMLPrinter extends AbstractTablePrinter
 
     public String[] getHeaders()
     {
-        String[] column = new String[36];
+        String[] column = new String[42];
         column[0] = "Component Name";
         column[1] = "Component Pool Max Size";
         column[2] = "Component Pool Size";
@@ -70,15 +73,21 @@ public class XMLPrinter extends AbstractTablePrinter
         column[24] = "Total Routed";
         column[25] = "Not Routed";
         column[26] = "Caught Events";
-        column[27] = "Router";
-        column[28] = "Router";
-        column[29] = "Type";
-        column[30] = "Total Received";
-        column[31] = "Total Routed";
-        column[32] = "Not Routed";
-        column[33] = "Caught Events";
-        column[34] = "Router";
-        column[35] = "Sample Period";
+        column[27] = "Providers";
+        column[28] = "";
+        column[29] = "Providers";
+        column[30] = "Router";
+        column[31] = "Router";
+        column[32] = "Type";
+        column[33] = "Total Received";
+        column[34] = "Total Routed";
+        column[35] = "Not Routed";
+        column[36] = "Caught Events";
+        column[37] = "Providers";
+        column[38] = "";
+        column[39] = "Providers";
+        column[40] = "Router";
+        column[41] = "Sample Period";
         return column;
     }
     
@@ -99,7 +108,31 @@ public class XMLPrinter extends AbstractTablePrinter
         col[index++] = String.valueOf(stats.getNotRouted());
         col[index++] = String.valueOf(stats.getCaughtMessages());
 
-        return ++index;
+        index++;
+        Map routed = stats.getRouted();
+        if (!routed.isEmpty())
+        {
+            Iterator it = routed.entrySet().iterator();
+
+            StringBuffer buf = new StringBuffer(40);
+            while (it.hasNext())
+            {
+                Map.Entry e = (Map.Entry)it.next();
+                buf.append(e.getKey()).append('=').append(e.getValue());
+                if (it.hasNext())
+                {
+                    buf.append(';');
+                }
+            }
+            col[index++] = buf.toString();
+        }
+        else
+        {
+            col[index++] = "";
+        }
+        index += 2;
+
+        return index;
     }
 
     public void print(Collection stats)
@@ -108,6 +141,7 @@ public class XMLPrinter extends AbstractTablePrinter
         println("<Components>");
         String[][] table = getTable(stats);
         boolean router = false;
+        boolean providers = false;
 
         int indentLevel = 1;
 
@@ -119,7 +153,7 @@ public class XMLPrinter extends AbstractTablePrinter
             {
                 if (StringUtils.equals(table[0][j], "Router"))
                 {
-                    if (!router)         
+                    if (!router)
                     {
                         println("<Router type=\"" + table[i][++j] + "\">", indentLevel);
                         indentLevel++;
@@ -132,10 +166,40 @@ public class XMLPrinter extends AbstractTablePrinter
                         router = false;
                     }
                 }
+                else if (StringUtils.equals(table[0][j], "Providers"))
+                {
+                    if (StringUtils.isEmpty(table[i][j + 1]) && StringUtils.equals(table[0][j + 2], "Providers"))
+                    {
+                        println("<Providers/>", indentLevel);
+                        j += 2;
+                    }
+                    else
+                    {
+                        if (!providers)
+                        {
+                            println("<Providers>", indentLevel);
+                            indentLevel++;
+                            providers = true;
+                        }
+                        else
+                        {
+                            indentLevel--;
+                            println("</Providers>", indentLevel);
+                            providers = false;
+                        }
+                    }
+                }
                 else
                 {
-                    println("<Statistic name=\"" + table[0][j] + "\" value=\"" + table[i][j] + "\"/>",
-                            indentLevel);
+                    if (providers)
+                    {
+                        printProviderStatsXml(table[i][j], indentLevel);
+                    }
+                    else
+                    {
+                        println("<Statistic name=\"" + table[0][j] + "\" value=\"" + table[i][j] + "\"/>",
+                                indentLevel);
+                    }
                 }
             }
             indentLevel--;
@@ -149,5 +213,43 @@ public class XMLPrinter extends AbstractTablePrinter
     {
         final String indent = StringUtils.repeat(' ', indentLevel * XML_INDENT_SIZE);
         println(indent + s);
+    }
+
+    protected void printProviderStatsXml(String stats, int indentLevel)
+    {
+        if (StringUtils.isBlank(stats))
+        {
+            return;
+        }
+
+        StringTokenizer st = new StringTokenizer(stats, ";");
+
+        if (st.countTokens() == 0)
+        {
+            StringBuffer buf = new StringBuffer();
+            buf.append("<Provider name=\"");
+            int i = stats.indexOf("=");
+            buf.append(stats.substring(0, i));
+            buf.append("\" value=\"");
+            buf.append(stats.substring(i + 1));
+            buf.append("\"/>");
+            println(buf.toString(), indentLevel);
+        }
+        else
+        {
+            String token;
+            while (st.hasMoreTokens())
+            {
+                StringBuffer buf = new StringBuffer();
+                token = st.nextToken();
+                buf.append("<Provider name=\"");
+                int i = token.indexOf("=");
+                buf.append(token.substring(0, i));
+                buf.append("\" value=\"");
+                buf.append(token.substring(i + 1));
+                buf.append("\"/>");
+                println(buf.toString(), indentLevel);
+            }
+        }
     }
 }

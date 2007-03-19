@@ -28,6 +28,7 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.LifecycleException;
+import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.routing.RoutingException;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
@@ -47,7 +48,7 @@ import org.apache.commons.logging.LogFactory;
  * this exception listener and provides an implementation for dispatching exception
  * events from this Listener.
  */
-public abstract class AbstractExceptionListener implements ExceptionListener, Initialisable, ManagementContextAware
+public abstract class AbstractExceptionListener implements ExceptionListener, Initialisable, Disposable, ManagementContextAware
 {
     /**
      * logger used by this class
@@ -337,6 +338,12 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
     public boolean isInitialised()
     {
         return initialised.get();
+    }
+
+
+    public void dispose()
+    {
+        // Template method
     }
 
     /**

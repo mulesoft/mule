@@ -295,9 +295,15 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             // null or throws an exception if the file is already locked.
             lock = channel.tryLock();
         }
+        catch (FileNotFoundException fnfe)
+        {
+           logger.warn("Unable to open " + sourceFile.getAbsolutePath(), fnfe);
+        }
         catch (IOException e)
         {
-            // unable to create a lock
+            // Unable to create a lock. This exception should only be thrown when
+            // the file is already locked. No sense in repeating the message over
+            // and over.
         }
         finally {
             if (lock != null)

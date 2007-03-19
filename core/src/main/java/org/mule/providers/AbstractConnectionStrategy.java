@@ -13,6 +13,7 @@ package org.mule.providers;
 import org.mule.umo.manager.UMOWorkManager;
 import org.mule.umo.provider.UMOConnectable;
 import org.mule.umo.provider.UMOMessageReceiver;
+import org.mule.umo.provider.UMOConnector;
 
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
@@ -34,6 +35,8 @@ public abstract class AbstractConnectionStrategy implements ConnectionStrategy
 
     private UMOWorkManager workManager;
 
+    private final Object reconnectLock = new Object();
+
     public final void connect(final UMOConnectable connectable) throws FatalConnectException
     {
         if (doThreading)
@@ -51,29 +54,36 @@ public abstract class AbstractConnectionStrategy implements ConnectionStrategy
                     {
                         try
                         {
-                            synchronized (this)
+                            synchronized (reconnectLock)
                             {
                                 doConnect(connectable);
                             }
                         }
                         catch (FatalConnectException e)
                         {
-                            synchronized (this)
+                            synchronized (reconnectLock)
                             {
                                 resetState();
                             }
+                            // TODO should really extract an interface for
+                            // classes capable of handling an exception
+                            if (connectable instanceof UMOConnector) {
+                                ((UMOConnector) connectable).handleException(e);
+                            }
                             // TODO: this cast is evil
-                            if (connectable instanceof AbstractMessageReceiver)
+                            else if (connectable instanceof AbstractMessageReceiver)
                             {
                                 ((AbstractMessageReceiver)connectable).handleException(e);
                             }
+                            // TODO MULE-863: And if it's not?
+                            // AP if it's not, it's not handled and Mule just sits doing nothing
                         }
                     }
                 });
             }
             catch (WorkException e)
             {
-                synchronized (this)
+                synchronized (reconnectLock)
                 {
                     resetState();
                 }
@@ -84,14 +94,14 @@ public abstract class AbstractConnectionStrategy implements ConnectionStrategy
         {
             try
             {
-                synchronized (this)
+                synchronized (reconnectLock)
                 {
                     doConnect(connectable);
                 }
             }
             finally
             {
-                synchronized (this)
+                synchronized (reconnectLock)
                 {
                     resetState();
                 }

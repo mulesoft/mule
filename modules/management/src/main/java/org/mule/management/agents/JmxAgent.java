@@ -107,6 +107,7 @@ public class JmxAgent extends AbstractAgent
     private JmxSupportFactory jmxSupportFactory = AutoDiscoveryJmxSupportFactory.getInstance();
     private JmxSupport jmxSupport = jmxSupportFactory.getJmxSupport();
 
+
     /**
      * Username/password combinations for JMX Remoting
      * authentication.
@@ -123,6 +124,7 @@ public class JmxAgent extends AbstractAgent
     public JmxAgent()
     {
         super("JMX Agent");
+        connectorServerProperties = new HashMap(DEFAULT_CONNECTOR_SERVER_PROPERTIES);
     }
 
     /** {@inheritDoc}
@@ -133,7 +135,7 @@ public class JmxAgent extends AbstractAgent
     {
         if (connectorServerUrl != null)
         {
-            return "JMX Agent: " + connectorServerUrl;
+            return name + ": " + connectorServerUrl;
         }
         else
         {
@@ -536,7 +538,8 @@ public class JmxAgent extends AbstractAgent
     /**
      * Setter for property 'connectorServerProperties'. Set to
      * {@code null} to use defaults ({@link #DEFAULT_CONNECTOR_SERVER_PROPERTIES}).
-     * Pass in an empty map to use no parameters.
+     * Pass in an empty map to use no parameters. Passing a non-empty map will
+     * replace defaults.
      *
      * @param connectorServerProperties Value to set for property 'connectorServerProperties'.
      */

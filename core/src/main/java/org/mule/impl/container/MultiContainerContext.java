@@ -28,7 +28,7 @@ import org.apache.commons.logging.LogFactory;
  * <code>MultiContainerContext</code> is a container that hosts other containers
  * from which components are queried.
  */
-public class MultiContainerContext extends AbstractContainerContext
+public class MultiContainerContext implements UMOContainerContext
 {
     /**
      * logger used by this class
@@ -40,13 +40,12 @@ public class MultiContainerContext extends AbstractContainerContext
 
     public MultiContainerContext()
     {
-        super("multi");
         addContainer(new MuleContainerContext());
     }
 
     public void setName(String name)
     {
-        this.name = name;
+        // noop
     }
 
     public String getName()
@@ -66,14 +65,17 @@ public class MultiContainerContext extends AbstractContainerContext
 
     public UMOContainerContext removeContainer(String name)
     {
-        return (UMOContainerContext)containers.remove(name);
+        return (UMOContainerContext) containers.remove(name);
     }
 
     public Object getComponent(Object key) throws ObjectNotFoundException
     {
-        // first see if a particular container has been requested
         ContainerKeyPair realKey = null;
-        String cause = null;
+        StringBuffer cause = new StringBuffer();
+        Throwable finalCause = null;
+
+        // first see if a particular container has been requested
+        // TODO MULE-863: possible class cast exception below.  Document?
         if (key instanceof String)
         {
             realKey = new ContainerKeyPair(null, key);
@@ -100,20 +102,34 @@ public class MultiContainerContext extends AbstractContainerContext
 
         for (Iterator iterator = containers.values().iterator(); iterator.hasNext();)
         {
-            container = (UMOContainerContext)iterator.next();
+            container = (UMOContainerContext) iterator.next();
             try
             {
                 component = container.getComponent(realKey);
             }
             catch (ObjectNotFoundException e)
             {
-                if (logger.isDebugEnabled())
+                if (e.getCause() != null)
                 {
-                    logger.debug("Object: '" + realKey + "' not found in container: " + container.getName() + ": " + e.getMessage());
+                    finalCause = e.getCause();
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Object: '" + realKey + "' not found in container: " + container.getName());
+                    }
+                } else
+                {
+                    finalCause = e;
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Object: '" + realKey + "' not found in container: " + container.getName());
+                    }
                 }
-                if (e.getCause() != null){
-                    cause = cause + " " + e.getCause().toString();
+
+                if (cause.length() > 0)
+                {
+                    cause.append("; ");
                 }
+                cause.append(finalCause.toString());
             }
             if (component != null)
             {
@@ -124,11 +140,12 @@ public class MultiContainerContext extends AbstractContainerContext
                 break;
             }
         }
+
         if (component == null)
         {
             if (realKey.isRequired())
             {
-                throw new ObjectNotFoundException(realKey.toString() + " " + cause);
+                throw new ObjectNotFoundException(realKey.toString() + " " + cause, finalCause);
             }
             else if (logger.isDebugEnabled())
             {
@@ -139,6 +156,10 @@ public class MultiContainerContext extends AbstractContainerContext
         return component;
     }
 
+    public void configure(Reader configuration, String doctype, String encoding) throws ContainerException
+    {
+        // noop
+    }
 
     public void dispose()
     {
@@ -152,19 +173,9 @@ public class MultiContainerContext extends AbstractContainerContext
         containers = null;
     }
 
-
-    //@Override
     public void initialise() throws InitialisationException
     {
-        for (Iterator iterator = containers.values().iterator(); iterator.hasNext();)
-        {
-            UMOContainerContext context = (UMOContainerContext) iterator.next();
-            context.initialise();
-        }
+        // no op
     }
 
-    public void configure(Reader configuration) throws ContainerException
-    {
-        //noop
-    }
 }

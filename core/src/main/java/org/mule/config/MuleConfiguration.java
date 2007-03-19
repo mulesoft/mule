@@ -394,7 +394,8 @@ public class MuleConfiguration
                         }
                         catch (IOException e1)
                         {
-                            e1.printStackTrace();
+                            // TODO MULE-863: Is this sufficient (was printStackTrace) and correct?
+                            logger.debug("Failure reading manifest: " + e1.getMessage(), e1);
                         }
                         return null;
                     }
@@ -413,6 +414,7 @@ public class MuleConfiguration
             }
             catch (IOException e)
             {
+                // TODO MULE-863
                 logger.warn("Failed to read manifest Info, Manifest information will not display correctly: "
                             + e.getMessage());
             }
@@ -455,7 +457,9 @@ public class MuleConfiguration
         }
         catch (Exception e)
         {
-            throw new MuleRuntimeException(new Message(Messages.FAILED_TO_CLONE_X, "Connection Strategy"), e);
+            throw new MuleRuntimeException(
+                new Message(Messages.FAILED_TO_CLONE_X, "Connection Strategy"), 
+                e);
         }
     }
 

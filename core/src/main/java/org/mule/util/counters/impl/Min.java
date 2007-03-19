@@ -12,10 +12,6 @@ package org.mule.util.counters.impl;
 
 import org.mule.util.counters.CounterFactory.Type;
 
-/**
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
- */
 public class Min extends AggregateCounter
 {
 
@@ -34,11 +30,8 @@ public class Min extends AggregateCounter
     public void doCompute()
     {
         double next = getBase().nextValue();
-        if (min == Double.NaN)
-        {
-            min = next;
-        }
-        else if (next < min)
+
+        if (Double.isNaN(min) || (next < min))
         {
             min = next;
         }

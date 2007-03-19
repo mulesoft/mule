@@ -56,6 +56,8 @@ public class CSVPrinter extends AbstractTablePrinter
         }
         catch (Throwable e)
         {
+            // TODO MULE-863: Unlikely to be sufficient
+            // (and nothing explicitly thrown above)
             e.printStackTrace();
         }
     }

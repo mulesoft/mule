@@ -88,6 +88,7 @@ public class Multicaster
                 }
                 catch (Throwable t)
                 {
+                    // TODO MULE-863: What should we do if null?
                     if (listener != null)
                     {
                         t = listener.onException(item, method, args, t);

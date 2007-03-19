@@ -12,21 +12,12 @@ package org.mule.config.spring;
 import org.mule.RegistryContext;
 import org.mule.impl.ManagementContext;
 import org.mule.impl.container.MultiContainerContext;
-import org.mule.impl.model.ModelHelper;
-import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.manager.UMOAgent;
 import org.mule.umo.manager.UMOContainerContext;
 import org.mule.umo.manager.UMOTransactionManagerFactory;
-import org.mule.umo.model.UMOModel;
-import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOSecurityManager;
-import org.mule.umo.transformer.UMOTransformer;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -104,38 +95,7 @@ public class ManagementContextFactoryBean extends AbstractFactoryBean
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
     {
         this.context = applicationContext;
-        //TODO where do I get this from
-        //registry = new SpringRegistry();
-        //Add the Spring Container context by default
-        //SpringContainerContext container = new SpringContainerContext();
-        //container.setBeanFactory(context);
-        //container.setName("spring-registry");
-//        if(registry==null)
-//        {
-//            Map m = applicationContext.getBeansOfType(RegistryFacade.class);
-//            if(m.size() > 0)
-//            {
-//                registry = (RegistryFacade)m.values().iterator().next();
-//            }
-//            else
-//            {
-//                registry = createDefaultRegistry();
-//
-//                logger.debug("no registry has been defined in context. Created default Registry: " + registry.getClass().getName());
-//            }
-//        }
-//        managementContext.setRegistry(registry);
         registry = RegistryContext.getRegistry();
-
-//        try
-//        {
-//            registry.registerContainerContext(container);
-//        }
-//        catch (UMOException e)
-//        {
-//            throw new BeanCreationException("failed to register default spring container", e);
-//        }
-
     }
 
 
@@ -143,27 +103,23 @@ public class ManagementContextFactoryBean extends AbstractFactoryBean
     {
         super.afterPropertiesSet();
         managementContext.initialise();        
-        initialise();
+        init();
     }
 
-    protected RegistryFacade createDefaultRegistry()
+
+    //@java.lang.Override
+    protected void destroyInstance(Object instance) throws Exception
     {
-        return new SpringRegistry();
+        managementContext.dispose();
+        managementContext = null;
+        registry = null;
     }
 
-    protected void initialise()
+    protected void init()
     {
         try
         {
             boolean legacy = false;
-
-            // set mule configuration
-//            Map temp = context.getBeansOfType(MuleConfiguration.class, true, false);
-//            if (temp.size() > 0)
-//            {
-//               registry.setConfiguration((MuleConfiguration)temp.values().iterator().next());
-//            }
-
             //Legacy handling.  If the context contains an AutowireUMOManagerFactoryBean, then we're dealing
             //with an old Mule config file and we change the way we deal with some of the components
             Map temp = context.getBeansOfType(AutowireUMOManagerFactoryBean.LegacyManager.class);
@@ -176,14 +132,9 @@ public class ManagementContextFactoryBean extends AbstractFactoryBean
 
             }
 
-
             // Set the container Context
             Map containers = context.getBeansOfType(UMOContainerContext.class, true, false);
             setContainerContext(containers);
-
-            // set Connectors
-//            Map connectors = context.getBeansOfType(UMOConnector.class, true, false);
-//            setConnectors(connectors.values());
 
             // set mule transaction manager
             temp = context.getBeansOfType(UMOTransactionManagerFactory.class, true, false);
@@ -207,36 +158,6 @@ public class ManagementContextFactoryBean extends AbstractFactoryBean
                managementContext.setSecurityManager((UMOSecurityManager)temp.values().iterator().next());
             }
 
-            // set Transformers
-//            Map transformers = context.getBeansOfType(UMOTransformer.class, true, false);
-//            setTransformers(transformers.values());
-
-            // set Endpoints
-//            Map endpoints = context.getBeansOfType(UMOEndpoint.class, true, false);
-//
-//            if(legacy)
-//            {
-//                setLegacyEndpoints(endpoints.values());
-//            }
-//            else
-//            {
-//                setEndpoints(endpoints.values());
-//            }
-
-            // set Agents
-//            Map agents = context.getBeansOfType(UMOAgent.class, true, false);
-//            setAgents(agents.values());
-//
-//            // add the models
-//            Map models = context.getBeansOfType(UMOModel.class, true, false);
-//            if(legacy)
-//            {
-//                setLegacyModels(models);
-//            }
-//            else
-//            {
-//                setModels(models);
-//            }
         }
         catch (Exception e)
         {
@@ -267,132 +188,6 @@ public class ManagementContextFactoryBean extends AbstractFactoryBean
             }
 
         }
-    }
-
-    protected void setModels(Map models) throws UMOException
-    {
-        if (models == null)
-        {
-            return;
-        }
-        Map.Entry entry;
-        for (Iterator iterator = models.entrySet().iterator(); iterator.hasNext();)
-        {
-            entry = (Map.Entry)iterator.next();
-            UMOModel model = (UMOModel)entry.getValue();
-            model.setName(entry.getKey().toString());
-            //TODO LM: Registry Lookup
-            registry.registerModel(model);
-        }
-    }
-
-    protected void setAgents(Collection agents) throws UMOException
-    {
-        for (Iterator iterator = agents.iterator(); iterator.hasNext();)
-        {
-            //TODO registry.registerMuleObject(null, (UMOAgent)iterator.next());
-        registry.registerAgent((UMOAgent)iterator.next());
-
-        }
-    }
-
-    protected void setConnectors(Collection connectors) throws UMOException
-    {
-        for (Iterator iterator = connectors.iterator(); iterator.hasNext();)
-        {
-            //TODO LM: Registry Lookup
-            //manager.registerConnector((UMOConnector)iterator.next());
-            registry.registerConnector((UMOConnector)iterator.next());
-        }
-    }
-
-    protected void setTransformers(Collection transformers) throws UMOException
-    {
-        for (Iterator iterator = transformers.iterator(); iterator.hasNext();)
-        {
-            //TODO LM: Registry Lookup
-            //manager.registerTransformer((UMOTransformer)iterator.next());
-            registry.registerTransformer((UMOTransformer)iterator.next());
-
-        }
-    }
-
-    protected void setEndpoints(Collection endpoints) throws UMOException
-    {
-        for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
-        {
-            UMOEndpoint ep  = (UMOEndpoint)iterator.next();
-            if(UMOImmutableEndpoint.ENDPOINT_TYPE_GLOBAL.equals(ep.getType()))
-            {
-                //TODO LM: Registry Lookup
-
-                //manager.registerEndpoint(ep);
-                registry.registerEndpoint((UMOEndpoint)iterator.next());
-            }
-        }
-    }
-
-
-
-    /**
-     * In Mule 1.x all endpoints in the the context should be registered with the manager
-     * @param endpoints
-     * @throws org.mule.umo.lifecycle.InitialisationException
-     */
-    //@Override
-    protected void setLegacyEndpoints(Collection endpoints) throws UMOException
-    {
-        for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
-        {
-            UMOEndpoint ep  = (UMOEndpoint)iterator.next();
-            //TODO LM: Replace
-            registry.registerEndpoint(ep);
-        }
-    }
-
-    /**
-     * In Mule 1.x Inherited model types need to be handled differently to the other model types.  this
-     * method has the logic to discover the correct model and copy service descriptors to the correct model
-     * @param models
-     * @throws UMOException
-     */
-    //@Override
-    protected void setLegacyModels(Map models) throws UMOException
-    {
-        if (models == null)
-        {
-            return;
-        }
-
-        UMOModel model;
-
-        if(models.size() > 1)
-        {
-            throw new IllegalArgumentException("Legacy configuration could only support onr model");
-        }
-        else if (models.size() == 0)
-        {
-            model = ModelHelper.getFirstUserModel();
-            if(model==null)
-            {
-                throw new IllegalArgumentException("There is no component model set");
-            }
-        }
-        else
-        {
-            model = (UMOModel)models.values().iterator().next();
-            registry.registerModel(model);
-        }
-
-        Map components = context.getBeansOfType(UMODescriptor.class, true, false);
-        UMODescriptor d;
-
-        for (Iterator iterator = components.values().iterator(); iterator.hasNext();)
-        {
-            d = (UMODescriptor)iterator.next();
-            model.registerComponent(d);
-        }
-
     }
 
     protected void setLegacyProperties(Map props)

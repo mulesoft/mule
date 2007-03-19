@@ -19,6 +19,7 @@ import org.mule.registry.DeregistrationException;
 import org.mule.registry.RegistrationException;
 import org.mule.routing.inbound.InboundPassThroughRouter;
 import org.mule.routing.inbound.InboundRouterCollection;
+import org.mule.routing.nested.NestedRouterCollection;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.routing.outbound.OutboundRouterCollection;
 import org.mule.routing.response.ResponseRouterCollection;
@@ -150,6 +151,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         inboundRouter = descriptor.getInboundRouter();
         outboundRouter = descriptor.getOutboundRouter();
         responseRouter = descriptor.getResponseRouter();
+        nestedRouter = descriptor.getNestedRouter();
         implementationReference = descriptor.getImplementation();
         version = descriptor.getVersion();
         intecerptorList = descriptor.getInterceptors();
@@ -173,6 +175,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 
         outboundRouter = new OutboundRouterCollection();
         responseRouter = new ResponseRouterCollection();
+        nestedRouter = new NestedRouterCollection();
 
     }
 

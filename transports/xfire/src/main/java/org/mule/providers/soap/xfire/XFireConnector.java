@@ -312,7 +312,7 @@ public class XFireConnector extends AbstractConnector
         return serviceFactory;
     }
 
-    public void setServiceFactory(ObjectServiceFactory serviceFactory)
+    public void setServiceFactory(ServiceFactory serviceFactory)
     {
         this.serviceFactory = serviceFactory;
     }

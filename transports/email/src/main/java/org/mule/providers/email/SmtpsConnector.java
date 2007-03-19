@@ -11,6 +11,9 @@
 package org.mule.providers.email;
 
 import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.security.TlsSupport;
+
+import java.io.IOException;
 
 /**
  * Creates a secure SMTP connection
@@ -22,8 +25,7 @@ public class SmtpsConnector extends SmtpConnector
 
     private String socketFactory = DEFAULT_SOCKET_FACTORY;
     private String socketFactoryFallback = "false";
-    private String trustStore = null;
-    private String trustStorePassword = null;
+    private TlsSupport tlsSupport = new TlsSupport();
 
     public static final int DEFAULT_SMTPS_PORT = 465;
 
@@ -44,29 +46,11 @@ public class SmtpsConnector extends SmtpConnector
 
     protected void doInitialise() throws InitialisationException
     {
+        tlsSupport.initialiseFactories(true);
         System.setProperty("mail.smtps.ssl", "true");
         System.setProperty("mail.smtps.socketFactory.class", getSocketFactory());
         System.setProperty("mail.smtps.socketFactory.fallback", getSocketFactoryFallback());
-
-        /*
-         * These Properties need to be set, but if set on the System properties They
-         * will ovverwrite SMTP properties, thus effectively only letting eiter SMTP
-         * or SMTPs endpoints in 1 config. These Veriables will be set in the
-         * MailUtils, createMailSession so they will only effrect the smtps Session.
-         * System.setProperty("mail.smtp.ssl", "true");
-         * System.setProperty("mail.smtp.socketFactory.class", getSocketFactory());
-         * System.setProperty("mail.smtp.socketFactory.fallback",
-         * getSocketFactoryFallback());
-         */
-
-        if (getTrustStore() != null)
-        {
-            System.setProperty("javax.net.ssl.trustStore", getTrustStore());
-            if (getTrustStorePassword() != null)
-            {
-                System.setProperty("javax.net.ssl.trustStorePassword", getTrustStorePassword());
-            }
-        }
+        tlsSupport.initialiseStores();
     }
 
     public String getSocketFactory()
@@ -91,21 +75,23 @@ public class SmtpsConnector extends SmtpConnector
 
     public String getTrustStore()
     {
-        return trustStore;
-    }
-
-    public void setTrustStore(String trustStore)
-    {
-        this.trustStore = trustStore;
+        return tlsSupport.getTrustStore();
     }
 
     public String getTrustStorePassword()
     {
-        return trustStorePassword;
+        return tlsSupport.getTrustStorePassword();
+    }
+
+    public void setTrustStore(String trustStore) throws IOException
+    {
+        tlsSupport.setTrustStore(trustStore);
     }
 
     public void setTrustStorePassword(String trustStorePassword)
     {
-        this.trustStorePassword = trustStorePassword;
+        tlsSupport.setTrustStorePassword(trustStorePassword);
     }
+
+
 }

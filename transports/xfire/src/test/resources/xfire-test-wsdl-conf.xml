@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="Mule_Sample" version="1.0">
+    <connector name="servlet" className="org.mule.providers.http.servlet.ServletConnector">
+        <properties>
+            <property name="servletUrl" value="http://localhost:18088/services"/>
+        </properties>
+    </connector>
+
+    <model name="test">
+        <mule-descriptor name="mycomponent"
+            implementation="org.mule.tck.testmodels.services.TestServiceComponent"
+            inboundEndpoint="xfire:servlet://mycomponent">
+        </mule-descriptor>
+
+        <mule-descriptor name="xfireService" implementation="org.mule.tck.testmodels.services.TestServiceComponent">
+            <inbound-router>
+                <endpoint address="xfire:http://localhost:82"/>
+            </inbound-router>
+        </mule-descriptor>
+    </model>
+</mule-configuration>

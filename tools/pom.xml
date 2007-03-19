@@ -20,11 +20,6 @@
             <artifactId>mule-core</artifactId>
             <version>${parent.version}</version>
         </dependency>
-
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.2</version>
-        </dependency>
     </dependencies>
+
 </project>

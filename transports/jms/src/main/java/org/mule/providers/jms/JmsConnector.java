@@ -123,9 +123,14 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
     private JmsTopicResolver topicResolver;
 
+    /**
+     * Whether to create a consumer on connect.
+     */
+    private boolean eagerConsumer = true;
+
     public JmsConnector()
     {
-        receivers = new ConcurrentHashMap();
+        super();
         topicResolver = new DefaultJmsTopicResolver(this);
     }
 
@@ -217,8 +222,8 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         }
         else
         {
-            throw new InitialisationException(new Message(Messages.JNDI_RESOURCE_X_NOT_FOUND,
-                connectionFactoryJndiName), this);
+            throw new InitialisationException(new Message(Messages.INVALID_RESOURCE_TYPE_X_EXPECTED_X,
+                ConnectionFactory.class, temp == null ? null : temp.getClass()), this);
         }
     }
 
@@ -257,8 +262,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         // Register a JMS exception listener to detect failed connections.
         // Existing connection strategy will be used to recover.
 
-        //TODO RM* Urgent final ConnectionStrategy connectionStrategy = getConnectionStrategy();
-        if (recoverJmsConnections /*&& connectionStrategy != null*/ && connection != null)
+        if (recoverJmsConnections && connectionStrategy != null && connection != null)
         {
             connection.setExceptionListener(new ExceptionListener()
             {
@@ -806,6 +810,40 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     public void setTopicResolver (final JmsTopicResolver topicResolver)
     {
         this.topicResolver = topicResolver;
+    }
+
+    /**
+     * Getter for property 'eagerConsumer'. Default
+     * is {@code true}.
+     *
+     * @return Value for property 'eagerConsumer'.
+     * @see #eagerConsumer
+     */
+    public boolean isEagerConsumer ()
+    {
+        return eagerConsumer;
+    }
+
+    /**
+     * A value of {@code true} will create a consumer on
+     * connect, in contrast to lazy instantiation in the poll loop.
+     * This setting very much depends on the JMS vendor.
+     * Affects transactional receivers, typical symptoms are:
+     * <ul>
+     * <li> consumer thread hanging forever, though a message is
+     * available
+     * <li>failure to consume the first message (the rest
+     * are fine)
+     * </ul>
+     * <p/>
+     *
+     * @param eagerConsumer Value to set for property 'eagerConsumer'.
+     * @see #eagerConsumer
+     * @see org.mule.providers.jms.TransactedJmsMessageReceiver
+     */
+    public void setEagerConsumer (final boolean eagerConsumer)
+    {
+        this.eagerConsumer = eagerConsumer;
     }
 
     public void onNotification(UMOServerNotification notification)

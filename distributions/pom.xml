@@ -272,17 +272,12 @@
         </dependency>
         <dependency>
             <groupId>org.mule.examples</groupId>
-            <artifactId>mule-example-loanbroker</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-loanbroker-esb</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.examples</groupId>
-            <artifactId>mule-example-loanbroker-esb-credit-agency</artifactId>
+            <artifactId>mule-example-loanbroker-esn</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>

@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PushbackInputStream;
-import java.io.Serializable;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.Map;
@@ -63,7 +62,7 @@ public class XmlMessageProtocol extends ByteProtocol
      * 
      * @see DefaultProtocol#read(java.io.InputStream)
      */
-    public Serializable read(InputStream is) throws IOException
+    public Object read(InputStream is) throws IOException
     {
         // look for existing pushback wrapper for the given stream
         // if not found, create a wrapper

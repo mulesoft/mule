@@ -25,19 +25,6 @@
             <artifactId>mule-module-scripting</artifactId>
             <version>${muleVersion}</version>
         </dependency>
-        <dependency>
-            <groupId>com.sun.script</groupId>
-            <artifactId>groovy</artifactId>
-            <version>20061114</version>
-            <classifier>jdk14</classifier>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>groovy</groupId>
-            <artifactId>groovy-all</artifactId>
-            <version>1.0</version>
-            <scope>provided</scope>
-        </dependency>
     </dependencies>
 
     <repositories>
@@ -118,17 +105,6 @@
                                     <groupId>${groupId}</groupId>
                                     <artifactId>${artifactId}</artifactId>
                                     <version>${version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>com.sun.script</groupId>
-                                    <artifactId>groovy</artifactId>
-                                    <version>20061114</version>
-                                    <classifier>jdk14</classifier>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>groovy</groupId>
-                                    <artifactId>groovy-all</artifactId>
-                                    <version>1.0</version>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>

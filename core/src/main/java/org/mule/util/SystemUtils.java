@@ -66,6 +66,7 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
         }
         catch (Exception ex)
         {
+            // TODO MULE-863: Is this bad enough to fail?
             logger.error("Could not access OS environment: ", ex);
         }
 
@@ -179,7 +180,7 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
         }
         catch (ParseException p)
         {
-            throw new MuleException("Unable to parse the Mule command line because of: " + p.toString());
+            throw new MuleException("Unable to parse the Mule command line because of: " + p.toString(), p);
         }
     }
 

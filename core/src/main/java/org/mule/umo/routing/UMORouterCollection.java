@@ -15,6 +15,8 @@ import org.mule.umo.lifecycle.Initialisable;
 
 import java.util.List;
 
+import org.apache.avalon.framework.activity.Disposable;
+
 /**
  * <code>UMORouterCollection</code> defines the interface for a MessageRouter that
  * manages more than one router. A {@link UMORouterCatchAllStrategy} can be set on
@@ -22,7 +24,7 @@ import java.util.List;
  * set, the router just returns null.
  */
 
-public interface UMORouterCollection extends Initialisable
+public interface UMORouterCollection extends Initialisable, Disposable
 {
     void setRouters(List routers);
 

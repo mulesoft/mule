@@ -68,7 +68,7 @@
             <artifactId>mx4j-remote</artifactId>
             <version>2.1.1</version>
         </dependency>
-        
+
         <!-- Provided by the OSGi environment -->
         <dependency>
             <groupId>log4j</groupId>

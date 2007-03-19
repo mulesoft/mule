@@ -10,15 +10,8 @@
 
 package org.mule.config;
 
-import org.mule.MuleRuntimeException;
-import org.mule.RegistryContext;
-import org.mule.config.i18n.Message;
-import org.mule.providers.service.TransportServiceDescriptor;
-import org.mule.registry.ServiceDescriptorFactory;
-import org.mule.registry.ServiceException;
 import org.mule.umo.UMOException;
 import org.mule.util.ClassUtils;
-import org.mule.util.MapUtils;
 import org.mule.util.SpiUtils;
 import org.mule.util.StringUtils;
 
@@ -29,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -55,7 +49,7 @@ public class ExceptionHelper
      * applied to
      */
     public static final String APPLY_TO_PROPERTY = "apply.to";
-    
+
     /**
      * logger used by this class
      */
@@ -73,7 +67,9 @@ public class ExceptionHelper
 
     private static String J2SE_VERSION = "";
 
-    /** TODO How do you get the j2ee version?? */
+    /**
+     * todo How do you get the j2ee version??
+     */
     private static String J2EE_VERSION = "1.3ee";
 
     /**
@@ -93,6 +89,7 @@ public class ExceptionHelper
 
     public static void initialise()
     {
+
         if (initialised)
         {
             return;
@@ -102,20 +99,25 @@ public class ExceptionHelper
         registerExceptionReader(new NamingExceptionReader());
         J2SE_VERSION = System.getProperty("java.specification.version");
 
-        errorCodes = SpiUtils.findServiceDescriptor(ServiceDescriptorFactory.EXCEPTION_SERVICE_TYPE, "mule-exception-codes");
+        errorCodes = SpiUtils.findServiceDescriptor("org/mule/config",
+                "mule-exception-codes.properties", ExceptionHelper.class);
         if (errorCodes == null)
         {
-            throw new MuleRuntimeException(Message.createStaticMessage("Failed to load Exception resource: mule-exception-codes.properties"));
+            throw new NullPointerException(
+                    "Failed to load resource: META_INF/services/org/mule/config/mule-exception-codes.properties");
         }
-        reverseErrorCodes = MapUtils.invertMap(errorCodes);
 
-        errorDocs = SpiUtils.findServiceDescriptor(ServiceDescriptorFactory.EXCEPTION_SERVICE_TYPE, "mule-exception-config");
+        reverseErrorCodes = MapUtils.invertMap(errorCodes);
+        errorDocs = SpiUtils.findServiceDescriptor("org/mule/config", "mule-exception-config.properties",
+                ExceptionHelper.class);
         if (errorDocs == null)
         {
-            throw new MuleRuntimeException(Message.createStaticMessage("Failed to load Exception resource: mule-exception-config.properties"));
+            throw new NullPointerException(
+                    "Failed to load resource: META_INF/services/org/mule/config/mule-exception-config.properties");
         }
 
         initialised = true;
+
     }
 
     public static int getErrorCode(Class exception)
@@ -134,7 +136,7 @@ public class ExceptionHelper
         }
         else if (clazz instanceof Class)
         {
-            return (Class)clazz;
+            return (Class) clazz;
         }
         else
         {
@@ -148,7 +150,7 @@ public class ExceptionHelper
                 return null;
             }
             reverseErrorCodes.put(key, clazz);
-            return (Class)clazz;
+            return (Class) clazz;
         }
     }
 
@@ -173,7 +175,7 @@ public class ExceptionHelper
         {
             if (m instanceof Properties)
             {
-                return (Properties)m;
+                return (Properties) m;
             }
             else
             {
@@ -182,39 +184,29 @@ public class ExceptionHelper
         }
         else
         {
-            TransportServiceDescriptor sd;
-            try 
+            Properties p = SpiUtils.findServiceDescriptor("org/mule/config",
+                    protocol + "-exception-mappings.properties", ExceptionHelper.class);
+            if (p == null)
             {
-                sd = (TransportServiceDescriptor) RegistryContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, protocol, null);
-                if (sd == null)
-                {
-                    throw new ServiceException(Message.createStaticMessage("No service descriptor found for transport: " + protocol + ".  This transport does not appear to be installed."));
-                }
-                Properties p = sd.getExceptionMappings();
-                if(p!=null)
-                {
-                    errorMappings.put(protocol, p);
-                    String applyTo = p.getProperty(APPLY_TO_PROPERTY, null);
-                    if (applyTo != null)
-                    {
-                        String[] protocols = StringUtils.splitAndTrim(applyTo, ",");
-                        for (int i = 0; i < protocols.length; i++)
-                        {
-                            errorMappings.put(protocols[i], p);
-                        }
-                    }
-                }
-                else
-                {
-                    p = new Properties();
-                }
-                return p;
-            }
-            catch (ServiceException e)
-            {
-                logger.warn(e.getMessage());
+                errorMappings.put(protocol, "not found");
+                logger.warn("Failed to load error mappings from: META-INF/services/org/mule/config/"
+                        + protocol
+                        + "-exception-mappings.properties. This may be because there are no error code mappings for protocol: "
+                        + protocol);
                 return null;
             }
+
+            errorMappings.put(protocol, p);
+            String applyTo = p.getProperty(APPLY_TO_PROPERTY, null);
+            if (applyTo != null)
+            {
+                String[] protocols = StringUtils.splitAndTrim(applyTo, ",");
+                for (int i = 0; i < protocols.length; i++)
+                {
+                    errorMappings.put(protocols[i], p);
+                }
+            }
+            return p;
         }
     }
 
@@ -382,7 +374,7 @@ public class ExceptionHelper
         {
             if (cause instanceof UMOException)
             {
-                umoException = (UMOException)cause;
+                umoException = (UMOException) cause;
             }
             cause = getExceptionReader(cause).getCause(cause);
             // address some misbehaving exceptions, avoid endless loop
@@ -442,7 +434,7 @@ public class ExceptionHelper
                 buf.append("(").append(exceptions.size() - i + 1).append(" more...)");
                 break;
             }
-            Throwable throwable = (Throwable)iterator.next();
+            Throwable throwable = (Throwable) iterator.next();
             ExceptionReader er = getExceptionReader(throwable);
             buf.append(i).append(". ").append(er.getMessage(throwable)).append(" (");
             buf.append(throwable.getClass().getName()).append(")\n");
@@ -450,12 +442,12 @@ public class ExceptionHelper
             {
                 StackTraceElement e = throwable.getStackTrace()[0];
                 buf.append("  ")
-                    .append(e.getClassName())
-                    .append(":")
-                    .append(e.getLineNumber())
-                    .append(" (")
-                    .append(getJavaDocUrl(throwable.getClass()))
-                    .append(")\n");
+                        .append(e.getClassName())
+                        .append(":")
+                        .append(e.getLineNumber())
+                        .append(" (")
+                        .append(getJavaDocUrl(throwable.getClass()))
+                        .append(")\n");
             }
         }
         return buf.toString();
@@ -482,7 +474,7 @@ public class ExceptionHelper
     {
         for (Iterator iterator = exceptionReaders.iterator(); iterator.hasNext();)
         {
-            ExceptionReader exceptionReader = (ExceptionReader)iterator.next();
+            ExceptionReader exceptionReader = (ExceptionReader) iterator.next();
             if (exceptionReader.getExceptionType().isInstance(t))
             {
                 return exceptionReader;

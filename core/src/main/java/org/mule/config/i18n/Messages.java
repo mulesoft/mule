@@ -24,7 +24,7 @@ import org.apache.commons.logging.LogFactory;
  * <code>Messages</code> provides facilities for constructing <code>Message</code>
  * objects and access to core message constants.
  */
-public class Messages implements CoreMessageConstants
+public final class Messages implements CoreMessageConstants
 {
     /**
      * logger used by this class
@@ -33,20 +33,28 @@ public class Messages implements CoreMessageConstants
 
     public static final String DEFAULT_BUNDLE = "core";
 
-    private static Map bundles = new HashMap();
+    private static final Map BUNDLES = new HashMap();
 
-    private static Object[] emptyArgs = new Object[]{};
+    private static final Object[] EMPTY_ARGS = new Object[]{};
+
+    /**
+     * Do not instantiate.
+     */
+    private Messages ()
+    {
+        // no op
+    }
 
     public static String get(int code)
     {
-        return getString(DEFAULT_BUNDLE, code, emptyArgs);
+        return getString(DEFAULT_BUNDLE, code, EMPTY_ARGS);
     }
 
     public static String get(int code, Object[] args)
     {
         if (args == null)
         {
-            args = Messages.emptyArgs;
+            args = Messages.EMPTY_ARGS;
         }
         return getString(DEFAULT_BUNDLE, code, args);
     }
@@ -90,30 +98,30 @@ public class Messages implements CoreMessageConstants
         return getString(DEFAULT_BUNDLE, code, new Object[]{arg1, arg2, arg3});
     }
 
-    public static String get(String bundle, int code)
+    public static String get(String bundleName, int code)
     {
-        return getString(bundle, code, emptyArgs);
+        return getString(bundleName, code, EMPTY_ARGS);
     }
 
-    public static String get(String bundle, int code, Object[] args)
+    public static String get(String bundleName, int code, Object[] args)
     {
         if (args == null)
         {
-            args = Messages.emptyArgs;
+            args = Messages.EMPTY_ARGS;
         }
-        return getString(bundle, code, args);
+        return getString(bundleName, code, args);
     }
 
-    public static String get(String bundle, int code, Object arg1)
+    public static String get(String bundleName, int code, Object arg1)
     {
         if (arg1 == null)
         {
             arg1 = "null";
         }
-        return getString(bundle, code, new Object[]{arg1});
+        return getString(bundleName, code, new Object[]{arg1});
     }
 
-    public static String get(String bundle, int code, Object arg1, Object arg2)
+    public static String get(String bundleName, int code, Object arg1, Object arg2)
     {
         if (arg1 == null)
         {
@@ -123,10 +131,10 @@ public class Messages implements CoreMessageConstants
         {
             arg2 = "null";
         }
-        return getString(bundle, code, new Object[]{arg1, arg2});
+        return getString(bundleName, code, new Object[]{arg1, arg2});
     }
 
-    public static String get(String bundle, int code, Object arg1, Object arg2, Object arg3)
+    public static String get(String bundleName, int code, Object arg1, Object arg2, Object arg3)
     {
         if (arg1 == null)
         {
@@ -140,40 +148,49 @@ public class Messages implements CoreMessageConstants
         {
             arg3 = "null";
         }
-        return getString(bundle, code, new Object[]{arg1, arg2, arg3});
+        return getString(bundleName, code, new Object[]{arg1, arg2, arg3});
     }
 
-    public static String getString(String bundle, int code, Object[] args)
+    public static String getString(String bundleName, int code, Object[] args)
     {
-        String m = getBundle(bundle).getString(String.valueOf(code));
-        if (m == null)
+        // We will throw a MissingResourceException if the bundle name is invalid
+        // This happens if the code references a bundle name that just doesn't exist
+        ResourceBundle bundle = getBundle(bundleName);
+
+        try
         {
-            logger.error("Failed to find message for id " + code + " in resource bundle " + bundle);
+            String m = bundle.getString(String.valueOf(code));
+            if (m == null)
+            {
+                logger.error("Failed to find message for id " + code + " in resource bundle " + bundleName);
+                return "";
+            }
+
+            return MessageFormat.format(m, args);
+        }
+        catch (MissingResourceException e)
+        {
+            logger.error("Failed to find message for id " + code + " in resource bundle " + bundleName);
             return "";
         }
-        return MessageFormat.format(m, args);
     }
 
-    protected static ResourceBundle getBundle(String name)
+    /**
+     * @throws MissingResourceException if resource is missing
+     */
+    protected static ResourceBundle getBundle(String bundleName)
     {
-        ResourceBundle bundle = (ResourceBundle)bundles.get(name);
+        ResourceBundle bundle = (ResourceBundle) BUNDLES.get(bundleName);
         if (bundle == null)
         {
-            String path = "META-INF.services.org.mule.i18n." + name + "-messages";
-            logger.debug("Loading resource bundle: " + path);
+            String path = "META-INF.services.org.mule.i18n." + bundleName + "-messages";
+            logger.debug("Loading resource bundle: " + path + " for locale " +
+                    Locale.getDefault());
             Locale locale = Locale.getDefault();
-            try
-            {
-                bundle = ResourceBundle.getBundle(path, locale);
-            }
-            catch (MissingResourceException e)
-            {
-                logger.warn("Failed to find resource bundle using default Locale: " + locale.toString()
-                            + ", defaulting to Locale.US. Error was: " + e.getMessage());
-                bundle = ResourceBundle.getBundle(path);
-            }
-            bundles.put(name, bundle);
+            bundle = ResourceBundle.getBundle(path, locale);
+            BUNDLES.put(bundleName, bundle);
         }
         return bundle;
     }
+
 }

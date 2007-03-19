@@ -11,6 +11,7 @@
 package org.mule.providers.tcp.protocols;
 
 import org.mule.providers.tcp.TcpProtocol;
+import org.mule.umo.provider.UMOMessageAdapter;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -26,15 +27,37 @@ import org.apache.commons.lang.SerializationUtils;
  */
 public abstract class ByteProtocol implements TcpProtocol
 {
-    public void write(OutputStream os, Serializable data) throws IOException
+
+    public void write(OutputStream os, Object data) throws IOException
     {
+        // By default the UMOMessageAdapter object itself is passed in, I guess so
+        // that the whole adapter can be serialised if necessary. I'm doing the check
+        // here to extract the real payload, rather than extracting it in the
+        // TcpMessageReceiver where the protocol is called
+        if (data instanceof UMOMessageAdapter)
+        {
+            data = ((UMOMessageAdapter)data).getPayload();
+        }
+
         if (data instanceof byte[])
         {
             write(os, (byte[])data);
         }
+        else if (data instanceof String)
+        {
+            // TODO SF: encoding is lost/ignored; it is probably a good idea to have
+            // a separate "stringEncoding" property on the protocol
+            write(os, ((String)data).getBytes());
+        }
+        else if (data instanceof Serializable)
+        {
+            write(os, SerializationUtils.serialize((Serializable)data));
+        }
         else
         {
-            write(os, SerializationUtils.serialize(data));
+            // TODO SF: Throw Exception since have no idea how to serialize!!! Which
+            // exception should we throw? (HH) how about IllegalArgumentException?
         }
     }
+
 }

@@ -82,7 +82,8 @@ public abstract class AbstractJCEEncryptionStrategy implements UMOEncryptionStra
         }
         catch (Exception e)
         {
-            throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X, "encryption ciphers"),
+            throw new InitialisationException(
+                new Message(Messages.FAILED_TO_CREATE_X, "encryption ciphers"),
                 e, this);
         }
     }

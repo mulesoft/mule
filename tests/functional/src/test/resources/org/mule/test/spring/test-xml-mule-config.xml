@@ -37,7 +37,7 @@
         <!--</connection-strategy>-->
     </connector>
 
-    <connector name="dummyConnector2" className="org.mule.tck.testmodels.mule.TestConnector">
+    <connector name="dummyConnector2" className="org.mule.tck.testmodels.mule.TestConnector2">
         <exception-strategy className="org.mule.impl.DefaultExceptionStrategy">
         	<endpoint name="blahEndpoint" address="test://blah" />
         	<global-endpoint name="orangeEndpoint" />
@@ -93,7 +93,7 @@
 
             <inbound-router>
                 <catch-all-strategy className="org.mule.routing.ForwardingCatchAllStrategy">
-                    <endpoint connector="dummyConnector2" address="test://catch.all"/>
+                    <endpoint connector="dummyConnector2" address="test2://catch.all"/>
                 </catch-all-strategy>
                 <endpoint name="Orange" type="receiver" address="test://orange/" transformers="TestCompressionTransformer" responseTransformers="TestCompressionTransformer"/>
                 <global-endpoint name="orangeEndpoint" transformers="TestCompressionTransformer">

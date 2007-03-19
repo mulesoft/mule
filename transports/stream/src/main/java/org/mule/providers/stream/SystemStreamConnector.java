@@ -11,6 +11,7 @@
 package org.mule.providers.stream;
 
 import org.mule.registry.metadata.ObjectMetadata;
+import org.mule.config.i18n.Message;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
@@ -19,6 +20,7 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
+import org.mule.util.StringUtils;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -33,6 +35,8 @@ public class SystemStreamConnector extends StreamConnector
     public static ObjectMetadata objectMetadata = new ObjectMetadata(SystemStreamConnector.class, true, new String[] { "promptMessage", "outputMessage", "messageDelayTime", "firstTime" });
 
     private String promptMessage;
+    private int promptMessageCode = -1;
+    private String resourceBundle = null;
     private String outputMessage;
     private long messageDelayTime = 3000;
     private boolean firstTime = true;
@@ -116,6 +120,11 @@ public class SystemStreamConnector extends StreamConnector
      */
     public String getPromptMessage()
     {
+        if (!StringUtils.isBlank(resourceBundle) && promptMessageCode > -1)
+        {
+            return new Message(resourceBundle, promptMessageCode).getMessage();
+        }
+
         return promptMessage;
     }
 
@@ -125,6 +134,38 @@ public class SystemStreamConnector extends StreamConnector
     public void setPromptMessage(String promptMessage)
     {
         this.promptMessage = promptMessage;
+    }
+
+    /**
+     * @return Returns the promptMessageCode.
+     */
+    public int getPromptMessageCode()
+    {
+        return promptMessageCode;
+    }
+
+    /**
+     * @param promptMessageCode The promptMessageCode to set.
+     */
+    public void setPromptMessageCode(int promptMessageCode)
+    {
+        this.promptMessageCode = promptMessageCode;
+    }
+
+    /**
+     * @return Returns the resourceBundle.
+     */
+    public String getResourceBundle()
+    {
+        return resourceBundle;
+    }
+
+    /**
+     * @param resourceBundle The resourceBundle to set.
+     */
+    public void setResourceBundle(String resourceBundle)
+    {
+        this.resourceBundle = resourceBundle;
     }
 
     /**

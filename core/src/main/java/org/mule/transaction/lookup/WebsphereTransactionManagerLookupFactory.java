@@ -30,7 +30,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class WebsphereTransactionManagerLookupFactory implements UMOTransactionManagerFactory
 {
-    private static final String FACTORY_CLASS_5_1 = "com.ibm.ws.Transaction.TransactionManagerFactory";
+    private static final String FACTORY_CLASS_5_1_AND_ABOVE = "com.ibm.ws.Transaction.TransactionManagerFactory";
 
     private static final String FACTORY_CLASS_5_0 = "com.ibm.ejs.jts.jta.TransactionManagerFactory";
 
@@ -48,13 +48,13 @@ public class WebsphereTransactionManagerLookupFactory implements UMOTransactionM
         TransactionManager transactionManager;
         try
         {
-            logger.debug("Trying WebSphere 5.1: " + FACTORY_CLASS_5_1);
-            clazz = Class.forName(FACTORY_CLASS_5_1);
-            logger.info("Found WebSphere 5.1: " + FACTORY_CLASS_5_1);
+            logger.debug("Trying WebSphere 5.1+: " + FACTORY_CLASS_5_1_AND_ABOVE);
+            clazz = Class.forName(FACTORY_CLASS_5_1_AND_ABOVE);
+            logger.info("Found WebSphere 5.1+: " + FACTORY_CLASS_5_1_AND_ABOVE);
         }
         catch (ClassNotFoundException ex)
         {
-            logger.debug("Could not find WebSphere 5.1 TransactionManager factory class", ex);
+            logger.debug("Could not find WebSphere 5.1+ TransactionManager factory class", ex);
             try
             {
                 logger.debug("Trying WebSphere 5.0: " + FACTORY_CLASS_5_0);
@@ -75,7 +75,8 @@ public class WebsphereTransactionManagerLookupFactory implements UMOTransactionM
                     logger.debug("Could not find WebSphere 4 TransactionManager factory class", ex3);
                     throw new RuntimeException(
                         "Couldn't find any WebSphere TransactionManager factory class, "
-                                        + "neither for WebSphere version 5.1 nor 5.0 nor 4");
+                        + "neither for WebSphere version 5.1 nor 5.0 nor 4",
+                        ex);
                 }
             }
         }

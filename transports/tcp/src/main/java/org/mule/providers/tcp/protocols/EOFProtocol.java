@@ -13,7 +13,6 @@ package org.mule.providers.tcp.protocols;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.Serializable;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
@@ -32,7 +31,7 @@ public class EOFProtocol extends ByteProtocol
 
     private static final Log logger = LogFactory.getLog(EOFProtocol.class);
 
-    public Serializable read(InputStream is) throws IOException
+    public Object read(InputStream is) throws IOException
     {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(EOFProtocol.BUFFER_SIZE);
 

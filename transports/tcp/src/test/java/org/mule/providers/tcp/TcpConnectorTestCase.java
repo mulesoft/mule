@@ -20,6 +20,7 @@ import org.mule.umo.provider.UMOConnector;
 
 public class TcpConnectorTestCase extends AbstractConnectorTestCase
 {
+
     public UMOConnector getConnector() throws Exception
     {
         TcpConnector c = new TcpConnector();
@@ -52,8 +53,10 @@ public class TcpConnectorTestCase extends AbstractConnectorTestCase
             fail("cannot register with null endpointUri");
         }
         catch (Exception e)
-        { /* expected */
+        {
+            /* expected */
         }
+
         endpoint.setEndpointURI(null);
         try
         {
@@ -61,7 +64,8 @@ public class TcpConnectorTestCase extends AbstractConnectorTestCase
             fail("cannot register with empty endpointUri");
         }
         catch (Exception e)
-        { /* expected */
+        {
+            /* expected */
         }
 
         endpoint.setEndpointURI(new MuleEndpointURI("tcp://localhost:30303"));
@@ -72,7 +76,8 @@ public class TcpConnectorTestCase extends AbstractConnectorTestCase
             // fail("cannot register on the same endpointUri");
         }
         catch (Exception e)
-        { /* expected */
+        {
+            /* expected */
         }
     }
 
@@ -80,10 +85,10 @@ public class TcpConnectorTestCase extends AbstractConnectorTestCase
     {
         TcpConnector c = (TcpConnector)connector;
 
-        c.setBufferSize(1024);
-        assertEquals(1024, c.getBufferSize());
-        c.setBufferSize(0);
-        assertEquals(TcpConnector.DEFAULT_BUFFER_SIZE, c.getBufferSize());
+        c.setSendBufferSize(1024);
+        assertEquals(1024, c.getSendBufferSize());
+        c.setSendBufferSize(0);
+        assertEquals(TcpConnector.DEFAULT_BUFFER_SIZE, c.getSendBufferSize());
 
         // timeouts
         c.setReceiveTimeout(-1);

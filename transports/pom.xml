@@ -44,12 +44,7 @@
             <artifactId>mule-core</artifactId>
             <version>${version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-core</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
+
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
@@ -57,73 +52,73 @@
             <scope>test</scope>
         </dependency>
 
-		<!-- Note: Ideally, the following list of libraries should be in the Mule project's top-level 
-			POM, but Maven has visibility problems when dependencies are more than 2 levels away, so 
+		<!-- Note: Ideally, the following list of libraries should be in the Mule project's top-level
+			POM, but Maven has visibility problems when dependencies are more than 2 levels away, so
             this list is repeated in core/pom.xml, modules/pom.xml, transports/pom.xml, examples/pom.xml -->
-			
+
 		<!-- The following libraries are provided by the mule-module-util bundle -->
-        <dependency>
-            <groupId>backport-util-concurrent</groupId>
-            <artifactId>backport-util-concurrent</artifactId>
-            <version>3.0</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-beanutils</groupId>
-            <artifactId>commons-beanutils</artifactId>
-            <version>1.7.0</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <version>3.2</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>1.2</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-            <version>2.2</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-            <version>1.0.4</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>backport-util-concurrent</groupId>-->
+            <!--<artifactId>backport-util-concurrent</artifactId>-->
+            <!--<version>3.0</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>commons-beanutils</groupId>-->
+            <!--<artifactId>commons-beanutils</artifactId>-->
+            <!--<version>1.7.0</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>commons-collections</groupId>-->
+            <!--<artifactId>commons-collections</artifactId>-->
+            <!--<version>3.2</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>commons-io</groupId>-->
+            <!--<artifactId>commons-io</artifactId>-->
+            <!--<version>1.2</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>commons-lang</groupId>-->
+            <!--<artifactId>commons-lang</artifactId>-->
+            <!--<version>2.2</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>commons-logging</groupId>-->
+            <!--<artifactId>commons-logging</artifactId>-->
+            <!--<version>1.0.4</version>-->
+        <!--</dependency>-->
         <!-- Used by mules default component pooling mechanism -->
-        <dependency>
-            <groupId>commons-pool</groupId>
-            <artifactId>commons-pool</artifactId>
-            <version>1.3</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>commons-pool</groupId>-->
+            <!--<artifactId>commons-pool</artifactId>-->
+            <!--<version>1.3</version>-->
+        <!--</dependency>-->
         <!-- UMOMesage attachment support; not needed for JDK 6 -->
-        <dependency>
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
-            <version>1.1</version>
-            <scope>provided</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>javax.activation</groupId>-->
+            <!--<artifactId>activation</artifactId>-->
+            <!--<version>1.1</version>-->
+            <!--<scope>provided</scope>-->
+        <!--</dependency>-->
         <!-- Used for the WorkManager API & for the Mule RA -->
-        <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
-            <version>1.0.1</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.apache.geronimo.specs</groupId>-->
+            <!--<artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>-->
+            <!--<version>1.0.1</version>-->
+        <!--</dependency>-->
         <!-- Used for XA Transactions -->
-        <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-jta_1.0.1B_spec</artifactId>
-            <version>1.0.1</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.apache.geronimo.specs</groupId>-->
+            <!--<artifactId>geronimo-jta_1.0.1B_spec</artifactId>-->
+            <!--<version>1.0.1</version>-->
+        <!--</dependency>-->
         <!-- Unit tests -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.2</version>
-            <scope>test</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>junit</groupId>-->
+            <!--<artifactId>junit</artifactId>-->
+            <!--<version>3.8.2</version>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
     </dependencies>
 
     <profiles>
@@ -144,8 +139,8 @@
                                     org.mule.modules.osgi
                                 </Private-Package>
                                 <!-- Since org.mule.modules.osgi is included as a private package,
-                                    we need to explicitly declare its imports (they aren't 
-                                    automatically generated. 
+                                    we need to explicitly declare its imports (they aren't
+                                    automatically generated.
                                     Note: manifest settings don't get merged with the parent, so
                                     we need to repeat all settings from ../pom.xml here :-( -->
                                 <Import-Package>
@@ -172,7 +167,7 @@
                         </configuration>
                     </plugin>
                  </plugins>
-            </build>    
+            </build>
             <dependencies>
                 <!-- Needed for the TransportActivator -->
                 <dependency>

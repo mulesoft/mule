@@ -24,6 +24,8 @@ public class XslHelper
     private static List errors = new ArrayList();
     private static List warnings = new ArrayList();
 
+    private String currentModel;
+
     public static void reportError(String message)
     {
         errors.add((errors.size() + 1) + ". " + message);
@@ -92,5 +94,27 @@ public class XslHelper
     public static String concatId(String string)
     {
         return string + "#" + UUID.getUUID();
+    }
+
+
+    public String getCurrentModel()
+    {
+        return currentModel;
+    }
+
+    public void setCurrentModel(String currentModel)
+    {
+        this.currentModel = currentModel;
+    }
+   
+
+    public static List getErrors()
+    {
+        return new ArrayList(errors);
+    }
+
+    public static List getWarnings()
+    {
+        return new ArrayList(warnings);
     }
 }

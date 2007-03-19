@@ -46,6 +46,18 @@
             <artifactId>mule-transport-soap</artifactId>
             <version>${version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-vm</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-axis</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
         
         <!-- This is needed by org.mule.providers.soap.xfire.transport.MuleUniversalChannel -->
         <dependency>
@@ -60,9 +72,23 @@
             <artifactId>xfire-core</artifactId>
             <version>1.2.2</version>
             <exclusions>
+                <!-- we like slf4j -->
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>                
+                <exclusion>
+                    <!-- we want the newer version below -->
+                    <groupId>woodstox</groupId>
+                    <artifactId>wstx-asl</artifactId>
+                </exclusion>
                 <exclusion>
                     <groupId>xerces</groupId>
                     <artifactId>xmlParserAPIs</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -102,16 +128,30 @@
             <version>1.4</version>
             <scope>provided</scope>
         </dependency>
+        <!-- use new jaxen/jdom versions for xfire-core -->
+        <dependency>
+            <groupId>jaxen</groupId>
+            <artifactId>jaxen</artifactId>
+            <version>1.1</version>
+        </dependency>
         <dependency>
             <groupId>jdom</groupId>
             <artifactId>jdom</artifactId>
             <version>1.0</version>
-            <scope>compile</scope>
         </dependency>
+        <!-- re-add woodstox with newer groupId & version -->
         <dependency>
-            <groupId>woodstox</groupId>
+            <groupId>org.codehaus.woodstox</groupId>
             <artifactId>wstx-asl</artifactId>
-            <version>3.0.2</version>
+            <version>3.2.0</version>
+        </dependency>
+
+        <!-- Better testing of XML -->        
+        <dependency>
+            <groupId>xmlunit</groupId>
+            <artifactId>xmlunit</artifactId>
+            <version>1.0</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

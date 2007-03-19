@@ -26,6 +26,7 @@ import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.URIResolver;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.pool.BasePoolableObjectFactory;
@@ -206,6 +207,20 @@ public class XsltTransformer extends AbstractXmlTransformer
         {
             StreamSource source = XsltTransformer.this.getStreamSource();
             TransformerFactory factory = TransformerFactory.newInstance();
+            factory.setURIResolver(new URIResolver()
+            {
+                public Source resolve(String href, String base) throws javax.xml.transform.TransformerException
+                {
+                    try
+                    {
+                        return new StreamSource(IOUtils.getResourceAsStream(href, getClass()));
+                    }
+                    catch (IOException e)
+                    {
+                        throw new javax.xml.transform.TransformerException(e);
+                    }
+                }
+            });
             return factory.newTransformer(source);
         }
     }

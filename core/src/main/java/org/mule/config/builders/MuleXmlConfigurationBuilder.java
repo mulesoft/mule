@@ -103,7 +103,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         MuleApplicationContext root = null;
         if(defaultConfigResource!=null)
         {
-            new MuleApplicationContext(defaultConfigResource);
+           // new MuleApplicationContext(defaultConfigResource);
         }
 
         String[] all = new String[resources.length + 1];

@@ -35,6 +35,7 @@
             <id>java14</id>
             <activation>
                 <jdk>1.4</jdk>
+                <activeByDefault>true</activeByDefault>
             </activation>
             <dependencies>
                 <!--
@@ -59,6 +60,11 @@
                     <artifactId>xfire-ws-security</artifactId>
                     <version>1.2.2</version>
                     <exclusions>
+                        <!-- we like slf4j -->
+                        <exclusion>
+                            <groupId>commons-logging</groupId>
+                            <artifactId>commons-logging</artifactId>
+                        </exclusion>                
                         <!-- this is JDK5 only - see below for JDK14 version -->
                         <exclusion>
                             <groupId>org.codehaus.xfire</groupId>
@@ -86,6 +92,11 @@
                     <artifactId>xfire-ws-security</artifactId>
                     <version>1.2.2</version>
                     <exclusions>
+                        <!-- we like slf4j -->
+                        <exclusion>
+                            <groupId>commons-logging</groupId>
+                            <artifactId>commons-logging</artifactId>
+                        </exclusion>                
                         <!-- IMPORTANT for JDK5 -->
                         <exclusion>
                             <groupId>xml-apis</groupId>
@@ -255,6 +266,19 @@
             <artifactId>mule-transport-vm</artifactId>
             <version>${version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+            <version>3.0.1</version>
+            <scope>test</scope>
+            <exclusions>
+                <!-- we like slf4j -->
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>                
+            </exclusions>
         </dependency>
     </dependencies>
 </project>

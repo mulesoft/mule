@@ -648,7 +648,7 @@ public class Base64
                 msg.append(source[srcOffset + 1]).append(": ").append(DECODABET[source[srcOffset + 1]]);
                 msg.append(source[srcOffset + 2]).append(": ").append(DECODABET[source[srcOffset + 2]]);
                 msg.append(source[srcOffset + 3]).append(": ").append(DECODABET[source[srcOffset + 3]]);
-                throw new IllegalStateException(msg.toString());
+                throw (IllegalStateException)new IllegalStateException(msg.toString()).initCause(e);
             } // end catch
         }
     } // end decodeToBytes

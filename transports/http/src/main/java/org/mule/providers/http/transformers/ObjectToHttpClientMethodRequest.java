@@ -28,11 +28,13 @@ import java.net.URI;
 import java.util.Iterator;
 
 import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.commons.httpclient.params.HttpMethodParams;
 
 /**
  * <code>ObjectToHttpClientMethodRequest</code> transforms a UMOMessage into a
@@ -202,9 +204,27 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
                 }
 
                 httpMethod = postMethod;
-
             }
 
+            //Allow the user to set HttpMethodParams as an object on the message
+            HttpMethodParams params = (HttpMethodParams)msg.removeProperty(HttpConnector.HTTP_PARAMS_PROPERTY);
+            if(params!=null)
+            {
+                httpMethod.setParams(params);
+            }
+            else
+            {
+                //TODO we should propbably set other propserties here
+                String httpVersion = msg.getStringProperty(HttpConnector.HTTP_VERSION_PROPERTY, HttpConstants.HTTP11);
+                if(HttpConstants.HTTP10.equals(httpVersion))
+                {
+                    httpMethod.getParams().setVersion(HttpVersion.HTTP_1_0);
+                }
+                else
+                {
+                    httpMethod.getParams().setVersion(HttpVersion.HTTP_1_1);
+                }                
+            }
             return httpMethod;
         }
         catch (Exception e)

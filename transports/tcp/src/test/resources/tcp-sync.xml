@@ -5,8 +5,13 @@
 
 <mule-configuration id="test" version="1.0">
 
+    <environment-properties>
+        <property name="test.endpoint" value="tcp://localhost:45441"/>
+    </environment-properties>
+
+
     <!-- Mule properties -->
-    <mule-environment-properties synchronous="false" remoteSync="false" />
+    <mule-environment-properties remoteSync="false" />
 
     <connector name="tcpConnector" className="org.mule.providers.tcp.TcpConnector">
         <properties>
@@ -18,10 +23,14 @@
         </properties>
     </connector>
 
+    <global-endpoints>
+        <endpoint name="clientEndpoint" address="${test.endpoint}" type="sender"/>
+    </global-endpoints>
+
     <model name="model">
         <mule-descriptor name="TcpReceiver" implementation="org.mule.components.simple.EchoComponent">
             <inbound-router>
-                <endpoint address="tcp://localhost:4544" synchronous="true"/>
+                <endpoint address="${test.endpoint}" synchronous="true"/>
             </inbound-router>
         </mule-descriptor>
 

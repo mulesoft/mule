@@ -23,6 +23,7 @@ import org.mule.umo.provider.NoReceiverForEndpointException;
 import org.mule.util.PropertiesUtils;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
@@ -119,7 +120,9 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
         {
             throw new EndpointException(new Message("http", 4, httpServletRequest.getRequestURI()));
         }
+
         AbstractMessageReceiver receiver = (AbstractMessageReceiver)getReceivers().get(uri);
+
         if (receiver == null)
         {
             // Nothing found lets try stripping the path and only use the last
@@ -127,9 +130,33 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
             int i = uri.lastIndexOf("/");
             if (i > -1)
             {
-                uri = uri.substring(i + 1);
-                receiver = (AbstractMessageReceiver)getReceivers().get(uri);
+                String tempUri = uri.substring(i + 1);
+                receiver = (AbstractMessageReceiver)getReceivers().get(tempUri);
             }
+
+            // Conversely, lets see if the uri matches up with the last part of
+            // any of the receiver keys. This will be necesary to find xfire
+            // receivers
+
+            if (receiver == null)
+            {
+                Map receivers = getReceivers();
+                Iterator iter = receivers.keySet().iterator();
+                while (iter.hasNext())
+                {
+                    String key = iter.next().toString();
+                    i = key.lastIndexOf("/");
+                    if (i > -1)
+                    {
+                        if (key.substring(i+1).equals(uri))
+                        {
+                            receiver = (AbstractMessageReceiver)receivers.get(key);
+                            break;
+                        }
+                    }
+                }
+            }
+            
             if (receiver == null)
             {
                 throw new NoReceiverForEndpointException("No receiver found for endpointUri: " + uri);

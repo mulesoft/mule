@@ -10,6 +10,7 @@
 
 package org.mule.samples.errorhandler.handlers;
 
+import org.mule.config.i18n.Message;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.samples.errorhandler.ErrorMessage;
@@ -36,10 +37,9 @@ public class FatalHandler extends DefaultHandler
 
     public void processException(ErrorMessage message, Throwable t) throws HandlerException
     {
-        System.out.println(StringMessageUtils.getBoilerPlate("Exception received in \n"
-                                                             + " FATAL EXCEPTION HANDLER \n."
-                                                             + " Logic could be put in here to enrich the message content"));
-        logger.fatal("Exception is: " + t, t);
+        String msg = new Message("errorhandler-example", 15).getMessage();
+        System.out.println(StringMessageUtils.getBoilerPlate(msg));
+        logger.fatal(new Message("errorhandler-example", 16, t).getMessage(), t);
     }
 
 }

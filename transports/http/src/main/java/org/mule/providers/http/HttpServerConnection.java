@@ -71,7 +71,10 @@ public class HttpServerConnection
         }
         catch (IOException e)
         {
-            // ignore
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("(Ignored) Error closing the socket: " + e.getMessage());
+            }
         }
         finally
         {
@@ -119,7 +122,7 @@ public class HttpServerConnection
         try
         {
             String line = readLine();
-            if(line==null)
+            if (line == null)
             {
                 return null;
             }
@@ -176,7 +179,7 @@ public class HttpServerConnection
         Iterator item = request.getHeaderIterator();
         while (item.hasNext())
         {
-            Header header = (Header)item.next();
+            Header header = (Header) item.next();
             writer.print(header.toExternalForm());
         }
         writer.println();
@@ -200,7 +203,7 @@ public class HttpServerConnection
 
             if (outstream instanceof ChunkedOutputStream)
             {
-                ((ChunkedOutputStream)outstream).finish();
+                ((ChunkedOutputStream) outstream).finish();
             }
         }
 
@@ -222,7 +225,7 @@ public class HttpServerConnection
         Iterator item = response.getHeaderIterator();
         while (item.hasNext())
         {
-            Header header = (Header)item.next();
+            Header header = (Header) item.next();
             writer.print(header.toExternalForm());
         }
 
@@ -246,7 +249,7 @@ public class HttpServerConnection
 
             if (outstream instanceof ChunkedOutputStream)
             {
-                ((ChunkedOutputStream)outstream).finish();
+                ((ChunkedOutputStream) outstream).finish();
             }
         }
 

@@ -87,7 +87,8 @@ public class MuleMessage implements UMOMessage
                     }
                     catch (Exception e)
                     {
-                        throw new MuleRuntimeException(new Message(Messages.FAILED_TO_READ_ATTACHMENT_X, s),
+                        throw new MuleRuntimeException(
+                            new Message(Messages.FAILED_TO_READ_ATTACHMENT_X, s),
                             e);
                     }
                 }

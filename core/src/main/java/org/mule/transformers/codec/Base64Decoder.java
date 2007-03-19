@@ -70,8 +70,10 @@ public class Base64Decoder extends AbstractTransformer
         }
         catch (Exception ex)
         {
-            throw new TransformerException(new Message(Messages.TRANSFORM_FAILED_FROM_X_TO_X, "base64",
-                this.getReturnClass().getName()), this, ex);
+            throw new TransformerException(
+                new Message(Messages.TRANSFORM_FAILED_FROM_X_TO_X, 
+                    "base64", this.getReturnClass().getName()),
+                this, ex);
         }
     }
 

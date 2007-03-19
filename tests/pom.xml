@@ -14,7 +14,6 @@
     <name>Mule Tests</name>
 
     <modules>
-        <module>core</module>
         <module>functional</module>
     </modules>
 
@@ -24,16 +23,16 @@
             <artifactId>mule-core</artifactId>
             <version>${version}</version>
         </dependency>
+        <!-- Now that m2 dependency resolution works, activation
+             should ONLY come via core or (in the future) core-api, but there is
+             OF COURSE a bug with m2's handling of provided dependencies:
+             http://jira.codehaus.org/browse/MNG-2205
+        -->
         <dependency>
             <groupId>javax.activation</groupId>
             <artifactId>activation</artifactId>
             <version>1.1</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.2</version>
         </dependency>
     </dependencies>
 

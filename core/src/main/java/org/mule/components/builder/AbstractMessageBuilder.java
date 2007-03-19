@@ -10,6 +10,7 @@
 
 package org.mule.components.builder;
 
+import org.mule.config.ConfigurationException;
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.UMODescriptorAware;
@@ -42,7 +43,7 @@ public abstract class AbstractMessageBuilder implements UMODescriptorAware, Call
 
     protected UMODescriptor descriptor;
 
-    public void setDescriptor(UMODescriptor descriptor)
+    public void setDescriptor(UMODescriptor descriptor) throws ConfigurationException
     {
         this.descriptor = descriptor;
     }

@@ -16,10 +16,6 @@ import org.mule.providers.http.jetty.JettyConnector;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.UMOEndpointURI;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class JettyEndpointTestCase extends AbstractMuleTestCase
 {
     public void testHostPortOnlyUrl() throws Exception

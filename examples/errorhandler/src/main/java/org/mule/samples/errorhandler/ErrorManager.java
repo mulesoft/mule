@@ -14,6 +14,8 @@ import org.mule.samples.errorhandler.handlers.DefaultHandler;
 import org.mule.samples.errorhandler.handlers.FatalHandler;
 import org.mule.umo.UMOException;
 
+import org.mule.config.i18n.Message;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -24,8 +26,6 @@ import org.apache.commons.logging.LogFactory;
 /**
  * <code>ErrorManager</code> TODO (document class)
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class ErrorManager
 {
@@ -85,30 +85,29 @@ public class ErrorManager
         }
         catch (Exception e)
         {
-            logger.error("Failed to handle Exception using handler: "
-                         + (eh != null ? (eh.getClass().getName() + " : " + e) : "null"));
+        
+            logger.error(new Message("errorhandler-example", 6, 
+               (eh != null ? (eh.getClass().getName() + " : " + e) : "null")).getMessage());
 
             if (eh instanceof DefaultHandler)
             {
-                logger.error("As the failure happened in the Default Exception handler, now using Fatal Behaviour "
-                             + FatalHandler.class.getName()
-                             + " which will cause the Exception Manager to shutdown");
-
+                logger.error(new Message("errorhandler-example", 7, 
+                    FatalHandler.class.getName()).getMessage());
                 handleFatal(e);
 
             }
             else if (eh instanceof FatalHandler)
             {
-                logger.fatal("Exception caught handling Fatal exception: " + e);
+                logger.fatal(new Message("errorhandler-example", 8, 
+                    e).getMessage());
                 //TODO Fix this
                 //managementContext.shutdown(e, false);
             }
             else
             {
-                logger.error("Exception Handler resorting to Default Behaviour : "
-                             + DefaultHandler.class.getName()
-                             + ", due to exception in configured behavour : "
-                             + (eh != null ? (eh.getClass().getName() + " : " + e) : "null"));
+                logger.error(new Message("errorhandler-example", 9, 
+                    DefaultHandler.class.getName(),
+                    (eh != null ? (eh.getClass().getName() + " : " + e) : "null")).getMessage());
                 handleDefault(msg, e);
             }
         }
@@ -125,8 +124,7 @@ public class ErrorManager
         }
         catch (Exception e)
         {
-            logger.fatal("Exception happened while handling and exception using the Default behaviour: " + e,
-                e);
+            logger.fatal(new Message("errorhandler-example", 10, e).getMessage(), e);
             handleFatal(e);
         }
         try
@@ -135,8 +133,7 @@ public class ErrorManager
         }
         catch (HandlerException e)
         {
-            logger.fatal("Exception happened while handling and exception using the Default behaviour: " + e,
-                e);
+            logger.fatal(new Message("errorhandler-example", 11, e).getMessage(), e);
             handleFatal(e);
         }
 
@@ -146,8 +143,7 @@ public class ErrorManager
     {
         // If this method has been called, all other handlers failed
         // this is all we can do
-        logger.fatal("An exception has been caught be the Fatal Exception Behaviour");
-        logger.fatal("Exception is: " + t, t);
+        logger.fatal(new Message("errorhandler-example", 12, t).getMessage(), t);
         //TODO fix this
         //managementContext.shutdown(t, false);
     }

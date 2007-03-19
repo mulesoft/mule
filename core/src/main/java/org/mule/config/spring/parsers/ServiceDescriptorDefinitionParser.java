@@ -12,31 +12,32 @@ package org.mule.config.spring.parsers;
 import org.mule.impl.MuleDescriptor;
 
 import org.w3c.dom.Element;
+import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 
 /**
  * TODO
  */
-public class ServiceDescriptorDefinitionParser extends AbstractChildBeanDefinitionParser
+public class ServiceDescriptorDefinitionParser extends AbstractMuleSingleBeanDefinitionParser
 {
-
     protected Class getBeanClass(Element element)
     {
         return MuleDescriptor.class;
     }
 
-    public boolean isCollection(Element element)
+    //@java.lang.Override
+    protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
         Element parent = (Element) element.getParentNode();
-        if (parent.getNodeName().equals("beans"))
-        {
-            return false;
-        }
-        return true;
-    }
+        String modelName = parent.getAttribute(ATTRIBUTE_NAME);
+        builder.addPropertyValue("modelName", modelName);
+        builder.getBeanDefinition().setEnforceDestroyMethod(false);
+        builder.getBeanDefinition().setEnforceInitMethod(false);
+        builder.setInitMethodName("initialise");
+        builder.setDestroyMethodName("dispose");
+        builder.setSingleton(true);
+        builder.addDependsOn(modelName);
 
-    public String getPropertyName(Element e)
-    {
-        return "serviceDescriptor";
+        super.doParse(element, parserContext, builder);
     }
-
 }

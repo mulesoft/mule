@@ -63,8 +63,8 @@
         </mule-descriptor>
     </model>
 
-    <bean id="beanConnector" class="org.mule.tck.testmodels.mule.TestConnector">
-        <spring-property name="someProperty">
+    <bean id="beanTransformer" class="org.mule.tck.testmodels.mule.TestCompressionTransformer">
+        <spring-property name="beanProperty1">
             <value>hello</value>
         </spring-property>
     </bean>

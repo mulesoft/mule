@@ -68,8 +68,9 @@ public class ReflectionMessageBuilder extends AbstractMessageBuilder
             }
             catch (Exception e)
             {
-                throw new MessageBuilderException(new Message(Messages.FAILED_TO_INVOKE_X,
-                    m.getName() + " on " + master.getClass().getName()), request);
+                throw new MessageBuilderException(
+                    new Message(Messages.FAILED_TO_INVOKE_X, m.getName() + " on " + master.getClass().getName()), 
+                    request, e);
 
             }
         }

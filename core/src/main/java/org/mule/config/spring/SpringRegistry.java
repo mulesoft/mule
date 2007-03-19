@@ -1117,24 +1117,23 @@ public class SpringRegistry implements RegistryFacade, ApplicationContextAware
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
     {
         this.applicationContext = applicationContext;
-//        SpringContainerContext c = new SpringContainerContext();
-//        c.setName("_springRegistryContainerContext");
-//        c.setBeanFactory(applicationContext);
-//        try
-//        {
-//            registerContainerContext(c);
-//        }
-//        catch (UMOException e)
-//        {
-//            throw new IllegalStateException("failed to register default Spring Registry Container Context", e);
-//        }
+    }
+
+    public UMOManagementContext getManagementContext()
+    {
+        try
+        {
+            return (UMOManagementContext)lookupObject("_managementContextFactoryBean");
+        }
+        catch (ObjectNotFoundException e)
+        {
+            throw new IllegalStateException("ManagementContext not found in the runtime registry");
+        }
     }
 
     public UMOEndpoint createEndpointFromUri(UMOEndpointURI uri, String type) throws UMOException
     {
         UMOEndpoint endpoint = TransportFactory.createEndpoint(uri, type);
-
-        //TODO RM* check the container desn't already call this and see if we can make it call it for us
         endpoint.initialise();
         return endpoint;
     }
@@ -1174,6 +1173,7 @@ public class SpringRegistry implements RegistryFacade, ApplicationContextAware
         if (endpoint == null)
         {
             endpoint = createEndpointFromUri(new MuleEndpointURI(uriIdentifier), type);
+
         }
         else
         {

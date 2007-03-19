@@ -98,6 +98,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         }
         catch (ResourceManagerException e)
         {
+            // TODO MULE-863: What should we really do?
             logger.error("Error disposing manager", e);
         }
     }
@@ -128,6 +129,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         }
         catch (IOException e)
         {
+            // TODO MULE-863: What should we really do?
             logger.error("Error closing persistent store", e);
         }
         return super.shutdown(mode, timeoutMSecs);

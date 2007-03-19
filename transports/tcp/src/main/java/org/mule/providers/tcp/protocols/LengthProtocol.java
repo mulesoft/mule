@@ -15,7 +15,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.Serializable;
 
 /**
  * The LengthProtocol is an application level tcp protocol that can be used to
@@ -26,7 +25,7 @@ import java.io.Serializable;
 public class LengthProtocol extends ByteProtocol
 {
 
-    public Serializable read(InputStream is) throws IOException
+    public Object read(InputStream is) throws IOException
     {
         // Use a mark / reset here so that an exception
         // will not be thrown is the read times out.

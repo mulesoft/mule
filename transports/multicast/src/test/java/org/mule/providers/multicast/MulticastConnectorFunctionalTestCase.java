@@ -10,116 +10,66 @@
 
 package org.mule.providers.multicast;
 
-import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.providers.udp.UdpMessageAdapter;
-import org.mule.tck.functional.AbstractProviderFunctionalTestCase;
-import org.mule.umo.endpoint.EndpointException;
-import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.provider.UMOConnector;
+import org.mule.extras.client.MuleClient;
+import org.mule.tck.FunctionalTestCase;
 
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
-import java.net.URI;
+import java.util.HashSet;
+import java.util.Set;
 
-public class MulticastConnectorFunctionalTestCase extends AbstractProviderFunctionalTestCase
+public class MulticastConnectorFunctionalTestCase extends FunctionalTestCase
 {
-    private MulticastSocket s1 = null;
-    private MulticastSocket s2 = null;
-    private InetAddress inet = null;
-    private URI uri;
+    public static final String MESSAGE = "hello";
 
-    protected void doSetUp() throws Exception
+
+    protected String getConfigResources()
     {
-        super.doSetUp();
-        uri = getInDest().getUri();
-        inet = InetAddress.getByName(uri.getHost());
+        return "multicast-functional-test.xml";
     }
 
-    protected void doTearDown() throws Exception
+    public void testSendTestData() throws Exception
     {
-        try
+        final int numberOfMessages = 100;
+        MuleClient client = new MuleClient();
+
+        for (int sentPackets = 0; sentPackets < numberOfMessages; sentPackets++)
         {
-            s1.close();
-        }
-        catch (Exception e)
-        {
-            // ignore
-        }
-        try
-        {
-            s2.close();
-        }
-        catch (Exception e)
-        {
-            // ignore
+            String msg = MESSAGE + sentPackets;
+            client.dispatch("serverEndpoint", msg, null);
         }
 
-        super.doTearDown();
+        int broadcastMessages = numberOfMessages * 3; //3 components
+        Set receivedMessages = new HashSet(broadcastMessages);
+
+        int receivedPackets = 0;
+        for (; receivedPackets < broadcastMessages; receivedPackets++)
+        {
+            receivedMessages.add(client.receive("vm://foo", 2000).getPayloadAsString());
+
+        }
+
+        assertEquals(broadcastMessages, receivedPackets);
+
+        //Check all broadcasts were received from Component1
+        checkBroadcastMessagesForComponent(receivedMessages, "Component1");
+
+        //Check all broadcasts were received from Component2
+        checkBroadcastMessagesForComponent(receivedMessages, "Component2");
+
+        //Check all broadcasts were received from Component3
+        checkBroadcastMessagesForComponent(receivedMessages, "Component3");
+
+        assertEquals(0, receivedMessages.size());
     }
 
-    protected void sendTestData(int iterations) throws Exception
+    protected void checkBroadcastMessagesForComponent(Set receivedMessages, String name)
     {
-
-        s1 = new MulticastSocket(uri.getPort());
-        s1.joinGroup(inet);
-
-        s2 = new MulticastSocket(uri.getPort());
-        s2.joinGroup(inet);
-
-        for (int i = 0; i < iterations; i++)
+        //Check all broadcasts were received from Component2
+        for (int x = 0; x <100; x++)
         {
-            String msg = "Hello" + i;
+            String expected = MESSAGE + x + " Received " + name;
 
-            DatagramPacket packet = new DatagramPacket(msg.getBytes(), msg.length(), inet, uri.getPort());
-
-            System.out.println("sending message: " + i);
-            s1.send(packet);
+            assertTrue(receivedMessages.contains(expected));
+            assertTrue(receivedMessages.remove(expected));
         }
     }
-
-    protected void receiveAndTestResults() throws Exception
-    {
-        s2.setSoTimeout(2000);
-        for (int i = 0; i < 100; i++)
-        {
-
-            DatagramPacket packet = new DatagramPacket(new byte[32], 32, inet, uri.getPort());
-
-            s2.receive(packet);
-            UdpMessageAdapter adapter = new UdpMessageAdapter(packet);
-            System.out.println("Received message: " + adapter.getPayloadAsString());
-
-        }
-        Thread.sleep(3000);
-    }
-
-    protected UMOEndpointURI getInDest()
-    {
-        try
-        {
-            return new MuleEndpointURI("multicast://228.8.9.10:6677");
-        }
-        catch (EndpointException e)
-        {
-            fail(e.getMessage());
-            return null;
-        }
-    }
-
-    protected UMOEndpointURI getOutDest()
-    {
-        return getInDest();
-    }
-
-    public UMOConnector createConnector() throws Exception
-    {
-        MulticastConnector connector = new MulticastConnector();
-        connector.setName("testMulticast");
-        connector.getDispatcherThreadingProfile().setDoThreading(false);
-
-        connector.setBufferSize(1024);
-        return connector;
-    }
-
 }

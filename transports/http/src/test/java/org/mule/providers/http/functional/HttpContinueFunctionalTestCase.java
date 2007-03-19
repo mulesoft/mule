@@ -10,19 +10,27 @@
 
 package org.mule.providers.http.functional;
 
-import java.net.URI;
+import org.mule.extras.client.MuleClient;
+import org.mule.providers.http.HttpConnector;
+import org.mule.tck.FunctionalTestCase;
+import org.mule.umo.UMOMessage;
 
-import org.apache.commons.httpclient.HttpConnection;
-import org.apache.commons.httpclient.HttpState;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.httpclient.HttpVersion;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.params.HttpClientParams;
-import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.lang.time.StopWatch;
 
-public class HttpContinueFunctionalTestCase extends HttpFunctionalTestCase
+public class HttpContinueFunctionalTestCase extends FunctionalTestCase
 {
+
+    public static final String TEST_MESSAGE = "Foo Bar";
+
+    protected String getConfigResources()
+    {
+        return "http-functional-test.xml";
+    }
 
     /**
      * HttpClient has default 3 seconds wait for Expect-Continue calls.
@@ -31,30 +39,24 @@ public class HttpContinueFunctionalTestCase extends HttpFunctionalTestCase
 
     protected StopWatch stopWatch;
 
-    protected void sendTestData(int iterations) throws Exception
+    public void testSendWithContinue() throws Exception
     {
-        URI uri = getInDest().getUri();
+        MuleClient client = new MuleClient();
+        Map props = new HashMap();
+        //Need to use Http1.1 for Expect: Continue
         HttpClientParams params = new HttpClientParams();
         params.setVersion(HttpVersion.HTTP_1_1);
         params.setBooleanParameter(HttpClientParams.USE_EXPECT_CONTINUE, true);
-        postMethod = new PostMethod(uri.toString());
-        postMethod.setParams(params);
-        postMethod.setRequestEntity(new StringRequestEntity(TEST_MESSAGE, TEST_CONTENT_TYPE, TEST_CHARSET));
-        cnn = new HttpConnection(uri.getHost(), uri.getPort(), Protocol.getProtocol(uri.getScheme()));
-        cnn.open();
+        props.put(HttpConnector.HTTP_PARAMS_PROPERTY, params);
         stopWatch = new StopWatch();
         stopWatch.start();
-        postMethod.execute(new HttpState(), cnn);
-    }
-
-    protected void receiveAndTestResults() throws Exception
-    {
+        UMOMessage result = client.send("clientEndpoint", TEST_MESSAGE, props);
         stopWatch.stop();
-        String msg = postMethod.getResponseBodyAsString();
-        assertNotNull(msg);
-        assertEquals(TEST_MESSAGE + " Received", msg);
-        long processingTime = stopWatch.getTime();
-        if (processingTime > DEFAULT_HTTP_CLIENT_CONTINUE_WAIT)
+
+        assertNotNull(result);
+        assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
+
+        if (stopWatch.getTime() > DEFAULT_HTTP_CLIENT_CONTINUE_WAIT)
         {
             fail("Server did not handle Expect=100-continue header properly,");
         }

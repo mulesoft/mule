@@ -6,35 +6,39 @@
     <parent>
         <groupId>org.mule.modules</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>2.0-SNAPSHOT</version>
+        <version>1.4-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-builders</artifactId>
-    <packaging>bundle</packaging>
+    <packaging>jar</packaging>
+    <!--<packaging>bundle</packaging>-->
     <name>Mule Configuration Builders</name>
     <description>Standard configuration builders for Mule</description>
 
-    <build>
-         <plugins>
-              <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <configuration>
-                    <instructions>
-                        <Export-Package>
-                            org.mule.config.builders,
-                            org.mule.config.converters
-                        </Export-Package>
-                    </instructions>
-                </configuration>
-            </plugin>
-         </plugins>
-    </build>
+    <!--<build>-->
+     	<!--<plugins>-->
+	      	<!--<plugin>-->
+                <!--<groupId>org.apache.felix</groupId>-->
+                <!--<artifactId>maven-bundle-plugin</artifactId>-->
+		        <!--<configuration>-->
+                    <!--<instructions>-->
+                        <!--<!- TODO Limit exports to the minimum necessary,-->
+                            <!--in particular "impl" packages should not be exported. -->
+                        <!--<Export-Package>-->
+                            <!--org.mule.config.builders,-->
+                            <!--org.mule.config.converters-->
+                        <!--</Export-Package>-->
+                    <!--</instructions>-->
+		        <!--</configuration>-->
+		    <!--</plugin>-->
+     	<!--</plugins>-->
+    <!--</build>-->
 
     <profiles>
         <profile>
             <id>java14</id>
             <activation>
                 <jdk>1.4</jdk>
+                <activeByDefault>true</activeByDefault>
             </activation>
             <dependencies>
                 <!-- see mule-module-xml -->
@@ -48,12 +52,6 @@
                     <artifactId>xercesImpl</artifactId>
                     <version>2.8.1</version>
                 </dependency>
-                <!-- Used by MuleXmlConfigurationBuilder -->
-                <dependency>
-                    <groupId>commons-digester</groupId>
-                    <artifactId>commons-digester</artifactId>
-                    <version>1.7</version>
-                </dependency>
             </dependencies>
         </profile>
         <profile>
@@ -61,22 +59,16 @@
             <activation>
                 <jdk>1.5</jdk>
             </activation>
-            <dependencies>
-            </dependencies>
         </profile>
     </profiles>
-    
+
     <dependencies>
         <!-- Used by MuleXmlBuilderContextServlet -->
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-servlet_2.4_spec</artifactId>
             <version>1.0.1</version>
-            <!-- TODO MULE-10221 
-            This library causes conflicts when Mule is deployed to a Web/J2EE server but is
-            needed otherwise.
-            <scope>provided</scope> 
-            -->
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>

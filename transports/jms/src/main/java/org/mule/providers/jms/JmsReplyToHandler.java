@@ -23,9 +23,9 @@ import javax.jms.DeliveryMode;
 import javax.jms.Destination;
 import javax.jms.Message;
 import javax.jms.MessageProducer;
-import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.Topic;
+import javax.jms.Queue;
 
 import org.apache.commons.lang.ObjectUtils;
 
@@ -77,7 +77,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
             }
 
             if (replyToDestination instanceof Topic && replyToDestination instanceof Queue
-                && connector.getJmsSupport() instanceof Jms102bSupport)
+                    && connector.getJmsSupport() instanceof Jms102bSupport)
             {
                 logger.error(StringMessageUtils.getBoilerPlate("ReplyTo destination implements both Queue and Topic "
                                                                + "while complying with JMS 1.0.2b specification. "

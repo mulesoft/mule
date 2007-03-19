@@ -10,10 +10,10 @@
 
 package org.mule.transaction;
 
+import org.mule.umo.UMOTransaction;
+import org.mule.umo.TransactionException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.umo.TransactionException;
-import org.mule.umo.UMOTransaction;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -22,9 +22,11 @@ public class TransactionCoordination
 {
     protected static final Log logger = LogFactory.getLog(TransactionCoordination.class);
 
-    private static volatile TransactionCoordination instance;
+    private static final TransactionCoordination instance = new TransactionCoordination();
 
-    private final ThreadLocal transactions = new ThreadLocal();
+    private static final ThreadLocal transactions = new ThreadLocal();
+
+    // @GuardedBy("this")
     private int txCounter = 0;
 
     private TransactionCoordination()
@@ -34,30 +36,7 @@ public class TransactionCoordination
 
     public static TransactionCoordination getInstance()
     {
-        if (instance == null)
-        {
-            setInstance(new TransactionCoordination());
-        }
-
         return instance;
-    }
-
-    public static synchronized void setInstance(TransactionCoordination txSync)
-    {
-        if (instance == null)
-        {
-            instance = txSync;
-        }
-
-        // TODO this lock is different from whatever other places use
-        synchronized (instance)
-        {
-            if (instance.txCounter != 0)
-            {
-                throw new IllegalStateException("there are currently " + instance.txCounter
-                                + "transactions associated with this manager, cannot replace the manager");
-            }
-        }
     }
 
     public UMOTransaction getTransaction()

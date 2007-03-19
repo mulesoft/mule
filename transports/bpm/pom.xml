@@ -31,9 +31,7 @@
     </build>
 
     <dependencies>
-        <!-- *************************************************************************
-             jBPM
-        ****************************************************************************** --> 
+        <!-- jBPM --> 
         <dependency>
             <groupId>jboss</groupId>
             <artifactId>jbpm</artifactId>
@@ -115,9 +113,7 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- *************************************************************************
-             Hibernate
-        ****************************************************************************** --> 
+        <!-- Hibernate --> 
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate</artifactId>
@@ -127,6 +123,11 @@
                 <exclusion>
                     <groupId>commons-collections</groupId>
                     <artifactId>commons-collections</artifactId>
+                </exclusion>
+                <!-- we like slf4j -->
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
                 </exclusion>
                 <!-- We've already got the geronimo-jta spec -->
                 <exclusion>
@@ -183,4 +184,5 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
 </project>

@@ -35,6 +35,7 @@ public class HttpResponse
 {
 
     public static final String DEFAULT_CONTENT_CHARSET = "ISO-8859-1";
+    private static final int DEFAULT_BUFFER_SIZE = 8192;
 
     private HttpVersion ver = HttpVersion.HTTP_1_1;
     private int statusCode = HttpStatus.SC_OK;
@@ -255,7 +256,7 @@ public class HttpResponse
     {
         if (string != null)
         {
-            byte[] raw = null;
+            byte[] raw;
             try
             {
                 raw = string.getBytes(getCharset());
@@ -292,7 +293,7 @@ public class HttpResponse
         InputStream in = getBody();
         if (in != null)
         {
-            ByteArrayOutputStream buffer = new ByteArrayOutputStream(8192);
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream(DEFAULT_BUFFER_SIZE);
             IOUtils.copy(in, buffer);
             return buffer.toByteArray();
         }

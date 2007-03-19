@@ -10,6 +10,8 @@
 
 package org.mule.samples.hello;
 
+import org.mule.config.i18n.Message;
+
 /**
  * <code>ChitChatter</code> TODO (document class)
  * 
@@ -18,7 +20,12 @@ package org.mule.samples.hello;
  */
 public class ChitChatter
 {
-    String chitchat = ", How are you?";
+    private String chitchat = "";
+
+    public ChitChatter()
+    {
+        chitchat = new Message("hello-example", 1).getMessage();
+    }
 
     public void chat(ChatString string)
     {

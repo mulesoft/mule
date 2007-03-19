@@ -10,76 +10,12 @@
 
 package org.mule.providers.http.functional;
 
-import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.providers.http.jetty.JettyConnector;
-import org.mule.umo.endpoint.EndpointException;
-import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.provider.UMOConnector;
-
-import java.net.URI;
-
-import org.apache.commons.httpclient.HttpConnection;
-import org.apache.commons.httpclient.HttpState;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
-
 public class JettyHttpFunctionalTestCase extends HttpFunctionalTestCase
 {
-    protected static final String TEST_MESSAGE = "Test Http Request";
 
-    private HttpConnection cnn;
-
-    protected UMOEndpointURI getInDest()
+    //@Override
+    protected String getConfigResources()
     {
-        try
-        {
-            return new MuleEndpointURI("jetty:http://localhost:60198");
-        }
-        catch (EndpointException e)
-        {
-            fail(e.getMessage());
-            return null;
-        }
-    }
-
-    protected UMOEndpointURI getOutDest()
-    {
-        return null;
-    }
-
-    protected UMOConnector createConnector() throws Exception
-    {
-        JettyConnector connector = new JettyConnector();
-        connector.setName("testJettyHttp");
-
-        return connector;
-    }
-
-    protected void sendTestData(int iterations) throws Exception
-    {
-        URI uri = getInDest().getUri();
-        PostMethod postMethod = new PostMethod(uri.toString());
-        postMethod.setRequestEntity(new StringRequestEntity(TEST_MESSAGE));
-        cnn = new HttpConnection(uri.getHost(), uri.getPort());
-        cnn.open();
-        postMethod.execute(new HttpState(), cnn);
-    }
-
-    //
-    protected void receiveAndTestResults() throws Exception
-    {
-        Thread.sleep(1000);
-        byte[] buf = new byte[1024 * 4];
-
-        int len = cnn.getResponseInputStream().read(buf);
-        if (len < 1)
-        {
-            fail("Nothing was sent back in the response");
-        }
-        String msg = new String(buf, 0, len);
-
-        assertNotNull(msg);
-        // Todo regression assertTrue(msg.endsWith(TEST_MESSAGE + " Received"));
-        assertTrue(msg.indexOf(TEST_MESSAGE + " Received") > -1);
+        return "jetty-http-functional-test.xml";
     }
 }

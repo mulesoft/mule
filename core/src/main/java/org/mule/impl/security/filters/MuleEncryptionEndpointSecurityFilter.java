@@ -68,10 +68,11 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecuri
             // Authentication failed
             if (logger.isDebugEnabled())
             {
-                logger.debug("Authentication request for user: " + user.getUsername() + " failed: "
-                             + e.toString());
+                logger.debug("Authentication request for user: " + user.getUsername() 
+                    + " failed: " + e.toString());
             }
-            throw new UnauthorisedException(new Message(Messages.AUTH_FAILED_FOR_USER_X, user.getUsername()),
+            throw new UnauthorisedException(
+                new Message(Messages.AUTH_FAILED_FOR_USER_X, user.getUsername()),
                 event.getMessage(), e);
         }
 

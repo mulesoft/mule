@@ -20,7 +20,6 @@ public class WeblogicJmsConnector extends JmsConnector
     /** Constructs a new WeblogicJmsConnector. */
     public WeblogicJmsConnector()
     {
-        setDispatcherFactory(new WeblogicJmsMessageDispatcherFactory());
         setTopicResolver(new WeblogicJmsTopicResolver(this));
     }
 }

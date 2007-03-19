@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="myId" version="1.0">
+ <description>
+  Basic XFire Tests
+ </description>
+
+ <model name="TestXfire">
+  <mule-descriptor name="echoService" implementation="org.mule.components.simple.EchoComponent">
+   <inbound-router>
+    <endpoint address="xfire:http://localhost:10081/services"/>
+   </inbound-router>
+  </mule-descriptor>
+  <mule-descriptor name="echoService2" implementation="org.mule.components.simple.EchoComponent">
+   <inbound-router>
+    <endpoint address="xfire:http://localhost:10082/services">
+     <properties>
+      <property name="wsdlUrl" value="file://xfire-blat"/>
+     </properties>
+    </endpoint>
+   </inbound-router>
+  </mule-descriptor>
+ </model>
+
+</mule-configuration> 

@@ -28,7 +28,7 @@ public class QuartzReceiverFunctionalTestCase extends AbstractMuleTestCase
 
     public void testMuleReceiverJob() throws Exception
     {
-        CountDownLatch counter = TestComponent.QuartzCounter;
+        CountDownLatch counter = TestComponent.QUARTZ_COUNTER;
         assertEquals(4, counter.getCount());
 
         ConfigurationBuilder configBuilder = new MuleXmlConfigurationBuilder();

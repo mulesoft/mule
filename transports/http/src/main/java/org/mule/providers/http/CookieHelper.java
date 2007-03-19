@@ -26,10 +26,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Helper functions for parsing cookie headers
+ * Helper functions for parsing cookie headers.
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class CookieHelper
 {
@@ -38,6 +36,14 @@ public class CookieHelper
      * logger used by this class
      */
     protected static final Log logger = LogFactory.getLog(CookieHelper.class);
+
+    /**
+     * Do not instantiate.
+     */
+    private CookieHelper ()
+    {
+        // no op
+    }
 
     public static CookieSpec getCookieSpec(String spec)
     {

@@ -68,7 +68,7 @@ public class MuleSessionHandler implements UMOSessionHandler
             }
             catch (UnsupportedEncodingException e)
             {
-                e.printStackTrace();
+                sessionString = new String((byte[])decoder.transform(sessionHeader));
             }
             if (logger.isDebugEnabled())
             {

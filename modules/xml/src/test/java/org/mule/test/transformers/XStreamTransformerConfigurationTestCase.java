@@ -10,30 +10,33 @@
 
 package org.mule.test.transformers;
 
+import org.mule.tck.AbstractMuleTestCase;
+import org.mule.transformers.xml.XStreamFactory;
+import org.mule.transformers.xml.XmlToObject;
+import org.mule.umo.transformer.TransformerException;
+
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
-
-import junit.framework.TestCase;
-
-import org.mule.transformers.xml.XmlToObject;
-import org.mule.transformers.xml.XStreamFactory;
-import org.mule.umo.transformer.TransformerException;
 
 /**
  * Tests configuration and creation of XStream-based transformers
  */
-public class XStreamTransformerConfigurationTestCase extends TestCase
+public class XStreamTransformerConfigurationTestCase extends AbstractMuleTestCase
 {
-    public static boolean MyDriverDidInitialize;
+    public static volatile boolean MyDriverDidInitialize;
 
-    public void setUp()
+    // @Override
+    protected void doSetUp() throws Exception
     {
+        super.doSetUp();
         MyDriverDidInitialize = true;
     }
 
-    public void tearDown()
+    // @Override
+    protected void doTearDown() throws Exception
     {
         MyDriverDidInitialize = false;
+        super.doTearDown();
     }
 
     public void testDefaultDriver() throws Exception

@@ -146,7 +146,7 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
 
         Properties props = new Properties();
         // Endpoint wants String-typed properties
-        props.put(FileConnector.PROPERTY_POLLING_FREQUENCY, "" + POLLING_FREQUENCY_OVERRIDE);
+        props.put(FileConnector.PROPERTY_POLLING_FREQUENCY, String.valueOf(POLLING_FREQUENCY_OVERRIDE));
         endpoint.setProperties(props);
 
         UMOComponent component = getTestComponent(descriptor);

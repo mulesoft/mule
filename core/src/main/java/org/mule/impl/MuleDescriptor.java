@@ -16,11 +16,15 @@ import org.mule.registry.RegistrationException;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOInterceptor;
 import org.mule.umo.UMOManagementContext;
+import org.mule.umo.UMOException;
+import org.mule.umo.model.UMOModel;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.routing.UMONestedRouterCollection;
 import org.mule.umo.routing.UMOOutboundRouterCollection;
 import org.mule.umo.routing.UMOResponseRouterCollection;
 import org.mule.util.FileUtils;
+import org.mule.util.StringUtils;
 
 import java.beans.ExceptionListener;
 import java.io.FileInputStream;
@@ -120,6 +124,7 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
             }
             catch (Exception e)
             {
+                // TODO MULE-863: Sufficient?  Correct level?
                 logger.warn(MULE_PROPERTY_DOT_PROPERTIES + " was set  to " + delegate
                             + " but the file could not be read, exception is: " + e.getMessage());
             }
@@ -269,5 +274,27 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
     public void setManagementContext(UMOManagementContext context)
     {
         this.managementContext = context;
+    }
+
+
+    //@java.lang.Override
+    public void initialise() throws InitialisationException
+    {
+        super.initialise();
+        if(StringUtils.isNotEmpty(modelName))
+        {
+            UMOModel model = managementContext.getRegistry().lookupModel(modelName);
+            if(model!=null)
+            {
+                try
+                {
+                    model.registerComponent(this);
+                }
+                catch (UMOException e)
+                {
+                    throw new InitialisationException(e, this);
+                }
+            }
+        }
     }
 }

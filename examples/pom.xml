@@ -20,7 +20,6 @@
         <module>errorhandler</module>
         <module>hello</module>
         <module>loanbroker</module>
-        <module>loanbroker-esb</module>
         <module>scripting</module>
         <module>stockquote</module>
         <module>voipservice</module>
@@ -52,24 +51,12 @@
     </build>
 
     <dependencies>
+        <!-- every example depends at least on core -->
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
             <version>${version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-core</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-functional</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
-        
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-stream</artifactId>
@@ -163,6 +150,23 @@
             <version>3.8.2</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Now that m2 dependency resolution works, activation
+             should ONLY come via core or (in the future) core-api, but there is
+             OF COURSE a bug with m2's handling of provided dependencies:
+             http://jira.codehaus.org/browse/MNG-2205
+        -->
+        <dependency>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+            <version>1.1</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <!-- no build is complete without XML -->
@@ -200,4 +204,7 @@
         </profile>
         <!-- no need for a jdk5 profile since we don't have to exclude anything -->
     </profiles>
+        <!-- some even have functional tests (really?) -->
+
+
 </project>

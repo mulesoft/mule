@@ -60,6 +60,16 @@ public abstract class AbstractRouterCollection implements UMORouterCollection, I
         }
     }
 
+
+    public void dispose()
+    {
+        for (Iterator iterator = routers.iterator(); iterator.hasNext();)
+        {
+            UMORouter router = (UMORouter) iterator.next();
+            router.dispose();
+        }
+    }
+
     public void setRouters(List routers)
     {
         for (Iterator iterator = routers.iterator(); iterator.hasNext();)

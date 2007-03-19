@@ -14,6 +14,7 @@ import org.mule.impl.ManagementContextAware;
 import org.mule.impl.model.ModelFactory;
 import org.mule.impl.model.ModelHelper;
 import org.mule.umo.UMOManagementContext;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.model.UMOModel;
 
 import org.springframework.beans.factory.config.AbstractFactoryBean;
@@ -41,20 +42,24 @@ public class SystemModelFactoryBean extends AbstractFactoryBean implements Manag
         
         model = ModelFactory.createModel(type);
         model.setName(ModelHelper.SYSTEM_MODEL);
+
         model.setManagementContext(managementContext);
+        try
+        {
+            model.initialise();
+        }
+        catch (InitialisationException e)
+        {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        
         return model;
-    }
-
-
-    public void afterPropertiesSet() throws Exception
-    {
-        super.afterPropertiesSet();
-        model.initialise();
-
     }
 
     public void setManagementContext(UMOManagementContext context)
     {
         managementContext = context;
+
+
     }
 }

@@ -67,8 +67,9 @@ public class SelectiveConsumer extends AbstractRouter implements UMOInboundRoute
             }
             catch (TransformerException e)
             {
-                throw new RoutingException(new Message(Messages.TRANSFORM_FAILED_BEFORE_FILTER), event
-                    .getMessage(), event.getEndpoint(), e);
+                throw new RoutingException(
+                    new Message(Messages.TRANSFORM_FAILED_BEFORE_FILTER), 
+                    event.getMessage(), event.getEndpoint(), e);
             }
         }
 

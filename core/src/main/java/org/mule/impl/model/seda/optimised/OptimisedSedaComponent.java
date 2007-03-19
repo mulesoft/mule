@@ -66,8 +66,9 @@ public class OptimisedSedaComponent extends SedaComponent
         }
         catch (Exception e)
         {
-            throw new InitialisationException(new Message(Messages.X_FAILED_TO_INITIALISE, "Proxy Pool"), e,
-                this);
+            throw new InitialisationException(
+                new Message(Messages.X_FAILED_TO_INITIALISE, "Proxy Pool"),
+                e, this);
         }
     }
 }

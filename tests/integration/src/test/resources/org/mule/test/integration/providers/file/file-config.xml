@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+        "http://mule.mulesource.org/dtds/mule-configuration.dtd">
 
 <mule-configuration id="file_test" version="1.0">
 
     <model name="test">
         <mule-descriptor name="mycomponent"
-            implementation="org.mule.test.integration.providers.file.FileFunctionalTestCase$FileTestComponent">
+                         implementation="org.mule.test.integration.providers.file.FileFunctionalTestCase$FileTestComponent">
             <inbound-router>
                 <endpoint address="file://./test">
                     <filter pattern="*.data" className="org.mule.providers.file.filters.FilenameWildcardFilter"/>
@@ -17,3 +17,1001 @@
 
     </model>
 </mule-configuration>
+
+<beans>
+
+    <bean class="org.mule.impl.model.ModelFactory" destroy-method="dispose" factory-method="createModel"
+          init-method="initialise" name="main#dfbad128-d40c-11db-9a01-17e36b3f5d2e" scope="prototype">
+        <constructor-arg index="0" type="java.lang.String">
+            <value>inherited</value>
+        </constructor-arg>
+        <property name="serviceDescriptors">
+            <list>
+                <bean class="org.mule.impl.MuleDescriptor" destroy-method="dispose" init-method="initialise"
+                      name="appleComponent3" scope="prototype">
+                    <property name="implementation">
+                        <value>org.mule.tck.testmodels.fruit.Apple</value>
+                    </property>
+                    <property name="modelName" value=""/>
+                    <property name="properties">
+                        <map>
+                            <entry key="springBean">
+                                <bean class="java.lang.String" name="springBean"/>
+                            </entry>
+                            <entry key="springMap">
+                                <map>
+                                    <entry key="Entry1">
+                                        <value>Value1</value>
+                                    </entry>
+                                    <entry key="Entry2">
+                                        <value>Value2</value>
+                                    </entry>
+                                </map>
+                            </entry>
+                            <entry key="springList">
+                                <list>
+                                    <value>Value1</value>
+                                    <value>Value2</value>
+                                </list>
+                            </entry>
+                            <entry key="springSet">
+                                <set>
+                                    <value>Value1</value>
+                                    <value>Value2</value>
+                                </set>
+                            </entry>
+                        </map>
+                    </property>
+                    <property name="inboundRouter">
+                        <bean class="org.mule.routing.inbound.InboundRouterCollection" destroy-method="dispose"
+                              init-method="initialise" scope="prototype">
+                            <property name="endpoints">
+                                <list>
+                                    <bean class="org.mule.impl.endpoint.MuleEndpoint" name="inboundEndpoint3"
+                                          scope="prototype">
+                                        <property name="endpointURI">
+                                            <bean class="org.mule.impl.endpoint.MuleEndpointURI">
+                                                <constructor-arg index="0" type="java.lang.String">
+                                                    <value>test://endpoint.in33</value>
+                                                </constructor-arg>
+                                            </bean>
+                                        </property>
+                                        <property name="name">
+                                            <value>inboundEndpoint3</value>
+                                        </property>
+                                        <property name="type">
+                                            <value>receiver</value>
+                                        </property>
+                                        <property name="properties">
+                                            <map>
+                                                <entry key="testEndpointProperty">
+                                                    <value>Prop1</value>
+                                                </entry>
+                                                <entry key="testEndpointBeanProperty">
+                                                    <bean class="java.lang.String" name="testEndpointBeanProperty">
+                                                        <constructor-arg index="0" type="java.lang.String">
+                                                            <value>Prop2</value>
+                                                        </constructor-arg>
+                                                    </bean>
+                                                </entry>
+                                            </map>
+                                        </property>
+                                    </bean>
+                                </list>
+                            </property>
+                            <property name="routers">
+                                <list/>
+                            </property>
+                        </bean>
+                    </property>
+                    <property name="threadingProfile">
+                        <bean class="org.mule.config.ThreadingProfile" scope="prototype">
+                            <property name="doThreading">
+                                <value>true</value>
+                            </property>
+                            <property name="maxBufferSize">
+                                <value>6</value>
+                            </property>
+                            <property name="maxThreadsActive">
+                                <value>12</value>
+                            </property>
+                            <property name="maxThreadsIdle">
+                                <value>6</value>
+                            </property>
+                            <property name="poolExhaustedActionString">
+                                <value>RUN</value>
+                            </property>
+                        </bean>
+                    </property>
+                    <property name="exceptionListener">
+                        <bean class="org.mule.impl.DefaultExceptionStrategy" name="exceptionListener"/>
+                    </property>
+                    <property name="version">
+                        <bean class="java.lang.String" name="version">
+                            <constructor-arg index="0" type="java.lang.String">
+                                <value>1.1</value>
+                            </constructor-arg>
+                        </bean>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean abstract="false" autowire="default" class="org.mule.tck.testmodels.mule.TestCompressionTransformer"
+          dependency-check="default" id="beanTransformer" lazy-init="default" singleton="true">
+        <property name="beanProperty1">
+            <value>hello</value>
+        </property>
+    </bean>
+</beans>
+        <?xml version="1.0" encoding="UTF-8"?>
+<beans>
+
+    <bean class="org.mule.impl.container.PropertiesContainerContext" destroy-method="dispose" init-method="initialise"
+          name="muleEnvironmentProperties" scope="prototype">
+        <property name="properties">
+            <map>
+                <entry key="doCompression">
+                    <value>true</value>
+                </entry>
+                <entry key="beanProperty1">
+                    <value>this was set from the manager properties!</value>
+                </entry>
+                <entry key="OS Version">
+                    <value>${
+                os.version
+                }
+                    </value>
+                </entry>
+                <entry key="system-prop2">
+                    <value>${
+                system-prop2
+                }
+                    </value>
+                </entry>
+            </map>
+        </property>
+    </bean>
+
+    <bean class="org.mule.config.MuleConfiguration" name="muleConfiguratrion">
+        <property name="defaultSynchronousEndpoints">
+            <value>false</value>
+        </property>
+        <property name="defaultRemoteSync">
+            <value>false</value>
+        </property>
+        <property name="workingDirectory">
+            <value>./.mule</value>
+        </property>
+        <property name="defaultThreadingProfile">
+            <bean class="org.mule.config.ThreadingProfile" scope="prototype">
+                <property name="doThreading">
+                    <value>true</value>
+                </property>
+                <property name="maxBufferSize">
+                    <value>0</value>
+                </property>
+                <property name="maxThreadsActive">
+                    <value>8</value>
+                </property>
+                <property name="maxThreadsIdle">
+                    <value>4</value>
+                </property>
+                <property name="threadTTL">
+                    <value>60001</value>
+                </property>
+                <property name="poolExhaustedActionString">
+                    <value>WAIT</value>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <bean class="org.mule.tck.testmodels.mule.TestTransactionManagerFactory"/>
+
+    <bean class="org.mule.management.agents.JmxAgent" destroy-method="dispose" init-method="initialise" name="jmxAgent"
+          scope="prototype"/>
+
+    <bean class="org.mule.tck.testmodels.mule.TestConnector" destroy-method="dispose" init-method="initialise"
+          name="dummyConnector" scope="prototype">
+        <property name="exceptionListener">
+            <bean class="org.mule.tck.testmodels.mule.TestExceptionStrategy" destroy-method="dispose"
+                  init-method="initialise" scope="prototype">
+                <property name="endpoints">
+                    <list/>
+                </property>
+            </bean>
+        </property>
+        <property name="dispatcherThreadingProfile">
+            <bean class="org.mule.config.ThreadingProfile" scope="prototype">
+                <property name="doThreading">
+                    <value>true</value>
+                </property>
+                <property name="maxBufferSize">
+                    <value>2</value>
+                </property>
+                <property name="poolExhaustedActionString">
+                    <value>RUN</value>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <bean class="org.mule.tck.testmodels.mule.TestConnector2" destroy-method="dispose" init-method="initialise"
+          name="dummyConnector2" scope="prototype">
+        <property name="exceptionListener">
+            <bean class="org.mule.impl.DefaultExceptionStrategy" destroy-method="dispose" init-method="initialise"
+                  scope="prototype">
+                <property name="endpoints">
+                    <list>
+                        <bean class="org.mule.impl.endpoint.MuleEndpoint" name="blahEndpoint" scope="prototype">
+                            <property name="endpointURI">
+                                <bean class="org.mule.impl.endpoint.MuleEndpointURI">
+                                    <constructor-arg index="0" type="java.lang.String">
+                                        <value>test://blah</value>
+                                    </constructor-arg>
+                                </bean>
+                            </property>
+                            <property name="name">
+                                <value>blahEndpoint</value>
+                            </property>
+                            <property name="type">
+                                <value>senderAndReceiver</value>
+                            </property>
+                        </bean>
+                        <ref local="orangeEndpoint"/>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <bean class="org.mule.tck.testmodels.mule.TestCompressionTransformer" destroy-method="dispose"
+          init-method="initialise" name="TestCompressionTransformer" scope="prototype">
+        <property name="returnClass">
+            <value>java.lang.String</value>
+        </property>
+        <property name="beanProperty2">
+            <value>12</value>
+        </property>
+        <property name="sourceType">
+            <value>java.lang.String</value>
+        </property>
+        <property name="containerProperty">
+            <ref local="java.lang.String"/>
+        </property>
+    </bean>
+    <bean class="org.mule.transformers.NoActionTransformer" destroy-method="dispose" init-method="initialise"
+          name="Default" scope="prototype">
+        <property name="returnClass">
+            <value>java.lang.Object</value>
+        </property>
+    </bean>
+
+    <bean class="org.mule.impl.endpoint.MuleEndpoint" name="fruitBowlEndpoint" scope="prototype">
+        <property name="endpointURI">
+            <bean class="org.mule.impl.endpoint.MuleEndpointURI">
+                <constructor-arg index="0" type="java.lang.String">
+                    <value>test://fruitBowlPublishQ</value>
+                </constructor-arg>
+            </bean>
+        </property>
+        <property name="name">
+            <value>fruitBowlEndpoint</value>
+        </property>
+        <property name="type">
+            <value>senderAndReceiver</value>
+        </property>
+        <property name="filter">
+            <bean class="org.mule.routing.filters.xml.JXPathFilter" destroy-method="dispose" init-method="initialise"
+                  scope="prototype">org.mule.routing.filters.xml.JXPathFilter
+                <property name="expression">
+                    <value>name</value>
+                </property>
+                <property name="value">
+                    <value>bar</value>
+                </property>
+                <property name="namespaces">
+                    <map>
+                        <entry key="foo">
+                            <value>http://foo.com</value>
+                        </entry>
+                    </map>
+                </property>
+            </bean>
+        </property>
+    </bean>
+    <bean class="org.mule.impl.endpoint.MuleEndpoint" name="waterMelonEndpoint" scope="prototype">
+        <property name="endpointURI">
+            <bean class="org.mule.impl.endpoint.MuleEndpointURI">
+                <constructor-arg index="0" type="java.lang.String">
+                    <value>test://test.queue</value>
+                </constructor-arg>
+            </bean>
+        </property>
+        <property name="name">
+            <value>waterMelonEndpoint</value>
+        </property>
+        <property name="type">
+            <value>senderAndReceiver</value>
+        </property>
+    </bean>
+    <bean class="org.mule.impl.endpoint.MuleEndpoint" name="appleInEndpoint" scope="prototype">
+        <property name="endpointURI">
+            <bean class="org.mule.impl.endpoint.MuleEndpointURI">
+                <constructor-arg index="0" type="java.lang.String">
+                    <value>test://AppleQueue</value>
+                </constructor-arg>
+            </bean>
+        </property>
+        <property name="name">
+            <value>appleInEndpoint</value>
+        </property>
+        <property name="type">
+            <value>senderAndReceiver</value>
+        </property>
+    </bean>
+    <bean class="org.mule.impl.endpoint.MuleEndpoint" name="appleResponseEndpoint" scope="prototype">
+        <property name="endpointURI">
+            <bean class="org.mule.impl.endpoint.MuleEndpointURI">
+                <constructor-arg index="0" type="java.lang.String">
+                    <value>test://AppleResponseQueue</value>
+                </constructor-arg>
+            </bean>
+        </property>
+        <property name="name">
+            <value>appleResponseEndpoint</value>
+        </property>
+        <property name="type">
+            <value>senderAndReceiver</value>
+        </property>
+    </bean>
+    <bean class="org.mule.impl.endpoint.MuleEndpoint" name="AppleQueue" scope="prototype">
+        <property name="endpointURI">
+            <bean class="org.mule.impl.endpoint.MuleEndpointURI">
+                <constructor-arg index="0" type="java.lang.String">
+                    <value>test://apple.queue</value>
+                </constructor-arg>
+            </bean>
+        </property>
+        <property name="name">
+            <value>AppleQueue</value>
+        </property>
+        <property name="type">
+            <value>senderAndReceiver</value>
+        </property>
+    </bean>
+    <bean class="org.mule.impl.endpoint.MuleEndpoint" name="Banana_Queue" scope="prototype">
+        <property name="endpointURI">
+            <bean class="org.mule.impl.endpoint.MuleEndpointURI">
+                <constructor-arg index="0" type="java.lang.String">
+                    <value>test://banana.queue</value>
+                </constructor-arg>
+            </bean>
+        </property>
+        <property name="name">
+            <value>Banana_Queue</value>
+        </property>
+        <property name="type">
+            <value>senderAndReceiver</value>
+        </property>
+    </bean>
+    <bean class="org.mule.impl.endpoint.MuleEndpoint" name="orangeEndpoint" scope="prototype">
+        <property name="endpointURI">
+            <bean class="org.mule.impl.endpoint.MuleEndpointURI">
+                <constructor-arg index="0" type="java.lang.String">
+                    <value>test://orangeQ</value>
+                </constructor-arg>
+            </bean>
+        </property>
+        <property name="name">
+            <value>orangeEndpoint</value>
+        </property>
+        <property name="type">
+            <value>senderAndReceiver</value>
+        </property>
+        <property name="properties">
+            <map>
+                <entry key="testGlobal">
+                    <value>value1</value>
+                </entry>
+            </map>
+        </property>
+    </bean>
+
+    <bean class="org.mule.impl.model.ModelFactory" destroy-method="dispose" factory-method="createModel"
+          init-method="initialise" name="main" scope="prototype">
+        <constructor-arg index="0" type="java.lang.String">
+            <value>seda</value>
+        </constructor-arg>
+        <property name="lifecycleAdapterFactory">
+            <bean class="org.mule.tck.testmodels.mule.TestDefaultLifecycleAdapterFactory"
+                  name="componentLifecycleAdapterFactory" scope="prototype"/>
+        </property>
+        <property name="exceptionListener">
+            <bean class="org.mule.tck.testmodels.mule.TestExceptionStrategy" destroy-method="dispose"
+                  init-method="initialise" scope="prototype">
+                <property name="endpoints">
+                    <list>
+                        <bean class="org.mule.impl.endpoint.MuleEndpoint" scope="prototype">
+                            <property name="endpointURI">
+                                <bean class="org.mule.impl.endpoint.MuleEndpointURI">
+                                    <constructor-arg index="0" type="java.lang.String">
+                                        <value>test://component.exceptions</value>
+                                    </constructor-arg>
+                                </bean>
+                            </property>
+                            <property name="type">
+                                <value>senderAndReceiver</value>
+                            </property>
+                        </bean>
+                    </list>
+                </property>
+            </bean>
+        </property>
+        <property name="entryPointResolver">
+            <bean class="org.mule.tck.testmodels.mule.TestEntryPointResolver" name="entryPointResolver"
+                  scope="prototype"/>
+        </property>
+        <property name="serviceDescriptors">
+            <list>
+                <bean class="org.mule.impl.MuleDescriptor" destroy-method="dispose" init-method="initialise"
+                      name="orangeComponent" scope="prototype">
+                    <property name="implementation">
+                        <value>orange</value>
+                    </property>
+                    <property name="modelName" value=""/>
+                    <property name="properties">
+                        <map>
+                            <entry key="brand">
+                                <value>Juicy Baby!</value>
+                            </entry>
+                            <entry key="segments">
+                                <value>9</value>
+                            </entry>
+                            <entry key="radius">
+                                <value>4.21</value>
+                            </entry>
+                            <entry key="mapProperties">
+                                <map>
+                                    <entry key="prop1">
+                                        <value>prop1</value>
+                                    </entry>
+                                    <entry key="prop2">
+                                        <value>prop2</value>
+                                    </entry>
+                                </map>
+                            </entry>
+                            <entry key="listProperties">
+                                <list>
+                                    <value>prop1</value>
+                                    <value>prop2</value>
+                                    <value>prop3</value>
+                                </list>
+                            </entry>
+                            <entry key="arrayProperties">
+                                <list>
+                                    <value>prop4</value>
+                                    <value>prop5</value>
+                                    <value>prop6</value>
+                                </list>
+                            </entry>
+                        </map>
+                    </property>
+                    <property name="inboundRouter">
+                        <bean class="org.mule.routing.inbound.InboundRouterCollection" destroy-method="dispose"
+                              init-method="initialise" scope="prototype">
+                            <property name="endpoints">
+                                <list>
+                                    <bean class="org.mule.impl.endpoint.MuleEndpoint" name="Orange" scope="prototype">
+                                        <property name="transformer">
+                                            <value>TestCompressionTransformer</value>
+                                        </property>
+                                        <property name="responseTransformer">
+                                            <value>TestCompressionTransformer</value>
+                                        </property>
+                                        <property name="endpointURI">
+                                            <bean class="org.mule.impl.endpoint.MuleEndpointURI">
+                                                <constructor-arg index="0" type="java.lang.String">
+                                                    <value>test://orange/</value>
+                                                </constructor-arg>
+                                            </bean>
+                                        </property>
+                                        <property name="name">
+                                            <value>Orange</value>
+                                        </property>
+                                        <property name="type">
+                                            <value>receiver</value>
+                                        </property>
+                                    </bean>
+                                    <ref local="orangeEndpoint">
+                                        <property name="transformer">
+                                            <value>TestCompressionTransformer</value>
+                                        </property>
+                                    </ref>
+                                </list>
+                            </property>
+                            <property name="routers">
+                                <list/>
+                            </property>
+                            <property name="catchAllStrategy">
+                                <bean class="org.mule.routing.ForwardingCatchAllStrategy" scope="prototype">
+                                    <property name="endpoint">
+                                        <bean class="org.mule.impl.endpoint.MuleEndpoint" scope="prototype">
+                                            <property name="endpointURI">
+                                                <bean class="org.mule.impl.endpoint.MuleEndpointURI">
+                                                    <constructor-arg index="0" type="java.lang.String">
+                                                        <value>test2://catch.all</value>
+                                                    </constructor-arg>
+                                                </bean>
+                                            </property>
+                                            <property name="connector">
+                                                <ref local="dummyConnector2"/>
+                                            </property>
+                                            <property name="type">
+                                                <value>senderAndReceiver</value>
+                                            </property>
+                                        </bean>
+                                    </property>
+                                </bean>
+                            </property>
+                        </bean>
+                    </property>
+                    <property name="nestedRouter">
+                        <bean class="org.mule.routing.nested.NestedRouterCollection" destroy-method="dispose"
+                              init-method="initialise" scope="prototype">
+                            <property name="routers">
+                                <list>
+                                    <bean class="org.mule.routing.nested.NestedRouter" destroy-method="dispose"
+                                          init-method="initialise" scope="prototype">
+                                        <property name="endpoint">
+                                            <bean class="org.mule.impl.endpoint.MuleEndpoint" scope="prototype">
+                                                <property name="endpointURI">
+                                                    <bean class="org.mule.impl.endpoint.MuleEndpointURI">
+                                                        <constructor-arg index="0" type="java.lang.String">
+                                                            <value>test://do.wash</value>
+                                                        </constructor-arg>
+                                                    </bean>
+                                                </property>
+                                                <property name="type">
+                                                    <value>senderAndReceiver</value>
+                                                </property>
+                                            </bean>
+                                        </property>
+                                        <property name="interface">
+                                            <value>org.mule.tck.testmodels.fruit.FruitCleaner</value>
+                                        </property>
+                                        <property name="method">
+                                            <value>wash</value>
+                                        </property>
+                                    </bean>
+                                    <bean class="org.mule.routing.nested.NestedRouter" destroy-method="dispose"
+                                          init-method="initialise" scope="prototype">
+                                        <property name="endpoint">
+                                            <bean class="org.mule.impl.endpoint.MuleEndpoint" scope="prototype">
+                                                <property name="endpointURI">
+                                                    <bean class="org.mule.impl.endpoint.MuleEndpointURI">
+                                                        <constructor-arg index="0" type="java.lang.String">
+                                                            <value>test://do.polish</value>
+                                                        </constructor-arg>
+                                                    </bean>
+                                                </property>
+                                                <property name="type">
+                                                    <value>senderAndReceiver</value>
+                                                </property>
+                                            </bean>
+                                        </property>
+                                        <property name="interface">
+                                            <value>org.mule.tck.testmodels.fruit.FruitCleaner</value>
+                                        </property>
+                                        <property name="method">
+                                            <value>polish</value>
+                                        </property>
+                                    </bean>
+                                </list>
+                            </property>
+                        </bean>
+                    </property>
+                    <property name="outboundRouter">
+                        <bean class="org.mule.routing.outbound.OutboundRouterCollection" destroy-method="dispose"
+                              init-method="initialise" scope="prototype">
+                            <property name="matchAll">
+                                <value>false</value>
+                            </property>
+                            <property name="routers">
+                                <list>
+                                    <bean class="org.mule.routing.outbound.OutboundPassThroughRouter"
+                                          destroy-method="dispose" init-method="initialise" scope="prototype">
+                                        <property name="endpoints">
+                                            <list>
+                                                <ref local="appleInEndpoint">
+                                                    <property name="transformer">
+                                                        <value>TestCompressionTransformer</value>
+                                                    </property>
+                                                </ref>
+                                            </list>
+                                        </property>
+                                    </bean>
+                                </list>
+                            </property>
+                        </bean>
+                    </property>
+                    <property name="responseRouter">
+                        <bean class="org.mule.routing.response.ResponseRouterCollection" destroy-method="dispose"
+                              init-method="initialise" scope="prototype">
+                            <property name="timeout">
+                                <value>10001</value>
+                            </property>
+                            <property name="endpoints">
+                                <list>
+                                    <bean class="org.mule.impl.endpoint.MuleEndpoint" scope="prototype">
+                                        <property name="endpointURI">
+                                            <bean class="org.mule.impl.endpoint.MuleEndpointURI">
+                                                <constructor-arg index="0" type="java.lang.String">
+                                                    <value>test://response1</value>
+                                                </constructor-arg>
+                                            </bean>
+                                        </property>
+                                        <property name="type">
+                                            <value>senderAndReceiver</value>
+                                        </property>
+                                    </bean>
+                                    <ref local="appleResponseEndpoint"/>
+                                </list>
+                            </property>
+                            <property name="routers">
+                                <list>
+                                    <bean class="org.mule.tck.testmodels.mule.TestResponseAggregator"
+                                          destroy-method="dispose" init-method="initialise" scope="prototype"/>
+                                </list>
+                            </property>
+                        </bean>
+                    </property>
+                    <interceptor name="default"/>
+                    <interceptor className="org.mule.interceptors.TimerInterceptor"/>
+                    <property name="exceptionListener">
+                        <bean class="org.mule.impl.DefaultComponentExceptionStrategy" destroy-method="dispose"
+                              init-method="initialise" scope="prototype">
+                            <property name="endpoints">
+                                <list>
+                                    <bean class="org.mule.impl.endpoint.MuleEndpoint" scope="prototype">
+                                        <property name="endpointURI">
+                                            <bean class="org.mule.impl.endpoint.MuleEndpointURI">
+                                                <constructor-arg index="0" type="java.lang.String">
+                                                    <value>test://orange.exceptions</value>
+                                                </constructor-arg>
+                                            </bean>
+                                        </property>
+                                        <property name="type">
+                                            <value>senderAndReceiver</value>
+                                        </property>
+                                    </bean>
+                                </list>
+                            </property>
+                        </bean>
+                    </property>
+                </bean>
+                <bean class="org.mule.impl.MuleDescriptor" destroy-method="dispose" init-method="initialise"
+                      name="appleComponent" scope="prototype">
+                    <property name="implementation">
+                        <value>org.mule.tck.testmodels.fruit.Apple</value>
+                    </property>
+                    <property name="modelName" value=""/>
+                    <property name="inboundRouter">
+                        <bean class="org.mule.routing.inbound.InboundRouterCollection" destroy-method="dispose"
+                              init-method="initialise" scope="prototype">
+                            <property name="endpoints">
+                                <list>
+                                    <ref local="appleInEndpoint"/>
+                                </list>
+                            </property>
+                            <property name="routers">
+                                <list>
+                                    <bean class="org.mule.routing.inbound.SelectiveConsumer" destroy-method="dispose"
+                                          init-method="initialise" scope="prototype">
+                                        <property name="filter">
+                                            <bean class="org.mule.routing.filters.PayloadTypeFilter"
+                                                  destroy-method="dispose" init-method="initialise" scope="prototype">
+                                                org.mule.routing.filters.PayloadTypeFilter
+                                                <property name="expectedType">
+                                                    <value>java.lang.String</value>
+                                                </property>
+                                            </bean>
+                                        </property>
+                                    </bean>
+                                    <bean class="org.mule.routing.inbound.IdempotentReceiver" destroy-method="dispose"
+                                          init-method="initialise" scope="prototype"/>
+                                </list>
+                            </property>
+                            <property name="catchAllStrategy">
+                                <bean class="org.mule.tck.testmodels.mule.TestCatchAllStrategy" scope="prototype"/>
+                            </property>
+                        </bean>
+                    </property>
+                    <property name="outboundRouter">
+                        <bean class="org.mule.routing.outbound.OutboundRouterCollection" destroy-method="dispose"
+                              init-method="initialise" scope="prototype">
+                            <property name="matchAll">
+                                <value>false</value>
+                            </property>
+                            <property name="catchAllStrategy">
+                                <bean class="org.mule.tck.testmodels.mule.TestCatchAllStrategy" scope="prototype"/>
+                            </property>
+                            <property name="routers">
+                                <list>
+                                    <bean class="org.mule.routing.outbound.FilteringOutboundRouter"
+                                          destroy-method="dispose" init-method="initialise" scope="prototype">
+                                        <property name="endpoints">
+                                            <list>
+                                                <bean class="org.mule.impl.endpoint.MuleEndpoint" name="TestApple-Out"
+                                                      scope="prototype">
+                                                    <property name="endpointURI">
+                                                        <bean class="org.mule.impl.endpoint.MuleEndpointURI">
+                                                            <constructor-arg index="0" type="java.lang.String">
+                                                                <value>test://appleQ2</value>
+                                                            </constructor-arg>
+                                                        </bean>
+                                                    </property>
+                                                    <property name="name">
+                                                        <value>TestApple-Out</value>
+                                                    </property>
+                                                    <property name="type">
+                                                        <value>sender</value>
+                                                    </property>
+                                                </bean>
+                                            </list>
+                                        </property>
+                                        <property name="transformer">
+                                            <value>TestCompressionTransformer</value>
+                                        </property>
+                                        <property name="filter">
+                                            <bean class="org.mule.routing.filters.PayloadTypeFilter"
+                                                  destroy-method="dispose" init-method="initialise" scope="prototype">
+                                                org.mule.routing.filters.PayloadTypeFilter
+                                                <property name="expectedType">
+                                                    <value>java.lang.String</value>
+                                                </property>
+                                            </bean>
+                                        </property>
+                                    </bean>
+                                    <bean class="org.mule.routing.outbound.FilteringOutboundRouter"
+                                          destroy-method="dispose" init-method="initialise" scope="prototype">
+                                        <property name="endpoints">
+                                            <list>
+                                                <ref local="waterMelonEndpoint"/>
+                                            </list>
+                                        </property>
+                                        <property name="filter">
+                                            <bean class="org.mule.routing.filters.logic.AndFilter"
+                                                  destroy-method="dispose" init-method="initialise" scope="prototype">
+                                                org.mule.routing.filters.logic.AndFilter
+                                                <property name="leftFilter">
+                                                    <bean class="org.mule.routing.filters.RegExFilter"
+                                                          destroy-method="dispose" init-method="initialise"
+                                                          scope="prototype">org.mule.routing.filters.RegExFilter
+                                                        <property name="expression">
+                                                            <value>the quick brown (.*)</value>
+                                                        </property>
+                                                    </bean>
+                                                </property>
+                                                <property name="rightFilter">
+                                                    <bean class="org.mule.routing.filters.RegExFilter"
+                                                          destroy-method="dispose" init-method="initialise"
+                                                          scope="prototype">org.mule.routing.filters.RegExFilter
+                                                        <property name="expression">
+                                                            <value>(.*) brown (.*)</value>
+                                                        </property>
+                                                    </bean>
+                                                </property>
+                                            </bean>
+                                        </property>
+                                    </bean>
+                                </list>
+                            </property>
+                        </bean>
+                    </property>
+                    <property name="exceptionListener">
+                        <bean class="org.mule.impl.DefaultExceptionStrategy" destroy-method="dispose"
+                              init-method="initialise" scope="prototype">
+                            <property name="endpoints">
+                                <list/>
+                            </property>
+                        </bean>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean abstract="false" autowire="default" class="org.mule.tck.testmodels.fruit.Orange" dependency-check="default"
+          lazy-init="default" name="orange" singleton="true"/>
+
+</beans>
+        <?xml version="1.0" encoding="UTF-8"?>
+<beans>
+
+    <bean class="org.mule.impl.model.ModelFactory" destroy-method="dispose" factory-method="createModel"
+          init-method="initialise" name="main#e085e959-d40c-11db-9a01-17e36b3f5d2e" scope="prototype">
+        <constructor-arg index="0" type="java.lang.String">
+            <value>inherited</value>
+        </constructor-arg>
+        <property name="serviceDescriptors">
+            <list>
+                <bean class="org.mule.impl.MuleDescriptor" destroy-method="dispose" init-method="initialise"
+                      name="appleComponent2" scope="prototype">
+                    <property name="implementation">
+                        <value>org.mule.tck.testmodels.fruit.Apple</value>
+                    </property>
+                    <property name="modelName" value=""/>
+                    <property name="inboundRouter">
+                        <bean class="org.mule.routing.inbound.InboundRouterCollection" destroy-method="dispose"
+                              init-method="initialise" scope="prototype">
+                            <property name="endpoints">
+                                <list>
+                                    <bean class="org.mule.impl.endpoint.MuleEndpoint"
+                                          name="nonTransactedInboundEndpoint" scope="prototype">
+                                        <property name="endpointURI">
+                                            <bean class="org.mule.impl.endpoint.MuleEndpointURI">
+                                                <constructor-arg index="0" type="java.lang.String">
+                                                    <value>test://endpoint.in3</value>
+                                                </constructor-arg>
+                                            </bean>
+                                        </property>
+                                        <property name="name">
+                                            <value>nonTransactedInboundEndpoint</value>
+                                        </property>
+                                        <property name="type">
+                                            <value>senderAndReceiver</value>
+                                        </property>
+                                    </bean>
+                                    <bean class="org.mule.impl.endpoint.MuleEndpoint" name="transactedInboundEndpoint"
+                                          scope="prototype">
+                                        <property name="endpointURI">
+                                            <bean class="org.mule.impl.endpoint.MuleEndpointURI">
+                                                <constructor-arg index="0" type="java.lang.String">
+                                                    <value>test://endpoint.in2</value>
+                                                </constructor-arg>
+                                            </bean>
+                                        </property>
+                                        <property name="createConnectorAsString">
+                                            <value>ALWAYS_CREATE</value>
+                                        </property>
+                                        <property name="name">
+                                            <value>transactedInboundEndpoint</value>
+                                        </property>
+                                        <property name="type">
+                                            <value>receiver</value>
+                                        </property>
+                                        <property name="properties">
+                                            <map>
+                                                <entry key="testEndpointProperty">
+                                                    <value>Prop1</value>
+                                                </entry>
+                                            </map>
+                                        </property>
+                                        <property name="transactionConfig">
+                                            <bean class="org.mule.impl.MuleTransactionConfig" destroy-method="dispose"
+                                                  init-method="initialise" scope="prototype">
+                                                <property name="actionAsString">
+                                                    <value>ALWAYS_BEGIN</value>
+                                                </property>
+                                                <property name="factory">
+                                                    <bean class="org.mule.tck.testmodels.mule.TestTransactionFactory"
+                                                          destroy-method="dispose" init-method="initialise"
+                                                          scope="prototype"/>
+                                                </property>
+                                            </bean>
+                                        </property>
+                                    </bean>
+                                </list>
+                            </property>
+                            <property name="routers">
+                                <list/>
+                            </property>
+                        </bean>
+                    </property>
+                    <property name="outboundRouter">
+                        <bean class="org.mule.routing.outbound.OutboundRouterCollection" destroy-method="dispose"
+                              init-method="initialise" scope="prototype">
+                            <property name="matchAll">
+                                <value>false</value>
+                            </property>
+                            <property name="routers">
+                                <list>
+                                    <bean class="org.mule.routing.outbound.FilteringOutboundRouter"
+                                          destroy-method="dispose" init-method="initialise" scope="prototype">
+                                        <property name="endpoints">
+                                            <list>
+                                                <bean class="org.mule.impl.endpoint.MuleEndpoint"
+                                                      name="transactedOutboundEndpoint" scope="prototype">
+                                                    <property name="endpointURI">
+                                                        <bean class="org.mule.impl.endpoint.MuleEndpointURI">
+                                                            <constructor-arg index="0" type="java.lang.String">
+                                                                <value>test://endpoint.out</value>
+                                                            </constructor-arg>
+                                                        </bean>
+                                                    </property>
+                                                    <property name="name">
+                                                        <value>transactedOutboundEndpoint</value>
+                                                    </property>
+                                                    <property name="type">
+                                                        <value>sender</value>
+                                                    </property>
+                                                </bean>
+                                            </list>
+                                        </property>
+                                    </bean>
+                                </list>
+                            </property>
+                        </bean>
+                    </property>
+                    <interceptor className="org.mule.interceptors.LoggingInterceptor"/>
+                    <property name="threadingProfile">
+                        <bean class="org.mule.config.ThreadingProfile" scope="prototype">
+                            <property name="doThreading">
+                                <value>true</value>
+                            </property>
+                            <property name="maxBufferSize">
+                                <value>6</value>
+                            </property>
+                            <property name="maxThreadsActive">
+                                <value>12</value>
+                            </property>
+                            <property name="maxThreadsIdle">
+                                <value>6</value>
+                            </property>
+                            <property name="poolExhaustedActionString">
+                                <value>RUN</value>
+                            </property>
+                        </bean>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+</beans>
+        <?xml version="1.0" encoding="UTF-8"?>
+<beans>
+    <bean class="org.mule.impl.model.ModelFactory" destroy-method="dispose" factory-method="createModel"
+          init-method="initialise" name="main#e09ca5aa-d40c-11db-9a01-17e36b3f5d2e" scope="prototype">
+        <constructor-arg index="0" type="java.lang.String">
+            <value>inherited</value>
+        </constructor-arg>
+        <property name="serviceDescriptors">
+            <list>
+                <bean class="org.mule.impl.MuleDescriptor" destroy-method="dispose" init-method="initialise"
+                      name="TestComponent" scope="prototype">
+                    <property name="implementation">
+                        <value>org.mule.tck.functional.FunctionalTestComponent</value>
+                    </property>
+                    <property name="modelName" value=""/>
+                    <property name="inboundRouter">
+                        <bean class="org.mule.routing.inbound.InboundRouterCollection" destroy-method="dispose"
+                              init-method="initialise" scope="prototype">
+                            <property name="endpoints">
+                                <list>
+                                    <bean class="org.mule.impl.endpoint.MuleEndpoint" scope="prototype">
+                                        <property name="endpointURI">
+                                            <bean class="org.mule.impl.endpoint.MuleEndpointURI">
+                                                <constructor-arg index="0" type="java.lang.String">
+                                                    <value>test://in</value>
+                                                </constructor-arg>
+                                            </bean>
+                                        </property>
+                                        <property name="type">
+                                            <value>senderAndReceiver</value>
+                                        </property>
+                                    </bean>
+                                </list>
+                            </property>
+                            <property name="routers">
+                                <list/>
+                            </property>
+                        </bean>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+</beans>

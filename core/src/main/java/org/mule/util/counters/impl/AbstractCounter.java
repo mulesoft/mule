@@ -14,23 +14,23 @@ import org.mule.util.counters.Counter;
 import org.mule.util.counters.CounterFactory.Type;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
-/**
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
- */
 public abstract class AbstractCounter implements Counter
 {
 
-    private Type type;
-    private String name;
-    private ArrayList aggregates = null;
+    private final Type type;
+    private final String name;
+    private final List aggregates;
 
     public AbstractCounter(String name, Type type)
     {
+        super();
         this.name = name;
         this.type = type;
+        this.aggregates = Collections.synchronizedList(new ArrayList());
     }
 
     public Type getType()
@@ -55,23 +55,16 @@ public abstract class AbstractCounter implements Counter
 
     protected void addAggregate(AggregateCounter counter)
     {
-        if (this.aggregates == null)
-        {
-            this.aggregates = new ArrayList();
-        }
         this.aggregates.add(counter);
     }
 
     protected void propagate()
     {
-        if (this.aggregates != null)
+        Iterator it = this.aggregates.iterator();
+        while (it.hasNext())
         {
-            Iterator it = this.aggregates.iterator();
-            while (it.hasNext())
-            {
-                AggregateCounter agg = (AggregateCounter)it.next();
-                agg.compute();
-            }
+            AggregateCounter agg = (AggregateCounter)it.next();
+            agg.compute();
         }
     }
 

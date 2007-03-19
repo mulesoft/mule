@@ -92,7 +92,8 @@ public class DefaultReplyToHandler implements ReplyToHandler
         }
         catch (Exception e)
         {
-            throw new DispatchException(new Message(Messages.FAILED_TO_DISPATCH_TO_REPLYTO_X, endpoint),
+            throw new DispatchException(
+                new Message(Messages.FAILED_TO_DISPATCH_TO_REPLYTO_X, endpoint),
                 replyToEvent.getMessage(), replyToEvent.getEndpoint(), e);
         }
 

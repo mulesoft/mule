@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="test" version="1.0">
+
+    <connector name="quedvm" className="org.mule.providers.vm.VMConnector">
+        <properties>
+            <property name="queueEvents" value="true"/>
+        </properties>
+    </connector>
+
+    <connector name="tcpConnector" className="org.mule.providers.tcp.TcpConnector">
+        <properties>
+            <property name="tcpProtocolClassName" value="org.mule.providers.tcp.protocols.MuleMessageProtocol"/>
+            <property name="keepSendSocketOpen" value="false"/>
+        </properties>
+    </connector>
+
+    <!-- Container context -->
+    <model name="model">
+        <mule-descriptor name="BridgeIn" implementation="org.mule.components.simple.PassThroughComponent">
+            <inbound-router>
+                <endpoint address="vm://in"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.MessageChunkingRouter">
+                    <endpoint address="tcp://localhost:9994"/>
+                    <properties>
+                      <property name="chunkSize" value="90" />
+                    </properties>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="BridgeOut" implementation="org.mule.components.simple.PassThroughComponent">
+            <inbound-router>
+                <endpoint address="tcp://localhost:9994"/>
+                <router className="org.mule.routing.inbound.MessageChunkingAggregator"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="vm://out"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+
+    </model>
+</mule-configuration>

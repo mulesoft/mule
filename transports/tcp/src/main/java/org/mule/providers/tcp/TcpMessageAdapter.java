@@ -13,7 +13,6 @@ package org.mule.providers.tcp;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.umo.MessagingException;
-import org.mule.umo.provider.MessageTypeNotSupportedException;
 
 import java.io.Serializable;
 import java.util.Iterator;
@@ -48,13 +47,9 @@ public class TcpMessageAdapter extends AbstractMessageAdapter
             }
             this.message = muleMessage.getPayload();
         }
-        else if (message instanceof Serializable)
-        {
-            this.message = message;
-        }
         else
         {
-            throw new MessageTypeNotSupportedException(message, getClass());
+            this.message = message;
         }
     }
 

@@ -11,27 +11,23 @@
 package org.mule.providers.tcp;
 
 import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.tcp.protocols.DefaultProtocol;
+import org.mule.umo.MessagingException;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.provider.DispatchException;
-import org.mule.umo.provider.UMOConnector;
 import org.mule.util.ClassUtils;
-import org.mule.util.MapUtils;
 
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.InetAddress;
 import java.net.Socket;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
+
+import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 
 /**
  * <code>TcpConnector</code> can bind or sent to a given TCP port on a given host.
@@ -53,9 +49,15 @@ public class TcpConnector extends AbstractConnector
 
     protected int receiveTimeout = DEFAULT_SOCKET_TIMEOUT;
 
-    protected int bufferSize = DEFAULT_BUFFER_SIZE;
+    protected int sendBufferSize = DEFAULT_BUFFER_SIZE;
 
-    protected int backlog = DEFAULT_BACKLOG;
+    protected int receiveBufferSize = DEFAULT_BUFFER_SIZE;
+
+    protected int receiveBacklog = DEFAULT_BACKLOG;
+
+    protected boolean sendTcpNoDelay;
+
+    protected int socketLinger = INT_VALUE_NOT_SET;
 
     protected String tcpProtocolClassName = DefaultProtocol.class.getName();
 
@@ -65,11 +67,16 @@ public class TcpConnector extends AbstractConnector
 
     protected boolean keepAlive = false;
 
-    protected Map dispatcherSockets = new HashMap();
+    protected GenericKeyedObjectPool dispatcherSocketsPool = new GenericKeyedObjectPool();
 
     public boolean isKeepSendSocketOpen()
     {
         return keepSendSocketOpen;
+    }
+
+    public void setKeepSendSocketOpen(boolean keepSendSocketOpen)
+    {
+        this.keepSendSocketOpen = keepSendSocketOpen;
     }
 
     protected void doInitialise() throws InitialisationException
@@ -86,11 +93,23 @@ public class TcpConnector extends AbstractConnector
                 throw new InitialisationException(new Message("tcp", 3), e);
             }
         }
+        dispatcherSocketsPool.setFactory(new TcpSocketFactory());
+        dispatcherSocketsPool.setTestOnBorrow(true);
+        dispatcherSocketsPool.setTestOnReturn(true);
+        //There should only be one pooled instance per socket (key)        
+        dispatcherSocketsPool.setMaxActive(1);
     }
 
     protected void doDispose()
     {
-        // template method
+        try
+        {
+            dispatcherSocketsPool.close();
+        }
+        catch (Exception e)
+        {
+            logger.warn("Failed to close dispatcher socket pool: " + e.getMessage());
+        }
     }
 
     protected void doConnect() throws Exception
@@ -100,7 +119,7 @@ public class TcpConnector extends AbstractConnector
 
     protected void doDisconnect() throws Exception
     {
-        // template method
+        dispatcherSocketsPool.clear();
     }
 
     protected void doStart() throws UMOException
@@ -120,6 +139,7 @@ public class TcpConnector extends AbstractConnector
 
     /**
      * A shorthand property setting timeout for both SEND and RECEIVE sockets.
+     * @deprecated The time out should be set explicitly for each
      */
     public void setTimeout(int timeout)
     {
@@ -141,9 +161,6 @@ public class TcpConnector extends AbstractConnector
         this.sendTimeout = timeout;
     }
 
-    // ////////////////////////////////////////////
-    // New independednt Socket timeout for receiveSocket
-    // ////////////////////////////////////////////
     public int getReceiveTimeout()
     {
         return receiveTimeout;
@@ -158,28 +175,105 @@ public class TcpConnector extends AbstractConnector
         this.receiveTimeout = timeout;
     }
 
+    /**
+     *
+     * @return
+     * @deprecated Should use {@link #getSendBufferSize()} or {@link #getReceiveBufferSize()}
+     */
     public int getBufferSize()
     {
-        return bufferSize;
+        return sendBufferSize;
     }
 
+    /**
+     *
+     * @param bufferSize
+     * @deprecated Should use {@link #setSendBufferSize(int)} or {@link #setReceiveBufferSize(int)}
+     */
     public void setBufferSize(int bufferSize)
     {
         if (bufferSize < 1)
         {
             bufferSize = DEFAULT_BUFFER_SIZE;
         }
-        this.bufferSize = bufferSize;
+        this.sendBufferSize = bufferSize;
     }
 
+
+    public int getSendBufferSize()
+    {
+        return sendBufferSize;
+    }
+
+    public void setSendBufferSize(int sendBufferSize)
+    {
+        if (sendBufferSize < 1)
+        {
+            sendBufferSize = DEFAULT_BUFFER_SIZE;
+        }
+        this.sendBufferSize = sendBufferSize;
+    }
+
+    public int getReceiveBufferSize()
+    {
+        return receiveBufferSize;
+    }
+
+    public void setReceiveBufferSize(int receiveBufferSize)
+    {
+        if (receiveBufferSize < 1)
+        {
+            receiveBufferSize = DEFAULT_BUFFER_SIZE;
+        }
+        this.receiveBufferSize = receiveBufferSize;
+    }
+
+    public int getReceiveBacklog()
+    {
+        return receiveBacklog;
+    }
+
+    public void setReceiveBacklog(int receiveBacklog)
+    {
+        if(receiveBacklog < 0)
+        {
+            receiveBacklog = DEFAULT_BACKLOG;
+        }
+        this.receiveBacklog = receiveBacklog;
+    }
+
+    public int getSendSocketLinger()
+    {
+        return socketLinger;
+    }
+
+    public void setSendSocketLinger(int soLinger)
+    {
+        if(soLinger < 0)
+        {
+            soLinger = INT_VALUE_NOT_SET;
+        }
+        this.socketLinger = soLinger;
+    }
+
+    /**
+     *
+     * @return
+     * @deprecated should use {@link #getReceiveBacklog()}
+     */
     public int getBacklog()
     {
-        return backlog;
+        return receiveBacklog;
     }
 
+    /**
+     *
+     * @param backlog
+     * @deprecated should use {@link #setReceiveBacklog(int)}
+     */
     public void setBacklog(int backlog)
     {
-        this.backlog = backlog;
+        this.receiveBacklog = backlog;
     }
 
     public TcpProtocol getTcpProtocol()
@@ -229,30 +323,35 @@ public class TcpConnector extends AbstractConnector
      *         does not support streaming
      * @throws org.mule.umo.UMOException
      */
-    // TODO HH: Is this the right thing to do? not sure how else to get the
-    // outputstream
+    // TODO HH: Is this the right thing to do? not sure how else to get the outputstream
     public OutputStream getOutputStream(UMOImmutableEndpoint endpoint, UMOMessage message)
         throws UMOException
     {
+
+        Socket socket;
         try
         {
-            Socket socket = getSocket(endpoint);
-            if (socket == null)
-            {
-                // This shouldn't happen
-                throw new IllegalStateException("could not get socket for endpoint: "
-                                + endpoint.getEndpointURI().getAddress());
-            }
+            socket = getSocket(endpoint);
+        }
+        catch (Exception e)
+        {
+            throw new MessagingException(new Message(Messages.FAILED_TO_GET_OUTPUT_STREAM), message, e);
+        }
+        if (socket == null)
+        {
+            // This shouldn't happen
+            throw new IllegalStateException("could not get socket for endpoint: "
+                                            + endpoint.getEndpointURI().getAddress());
+        }
+        try
+        {
             return new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
         }
         catch (IOException e)
         {
-            throw new DispatchException(message, endpoint);
+            throw new MessagingException(new Message(Messages.FAILED_TO_GET_OUTPUT_STREAM), message, e);
         }
-        catch (URISyntaxException e)
-        {
-            throw new DispatchException(message, endpoint);
-        }
+
     }
 
     /**
@@ -262,85 +361,23 @@ public class TcpConnector extends AbstractConnector
      * @param endpoint
      * @return
      */
-    Socket lookupSocket(UMOImmutableEndpoint endpoint)
+    Socket getSocket(UMOImmutableEndpoint endpoint) throws Exception
     {
-        Socket socket;
-        synchronized (dispatcherSockets)
-        {
-            socket = (Socket)dispatcherSockets.remove(endpoint.getEndpointURI().getAddress());
-        }
-        return socket;
+        return (Socket)dispatcherSocketsPool.borrowObject(endpoint);
     }
 
-    Socket getSocket(UMOImmutableEndpoint endpoint) throws IOException, URISyntaxException
+    void releaseSocket(Socket socket, UMOImmutableEndpoint endpoint) throws Exception
     {
-        Socket socket = lookupSocket(endpoint);
-
-        if (socket == null)
-        {
-            socket = initSocket(endpoint.getEndpointURI().getUri());
-        }
-        else if (!socket.isConnected() || socket.isClosed())
-        {
-            logger.debug("The current socket connection for this endpoint is closed. Creating new connection");
-            socket = initSocket(endpoint.getEndpointURI().getUri());
-        }
-        return socket;
+        dispatcherSocketsPool.returnObject(endpoint, socket);
     }
 
-    void releaseSocket(Socket socket, UMOImmutableEndpoint endpoint)
+    public boolean isSendTcpNoDelay()
     {
-        boolean keepSocketOpen = MapUtils.getBooleanValue(endpoint.getProperties(),
-            KEEP_SEND_SOCKET_OPEN_PROPERTY, isKeepSendSocketOpen());
-        if (!keepSocketOpen)
-        {
-            try
-            {
-                if (socket != null)
-                {
-                    socket.close();
-                }
-            }
-            catch (IOException e)
-            {
-                logger.debug("Failed to close socket after dispatch", e);
-            }
-        }
-        else if (socket != null && !socket.isClosed())
-        {
-            synchronized (dispatcherSockets)
-            {
-                dispatcherSockets.put(endpoint.getEndpointURI().getAddress(), socket);
-            }
-        }
+        return sendTcpNoDelay;
     }
 
-    protected Socket initSocket(URI endpoint) throws IOException, URISyntaxException
+    public void setSendTcpNoDelay(boolean sendTcpNoDelay)
     {
-        int port = endpoint.getPort();
-        InetAddress inetAddress = InetAddress.getByName(endpoint.getHost());
-        Socket socket = createSocket(port, inetAddress);
-        socket.setReuseAddress(true);
-        if (getBufferSize() != UMOConnector.INT_VALUE_NOT_SET
-                        && socket.getReceiveBufferSize() != getBufferSize())
-        {
-            socket.setReceiveBufferSize(getBufferSize());
-        }
-        if (getBufferSize() != UMOConnector.INT_VALUE_NOT_SET
-                        && socket.getSendBufferSize() != getBufferSize())
-        {
-            socket.setSendBufferSize(getBufferSize());
-        }
-        if (getReceiveTimeout() != UMOConnector.INT_VALUE_NOT_SET
-                        && socket.getSoTimeout() != getReceiveTimeout())
-        {
-            socket.setSoTimeout(getReceiveTimeout());
-        }
-        return socket;
-    }
-
-    protected Socket createSocket(int port, InetAddress inetAddress) throws IOException
-    {
-        return new Socket(inetAddress, port);
+        this.sendTcpNoDelay = sendTcpNoDelay;
     }
 }

@@ -16,13 +16,4 @@ fi
 MULE_LIB=./conf
 export MULE_LIB
 
-GROOVY=groovy-all-1.0.jar
-
-# Check for additional libraries
-if [ -f "$MULE_BASE/lib/user/${GROOVY}" ]; then
-        exec $MULE_BASE/bin/mule -config ./conf/scripting-config.xml
-elif [ -f "$MULE_HOME/lib/user/${GROOVY}" ]; then
-        exec $MULE_BASE/bin/mule -config ./conf/scripting-config.xml
-else
-    echo "This example requires additional libraries which need to be downloaded by the build script.  Please follow the instructions in the README.txt file."
-fi
+exec $MULE_BASE/bin/mule -config ./conf/scripting-config.xml

@@ -12,16 +12,12 @@ package org.mule.util.counters.impl;
 
 import org.mule.util.counters.CounterFactory.Type;
 
-/**
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
- */
 public class TimeAverage extends AggregateCounter
 {
 
     private double sum = 0.0;
     private double lastValue = 0.0;
-    private long firstTime = System.currentTimeMillis();
+    private final long firstTime = System.currentTimeMillis();
     private long lastTime = firstTime;
 
     public TimeAverage(String name, AbstractCounter base)
@@ -42,4 +38,5 @@ public class TimeAverage extends AggregateCounter
         this.lastValue = getBase().nextValue();
         this.lastTime = current;
     }
+
 }

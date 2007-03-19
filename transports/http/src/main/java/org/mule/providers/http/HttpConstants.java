@@ -34,9 +34,14 @@ public class HttpConstants
     public static final int DEFAULT_HTTP_PORT = 80;
 
     // HTTP Methods
+    public static final String METHOD_OPTIONS = "OPTIONS";
+    public static final String METHOD_GET = "GET";
+    public static final String METHOD_HEAD = "HEAD";
     public static final String METHOD_POST = "POST";
     public static final String METHOD_PUT = "PUT";
-    public static final String METHOD_GET = "GET";
+    public static final String METHOD_DELETE = "DELETE";
+    public static final String METHOD_TRACE = "TRACE";
+    public static final String METHOD_CONNECT = "CONNECT";
 
     // Date header format
     public static final String DATE_FORMAT = "EEE, dd MMM yyyy hh:mm:ss zzz";
@@ -50,59 +55,59 @@ public class HttpConstants
     public static final String DEFAULT_CONTENT_TYPE = "text/plain";
 
     // Headers
-    public static final String HEADER_ACCEPT = "Accept";// [Request]
-    public static final String HEADER_ACCEPT_CHARSET = "Accept-Charset";// [Request]
-    public static final String HEADER_ACCEPT_ENCODING = "Accept-Encoding";// [Request]
-    public static final String HEADER_ACCEPT_LANGUAGE = "Accept-Language";// [Request]
-    public static final String HEADER_ACCEPT_RANGES = "Accept-Ranges";// [Response]
-    public static final String HEADER_AGE = "Age";// [Response]
-    public static final String HEADER_ALLOW = "Allow";// [Entity]
-    public static final String HEADER_AUTHORIZATION = "Authorization";// [Request]
-    public static final String HEADER_CACHE_CONTROL = "Cache-Control";// [General]
-    public static final String HEADER_CONNECTION = "Connection";// [General]
-    public static final String HEADER_CONTENT_ENCODING = "Content-Encoding";// [Entity]
-    public static final String HEADER_CONTENT_LANGUAGE = "Content-Language";// [Entity]
-    public static final String HEADER_CONTENT_LENGTH = "Content-Length";// [Entity]
-    public static final String HEADER_CONTENT_LOCATION = "Content-Location";// [Entity]
-    public static final String HEADER_CONTENT_MD5 = "Content-MD5";// [Entity]
-    public static final String HEADER_CONTENT_RANGE = "Content-Range";// [Entity]
-    public static final String HEADER_CONTENT_TYPE = "Content-Type";// [Entity]
-    public static final String HEADER_COOKIE = "Cookie";// [Request]
-    public static final String HEADER_COOKIE_SET = "Set-Cookie";// [Response]
-    public static final String HEADER_DATE = "Date";// [General]
-    public static final String HEADER_ETAG = "ETag";// [Response]
-    public static final String HEADER_EXPECT = "Expect";// [Request]
-    public static final String HEADER_EXPIRES = "Expires";// [Entity]
-    public static final String HEADER_FROM = "From";// [Request]
-    public static final String HEADER_HOST = "Host";// [Request]
-    public static final String HEADER_IF_MATCH = "If-Match";// [Request]
-    public static final String HEADER_IF_MODIFIED_SINCE = "If-Modified-Since";// [Request]
-    public static final String HEADER_IF_NONE_MATCH = "If-None-Match";// [Request]
-    public static final String HEADER_IF_RANGE = "If-Range";// [Request]
-    public static final String HEADER_IF_UNMODIFIED_SINCE = "If-Unmodified-Since";// [Request]
-    public static final String HEADER_KEEP_ALIVE = "Keep-Alive";// [Entity]
-    public static final String HEADER_LAST_MODIFIED = "Last-Modified";// [Entity]
-    public static final String HEADER_LOCATION = "Location";// [Response]
-    public static final String HEADER_MAX_FORWARDS = "Max-Forwards";// [Request]
-    public static final String HEADER_PRAGMA = "Pragma";// [General]
-    public static final String HEADER_PROXY_AUTHENTICATE = "Proxy-Authenticate";// [Response]
-    public static final String HEADER_PROXY_AUTHORIZATION = "Proxy-Authorization";// [Request]
-    public static final String HEADER_RANGE = "Range";// [Request]
-    public static final String HEADER_REFERER = "Referer";// [Request]
-    public static final String HEADER_RETRY_AFTER = "Retry-After";// [Response]
-    public static final String HEADER_SERVER = "Server";// [Response]
-    public static final String HEADER_TE = "TE";// [Request]
-    public static final String HEADER_TRAILER = "Trailer";// [General]
-    public static final String HEADER_TRANSFER_ENCODING = "Transfer-Encoding";// [General]
-    public static final String HEADER_UPGRADE = "Upgrade";// [General]
-    public static final String HEADER_USER_AGENT = "User-Agent";// [Request]
-    public static final String HEADER_VARY = "Vary";// [Response]
-    public static final String HEADER_VIA = "Via";// [General]
-    public static final String HEADER_WARNING = "Warning";// [General]
-    public static final String HEADER_WWW_AUTHENTICATE = "WWW-Authenticate";// [Response]
+    public static final String HEADER_ACCEPT = "Accept"; // [Request]
+    public static final String HEADER_ACCEPT_CHARSET = "Accept-Charset"; // [Request]
+    public static final String HEADER_ACCEPT_ENCODING = "Accept-Encoding"; // [Request]
+    public static final String HEADER_ACCEPT_LANGUAGE = "Accept-Language"; // [Request]
+    public static final String HEADER_ACCEPT_RANGES = "Accept-Ranges"; // [Response]
+    public static final String HEADER_AGE = "Age"; // [Response]
+    public static final String HEADER_ALLOW = "Allow"; // [Entity]
+    public static final String HEADER_AUTHORIZATION = "Authorization"; // [Request]
+    public static final String HEADER_CACHE_CONTROL = "Cache-Control"; // [General]
+    public static final String HEADER_CONNECTION = "Connection"; // [General]
+    public static final String HEADER_CONTENT_ENCODING = "Content-Encoding"; // [Entity]
+    public static final String HEADER_CONTENT_LANGUAGE = "Content-Language"; // [Entity]
+    public static final String HEADER_CONTENT_LENGTH = "Content-Length"; // [Entity]
+    public static final String HEADER_CONTENT_LOCATION = "Content-Location"; // [Entity]
+    public static final String HEADER_CONTENT_MD5 = "Content-MD5"; // [Entity]
+    public static final String HEADER_CONTENT_RANGE = "Content-Range"; // [Entity]
+    public static final String HEADER_CONTENT_TYPE = "Content-Type"; // [Entity]
+    public static final String HEADER_COOKIE = "Cookie"; // [Request]
+    public static final String HEADER_COOKIE_SET = "Set-Cookie"; // [Response]
+    public static final String HEADER_DATE = "Date"; // [General]
+    public static final String HEADER_ETAG = "ETag"; // [Response]
+    public static final String HEADER_EXPECT = "Expect"; // [Request]
+    public static final String HEADER_EXPIRES = "Expires"; // [Entity]
+    public static final String HEADER_FROM = "From"; // [Request]
+    public static final String HEADER_HOST = "Host"; // [Request]
+    public static final String HEADER_IF_MATCH = "If-Match"; // [Request]
+    public static final String HEADER_IF_MODIFIED_SINCE = "If-Modified-Since"; // [Request]
+    public static final String HEADER_IF_NONE_MATCH = "If-None-Match"; // [Request]
+    public static final String HEADER_IF_RANGE = "If-Range"; // [Request]
+    public static final String HEADER_IF_UNMODIFIED_SINCE = "If-Unmodified-Since"; // [Request]
+    public static final String HEADER_KEEP_ALIVE = "Keep-Alive"; // [Entity]
+    public static final String HEADER_LAST_MODIFIED = "Last-Modified"; // [Entity]
+    public static final String HEADER_LOCATION = "Location"; // [Response]
+    public static final String HEADER_MAX_FORWARDS = "Max-Forwards"; // [Request]
+    public static final String HEADER_PRAGMA = "Pragma"; // [General]
+    public static final String HEADER_PROXY_AUTHENTICATE = "Proxy-Authenticate"; // [Response]
+    public static final String HEADER_PROXY_AUTHORIZATION = "Proxy-Authorization"; // [Request]
+    public static final String HEADER_RANGE = "Range"; // [Request]
+    public static final String HEADER_REFERER = "Referer"; // [Request]
+    public static final String HEADER_RETRY_AFTER = "Retry-After"; // [Response]
+    public static final String HEADER_SERVER = "Server"; // [Response]
+    public static final String HEADER_TE = "TE"; // [Request]
+    public static final String HEADER_TRAILER = "Trailer"; // [General]
+    public static final String HEADER_TRANSFER_ENCODING = "Transfer-Encoding"; // [General]
+    public static final String HEADER_UPGRADE = "Upgrade"; // [General]
+    public static final String HEADER_USER_AGENT = "User-Agent"; // [Request]
+    public static final String HEADER_VARY = "Vary"; // [Response]
+    public static final String HEADER_VIA = "Via"; // [General]
+    public static final String HEADER_WARNING = "Warning"; // [General]
+    public static final String HEADER_WWW_AUTHENTICATE = "WWW-Authenticate"; // [Response]
 
     // This is a POST-related request header value
-    public static final String HEADER_EXPECT_CONTINUE_REQUEST_VALUE = "100-continue";// [Request]
+    public static final String HEADER_EXPECT_CONTINUE_REQUEST_VALUE = "100-continue"; // [Request]
 
     // Chunked transfer encoding indicator
     public static final String TRANSFER_ENCODING_CHUNKED = "chunked";

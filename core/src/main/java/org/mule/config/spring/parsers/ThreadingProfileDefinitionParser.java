@@ -10,7 +10,6 @@
 package org.mule.config.spring.parsers;
 
 import org.mule.config.ThreadingProfile;
-import org.mule.util.StringUtils;
 
 import org.w3c.dom.Element;
 
@@ -65,16 +64,5 @@ public class ThreadingProfileDefinitionParser extends AbstractChildBeanDefinitio
         {
             return "threadingProfile";
         }
-    }
-
-    protected String getParentBeanName(Element element)
-    {
-        String name = super.getParentBeanName(element);
-        if(StringUtils.isBlank(name))
-        {
-            //The parent may be the global configuration
-            name = ((Element) element.getParentNode()).getAttribute("serverId");
-        }
-        return name;
     }
 }

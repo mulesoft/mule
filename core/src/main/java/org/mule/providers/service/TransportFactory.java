@@ -23,6 +23,7 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.UMOTransformer;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.BeanUtils;
 import org.mule.util.MuleObjectHelper;
 import org.mule.util.ObjectNameHelper;
@@ -58,12 +59,13 @@ public class TransportFactory
     public static UMOEndpoint createEndpoint(UMOEndpointURI uri, String type) throws EndpointException
     {
         String scheme = uri.getFullScheme();
-        UMOConnector connector = null;
+        UMOConnector connector;
         try
         {
             if (uri.getCreateConnector() == ALWAYS_CREATE_CONNECTOR)
             {
                 connector = createConnector(uri);
+
                 RegistryContext.getRegistry().registerConnector(connector);
             }
             else if (uri.getCreateConnector() == NEVER_CREATE_CONNECTOR)
@@ -109,9 +111,8 @@ public class TransportFactory
         {
             endpoint.setName(uri.getEndpointName());
         }
-        String name = ObjectNameHelper.getEndpointName(endpoint);
-
-        endpoint.setName(name);
+        //TODO RM* I dont think this is needed String name = ObjectNameHelper.getEndpointName(endpoint);
+        //endpoint.setName(name);
 
         if (type != null)
         {
@@ -125,6 +126,14 @@ public class TransportFactory
                 trans = getTransformer(uri, connector, 2);
                 endpoint.setResponseTransformer(trans);
             }
+        }
+        try
+        {
+            endpoint.initialise();
+        }
+        catch (InitialisationException e)
+        {
+            throw new TransportFactoryException(e);
         }
         return endpoint;
     }
@@ -254,13 +263,15 @@ public class TransportFactory
                 props = PropertiesUtils.removeNamespaces(props);
                 BeanUtils.populateWithoutFail(connector, props, true);
             }
-
+            connector.setManagementContext(RegistryContext.getRegistry().getManagementContext());
+            connector.initialise();
             return connector;
         }
         catch (Exception e)
         {
-            throw new TransportFactoryException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X, "Endpoint",
-                url), e);
+            throw new TransportFactoryException(
+                new Message(Messages.FAILED_TO_CREATE_X_WITH_X, "Endpoint", url),
+                e);
         }
     }
 
@@ -292,8 +303,9 @@ public class TransportFactory
             }
             catch (Exception e)
             {
-                throw new TransportFactoryException(new Message(Messages.FAILED_TO_SET_PROPERTIES_ON_X,
-                    "Connector"), e);
+                throw new TransportFactoryException(
+                    new Message(Messages.FAILED_TO_SET_PROPERTIES_ON_X, "Connector"),
+                    e);
             }
         }
         else if (create == NEVER_CREATE_CONNECTOR && connector == null)
@@ -307,15 +319,23 @@ public class TransportFactory
     public static UMOConnector getConnectorByProtocol(String protocol)
     {
         UMOConnector connector;
+        UMOConnector resultConnector = null;
         Map connectors = RegistryContext.getRegistry().getConnectors();
         for (Iterator iterator = connectors.values().iterator(); iterator.hasNext();)
         {
             connector = (UMOConnector)iterator.next();
             if (connector.supportsProtocol(protocol))
             {
-                return connector;
+                if(resultConnector==null)
+                {
+                    resultConnector = connector;
+                }
+                else
+                {
+                    throw new IllegalStateException(new Message(Messages.MORE_THAN_ONE_CONNECTOR_WITH_PROTOCOL_X, protocol).getMessage());
+                }
             }
         }
-        return null;
+        return resultConnector;
     }
 }

@@ -86,13 +86,13 @@ public class MulticastConnectorTestCase extends AbstractConnectorTestCase
     {
         MulticastConnector c = new MulticastConnector();
         c.initialise();
-        c.setBufferSize(1024);
-        assertEquals(1024, c.getBufferSize());
-        c.setBufferSize(0);
-        assertEquals(MulticastConnector.DEFAULT_BUFFER_SIZE, c.getBufferSize());
+        c.setReceiveBufferSize(1024);
+        assertEquals(1024, c.getReceiveBufferSize());
+        c.setReceiveBufferSize(0);
+        assertEquals(MulticastConnector.DEFAULT_BUFFER_SIZE, c.getReceiveBufferSize());
 
-        c.setTimeout(-1);
-        assertEquals(MulticastConnector.DEFAULT_SOCKET_TIMEOUT, c.getTimeout());
+        c.setReceiveTimeout(-1);
+        assertEquals(MulticastConnector.DEFAULT_SOCKET_TIMEOUT, c.getReceiveTimeout());
 
         c.setLoopback(true);
         assertTrue(c.isLoopback());
