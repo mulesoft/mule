@@ -128,7 +128,14 @@ public class ManagementContextFactoryBean extends AbstractFactoryBean
                 legacy = true;
                 registry.getConfiguration().setId(((AutowireUMOManagerFactoryBean.LegacyManager)temp.values().iterator().next()).getManagerId());
                 // set environment properties
-                setLegacyProperties((Map)context.getBean("muleEnvironmentProperties", Map.class));
+                try
+                {
+                    setLegacyProperties((Map)context.getBean("muleEnvironmentProperties", Map.class));
+                }
+                catch (BeansException e)
+                {
+                    //ignore
+                }
 
             }
 

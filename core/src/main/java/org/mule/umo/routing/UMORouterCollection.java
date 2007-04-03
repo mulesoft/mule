@@ -11,11 +11,10 @@
 package org.mule.umo.routing;
 
 import org.mule.management.stats.RouterStatistics;
+import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
 
 import java.util.List;
-
-import org.apache.avalon.framework.activity.Disposable;
 
 /**
  * <code>UMORouterCollection</code> defines the interface for a MessageRouter that

@@ -15,6 +15,7 @@ import org.mule.config.XslHelper;
 
 import java.io.IOException;
 
+import javax.xml.transform.ErrorListener;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -24,6 +25,9 @@ import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.dom4j.io.DOMReader;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -34,7 +38,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.w3c.dom.Document;
 import org.xml.sax.EntityResolver;
-import org.dom4j.io.DOMReader;
 
 /**
  * <code>MuleBeanDefinitionReader</code> Is a custom Spring Bean reader that will
@@ -43,6 +46,11 @@ import org.dom4j.io.DOMReader;
  */
 public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
 {
+    /**
+     * logger used by this class
+     */
+    protected static transient final Log logger = LogFactory.getLog(MuleBeanDefinitionReader.class);
+
     private int contextCount = 0;
     private int configCount = 0;
     private MuleDtdResolver dtdResolver = null;
@@ -75,6 +83,24 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
     public static Transformer createTransformer(Source source) throws TransformerConfigurationException
     {
         TransformerFactory factory = TransformerFactory.newInstance();
+        factory.setErrorListener(new ErrorListener()
+        {
+
+            public void warning(TransformerException exception) throws TransformerException
+            {
+                logger.warn("failed to create transformer: " + exception.getMessage(), exception);
+            }
+
+            public void error(TransformerException exception) throws TransformerException
+            {
+                logger.error("failed to create transformer: " + exception.getMessage(), exception);
+            }
+
+            public void fatalError(TransformerException exception) throws TransformerException
+            {
+                logger.fatal("failed to create transformer: " + exception.getMessage(), exception);
+            }
+        });
         Transformer transformer = factory.newTransformer(source);
         return transformer;
     }

@@ -21,7 +21,7 @@
                 <xsl:value-of select="property[@name='connector']"/>
             </xsl:attribute>
         </xsl:if>
-        <xsl:attribute name="scope">prototype</xsl:attribute>
+        <xsl:attribute name="singleton">true</xsl:attribute>
      </xsl:template>
 
      <xsl:template match="bean[@class='org.mule.impl.MuleDescriptor']">

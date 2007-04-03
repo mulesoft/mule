@@ -1056,7 +1056,7 @@ Whether every configured router will be matched
 <!--
 Configuration that binds and endpoint to an interface
 -->
-<!ELEMENT binding ((endpoint | global-endpoint))>
+<!ELEMENT binding ((endpoint | global-endpoint | router))>
 
 <!--
 The fully qualified name of the interface class that will be proxied to call out to an endpoint

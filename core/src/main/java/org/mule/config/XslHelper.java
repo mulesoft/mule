@@ -10,8 +10,8 @@
 package org.mule.config;
 
 import org.mule.util.StringMessageUtils;
-import org.mule.util.UUID;
 import org.mule.util.StringUtils;
+import org.mule.util.UUID;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,16 +24,24 @@ public class XslHelper
     private static List errors = new ArrayList();
     private static List warnings = new ArrayList();
 
-    private String currentModel;
+    private static String currentModel;
 
     public static void reportError(String message)
     {
-        errors.add((errors.size() + 1) + ". " + message);
+        //Lets not duplicate error messages
+        if(!errors.contains(errors.size() + ". " + message))
+        {
+            errors.add((errors.size() + 1) + ". " + message);
+        }
     }
 
     public static void reportWarning(String message)
     {
-        warnings.add((warnings.size() + 1) + ". " + message);
+        //Lets not duplicate error messages
+        if(!warnings.contains(warnings.size() + ". " + message))
+        {
+            warnings.add((warnings.size() + 1) + ". " + message);
+        }
     }
 
     public static boolean hasErrorReport()
@@ -48,12 +56,18 @@ public class XslHelper
 
     public static String getErrorReport()
     {
-        return StringMessageUtils.getBoilerPlate(errors, '#', 80);
+        List messages = new ArrayList();
+        messages.add("ERROS");
+        messages.addAll(errors);
+        return StringMessageUtils.getBoilerPlate(messages, '#', 80);
     }
 
     public static String getWarningReport()
     {
-        return StringMessageUtils.getBoilerPlate(warnings, '#', 80);
+        List messages = new ArrayList();
+        messages.add("WARNINGS");
+        messages.addAll(warnings);
+        return StringMessageUtils.getBoilerPlate(messages, '#', 80);
     }
 
     public static String getFullReport()
@@ -97,14 +111,14 @@ public class XslHelper
     }
 
 
-    public String getCurrentModel()
+    public static String getCurrentModel()
     {
         return currentModel;
     }
 
-    public void setCurrentModel(String currentModel)
+    public static void setCurrentModel(String model)
     {
-        this.currentModel = currentModel;
+        currentModel = model;
     }
    
 

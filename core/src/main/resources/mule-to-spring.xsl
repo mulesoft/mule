@@ -2,11 +2,10 @@
 
 <xsl:stylesheet
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-        xmlns:java="http://xml.apache.org/xslt/java"
-        xmlns:helper="org.mule.config.XslHelper" exclude-result-prefixes="helper java"
+        xmlns:helper="org.mule.config.XslHelper" exclude-result-prefixes="helper"
         version='1.0'>
 
-    <xsl:param name="firstContext"/>
+     <xsl:param name="firstContext"/>
 
     <xsl:output method="xml" indent="yes" encoding="ISO-8859-1" standalone="yes"
                 doctype-public="-//SPRING//DTD BEAN//EN"
@@ -124,7 +123,7 @@
     </xsl:template>
 
     <!--<xsl:template match="environment-properties">-->
-    <!--<bean name="muleEnvironmentProperties" class="org.mule.impl.container.PropertiesContainerContext" init-method="initialise" destroy-method="dispose" scope="prototype">-->
+    <!--<bean name="muleEnvironmentProperties" class="org.mule.impl.container.PropertiesContainerContext" init-method="initialise" destroy-method="dispose" singleton="false">-->
     <!--<property name="properties">-->
     <!--<map>-->
     <!--<xsl:apply-templates select="property" mode="mapProperty"/>-->
@@ -149,9 +148,9 @@
             <xsl:if test="file-property[@location]">
                 <property name="locations">
                     <list>
-                        <entry>
+                        <value>
                             <xsl:value-of select="file-property[@location]"/>
-                        </entry>
+                        </value>
                     </list>
                 </property>
             </xsl:if>
@@ -175,7 +174,7 @@
             </xsl:choose>
         </xsl:variable>
 
-        <bean name="{$name}" class="{$type}" init-method="initialise" destroy-method="dispose" scope="prototype"
+        <bean name="{$name}" class="{$type}" init-method="initialise" destroy-method="dispose" singleton="false"
               depends-on="_muleManagementContextFactoryBean">
             <xsl:apply-templates select="properties"/>
             <xsl:apply-templates select="exception-strategy"/>
@@ -196,7 +195,7 @@
         <xsl:apply-templates select="agent"/>
     </xsl:template>
     <xsl:template match="agent">
-        <bean name="{@name}" class="{@className}" init-method="initialise" destroy-method="dispose" scope="prototype">
+        <bean name="{@name}" class="{@className}" init-method="initialise" destroy-method="dispose" singleton="false">
             <xsl:apply-templates select="properties"/>
         </bean>
     </xsl:template>
@@ -227,9 +226,27 @@
         </xsl:element>
     </xsl:template>
 
-    <xsl:template match="endpoint-identifiers|endpoint-identifier">
+    <xsl:template match="endpoint-identifiers">
+        <xsl:apply-templates select="endpoint-identifier"/>
+    </xsl:template>
+
+    <xsl:template match="endpoint-identifier">
         <xsl:variable name="err"
-                      select="helper:reportError('[endpoint-identifier] elements are no longer supported in Mule 2.0.  Instead we recommend you just use standard top-level endpoint elements (In Mule 1.x [global-endpoint] elements). For more information see http://muledocs.org/Endpoints')"/>
+                      select="helper:reportError('[endpoint-identifier] elements are no longer supported in Mule 2.0.  Instead you need to use standard top-level endpoint elements (In Mule 1.x [global-endpoint] elements) ad use endpoint-ref elements in your service configuration. For more information see http://muledocs.org/Endpoints')"/>
+        <!--<xsl:element name="bean">-->
+            <!--<xsl:attribute name="name"><xsl:value-of select="@name"/></xsl:attribute>-->
+            <!--<xsl:attribute name="class">org.mule.impl.endpoint.MuleEndpoint</xsl:attribute>-->
+            <!--<xsl:attribute name="singleton">true</xsl:attribute>-->
+             <!--<property name="endpointURI">-->
+            <!--<bean class="org.mule.impl.endpoint.MuleEndpointURI">-->
+                <!--<constructor-arg index="0" type="java.lang.String">-->
+                    <!--<value>-->
+                        <!--<xsl:value-of select="@value"/>-->
+                    <!--</value>-->
+                <!--</constructor-arg>-->
+            <!--</bean>-->
+        <!--</property>-->
+        <!--</xsl:element>-->
     </xsl:template>
 
     <!-- Global Endpoints -->
@@ -253,47 +270,19 @@
         <xsl:variable name="type">
             <xsl:value-of select="@className"/>
         </xsl:variable>
-        <bean name="{$name}" class="{$type}" init-method="initialise" destroy-method="dispose" scope="prototype">
+        <bean name="{$name}" class="{$type}" init-method="initialise" destroy-method="dispose" singleton="false">
             <xsl:apply-templates select="@returnClass" mode="addProperties"/>
             <xsl:apply-templates select="properties"/>
         </bean>
     </xsl:template>
 
-
-    <!-- Endpoint Template -->
-    <!--<xsl:template match="endpoint|global-endpoint">-->
-    <!--<xsl:element name="bean">-->
-    <!--<xsl:if test="@name">-->
-    <!--<xsl:attribute name="name">-->
-    <!--<xsl:value-of select="@name"/>-->
-    <!--</xsl:attribute>-->
-    <!--</xsl:if>-->
-    <!--<xsl:attribute name="class">org.mule.config.spring.EndpointFactoryBean</xsl:attribute>-->
-    <!--<xsl:attribute name="scope">prototype</xsl:attribute>-->
-
-    <!--<xsl:apply-templates select="@transformers" mode="addTransformers"/>-->
-    <!--<xsl:apply-templates select="@responseTransformers" mode="addTransformers"/>-->
-    <!--<!-<xsl:apply-templates select="@address" mode="addEndpointURI"/>-->
-    <!--<xsl:apply-templates select="@createConnector"/>-->
-    <!--<xsl:apply-templates select="@connector"/>-->
-    <!--<xsl:apply-templates-->
-    <!--select="@*[local-name() != 'transformers' and local-name() != 'createConnector' and local-name() != 'responseTransformers' and local-name() != 'connector']"-->
-    <!--mode="addProperties"/>-->
-    <!--<xsl:apply-templates select="properties" mode="asMap"/>-->
-    <!--<xsl:apply-templates select="transaction"/>-->
-    <!--<xsl:apply-templates select="filter"/>-->
-    <!--<xsl:apply-templates select="security-filter"/>-->
-    <!--</xsl:element>-->
-    <!--</xsl:template>-->
-
     <xsl:template match="global-endpoint">
         <xsl:element name="bean">
             <xsl:attribute name="class">org.mule.impl.endpoint.MuleEndpoint</xsl:attribute>
-            <xsl:attribute name="scope">prototype</xsl:attribute>
+            <xsl:attribute name="singleton">false</xsl:attribute>
             <xsl:attribute name="parent">
                 <xsl:value-of select="@name"/>
             </xsl:attribute>
-            <xsl:attribute name="init-method">initialise</xsl:attribute>
             <xsl:apply-templates select="@transformers" mode="addTransformers"/>
             <xsl:apply-templates select="@responseTransformers" mode="addTransformers"/>
             <xsl:apply-templates select="@address" mode="addEndpointURI"/>
@@ -317,7 +306,7 @@
                 </xsl:attribute>
             </xsl:if>
             <xsl:attribute name="class">org.mule.impl.endpoint.MuleEndpoint</xsl:attribute>
-            <xsl:attribute name="scope">prototype</xsl:attribute>
+            <xsl:attribute name="singleton">false</xsl:attribute>
             <xsl:attribute name="init-method">initialise</xsl:attribute>
             <xsl:attribute name="depends-on">_muleManagementContextFactoryBean</xsl:attribute>
             <xsl:apply-templates select="@transformers" mode="addTransformers"/>
@@ -403,16 +392,16 @@
     </xsl:template>
 
     <xsl:template match="entry-point-resolver">
-        <bean name="entryPointResolver" class="{@className}" scope="prototype"/>
+        <bean name="entryPointResolver" class="{@className}" singleton="false"/>
     </xsl:template>
 
     <xsl:template match="component-lifecycle-adapter-factory">
-        <bean name="componentLifecycleAdapterFactory" class="{@className}" scope="prototype"/>
+        <bean name="componentLifecycleAdapterFactory" class="{@className}" singleton="false"/>
     </xsl:template>
 
     <xsl:template match="exception-strategy">
         <property name="exceptionListener">
-            <bean class="{@className}" init-method="initialise" destroy-method="dispose" scope="prototype">
+            <bean class="{@className}" init-method="initialise" destroy-method="dispose" singleton="false">
                 <xsl:apply-templates select="properties"/>
                 <property name="endpoints">
                     <list>
@@ -426,7 +415,7 @@
 
     <xsl:template match="connection-strategy">
         <property name="connectionStrategy">
-            <bean class="{@className}" init-method="initialise" destroy-method="dispose" scope="prototype">
+            <bean class="{@className}" init-method="initialise" destroy-method="dispose" singleton="false">
                 <xsl:apply-templates select="properties"/>
             </bean>
         </property>
@@ -543,7 +532,7 @@
         </xsl:variable>
 
         <property name="{$name}">
-            <bean class="{@className}" scope="prototype">
+            <bean class="{@className}" singleton="false">
                 <xsl:apply-templates select="@*" mode="addProperties"/>
                 <xsl:apply-templates select="properties"/>
                 <xsl:apply-templates select="left-filter"/>
@@ -564,7 +553,7 @@
             </xsl:choose>
         </xsl:variable>
         <property name="inboundRouter">
-            <bean class="{$type}" init-method="initialise" destroy-method="dispose" scope="prototype">
+            <bean class="{$type}" init-method="initialise" destroy-method="dispose" singleton="false">
                 <property name="endpoints">
                     <list>
                         <xsl:apply-templates select="endpoint"/>
@@ -592,7 +581,7 @@
             </xsl:choose>
         </xsl:variable>
         <property name="nestedRouter">
-            <bean class="{$type}" init-method="initialise" destroy-method="dispose" scope="prototype">
+            <bean class="{$type}" init-method="initialise" destroy-method="dispose" singleton="false">
                 <property name="routers">
                     <list>
                         <xsl:apply-templates select="binding"/>
@@ -613,7 +602,7 @@
             </xsl:choose>
         </xsl:variable>
         <property name="responseRouter">
-            <bean class="{$type}" init-method="initialise" destroy-method="dispose" scope="prototype">
+            <bean class="{$type}" init-method="initialise" destroy-method="dispose" singleton="false">
                 <xsl:apply-templates select="@*" mode="addProperties"/>
                 <property name="endpoints">
                     <list>
@@ -643,7 +632,7 @@
             </xsl:choose>
         </xsl:variable>
         <property name="outboundRouter">
-            <bean class="{$type}" init-method="initialise" destroy-method="dispose" scope="prototype">
+            <bean class="{$type}" init-method="initialise" destroy-method="dispose" singleton="false">
                 <xsl:apply-templates select="@*" mode="addProperties"/>
                 <xsl:apply-templates select="catch-all-strategy"/>
                 <property name="routers">
@@ -658,7 +647,7 @@
     <!-- Catch all strategy Template -->
     <xsl:template match="catch-all-strategy">
         <property name="catchAllStrategy">
-            <bean class="{@className}" scope="prototype">
+            <bean class="{@className}" singleton="false">
                 <xsl:apply-templates select="endpoint" mode="propertyEndpoint"/>
                 <xsl:apply-templates select="global-endpoint" mode="propertyEndpoint"/>
                 <xsl:apply-templates select="properties"/>
@@ -691,7 +680,7 @@
 
     <!-- Router Template -->
     <xsl:template match="router">
-        <bean class="{@className}" init-method="initialise" destroy-method="dispose" scope="prototype">
+        <bean class="{@className}" init-method="initialise" destroy-method="dispose" singleton="false">
             <property name="endpoints">
                 <list>
                     <xsl:apply-templates select="endpoint"/>
@@ -706,7 +695,7 @@
     <!-- Nested Router binding Template -->
     <xsl:template match="binding">
         <bean class="org.mule.routing.nested.NestedRouter" init-method="initialise" destroy-method="dispose"
-              scope="prototype">
+              singleton="false">
             <property name="endpoint">
                 <xsl:apply-templates select="endpoint"/>
                 <xsl:apply-templates select="global-endpoint"/>
@@ -716,7 +705,7 @@
     </xsl:template>
 
     <xsl:template match="router" mode="inbound">
-        <bean class="{@className}" init-method="initialise" destroy-method="dispose" scope="prototype">
+        <bean class="{@className}" init-method="initialise" destroy-method="dispose" singleton="false">
             <xsl:apply-templates select="properties"/>
             <xsl:apply-templates select="filter"/>
         </bean>
@@ -725,7 +714,7 @@
     <!-- Transaction Template -->
     <xsl:template match="transaction">
         <property name="transactionConfig">
-            <bean class="org.mule.impl.MuleTransactionConfig" scope="prototype">
+            <bean class="org.mule.impl.MuleTransactionConfig" singleton="false">
                 <xsl:if test="@action">
                     <property name="actionAsString">
                         <value>
@@ -735,7 +724,7 @@
                 </xsl:if>
                 <xsl:if test="@factory">
                     <property name="factory">
-                        <bean class="{@factory}" scope="prototype"/>
+                        <bean class="{@factory}" singleton="false"/>
                     </property>
                 </xsl:if>
                 <xsl:apply-templates select="constraint"/>
@@ -764,7 +753,7 @@
         </xsl:variable>
 
         <property name="{$propertyName}">
-            <bean class="org.mule.config.ThreadingProfile" scope="prototype">
+            <bean class="org.mule.config.ThreadingProfile" singleton="false">
                 <xsl:apply-templates select="@*[local-name() !='id' and local-name() !='poolExhaustedAction']|*"
                                      mode="addProperties"/>
                 <xsl:if test="@poolExhaustedAction">
@@ -781,7 +770,7 @@
 
     <xsl:template match="threading-profile">
         <property name="threadingProfile">
-            <bean class="org.mule.config.ThreadingProfile" scope="prototype">
+            <bean class="org.mule.config.ThreadingProfile" singleton="false">
                 <xsl:apply-templates select="@*[local-name() !='id' and local-name() !='poolExhaustedAction']|*"
                                      mode="addProperties"/>
                 <xsl:if test="@poolExhaustedAction">
@@ -797,7 +786,7 @@
 
     <xsl:template match="pooling-profile">
         <property name="poolingProfile">
-            <bean name="pooling-profile" class="org.mule.config.PoolingProfile" scope="prototype">
+            <bean name="pooling-profile" class="org.mule.config.PoolingProfile" singleton="false">
                 <xsl:apply-templates
                         select="@*[local-name() !='initialisationPolicy' and local-name() !='exhaustedAction' and local-name() !='factory']|*"
                         mode="addProperties"/>
@@ -817,7 +806,7 @@
                 </xsl:if>
                 <xsl:if test="@factory">
                     <property name="poolFactory">
-                        <bean class="{@factory}" scope="prototype"/>
+                        <bean class="{@factory}" singleton="false"/>
                     </property>
                 </xsl:if>
             </bean>
@@ -826,7 +815,7 @@
 
     <xsl:template match="queue-profile">
         <property name="queueProfile">
-            <bean name="queue-profile" class="org.mule.config.QueueProfile" scope="prototype">
+            <bean name="queue-profile" class="org.mule.config.QueueProfile" singleton="false">
                 <xsl:apply-templates select="@*" mode="addProperties"/>
             </bean>
         </property>
@@ -852,7 +841,7 @@
                 <xsl:otherwise>org.mule.impl.security.MuleSecurityManager</xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
-        <bean class="{$type}" init-method="initialise" destroy-method="dispose" scope="prototype">
+        <bean class="{$type}" init-method="initialise" destroy-method="dispose" singleton="false">
             <property name="providers">
                 <list>
                     <xsl:apply-templates select="security-provider"/>
@@ -862,7 +851,7 @@
     </xsl:template>
     <xsl:template match="security-provider">
         <xsl:variable name="type" select="@className"/>
-        <bean class="{$type}" init-method="initialise" destroy-method="dispose" scope="prototype">
+        <bean class="{$type}" init-method="initialise" destroy-method="dispose" singleton="false">
             <property name="name">
                 <value>
                     <xsl:value-of select="@name"/>
@@ -873,7 +862,7 @@
     </xsl:template>
     <xsl:template match="security-filter">
         <property name="securityFilter">
-            <bean class="{@className}" scope="prototype">
+            <bean class="{@className}" singleton="false">
                 <xsl:apply-templates select="properties"/>
                 <xsl:if test="@useProviders">
                     NOT IMPLEMENTED
@@ -912,7 +901,7 @@
 
     <xsl:template match="persistence-strategy">
         <property name="persistenceStrategy">
-            <bean class="{@className}" init-method="initialise" destroy-method="dispose" scope="prototype">
+            <bean class="{@className}" init-method="initialise" destroy-method="dispose" singleton="false">
                 <xsl:apply-templates select="properties"/>
             </bean>
         </property>
@@ -955,7 +944,7 @@
     <xsl:template match="@inboundEndpoint|@outboundEndpoint" mode="addEndpointURI">
         <property name="{local-name()}">
             <bean class="org.mule.impl.endpoint.MuleEndpoint" init-method="initialise" destroy-method="dispose"
-                  scope="prototype">
+                  singleton="false">
                 <property name="endpointURI">
                     <bean class="org.mule.impl.endpoint.MuleEndpointURI">
                         <constructor-arg index="0" type="java.lang.String">

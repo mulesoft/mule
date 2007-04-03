@@ -21,9 +21,9 @@ import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.BeanUtils;
 import org.mule.util.MuleObjectHelper;
 import org.mule.util.ObjectNameHelper;
@@ -264,7 +264,7 @@ public class TransportFactory
                 BeanUtils.populateWithoutFail(connector, props, true);
             }
             connector.setManagementContext(RegistryContext.getRegistry().getManagementContext());
-            connector.initialise();
+            //connector.initialise();
             return connector;
         }
         catch (Exception e)

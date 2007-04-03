@@ -1123,7 +1123,7 @@ public class SpringRegistry implements RegistryFacade, ApplicationContextAware
     {
         try
         {
-            return (UMOManagementContext)lookupObject("_managementContextFactoryBean");
+            return (UMOManagementContext)lookupObject("_muleManagementContextFactoryBean");
         }
         catch (ObjectNotFoundException e)
         {

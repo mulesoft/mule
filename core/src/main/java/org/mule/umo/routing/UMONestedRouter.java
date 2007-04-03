@@ -1,18 +1,40 @@
 package org.mule.umo.routing;
 
 import org.mule.umo.MessagingException;
-import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 
 public interface UMONestedRouter extends UMORouter
 {
 
-	UMOMessage route(UMOEvent event) throws MessagingException;
+	/**
+     * This method is responsible for routing the Message via the Session. The logic
+     * for this method will change for each type of router depending on expected
+     * behaviour. For example, a MulticastingRouter might just iterate through the
+     * list of assoaciated endpoints sending the message. Another type of router such
+     * as the ExceptionBasedRouter will hit the first endpoint, if it fails try the
+     * second, and so on. Most router implementations will extends the
+     * FilteringOutboundRouter which implements all the common logic need for a
+     * router.
+     *
+     * @param message the message to send via one or more endpoints on this router
+     * @param session the session used to actually send the event
+     * @param synchronous whether the invocation process should be synchronous or not
+     * @return a result message if any from the invocation. If the synchronous flag
+     *         is false a null result will always be returned.
+     * @throws MessagingException if any errors occur during the sending of messages
+     * @see org.mule.routing.outbound.FilteringOutboundRouter
+     * @see org.mule.routing.outbound.ExceptionBasedRouter
+     * @see org.mule.routing.outbound.MulticastingRouter
+     */
+    UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous) throws MessagingException;
 
     void setEndpoint(UMOEndpoint endpoint);
 
-    UMOEndpoint getEndpoint();
+    UMOOutboundRouter getOutboundRouter();
+
+    void setOutboundRouter(UMOOutboundRouter router);
 
     Class getInterface();
 

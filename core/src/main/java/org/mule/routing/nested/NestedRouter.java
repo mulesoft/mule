@@ -4,10 +4,9 @@ import org.mule.management.stats.RouterStatistics;
 import org.mule.routing.AbstractRouter;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.umo.MessagingException;
-import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.routing.UMONestedRouter;
 import org.mule.umo.routing.UMOOutboundRouter;
 
@@ -25,8 +24,6 @@ public class NestedRouter extends AbstractRouter implements UMONestedRouter
 
     private String methodName;
 
-    private UMOEndpoint endpoint;
-
     //The router ued to actually ispatch the message
     protected UMOOutboundRouter outboundRouter;
 
@@ -35,11 +32,10 @@ public class NestedRouter extends AbstractRouter implements UMONestedRouter
         setRouterStatistics(new RouterStatistics(RouterStatistics.TYPE_NESTED));
     }
 
-    public UMOMessage route(final UMOEvent event) throws MessagingException
-    {
-        final UMOImmutableEndpoint endpoint = event.getEndpoint();
 
-        return outboundRouter.route(event.getMessage(), event.getSession(), endpoint.isSynchronous());
+    public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous) throws MessagingException
+    {
+        return outboundRouter.route(message, session, synchronous);
     }
 
 
@@ -83,18 +79,22 @@ public class NestedRouter extends AbstractRouter implements UMONestedRouter
         }
     }
 
-    public UMOEndpoint getEndpoint()
+    public UMOOutboundRouter getOutboundRouter()
     {
-        return endpoint;
+        return outboundRouter;
+    }
+
+
+    public void setOutboundRouter(UMOOutboundRouter router)
+    {
+        this.outboundRouter = router;
     }
 
     public void setEndpoint(UMOEndpoint e)
     {
-        endpoint = e;
-        //TODO RM** endpoint.setType(UMOEndpoint.ENDPOINT_TYPE_SENDER_AND_RECEIVER);
         outboundRouter = new OutboundPassThroughRouter();
-        outboundRouter.addEndpoint(endpoint);
-        outboundRouter.setTransactionConfig(endpoint.getTransactionConfig());
+        outboundRouter.addEndpoint(e);
+        outboundRouter.setTransactionConfig(e.getTransactionConfig());
     }
 
 
