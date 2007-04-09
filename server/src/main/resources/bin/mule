@@ -213,7 +213,7 @@ do
         'ip27')
             DIST_ARCH="mips"
             break;;
-        'power' | 'powerpc' | 'power_pc' | 'ppc64' | 'Power Macintosh')
+        'power' | 'powerpc' | 'power_pc' | 'ppc64' | 'powermacintosh')
             DIST_ARCH="ppc"
             break;;
         'pa_risc' | 'pa-risc')
