@@ -107,11 +107,11 @@ public class MuleEvent extends EventObject implements UMOEvent
         this.message = message;
         this.id = generateEventId();
         this.session = previousEvent.getSession();
-        ((MuleSession)session).setComponent(component);
+        ((MuleSession) session).setComponent(component);
         this.endpoint = endpoint;
         this.synchronous = previousEvent.isSynchronous();
         this.timeout = previousEvent.getTimeout();
-        this.outputStream = (ResponseOutputStream)previousEvent.getOutputStream();
+        this.outputStream = (ResponseOutputStream) previousEvent.getOutputStream();
         fillProperties(previousEvent);
     }
 
@@ -182,14 +182,14 @@ public class MuleEvent extends EventObject implements UMOEvent
         this.message = message;
         this.id = rewriteEvent.getId();
         this.session = rewriteEvent.getSession();
-        ((MuleSession)session).setComponent(rewriteEvent.getComponent());
+        ((MuleSession) session).setComponent(rewriteEvent.getComponent());
         this.endpoint = rewriteEvent.getEndpoint();
         this.synchronous = rewriteEvent.isSynchronous();
         this.timeout = rewriteEvent.getTimeout();
-        this.outputStream = (ResponseOutputStream)rewriteEvent.getOutputStream();
+        this.outputStream = (ResponseOutputStream) rewriteEvent.getOutputStream();
         if (rewriteEvent instanceof MuleEvent)
         {
-            this.transformedMessage = ((MuleEvent)rewriteEvent).getCachedMessage();
+            this.transformedMessage = ((MuleEvent) rewriteEvent).getCachedMessage();
         }
         fillProperties(rewriteEvent);
     }
@@ -203,7 +203,7 @@ public class MuleEvent extends EventObject implements UMOEvent
             {
                 for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();)
                 {
-                    String prop = (String)iterator.next();
+                    String prop = (String) iterator.next();
                     Object value = msg.getProperty(prop);
                     // don't overwrite property on the message
                     if (!ignoreProperty(prop))
@@ -228,7 +228,7 @@ public class MuleEvent extends EventObject implements UMOEvent
         {
             for (Iterator iterator = endpoint.getProperties().keySet().iterator(); iterator.hasNext();)
             {
-                String prop = (String)iterator.next();
+                String prop = (String) iterator.next();
                 Object value = endpoint.getProperties().get(prop);
                 // don't overwrite property on the message
                 if (!ignoreProperty(prop))
@@ -381,7 +381,7 @@ public class MuleEvent extends EventObject implements UMOEvent
         Object msg = getTransformedMessage();
         if (msg instanceof byte[])
         {
-            return (byte[])msg;
+            return (byte[]) msg;
         }
         else if (msg instanceof String)
         {
@@ -400,7 +400,7 @@ public class MuleEvent extends EventObject implements UMOEvent
         {
             try
             {
-                return SerializationUtils.serialize((Serializable)msg);
+                return SerializationUtils.serialize((Serializable) msg);
             }
             catch (Exception e)
             {
@@ -688,14 +688,14 @@ public class MuleEvent extends EventObject implements UMOEvent
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
     {
         in.defaultReadObject();
-        String uri = (String)in.readObject();
+        String uri = (String) in.readObject();
         try
         {
             endpoint = getManagementContext().getRegistry().getOrCreateEndpointForUri(uri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
         }
         catch (UMOException e)
         {
-            throw (IOException)new IOException(e.getMessage()).initCause(e);
+            throw (IOException) new IOException(e.getMessage()).initCause(e);
         }
     }
 

@@ -86,7 +86,7 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
     {
         for (Iterator iterator = listeners.iterator(); iterator.hasNext();)
         {
-            UMOServerNotificationListener listener = (UMOServerNotificationListener)iterator.next();
+            UMOServerNotificationListener listener = (UMOServerNotificationListener) iterator.next();
             managementContext.unregisterListener(listener);
         }
     }

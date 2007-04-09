@@ -25,7 +25,7 @@ public class ComponentException extends MessagingException
      */
     private static final long serialVersionUID = 56178344205041599L;
 
-    private transient final UMOComponent component;
+    private final transient UMOComponent component;
 
     /**
      * @param message the exception message

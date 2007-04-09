@@ -25,7 +25,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 /**
  * <code>ThreadingProfile</code> is used to configure a thread pool. Mule uses a
- * few different pools i.e. for component threds and message dispatchers. This object
+ * few different pools i.e. for component threads and message dispatchers. This object
  * makes it easier to configure the pool.
  */
 
@@ -211,7 +211,7 @@ public class ThreadingProfile
         }
     }
 
-    public void setBlockedExecutionHandler(RejectedExecutionHandler rejectedExecutionHandler)
+    public void setRejectedExecutionHandler(RejectedExecutionHandler rejectedExecutionHandler)
     {
         this.rejectedExecutionHandler = rejectedExecutionHandler;
     }
@@ -272,11 +272,6 @@ public class ThreadingProfile
         ThreadPoolExecutor pool = new ThreadPoolExecutor(maxThreadsIdle, maxThreadsActive, threadTTL,
             TimeUnit.MILLISECONDS, buffer);
 
-        if (rejectedExecutionHandler != null)
-        {
-            pool.setRejectedExecutionHandler(rejectedExecutionHandler);
-        }
-
         ThreadFactory tf = threadFactory;
         if (name != null)
         {
@@ -288,37 +283,32 @@ public class ThreadingProfile
             pool.setThreadFactory(tf);
         }
 
-        switch (poolExhaustPolicy)
+        if (rejectedExecutionHandler != null)
         {
-            case WHEN_EXHAUSTED_DISCARD_OLDEST :
+            pool.setRejectedExecutionHandler(rejectedExecutionHandler);
+        }
+        else
+        {
+            switch (poolExhaustPolicy)
             {
-                pool.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardOldestPolicy());
-                break;
-            }
-            case WHEN_EXHAUSTED_RUN :
-            {
-                pool.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-                break;
-            }
-            case WHEN_EXHAUSTED_ABORT :
-            {
-                pool.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());
-                break;
-            }
-            case WHEN_EXHAUSTED_DISCARD :
-            {
-                pool.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
-                break;
-            }
-            case WHEN_EXHAUSTED_WAIT :
-            {
-                pool.setRejectedExecutionHandler(new WaitPolicy(threadWaitTimeout, TimeUnit.MILLISECONDS));
-                break;
-            }
-            default :
-            {
-                pool.setRejectedExecutionHandler(new WaitPolicy(threadWaitTimeout, TimeUnit.MILLISECONDS));
-                break;
+                case WHEN_EXHAUSTED_DISCARD_OLDEST :
+                    pool.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardOldestPolicy());
+                    break;
+                case WHEN_EXHAUSTED_RUN :
+                    pool.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+                    break;
+                case WHEN_EXHAUSTED_ABORT :
+                    pool.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());
+                    break;
+                case WHEN_EXHAUSTED_DISCARD :
+                    pool.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
+                    break;
+                case WHEN_EXHAUSTED_WAIT :
+                    pool.setRejectedExecutionHandler(new WaitPolicy(threadWaitTimeout, TimeUnit.MILLISECONDS));
+                    break;
+                default :
+                    pool.setRejectedExecutionHandler(new WaitPolicy(threadWaitTimeout, TimeUnit.MILLISECONDS));
+                    break;
             }
         }
 

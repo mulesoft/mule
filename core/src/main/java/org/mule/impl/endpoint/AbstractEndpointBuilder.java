@@ -71,26 +71,26 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     {
         Properties properties = PropertiesUtils.getPropertiesFromQueryString(uri.getQuery());
 
-        String tempEndpointName = (String)properties.get(UMOEndpointURI.PROPERTY_ENDPOINT_NAME);
+        String tempEndpointName = (String) properties.get(UMOEndpointURI.PROPERTY_ENDPOINT_NAME);
         if (tempEndpointName != null)
         {
             this.endpointName = tempEndpointName;
         }
         // override the endpointUri if set
-        String endpoint = (String)properties.get(UMOEndpointURI.PROPERTY_ENDPOINT_URI);
+        String endpoint = (String) properties.get(UMOEndpointURI.PROPERTY_ENDPOINT_URI);
         if (endpoint != null)
         {
             this.address = endpoint;
             address = decode(address, uri);
         }
 
-        String cnnName = (String)properties.get(UMOEndpointURI.PROPERTY_CONNECTOR_NAME);
+        String cnnName = (String) properties.get(UMOEndpointURI.PROPERTY_CONNECTOR_NAME);
         if (cnnName != null)
         {
             this.connectorName = cnnName;
         }
 
-        String create = (String)properties.get(UMOEndpointURI.PROPERTY_CREATE_CONNECTOR);
+        String create = (String) properties.get(UMOEndpointURI.PROPERTY_CREATE_CONNECTOR);
         if (create != null)
         {
             if ("0".equals(create))
@@ -125,12 +125,12 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
         }
 
-        transformers = (String)properties.get(UMOEndpointURI.PROPERTY_TRANSFORMERS);
+        transformers = (String) properties.get(UMOEndpointURI.PROPERTY_TRANSFORMERS);
         if (transformers != null)
         {
             transformers = transformers.replaceAll(" ", ",");
         }
-        responseTransformers = (String)properties.get(UMOEndpointURI.PROPERTY_RESPONSE_TRANSFORMERS);
+        responseTransformers = (String) properties.get(UMOEndpointURI.PROPERTY_RESPONSE_TRANSFORMERS);
         if (responseTransformers != null)
         {
             responseTransformers = responseTransformers.replaceAll(" ", ",");

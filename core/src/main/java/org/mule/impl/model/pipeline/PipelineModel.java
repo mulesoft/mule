@@ -19,7 +19,7 @@ public class PipelineModel extends AbstractModel
 {
     protected UMOComponent createComponent(UMODescriptor descriptor)
     {
-        return new PipelineComponent((MuleDescriptor)descriptor, this);
+        return new PipelineComponent((MuleDescriptor) descriptor, this);
     }
 
     /**

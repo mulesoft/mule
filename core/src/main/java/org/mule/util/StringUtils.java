@@ -73,7 +73,7 @@ public class StringUtils extends org.apache.commons.lang.StringUtils
         {
             char hi = Character.toLowerCase(hex.charAt(j++));
             char lo = Character.toLowerCase(hex.charAt(j++));
-            result[i] = (byte)((Character.digit(hi, 16) << 4) | Character.digit(lo, 16));
+            result[i] = (byte) ((Character.digit(hi, 16) << 4) | Character.digit(lo, 16));
         }
 
         return result;

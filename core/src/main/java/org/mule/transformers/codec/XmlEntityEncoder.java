@@ -37,11 +37,11 @@ public class XmlEntityEncoder extends AbstractTransformer
 
             if (src instanceof byte[])
             {
-                data = new String((byte[])src, encoding);
+                data = new String((byte[]) src, encoding);
             }
             else
             {
-                data = (String)src;
+                data = (String) src;
             }
 
             return XMLEntityCodec.encodeString(data);

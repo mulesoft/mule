@@ -36,7 +36,7 @@ public class Apple implements Fruit, Callable
 
     public void wash()
     {
-        if(cleaner!= null )
+        if (cleaner != null)
         {
             cleaner.wash(this);
         }
@@ -93,7 +93,7 @@ public class Apple implements Fruit, Callable
             return false;
         }
 
-        final Apple apple = (Apple)o;
+        final Apple apple = (Apple) o;
 
         if (bitten != apple.bitten)
         {

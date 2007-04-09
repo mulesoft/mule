@@ -12,16 +12,17 @@ package org.mule.tck;
 
 import org.mule.impl.AbstractExceptionListener;
 import org.mule.management.agents.JmxAgent;
+import org.mule.providers.SimpleRetryConnectionStrategy;
 import org.mule.routing.ForwardingCatchAllStrategy;
 import org.mule.routing.filters.xml.JXPathFilter;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.tck.testmodels.fruit.FruitCleaner;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
+import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.tck.testmodels.mule.TestDefaultLifecycleAdapterFactory;
 import org.mule.tck.testmodels.mule.TestEntryPointResolver;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.tck.testmodels.mule.TestResponseAggregator;
-import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -35,7 +36,6 @@ import org.mule.umo.routing.UMOOutboundRouterCollection;
 import org.mule.umo.routing.UMOResponseRouter;
 import org.mule.umo.routing.UMOResponseRouterCollection;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.providers.SimpleRetryConnectionStrategy;
 
 import java.util.List;
 import java.util.Map;
@@ -194,12 +194,15 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         UMONestedRouter route1 = (UMONestedRouter)router.getRouters().get(0);
         assertEquals(FruitCleaner.class, route1.getInterface());
         assertEquals("wash", route1.getMethod());
-        assertNotNull(route1.getEndpoint());
+        assertNotNull(route1.getOutboundRouter());
+        assertEquals(1, route1.getOutboundRouter().getEndpoints().size());
         // check second Router
         UMONestedRouter route2 = (UMONestedRouter)router.getRouters().get(1);
         assertEquals(FruitCleaner.class, route2.getInterface());
         assertEquals("polish", route2.getMethod());
-        assertNotNull(route2.getEndpoint());
+        assertNotNull(route2.getOutboundRouter());        
+        assertEquals(1, route2.getOutboundRouter().getEndpoints().size());
+
     }
     
     public void testDescriptorEndpoints()

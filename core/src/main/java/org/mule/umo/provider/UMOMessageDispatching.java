@@ -12,15 +12,14 @@ package org.mule.umo.provider;
 
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 /**
  * <code>UMOMessageDispatching</code> defines generic methods for dispatching and
  * receiving events. The exact behaviour of the action is defined by the implementing
  * class.
  * 
- * @see UMOImmutableEndpoint
- * @see UMOMessageDispatcher
+ * @see org.mule.umo.endpoint.UMOImmutableEndpoint
+ * @see org.mule.umo.provider.UMOMessageDispatcher
  */
 public interface UMOMessageDispatching
 {

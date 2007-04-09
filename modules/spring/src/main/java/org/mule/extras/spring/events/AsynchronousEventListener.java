@@ -10,17 +10,17 @@
 
 package org.mule.extras.spring.events;
 
+import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
+import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
-import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionException;
-
 /**
- * <code>AsynchronousEventListener</code> will spawn a thread for each Event
- * received. The thread pool passed in the constructor will determine hown many
+ * <code>AsynchronousEventListener</code> will proces a received Event in a
+ * separate Thread. The thread pool passed in the constructor will determine how many
  * threads can be executed at any time.
  */
 
@@ -51,26 +51,11 @@ public class AsynchronousEventListener implements MuleEventListener
     {
         try
         {
-            threadPool.execute(new Worker(event));
+            threadPool.execute(new Worker(listener, event));
         }
         catch (RejectedExecutionException e)
         {
-            logger.error("Failed to process event: " + event.toString(), e);
-        }
-    }
-
-    private class Worker extends Thread
-    {
-        private ApplicationEvent event;
-
-        public Worker(ApplicationEvent event)
-        {
-            this.event = event;
-        }
-
-        public void run()
-        {
-            listener.onApplicationEvent(event);
+            logger.error("Failed to execute worker for event: " + event.toString(), e);
         }
     }
 
@@ -78,4 +63,29 @@ public class AsynchronousEventListener implements MuleEventListener
     {
         return listener;
     }
+
+    private static class Worker implements Runnable
+    {
+        private final ApplicationListener listener;
+        private final ApplicationEvent event;
+
+        public Worker(ApplicationListener listener, ApplicationEvent event)
+        {
+            this.listener = listener;
+            this.event = event;
+        }
+
+        public void run()
+        {
+            try
+            {
+                listener.onApplicationEvent(event);
+            }
+            catch (Exception e)
+            {
+                logger.error("Failed to forward event: " + event.toString(), e);
+            }
+        }
+    }
+
 }

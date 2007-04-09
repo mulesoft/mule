@@ -282,7 +282,7 @@ public class JmxAgent extends AbstractAgent
             mBeanServer = null;
         }
 
-        initialized.set(true);
+        initialized.set(false);
     }
 
     /** {@inheritDoc}

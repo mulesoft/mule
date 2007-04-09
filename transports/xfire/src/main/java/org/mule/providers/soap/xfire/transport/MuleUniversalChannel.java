@@ -10,12 +10,13 @@
 
 package org.mule.providers.soap.xfire.transport;
 
-import org.mule.MuleRuntimeException;
+
+import org.mule.RegistryContext;
 import org.mule.config.MuleProperties;
-import org.mule.config.i18n.CoreMessageConstants;
-import org.mule.config.i18n.Message;
-import org.mule.extras.client.MuleClient;
-import org.mule.impl.ManagementContext;
+import org.mule.impl.MuleEvent;
+import org.mule.impl.MuleMessage;
+import org.mule.impl.MuleSession;
+import org.mule.impl.NullSessionHandler;
 import org.mule.impl.RequestContext;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
@@ -23,6 +24,7 @@ import org.mule.providers.streaming.StreamMessageAdapter;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.OutputHandler;
 import org.mule.umo.provider.UMOStreamMessageAdapter;
 
@@ -74,26 +76,10 @@ public class MuleUniversalChannel extends AbstractChannel
      */
     protected transient final Log logger = LogFactory.getLog(getClass());
 
-    /**
-     * MuleClient used for sending "universal" requests
-     */
-    protected transient final MuleClient client;
-
     public MuleUniversalChannel(String uri, Transport transport)
     {
         setTransport(transport);
         setUri(uri);
-
-        try
-        {
-            //TODO RM* This aint right
-            this.client = new MuleClient(new ManagementContext());
-        }
-        catch (UMOException ex)
-        {
-            throw new MuleRuntimeException(new Message(CoreMessageConstants.X_FAILED_TO_INITIALISE,
-                "MuleClient"), ex);
-        }
     }
 
     public void open()
@@ -297,7 +283,7 @@ public class MuleUniversalChannel extends AbstractChannel
 
         try
         {
-            result = client.sendStream(getUri(), sp);
+            result = sendStream(getUri(), sp);
             if (result != null)
             {
                 InMessage inMessage;
@@ -344,6 +330,30 @@ public class MuleUniversalChannel extends AbstractChannel
     public boolean isAsync()
     {
         return false;
+    }
+
+    protected UMOStreamMessageAdapter sendStream(String uri, UMOStreamMessageAdapter sa) throws UMOException
+    {
+
+        UMOEndpoint ep = RegistryContext.getRegistry().getOrCreateEndpointForUri(uri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        ep.setStreaming(true);
+        UMOMessage message = new MuleMessage(sa);
+        UMOEvent event = new MuleEvent(message, ep, new MuleSession(message, new NullSessionHandler()), true);
+        UMOMessage result = ep.send(event);
+        if (result != null)
+        {
+            if (result.getAdapter() instanceof UMOStreamMessageAdapter)
+            {
+                return (UMOStreamMessageAdapter) result.getAdapter();
+            }
+            else
+            {
+                // TODO i18n (though this case should never happen...)
+                throw new IllegalStateException(
+                        "Mismatch of stream states. A stream was used for outbound channel, but a stream was not used for the response");
+            }
+        }
+        return null;
     }
 
 }

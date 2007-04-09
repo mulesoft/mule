@@ -64,7 +64,7 @@ public class TransactionTemplate
             }
 
             if (action == UMOTransactionConfig.ACTION_ALWAYS_BEGIN
-                            || action == UMOTransactionConfig.ACTION_BEGIN_OR_JOIN)
+                            || (action == UMOTransactionConfig.ACTION_BEGIN_OR_JOIN && tx == null))
             {
                 logger.debug("Beginning transaction");
                 tx = config.getFactory().beginTransaction(context);

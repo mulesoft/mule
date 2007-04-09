@@ -66,7 +66,7 @@ public abstract class AbstractMuleTestCase extends TestCase
 
     protected void addTest()
     {
-        TestInfo info = (TestInfo)testCounters.get(getClass().getName());
+        TestInfo info = (TestInfo) testCounters.get(getClass().getName());
         if (info == null)
         {
             info = new TestInfo(getClass().getName());
@@ -82,7 +82,7 @@ public abstract class AbstractMuleTestCase extends TestCase
 
     protected TestInfo getTestInfo()
     {
-        TestInfo info = (TestInfo)testCounters.get(getClass().getName());
+        TestInfo info = (TestInfo) testCounters.get(getClass().getName());
         if (info == null)
         {
             info = new TestInfo(getClass().getName());

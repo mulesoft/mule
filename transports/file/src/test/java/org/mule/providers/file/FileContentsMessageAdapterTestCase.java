@@ -102,7 +102,7 @@ public class FileContentsMessageAdapterTestCase extends AbstractMessageAdapterTe
     public void testMultipleSetMessageCalls() throws Exception
     {
         // get new message adapter to test
-        AccessibleFCMAdapter adapter = new AccessibleFCMAdapter(messageFile);
+        FileContentsMessageAdapter adapter = new FileContentsMessageAdapter(messageFile);
 
         // access first payload
         doTestMessageEqualsPayload(validMessage, adapter.getPayload());
@@ -118,24 +118,6 @@ public class FileContentsMessageAdapterTestCase extends AbstractMessageAdapterTe
 
         // make sure the file was properly read
         doTestMessageEqualsPayload(secondMessage, adapter.getPayload());
-    }
-
-}
-
-// need this since setMessage is protected and we're in a different package
-// TODO refactor, this is no longer required, as tests mirror the original class hierarchy
-class AccessibleFCMAdapter extends FileContentsMessageAdapter
-{
-    private static final long serialVersionUID = -985644721173808557L;
-
-    public AccessibleFCMAdapter(Object message) throws MessagingException
-    {
-        super(message);
-    }
-
-    protected void setMessage(File message) throws MessagingException
-    {
-        super.setMessage(message);
     }
 
 }

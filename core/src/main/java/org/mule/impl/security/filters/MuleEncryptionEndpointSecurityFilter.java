@@ -48,7 +48,7 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecuri
         throws SecurityException, CryptoFailureException, EncryptionStrategyNotFoundException,
         UnknownAuthenticationTypeException
     {
-        String userHeader = (String)getCredentialsAccessor().getCredentials(event);
+        String userHeader = (String) getCredentialsAccessor().getCredentials(event);
         if (userHeader == null)
         {
             throw new CredentialsNotSetException(event.getMessage(), event.getSession().getSecurityContext(),

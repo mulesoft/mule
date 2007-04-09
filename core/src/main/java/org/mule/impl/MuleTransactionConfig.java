@@ -148,7 +148,7 @@ public class MuleTransactionConfig implements UMOTransactionConfig
         }
         try
         {
-            return (ConstraintFilter)constraint.clone();
+            return (ConstraintFilter) constraint.clone();
         }
         catch (CloneNotSupportedException e)
         {

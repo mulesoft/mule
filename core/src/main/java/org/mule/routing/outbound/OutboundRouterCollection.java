@@ -51,7 +51,7 @@ public class OutboundRouterCollection extends AbstractRouterCollection implement
 
         for (Iterator iterator = getRouters().iterator(); iterator.hasNext();)
         {
-            UMOOutboundRouter umoOutboundRouter = (UMOOutboundRouter)iterator.next();
+            UMOOutboundRouter umoOutboundRouter = (UMOOutboundRouter) iterator.next();
             if (umoOutboundRouter.isMatch(message))
             {
                 matchfound = true;
@@ -70,7 +70,7 @@ public class OutboundRouterCollection extends AbstractRouterCollection implement
                 };
                 try
                 {
-                    result = (UMOMessage)tt.execute(cb);
+                    result = (UMOMessage) tt.execute(cb);
                 }
                 catch (Exception e)
                 {
@@ -116,7 +116,7 @@ public class OutboundRouterCollection extends AbstractRouterCollection implement
         List endpoints = new ArrayList();
         for (Iterator iterator = getRouters().iterator(); iterator.hasNext();)
         {
-            UMOOutboundRouter umoOutboundRouter = (UMOOutboundRouter)iterator.next();
+            UMOOutboundRouter umoOutboundRouter = (UMOOutboundRouter) iterator.next();
             if (umoOutboundRouter.isMatch(message))
             {
                 endpoints.addAll(umoOutboundRouter.getEndpoints());
@@ -128,7 +128,7 @@ public class OutboundRouterCollection extends AbstractRouterCollection implement
         }
 
         UMOEndpoint[] result = new UMOEndpoint[endpoints.size()];
-        return (UMOEndpoint[])endpoints.toArray(result);
+        return (UMOEndpoint[]) endpoints.toArray(result);
     }
 
     protected UMOMessage catchAll(UMOMessage message, UMOSession session, boolean synchronous)
@@ -146,7 +146,7 @@ public class OutboundRouterCollection extends AbstractRouterCollection implement
     {
         for (Iterator iterator = routers.iterator(); iterator.hasNext();)
         {
-            UMOOutboundRouter router = (UMOOutboundRouter)iterator.next();
+            UMOOutboundRouter router = (UMOOutboundRouter) iterator.next();
             if (router.getEndpoints().size() > 0 || router.isDynamicEndpoints())
             {
                 return true;

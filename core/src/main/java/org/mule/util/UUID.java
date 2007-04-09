@@ -16,7 +16,7 @@ import org.safehaus.uuid.UUIDGenerator;
  * <code>UUID</code> Generates a UUID using the JUG library
  */
 // @ThreadSafe
-public class UUID
+public final class UUID
 {
     private static final UUIDGenerator generator = UUIDGenerator.getInstance();
 

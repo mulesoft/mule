@@ -10,6 +10,8 @@
 
 package org.mule.providers.jms;
 
+import java.text.MessageFormat;
+
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.DeliveryMode;
@@ -167,13 +169,14 @@ public class Jms11Support implements JmsSupport
         }
         catch (NamingException e)
         {
-            throw new JMSException("Failed to look up destination: " + e.getMessage());
+            throw new JMSException(MessageFormat.format("Failed to look up destination {0}. Reason: {1}",
+                                                        new Object[] {name, e.getMessage()}));
         }
         if (temp != null)
         {
             if (temp instanceof Destination)
             {
-                return (Destination)temp;
+                return (Destination) temp;
             }
             else if (forceJndiDestinations)
             {

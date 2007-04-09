@@ -18,73 +18,41 @@ import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
-import org.mule.util.StringUtils;
 
 import java.util.Calendar;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.Session;
 import javax.mail.Transport;
-import javax.mail.URLName;
 
 /**
  * <code>SmtpMessageDispatcher</code> will dispatch Mule events as Mime email
- * messages over an SMTP gateway
+ * messages over an SMTP gateway.
+ * 
+ * This contains a reference to a transport (and endpoint and connector, via superclasses)
  */
 public class SmtpMessageDispatcher extends AbstractMessageDispatcher
 {
-    private final SmtpConnector connector;
-    protected volatile Transport transport;
-    protected volatile Session session;
+    private volatile Transport transport;
 
     public SmtpMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
         super(endpoint);
-        this.connector = (SmtpConnector)endpoint.getConnector();
+    }
+
+    private SmtpConnector castConnector()
+    {
+        return (SmtpConnector) getConnector();
     }
 
     protected void doConnect() throws Exception
     {
         if (transport == null)
         {
-            UMOEndpointURI uri = endpoint.getEndpointURI();
-
-            // Try to get the properties from the endpoint and use the connector
-            // properties if they are not given.
-
-            String host = uri.getHost();
-            if (host == null)
-            {
-                host = connector.getHost();
-            }
-
-            int port = uri.getPort();
-            if (port == -1)
-            {
-                port = connector.getPort();
-            }
-
-            String username = uri.getUsername();
-            if (StringUtils.isBlank(username))
-            {
-                username = connector.getUsername();
-            }
-
-            String password = uri.getPassword();
-            if (StringUtils.isBlank(password))
-            {
-                password = connector.getPassword();
-            }
-
-            URLName url = new URLName(connector.getProtocol(), host, port, null, username, password);
-
             try
             {
-                session = connector.getMailSession(url);
-                session.setDebug(logger.isDebugEnabled());
-
-                transport = session.getTransport(url);
+                transport = castConnector().getSessionDetails(endpoint).newTransport();
+                UMOEndpointURI uri = endpoint.getEndpointURI();
                 transport.connect(uri.getHost(), uri.getPort(), uri.getUsername(), uri.getPassword());
             }
             catch (Exception e)
@@ -98,14 +66,16 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
 
     protected void doDisconnect() throws Exception
     {
-        try
+        if (null != transport)
         {
-            transport.close();
-        }
-        finally
-        {
-            transport = null;
-            session = null;
+            try
+            {
+                transport.close();
+            }
+            finally
+            {
+                transport = null;
+            }
         }
     }
 
@@ -130,7 +100,7 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
             else
             {
                 // Check the message for any unset data and use defaults
-                sendMailMessage((Message)data);
+                sendMailMessage((Message) data);
             }
         }
         catch (Exception e)
@@ -166,16 +136,11 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
         // sent date
         message.setSentDate(Calendar.getInstance().getTime());
 
-        // These getAllRecipients() and similar methods always return null???
-        // Seems like JavaMail 1.3.3 is setting headers only
-        // transport.sendMessage(message, message.getAllRecipients());
+        transport.sendMessage(message, message.getAllRecipients());
 
-        // this call at least preserves the TO field
-        // TODO handle CC and BCC
-        Transport.send(message);
         if (logger.isDebugEnabled())
         {
-            StringBuffer msg = new StringBuffer(200);
+            StringBuffer msg = new StringBuffer();
             msg.append("Email message sent with subject'").append(message.getSubject()).append("' sent- ");
             msg.append(", From: ").append(MailUtils.mailAddressesToString(message.getFrom())).append(" ");
             msg.append(", To: ").append(
@@ -183,8 +148,8 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
             msg.append(", Cc: ").append(
                 MailUtils.mailAddressesToString(message.getRecipients(Message.RecipientType.CC))).append(" ");
             msg.append(", Bcc: ")
-                .append(MailUtils.mailAddressesToString(message.getRecipients(Message.RecipientType.BCC)))
-                .append(" ");
+            .append(MailUtils.mailAddressesToString(message.getRecipients(Message.RecipientType.BCC)))
+            .append(" ");
             msg.append(", ReplyTo: ").append(MailUtils.mailAddressesToString(message.getReplyTo()));
 
             logger.debug(msg.toString());
@@ -194,6 +159,7 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
 
     protected void doDispose()
     {
-        session = null;
+        // nothing doing
     }
+
 }

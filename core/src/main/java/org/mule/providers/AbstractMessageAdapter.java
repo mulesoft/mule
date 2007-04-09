@@ -81,8 +81,8 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
             {
                 for (Iterator iter = props.entrySet().iterator(); iter.hasNext();)
                 {
-                    Map.Entry entry = (Map.Entry)iter.next();
-                    setProperty((String)entry.getKey(), entry.getValue());
+                    Map.Entry entry = (Map.Entry) iter.next();
+                    setProperty((String) entry.getKey(), entry.getValue());
                 }
             }
         }
@@ -232,7 +232,7 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
 
     public String getCorrelationId()
     {
-        return (String)getProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
+        return (String) getProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
     }
 
     public void setCorrelationId(String correlationId)
@@ -311,7 +311,7 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
 
     public DataHandler getAttachment(String name)
     {
-        return (DataHandler)attachments.get(name);
+        return (DataHandler) attachments.get(name);
     }
 
     public Set getAttachmentNames()
@@ -355,13 +355,13 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
 
         if (object instanceof byte[])
         {
-            return (byte[])object;
+            return (byte[]) object;
         }
         else if (object instanceof Serializable)
         {
             try
             {
-                return SerializationUtils.serialize((Serializable)object);
+                return SerializationUtils.serialize((Serializable) object);
             }
             catch (Exception e)
             {

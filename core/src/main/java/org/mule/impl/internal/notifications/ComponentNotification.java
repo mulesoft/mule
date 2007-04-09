@@ -47,7 +47,7 @@ public class ComponentNotification extends UMOServerNotification
 
     protected String getPayloadToString()
     {
-        return ((MuleDescriptor)source).getName();
+        return ((MuleDescriptor) source).getName();
     }
 
     protected String getActionName(int action)

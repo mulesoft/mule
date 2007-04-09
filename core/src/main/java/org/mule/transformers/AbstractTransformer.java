@@ -17,7 +17,6 @@ import org.mule.config.spring.RegistryFacade;
 import org.mule.providers.NullPayload;
 import org.mule.registry.DeregistrationException;
 import org.mule.registry.RegistrationException;
-import org.mule.registry.metadata.ObjectMetadata;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -30,7 +29,6 @@ import org.mule.util.StringMessageUtils;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -43,7 +41,7 @@ import org.apache.commons.logging.LogFactory;
 
 public abstract class AbstractTransformer implements UMOTransformer
 {
-    public static ObjectMetadata objectMetadata = new ObjectMetadata(new String[] { "returnClass", "sourceTypes" });
+    protected static final int DEFAULT_TRUNCATE_LENGTH = 200;
 
     /**
      * logger used by this class
@@ -71,7 +69,7 @@ public abstract class AbstractTransformer implements UMOTransformer
      * A list of supported Class types that the source payload passed into this
      * transformer
      */
-    protected List sourceTypes = new CopyOnWriteArrayList();
+    protected final List sourceTypes = new CopyOnWriteArrayList();
 
     /**
      * This is the following transformer in the chain of transformers.
@@ -94,7 +92,7 @@ public abstract class AbstractTransformer implements UMOTransformer
      */
     public AbstractTransformer()
     {
-        name = generateTransformerName();
+        name = this.generateTransformerName();
     }
 
     protected Object checkReturnClass(Object object) throws TransformerException
@@ -119,12 +117,15 @@ public abstract class AbstractTransformer implements UMOTransformer
 
     protected void registerSourceType(Class aClass)
     {
-        if (aClass.equals(Object.class))
+        if (!sourceTypes.contains(aClass))
         {
-            logger.debug("java.lang.Object has been added as an acceptable sourcetype for this transformer, there will be no source type checking performed");
-        }
+            sourceTypes.add(aClass);
 
-        sourceTypes.add(aClass);
+            if (aClass.equals(Object.class))
+            {
+                logger.debug("java.lang.Object has been added as source type for this transformer, there will be no source type checking performed");
+            }
+        }
     }
 
     protected void unregisterSourceType(Class aClass)
@@ -137,10 +138,6 @@ public abstract class AbstractTransformer implements UMOTransformer
      */
     public String getName()
     {
-        if (name == null)
-        {
-            setName(ClassUtils.getShortClassName(getClass()));
-        }
         return name;
     }
 
@@ -149,7 +146,12 @@ public abstract class AbstractTransformer implements UMOTransformer
      */
     public void setName(String string)
     {
-        logger.debug("Setting transformer name to: " + name);
+        if (string == null)
+        {
+            string = ClassUtils.getShortClassName(this.getClass());
+        }
+
+        logger.debug("Setting transformer name to: " + string);
         name = string;
     }
 
@@ -189,7 +191,7 @@ public abstract class AbstractTransformer implements UMOTransformer
 
         for (int i = 0; i < numTypes; i++)
         {
-            Class anotherClass = (Class)sourceTypes.get(i);
+            Class anotherClass = (Class) sourceTypes.get(i);
             if (exactMatch)
             {
                 if (anotherClass.equals(aClass))
@@ -218,8 +220,8 @@ public abstract class AbstractTransformer implements UMOTransformer
 
         if (src instanceof UMOMessage && !isSourceTypeSupported(UMOMessage.class))
         {
-            encoding = ((UMOMessage)src).getEncoding();
-            src = ((UMOMessage)src).getPayload();
+            encoding = ((UMOMessage) src).getEncoding();
+            src = ((UMOMessage) src).getPayload();
         }
 
         if (encoding == null && endpoint != null)
@@ -250,7 +252,7 @@ public abstract class AbstractTransformer implements UMOTransformer
         {
             logger.debug("Applying transformer " + getName() + " (" + getClass().getName() + ")");
             logger.debug("Object before transform: "
-                            + StringMessageUtils.truncate(StringMessageUtils.toString(src), 200, false));
+                            + StringMessageUtils.truncate(StringMessageUtils.toString(src), DEFAULT_TRUNCATE_LENGTH, false));
         }
 
         Object result = doTransform(src, encoding);
@@ -262,7 +264,7 @@ public abstract class AbstractTransformer implements UMOTransformer
         if (logger.isDebugEnabled())
         {
             logger.debug("Object after transform: "
-                            + StringMessageUtils.truncate(StringMessageUtils.toString(result), 200, false));
+                            + StringMessageUtils.truncate(StringMessageUtils.toString(result), DEFAULT_TRUNCATE_LENGTH, false));
         }
 
         result = checkReturnClass(result);
@@ -394,64 +396,7 @@ public abstract class AbstractTransformer implements UMOTransformer
 
     protected String generateTransformerName()
     {
-        String name = getClass().getName();
-        int i = name.lastIndexOf(".");
-        if (i > -1)
-        {
-            name = name.substring(i + 1);
-        }
-        return name;
-    }
-
-    /**
-     * Convenience method to register source types using a bean property setter
-     * 
-     * @param type the fully qualified class name
-     * @throws ClassNotFoundException is thrown if the class is not on theclasspath
-     * @deprecated Use setSourceTypes(List)
-     */
-    public void setSourceType(String type) throws ClassNotFoundException
-    {
-        Class clazz = ClassUtils.loadClass(type, getClass());
-        registerSourceType(clazz);
-    }
-
-    /**
-     * Register a list of source types
-     *
-     * @param types a list of fully qualified class names
-     * @throws ClassNotFoundException is thrown if the class is not on theclasspath
-     * @deprecated Use setSourceTypes(List)
-     */
-    public void setSourceTypes(List types) throws ClassNotFoundException
-    {
-        for (Iterator iterator = types.iterator(); iterator.hasNext();)
-        {
-             Class clazz = ClassUtils.loadClass( iterator.next().toString(), getClass());
-            registerSourceType(clazz);
-        }
-
-    }
-    /**
-     * Where multiple source types are listed, this method only returns the first
-     * one. The full list of supported source types can also be obtained using
-     * <code>getSourceTypesIterator()</code>
-     * 
-     * @return the first SourceType on the transformer or java.lang.Object if there
-     *         is no source type set
-     */
-    public String getSourceType()
-    {
-        Class c = null;
-        if (sourceTypes.size() > 0)
-        {
-            c = (Class)sourceTypes.get(0);
-        }
-        if (c == null)
-        {
-            c = Object.class;
-        }
-        return c.getName();
+        return ClassUtils.getShortClassName(this.getClass());
     }
 
     public List getSourceTypes()

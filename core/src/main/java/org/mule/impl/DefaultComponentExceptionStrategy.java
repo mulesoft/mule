@@ -120,7 +120,7 @@ public class DefaultComponentExceptionStrategy extends DefaultExceptionStrategy
         {
             if (statistics != null)
             {
-                this.statistics = ((AbstractComponent)component).getStatistics();
+                this.statistics = ((AbstractComponent) component).getStatistics();
             }
         }
     }

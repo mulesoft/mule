@@ -50,11 +50,13 @@ import java.util.Map;
 public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfigBuilderTestCase
 {
 
+    // @Override
     public void testManagerConfig() throws Exception
     {
         assertNotNull(managementContext.getTransactionManager());
     }
 
+    // @Override
     public void testConnectorConfig() throws Exception
     {
         TestConnector c = (TestConnector)managementContext.getRegistry().lookupConnector("dummyConnector");
@@ -68,6 +70,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
 //        assertEquals(3000, ((SimpleRetryConnectionStrategy)c.getConnectionStrategy()).getFrequency());
     }
 
+    // @Override
     public void testGlobalEndpointConfig()
     {
         UMOEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("fruitBowlEndpoint");
@@ -81,6 +84,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertEquals("http://foo.com", filter.getNamespaces().get("foo"));
     }
 
+    // @Override
     public void testEndpointConfig()
     {
         // test that endpoints have been resolved on endpoints
@@ -97,9 +101,9 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         UMODescriptor descriptor = managementContext.getRegistry().lookupModel("main").getDescriptor("appleComponent");
         assertNotNull(descriptor.getExceptionListener());
         assertEquals(DefaultExceptionStrategy.class, descriptor.getExceptionListener().getClass());
-
     }
 
+    // @Override
     public void testTransformerConfig()
     {
         UMOTransformer t = managementContext.getRegistry().lookupTransformer("TestCompressionTransformer");
@@ -107,9 +111,9 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertTrue(t instanceof TestCompressionTransformer);
         assertEquals(t.getReturnClass(), java.lang.String.class);
         assertNotNull(((TestCompressionTransformer)t).getContainerProperty());
-        assertTrue(((TestCompressionTransformer)t).isSourceTypeSupported(String.class, true));
     }
 
+    // @Override
     public void testModelConfig() throws Exception
     {
         UMOModel model = managementContext.getRegistry().lookupModel("main");

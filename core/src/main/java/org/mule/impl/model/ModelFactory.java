@@ -18,10 +18,10 @@ import org.mule.umo.model.UMOModel;
 /**
  * Will locate the model service using the model type as the key and construct the model.
  */
-public class ModelFactory
+public final class ModelFactory
 {
     public static final String DEFAULT_MODEL_NAME = "main";
-    
+
     public static UMOModel createModel(String type) throws ServiceException
     {
         ModelServiceDescriptor sd = (ModelServiceDescriptor)

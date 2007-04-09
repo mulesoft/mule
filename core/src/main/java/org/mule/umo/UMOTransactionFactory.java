@@ -11,9 +11,8 @@
 package org.mule.umo;
 
 /**
- * <p>
  * <code>UMOTransactionFactory</code> creates a transaction.
- * 
+ *
  */
 public interface UMOTransactionFactory
 {

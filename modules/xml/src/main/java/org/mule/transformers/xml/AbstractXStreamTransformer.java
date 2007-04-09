@@ -10,11 +10,16 @@
 
 package org.mule.transformers.xml;
 
-import com.thoughtworks.xstream.XStream;
 import org.mule.config.i18n.Message;
 import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.transformer.TransformerException;
 
+import com.thoughtworks.xstream.XStream;
+
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,18 +30,24 @@ import java.util.Map;
 
 public abstract class AbstractXStreamTransformer extends AbstractEventAwareTransformer
 {
-    private String driverClassName = XStreamFactory.XSTREAM_XPP_DRIVER;
-    private XStream xstream;
-    private Map aliases;
-    private List converters;
+    private final AtomicReference/* XStream */xstream = new AtomicReference();
+    private volatile String driverClassName = XStreamFactory.XSTREAM_XPP_DRIVER;
+    private volatile Map aliases = null;
+    private volatile List converters = null;
 
-    public synchronized final XStream getXStream() throws TransformerException
+    public final XStream getXStream() throws TransformerException
     {
-        if (xstream == null)
+        XStream instance = (XStream) xstream.get();
+
+        if (instance == null)
         {
             try
             {
-                xstream = new XStreamFactory(driverClassName, aliases, converters).getInstance();
+                instance = new XStreamFactory(driverClassName, aliases, converters).getInstance();
+                if (!xstream.compareAndSet(null, instance))
+                {
+                    instance = (XStream)xstream.get();
+                }
             }
             catch (Exception e)
             {
@@ -44,43 +55,61 @@ public abstract class AbstractXStreamTransformer extends AbstractEventAwareTrans
             }
         }
 
-        return xstream;
+        return instance;
     }
 
-    public synchronized String getDriverClassName()
+    public Object clone() throws CloneNotSupportedException
+    {
+        AbstractXStreamTransformer clone = (AbstractXStreamTransformer) super.clone();
+        clone.setDriverClassName(driverClassName);
+
+        if (aliases != null)
+        {
+            clone.setAliases(new HashMap(aliases));
+        }
+        
+        if (converters != null)
+        {
+            clone.setConverters(new ArrayList(converters));
+        }
+
+        return clone;
+    }
+
+    public String getDriverClassName()
     {
         return driverClassName;
     }
 
-    public synchronized void setDriverClassName(String driverClassName)
+    public void setDriverClassName(String driverClassName)
     {
         this.driverClassName = driverClassName;
         // force XStream instance update
-        this.xstream = null;
+        this.xstream.set(null);
     }
 
-    public synchronized Map getAliases()
+    public Map getAliases()
     {
         return aliases;
     }
 
-    public synchronized void setAliases(Map aliases)
+    public void setAliases(Map aliases)
     {
         this.aliases = aliases;
         // force XStream instance update
-        this.xstream = null;
+        this.xstream.set(null);
     }
 
-    public synchronized List getConverters()
+    public List getConverters()
     {
         return converters;
     }
 
-    public synchronized void setConverters(List converters)
+    public void setConverters(List converters)
     {
         this.converters = converters;
         // force XStream instance update
-        this.xstream = null;
+        this.xstream.set(null);
     }
 
     protected boolean requiresCurrentEvent()

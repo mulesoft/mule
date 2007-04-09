@@ -15,16 +15,14 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang.StringEscapeUtils;
-
 /**
  * This encoder contains methods that convert characters to Character entities as
  * defined by http://www.w3.org/TR/REC-html40/sgml/entities.html. More precisely it
- * combines the functionality of {@link StringEscapeUtils#escapeXml(String)} and
- * {@link StringEscapeUtils#escapeHtml(String)} into a single pass.
+ * combines the functionality of {@link org.apache.commons.lang.StringEscapeUtils#escapeXml(String)} and
+ * {@link org.apache.commons.lang.StringEscapeUtils#escapeHtml(String)} into a single pass.
  */
 // @ThreadSafe
-public class XMLEntityCodec
+public final class XMLEntityCodec
 {
     private static final Entities MuleEntities = new Entities();
 
@@ -34,6 +32,11 @@ public class XMLEntityCodec
         MuleEntities.addEntities(Entities.BASIC_ARRAY);
         MuleEntities.addEntities(Entities.ISO8859_1_ARRAY);
         MuleEntities.addEntities(Entities.HTML40_ARRAY);
+    }
+
+    protected XMLEntityCodec()
+    {
+        // no-op
     }
 
     public static String encodeString(String str)
@@ -519,7 +522,7 @@ public class XMLEntityCodec
                     {
                         buf.append('&');
                         buf.append('#');
-                        buf.append((int)ch);
+                        buf.append((int) ch);
                         buf.append(';');
                     }
                     else
@@ -670,7 +673,7 @@ public class XMLEntityCodec
                     }
                     else
                     {
-                        buf.append((char)(entityValue));
+                        buf.append((char) (entityValue));
                     }
                     i = semi;
                 }
@@ -744,14 +747,10 @@ public class XMLEntityCodec
                                     {
                                         case 'X' :
                                         case 'x' :
-                                        {
                                             entityValue = Integer.parseInt(entityContent.substring(2), 16);
                                             break;
-                                        }
                                         default :
-                                        {
                                             entityValue = Integer.parseInt(entityContent.substring(1), 10);
-                                        }
                                     }
                                     if (entityValue > 0xFFFF)
                                     {
@@ -841,7 +840,7 @@ public class XMLEntityCodec
              */
             public String name(int value)
             {
-                return (String)mapValueToName.get(value);
+                return (String) mapValueToName.get(value);
             }
 
             /**
@@ -854,14 +853,14 @@ public class XMLEntityCodec
                 {
                     return -1;
                 }
-                return ((Integer)value).intValue();
+                return ((Integer) value).intValue();
             }
         }
 
         private static class LookupEntityMap extends PrimitiveEntityMap
         {
+            private static final int LOOKUP_TABLE_SIZE = 256;
             private String[] lookupTable;
-            private int LOOKUP_TABLE_SIZE = 256;
 
             /**
              * {@inheritDoc}
@@ -1042,7 +1041,7 @@ public class XMLEntityCodec
 
                 this.loadFactor = loadFactor;
                 table = new Entry[initialCapacity];
-                threshold = (int)(initialCapacity * loadFactor);
+                threshold = (int) (initialCapacity * loadFactor);
             }
 
             /**
@@ -1202,7 +1201,7 @@ public class XMLEntityCodec
                 int newCapacity = oldCapacity * 2 + 1;
                 Entry newMap[] = new Entry[newCapacity];
 
-                threshold = (int)(newCapacity * loadFactor);
+                threshold = (int) (newCapacity * loadFactor);
                 table = newMap;
 
                 for (int i = oldCapacity; i-- > 0;)

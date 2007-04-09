@@ -34,7 +34,7 @@ public class PayloadPropertyExtractor implements PropertyExtractor
         Object payload = message;
         if (message instanceof UMOMessage)
         {
-            payload = ((UMOMessage)message).getPayload();
+            payload = ((UMOMessage) message).getPayload();
         }
         Object value = null;
         try

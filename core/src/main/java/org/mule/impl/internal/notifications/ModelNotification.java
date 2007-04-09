@@ -49,7 +49,7 @@ public class ModelNotification extends UMOServerNotification implements Blocking
 
     protected String getPayloadToString()
     {
-        return ((UMOModel)source).getName();
+        return ((UMOModel) source).getName();
     }
 
     protected String getActionName(int action)

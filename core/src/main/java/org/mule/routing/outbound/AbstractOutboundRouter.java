@@ -224,7 +224,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements U
         // this.endpoints = new CopyOnWriteArrayList(endpoints);
         for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
         {
-            UMOEndpoint umoEndpoint = (UMOEndpoint)iterator.next();
+            UMOEndpoint umoEndpoint = (UMOEndpoint) iterator.next();
             addEndpoint(umoEndpoint);
         }
     }
@@ -298,12 +298,12 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements U
     {
         try
         {
-            this.propertyExtractor = (PropertyExtractor)ClassUtils.instanciateClass(className, null,
+            this.propertyExtractor = (PropertyExtractor) ClassUtils.instanciateClass(className, null,
                 getClass());
         }
         catch (Exception ex)
         {
-            throw (IllegalArgumentException)new IllegalArgumentException(
+            throw (IllegalArgumentException) new IllegalArgumentException(
                 "Couldn't instanciate property extractor class " + className
                 ).initCause(ex);
         }

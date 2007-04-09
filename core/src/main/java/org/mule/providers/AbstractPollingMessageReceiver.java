@@ -90,7 +90,7 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
             // progress
             for (Iterator i = schedules.iterator(); i.hasNext();)
             {
-                ScheduledFuture schedule = (ScheduledFuture)i.next();
+                ScheduledFuture schedule = (ScheduledFuture) i.next();
                 schedule.cancel(false);
                 i.remove();
 

@@ -32,7 +32,7 @@ public class StreamingModel extends AbstractModel
 
     protected UMOComponent createComponent(UMODescriptor descriptor)
     {
-        return new StreamingComponent((MuleDescriptor)descriptor, this);
+        return new StreamingComponent((MuleDescriptor) descriptor, this);
     }
 
     public String getType()
@@ -48,7 +48,7 @@ public class StreamingModel extends AbstractModel
     */
     public void setEntryPointResolver(UMOEntryPointResolver entryPointResolver)
     {
-        if(!(entryPointResolver instanceof StreamingEntryPointResolver))
+        if (!(entryPointResolver instanceof StreamingEntryPointResolver))
         {
             throw new IllegalArgumentException("EntrypointResolver needs to be an instance of " + StreamingEntryPointResolver.class.getName());
         }

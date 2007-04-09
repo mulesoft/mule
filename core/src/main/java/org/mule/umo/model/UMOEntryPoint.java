@@ -10,12 +10,12 @@
 
 package org.mule.umo.model;
 
-import org.mule.impl.VoidResult;
 import org.mule.umo.UMOEventContext;
 
 /**
  * <code>UMOEntryPoint</code> defines the current entry method on a component. If
- * the invoked method does not have a return value, a {@link VoidResult} is returned.
+ * the invoked method does not have a return value, a {@link org.mule.impl.VoidResult}
+ * is returned.
  */
 public interface UMOEntryPoint
 {

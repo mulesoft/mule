@@ -42,7 +42,7 @@ public class InterceptorsInvoker extends Invocation
     {
         if (cursor < interceptors.size())
         {
-            UMOInterceptor interceptor = (UMOInterceptor)interceptors.get(cursor);
+            UMOInterceptor interceptor = (UMOInterceptor) interceptors.get(cursor);
             incCursor();
             return interceptor.intercept(this);
         }

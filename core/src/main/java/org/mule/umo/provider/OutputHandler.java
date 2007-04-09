@@ -34,7 +34,7 @@ public interface OutputHandler
      * @param out the output stream to write to
      * @throws IOException
      */
-    public void write(UMOEvent event, OutputStream out) throws IOException;
+    void write(UMOEvent event, OutputStream out) throws IOException;
 
     /**
      * Used to obtain a set of headers that will be sent with this stream payload.
@@ -43,5 +43,5 @@ public interface OutputHandler
      * @param event the current event
      * @return a Map of headers or an empty map if there are no headers
      */
-    public Map getHeaders(UMOEvent event);
+    Map getHeaders(UMOEvent event);
 }

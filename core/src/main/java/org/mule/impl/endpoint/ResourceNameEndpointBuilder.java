@@ -35,13 +35,13 @@ public class ResourceNameEndpointBuilder extends AbstractEndpointBuilder
 
         if (uri.getPath() != null && uri.getPath().length() != 0)
         {
-            if(address.length() > 0)
+            if (address.length() > 0)
             {
                 address += "/";
             }
             address += uri.getPath().substring(1);
         }
-        else if (uri.getAuthority()!=null && ! uri.getAuthority().equals(address))
+        else if (uri.getAuthority() != null && !uri.getAuthority().equals(address))
         {
             address += uri.getAuthority();
         }

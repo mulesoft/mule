@@ -45,7 +45,7 @@ public class StaticRecipientList extends AbstractRecipientList
         }
         else if (msgRecipients instanceof List)
         {
-            return new ArrayList((List)msgRecipients);
+            return new ArrayList((List) msgRecipients);
         }
         else
         {

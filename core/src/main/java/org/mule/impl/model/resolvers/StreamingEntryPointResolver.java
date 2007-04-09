@@ -9,10 +9,10 @@
  */
 package org.mule.impl.model.resolvers;
 
-import org.mule.umo.model.UMOEntryPointResolver;
-import org.mule.umo.model.UMOEntryPoint;
-import org.mule.umo.model.ModelException;
 import org.mule.umo.UMODescriptor;
+import org.mule.umo.model.ModelException;
+import org.mule.umo.model.UMOEntryPoint;
+import org.mule.umo.model.UMOEntryPointResolver;
 
 /**
  * Creates a {@link org.mule.impl.model.resolvers.StreamingEntryPoint}. For use with the Streaming Model.

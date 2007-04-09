@@ -10,7 +10,6 @@
 
 package org.mule.umo.provider;
 
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Registerable;
 
@@ -25,18 +24,18 @@ public interface UMOMessageDispatcher extends Registerable, Disposable, UMOConne
      * This method can perform necessary state updates before any of the
      * {@link UMOMessageDispatching} methods are invoked.
      * 
-     * @see {@link UMOMessageDispatcherFactory#activate(UMOImmutableEndpoint, UMOMessageDispatcher)}
+     * @see {@link UMOMessageDispatcherFactory#activate(org.mule.umo.endpoint.UMOImmutableEndpoint, UMOMessageDispatcher)}
      */
-    public void activate();
+    void activate();
 
     /**
      * After sending/receiving a message, the dispatcher can use this method e.g. to
      * clean up its internal state (if it has any) or return pooled resources to
      * whereever it got them during {@link #activate()}.
      * 
-     * @see {@link UMOMessageDispatcherFactory#passivate(UMOImmutableEndpoint, UMOMessageDispatcher)}
+     * @see {@link UMOMessageDispatcherFactory#passivate(org.mule.umo.endpoint.UMOImmutableEndpoint, UMOMessageDispatcher)}
      */
-    public void passivate();
+    void passivate();
 
     /**
      * Determines whether this dispatcher can be reused after message
@@ -47,7 +46,7 @@ public interface UMOMessageDispatcher extends Registerable, Disposable, UMOConne
      *         {@link Disposable#dispose()} has been called because an Exception was
      *         raised)
      */
-    public boolean validate();
+    boolean validate();
 
     /**
      * Gets the connector for this dispatcher

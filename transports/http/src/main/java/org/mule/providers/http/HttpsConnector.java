@@ -11,8 +11,11 @@
 package org.mule.providers.http;
 
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.security.TlsConfiguration;
+import org.mule.umo.security.TlsDirectKeyStore;
+import org.mule.umo.security.TlsDirectTrustStore;
+import org.mule.umo.security.TlsIndirectKeyStore;
 import org.mule.umo.security.provider.SecurityProviderFactory;
+import org.mule.umo.security.tls.TlsConfiguration;
 
 import java.io.IOException;
 import java.security.Provider;
@@ -23,7 +26,8 @@ import javax.net.ssl.TrustManagerFactory;
 /**
  * <code>HttpsConnector</code> provides Https connectivity
  */
-public class HttpsConnector extends HttpConnector
+public class HttpsConnector extends HttpConnector 
+implements TlsDirectKeyStore, TlsIndirectKeyStore, TlsDirectTrustStore
 {
     private TlsConfiguration tls = new TlsConfiguration(TlsConfiguration.DEFAULT_KEYSTORE);
 
@@ -46,6 +50,11 @@ public class HttpsConnector extends HttpConnector
     public String getClientKeyStorePassword()
     {
         return tls.getClientKeyStorePassword();
+    }
+
+    public String getClientKeyStoreType()
+    {
+        return this.tls.getClientKeyStoreType();
     }
 
     public String getKeyManagerAlgorithm()
@@ -141,6 +150,11 @@ public class HttpsConnector extends HttpConnector
     public void setClientKeyStorePassword(String clientKeyStorePassword)
     {
         tls.setClientKeyStorePassword(clientKeyStorePassword);
+    }
+
+    public void setClientKeyStoreType(String clientKeyStoreType)
+    {
+        this.tls.setClientKeyStoreType(clientKeyStoreType);
     }
 
     public void setExplicitTrustStoreOnly(boolean explicitTrustStoreOnly)

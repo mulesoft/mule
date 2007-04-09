@@ -59,7 +59,7 @@ public abstract class AbstractModel implements UMOModel
     protected transient Log logger = LogFactory.getLog(getClass());
 
     private String name = DEFAULT_MODEL_NAME;
-    private UMOEntryPointResolver entryPointResolver= new DynamicEntryPointResolver();
+    private UMOEntryPointResolver entryPointResolver = new DynamicEntryPointResolver();
     private UMOLifecycleAdapterFactory lifecycleAdapterFactory = new DefaultLifecycleAdapterFactory();
 
     private Map components = new ConcurrentSkipListMap();
@@ -180,7 +180,7 @@ public abstract class AbstractModel implements UMOModel
             throw new ModelException(new Message(Messages.DESCRIPTOR_X_ALREADY_EXISTS, descriptor.getName()));
         }
 
-        UMOComponent component = (UMOComponent)components.get(descriptor.getName());
+        UMOComponent component = (UMOComponent) components.get(descriptor.getName());
 
         if (component == null)
         {
@@ -215,7 +215,7 @@ public abstract class AbstractModel implements UMOModel
         {
             throw new ModelException(new Message(Messages.COMPONENT_X_NOT_REGISTERED, descriptor.getName()));
         }
-        UMOComponent component = (UMOComponent)components.remove(descriptor.getName());
+        UMOComponent component = (UMOComponent) components.remove(descriptor.getName());
 
         if (component != null)
         {
@@ -256,7 +256,7 @@ public abstract class AbstractModel implements UMOModel
 
         for (Iterator i = components.values().iterator(); i.hasNext();)
         {
-            UMOComponent component = (UMOComponent)i.next();
+            UMOComponent component = (UMOComponent) i.next();
             try
             {
                 component.dispose();
@@ -283,7 +283,7 @@ public abstract class AbstractModel implements UMOModel
      */
     public UMOSession getComponentSession(String muleName)
     {
-        UMOComponent component = (UMOComponent)components.get(muleName);
+        UMOComponent component = (UMOComponent) components.get(muleName);
         if (component == null)
         {
             logger.warn("Component: " + muleName + " not found returning null session");
@@ -305,7 +305,7 @@ public abstract class AbstractModel implements UMOModel
         fireNotification(new ModelNotification(this, ModelNotification.MODEL_STOPPING));
         for (Iterator i = components.values().iterator(); i.hasNext();)
         {
-            UMOComponent component = (UMOComponent)i.next();
+            UMOComponent component = (UMOComponent) i.next();
             component.stop();
             logger.info("Component " + component + " has been stopped successfully");
         }
@@ -330,7 +330,7 @@ public abstract class AbstractModel implements UMOModel
 
             for (Iterator i = components.values().iterator(); i.hasNext();)
             {
-                AbstractComponent component = (AbstractComponent)i.next();
+                AbstractComponent component = (AbstractComponent) i.next();
                 startComponent(component.getDescriptor().getName());
             }
             started.set(true);
@@ -394,7 +394,7 @@ public abstract class AbstractModel implements UMOModel
      */
     public void stopComponent(String name) throws UMOException
     {
-        UMOComponent component = (UMOComponent)components.get(name);
+        UMOComponent component = (UMOComponent) components.get(name);
         if (component == null)
         {
             throw new ModelException(new Message(Messages.COMPONENT_X_NOT_REGISTERED, name));
@@ -421,7 +421,7 @@ public abstract class AbstractModel implements UMOModel
      */
     public void pauseComponent(String name) throws UMOException
     {
-        UMOComponent component = (UMOComponent)components.get(name);
+        UMOComponent component = (UMOComponent) components.get(name);
 
         if (component != null)
         {
@@ -444,7 +444,7 @@ public abstract class AbstractModel implements UMOModel
      */
     public void resumeComponent(String name) throws UMOException
     {
-        UMOComponent component = (UMOComponent)components.get(name);
+        UMOComponent component = (UMOComponent) components.get(name);
 
         if (component != null)
         {
@@ -461,7 +461,7 @@ public abstract class AbstractModel implements UMOModel
     {
         for (Iterator iterator = descriptors.iterator(); iterator.hasNext();)
         {
-            registerComponent((UMODescriptor)iterator.next());
+            registerComponent((UMODescriptor) iterator.next());
         }
     }
 
@@ -481,12 +481,12 @@ public abstract class AbstractModel implements UMOModel
 
             if (exceptionListener instanceof Initialisable)
             {
-                ((Initialisable)exceptionListener).initialise();
+                ((Initialisable) exceptionListener).initialise();
             }
             UMOComponent component = null;
             for (Iterator i = components.values().iterator(); i.hasNext();)
             {
-                component = (UMOComponent)i.next();
+                component = (UMOComponent) i.next();
 
                 component.initialise();
 
@@ -545,12 +545,12 @@ public abstract class AbstractModel implements UMOModel
 
     public UMODescriptor getDescriptor(String name)
     {
-        return (UMODescriptor)descriptors.get(name);
+        return (UMODescriptor) descriptors.get(name);
     }
 
     public UMOComponent getComponent(String name)
     {
-        return (UMOComponent)components.get(name);
+        return (UMOComponent) components.get(name);
     }
 
     /**

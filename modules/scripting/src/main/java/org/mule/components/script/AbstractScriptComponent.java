@@ -38,18 +38,19 @@ import org.apache.commons.logging.LogFactory;
 public abstract class AbstractScriptComponent
     implements Initialisable, Lifecycle, UMODescriptorAware, FileListener, Callable
 {
+    public static final int DEFAULT_RELOAD_INTERVAL_MS = 60000;
+
     /**
      * logger used by this class
      */
     protected transient Log logger = LogFactory.getLog(getClass());
-
     private String script = null;
-    private String scriptText = null;
 
+    private String scriptText = null;
     private boolean autoReload = true;
     protected UMODescriptor descriptor;
     private FileMonitor monitor;
-    private long reloadInterval = 60000;
+    private long reloadInterval = DEFAULT_RELOAD_INTERVAL_MS;
 
     public void setDescriptor(UMODescriptor descriptor)
     {

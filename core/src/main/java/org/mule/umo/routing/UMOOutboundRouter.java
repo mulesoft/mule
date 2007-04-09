@@ -107,7 +107,7 @@ public interface UMOOutboundRouter extends UMORouter
      * 
      * @return the replyTo endpoint or null if one has not been set.
      */
-    public String getReplyTo();
+    String getReplyTo();
 
     /**
      * Sets the replyTo endpoint for any outgoing messages. This will then be used by
@@ -117,7 +117,7 @@ public interface UMOOutboundRouter extends UMORouter
      * 
      * @param replyTo endpoint string to use
      */
-    public void setReplyTo(String replyTo);
+    void setReplyTo(String replyTo);
 
     /**
      * Determines whether this router supports dynamic endpoint. i.e. endpoints that
@@ -126,7 +126,7 @@ public interface UMOOutboundRouter extends UMORouter
      * 
      * @return
      */
-    public boolean isDynamicEndpoints();
+    boolean isDynamicEndpoints();
 
     /**
      * @param name the Endpoint identifier

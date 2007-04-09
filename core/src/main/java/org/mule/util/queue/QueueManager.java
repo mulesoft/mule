@@ -38,15 +38,15 @@ public interface QueueManager
     /**
      * @return Returns the persistenceStrategy.
      */
-    public QueuePersistenceStrategy getPersistenceStrategy();
+    QueuePersistenceStrategy getPersistenceStrategy();
 
     /**
      * @param persistenceStrategy The persistenceStrategy to set.
      */
-    public void setPersistenceStrategy(QueuePersistenceStrategy persistenceStrategy);
+    void setPersistenceStrategy(QueuePersistenceStrategy persistenceStrategy);
 
-    public QueuePersistenceStrategy getMemoryPersistenceStrategy();
+    QueuePersistenceStrategy getMemoryPersistenceStrategy();
 
-    public void setMemoryPersistenceStrategy(QueuePersistenceStrategy memoryPersistenceStrategy);
+    void setMemoryPersistenceStrategy(QueuePersistenceStrategy memoryPersistenceStrategy);
 
 }

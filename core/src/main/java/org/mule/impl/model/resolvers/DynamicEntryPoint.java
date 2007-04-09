@@ -68,7 +68,7 @@ public class DynamicEntryPoint implements UMOEntryPoint
 
     protected Method addMethodByArgumentType(Method method, String payloadClass)
     {
-        Method previousMethod = (Method)entryPoints.putIfAbsent(payloadClass, method);
+        Method previousMethod = (Method) entryPoints.putIfAbsent(payloadClass, method);
         return (previousMethod != null ? previousMethod : method);
     }
 
@@ -76,30 +76,30 @@ public class DynamicEntryPoint implements UMOEntryPoint
     {
         String methodName = method.getName();
 
-        ConcurrentMap argumentTypes = (ConcurrentMap)entryPoints.get(methodName);
+        ConcurrentMap argumentTypes = (ConcurrentMap) entryPoints.get(methodName);
         if (argumentTypes == null)
         {
             argumentTypes = new ConcurrentHashMap();
-            ConcurrentMap previousTypes = (ConcurrentMap)entryPoints.putIfAbsent(methodName, argumentTypes);
+            ConcurrentMap previousTypes = (ConcurrentMap) entryPoints.putIfAbsent(methodName, argumentTypes);
             if (previousTypes != null)
             {
                 argumentTypes = previousTypes;
             }
         }
 
-        Method previousMethod = (Method)argumentTypes.putIfAbsent(payloadClass, method);
+        Method previousMethod = (Method) argumentTypes.putIfAbsent(payloadClass, method);
         return (previousMethod != null ? previousMethod : method);
     }
 
     protected Method getMethodByArgumentType(String argumentType)
     {
-        return (Method)entryPoints.get(argumentType);
+        return (Method) entryPoints.get(argumentType);
     }
 
     protected Method getMethodByName(String methodName, String argumentType)
     {
-        ConcurrentMap argumentTypes = (ConcurrentMap)entryPoints.get(methodName);
-        return (argumentTypes != null ? (Method)argumentTypes.get(argumentType) : null);
+        ConcurrentMap argumentTypes = (ConcurrentMap) entryPoints.get(methodName);
+        return (argumentTypes != null ? (Method) argumentTypes.get(argumentType) : null);
     }
 
     public Object invoke(Object component, UMOEventContext context) throws Exception
@@ -108,7 +108,7 @@ public class DynamicEntryPoint implements UMOEntryPoint
         Object payload = null;
 
         // Transports such as SOAP need to ignore the method property
-        boolean ignoreMethod = BooleanUtils.toBoolean((Boolean)context.getMessage().removeProperty(
+        boolean ignoreMethod = BooleanUtils.toBoolean((Boolean) context.getMessage().removeProperty(
             MuleProperties.MULE_IGNORE_METHOD_PROPERTY));
 
         if (!ignoreMethod)
@@ -119,7 +119,7 @@ public class DynamicEntryPoint implements UMOEntryPoint
             if (methodOverride instanceof Method)
             {
                 // Methods are (hopefully) directly useable
-                method = (Method)methodOverride;
+                method = (Method) methodOverride;
             }
             else if (methodOverride != null)
             {
@@ -140,7 +140,7 @@ public class DynamicEntryPoint implements UMOEntryPoint
                     // try to find the method matching the methodOverride
                     for (Iterator i = matchingMethods.iterator(); i.hasNext();)
                     {
-                        Method candidate = (Method)i.next();
+                        Method candidate = (Method) i.next();
                         if (candidate.getName().equals(methodOverride))
                         {
                             method = candidate;
@@ -213,7 +213,7 @@ public class DynamicEntryPoint implements UMOEntryPoint
             {
                 // found exact match for method with context argument
                 payload = context;
-                method = this.addMethodByArgumentType((Method)methods.get(0), payload.getClass().getName());
+                method = this.addMethodByArgumentType((Method) methods.get(0), payload.getClass().getName());
             }
             else
             {
@@ -234,7 +234,7 @@ public class DynamicEntryPoint implements UMOEntryPoint
                 else if (numMethods == 1)
                 {
                     // found exact match for payload argument
-                    method = this.addMethodByArgumentType((Method)methods.get(0), payload.getClass()
+                    method = this.addMethodByArgumentType((Method) methods.get(0), payload.getClass()
                         .getName());
                 }
                 else
@@ -295,7 +295,7 @@ public class DynamicEntryPoint implements UMOEntryPoint
         {
             if (Object[].class.isAssignableFrom(argument.getClass()))
             {
-                invocationArgs = (Object[])argument;
+                invocationArgs = (Object[]) argument;
             }
             else
             {

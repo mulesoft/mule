@@ -55,12 +55,12 @@ public abstract class AbstractResponseRouter extends AbstractRouter implements U
     {
         try
         {
-            this.correlationExtractor = (PropertyExtractor)ClassUtils.instanciateClass(className, null,
+            this.correlationExtractor = (PropertyExtractor) ClassUtils.instanciateClass(className, null,
                 getClass());
         }
         catch (Exception ex)
         {
-            throw (IllegalArgumentException)new IllegalArgumentException(
+            throw (IllegalArgumentException) new IllegalArgumentException(
                 "Couldn't instanciate property extractor class " + className
                 ).initCause(ex);
         }

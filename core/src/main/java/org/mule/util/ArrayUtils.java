@@ -27,39 +27,39 @@ public class ArrayUtils extends org.apache.commons.lang.ArrayUtils
         Class componentType = array.getClass().getComponentType();
         if (Object.class.isAssignableFrom(componentType))
         {
-            result = ArrayUtils.toString((ArrayUtils.subarray((Object[])array, 0, maxElements)));
+            result = ArrayUtils.toString((ArrayUtils.subarray((Object[]) array, 0, maxElements)));
         }
         else if (componentType.equals(Boolean.TYPE))
         {
-            result = ArrayUtils.toString((ArrayUtils.subarray((boolean[])array, 0, maxElements)));
+            result = ArrayUtils.toString((ArrayUtils.subarray((boolean[]) array, 0, maxElements)));
         }
         else if (componentType.equals(Byte.TYPE))
         {
-            result = ArrayUtils.toString((ArrayUtils.subarray((byte[])array, 0, maxElements)));
+            result = ArrayUtils.toString((ArrayUtils.subarray((byte[]) array, 0, maxElements)));
         }
         else if (componentType.equals(Character.TYPE))
         {
-            result = ArrayUtils.toString((ArrayUtils.subarray((char[])array, 0, maxElements)));
+            result = ArrayUtils.toString((ArrayUtils.subarray((char[]) array, 0, maxElements)));
         }
         else if (componentType.equals(Short.TYPE))
         {
-            result = ArrayUtils.toString((ArrayUtils.subarray((short[])array, 0, maxElements)));
+            result = ArrayUtils.toString((ArrayUtils.subarray((short[]) array, 0, maxElements)));
         }
         else if (componentType.equals(Integer.TYPE))
         {
-            result = ArrayUtils.toString((ArrayUtils.subarray((int[])array, 0, maxElements)));
+            result = ArrayUtils.toString((ArrayUtils.subarray((int[]) array, 0, maxElements)));
         }
         else if (componentType.equals(Long.TYPE))
         {
-            result = ArrayUtils.toString((ArrayUtils.subarray((long[])array, 0, maxElements)));
+            result = ArrayUtils.toString((ArrayUtils.subarray((long[]) array, 0, maxElements)));
         }
         else if (componentType.equals(Float.TYPE))
         {
-            result = ArrayUtils.toString((ArrayUtils.subarray((float[])array, 0, maxElements)));
+            result = ArrayUtils.toString((ArrayUtils.subarray((float[]) array, 0, maxElements)));
         }
         else if (componentType.equals(Double.TYPE))
         {
-            result = ArrayUtils.toString((ArrayUtils.subarray((double[])array, 0, maxElements)));
+            result = ArrayUtils.toString((ArrayUtils.subarray((double[]) array, 0, maxElements)));
         }
         else
         {
@@ -106,7 +106,7 @@ public class ArrayUtils extends org.apache.commons.lang.ArrayUtils
             throw new IllegalArgumentException("Array target class must not be null");
         }
 
-        Object[] result = (Object[])Array.newInstance(clazz, objects.length);
+        Object[] result = (Object[]) Array.newInstance(clazz, objects.length);
         System.arraycopy(objects, 0, result, 0, objects.length);
         return result;
     }

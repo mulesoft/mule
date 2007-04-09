@@ -17,8 +17,8 @@ import java.io.ByteArrayInputStream;
 
 /**
  * <code>XmlToObject</code> converts xml created by the ObjectToXml transformer in
- * to a java object graph. This transformer uses XStream. Xstream uses some cleaver
- * tricks so objects that get marshalled to xml do not need to implement any
+ * to a java object graph. This transformer uses XStream. Xstream uses some clever
+ * tricks so objects that get marshalled to XML do not need to implement any
  * interfaces including Serializable and you don't even need to specify a default
  * constructor.
  * 
@@ -40,10 +40,9 @@ public class XmlToObject extends AbstractXStreamTransformer
 
     public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
     {
-
         if (src instanceof byte[])
         {
-            return getXStream().fromXML(new ByteArrayInputStream((byte[])src));
+            return getXStream().fromXML(new ByteArrayInputStream((byte[]) src));
         }
         else if (src instanceof String)
         {
@@ -51,7 +50,8 @@ public class XmlToObject extends AbstractXStreamTransformer
         }
         else
         {
-            return getXStream().fromXML((String)domTransformer.transform(src));
+            return getXStream().fromXML((String) domTransformer.transform(src));
         }
     }
+
 }

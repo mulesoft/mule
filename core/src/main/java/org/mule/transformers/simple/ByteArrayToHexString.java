@@ -46,7 +46,7 @@ public class ByteArrayToHexString extends AbstractTransformer
 
         try
         {
-            return StringUtils.toHexString((byte[])src, upperCase);
+            return StringUtils.toHexString((byte[]) src, upperCase);
         }
         catch (Exception ex)
         {

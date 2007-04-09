@@ -15,10 +15,9 @@ import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.routing.AggregationException;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.provider.UMOMessageAdapter;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
@@ -131,7 +130,7 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
 
     /**
      * Returns the identifier by which events will be correlated. By default this is
-     * the value as returned by {@link UMOMessageAdapter#getCorrelationId()}.
+     * the value as returned by {@link org.mule.umo.provider.UMOMessageAdapter#getCorrelationId()}.
      * 
      * @param event the event use for determining the correlation group id
      * @return the id used to correlate related events
@@ -157,7 +156,7 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
      */
     protected EventGroup getEventGroup(Object groupId)
     {
-        return (EventGroup)eventGroups.get(groupId);
+        return (EventGroup) eventGroups.get(groupId);
     }
 
     /**
@@ -176,7 +175,7 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
     {
         // a parallel thread might have removed the EventGroup already,
         // therefore we need to validate our current reference
-        EventGroup previous = (EventGroup)eventGroups.putIfAbsent(group.getGroupId(), group);
+        EventGroup previous = (EventGroup) eventGroups.putIfAbsent(group.getGroupId(), group);
         return (previous != null ? previous : group);
     }
 

@@ -25,7 +25,7 @@ import org.apache.commons.logging.LogFactory;
  * <code>TemplateParser</code> is a simple string parser that will substitute
  * tokens in a string with values supplied in a Map.
  */
-public class TemplateParser
+public final class TemplateParser
 {
     public static final String ANT_TEMPLATE_STYLE = "ant";
     public static final String SQUARE_TEMPLATE_STYLE = "square";
@@ -39,6 +39,7 @@ public class TemplateParser
     private final int pre;
     private final int post;
     private final String style;
+
 
     public static TemplateParser createAntStyleParser()
     {
@@ -188,7 +189,7 @@ public class TemplateParser
         Map.Entry entry;
         for (Iterator iterator = templates.entrySet().iterator(); iterator.hasNext();)
         {
-            entry = (Map.Entry)iterator.next();
+            entry = (Map.Entry) iterator.next();
             map.put(entry.getKey(), parse(props, entry.getValue().toString()));
         }
         return map;
@@ -240,7 +241,7 @@ public class TemplateParser
 
     public static interface TemplateCallback
     {
-        public Object match(String token);
+        Object match(String token);
     }
 
 }

@@ -38,7 +38,7 @@ public class OutStreamMessageAdapter extends AbstractMessageAdapter
         {
             if (message instanceof OutputStream)
             {
-                out = (OutputStream)message;
+                out = (OutputStream) message;
             }
             else if (message instanceof String)
             {
@@ -47,8 +47,8 @@ public class OutStreamMessageAdapter extends AbstractMessageAdapter
             }
             else if (message instanceof byte[])
             {
-                out = new ByteArrayOutputStream(((byte[])message).length);
-                out.write((byte[])message);
+                out = new ByteArrayOutputStream(((byte[]) message).length);
+                out.write((byte[]) message);
 
             }
             else
@@ -75,7 +75,7 @@ public class OutStreamMessageAdapter extends AbstractMessageAdapter
     {
         if (out instanceof ByteArrayOutputStream)
         {
-            return StringMessageUtils.getString(((ByteArrayOutputStream)out).toByteArray(), encoding);
+            return StringMessageUtils.getString(((ByteArrayOutputStream) out).toByteArray(), encoding);
         }
         else
         {
@@ -94,7 +94,7 @@ public class OutStreamMessageAdapter extends AbstractMessageAdapter
     {
         if (out instanceof ByteArrayOutputStream)
         {
-            return ((ByteArrayOutputStream)out).toByteArray();
+            return ((ByteArrayOutputStream) out).toByteArray();
         }
         else
         {

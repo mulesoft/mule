@@ -19,8 +19,10 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <excludes>
+                        <!-- MULE-1134 -->
                         <exclude>**/XFireConnectorVMFunctionalTestCase.java</exclude>
-                        <exclude>**/XFireMultipleConnectorsTestCase.java</exclude>
+                        <!-- MULE-1515 -->
+                        <exclude>**/XFireWsdlTestCase.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>
@@ -57,18 +59,6 @@
             <artifactId>mule-transport-soap</artifactId>
             <version>${version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-vm</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-axis</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
         
         <!-- This is needed by org.mule.providers.soap.xfire.transport.MuleUniversalChannel -->
         <dependency>
@@ -81,7 +71,7 @@
         <dependency>
             <groupId>org.codehaus.xfire</groupId>
             <artifactId>xfire-core</artifactId>
-            <version>1.2.2</version>
+            <version>1.2.5</version>
             <exclusions>
                 <!-- we like slf4j -->
                 <exclusion>
@@ -106,12 +96,12 @@
         <dependency>
             <groupId>org.codehaus.xfire</groupId>
             <artifactId>xfire-aegis</artifactId>
-            <version>1.2.2</version>
+            <version>1.2.5</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.xfire</groupId>
             <artifactId>xfire-annotations</artifactId>
-            <version>1.2.2</version>
+            <version>1.2.5</version>
             <exclusions>
                 <exclusion>
                     <groupId>qdox</groupId>
@@ -130,7 +120,7 @@
         <dependency>
             <groupId>org.codehaus.xfire</groupId>
             <artifactId>xfire-java5</artifactId>
-            <version>1.2.2</version>
+            <version>1.2.5</version>
         </dependency>
         <!-- need to explicitly mark javax.mail as provided -->
         <dependency>
@@ -150,6 +140,13 @@
             <artifactId>jdom</artifactId>
             <version>1.0</version>
         </dependency>
+<!-- testing
+        <dependency>
+            <groupId>wsdl4j</groupId>
+            <artifactId>wsdl4j</artifactId>
+            <version>1.6.1</version>
+        </dependency>
+-->
         <!-- re-add woodstox with newer groupId & version -->
         <dependency>
             <groupId>org.codehaus.woodstox</groupId>
@@ -157,12 +154,43 @@
             <version>3.2.0</version>
         </dependency>
 
-        <!-- Better testing of XML -->        
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-vm</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-axis</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- for integrtion tests -->
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-vm</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+
+         <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-client</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Better testing of XML -->
         <dependency>
             <groupId>xmlunit</groupId>
             <artifactId>xmlunit</artifactId>
             <version>1.0</version>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
 </project>

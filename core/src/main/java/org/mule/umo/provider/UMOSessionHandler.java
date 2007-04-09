@@ -21,9 +21,9 @@ import org.mule.umo.UMOSession;
 public interface UMOSessionHandler
 {
 
-    public void storeSessionInfoToMessage(UMOSession session, UMOMessage message) throws UMOException;
+    void storeSessionInfoToMessage(UMOSession session, UMOMessage message) throws UMOException;
 
-    public void retrieveSessionInfoFromMessage(UMOMessage message, UMOSession session) throws UMOException;
+    void retrieveSessionInfoFromMessage(UMOMessage message, UMOSession session) throws UMOException;
 
     /**
      * The property name of the session id to use when creating the Mule session. by
@@ -32,5 +32,5 @@ public interface UMOSessionHandler
      * 
      * @return the property name of the session id that is set on the session
      */
-    public String getSessionIDKey();
+    String getSessionIDKey();
 }

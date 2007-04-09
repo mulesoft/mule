@@ -22,18 +22,19 @@ import java.util.Iterator;
  * <li>create a counter</li>
  * <li>retrieve a list of public counters</li>
  * </ul>
- * 
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
  */
-public class CounterFactory
+public final class CounterFactory
 {
+
+    /** Do not instanciate. */
+    private CounterFactory ()
+    {
+        // no-op
+    }
 
     /**
      * Enum class for all different types of counters. The type of a counter is
      * defined on creation and can be retrieved on each counter.
-     * 
-     * @author gnt
      */
     public static final class Type
     {

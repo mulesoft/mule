@@ -12,7 +12,6 @@
         <agent name="mx4jAgent" className="org.mule.management.agents.Mx4jAgent"/>
     </agents>
 
-    <model name="samples">
+    <model name="main"/>
 
-    </model>
 </mule-configuration>

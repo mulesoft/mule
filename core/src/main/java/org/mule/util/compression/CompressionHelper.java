@@ -21,12 +21,9 @@ import org.apache.commons.logging.LogFactory;
 /**
  * <code>CompressionHelper</code> a static class that provides facilities for
  * compressing and uncompressing byte arrays
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
-public class CompressionHelper
+public final class CompressionHelper
 {
     /**
      * logger used by this class
@@ -35,11 +32,17 @@ public class CompressionHelper
 
     private static CompressionStrategy defaultStrategy;
 
-    synchronized public static CompressionStrategy getDefaultCompressionStrategy()
+    /** Do not instanciate. */
+    private CompressionHelper ()
+    {
+        // no-op
+    }
+
+    public static synchronized CompressionStrategy getDefaultCompressionStrategy()
     {
         if (defaultStrategy == null)
         {
-            defaultStrategy = (CompressionStrategy)AccessController.doPrivileged(new PrivilegedAction()
+            defaultStrategy = (CompressionStrategy) AccessController.doPrivileged(new PrivilegedAction()
             {
                 public Object run()
                 {

@@ -23,9 +23,6 @@ import java.util.Iterator;
  * events via the <code>UMOEventContext</code> which is obtainable via the
  * <code>UMOManager</code> or by implementing
  * <code>org.mule.umo.lifecycle.Callable</code>.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public interface UMOSession extends Serializable

@@ -31,7 +31,7 @@ import javax.naming.OperationNotSupportedException;
 public class SimpleContext implements Context
 {
     /** What holds the bindings. */
-    Map bindings = new HashMap();
+    protected Map bindings = new HashMap();
 
     /** Context's environment. */
     private Hashtable environment;
@@ -151,8 +151,8 @@ public class SimpleContext implements Context
         {
             public Object next()
             {
-                Map.Entry e = (Map.Entry)i.next();
-                return new NameClassPair((String)e.getKey(), e.getValue().getClass().getName());
+                Map.Entry e = (Map.Entry) i.next();
+                return new NameClassPair((String) e.getKey(), e.getValue().getClass().getName());
             }
 
             public boolean hasMore()
@@ -193,8 +193,8 @@ public class SimpleContext implements Context
         {
             public Object next()
             {
-                Map.Entry e = (Map.Entry)i.next();
-                return new Binding((String)e.getKey(), e.getValue());
+                Map.Entry e = (Map.Entry) i.next();
+                return new Binding((String) e.getKey(), e.getValue());
             }
 
             public boolean hasMore()
@@ -267,7 +267,7 @@ public class SimpleContext implements Context
 
     public Name composeName(Name name, Name prefix) throws NamingException
     {
-        Name result = (Name)prefix.clone();
+        Name result = (Name) prefix.clone();
         result.addAll(name);
         return result;
     }

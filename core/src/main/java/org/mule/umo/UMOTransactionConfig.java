@@ -13,12 +13,8 @@ package org.mule.umo;
 import org.mule.transaction.constraints.ConstraintFilter;
 
 /**
- * <p>
  * <code>UMOTransactionConfig</code> defines transaction configuration for a
  * transactional endpoint.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public interface UMOTransactionConfig
 {

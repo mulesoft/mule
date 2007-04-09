@@ -66,12 +66,12 @@ public class EventGroup implements Comparable, Serializable
      */
     public int compareTo(Object o)
     {
-        EventGroup other = (EventGroup)o;
+        EventGroup other = (EventGroup) o;
         Object otherId = other.getGroupId();
 
         if (groupId instanceof Comparable && otherId instanceof Comparable)
         {
-            return ((Comparable)groupId).compareTo(otherId);
+            return ((Comparable) groupId).compareTo(otherId);
         }
         else
         {
@@ -99,7 +99,7 @@ public class EventGroup implements Comparable, Serializable
             return false;
         }
 
-        final EventGroup other = (EventGroup)obj;
+        final EventGroup other = (EventGroup) obj;
         if (groupId == null)
         {
             return (other.groupId == null);
@@ -169,7 +169,7 @@ public class EventGroup implements Comparable, Serializable
                 return EMPTY_EVENTS_ARRAY;
             }
 
-            return (UMOEvent[])events.toArray(EMPTY_EVENTS_ARRAY);
+            return (UMOEvent[]) events.toArray(EMPTY_EVENTS_ARRAY);
         }
     }
 
@@ -265,7 +265,7 @@ public class EventGroup implements Comparable, Serializable
                 Iterator i = events.iterator();
                 while (i.hasNext())
                 {
-                    UMOEvent event = (UMOEvent)i.next();
+                    UMOEvent event = (UMOEvent) i.next();
                     buf.append(event.getMessage().getUniqueId());
                     if (i.hasNext())
                     {

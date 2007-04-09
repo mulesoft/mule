@@ -111,7 +111,7 @@ public class RatePerUnit extends AggregateCounter
             Sample sample = null;
             while (it.hasNext())
             {
-                sample = (Sample)it.next();
+                sample = (Sample) it.next();
                 if (current - sample.time > length)
                 {
                     break;
@@ -124,7 +124,7 @@ public class RatePerUnit extends AggregateCounter
 
     public void doCompute()
     {
-        Sample l = samples.isEmpty() ? null : (Sample)samples.getFirst();
+        Sample l = samples.isEmpty() ? null : (Sample) samples.getFirst();
         long t = getTime();
         if (l == null || t > l.time)
         {

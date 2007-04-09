@@ -30,12 +30,17 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Transforms a javax.mail.Message to a UMOMessage, with support for attachments
  */
 public class ObjectToMimeMessage extends StringToEmailMessage
 {
 
+    private Log logger = LogFactory.getLog(getClass());
+    
     // @Override
     protected void setContent(Object payload, Message msg, String contentType, UMOEventContext context)
         throws Exception

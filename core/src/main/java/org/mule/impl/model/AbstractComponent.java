@@ -526,9 +526,9 @@ public abstract class AbstractComponent implements UMOComponent
     {
         if (exceptionListener instanceof DefaultComponentExceptionStrategy)
         {
-            if (((DefaultComponentExceptionStrategy)exceptionListener).getComponent() == null)
+            if (((DefaultComponentExceptionStrategy) exceptionListener).getComponent() == null)
             {
-                ((DefaultComponentExceptionStrategy)exceptionListener).setComponent(this);
+                ((DefaultComponentExceptionStrategy) exceptionListener).setComponent(this);
             }
         }
         exceptionListener.exceptionThrown(e);
@@ -591,7 +591,7 @@ public abstract class AbstractComponent implements UMOComponent
 
         for (Iterator it = endpoints.iterator(); it.hasNext();)
         {
-            endpoint = (UMOEndpoint)it.next();
+            endpoint = (UMOEndpoint) it.next();
             try
             {
                 endpoint.getConnector().registerListener(this, endpoint);
@@ -617,7 +617,7 @@ public abstract class AbstractComponent implements UMOComponent
 
         for (Iterator it = endpoints.iterator(); it.hasNext();)
         {
-            endpoint = (UMOEndpoint)it.next();
+            endpoint = (UMOEndpoint) it.next();
             try
             {
                 endpoint.getConnector().unregisterListener(this, endpoint);
@@ -643,8 +643,8 @@ public abstract class AbstractComponent implements UMOComponent
 
         for (Iterator it = endpoints.iterator(); it.hasNext();)
         {
-            endpoint = (UMOEndpoint)it.next();
-            UMOMessageReceiver receiver = ((AbstractConnector)endpoint.getConnector()).getReceiver(this,
+            endpoint = (UMOEndpoint) it.next();
+            UMOMessageReceiver receiver = ((AbstractConnector) endpoint.getConnector()).getReceiver(this,
                 endpoint);
             if (receiver != null && endpoint.getConnector().isStarted()
                 && endpoint.getInitialState().equals(UMOEndpoint.INITIAL_STATE_STARTED))
@@ -661,8 +661,8 @@ public abstract class AbstractComponent implements UMOComponent
 
         for (Iterator it = endpoints.iterator(); it.hasNext();)
         {
-            endpoint = (UMOEndpoint)it.next();
-            UMOMessageReceiver receiver = ((AbstractConnector)endpoint.getConnector()).getReceiver(this,
+            endpoint = (UMOEndpoint) it.next();
+            UMOMessageReceiver receiver = ((AbstractConnector) endpoint.getConnector()).getReceiver(this,
                 endpoint);
             if (receiver != null)
             {
@@ -678,8 +678,8 @@ public abstract class AbstractComponent implements UMOComponent
 
         for (Iterator it = endpoints.iterator(); it.hasNext();)
         {
-            endpoint = (UMOEndpoint)it.next();
-            UMOMessageReceiver receiver = ((AbstractConnector)endpoint.getConnector()).getReceiver(this,
+            endpoint = (UMOEndpoint) it.next();
+            UMOMessageReceiver receiver = ((AbstractConnector) endpoint.getConnector()).getReceiver(this,
                 endpoint);
             if (receiver != null)
             {
@@ -705,8 +705,8 @@ public abstract class AbstractComponent implements UMOComponent
 
         for (Iterator it = endpoints.iterator(); it.hasNext();)
         {
-            endpoint = (UMOEndpoint)it.next();
-            UMOMessageReceiver receiver = ((AbstractConnector)endpoint.getConnector()).getReceiver(this,
+            endpoint = (UMOEndpoint) it.next();
+            UMOMessageReceiver receiver = ((AbstractConnector) endpoint.getConnector()).getReceiver(this,
                 endpoint);
             if (receiver != null)
             {

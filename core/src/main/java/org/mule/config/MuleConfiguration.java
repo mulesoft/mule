@@ -375,7 +375,7 @@ public class MuleConfiguration
                 // We want to load the MANIFEST.MF from the mule-core jar. Sine we
                 // don't the version we're using
                 // we have to search for the jar on the classpath
-                URL url = (URL)AccessController.doPrivileged(new PrivilegedAction()
+                URL url = (URL) AccessController.doPrivileged(new PrivilegedAction()
                 {
                     public Object run()
                     {
@@ -385,7 +385,7 @@ public class MuleConfiguration
                                 ("META-INF/MANIFEST.MF"));
                             while (e.hasMoreElements())
                             {
-                                URL url = (URL)e.nextElement();
+                                URL url = (URL) e.nextElement();
                                 if (url.toExternalForm().indexOf("mule-core") > -1)
                                 {
                                     return url;
@@ -453,7 +453,7 @@ public class MuleConfiguration
     {
         try
         {
-            return (ConnectionStrategy)BeanUtils.cloneBean(connectionStrategy);
+            return (ConnectionStrategy) BeanUtils.cloneBean(connectionStrategy);
         }
         catch (Exception e)
         {

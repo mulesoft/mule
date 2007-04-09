@@ -54,7 +54,7 @@ public class RmiContainerContext extends JndiContainerContext
                 if (securityManager != null)
                 {
                     Class clazz = ClassUtils.loadClass(securityManager, getClass());
-                    System.setSecurityManager((SecurityManager)clazz.newInstance());
+                    System.setSecurityManager((SecurityManager) clazz.newInstance());
                 }
             }
             catch (Exception e)

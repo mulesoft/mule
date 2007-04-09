@@ -94,7 +94,7 @@ public class OptimisedMuleProxy implements MuleProxy
         {
             try
             {
-                ((Startable)umo).start();
+                ((Startable) umo).start();
                 started = true;
             }
             catch (Exception e)
@@ -121,7 +121,7 @@ public class OptimisedMuleProxy implements MuleProxy
             started = false;
             try
             {
-                ((Stoppable)umo).stop();
+                ((Stoppable) umo).stop();
             }
             catch (Exception e)
             {
@@ -137,7 +137,7 @@ public class OptimisedMuleProxy implements MuleProxy
         checkDisposed();
         if (umo instanceof Disposable)
         {
-            ((Disposable)umo).dispose();
+            ((Disposable) umo).dispose();
             disposed = true;
         }
     }
@@ -293,7 +293,7 @@ public class OptimisedMuleProxy implements MuleProxy
         {
             if (result instanceof UMOMessage)
             {
-                return (UMOMessage)result;
+                return (UMOMessage) result;
             }
             else
             {
@@ -471,9 +471,9 @@ public class OptimisedMuleProxy implements MuleProxy
                 logger.error("Failed to return proxy: " + e2.getMessage(), e2);
             }
             //TODO RM* clean this up
-            if(getStatistics() instanceof SedaComponentStatistics)
+            if (getStatistics() instanceof SedaComponentStatistics)
             {
-                ((SedaComponentStatistics)getStatistics()).setComponentPoolSize(proxyPool.getSize());
+                ((SedaComponentStatistics) getStatistics()).setComponentPoolSize(proxyPool.getSize());
             }
         }
     }

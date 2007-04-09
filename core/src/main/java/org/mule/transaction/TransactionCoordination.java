@@ -10,15 +10,15 @@
 
 package org.mule.transaction;
 
-import org.mule.umo.UMOTransaction;
-import org.mule.umo.TransactionException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.umo.TransactionException;
+import org.mule.umo.UMOTransaction;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class TransactionCoordination
+public final class TransactionCoordination
 {
     protected static final Log logger = LogFactory.getLog(TransactionCoordination.class);
 
@@ -29,6 +29,7 @@ public class TransactionCoordination
     // @GuardedBy("this")
     private int txCounter = 0;
 
+    /** Do not instanciate. */
     private TransactionCoordination()
     {
         super();
@@ -41,14 +42,14 @@ public class TransactionCoordination
 
     public UMOTransaction getTransaction()
     {
-        return (UMOTransaction)transactions.get();
+        return (UMOTransaction) transactions.get();
     }
 
     public void unbindTransaction(UMOTransaction transaction) throws TransactionException
     {
         try
         {
-            UMOTransaction oldTx = (UMOTransaction)transactions.get();
+            UMOTransaction oldTx = (UMOTransaction) transactions.get();
             if (oldTx != null && !oldTx.equals(transaction))
             {
                 throw new IllegalTransactionStateException(new Message(Messages.TX_CANT_UNBIND));
@@ -70,7 +71,7 @@ public class TransactionCoordination
 
     public void bindTransaction(UMOTransaction transaction) throws TransactionException
     {
-        UMOTransaction oldTx = (UMOTransaction)transactions.get();
+        UMOTransaction oldTx = (UMOTransaction) transactions.get();
         if (oldTx != null)
         {
             throw new IllegalTransactionStateException(new Message(Messages.TX_CANT_BIND_ALREADY_BOUND));

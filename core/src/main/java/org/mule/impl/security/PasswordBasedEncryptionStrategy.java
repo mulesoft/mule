@@ -32,9 +32,12 @@ public class PasswordBasedEncryptionStrategy extends AbstractJCEEncryptionStrate
 {
 
     public static final String DEFAULT_ALGORITHM = "PBEWithMD5AndDES";
+    public static final int DEFAULT_ITERATION_COUNT = 20;
+
     private byte[] salt = null;
 
-    private int iterationCount = 20;
+    private int iterationCount = DEFAULT_ITERATION_COUNT;
+
     private char[] password;
 
     public PasswordBasedEncryptionStrategy()
@@ -46,8 +49,8 @@ public class PasswordBasedEncryptionStrategy extends AbstractJCEEncryptionStrate
     {
         if (salt == null)
         {
-            salt = new byte[]{(byte)0xc7, (byte)0x73, (byte)0x21, (byte)0x8c, (byte)0x7e, (byte)0xc8,
-                (byte)0xee, (byte)0x99};
+            salt = new byte[]{(byte) 0xc7, (byte) 0x73, (byte) 0x21, (byte) 0x8c, (byte) 0x7e, (byte) 0xc8,
+                (byte) 0xee, (byte) 0x99};
             logger.debug("Salt is not set. Using default salt");
         }
 

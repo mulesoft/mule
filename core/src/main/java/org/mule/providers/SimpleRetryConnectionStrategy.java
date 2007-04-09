@@ -26,17 +26,19 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 
 public class SimpleRetryConnectionStrategy extends AbstractConnectionStrategy
 {
+    public static final int DEFAULT_FREQUENCY = 2000;
+    public static final int DEFAULT_RETRY_COUNT = 2;
 
     protected static class RetryCounter extends ThreadLocal
     {
         public int countRetry()
         {
-            return ((AtomicInteger)get()).incrementAndGet();
+            return ((AtomicInteger) get()).incrementAndGet();
         }
         
         public void reset()
         {
-            ((AtomicInteger)get()).set(0);
+            ((AtomicInteger) get()).set(0);
         }
 
         //@Override
@@ -56,8 +58,8 @@ public class SimpleRetryConnectionStrategy extends AbstractConnectionStrategy
 
     protected static final ThreadLocal called = new ThreadLocal();
 
-    private volatile int retryCount = 2;
-    private volatile long frequency = 2000;
+    private volatile int retryCount = DEFAULT_RETRY_COUNT;
+    private volatile long frequency = DEFAULT_FREQUENCY;
 
     protected void doConnect(UMOConnectable connectable) throws FatalConnectException
     {

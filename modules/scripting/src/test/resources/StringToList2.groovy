@@ -1,1 +1,1 @@
-return src.toString().tokenize(" ")
+return src.toString().tokenize()

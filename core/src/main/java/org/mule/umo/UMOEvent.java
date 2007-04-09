@@ -28,9 +28,9 @@ import java.io.OutputStream;
  */
 public interface UMOEvent
 {
-    public static final int TIMEOUT_WAIT_FOREVER = 0;
-    public static final int TIMEOUT_DO_NOT_WAIT = -1;
-    public static final int TIMEOUT_NOT_SET_VALUE = Integer.MIN_VALUE;
+    int TIMEOUT_WAIT_FOREVER = 0;
+    int TIMEOUT_DO_NOT_WAIT = -1;
+    int TIMEOUT_NOT_SET_VALUE = Integer.MIN_VALUE;
 
     /**
      * Returns the message payload for this event
@@ -39,7 +39,7 @@ public interface UMOEvent
      */
     UMOMessage getMessage();
 
-    public UMOCredentials getCredentials();
+    UMOCredentials getCredentials();
 
     /**
      * Reterns the conents of the message as a byte array.

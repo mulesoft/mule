@@ -62,12 +62,12 @@ public abstract class AbstractMessageBuilder implements UMODescriptorAware, Call
             List endpoints = new ArrayList();
             for (Iterator iterator = descriptor.getOutboundRouter().getRouters().iterator(); iterator.hasNext();)
             {
-                UMOOutboundRouter router = (UMOOutboundRouter)iterator.next();
+                UMOOutboundRouter router = (UMOOutboundRouter) iterator.next();
                 endpoints.addAll(router.getEndpoints());
             }
             for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
             {
-                UMOEndpoint endpoint = (UMOEndpoint)iterator.next();
+                UMOEndpoint endpoint = (UMOEndpoint) iterator.next();
                 boolean rsync = eventContext.getMessage().getBooleanProperty(
                     MuleProperties.MULE_REMOTE_SYNC_PROPERTY, endpoint.isRemoteSync());
                 if (!rsync)

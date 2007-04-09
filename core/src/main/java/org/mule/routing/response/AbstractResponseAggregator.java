@@ -124,7 +124,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
 
                     // add the new response message so that it can be collected by
                     // the response Thread
-                    UMOMessage previousResult = (UMOMessage)responseMessages.putIfAbsent(groupId,
+                    UMOMessage previousResult = (UMOMessage) responseMessages.putIfAbsent(groupId,
                         returnMessage);
                     if (previousResult != null)
                     {
@@ -138,7 +138,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
                     // will get/create a latch for the response Message ID and
                     // release it, notifying other threads that the response message
                     // is available
-                    Latch l = (Latch)locks.get(groupId);
+                    Latch l = (Latch) locks.get(groupId);
                     if (l == null)
                     {
                         if (logger.isDebugEnabled())
@@ -147,7 +147,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
                         }
 
                         l = new Latch();
-                        Latch previous = (Latch)locks.putIfAbsent(groupId, l);
+                        Latch previous = (Latch) locks.putIfAbsent(groupId, l);
                         if (previous != null)
                         {
                             l = previous;
@@ -181,7 +181,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
      */
     protected EventGroup getEventGroup(Object groupId)
     {
-        return (EventGroup)eventGroups.get(groupId);
+        return (EventGroup) eventGroups.get(groupId);
     }
 
     /**
@@ -189,7 +189,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
      */
     protected EventGroup addEventGroup(EventGroup group)
     {
-        EventGroup previous = (EventGroup)eventGroups.putIfAbsent(group.getGroupId(), group);
+        EventGroup previous = (EventGroup) eventGroups.putIfAbsent(group.getGroupId(), group);
         // a parallel thread might have removed the EventGroup already,
         // therefore we need to validate our current reference
         return (previous != null ? previous : group);
@@ -220,7 +220,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
             logger.debug("Waiting for response for message id: " + responseId + " in " + this);
         }
 
-        Latch l = (Latch)locks.get(responseId);
+        Latch l = (Latch) locks.get(responseId);
         if (l == null)
         {
             if (logger.isDebugEnabled())
@@ -230,7 +230,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
             }
 
             l = new Latch();
-            Latch previous = (Latch)locks.putIfAbsent(responseId, l);
+            Latch previous = (Latch) locks.putIfAbsent(responseId, l);
             if (previous != null)
             {
                 l = previous;
@@ -278,7 +278,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
         finally
         {
             locks.remove(responseId);
-            result = (UMOMessage)responseMessages.remove(responseId);
+            result = (UMOMessage) responseMessages.remove(responseId);
 
             if (interruptedWhileWaiting)
             {

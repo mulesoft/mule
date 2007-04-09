@@ -59,7 +59,7 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
                     "endpointAddress"), this);
             }
             // Create a session for sending notifications
-            session = new MuleSession(new MuleMessage(NullPayload.getInstance(), (Map)null), new NullSessionHandler());
+            session = new MuleSession(new MuleMessage(NullPayload.getInstance(), (Map) null), new NullSessionHandler());
         }
         catch (Exception e)
         {
@@ -73,7 +73,7 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
         {
             try
             {
-                UMOMessage msg = new MuleMessage(e.toString(), (Map)null);
+                UMOMessage msg = new MuleMessage(e.toString(), (Map) null);
                 UMOEvent event = new MuleEvent(msg, logEndpoint, session, false);
                 logEndpoint.dispatch(event);
             }

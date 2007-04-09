@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+        "http://mule.mulesource.org/dtds/mule-configuration.dtd">
 
 <!--
 This loan broker example is modeled on the Enterprise integration Patterns book
@@ -17,7 +17,8 @@ that receives the results form each of the banks and selects the lowest quote.
     <endpoint-identifiers>
         <endpoint-identifier name="LoanBrokerRequests" value="vm://LoanBrokerRequests"/>
         <endpoint-identifier name="LoanBrokerQuotes" value="vm://LoanQuotes"/>
-        <endpoint-identifier name="CreditAgency" value="axis:http://localhost:18080/mule/CreditAgencyService?method=getCreditProfile"/>
+        <endpoint-identifier name="CreditAgency"
+                             value="axis:http://localhost:18080/mule/CreditAgencyService?method=getCreditProfile"/>
         <endpoint-identifier name="CreditAgencyReceiver" value="axis:http://localhost:18080/mule"/>
         <endpoint-identifier name="LenderService" value="vm://LenderService?method=setLenderList"/>
         <!-- The method parameter for the bank endpoints is added programmitcally when the bank objects are
@@ -29,75 +30,80 @@ that receives the results form each of the banks and selects the lowest quote.
         <endpoint-identifier name="Bank5" value="axis:http://localhost:50080/mule"/>
     </endpoint-identifiers>
 
-    <mule-descriptor name="LoanBroker"
-        implementation="org.mule.samples.loanbroker.SyncLoanBroker">
-        <inbound-router>
-            <endpoint address="LoanBrokerRequests"/>
-        </inbound-router>
+    <model name="main" type="inherited">
 
-        <outbound-router>
-            <router className="org.mule.routing.outbound.FilteringOutboundRouter">
-                <endpoint address="CreditAgency"/>
-                <filter expectedType="org.mule.samples.loanbroker.Customer" className="org.mule.routing.filters.PayloadTypeFilter"/>
-            </router>
-            <router className="org.mule.routing.outbound.FilteringOutboundRouter">
+        <mule-descriptor name="LoanBroker"
+                         implementation="org.mule.samples.loanbroker.SyncLoanBroker">
+            <inbound-router>
+                <endpoint address="LoanBrokerRequests"/>
+            </inbound-router>
+
+            <outbound-router>
+                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
+                    <endpoint address="CreditAgency"/>
+                    <filter expectedType="org.mule.samples.loanbroker.Customer"
+                            className="org.mule.routing.filters.PayloadTypeFilter"/>
+                </router>
+                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
+                    <endpoint address="LenderService"/>
+                    <filter expectedType="org.mule.samples.loanbroker.BankQuoteRequest"
+                            className="org.mule.routing.filters.PayloadTypeFilter"/>
+                </router>
+            </outbound-router>
+            <response-router timeout="100000">
+                <endpoint address="LoanBrokerQuotes"/>
+                <router className="org.mule.samples.loanbroker.routers.BankQuotesResponseAggregator"/>
+            </response-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="CreditAgencyService"
+                         implementation="org.mule.samples.loanbroker.DefaultCreditAgencyService">
+            <inbound-router>
+                <endpoint address="CreditAgencyReceiver"/>
+            </inbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="LenderService"
+                         implementation="org.mule.samples.loanbroker.DefaultLenderService">
+            <inbound-router>
                 <endpoint address="LenderService"/>
-                <filter expectedType="org.mule.samples.loanbroker.BankQuoteRequest" className="org.mule.routing.filters.PayloadTypeFilter"/>
-            </router>
-        </outbound-router>
-        <response-router timeout="100000">
-            <endpoint address="LoanBrokerQuotes"/>
-            <router className="org.mule.samples.loanbroker.routers.BankQuotesResponseAggregator"/>
-        </response-router>
-    </mule-descriptor>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.StaticRecipientList">
+                    <reply-to address="LoanBrokerQuotes"/>
+                    <filter expression="recipients!=null" className="org.mule.routing.filters.MessagePropertyFilter"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
 
-    <mule-descriptor name="CreditAgencyService"
-        implementation="org.mule.samples.loanbroker.DefaultCreditAgencyService">
-        <inbound-router>
-            <endpoint address="CreditAgencyReceiver"/>
-        </inbound-router>
-    </mule-descriptor>
+        <mule-descriptor name="Bank1" implementation="org.mule.samples.loanbroker.Bank">
+            <inbound-router>
+                <endpoint address="Bank1"/>
+            </inbound-router>
+        </mule-descriptor>
 
-    <mule-descriptor name="LenderService"
-        implementation="org.mule.samples.loanbroker.DefaultLenderService">
-        <inbound-router>
-            <endpoint address="LenderService"/>
-        </inbound-router>
-        <outbound-router>
-            <router className="org.mule.routing.outbound.StaticRecipientList">
-                <reply-to address="LoanBrokerQuotes"/>
-                <filter expression="recipients!=null" className="org.mule.routing.filters.MessagePropertyFilter"/>
-            </router>
-        </outbound-router>
-    </mule-descriptor>
+        <mule-descriptor name="Bank2" implementation="org.mule.samples.loanbroker.Bank">
+            <inbound-router>
+                <endpoint address="Bank2"/>
+            </inbound-router>
+        </mule-descriptor>
 
-    <mule-descriptor name="Bank1" implementation="org.mule.samples.loanbroker.Bank">
-        <inbound-router>
-            <endpoint address="Bank1"/>
-        </inbound-router>
-    </mule-descriptor>
+        <mule-descriptor name="Bank3" implementation="org.mule.samples.loanbroker.Bank">
+            <inbound-router>
+                <endpoint address="Bank3"/>
+            </inbound-router>
+        </mule-descriptor>
 
-    <mule-descriptor name="Bank2" implementation="org.mule.samples.loanbroker.Bank">
-        <inbound-router>
-            <endpoint address="Bank2"/>
-        </inbound-router>
-    </mule-descriptor>
+        <mule-descriptor name="Bank4" implementation="org.mule.samples.loanbroker.Bank">
+            <inbound-router>
+                <endpoint address="Bank4"/>
+            </inbound-router>
+        </mule-descriptor>
 
-    <mule-descriptor name="Bank3" implementation="org.mule.samples.loanbroker.Bank">
-        <inbound-router>
-            <endpoint address="Bank3"/>
-        </inbound-router>
-    </mule-descriptor>
-
-    <mule-descriptor name="Bank4" implementation="org.mule.samples.loanbroker.Bank">
-        <inbound-router>
-            <endpoint address="Bank4"/>
-        </inbound-router>
-    </mule-descriptor>
-
-    <mule-descriptor name="Bank5" implementation="org.mule.samples.loanbroker.Bank">
-        <inbound-router>
-            <endpoint address="Bank5"/>
-        </inbound-router>
-    </mule-descriptor>
+        <mule-descriptor name="Bank5" implementation="org.mule.samples.loanbroker.Bank">
+            <inbound-router>
+                <endpoint address="Bank5"/>
+            </inbound-router>
+        </mule-descriptor>
+    </model>
 </mule-configuration>

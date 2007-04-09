@@ -13,8 +13,8 @@ package org.mule.impl.model.seda.optimised;
 import org.mule.config.pool.CommonsPoolProxyFactory;
 import org.mule.impl.MuleDescriptor;
 import org.mule.umo.UMOException;
-import org.mule.umo.model.UMOModel;
 import org.mule.umo.lifecycle.Callable;
+import org.mule.umo.model.UMOModel;
 
 /**
  * Creates an optimised Mule proxy for pooling which does away with the reflection
@@ -34,6 +34,6 @@ public class OptimisedProxyFactory extends CommonsPoolProxyFactory
             throw new IllegalArgumentException("Components for the Optimised Mule proxy must implement: "
                                                + Callable.class.getName());
         }
-        return new OptimisedMuleProxy((Callable)component, descriptor, pool);
+        return new OptimisedMuleProxy((Callable) component, descriptor, pool);
     }
 }

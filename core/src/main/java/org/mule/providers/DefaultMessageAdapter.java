@@ -71,7 +71,7 @@ public class DefaultMessageAdapter extends AbstractMessageAdapter
             }
             for (Iterator iterator = previous.getAttachmentNames().iterator(); iterator.hasNext();)
             {
-                String name = (String)iterator.next();
+                String name = (String) iterator.next();
                 try
                 {
                     addAttachment(name, previous.getAttachment(name));
@@ -83,7 +83,7 @@ public class DefaultMessageAdapter extends AbstractMessageAdapter
             }
             for (Iterator iterator = previous.getPropertyNames().iterator(); iterator.hasNext();)
             {
-                String name = (String)iterator.next();
+                String name = (String) iterator.next();
                 try
                 {
                     setProperty(name, previous.getProperty(name));
@@ -138,11 +138,11 @@ public class DefaultMessageAdapter extends AbstractMessageAdapter
         {
             if (encoding != null)
             {
-                return new String((byte[])message, encoding);
+                return new String((byte[]) message, encoding);
             }
             else
             {
-                return new String((byte[])message);
+                return new String((byte[]) message);
             }
         }
         else

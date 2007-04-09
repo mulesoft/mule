@@ -16,28 +16,28 @@ import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 public abstract class SynchronizedVariable implements Executor
 {
     // @GuardedBy(itself)
-    protected final Object _lock;
+    protected final Object lock;
 
     public SynchronizedVariable()
     {
         super();
-        _lock = this;
+        lock = this;
     }
 
     public SynchronizedVariable(Object lock)
     {
         super();
-        _lock = lock;
+        this.lock = lock;
     }
 
     public Object getLock()
     {
-        return _lock;
+        return lock;
     }
 
     public void execute(Runnable command)
     {
-        synchronized (_lock)
+        synchronized (lock)
         {
             command.run();
         }

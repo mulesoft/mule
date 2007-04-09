@@ -50,11 +50,11 @@ public class CollectionUtils extends org.apache.commons.collections.CollectionUt
 
         if (objects.isEmpty())
         {
-            return (Object[])Array.newInstance(clazz, 0);
+            return (Object[]) Array.newInstance(clazz, 0);
         }
 
         int i = 0, size = objects.size();
-        Object[] result = (Object[])Array.newInstance(clazz, size);
+        Object[] result = (Object[]) Array.newInstance(clazz, size);
         Iterator iter = objects.iterator();
 
         while (i < size && iter.hasNext())
@@ -129,7 +129,7 @@ public class CollectionUtils extends org.apache.commons.collections.CollectionUt
 
             if (item instanceof Class)
             {
-                buf.append(((Class)item).getName());
+                buf.append(((Class) item).getName());
             }
             else
             {
@@ -150,7 +150,7 @@ public class CollectionUtils extends org.apache.commons.collections.CollectionUt
         Object lastItem = items.next();
         if (lastItem instanceof Class)
         {
-            buf.append(((Class)lastItem).getName());
+            buf.append(((Class) lastItem).getName());
         }
         else
         {

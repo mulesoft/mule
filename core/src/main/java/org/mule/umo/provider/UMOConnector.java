@@ -10,6 +10,7 @@
 
 package org.mule.umo.provider;
 
+import org.mule.impl.ManagementContextAware;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
@@ -22,7 +23,6 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.Lifecycle;
 import org.mule.umo.lifecycle.Registerable;
-import org.mule.impl.ManagementContextAware;
 
 import java.beans.ExceptionListener;
 import java.io.InputStream;
@@ -34,7 +34,7 @@ import java.io.OutputStream;
  */
 public interface UMOConnector extends Lifecycle, Initialisable, Registerable, ManagementContextAware
 {
-    public static final int INT_VALUE_NOT_SET = -1;
+    int INT_VALUE_NOT_SET = -1;
 
     /**
      * This creates a <code>UMOMessageReceiver</code> associated with this endpoint
@@ -152,7 +152,7 @@ public interface UMOConnector extends Lifecycle, Initialisable, Registerable, Ma
      */
     UMOMessageDispatcherFactory getDispatcherFactory();
 
-    public boolean isRemoteSyncEnabled();
+    boolean isRemoteSyncEnabled();
 
     /**
      * Dispatches an event from the endpoint to the external system

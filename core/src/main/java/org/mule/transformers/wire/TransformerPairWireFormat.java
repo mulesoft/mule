@@ -85,7 +85,7 @@ public class TransformerPairWireFormat implements WireFormat
                 byte[] bytes;
                 if (result instanceof byte[])
                 {
-                    bytes = (byte[])result;
+                    bytes = (byte[]) result;
                 }
                 else
                 {
@@ -96,12 +96,12 @@ public class TransformerPairWireFormat implements WireFormat
             }
             else if (returnClass.equals(byte[].class))
             {
-                byte[] b = (byte[])outboundTransformer.transform(o);
+                byte[] b = (byte[]) outboundTransformer.transform(o);
                 out.write(b);
             }
             else if (returnClass.equals(String.class))
             {
-                String s = (String)outboundTransformer.transform(o);
+                String s = (String) outboundTransformer.transform(o);
                 out.write(s.getBytes(encoding));
             }
             else

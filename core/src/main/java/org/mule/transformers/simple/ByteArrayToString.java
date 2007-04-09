@@ -39,7 +39,7 @@ public class ByteArrayToString extends AbstractTransformer
         {
             try
             {
-                return new String((byte[])src, encoding);
+                return new String((byte[]) src, encoding);
             }
             catch (UnsupportedEncodingException e)
             {

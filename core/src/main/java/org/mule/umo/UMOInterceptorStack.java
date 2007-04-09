@@ -13,10 +13,7 @@ package org.mule.umo;
 import java.util.List;
 
 /**
- * Maintains a list of interceptors
- * 
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
+ * Maintains a list of interceptors.
  */
 public interface UMOInterceptorStack extends UMOInterceptor
 {

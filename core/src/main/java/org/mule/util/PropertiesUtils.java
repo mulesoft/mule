@@ -30,7 +30,7 @@ import org.apache.commons.lang.StringUtils;
  * property Maps.
  */
 // @ThreadSafe
-public class PropertiesUtils
+public final class PropertiesUtils
 {
     // @GuardedBy(itself)
     private static final List maskedProperties = new CopyOnWriteArrayList();
@@ -40,6 +40,12 @@ public class PropertiesUtils
         // When printing property lists mask password fields
         // Users can register their own fields to mask
         registerMaskedPropertyName("password");
+    }
+
+    /** Do not instanciate. */
+    protected PropertiesUtils ()
+    {
+        // no-op
     }
 
     /**
@@ -146,8 +152,8 @@ public class PropertiesUtils
         Map.Entry entry;
         for (Iterator iter = properties.entrySet().iterator(); iter.hasNext();)
         {
-            entry = (Map.Entry)iter.next();
-            props.put(removeNamespacePrefix((String)entry.getKey()), entry.getValue());
+            entry = (Map.Entry) iter.next();
+            props.put(removeNamespacePrefix((String) entry.getKey()), entry.getValue());
 
         }
         return props;
@@ -166,7 +172,7 @@ public class PropertiesUtils
     {
         for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();)
         {
-            Map.Entry entry = (Map.Entry)iterator.next();
+            Map.Entry entry = (Map.Entry) iterator.next();
             Object key = entry.getKey();
             if (key.toString().startsWith(prefix))
             {
@@ -180,7 +186,7 @@ public class PropertiesUtils
         Map newProps = new HashMap();
         for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();)
         {
-            Map.Entry entry = (Map.Entry)iterator.next();
+            Map.Entry entry = (Map.Entry) iterator.next();
             Object key = entry.getKey();
             if (!key.toString().startsWith(prefix))
             {

@@ -60,7 +60,7 @@ public class StreamingComponent extends AbstractComponent
         // Right now we do not support transformers on the Streaming model
         for (Iterator iterator = descriptor.getInboundRouter().getEndpoints().iterator(); iterator.hasNext();)
         {
-            UMOImmutableEndpoint ep = (UMOImmutableEndpoint)iterator.next();
+            UMOImmutableEndpoint ep = (UMOImmutableEndpoint) iterator.next();
             if (!ep.isStreaming())
             {
                 throw new InitialisationException(new Message(
@@ -76,7 +76,7 @@ public class StreamingComponent extends AbstractComponent
         }
         if (component instanceof Initialisable)
         {
-            ((Initialisable)component).initialise();
+            ((Initialisable) component).initialise();
         }
 
         try
@@ -117,7 +117,7 @@ public class StreamingComponent extends AbstractComponent
     {
         if (component instanceof Disposable)
         {
-            ((Disposable)component).dispose();
+            ((Disposable) component).dispose();
         }
     }
 }

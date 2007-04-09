@@ -42,7 +42,7 @@ public class FilteringListMessageSplitter extends AbstractMessageSplitter
         if (message.getPayload() instanceof List)
         {
             // get a copy of the list
-            List payload = new LinkedList((List)message.getPayload());
+            List payload = new LinkedList((List) message.getPayload());
             payloadContext.set(payload);
 
             if (enableCorrelation != ENABLE_CORRELATION_NEVER)
@@ -69,7 +69,7 @@ public class FilteringListMessageSplitter extends AbstractMessageSplitter
         Map props = new HashMap();
         for (Iterator iterator = message.getPropertyNames().iterator(); iterator.hasNext();)
         {
-            String propertyKey = (String)iterator.next();
+            String propertyKey = (String) iterator.next();
             props.put(propertyKey, message.getProperty(propertyKey));
         }
         propertiesContext.set(props);
@@ -80,12 +80,12 @@ public class FilteringListMessageSplitter extends AbstractMessageSplitter
      */
     protected UMOMessage getMessagePart(UMOMessage message, UMOEndpoint endpoint)
     {
-        List payloads = (List)payloadContext.get();
+        List payloads = (List) payloadContext.get();
 
         for (Iterator i = payloads.iterator(); i.hasNext();)
         {
             Object payload = i.next();
-            UMOMessage result = new MuleMessage(payload, (Map)propertiesContext.get());
+            UMOMessage result = new MuleMessage(payload, (Map) propertiesContext.get());
             // If there is no filter assume that the endpoint can accept the
             // message. Endpoints will be processed in order to only the last
             // (if any) of the the endpoints may not have a filter

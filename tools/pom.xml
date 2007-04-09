@@ -14,6 +14,10 @@
     <name>Mule Tools</name>
     <description>Tools for building and working with Mule projects.</description>
     
+    <modules>
+        <module>visualizer</module>
+    </modules>
+
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>

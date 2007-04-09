@@ -14,7 +14,8 @@ import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.transformer.TransformerException;
 
-import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -28,13 +29,31 @@ import java.util.Set;
  */
 public class MessagePropertiesTransformer extends AbstractEventAwareTransformer
 {
-    private Set deleteProperties = Collections.EMPTY_SET;
-    private Map addProperties = Collections.EMPTY_MAP;
+    private Set deleteProperties = null;
+    private Map addProperties = null;
 
     public MessagePropertiesTransformer()
     {
         registerSourceType(Object.class);
         setReturnClass(Object.class);
+    }
+
+    // @Override
+    public Object clone() throws CloneNotSupportedException
+    {
+        MessagePropertiesTransformer clone = (MessagePropertiesTransformer) super.clone();
+
+        if (deleteProperties != null)
+        {
+            clone.setDeleteProperties(new HashSet(deleteProperties));
+        }
+
+        if (addProperties != null)
+        {
+            clone.setAddProperties(new HashMap(addProperties));
+        }
+
+        return clone;
     }
 
     public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
@@ -52,7 +71,7 @@ public class MessagePropertiesTransformer extends AbstractEventAwareTransformer
         {
             for (Iterator iterator = addProperties.entrySet().iterator(); iterator.hasNext();)
             {
-                Map.Entry entry = (Map.Entry)iterator.next();
+                Map.Entry entry = (Map.Entry) iterator.next();
                 if (entry.getKey() == null)
                 {
                     logger.error("Setting Null property keys is not supported, this entry is being ignored");
@@ -63,6 +82,7 @@ public class MessagePropertiesTransformer extends AbstractEventAwareTransformer
                 }
             }
         }
+
         return context.getMessage();
     }
 
@@ -85,4 +105,5 @@ public class MessagePropertiesTransformer extends AbstractEventAwareTransformer
     {
         this.addProperties = addProperties;
     }
+
 }

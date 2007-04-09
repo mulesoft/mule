@@ -47,7 +47,7 @@ public class IdempotentSecureHashReceiver extends IdempotentReceiver
         try
         {
             MessageDigest md = MessageDigest.getInstance(messageDigestAlgorithm);
-            return byteArrayToHexString.transform(md.digest((byte[])objectToByteArray.transform(event.getMessage()
+            return byteArrayToHexString.transform(md.digest((byte[]) objectToByteArray.transform(event.getMessage()
                 .getPayload())));
         }
         catch (NoSuchAlgorithmException nsa)

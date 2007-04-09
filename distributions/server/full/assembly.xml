@@ -5,7 +5,7 @@ Assembly descriptor for the full Mule distribution.
   <id>full</id>
   <formats>
     <format>zip</format>
-    <format>tar.gz</format>
+    <!--<format>tar.gz</format>-->
   </formats>
 
   <fileSets>
@@ -756,6 +756,7 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule.examples:mule-example-echo</exclude>
         <exclude>org.mule.examples:mule-example-errorhandler</exclude>
         <exclude>org.mule.examples:mule-example-hello</exclude>
+        <exclude>org.mule.examples:mule-example-loanbroker-common</exclude>
         <exclude>org.mule.examples:mule-example-loanbroker-esn</exclude>
         <exclude>org.mule.examples:mule-example-loanbroker-esb</exclude>
         <exclude>org.mule.examples:mule-example-loanbroker-credit-agency</exclude>
@@ -764,11 +765,19 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule.examples:mule-example-voipservice</exclude>
         <!-- Workaround, see comment for "<packaging>jar</packaging>" in the pom.xml -->
         <exclude>org.mule.distributions:mule-full</exclude>
+<<<<<<< .working
         <!-- TODO Remove these -->
+=======
+        <!-- TODO The following exclusions shouldn't be necessary here if they are kept 
+        out in their originating POMs, need to do some transitive dependency debugging
+        to figure out who is dragging them into the distro. -->
+        <exclude>org.mule.tests:mule-tests-functional</exclude>
+>>>>>>> .merge-right.r5844
         <exclude>javax.activation:activation</exclude>
         <exclude>javax.mail:mail</exclude>
-
         <exclude>commons-logging:commons-logging</exclude>
+
+        <exclude>org.apache.activemq:apache-activemq</exclude>
       </excludes>
     </dependencySet>
 
@@ -782,6 +791,7 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.examples:mule-example-echo</include>
         <include>org.mule.examples:mule-example-errorhandler</include>
         <include>org.mule.examples:mule-example-hello</include>
+        <include>org.mule.examples:mule-example-loanbroker-common</include>
         <include>org.mule.examples:mule-example-loanbroker-esn</include>
         <include>org.mule.examples:mule-example-loanbroker-esb</include>
         <include>org.mule.examples:mule-example-loanbroker-credit-agency</include>

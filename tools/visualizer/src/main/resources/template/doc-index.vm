@@ -1,0 +1,17 @@
+#include( "template/header.html" )
+
+<h1>MuleDoc index</h1>
+<ul>
+<p>
+find below the generated documentation for the given mule configuration files :
+</p>
+<br/>
+<ul>
+<table> 
+#foreach( $file in $fileList ) 
+    <tr><td>$velocityCount</td><td><a href="$file.Name">$file.Name</a></td></tr> 
+#end 
+</table>
+</ul>
+</ul>
+#include( "template/footer.html" )

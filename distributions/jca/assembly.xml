@@ -114,6 +114,8 @@ Assembly descriptor for the Mule JCA distribution.
                 <exclude>org.mule.examples:mule-example-stockquote</exclude>
                 <exclude>org.mule.examples:mule-example-voipservice</exclude>
 
+                <exclude>org.apache.activemq:apache-activemq</exclude>
+                
                 <!-- Workaround, see comment for "<packaging>jar</packaging>" in the pom.xml -->
                 <exclude>org.mule.distributions:mule-jca</exclude>
             </excludes>

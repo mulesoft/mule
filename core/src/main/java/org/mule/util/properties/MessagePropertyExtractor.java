@@ -21,7 +21,7 @@ public class MessagePropertyExtractor implements PropertyExtractor
     {
         if (message instanceof UMOMessage)
         {
-            return ((UMOMessage)message).getProperty(name);
+            return ((UMOMessage) message).getProperty(name);
         }
         return null;
     }

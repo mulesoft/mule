@@ -16,17 +16,18 @@ import org.mule.umo.transformer.TransformerException;
 import org.apache.commons.beanutils.PropertyUtils;
 
 /**
- * Looks up a property/field from a JavaBean using PropertyUtils.getProperty()
+ * Looks up a property from a JavaBean using PropertyUtils.getProperty().
+ * Nested properties are valid, assuming they follow JavaBean conventions.
  * 
  *   <transformer name="ExtractCustomer" className="org.mule.transformers.simple.GetBeanProperty">
  *       <properties>
- *           <property name="field" value="customerRequest.customer" />
+ *           <property name="propertyName" value="customerRequest.customer" />
  *       </properties>
  *   </transformer>
  */
 public class GetBeanProperty extends AbstractTransformer
 {
-    private String field;
+    private String propertyName;
     
     public GetBeanProperty()
     {
@@ -39,7 +40,7 @@ public class GetBeanProperty extends AbstractTransformer
     {
         try
         {
-            return PropertyUtils.getProperty(src, this.field);
+            return PropertyUtils.getProperty(src, this.propertyName);
         }
         catch (Exception e)
         {
@@ -47,13 +48,14 @@ public class GetBeanProperty extends AbstractTransformer
         }
     }
 
-    public String getField()
+    public String getPropertyName()
     {
-        return field;
+        return propertyName;
     }
 
-    public void setField(String field)
+    public void setPropertyName(String propertyName)
     {
-        this.field = field;
+        this.propertyName = propertyName;
     }
+
 }

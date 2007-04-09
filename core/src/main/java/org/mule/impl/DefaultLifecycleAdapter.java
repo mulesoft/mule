@@ -285,19 +285,19 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
                     List methods = 
                         ClassUtils.getSatisfiableMethods(component.getClass(), 
                             new Class[]{nestedRouter.getInterface()}, true, false, null);
-                    if(methods.size()==1)
+                    if (methods.size() == 1)
                     {
-                        setterMethod = (Method)methods.get(0);
+                        setterMethod = (Method) methods.get(0);
                     }
-                    else if(methods.size() > 1)
+                    else if (methods.size() > 1)
                     {
                         throw new TooManySatisfiableMethodsException(
-                            component.getClass(), new Class[]{nestedRouter.getInterface()});
+                                component.getClass(), new Class[]{nestedRouter.getInterface()});
                     }
                     else
                     {
                         throw new NoSatisfiableMethodsException(
-                            component.getClass(), nestedRouter.getInterface());
+                                component.getClass(), nestedRouter.getInterface());
                     }
 
                     try

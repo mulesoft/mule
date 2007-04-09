@@ -38,11 +38,11 @@ public class ByteArrayToSerializable extends AbstractTransformer
         {
             if (src instanceof byte[])
             {
-                return SerializationUtils.deserialize((byte[])src);
+                return SerializationUtils.deserialize((byte[]) src);
             }
             else
             {
-                return SerializationUtils.deserialize((InputStream)src);
+                return SerializationUtils.deserialize((InputStream) src);
 
             }
         }

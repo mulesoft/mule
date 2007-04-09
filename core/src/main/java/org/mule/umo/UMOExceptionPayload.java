@@ -15,10 +15,7 @@ import java.util.Map;
 
 /**
  * <code>UMOExceptionPayload</code> is a message payload that contains exception
- * information that occurred during message processing
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * information that occurred during message processing.
  */
 public interface UMOExceptionPayload extends Serializable
 {

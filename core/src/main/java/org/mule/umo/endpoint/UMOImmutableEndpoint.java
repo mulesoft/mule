@@ -10,6 +10,7 @@
 
 package org.mule.umo.endpoint;
 
+import org.mule.providers.ConnectionStrategy;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOTransactionConfig;
@@ -19,7 +20,6 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatching;
 import org.mule.umo.security.UMOEndpointSecurityFilter;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.providers.ConnectionStrategy;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -31,23 +31,23 @@ import java.util.Map;
  */
 public interface UMOImmutableEndpoint extends Serializable, Initialisable, Registerable, UMOMessageDispatching
 {
-    public static final String INITIAL_STATE_STARTED = "started";
-    public static final String INITIAL_STATE_STOPPED = "stopped";
+    String INITIAL_STATE_STARTED = "started";
+    String INITIAL_STATE_STOPPED = "stopped";
 
     /** The endpoint is outbound */
-    public static final String ENDPOINT_TYPE_SENDER = "sender";
+    String ENDPOINT_TYPE_SENDER = "sender";
 
     /** The endpoint is indound */
-    public static final String ENDPOINT_TYPE_RECEIVER = "receiver";
+    String ENDPOINT_TYPE_RECEIVER = "receiver";
 
     /** The endpoint is either and will be set depending on how it is used */
-    public static final String ENDPOINT_TYPE_SENDER_AND_RECEIVER = "senderAndReceiver";
+    String ENDPOINT_TYPE_SENDER_AND_RECEIVER = "senderAndReceiver";
 
     /** The endpoit is a global endpoint */
     public static final String ENDPOINT_TYPE_GLOBAL = "global";
 
     /** The endpoint is a receive endpoint set on a response router */
-    public static final String ENDPOINT_TYPE_RESPONSE = "response";
+    String ENDPOINT_TYPE_RESPONSE = "response";
 
     /**
      * This specifes the communication endpointUri. This will have a different format

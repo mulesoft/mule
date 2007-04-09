@@ -20,7 +20,7 @@
             </inbound-router>
         </mule-descriptor>
 
-        <mule-descriptor name="testService2" implementation="org.mule.components.simple.NullComponent">
+        <mule-descriptor name="testService2" implementation="org.mule.components.simple.EchoComponent">
             <inbound-router>
                 <endpoint address="bpm://sendMessageProcess" />
             </inbound-router>

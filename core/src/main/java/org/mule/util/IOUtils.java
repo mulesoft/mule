@@ -169,7 +169,7 @@ public class IOUtils extends org.apache.commons.io.IOUtils
         {
             try
             {
-                url = (URL)AccessController.doPrivileged(new PrivilegedAction()
+                url = (URL) AccessController.doPrivileged(new PrivilegedAction()
                 {
                     public Object run()
                     {

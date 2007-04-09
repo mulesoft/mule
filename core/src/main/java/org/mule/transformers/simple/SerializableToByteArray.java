@@ -21,9 +21,10 @@ import org.apache.commons.lang.SerializationUtils;
 
 /**
  * <code>SerializableToByteArray</code> converts a serializable object or a String
- * to a byte array. If <code>UMOMessage</code> is added as a source type on this
- * transformer then the UMOMessage will be serialised. This is useful for transports
- * such as TCP where the message headers would normally be lost.
+ * to a byte array. If <code>UMOMessage</code> is configured as a source type on this
+ * transformer by calling <code>setAcceptUMOMessage(true)</code> then the UMOMessage
+ * will be serialised. This is useful for transports such as TCP where the message
+ * headers would normally be lost.
  */
 public class SerializableToByteArray extends AbstractEventAwareTransformer
 {
@@ -35,15 +36,32 @@ public class SerializableToByteArray extends AbstractEventAwareTransformer
         this.setReturnClass(byte[].class);
     }
 
+    public boolean isAcceptUMOMessage()
+    {
+        return this.isSourceTypeSupported(UMOMessage.class, true);
+    }
+
+    public void setAcceptUMOMessage(boolean value)
+    {
+        if (value)
+        {
+            this.registerSourceType(UMOMessage.class);
+        }
+        else
+        {
+            this.unregisterSourceType(UMOMessage.class);
+        }
+    }
+
     public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
     {
         /*
-         * If the UMOMessage source type has been registered that we can assume that
+         * If the UMOMessage source type has been registered then we can assume that
          * the whole message is to be serialised, not just the payload. This can be
          * useful for protocols such as tcp where the protocol does not support
-         * headers, thus the whole message needs to be serialized.
+         * headers and the whole message needs to be serialized.
          */
-        if (isSourceTypeSupported(UMOMessage.class, true))
+        if (this.isAcceptUMOMessage())
         {
             src = context.getMessage();
         }
@@ -54,7 +72,7 @@ public class SerializableToByteArray extends AbstractEventAwareTransformer
 
         try
         {
-            return SerializationUtils.serialize((Serializable)src);
+            return SerializationUtils.serialize((Serializable) src);
         }
         catch (Exception e)
         {

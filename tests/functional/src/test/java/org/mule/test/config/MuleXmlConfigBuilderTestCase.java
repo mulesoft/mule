@@ -149,7 +149,6 @@ public class MuleXmlConfigBuilderTestCase extends AbstractConfigBuilderTestCase
         UMOTransformer t = managementContext.getRegistry().lookupTransformer("TestCompressionTransformer");
         assertNotNull(t);
         assertTrue(t instanceof TestCompressionTransformer);
-        assertTrue(((TestCompressionTransformer)t).isSourceTypeSupported(String.class, true));
 
         // This will only work with the MuleXml Builder other implementations
         // will have to set this proerty manually or mimic Mules behaviour

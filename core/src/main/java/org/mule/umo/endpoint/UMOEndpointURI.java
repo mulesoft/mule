@@ -29,12 +29,12 @@ import java.util.Properties;
  */
 public interface UMOEndpointURI extends Serializable, Initialisable
 {
-    public static final String PROPERTY_ENDPOINT_NAME = "endpointName";
-    public static final String PROPERTY_ENDPOINT_URI = "address";
-    public static final String PROPERTY_CREATE_CONNECTOR = "createConnector";
-    public static final String PROPERTY_CONNECTOR_NAME = "connector";
-    public static final String PROPERTY_TRANSFORMERS = "transformers";
-    public static final String PROPERTY_RESPONSE_TRANSFORMERS = "responseTransformers";
+    String PROPERTY_ENDPOINT_NAME = "endpointName";
+    String PROPERTY_ENDPOINT_URI = "address";
+    String PROPERTY_CREATE_CONNECTOR = "createConnector";
+    String PROPERTY_CONNECTOR_NAME = "connector";
+    String PROPERTY_TRANSFORMERS = "transformers";
+    String PROPERTY_RESPONSE_TRANSFORMERS = "responseTransformers";
 
     String getAddress();
 

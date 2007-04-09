@@ -41,11 +41,11 @@ public class GZipCompressTransformer extends AbstractCompressionTransformer
             byte[] data = null;
             if (src instanceof byte[])
             {
-                data = (byte[])src;
+                data = (byte[]) src;
             }
             else
             {
-                data = SerializationUtils.serialize((Serializable)src);
+                data = SerializationUtils.serialize((Serializable) src);
             }
             return this.getStrategy().compressByteArray(data);
         }

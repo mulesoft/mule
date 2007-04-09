@@ -25,7 +25,8 @@ public class ScriptComponent extends Scriptable implements Callable
 {
     private Bindings bindings;
 
-    public void initialise() throws InitialisationException {
+    public void initialise() throws InitialisationException
+    {
         super.initialise();
         bindings = getScriptEngine().createBindings();
     }

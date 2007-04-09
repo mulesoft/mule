@@ -172,6 +172,7 @@ public class MuleServer implements Runnable
             cfgBuilderClassName = CLASSNAME_DEFAULT_IDLE_CONFIG_BUILDER;
         }
 
+        // Configuration builder
         if (cfgBuilderClassName != null)
         {
             try
@@ -296,11 +297,11 @@ public class MuleServer implements Runnable
         logger.info("Mule Server starting...");
 
         // install an RMI security manager in case we expose any RMI objects
-        if (System.getSecurityManager() == null)
-        {
+        //if (System.getSecurityManager() == null)
+        //{
             // TODO Why is this disabled?
             // System.setSecurityManager(new RMISecurityManager());
-        }
+        //}
 
         // create a new ConfigurationBuilder that is disposed afterwards
         Class cfgBuilderClass = ClassUtils.loadClass(getConfigBuilderClassName(), MuleServer.class);

@@ -46,7 +46,7 @@ public class MuleContainerContext extends AbstractContainerContext
             Class clazz;
             if (key instanceof Class)
             {
-                clazz = (Class)key;
+                clazz = (Class) key;
             }
             else
             {

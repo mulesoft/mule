@@ -25,11 +25,11 @@ public class NumberUtils extends org.apache.commons.lang.math.NumberUtils
         }
         else if (obj instanceof String)
         {
-            return toLong((String)obj);
+            return toLong((String) obj);
         }
         else if (obj instanceof Number)
         {
-            return ((Number)obj).longValue();
+            return ((Number) obj).longValue();
         }
         else
         {

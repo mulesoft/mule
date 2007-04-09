@@ -106,7 +106,7 @@ public class DefaultXASession implements XAResource
     public boolean isSameRM(XAResource xares) throws XAException
     {
         return xares instanceof DefaultXASession
-               && ((DefaultXASession)xares).getResourceManager().equals(resourceManager);
+               && ((DefaultXASession) xares).getResourceManager().equals(resourceManager);
     }
 
     public Xid[] recover(int flag) throws XAException
@@ -147,7 +147,7 @@ public class DefaultXASession implements XAResource
                 {
                     // TODO MULE-863: Is logging necessary?
                     logger.error("Could not create new transactional resource", e);
-                    throw (XAException)new XAException(e.getMessage()).initCause(e);
+                    throw (XAException) new XAException(e.getMessage()).initCause(e);
                 }
                 break;
             case TMRESUME :
@@ -195,13 +195,14 @@ public class DefaultXASession implements XAResource
                 case TMFAIL :
                     resourceManager.setTransactionRollbackOnly(localContext);
                     break;
-                case TMSUCCESS :
+                case TMSUCCESS : // no-op
+                default :        // no-op
                     break;
             }
         }
         catch (ResourceManagerException e)
         {
-            throw (XAException)new XAException(XAException.XAER_RMERR).initCause(e);
+            throw (XAException) new XAException(XAException.XAER_RMERR).initCause(e);
         }
         localXid = null;
         localContext = null;
@@ -244,7 +245,7 @@ public class DefaultXASession implements XAResource
         }
         catch (ResourceManagerException e)
         {
-            throw (XAException)new XAException(XAException.XAER_RMERR).initCause(e);
+            throw (XAException) new XAException(XAException.XAER_RMERR).initCause(e);
         }
         resourceManager.removeActiveTransactionalResource(xid);
         resourceManager.removeSuspendedTransactionalResource(xid);
@@ -271,7 +272,7 @@ public class DefaultXASession implements XAResource
         }
         catch (ResourceManagerException e)
         {
-            throw (XAException)new XAException(XAException.XAER_RMERR).initCause(e);
+            throw (XAException) new XAException(XAException.XAER_RMERR).initCause(e);
         }
         resourceManager.removeActiveTransactionalResource(xid);
         resourceManager.removeSuspendedTransactionalResource(xid);
@@ -306,7 +307,7 @@ public class DefaultXASession implements XAResource
         }
         catch (ResourceManagerException e)
         {
-            throw (XAException)new XAException(XAException.XAER_RMERR).initCause(e);
+            throw (XAException) new XAException(XAException.XAER_RMERR).initCause(e);
         }
     }
 

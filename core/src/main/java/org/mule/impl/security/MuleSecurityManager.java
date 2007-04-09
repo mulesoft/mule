@@ -50,13 +50,13 @@ public class MuleSecurityManager implements UMOSecurityManager
     {
         for (Iterator iterator = providers.values().iterator(); iterator.hasNext();)
         {
-            UMOSecurityProvider provider = (UMOSecurityProvider)iterator.next();
+            UMOSecurityProvider provider = (UMOSecurityProvider) iterator.next();
             provider.initialise();
         }
 
         for (Iterator iterator = cryptoStrategies.values().iterator(); iterator.hasNext();)
         {
-            UMOEncryptionStrategy strategy = (UMOEncryptionStrategy)iterator.next();
+            UMOEncryptionStrategy strategy = (UMOEncryptionStrategy) iterator.next();
             strategy.initialise();
         }
     }
@@ -70,7 +70,7 @@ public class MuleSecurityManager implements UMOSecurityManager
 
         while (iter.hasNext())
         {
-            UMOSecurityProvider provider = (UMOSecurityProvider)iter.next();
+            UMOSecurityProvider provider = (UMOSecurityProvider) iter.next();
 
             if (provider.supports(toTest))
             {
@@ -106,12 +106,12 @@ public class MuleSecurityManager implements UMOSecurityManager
         {
             throw new NullPointerException("provider Name cannot be null");
         }
-        return (UMOSecurityProvider)providers.get(name);
+        return (UMOSecurityProvider) providers.get(name);
     }
 
     public UMOSecurityProvider removeProvider(String name)
     {
-        return (UMOSecurityProvider)providers.remove(name);
+        return (UMOSecurityProvider) providers.remove(name);
     }
 
     public List getProviders()
@@ -123,7 +123,7 @@ public class MuleSecurityManager implements UMOSecurityManager
     {
         for (Iterator iterator = providers.iterator(); iterator.hasNext();)
         {
-            UMOSecurityProvider provider = (UMOSecurityProvider)iterator.next();
+            UMOSecurityProvider provider = (UMOSecurityProvider) iterator.next();
             addProvider(provider);
         }
     }
@@ -137,7 +137,7 @@ public class MuleSecurityManager implements UMOSecurityManager
 
         while (iter.hasNext())
         {
-            UMOSecurityProvider provider = (UMOSecurityProvider)iter.next();
+            UMOSecurityProvider provider = (UMOSecurityProvider) iter.next();
 
             if (provider.supports(toTest))
             {
@@ -149,7 +149,7 @@ public class MuleSecurityManager implements UMOSecurityManager
 
     public UMOEncryptionStrategy getEncryptionStrategy(String name)
     {
-        return (UMOEncryptionStrategy)cryptoStrategies.get(name);
+        return (UMOEncryptionStrategy) cryptoStrategies.get(name);
     }
 
     public void addEncryptionStrategy(String name, UMOEncryptionStrategy strategy)
@@ -159,7 +159,7 @@ public class MuleSecurityManager implements UMOSecurityManager
 
     public UMOEncryptionStrategy removeEncryptionStrategy(String name)
     {
-        return (UMOEncryptionStrategy)cryptoStrategies.remove(name);
+        return (UMOEncryptionStrategy) cryptoStrategies.remove(name);
 
     }
 

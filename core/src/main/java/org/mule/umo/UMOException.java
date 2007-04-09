@@ -51,14 +51,14 @@ public abstract class UMOException extends Exception
     public UMOException(Message message, Throwable cause)
     {
         super((cause instanceof InvocationTargetException
-                        ? ((InvocationTargetException)cause).getTargetException() : cause));
+                        ? ((InvocationTargetException) cause).getTargetException() : cause));
         setMessage(message);
     }
 
     public UMOException(Throwable cause)
     {
         super((cause instanceof InvocationTargetException
-                        ? ((InvocationTargetException)cause).getTargetException() : cause));
+                        ? ((InvocationTargetException) cause).getTargetException() : cause));
         setMessage(Message.createStaticMessage(cause.getMessage() + " (" + cause.getClass().getName() + ")"));
         initialise();
     }
@@ -165,7 +165,7 @@ public abstract class UMOException extends Exception
         Map info = ExceptionHelper.getExceptionInfo(this);
         for (Iterator iterator = info.keySet().iterator(); iterator.hasNext();)
         {
-            String s = (String)iterator.next();
+            String s = (String) iterator.next();
             int pad = 22 - s.length();
             buf.append(s);
             if (pad > 0)
@@ -204,7 +204,7 @@ public abstract class UMOException extends Exception
             return false;
         }
 
-        final UMOException umoException = (UMOException)o;
+        final UMOException umoException = (UMOException) o;
 
         if (errorCode != umoException.errorCode)
         {

@@ -14,7 +14,7 @@ import java.io.Serializable;
 
 public interface Fruit extends Serializable
 {
-    public void bite();
+    void bite();
 
-    public boolean isBitten();
+    boolean isBitten();
 }

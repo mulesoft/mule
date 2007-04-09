@@ -115,7 +115,7 @@ public class EventTimerTask extends TimerTask
             int count = listeners.size();
             for (int i = 0; i < count; i++)
             {
-                ((TimeEventListener)listeners.get(i)).timeExpired(event);
+                ((TimeEventListener) listeners.get(i)).timeExpired(event);
             }
         }
     }

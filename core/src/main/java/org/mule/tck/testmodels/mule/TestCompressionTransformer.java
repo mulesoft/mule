@@ -76,6 +76,7 @@ public class TestCompressionTransformer extends AbstractCompressionTransformer
             throw new IllegalStateException(
                 "Transformer cannot be cloned until all properties have been set on it");
         }
+
         return super.clone();
     }
 

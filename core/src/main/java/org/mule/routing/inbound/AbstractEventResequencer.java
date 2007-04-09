@@ -144,7 +144,7 @@ public abstract class AbstractEventResequencer extends SelectiveConsumer
      */
     protected EventGroup getEventGroup(Object groupId)
     {
-        return (EventGroup)eventGroups.get(groupId);
+        return (EventGroup) eventGroups.get(groupId);
     }
 
     /**
@@ -152,7 +152,7 @@ public abstract class AbstractEventResequencer extends SelectiveConsumer
      */
     protected EventGroup addEventGroup(EventGroup group)
     {
-        EventGroup previous = (EventGroup)eventGroups.putIfAbsent(group.getGroupId(), group);
+        EventGroup previous = (EventGroup) eventGroups.putIfAbsent(group.getGroupId(), group);
         // a parallel thread might have removed the EventGroup already,
         // therefore we need to validate our current reference
         return (previous != null ? previous : group);

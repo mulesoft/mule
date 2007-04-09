@@ -31,7 +31,7 @@ public class ObjectToFruitLover extends AbstractTransformer
         }
         else
         {
-            return new FruitLover((String)src);
+            return new FruitLover((String) src);
         }
     }
 

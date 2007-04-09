@@ -63,7 +63,7 @@ public class InterceptorStack implements UMOInterceptorStack, Initialisable, Dis
         {
             if (interceptors != null && cursor < interceptors.size())
             {
-                UMOInterceptor interceptor = (UMOInterceptor)interceptors.get(cursor);
+                UMOInterceptor interceptor = (UMOInterceptor) interceptors.get(cursor);
                 cursor++;
                 setMessage(interceptor.intercept(this));
             }
@@ -91,10 +91,10 @@ public class InterceptorStack implements UMOInterceptorStack, Initialisable, Dis
     {
         for (Iterator it = interceptors.iterator(); it.hasNext();)
         {
-            UMOInterceptor interceptor = (UMOInterceptor)it.next();
+            UMOInterceptor interceptor = (UMOInterceptor) it.next();
             if (interceptor instanceof Initialisable)
             {
-                ((Initialisable)interceptor).initialise();
+                ((Initialisable) interceptor).initialise();
             }
         }
     }
@@ -103,10 +103,10 @@ public class InterceptorStack implements UMOInterceptorStack, Initialisable, Dis
     {
         for (Iterator it = interceptors.iterator(); it.hasNext();)
         {
-            UMOInterceptor interceptor = (UMOInterceptor)it.next();
+            UMOInterceptor interceptor = (UMOInterceptor) it.next();
             if (interceptor instanceof Disposable)
             {
-                ((Disposable)interceptor).dispose();
+                ((Disposable) interceptor).dispose();
             }
         }
     }

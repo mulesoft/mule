@@ -56,7 +56,7 @@ public class SingleResponseRouter extends AbstractResponseAggregator
      */
     protected UMOMessage aggregateEvents(EventGroup events) throws RoutingException
     {
-        return ((UMOEvent)events.iterator().next()).getMessage();
+        return ((UMOEvent) events.iterator().next()).getMessage();
     }
 
 }

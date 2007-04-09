@@ -15,12 +15,13 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
 
 /**
- * <code>ObjectToXml</code> converts any object to xml using Xstream. Xstream uses
- * some cleaver tricks so objects that get marshalled to xml do not need to implement
+ * <code>ObjectToXml</code> converts any object to XML using Xstream. Xstream uses
+ * some clever tricks so objects that get marshalled to XML do not need to implement
  * any interfaces including Serializable and you don't even need to specify a default
- * constructor. If <code>UMOMessage</code> is added as a source type on this
- * transformer then the UMOMessage will be serialised. This is useful for transports
- * such as tcp where the message headers would normally be lost.
+ * constructor. If <code>UMOMessage</code> is configured as a source type on this
+ * transformer by calling <code>setAcceptUMOMessage(true)</code> then the UMOMessage
+ * will be serialised. This is useful for transports such as TCP where the message
+ * headers would normally be lost.
  */
 
 public class ObjectToXml extends AbstractXStreamTransformer
@@ -28,7 +29,24 @@ public class ObjectToXml extends AbstractXStreamTransformer
 
     public ObjectToXml()
     {
-        registerSourceType(Object.class);
+        this.registerSourceType(Object.class);
+    }
+
+    public boolean isAcceptUMOMessage()
+    {
+        return this.isSourceTypeSupported(UMOMessage.class, true);
+    }
+
+    public void setAcceptUMOMessage(boolean value)
+    {
+        if (value)
+        {
+            this.registerSourceType(UMOMessage.class);
+        }
+        else
+        {
+            this.unregisterSourceType(UMOMessage.class);
+        }
     }
 
     public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
@@ -39,13 +57,11 @@ public class ObjectToXml extends AbstractXStreamTransformer
          * can be useful for protocols such as tcp where the protocol does not
          * support headers, thus the whole messgae needs to be serialized
          */
-        if (isSourceTypeSupported(UMOMessage.class, true) && context != null)
+        if (this.isAcceptUMOMessage() && context != null)
         {
-            return getXStream().toXML(context.getMessage());
+            src = context.getMessage();
         }
-        else
-        {
-            return getXStream().toXML(src);
-        }
+
+        return this.getXStream().toXML(src);
     }
 }

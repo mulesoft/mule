@@ -39,6 +39,8 @@ import org.apache.log4j.xml.DOMConfigurator;
 public class Log4jNotificationLoggerAgent extends AbstractNotificationLoggerAgent
 {
 
+    protected static final int DEFAULT_DESCRIPTION_BUFFER_SIZE = 64;
+
     protected Logger eventLogger;
     private String logName = Log4jNotificationLoggerAgent.class.getName();
     private String logFile = null;
@@ -60,7 +62,7 @@ public class Log4jNotificationLoggerAgent extends AbstractNotificationLoggerAgen
      */
     public String getDescription()
     {
-        StringBuffer buf = new StringBuffer(64);
+        StringBuffer buf = new StringBuffer(DEFAULT_DESCRIPTION_BUFFER_SIZE);
         if (StringUtils.isNotBlank(logFile))
         {
             buf.append("Logging notifications to: ").append(logFile);

@@ -23,6 +23,7 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.TransformerException;
+import org.mule.util.ClassUtils;
 import org.mule.util.TemplateParser;
 
 import java.util.ArrayList;
@@ -81,7 +82,7 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
             {
                 for(int i = 0; i < inList.size(); i++)
                 {
-                    Class clazz = Class.forName(inList.get(i).toString());
+                    Class clazz = ClassUtils.loadClass(inList.get(i).toString(), this.getClass());
                     Handler handler = (Handler)clazz.getConstructor(null).newInstance(null);
                     service.addInHandler(handler);
                 }
@@ -92,7 +93,7 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
             {
                 for(int i = 0; i < outList.size(); i++)
                 {
-                    Class clazz = Class.forName(outList.get(i).toString());
+                    Class clazz = ClassUtils.loadClass(outList.get(i).toString(), this.getClass());
                     Handler handler = (Handler)clazz.getConstructor(null).newInstance(null);
                     service.addOutHandler(handler);
                 }
@@ -112,11 +113,28 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
 
     protected Client createXFireClient(UMOImmutableEndpoint endpoint, Service service, XFire xfire) throws Exception
     {
+        return createXFireClient(endpoint, service, xfire, null);
+    }
+
+    protected Client createXFireClient(UMOImmutableEndpoint endpoint, Service service, XFire xfire, String transportClass) throws Exception
+    {
     	Class transportClazz;
-    	if(connector.getClientTransport() == null)
-    		transportClazz = MuleUniversalTransport.class;
-    	else
-    		transportClazz = Class.forName(connector.getClientTransport());
+
+        if (connector.getClientTransport() == null)
+        {
+            if (!StringUtils.isBlank(transportClass))
+            {
+    	        transportClazz = ClassUtils.loadClass(transportClass, this.getClass());
+            }
+            else
+            {
+    	        transportClazz = MuleUniversalTransport.class;
+            }
+        }
+        else
+        {
+            transportClazz = ClassUtils.loadClass(connector.getClientTransport(), this.getClass());
+        }
 
     	Transport transport = (Transport)transportClazz.getConstructor(null).newInstance(null);
         Client client = new Client(transport, service, endpoint.getEndpointURI().toString());
@@ -130,7 +148,7 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
         {
             for(int i = 0; i < inList.size(); i++)
             {
-            	Class clazz = Class.forName(inList.get(i).toString());
+            	Class clazz = ClassUtils.loadClass(inList.get(i).toString(), this.getClass());
             	Handler handler = (Handler)clazz.getConstructor(null).newInstance(null);
                 client.addInHandler(handler);
             }
@@ -141,7 +159,7 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
         {
             for(int i = 0; i < outList.size(); i++)
             {
-            	Class clazz = Class.forName(outList.get(i).toString());
+            	Class clazz = ClassUtils.loadClass(outList.get(i).toString(), this.getClass());
             	Handler handler = (Handler)clazz.getConstructor(null).newInstance(null);
                 client.addOutHandler(handler);
             }

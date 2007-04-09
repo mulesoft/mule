@@ -60,7 +60,8 @@ public class InboundRouterCollection extends AbstractRouterCollection implements
     public UMOMessage route(UMOEvent event) throws MessagingException
     {
         String inboundEndpoint = event.getEndpoint().getName();
-        if (StringUtils.isBlank(inboundEndpoint)) {
+        if (StringUtils.isBlank(inboundEndpoint))
+        {
             inboundEndpoint = event.getEndpoint().getEndpointURI().getAddress();
         }
         event.getMessage().setProperty(MuleProperties.MULE_ORIGINATING_ENDPOINT_PROPERTY, inboundEndpoint);
@@ -79,7 +80,7 @@ public class InboundRouterCollection extends AbstractRouterCollection implements
 
         for (Iterator iterator = getRouters().iterator(); iterator.hasNext();)
         {
-            umoInboundRouter = (UMOInboundRouter)iterator.next();
+            umoInboundRouter = (UMOInboundRouter) iterator.next();
 
             if (umoInboundRouter.isMatch(event))
             {
@@ -154,7 +155,8 @@ public class InboundRouterCollection extends AbstractRouterCollection implements
                         for (int i = 0; i < eventsToRoute.length; i++)
                         {
                             // Set the originating endpoint so we'll know where this event came from further down the pipeline.
-                            if (event.getMessage().getProperty(MuleProperties.MULE_ORIGINATING_ENDPOINT_PROPERTY) == null) {
+                            if (event.getMessage().getProperty(MuleProperties.MULE_ORIGINATING_ENDPOINT_PROPERTY) == null)
+                            {
                                 event.getMessage().setProperty(MuleProperties.MULE_ORIGINATING_ENDPOINT_PROPERTY, inboundEndpoint);
                             }
 
@@ -244,7 +246,7 @@ public class InboundRouterCollection extends AbstractRouterCollection implements
             // Force all endpoints' type to RECEIVER just in case.
             for (Iterator it = endpoints.iterator(); it.hasNext();)
             {
-                ((UMOEndpoint)it.next()).setType(UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
+                ((UMOEndpoint) it.next()).setType(UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
             }
 
             this.endpoints.clear();
@@ -266,7 +268,7 @@ public class InboundRouterCollection extends AbstractRouterCollection implements
         UMOEndpoint endpointDescriptor;
         for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
         {
-            endpointDescriptor = (UMOEndpoint)iterator.next();
+            endpointDescriptor = (UMOEndpoint) iterator.next();
             if (endpointDescriptor.getName().equals(name))
             {
                 return endpointDescriptor;

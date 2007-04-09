@@ -3,14 +3,11 @@
 <!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
                                 "http://mule.mulesource.org/dtds/mule-configuration.dtd">
 
-<!--  This is the configuration for the Loan Broker ESB example -->
-<!-- See http://mule.mulesource.org/LoanBroker  for more information, diagrams and even a presentation! -->
-
 <mule-configuration id="Mule_Loan_broker_ESB_with_Ejb_Container" version="1.0">
 
     <description>
     The Loan Broker ESB example implements the Loan Broker Example using an ESB topology.
-    See http://mule.mulesource.org/LoanBroker+ESB for details.
+    See http://mule.mulesource.org/wiki/display/MULE/LoanBroker+ESB for details.
 
     Instead of using an ejb Connector as in the other configuration (see mule-config.xml in this directory)
     We configure an EJB container context and reference the EJB session bean directly as a Mule Managed component

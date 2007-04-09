@@ -26,10 +26,16 @@ import org.apache.commons.logging.LogFactory;
  * current event or set response properties that will be sent on the outgoing
  * message.
  */
-public class RequestContext
+public final class RequestContext
 {
     private static final Log logger = LogFactory.getLog(RequestContext.class);
     private static final ThreadLocal currentEvent = new ThreadLocal();
+
+    /** Do not instanciate. */
+    private RequestContext()
+    {
+        // no-op
+    }
 
     public static UMOEventContext getEventContext()
     {
@@ -46,7 +52,7 @@ public class RequestContext
 
     public static UMOEvent getEvent()
     {
-        return (UMOEvent)currentEvent.get();
+        return (UMOEvent) currentEvent.get();
     }
 
     public static void setEvent(UMOEvent event)
@@ -82,7 +88,7 @@ public class RequestContext
             {
                 for (Iterator iterator = event.getMessage().getPropertyNames().iterator(); iterator.hasNext();)
                 {
-                    String key = (String)iterator.next();
+                    String key = (String) iterator.next();
                     if (key == null)
                     {
                         logger.warn("Message property key is null: please report the following stack trace to dev@mule.codehaus.org.",

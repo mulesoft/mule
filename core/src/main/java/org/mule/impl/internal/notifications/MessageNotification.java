@@ -69,7 +69,7 @@ public class MessageNotification extends UMOServerNotification
     {
         if (source instanceof UMOConnectable)
         {
-            return ((UMOConnectable)source).getConnectionDescription();
+            return ((UMOConnectable) source).getConnectionDescription();
         }
         return source.toString();
     }

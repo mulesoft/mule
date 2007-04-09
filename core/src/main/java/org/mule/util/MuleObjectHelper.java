@@ -18,10 +18,10 @@ import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.routing.filters.EqualsFilter;
 import org.mule.routing.filters.ObjectFilter;
 import org.mule.routing.filters.WildcardFilter;
+import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.umo.UMOException;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -33,8 +33,14 @@ import java.util.StringTokenizer;
  * @deprecated these methods are bad and need to be removed
  */
 // @ThreadSafe
-public class MuleObjectHelper
+public final class MuleObjectHelper
 {
+
+    /** Do not instanciate. */
+    private MuleObjectHelper ()
+    {
+        // no-op
+    }
 
     /**
      * Builds a linked list of UMOTransformers.
@@ -83,7 +89,7 @@ public class MuleObjectHelper
         Map endpoints = RegistryContext.getRegistry().getEndpoints();
         for (Iterator iterator = endpoints.values().iterator(); iterator.hasNext();)
         {
-            iprovider = (UMOImmutableEndpoint)iterator.next();
+            iprovider = (UMOImmutableEndpoint) iterator.next();
             if (iprovider.getProtocol().equals(protocol))
             {
                 return new MuleEndpoint(iprovider);
@@ -110,7 +116,7 @@ public class MuleObjectHelper
 
         for (Iterator iterator = endpoints.values().iterator(); iterator.hasNext();)
         {
-            iprovider = (UMOImmutableEndpoint)iterator.next();
+            iprovider = (UMOImmutableEndpoint) iterator.next();
             if (filter.accept(iprovider.getEndpointURI()))
             {
                 return new MuleEndpoint(iprovider);

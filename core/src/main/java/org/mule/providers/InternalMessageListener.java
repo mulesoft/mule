@@ -26,9 +26,9 @@ import java.io.OutputStream;
  */
 public interface InternalMessageListener
 {
-    public UMOMessage onMessage(UMOMessage message,
-                                UMOTransaction trans,
-                                boolean synchronous,
-                                OutputStream outputStream) throws UMOException;
+    UMOMessage onMessage(UMOMessage message,
+                         UMOTransaction trans,
+                         boolean synchronous,
+                         OutputStream outputStream) throws UMOException;
 
 }

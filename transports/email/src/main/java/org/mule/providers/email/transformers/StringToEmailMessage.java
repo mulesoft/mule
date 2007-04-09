@@ -43,9 +43,9 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
     /**
      * logger used by this class
      */
-    protected final Log logger = LogFactory.getLog(getClass());
+    private final Log logger = LogFactory.getLog(getClass());
 
-    protected TemplateParser templateParser = TemplateParser.createAntStyleParser();
+    private TemplateParser templateParser = TemplateParser.createAntStyleParser();
 
     public StringToEmailMessage()
     {
@@ -61,7 +61,7 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
     public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
     {
         String endpointAddress = endpoint.getEndpointURI().getAddress();
-        SmtpConnector connector = (SmtpConnector)endpoint.getConnector();
+        SmtpConnector connector = (SmtpConnector) endpoint.getConnector();
         UMOMessage eventMsg = context.getMessage();
         String to = eventMsg.getStringProperty(MailProperties.TO_ADDRESSES_PROPERTY, endpointAddress);
         String cc = eventMsg.getStringProperty(MailProperties.CC_ADDRESSES_PROPERTY,
@@ -84,13 +84,13 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
             headers.putAll(customHeaders);
         }
 
-        Properties otherHeaders = (Properties)eventMsg.getProperty(MailProperties.CUSTOM_HEADERS_MAP_PROPERTY);
+        Properties otherHeaders = (Properties) eventMsg.getProperty(MailProperties.CUSTOM_HEADERS_MAP_PROPERTY);
         if (otherHeaders != null && !otherHeaders.isEmpty())
         {
             Map props = new HashMap(context.getManagementContext().getProperties());
             for (Iterator iterator = eventMsg.getPropertyNames().iterator(); iterator.hasNext();)
             {
-                String propertyKey = (String)iterator.next();
+                String propertyKey = (String) iterator.next();
                 props.put(propertyKey, eventMsg.getProperty(propertyKey));
             }
             headers.putAll(templateParser.parse(props, otherHeaders));
@@ -98,7 +98,7 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
 
         if (logger.isDebugEnabled())
         {
-            StringBuffer buf = new StringBuffer(256);
+            StringBuffer buf = new StringBuffer();
             buf.append("Constructing email using:\n");
             buf.append("To: ").append(to);
             buf.append("From: ").append(from);
@@ -114,7 +114,7 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
 
         try
         {
-            Message email = new MimeMessage(((SmtpConnector)endpoint.getConnector()).getMailSession(endpoint));
+            Message email = new MimeMessage(((SmtpConnector) endpoint.getConnector()).getSessionDetails(endpoint).getSession());
 
             email.setRecipients(Message.RecipientType.TO, MailUtils.stringToInternetAddresses(to));
 
@@ -145,7 +145,7 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
 
             for (Iterator iterator = headers.entrySet().iterator(); iterator.hasNext();)
             {
-                Map.Entry entry = (Map.Entry)iterator.next();
+                Map.Entry entry = (Map.Entry) iterator.next();
                 email.setHeader(entry.getKey().toString(), entry.getValue().toString());
             }
 

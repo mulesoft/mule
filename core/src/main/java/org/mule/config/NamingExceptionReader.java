@@ -26,12 +26,12 @@ public class NamingExceptionReader implements ExceptionReader
 
     public String getMessage(Throwable t)
     {
-        return (t instanceof NamingException ? ((NamingException)t).toString(true) : "<unknown>");
+        return (t instanceof NamingException ? ((NamingException) t).toString(true) : "<unknown>");
     }
 
     public Throwable getCause(Throwable t)
     {
-        return (t instanceof NamingException ? ((NamingException)t).getCause() : null);
+        return (t instanceof NamingException ? ((NamingException) t).getCause() : null);
     }
 
     public Class getExceptionType()
@@ -49,7 +49,7 @@ public class NamingExceptionReader implements ExceptionReader
     {
         if (t instanceof NamingException)
         {
-            NamingException e = (NamingException)t;
+            NamingException e = (NamingException) t;
             Map info = new HashMap();
             final Name remainingName = e.getRemainingName();
             final Name resolvedName = e.getResolvedName();

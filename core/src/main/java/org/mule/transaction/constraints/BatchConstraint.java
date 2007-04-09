@@ -53,7 +53,7 @@ public class BatchConstraint extends ConstraintFilter
     {
         synchronized (this)
         {
-            BatchConstraint clone = (BatchConstraint)super.clone();
+            BatchConstraint clone = (BatchConstraint) super.clone();
             clone.setBatchSize(batchSize);
             for (int i = 0; i < batchCount; i++)
             {

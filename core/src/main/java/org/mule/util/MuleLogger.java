@@ -125,17 +125,17 @@ public class MuleLogger implements Log
 
     public void boilerPlate(String message)
     {
-        boilerPlate(message, '*', 80);
+        boilerPlate(message, '*', StringMessageUtils.DEFAULT_MESSAGE_WIDTH);
     }
 
     public void logBoilerPlate(List messages)
     {
-        boilerPlate(messages, '*', 80);
+        boilerPlate(messages, '*', StringMessageUtils.DEFAULT_MESSAGE_WIDTH);
     }
 
     public void logBoilerPlate(String[] messages)
     {
-        boilerPlate(Arrays.asList(messages), '*', 80);
+        boilerPlate(Arrays.asList(messages), '*', StringMessageUtils.DEFAULT_MESSAGE_WIDTH);
     }
 
     public void boilerPlate(String message, char c, int maxlength)

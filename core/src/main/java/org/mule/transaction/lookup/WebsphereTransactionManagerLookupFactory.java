@@ -83,7 +83,7 @@ public class WebsphereTransactionManagerLookupFactory implements UMOTransactionM
         try
         {
             Method method = clazz.getMethod("getTransactionManager", null);
-            transactionManager = (TransactionManager)method.invoke(null, null);
+            transactionManager = (TransactionManager) method.invoke(null, null);
         }
         catch (Exception ex)
         {

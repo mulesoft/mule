@@ -62,7 +62,7 @@ public class FruitBowl
         logger.debug("Got a fruit lover who says: " + fruitlover.speak());
         for (Iterator iter = bowl.values().iterator(); iter.hasNext();)
         {
-            ((Fruit)iter.next()).bite();
+            ((Fruit) iter.next()).bite();
         }
         return fruitlover;
     }
@@ -77,12 +77,12 @@ public class FruitBowl
 
     public void setFruit(List fruit)
     {
-        this.setFruit((Fruit[])fruit.toArray(new Fruit[fruit.size()]));
+        this.setFruit((Fruit[]) fruit.toArray(new Fruit[fruit.size()]));
     }
 
     public Apple getApple()
     {
-        return (Apple)bowl.get(Apple.class);
+        return (Apple) bowl.get(Apple.class);
     }
 
     public void setApple(Apple apple)
@@ -92,7 +92,7 @@ public class FruitBowl
 
     public Banana getBanana()
     {
-        return (Banana)bowl.get(Banana.class);
+        return (Banana) bowl.get(Banana.class);
     }
 
     public void setBanana(Banana banana)

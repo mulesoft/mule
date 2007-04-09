@@ -32,7 +32,7 @@
     <transformers>
     	<transformer name="ExtractCustomer" className="org.mule.transformers.simple.GetBeanProperty">
     		<properties>
-    			<property name="field" value="customerRequest.customer" />
+    			<property name="propertyName" value="customerRequest.customer" />
     		</properties>
     	</transformer>
         <transformer name="SetLendersAsRecipients" className="org.mule.examples.loanbroker.transformers.SetLendersAsRecipients" />

@@ -12,9 +12,6 @@ package org.mule.umo;
 
 /**
  * The <code>UMOFilter</code> interface allows UMOMessage filtering.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public interface UMOFilter

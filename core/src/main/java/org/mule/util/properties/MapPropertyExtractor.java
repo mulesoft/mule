@@ -26,11 +26,11 @@ public class MapPropertyExtractor implements PropertyExtractor
         Object payload = message;
         if (message instanceof UMOMessage)
         {
-            payload = ((UMOMessage)message).getPayload();
+            payload = ((UMOMessage) message).getPayload();
         }
         if (payload instanceof Map)
         {
-            return ((Map)payload).get(name);
+            return ((Map) payload).get(name);
         }
         return null;
     }

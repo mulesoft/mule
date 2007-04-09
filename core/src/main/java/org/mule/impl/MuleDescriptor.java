@@ -10,15 +10,14 @@
 
 package org.mule.impl;
 
-import org.mule.config.MuleConfiguration;
 import org.mule.config.ThreadingProfile;
 import org.mule.registry.RegistrationException;
 import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOException;
 import org.mule.umo.UMOInterceptor;
 import org.mule.umo.UMOManagementContext;
-import org.mule.umo.UMOException;
-import org.mule.umo.model.UMOModel;
 import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.model.UMOModel;
 import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.routing.UMONestedRouterCollection;
 import org.mule.umo.routing.UMOOutboundRouterCollection;
@@ -63,7 +62,7 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
      * Default constructor. Initalises common properties for the MuleConfiguration
      * object
      *
-     * @see MuleConfiguration
+     * @see org.mule.config.MuleConfiguration
      */
     public MuleDescriptor()
     {
@@ -112,7 +111,7 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
     public void setProperties(Map props)
     {
         properties = props;
-        String delegate = (String)properties.get(MULE_PROPERTY_DOT_PROPERTIES);
+        String delegate = (String) properties.get(MULE_PROPERTY_DOT_PROPERTIES);
         if (delegate != null)
         {
             try
@@ -193,7 +192,7 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
 
     public void setNestedRouter(UMONestedRouterCollection router)
     {
-    	nestedRouter = router;
+        nestedRouter = router;
     }
 
     public void addInitialisationCallback(InitialisationCallback callback)

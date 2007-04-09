@@ -11,7 +11,6 @@
 package org.mule.routing.inbound;
 
 import org.mule.umo.UMOEvent;
-import org.mule.umo.provider.UMOMessageAdapter;
 
 /**
  * <code>CorrelationAggregator</code> uses the CorrelationID and
@@ -23,7 +22,7 @@ public abstract class CorrelationAggregator extends AbstractEventAggregator
 
     /**
      * Creates a new EventGroup that will expect the number of events as returned by
-     * {@link UMOMessageAdapter#getCorrelationGroupSize()}.
+     * {@link org.mule.umo.provider.UMOMessageAdapter#getCorrelationGroupSize()}.
      */
     // //@Override
     protected EventGroup createEventGroup(UMOEvent event, Object groupId)

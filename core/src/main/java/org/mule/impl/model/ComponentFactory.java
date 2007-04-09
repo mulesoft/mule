@@ -22,8 +22,14 @@ import org.mule.util.BeanUtils;
 /**
  * Reusable methods for working with UMOComponents.
  */
-public class ComponentFactory
+public final class ComponentFactory
 {
+
+    /** Do not instanciate. */
+    private ComponentFactory ()
+    {
+        // no-op
+    }
 
     /**
      * Creates a component based on its descriptor.
@@ -70,7 +76,7 @@ public class ComponentFactory
         // Call any custom initialisers
         if (descriptor instanceof MuleDescriptor)
         {
-            ((MuleDescriptor)descriptor).fireInitialisationCallbacks(component);
+            ((MuleDescriptor) descriptor).fireInitialisationCallbacks(component);
         }
 
         return component;

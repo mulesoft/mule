@@ -43,11 +43,11 @@ public class Base64Encoder extends AbstractTransformer
 
             if (src instanceof String)
             {
-                buf = ((String)src).getBytes(encoding);
+                buf = ((String) src).getBytes(encoding);
             }
             else
             {
-                buf = (byte[])src;
+                buf = (byte[]) src;
             }
 
             String result = Base64.encodeBytes(buf, Base64.DONT_BREAK_LINES);

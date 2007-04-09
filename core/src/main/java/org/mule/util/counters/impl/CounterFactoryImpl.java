@@ -18,19 +18,21 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-/**
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
- */
-public class CounterFactoryImpl
+public final class CounterFactoryImpl
 {
 
     private static Map counters = new HashMap();
     private static ArrayList publicCounters = new ArrayList();
 
+    /** Do not instanciate. */
+    private CounterFactoryImpl ()
+    {
+        // no-op
+    }
+
     public static Counter getCounter(String name)
     {
-        return (Counter)counters.get(name);
+        return (Counter) counters.get(name);
     }
 
     public static Counter createCounter(String name, String first, String second, Type type, boolean visible)
@@ -76,7 +78,7 @@ public class CounterFactoryImpl
         }
         else if (first != null && second == null)
         {
-            AbstractCounter b = (AbstractCounter)getCounter(first);
+            AbstractCounter b = (AbstractCounter) getCounter(first);
             if (b == null)
             {
                 throw new IllegalStateException();
@@ -121,7 +123,7 @@ public class CounterFactoryImpl
         }
         else if (first != null && second != null)
         {
-            AbstractCounter b = (AbstractCounter)getCounter(first);
+            AbstractCounter b = (AbstractCounter) getCounter(first);
             if (b == null)
             {
                 throw new IllegalStateException();
@@ -132,7 +134,7 @@ public class CounterFactoryImpl
             }
             else if (type == Type.PLUS || type == Type.MINUS || type == Type.MULTIPLY || type == Type.DIVIDE)
             {
-                AbstractCounter b2 = (AbstractCounter)getCounter(second);
+                AbstractCounter b2 = (AbstractCounter) getCounter(second);
                 if (b2 == null)
                 {
                     throw new IllegalStateException();

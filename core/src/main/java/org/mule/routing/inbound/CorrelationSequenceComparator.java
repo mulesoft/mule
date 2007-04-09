@@ -18,16 +18,10 @@ import java.util.Comparator;
  * <code>CorrelationSequenceComparator</code> is a {@link Comparator} for
  * {@link UMOEvent}s using their respective correlation sequences.
  */
-public class CorrelationSequenceComparator implements Comparator
+public final class CorrelationSequenceComparator implements Comparator
 {
-    private static final Comparator Instance = new CorrelationSequenceComparator();
 
-    public static Comparator getInstance()
-    {
-        return Instance;
-    }
-
-    private CorrelationSequenceComparator()
+    public CorrelationSequenceComparator()
     {
         super();
     }

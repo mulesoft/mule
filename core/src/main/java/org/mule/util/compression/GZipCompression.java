@@ -28,6 +28,8 @@ import org.apache.commons.logging.LogFactory;
  */
 public class GZipCompression implements CompressionStrategy
 {
+    public static final int DEFAULT_BUFFER_SIZE = 32768;
+    
     /**
      * The logger for this class
      */
@@ -50,7 +52,7 @@ public class GZipCompression implements CompressionStrategy
         }
         else
         {
-            return ((bytes[0] == (byte)(GZIPInputStream.GZIP_MAGIC)) && (bytes[1] == (byte)(GZIPInputStream.GZIP_MAGIC >> 8)));
+            return ((bytes[0] == (byte) (GZIPInputStream.GZIP_MAGIC)) && (bytes[1] == (byte) (GZIPInputStream.GZIP_MAGIC >> 8)));
         }
     }
 
@@ -85,7 +87,7 @@ public class GZipCompression implements CompressionStrategy
 
         try
         {
-            baos = new ByteArrayOutputStream(32768);
+            baos = new ByteArrayOutputStream(DEFAULT_BUFFER_SIZE);
             gzos = new GZIPOutputStream(baos);
 
             gzos.write(bytes, 0, bytes.length);
@@ -155,7 +157,7 @@ public class GZipCompression implements CompressionStrategy
         {
             bais = new ByteArrayInputStream(bytes);
             gzis = new GZIPInputStream(bais);
-            baos = new ByteArrayOutputStream(32768);
+            baos = new ByteArrayOutputStream(DEFAULT_BUFFER_SIZE);
 
             IOUtils.copy(gzis, baos);
             gzis.close();

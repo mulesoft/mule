@@ -18,7 +18,7 @@ public class WebsphereEmbeddedJmsConnectorTestCase extends AbstractMuleTestCase
 {
     public void testConfigurationDefaults()
     {
-        WebsphereEmbededJmsConnector c = new WebsphereEmbededJmsConnector();
+        WebsphereJmsConnector c = new WebsphereJmsConnector();
         // TODO has to be confirmed for Websphere
         assertTrue(c.isEagerConsumer());
         assertFalse("JMS connection recovery is not supported by Websphere Embedded provider.",

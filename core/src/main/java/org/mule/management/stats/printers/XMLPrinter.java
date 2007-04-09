@@ -117,7 +117,7 @@ public class XMLPrinter extends AbstractTablePrinter
             StringBuffer buf = new StringBuffer(40);
             while (it.hasNext())
             {
-                Map.Entry e = (Map.Entry)it.next();
+                Map.Entry e = (Map.Entry) it.next();
                 buf.append(e.getKey()).append('=').append(e.getValue());
                 if (it.hasNext())
                 {

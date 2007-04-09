@@ -61,7 +61,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
     {
         if (!connector.isQueueEvents())
         {
-            throw new UnsupportedOperationException("Receive only supported on the VM Queue Connector");
+            throw new UnsupportedOperationException("Receive requested on VM Connector, but queueEvents is false");
         }
 
         try

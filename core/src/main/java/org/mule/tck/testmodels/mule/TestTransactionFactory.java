@@ -20,15 +20,13 @@ import com.mockobjects.dynamic.Mock;
 /**
  * <code>TestTransactionFactory</code> TODO
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class TestTransactionFactory implements UMOTransactionFactory
 {
     public UMOTransaction beginTransaction(UMOManagementContext managementContext) throws TransactionException
     {
-        return (UMOTransaction)new Mock(UMOTransaction.class).proxy();
+        return (UMOTransaction) new Mock(UMOTransaction.class).proxy();
     }
 
     public boolean isTransacted()

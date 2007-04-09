@@ -25,8 +25,13 @@ import java.util.List;
  * used like a single object.
  */
 // @ThreadSafe
-public class Multicaster
+public final class Multicaster
 {
+    /** Do not instanciate. */
+    private Multicaster ()
+    {
+        // no-op
+    }
 
     public static Object create(Class theInterface, Collection objects)
     {

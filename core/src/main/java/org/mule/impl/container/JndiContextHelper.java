@@ -20,8 +20,14 @@ import javax.naming.NamingException;
 /**
  * Common code for initialising the JNDI context.
  */
-public class JndiContextHelper
+public final class JndiContextHelper
 {
+    /** Do not instanciate. */
+    private JndiContextHelper ()
+    {
+        // no-op
+    }
+
     /**
      * Create a new initial context.
      * 

@@ -30,9 +30,7 @@ import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.ContainerException;
 import org.mule.umo.routing.UMOInboundRouterCollection;
-import org.mule.umo.routing.UMONestedRouter;
 import org.mule.umo.routing.UMONestedRouterCollection;
-import org.mule.umo.routing.UMOOutboundRouter;
 import org.mule.umo.routing.UMOOutboundRouterCollection;
 import org.mule.umo.routing.UMOResponseRouterCollection;
 
@@ -189,12 +187,12 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 
         else if (exceptionListener instanceof Initialisable)
         {
-            ((Initialisable)exceptionListener).initialise();
+            ((Initialisable) exceptionListener).initialise();
         }
 
         if (exceptionListener instanceof Initialisable)
         {
-            ((Initialisable)exceptionListener).initialise();
+            ((Initialisable) exceptionListener).initialise();
         }
 
         MuleEndpoint endpoint;
@@ -214,7 +212,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
             }
             for (Iterator iterator = inboundRouter.getEndpoints().iterator(); iterator.hasNext();)
             {
-                endpoint = (MuleEndpoint)iterator.next();
+                endpoint = (MuleEndpoint) iterator.next();
                 endpoint.initialise();
             }
         }
@@ -223,20 +221,21 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         {
             for (Iterator iterator = responseRouter.getEndpoints().iterator(); iterator.hasNext();)
             {
-                endpoint = (MuleEndpoint)iterator.next();
+                endpoint = (MuleEndpoint) iterator.next();
                 endpoint.initialise();
             }
         }
 
-        if (nestedRouter != null)
-        {
-            for (Iterator it = nestedRouter.getRouters().iterator(); it.hasNext();)
-            {
-                UMONestedRouter nestedRouter = (UMONestedRouter) it.next();
-                endpoint = (MuleEndpoint) nestedRouter.getEndpoint();
-                endpoint.initialise();
-            }
-        }
+        //TODO: RM* Remove
+//        if (nestedRouter != null)
+//        {
+//            for (Iterator it = nestedRouter.getRouters().iterator(); it.hasNext();)
+//            {
+//                UMONestedRouter nestedRouter = (UMONestedRouter) it.next();
+//                endpoint = (MuleEndpoint) nestedRouter.getEndpoint();
+//                endpoint.initialise();
+//            }
+//        }
 
         if (outboundRouter == null)
         {
@@ -245,21 +244,22 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         }
         else
         {
-            if (outboundRouter.getCatchAllStrategy() != null
-                && outboundRouter.getCatchAllStrategy().getEndpoint() != null)
-            {
-                outboundRouter.getCatchAllStrategy().getEndpoint().initialise();
-            }
-            UMOOutboundRouter router;
-            for (Iterator iterator = outboundRouter.getRouters().iterator(); iterator.hasNext();)
-            {
-                router = (UMOOutboundRouter)iterator.next();
-                for (Iterator iterator1 = router.getEndpoints().iterator(); iterator1.hasNext();)
-                {
-                    endpoint = (MuleEndpoint)iterator1.next();
-                    endpoint.initialise();
-                }
-            }
+            //TODO RM* Remove
+//            if (outboundRouter.getCatchAllStrategy() != null
+//                && outboundRouter.getCatchAllStrategy().getEndpoint() != null)
+//            {
+//                outboundRouter.getCatchAllStrategy().getEndpoint().initialise();
+//            }
+//            UMOOutboundRouter router;
+//            for (Iterator iterator = outboundRouter.getRouters().iterator(); iterator.hasNext();)
+//            {
+//                router = (UMOOutboundRouter) iterator.next();
+//                for (Iterator iterator1 = router.getEndpoints().iterator(); iterator1.hasNext();)
+//                {
+//                    endpoint = (MuleEndpoint) iterator1.next();
+//                    endpoint.initialise();
+//                }
+//            }
         }
         // Is a reference of an implementation object?
         if (implementationReference instanceof String)
@@ -432,7 +432,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         InitialisationCallback callback;
         for (Iterator iterator = initialisationCallbacks.iterator(); iterator.hasNext();)
         {
-            callback = (InitialisationCallback)iterator.next();
+            callback = (InitialisationCallback) iterator.next();
             callback.initialise(component);
         }
     }

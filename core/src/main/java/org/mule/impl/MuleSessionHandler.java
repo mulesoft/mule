@@ -49,7 +49,7 @@ public class MuleSessionHandler implements UMOSessionHandler
 
     public void retrieveSessionInfoFromMessage(UMOMessage message, UMOSession session) throws UMOException
     {
-        String sessionId = (String)message.removeProperty(MuleProperties.MULE_SESSION_ID_PROPERTY);
+        String sessionId = (String) message.removeProperty(MuleProperties.MULE_SESSION_ID_PROPERTY);
         Object sessionHeader = message.removeProperty(MuleProperties.MULE_SESSION_PROPERTY);
 
         if (sessionId != null)
@@ -64,11 +64,11 @@ public class MuleSessionHandler implements UMOSessionHandler
             String sessionString = null;
             try
             {
-                sessionString = new String((byte[])decoder.transform(sessionHeader), message.getEncoding());
+                sessionString = new String((byte[]) decoder.transform(sessionHeader), message.getEncoding());
             }
             catch (UnsupportedEncodingException e)
             {
-                sessionString = new String((byte[])decoder.transform(sessionHeader));
+                sessionString = new String((byte[]) decoder.transform(sessionHeader));
             }
             if (logger.isDebugEnabled())
             {
@@ -117,7 +117,7 @@ public class MuleSessionHandler implements UMOSessionHandler
         {
             logger.debug("Adding session header to message: " + sessionString);
         }
-        sessionString = (String)encoder.transform(sessionString);
+        sessionString = (String) encoder.transform(sessionString);
         message.setProperty(MuleProperties.MULE_SESSION_PROPERTY, sessionString);
     }
 

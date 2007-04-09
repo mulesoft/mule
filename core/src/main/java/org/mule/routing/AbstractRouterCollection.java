@@ -35,7 +35,7 @@ public abstract class AbstractRouterCollection implements UMORouterCollection, I
     /**
      * logger used by this class
      */
-    protected transient final Log logger = LogFactory.getLog(getClass());
+    protected final transient Log logger = LogFactory.getLog(getClass());
 
     protected boolean matchAll = false;
 
@@ -74,7 +74,7 @@ public abstract class AbstractRouterCollection implements UMORouterCollection, I
     {
         for (Iterator iterator = routers.iterator(); iterator.hasNext();)
         {
-            addRouter((UMORouter)iterator.next());
+            addRouter((UMORouter) iterator.next());
         }
     }
 
@@ -111,7 +111,7 @@ public abstract class AbstractRouterCollection implements UMORouterCollection, I
         this.catchAllStrategy = catchAllStrategy;
         if (this.catchAllStrategy != null && catchAllStrategy instanceof AbstractCatchAllStrategy)
         {
-            ((AbstractCatchAllStrategy)this.catchAllStrategy).setStatistics(statistics);
+            ((AbstractCatchAllStrategy) this.catchAllStrategy).setStatistics(statistics);
         }
     }
 

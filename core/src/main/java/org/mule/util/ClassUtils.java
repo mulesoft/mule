@@ -75,7 +75,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      */
     public static URL getResource(final String resourceName, final Class callingClass)
     {
-        URL url = (URL)AccessController.doPrivileged(new PrivilegedAction()
+        URL url = (URL) AccessController.doPrivileged(new PrivilegedAction()
         {
             public Object run()
             {
@@ -85,7 +85,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
 
         if (url == null)
         {
-            url = (URL)AccessController.doPrivileged(new PrivilegedAction()
+            url = (URL) AccessController.doPrivileged(new PrivilegedAction()
             {
                 public Object run()
                 {
@@ -96,7 +96,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
 
         if (url == null)
         {
-            url = (URL)AccessController.doPrivileged(new PrivilegedAction()
+            url = (URL) AccessController.doPrivileged(new PrivilegedAction()
             {
                 public Object run()
                 {
@@ -110,7 +110,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
 
     public static Enumeration getResources(final String resourceName, final Class callingClass)
     {
-        Enumeration enumeration = (Enumeration)AccessController.doPrivileged(new PrivilegedAction()
+        Enumeration enumeration = (Enumeration) AccessController.doPrivileged(new PrivilegedAction()
         {
             public Object run()
             {
@@ -127,7 +127,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
 
         if (enumeration == null)
         {
-            enumeration = (Enumeration)AccessController.doPrivileged(new PrivilegedAction()
+            enumeration = (Enumeration) AccessController.doPrivileged(new PrivilegedAction()
             {
                 public Object run()
                 {
@@ -145,7 +145,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
 
         if (enumeration == null)
         {
-            enumeration = (Enumeration)AccessController.doPrivileged(new PrivilegedAction()
+            enumeration = (Enumeration) AccessController.doPrivileged(new PrivilegedAction()
             {
                 public Object run()
                 {
@@ -183,7 +183,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
     public static Class loadClass(final String className, final Class callingClass)
         throws ClassNotFoundException
     {
-        Class clazz = (Class)AccessController.doPrivileged(new PrivilegedAction()
+        Class clazz = (Class) AccessController.doPrivileged(new PrivilegedAction()
         {
             public Object run()
             {
@@ -200,7 +200,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
 
         if (clazz == null)
         {
-            clazz = (Class)AccessController.doPrivileged(new PrivilegedAction()
+            clazz = (Class) AccessController.doPrivileged(new PrivilegedAction()
             {
                 public Object run()
                 {
@@ -218,7 +218,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
 
         if (clazz == null)
         {
-            clazz = (Class)AccessController.doPrivileged(new PrivilegedAction()
+            clazz = (Class) AccessController.doPrivileged(new PrivilegedAction()
             {
                 public Object run()
                 {
@@ -236,7 +236,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
 
         if (clazz == null)
         {
-            clazz = (Class)AccessController.doPrivileged(new PrivilegedAction()
+            clazz = (Class) AccessController.doPrivileged(new PrivilegedAction()
             {
                 public Object run()
                 {
@@ -545,7 +545,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
 
         if (object instanceof Object[])
         {
-            Object[] objects = (Object[])object;
+            Object[] objects = (Object[]) object;
             types = new Class[objects.length];
             for (int i = 0; i < objects.length; i++)
             {
@@ -593,7 +593,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
 
     public static Class wrapperToPrimitive(Class wrapper)
     {
-        return (Class)MapUtils.getObject(wrapperToPrimitiveMap, wrapper, wrapper);
+        return (Class) MapUtils.getObject(wrapperToPrimitiveMap, wrapper, wrapper);
     }
 
     public static Class[] wrappersToPrimitives(Class[] wrappers)
@@ -612,7 +612,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
 
         for (int i = 0; i < wrappers.length; i++)
         {
-            primitives[i] = (Class)MapUtils.getObject(wrapperToPrimitiveMap, wrappers[i], wrappers[i]);
+            primitives[i] = (Class) MapUtils.getObject(wrapperToPrimitiveMap, wrappers[i], wrappers[i]);
         }
 
         return primitives;

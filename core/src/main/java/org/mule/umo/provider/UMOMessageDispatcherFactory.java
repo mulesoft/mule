@@ -13,12 +13,10 @@ package org.mule.umo.provider;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
-import org.apache.commons.pool.KeyedPoolableObjectFactory;
-
 /**
  * <code>UMOMessageDispatcherFactory</code> is a factory interface for managing the
  * lifecycles of a transport's message dispatchers. The methods basically implement
- * the {@link KeyedPoolableObjectFactory} lifecycle, with a
+ * the {@link org.apache.commons.pool.KeyedPoolableObjectFactory} lifecycle, with a
  * {@link UMOImmutableEndpoint} as the key and the dispatcher as pooled object.
  */
 public interface UMOMessageDispatcherFactory

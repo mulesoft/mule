@@ -115,12 +115,12 @@ public class DefaultMuleProxy implements MuleProxy
 
         for (Iterator iter = interceptorList.iterator(); iter.hasNext();)
         {
-            UMOInterceptor interceptor = (UMOInterceptor)iter.next();
+            UMOInterceptor interceptor = (UMOInterceptor) iter.next();
             if (interceptor instanceof Initialisable)
             {
                 try
                 {
-                    ((Initialisable)interceptor).initialise();
+                    ((Initialisable) interceptor).initialise();
                 }
                 catch (Exception e)
                 {
@@ -180,12 +180,12 @@ public class DefaultMuleProxy implements MuleProxy
         checkDisposed();
         for (Iterator iter = interceptorList.iterator(); iter.hasNext();)
         {
-            UMOInterceptor interceptor = (UMOInterceptor)iter.next();
+            UMOInterceptor interceptor = (UMOInterceptor) iter.next();
             if (interceptor instanceof Disposable)
             {
                 try
                 {
-                    ((Disposable)interceptor).dispose();
+                    ((Disposable) interceptor).dispose();
                 }
                 catch (Exception e)
                 {
@@ -300,7 +300,7 @@ public class DefaultMuleProxy implements MuleProxy
                 // process repltyTo if there is one
                 if (returnMessage != null && replyToHandler != null)
                 {
-                    String requestor = (String)returnMessage.getProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY);
+                    String requestor = (String) returnMessage.getProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY);
                     if ((requestor != null && !requestor.equals(descriptor.getName())) || requestor == null)
                     {
                         replyToHandler.processReplyTo(event, returnMessage, replyTo);
@@ -337,7 +337,7 @@ public class DefaultMuleProxy implements MuleProxy
 
             if (returnMessage == null)
             {
-                returnMessage = new MuleMessage(NullPayload.getInstance(), (Map)null);
+                returnMessage = new MuleMessage(NullPayload.getInstance(), (Map) null);
             }
             UMOExceptionPayload exceptionPayload = RequestContext.getExceptionPayload();
             if (exceptionPayload == null)
@@ -402,7 +402,7 @@ public class DefaultMuleProxy implements MuleProxy
         ReplyToHandler replyToHandler = null;
         if (replyTo != null)
         {
-            replyToHandler = ((AbstractConnector)endpoint.getConnector()).getReplyToHandler();
+            replyToHandler = ((AbstractConnector) endpoint.getConnector()).getReplyToHandler();
             // Use the response transformer for the event if one is set
             if (endpoint.getResponseTransformer() != null)
             {
@@ -493,7 +493,7 @@ public class DefaultMuleProxy implements MuleProxy
                 // process repltyTo if there is one
                 if (result != null && replyToHandler != null)
                 {
-                    String requestor = (String)result.getProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY);
+                    String requestor = (String) result.getProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY);
                     if ((requestor != null && !requestor.equals(descriptor.getName())) || requestor == null)
                     {
                         replyToHandler.processReplyTo(event, result, replyTo);
@@ -537,9 +537,9 @@ public class DefaultMuleProxy implements MuleProxy
                 logger.error("Failed to return proxy: " + e2.getMessage(), e2);
             }
             //TODO RM* clean this up
-            if(getStatistics() instanceof SedaComponentStatistics)
+            if (getStatistics() instanceof SedaComponentStatistics)
             {
-                ((SedaComponentStatistics)getStatistics()).setComponentPoolSize(proxyPool.getSize());
+                ((SedaComponentStatistics) getStatistics()).setComponentPoolSize(proxyPool.getSize());
             }
         }
     }

@@ -58,7 +58,7 @@ public class SecretKeyEncryptionStrategy extends AbstractJCEEncryptionStrategy
             {
                 try
                 {
-                    key = (byte[])keyFactory.create();
+                    key = (byte[]) keyFactory.create();
                 }
                 catch (Exception e)
                 {

@@ -34,11 +34,11 @@ public class WriterMessageAdapter extends AbstractMessageAdapter
         if (message instanceof String)
         {
             writer = new StringWriter();
-            writer.write((String)message);
+            writer.write((String) message);
         }
         else if (message instanceof StringWriter)
         {
-            this.writer = (StringWriter)message;
+            this.writer = (StringWriter) message;
         }
         else
         {

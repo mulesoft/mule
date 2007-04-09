@@ -29,7 +29,7 @@ public class RoutingException extends MessagingException
      */
     private static final long serialVersionUID = 2478458847072048645L;
 
-    protected transient final UMOImmutableEndpoint endpoint;
+    protected final transient UMOImmutableEndpoint endpoint;
 
     public RoutingException(UMOMessage message, UMOImmutableEndpoint endpoint)
     {

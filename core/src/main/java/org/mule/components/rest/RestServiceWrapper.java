@@ -141,7 +141,8 @@ public class RestServiceWrapper implements Callable, Initialisable
         this.errorExpression = errorExpression;
     }
 
-    public void initialise() throws InitialisationException {
+    public void initialise() throws InitialisationException
+    {
         if (serviceUrl == null && !urlFromMessage)
         {
             throw new InitialisationException(new Message(Messages.X_IS_NULL, "serviceUrl"), this);
@@ -237,9 +238,9 @@ public class RestServiceWrapper implements Callable, Initialisable
 
         for (Iterator iterator = args.entrySet().iterator(); iterator.hasNext();)
         {
-            Map.Entry entry = (Map.Entry)iterator.next();
-            String name = (String)entry.getKey();
-            String exp = (String)entry.getValue();
+            Map.Entry entry = (Map.Entry) iterator.next();
+            String name = (String) entry.getKey();
+            String exp = (String) entry.getValue();
             Object value = propertyExtractor.getProperty(exp, msg);
 
             if (value == null)

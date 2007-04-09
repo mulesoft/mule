@@ -17,22 +17,18 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.URI;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-
-import javax.net.ServerSocketFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLServerSocket;
-
-import org.apache.commons.lang.StringUtils;
 
 /**
  * <code>SslMessageReceiver</code> acts like a tcp server to receive socket
  * requests using SSL.
+ *
+ * TODO - TCP can be refactored to mirror the structure here, including the
+ * ServerSocketFactory.  Once that is done, this class can be removed and the
+ * TCP superclass used directly.
  */
 public class SslMessageReceiver extends TcpMessageReceiver
 {
@@ -46,38 +42,7 @@ public class SslMessageReceiver extends TcpMessageReceiver
     protected ServerSocket createSocket(URI uri)
         throws IOException, NoSuchAlgorithmException, KeyManagementException
     {
-        SslConnector cnn;
-        ServerSocketFactory ssf;
-        cnn = (SslConnector)connector;
-        // An SSLContext is an environment for implementing JSSE
-        // It is used to create a ServerSocketFactory
-        SSLContext sslc = SSLContext.getInstance(cnn.getProtocol().toLowerCase(), cnn.getProvider());
-
-        // Initialize the SSLContext to work with our key managers
-        sslc.init(cnn.getKeyManagerFactory().getKeyManagers(), cnn.getTrustManagerFactory()
-            .getTrustManagers(),
-        // TODO provide more secure seed (othen than the default one)
-            new SecureRandom());
-
-        ssf = sslc.getServerSocketFactory();
-
-        String host = StringUtils.defaultIfEmpty(uri.getHost(), "localhost");
-        int backlog = cnn.getReceiveBacklog();
-        SSLServerSocket serverSocket;
-
-        InetAddress inetAddress = InetAddress.getByName(host);
-        if (inetAddress.equals(InetAddress.getLocalHost()) || inetAddress.isLoopbackAddress()
-            || host.trim().equals("localhost"))
-        {
-            serverSocket = (SSLServerSocket)ssf.createServerSocket(uri.getPort(), backlog);
-        }
-        else
-        {
-            serverSocket = (SSLServerSocket)ssf.createServerSocket(uri.getPort(), backlog, inetAddress);
-        }
-        // Authenticate the client?
-        serverSocket.setNeedClientAuth(cnn.isRequireClientAuthentication());
-        return serverSocket;
+        return ((SslConnector) connector).getServerSocket(uri);
     }
 
 }

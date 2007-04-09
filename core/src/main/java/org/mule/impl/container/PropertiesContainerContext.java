@@ -115,7 +115,7 @@ public class PropertiesContainerContext extends AbstractContainerContext
         {
             for (Iterator iterator = systemProperties.entrySet().iterator(); iterator.hasNext();)
             {
-                entry = (Map.Entry)iterator.next();
+                entry = (Map.Entry) iterator.next();
                 value = entry.getValue().toString();
                 value = templateParser.parse(systemProperties, value);
                 value = templateParser.parse(managementContext.getProperties(), value);
@@ -129,7 +129,7 @@ public class PropertiesContainerContext extends AbstractContainerContext
 
             for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();)
             {
-                entry = (Map.Entry)iterator.next();
+                entry = (Map.Entry) iterator.next();
                 value = entry.getValue().toString();
                 value = templateParser.parse(managementContext.getProperties(), value.toString());
                 managementContext.getRegistry().setProperty(entry.getKey(), value);

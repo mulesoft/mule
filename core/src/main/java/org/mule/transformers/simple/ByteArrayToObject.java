@@ -26,9 +26,9 @@ public class ByteArrayToObject extends ByteArrayToSerializable
     // @Override
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
-        byte[] bytes = (byte[])src;
+        byte[] bytes = (byte[]) src;
 
-        if (bytes[0] == (byte)((ObjectStreamConstants.STREAM_MAGIC >>> 8) & 0xFF))
+        if (bytes[0] == (byte) ((ObjectStreamConstants.STREAM_MAGIC >>> 8) & 0xFF))
         {
             return super.doTransform(src, encoding);
         }

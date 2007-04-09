@@ -14,7 +14,7 @@ import java.io.ObjectStreamException;
 import java.io.Serializable;
 
 // @Immutable
-public class VoidResult implements Serializable
+public final class VoidResult implements Serializable
 {
     /**
      * Serial version
@@ -45,6 +45,12 @@ public class VoidResult implements Serializable
     public boolean equals(Object obj)
     {
         return obj instanceof VoidResult;
+    }
+
+    // @Override
+    public int hashCode ()
+    {
+        return 0;
     }
 
     // @Override

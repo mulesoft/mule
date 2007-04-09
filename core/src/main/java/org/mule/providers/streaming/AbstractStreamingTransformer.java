@@ -187,11 +187,12 @@ public abstract class AbstractStreamingTransformer implements UMOStreamingTransf
     {
         try
         {
+            // TODO see AbstractTransformer.clone() for why this is not enough
             return BeanUtils.cloneBean(this);
         }
         catch (Exception e)
         {
-            throw (CloneNotSupportedException)new CloneNotSupportedException("Failed to clone transformer: "
+            throw (CloneNotSupportedException) new CloneNotSupportedException("Failed to clone transformer: "
                             + e.getMessage()).initCause(e);
         }
     }

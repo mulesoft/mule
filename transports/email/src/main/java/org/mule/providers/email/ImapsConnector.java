@@ -13,30 +13,23 @@ package org.mule.providers.email;
 /**
  * Creates a secure IMAP connection
  */
-public class ImapsConnector extends Pop3sConnector
+public class ImapsConnector extends AbstractTlsRetrieveMailConnector
 {
     public static final int DEFAULT_IMAPS_PORT = 993;
 
-    private String mailboxFolder = Pop3sConnector.MAILBOX;
-
+    public ImapsConnector()
+    {
+        super(DEFAULT_IMAPS_PORT, ImapsSocketFactory.MULE_IMAPS_NAMESPACE, ImapsSocketFactory.class);
+    }
+  
     public String getProtocol()
     {
         return "imaps";
     }
-
-    public int getDefaultPort()
+    
+    public String getBaseProtocol()
     {
-        return DEFAULT_IMAPS_PORT;
-    }
-
-    public String getMailboxFolder()
-    {
-        return mailboxFolder;
-    }
-
-    public void setMailboxFolder(String mailboxFolder)
-    {
-        this.mailboxFolder = mailboxFolder;
+        return "imap";
     }
 
 }

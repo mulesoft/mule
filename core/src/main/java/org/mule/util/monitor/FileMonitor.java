@@ -101,8 +101,8 @@ public class FileMonitor
         // Don't add if its already there
         for (Iterator i = listeners.iterator(); i.hasNext();)
         {
-            WeakReference reference = (WeakReference)i.next();
-            FileListener listener = (FileListener)reference.get();
+            WeakReference reference = (WeakReference) i.next();
+            FileListener listener = (FileListener) reference.get();
             if (listener == fileListener)
             {
                 return;
@@ -123,8 +123,8 @@ public class FileMonitor
     {
         for (Iterator i = listeners.iterator(); i.hasNext();)
         {
-            WeakReference reference = (WeakReference)i.next();
-            FileMonitor listener = (FileMonitor)reference.get();
+            WeakReference reference = (WeakReference) i.next();
+            FileMonitor listener = (FileMonitor) reference.get();
             if (listener == fileListener)
             {
                 i.remove();
@@ -160,8 +160,8 @@ public class FileMonitor
 
             for (Iterator i = fileKeys.iterator(); i.hasNext();)
             {
-                File file = (File)i.next();
-                long lastModifiedTime = ((Long)files.get(file)).longValue();
+                File file = (File) i.next();
+                long lastModifiedTime = ((Long) files.get(file)).longValue();
                 long newModifiedTime = file.exists() ? file.lastModified() : -1;
 
                 // Chek if file has changed
@@ -173,8 +173,8 @@ public class FileMonitor
                     // Notify listeners
                     for (Iterator j = listeners.iterator(); j.hasNext();)
                     {
-                        WeakReference reference = (WeakReference)j.next();
-                        FileListener listener = (FileListener)reference.get();
+                        WeakReference reference = (WeakReference) j.next();
+                        FileListener listener = (FileListener) reference.get();
 
                         // Remove from list if the back-end object has been GC'd
                         if (listener == null)

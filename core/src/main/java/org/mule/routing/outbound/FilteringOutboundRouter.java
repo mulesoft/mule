@@ -105,7 +105,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
             {
                 throw new RoutingException(
                     new Message(Messages.TRANSFORM_FAILED_BEFORE_FILTER), 
-                    message, (UMOEndpoint)endpoints.get(0), e);
+                    message, (UMOEndpoint) endpoints.get(0), e);
             }
         }
         return getFilter().accept(message);
@@ -146,11 +146,11 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
     {
         if (!useTemplates)
         {
-            return (UMOEndpoint)endpoints.get(index);
+            return (UMOEndpoint) endpoints.get(index);
         }
         else
         {
-            UMOEndpoint ep = (UMOEndpoint)endpoints.get(index);
+            UMOEndpoint ep = (UMOEndpoint) endpoints.get(index);
             String uri = ep.getEndpointURI().toString();
             if (logger.isDebugEnabled())
             {
@@ -162,7 +162,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
             props.putAll(ep.getProperties());
             for (Iterator iterator = message.getPropertyNames().iterator(); iterator.hasNext();)
             {
-                String propertyKey = (String)iterator.next();
+                String propertyKey = (String) iterator.next();
                 props.put(propertyKey, message.getProperty(propertyKey));
             }
             String newUriString = parser.parse(props, uri);

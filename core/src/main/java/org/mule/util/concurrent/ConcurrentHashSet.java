@@ -29,96 +29,96 @@ public class ConcurrentHashSet/* <E> */extends AbstractSet/* <E> */implements Se
 {
     private static final long serialVersionUID = 2454657854757543876L;
 
-    private final ConcurrentHashMap/* <E, Boolean> */_map;
-    private transient Set/* <E> */_keySet;
+    private final ConcurrentHashMap/* <E, Boolean> */map;
+    private transient Set/* <E> */keySet;
 
     public ConcurrentHashSet()
     {
-        _map = new ConcurrentHashMap/* <E, Boolean> */();
-        _keySet = _map.keySet();
+        map = new ConcurrentHashMap/* <E, Boolean> */();
+        keySet = map.keySet();
     }
 
     public ConcurrentHashSet(int initialCapacity)
     {
-        _map = new ConcurrentHashMap/* <E, Boolean> */(initialCapacity);
-        _keySet = _map.keySet();
+        map = new ConcurrentHashMap/* <E, Boolean> */(initialCapacity);
+        keySet = map.keySet();
     }
 
     public ConcurrentHashSet(int initialCapacity, float loadFactor, int concurrencyLevel)
     {
-        _map = new ConcurrentHashMap/* <E, Boolean> */(initialCapacity, loadFactor, concurrencyLevel);
-        _keySet = _map.keySet();
+        map = new ConcurrentHashMap/* <E, Boolean> */(initialCapacity, loadFactor, concurrencyLevel);
+        keySet = map.keySet();
     }
 
     public int size()
     {
-        return _map.size();
+        return map.size();
     }
 
     public boolean isEmpty()
     {
-        return _map.isEmpty();
+        return map.isEmpty();
     }
 
     public boolean contains(Object o)
     {
-        return _map.containsKey(o);
+        return map.containsKey(o);
     }
 
     public Iterator/* <E> */iterator()
     {
-        return _keySet.iterator();
+        return keySet.iterator();
     }
 
     public Object[] toArray()
     {
-        return _keySet.toArray();
+        return keySet.toArray();
     }
 
     public/* <T> T[] */Object[] toArray(Object[]/* T[] */a)
     {
-        return _keySet.toArray(a);
+        return keySet.toArray(a);
     }
 
     public boolean add(Object/* E */e)
     {
-        return _map.put(e, Boolean.TRUE) == null;
+        return map.put(e, Boolean.TRUE) == null;
     }
 
     public boolean remove(Object o)
     {
-        return _map.remove(o) != null;
+        return map.remove(o) != null;
     }
 
     public boolean removeAll(Collection/* <?> */c)
     {
-        return _keySet.removeAll(c);
+        return keySet.removeAll(c);
     }
 
     public boolean retainAll(Collection/* <?> */c)
     {
-        return _keySet.retainAll(c);
+        return keySet.retainAll(c);
     }
 
     public void clear()
     {
-        _map.clear();
+        map.clear();
     }
 
     public boolean equals(Object o)
     {
-        return _keySet.equals(o);
+        return keySet.equals(o);
     }
 
     public int hashCode()
     {
-        return _keySet.hashCode();
+        return keySet.hashCode();
     }
 
     private void readObject(java.io.ObjectInputStream s) throws IOException, ClassNotFoundException
     {
         s.defaultReadObject();
-        _keySet = _map.keySet();
+        keySet = map.keySet();
     }
 
 }

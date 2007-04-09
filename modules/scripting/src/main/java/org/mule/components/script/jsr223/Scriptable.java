@@ -52,7 +52,8 @@ public class Scriptable implements Initialisable
     private ScriptEngine scriptEngine;
     private String scriptEngineName;
 
-    public void initialise() throws InitialisationException {
+    public void initialise() throws InitialisationException
+    {
         if (scriptEngine == null)
         {
             if (compiledScript == null)

@@ -40,4 +40,5 @@ public interface TcpProtocol
     void write(OutputStream os, Object data) throws IOException;
 
     void write(OutputStream os, byte[] data) throws IOException;
+    
 }

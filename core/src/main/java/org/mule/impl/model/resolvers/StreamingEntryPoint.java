@@ -72,7 +72,7 @@ public class StreamingEntryPoint implements UMOEntryPoint
             }
             else
             {
-                streamingMethod = (Method)methods.get(0);
+                streamingMethod = (Method) methods.get(0);
             }
         }
     }
@@ -84,7 +84,7 @@ public class StreamingEntryPoint implements UMOEntryPoint
             initialise(component);
         }
 
-        StreamMessageAdapter adapter = (StreamMessageAdapter)context.getMessage().getAdapter();
+        StreamMessageAdapter adapter = (StreamMessageAdapter) context.getMessage().getAdapter();
         OutputStream out = new DeferredOutputStream(context);
 
         try

@@ -40,7 +40,7 @@ public class StringToByteArray extends AbstractTransformer
         {
             try
             {
-                return ((String)src).getBytes(encoding);
+                return ((String) src).getBytes(encoding);
             }
             catch (UnsupportedEncodingException e)
             {

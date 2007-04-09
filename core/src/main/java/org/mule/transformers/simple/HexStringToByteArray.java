@@ -37,7 +37,7 @@ public class HexStringToByteArray extends AbstractTransformer
 
         try
         {
-            return StringUtils.hexStringToByteArray((String)src);
+            return StringUtils.hexStringToByteArray((String) src);
         }
         catch (Exception ex)
         {

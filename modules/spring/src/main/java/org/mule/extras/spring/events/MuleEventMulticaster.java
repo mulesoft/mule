@@ -192,8 +192,8 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
      * Adds a listener to the the Multicaster. If asynchronous is set to true, an
      * <code>AsynchronousMessageListener</code> is used to wrap the listener. This
      * listener will be initialised with a threadpool. The configuration for the
-     * threadpool can be set on this multicaster of can be inherited from the
-     * MuleManager configuration, which is good for most cases.
+     * threadpool can be set on this multicaster or inherited from the MuleManager
+     * configuration, which is good for most cases.
      * 
      * @param listener the ApplicationListener to register with this Multicaster
      * @see AsynchronousEventListener

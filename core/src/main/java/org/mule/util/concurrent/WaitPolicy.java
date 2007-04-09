@@ -23,8 +23,8 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 // @Immutable
 public class WaitPolicy implements RejectedExecutionHandler
 {
-    private final long _time;
-    private final TimeUnit _timeUnit;
+    private final long time;
+    private final TimeUnit timeUnit;
 
     /**
      * Constructs a <tt>WaitPolicy</tt> which waits (almost) forever.
@@ -42,16 +42,17 @@ public class WaitPolicy implements RejectedExecutionHandler
     public WaitPolicy(long time, TimeUnit timeUnit)
     {
         super();
-        _time = (time < 0 ? Long.MAX_VALUE : time);
-        _timeUnit = timeUnit;
+        this.time = (time < 0 ? Long.MAX_VALUE : time);
+        this.timeUnit = timeUnit;
     }
 
     public void rejectedExecution(Runnable r, ThreadPoolExecutor e)
     {
         try
         {
-            if (e.isShutdown() || !e.getQueue().offer(r, _time, _timeUnit))
+            if (e.isShutdown() || !e.getQueue().offer(r, time, timeUnit))
             {
+                // TODO HH: better message
                 throw new RejectedExecutionException();
             }
         }

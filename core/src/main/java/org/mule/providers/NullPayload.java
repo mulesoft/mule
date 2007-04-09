@@ -17,7 +17,7 @@ import java.io.Serializable;
  * <code>NullPayload</code> represents a null event payload
  */
 // @Immutable
-public class NullPayload implements Serializable
+public final class NullPayload implements Serializable
 {
     /**
      * Serial version
@@ -48,6 +48,12 @@ public class NullPayload implements Serializable
     public boolean equals(Object obj)
     {
         return obj instanceof NullPayload;
+    }
+
+    // @Override
+    public int hashCode ()
+    {
+        return 1; // random, 0 is taken by VoidResult
     }
 
     // @Override

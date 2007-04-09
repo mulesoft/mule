@@ -33,7 +33,7 @@ public class MessagingException extends UMOException
     /**
      * The UMOMessage being processed when the error occurred
      */
-    protected transient final UMOMessage umoMessage;
+    protected final transient UMOMessage umoMessage;
 
     public MessagingException(Message message, UMOMessage umoMessage)
     {
@@ -58,7 +58,7 @@ public class MessagingException extends UMOException
         }
         else
         {
-            this.umoMessage = new MuleMessage(payload, (Map)null);
+            this.umoMessage = new MuleMessage(payload, (Map) null);
         }
         setMessage(generateMessage(message));
     }
@@ -72,7 +72,7 @@ public class MessagingException extends UMOException
         }
         else
         {
-            this.umoMessage = new MuleMessage(payload, (Map)null);
+            this.umoMessage = new MuleMessage(payload, (Map) null);
         }
         setMessage(generateMessage(message));
     }

@@ -12,7 +12,6 @@
         <event type="node-enter">
             <action class="org.jbpm.actions.mule.SendMuleEvent">
                 <endpoint>test:///tmp</endpoint>
-                <payload>This is a text message.</payload>
             </action>
         </event>
         <transition to="end" />

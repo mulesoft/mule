@@ -30,7 +30,7 @@ import org.apache.commons.lang.SystemUtils;
  * message strings for logging or exceptions.
  */
 // @ThreadSafe
-public class StringMessageUtils
+public final class StringMessageUtils
 {
     // Character encoding properties
     public static final String DEFAULT_ENCODING = "UTF-8";
@@ -38,6 +38,13 @@ public class StringMessageUtils
 
     // The maximum number of Collection and Array elements used for messages
     public static final int MAX_ELEMENTS = 50;
+    public static final int DEFAULT_MESSAGE_WIDTH = 80;
+
+    /** Do not instanciate. */
+    private StringMessageUtils ()
+    {
+        // no-op
+    }
 
     public static String getFormattedMessage(String msg, Object[] arguments)
     {
@@ -53,7 +60,7 @@ public class StringMessageUtils
 
     public static String getBoilerPlate(String message)
     {
-        return getBoilerPlate(message, '*', 80);
+        return getBoilerPlate(message, '*', DEFAULT_MESSAGE_WIDTH);
     }
 
     public static String getBoilerPlate(String message, char c, int maxlength)
@@ -230,11 +237,11 @@ public class StringMessageUtils
         }
         else if (o instanceof Class)
         {
-            return ((Class)o).getName();
+            return ((Class) o).getName();
         }
         else if (o instanceof Map)
         {
-            return MapUtils.toString((Map)o, false);
+            return MapUtils.toString((Map) o, false);
         }
         else if (o.getClass().isArray())
         {
@@ -242,7 +249,7 @@ public class StringMessageUtils
         }
         else if (o instanceof Collection)
         {
-            return CollectionUtils.toString((Collection)o, MAX_ELEMENTS);
+            return CollectionUtils.toString((Collection) o, MAX_ELEMENTS);
         }
         else
         {

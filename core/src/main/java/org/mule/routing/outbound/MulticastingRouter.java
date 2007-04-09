@@ -60,7 +60,7 @@ public class MulticastingRouter extends FilteringOutboundRouter
             {
                 for (int i = 0; i < endpoints.size(); i++)
                 {
-                    endpoint = (UMOEndpoint)endpoints.get(i);
+                    endpoint = (UMOEndpoint) endpoints.get(i);
                     if (synchronous)
                     {
                         // Were we have multiple outbound endpoints
@@ -70,7 +70,7 @@ public class MulticastingRouter extends FilteringOutboundRouter
                         }
                         else
                         {
-                            String def = (String)endpoint.getProperties().get("default");
+                            String def = (String) endpoint.getProperties().get("default");
                             if (def != null)
                             {
                                 result = send(session, message, endpoint);
@@ -90,7 +90,7 @@ public class MulticastingRouter extends FilteringOutboundRouter
         }
         catch (UMOException e)
         {
-            throw new CouldNotRouteOutboundMessageException(message, (UMOEndpoint)endpoints.get(0), e);
+            throw new CouldNotRouteOutboundMessageException(message, (UMOEndpoint) endpoints.get(0), e);
         }
         return result;
     }

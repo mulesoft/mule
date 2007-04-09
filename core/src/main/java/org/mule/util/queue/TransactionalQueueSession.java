@@ -63,7 +63,7 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
         {
             if (localContext != null)
             {
-                return ((TransactionalQueueManager.QueueTransactionContext)localContext).offer(queue, item,
+                return ((TransactionalQueueManager.QueueTransactionContext) localContext).offer(queue, item,
                     timeout);
             }
             else
@@ -107,7 +107,7 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
             {
                 if (localContext != null)
                 {
-                    return ((TransactionalQueueManager.QueueTransactionContext)localContext).poll(queue,
+                    return ((TransactionalQueueManager.QueueTransactionContext) localContext).poll(queue,
                         timeout);
                 }
                 else
@@ -134,7 +134,7 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
             {
                 if (localContext != null)
                 {
-                    return ((TransactionalQueueManager.QueueTransactionContext)localContext).peek(queue);
+                    return ((TransactionalQueueManager.QueueTransactionContext) localContext).peek(queue);
                 }
                 else
                 {
@@ -158,7 +158,7 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
         {
             if (localContext != null)
             {
-                return ((TransactionalQueueManager.QueueTransactionContext)localContext).size(queue);
+                return ((TransactionalQueueManager.QueueTransactionContext) localContext).size(queue);
             }
             else
             {

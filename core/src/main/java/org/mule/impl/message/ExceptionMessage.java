@@ -51,7 +51,7 @@ public class ExceptionMessage extends BaseMessage
             UMOMessage msg = ctx.getMessage();
             for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();)
             {
-                String propertyKey = (String)iterator.next();
+                String propertyKey = (String) iterator.next();
                 setProperty(propertyKey, msg.getProperty(propertyKey));
             }
         }

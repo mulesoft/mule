@@ -20,8 +20,14 @@ import java.util.Set;
  * Useful for enumerating debug information about the current Java environment
  */
 // @ThreadSafe
-public class DebugUtils
+public final class DebugUtils
 {
+
+    /** Do not instanciate. */
+    private DebugUtils ()
+    {
+        // no-op
+    }
 
     /**
      * @return all available services types
@@ -38,7 +44,7 @@ public class DebugUtils
             Set keys = providers[i].keySet();
             for (Iterator it = keys.iterator(); it.hasNext();)
             {
-                String key = (String)it.next();
+                String key = (String) it.next();
                 key = key.split(" ")[0];
 
                 if (key.startsWith("Alg.Alias."))
@@ -50,7 +56,7 @@ public class DebugUtils
                 result.add(key.substring(0, ix));
             }
         }
-        return (String[])result.toArray(new String[result.size()]);
+        return (String[]) result.toArray(new String[result.size()]);
     }
 
     /**
@@ -68,7 +74,7 @@ public class DebugUtils
             Set keys = providers[i].keySet();
             for (Iterator it = keys.iterator(); it.hasNext();)
             {
-                String key = (String)it.next();
+                String key = (String) it.next();
                 key = key.split(" ")[0];
 
                 if (key.startsWith(serviceType + "."))
@@ -82,6 +88,6 @@ public class DebugUtils
                 }
             }
         }
-        return (String[])result.toArray(new String[result.size()]);
+        return (String[]) result.toArray(new String[result.size()]);
     }
 }

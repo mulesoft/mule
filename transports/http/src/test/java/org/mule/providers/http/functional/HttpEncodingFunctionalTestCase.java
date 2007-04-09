@@ -36,7 +36,7 @@ public class HttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
         assertNotNull(reply);
         assertEquals("200", reply.getProperty(HttpConnector.HTTP_STATUS_PROPERTY));
         assertEquals(TEST_MESSAGE + " Received", reply.getPayloadAsString());
-        assertTrue(reply.getProperty(HttpConstants.HEADER_CONTENT_TYPE).toString().equals("text/baz;charset=UTF-16BE"));
+        assertEquals("text/baz;charset=UTF-16BE", reply.getProperty(HttpConstants.HEADER_CONTENT_TYPE).toString());
         assertEquals("UTF-16BE", reply.getEncoding());
     }
 

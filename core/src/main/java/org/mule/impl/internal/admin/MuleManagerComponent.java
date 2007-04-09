@@ -89,7 +89,7 @@ public class MuleManagerComponent implements Callable, Initialisable
         Object result;
         logger.debug("Message received by MuleManagerComponent");
         ByteArrayInputStream in = new ByteArrayInputStream(context.getTransformedMessageAsBytes());
-        AdminNotification action = (AdminNotification)wireFormat.read(in);
+        AdminNotification action = (AdminNotification) wireFormat.read(in);
         if (AdminNotification.ACTION_INVOKE == action.getAction())
         {
             result = invokeAction(action, context);
@@ -213,7 +213,7 @@ public class MuleManagerComponent implements Callable, Initialisable
             if (result != null)
             {
                 // See if there is a default transformer on the connector
-                UMOTransformer trans = ((AbstractConnector)endpoint.getConnector()).getDefaultInboundTransformer();
+                UMOTransformer trans = ((AbstractConnector) endpoint.getConnector()).getDefaultInboundTransformer();
                 if (trans != null)
                 {
                     Object payload = trans.transform(result.getPayload());
@@ -272,7 +272,7 @@ public class MuleManagerComponent implements Callable, Initialisable
         logger.error("Failed to process admin request: " + e.getMessage(), e);
         if (result == null)
         {
-            result = new MuleMessage(NullPayload.getInstance(), (Map)null);
+            result = new MuleMessage(NullPayload.getInstance(), (Map) null);
         }
         result.setExceptionPayload(new ExceptionPayload(e));
         try

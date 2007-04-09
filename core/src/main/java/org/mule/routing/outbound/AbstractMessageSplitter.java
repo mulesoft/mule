@@ -42,7 +42,7 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
     public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous)
         throws RoutingException
     {
-        String correlationId = (String)propertyExtractor.getProperty(
+        String correlationId = (String) propertyExtractor.getProperty(
             MuleProperties.MULE_CORRELATION_ID_PROPERTY, message);
 
         this.initialise(message);
@@ -53,7 +53,7 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
         int correlationSequence = 1;
         for (Iterator iterator = list.iterator(); iterator.hasNext();)
         {
-            endpoint = (UMOEndpoint)iterator.next();
+            endpoint = (UMOEndpoint) iterator.next();
             message = getMessagePart(message, endpoint);
             // TODO MULE-1378
             if (message == null)

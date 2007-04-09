@@ -76,11 +76,11 @@ public class JndiContainerContext extends AbstractContainerContext
             }
             if (key instanceof Name)
             {
-                return context.lookup((Name)key);
+                return context.lookup((Name) key);
             }
             else if (key instanceof Class)
             {
-                return context.lookup(((Class)key).getName());
+                return context.lookup(((Class) key).getName());
             }
             else
             {

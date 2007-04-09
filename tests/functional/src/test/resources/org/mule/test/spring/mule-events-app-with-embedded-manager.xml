@@ -17,13 +17,9 @@
 -->
 <beans>
 
-    <bean id="muleManager" class="org.mule.extras.spring.config.AutowireUMOManagerFactoryBean"/>
+    <bean id="muleManager" class="org.mule.config.spring.AutowireUMOManagerFactoryBean"/>
 
-    <bean id="muleNameProcessor" class="org.mule.extras.spring.config.MuleObjectNameProcessor"/>
-
-    <bean id="environmentProperties" class="org.mule.config.MuleConfiguration">
-          <property name="serverUrl" value=""/>
-    </bean>
+    <bean id="muleNameProcessor" class="org.mule.config.spring.MuleObjectNameProcessor"/>
 
     <bean id="muleEnvironmentProperties" class="java.util.HashMap">
         <constructor-arg>

@@ -46,27 +46,27 @@ public class KeyedPoolMessageDispatcherFactoryAdapter
 
     public void activateObject(Object key, Object obj) throws Exception
     {
-        factory.activate((UMOImmutableEndpoint)key, (UMOMessageDispatcher)obj);
+        factory.activate((UMOImmutableEndpoint) key, (UMOMessageDispatcher) obj);
     }
 
     public void destroyObject(Object key, Object obj) throws Exception
     {
-        factory.destroy((UMOImmutableEndpoint)key, (UMOMessageDispatcher)obj);
+        factory.destroy((UMOImmutableEndpoint) key, (UMOMessageDispatcher) obj);
     }
 
     public Object makeObject(Object key) throws Exception
     {
-        return factory.create((UMOImmutableEndpoint)key);
+        return factory.create((UMOImmutableEndpoint) key);
     }
 
     public void passivateObject(Object key, Object obj) throws Exception
     {
-        factory.passivate((UMOImmutableEndpoint)key, (UMOMessageDispatcher)obj);
+        factory.passivate((UMOImmutableEndpoint) key, (UMOMessageDispatcher) obj);
     }
 
     public boolean validateObject(Object key, Object obj)
     {
-        return factory.validate((UMOImmutableEndpoint)key, (UMOMessageDispatcher)obj);
+        return factory.validate((UMOImmutableEndpoint) key, (UMOMessageDispatcher) obj);
     }
 
     public boolean isCreateDispatcherPerRequest()

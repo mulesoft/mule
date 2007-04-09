@@ -11,19 +11,19 @@ package org.mule.impl.model.streaming;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.providers.streaming.StreamMessageAdapter;
+import org.mule.umo.MessagingException;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
-import org.mule.umo.MessagingException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.routing.UMOOutboundRouter;
 import org.mule.umo.routing.UMOOutboundRouterCollection;
-import org.mule.providers.streaming.StreamMessageAdapter;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.BufferedOutputStream;
 import java.util.Iterator;
 
 import org.apache.commons.logging.Log;
@@ -40,7 +40,7 @@ public class DeferredOutputStream extends OutputStream
     /**
      * logger used by this class
      */
-    protected transient final Log logger = LogFactory.getLog(DeferredOutputStream.class);
+    protected final transient Log logger = LogFactory.getLog(DeferredOutputStream.class);
     private UMOEventContext event;
     private OutputStream out = null;
     private int buffer = 0;
@@ -71,7 +71,7 @@ public class DeferredOutputStream extends OutputStream
     public void flush() throws IOException
     {
         //out could be null if the stream hasn't been written to yet
-        if(out!=null)
+        if (out != null)
         {
             out.flush();
         }
@@ -80,7 +80,7 @@ public class DeferredOutputStream extends OutputStream
     public void close() throws IOException
     {
         //out could be null if the stream hasn't been written to yet
-        if(out!=null)
+        if (out != null)
         {
             out.close();
         }
@@ -116,7 +116,7 @@ public class DeferredOutputStream extends OutputStream
 
     public void setBuffer(int buffer)
     {
-        if(out!=null)
+        if (out != null)
         {
             throw new IllegalStateException("The stream buffer cannot be set after the stream has been written to");
         }
@@ -141,7 +141,7 @@ public class DeferredOutputStream extends OutputStream
                 }
                 catch (MessagingException e)
                 {
-                    throw (IOException)new IOException(e.toString()).initCause(e);
+                    throw (IOException) new IOException(e.toString()).initCause(e);
                 }
                 if (match)
                 {
@@ -160,8 +160,8 @@ public class DeferredOutputStream extends OutputStream
                         }
                         catch (UMOException e)
                         {
-                            throw (IOException)new IOException(
-                                new Message(Messages.STREAMING_FAILED_FOR_ENDPOINT_X,endpoint.toString()).toString()
+                            throw (IOException) new IOException(
+                                new Message(Messages.STREAMING_FAILED_FOR_ENDPOINT_X, endpoint.toString()).toString()
                                 ).initCause(e);
                         }
                     }

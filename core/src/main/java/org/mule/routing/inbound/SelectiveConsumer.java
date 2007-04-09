@@ -19,9 +19,7 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.routing.RoutingException;
-import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.routing.UMOInboundRouter;
-import org.mule.umo.routing.UMORouterCollection;
 import org.mule.umo.transformer.TransformerException;
 
 import org.apache.commons.logging.Log;
@@ -33,8 +31,8 @@ import org.apache.commons.logging.LogFactory;
  * on the router.
  * 
  * @see UMOInboundRouter
- * @see UMOInboundRouterCollection
- * @see UMORouterCollection
+ * @see org.mule.umo.routing.UMOInboundRouterCollection
+ * @see org.mule.umo.routing.UMORouterCollection
  */
 
 public class SelectiveConsumer extends AbstractRouter implements UMOInboundRouter

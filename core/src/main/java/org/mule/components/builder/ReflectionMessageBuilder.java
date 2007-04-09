@@ -60,11 +60,11 @@ public class ReflectionMessageBuilder extends AbstractMessageBuilder
         }
         else
         {
-            Method m = (Method)methods.get(0);
+            Method m = (Method) methods.get(0);
             try
             {
                 m.invoke(master,
-                    (property.getClass().isArray() ? (Object[])property : new Object[]{property}));
+                    (property.getClass().isArray() ? (Object[]) property : new Object[]{property}));
             }
             catch (Exception e)
             {

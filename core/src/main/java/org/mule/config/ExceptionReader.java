@@ -21,11 +21,11 @@ import java.util.Map;
 public interface ExceptionReader
 {
 
-    public String getMessage(Throwable t);
+    String getMessage(Throwable t);
 
-    public Throwable getCause(Throwable t);
+    Throwable getCause(Throwable t);
 
-    public Class getExceptionType();
+    Class getExceptionType();
 
     /**
      * Returns a map of the non-stanard information stored on the exception
@@ -33,6 +33,6 @@ public interface ExceptionReader
      * @param t the exception to extract the information from
      * @return a map of the non-stanard information stored on the exception
      */
-    public Map getInfo(Throwable t);
+    Map getInfo(Throwable t);
 
 }

@@ -30,7 +30,7 @@ public class CorrelationPropertiesExtractor extends MessagePropertyExtractor
         UMOMessage msg = null;
         if (message instanceof UMOMessage)
         {
-            msg = (UMOMessage)message;
+            msg = (UMOMessage) message;
         }
         if (msg != null)
         {

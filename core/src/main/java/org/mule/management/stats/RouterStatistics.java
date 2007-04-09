@@ -112,7 +112,7 @@ public class RouterStatistics implements Statistics
         {
             for (int i = 0; i < list.size(); i++)
             {
-                incrementRoutedMessage((UMOEndpoint)list.get(i));
+                incrementRoutedMessage((UMOEndpoint) list.get(i));
             }
         }
     }
@@ -131,7 +131,7 @@ public class RouterStatistics implements Statistics
 
         String name = endpoint.getName();
 
-        Long cpt = (Long)routed.get(name);
+        Long cpt = (Long) routed.get(name);
         long count = 0;
 
         if (cpt != null)
@@ -201,7 +201,7 @@ public class RouterStatistics implements Statistics
      */
     public final long getRouted(String endpointName)
     {
-        Long l = (Long)routed.get(endpointName);
+        Long l = (Long) routed.get(endpointName);
 
         if (l == null)
         {

@@ -15,9 +15,6 @@ package org.mule.umo;
  * works much the same way. This method is more commonally known as the interceptor
  * pattern and it allows for pre and processing of invocations on the object being
  * intercepted.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public interface UMOInterceptor
 {

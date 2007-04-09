@@ -72,7 +72,7 @@ public class AllStatistics
 
         while (it.hasNext())
         {
-            ((Statistics)it.next()).clear();
+            ((Statistics) it.next()).clear();
         }
         startTime = System.currentTimeMillis();
     }
@@ -96,7 +96,7 @@ public class AllStatistics
 
         while (it.hasNext())
         {
-            ((ComponentStatistics)it.next()).setEnabled(b);
+            ((ComponentStatistics) it.next()).setEnabled(b);
         }
     }
 

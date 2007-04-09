@@ -26,7 +26,9 @@ import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 
 import java.util.HashMap;
-
+/**
+ * @deprecated use Xml configuration instead
+ */
 public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTestCase
 {
     protected static final int NUM_MESSAGES_TO_SEND = 100;

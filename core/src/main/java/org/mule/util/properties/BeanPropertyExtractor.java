@@ -24,7 +24,7 @@ public class BeanPropertyExtractor implements PropertyExtractor
         {
             if (message instanceof UMOMessage)
             {
-                return ((UMOMessage)message).getPayload();
+                return ((UMOMessage) message).getPayload();
             }
             return message;
         }

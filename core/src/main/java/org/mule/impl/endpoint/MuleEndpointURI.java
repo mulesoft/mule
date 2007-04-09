@@ -111,7 +111,7 @@ public class MuleEndpointURI implements UMOEndpointURI
         this.userInfo = uri.getUserInfo();
         if (properties != null)
         {
-            resourceInfo = (String)properties.remove("resourceInfo");
+            resourceInfo = (String) properties.remove("resourceInfo");
         }
     }
 
@@ -466,7 +466,7 @@ public class MuleEndpointURI implements UMOEndpointURI
             return false;
         }
 
-        final MuleEndpointURI muleEndpointURI = (MuleEndpointURI)o;
+        final MuleEndpointURI muleEndpointURI = (MuleEndpointURI) o;
 
         if (createConnector != muleEndpointURI.createConnector)
         {

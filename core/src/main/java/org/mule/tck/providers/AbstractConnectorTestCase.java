@@ -77,13 +77,13 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         ehandlerMock.expect("exceptionThrown", C.isA(Exception.class));
 
         assertNotNull(connector.getExceptionListener());
-        connector.setExceptionListener((ExceptionListener)ehandlerMock.proxy());
+        connector.setExceptionListener((ExceptionListener) ehandlerMock.proxy());
         connector.handleException(new MuleException(Message.createStaticMessage("Dummy")));
 
         if (connector instanceof AbstractConnector)
         {
             ehandlerMock.expect("exceptionThrown", C.isA(Exception.class));
-            ((AbstractConnector)connector).exceptionThrown(new MuleException(
+            ((AbstractConnector) connector).exceptionThrown(new MuleException(
                 Message.createStaticMessage("Dummy")));
         }
 

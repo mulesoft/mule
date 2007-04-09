@@ -63,7 +63,7 @@ public class DirectComponent extends AbstractComponent
         Object obj = proxy.onCall(event);
         if (obj instanceof UMOMessage)
         {
-            return (UMOMessage)obj;
+            return (UMOMessage) obj;
         }
         else
         {

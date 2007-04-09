@@ -68,7 +68,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
 
     protected synchronized QueueInfo getQueue(String name)
     {
-        QueueInfo q = (QueueInfo)queues.get(name);
+        QueueInfo q = (QueueInfo) queues.get(name);
         if (q == null)
         {
             q = new QueueInfo();
@@ -144,7 +144,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
                 List msgs = persistenceStrategy.restore();
                 for (Iterator it = msgs.iterator(); it.hasNext();)
                 {
-                    Holder h = (Holder)it.next();
+                    Holder h = (Holder) it.next();
                     getQueue(h.getQueue()).putNow(h.getId());
                 }
             }
@@ -192,16 +192,16 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
      */
     protected void doCommit(AbstractTransactionContext context) throws ResourceManagerException
     {
-        QueueTransactionContext ctx = (QueueTransactionContext)context;
+        QueueTransactionContext ctx = (QueueTransactionContext) context;
         try
         {
             if (ctx.added != null)
             {
                 for (Iterator it = ctx.added.entrySet().iterator(); it.hasNext();)
                 {
-                    Map.Entry entry = (Map.Entry)it.next();
-                    QueueInfo queue = (QueueInfo)entry.getKey();
-                    List queueAdded = (List)entry.getValue();
+                    Map.Entry entry = (Map.Entry) it.next();
+                    QueueInfo queue = (QueueInfo) entry.getKey();
+                    List queueAdded = (List) entry.getValue();
                     if (queueAdded != null && queueAdded.size() > 0)
                     {
                         for (Iterator itAdded = queueAdded.iterator(); itAdded.hasNext();)
@@ -217,9 +217,9 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
             {
                 for (Iterator it = ctx.removed.entrySet().iterator(); it.hasNext();)
                 {
-                    Map.Entry entry = (Map.Entry)it.next();
-                    QueueInfo queue = (QueueInfo)entry.getKey();
-                    List queueRemoved = (List)entry.getValue();
+                    Map.Entry entry = (Map.Entry) it.next();
+                    QueueInfo queue = (QueueInfo) entry.getKey();
+                    List queueRemoved = (List) entry.getValue();
                     if (queueRemoved != null && queueRemoved.size() > 0)
                     {
                         for (Iterator itRemoved = queueRemoved.iterator(); itRemoved.hasNext();)
@@ -275,14 +275,14 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
      */
     protected void doRollback(AbstractTransactionContext context) throws ResourceManagerException
     {
-        QueueTransactionContext ctx = (QueueTransactionContext)context;
+        QueueTransactionContext ctx = (QueueTransactionContext) context;
         if (ctx.removed != null)
         {
             for (Iterator it = ctx.removed.entrySet().iterator(); it.hasNext();)
             {
-                Map.Entry entry = (Map.Entry)it.next();
-                QueueInfo queue = (QueueInfo)entry.getKey();
-                List queueRemoved = (List)entry.getValue();
+                Map.Entry entry = (Map.Entry) it.next();
+                QueueInfo queue = (QueueInfo) entry.getKey();
+                List queueRemoved = (List) entry.getValue();
                 if (queueRemoved != null && queueRemoved.size() > 0)
                 {
                     for (Iterator itRemoved = queueRemoved.iterator(); itRemoved.hasNext();)
@@ -309,7 +309,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
             {
                 added = new HashMap();
             }
-            List queueAdded = (List)added.get(queue);
+            List queueAdded = (List) added.get(queue);
             if (queueAdded == null)
             {
                 queueAdded = new ArrayList();
@@ -345,7 +345,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
                 {
                     removed = new HashMap();
                 }
-                List queueRemoved = (List)removed.get(queue);
+                List queueRemoved = (List) removed.get(queue);
                 if (queueRemoved == null)
                 {
                     queueRemoved = new ArrayList();
@@ -362,7 +362,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
             readOnly = false;
             if (added != null)
             {
-                List queueAdded = (List)added.get(queue);
+                List queueAdded = (List) added.get(queue);
                 if (queueAdded != null)
                 {
                     return queueAdded.get(queueAdded.size() - 1);
@@ -381,7 +381,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
             int sz = queue.list.size();
             if (added != null)
             {
-                List queueAdded = (List)added.get(queue);
+                List queueAdded = (List) added.get(queue);
                 if (queueAdded != null)
                 {
                     sz += queueAdded.size();

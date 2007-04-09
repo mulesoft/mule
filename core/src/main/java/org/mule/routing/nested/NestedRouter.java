@@ -18,7 +18,7 @@ import org.apache.commons.logging.LogFactory;
 public class NestedRouter extends AbstractRouter implements UMONestedRouter
 {
 
-    static Log logger = LogFactory.getLog(NestedRouter.class);
+    protected static Log logger = LogFactory.getLog(NestedRouter.class);
 
     private Class interfaceClass;
 

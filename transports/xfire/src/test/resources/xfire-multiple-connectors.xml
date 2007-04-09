@@ -7,6 +7,11 @@
     <connector name="XFireConnector1" className="org.mule.providers.soap.xfire.XFireConnector"/>
     <connector name="XFireConnector2" className="org.mule.providers.soap.xfire.XFireConnector"/>
 
+    <global-endpoints>
+     <endpoint name="xfire1" address="xfire:http://localhost:8081/services/TestComponent1?method=receive" connector="XFireConnector1"/>
+     <endpoint name="xfire2" address="xfire:http://localhost:8082/services/TestComponent2?method=receive" connector="XFireConnector2"/>
+    </global-endpoints>
+
     <model name="TestXfireConnectors">
         
         <!--Two separate components are created instead of 1 with 2 endpoints so that exceptions are not compomised-->

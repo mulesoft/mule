@@ -59,7 +59,6 @@ public class TcpConnector extends AbstractConnector
 
     protected void doInitialise() throws InitialisationException
     {
-
         if (tcpProtocol == null)
         {
             try
@@ -93,13 +92,13 @@ public class TcpConnector extends AbstractConnector
     /**
      * Lookup a socket in the list of dispatcher sockets but don't create a new
      * socket
-     * 
-     * @param endpoint
-     * @return
      */
-    Socket getSocket(UMOImmutableEndpoint endpoint) throws Exception
+    // TODO - reduce access once testing done
+    protected Socket getSocket(UMOImmutableEndpoint endpoint) throws Exception
     {
-        return (Socket)dispatcherSocketsPool.borrowObject(endpoint);
+        Socket socket = (Socket)dispatcherSocketsPool.borrowObject(endpoint);
+        logger.debug("returning socket " + socket);
+        return socket;
     }
 
     void releaseSocket(Socket socket, UMOImmutableEndpoint endpoint) throws Exception
@@ -119,14 +118,12 @@ public class TcpConnector extends AbstractConnector
      *         does not support streaming
      * @throws org.mule.umo.UMOException
      */
-    // TODO HH: Is this the right thing to do? not sure how else to get the outputstream
-    // acooke - what about releaseSocket?  it is not called, so will pooling fail?
-    // maybe the output stream needs to return the socket to the pool when closed?
-    // (calling release directly here will close the socket unless it is flagged
-    // to be kept open - perhaps that flag should be set for streams?)
     public OutputStream getOutputStream(UMOImmutableEndpoint endpoint, UMOMessage message)
         throws UMOException
     {
+        // TODO HH: Is this the right thing to do? not sure how else to get the outputstream
+        // acooke - what about releaseSocket?  it is not called, so will pooling fail?
+        // acooke [later] - holger confirmed that releaseSocket must be called separately
 
         Socket socket;
         try

@@ -332,7 +332,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>2.0-SNAPSHOT</version>
+                <version>2.0-beta-5</version>
             </plugin>
 
             <!-- by default download all sources when generating project files -->
@@ -519,7 +519,7 @@
             http://mule.mulesource.org/jira/browse/MULETOOLS-21
             http://mule.mulesource.org/jira/browse/MULETOOLS-22
         -->
-        <!-- <module>tools</module -->
+        <module>tools</module>
     </modules>
 
     <!--

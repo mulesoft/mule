@@ -43,7 +43,7 @@ public final class UMOExceptionReader implements ExceptionReader
      */
     public Map getInfo(Throwable t)
     {
-        return (t instanceof UMOException ? ((UMOException)t).getInfo() : Collections.EMPTY_MAP);
+        return (t instanceof UMOException ? ((UMOException) t).getInfo() : Collections.EMPTY_MAP);
     }
 
 }

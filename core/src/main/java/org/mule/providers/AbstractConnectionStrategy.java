@@ -12,8 +12,8 @@ package org.mule.providers;
 
 import org.mule.umo.manager.UMOWorkManager;
 import org.mule.umo.provider.UMOConnectable;
-import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.umo.provider.UMOMessageReceiver;
 
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
@@ -67,13 +67,14 @@ public abstract class AbstractConnectionStrategy implements ConnectionStrategy
                             }
                             // TODO should really extract an interface for
                             // classes capable of handling an exception
-                            if (connectable instanceof UMOConnector) {
+                            if (connectable instanceof UMOConnector)
+                            {
                                 ((UMOConnector) connectable).handleException(e);
                             }
                             // TODO: this cast is evil
                             else if (connectable instanceof AbstractMessageReceiver)
                             {
-                                ((AbstractMessageReceiver)connectable).handleException(e);
+                                ((AbstractMessageReceiver) connectable).handleException(e);
                             }
                             // TODO MULE-863: And if it's not?
                             // AP if it's not, it's not handled and Mule just sits doing nothing
@@ -141,7 +142,7 @@ public abstract class AbstractConnectionStrategy implements ConnectionStrategy
     {
         if (connectable instanceof UMOMessageReceiver)
         {
-            return ((UMOMessageReceiver)connectable).getEndpointURI().toString();
+            return ((UMOMessageReceiver) connectable).getEndpointURI().toString();
         }
         else
         {

@@ -22,7 +22,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
 public interface UMOOutboundRouterCollection extends UMORouterCollection
 {
     /**
-     * Prepares one or more events to be dispached by a Message Dispatcher
+     * Prepares one or more events to be dispached by a Message Dispatcher.
      * 
      * @param message The source Message
      * @param session The current session
@@ -33,7 +33,7 @@ public interface UMOOutboundRouterCollection extends UMORouterCollection
 
     /**
      * A helper method for finding out which endpoints a message would be routed to
-     * without actually routing the the message
+     * without actually routing the the message.
      * 
      * @param message the message to retrieve endpoints for
      * @return an array of UMOEndpoint objects or an empty array
@@ -42,9 +42,9 @@ public interface UMOOutboundRouterCollection extends UMORouterCollection
     UMOEndpoint[] getEndpointsForMessage(UMOMessage message) throws MessagingException;
 
     /**
-     * Determines if any endpoints have been set on this router
+     * Determines if any endpoints have been set on this router.
      * 
      * @return
      */
-    public boolean hasEndpoints();
+    boolean hasEndpoints();
 }

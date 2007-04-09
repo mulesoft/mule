@@ -12,11 +12,11 @@ package org.mule.tck.testmodels.mule;
 
 import org.mule.umo.manager.UMOTransactionManagerFactory;
 
-import javax.transaction.TransactionManager;
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+
+import javax.transaction.TransactionManager;
 
 /**
  * <code>TestTransactionManagerFactory</code> TODO
@@ -29,14 +29,15 @@ public class TestTransactionManagerFactory implements UMOTransactionManagerFacto
 {
     public TransactionManager create() throws Exception
     {
-        return (TransactionManager)Proxy.newProxyInstance(getClass().getClassLoader(),
-            new Class[]{TransactionManager.class}, new InvocationHandler()
+        return (TransactionManager) Proxy.newProxyInstance(getClass().getClassLoader(),
+                                                           new Class[] {TransactionManager.class},
+                                                           new InvocationHandler()
+        {
+            public Object invoke (Object proxy, Method method, Object[] args) throws Throwable
             {
-                public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
-                {
-                    return null;
-                }
+                return null;
+            }
 
-            });
+        });
     }
 }

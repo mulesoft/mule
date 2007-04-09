@@ -24,17 +24,20 @@ import java.util.Iterator;
  * <code>EndpointSelector</code> selects the outgoing endpoint based on a
  * message property ("endpoint" by default).  It will first try to match the
  * endpoint by name and then by address.
+ * <pre>
  *
- * <outbound-router>
- *      <router className="org.mule.routing.outbound.EndpointSelector">
- *          <endpoint name="dest1" address="jms://queue1" />
- *          <endpoint name="dest2" address="jms://queue2" />
- *          <endpoint name="dest3" address="jms://queue3" />
- *          <properties>
- *              <property name="selector" value="endpoint" />
- *          </properties>
- *      </router>
- * </outbound-router>
+ * &lt;outbound-router&gt;
+ *      &lt;router className="org.mule.routing.outbound.EndpointSelector"&gt;
+ *          &lt;endpoint name="dest1" address="jms://queue1" /&gt;
+ *          &lt;endpoint name="dest2" address="jms://queue2" /&gt;
+ *          &lt;endpoint name="dest3" address="jms://queue3" /&gt;
+ *          &lt;properties&gt;
+ *              &lt;property name="selector" value="endpoint" /&gt;
+ *          &lt;/properties&gt;
+ *      &lt;/router&gt;
+ * &lt;/outbound-router&gt;
+ *
+ * </pre>
  */
 public class EndpointSelector extends FilteringOutboundRouter
 {
@@ -81,7 +84,7 @@ public class EndpointSelector extends FilteringOutboundRouter
         Iterator iterator = endpoints.iterator();
         while (iterator.hasNext())
         {
-            ep = (UMOEndpoint)iterator.next();
+            ep = (UMOEndpoint) iterator.next();
             if (endpointName.equals(ep.getName()))
             {
                 return ep;

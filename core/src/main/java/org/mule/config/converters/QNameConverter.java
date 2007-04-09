@@ -92,27 +92,17 @@ public class QNameConverter implements Converter
         switch (elements.size())
         {
             case 1 :
-            {
-                return new QName((String)elements.get(0));
-            }
+                return new QName((String) elements.get(0));
             case 2 :
-            {
-                return new QName((String)elements.get(0), (String)elements.get(1));
-            }
+                return new QName((String) elements.get(0), (String) elements.get(1));
             case 3 :
-            {
-                return new QName((String)elements.get(1) + ":" + (String)elements.get(2),
-                    (String)elements.get(0));
-            }
+                return new QName((String) elements.get(1) + ":" + (String) elements.get(2),
+                    (String) elements.get(0));
             case 4 :
-            {
-                return new QName((String)elements.get(2) + ":" + (String)elements.get(3),
-                    (String)elements.get(1), (String)elements.get(0));
-            }
+                return new QName((String) elements.get(2) + ":" + (String) elements.get(3),
+                    (String) elements.get(1), (String) elements.get(0));
             default :
-            {
                 return null;
-            }
         }
     }
 

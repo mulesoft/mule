@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+        "http://mule.mulesource.org/dtds/mule-configuration.dtd">
 
 <mule-configuration id="Mule_Samples" version="1.0">
     <!--
@@ -13,9 +13,9 @@
        -->
     <transformers>
         <transformer name="StringToNameString" className="org.mule.samples.hello.StringToNameString"
-            returnClass="org.mule.samples.hello.NameString"/>
+                     returnClass="org.mule.samples.hello.NameString"/>
         <transformer name="NameStringToChatString" className="org.mule.samples.hello.NameStringToChatString"
-            returnClass="org.mule.samples.hello.ChatString"/>
+                     returnClass="org.mule.samples.hello.ChatString"/>
     </transformers>
 
     <!--
@@ -23,22 +23,24 @@
         interact with the framework, other components in the system and external sources.
         Please refer to the Configuration Guide for a full description of all the parameters.
     -->
-    <mule-descriptor name="GreeterUMO" implementation="org.mule.samples.hello.Greeter">
-        <inbound-router>
-            <endpoint address="vm://greeter" transformers="StringToNameString"/>
-            <!-- Used by the REST Hello world Example -->
-            <endpoint address="servlet://greeter" transformers="StringToNameString"/>
-        </inbound-router>
-        <outbound-router>
-            <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                <endpoint address="vm://chitchatter"/>
-            </router>
-        </outbound-router>
-    </mule-descriptor>
+    <model name="main" type="inherited">
+        <mule-descriptor name="GreeterUMO" implementation="org.mule.samples.hello.Greeter">
+            <inbound-router>
+                <endpoint address="vm://greeter" transformers="StringToNameString"/>
+                <!-- Used by the REST Hello world Example -->
+                <endpoint address="servlet://greeter" transformers="StringToNameString"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="vm://chitchatter"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
 
-    <mule-descriptor name="ChitChatUMO" implementation="org.mule.samples.hello.ChitChatter">
-        <inbound-router>
-            <endpoint address="vm://chitchatter" transformers="NameStringToChatString"/>
-        </inbound-router>
-    </mule-descriptor>
+        <mule-descriptor name="ChitChatUMO" implementation="org.mule.samples.hello.ChitChatter">
+            <inbound-router>
+                <endpoint address="vm://chitchatter" transformers="NameStringToChatString"/>
+            </inbound-router>
+        </mule-descriptor>
+    </model>
 </mule-configuration>

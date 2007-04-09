@@ -66,7 +66,7 @@ public class CommonsPoolProxyPool implements ObjectPool
         config.maxIdle = pp.getMaxIdle();
         config.maxActive = pp.getMaxActive();
         config.maxWait = pp.getMaxWait();
-        config.whenExhaustedAction = (byte)pp.getExhaustedAction();
+        config.whenExhaustedAction = (byte) pp.getExhaustedAction();
 
         init(descriptor, model, config);
     }
@@ -93,11 +93,11 @@ public class CommonsPoolProxyPool implements ObjectPool
             setFactory(new CommonsPoolProxyFactory(descriptor, model));
         }
 
-        pool = new GenericObjectPool((PoolableObjectFactory)factory, config);
+        pool = new GenericObjectPool((PoolableObjectFactory) factory, config);
 
         if (factory instanceof CommonsPoolProxyFactory)
         {
-            ((CommonsPoolProxyFactory)factory).setPool(this);
+            ((CommonsPoolProxyFactory) factory).setPool(this);
         }
     }
 
@@ -162,7 +162,7 @@ public class CommonsPoolProxyPool implements ObjectPool
         {
             for (Iterator i = components.iterator(); i.hasNext();)
             {
-                ((Disposable)i.next()).dispose();
+                ((Disposable) i.next()).dispose();
             }
             components.clear();
         }
@@ -184,7 +184,7 @@ public class CommonsPoolProxyPool implements ObjectPool
             final boolean wasRemoved = components.remove(proxy);
             if (wasRemoved)
             {
-                ((Disposable)proxy).dispose();
+                ((Disposable) proxy).dispose();
             }
         }
     }
@@ -195,7 +195,7 @@ public class CommonsPoolProxyPool implements ObjectPool
         {
             for (Iterator i = components.iterator(); i.hasNext();)
             {
-                ((Startable)i.next()).start();
+                ((Startable) i.next()).start();
             }
         }
     }
@@ -206,7 +206,7 @@ public class CommonsPoolProxyPool implements ObjectPool
         {
             for (Iterator i = components.iterator(); i.hasNext();)
             {
-                ((Stoppable)i.next()).stop();
+                ((Stoppable) i.next()).stop();
             }
         }
     }

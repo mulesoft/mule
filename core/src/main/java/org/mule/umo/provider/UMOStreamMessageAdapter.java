@@ -30,14 +30,14 @@ public interface UMOStreamMessageAdapter extends UMOMessageAdapter
      * 
      * @return the input Stream associated with this event
      */
-    public InputStream getInputStream();
+    InputStream getInputStream();
 
     /**
      * Gets the output Stream associated with this event
      * 
      * @return the output Stream associated with this event
      */
-    public OutputStream getOutputStream();
+    OutputStream getOutputStream();
 
     /**
      * Writes the event to the current outputStream using the OutputHandler set on
@@ -46,7 +46,7 @@ public interface UMOStreamMessageAdapter extends UMOMessageAdapter
      * @param event the event to write to the stream
      * @throws IOException
      */
-    public void write(UMOEvent event) throws IOException;
+    void write(UMOEvent event) throws IOException;
 
     /**
      * The Output handler is a callback that will handle the writing to an output
@@ -54,7 +54,7 @@ public interface UMOStreamMessageAdapter extends UMOMessageAdapter
      * 
      * @return the handler used to write to the stream
      */
-    public OutputHandler getOutputHandler();
+    OutputHandler getOutputHandler();
 
     /**
      * The Output handler is a callback that will handle the writing to an output
@@ -62,12 +62,12 @@ public interface UMOStreamMessageAdapter extends UMOMessageAdapter
      * 
      * @param handler the handler used to write to the stream
      */
-    public void setOutputHandler(OutputHandler handler);
+    void setOutputHandler(OutputHandler handler);
 
     /**
      * The release method is called by Mule to notify this adapter that it is no
      * longer needed. This method can be used to release any resources that a custom
      * StreamAdapter may have associated with it.
      */
-    public void release();
+    void release();
 }

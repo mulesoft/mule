@@ -42,14 +42,14 @@ public class MuleMessage implements UMOMessage
 
     public MuleMessage(Object message)
     {
-        this(message, (Map)null);
+        this(message, (Map) null);
     }
 
     public MuleMessage(Object message, Map properties)
     {
         if (message instanceof UMOMessageAdapter)
         {
-            adapter = (UMOMessageAdapter)message;
+            adapter = (UMOMessageAdapter) message;
         }
         else
         {
@@ -62,7 +62,7 @@ public class MuleMessage implements UMOMessage
     {
         if (message instanceof UMOMessageAdapter)
         {
-            adapter = (UMOMessageAdapter)message;
+            adapter = (UMOMessageAdapter) message;
         }
         else
         {
@@ -80,7 +80,7 @@ public class MuleMessage implements UMOMessage
             {
                 for (Iterator iterator = attNames.iterator(); iterator.hasNext();)
                 {
-                    String s = (String)iterator.next();
+                    String s = (String) iterator.next();
                     try
                     {
                         addAttachment(s, adapter.getAttachment(s));

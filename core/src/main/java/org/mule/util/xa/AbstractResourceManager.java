@@ -362,7 +362,7 @@ public abstract class AbstractResourceManager
                 return false;
             }
 
-            AbstractTransactionContext context = (AbstractTransactionContext)it.next();
+            AbstractTransactionContext context = (AbstractTransactionContext) it.next();
             synchronized (context)
             {
                 if (!context.finished)

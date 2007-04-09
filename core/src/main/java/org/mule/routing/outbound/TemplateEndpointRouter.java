@@ -54,7 +54,7 @@ public class TemplateEndpointRouter extends FilteringOutboundRouter
         }
         try
         {
-            UMOEndpoint ep = (UMOEndpoint)endpoints.get(0);
+            UMOEndpoint ep = (UMOEndpoint) endpoints.get(0);
             String uri = ep.getEndpointURI().toString();
             if (logger.isDebugEnabled())
             {
@@ -66,7 +66,7 @@ public class TemplateEndpointRouter extends FilteringOutboundRouter
             props.putAll(ep.getProperties());
             for (Iterator iterator = message.getPropertyNames().iterator(); iterator.hasNext();)
             {
-                String propertyKey = (String)iterator.next();
+                String propertyKey = (String) iterator.next();
                 props.put(propertyKey, message.getProperty(propertyKey));
             }
             uri = parser.parse(props, uri);
@@ -93,7 +93,7 @@ public class TemplateEndpointRouter extends FilteringOutboundRouter
         }
         catch (UMOException e)
         {
-            throw new CouldNotRouteOutboundMessageException(message, (UMOEndpoint)endpoints.get(0), e);
+            throw new CouldNotRouteOutboundMessageException(message, (UMOEndpoint) endpoints.get(0), e);
         }
         return result;
     }

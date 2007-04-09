@@ -39,7 +39,7 @@ public class GZipUncompressTransformer extends GZipCompressTransformer
 
         try
         {
-            buffer = getStrategy().uncompressByteArray((byte[])src);
+            buffer = getStrategy().uncompressByteArray((byte[]) src);
         }
         catch (IOException e)
         {

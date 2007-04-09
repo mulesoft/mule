@@ -35,6 +35,6 @@ public class OptimisedSedaModel extends SedaModel
 
     protected UMOComponent createComponent(UMODescriptor descriptor)
     {
-        return new OptimisedSedaComponent((MuleDescriptor)descriptor, this);
+        return new OptimisedSedaComponent((MuleDescriptor) descriptor, this);
     }
 }

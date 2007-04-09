@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+        "http://mule.mulesource.org/dtds/mule-configuration.dtd">
 
 <mule-configuration id="Samples" version="1.0">
 
@@ -9,17 +9,19 @@
         <endpoint name="restFileEndpoint" address="file://./.mule/restFile"/>
     </global-endpoints>
 
-    <mule-descriptor name="RestTesterUMO" implementation="org.mule.samples.rest.RestTester">
-        <inbound-router>
-            <endpoint address="servlet://restPUTTest"/>
-        </inbound-router>
-        <outbound-router>
-            <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                <endpoint address="restFileEndpoint"/>
-            </router>
-        </outbound-router>
-        <properties>
-            <property name="prefix" value="Received: "/>
-        </properties>
-    </mule-descriptor>
+    <model name="main" type="inherited">
+        <mule-descriptor name="RestTesterUMO" implementation="org.mule.samples.rest.RestTester">
+            <inbound-router>
+                <endpoint address="servlet://restPUTTest"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="restFileEndpoint"/>
+                </router>
+            </outbound-router>
+            <properties>
+                <property name="prefix" value="Received: "/>
+            </properties>
+        </mule-descriptor>
+    </model>
 </mule-configuration>

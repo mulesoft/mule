@@ -64,7 +64,7 @@ public class MapUtils extends org.apache.commons.collections.MapUtils
 
         try
         {
-            m = (Map)mapClass.newInstance();
+            m = (Map) mapClass.newInstance();
         }
         catch (Exception ex)
         {
@@ -110,7 +110,7 @@ public class MapUtils extends org.apache.commons.collections.MapUtils
 
         for (i = 0; i < entries.length - 1; i++)
         {
-            Map.Entry property = (Map.Entry)entries[i];
+            Map.Entry property = (Map.Entry) entries[i];
             buf.append(property.getKey());
             buf.append('=');
             buf.append(PropertiesUtils.maskedPropertyValue(property));
@@ -126,7 +126,7 @@ public class MapUtils extends org.apache.commons.collections.MapUtils
         }
 
         // don't forget the last one
-        Map.Entry lastProperty = (Map.Entry)entries[i];
+        Map.Entry lastProperty = (Map.Entry) entries[i];
         buf.append(lastProperty.getKey().toString());
         buf.append('=');
         buf.append(PropertiesUtils.maskedPropertyValue(lastProperty));

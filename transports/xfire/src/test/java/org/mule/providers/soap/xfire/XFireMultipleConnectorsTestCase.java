@@ -32,21 +32,15 @@ public class XFireMultipleConnectorsTestCase extends FunctionalTestCase
     public void testXFireConnector1() throws Exception
     {
         MuleClient client = new MuleClient();
-        
-        UMOMessage reply = client.send("xfire:http://localhost:8081/services/TestComponent1?method=receive", new MuleMessage("mule"));
-        
+        UMOMessage reply = client.send("xfire1", new MuleMessage("mule"));
         assertEquals("Received: mule", reply.getPayloadAsString());
     }
     
     public void testXFireConnector2() throws Exception
     {
         MuleClient client = new MuleClient();
-        
-        /*
-        UMOMessage reply = client.send("xfire:http://localhost:8082/services/TestComponent2?method=receive", new MuleMessage("mule"));
-        
+        UMOMessage reply = client.send("xfire2", new MuleMessage("mule"));
         assertEquals("Received: mule", reply.getPayloadAsString());
-        */
     }
 
 }

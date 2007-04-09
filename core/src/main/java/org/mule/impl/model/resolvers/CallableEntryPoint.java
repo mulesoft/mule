@@ -25,7 +25,7 @@ public class CallableEntryPoint implements UMOEntryPoint
     {
         if (component instanceof Callable)
         {
-            return ((Callable)component).onCall(context);
+            return ((Callable) component).onCall(context);
         }
         else
         {

@@ -24,6 +24,7 @@ import java.util.Map;
  */
 public class ObjectToString extends AbstractTransformer
 {
+    protected static final int DEFAULT_BUFFER_SIZE = 80;
 
     public ObjectToString()
     {
@@ -37,13 +38,13 @@ public class ObjectToString extends AbstractTransformer
 
         if (src instanceof Map)
         {
-            Iterator iter = ((Map)src).entrySet().iterator();
+            Iterator iter = ((Map) src).entrySet().iterator();
             if (iter.hasNext())
             {
-                StringBuffer b = new StringBuffer(80);
+                StringBuffer b = new StringBuffer(DEFAULT_BUFFER_SIZE);
                 while (iter.hasNext())
                 {
-                    Map.Entry e = (Map.Entry)iter.next();
+                    Map.Entry e = (Map.Entry) iter.next();
                     Object key = e.getKey();
                     Object value = e.getValue();
                     b.append(key.toString()).append(':').append(value.toString());
@@ -57,10 +58,10 @@ public class ObjectToString extends AbstractTransformer
         }
         else if (src instanceof Collection)
         {
-            Iterator iter = ((Collection)src).iterator();
+            Iterator iter = ((Collection) src).iterator();
             if (iter.hasNext())
             {
-                StringBuffer b = new StringBuffer(80);
+                StringBuffer b = new StringBuffer(DEFAULT_BUFFER_SIZE);
                 while (iter.hasNext())
                 {
                     b.append(iter.next().toString());

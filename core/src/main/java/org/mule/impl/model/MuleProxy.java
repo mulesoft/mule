@@ -32,11 +32,11 @@ public interface MuleProxy extends Work, Lifecycle
      * 
      * @param event the event being processed
      */
-    public void onEvent(QueueSession session, UMOEvent event);
+    void onEvent(QueueSession session, UMOEvent event);
 
-    public ComponentStatistics getStatistics();
+    ComponentStatistics getStatistics();
 
-    public void setStatistics(ComponentStatistics stat);
+    void setStatistics(ComponentStatistics stat);
 
     /**
      * Makes a synchronous call on the UMO
@@ -45,7 +45,7 @@ public interface MuleProxy extends Work, Lifecycle
      * @return the return event from the UMO
      * @throws UMOException if the call fails
      */
-    public Object onCall(UMOEvent event) throws UMOException;
+    Object onCall(UMOEvent event) throws UMOException;
 
     /**
      * When an exception occurs this method can be called to invoke the configured
@@ -53,29 +53,29 @@ public interface MuleProxy extends Work, Lifecycle
      * 
      * @param exception If the UMOExceptionStrategy implementation fails
      */
-    public void handleException(Exception exception);
+    void handleException(Exception exception);
 
     /**
      * Determines if the proxy is suspended
      * 
      * @return true if the proxy (and the UMO) are suspended
      */
-    public boolean isSuspended();
+    boolean isSuspended();
 
     /**
      * Controls the suspension of the UMO event processing
      */
-    public void suspend();
+    void suspend();
 
     /**
      * Triggers the UMO to resume processing of events if it is suspended
      */
-    public void resume();
+    void resume();
 
     /*
      * (non-Javadoc)
      * 
      * @see org.mule.umo.UMOLifecycleAdapter#getDescriptor()
      */
-    public UMOImmutableDescriptor getDescriptor();
+    UMOImmutableDescriptor getDescriptor();
 }

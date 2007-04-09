@@ -26,12 +26,12 @@ public class CorrelationEventResequencer extends AbstractEventResequencer
     public CorrelationEventResequencer()
     {
         super();
-        this.setComparator(CorrelationSequenceComparator.getInstance());
+        this.setComparator(new CorrelationSequenceComparator());
     }
 
     protected boolean shouldResequenceEvents(EventGroup events)
     {
-        UMOEvent event = (UMOEvent)events.iterator().next();
+        UMOEvent event = (UMOEvent) events.iterator().next();
 
         if (event == null)
         {

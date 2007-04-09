@@ -12,9 +12,7 @@ package org.mule.providers;
 
 import org.mule.MuleRuntimeException;
 import org.mule.RegistryContext;
-import org.mule.util.ClassUtils;
 import org.mule.config.MuleProperties;
-import org.mule.config.ThreadingProfile;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.RequestContext;
@@ -35,6 +33,7 @@ import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.ReceiveException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
+import org.mule.util.ClassUtils;
 
 import java.beans.ExceptionListener;
 
@@ -65,8 +64,6 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
 
     protected boolean disposed = false;
 
-    protected boolean doThreading = true;
-
     protected ConnectionStrategy connectionStrategy;
 
     protected volatile boolean connecting = false;
@@ -77,7 +74,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
     public AbstractMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
         this.endpoint = endpoint;
-        this.connector = (AbstractConnector)endpoint.getConnector();
+        this.connector = (AbstractConnector) endpoint.getConnector();
 
         connectionStrategy = endpoint.getConnectionStrategy();
         if (connectionStrategy instanceof AbstractConnectionStrategy)
@@ -85,12 +82,18 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
             // We don't want to do threading in the dispatcher because we're either
             // already running in a worker thread (asynchronous) or we need to
             // complete the operation in a single thread
-            ((AbstractConnectionStrategy)connectionStrategy).setDoThreading(false);
+            final AbstractConnectionStrategy connStrategy = (AbstractConnectionStrategy) connectionStrategy;
+            if (connStrategy.isDoThreading())
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Overriding doThreading to false on " + connStrategy);
+                }
+                connStrategy.setDoThreading(false);
+            }
         }
 
-        ThreadingProfile profile = connector.getDispatcherThreadingProfile();
-        doThreading = profile.isDoThreading();
-        if (doThreading)
+        if (isDoThreading())
         {
             try
             {
@@ -186,7 +189,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
         try
         {
             UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
-            if (doThreading && !event.isSynchronous() && tx == null)
+            if (isDoThreading() && !event.isSynchronous() && tx == null)
             {
                 workManager.scheduleWork(new Worker(event), WorkManager.INDEFINITE, null, connector);
             }
@@ -498,7 +501,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
 
             if (e instanceof ConnectException)
             {
-                throw (ConnectException)e;
+                throw (ConnectException) e;
             }
             else
             {
@@ -536,6 +539,11 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
     public final boolean isConnected()
     {
         return connected;
+    }
+
+    protected boolean isDoThreading ()
+    {
+        return connector.getDispatcherThreadingProfile().isDoThreading();
     }
 
     /**

@@ -55,7 +55,7 @@ public class PipelineComponent extends DirectComponent
         }
         if (component instanceof Callable)
         {
-            callable = (Callable)component;
+            callable = (Callable) component;
         }
         else
         {
@@ -65,7 +65,7 @@ public class PipelineComponent extends DirectComponent
 
         if (component instanceof Initialisable)
         {
-            ((Initialisable)component).initialise();
+            ((Initialisable) component).initialise();
         }
 
     }
@@ -78,7 +78,7 @@ public class PipelineComponent extends DirectComponent
             UMOMessage returnMessage = null;
             if (result instanceof UMOMessage)
             {
-                returnMessage = (UMOMessage)result;
+                returnMessage = (UMOMessage) result;
             }
             else
             {
@@ -124,7 +124,7 @@ public class PipelineComponent extends DirectComponent
     {
         if (callable instanceof Disposable)
         {
-            ((Disposable)callable).dispose();
+            ((Disposable) callable).dispose();
         }
     }
 }

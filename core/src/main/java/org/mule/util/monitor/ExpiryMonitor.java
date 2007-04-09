@@ -93,7 +93,7 @@ public class ExpiryMonitor extends TimerTask implements Disposable
 
     public void resetExpirable(Expirable expirable)
     {
-        ExpirableHolder eh = (ExpirableHolder)monitors.get(expirable);
+        ExpirableHolder eh = (ExpirableHolder) monitors.get(expirable);
         if (eh != null)
         {
             eh.reset();
@@ -112,7 +112,7 @@ public class ExpiryMonitor extends TimerTask implements Disposable
         ExpirableHolder holder;
         for (Iterator iterator = monitors.values().iterator(); iterator.hasNext();)
         {
-            holder = (ExpirableHolder)iterator.next();
+            holder = (ExpirableHolder) iterator.next();
             if (holder.isExpired())
             {
                 removeExpirable(holder.getExpirable());
@@ -128,7 +128,7 @@ public class ExpiryMonitor extends TimerTask implements Disposable
         ExpirableHolder holder;
         for (Iterator iterator = monitors.values().iterator(); iterator.hasNext();)
         {
-            holder = (ExpirableHolder)iterator.next();
+            holder = (ExpirableHolder) iterator.next();
             removeExpirable(holder.getExpirable());
             try
             {

@@ -20,7 +20,7 @@ public class DirectModel extends AbstractModel
 
     protected UMOComponent createComponent(UMODescriptor descriptor)
     {
-        return new DirectComponent((MuleDescriptor)descriptor, this);
+        return new DirectComponent((MuleDescriptor) descriptor, this);
     }
 
     /**

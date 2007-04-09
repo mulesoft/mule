@@ -58,7 +58,7 @@ public class BeanUtils extends org.apache.commons.beanutils.BeanUtils
         {
             for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();)
             {
-                Map.Entry entry = (Map.Entry)iterator.next();
+                Map.Entry entry = (Map.Entry) iterator.next();
 
                 try
                 {

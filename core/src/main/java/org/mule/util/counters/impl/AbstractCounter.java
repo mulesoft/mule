@@ -63,7 +63,7 @@ public abstract class AbstractCounter implements Counter
         Iterator it = this.aggregates.iterator();
         while (it.hasNext())
         {
-            AggregateCounter agg = (AggregateCounter)it.next();
+            AggregateCounter agg = (AggregateCounter) it.next();
             agg.compute();
         }
     }

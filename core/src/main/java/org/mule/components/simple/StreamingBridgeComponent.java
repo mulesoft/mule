@@ -25,10 +25,10 @@ public class StreamingBridgeComponent implements StreamingService
 
     public void call(InputStream in, OutputStream out, UMOEventContext context) throws Exception
     {
-        if(out==null)
+        if (out == null)
         {
             throw new IllegalStateException("There is no outputstream for this request on: " + context.getEndpointURI() +
-            ". This might be because this is a one way request, but the StreamingBridge component should not be used in this scenario");
+                                            ". This might be because this is a one way request, but the StreamingBridge component should not be used in this scenario");
         }
 
         IOUtils.copy(in, out);

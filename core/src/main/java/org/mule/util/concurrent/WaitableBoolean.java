@@ -13,32 +13,32 @@ package org.mule.util.concurrent;
 // @ThreadSafe
 public class WaitableBoolean extends SynchronizedVariable
 {
-    // @GuardedBy(_lock)
-    private boolean _value;
+    // @GuardedBy(lock)
+    private boolean value;
 
     public WaitableBoolean(boolean initialValue)
     {
         super();
-        synchronized (_lock)
+        synchronized (lock)
         {
-            _value = initialValue;
+            value = initialValue;
         }
     }
 
     public WaitableBoolean(boolean initialValue, Object lock)
     {
         super(lock);
-        synchronized (_lock)
+        synchronized (this.lock)
         {
-            _value = initialValue;
+            value = initialValue;
         }
     }
 
     public int compareTo(boolean other)
     {
-        synchronized (_lock)
+        synchronized (lock)
         {
-            return (_value == other ? 0 : (_value ? 1 : -1));
+            return (value == other ? 0 : (value ? 1 : -1));
         }
     }
 
@@ -49,7 +49,7 @@ public class WaitableBoolean extends SynchronizedVariable
 
     public int compareTo(Object other)
     {
-        return this.compareTo((WaitableBoolean)other);
+        return this.compareTo((WaitableBoolean) other);
     }
 
     public boolean equals(Object other)
@@ -60,9 +60,9 @@ public class WaitableBoolean extends SynchronizedVariable
         }
         else if (other instanceof WaitableBoolean)
         {
-            synchronized (_lock)
+            synchronized (lock)
             {
-                return (_value == ((WaitableBoolean)other).get());
+                return (value == ((WaitableBoolean) other).get());
             }
         }
         else
@@ -83,33 +83,33 @@ public class WaitableBoolean extends SynchronizedVariable
 
     public boolean get()
     {
-        synchronized (_lock)
+        synchronized (lock)
         {
-            return _value;
+            return value;
         }
     }
 
     public boolean set(boolean newValue)
     {
-        synchronized (_lock)
+        synchronized (lock)
         {
-            _lock.notifyAll();
-            boolean oldValue = _value;
-            _value = newValue;
+            lock.notifyAll();
+            boolean oldValue = value;
+            value = newValue;
             return oldValue;
         }
     }
 
     public boolean compareAndSet(boolean assumedValue, boolean newValue)
     {
-        synchronized (_lock)
+        synchronized (lock)
         {
-            boolean success = (_value == assumedValue);
+            boolean success = (value == assumedValue);
 
             if (success)
             {
-                _value = newValue;
-                _lock.notifyAll();
+                value = newValue;
+                lock.notifyAll();
             }
 
             return success;
@@ -118,37 +118,37 @@ public class WaitableBoolean extends SynchronizedVariable
 
     public boolean complement()
     {
-        synchronized (_lock)
+        synchronized (lock)
         {
-            _lock.notifyAll();
-            return (_value = !_value);
+            lock.notifyAll();
+            return (value = !value);
         }
     }
 
     public boolean and(boolean b)
     {
-        synchronized (_lock)
+        synchronized (lock)
         {
-            _lock.notifyAll();
-            return (_value &= b);
+            lock.notifyAll();
+            return (value &= b);
         }
     }
 
     public synchronized boolean or(boolean b)
     {
-        synchronized (_lock)
+        synchronized (lock)
         {
-            _lock.notifyAll();
-            return (_value |= b);
+            lock.notifyAll();
+            return (value |= b);
         }
     }
 
     public boolean xor(boolean b)
     {
-        synchronized (_lock)
+        synchronized (lock)
         {
-            _lock.notifyAll();
-            return (_value ^= b);
+            lock.notifyAll();
+            return (value ^= b);
         }
     }
 
@@ -164,11 +164,11 @@ public class WaitableBoolean extends SynchronizedVariable
 
     public void whenEqual(boolean condition, Runnable action) throws InterruptedException
     {
-        synchronized (_lock)
+        synchronized (lock)
         {
-            while (_value != condition)
+            while (value != condition)
             {
-                _lock.wait();
+                lock.wait();
             }
 
             if (action != null)

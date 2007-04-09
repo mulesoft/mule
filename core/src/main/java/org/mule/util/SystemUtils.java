@@ -61,7 +61,7 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
                 // compile on JDK 1.4
                 Class target = System.class;
                 Method envMethod = target.getMethod("getenv", ArrayUtils.EMPTY_CLASS_ARRAY);
-                env = (Map)envMethod.invoke(target, (Class[])null);
+                env = (Map) envMethod.invoke(target, (Class[] )null);
             }
         }
         catch (Exception ex)
@@ -142,7 +142,7 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
 
     public static String getenv(String name)
     {
-        return (String)SystemUtils.getenv().get(name);
+        return (String) SystemUtils.getenv().get(name);
     }
 
     public static boolean isSunJDK()

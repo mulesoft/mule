@@ -26,7 +26,7 @@ public class QueueInfo
 
     public boolean equals(Object obj)
     {
-        return (obj instanceof QueueInfo && name.equals(((QueueInfo)obj).name));
+        return (obj instanceof QueueInfo && name.equals(((QueueInfo) obj).name));
     }
 
     public int hashCode()

@@ -47,7 +47,7 @@ public class XsltTransformer extends AbstractXmlTransformer
     // MAX_IDLE is also the total limit
     private static final int MAX_ACTIVE_TRANSFORMERS = MAX_IDLE_TRANSFORMERS;
 
-    private final GenericObjectPool transformerPool;
+    protected final GenericObjectPool transformerPool;
 
     private volatile String xslFile;
     private volatile String xslt;
@@ -55,7 +55,7 @@ public class XsltTransformer extends AbstractXmlTransformer
     public XsltTransformer()
     {
         super();
-        this.transformerPool = new GenericObjectPool(new PooledXsltTransformerFactory());
+        transformerPool = new GenericObjectPool(new PooledXsltTransformerFactory());
         transformerPool.setMinIdle(MIN_IDLE_TRANSFORMERS);
         transformerPool.setMaxIdle(MAX_IDLE_TRANSFORMERS);
         transformerPool.setMaxActive(MAX_ACTIVE_TRANSFORMERS);
@@ -276,7 +276,7 @@ public class XsltTransformer extends AbstractXmlTransformer
      */
     public void setMaxActiveTransformers(int maxActiveTransformers)
     {
-        this.transformerPool.setMaxActive(maxActiveTransformers);
+        transformerPool.setMaxActive(maxActiveTransformers);
     }
 
     /**
@@ -296,7 +296,7 @@ public class XsltTransformer extends AbstractXmlTransformer
      */
     public void setMaxIdleTransformers(int maxIdleTransformers)
     {
-        this.transformerPool.setMaxIdle(maxIdleTransformers);
+        transformerPool.setMaxIdle(maxIdleTransformers);
     }
 
 }

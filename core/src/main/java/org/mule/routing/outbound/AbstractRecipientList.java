@@ -71,7 +71,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
 
         for (Iterator iterator = recipients.iterator(); iterator.hasNext();)
         {
-            String recipient = (String)iterator.next();
+            String recipient = (String) iterator.next();
             // Make a copy of the message. Question is do we do a proper clone? in
             // which case there
             // would potentially be multiple messages with the same id...
@@ -123,7 +123,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
 
     protected UMOEndpoint getRecipientEndpoint(UMOMessage message, String recipient) throws RoutingException
     {
-        UMOEndpoint endpoint = (UMOEndpoint)recipientCache.get(recipient);
+        UMOEndpoint endpoint = (UMOEndpoint) recipientCache.get(recipient);
 
         if (endpoint != null)
         {
@@ -142,7 +142,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
             throw new RoutingException(message, endpoint, e);
         }
 
-        UMOEndpoint existingEndpoint = (UMOEndpoint)recipientCache.putIfAbsent(recipient, endpoint);
+        UMOEndpoint existingEndpoint = (UMOEndpoint) recipientCache.putIfAbsent(recipient, endpoint);
         if (existingEndpoint != null)
         {
             endpoint = existingEndpoint;

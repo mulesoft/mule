@@ -56,13 +56,13 @@ import org.springframework.context.support.StaticApplicationContext;
 /**
  * Utilities for creating test and Mock Mule objects
  */
-public class MuleTestUtils
+public final class MuleTestUtils
 {
     public static UMOModel getDefaultModel(UMOManagementContext context) throws UMOException
     {
 
         UMOModel m = context.getRegistry().lookupModel(UMOModel.DEFAULT_MODEL_NAME);
-        if(m==null)
+        if (m == null)
         {
             m = new SedaModel();
             m.setName(UMOModel.DEFAULT_MODEL_NAME);
