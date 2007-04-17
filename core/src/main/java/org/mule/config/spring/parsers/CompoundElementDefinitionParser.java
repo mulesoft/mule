@@ -24,6 +24,7 @@ public class CompoundElementDefinitionParser extends AbstractMuleSingleBeanDefin
 {
     protected Class getBeanClass(Element element)
     {
+        //this has no impact since we just use the bean definition to hold property configurations
         return Object.class;
     }
 
@@ -35,16 +36,6 @@ public class CompoundElementDefinitionParser extends AbstractMuleSingleBeanDefin
         Assert.state(beanClass != null, "Class returned from getBeanClass(Element) must not be null, element is: " + element.getNodeName());
         BeanDefinitionBuilder builder = createBeanDefinitionBuilder(element, beanClass);
         builder.setSource(parserContext.extractSource(element));
-//        builder.setSingleton(isSingleton());
-//        builder.addDependsOn("_registry");
-//        if(getInitMethodName()!=null)
-//        {
-//            builder.setInitMethodName(getInitMethodName());
-//        }
-//        if(getDisposeMethodName()!=null)
-//        {
-//            builder.setDestroyMethodName(getDisposeMethodName());
-//        }
         if (parserContext.isNested())
         {
             // Inner bean definition must receive same singleton status as containing bean.

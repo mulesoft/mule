@@ -21,10 +21,10 @@ import org.mule.management.agents.Mx4jAgent;
 import org.mule.management.agents.RmiRegistryAgent;
 
 /**
- * TODO document
+ * Handles all configuration elements in the Mule Management module.
  *
  */
-public class ManagementNamespaceHandler extends AbstractHierarchicalNamespaceHandler
+public class ManagementNamespaceHandler extends AbstractIgnorableNamespaceHandler
 {
 
     public void init()

@@ -24,16 +24,14 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
- * TODO
+ * Sets a Map of service overrides on the parent connector
  */
 public class ServiceOverridesDefinitionParser extends AbstractChildBeanDefinitionParser
 {
 
     protected Class getBeanClass(Element element)
     {
-        // TODO MERGE this class is in the management module, most probably this is an error
-        // and a different class should be returned.
-        //return ManagementContext.class;
+        // Not used;
         return null;
     }
 

@@ -15,7 +15,8 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
- * TODO
+ * Allows the <i>Inherited</i> model type to be used. This parser simply looks up the real Model bean and
+ * passes that back.
  */
 public class InheritedModelDefinitionParser extends AbstractBeanDefinitionParser
 {

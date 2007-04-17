@@ -14,9 +14,9 @@ import org.mule.config.spring.parsers.SimpleChildDefinitionParser;
 import org.mule.routing.filters.xml.JXPathFilter;
 
 /**
- * TODO
+ * Handles all configuration elements in the Mule Xml module.
  */
-public class XmlNamespaceHandler extends AbstractHierarchicalNamespaceHandler
+public class XmlNamespaceHandler extends AbstractIgnorableNamespaceHandler
 {
 
     public void init()

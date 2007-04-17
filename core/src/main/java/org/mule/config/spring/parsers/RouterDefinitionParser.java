@@ -12,7 +12,7 @@ package org.mule.config.spring.parsers;
 import org.w3c.dom.Element;
 
 /**
- * TODO
+ * Generic router definition parser for parsing all Router elements.
  */
 public class RouterDefinitionParser extends SimpleChildDefinitionParser
 {

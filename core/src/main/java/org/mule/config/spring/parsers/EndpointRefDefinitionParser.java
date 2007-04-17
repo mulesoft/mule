@@ -16,7 +16,10 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.w3c.dom.Element;
 
 /**
- * TODO
+ * The EndpointRef definition parser extends the {@link org.mule.config.spring.parsers.EndpointDefinitionParser} to
+ * process refernces to global endpoints.
+ *
+ * @see org.mule.config.spring.parsers.EndpointDefinitionParser
  */
 public class EndpointRefDefinitionParser extends EndpointDefinitionParser
 {

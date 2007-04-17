@@ -16,7 +16,8 @@ import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Element;
 
 /**
- * TODO
+ * Contructs a single bean object from a element. This parser can be configured to automatically set the
+ * class of the object, the init and destroy methods and whether this object is a singleton.
  */
 public class SingleElementDefinitionParser extends AbstractMuleSingleBeanDefinitionParser
 {

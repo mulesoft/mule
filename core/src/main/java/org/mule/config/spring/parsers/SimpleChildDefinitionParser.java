@@ -15,7 +15,11 @@ import org.w3c.dom.Element;
 
 /**
  * Creates a definitionparser that will construct a single child element and set
- * the beanDefinition on the parent object
+ * the beanDefinition on the parent object.
+ *
+ * The parser will set all attributes defined in the Xml as bean properties and will
+ * process any nested elements as bean properties too, except the correct Definition parser
+ * for the element will be looked up automatically.
  */
 public class SimpleChildDefinitionParser extends AbstractChildBeanDefinitionParser
 {

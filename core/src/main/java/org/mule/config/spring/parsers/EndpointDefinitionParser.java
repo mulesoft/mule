@@ -24,7 +24,11 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
 /**
- * TODO
+ * The pasr used for processing <code><endpoint></code> elements in Mule Xml configuration.
+ * This parser is a child bean definition parser which means the endpoint created is always set on the parent object,
+ * unless the parent elemet is the root element <code><beans></code> in which case the Endpoint becomes a
+ * <i>global Endpoint</i> and is available via the registry.
+ * 
  */
 public class EndpointDefinitionParser extends AbstractChildBeanDefinitionParser
 {

@@ -23,7 +23,8 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
- * TODO
+ * @deprecated Not sure we need this
+ * //TODO Try using the MapEntryDefinitionParser instead
  */
 public class PropertiesDefinitionParser implements BeanDefinitionParser
 {

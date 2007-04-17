@@ -11,12 +11,12 @@ package org.mule.config.spring.parsers;
 
 import org.mule.impl.MuleDescriptor;
 
-import org.w3c.dom.Element;
-import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.xml.ParserContext;
+import org.w3c.dom.Element;
 
 /**
- * TODO
+ * Parser used for processing <code><mule:service></code> elements.
  */
 public class ServiceDescriptorDefinitionParser extends AbstractMuleSingleBeanDefinitionParser
 {

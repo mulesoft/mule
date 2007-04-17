@@ -16,7 +16,7 @@ import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Element;
 
 /**
- * TODO
+ * A generic parser for processing custom elements that have a <code>class<code> attribute.
  */
 public class CustomElementDefinitionParser extends AbstractMuleSingleBeanDefinitionParser
 {

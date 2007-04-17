@@ -21,7 +21,7 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
 /**
- * TODO
+ * This parser is responsible for processing the <code><transaction-config><code> configuration elements.
  */
 public class TransactionConfigDefinitionParser extends SimpleChildDefinitionParser
 {

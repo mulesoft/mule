@@ -22,7 +22,9 @@ import org.mule.routing.filters.logic.OrFilter;
 import org.w3c.dom.Element;
 
 /**
- * TODO
+ * Parses all the core filter types such as logic (AND OR NOT) and generic filters such as <i>Payload Type</i>,
+ * <i>RegEX</i> and <i>Message Property</i>
+ * 
  */
 public class FilterDefinitionParser extends AbstractChildBeanDefinitionParser
 {

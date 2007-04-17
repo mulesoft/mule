@@ -14,7 +14,7 @@ import org.mule.config.ThreadingProfile;
 import org.w3c.dom.Element;
 
 /**
- * TODO
+ * This parser is responsible for processing the <code><threading-profile><code> configuration elements.
  */
 public class ThreadingProfileDefinitionParser extends AbstractChildBeanDefinitionParser
 {

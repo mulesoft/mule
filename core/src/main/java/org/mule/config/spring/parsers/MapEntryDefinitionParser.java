@@ -16,7 +16,18 @@ import org.w3c.dom.Element;
 /**
  * Allows a series of key vlaue pair elements to be set on an object as a Map. There is no need to define
  * a surrounding 'map' element to contain the map entries.
- * TODO RM: add a sample config snippet to this JavaDoc.
+ * This is useful for key value pair mappings for example -
+ *
+ * <code>
+ *   <mule:endpoint name="fruitBowlEndpoint" address="test://fruitBowlPublishQ">
+ *       <xm:jxpath-filter expectedValue="bar" expression="name">
+ *           <xm:namespace prefix="foo" uri="http://foo.com"/>
+ *           <xm:namespace prefix="bar" uri="http://bar.com"/>
+ *       </xm:jxpath-filter>
+ *   </mule:endpoint>
+ * </code>
+ *
+ * Here <xm:namespace> refers to a Map of prefix/uri values.
  */
 public class MapEntryDefinitionParser extends AbstractChildBeanDefinitionParser
 {

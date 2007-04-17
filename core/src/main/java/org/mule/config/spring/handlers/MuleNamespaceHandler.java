@@ -81,9 +81,10 @@ import org.mule.transformers.simple.ObjectToByteArray;
 import org.mule.transformers.simple.SerializableToByteArray;
 
 /**
- * TODO document
+ * This is the core namespace handler for Mule and configures all Mule configuration elements under the
+ * <code>http://www.mulesource.org/schema/mule/core/2.0</code> Namespace.
  */
-public class MuleNamespaceHandler extends AbstractHierarchicalNamespaceHandler
+public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
 {
 
     public void init()

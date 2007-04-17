@@ -18,7 +18,10 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
- * TODO
+ * Parses the <mule:configuration> element. If this element appears in multiple Xml config files each will its configuration
+ * to a singe {@link MuleConfiguration} object.
+ *
+ * @see MuleConfiguration
  */
 public class ConfigurationDefinitionParser extends AbstractMuleSingleBeanDefinitionParser
 {

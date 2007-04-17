@@ -18,7 +18,8 @@ import org.springframework.beans.FatalBeanException;
 import org.w3c.dom.Element;
 
 /**
- * TODO
+ * Handles the parsing of <code><mule:connection-strategy>, <mule:dispatcher-connection-strategy>,
+ * <mule:receiver-connection-strategy></code> elements in Mule Xml configuration.
  */
 public class ConnectionStrategyDefinitionParser extends AbstractChildBeanDefinitionParser
 {
@@ -27,7 +28,6 @@ public class ConnectionStrategyDefinitionParser extends AbstractChildBeanDefinit
 
     protected Class getBeanClass(Element element)
     {
-        //generateBeanNameIfNotSet(element, JdmkAgent.class);
         String clazz = element.getAttribute("class");
         if (clazz != null)
         {

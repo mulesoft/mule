@@ -18,7 +18,7 @@ import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.w3c.dom.Element;
 
 /**
- * TODO
+ * Creates a FactoryBean that will discover the Model class to instantiate from the class path.
  */
 public class ModelDefinitionParser extends AbstractMuleSingleBeanDefinitionParser
 {
