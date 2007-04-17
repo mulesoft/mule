@@ -56,7 +56,7 @@ public class SerializedUMOMessageTransformersTestCase extends AbstractTransforme
     public UMOTransformer getTransformer() throws Exception
     {
         SerializableToByteArray trans = new SerializableToByteArray();
-        trans.setSourceType(UMOMessage.class.getName());
+        trans.setAcceptUMOMessage(true);
         return trans;
     }
 

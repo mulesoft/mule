@@ -10,7 +10,7 @@
 
 package org.mule.test.umo;
 
-import org.mule.umo.security.TlsConfiguration;
+import org.mule.umo.security.tls.TlsConfiguration;
 
 import javax.net.ssl.SSLSocketFactory;
 

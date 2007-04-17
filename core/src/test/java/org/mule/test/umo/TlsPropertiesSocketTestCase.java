@@ -10,8 +10,8 @@
 
 package org.mule.test.umo;
 
-import org.mule.umo.security.TlsConfiguration;
-import org.mule.umo.security.TlsPropertiesSocketFactory;
+import org.mule.umo.security.tls.TlsConfiguration;
+import org.mule.umo.security.tls.TlsPropertiesSocketFactory;
 
 import junit.framework.TestCase;
 
@@ -27,7 +27,7 @@ public class TlsPropertiesSocketTestCase extends TestCase
         configuration.initialise(false, TlsConfiguration.JSSE_NAMESPACE);
 
         TlsPropertiesSocketFactory socketFactory = 
-            new TlsPropertiesSocketFactory(TlsConfiguration.JSSE_NAMESPACE);
+            new TlsPropertiesSocketFactory(true, TlsConfiguration.JSSE_NAMESPACE);
         assertTrue("socket is useless", socketFactory.getSupportedCipherSuites().length > 0);
     }
 
