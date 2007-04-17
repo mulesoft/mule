@@ -9,29 +9,19 @@
  */
 package org.mule.providers.tcp.config;
 
-import org.w3c.dom.Element;
-import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
-import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
+import org.mule.config.spring.parsers.SingleElementDefinitionParser;
 import org.mule.providers.tcp.TcpConnector;
 
+import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
+
 /**
- * TODO document
+ * Reigsters a Bean Definition Parser for handling <code><tcp:connector></code> elements.
  *
  */
 public class TcpNamespaceHandler extends NamespaceHandlerSupport
 {
-
-
     public void init()
     {
-        registerBeanDefinitionParser("connector", new ConnectorDefinitionParser());
-    }
-
-
-    public static class ConnectorDefinitionParser extends AbstractSingleBeanDefinitionParser
-    {
-        protected Class getBeanClass(Element element) {
-            return TcpConnector.class;
-        }
+        registerBeanDefinitionParser("connector", new SingleElementDefinitionParser(TcpConnector.class, true));
     }
 }

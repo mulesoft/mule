@@ -31,7 +31,6 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.xml.BeansDtdResolver;
-import org.springframework.beans.factory.xml.ResourceEntityResolver;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -219,7 +218,7 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
         }
         else
         {
-            setEntityResolver(new ResourceEntityResolver(getResourceLoader()));
+            setEntityResolver(new MuleDelegatingClasspathEntityResolver(getResourceLoader()));
         }
         return i;
     }
