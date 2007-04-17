@@ -77,9 +77,12 @@ public class ContainerKeyPair
 
         final ContainerKeyPair that = (ContainerKeyPair) o;
 
-        if (!containerName.equals(that.containerName))
+        if(containerName!=null)
         {
-            return false;
+            if (!containerName.equals(that.containerName))
+            {
+                return false;
+            }
         }
         if (!key.equals(that.key))
         {
