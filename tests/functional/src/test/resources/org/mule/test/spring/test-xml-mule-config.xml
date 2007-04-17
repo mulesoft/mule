@@ -51,7 +51,6 @@
                 <property name="org.mule.useManagerProperties" value="true"/>
                 <property name="beanProperty2" value="12"/>
                 <container-property name="containerProperty" reference="java.lang.String"/>
-                <property name="sourceType" value="java.lang.String"/>
             </properties>
         </transformer>
         <transformer name="Default" className="org.mule.transformers.NoActionTransformer" />

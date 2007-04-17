@@ -65,7 +65,7 @@
     <mule:custom-transformer name="TestCompressionTransformer"
                              class="org.mule.tck.testmodels.mule.TestCompressionTransformer"
                              returnClass="java.lang.String">
-        <mule:source-type class="java.lang.String"/>
+        <!--<mule:source-type class="java.lang.String"/>-->
         <property name="beanProperty2" value="12"/>
         <property name="containerProperty" value="myString"/>
     </mule:custom-transformer>

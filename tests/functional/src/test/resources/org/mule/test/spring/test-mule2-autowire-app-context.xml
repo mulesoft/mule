@@ -118,7 +118,7 @@
     <bean id="dummyExceptionStrategy" class="org.mule.tck.testmodels.mule.TestExceptionStrategy">
         <property name="endpoints">
             <list>
-                <bean class="org.mule.impl.endpoint.MuleEndpoint" init-method="initialise" destroy-method="dispose" singleton="false">
+                <bean class="org.mule.impl.endpoint.MuleEndpoint" init-method="initialise" singleton="false">
                     <property name="endpointURI">
                         <bean class="org.mule.impl.endpoint.MuleEndpointURI">
                             <constructor-arg>
@@ -132,7 +132,7 @@
     </bean>
 
     <!-- transaformers -->
-    <bean id="TestCompressionTransformer"  init-method="initialise" destroy-method="dispose" singleton="false"
+    <bean id="TestCompressionTransformer"  init-method="initialise" singleton="false"
           class="org.mule.tck.testmodels.mule.TestCompressionTransformer">
         <property name="name">
             <value>TestCompressionTransformer</value>
@@ -151,13 +151,10 @@
         <property name="beanProperty2">
             <value>12</value>
         </property>
-        <property name="sourceType">
-            <value>java.lang.String</value>
-        </property>
     </bean>
 
 
-    <bean id="fruitBowlEndpoint" singleton="false" class="org.mule.impl.endpoint.MuleEndpoint"  init-method="initialise" destroy-method="dispose">
+    <bean id="fruitBowlEndpoint" singleton="false" class="org.mule.impl.endpoint.MuleEndpoint"  init-method="initialise">
         <property name="connector">
             <ref local="dummyConnector"/>
         </property>
@@ -187,7 +184,7 @@
         </property>
     </bean>
 
-    <bean id="waterMelonEndpoint" singleton="false" class="org.mule.impl.endpoint.MuleEndpoint"  init-method="initialise" destroy-method="dispose">
+    <bean id="waterMelonEndpoint" singleton="false" class="org.mule.impl.endpoint.MuleEndpoint"  init-method="initialise" >
         <property name="connector">
             <ref local="dummyConnector"/>
         </property>
@@ -198,7 +195,7 @@
         </property>
     </bean>
 
-    <bean id="appleInEndpoint" singleton="false" class="org.mule.impl.endpoint.MuleEndpoint" init-method="initialise" destroy-method="dispose">
+    <bean id="appleInEndpoint" singleton="false" class="org.mule.impl.endpoint.MuleEndpoint" init-method="initialise" >
         <property name="connector">
             <ref local="dummyConnector"/>
         </property>
@@ -214,7 +211,7 @@
         </property>
     </bean>
 
-    <bean id="appleResponseEndpoint" singleton="false" class="org.mule.impl.endpoint.MuleEndpoint"  init-method="initialise" destroy-method="dispose">
+    <bean id="appleResponseEndpoint" singleton="false" class="org.mule.impl.endpoint.MuleEndpoint"  init-method="initialise" >
         <property name="connector">
             <ref local="dummyConnector"/>
         </property>
@@ -230,7 +227,7 @@
         </property>
     </bean>
 
-    <bean id="orangeEndpoint" singleton="false" class="org.mule.impl.endpoint.MuleEndpoint" init-method="initialise" destroy-method="dispose">
+    <bean id="orangeEndpoint" singleton="false" class="org.mule.impl.endpoint.MuleEndpoint" init-method="initialise" >
         <property name="connector">
             <ref local="dummyConnector"/>
         </property>
@@ -243,7 +240,7 @@
         </property>
     </bean>
 
-    <bean id="transactedInboundEndpoint" singleton="false" class="org.mule.impl.endpoint.MuleEndpoint" init-method="initialise" destroy-method="dispose">
+    <bean id="transactedInboundEndpoint" singleton="false" class="org.mule.impl.endpoint.MuleEndpoint" init-method="initialise">
         <property name="connector">
             <ref local="dummyConnector"/>
         </property>
@@ -283,7 +280,7 @@
         </property>
     </bean>
 
-    <bean id="transactedOutboundEndpoint" singleton="false" class="org.mule.impl.endpoint.MuleEndpoint" init-method="initialise" destroy-method="dispose">
+    <bean id="transactedOutboundEndpoint" singleton="false" class="org.mule.impl.endpoint.MuleEndpoint" init-method="initialise" >
         <property name="connector">
             <ref local="dummyConnector"/>
         </property>
@@ -326,12 +323,10 @@
                 <property name="catchAllStrategy">
                     <bean class="org.mule.routing.ForwardingCatchAllStrategy">
                         <property name="endpoint">
-                            <bean class="org.mule.impl.endpoint.MuleEndpoint" init-method="initialise" destroy-method="dispose" singleton="false">
+                            <bean class="org.mule.impl.endpoint.MuleEndpoint" init-method="initialise" singleton="false">
                                 <property name="endpointURI">
                                     <bean class="org.mule.impl.endpoint.MuleEndpointURI">
-                                        <constructor-arg>
-                                            <value>test://catch.all</value>
-                                        </constructor-arg>
+                                        <constructor-arg value="test://catch.all"/>
                                     </bean>
                                 </property>
                             </bean>
@@ -341,15 +336,14 @@
                 <property name="endpoints">
                     <list>
                         <ref local="appleInEndpoint"/>
-                        <bean name="orangeEndpoint" singleton="false" class="org.mule.impl.endpoint.MuleEndpoint"  init-method="initialise" destroy-method="dispose">
+                        <bean singleton="false" class="org.mule.impl.endpoint.MuleEndpoint"  init-method="initialise">
                             <property name="connector">
                                 <ref local="dummyConnector"/>
                             </property>
+                            <property name="name" value="orangeEndpoint"/>
                             <property name="endpointURI">
                                 <bean class="org.mule.impl.endpoint.MuleEndpointURI" singleton="false">
-                                    <constructor-arg>
-                                        <value>test://orangeQ</value>
-                                    </constructor-arg>
+                                    <constructor-arg value="test://orangeQ"/>
                                 </bean>
                             </property>
                             <property name="transformer">
@@ -357,18 +351,14 @@
                             </property>
                         </bean>
 
-                        <bean id="Orange" singleton="false" class="org.mule.impl.endpoint.MuleEndpoint" init-method="initialise" destroy-method="dispose">
+                        <bean id="Orange" singleton="false" class="org.mule.impl.endpoint.MuleEndpoint" init-method="initialise">
                             <property name="connector">
                                 <ref local="dummyConnector"/>
                             </property>
-                            <property name="type">
-                                <value>sender</value>
-                            </property>
+                            <property name="type" value="sender"/>
                             <property name="endpointURI">
                                 <bean class="org.mule.impl.endpoint.MuleEndpointURI" singleton="false">
-                                    <constructor-arg>
-                                        <value>test://orange/</value>
-                                    </constructor-arg>
+                                    <constructor-arg value="test://orange/"/>
                                 </bean>
                             </property>
                         </bean>
@@ -387,7 +377,7 @@
                             <property name="method" value="wash"/>
                             <property name="endpoint">
                                 <bean id="nestedEndpoint1" singleton="false"
-                                      class="org.mule.impl.endpoint.MuleEndpoint"  init-method="initialise" destroy-method="dispose">
+                                      class="org.mule.impl.endpoint.MuleEndpoint"  init-method="initialise">
                                     <constructor-arg value="test://do.wash"/>
                                     <constructor-arg value="false"/>
                                 </bean>
@@ -398,7 +388,7 @@
                             <property name="method" value="polish"/>
                             <property name="endpoint">
                                 <bean id="nestedEndpoint2" singleton="false"
-                                      class="org.mule.impl.endpoint.MuleEndpoint"  init-method="initialise" destroy-method="dispose">
+                                      class="org.mule.impl.endpoint.MuleEndpoint"  init-method="initialise">
                                     <constructor-arg value="test://do.polish"/>
                                     <constructor-arg value="false"/>
                                 </bean>
@@ -412,25 +402,19 @@
 
         <property name="responseRouter">
             <bean class="org.mule.routing.response.ResponseRouterCollection">
-                <property name="timeout">
-                    <value>10001</value>
-                </property>
+                <property name="timeout" value="10001"/>
                 <property name="endpoints">
                     <list>
-                        <bean id="response1" singleton="false" class="org.mule.impl.endpoint.MuleEndpoint" init-method="initialise" destroy-method="dispose">
+                        <bean id="response1" singleton="false" class="org.mule.impl.endpoint.MuleEndpoint" init-method="initialise">
                             <property name="endpointURI">
                                 <bean class="org.mule.impl.endpoint.MuleEndpointURI" singleton="false">
-                                    <constructor-arg>
-                                        <value>test://response1</value>
-                                    </constructor-arg>
+                                    <constructor-arg value="test://response1"/>
                                 </bean>
                             </property>
                         </bean>
-                        <bean id="appleResponse" class="org.mule.impl.endpoint.MuleEndpoint" init-method="initialise" destroy-method="dispose" singleton="false"
-                              factory-method="getEndpointFromUri">
-                            <constructor-arg index="0">
-                                <value>appleResponseEndpoint</value>
-                            </constructor-arg>
+                        <bean id="appleResponse" class="org.mule.impl.endpoint.MuleEndpoint" init-method="initialise" singleton="false">
+                            <constructor-arg index="0" value="appleResponseEndpoint"/>
+                            <constructor-arg index="1" value="true"/>
                         </bean>
                     </list>
                 </property>
@@ -485,12 +469,10 @@
             <bean class="org.mule.impl.DefaultComponentExceptionStrategy"  init-method="initialise" destroy-method="dispose">
                 <property name="endpoints">
                     <list>
-                        <bean class="org.mule.impl.endpoint.MuleEndpoint"  init-method="initialise" destroy-method="dispose" singleton="false">
+                        <bean class="org.mule.impl.endpoint.MuleEndpoint"  init-method="initialise" singleton="false">
                             <property name="endpointURI">
                                 <bean class="org.mule.impl.endpoint.MuleEndpointURI">
-                                    <constructor-arg>
-                                        <value>test://orange.exceptions</value>
-                                    </constructor-arg>
+                                    <constructor-arg value="test://orange.exceptions"/>
                                 </bean>
                             </property>
                         </bean>
@@ -501,7 +483,7 @@
     </bean>
 
     <bean id="appleComponent" class="org.mule.impl.MuleDescriptor">
-        <property name="implementation"><value>org.mule.tck.testmodels.fruit.Apple</value></property>
+        <property name="implementation" value="org.mule.tck.testmodels.fruit.Apple"/>
         <property name="outboundRouter">
             <ref local="testOutboundMessageRouter"/>
         </property>
