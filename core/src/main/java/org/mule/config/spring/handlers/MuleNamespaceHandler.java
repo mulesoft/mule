@@ -22,7 +22,6 @@ import org.mule.config.spring.parsers.ServiceDescriptorDefinitionParser;
 import org.mule.config.spring.parsers.ServiceOverridesDefinitionParser;
 import org.mule.config.spring.parsers.SimpleChildDefinitionParser;
 import org.mule.config.spring.parsers.SingleElementDefinitionParser;
-import org.mule.config.spring.parsers.SourceTypeDefinitionParser;
 import org.mule.config.spring.parsers.ThreadingProfileDefinitionParser;
 import org.mule.config.spring.parsers.TransactionConfigDefinitionParser;
 import org.mule.impl.DefaultComponentExceptionStrategy;
@@ -114,7 +113,6 @@ public class MuleNamespaceHandler extends AbstractHierarchicalNamespaceHandler
         //Transformer elements
         registerBeanDefinitionParser("custom-transformer", new CustomElementDefinitionParser(false));
         registerBeanDefinitionParser("transformer-no-action", new SingleElementDefinitionParser(NoActionTransformer.class, false));
-        registerBeanDefinitionParser("source-type", new SourceTypeDefinitionParser());
 
         registerBeanDefinitionParser("transformer-base64-encoder", new SingleElementDefinitionParser(Base64Encoder.class, false));
         registerBeanDefinitionParser("transformer-base64-decoder", new SingleElementDefinitionParser(Base64Decoder.class, false));
