@@ -102,32 +102,32 @@
 
 
     <xsd:complexType name="baseEndpointType" mixed="true">
-                <xsd:choice minOccurs="0" maxOccurs="unbounded">
-                    <xsd:element name="transaction" type="transactionType" minOccurs="0" maxOccurs="1"/>
-                    <xsd:group ref="filters" minOccurs="0" maxOccurs="unbounded"/>
-                    <!--<xsd:group ref="securityFilters" minOccurs="0" maxOccurs="1"/>-->
-                    <xsd:group ref="connectionStrategies" minOccurs="0" maxOccurs="1"/>
-                    <!--<xsd:element name="properties" type="propertiesType" minOccurs="0" maxOccurs="1"/>-->
-                    <xsd:choice minOccurs="0" maxOccurs="unbounded">
-                      <xsd:any namespace="##other"/>
-                  </xsd:choice>
-                </xsd:choice>
-                <xsd:attribute name="name" type="xsd:string"/>
-                <xsd:attribute name="transformers" type="xsd:string"/>
-                <xsd:attribute name="responseTransformers" type="xsd:string"/>
-                <xsd:attribute name="synchronous" type="xsd:boolean"/>
-                <xsd:attribute name="remoteSync" type="xsd:boolean"/>
-                <xsd:attribute name="remoteSyncTimeout" type="xsd:NMTOKEN"/>
-                <xsd:attribute name="connector" type="xsd:string"/>
-                <xsd:attribute name="createConnector">
-                    <xsd:simpleType>
-                        <xsd:restriction base="xsd:NMTOKEN">
-                            <xsd:enumeration value="FIND_OR_CREATE"/>
-                            <xsd:enumeration value="ALWAYS_CREATE"/>
-                            <xsd:enumeration value="NEVER_CREATE"/>
-                        </xsd:restriction>
-                    </xsd:simpleType>
-                </xsd:attribute>
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="transaction" type="transactionType" minOccurs="0" maxOccurs="1"/>
+            <xsd:group ref="filters" minOccurs="0" maxOccurs="unbounded"/>
+            <!--<xsd:group ref="securityFilters" minOccurs="0" maxOccurs="1"/>-->
+            <xsd:group ref="connectionStrategies" minOccurs="0" maxOccurs="1"/>
+            <!--<xsd:element name="properties" type="propertiesType" minOccurs="0" maxOccurs="1"/>-->
+            <xsd:choice minOccurs="0" maxOccurs="unbounded">
+                <xsd:any namespace="##other"/>
+            </xsd:choice>
+        </xsd:choice>
+        <xsd:attribute name="name" type="xsd:string"/>
+        <xsd:attribute name="transformers" type="xsd:string"/>
+        <xsd:attribute name="responseTransformers" type="xsd:string"/>
+        <xsd:attribute name="synchronous" type="xsd:boolean"/>
+        <xsd:attribute name="remoteSync" type="xsd:boolean"/>
+        <xsd:attribute name="remoteSyncTimeout" type="xsd:NMTOKEN"/>
+        <xsd:attribute name="connector" type="xsd:string"/>
+        <xsd:attribute name="createConnector">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="FIND_OR_CREATE"/>
+                    <xsd:enumeration value="ALWAYS_CREATE"/>
+                    <xsd:enumeration value="NEVER_CREATE"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
     </xsd:complexType>
 
     <xsd:complexType name="endpointType" mixed="true">
@@ -217,8 +217,8 @@
 
     <xsd:complexType name="customFilterType" mixed="true">
         <xsd:choice>
-                        <xsd:any namespace="##other" minOccurs="0" maxOccurs="unbounded"/>
-                    </xsd:choice>
+            <xsd:any namespace="##other" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:choice>
         <xsd:attribute name="not" type="xsd:boolean"/>
     </xsd:complexType>
 
@@ -239,13 +239,13 @@
 
     <xsd:complexType name="transfomrersType" mixed="true">
 
-        <xsd:choice minOccurs="0" maxOccurs="unbounded">
-            <xsd:element name="source-type" minOccurs="0" maxOccurs="unbounded">
-                <xsd:complexType>
-                    <xsd:attribute name="class" use="required"/>
-                </xsd:complexType>
-            </xsd:element>
-        </xsd:choice>
+        <!--<xsd:choice minOccurs="0" maxOccurs="unbounded">-->
+        <!--<xsd:element name="source-type" minOccurs="0" maxOccurs="unbounded">-->
+        <!--<xsd:complexType>-->
+        <!--<xsd:attribute name="class" use="required"/>-->
+        <!--</xsd:complexType>-->
+        <!--</xsd:element>-->
+        <!--</xsd:choice>-->
         <xsd:attribute name="name" type="xsd:string"/>
         <xsd:attribute name="returnClass" type="xsd:string"/>
         <xsd:attribute name="ignoreBadInput" type="xsd:boolean"/>
@@ -407,10 +407,10 @@
 
 
     <xsd:complexType name="exceptionStrategyType" mixed="true">
-                <xsd:choice maxOccurs="unbounded" minOccurs="0">
-                    <xsd:element name="endpoint" type="endpointType" minOccurs="0" maxOccurs="unbounded"/>
-                    <xsd:element name="endpoint-ref" type="endpointRefType" minOccurs="0" maxOccurs="unbounded"/>
-                </xsd:choice>
+        <xsd:choice maxOccurs="unbounded" minOccurs="0">
+            <xsd:element name="endpoint" type="endpointType" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element name="endpoint-ref" type="endpointRefType" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:choice>
     </xsd:complexType>
 
     <xsd:group name="exceptionStrategies">
@@ -429,18 +429,18 @@
 
 
     <xsd:complexType name="connectorType" mixed="true">
-                <xsd:choice minOccurs="0" maxOccurs="unbounded">
-                    <xsd:element name="receiver-threading-profile" type="threadingProfileType" minOccurs="0"
-                                 maxOccurs="1"/>
-                    <xsd:element name="dispatcher-threading-profile" type="threadingProfileType" minOccurs="0"
-                                 maxOccurs="1"/>
-                    <xsd:group ref="exceptionStrategies" minOccurs="0" maxOccurs="1"/>
-                    <xsd:element name="service-overrides" type="serviceOverridesType" minOccurs="0" maxOccurs="1"/>
-                </xsd:choice>
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="receiver-threading-profile" type="threadingProfileType" minOccurs="0"
+                         maxOccurs="1"/>
+            <xsd:element name="dispatcher-threading-profile" type="threadingProfileType" minOccurs="0"
+                         maxOccurs="1"/>
+            <xsd:group ref="exceptionStrategies" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="service-overrides" type="serviceOverridesType" minOccurs="0" maxOccurs="1"/>
+        </xsd:choice>
 
-                <xsd:attribute name="name" type="xsd:string" use="required"/>
-                <xsd:attribute name="createDispatcherPerRequest" type="xsd:boolean"/>
-                <xsd:attribute name="createMultipleTransactedReceivers" type="xsd:boolean"/>
+        <xsd:attribute name="name" type="xsd:string" use="required"/>
+        <xsd:attribute name="createDispatcherPerRequest" type="xsd:boolean"/>
+        <xsd:attribute name="createMultipleTransactedReceivers" type="xsd:boolean"/>
     </xsd:complexType>
 
     <xsd:complexType name="serviceOverridesType">
@@ -469,7 +469,7 @@
     </xsd:group>
 
     <xsd:complexType name="connectionStrategyType" mixed="true">
-                <xsd:attribute name="inbound" type="xsd:boolean" use="required"/>
+        <xsd:attribute name="inbound" type="xsd:boolean" use="required"/>
     </xsd:complexType>
 
     <xsd:element name="retry-connection-strategy">
@@ -659,12 +659,12 @@
     <!-- Inbound Routers -->
 
     <xsd:complexType name="nestedInboundRouterType" mixed="true">
-                <xsd:choice maxOccurs="unbounded">
-                    <xsd:element name="endpoint" type="endpointType" minOccurs="0"/>
-                    <xsd:element name="endpoint-ref" type="endpointRefType" minOccurs="0"/>
-                    <xsd:group ref="filters" minOccurs="0"/>
-                </xsd:choice>
-                <xsd:attribute name="propertyExtractor" type="xsd:NMTOKEN"/>
+        <xsd:choice maxOccurs="unbounded">
+            <xsd:element name="endpoint" type="endpointType" minOccurs="0"/>
+            <xsd:element name="endpoint-ref" type="endpointRefType" minOccurs="0"/>
+            <xsd:group ref="filters" minOccurs="0"/>
+        </xsd:choice>
+        <xsd:attribute name="propertyExtractor" type="xsd:NMTOKEN"/>
     </xsd:complexType>
 
     <!-- Inbound Router impls -->
@@ -731,11 +731,11 @@
 
     <!-- ResponseRouters -->
     <xsd:complexType name="responseRouterType" mixed="true">
-                <xsd:choice maxOccurs="unbounded">
-                    <xsd:element name="endpoint" type="endpointType" minOccurs="0"/>
-                    <xsd:element name="endpoint-ref" type="endpointRefType" minOccurs="0"/>
-                </xsd:choice>
-                <xsd:attribute name="propertyExtractor" type="xsd:NMTOKEN"/>
+        <xsd:choice maxOccurs="unbounded">
+            <xsd:element name="endpoint" type="endpointType" minOccurs="0"/>
+            <xsd:element name="endpoint-ref" type="endpointRefType" minOccurs="0"/>
+        </xsd:choice>
+        <xsd:attribute name="propertyExtractor" type="xsd:NMTOKEN"/>
     </xsd:complexType>
 
     <xsd:complexType name="customResponseRouterType">
@@ -755,23 +755,23 @@
 
 
     <xsd:complexType name="outboundRouterType" mixed="true">
-                <xsd:choice maxOccurs="unbounded">
-                    <xsd:element name="endpoint" type="endpointType" minOccurs="0"/>
-                    <xsd:element name="endpoint-ref" type="endpointRefType" minOccurs="0"/>
-                    <xsd:element name="reply-to" type="replyToType" minOccurs="0"/>
-                    <xsd:element name="transaction" type="transactionType" minOccurs="0"/>
-                    <xsd:group ref="filters" minOccurs="0"/>
-                </xsd:choice>
-                <xsd:attribute name="enableCorrelation" default="IF_NOT_SET">
-                    <xsd:simpleType>
-                        <xsd:restriction base="xsd:NMTOKEN">
-                            <xsd:enumeration value="ALWAYS"/>
-                            <xsd:enumeration value="NEVER"/>
-                            <xsd:enumeration value="IF_NOT_SET"/>
-                        </xsd:restriction>
-                    </xsd:simpleType>
-                </xsd:attribute>
-                <xsd:attribute name="propertyExtractor" type="xsd:NMTOKEN"/>
+        <xsd:choice maxOccurs="unbounded">
+            <xsd:element name="endpoint" type="endpointType" minOccurs="0"/>
+            <xsd:element name="endpoint-ref" type="endpointRefType" minOccurs="0"/>
+            <xsd:element name="reply-to" type="replyToType" minOccurs="0"/>
+            <xsd:element name="transaction" type="transactionType" minOccurs="0"/>
+            <xsd:group ref="filters" minOccurs="0"/>
+        </xsd:choice>
+        <xsd:attribute name="enableCorrelation" default="IF_NOT_SET">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="ALWAYS"/>
+                    <xsd:enumeration value="NEVER"/>
+                    <xsd:enumeration value="IF_NOT_SET"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+        <xsd:attribute name="propertyExtractor" type="xsd:NMTOKEN"/>
     </xsd:complexType>
 
 
@@ -846,15 +846,15 @@
 
     <!-- Catch all strategy Types -->
     <xsd:complexType name="forwardingCatchAllStrategyType" mixed="true">
-                <xsd:choice maxOccurs="unbounded">
-                    <xsd:element name="endpoint" type="endpointType" minOccurs="0"/>
-                    <xsd:element name="endpoint-ref" type="endpointRefType" minOccurs="0"/>
-                </xsd:choice>
+        <xsd:choice maxOccurs="unbounded">
+            <xsd:element name="endpoint" type="endpointType" minOccurs="0"/>
+            <xsd:element name="endpoint-ref" type="endpointRefType" minOccurs="0"/>
+        </xsd:choice>
     </xsd:complexType>
 
 
     <xsd:complexType name="customCatchAllStrategyType" mixed="true">
-                <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
+        <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
     </xsd:complexType>
 
     <xsd:complexType name="loggingCatchAllStrategyType" mixed="true">
@@ -902,12 +902,12 @@
     </xsd:complexType>
 
     <xsd:complexType name="propertiesContainerContextType" mixed="true">
-                <xsd:choice>
-                    <xsd:any namespace="##other" processContents="strict" minOccurs="0" maxOccurs="unbounded"/>
-                </xsd:choice>
-                <xsd:attribute name="name" type="xsd:string" default="properties"/>
-                <xsd:attribute name="includeSystemProperties" type="xsd:boolean"/>
-                <xsd:attribute name="enableTemplates" type="xsd:boolean"/>
+        <xsd:choice>
+            <xsd:any namespace="##other" processContents="strict" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:choice>
+        <xsd:attribute name="name" type="xsd:string" default="properties"/>
+        <xsd:attribute name="includeSystemProperties" type="xsd:boolean"/>
+        <xsd:attribute name="enableTemplates" type="xsd:boolean"/>
     </xsd:complexType>
 
     <xsd:complexType name="iocContainerContextType" mixed="true">
@@ -944,4 +944,36 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:complexType name="tlsConfigurationType">
+        <xsd:attribute name="protocolHandler" type="xsd:string"/>
+        <xsd:attribute name="keyStore" type="xsd:string"/>
+        <xsd:attribute name="keyPassword" type="xsd:string"/>
+        <xsd:attribute name="storePassword" type="xsd:string"/>
+        <xsd:attribute name="storeType" type="xsd:string"/>
+        <xsd:attribute name="keyManagerAlgorithm" type="xsd:string"/>
+        <!-- should be of type KeyManagerFactory -->
+        <xsd:attribute name="keyManagerFactory" type="xsd:NMTOKEN"/>
+
+        <!-- this is the key store defined in system properties that is used implicitly.
+        note that some transports use different namespaces within system properties,
+        so this is typically global across a particular transport.
+        it is also used as the trust store defined in system properties if no other trust
+        store is given and explicitTrustStoreOnly is false
+        -->
+        <xsd:attribute name="clientKeyStore" type="xsd:string"/>
+        <xsd:attribute name="clientKeyStorePassword" type="xsd:string"/>
+        <xsd:attribute name="clientKeyStoreType" type="xsd:string"/>
+
+        <!--this is the trust store used to construct sockets both explicitly
+and globally (if not set, see client key above) via the jvm defaults. -->
+        <xsd:attribute name="trustStore" type="xsd:string"/>
+        <xsd:attribute name="trustStorePassword" type="xsd:string"/>
+        <xsd:attribute name="trustStoreType" type="xsd:string"/>
+        <xsd:attribute name="trustManagerAlgorithm" type="xsd:string"/>
+        <!-- should be of type TrustManagerFactory -->
+        <xsd:attribute name="trustManagerFactory" type="xsd:NMTOKEN"/>
+
+        <xsd:attribute name="explicitTrustStoreOnly" type="xsd:boolean"/>
+        <xsd:attribute name="requireClientAuthentication" type="xsd:boolean"/>
+    </xsd:complexType>
 </xsd:schema>

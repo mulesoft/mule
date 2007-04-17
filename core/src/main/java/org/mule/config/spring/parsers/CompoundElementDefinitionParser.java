@@ -1,0 +1,62 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the MuleSource MPL
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+package org.mule.config.spring.parsers;
+
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.util.Assert;
+import org.w3c.dom.Element;
+
+/**
+ * Processes child property elements in Xml but sets the properties on the parent object.  This is
+ * useful when an object has lots of properties and its more readable to break those properties into
+ * groups that can be represented as a sub-element in Xml.
+ */
+public class CompoundElementDefinitionParser extends AbstractMuleSingleBeanDefinitionParser
+{
+    protected Class getBeanClass(Element element)
+    {
+        return Object.class;
+    }
+
+    protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext)
+    {
+        parserContext.getContainingBeanDefinition();
+        this.parserContext = parserContext;
+        Class beanClass = getBeanClass(element);
+        Assert.state(beanClass != null, "Class returned from getBeanClass(Element) must not be null, element is: " + element.getNodeName());
+        BeanDefinitionBuilder builder = createBeanDefinitionBuilder(element, beanClass);
+        builder.setSource(parserContext.extractSource(element));
+//        builder.setSingleton(isSingleton());
+//        builder.addDependsOn("_registry");
+//        if(getInitMethodName()!=null)
+//        {
+//            builder.setInitMethodName(getInitMethodName());
+//        }
+//        if(getDisposeMethodName()!=null)
+//        {
+//            builder.setDestroyMethodName(getDisposeMethodName());
+//        }
+        if (parserContext.isNested())
+        {
+            // Inner bean definition must receive same singleton status as containing bean.
+            builder.setSingleton(parserContext.getContainingBeanDefinition().isSingleton());
+        }
+        doParse(element, parserContext, builder);
+        AbstractBeanDefinition bd = (AbstractBeanDefinition)parserContext.getContainingBeanDefinition();
+        for (int i=0;i < builder.getBeanDefinition().getPropertyValues().getPropertyValues().length; i++)
+        {
+            bd.getPropertyValues().addPropertyValue(builder.getBeanDefinition().getPropertyValues().getPropertyValues()[i]);
+
+        }
+        return bd;
+    }
+}
