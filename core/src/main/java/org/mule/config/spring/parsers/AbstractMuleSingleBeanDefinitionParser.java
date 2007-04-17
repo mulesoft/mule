@@ -28,7 +28,30 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 
 /**
- * TODO document
+ * This parser extends the Spring provided {@link AbstractBeanDefinitionParser} to provide additional features for
+ * consitently customising bean represnetations for Mule bean definition parsers.  Most custom bean definition parsers
+ * in Mule will use this base class. The following enhancements are made -
+ *
+ * 1. Attribute mappings can be registered to control how an attribute name in Mule Xml maps to the bean name in the
+ * object being created. For example -
+ *
+ * <code>registerAttributeMapping("poolExhaustedAction", "poolExhaustedActionString");</code>
+ *
+ * Map the 'poolExhaustedAction' to the 'poolExhaustedActionString' property on the bean being created.
+ *
+ * 2. Value Mappings can be used to map key value pairs from selection lists in the XML schema to property values on the
+ * bean being created. These are a comma-separated list of key=value pairs. For example -
+ *
+ *     <code> registerValueMapping("action", "NONE=0,ALWAYS_BEGIN=1,BEGIN_OR_JOIN=2,JOIN_IF_POSSIBLE=3");</code>
+ *
+ * The first argument is the bean name to set, the second argument is the set of possible key=value pairs
+ *
+ * 3. Provides properties for setting the 'init-method' and 'destroy-method' for this object. This will then automatically 
+ * wire the bean into the lifecycle of the Application context.
+ *
+ * 4. The 'singleton' property provides a fixed way to make sure the bean is always a singleton or not.
+ *
+ * @see  AbstractBeanDefinitionParser
  */
 public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBeanDefinitionParser
 {

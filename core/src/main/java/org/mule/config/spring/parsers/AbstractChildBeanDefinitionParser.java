@@ -24,7 +24,23 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
- * TODO document
+ * This definition parser introduces the notion of Heirarchical processing to nested Xml elements. Definition
+ * parsers that exnd this are always child beans that get set on the parent Definition Parser.
+ *
+ * A single method needs to be overriden called {@link #getPropertyName} that determines the name of the property to
+ * set on the parent bean with this bean. Note that the property name can be dynamically resolved depending on the parent
+ * element.
+ *
+ * This implementation also supports collections and Maps. For collections is a child element is repeated it will be assumed
+ * that it is a collection.
+ *
+ * If the Bean Class for this element is set to {@link MapEntryDefinitionParser.KeyValuePair} it is assumed that a Map
+ * is being processed and any child elements will be added to the parent Map.
+ *
+ *
+ * @see SimpleChildDefinitionParser
+ * @see MapEntryDefinitionParser.KeyValuePair
+ * @see AbstractMuleSingleBeanDefinitionParser
  */
 public abstract class AbstractChildBeanDefinitionParser extends AbstractMuleSingleBeanDefinitionParser
 {
