@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id:TransformerCloningTestCase.java 5937 2007-04-09 22:35:04Z rossmason $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -50,31 +50,6 @@ public class TransformerCloningTestCase extends AbstractTransformerTestCase
     public Object getResultData()
     {
         return this;
-    }
-
-    // @Override
-    protected void doTestClone(UMOTransformer original, UMOTransformer clone) throws Exception
-    {
-        super.doTestClone(original, clone);
-
-        NoActionTransformer t1 = (NoActionTransformer) original;
-        NoActionTransformer t2 = (NoActionTransformer) clone;
-
-        // name must be equal
-        assertEquals("name", t1.name, t2.name);
-
-        // returnClass must be equal
-        assertEquals("returnClass", t1.returnClass, t2.returnClass);
-
-        // sourceTypes must be a copy
-        assertNotSame("sourceTypes", t1.sourceTypes, t2.sourceTypes);
-        assertEquals("sourceTypes", t1.sourceTypes, t2.sourceTypes);
-
-        // TODO HH: is this correct? for now AbstractTransformer.clone() keeps the reference
-        assertSame("endpoint", t1.endpoint, t2.endpoint);
-
-        // nextTransformer must be a copy of the entire chain!
-        assertNotSame("nextTransformer", t1.nextTransformer, t2.nextTransformer);
     }
 
 }

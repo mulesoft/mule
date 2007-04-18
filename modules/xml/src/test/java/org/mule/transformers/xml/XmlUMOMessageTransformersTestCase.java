@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id:XmlUMOMessageTransformersTestCase.java 5937 2007-04-09 22:35:04Z rossmason $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -149,34 +149,6 @@ public class XmlUMOMessageTransformersTestCase extends AbstractXmlTransformerTes
         else
         {
             return false;
-        }
-    }
-
-    // @Override
-    protected void doTestClone(UMOTransformer original, UMOTransformer clone) throws Exception
-    {
-        super.doTestClone(original, clone);
-
-        ObjectToXml t1 = (ObjectToXml) original;
-        ObjectToXml t2 = (ObjectToXml) clone;
-
-        // The XStream instance must not be the same
-        assertNotSame("xstream", t1.getXStream(), t2.getXStream());
-
-        // The driver class name must be equal
-        assertEquals("driverClassName", t1.getDriverClassName(), t2.getDriverClassName());
-
-        // The aliases and converters must be equal but not identical
-        assertEquals("aliases", t1.getAliases(), t2.getAliases());
-        if (t1.getAliases() != null && t2.getAliases() != null)
-        {
-            assertNotSame("aliases", t1.getAliases(), t2.getAliases());
-        }
-
-        assertEquals("converters", t1.getConverters(), t2.getConverters());
-        if (t1.getConverters() != null && t2.getConverters() != null)
-        {
-            assertNotSame("converters", t1.getConverters(), t2.getConverters());
         }
     }
 

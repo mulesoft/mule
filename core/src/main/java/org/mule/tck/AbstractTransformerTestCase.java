@@ -10,7 +10,6 @@
 
 package org.mule.tck;
 
-import org.mule.RegistryContext;
 import org.mule.impl.RequestContext;
 import org.mule.tck.testmodels.fruit.InvalidSatsuma;
 import org.mule.umo.transformer.TransformerException;
@@ -21,14 +20,14 @@ import java.util.Arrays;
 public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
 {
 
-    // //@Override
+    //@Override
     protected void doSetUp() throws Exception
     {
         // setup a dummy context for transformers that are event aware
         RequestContext.setEvent(getTestEvent("test"));
     }
 
-    // //@Override
+    //@Override
     protected void doTearDown() throws Exception
     {
         RequestContext.setEvent(null);
@@ -103,12 +102,6 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
         }
     }
 
-    public void testClone() throws Exception
-    {
-        UMOTransformer original = this.getTransformer();
-        UMOTransformer clone = RegistryContext.getRegistry().lookupTransformer(original.getName());
-        this.doTestClone(original, clone);
-    }
 
     protected void doTestClone(UMOTransformer original, UMOTransformer clone) throws Exception
     {

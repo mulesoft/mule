@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id:EncryptionTransformerTestCase.java 5937 2007-04-09 22:35:04Z rossmason $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -125,21 +125,6 @@ public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
         {
             return super.compareResults(src, result);
         }
-    }
-
-    // @Override
-    protected void doTestClone(UMOTransformer original, UMOTransformer clone) throws Exception
-    {
-        super.doTestClone(original, clone);
-
-        EncryptionTransformer t1 = (EncryptionTransformer) original;
-        EncryptionTransformer t2 = (EncryptionTransformer) clone;
-
-        // strategyName must be equal
-        assertEquals("strategyName", t1.getStrategyName(), t2.getStrategyName());
-        // strategy instance must be the same (shared);
-        // see AbstractEncryptionTransformer.clone()
-        assertSame("strategy", t1.getStrategy(), t2.getStrategy());
     }
 
 }

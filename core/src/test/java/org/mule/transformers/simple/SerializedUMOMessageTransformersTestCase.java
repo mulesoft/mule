@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id:SerializedUMOMessageTransformersTestCase.java 5937 2007-04-09 22:35:04Z rossmason $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -128,12 +128,4 @@ public class SerializedUMOMessageTransformersTestCase extends AbstractTransforme
             return false;
         }
     }
-
-    // @Override
-    protected void doTestClone(UMOTransformer original, UMOTransformer clone) throws Exception
-    {
-        super.doTestClone(original, clone);
-        assertTrue(((SerializableToByteArray)clone).isAcceptUMOMessage());
-    }
-    
 }

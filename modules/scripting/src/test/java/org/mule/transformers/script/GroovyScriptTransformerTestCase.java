@@ -52,16 +52,4 @@ public class GroovyScriptTransformerTestCase extends AbstractTransformerTestCase
         return list;
     }
 
-    // @Override
-    protected void doTestClone(UMOTransformer original, UMOTransformer clone) throws Exception
-    {
-        super.doTestClone(original, clone);
-
-        ScriptTransformer t1 = (ScriptTransformer) original;
-        ScriptTransformer t2 = (ScriptTransformer) clone;
-
-        // The Scriptable instance must be different 
-        assertNotSame(t1.scriptable, t2.scriptable);
-    }
-
 }

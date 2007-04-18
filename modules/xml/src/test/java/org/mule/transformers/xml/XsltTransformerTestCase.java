@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id:XsltTransformerTestCase.java 5937 2007-04-09 22:35:04Z rossmason $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -54,20 +54,6 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
     public Object getResultData()
     {
         return resultData;
-    }
-
-    // @Override
-    protected void doTestClone(UMOTransformer original, UMOTransformer clone) throws Exception
-    {
-        super.doTestClone(original, clone);
-
-        XsltTransformer t1 = (XsltTransformer) original;
-        XsltTransformer t2 = (XsltTransformer) clone;
-
-        // The transformerPool must be a new instance
-        assertNotSame("transformerPool", t1.transformerPool, t2.transformerPool);
-        // ..but it must have the same config value
-        assertEquals("transformerPool.maxActive", t1.getMaxActiveTransformers(), t2.getMaxActiveTransformers());
     }
 
 }
