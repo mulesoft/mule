@@ -6,13 +6,13 @@
     <parent>
         <groupId>org.mule.tools</groupId>
         <artifactId>mule-tools</artifactId>
-        <version>1.4-SNAPSHOT</version>
+        <version>2.0-SNAPSHOT</version>
     </parent>
     <packaging>maven-plugin</packaging>
     <name>Mule Config Visualizer</name>
     <artifactId>mule-tools-visualizer</artifactId>
     <groupId>org.mule.tools</groupId>
-    <version>1.4-SNAPSHOT</version>
+    <version>2.0-SNAPSHOT</version>
     <inceptionYear>2005</inceptionYear>
     <description>A tool for generating visual representations of configuration Xml config files</description>
 
@@ -21,7 +21,7 @@
             <plugin>
                 <groupId>org.mule.tools</groupId>
                 <artifactId>mule-tools-visualizer</artifactId>
-                <version>1.4-SNAPSHOT</version>
+                <version>2.0-SNAPSHOT</version>
                 <configuration>
                     <files>
                         <param>echo-config.xml</param>
@@ -40,7 +40,7 @@
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
-            <version>1.4-SNAPSHOT</version>
+            <version>2.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>oy-lm</groupId>
