@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id:LogicFiltersTestCase.java 5937 2007-04-09 22:35:04Z rossmason $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -22,29 +22,26 @@ public class LogicFiltersTestCase extends AbstractMuleTestCase
     public void testAndFilter()
     {
         AndFilter filter = new AndFilter();
-        assertNull(filter.getLeftFilter());
-        assertNull(filter.getRightFilter());
+        assertEquals(0, filter.getFilters().size());
 
         // both null
         assertFalse(filter.accept(new MuleMessage("foo")));
 
-        // left set, right null
-        filter.setLeftFilter(new EqualsFilter("foo"));
-        assertFalse(filter.accept(new MuleMessage("foo")));
+        // only one filter set
+        filter.getFilters().add(new EqualsFilter("foo"));
+        assertTrue(filter.accept(new MuleMessage("foo")));
 
-        // right set too, but does not accept
-        filter.setRightFilter(new EqualsFilter("foo"));
+        // another one set too, but does not accept
+        filter.getFilters().add(new EqualsFilter("foo"));
         assertFalse(filter.accept(new MuleMessage("bar")));
 
         // both accept
-        filter.setRightFilter(new EqualsFilter("foo"));
         assertTrue(filter.accept(new MuleMessage("foo")));
 
         WildcardFilter left = new WildcardFilter("blah.blah.*");
         WildcardFilter right = new WildcardFilter("blah.*");
         filter = new AndFilter(left, right);
-        assertNotNull(filter.getLeftFilter());
-        assertNotNull(filter.getRightFilter());
+        assertEquals(2,filter.getFilters().size());
 
         assertTrue(filter.accept(new MuleMessage("blah.blah.blah")));
         assertTrue(right.accept(new MuleMessage("blah.blah")));
@@ -52,8 +49,8 @@ public class LogicFiltersTestCase extends AbstractMuleTestCase
         assertTrue(!filter.accept(new MuleMessage("blah.blah")));
 
         filter = new AndFilter();
-        filter.setLeftFilter(left);
-        filter.setRightFilter(right);
+        filter.getFilters().add(left);
+        filter.getFilters().add(right);
 
         assertTrue(filter.accept(new MuleMessage("blah.blah.blah")));
         assertTrue(!filter.accept(new MuleMessage("blah.blah")));

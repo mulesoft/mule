@@ -29,7 +29,6 @@ public abstract class AbstractFilterCollection implements UMOFilter
     }
 
     /**
-     * @deprecated
      * @param left
      * @param right
      */

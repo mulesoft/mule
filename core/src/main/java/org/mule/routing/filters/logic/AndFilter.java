@@ -29,7 +29,7 @@ public class AndFilter extends AbstractFilterCollection
     }
 
     /**
-     * @deprecated
+     *
      * @param left
      * @param right
      */

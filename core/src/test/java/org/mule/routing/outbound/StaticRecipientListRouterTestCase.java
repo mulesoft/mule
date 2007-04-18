@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id:StaticRecipientListRouterTestCase.java 5937 2007-04-09 22:35:04Z rossmason $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -41,6 +41,7 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
         List endpoints = new ArrayList();
         endpoints.add(endpoint1);
         router.setEndpoints(endpoints);
+        router.setManagementContext(managementContext);
 
         assertEquals(2, router.getRecipients().size());
 
