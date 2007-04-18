@@ -23,7 +23,8 @@
                         <!-- TODO This module needs reorganization in order to properly export its packages. 
                             Note that org.mule.management.stats.* is still in mule-core -->
                         <Export-Package>
-                            org.mule.management.*
+                            org.mule.management.*,
+                            org.mule.management.agents.*
                         </Export-Package>
                     </instructions>
                 </configuration>

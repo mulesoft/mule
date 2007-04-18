@@ -765,14 +765,10 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule.examples:mule-example-voipservice</exclude>
         <!-- Workaround, see comment for "<packaging>jar</packaging>" in the pom.xml -->
         <exclude>org.mule.distributions:mule-full</exclude>
-<<<<<<< .working
-        <!-- TODO Remove these -->
-=======
         <!-- TODO The following exclusions shouldn't be necessary here if they are kept 
         out in their originating POMs, need to do some transitive dependency debugging
         to figure out who is dragging them into the distro. -->
         <exclude>org.mule.tests:mule-tests-functional</exclude>
->>>>>>> .merge-right.r5844
         <exclude>javax.activation:activation</exclude>
         <exclude>javax.mail:mail</exclude>
         <exclude>commons-logging:commons-logging</exclude>
