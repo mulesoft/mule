@@ -31,6 +31,9 @@ public class StreamingBridgeComponent implements StreamingService
                                             ". This might be because this is a one way request, but the StreamingBridge component should not be used in this scenario");
         }
 
-        IOUtils.copy(in, out);
+        // TODO if we can find a way (e.g. for FTP) to pass in (remote) file's size, it would
+        // allow to detect stream corruption and broken connections by comparing the actually read
+        // and size values
+        IOUtils.copyLarge(in, out);
     }
 }

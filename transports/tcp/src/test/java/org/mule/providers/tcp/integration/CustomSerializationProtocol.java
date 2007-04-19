@@ -33,13 +33,16 @@ public class CustomSerializationProtocol extends DefaultProtocol
 
             write(os, SerializationUtils.serialize(serializableObject));
         }
-        // TODO SF: isn't the "else" branch missing here? :)
+        else
+        {
+            super.write(os, data);
+        }
     }
 
     // @Override
     public Object read(InputStream is) throws IOException
     {
-        byte[] tmp = (byte[])super.read(is);
+        byte[] tmp = (byte[]) super.read(is);
 
         if (tmp == null)
         {

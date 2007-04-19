@@ -10,7 +10,6 @@
 
 package org.mule.samples.errorhandler;
 
-import org.mule.config.i18n.Message;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.Callable;
@@ -23,10 +22,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * <code>BusinessErrorManager</code> TODO (document class)
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * The <code>BusinessErrorManager</code> is the UMO Component that processes 
+ * exceptions of type org.mule.samples.errorhandler.exceptions.BusinessException.
+ * The business method simply reports the errors and stops any further processing.
  */
 public class BusinessErrorManager implements Callable
 {
@@ -44,9 +42,9 @@ public class BusinessErrorManager implements Callable
         // Do something with the error message
         List msgs = new ArrayList();
 
-        msgs.add(new Message("errorhandler-example", 3).getMessage());
-        msgs.add(new Message("errorhandler-example", 4, msg.getException().getDetailMessage()).getMessage());
-        msgs.add(new Message("errorhandler-example", 5, msg.getException().getClass().getName()).getMessage());
+        msgs.add(LocaleMessage.getString(LocaleMessage.BUSINESS_ERROR_MANAGER_ERROR));
+        msgs.add(LocaleMessage.getString(LocaleMessage.ERROR_DETAIL, msg.getException().getDetailMessage()));
+        msgs.add(LocaleMessage.getString(LocaleMessage.ERROR_CLASS, msg.getException().getClass().getName()));
 
         logger.info("\n" + StringMessageUtils.getBoilerPlate(msgs, '*', 80));
         context.setStopFurtherProcessing(true);

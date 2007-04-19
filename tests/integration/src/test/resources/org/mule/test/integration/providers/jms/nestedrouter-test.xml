@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="NestedRouter-Test" version="1.0">
+
+    <container-context className="org.mule.extras.spring.SpringContainerContext">
+        <properties>
+            <text-property name="configuration">
+                <![CDATA[
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+    <bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+        <constructor-arg>
+            <value>vm://localhost?broker.persistent=false&amp;broker.useJmx=false</value>
+        </constructor-arg>
+    </bean>
+</beans>
+                ]]>
+            </text-property>
+        </properties>
+    </container-context>
+
+	<connector name="JMSConnector" className="org.mule.providers.jms.JmsConnector">
+		<properties>
+			<property name="specification" value="1.1"/>
+			<container-property name="connectionFactory" reference="jmsConnectionFactory" container="spring"/>
+		</properties>
+	</connector>
+
+	<model name="NestedRouter">
+		<mule-descriptor name="HelloComponent" implementation="org.mule.test.integration.routing.nested.HelloService">
+			<inbound-router>
+				<endpoint address="jms://hello.in"/>
+			</inbound-router>
+		</mule-descriptor>
+		<mule-descriptor name="InvokerComponent" implementation="org.mule.test.integration.routing.nested.Invoker">
+			<inbound-router>
+				<endpoint address="jms://invoker.in"/>
+			</inbound-router>
+			<nested-router>
+				<binding interface="org.mule.test.integration.routing.nested.HelloInterface">
+					<endpoint address="jms://hello.in" remoteSync="true"/>
+				</binding>
+			</nested-router>
+			<outbound-router>
+				<router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+					<endpoint address="jms://invoker.out"/>
+				</router>
+			</outbound-router>
+		</mule-descriptor>
+	</model>
+</mule-configuration>

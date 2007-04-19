@@ -12,6 +12,7 @@ package org.mule.examples.loanbroker.bank;
 
 import org.mule.config.ConfigurationException;
 import org.mule.config.i18n.Message;
+import org.mule.examples.loanbroker.LocaleMessage;
 import org.mule.examples.loanbroker.messages.LoanBrokerQuoteRequest;
 import org.mule.examples.loanbroker.messages.LoanQuote;
 import org.mule.impl.UMODescriptorAware;
@@ -86,7 +87,7 @@ public class Bank implements UMODescriptorAware, Serializable, BankService
         LoanQuote quote = new LoanQuote();
         quote.setBankName(getBankName());
         quote.setInterestRate(primeRate);
-        logger.info(new Message("loanbroker-example", 3, quote.toString()).getMessage());
+        logger.info(LocaleMessage.getString(LocaleMessage.RECEIVED_RATE, quote.toString()));
         
         return quote;
     }

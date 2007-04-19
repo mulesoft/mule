@@ -28,7 +28,7 @@ The following parameters can be configured (simple string values unless
 indicated otherwise):
 
 files        - a list of mule config files - required
-exec         - the Graphvix executable; can also be specified via MULE_GRAPHVIZ
+exec         - the Graphviz executable; can also be specified via MULE_GRAPHVIZ
                system property
 workingdir   - prefix directory, default "target"
 outputdir    - destination directory for output

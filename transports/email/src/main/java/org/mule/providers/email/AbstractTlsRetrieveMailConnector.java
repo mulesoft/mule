@@ -52,7 +52,7 @@ extends AbstractRetrieveMailConnector implements TlsIndirectTrustStore, TlsIndir
     }
 
     // @Override
-    void extendPropertiesForSession(Properties global, Properties local, URLName url)
+    protected void extendPropertiesForSession(Properties global, Properties local, URLName url)
     {
         super.extendPropertiesForSession(global, local, url);
 

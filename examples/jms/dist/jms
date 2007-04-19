@@ -2,7 +2,7 @@
 
 # There is no need to call this if you set the MULE_HOME in your environment
 if [ -z "$MULE_HOME" ] ; then
-  MULE_HOME=../../..
+  MULE_HOME=../..
   export MULE_HOME
 fi
 
@@ -17,9 +17,9 @@ MULE_LIB=./conf
 export MULE_LIB
 
 if [ -f "$MULE_BASE/lib/user/activemq.jar" ]; then
-    exec $MULE_BASE/bin/mule -config ./conf/jms-config.xml
+    exec "$MULE_BASE/bin/mule" -config ./conf/jms-config.xml
 elif [ -f "$MULE_HOME/lib/user/activemq.jar" ]; then
-    exec $MULE_BASE/bin/mule -config ./conf/jms-config.xml
+    exec "$MULE_BASE/bin/mule" -config ./conf/jms-config.xml
 else
     echo "This example requires additional libraries which need to be downloaded by the build script.  Please follow the instructions in the README.txt file."
 fi

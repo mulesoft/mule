@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="axis_test" version="1.0">
+
+    <connector name="servlet" className="org.mule.providers.http.servlet.ServletConnector">
+        <properties>
+            <property name="servletUrl" value="http://localhost:18088/services"/>
+        </properties>
+    </connector>
+
+    <model name="test">
+        <mule-descriptor name="mycomponent"
+            implementation="org.mule.tck.testmodels.services.TestServiceComponent"
+            inboundEndpoint="axis:servlet://mycomponent">
+        </mule-descriptor>
+    </model>
+</mule-configuration>

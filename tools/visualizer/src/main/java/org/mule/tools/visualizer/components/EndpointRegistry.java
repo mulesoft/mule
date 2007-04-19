@@ -53,7 +53,7 @@ public class EndpointRegistry
             }
         }
 
-        GraphNode[] nodes = null;
+        GraphNode[] nodes;
         if (nodesList.size() > 0)
         {
             nodes = new GraphNode[nodesList.size()];
@@ -68,19 +68,29 @@ public class EndpointRegistry
 
     public GraphNode getEndpoint(String uri, String componentName)
     {
+        env.log("retrieving endpoint for " + uri + " / " + componentName);
         GraphNode n = getEqualsMapping(uri, componentName);
-        if (n == null)
+        if (n != null)
+        {
+            env.log("found equals mapping: " + n.getId());
+        }
+        else
         {
             n = (GraphNode) endpoints.get(uri);
-        }
-        if (n == null)
-        {
-            for (Iterator iterator = endpoints.keySet().iterator(); iterator.hasNext();)
+            if (null != n)
             {
-                String s = (String) iterator.next();
-                if (s.startsWith(uri + "/" + componentName))
+                env.log("found direct match: " + n.getId());
+            }
+            else
+            {
+                for (Iterator iterator = endpoints.keySet().iterator(); iterator.hasNext();)
                 {
-                    n = (GraphNode) endpoints.get(s);
+                    String s = (String) iterator.next();
+                    if (s.startsWith(uri + "/" + componentName))
+                    {
+                        n = (GraphNode) endpoints.get(s);
+                        env.log("found prefix: " + n.getId() +"; " + s);
+                    }
                 }
             }
         }
@@ -93,7 +103,7 @@ public class EndpointRegistry
         String equalsMapping = env.getConfig().getMappings().getProperty(uri + ".equals");
         if (equalsMapping != null)
         {
-            env.log("Mapping equivilent endpoint '" + equalsMapping + "' to '" + uri + "'");
+            env.log("Mapping equivalent endpoint '" + equalsMapping + "' to '" + uri + "'");
             return getEndpoint(equalsMapping, componentName);
         }
         return null;
@@ -101,6 +111,7 @@ public class EndpointRegistry
 
     public void addEndpoint(String url, GraphNode out)
     {
+        env.log("adding endpoint: " + out.getId() + "; " + url);
         endpoints.put(url, out);
     }
 }

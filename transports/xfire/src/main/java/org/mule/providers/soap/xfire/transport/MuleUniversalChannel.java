@@ -15,8 +15,6 @@ import org.mule.RegistryContext;
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
-import org.mule.impl.MuleSession;
-import org.mule.impl.NullSessionHandler;
 import org.mule.impl.RequestContext;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
@@ -338,7 +336,7 @@ public class MuleUniversalChannel extends AbstractChannel
         UMOEndpoint ep = RegistryContext.getRegistry().getOrCreateEndpointForUri(uri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
         ep.setStreaming(true);
         UMOMessage message = new MuleMessage(sa);
-        UMOEvent event = new MuleEvent(message, ep, new MuleSession(message, new NullSessionHandler()), true);
+        UMOEvent event = new MuleEvent(message, ep, RequestContext.getEventContext().getSession(), true);
         UMOMessage result = ep.send(event);
         if (result != null)
         {

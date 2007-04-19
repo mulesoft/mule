@@ -1,0 +1,88 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the MuleSource MPL
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
+package org.mule.providers.${TransportNameLower}.transformers;
+
+import org.mule.tck.AbstractTransformerTestCase;
+import org.mule.umo.transformer.UMOTransformer;
+
+
+public class ${TransportName}TransformersTestCase extends AbstractTransformerTestCase
+{
+
+    /* For general guidelines on writing transports see
+       http://mule.mulesource.org/display/MULE/Writing+Transports */
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.mule.tck.AbstractTransformerTestCase#getTestData()
+     */
+    public Object getTestData()
+    {
+        // TODO create a test data object that will be passed into the
+        // transformer
+        throw new UnsupportedOperationException("getResultData");
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.mule.tck.AbstractTransformerTestCase#getResultData()
+     */
+    public Object getResultData()
+    {
+        try {
+            // TODO Return the result data expected once the getTestData()
+            // value has been transformed
+            throw new UnsupportedOperationException("getResultData");
+        }
+        catch (Exception ex) {
+            return null;
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.mule.tck.AbstractTransformerTestCase#getTransformers()
+     */
+    public UMOTransformer getTransformer()
+    {
+#if( $InboundTransformer != "n")
+        UMOTransformer t = new ${InboundTransformer}();
+        // Set the correct return class for this roundtrip test
+        t.setReturnClass(this.getResultData().getClass());
+        return t;
+#else
+        // No Inbound transformer was created for this Transport
+        return null;
+#end
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.mule.tck.AbstractTransformerTestCase#getRoundTripTransformer()
+     */
+    public UMOTransformer getRoundTripTransformer()
+    {
+#if( $OutboundTransformer != "n")
+        UMOTransformer t = new ${OutboundTransformer}();
+        // Set the correct return class for this roundtrip test
+        t.setReturnClass(this.getTestData().getClass());
+        return t;
+#else
+        // No Outbound transformer was created for this Transport
+        return null;
+#end
+    }
+
+}

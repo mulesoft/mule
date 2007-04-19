@@ -33,16 +33,16 @@
     <dependencies>
         <!-- jBPM --> 
         <dependency>
-            <groupId>jboss</groupId>
+            <groupId>org.jbpm</groupId>
             <artifactId>jbpm</artifactId>
-            <version>3.1.3</version>
+            <version>3.1.4</version>
         </dependency>
-        <!-- This is the same as spring-modules-jbpm31 but we override the pom in our local dependencies repo
-            because the one from Spring includes the kitchen sink. -->
+        <!-- This is the same as spring-modules-jbpm31 but we override the pom in our local 
+        	dependencies repo because the one from Spring includes the kitchen sink. -->
         <dependency>
             <groupId>org.springmodules</groupId>
             <artifactId>spring-modules-jbpm31-nodeps</artifactId>
-            <version>0.6</version>
+            <version>0.8a</version>
             <!-- Exclude older Spring version -->
             <exclusions>
                 <!--
@@ -100,9 +100,9 @@
         </dependency>
         <!-- Only needed if using jBpm's built-in identity management
         <dependency>
-            <groupId>jboss</groupId>
+            <groupId>org.jbpm</groupId>
             <artifactId>jbpm-identity</artifactId>
-            <version>3.1.3</version>
+            <version>3.1.4</version>
         </dependency>
         -->
         <!-- Only needed for scripting in jBpm -->
@@ -169,7 +169,7 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Only used if localEndpointsOnly = false -->
+        <!-- Only used if allowGlobalDispatcher = true -->
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>
@@ -181,7 +181,10 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring</artifactId>
             <version>${version}</version>
-            <scope>test</scope>
+            <!-- TODO Change this back to scope=test once 
+                LocalJbpmConfigurationFactoryBeanWorkaround 
+            	is no longer needed in src/main/java -->
+            <!-- <scope>test</scope> -->
         </dependency>
     </dependencies>
 

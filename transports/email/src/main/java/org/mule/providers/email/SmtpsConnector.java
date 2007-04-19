@@ -57,7 +57,7 @@ public class SmtpsConnector extends SmtpConnector implements TlsIndirectTrustSto
     }
 
     // @Override
-    void extendPropertiesForSession(Properties global, Properties local, URLName url)
+    protected void extendPropertiesForSession(Properties global, Properties local, URLName url)
     {
         super.extendPropertiesForSession(global, local, url);
 

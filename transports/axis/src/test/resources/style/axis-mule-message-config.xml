@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="Test_Server" version="1.0">
+    <mule-environment-properties synchronous="true" serverUrl="" />
+
+    <model name="WebService_Test">
+        <mule-descriptor name="ServiceEntryPoint"
+            implementation="org.mule.providers.soap.axis.style.DefaultMessageService"
+            inboundEndpoint="axis:http://localhost:8088">
+            <properties>
+                <property name="style" value="Message" />
+                <property name="serviceNamespace" value="http://muleumo.org"/>
+                <map name="axisOptions">
+                    <property name="wsdlServiceElement" value="testService"/>
+                </map>
+               </properties>
+        </mule-descriptor>
+    </model>
+</mule-configuration>

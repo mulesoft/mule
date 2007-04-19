@@ -10,9 +10,10 @@
 
 package org.mule.samples.voipservice.client;
 
-import org.mule.config.i18n.Message;
+import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
 import org.mule.impl.MuleMessage;
+import org.mule.samples.voipservice.LocaleMessage;
 import org.mule.samples.voipservice.to.CreditCardTO;
 import org.mule.samples.voipservice.to.CreditProfileTO;
 import org.mule.samples.voipservice.to.CustomerTO;
@@ -20,7 +21,6 @@ import org.mule.samples.voipservice.to.ServiceParamTO;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.util.StringMessageUtils;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
 
 import java.io.IOException;
 
@@ -79,15 +79,15 @@ public class VoipConsumer
         {
             voipConsumer = new VoipConsumer("voip-broker-sync-config.xml");
 
-            String msg = new Message("voip-example", 1).getMessage();
+            String msg = LocaleMessage.getWelcomeMessage();
 
             System.out.println(StringMessageUtils.getBoilerPlate(msg, '*', 70));
 
             while (response != 'q')
             {
-                System.out.println("\n" + new Message("voip-example", 2).getMessage());
-                System.out.println(new Message("voip-example", 3).getMessage());
-                System.out.println("\n" + new Message("voip-example", 4).getMessage());
+                System.out.println("\n" + LocaleMessage.getMenuOption1());
+                System.out.println(LocaleMessage.getMenuOptionQuit());
+                System.out.println("\n" + LocaleMessage.getMenuPromptMessage());
 
                 response = getSelection();
                 if (response == '1')
@@ -98,12 +98,12 @@ public class VoipConsumer
                 }
                 else if (response == 'q')
                 {
-                    System.out.println(new Message("voip-example", 5).getMessage());
+                    System.out.println(LocaleMessage.getGoodbyeMessage());
                     System.exit(0);
                 }
                 else
                 {
-                    System.out.println(new Message("voip-example", 6).getMessage());
+                    System.out.println(LocaleMessage.getMenuErrorMessage());
                 }
             }
 

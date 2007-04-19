@@ -21,8 +21,8 @@
         <module>credit-agency</module>
         <module>esb</module>
         <module>esn</module>
-        <!--
         <module>bpm</module>
+        <!--
         <module>bpel</module>
         <module>rules</module>
         <module>spaces</module>

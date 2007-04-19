@@ -28,8 +28,8 @@
     <!-- Download any additional libraries needed to run the application -->
     <target name="get.libraries">
 
-        <get src="${url.apache.repo}/org/apache/activemq/apache-activemq/4.1.0-incubator/apache-activemq-4.1.0-incubator.jar"
-             dest="${dir.user.lib}/apache-activemq-4.1.0-incubator.jar"
+        <get src="${url.apache.repo}/org/apache/activemq/activemq-core/4.1.0-incubator/activemq-core-4.1.0-incubator.jar"
+             dest="${dir.user.lib}/activemq-core-4.1.0-incubator.jar"
              verbose="true"
              usetimestamp="true"/>
         <!-- Used by ActiveMQ -->

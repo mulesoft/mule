@@ -1,0 +1,36 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the MuleSource MPL
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
+package org.mule.providers.${TransportNameLower};
+
+import org.mule.umo.endpoint.MalformedEndpointException;
+import org.mule.impl.endpoint.AbstractEndpointBuilder;
+
+import java.net.URI;
+import java.util.Properties;
+
+/**
+ * <code>${TransportName}EndpointBuilder</code> TODO Document
+ */
+public class ${TransportName}EndpointBuilder extends AbstractEndpointBuilder
+{
+    protected void setEndpoint(URI uri, Properties props) throws MalformedEndpointException
+    {
+        /* IMPLEMENTATION NOTE: This method should set the this.address
+           variable to the endpoint value to be retruned when calling
+           MuleEndpointURI.getAddress().  Mule uses this portion to pass to
+           the underlying technology */
+
+        // TODO extract the endpoint config from the uri
+
+        throw new UnsupportedOperationException("setEndpoint");
+    }
+
+}

@@ -19,22 +19,21 @@ import java.net.Socket;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.pool.KeyedPoolableObjectFactory;
 
 /**
  * Creates a client socket using the host and port address supplied in the endpoint URI.  Addtional
  * socket parameters will also be set from the connector
  */
-public class TcpSocketFactory implements KeyedPoolableObjectFactory
+public class TcpSocketFactory implements PooledSocketFactory
 {
     /**
      * logger used by this class
      */
-    protected transient final Log logger = LogFactory.getLog(TcpSocketFactory.class);
+    private static final Log logger = LogFactory.getLog(TcpSocketFactory.class);
 
     public Object makeObject(Object key) throws Exception
     {
-        UMOImmutableEndpoint ep = (UMOImmutableEndpoint)key;
+        UMOImmutableEndpoint ep = (UMOImmutableEndpoint) key;
         int port = ep.getEndpointURI().getPort();
         InetAddress inetAddress = InetAddress.getByName(ep.getEndpointURI().getHost());
         Socket socket = createSocket(port, inetAddress);
@@ -70,7 +69,7 @@ public class TcpSocketFactory implements KeyedPoolableObjectFactory
 
     public void destroyObject(Object key, Object object) throws Exception
     {
-        Socket socket = (Socket)object;
+        Socket socket = (Socket) object;
         if(!socket.isClosed())
         {
             socket.close();
@@ -79,7 +78,7 @@ public class TcpSocketFactory implements KeyedPoolableObjectFactory
 
     public boolean validateObject(Object key, Object object)
     {
-        Socket socket = (Socket)object;        
+        Socket socket = (Socket) object;
         return !socket.isClosed();       
     }
 
@@ -90,11 +89,11 @@ public class TcpSocketFactory implements KeyedPoolableObjectFactory
 
     public void passivateObject(Object key, Object object) throws Exception
     {
-        UMOImmutableEndpoint ep = (UMOImmutableEndpoint)key;
+        UMOImmutableEndpoint ep = (UMOImmutableEndpoint) key;
 
         boolean keepSocketOpen = MapUtils.getBooleanValue(ep.getProperties(),
-            TcpConnector.KEEP_SEND_SOCKET_OPEN_PROPERTY, ((TcpConnector)ep.getConnector()).isKeepSendSocketOpen());
-        Socket socket = (Socket)object;
+            TcpConnector.KEEP_SEND_SOCKET_OPEN_PROPERTY, ((TcpConnector) ep.getConnector()).isKeepSendSocketOpen());
+        Socket socket = (Socket) object;
 
         if (!keepSocketOpen)
         {

@@ -1,0 +1,235 @@
+<archetype>
+    <id>maven-archetype-mule-transport</id>
+    <variables>
+        <variable>
+            <name>MuleVersion</name>
+            <description>Which version of Mule are you working with?</description>
+            <defvalue>1.4</defvalue>
+        </variable>
+        <variable>
+            <name>TransportName</name>
+            <description>The protocol name to use for the transport (lower case) i.e. jms or http</description>
+            <defvalue>myTransport</defvalue>
+        </variable>
+        <variable>
+            <name>TransportDescription</name>
+            <description>Provide a description of what the transport does:</description>
+            <defvalue></defvalue>
+        </variable>
+        <variable>
+            <name>Receiver</name>
+            <description>Can the transport receive inbound requests? [y] or [n]</description>
+            <defvalue>y</defvalue>
+
+            <variables>
+                <variable>
+                    <name>PollingMessageReceiver</name>
+                    <description>Does the Message Receiver need to poll the underlying resource? [y] or [n]</description>
+                    <defvalue>n</defvalue>
+                </variable>
+
+                <variable>
+                    <name>Streaming</name>
+                    <description>Does this transport support Streaming? [y] or [n]</description>
+                    <defvalue>n</defvalue>
+                </variable>
+
+                <variable>
+                    <name>InboundTransformer</name>
+                    <description>If this transport will have a default inbound transformer, enter the name of the
+                        transformer? (i.e. JmsMessageToObject)
+                    </description>
+                    <defvalue>n</defvalue>
+                </variable>
+            </variables>
+        </variable>
+
+        <variable>
+            <name>Dispatcher</name>
+            <description>Can the transport dispatch outbound requests?</description>
+            <defvalue>y</defvalue>
+
+            <variables>
+                <variable>
+                    <name>OutboundTransformer</name>
+                    <description>If this transport will have a default outbound transformer, enter the name of the
+                        transformer? (i.e. ObjectToJmsMessage)
+                    </description>
+                    <defvalue>n</defvalue>
+                </variable>
+            </variables>
+        </variable>
+
+        <variable>
+            <name>Transactions</name>
+            <description>Does this transport support transactions? [y] or [n]</description>
+            <defvalue>n</defvalue>
+
+            <variables>
+                <variable>
+                    <name>CustomTransactions</name>
+                    <description>Does this transport use a non-JTA Transaction manager? [y] or [n]
+                    (i.e. needs to wrap proprietary transaction management)
+                    </description>
+                    <defvalue>n</defvalue>
+                </variable>
+            </variables>
+        </variable>
+
+        <variable>
+            <name>EndpointBuilder</name>
+            <description>What type of Endpoints does this transport use?
+            - [r]esource endpoints (i.e. jms://my.queue)
+            - [u]rl endpoints (i.e. http://localhost:1234/context/foo?param=1)
+            - [s]ocket endpoints (i.e. tcp://localhost:1234)
+            - [c]ustom - parse your own
+            </description>
+            <defvalue>r</defvalue>
+        </variable>
+
+    </variables>
+    <templates>
+        <template>
+            <file>src/main/resources/META-INF/services/org/mule/providers/csd.vm</file>
+            <output>src/main/resources/META-INF/services/org/mule/providers/${TransportName}</output>
+        </template>
+        <template>
+            <file>src/main/resources/META-INF/services/org/mule/i18n/messages.vm</file>
+            <output>src/main/resources/META-INF/services/org/mule/i18n/${TransportNameLower}-messages.properties</output>
+        </template>
+        <template>
+            <file>pom.vm</file>
+            <output>pom.xml</output>
+        </template>
+        <template>
+            <file>src/main/java/org/mule/providers/Connector.vm</file>
+            <output>
+                src/main/java/org/mule/providers/${TransportNameLower}/${TransportName}Connector.java
+            </output>
+        </template>
+        <template>
+            <file>src/main/java/org/mule/providers/MessageAdapter.vm</file>
+            <output>
+                src/main/java/org/mule/providers/${TransportNameLower}/${TransportName}MessageAdapter.java
+            </output>
+        </template>
+        <template>
+            <file>src/main/java/org/mule/providers/MessageDispatcher.vm</file>
+            <output>
+                src/main/java/org/mule/providers/${TransportNameLower}/${TransportName}MessageDispatcher.java
+            </output>
+            <dependsOnVar>Dispatcher=y</dependsOnVar>
+        </template>
+        <template>
+            <file>src/main/java/org/mule/providers/MessageDispatcherFactory.vm</file>
+            <output>
+                src/main/java/org/mule/providers/${TransportNameLower}/${TransportName}MessageDispatcherFactory.java
+            </output>
+            <dependsOnVar>Dispatcher=y</dependsOnVar>
+        </template>
+        <template>
+            <file>src/main/java/org/mule/providers/MessageReceiver.vm</file>
+            <output>
+                src/main/java/org/mule/providers/${TransportNameLower}/${TransportName}MessageReceiver.java
+            </output>
+            <dependsOnVar>Receiver=y</dependsOnVar>
+        </template>
+        <template>
+            <file>src/main/java/org/mule/providers/TransactedMessageReceiver.vm</file>
+            <output>
+                src/main/java/org/mule/providers/${TransportNameLower}/${TransportName}TransactedMessageReceiver.java
+            </output>
+            <dependsOnVar>Transactions=y</dependsOnVar>
+        </template>
+
+        <template>
+            <file>src/main/java/org/mule/providers/TransactionFactory.vm</file>
+            <output>
+                src/main/java/org/mule/providers/${TransportNameLower}/${TransportName}TransactionFactory.java
+            </output>
+            <dependsOnVar>CustomTransactions=y</dependsOnVar>
+        </template>
+
+        <template>
+            <file>src/main/java/org/mule/providers/Transaction.vm</file>
+            <output>
+                src/main/java/org/mule/providers/${TransportNameLower}/${TransportName}Transaction.java
+            </output>
+            <dependsOnVar>CustomTransactions=y</dependsOnVar>
+        </template>
+
+        <template>
+            <file>src/main/java/org/mule/providers/StreamingMessageAdapter.vm</file>
+            <output>
+                src/main/java/org/mule/providers/${TransportNameLower}/${TransportName}StreamingMessageAdapter.java
+            </output>
+            <dependsOnVar>Streaming=y</dependsOnVar>
+        </template>
+
+        <template>
+            <file>src/main/java/org/mule/providers/InboundTransformer.vm</file>
+            <output>src/main/java/org/mule/providers/${TransportNameLower}/transformers/${InboundTransformer}.java</output>
+            <dependsOnVar>InboundTransformer!=n</dependsOnVar>
+        </template>
+
+        <template>
+            <file>src/main/java/org/mule/providers/OutboundTransformer.vm</file>
+            <output>src/main/java/org/mule/providers/${TransportNameLower}/transformers/${OutboundTransformer}.java</output>
+            <dependsOnVar>OutboundTransformer!=n</dependsOnVar>
+        </template>
+
+        <template>
+            <file>src/main/java/org/mule/providers/EndpointBuilder.vm</file>
+            <output>src/main/java/org/mule/providers/${TransportNameLower}/${TransportName}EndpointBuilder.java</output>
+            <dependsOnVar>EndpointBuilder=c</dependsOnVar>
+        </template>
+
+        <!-- Test Cases -->
+        <template>
+            <file>src/test/java/org/mule/providers/ConnectorFactoryTestCase.vm</file>
+            <output>
+                src/test/java/org/mule/providers/${TransportNameLower}/${TransportName}ConnectorFactoryTestCase.java
+            </output>
+        </template>
+        <template>
+            <file>src/test/java/org/mule/providers/ConnectorTestCase.vm</file>
+            <output>
+                src/test/java/org/mule/providers/${TransportNameLower}/${TransportName}ConnectorTestCase.java
+            </output>
+        </template>
+        <template>
+            <file>src/test/java/org/mule/providers/EndpointTestCase.vm</file>
+            <output>
+                src/test/java/org/mule/providers/${TransportNameLower}/${TransportName}EndpointTestCase.java
+            </output>
+        </template>
+        <template>
+            <file>src/test/java/org/mule/providers/MessageAdapterTestCase.vm</file>
+            <output>
+                src/test/java/org/mule/providers/${TransportNameLower}/${TransportName}MessageAdapterTestCase.java
+            </output>
+        </template>
+        <template>
+            <file>src/test/java/org/mule/providers/MessageReceiverTestCase.vm</file>
+            <output>
+                src/test/java/org/mule/providers/${TransportNameLower}/${TransportName}MessageReceiverTestCase.java
+            </output>
+            <dependsOnVar>Receiver=y</dependsOnVar>
+        </template>
+        <template>
+            <file>src/test/java/org/mule/providers/TransformersTestCase.vm</file>
+            <output>
+                src/test/java/org/mule/providers/${TransportNameLower}/transformers/${TransportName}TransformersTestCase.java
+            </output>
+            <dependsOnVar>InboundTransformer!=n</dependsOnVar>
+        </template>
+        <template>
+            <file>src/test/java/org/mule/providers/TransformersTestCase.vm</file>
+            <output>
+                src/test/java/org/mule/providers/${TransportNameLower}/transformers/${TransportName}TransformersTestCase.java
+            </output>
+            <dependsOnVar>OutboundTransformer!=n</dependsOnVar>
+        </template>
+    </templates>
+</archetype>
+

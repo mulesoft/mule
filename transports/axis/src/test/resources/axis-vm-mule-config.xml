@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="axis_test" version="1.0">
+    <model name="test">
+        <mule-descriptor name="mycomponent"
+            implementation="org.mule.tck.testmodels.services.TestServiceComponent"
+            inboundEndpoint="axis:vm://mycomponent">
+        </mule-descriptor>
+
+        <mule-descriptor name="mycomponent2"
+            implementation="org.mule.tck.testmodels.services.TestServiceComponent"
+            inboundEndpoint="axis:vm://mycomponent2">
+            <properties>
+                <list name="serviceInterfaces">
+                    <entry value="org.mule.components.simple.EchoService"/>
+                    <entry value="org.mule.tck.testmodels.services.DateService"/>
+                </list>
+            </properties>
+        </mule-descriptor>
+
+        <mule-descriptor name="mycomponent3"
+            implementation="org.mule.tck.testmodels.services.TestServiceComponent"
+            inboundEndpoint="axis:vm://mycomponent3">
+        </mule-descriptor>
+
+        <mule-descriptor name="mycomponent4"
+            implementation="org.mule.tck.testmodels.services.TestServiceComponent">
+            <inbound-router>
+                <endpoint address="axis:vm://mycomponent4" synchronous="false"/>
+            </inbound-router>
+        </mule-descriptor>
+    </model>
+</mule-configuration>

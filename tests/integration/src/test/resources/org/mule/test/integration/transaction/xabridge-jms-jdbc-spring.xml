@@ -52,7 +52,7 @@
     <!-- ActiveMQ -->
     <bean id="jmsConnectionFactoryXa"
         class="org.apache.activemq.ActiveMQXAConnectionFactory">
-        <property name="brokerURL"><value>vm://localhost?broker.persistence=true</value></property>
+        <property name="brokerURL"><value>vm://localhost?broker.persistent=true</value></property>
     </bean>
 
 </beans>

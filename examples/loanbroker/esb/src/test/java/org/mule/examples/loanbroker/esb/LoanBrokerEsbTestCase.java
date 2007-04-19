@@ -10,8 +10,9 @@
 
 package org.mule.examples.loanbroker.esb;
 
+import org.mule.examples.loanbroker.tests.AbstractLoanBrokerTestCase;
 
-public class LoanBrokerEsbTestCase extends AbstractLoanBrokerEsbTestCase
+public class LoanBrokerEsbTestCase extends AbstractLoanBrokerTestCase
 {
     protected String getConfigResources()
     {

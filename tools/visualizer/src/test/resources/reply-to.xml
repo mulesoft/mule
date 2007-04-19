@@ -1,0 +1,50 @@
+<!DOCTYPE mule-configuration PUBLIC
+        "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+        "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="Mule_Echo_Sample" version="1.0">
+
+    <connector name="SystemStreamConnector"
+               className="org.mule.providers.stream.SystemStreamConnector">
+        <properties>
+            <property name="promptMessage" value="Please enter something: "/>
+            <property name="messageDelayTime" value="1000"/>
+        </properties>
+    </connector>
+
+    <connector name="vmQueue" className="org.mule.providers.vm.VMConnector">
+        <properties>
+            <property name="queueEvents" value="true"/>
+        </properties>
+    </connector>
+
+    <model name="echoSample">
+
+        <mule-descriptor name="EchoUMO"
+                         implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <endpoint address="stream://System.in"/>
+           </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="vm://in"/>
+                    <reply-to address="vm://out"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="Bridge"
+                         implementation="org.mule.components.simple.BridgeComponent">
+            <inbound-router>
+                <endpoint address="vm://in"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="vm://out"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+
+    </model>
+
+</mule-configuration>

@@ -140,6 +140,11 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
         Client client = new Client(transport, service, endpoint.getEndpointURI().toString());
         client.setXFire(xfire);
         client.setEndpointUri(endpoint.getEndpointURI().toString());
+        return configureXFireClient(client);
+    }
+
+    protected Client configureXFireClient(Client client) throws Exception
+    {
         client.addInHandler(new MuleHeadersInHandler());
         client.addOutHandler(new MuleHeadersOutHandler());
 

@@ -22,7 +22,7 @@ import org.mule.umo.routing.RoutingException;
 
 /**
  * <code>ChainingRouter</code> is used to pass a Mule event through multiple
- * endpoints using the result of the first and the input for the second.
+ * endpoints using the result of the first as the input for the second.
  */
 
 public class ChainingRouter extends FilteringOutboundRouter

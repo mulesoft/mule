@@ -20,9 +20,9 @@ import org.apache.commons.logging.LogFactory;
 
 public class TestReceiver
 {
-    private static final Log logger = LogFactory.getLog(TestComponent.class);
+    protected static final Log logger = LogFactory.getLog(TestComponent.class);
 
-    private AtomicInteger count = new AtomicInteger(0);
+    protected AtomicInteger count = new AtomicInteger(0);
 
     public String receive(String message) throws Exception
     {
@@ -36,7 +36,6 @@ public class TestReceiver
 
         return "Received: " + message;
     }
-
 
     protected int inc()
     {

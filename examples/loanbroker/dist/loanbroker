@@ -1,5 +1,12 @@
 #! /bin/sh
 
+<<<<<<< .working
+=======
+# 3rd party libraries needed to run the example
+ACTIVEMQ=apache-activemq-4.1.0-incubator.jar
+OPENEJB=openejb-core-1.0.jar
+
+>>>>>>> .merge-right.r6089
 # There is no need to call this if you set the MULE_HOME in your environment
 if [ -z "$MULE_HOME" ] ; then
   MULE_HOME=../../..
@@ -16,5 +23,43 @@ fi
 MULE_LIB=./conf
 export MULE_LIB
 
+<<<<<<< .working
 exec $MULE_BASE/bin/mule -main org.mule.samples.loanbroker.LoanConsumer
+=======
+echo "The Loan Broker example is available in three flavors:"
+echo "  1. Loan Broker ESB"
+echo "  2. Loan Broker ESN"
+echo "  3. Loan Broker BPM"
+echo "Select the one you wish to execute and press Enter..."
+read i
+>>>>>>> .merge-right.r6089
 
+<<<<<<< .working
+=======
+if [ 1 = $i ]
+then
+    if [ ! -f "$MULE_BASE/lib/user/${ACTIVEMQ}" ]; then
+       if [ ! -f "$MULE_HOME/lib/user/${ACTIVEMQ}" ]; then
+          MISSING_LIB=1
+       fi
+    fi
+    if [ ! -f "$MULE_BASE/lib/user/${OPENEJB}" ]; then
+       if [ ! -f "$MULE_HOME/lib/user/${OPENEJB}" ]; then
+          MISSING_LIB=1
+       fi
+    fi
+
+    if [ -z "$MISSING_LIB" ]
+    then
+        exec "$MULE_BASE/bin/mule" -main org.mule.examples.loanbroker.esb.LoanBrokerApp
+    else
+        echo "This example requires additional libraries which need to be downloaded by the build script.  Please follow the instructions in the README.txt file."
+    fi
+elif [ 2 = $i ]
+then
+    exec "$MULE_BASE/bin/mule" -main org.mule.examples.loanbroker.esn.LoanBrokerApp
+elif [ 3 = $i ]
+then
+    exec "$MULE_BASE/bin/mule" -main org.mule.examples.loanbroker.bpm.LoanBrokerApp
+fi
+>>>>>>> .merge-right.r6089

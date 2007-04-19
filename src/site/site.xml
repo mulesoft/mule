@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="Mule">
+    <bannerLeft>
+        <name>Mule</name>
+        <src>http://www.mulesource.com/images/mulesource_logo.gif</src>
+        <href>http://mule.mulesource.org/</href>
+    </bannerLeft>
+    <!--
+    <bannerRight>
+        <src>http://maven.apache.org/images/maven-small.gif</src>
+    </bannerRight>
+    -->
+    <body>
+        <links>
+            <item name="Mule" href="http://mule.codehaus.org/"/>
+        </links>
+
+        <menu name="Mule">
+            <item name="Javadocs" href="apidocs"/>
+        </menu>
+
+        <!-- link to parent from submodules -->
+        ${parentProject}
+
+        <!-- adds a menu with all submodules -->
+        <menu ref="modules" />
+        <menu ref="reports"/>
+    </body>
+</project>

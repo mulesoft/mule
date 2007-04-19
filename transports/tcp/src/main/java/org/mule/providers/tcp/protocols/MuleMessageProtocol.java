@@ -10,19 +10,15 @@
 
 package org.mule.providers.tcp.protocols;
 
-import org.mule.impl.MuleMessage;
-import org.mule.impl.RequestContext;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.apache.commons.lang.SerializationUtils;
-
 /**
  * This Protocol will send the actual Mule Message over the TCP channel, and in this
  * way we are preserving any headers which might be needed, for example Correlation
- * IDs in order to be able to aggregate messages after chunking.
+ * IDs in order to be able to aggregate messages after chunking.  Data are read until
+ * no more are (momentarily) available.
  */
 public class MuleMessageProtocol extends DefaultProtocol
 {
@@ -30,24 +26,13 @@ public class MuleMessageProtocol extends DefaultProtocol
     // @Override
     public Object read(InputStream is) throws IOException
     {
-        byte[] tmp = (byte[])super.read(is);
-
-        if (tmp == null)
-        {
-            return null;
-        }
-        else
-        {
-            return SerializationUtils.deserialize(tmp);
-        }
+        return MuleMessageWorker.doRead(super.read(is));
     }
 
     // @Override
     public void write(OutputStream os, byte[] data) throws IOException
     {
-        MuleMessage msg = (MuleMessage)RequestContext.getEvent().getMessage();
-        data = SerializationUtils.serialize(msg);
-        super.write(os, data);
+        MuleMessageWorker.doWrite(os);
     }
 
 }

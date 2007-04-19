@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="axis_test" version="1.0">
+
+    <container-context className="org.mule.extras.spring.SpringContainerContext">
+        <properties>
+            <text-property name="configuration">
+                <![CDATA[
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+                <beans>
+                <bean id="jmsConnectionFactory"
+        class="org.apache.activemq.ActiveMQConnectionFactory">
+        <property name="brokerURL"><value>vm://localhost?broker.persistence=true</value></property>
+    </bean>
+                </beans>
+                ]]>
+            </text-property>
+        </properties>
+    </container-context>
+    <!--
+    JmsConnector is used to send and receive information via the Jms channel
+    -->
+    <!-- Testing with ActiveMq -->
+    <connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">
+        <properties>
+            <container-property name="connectionFactory" reference="jmsConnectionFactory"/>
+            <property name="specification" value="1.1"/>
+        </properties>
+    </connector>
+
+    <model name="test">
+        <mule-descriptor name="mycomponent"
+            implementation="org.mule.tck.testmodels.services.TestServiceComponent"
+            inboundEndpoint="axis:jms://mycomponent">
+        </mule-descriptor>
+
+        <mule-descriptor name="mycomponent2"
+            implementation="org.mule.tck.testmodels.services.TestServiceComponent"
+            inboundEndpoint="axis:jms://mycomponent2">
+            <properties>
+                <list name="serviceInterfaces">
+                    <entry value="org.mule.components.simple.EchoService"/>
+                    <entry value="org.mule.tck.testmodels.services.DateService"/>
+                </list>
+            </properties>
+        </mule-descriptor>
+
+        <mule-descriptor name="mycomponent3"
+            implementation="org.mule.tck.testmodels.services.TestServiceComponent"
+            inboundEndpoint="axis:jms://mycomponent3">
+        </mule-descriptor>
+
+        <mule-descriptor name="mycomponent4"
+            implementation="org.mule.tck.testmodels.services.TestServiceComponent">
+            <inbound-router>
+                <endpoint address="axis:jms://mycomponent4" synchronous="false"/>
+            </inbound-router>
+        </mule-descriptor>
+    </model>
+</mule-configuration>

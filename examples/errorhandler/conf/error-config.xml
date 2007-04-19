@@ -30,7 +30,7 @@
         </properties>
     </connector>
 
-    <connector name="JMSConnector" className="org.mule.providers.jms.JmsConnector">
+    <connector name="JMSConnector" className="org.mule.providers.jms.activemq.ActiveMqJmsConnector">
         <properties>
             <property name="specification" value="1.1"/>
             <!-- This property references the Spring container defined above -->

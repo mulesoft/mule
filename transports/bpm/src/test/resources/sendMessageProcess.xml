@@ -10,8 +10,10 @@
 
     <state name="sendMessage">
         <event type="node-enter">
-            <action class="org.jbpm.actions.mule.SendMuleEvent">
+            <action class="org.mule.providers.bpm.jbpm.actions.SendMuleEvent">
                 <endpoint>test:///tmp</endpoint>
+                <payload>Message in a bottle.</payload>
+                <synchronous>false</synchronous>
             </action>
         </event>
         <transition to="end" />

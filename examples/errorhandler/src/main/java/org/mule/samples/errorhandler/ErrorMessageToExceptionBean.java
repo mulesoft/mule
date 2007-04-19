@@ -13,6 +13,10 @@ package org.mule.samples.errorhandler;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 
+/**
+ * The <code>ErrorMessageToExceptionBean</code> transformer returns 
+ * the exception bean encapsulated by the ErrorMessage message payload.
+ */
 public class ErrorMessageToExceptionBean extends AbstractTransformer
 {
 

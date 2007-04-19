@@ -9,6 +9,22 @@
     See http://mule.mulesource.org/wiki/display/MULE/LoanBroker+ESB for details.
     </description>
 
+    <!-- Embed Spring configuration to create a Jms Connection factory -->
+    <container-context className="org.mule.extras.spring.SpringContainerContext">
+        <properties>
+            <text-property name="configuration">
+                <![CDATA[
+                <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+                <beans>
+                    <bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+                        <property name="brokerURL"><value>vm://localhost?broker.persistent=false&amp;broker.useJmx=false</value></property>
+                    </bean>
+                </beans>
+                ]]>
+            </text-property>
+        </properties>
+    </container-context>
+
     <connector name="ejbConnector" className="org.mule.providers.ejb.EjbConnector">
         <properties>
             <property name="jndiInitialFactory" value="org.openejb.client.LocalInitialContextFactory"/>
@@ -24,14 +40,11 @@
         </properties>
     </connector>
 
-    <connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">
+    <connector name="jmsConnector" className="org.mule.providers.jms.activemq.ActiveMqJmsConnector">
         <properties>
-            <property name="connectionFactoryJndiName" value="ConnectionFactory"/>
-            <property name="jndiInitialFactory" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
+            <!-- The ActiveMQ ConnectionFactory is configured as a Spring bean. -->
+            <container-property name="connectionFactory" reference="jmsConnectionFactory"/>
             <property name="specification" value="1.1"/>
-            <map name="connectionFactoryProperties">
-                <property name="useEmbeddedBroker" value="true"/>
-            </map>
         </properties>
     </connector>
 
@@ -79,7 +92,7 @@
         The loan broker is used to receive loan requests
         -->
         <mule-descriptor name="LoanBroker"
-            implementation="org.mule.examples.loanbroker.DefaultLoanBroker">
+            implementation="org.mule.examples.loanbroker.AsynchronousLoanBroker">
 
             <inbound-router>
                 <endpoint address="CustomerRequestsREST" transformers="RestRequestToCustomerRequest"/>

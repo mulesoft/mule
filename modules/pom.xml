@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.mule</groupId>
@@ -12,7 +12,9 @@
     <artifactId>mule-modules</artifactId>
     <packaging>pom</packaging>
     <name>Mule Modules</name>
-    <description>These are the modules that comprise the Mule platform. mule-core is the main server module and transport modules are prepended with '-transport-'.</description>
+    <description>These are the modules that comprise the Mule platform. mule-core is the main server module and
+        transport modules are prepended with '-transport-'.
+    </description>
 
     <modules>
         <module>acegi</module>
@@ -53,11 +55,11 @@
         </dependency>
         -->
 
-		<!-- Note: Ideally, the following list of libraries should be in the Mule project's top-level
-			POM, but Maven has visibility problems when dependencies are more than 2 levels away, so
-            this list is repeated in core/pom.xml, modules/pom.xml, transports/pom.xml, examples/pom.xml -->
+        <!-- Note: Ideally, the following list of libraries should be in the Mule project's top-level
+POM, but Maven has visibility problems when dependencies are more than 2 levels away, so
+this list is repeated in core/pom.xml, modules/pom.xml, transports/pom.xml, examples/pom.xml -->
 
-		<!-- The following libraries are provided by the mule-module-util bundle -->
+        <!-- The following libraries are provided by the mule-module-util bundle -->
 
     </dependencies>
 
@@ -73,68 +75,69 @@
         <profile>
             <id>java14</id>
             <activation>
-                <jdk>1.4</jdk> <!--<dependency>-->
-            <!--<groupId>backport-util-concurrent</groupId>-->
-            <!--<artifactId>backport-util-concurrent</artifactId>-->
-            <!--<version>3.0</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>commons-beanutils</groupId>-->
-            <!--<artifactId>commons-beanutils</artifactId>-->
-            <!--<version>1.7.0</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>commons-collections</groupId>-->
-            <!--<artifactId>commons-collections</artifactId>-->
-            <!--<version>3.2</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>commons-io</groupId>-->
-            <!--<artifactId>commons-io</artifactId>-->
-            <!--<version>1.2</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>commons-lang</groupId>-->
-            <!--<artifactId>commons-lang</artifactId>-->
-            <!--<version>2.2</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>commons-logging</groupId>-->
-            <!--<artifactId>commons-logging</artifactId>-->
-            <!--<version>1.0.4</version>-->
-        <!--</dependency>-->
-        <!--<!- Used by mules default component pooling mechanism -->
-        <!--<dependency>-->
-            <!--<groupId>commons-pool</groupId>-->
-            <!--<artifactId>commons-pool</artifactId>-->
-            <!--<version>1.3</version>-->
-        <!--</dependency>-->
-        <!--<!- UMOMesage attachment support; not needed for JDK 6 -->
-        <!--<dependency>-->
-            <!--<groupId>javax.activation</groupId>-->
-            <!--<artifactId>activation</artifactId>-->
-            <!--<version>1.1</version>-->
-            <!--<scope>provided</scope>-->
-        <!--</dependency>-->
-        <!--<!- Used for the WorkManager API & for the Mule RA -->
-        <!--<dependency>-->
-            <!--<groupId>org.apache.geronimo.specs</groupId>-->
-            <!--<artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>-->
-            <!--<version>1.0.1</version>-->
-        <!--</dependency>-->
-        <!--<!- Used for XA Transactions -->
-        <!--<dependency>-->
-            <!--<groupId>org.apache.geronimo.specs</groupId>-->
-            <!--<artifactId>geronimo-jta_1.0.1B_spec</artifactId>-->
-            <!--<version>1.0.1</version>-->
-        <!--</dependency>-->
-        <!--<!- Unit tests -->
-        <!--<dependency>-->
-            <!--<groupId>junit</groupId>-->
-            <!--<artifactId>junit</artifactId>-->
-            <!--<version>3.8.2</version>-->
-            <!--<scope>test</scope>-->
-        <!--</dependency>-->
+                <jdk>1.4</jdk>
+                <!--<dependency>-->
+                <!--<groupId>backport-util-concurrent</groupId>-->
+                <!--<artifactId>backport-util-concurrent</artifactId>-->
+                <!--<version>3.0</version>-->
+                <!--</dependency>-->
+                <!--<dependency>-->
+                <!--<groupId>commons-beanutils</groupId>-->
+                <!--<artifactId>commons-beanutils</artifactId>-->
+                <!--<version>1.7.0</version>-->
+                <!--</dependency>-->
+                <!--<dependency>-->
+                <!--<groupId>commons-collections</groupId>-->
+                <!--<artifactId>commons-collections</artifactId>-->
+                <!--<version>3.2</version>-->
+                <!--</dependency>-->
+                <!--<dependency>-->
+                <!--<groupId>commons-io</groupId>-->
+                <!--<artifactId>commons-io</artifactId>-->
+                <!--<version>1.2</version>-->
+                <!--</dependency>-->
+                <!--<dependency>-->
+                <!--<groupId>commons-lang</groupId>-->
+                <!--<artifactId>commons-lang</artifactId>-->
+                <!--<version>2.2</version>-->
+                <!--</dependency>-->
+                <!--<dependency>-->
+                <!--<groupId>commons-logging</groupId>-->
+                <!--<artifactId>commons-logging</artifactId>-->
+                <!--<version>1.0.4</version>-->
+                <!--</dependency>-->
+                <!--<!- Used by mules default component pooling mechanism -->
+                <!--<dependency>-->
+                <!--<groupId>commons-pool</groupId>-->
+                <!--<artifactId>commons-pool</artifactId>-->
+                <!--<version>1.3</version>-->
+                <!--</dependency>-->
+                <!--<!- UMOMesage attachment support; not needed for JDK 6 -->
+                <!--<dependency>-->
+                <!--<groupId>javax.activation</groupId>-->
+                <!--<artifactId>activation</artifactId>-->
+                <!--<version>1.1</version>-->
+                <!--<scope>provided</scope>-->
+                <!--</dependency>-->
+                <!--<!- Used for the WorkManager API & for the Mule RA -->
+                <!--<dependency>-->
+                <!--<groupId>org.apache.geronimo.specs</groupId>-->
+                <!--<artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>-->
+                <!--<version>1.0.1</version>-->
+                <!--</dependency>-->
+                <!--<!- Used for XA Transactions -->
+                <!--<dependency>-->
+                <!--<groupId>org.apache.geronimo.specs</groupId>-->
+                <!--<artifactId>geronimo-jta_1.0.1B_spec</artifactId>-->
+                <!--<version>1.0.1</version>-->
+                <!--</dependency>-->
+                <!--<!- Unit tests -->
+                <!--<dependency>-->
+                <!--<groupId>junit</groupId>-->
+                <!--<artifactId>junit</artifactId>-->
+                <!--<version>3.8.2</version>-->
+                <!--<scope>test</scope>-->
+                <!--</dependency>-->
             </activation>
             <dependencies>
                 <!--

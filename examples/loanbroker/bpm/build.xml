@@ -1,0 +1,136 @@
+<!--
+ Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+
+ The software in this package is published under the terms of the MuleSource MPL
+ license, a copy of which has been included with this distribution in the
+ LICENSE.txt file.
+-->
+<project name="Mule Examples: Loan Broker BPM" default="setup">
+
+    <property name="app.name" value="mule-example-loanbroker-bpm"/>
+    <property environment="env"/>
+
+    <property name="dir.java" value="src"/>
+    <property name="dir.conf" value="conf"/>
+    <property name="dir.build" value="build"/>
+    <property name="dir.classes" value="build/classes"/>
+    <property name="dir.common" value="../common"/>
+    <property name="dir.common.tests" value="../common-tests"/>
+
+
+    <target name="clean"
+            description="Clean the output directory (start from scratch).">
+        <delete dir="${dir.build}"/>
+    </target>
+
+    <target name="init">
+
+       <ant dir="${dir.common.tests}" antfile="build.xml" />   
+           
+        <!-- Create the build directory if it doesn't exist -->
+        <mkdir dir="${dir.classes}"/>
+
+        <!-- Configure Mule classpath (mirrors wrapper.conf settings -->
+        <path id="classpath.mule">
+            <pathelement location="${dir.mule.home}/conf"/>
+            <fileset dir="${dir.mule.home}/lib/user">
+                <include name="**/*.jar"/>
+            </fileset>
+            <fileset dir="${dir.mule.home}/lib/mule">
+                <include name="**/*.jar"/>
+            </fileset>
+            <fileset dir="${dir.mule.home}/lib/opt">
+                <include name="**/*.jar"/>
+            </fileset>
+            <fileset dir="${dir.mule.home}/lib">
+                <include name="**/*.jar"/>
+            </fileset>
+            <!-- Include dependencies -->
+            <fileset dir="${dir.common}/build">
+                <include name="*.jar"/>
+            </fileset>
+            <fileset dir="${dir.common.tests}/build">
+                <include name="*.jar"/>
+            </fileset>
+        </path>
+
+
+    </target>
+
+    <target name="compile"
+            depends="init"
+            description="Compile the application.">
+            
+        <javac srcdir="${dir.java}"
+               destdir="${dir.classes}"
+               debug="true"
+               source="1.4"
+               target="1.4">
+            <classpath refid="classpath.mule"/>
+        </javac>
+        
+        <!-- Copy all resources to the output folder as well -->
+        <copy todir="${dir.classes}">
+            <fileset dir="${dir.conf}"/>
+        </copy>
+    </target>
+
+   <target name="package" 
+           depends="compile" 
+           description="Package the application">
+           
+        <jar jarfile="${dir.build}/${app.name}.jar" >
+            <fileset dir="${dir.classes}">
+                <include name="**/*.class"/>
+            </fileset>
+            <fileset dir="${dir.java}/main/resources">
+                <include name="**/*"/>
+            </fileset>
+            <fileset dir="${dir.conf}">
+                <include name="**/*"/>
+            </fileset>
+
+        </jar>
+
+   </target>
+
+   <target name="deploy" 
+           depends="package" 
+           description="Deploy the application to the Mule server">
+           
+        <copy file="${dir.build}/${app.name}.jar" 
+              todir="${dir.user.lib}" 
+              overwrite="true"
+              verbose="true"/>
+   </target>
+
+   <target name="setup">
+      <fail message="MULE_HOME environment variable has not been set.">
+       <condition>
+        <or>
+         <equals arg1="${env.MULE_HOME}" arg2=""/>
+          <!-- Using a trick here. If there was no MULE_HOME environment 
+               variable set, ant will set the value to the unprocessed 
+               template string -->
+          <equals arg1="${env.MULE_HOME}" arg2="$${env.MULE_HOME}"/>
+         </or>
+        </condition>
+      </fail>
+
+      <antcall target="ifMuleBase"/>
+      <antcall target="ifMuleHome"/>
+   </target>
+
+   <target name="ifMuleBase" if="env.MULE_BASE">
+      <property name="dir.mule.home" value="${env.MULE_BASE}"/>
+      <property name="dir.user.lib" value="${dir.mule.home}/lib/user/"/>
+      <antcall target="deploy"/>
+   </target>
+
+   <target name="ifMuleHome" if="env.MULE_HOME" unless="env.MULE_BASE">
+      <property name="dir.mule.home" value="${env.MULE_HOME}"/>
+      <property name="dir.user.lib" value="${dir.mule.home}/lib/user/"/>
+      <antcall target="deploy"/>
+   </target>
+
+</project>

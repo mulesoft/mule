@@ -10,16 +10,12 @@
 
 package org.mule.samples.errorhandler;
 
-import org.mule.config.i18n.Message;
-
 import java.util.HashMap;
 import java.util.Iterator;
 
 /**
  * <code>AbstractExceptionListener</code> TODO (document class)
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public abstract class AbstractExceptionHandler implements ExceptionHandler
 {
@@ -72,12 +68,12 @@ public abstract class AbstractExceptionHandler implements ExceptionHandler
         }
         catch (Exception e)
         {
-            throw new HandlerException(new Message("errorhandler-example", 1, e).getMessage(), e);
+            throw new HandlerException(LocaleMessage.getString(LocaleMessage.UNRETRIEVED_EXCEPTION, e), e);
         }
 
         if (!isRegisteredFor(t.getClass()))
         {
-            throw new HandlerException(new Message("errorhandler-example", 2, t.getClass().getName(), getClass().getName()).getMessage());
+            throw new HandlerException(LocaleMessage.getString(LocaleMessage.UNHANDLED_EXCEPTION, t.getClass().getName(), getClass().getName()));
 
         }
         processException(message, t);

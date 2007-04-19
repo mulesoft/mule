@@ -25,13 +25,17 @@ import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.URI;
 
-import org.apache.commons.pool.KeyedPoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 
 /**
  * <code>TcpConnector</code> can bind or sent to a given TCP port on a given host.
+ * Other socket-based transports can be built on top of this class by providing the
+ * appropriate socket factories and application level protocols as required (see
+ * the constructor and the SSL transport for examples).
  */
 public class TcpConnector extends AbstractConnector
 {
@@ -49,13 +53,22 @@ public class TcpConnector extends AbstractConnector
     private int receiveBufferSize = DEFAULT_BUFFER_SIZE;
     private int receiveBacklog = DEFAULT_BACKLOG;
     private boolean sendTcpNoDelay;
+    private boolean validateConnections = true;
     private int socketLinger = INT_VALUE_NOT_SET;
-    private String tcpProtocolClassName = DefaultProtocol.class.getName();
+    private String tcpProtocolClassName;
     private TcpProtocol tcpProtocol;
     private boolean keepSendSocketOpen = false;
     private boolean keepAlive = false;
-    private KeyedPoolableObjectFactory socketFactory = new TcpSocketFactory();
+    private PooledSocketFactory socketFactory;
+    private SimpleServerSocketFactory serverSocketFactory;
     private GenericKeyedObjectPool dispatcherSocketsPool = new GenericKeyedObjectPool();
+
+    public TcpConnector()
+    {
+        setSocketFactory (new TcpSocketFactory());
+        setServerSocketFactory(new TcpServerSocketFactory());
+        setTcpProtocolClassName(DefaultProtocol.class.getName());
+    }
 
     protected void doInitialise() throws InitialisationException
     {
@@ -63,13 +76,14 @@ public class TcpConnector extends AbstractConnector
         {
             try
             {
-                tcpProtocol = (TcpProtocol)ClassUtils.instanciateClass(tcpProtocolClassName, null);
+                tcpProtocol = (TcpProtocol) ClassUtils.instanciateClass(tcpProtocolClassName, null);
             }
             catch (Exception e)
             {
                 throw new InitialisationException(new Message("tcp", 3), e);
             }
         }
+
         dispatcherSocketsPool.setFactory(getSocketFactory());
         dispatcherSocketsPool.setTestOnBorrow(true);
         dispatcherSocketsPool.setTestOnReturn(true);
@@ -93,10 +107,9 @@ public class TcpConnector extends AbstractConnector
      * Lookup a socket in the list of dispatcher sockets but don't create a new
      * socket
      */
-    // TODO - reduce access once testing done
     protected Socket getSocket(UMOImmutableEndpoint endpoint) throws Exception
     {
-        Socket socket = (Socket)dispatcherSocketsPool.borrowObject(endpoint);
+        Socket socket = (Socket) dispatcherSocketsPool.borrowObject(endpoint);
         logger.debug("returning socket " + socket);
         return socket;
     }
@@ -339,16 +352,31 @@ public class TcpConnector extends AbstractConnector
         this.sendTcpNoDelay = sendTcpNoDelay;
     }
     
-    protected void setSocketFactory(KeyedPoolableObjectFactory socketFactory)
+    protected void setSocketFactory(PooledSocketFactory socketFactory)
     {
         this.socketFactory = socketFactory;
     }
 
-    protected KeyedPoolableObjectFactory getSocketFactory()
+    protected PooledSocketFactory getSocketFactory()
     {
         return socketFactory;
     }
 
+    public SimpleServerSocketFactory getServerSocketFactory()
+    {
+        return serverSocketFactory;
+    }
+
+    public void setServerSocketFactory(SimpleServerSocketFactory serverSocketFactory)
+    {
+        this.serverSocketFactory = serverSocketFactory;
+    }
+
+    protected ServerSocket getServerSocket(URI uri) throws IOException
+    {
+        return getServerSocketFactory().createServerSocket(uri, getReceiveBacklog());
+    }
+    
     private static int valueOrDefault(int value, int threshhold, int deflt)
     {
         if (value < threshhold)
@@ -360,5 +388,21 @@ public class TcpConnector extends AbstractConnector
             return value;    
         }
     }
-    
+
+    /**
+     * Should the connection be checked before sending data?
+     *
+     * @return If true, the message adapter opens and closes the socket on intialisation.
+     */
+    public boolean isValidateConnections() {
+        return validateConnections;
+    }
+
+    /**
+     * @see #isValidateConnections()
+     * @param validateConnections If true, the message adapter opens and closes the socket on intialisation.
+     */
+    public void setValidateConnections(boolean validateConnections) {
+        this.validateConnections = validateConnections;
+    }
 }

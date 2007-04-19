@@ -12,6 +12,7 @@
 
     <properties>
         <muleVersion>2.0-SNAPSHOT</muleVersion>
+        <activemqVersion>4.1.0-incubator</activemqVersion>
     </properties>
 
     <dependencies>
@@ -59,7 +60,7 @@
         <dependency>
             <groupId>org.apache.activemq</groupId> 
             <artifactId>apache-activemq</artifactId>
-            <version>4.1.0-incubator</version>
+            <version>${activemqVersion}</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
@@ -238,6 +239,7 @@
 
     <build>
         <defaultGoal>install</defaultGoal>
+        <finalName>${artifactId}</finalName>
 
         <!-- Allow config files to be in the "conf" directory to make it easier for users to find them. -->
         <resources>
@@ -271,11 +273,12 @@
                                     <groupId>${groupId}</groupId>
                                     <artifactId>${artifactId}</artifactId>
                                     <version>${version}</version>
+                                    <destFileName>${artifactId}.jar</destFileName>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>activemq</groupId>
-                                    <artifactId>activemq</artifactId>
-                                    <version>3.2.4</version>
+                                    <groupId>org.apache.activemq</groupId> 
+                                    <artifactId>activemq-core</artifactId>
+                                    <version>${activemqVersion}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>concurrent</groupId>

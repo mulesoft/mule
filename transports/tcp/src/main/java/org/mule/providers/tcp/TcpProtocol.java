@@ -16,7 +16,11 @@ import java.io.OutputStream;
 
 /**
  * The TcpProtocol interface enables to plug different application level protocols on
- * a TcpConnector.
+ * a TcpConnector.  Note that this interface has lost the direct byte array write method.
+ * Standard callers should (and will, since it matches the same signature, which is why
+ * the method has not been deprecated) use the generic method instead.  For more complex use,
+ * the method remains as an implementation detail in
+ * {@link org.mule.providers.tcp.protocols.ByteProtocol#writeByteArray(java.io.OutputStream, byte[])}.
  */
 public interface TcpProtocol
 {
@@ -39,6 +43,4 @@ public interface TcpProtocol
      */
     void write(OutputStream os, Object data) throws IOException;
 
-    void write(OutputStream os, byte[] data) throws IOException;
-    
 }

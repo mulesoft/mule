@@ -14,10 +14,7 @@ import org.mule.impl.AlreadyInitialisedException;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.tck.AbstractTransformerTestCase;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.transformer.UMOTransformer;
-
-import com.mockobjects.dynamic.Mock;
 
 import java.util.Properties;
 
@@ -50,9 +47,6 @@ public class MailMessageTransformersTestCase extends AbstractTransformerTestCase
         {
             assertNotNull(e);
         }
-        final Mock mockDispatcher = new Mock(UMOMessageDispatcher.class);
-        mockDispatcher.expectAndReturn("getDelegateSession", Session.getDefaultInstance(new Properties()));
-        mockDispatcher.expectAndReturn("getDelegateSession", Session.getDefaultInstance(new Properties()));
 
         trans.setEndpoint(endpoint);
 

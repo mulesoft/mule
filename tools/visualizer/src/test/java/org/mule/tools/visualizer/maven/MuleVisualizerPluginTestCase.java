@@ -10,23 +10,12 @@
 
 package org.mule.tools.visualizer.maven;
 
-import org.mule.util.FileUtils;
-
-import java.util.Arrays;
-
-import junit.framework.TestCase;
-
-public class MuleVisualizerPluginTestCase extends TestCase
+public class MuleVisualizerPluginTestCase extends AbstractBaseVisualizerXmlTestCase
 {
     
-    public void testEcho() throws Exception
+    String getXmlConfig()
     {
-        MuleVisualizerPlugin plugin = new MuleVisualizerPlugin();
-        String file = FileUtils.getResourcePath("echo-config.xml", getClass());
-        assertNotNull("missing echo-config.xml", file);
-        plugin.setFiles(Arrays.asList(new String[]{file}));
-        plugin.setOutputdir(FileUtils.getResourcePath("target", getClass()));
-        plugin.execute();
+        return "echo-config.xml";
     }
 
 }

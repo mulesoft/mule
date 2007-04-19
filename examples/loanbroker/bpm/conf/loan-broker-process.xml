@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<process-definition name="LoanBroker">
+    xmlns="http://jbpm.org/3/jpdl"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://jbpm.org/3/jpdl http://jbpm.org/jpdl-3.1.xsd"
+
+    <!-- *******************************************************************
+                        Loan Broker Process Definition
+         ******************************************************************* -->
+
+    <!-- Request received from customer -->
+    <start-state name="customerRequest">
+        <transition to="validateCustomerRequest" />
+    </start-state>
+
+    <state name="validateCustomerRequest">
+        <event type="node-enter">
+            <action class="org.mule.providers.bpm.jbpm.actions.ValidateMessageSource">
+                <expectedSource>CustomerRequests</expectedSource>
+            </action>
+            <!-- We could perform additional data validation here
+            <action class="com.mycompany.process.actions.ValidateMessageData" />
+            -->
+            <action class="org.mule.providers.bpm.jbpm.actions.StoreIncomingData">
+                <variable>customerRequest</variable>
+            </action>
+            <action class="org.mule.providers.bpm.jbpm.actions.Continue" />
+        </event>
+        <transition to="sendToCreditAgency" />
+    </state>
+
+    <!-- Send customer info. to credit agency -->
+    <state name="sendToCreditAgency">
+        <event type="node-enter">
+            <action class="org.mule.providers.bpm.jbpm.actions.SendMuleEventAndContinue">
+            	<!-- This is the variable we stored in the previous step -->
+                <payloadSource>customerRequest.customer</payloadSource>
+                <endpoint>CreditAgency</endpoint>
+                <synchronous>false</synchronous>
+            </action>
+        </event>
+        <transition to="waitForCreditAgency" />
+    </state>
+
+    <!-- Wait for the customer's credit profile to arrive. -->
+    <state name="waitForCreditAgency">
+        <timer duedate="4 hours" />
+        <transition to="validateCreditProfile" />
+    </state>
+
+    <state name="validateCreditProfile">
+        <event type="node-enter">
+            <action class="org.mule.providers.bpm.jbpm.actions.ValidateMessageSource">
+                <expectedSource>CreditProfiles</expectedSource>
+            </action>
+            <!-- We could perform additional data validation here
+            <action class="com.mycompany.process.actions.ValidateMessageData" />
+            -->
+            <action class="org.mule.providers.bpm.jbpm.actions.StoreIncomingData">
+                <variable>creditProfile</variable>
+            </action>
+            <action class="org.mule.providers.bpm.jbpm.actions.Continue" />
+        </event>
+        <transition to="prepareLoanQuoteRequest" />
+    </state>
+
+    <!-- Prepare a quote request to send to the banks which includes the customer's credit info. -->
+    <state name="prepareLoanQuoteRequest">
+        <event type="node-enter">
+            <action class="org.mule.examples.loanbroker.bpm.actions.PrepareLoanQuoteRequest" />
+            <action class="org.mule.providers.bpm.jbpm.actions.Continue" />
+        </event>
+        <transition to="sendToBank" />
+    </state>
+
+    <!-- Send the request to one of three banks, depending on the loan amount and customer credit info. -->
+    <decision name="sendToBank">
+        <transition name="sendToBigBank" to="validateLoanQuote">
+            <condition><![CDATA[#{customerRequest.loanAmount >= 20000}]]></condition>
+            <condition><![CDATA[#{creditProfile.creditHistory >= 24}]]></condition>
+            <condition><![CDATA[#{creditProfile.creditScore >= 5}]]></condition>
+            <action class="org.mule.providers.bpm.jbpm.actions.SendMuleEvent">
+                <endpoint>BigBank</endpoint>
+                <payloadSource>loanRequest</payloadSource>
+            </action>
+        </transition>
+        <transition name="sendToMediumBank" to="validateLoanQuote">
+            <condition><![CDATA[#{customerRequest.loanAmount >= 10000}]]></condition>
+            <condition><![CDATA[#{creditProfile.creditHistory >= 12}]]></condition>
+            <condition><![CDATA[#{creditProfile.creditScore >= 3}]]></condition>
+            <action class="org.mule.providers.bpm.jbpm.actions.SendMuleEvent">
+                <endpoint>MediumBank</endpoint>
+                <payloadSource>loanRequest</payloadSource>
+            </action>
+        </transition>
+        <transition name="sendToSmallBank" to="validateLoanQuote">
+            <condition><![CDATA[#{customerRequest.loanAmount < 10000}]]></condition>
+            <condition><![CDATA[#{creditProfile.creditHistory >= 6}]]></condition>
+            <condition><![CDATA[#{creditProfile.creditScore >= 1}]]></condition>
+            <action class="org.mule.providers.bpm.jbpm.actions.SendMuleEvent">
+                <endpoint>SmallBank</endpoint>
+                <payloadSource>loanRequest</payloadSource>
+            </action>
+        </transition>
+        <!-- If the credit info. doesn't meet minimum requirements based on the loan amount,
+             the loan is just denied. -->
+        <transition to="loanDenied" />
+    </decision>
+
+    <state name="validateLoanQuote">
+        <event type="node-enter">
+            <action class="org.mule.providers.bpm.jbpm.actions.ValidateMessageType">
+                <expectedType>org.mule.examples.loanbroker.messages.LoanQuote</expectedType>
+            </action>
+            <!-- We could perform additional data validation here
+            <action class="com.mycompany.process.actions.ValidateMessageData" />
+            -->
+            <action class="org.mule.providers.bpm.jbpm.actions.Continue" />
+        </event>
+        <transition to="loanApproved">
+            <!-- Send the final loan quote back to the customer. -->
+            <action class="org.mule.providers.bpm.jbpm.actions.SendMuleEvent">
+                <endpoint>LoanQuotes</endpoint>
+                <synchronous>false</synchronous>
+            </action>
+        </transition>
+    </state>
+
+    <end-state name="loanApproved" />
+
+    <end-state name="loanDenied" />
+
+</process-definition>

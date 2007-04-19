@@ -10,9 +10,11 @@
 
 package org.mule.providers.tcp.protocols;
 
-import java.io.ByteArrayInputStream;
-
 import org.mule.tck.AbstractMuleTestCase;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Test by reading characters from a fixed StringBuffer instead of a TCP port.
@@ -21,9 +23,19 @@ public class XmlMessageProtocolTestCase extends AbstractMuleTestCase
 {
     private XmlMessageProtocol xmp;
 
+    protected void setProtocol(XmlMessageProtocol xmp)
+    {
+        this.xmp = xmp;
+    }
+
+    protected byte[] read(InputStream is) throws IOException
+    {
+        return(byte[]) xmp.read(is);
+    }
+
     protected void doSetUp() throws Exception
     {
-        xmp = new XmlMessageProtocol();
+        setProtocol(new XmlMessageProtocol());
     }
 
     protected void doTearDown() throws Exception
@@ -37,12 +49,11 @@ public class XmlMessageProtocolTestCase extends AbstractMuleTestCase
 
         ByteArrayInputStream bais = new ByteArrayInputStream(msgData.getBytes());
 
-        byte[] result = (byte[])xmp.read(bais);
+        byte[] result = read(bais);
         assertNotNull(result);
         assertEquals(msgData, new String(result));
 
-        result = (byte[])xmp.read(bais);
-        assertNull(result);
+        assertNull(read(bais));
     }
 
     public void testTwoMessages() throws Exception
@@ -52,16 +63,15 @@ public class XmlMessageProtocolTestCase extends AbstractMuleTestCase
 
         ByteArrayInputStream bais = new ByteArrayInputStream((msgData[0] + msgData[1]).getBytes());
 
-        byte[] result = (byte[])xmp.read(bais);
+        byte[] result = read(bais);
         assertNotNull(result);
         assertEquals(msgData[0], new String(result));
 
-        result = (byte[])xmp.read(bais);
+        result = read(bais);
         assertNotNull(result);
         assertEquals(msgData[1], new String(result));
 
-        result = (byte[])xmp.read(bais);
-        assertNull(result);
+        assertNull(read(bais));
     }
 
     public void testMultipleMessages() throws Exception
@@ -94,13 +104,24 @@ public class XmlMessageProtocolTestCase extends AbstractMuleTestCase
 
         for (int i = 0; i < msgData.length; i++)
         {
-            result = (byte[])xmp.read(bais);
+            result = read(bais);
             assertNotNull(result);
             assertEquals(msgData[i], new String(result));
         }
 
-        result = (byte[])xmp.read(bais);
-        assertNull(result);
+        assertNull(read(bais));
+    }
+
+    public void testSlowStream() throws Exception
+    {
+        String msgData = "<?xml version=\"1.0\"?><data>hello</data>";
+
+        SlowInputStream bais = new SlowInputStream(msgData.getBytes());
+
+        byte[] result = read(bais);
+        assertNotNull(result);
+        // only get the first character!  use XmlMessageEOFProtocol instead
+        assertEquals(msgData.substring(0, 1), new String(result));
     }
 
 }

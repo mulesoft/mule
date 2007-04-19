@@ -12,7 +12,9 @@
 
     <connector name="tcpConnector" className="org.mule.providers.tcp.TcpConnector">
         <properties>
-            <property name="tcpProtocolClassName" value="org.mule.providers.tcp.protocols.MuleMessageProtocol"/>
+            <!-- this is more reliable on slow networks (and IDEs!) -->
+            <property name="tcpProtocolClassName" value="org.mule.providers.tcp.protocols.MuleMessageEOFProtocol"/>
+            <!-- property name="tcpProtocolClassName" value="org.mule.providers.tcp.protocols.MuleMessageProtocol"/ -->
             <property name="keepSendSocketOpen" value="false"/>
         </properties>
     </connector>

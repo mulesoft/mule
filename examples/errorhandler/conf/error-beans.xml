@@ -2,7 +2,7 @@
 
 <beans>
     <bean id="activeMqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
-        <property name="useEmbeddedBroker" value="true"/>
+        <constructor-arg value="vm://localhost?broker.persistent=false&amp;broker.useJmx=false"/>
     </bean>
 
     <bean id="errorManager" class="org.mule.samples.errorhandler.ErrorManager">
@@ -18,27 +18,21 @@
     <bean id="businessErrorManager" class="org.mule.samples.errorhandler.BusinessErrorManager"/>
 
     <bean id="defaultHandler" class="org.mule.samples.errorhandler.handlers.DefaultHandler">
-        <property name="endpointName">
-            <value>ExceptionFileWriter</value>
-        </property>
+        <property name="endpointName" value="ExceptionFileWriter"/>
         <property name="errorManager">
             <ref local="errorManager"/>
         </property>
     </bean>
 
     <bean id="fatalHandler" class="org.mule.samples.errorhandler.handlers.FatalHandler">
-        <property name="endpointName">
-            <value>ExceptionEmailer</value>
-        </property>
+        <property name="endpointName" value="ExceptionEmailer"/>
         <property name="errorManager">
             <ref local="errorManager"/>
         </property>
     </bean>
 
     <bean id="businessHandler" class="org.mule.samples.errorhandler.handlers.BusinessHandler">
-        <property name="endpointName">
-            <value>ExceptionQueue</value>
-        </property>
+        <property name="endpointName" value="ExceptionQueue"/>
         <property name="errorManager">
             <ref local="errorManager"/>
         </property>

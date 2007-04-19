@@ -12,7 +12,6 @@ package org.mule.providers.tcp;
 
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
-import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
@@ -32,13 +31,11 @@ import java.net.SocketTimeoutException;
 public class TcpMessageDispatcher extends AbstractMessageDispatcher
 {
     private final TcpConnector connector;
-    protected final SerializableToByteArray serializableToByteArray;
 
     public TcpMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
         super(endpoint);
-        this.connector = (TcpConnector)endpoint.getConnector();
-        serializableToByteArray = new SerializableToByteArray();
+        this.connector = (TcpConnector) endpoint.getConnector();
     }
 
     protected synchronized void doDispatch(UMOEvent event) throws Exception
@@ -172,9 +169,12 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
 
     protected void doConnect() throws Exception
     {
-        //Test the connection
-        Socket socket = connector.getSocket(endpoint);
-        connector.releaseSocket(socket, endpoint);
+        // Test the connection
+        if (connector.isValidateConnections())
+        {
+            Socket socket = connector.getSocket(endpoint);
+            connector.releaseSocket(socket, endpoint);
+        }
     }
 
     protected void doDisconnect() throws Exception

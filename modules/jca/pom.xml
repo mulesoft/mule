@@ -39,7 +39,6 @@
             </resource>
         </resources>
     </build>
-
     <dependencies>
         <dependency>
             <groupId>org.mule.modules</groupId>
@@ -78,4 +77,48 @@
             <version>${version}</version>
         </dependency>
     </dependencies>
+    
+    <!-- it's not enough to have resources declared globally and only resources for the jboss
+         jca in a profile. 
+         Resources from profiles are added to maven's runtime model so you'll end up with the
+         same directory included twice and ignoring the exclude.
+    -->
+    <profiles>
+        <profile>
+            <id>default</id>
+            <activation>
+                <activeByDefault/>
+            </activation>
+            <build>
+                <resources>
+                    <!--
+                        Need to inject the final RAR name into some
+                        vendor-specific deployment descriptors.
+                        -->
+                    <resource>
+                        <directory>src/main/resources</directory>
+                        <filtering>true</filtering>
+                    </resource>
+                </resources>
+            </build>
+        </profile>
+        <profile>
+            <id>jboss</id>
+            <build>
+                <resources>
+                    <resource>
+                        <directory>src/main/resources</directory>
+                        <filtering>true</filtering>
+                        <!-- see http://jira.jboss.com/jira/browse/JBAS-4283
+                             JBoss sees other vendor specific deployment descriptors
+                             which have to be excluded when building this module for jboss
+                        -->
+                        <excludes>
+                            <exclude>**/oc4j*</exclude>
+                        </excludes>
+                    </resource>
+                </resources>
+            </build>
+        </profile>
+    </profiles>
 </project>

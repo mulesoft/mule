@@ -10,7 +10,7 @@
 
 package org.mule.samples.voipservice.to;
 
-import org.mule.config.i18n.Message;
+import org.mule.samples.voipservice.LocaleMessage;
 
 import java.io.Serializable;
 
@@ -63,11 +63,11 @@ public class ServiceParamTO implements Serializable
         StringBuffer stringBuffer = new StringBuffer();
         if (this.customerTO != null)
         {
-            stringBuffer.append(new Message("voip-example", 15, customerTO).getMessage());
+            stringBuffer.append(LocaleMessage.getCustomerCaption(customerTO));
         }
         if (this.creditCardTO != null)
         {
-            stringBuffer.append(new Message("voip-example", 16, creditCardTO).getMessage());
+            stringBuffer.append(LocaleMessage.getCardCaption(creditCardTO));
         }
 
         return stringBuffer.toString();

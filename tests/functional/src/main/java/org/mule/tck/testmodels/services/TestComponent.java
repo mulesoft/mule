@@ -19,9 +19,9 @@ public class TestComponent implements ITestComponent
 {
     public static final String EXCEPTION_MESSAGE = "Test Component fired an Exception";
 
-    private static final Log logger = LogFactory.getLog(TestComponent.class);
+    protected static final Log logger = LogFactory.getLog(TestComponent.class);
 
-    private AtomicInteger count = new AtomicInteger(0);
+    protected AtomicInteger count = new AtomicInteger(0);
 
     public String receive(String message) throws Exception
     {

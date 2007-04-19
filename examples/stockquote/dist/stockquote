@@ -2,7 +2,7 @@
 
 # There is no need to call this if you set the MULE_HOME in your environment
 if [ -z "$MULE_HOME" ] ; then
-  MULE_HOME=../../..
+  MULE_HOME=../..
   export MULE_HOME
 fi
 
@@ -27,11 +27,11 @@ read i
 
 if [ 1 = $i ]
 then
-    exec $MULE_BASE/bin/mule -config ./conf/rest-config.xml
+    exec "$MULE_BASE/bin/mule" -config ./conf/rest-config.xml
 elif [ 2 = $i ]
 then
-    exec $MULE_BASE/bin/mule -config ./conf/soap-config.xml
+    exec "$MULE_BASE/bin/mule" -config ./conf/soap-config.xml
 elif [ 3 = $i ]
 then
-    exec $MULE_BASE/bin/mule -config ./conf/wsdl-config.xml
+    exec "$MULE_BASE/bin/mule" -config ./conf/wsdl-config.xml
 fi

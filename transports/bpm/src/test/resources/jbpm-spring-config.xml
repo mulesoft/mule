@@ -14,13 +14,13 @@
     </connector>
 
     <model name="processModel">
-        <mule-descriptor name="testService1" implementation="org.mule.components.simple.NullComponent">
+        <mule-descriptor name="testService1" implementation="org.mule.components.simple.LogComponent">
             <inbound-router>
                 <endpoint address="bpm://dummyProcess" />
             </inbound-router>
         </mule-descriptor>
 
-        <mule-descriptor name="testService2" implementation="org.mule.components.simple.EchoComponent">
+        <mule-descriptor name="testService2" implementation="org.mule.components.simple.LogComponent">
             <inbound-router>
                 <endpoint address="bpm://sendMessageProcess" />
             </inbound-router>
@@ -31,7 +31,7 @@
          BPMS Configuration
          *************************************************** -->
     <!-- BPMS object for Mule's BPM Connector -->
-    <bean id="jbpm" class="org.jbpm.msg.mule.Jbpm">
+    <bean id="jbpm" class="org.mule.providers.bpm.jbpm.Jbpm" destroy-method="destroy">
         <spring-property name="jbpmConfiguration">
             <ref local="jbpmConfig" />
         </spring-property>
@@ -56,6 +56,9 @@
         <spring-property name="mappingLocations">
             <value>classpath*:/org/jbpm/**/*.hbm.xml</value>
         </spring-property>
+        <spring-property name="typeDefinitions">
+            <ref local="jbpmTypes" />
+        </spring-property>
         <spring-property name="hibernateProperties">
             <props>
                 <prop key="hibernate.dialect">org.hibernate.dialect.HSQLDialect</prop>
@@ -68,6 +71,12 @@
                 <prop key="hibernate.hbm2ddl.auto">update</prop>
             </props>
         </spring-property>
+    </bean>
+
+    <!-- JBPM data types -->
+    <bean id="jbpmTypes" class="org.springframework.orm.hibernate3.TypeDefinitionBean">
+        <spring-property name="typeName"><value>string_max</value></spring-property>
+        <spring-property name="typeClass"><value>org.jbpm.db.hibernate.StringMax</value></spring-property>
     </bean>
 
     <!-- JBPM Datasource -->

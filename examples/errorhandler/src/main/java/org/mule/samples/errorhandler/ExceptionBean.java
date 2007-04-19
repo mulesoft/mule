@@ -13,10 +13,7 @@ package org.mule.samples.errorhandler;
 import org.mule.util.ClassUtils;
 
 /**
- * <code>ExceptionBean</code> TODO -document class
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version 1.0
+ * The <code>ExceptionBean</code> is a POJO representing the details of a Throwable
  */
 public class ExceptionBean
 {

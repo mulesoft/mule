@@ -10,8 +10,9 @@
 
 package org.mule.transformers.xml;
 
+import org.mule.transformers.AbstractTransformer;
+
 import java.io.ByteArrayInputStream;
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 
@@ -26,10 +27,10 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.dom4j.Document;
 import org.dom4j.io.DocumentResult;
 import org.dom4j.io.DocumentSource;
-import org.mule.transformers.AbstractTransformer;
 
 /**
  * <code>AbstractXmlTransformer</code> offers some XSLT transform on a DOM (or
@@ -38,8 +39,8 @@ import org.mule.transformers.AbstractTransformer;
 
 public abstract class AbstractXmlTransformer extends AbstractTransformer
 {
-	private String outputEncoding = null;
-	
+    private String outputEncoding;
+
     public AbstractXmlTransformer()
     {
         registerSourceType(String.class);
@@ -206,7 +207,7 @@ public abstract class AbstractXmlTransformer extends AbstractTransformer
     protected String convertToText(Object obj)
         throws TransformerFactoryConfigurationError, javax.xml.transform.TransformerException
     {
-    	return convertToText(obj, null);
+        return convertToText(obj, null);
     }
 
     /**
@@ -245,9 +246,9 @@ public abstract class AbstractXmlTransformer extends AbstractTransformer
         Transformer idTransformer = TransformerFactory.newInstance().newTransformer();
         if (outputEncoding != null)
         {
-        	idTransformer.setOutputProperty(OutputKeys.ENCODING, outputEncoding);
+            idTransformer.setOutputProperty(OutputKeys.ENCODING, outputEncoding);
         }
-		idTransformer.transform(src, result);
+        idTransformer.transform(src, result);
         return writer.getBuffer().toString();
     }
     
@@ -280,20 +281,20 @@ public abstract class AbstractXmlTransformer extends AbstractTransformer
         return writer.getBuffer().toString();
     }
 
-	/**
-	 * @return the outputEncoding
-	 */
-	public String getOutputEncoding()
-	{
-		return outputEncoding;
-	}
+    /**
+     * @return the outputEncoding
+     */
+    public String getOutputEncoding()
+    {
+        return outputEncoding;
+    }
 
-	/**
-	 * @param outputEncoding the outputEncoding to set
-	 */
-	public void setOutputEncoding(String outputEncoding)
-	{
-		this.outputEncoding = outputEncoding;
-	}
+    /**
+     * @param outputEncoding the outputEncoding to set
+     */
+    public void setOutputEncoding(String outputEncoding)
+    {
+        this.outputEncoding = outputEncoding;
+    }
         
 }

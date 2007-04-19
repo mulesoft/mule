@@ -12,9 +12,6 @@ package org.mule.providers.tcp.protocols;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.logging.Log;
@@ -22,70 +19,102 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * The DefaultProtocol class is an application level tcp protocol that does nothing.
- * Reading is performed in reading the socket until no more bytes are available.
- * Writing simply writes the data to the socket.
+ * The socket is read until no more bytes are (momentariy) available
+ * (previously the transfer buffer also had to be full on the previous read, which made
+ * stronger requirements on the underlying network).  On slow networks
+ * {@link org.mule.providers.tcp.protocols.EOFProtocol} and
+ * {@link org.mule.providers.tcp.protocols.LengthProtocol} may be more reliable.
+ *
+ * <p>Writing simply writes the data to the socket.</p>
  */
 public class DefaultProtocol extends ByteProtocol
 {
 
-    private static final int BUFFER_SIZE = 8192;
-
     private static final Log logger = LogFactory.getLog(DefaultProtocol.class);
+    private static final int DEFAULT_BUFFER_SIZE = 8192;
+    private static final int UNLIMITED = -1;
+
+    private int bufferSize;
+
+    public DefaultProtocol()
+    {
+        this(DEFAULT_BUFFER_SIZE);
+    }
+
+    public DefaultProtocol(int bufferSize)
+    {
+        this.bufferSize = bufferSize;
+    }
 
     public Object read(InputStream is) throws IOException
     {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(BUFFER_SIZE);
+        return read(is, UNLIMITED);
+    }
 
-        byte[] buffer = new byte[BUFFER_SIZE];
-        int len = 0;
+    public Object read(InputStream is, int limit) throws IOException
+    {
+        // this can grow on repeated reads
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(bufferSize);
+        
         try
         {
-            while ((len = is.read(buffer)) == 0)
+            byte[] buffer = new byte[bufferSize];
+            int len;
+            int remain = remaining(limit, limit, 0);
+            boolean repeat;
+            do
             {
-                // wait
+                len = copy(is, buffer, baos, remain);
+                remain = remaining(limit, remain, len);
+                repeat = EOF != len && remain > 0 && isRepeat(len, is.available());
+
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("len/limit/repeat: " + len + "/" + limit + "/" + repeat);
+                }
             }
+            while (repeat);
         }
-        catch (SocketException e)
+        finally
         {
-            // do not pollute the log with a stacktrace, log only the message
-            logger.debug("Socket exception occured: " + e.getMessage());
-            return null;
+            baos.flush();
+            baos.close();
         }
-        catch (SocketTimeoutException e)
+        return nullEmptyArray(baos.toByteArray());
+    }
+
+    private int remaining(int limit, int remain, int len)
+    {
+        if (UNLIMITED == limit)
         {
-            logger.debug("Socket timeout, returning null.");
-            return null;
+            return bufferSize;
         }
-        if (len == -1)
+        else if (EOF != len)
         {
-            return null;
+            return remain - len;
         }
         else
         {
-            do
-            {
-                baos.write(buffer, 0, len);
-                if (len < buffer.length)
-                {
-                    break;
-                }
-                int av = is.available();
-                if (av == 0)
-                {
-                    break;
-                }
-            }
-            while ((len = is.read(buffer)) > 0);
-
-            baos.flush();
-            baos.close();
-            return baos.toByteArray();
+            return remain;
         }
     }
 
-    public void write(OutputStream os, byte[] data) throws IOException
+    /**
+     * Decide whether to repeat transfer.  This implementation does so if
+     * more data are available.  Note that previously, while documented as such,
+     * there was also the additional requirement that the previous transfer
+     * completely used the transfer buffer.
+     *
+     * @param len Amount transferred last call (-1 on EOF or socket error)
+     * @param available Amount available
+     * @return true if the transfer should continue
+     */
+    protected boolean isRepeat(int len, int available)
     {
-        os.write(data);
+        // previous logic - less reliable on slow networks
+//        return len == bufferSize && available > 0;
+        
+        return available > 0;
     }
 
 }

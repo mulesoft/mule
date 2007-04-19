@@ -1,0 +1,71 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.mule.tools</groupId>
+        <artifactId>mule-tools</artifactId>
+        <version>2.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>bobberplus</artifactId>
+    <packaging>maven-plugin</packaging>
+    <name>BobberPlus Archetype Plugin</name>
+    <version>1.4.1-SNAPSHOT</version>
+    <description>Extended Bobber Custom Archetype Creator</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-plugin-api</artifactId>
+            <version>RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-settings</artifactId>
+            <version>RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-archetype-core</artifactId>
+            <version>RELEASE</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-utils</artifactId>
+            <version>1.4.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-interactivity-api</artifactId>
+            <version>1.0-alpha-6</version>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.modello</groupId>
+                <artifactId>modello-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <!-- Generate the xpp3 reader code -->
+                            <goal>xpp3-reader</goal>
+                            <!-- Generate the xpp3 writer code -->
+                            <goal>xpp3-writer</goal>
+                            <!-- Generate the Java sources for the model itself -->
+                            <goal>java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <model>src/main/mdo/bobberarchetype.mdo</model>
+                    <version>1.0.0</version>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

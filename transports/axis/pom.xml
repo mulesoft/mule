@@ -31,8 +31,19 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <!-- TODO fails now -->
-                        <exclude>**/SoapAttachmentsFunctionalTestCase.*</exclude>
+                        <!-- TODO Requires an external Axis server running in Tomcat on 8080 with the Calculator.jws service deployed to it -->
+                        <!-- MULE-1515 -->
+                        <exclude>**/AxisExternalServerTest.java</exclude>
+
+                        <!-- MULE-1553 -->
+                        <exclude>**/AxisConnectorHttpsTestCase.java</exclude>
+                        <exclude>**/AxisConnectorJmsFunctionalTestCase.java</exclude>
+                        <exclude>**/AxisConnectorJmsTopicsFunctionalTestCase.java</exclude>
+                        <exclude>**/AxisConnectorVMFunctionalTestCase.java</exclude>
+                        <exclude>**/AxisEndpointTestCase.java</exclude>
+                        <exclude>**/AxisServletBindingTestCase.java</exclude>
+                        <exclude>**/SoapAttachmentsFunctionalTestCase.java</exclude>
+                        <exclude>**/VmToAxisProxyTestCase.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>
@@ -45,6 +56,15 @@
             <artifactId>mule-transport-soap</artifactId>
             <version>${version}</version>
         </dependency>
+
+        <!-- Needed for common SOAP test classes -->
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-soap</artifactId>
+            <version>${version}</version>
+            <type>test-jar</type>
+        </dependency>
+        
         <dependency>
             <groupId>axis</groupId>
             <artifactId>axis</artifactId>
@@ -82,6 +102,30 @@
             <artifactId>mail</artifactId>
             <version>1.4</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-spring</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-vm</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-xfire</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-acegi</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

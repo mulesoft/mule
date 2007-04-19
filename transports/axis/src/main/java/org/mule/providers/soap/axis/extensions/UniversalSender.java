@@ -14,12 +14,10 @@ import org.mule.RegistryContext;
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
-import org.mule.impl.MuleSession;
 import org.mule.impl.RequestContext;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.model.ModelHelper;
-import org.mule.providers.AbstractConnector;
 import org.mule.providers.http.HttpConstants;
 import org.mule.providers.soap.axis.AxisConnector;
 import org.mule.providers.soap.axis.extras.AxisCleanAndAddProperties;
@@ -52,7 +50,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * TODO document
+ * An Axis handler that will dispatch the SOAP event via a Mule endpoint
  */
 public class UniversalSender extends BasicHandler
 {
@@ -169,8 +167,7 @@ public class UniversalSender extends BasicHandler
                 props.put(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
             }
             UMOMessage message = new MuleMessage(payload, props);
-            UMOSession session = new MuleSession(message,
-                ((AbstractConnector)endpoint.getConnector()).getSessionHandler());
+            UMOSession session = RequestContext.getEventContext().getSession();
 
             logger.info("Making Axis soap request on: " + uri);
             if (logger.isDebugEnabled())

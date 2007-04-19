@@ -10,8 +10,6 @@
 
 package org.mule.umo.security.tls;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -24,13 +22,6 @@ import org.mule.umo.security.provider.SecurityProviderInfo;
 import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
 
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.SSLServerSocketFactory;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,6 +30,17 @@ import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
 import java.security.Security;
+
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLServerSocketFactory;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Support for configuring TLS/SSL connections.
@@ -322,6 +324,7 @@ public final class TlsConfiguration implements TlsDirectTrustStore, TlsDirectKey
             null == getTrustManagerFactory() ? null :  getTrustManagerFactory().getTrustManagers();
 
         SSLContext context = SSLContext.getInstance(getSslType());
+        // TODO - nice to have a configurable random number source set here
         context.init(keyManagers, trustManagers, null);
         return context;
     }

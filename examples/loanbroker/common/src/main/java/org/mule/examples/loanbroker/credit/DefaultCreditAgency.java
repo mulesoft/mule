@@ -23,7 +23,6 @@ public class DefaultCreditAgency implements CreditAgencyService
          CreditProfile cp = new CreditProfile();
          cp.setCreditHistory(getCreditHistoryLength(customer.getSsn()));
          cp.setCreditScore(getCreditScore(customer.getSsn()));
-        
          return cp;
      }
 

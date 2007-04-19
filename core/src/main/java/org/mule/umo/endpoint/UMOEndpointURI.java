@@ -40,8 +40,14 @@ public interface UMOEndpointURI extends Serializable, Initialisable
 
     String getFilterAddress();
 
+    /** 
+     * @deprecated This property is used by endpoint-identifiers, global-endpoints use UMOImmutableEndpoint.getName()
+     */
     String getEndpointName();
 
+    /** 
+     * @deprecated This property is used by endpoint-identifiers, global-endpoints use UMOImmutableEndpoint.getName()
+     */
     void setEndpointName(String name);
 
     Properties getParams();

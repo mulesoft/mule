@@ -18,6 +18,6 @@ public class AxisLoanBrokerAsynchronousFunctionalTestCase extends AbstractAsynch
     // @Override
     protected String getConfigResources()
     {
-        return "loan-broker-axis-async-config.xml";
+        return "loan-broker-axis-endpoints-config.xml, loan-broker-async-config.xml";
     }
 }

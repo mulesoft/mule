@@ -59,10 +59,20 @@ public class InboundRouterCollection extends AbstractRouterCollection implements
 
     public UMOMessage route(UMOEvent event) throws MessagingException
     {
-        String inboundEndpoint = event.getEndpoint().getName();
+        // If the endpoint has a logical name, use it, otherwise use the URI.
+        String inboundEndpoint = 
+            // Endpoint identifier (deprecated)
+            event.getEndpoint().getEndpointURI().getEndpointName();
+
         if (StringUtils.isBlank(inboundEndpoint))
         {
-            inboundEndpoint = event.getEndpoint().getEndpointURI().getAddress();
+            // Global endpoint
+            inboundEndpoint = event.getEndpoint().getName();
+        }
+        if (StringUtils.isBlank(inboundEndpoint))
+        {
+            // URI
+            inboundEndpoint = event.getEndpoint().getEndpointURI().getUri().toString();
         }
         event.getMessage().setProperty(MuleProperties.MULE_ORIGINATING_ENDPOINT_PROPERTY, inboundEndpoint);
 

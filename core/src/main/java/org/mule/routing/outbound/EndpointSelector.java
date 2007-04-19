@@ -85,11 +85,17 @@ public class EndpointSelector extends FilteringOutboundRouter
         while (iterator.hasNext())
         {
             ep = (UMOEndpoint) iterator.next();
-            if (endpointName.equals(ep.getName()))
+            // Endpoint identifier (deprecated)
+            if (endpointName.equals(ep.getEndpointURI().getEndpointName()))
             {
                 return ep;
             }
-            else if (endpointName.equals(ep.getEndpointURI().getAddress()))
+            // Global endpoint
+            else if (endpointName.equals(ep.getName()))
+            {
+                return ep;
+            }
+            else if (endpointName.equals(ep.getEndpointURI().getUri().toString()))
             {
                 return ep;
             }

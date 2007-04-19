@@ -21,7 +21,7 @@ fi
 mvn -Ptests,distributions clean
 
 # Build all modules
-mvn -Dmaven.test.skip=true -Ptests install
+mvn -Dmaven.test.skip=true -Ptests compile test-compile install
 
 # Run unit tests only
 mvn -Dmaven.test.failure.ignore=true test

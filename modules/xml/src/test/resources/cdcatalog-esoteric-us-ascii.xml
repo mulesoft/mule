@@ -16,11 +16,11 @@
         <year>2006</year>
     </cd>
     <cd>
-		<title>&#131166;&#131167;</title><!-- Invisible as UTF-8 on Stock Windows -->
-		<artist>&#132739;</artist><!-- Invisible as UTF-8 on Stock Windows -->
-		<country>China</country>
-		<company>CJK Unified Ideographs Extension B Records</company>
-		<price>100042</price>
-		<year>2007</year>
-	</cd>
+        <title>&#131166;&#131167;</title><!-- Invisible as UTF-8 on Stock Windows -->
+        <artist>&#132739;</artist><!-- Invisible as UTF-8 on Stock Windows -->
+        <country>China</country>
+        <company>CJK Unified Ideographs Extension B Records</company>
+        <price>100042</price>
+        <year>2007</year>
+    </cd>
 </catalog>

@@ -11,7 +11,6 @@
 package org.mule.examples.loanbroker;
 
 import org.mule.examples.loanbroker.messages.CustomerQuoteRequest;
-import org.mule.examples.loanbroker.messages.LoanBrokerQuoteRequest;
 import org.mule.examples.loanbroker.messages.LoanQuote;
 
 /**
@@ -22,13 +21,13 @@ public interface LoanBrokerService
 {
     /**
      * Triggered by an incoming customer request for a loan.
-     * @return LoanBrokerQuoteRequest to send to the banks.
+     * @return Outgoing payload will depend on the implementation
      */
-	LoanBrokerQuoteRequest getLoanQuote(CustomerQuoteRequest request) throws LoanBrokerException;
+	Object getLoanQuote(CustomerQuoteRequest request) throws LoanBrokerException;
 
     /**
      * Triggered by an incoming offer from a bank.
-     * @return LoanQuote to return to the customer.
+     * @return Outgoing payload will depend on the implementation
      */
-    LoanQuote receiveQuote(LoanQuote quote);
+    Object receiveQuote(LoanQuote quote);
 }

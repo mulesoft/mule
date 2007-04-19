@@ -10,7 +10,7 @@
 
 package org.mule.samples.voipservice.to;
 
-import org.mule.config.i18n.Message;
+import org.mule.samples.voipservice.LocaleMessage;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -134,11 +134,11 @@ public class CustomerTO implements Serializable, Cloneable
         StringBuffer stringBuffer = new StringBuffer();
         if (this.firstName != null)
         {
-            stringBuffer.append(new Message("voip-example", 13, getName()).getMessage());
+            stringBuffer.append(LocaleMessage.getFirstNameCaption(getName()));
         }
         if (this.addressTO != null)
         {
-            stringBuffer.append(new Message("voip-example", 14, addressTO).getMessage());
+            stringBuffer.append(LocaleMessage.getAddressCaption(addressTO));
         }
         return stringBuffer.toString();
     }

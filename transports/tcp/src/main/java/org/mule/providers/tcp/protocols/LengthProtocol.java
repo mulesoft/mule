@@ -16,49 +16,81 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * The LengthProtocol is an application level tcp protocol that can be used to
  * transfer large amounts of data without risking some data to be loss. The protocol
  * is defined by sending / reading an integer (the packet length) and then the data
  * to be transferred.
+ *
+ * <p>Note that use of this protocol must be symmetric - both the sending and receiving
+ * connectors must use the same protocol.</p>
  */
-public class LengthProtocol extends ByteProtocol
+public class LengthProtocol extends DefaultProtocol
 {
+
+    private static final Log logger = LogFactory.getLog(LengthProtocol.class);
+    // TODO - can we not get this from the API somewhere?
+    private static final int SIZE_INT = 4;
+
+    public LengthProtocol()
+    {
+        super(SIZE_INT);
+    }
 
     public Object read(InputStream is) throws IOException
     {
-        // Use a mark / reset here so that an exception
-        // will not be thrown is the read times out.
-        // So use the read(byte[]) method that returns 0
-        // if no data can be read and reset the mark.
-        // This is necessary because when no data is available
-        // reading an int would throw a SocketTimeoutException.
+        // original comments indicated that we nede to use read(byte[]) rather than readInt()
+        // to avoid socket timeouts - don't understand, but don't want to risk change.
+
+        // first read the data necessary to know the length of the payload
         DataInputStream dis = new DataInputStream(is);
-        byte[] buffer = new byte[32];
-        int length;
-        dis.mark(32);
-        while ((length = dis.read(buffer)) == 0)
-        {
-            // wait
-        }
-        if (length == -1)
-        {
-            return null;
-        }
+        dis.mark(SIZE_INT);
+        // this pulls through SIZE_INT bytes
+        super.read(dis, SIZE_INT);
+
+        // reset and read the integer
         dis.reset();
-        length = dis.readInt();
-        buffer = new byte[length];
+        int length = dis.readInt();
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("length: " + length);
+        }
+
+        // finally read the rest of the data
+        byte[] buffer = new byte[length];
         dis.readFully(buffer);
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("length read: " + buffer.length);
+        }
+
         return buffer;
     }
 
-    public void write(OutputStream os, byte[] data) throws IOException
+    // @Override
+    protected void writeByteArray(OutputStream os, byte[] data) throws IOException
     {
         // Write the length and then the data.
         DataOutputStream dos = new DataOutputStream(os);
         dos.writeInt(data.length);
         dos.write(data);
         dos.flush();
+    }
+
+    /**
+     * Read all four bytes for initial integer (limit is set in read)
+     *
+     * @param len Amount transferred last call (-1 on EOF or socket error)
+     * @param available Amount available
+     * @return true if the transfer should continue
+     */
+    // @Override
+    protected boolean isRepeat(int len, int available)
+    {
+        return true;
     }
 
 }

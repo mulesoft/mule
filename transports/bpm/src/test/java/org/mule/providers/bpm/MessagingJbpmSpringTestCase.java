@@ -13,11 +13,10 @@ package org.mule.providers.bpm;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
+import org.mule.providers.bpm.jbpm.Jbpm;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 import org.mule.util.NumberUtils;
-
-import org.jbpm.msg.mule.Jbpm;
 
 /**
  * Tests the connector against jBPM with a simple process which generates a Mule message.

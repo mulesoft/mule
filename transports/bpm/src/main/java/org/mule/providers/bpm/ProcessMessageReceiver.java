@@ -59,18 +59,18 @@ public class ProcessMessageReceiver extends AbstractMessageReceiver {
         }
         message.addProperties(messageProperties);
 
-        if (connector.isLocalEndpointsOnly()) {
-            message.setStringProperty(ProcessConnector.PROPERTY_ENDPOINT, endpoint);
-            return routeMessage(message, synchronous);
-        }
-        else {
-            // TODO This should use the "dynamic://" endpoint instead
+        if (connector.isAllowGlobalDispatcher()) {
+            // TODO MULE-1221 This should use the "dynamic://" endpoint and not depend on the MuleClient.
             if (synchronous) {
                 return connector.getMuleClient().send(endpoint, message);
             } else {
                 connector.getMuleClient().dispatch(endpoint, message);
                 return null;
             }
+        }
+        else {
+            message.setStringProperty(ProcessConnector.PROPERTY_ENDPOINT, endpoint);
+            return routeMessage(message, synchronous);
         }
     }
 

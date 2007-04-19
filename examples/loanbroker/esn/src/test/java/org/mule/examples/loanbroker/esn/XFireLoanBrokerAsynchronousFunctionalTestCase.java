@@ -18,6 +18,6 @@ public class XFireLoanBrokerAsynchronousFunctionalTestCase extends AbstractAsync
     // @Override
     protected String getConfigResources()
     {
-        return "loan-broker-xfire-async-config.xml";
+        return "loan-broker-xfire-endpoints-config.xml, loan-broker-async-config.xml";
     }
 }

@@ -282,6 +282,11 @@
         </dependency>
         <dependency>
             <groupId>org.mule.examples</groupId>
+            <artifactId>mule-example-loanbroker-bpm</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-scripting</artifactId>
             <version>${version}</version>
         </dependency>

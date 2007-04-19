@@ -14,9 +14,6 @@ import java.util.Iterator;
 
 /**
  * <code>ExceptionHandler</code> TODO (document class)
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public interface ExceptionHandler
 {

@@ -40,6 +40,7 @@
             <groupId>icegreen</groupId>
             <artifactId>greenmail</artifactId>
             <version>1.1</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

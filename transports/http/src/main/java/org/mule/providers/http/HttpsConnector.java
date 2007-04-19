@@ -10,6 +10,8 @@
 
 package org.mule.providers.http;
 
+import org.mule.providers.ssl.SslServerSocketFactory;
+import org.mule.providers.ssl.SslSocketFactory;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.TlsDirectKeyStore;
 import org.mule.umo.security.TlsDirectTrustStore;
@@ -18,9 +20,12 @@ import org.mule.umo.security.provider.SecurityProviderFactory;
 import org.mule.umo.security.tls.TlsConfiguration;
 
 import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.URI;
 import java.security.Provider;
 
 import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.TrustManagerFactory;
 
 /**
@@ -30,6 +35,22 @@ public class HttpsConnector extends HttpConnector
 implements TlsDirectKeyStore, TlsIndirectKeyStore, TlsDirectTrustStore
 {
     private TlsConfiguration tls = new TlsConfiguration(TlsConfiguration.DEFAULT_KEYSTORE);
+
+    public HttpsConnector()
+    {
+        setSocketFactory(new SslSocketFactory(tls));
+        setServerSocketFactory(new SslServerSocketFactory(tls));
+        // setting this true causes problems as socket closes before handshake finishes
+        setValidateConnections(false);
+    }
+
+    // @Override
+    protected ServerSocket getServerSocket(URI uri) throws IOException
+    {
+        SSLServerSocket serverSocket = (SSLServerSocket) super.getServerSocket(uri);
+        serverSocket.setNeedClientAuth(isRequireClientAuthentication());
+        return serverSocket;
+    }
 
     protected void doInitialise() throws InitialisationException
     {

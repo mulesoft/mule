@@ -10,14 +10,13 @@
 
 package org.mule.test.integration.providers.jms.oracle;
 
+import org.mule.impl.model.ModelHelper;
 import org.mule.test.integration.providers.jms.oracle.util.AQUtil;
 import org.mule.test.integration.providers.jms.oracle.util.MuleUtil;
 
 /**
  * Makes sure the Oracle AQ connector continues to process new incoming messages after
  * startup.
- *
- * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>
  */
 public class PollingTestCase extends AbstractIntegrationTestCase {
 
@@ -32,7 +31,7 @@ public class PollingTestCase extends AbstractIntegrationTestCase {
 
         // We have to start the model _after_ the queues have been created, otherwise
         // the connector will try to create them dynamically.
-       managementContext.getModel().startComponent("PassThrough");
+        ModelHelper.getComponent("PassThrough").start();
     }
 
     public synchronized void tearDown() throws Exception {

@@ -1,0 +1,51 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the MuleSource MPL
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
+#set($TransportName = "${TransportName.substring(0,1).toUpperCase()}${TransportName.substring(1)}")
+package org.mule.providers.${TransportName.toLowerCase()};
+
+import com.mockobjects.dynamic.Mock;
+import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.providers.AbstractConnector;
+import org.mule.providers.${TransportName.toLowerCase()}.${TransportName}MessageReceiver;
+import org.mule.tck.providers.AbstractMessageReceiverTestCase;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.UMODescriptor;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.provider.UMOMessageReceiver;
+
+
+public class ${TransportName}MessageReceiverTestCase extends AbstractMessageReceiverTestCase
+{
+
+    /* For general guidelines on writing transports see
+       http://mule.mulesource.org/display/MULE/Writing+Transports */
+
+    public UMOMessageReceiver getMessageReceiver() throws Exception
+    {
+        Mock mockComponent = new Mock(UMOComponent.class);
+        Mock mockDescriptor = new Mock(UMODescriptor.class);
+        mockComponent.expectAndReturn("getDescriptor", mockDescriptor.proxy());
+        mockDescriptor.expectAndReturn("getResponseTransformer", null);
+#if($PollingMessageReceiver)
+        return new ${TransportName}MessageReceiver(endpoint.getConnector(), (UMOComponent) mockComponent.proxy(), endpoint, 1000);
+#else
+        return new ${TransportName}MessageReceiver(endpoint.getConnector(), (UMOComponent) mockComponent.proxy(), endpoint);
+#end
+    }
+
+    public UMOEndpoint getEndpoint() throws Exception
+    {
+    	// TODO return a valid UMOendpoint i.e.
+    	// return new MuleEndpoint("tcp://localhost:1234", true)
+        throw new UnsupportedOperationException("getEndpoint");
+    }
+
+}

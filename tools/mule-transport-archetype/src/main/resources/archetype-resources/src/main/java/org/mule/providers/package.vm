@@ -1,0 +1,7 @@
+<html>
+<head><title>Mule - ${TransportName} Transport</title>
+</head>
+<body>
+<p>${TransportDescription}</p>
+</body>
+</html>

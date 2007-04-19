@@ -10,72 +10,24 @@
 
 package org.mule.providers.tcp.protocols;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
-
-import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * The EOFProtocol class is an application level tcp protocol that does nothing.
  * Reading is terminated by the stream being closed by the client.
  */
-public class EOFProtocol extends ByteProtocol
+public class EOFProtocol extends DefaultProtocol
 {
 
-    private static final int BUFFER_SIZE = 8192;
-
-    private static final Log logger = LogFactory.getLog(EOFProtocol.class);
-
-    public Object read(InputStream is) throws IOException
+    /**
+     * Repeat until end of file
+     *
+     * @param len Amount transferred last call (-1 on EOF or socket error)
+     * @param available Amount available
+     * @return true if the transfer should continue
+     */
+    // @Override
+    protected boolean isRepeat(int len, int available)
     {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(EOFProtocol.BUFFER_SIZE);
-
-        byte[] buffer = new byte[EOFProtocol.BUFFER_SIZE];
-        int len = 0;
-        try
-        {
-            while ((len = is.read(buffer)) == 0)
-            {
-                // wait
-            }
-        }
-        catch (SocketException e)
-        {
-            // do not pollute the log with a stacktrace, log only the message
-            EOFProtocol.logger.debug("Socket exception occured: " + e.getMessage());
-            return null;
-        }
-        catch (SocketTimeoutException e)
-        {
-            EOFProtocol.logger.debug("Socket timeout, returning null.");
-            return null;
-        }
-        if (len == -1)
-        {
-            return null;
-        }
-        else
-        {
-            do
-            {
-                baos.write(buffer, 0, len);
-            }
-            while ((len = is.read(buffer)) >= 0);
-
-            baos.flush();
-            baos.close();
-            return baos.toByteArray();
-        }
-    }
-
-    public void write(OutputStream os, byte[] data) throws IOException
-    {
-        os.write(data);
+        return true;
     }
 
 }

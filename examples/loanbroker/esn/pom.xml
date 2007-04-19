@@ -12,23 +12,6 @@
     <name>Loan Broker ESN Example</name>
     <description>The Loan Broker example application is based on the example presented in the Enterprise Integration Patterns book. This chapter of the book is available online so you can see a detailed description of the application here (http://www.eaipatterns.com/ComposedMessagingWS.html).</description>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <forkMode>pertest</forkMode>
-                    <excludes>
-                        <!-- these fail quite often with an unexpected NullPayload :( -->
-                        <exclude>org/mule/samples/loanbroker/AxisLoanBrokerSynchronousFunctionalTestCase.java</exclude>
-                        <exclude>org/mule/samples/loanbroker/XFireLoanBrokerSynchronousFunctionalTestCase.java</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
     <dependencies>
         <dependency>
             <groupId>org.mule.examples</groupId>
@@ -52,4 +35,51 @@
             <version>${version}</version>
         </dependency>
     </dependencies>
+    <build>
+        <defaultGoal>install</defaultGoal>
+        <finalName>${artifactId}</finalName>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <forkMode>pertest</forkMode>
+                    <excludes>
+                        <!-- these still fail quite often with an unexpected NullPayload :( -->
+                        <exclude>org/mule/examples/loanbroker/esn/AxisLoanBrokerSynchronousFunctionalTestCase.java</exclude>
+                        <exclude>org/mule/examples/loanbroker/esn/XFireLoanBrokerSynchronousFunctionalTestCase.java</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <!-- "mvn install" will copy the target jar to the $MULE_HOME/lib/user directory,
+                overwriting the previous one. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-artifact</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${MULE_HOME}/lib/user</outputDirectory>
+                            <overWriteReleases>true</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${groupId}</groupId>
+                                    <artifactId>${artifactId}</artifactId>
+                                    <version>${version}</version>
+                                    <destFileName>${artifactId}.jar</destFileName>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

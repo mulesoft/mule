@@ -60,7 +60,10 @@ public class MuleVisualizer
         }
         catch (Exception e)
         {
-            env.logError("MuleGrapher failed to process: " + e.getMessage(), e);
+            if (null != env)
+            {
+                env.logError("MuleGrapher failed to process: " + e.getMessage(), e);
+            }
             System.exit(0);
         }
 

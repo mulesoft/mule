@@ -41,8 +41,8 @@ public class XFireWsdlTestCase extends AbstractMuleTestCase
     }
 
     /**
-     * This tests the endpoint propery of wsdlUrl which specifies an
-     * alternative WSDL location (see MULE-1368)
+     * This tests the endpoint propery of wsdlUrl which specifies an alternative WSDL
+     * location (see MULE-1368)
      */
     public void testXFireWsdlServiceWithEndpointParam() throws Exception
     {
@@ -60,9 +60,7 @@ public class XFireWsdlTestCase extends AbstractMuleTestCase
 
         String response = reply.getPayloadAsString();
         assertNotNull(response);
-
         XMLAssert.assertXpathEvaluatesTo(STOCK_SYMBOL, "//StockQuotes/Stock/Symbol", response);
-
     }
 
 }

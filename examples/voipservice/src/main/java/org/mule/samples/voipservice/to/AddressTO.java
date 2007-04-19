@@ -10,7 +10,7 @@
 
 package org.mule.samples.voipservice.to;
 
-import org.mule.config.i18n.Message;
+import org.mule.samples.voipservice.LocaleMessage;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -111,15 +111,15 @@ public class AddressTO implements Serializable, Cloneable
         StringBuffer stringBuffer = new StringBuffer();
         if (this.houseNumber != null)
         {
-            stringBuffer.append(new Message("voip-example", 7, houseNumber).getMessage());
+            stringBuffer.append(LocaleMessage.getHouseCaption(houseNumber));
         }
         if (this.street != null)
         {
-            stringBuffer.append(new Message("voip-example", 8, street).getMessage());
+            stringBuffer.append(LocaleMessage.getStreetCaption(street));
         }
         if (this.city != null)
         {
-            stringBuffer.append(new Message("voip-example", 9, city).getMessage());
+            stringBuffer.append(LocaleMessage.getCityCaption(city));
         }
         return stringBuffer.toString();
     }

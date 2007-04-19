@@ -16,9 +16,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PushbackInputStream;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
-import java.util.Map;
 
 /**
  * <p>
@@ -36,6 +33,11 @@ import java.util.Map;
  * this class.
  * </p>
  * <p>
+ * Data are read until a new document is found or there are no more data
+ * (momentarily).  For slower networks,
+ * {@link org.mule.providers.tcp.protocols.XmlMessageEOFProtocol} may be more reliable.
+ * </p>
+ * <p>
  * Also, the default character encoding for the platform is used to decode the
  * message bytes when looking for the XML declaration. Some caution with message
  * character encodings is warranted.
@@ -50,91 +52,98 @@ import java.util.Map;
  */
 public class XmlMessageProtocol extends ByteProtocol
 {
-    private static String XML_PATTERN = "<?xml";
+    private static final String XML_PATTERN = "<?xml";
 
-    private static int READ_BUFFER_SIZE = 4096;
-    private static int PUSHBACK_BUFFER_SIZE = READ_BUFFER_SIZE * 2;
+    private static final int READ_BUFFER_SIZE = 4096;
+    private static final int PUSHBACK_BUFFER_SIZE = READ_BUFFER_SIZE * 2;
 
-    private Map pbMap = new ConcurrentHashMap();
+    private ConcurrentHashMap pbMap = new ConcurrentHashMap();
 
-    /**
-     * Adapted from DefaultProtocol
-     * 
-     * @see DefaultProtocol#read(java.io.InputStream)
-     */
     public Object read(InputStream is) throws IOException
     {
-        // look for existing pushback wrapper for the given stream
-        // if not found, create a wrapper
-        PushbackInputStream pbis = (PushbackInputStream)pbMap.get(is);
-        if (pbis == null)
+        PushbackInputStream pbis = (PushbackInputStream) pbMap.get(is);
+        if (null == pbis)
         {
             pbis = new PushbackInputStream(is, PUSHBACK_BUFFER_SIZE);
-            pbMap.put(is, pbis);
+            PushbackInputStream prev = (PushbackInputStream) pbMap.putIfAbsent(is, pbis);
+            pbis = null == prev ? pbis : prev;
         }
 
-        // read until xml pattern is seen (and then pushed back) or no more data
-        // to read. return all data as message
-        byte[] buffer = new byte[READ_BUFFER_SIZE];
-        int len = 0;
-
+        int len = -1;
         try
         {
-            while ((len = pbis.read(buffer)) == 0)
+            // read until xml pattern is seen (and then pushed back) or no more data
+            // to read. return all data as message
+            byte[] buffer = new byte[READ_BUFFER_SIZE];
+            StringBuffer message = new StringBuffer(READ_BUFFER_SIZE);
+            int patternIndex = -1;
+            boolean repeat;
+            do
             {
-                // feed me!
+                len = safeRead(pbis, buffer);
+                if (len >= 0)
+                {
+                    // TODO take encoding into account, ideally from the incoming XML
+                    message.append(new String(buffer, 0, len));
+                    // start search at 2nd character in buffer (index=1) to
+                    // indicate whether we have reached a new document.
+                    patternIndex = message.toString().indexOf(XML_PATTERN, 1);
+                    repeat = isRepeat(patternIndex, len, pbis.available());
+                }
+                else
+                {
+                    // never repeat on closed stream (and avoid calling available)
+                    repeat = false;
+                }
+
             }
-        }
-        catch (SocketException e)
-        {
-            return null;
-        }
-        catch (SocketTimeoutException e)
-        {
-            return null;
+            while (repeat);
+
+            if (patternIndex > 0)
+            {
+                // push back the start of the next message and
+                // ignore the pushed-back characters in the return buffer
+                pbis.unread(message.substring(patternIndex, message.length()).getBytes());
+                message.setLength(patternIndex);
+            }
+
+            // TODO encoding here, too...
+            return nullEmptyArray(message.toString().getBytes());
+
         }
         finally
         {
-            if (len <= 0)
+            // TODO - this doesn't seem very reliable, since loop above can end
+            // without EOF.  On the other hand, what else can we do?  Entire logic
+            // is not very dependable, IMHO.  XmlMessageEOFProtocol is more likely
+            // to be correct here, I think.
+
+            // clear from map if stream has ended
+            if (len < 0)
             {
-                // remove exhausted stream
                 pbMap.remove(is);
-                return null;
             }
         }
-
-        StringBuffer out = new StringBuffer(READ_BUFFER_SIZE);
-        int patternIndex = -1;
-
-        do
-        {
-            // TODO take encoding into account, ideally from the incoming XML
-            out.append(new String(buffer, 0, len));
-
-            // start search at 2nd character in buffer (index=1) to
-            // indicate whether we have reached a new document.
-            patternIndex = out.toString().indexOf(XML_PATTERN, 1);
-            if (patternIndex > 0 || len < buffer.length || pbis.available() == 0)
-            {
-                break;
-            }
-        }
-        while ((len = pbis.read(buffer)) > 0);
-
-        if (patternIndex > 0)
-        {
-            // push back the start of the next message and
-            // ignore the pushed-back characters in the return buffer
-            pbis.unread(out.substring(patternIndex, out.length()).getBytes());
-            out.setLength(patternIndex);
-        }
-
-        return out.toString().getBytes();
     }
 
-    // simply write the data (which SHOULD begin with an XML declaration!)
     public void write(OutputStream os, byte[] data) throws IOException
     {
         os.write(data);
     }
+
+    /**
+     * Show we continue reading?  This class, following previous implementations, only
+     * reads while input is saturated.
+     * @see XmlMessageEOFProtocol
+     *
+     * @param patternIndex The index of the xml tag (or -1 if the next message not found)
+     * @param len The amount of data read this loop (or -1 if EOF)
+     * @param available The amount of data available to read
+     * @return true if the read should continue
+     */
+    protected boolean isRepeat(int patternIndex, int len, int available)
+    {
+        return patternIndex < 0 && len == READ_BUFFER_SIZE && available > 0;
+    }
+
 }

@@ -10,7 +10,8 @@
 
 package org.mule.examples.loanbroker;
 
-import org.mule.config.i18n.Message;
+import org.mule.examples.loanbroker.messages.CreditProfile;
+import org.mule.examples.loanbroker.messages.Customer;
 import org.mule.examples.loanbroker.messages.CustomerQuoteRequest;
 import org.mule.examples.loanbroker.messages.LoanBrokerQuoteRequest;
 import org.mule.examples.loanbroker.messages.LoanQuote;
@@ -33,8 +34,9 @@ public class DefaultLoanBroker implements LoanBrokerService
     
     private final AtomicInteger quotes = new AtomicInteger(0);
     private final AtomicInteger requests = new AtomicInteger(0);
+    private final AtomicInteger profiles = new AtomicInteger(0);
 
-    public LoanBrokerQuoteRequest getLoanQuote(CustomerQuoteRequest request) throws LoanBrokerException
+    public Object getLoanQuote(CustomerQuoteRequest request) throws LoanBrokerException
     {
         int requests = incRequests();
         if (logger.isInfoEnabled())
@@ -45,21 +47,45 @@ public class DefaultLoanBroker implements LoanBrokerService
                 String.valueOf(request.getLoanAmount()),
                 String.valueOf(request.getLoanDuration()) };
 
-            logger.info("\n***** " + new Message("loanbroker-example", 1, params).getMessage());
+            logger.info("\n***** " + LocaleMessage.getString(LocaleMessage.RECEIVED_REQUEST, params));
         }        
-        LoanBrokerQuoteRequest bqr = new LoanBrokerQuoteRequest();
-        bqr.setCustomerRequest(request);
-        return bqr;
+        return request;
     }
 
-    public LoanQuote receiveQuote(LoanQuote quote)
+    public LoanBrokerQuoteRequest receiveLoanBrokerQuoteRequest(LoanBrokerQuoteRequest request)
+    {
+        // Just pass through
+        return request;
+    }
+
+    public Customer receiveCustomer(Customer customer)
+    {
+        // Just pass through
+        return customer;
+    }
+
+    public Object receiveCreditProfile(CreditProfile profile)
+    {
+        int profiles = incProfiles();
+        if (logger.isInfoEnabled())
+        {
+            String[] params = new String[] { String.valueOf(profiles), 
+                String.valueOf(profile.getCreditScore()),
+                String.valueOf(profile.getCreditHistory()) };
+
+            logger.info("\n***** " + LocaleMessage.getString(LocaleMessage.RECEIVED_PROFILE, params));
+        }
+        return profile;
+    }
+
+    public Object receiveQuote(LoanQuote quote)
     {
         int quotes = incQuotes();
         if (logger.isInfoEnabled())
         {
             String[] params = new String[] { String.valueOf(quotes), 
                 quote.toString() };
-            logger.info("\n***** " + new Message("loanbroker-example", 2, params).getMessage());
+            logger.info("\n***** " + LocaleMessage.getString(LocaleMessage.RECEIVED_QUOTE, params));
         }
         return quote;
     }
@@ -72,5 +98,10 @@ public class DefaultLoanBroker implements LoanBrokerService
     protected int incRequests()
     {
         return requests.incrementAndGet();
+    }
+
+    protected int incProfiles()
+    {
+        return profiles.incrementAndGet();
     }
 }

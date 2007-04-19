@@ -2,7 +2,7 @@
 
 # There is no need to call this if you set the MULE_HOME in your environment
 if [ -z "$MULE_HOME" ] ; then
-  MULE_HOME=../../..
+  MULE_HOME=../..
   export MULE_HOME
 fi
 
@@ -16,5 +16,5 @@ fi
 MULE_LIB=./conf
 export MULE_LIB
 
-exec $MULE_BASE/bin/mule -config ./conf/echo-config.xml
+exec "$MULE_BASE/bin/mule" -config ./conf/echo-config.xml
 

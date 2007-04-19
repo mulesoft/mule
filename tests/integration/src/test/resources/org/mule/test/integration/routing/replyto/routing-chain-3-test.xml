@@ -13,7 +13,7 @@
                 <beans>
                 <bean id="jmsConnectionFactory"
         class="org.apache.activemq.ActiveMQConnectionFactory">
-        <property name="brokerURL"><value>vm://localhost?broker.persistence=false</value></property>
+        <property name="brokerURL"><value>vm://localhost?broker.persistent=false</value></property>
     </bean>
                 </beans>
                 ]]>

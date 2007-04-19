@@ -68,8 +68,9 @@
     
     <dependencies>
         <dependency>
+            <!-- needed for SSL in httpS -->
             <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-tcp</artifactId>
+            <artifactId>mule-transport-ssl</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
@@ -87,12 +88,16 @@
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
             <groupId>jetty</groupId>
             <artifactId>org.mortbay.jetty</artifactId>
-            <version>5.1.10</version>
+            <version>5.1.12</version>
         </dependency>
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>

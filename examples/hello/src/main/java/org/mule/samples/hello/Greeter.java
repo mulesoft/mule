@@ -10,8 +10,6 @@
 
 package org.mule.samples.hello;
 
-import org.mule.config.i18n.Message;
-
 /**
  * <code>Greeter</code> TODO (document class)
  * 
@@ -24,7 +22,7 @@ public class Greeter
 
     public Greeter()
     {
-        greeting = new Message("hello-example", 2).getMessage();
+        greeting = LocaleMessage.getGreetingPart1();
     }
 
     public void greet(NameString person)

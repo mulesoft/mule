@@ -10,64 +10,79 @@
 
 package org.mule.routing.filters;
 
-import ognl.Ognl;
-import ognl.OgnlException;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.mule.config.ConfigurationException;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import ognl.Ognl;
+import ognl.OgnlException;
+
 public class OGNLFilter implements UMOFilter
 {
-    private static final Log logger = LogFactory.getLog(OGNLFilter.class);
+    protected final Log logger = LogFactory.getLog(this.getClass());
 
-    private String expression;
+    private volatile String expression;
+    private volatile Object compiledExpression;
 
     public String getExpression()
     {
         return expression;
     }
 
-    public void setExpression(String expression)
+    // TODO MULE-350
+    public void setExpression(String expression) throws ConfigurationException
     {
-        this.expression = expression;
+        try
+        {
+            this.compiledExpression = Ognl.parseExpression(expression);
+            this.expression = expression;
+        }
+        catch (OgnlException ex)
+        {
+            throw new ConfigurationException(ex);
+        }
     }
 
     public boolean accept(UMOMessage message)
     {
+        // no message: nothing to filter
         if (message == null)
         {
             return false;
         }
 
         Object candidate = message.getPayload();
+        // no payload: still nothing to filter
         if (candidate == null)
         {
             return false;
         }
 
-        if (expression == null)
+        // no expression configured: we reject by default
+        if (compiledExpression == null)
         {
-            logger.warn("Expression for OGNLFilter is not set");
+            logger.warn("No expression configured - rejecting message.");
             return false;
         }
 
         try
         {
-            Object result = Ognl.getValue(expression, candidate);
+            Object result = Ognl.getValue(compiledExpression, candidate);
+            // we only need to take boolean expressoin results into account
             if (result instanceof Boolean)
             {
-                return ((Boolean)result).booleanValue();
+                return ((Boolean) result).booleanValue();
             }
         }
-
         catch (OgnlException ex)
         {
-            logger.error("Error evaluating OGNL expression.", ex);
+            logger.error(ex);
         }
 
-        // default: reject
+        // default action: reject
         return false;
     }
 

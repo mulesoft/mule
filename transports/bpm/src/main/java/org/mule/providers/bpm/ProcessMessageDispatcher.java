@@ -16,7 +16,6 @@ import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.providers.NullPayload;
 import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
@@ -130,7 +129,7 @@ public class ProcessMessageDispatcher extends AbstractMessageDispatcher
         processVariables.remove(ProcessConnector.PROPERTY_TRANSITION);
 
         // Decode the URI, for example:
-        // bpm:/testProcess/4561?action=advance
+        // bpm://testProcess/4561?action=advance
         String temp;
         temp = event.getEndpoint().getEndpointURI().getHost();
         if (StringUtils.isNotEmpty(temp))

@@ -5,7 +5,7 @@ Assembly descriptor for the full Mule distribution.
   <id>full</id>
   <formats>
     <format>zip</format>
-    <!--<format>tar.gz</format>-->
+    <format>tar.gz</format>
   </formats>
 
   <fileSets>
@@ -32,61 +32,20 @@ Assembly descriptor for the full Mule distribution.
             Mule Examples: Echo
         ============================
       -->
-      <!-- Maven-style example -->
       <fileSet>
           <directory>../../../examples/echo</directory>
-          <outputDirectory>examples/maven/echo</outputDirectory>
-          <includes>
-              <include>README.txt</include>
-          </includes>
+          <outputDirectory>examples/echo</outputDirectory>
+          <excludes>
+              <exclude>target/**</exclude>
+              <exclude>dist/**</exclude>
+              <!-- AxisEchoTestCase does not build.  src directory was excluded in previous version too -->
+              <exclude>src/**</exclude>
+          </excludes>
       </fileSet>
       <fileSet>
           <directory>../../../examples/echo/dist</directory>
-          <outputDirectory>examples/maven/echo</outputDirectory>
-          <includes>
-              <include>pom.xml</include>
-          </includes>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/echo/dist</directory>
-          <outputDirectory>examples/maven/echo</outputDirectory>
-          <includes>
-              <include>echo*</include>
-          </includes>
+          <outputDirectory>examples/echo</outputDirectory>
           <fileMode>744</fileMode>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/echo/conf</directory>
-          <outputDirectory>examples/maven/echo/conf</outputDirectory>
-      </fileSet>
-
-      <!-- Ant-style example -->
-      <fileSet>
-          <directory>../../../examples/echo</directory>
-          <outputDirectory>examples/ant/echo</outputDirectory>
-          <includes>
-              <include>README.txt</include>
-          </includes>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/echo/dist</directory>
-          <outputDirectory>examples/ant/echo</outputDirectory>
-          <includes>
-              <include>build.xml</include>
-          </includes>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/echo/dist</directory>
-          <outputDirectory>examples/ant/echo</outputDirectory>
-          <includes>
-              <include>echo</include>
-              <include>*.bat</include>
-          </includes>
-          <fileMode>744</fileMode>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/echo/conf</directory>
-          <outputDirectory>examples/ant/echo/conf</outputDirectory>
       </fileSet>
 
       <!--
@@ -94,151 +53,54 @@ Assembly descriptor for the full Mule distribution.
             Mule Examples: Error Handler
         ==================================
       -->
-      <!-- Maven-style example -->
       <fileSet>
           <directory>../../../examples/errorhandler</directory>
-          <outputDirectory>examples/maven/errorhandler</outputDirectory>
-          <includes>
-              <include>README.txt</include>
-          </includes>
+          <outputDirectory>examples/errorhandler</outputDirectory>
+          <excludes>
+              <exclude>target/**</exclude>
+              <exclude>dist/**</exclude>
+          </excludes>
       </fileSet>
       <fileSet>
           <directory>../../../examples/errorhandler/dist</directory>
-          <outputDirectory>examples/maven/errorhandler</outputDirectory>
-          <includes>
-              <include>pom.xml</include>
-          </includes>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/errorhandler/dist</directory>
-          <outputDirectory>examples/maven/errorhandler</outputDirectory>
-          <includes>
-              <include>errorhandler</include>
-              <include>*.bat</include>
-          </includes>
+          <outputDirectory>examples/errorhandler</outputDirectory>
           <fileMode>744</fileMode>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/errorhandler/conf</directory>
-          <outputDirectory>examples/maven/errorhandler/conf</outputDirectory>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/errorhandler/src</directory>
-          <outputDirectory>examples/maven/errorhandler/src</outputDirectory>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/errorhandler/test-data</directory>
-          <outputDirectory>examples/maven/errorhandler/test-data</outputDirectory>
       </fileSet>
 
-      <!-- Ant-style example -->
       <fileSet>
-          <directory>../../../examples/errorhandler</directory>
-          <outputDirectory>examples/ant/errorhandler</outputDirectory>
-          <includes>
-              <include>README.txt</include>
-          </includes>
+          <directory>../../../examples/errorhandler/src/main/resources</directory>
+          <outputDirectory>examples/errorhandler/conf</outputDirectory>
       </fileSet>
-      <fileSet>
-          <directory>../../../examples/errorhandler/dist</directory>
-          <outputDirectory>examples/ant/errorhandler</outputDirectory>
-          <includes>
-              <include>build.xml</include>
-          </includes>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/errorhandler/dist</directory>
-          <outputDirectory>examples/ant/errorhandler</outputDirectory>
-          <includes>
-              <include>errorhandler</include>
-              <include>*.bat</include>
-          </includes>
-          <fileMode>744</fileMode>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/errorhandler/conf</directory>
-          <outputDirectory>examples/ant/errorhandler/conf</outputDirectory>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/errorhandler/src/main/java</directory>
-          <outputDirectory>examples/ant/errorhandler/src</outputDirectory>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/errorhandler/test-data</directory>
-          <outputDirectory>examples/ant/errorhandler/test-data</outputDirectory>
-      </fileSet>
+
+
+
 
       <!--
         ============================
             Mule Examples: Hello
         ============================
       -->
-      <!-- Maven-style example -->
-      <fileSet>
+       <fileSet>
           <directory>../../../examples/hello</directory>
-          <outputDirectory>examples/maven/hello</outputDirectory>
-          <includes>
-              <include>README.txt</include>
-          </includes>
+          <outputDirectory>examples/hello</outputDirectory>
+          <excludes>
+              <exclude>target/**</exclude>
+              <exclude>dist/**</exclude>
+          </excludes>
       </fileSet>
       <fileSet>
           <directory>../../../examples/hello/dist</directory>
-          <outputDirectory>examples/maven/hello</outputDirectory>
-          <includes>
-              <include>pom.xml</include>
-          </includes>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/hello/dist</directory>
-          <outputDirectory>examples/maven/hello</outputDirectory>
-          <includes>
-              <include>hello</include>
-              <include>*.bat</include>
-          </includes>
+          <outputDirectory>examples/hello</outputDirectory>
           <fileMode>744</fileMode>
       </fileSet>
-      <fileSet>
-          <directory>../../../examples/hello/conf</directory>
-          <outputDirectory>examples/maven/hello/conf</outputDirectory>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/hello/src</directory>
-          <outputDirectory>examples/maven/hello/src</outputDirectory>
-      </fileSet>
 
-      <!-- Ant-style example -->
       <fileSet>
-          <directory>../../../examples/hello</directory>
-          <outputDirectory>examples/ant/hello</outputDirectory>
-          <includes>
-              <include>README.txt</include>
-          </includes>
+          <directory>../../../examples/hello/src/main/resources</directory>
+          <outputDirectory>examples/hello/conf</outputDirectory>
       </fileSet>
-      <fileSet>
-          <directory>../../../examples/hello/dist</directory>
-          <outputDirectory>examples/ant/hello</outputDirectory>
-          <includes>
-              <include>build.xml</include>
-          </includes>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/hello/dist</directory>
-          <outputDirectory>examples/ant/hello</outputDirectory>
-          <includes>
-              <include>hello</include>
-              <include>*.bat</include>
-          </includes>
-          <fileMode>744</fileMode>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/hello/conf</directory>
-          <outputDirectory>examples/ant/hello/conf</outputDirectory>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/hello/src/main/java</directory>
-          <outputDirectory>examples/ant/hello/src</outputDirectory>
-      </fileSet>
+ 
 
+ 
       <!--
         ===============================
             Mule Examples: Loan Broker
@@ -266,8 +128,8 @@ Assembly descriptor for the full Mule distribution.
           <directory>../../../examples/loanbroker/common</directory>
           <outputDirectory>examples/loanbroker/common</outputDirectory>
           <includes>
-              <include>README.txt</include>
               <include>pom.xml</include>
+              <include>build.xml</include>
           </includes>
       </fileSet>
       <fileSet>
@@ -275,11 +137,23 @@ Assembly descriptor for the full Mule distribution.
           <outputDirectory>examples/loanbroker/common/src</outputDirectory>
       </fileSet>
       <fileSet>
+          <directory>../../../examples/loanbroker/common-tests</directory>
+          <outputDirectory>examples/loanbroker/common-tests</outputDirectory>
+          <includes>
+              <include>pom.xml</include>
+              <include>build.xml</include>
+          </includes>
+      </fileSet>
+      <fileSet>
+          <directory>../../../examples/loanbroker/common-tests/src</directory>
+          <outputDirectory>examples/loanbroker/common-tests/src</outputDirectory>
+      </fileSet>
+      <fileSet>
           <directory>../../../examples/loanbroker/credit-agency</directory>
           <outputDirectory>examples/loanbroker/credit-agency</outputDirectory>
           <includes>
-              <include>README.txt</include>
               <include>pom.xml</include>
+              <include>build.xml</include>
           </includes>
       </fileSet>
       <fileSet>
@@ -290,8 +164,8 @@ Assembly descriptor for the full Mule distribution.
           <directory>../../../examples/loanbroker/esb</directory>
           <outputDirectory>examples/loanbroker/esb</outputDirectory>
           <includes>
-              <include>README.txt</include>
               <include>pom.xml</include>
+              <include>build.xml</include>
           </includes>
       </fileSet>
       <fileSet>
@@ -306,8 +180,8 @@ Assembly descriptor for the full Mule distribution.
           <directory>../../../examples/loanbroker/esn</directory>
           <outputDirectory>examples/loanbroker/esn</outputDirectory>
           <includes>
-              <include>README.txt</include>
               <include>pom.xml</include>
+              <include>build.xml</include>
           </includes>
       </fileSet>
       <fileSet>
@@ -318,144 +192,73 @@ Assembly descriptor for the full Mule distribution.
           <directory>../../../examples/loanbroker/esn/src</directory>
           <outputDirectory>examples/loanbroker/esn/src</outputDirectory>
       </fileSet>
+      <fileSet>
+          <directory>../../../examples/loanbroker/bpm</directory>
+          <outputDirectory>examples/loanbroker/bpm</outputDirectory>
+          <includes>
+              <include>pom.xml</include>
+              <include>build.xml</include>
+          </includes>
+      </fileSet>
+      <fileSet>
+          <directory>../../../examples/loanbroker/bpm/conf</directory>
+          <outputDirectory>examples/loanbroker/bpm/conf</outputDirectory>
+      </fileSet>
+      <fileSet>
+          <directory>../../../examples/loanbroker/bpm/src</directory>
+          <outputDirectory>examples/loanbroker/bpm/src</outputDirectory>
+      </fileSet>
 
       <!--
         =============================
             Mule Examples: Scripting
         =============================
       -->
-      <!-- Maven-style example -->
+
       <fileSet>
           <directory>../../../examples/scripting</directory>
-          <outputDirectory>examples/maven/scripting</outputDirectory>
-          <includes>
-              <include>README.txt</include>
-          </includes>
+          <outputDirectory>examples/scripting</outputDirectory>
+          <excludes>
+              <exclude>target/**</exclude>
+              <exclude>dist/**</exclude>
+          </excludes>
       </fileSet>
       <fileSet>
           <directory>../../../examples/scripting/dist</directory>
-          <outputDirectory>examples/maven/scripting</outputDirectory>
-          <includes>
-              <include>pom.xml</include>
-          </includes>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/scripting/dist</directory>
-          <outputDirectory>examples/maven/scripting</outputDirectory>
-          <includes>
-              <include>scripting</include>
-              <include>*.bat</include>
-          </includes>
+          <outputDirectory>examples/scripting</outputDirectory>
           <fileMode>744</fileMode>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/scripting/conf</directory>
-          <outputDirectory>examples/maven/scripting/conf</outputDirectory>
       </fileSet>
 
-      <!-- Ant-style example -->
-      <fileSet>
-          <directory>../../../examples/scripting</directory>
-          <outputDirectory>examples/ant/scripting</outputDirectory>
-          <includes>
-              <include>README.txt</include>
-          </includes>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/scripting/dist</directory>
-          <outputDirectory>examples/ant/scripting</outputDirectory>
-          <includes>
-              <include>build.xml</include>
-          </includes>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/scripting/dist</directory>
-          <outputDirectory>examples/ant/scripting</outputDirectory>
-          <includes>
-              <include>scripting</include>
-              <include>*.bat</include>
-          </includes>
-          <fileMode>744</fileMode>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/scripting/conf</directory>
-          <outputDirectory>examples/ant/scripting/conf</outputDirectory>
-      </fileSet>
+
 
       <!--
         ===============================
             Mule Examples: Stock Quote
         ===============================
       -->
-      <!-- Maven-style example -->
+
+
+
       <fileSet>
           <directory>../../../examples/stockquote</directory>
-          <outputDirectory>examples/maven/stockquote</outputDirectory>
-          <includes>
-              <include>README.txt</include>
-          </includes>
+          <outputDirectory>examples/stockquote</outputDirectory>
+          <excludes>
+              <exclude>target/**</exclude>
+              <exclude>dist/**</exclude>
+          </excludes>
       </fileSet>
       <fileSet>
           <directory>../../../examples/stockquote/dist</directory>
-          <outputDirectory>examples/maven/stockquote</outputDirectory>
-          <includes>
-              <include>pom.xml</include>
-          </includes>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/stockquote/dist</directory>
-          <outputDirectory>examples/maven/stockquote</outputDirectory>
-          <includes>
-              <include>stockquote</include>
-              <include>*.bat</include>
-          </includes>
+          <outputDirectory>examples/stockquote</outputDirectory>
           <fileMode>744</fileMode>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/stockquote/conf</directory>
-          <outputDirectory>examples/maven/stockquote/conf</outputDirectory>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/stockquote/src</directory>
-          <outputDirectory>examples/maven/stockquote/src</outputDirectory>
       </fileSet>
 
-      <!-- Ant-style example -->
-      <fileSet>
-          <directory>../../../examples/stockquote</directory>
-          <outputDirectory>examples/ant/stockquote</outputDirectory>
-          <includes>
-              <include>README.txt</include>
-          </includes>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/stockquote/dist</directory>
-          <outputDirectory>examples/ant/stockquote</outputDirectory>
-          <includes>
-              <include>build.xml</include>
-          </includes>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/stockquote/dist</directory>
-          <outputDirectory>examples/ant/stockquote</outputDirectory>
-          <includes>
-              <include>stockquote</include>
-              <include>*.bat</include>
-          </includes>
-          <fileMode>744</fileMode>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/stockquote/conf</directory>
-          <outputDirectory>examples/ant/stockquote/conf</outputDirectory>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/stockquote/src/main/java</directory>
-          <outputDirectory>examples/ant/stockquote/src</outputDirectory>
-      </fileSet>
       <fileSet>
           <directory>../../../examples/stockquote/src/main/resources</directory>
-          <outputDirectory>examples/ant/stockquote/resources</outputDirectory>
+          <outputDirectory>examples/stockquote/resources</outputDirectory>
       </fileSet>
+
+
 
       <!--
         ================================
@@ -463,70 +266,27 @@ Assembly descriptor for the full Mule distribution.
         ================================
       -->
       <!-- Maven-style example -->
+ 
       <fileSet>
           <directory>../../../examples/voipservice</directory>
-          <outputDirectory>examples/maven/voipservice</outputDirectory>
-          <includes>
-              <include>README.txt</include>
-          </includes>
+          <outputDirectory>examples/voipservice</outputDirectory>
+          <excludes>
+              <exclude>target/**</exclude>
+              <exclude>dist/**</exclude>
+          </excludes>
       </fileSet>
       <fileSet>
           <directory>../../../examples/voipservice/dist</directory>
-          <outputDirectory>examples/maven/voipservice</outputDirectory>
-          <includes>
-              <include>pom.xml</include>
-          </includes>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/voipservice/dist</directory>
-          <outputDirectory>examples/maven/voipservice</outputDirectory>
-          <includes>
-              <include>voip</include>
-              <include>*.bat</include>
-          </includes>
+          <outputDirectory>examples/voipservice</outputDirectory>
           <fileMode>744</fileMode>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/voipservice/conf</directory>
-          <outputDirectory>examples/maven/voipservice/conf</outputDirectory>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/voipservice/src</directory>
-          <outputDirectory>examples/maven/voipservice/src</outputDirectory>
       </fileSet>
 
-      <!-- Ant-style example -->
       <fileSet>
-          <directory>../../../examples/voipservice</directory>
-          <outputDirectory>examples/ant/voipservice</outputDirectory>
-          <includes>
-              <include>README.txt</include>
-          </includes>
+          <directory>../../../examples/voipservice/src/main/resources</directory>
+          <outputDirectory>examples/voipservice/conf</outputDirectory>
       </fileSet>
-      <fileSet>
-          <directory>../../../examples/voipservice/dist</directory>
-          <outputDirectory>examples/ant/voipservice</outputDirectory>
-          <includes>
-              <include>build.xml</include>
-          </includes>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/voipservice/dist</directory>
-          <outputDirectory>examples/ant/voipservice</outputDirectory>
-          <includes>
-              <include>voip</include>
-              <include>*.bat</include>
-          </includes>
-          <fileMode>744</fileMode>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/voipservice/conf</directory>
-          <outputDirectory>examples/ant/voipservice/conf</outputDirectory>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/voipservice/src/main/java</directory>
-          <outputDirectory>examples/ant/voipservice/src</outputDirectory>
-      </fileSet>
+
+
 
       <!--
         ============================
@@ -537,7 +297,7 @@ Assembly descriptor for the full Mule distribution.
            from Ant -->
       <fileSet>
           <directory>../../../examples/webapp/dist</directory>
-          <outputDirectory>examples/maven/webapp</outputDirectory>
+          <outputDirectory>examples/webapp</outputDirectory>
           <includes>
               <include>MAVEN_README.txt</include>
           </includes>
@@ -570,33 +330,33 @@ Assembly descriptor for the full Mule distribution.
       <!-- Ant-style example -->
       <fileSet>
           <directory>../../../examples/webapp</directory>
-          <outputDirectory>examples/ant/webapp</outputDirectory>
+          <outputDirectory>examples/webapp</outputDirectory>
           <includes>
               <include>README.txt</include>
           </includes>
       </fileSet>
       <fileSet>
           <directory>../../../examples/webapp/dist</directory>
-          <outputDirectory>examples/ant/webapp</outputDirectory>
+          <outputDirectory>examples/webapp</outputDirectory>
           <includes>
               <include>build.xml</include>
           </includes>
       </fileSet>
       <fileSet>
           <directory>../../../examples/webapp/conf</directory>
-          <outputDirectory>examples/ant/webapp/conf</outputDirectory>
+          <outputDirectory>examples/webapp/conf</outputDirectory>
       </fileSet>
       <fileSet>
           <directory>../../../examples/webapp/src/main/java</directory>
-          <outputDirectory>examples/ant/webapp/src</outputDirectory>
+          <outputDirectory>examples/webapp/src</outputDirectory>
       </fileSet>
       <fileSet>
           <directory>../../../examples/webapp/src/main/resources</directory>
-          <outputDirectory>examples/ant/webapp/resources</outputDirectory>
+          <outputDirectory>examples/webapp/resources</outputDirectory>
       </fileSet>
       <fileSet>
           <directory>../../../examples/webapp/src/main/webapp</directory>
-          <outputDirectory>examples/ant/webapp/webapp</outputDirectory>
+          <outputDirectory>examples/webapp/webapp</outputDirectory>
       </fileSet>
 
 
@@ -759,6 +519,7 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule.examples:mule-example-loanbroker-common</exclude>
         <exclude>org.mule.examples:mule-example-loanbroker-esn</exclude>
         <exclude>org.mule.examples:mule-example-loanbroker-esb</exclude>
+        <exclude>org.mule.examples:mule-example-loanbroker-bpm</exclude>
         <exclude>org.mule.examples:mule-example-loanbroker-credit-agency</exclude>
         <exclude>org.mule.examples:mule-example-scripting</exclude>
         <exclude>org.mule.examples:mule-example-stockquote</exclude>
@@ -773,7 +534,8 @@ Assembly descriptor for the full Mule distribution.
         <exclude>javax.mail:mail</exclude>
         <exclude>commons-logging:commons-logging</exclude>
 
-        <exclude>org.apache.activemq:apache-activemq</exclude>
+        <exclude>org.apache.activemq:activemq-core</exclude>
+        <exclude>org.apache.activemq:activeio-core</exclude>
       </excludes>
     </dependencySet>
 
@@ -790,6 +552,7 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.examples:mule-example-loanbroker-common</include>
         <include>org.mule.examples:mule-example-loanbroker-esn</include>
         <include>org.mule.examples:mule-example-loanbroker-esb</include>
+        <include>org.mule.examples:mule-example-loanbroker-bpm</include>
         <include>org.mule.examples:mule-example-loanbroker-credit-agency</include>
         <include>org.mule.examples:mule-example-scripting</include>
         <include>org.mule.examples:mule-example-stockquote</include>

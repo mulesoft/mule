@@ -110,6 +110,12 @@ public class OutBoundRoutersProcessor extends TagProcessor
             if (replyTo != null)
             {
                 GraphNode out = getEnvironment().getEndpointRegistry().getEndpoint(replyTo, componentName);
+                if (null == out)
+                {
+                    out = graph.addNode();
+                    out.getInfo().setCaption(replyTo);
+                    getEnvironment().getEndpointRegistry().addEndpoint(replyTo, out);
+                }
                 addRelation(graph, routerNode, out, "sets");
             }
         }

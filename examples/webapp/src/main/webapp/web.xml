@@ -41,13 +41,13 @@
             <param-name>readonly</param-name>
             <param-value>false</param-value>
         </init-param>
-        <load-on-startup/>
+        <load-on-startup>1</load-on-startup>
     </servlet>
 
     <servlet>
         <servlet-name>muleServlet</servlet-name>
         <servlet-class>org.mule.providers.http.servlet.MuleReceiverServlet</servlet-class>
-        <load-on-startup/>
+        <load-on-startup>2</load-on-startup>
     </servlet>
 
     <servlet-mapping>

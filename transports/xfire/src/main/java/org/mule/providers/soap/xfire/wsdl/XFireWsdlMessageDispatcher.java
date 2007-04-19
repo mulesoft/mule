@@ -11,6 +11,7 @@
 package org.mule.providers.soap.xfire.wsdl;
 
 import org.mule.providers.soap.xfire.XFireMessageDispatcher;
+import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.util.StringUtils;
 
@@ -65,8 +66,7 @@ public class XFireWsdlMessageDispatcher extends XFireMessageDispatcher
 
             try
             {
-                this.client = createXFireClient(endpoint, service, xfire,
-                    DEFAULT_WSDL_TRANSPORT);
+                this.client = createXFireWsdlClient(endpoint, service, xfire, wsdlUrl);
             }
             catch (Exception ex)
             {
@@ -79,5 +79,14 @@ public class XFireWsdlMessageDispatcher extends XFireMessageDispatcher
             disconnect();
             throw ex;
         }
+    }
+
+    protected Client createXFireWsdlClient(UMOImmutableEndpoint endpoint, Service service, XFire xfire, String wsdlUrl) throws Exception
+    {
+        UMOEndpointURI uri = endpoint.getEndpointURI();
+        Client client = new Client(new URL(wsdlUrl));
+        client.setXFire(xfire);
+        client.setEndpointUri(uri.toString());
+        return configureXFireClient(client);
     }
 }

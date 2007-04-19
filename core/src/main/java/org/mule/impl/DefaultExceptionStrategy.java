@@ -47,7 +47,6 @@ public class DefaultExceptionStrategy extends AbstractExceptionListener
 
     public void handleStandardException(Throwable t)
     {
-        defaultHandler(t);
         markTransactionForRollback();
         // Attempt to send the exception details to an endpoint i one is set
         if (RequestContext.getEventContext() != null)

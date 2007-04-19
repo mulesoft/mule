@@ -10,7 +10,7 @@
 
 package org.mule.examples.loanbroker.routers;
 
-import org.mule.config.i18n.Message;
+import org.mule.examples.loanbroker.LocaleMessage;
 import org.mule.examples.loanbroker.messages.LoanQuote;
 import org.mule.impl.MuleMessage;
 import org.mule.routing.inbound.EventGroup;
@@ -39,7 +39,7 @@ public class BankQuotesAggregationLogic
         {
             event = (UMOEvent)iterator.next();
             quote = (LoanQuote)event.getTransformedMessage();
-            logger.info(new Message("loanbroker-example", 5, quote.toString()).getMessage());
+            logger.info(LocaleMessage.getString(LocaleMessage.PROCESSING_QUOTE, quote.toString()));
 
             if (lowestQuote == null)
             {
@@ -54,7 +54,7 @@ public class BankQuotesAggregationLogic
             }
         }
 
-        logger.info(new Message("loanbroker-example", 6, lowestQuote.toString()).getMessage());
+        logger.info(LocaleMessage.getString(LocaleMessage.LOWEST_QUOTE, lowestQuote.toString()));
         return new MuleMessage(lowestQuote, event.getMessage());
     }
 }

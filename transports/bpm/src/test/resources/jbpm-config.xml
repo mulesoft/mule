@@ -9,13 +9,13 @@
     <!-- Note: The BPM connector will get created programatically by the test. -->
 
     <model name="processModel">
-        <mule-descriptor name="testService1" implementation="org.mule.components.simple.NullComponent">
+        <mule-descriptor name="testService1" implementation="org.mule.components.simple.LogComponent">
             <inbound-router>
                 <endpoint address="bpm://dummyProcess" />
             </inbound-router>
         </mule-descriptor>
 
-        <mule-descriptor name="testService2" implementation="org.mule.components.simple.NullComponent">
+        <mule-descriptor name="testService2" implementation="org.mule.components.simple.LogComponent">
             <inbound-router>
                 <endpoint address="bpm://sendMessageProcess" />
             </inbound-router>

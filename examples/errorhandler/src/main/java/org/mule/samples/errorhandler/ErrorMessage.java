@@ -14,15 +14,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * <code>ErrorMessage</code> TODO (document class)
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * The <code>ErrorMessage</code> represents an exception.
  */
 public class ErrorMessage
 {
+    // Bean representing the Exception
     private ExceptionBean exception;
+    // The exception itself, in its primitive state
     private Throwable throwable;
+    // Properties for this object
     private Map properties = new HashMap();
 
     /**

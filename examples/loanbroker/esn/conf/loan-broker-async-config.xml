@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+
+<mule-configuration id="Mule_Loan_Broker_Asynchronous_Sample" version="1.0">
+
+    <description>
+    This loan broker example is modeled on the Enterprise integration Patterns book sample.  
+    This implementation differs in that this configuration uses an asynchronous model where 
+    each component communicates messaging according to its configuration in this file.
+    </description>
+
+    <mule-environment-properties serverUrl=""/>
+
+    <!--
+       The Mule model initialises and manages your UMO components
+    -->
+    <model name="loan-broker">
+        <!--
+        The loan broker is used to receive loan requests
+        -->
+        <mule-descriptor name="LoanBroker" implementation="org.mule.examples.loanbroker.AsynchronousLoanBroker">
+
+            <!--
+            This router uses the BankQuoteAggregator for events of type BankQuote, for all other
+            types the catch all strategy is invoked, which simply passes the event to the component
+            -->
+            <inbound-router>
+                <catch-all-strategy className="org.mule.routing.ComponentCatchAllStrategy"/>
+                
+                <!-- New requests from customers -->
+                <global-endpoint name="CustomerRequests"/>
+                
+                <!-- Loan quotes from banks -->
+                <global-endpoint name="LoanBrokerQuotes"/>
+                <router className="org.mule.examples.loanbroker.routers.BankQuotesInboundAggregator">
+                    <filter expectedType="org.mule.examples.loanbroker.messages.LoanQuote" 
+                    		className="org.mule.routing.filters.PayloadTypeFilter"/>
+                </router>
+            </inbound-router>
+
+            <outbound-router>
+            	<!-- Credit profile requests -->
+                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
+                    <global-endpoint name="CreditAgency" transformers="ExtractCustomer"/>
+                    <filter expectedType="org.mule.examples.loanbroker.messages.Customer" 
+                    		className="org.mule.routing.filters.PayloadTypeFilter"/>
+                </router>
+                <!-- Quote requests to the banks -->
+                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
+                    <global-endpoint name="LenderService"/>
+                    <filter expectedType="org.mule.examples.loanbroker.messages.LoanBrokerQuoteRequest" 
+                    		className="org.mule.routing.filters.PayloadTypeFilter"/>
+                </router>
+                <!-- Final quote response to the customer -->
+                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
+                    <global-endpoint name="CustomerResponses"/>
+                    <filter expectedType="org.mule.examples.loanbroker.messages.LoanQuote" 
+                    		className="org.mule.routing.filters.PayloadTypeFilter"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+
+        <!--
+        The credit agency service will get the credit profile for a customer
+        -->
+        <mule-descriptor name="CreditAgencyService"
+            			 implementation="org.mule.examples.loanbroker.credit.DefaultCreditAgency">
+            <inbound-router>
+                <global-endpoint name="CreditAgency"/>
+            </inbound-router>
+        </mule-descriptor>
+
+        <!--
+        The Lender service is used to determine which banks to contact for a quote
+        -->
+        <mule-descriptor name="LenderService"
+            			 implementation="org.mule.examples.loanbroker.lender.DefaultLender">
+            <inbound-router>
+                <global-endpoint name="LenderService"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
+                    <global-endpoint name="BankGateway" transformers="SetLendersAsRecipients"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+            
+        <mule-descriptor name="BankGateway"
+            			 implementation="org.mule.components.simple.BridgeComponent">
+            <inbound-router>
+                <global-endpoint name="BankGateway"/>
+            </inbound-router>
+            <outbound-router>
+                <catch-all-strategy className="org.mule.routing.LoggingCatchAllStrategy"/>
+                <router className="org.mule.routing.outbound.StaticRecipientList">
+                    <reply-to address="LoanBrokerQuotes"/>
+                    <filter expression="recipients!=null" className="org.mule.routing.filters.MessagePropertyFilter"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+
+        <!--
+        These are mock bank services that represent remote bank loan services
+        One or more of these are selected by the LenderService and a request
+        is routed to them.   The lenderService outbound router also defines a
+        replyTo property which will be used by Mule to route the responses back
+        to the LoanBrokerQuotes destination
+        -->
+        <mule-descriptor name="Bank1" implementation="org.mule.examples.loanbroker.bank.Bank">
+            <inbound-router>
+                <global-endpoint name="Bank1In"/>
+            </inbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="Bank2" implementation="org.mule.examples.loanbroker.bank.Bank">
+            <inbound-router>
+                <global-endpoint name="Bank2In"/>
+            </inbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="Bank3" implementation="org.mule.examples.loanbroker.bank.Bank">
+            <inbound-router>
+                <global-endpoint name="Bank3In"/>
+            </inbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="Bank4" implementation="org.mule.examples.loanbroker.bank.Bank">
+            <inbound-router>
+                <global-endpoint name="Bank4In"/>
+            </inbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="Bank5" implementation="org.mule.examples.loanbroker.bank.Bank">
+            <inbound-router>
+                <global-endpoint name="Bank5In"/>
+            </inbound-router>
+        </mule-descriptor>
+    </model>
+</mule-configuration>

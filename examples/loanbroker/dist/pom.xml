@@ -14,36 +14,20 @@
         <muleVersion>2.0-SNAPSHOT</muleVersion>
     </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-core</artifactId>
-            <version>${muleVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-axis</artifactId>
-            <version>${muleVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-xfire</artifactId>
-            <version>${muleVersion}</version>
-        </dependency>
-        <!-- For unit tests only -->
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-functional</artifactId>
-            <version>${muleVersion}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-vm</artifactId>
-            <version>${muleVersion}</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+    <modules>
+        <module>common</module>
+        <module>common-tests</module>
+        <module>credit-agency</module>
+        <module>esb</module>
+        <module>esn</module>
+        <module>bpm</module>
+        <!--
+        <module>bpel</module>
+        <module>rules</module>
+        <module>spaces</module>
+        <module>benchmark</module>
+        -->
+    </modules>
 
     <repositories>
         <repository>
@@ -112,9 +96,30 @@
                             <overWriteSnapshots>true</overWriteSnapshots>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>${groupId}</groupId>
-                                    <artifactId>${artifactId}</artifactId>
-                                    <version>${version}</version>
+                                    <groupId>org.apache.activemq</groupId>
+                                    <!-- TODO:
+                                         Import activemq-core artifact rather than
+                                         apache-activemq wich will include the entire kitchen sink.
+                                         Using it for now to make examples work
+                                    -->
+                                    <!--artifactId>activemq-core</artifactId-->
+                                    <artifactId>apache-activemq</artifactId>
+                                    <version>4.1.0-incubator</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>openejb</groupId>
+                                    <artifactId>openejb-core</artifactId>
+                                    <version>1.0</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>castor</groupId>
+                                    <artifactId>castor</artifactId>
+                                    <version>0.9.9</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.activemq</groupId>
+                                    <artifactId>activeio-core</artifactId>
+                                    <version>3.0.0-incubator</version>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>

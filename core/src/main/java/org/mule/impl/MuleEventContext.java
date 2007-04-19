@@ -594,9 +594,9 @@ public class MuleEventContext implements UMOEventContext
      * configuration. The user can override this behaviour by obtaining a reference
      * to the Event context, either by implementing
      * <code>org.mule.umo.lifecycle.Callable</code> or calling
-     * <code>UMOManager.getEventContext</code> to obtain the UMOEventContext for
+     * <code>RequestContext.getEventContext</code> to obtain the UMOEventContext for
      * the current thread. The user can programmatically control how events are
-     * dispached.
+     * dispatched.
      * 
      * @return Returns true is the user has set stopFurtherProcessing.
      * @see org.mule.umo.manager.UMOManager

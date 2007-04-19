@@ -10,8 +10,8 @@
 
 package org.mule.providers.stream;
 
+import org.mule.config.i18n.LocaleMessageHandler;
 import org.mule.registry.metadata.ObjectMetadata;
-import org.mule.config.i18n.Message;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
@@ -35,7 +35,7 @@ public class SystemStreamConnector extends StreamConnector
     public static ObjectMetadata objectMetadata = new ObjectMetadata(SystemStreamConnector.class, true, new String[] { "promptMessage", "outputMessage", "messageDelayTime", "firstTime" });
 
     private String promptMessage;
-    private int promptMessageCode = -1;
+    private String promptMessageCode = null;
     private String resourceBundle = null;
     private String outputMessage;
     private long messageDelayTime = 3000;
@@ -120,9 +120,9 @@ public class SystemStreamConnector extends StreamConnector
      */
     public String getPromptMessage()
     {
-        if (!StringUtils.isBlank(resourceBundle) && promptMessageCode > -1)
+        if (!StringUtils.isBlank(resourceBundle) && StringUtils.isNotBlank(promptMessageCode))
         {
-            return new Message(resourceBundle, promptMessageCode).getMessage();
+            return LocaleMessageHandler.getString(resourceBundle, promptMessageCode);
         }
 
         return promptMessage;
@@ -139,7 +139,7 @@ public class SystemStreamConnector extends StreamConnector
     /**
      * @return Returns the promptMessageCode.
      */
-    public int getPromptMessageCode()
+    public String getPromptMessageCode()
     {
         return promptMessageCode;
     }
@@ -147,7 +147,7 @@ public class SystemStreamConnector extends StreamConnector
     /**
      * @param promptMessageCode The promptMessageCode to set.
      */
-    public void setPromptMessageCode(int promptMessageCode)
+    public void setPromptMessageCode(String promptMessageCode)
     {
         this.promptMessageCode = promptMessageCode;
     }

@@ -29,7 +29,7 @@
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-axis</artifactId>
-            <version>${version}</version>
+            <version>${muleVersion}</version>
         </dependency>
     </dependencies>
 
@@ -70,6 +70,7 @@
   
     <build>
         <defaultGoal>install</defaultGoal>
+        <finalName>${artifactId}</finalName>
 
         <!-- Allow config files to be in the "conf" directory to make it easier for users to find them. -->
         <resources>
@@ -103,6 +104,7 @@
                                     <groupId>${groupId}</groupId>
                                     <artifactId>${artifactId}</artifactId>
                                     <version>${version}</version>
+                                    <destFileName>${artifactId}.jar</destFileName>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>

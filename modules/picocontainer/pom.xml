@@ -121,6 +121,14 @@
                    <groupId>xstream</groupId>
                    <artifactId>xstream</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>nanocontainer</groupId>
+                    <artifactId>nanocontainer-testmodel</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>picocontainer</groupId>
+                    <artifactId>picocontainer-tck</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>

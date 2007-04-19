@@ -113,7 +113,7 @@ public abstract class AbstractMailConnector extends AbstractConnector
      * 
      * @return the underlying (eg non-secure) protocol
      */
-    String getBaseProtocol()
+    protected String getBaseProtocol()
     {
         return getProtocol();
     }
@@ -126,7 +126,7 @@ public abstract class AbstractMailConnector extends AbstractConnector
      * @param local local properties (specific to one session)
      * @param url the endpoint url
      */
-    void extendPropertiesForSession(Properties global, Properties local, URLName url)
+    protected void extendPropertiesForSession(Properties global, Properties local, URLName url)
     {
         int port = url.getPort();
         if (port == -1)
@@ -156,11 +156,13 @@ public abstract class AbstractMailConnector extends AbstractConnector
         // using the base protocol) are needed.  they are inherited from old, gnarly
         // code.
 
-        local.setProperty("mail." + getBaseProtocol() + ".host", url.getHost());
+        if (StringUtils.isNotBlank(url.getHost())) {
+            local.setProperty("mail." + getBaseProtocol() + ".host", url.getHost());
+        }
         local.setProperty("mail." + getBaseProtocol() + ".rsetbeforequit", "true");
     }
 
-    private SessionDetails newSession(UMOImmutableEndpoint endpoint)
+    protected SessionDetails newSession(UMOImmutableEndpoint endpoint)
     {
         URLName url = urlFromEndpoint(endpoint);
 
@@ -188,7 +190,7 @@ public abstract class AbstractMailConnector extends AbstractConnector
         return new SessionDetails(session, url);
     }
     
-    private void dumpProperties(String title, Properties properties, boolean filter)
+    protected void dumpProperties(String title, Properties properties, boolean filter)
     {
         int skipped = 0;
         logger.debug(title + " =============");

@@ -163,11 +163,31 @@ public abstract class TagProcessor
 
     public static void addRelation(Graph graph, GraphNode src, GraphNode dest, String caption)
     {
-        GraphEdge ge = graph.addEdge(src, dest);
-        ge.getInfo().setArrowHeadNone();
-        if (caption != null)
+        if (null != src && null != dest)
         {
-            ge.getInfo().setCaption(caption);
+            GraphEdge ge = graph.addEdge(src, dest);
+            ge.getInfo().setArrowHeadNone();
+            if (caption != null)
+            {
+                ge.getInfo().setCaption(caption);
+            }
+        }
+        else
+        {
+            environment.log("Null relation: " + describeNode(src) + " / " + describeNode(dest)
+                    + " (" + caption + ")");
+        }
+    }
+
+    private static String describeNode(GraphNode node)
+    {
+        if (null == node)
+        {
+            return "-";
+        }
+        else
+        {
+            return node.getId() + ":" + node.getInfo().getCaption();
         }
     }
 

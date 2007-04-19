@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="Mule_Loan_broker_Synchronous_Sample" version="1.0">
+    <description>
+    This loan broker example is modeled on the Enterprise integration Patterns book
+    sample.
+    This implementation differs in that this configuration uses an synchronous
+    model where each component is invoked from the LoanBroker component.
+    </description>
+
+    <transformers>
+    	<transformer name="ExtractCustomer" className="org.mule.transformers.simple.GetBeanProperty">
+    		<properties>
+    			<property name="propertyName" value="customerRequest.customer" />
+    		</properties>
+    	</transformer>
+        <transformer name="SetLendersAsRecipients" className="org.mule.examples.loanbroker.transformers.SetLendersAsRecipients" />
+    </transformers>
+
+    <global-endpoints>
+        <endpoint name="CustomerRequests" address="vm://customer.requests"/>
+        <!-- only used for the async loan broker to send the lowest quote back to the customer -->
+        <endpoint name="CustomerResponses" address="vm://customer.responses"/>
+
+        <endpoint name="LoanBrokerQuotes" address="vm://loan.quotes"/>
+        <endpoint name="CreditAgency" address="vm://credit.agency"/>
+        <endpoint name="CreditAgencyIn" address="vm://credit.agency"/>
+        <endpoint name="LenderService" address="vm://lender.service?method=setLenderList"/>
+        <endpoint name="BankGateway" address="vm://bank.gateway"/>
+
+        <endpoint name="Bank1" address="vm://bank.1"/>
+        <endpoint name="Bank1In" address="vm://bank.1"/>
+
+        <endpoint name="Bank2" address="vm://bank.2"/>
+        <endpoint name="Bank2In" address="vm://bank.2"/>
+
+        <endpoint name="Bank3" address="vm://bank.3"/>
+        <endpoint name="Bank3In" address="vm://bank.3"/>
+
+        <endpoint name="Bank4" address="vm://bank.4"/>
+        <endpoint name="Bank4In" address="vm://bank.4"/>
+
+        <endpoint name="Bank5" address="vm://bank.5"/>
+        <endpoint name="Bank5In" address="vm://bank.5"/>
+    </global-endpoints>
+
+</mule-configuration>
