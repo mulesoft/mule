@@ -107,14 +107,17 @@ Assembly descriptor for the Mule JCA distribution.
                 <exclude>org.mule.examples:mule-example-echo</exclude>
                 <exclude>org.mule.examples:mule-example-errorhandler</exclude>
                 <exclude>org.mule.examples:mule-example-hello</exclude>
-                <exclude>org.mule.examples:mule-example-loanbroker</exclude>
-                <exclude>org.mule.examples:mule-example-loanbroker-esb</exclude>
-                <exclude>org.mule.examples:mule-example-loanbroker-esb-credit-agency</exclude>
                 <exclude>org.mule.examples:mule-example-scripting</exclude>
                 <exclude>org.mule.examples:mule-example-stockquote</exclude>
                 <exclude>org.mule.examples:mule-example-voipservice</exclude>
+                <exclude>org.mule.examples:mule-example-loanbroker-common</exclude>
+                <exclude>org.mule.examples:mule-example-loanbroker-credit-agency</exclude>
+                <exclude>org.mule.examples:mule-example-loanbroker-bpm</exclude>
+                <exclude>org.mule.examples:mule-example-loanbroker-esn</exclude>
+                <exclude>org.mule.examples:mule-example-loanbroker-esb</exclude>
 
-                <exclude>org.apache.activemq:apache-activemq</exclude>
+                <exclude>org.apache.activemq:activemq-core</exclude>
+                <exclude>org.apache.activemq:activeio-core</exclude>
                 
                 <!-- Workaround, see comment for "<packaging>jar</packaging>" in the pom.xml -->
                 <exclude>org.mule.distributions:mule-jca</exclude>

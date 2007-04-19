@@ -83,11 +83,12 @@ rem ###############################################################
 rem Customized for Mule
 rem ###############################################################
 rem Export the location of this script.  This will be used in wrapper.conf
-set MULE_EXE=%_REALPATH%
+rem ATTENTION: %_REALPATH% contains a trailing path delimiter that will cause the wrapper to fail. Do not use that
+set MULE_EXE=%MULE_HOME%\bin
 
 rem Mule options: Set the working directory to the current one and pass all command-line
 rem options (-config, -builder, etc.) straight through to the main() method.
-set MULE_OPTS=set.MULE_APP=%MULE_APP% set.MULE_APP_LONG=%MULE_APP_LONG% set.MULE_EXE=%MULE_EXE% set.MULE_LIB=%MULE_LIB% wrapper.working.dir="%CD%" wrapper.app.parameter.1=%1 wrapper.app.parameter.2=%2  wrapper.app.parameter.3=%3  wrapper.app.parameter.4=%4  wrapper.app.parameter.5=%5  wrapper.app.parameter.6=%6  wrapper.app.parameter.7=%7  wrapper.app.parameter.8=%8 wrapper.app.parameter.9=%9 
+set MULE_OPTS=set.MULE_APP=%MULE_APP% set.MULE_APP_LONG=%MULE_APP_LONG% set.MULE_EXE="%MULE_EXE%" set.MULE_LIB=%MULE_LIB% wrapper.working.dir="%CD%" wrapper.app.parameter.1=%1 wrapper.app.parameter.2=%2  wrapper.app.parameter.3=%3  wrapper.app.parameter.4=%4  wrapper.app.parameter.5=%5  wrapper.app.parameter.6=%6  wrapper.app.parameter.7=%7  wrapper.app.parameter.8=%8 wrapper.app.parameter.9=%9
 rem ###############################################################
 
 rem

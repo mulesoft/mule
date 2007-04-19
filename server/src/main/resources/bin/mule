@@ -36,13 +36,13 @@ APP_NAME=${MULE_APP}
 APP_LONG_NAME=${MULE_APP_LONG}
 
 # Wrapper
-WRAPPER_CMD="../lib/boot/exec/wrapper"
+WRAPPER_CMD="../sbin/wrapper"
 WRAPPER_CONF="../conf/wrapper.conf"
 
 # Set the startup directory so that any relative paths can be resolved later.
 STARTUP_DIR=`pwd`
 
-MULE_OPTS="wrapper.working.dir=$STARTUP_DIR \
+MULE_OPTS="wrapper.working.dir=\"$STARTUP_DIR\" \
            wrapper.app.parameter.1=$2 \
            wrapper.app.parameter.2=$3 \
            wrapper.app.parameter.3=$4 \
@@ -627,10 +627,10 @@ case "$1" in
         echo "No command specified, running in console (foreground) mode by default, use Ctrl-C to exit..."
 
         # Change back to the original startup directory.
-        cd $STARTUP_DIR
+        cd "$STARTUP_DIR"
 
         # Call this script recursively with the "console" parameter.
-        $REALPATH console $*
+        "$REALPATH" console $*
         ######################################################################
         ;;
 esac
