@@ -21,6 +21,7 @@ import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.manager.UMOServerNotificationListener;
 import org.mule.umo.manager.UMOWorkManager;
+import org.mule.util.ClassUtils;
 import org.mule.util.concurrent.ConcurrentHashSet;
 
 import edu.emory.mathcs.backport.java.util.concurrent.BlockingDeque;
@@ -29,8 +30,10 @@ import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
 import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingDeque;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.resource.spi.work.Work;
@@ -87,7 +90,41 @@ public class ServerNotificationManager implements Work, Disposable, ManagementCo
         }
     }
 
-    public void registerEventType(Class eventType, Class listenerType)
+    public void setEventTypes(Map eventTypes) throws ClassNotFoundException
+    {
+        eventsMap = new ConcurrentHashMap(eventTypes.size());
+
+        for (Iterator iterator = eventTypes.entrySet().iterator(); iterator.hasNext();)
+        {
+            Map.Entry entry = (Map.Entry) iterator.next();
+            registerEventType(getClassFromValue(entry.getKey()), getClassFromValue(entry.getValue()));
+        }
+    }
+
+    private Class getClassFromValue(Object value) throws ClassNotFoundException
+    {
+        Class theClass;
+        if(value instanceof String)
+        {
+            theClass = ClassUtils.loadClass(value.toString(), getClass());
+        }
+        else if(value instanceof Class)
+        {
+            theClass = (Class)value;
+        }
+        else
+        {
+           throw new IllegalArgumentException("Notification types and listeners must be a Class of fully qualified class name. Value is: " + value); 
+        }
+        return theClass;
+    }
+
+    public Map getEventTypes()
+    {
+        return Collections.unmodifiableMap(eventsMap);
+    }
+
+    public void registerEventType(Class listenerType, Class eventType)
     {
         if (UMOServerNotification.class.isAssignableFrom(eventType))
         {

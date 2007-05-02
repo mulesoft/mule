@@ -10,6 +10,7 @@
 
 package org.mule.tck;
 
+import org.mule.config.MuleProperties;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.ManagementContext;
 import org.mule.impl.MuleDescriptor;
@@ -103,7 +104,7 @@ public final class MuleTestUtils
     protected static StaticApplicationContext getStaticApplicationContext(UMOManagementContext context)
     {
         StaticApplicationContext ctx = new StaticApplicationContext();
-        ctx.getBeanFactory().registerSingleton("_muleManagementContext", context);
+        ctx.getBeanFactory().registerSingleton(MuleProperties.OBJECT_MANAGMENT_CONTEXT, context);
         ctx.start();
         return ctx;
     }

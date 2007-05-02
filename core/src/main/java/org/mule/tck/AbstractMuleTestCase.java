@@ -11,6 +11,7 @@
 package org.mule.tck;
 
 import org.mule.RegistryContext;
+import org.mule.config.MuleProperties;
 import org.mule.impl.MuleDescriptor;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.umo.UMOComponent;
@@ -202,7 +203,7 @@ public abstract class AbstractMuleTestCase extends TestCase
         //This will create the local registry too
         ApplicationContext ctx = new ClassPathXmlApplicationContext("default-mule-config.xml");
 
-        UMOManagementContext managementContext = (UMOManagementContext)ctx.getBean("_muleManagementContextFactoryBean");
+        UMOManagementContext managementContext = (UMOManagementContext)ctx.getBean(MuleProperties.OBJECT_MANAGMENT_CONTEXT);
         //Add a default model for compoennts to run in
         managementContext.getRegistry().registerModel(getDefaultModel(managementContext));
         return managementContext;

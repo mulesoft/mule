@@ -11,7 +11,7 @@
 package org.mule.test.spring;
 
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.manager.UMOContainerContext;
+import org.mule.tck.testmodels.fruit.FruitBowl;
 
 public class MultipleSpringContextsTestCase extends FunctionalTestCase
 {
@@ -23,11 +23,9 @@ public class MultipleSpringContextsTestCase extends FunctionalTestCase
 
     public void testMultiptleSpringContexts() throws Exception
     {
-        UMOContainerContext context =managementContext.getRegistry().getContainerContext();
-        assertNotNull(context);
-        Object bowl1 = context.getComponent("org.mule.tck.testmodels.fruit.FruitBowl");
+        Object bowl1 = managementContext.getRegistry().lookupObject("org.mule.tck.testmodels.fruit.FruitBowl", FruitBowl.class);
         assertNotNull(bowl1);
-        Object bowl2 = context.getComponent("org.mule.tck.testmodels.fruit.FruitBowl2");
+        Object bowl2 = managementContext.getRegistry().lookupObject("org.mule.tck.testmodels.fruit.FruitBowl2", FruitBowl.class);
         assertNotNull(bowl2);
     }
 }

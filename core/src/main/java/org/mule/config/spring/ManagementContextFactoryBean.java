@@ -11,14 +11,14 @@ package org.mule.config.spring;
 
 import org.mule.RegistryContext;
 import org.mule.impl.ManagementContext;
-import org.mule.impl.container.MultiContainerContext;
-import org.mule.umo.UMOException;
+import org.mule.impl.internal.notifications.ServerNotificationManager;
 import org.mule.umo.UMOManagementContext;
-import org.mule.umo.manager.UMOContainerContext;
+import org.mule.umo.lifecycle.UMOLifecycleManager;
 import org.mule.umo.manager.UMOTransactionManagerFactory;
+import org.mule.umo.manager.UMOWorkManager;
 import org.mule.umo.security.UMOSecurityManager;
+import org.mule.util.queue.QueueManager;
 
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.transaction.TransactionManager;
@@ -66,18 +66,39 @@ public class ManagementContextFactoryBean extends AbstractFactoryBean
      */
     protected static Log logger = LogFactory.getLog(ManagementContextFactoryBean.class);
 
-    protected UMOManagementContext managementContext = new ManagementContext();
+    protected UMOManagementContext managementContext;
 
     //TODO LM: Replace
     protected RegistryFacade registry;
 
     private ApplicationContext context;
 
+    private UMOLifecycleManager lifecycleManager;
+
+    private ServerNotificationManager notificationManager;
+
+    private UMOSecurityManager securityManager;
+
+    private UMOWorkManager workManager;
+
+    private TransactionManager transactionManager;
+
+    /**
+     * The queue manager to use for component queues and vm queues
+     */
+    private QueueManager queueManager;
+
+    public ManagementContextFactoryBean(UMOLifecycleManager lifecycleManager)
+    {
+        this.lifecycleManager = lifecycleManager;
+    }
+
     protected Object createInstance() throws Exception
     {
         if(managementContext==null)
         {
-            this.managementContext = new ManagementContext();
+
+            this.managementContext = new ManagementContext(lifecycleManager);
         }
         return managementContext;
     }
@@ -102,8 +123,13 @@ public class ManagementContextFactoryBean extends AbstractFactoryBean
     public void afterPropertiesSet() throws Exception
     {
         super.afterPropertiesSet();
-        managementContext.initialise();        
         init();
+        managementContext.setNotificationManager(notificationManager);
+        managementContext.setQueueManager(queueManager);
+        managementContext.setSecurityManager(securityManager);
+        managementContext.setWorkManager(workManager);
+        managementContext.setTransactionManager(transactionManager);
+        //managementContext.initialise();
     }
 
 
@@ -140,21 +166,21 @@ public class ManagementContextFactoryBean extends AbstractFactoryBean
             }
 
             // Set the container Context
-            Map containers = context.getBeansOfType(UMOContainerContext.class, true, false);
-            setContainerContext(containers);
+            //Map containers = context.getBeansOfType(UMOContainerContext.class, true, false);
+            //setContainerContext(containers);
 
             // set mule transaction manager
             temp = context.getBeansOfType(UMOTransactionManagerFactory.class, true, false);
             if (temp.size() > 0)
             {
-                managementContext.setTransactionManager(((UMOTransactionManagerFactory)temp.values().iterator().next()).create());
+                transactionManager = (((UMOTransactionManagerFactory)temp.values().iterator().next()).create());
             }
             else
             {
                 temp = context.getBeansOfType(TransactionManager.class, true, false);
                 if (temp.size() > 0)
                 {
-                    managementContext.setTransactionManager(((TransactionManager)temp.values().iterator().next()));
+                    transactionManager = (((TransactionManager)temp.values().iterator().next()));
                 }
             }
 
@@ -162,7 +188,28 @@ public class ManagementContextFactoryBean extends AbstractFactoryBean
             temp = context.getBeansOfType(UMOSecurityManager.class, true, false);
             if (temp.size() > 0)
             {
-               managementContext.setSecurityManager((UMOSecurityManager)temp.values().iterator().next());
+               securityManager = ((UMOSecurityManager)temp.values().iterator().next());
+            }
+
+            // set notification manager
+            temp = context.getBeansOfType(ServerNotificationManager.class, true, false);
+            if (temp.size() > 0)
+            {
+               notificationManager = ((ServerNotificationManager)temp.values().iterator().next());
+            }
+
+            // set notification manager
+            temp = context.getBeansOfType(UMOWorkManager.class, true, false);
+            if (temp.size() > 0)
+            {
+               workManager = ((UMOWorkManager)temp.values().iterator().next());
+            }
+
+            // set queue manager
+            temp = context.getBeansOfType(QueueManager.class, true, false);
+            if (temp.size() > 0)
+            {
+               queueManager = ((QueueManager)temp.values().iterator().next());
             }
 
         }
@@ -172,10 +219,15 @@ public class ManagementContextFactoryBean extends AbstractFactoryBean
         }
     }
 
+
+    
     public void destroy() throws Exception
     {
         super.destroy();
-        managementContext.dispose();
+        if(managementContext!=null)
+        {
+            managementContext.dispose();
+        }
     }
 
     public void setManagerId(String managerId)
@@ -183,25 +235,62 @@ public class ManagementContextFactoryBean extends AbstractFactoryBean
        managementContext.setId(managerId);
     }
 
-    protected void setContainerContext(Map containers) throws UMOException
-    {
-
-        for (Iterator iter = containers.values().iterator(); iter.hasNext();)
-        {
-            UMOContainerContext context =  (UMOContainerContext)iter.next();
-            if(!(context instanceof MultiContainerContext))
-            {
-                registry.registerContainerContext(context);
-            }
-
-        }
-    }
 
     protected void setLegacyProperties(Map props)
     {
         if(props!=null)
         {
-            registry.addProperties(props);
+            registry.registerProperties(props);
         }
+    }
+
+    public ApplicationContext getContext()
+    {
+        return context;
+    }
+
+    public void setContext(ApplicationContext context)
+    {
+        this.context = context;
+    }
+
+    public ServerNotificationManager getNotificationManager()
+    {
+        return notificationManager;
+    }
+
+    public void setNotificationManager(ServerNotificationManager notificationManager)
+    {
+        this.notificationManager = notificationManager;
+    }
+
+    public QueueManager getQueueManager()
+    {
+        return queueManager;
+    }
+
+    public void setQueueManager(QueueManager queueManager)
+    {
+        this.queueManager = queueManager;
+    }
+
+    public UMOSecurityManager getSecurityManager()
+    {
+        return securityManager;
+    }
+
+    public void setSecurityManager(UMOSecurityManager securityManager)
+    {
+        this.securityManager = securityManager;
+    }
+
+    public UMOWorkManager getWorkManager()
+    {
+        return workManager;
+    }
+
+    public void setWorkManager(UMOWorkManager workManager)
+    {
+        this.workManager = workManager;
     }
 }

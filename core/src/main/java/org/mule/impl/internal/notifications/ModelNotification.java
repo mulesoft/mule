@@ -37,9 +37,18 @@ public class ModelNotification extends UMOServerNotification implements Blocking
     public static final int MODEL_DISPOSING = MODEL_EVENT_ACTION_START_RANGE + 9;
     public static final int MODEL_DISPOSED = MODEL_EVENT_ACTION_START_RANGE + 10;
 
-    private static final transient String[] ACTIONS = new String[]{"initialising", "initialised",
-        "initialising listeners", "initialised listeners", "starting", "started", "stopping", "stopped",
-        "disposing", "disposed"};
+    static {
+        registerAction("initialising", MODEL_INITIALISING);
+        registerAction("initialised", MODEL_INITIALISED);
+        registerAction("initialising listener", MODEL_INITIALISING_LISTENERS);
+        registerAction("initialised listener", MODEL_INITIALISED_LISTENERS);
+        registerAction("starting", MODEL_STARTING);
+        registerAction("started", MODEL_STARTED);
+        registerAction("stopping", MODEL_STOPPING);
+        registerAction("stopped", MODEL_STOPPED);
+        registerAction("disposing", MODEL_DISPOSING);
+        registerAction("disposed", MODEL_DISPOSED);
+    }
 
     public ModelNotification(UMOModel model, int action)
     {
@@ -50,15 +59,5 @@ public class ModelNotification extends UMOServerNotification implements Blocking
     protected String getPayloadToString()
     {
         return ((UMOModel) source).getName();
-    }
-
-    protected String getActionName(int action)
-    {
-        int i = action - MODEL_EVENT_ACTION_START_RANGE;
-        if (i - 1 > ACTIONS.length)
-        {
-            return String.valueOf(action);
-        }
-        return ACTIONS[i - 1];
     }
 }

@@ -156,8 +156,8 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
         //If we have Dom4J on the classpath we can print out the generated XML
         //TODO RM*  this relies on Dom4j which is not in core, either we scrap this or do some reflection
         // trickery to print the XML. This is definitely useful for debugging
-        //String xml = new DOMReader().read((Document)result.getNode()).asXML();
-        //System.out.println(xml);
+//        String xml = new DOMReader().read((Document)result.getNode()).asXML();
+//        System.out.println(xml);
         if (logger.isDebugEnabled())
         {
             //logger.debug("Transformed document is:\n" + xml);
@@ -215,6 +215,7 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
         if(i==VALIDATION_DTD)
         {
             setEntityResolver(createEntityResolver());
+
         }
         else
         {

@@ -10,11 +10,6 @@
 
 package org.mule.providers.rmi;
 
-import java.lang.reflect.Method;
-import java.net.InetAddress;
-
-import javax.naming.Context;
-
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.ConnectException;
@@ -26,6 +21,11 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
+
+import java.lang.reflect.Method;
+import java.net.InetAddress;
+
+import javax.naming.Context;
 
 /**
  * TODO
@@ -80,7 +80,7 @@ public class RmiCallbackMessageReceiver extends AbstractMessageReceiver
 
         if (port < 1)
         {
-            port = RmiConnector.DEFAULT_RMI_REGISTRY_PORT;
+            port = RmiConnector.DEFAULT_RMI_muleRegistry_PORT;
         }
 
         try

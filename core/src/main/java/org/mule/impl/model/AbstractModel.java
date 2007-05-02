@@ -149,25 +149,32 @@ public abstract class AbstractModel implements UMOModel
      * 
      * @see org.mule.umo.UMOModel#registerUMO(org.mule.umo.UMODescriptor)
      */
-    public UMOComponent registerComponent(UMODescriptor descriptor) throws UMOException
+    public void registerComponent(UMODescriptor descriptor) throws UMOException
     {
         if (descriptor == null)
         {
             throw new ModelException(new Message(Messages.X_IS_NULL, "UMO Descriptor"));
         }
 
-        if (initialised.get())
+        if(descriptor.getModelName()==null)
         {
-            try 
-            {
-                descriptor.register();
-            }
-            catch (UMOException e)
-            {
-                logger.error("Unable to register descriptor " + 
-                    descriptor.getName() + " with the registry");
-            }
+            descriptor.setModelName(getName());
         }
+        else if(!descriptor.getModelName().equals(getName()))
+        {
+            //TODO
+            throw new ModelException(Message.createStaticMessage("Model name on descriptor: " + descriptor.getName() + "." + descriptor.getModelName() + " doesn't match this model: " + getName()));
+        }
+
+        //TODO this is a bit hacky. The API needs to change I think. Right now you can register a Descriptor on the
+        //model or through the registry
+//        if (RegistryContext.getRegistry().lookupService(descriptor.getName()) == null)
+//        {
+//            RegistryContext.getRegistry().registerService(descriptor);
+//            return;
+//        }
+
+
         // Set the es if one wasn't set in the configuration
         if (descriptor.getExceptionListener() == null)
         {
@@ -179,7 +186,7 @@ public abstract class AbstractModel implements UMOModel
         {
             throw new ModelException(new Message(Messages.DESCRIPTOR_X_ALREADY_EXISTS, descriptor.getName()));
         }
-
+        
         UMOComponent component = (UMOComponent) components.get(descriptor.getName());
 
         if (component == null)
@@ -200,7 +207,6 @@ public abstract class AbstractModel implements UMOModel
         {
             startComponent(descriptor.getName());
         }
-        return component;
     }
 
 
@@ -277,7 +283,7 @@ public abstract class AbstractModel implements UMOModel
 
     /**
      * Returns a valid component for the given Mule name
-     * 
+     *
      * @param muleName the Name of the Mule for which the component is required
      * @return a component for the specified name
      */
@@ -297,7 +303,7 @@ public abstract class AbstractModel implements UMOModel
 
     /**
      * Stops any registered components
-     * 
+     *
      * @throws UMOException if a Component fails tcomponent
      */
     public void stop() throws UMOException
@@ -314,7 +320,7 @@ public abstract class AbstractModel implements UMOModel
 
     /**
      * Starts all registered components
-     * 
+     *
      * @throws UMOException if any of the components fail to start
      */
     public void start() throws UMOException
@@ -345,41 +351,41 @@ public abstract class AbstractModel implements UMOModel
     /**
      * Starts a single Mule Component. This can be useful when stopping and starting
      * some Mule UMOs while letting others continue
-     * 
+     *
      * @param name the name of the Mule UMO to start
      * @throws UMOException if the MuleUMO is not registered or the component failed
-     *             to start
+     *                      to start
      */
     public void startComponent(String name) throws UMOException
     {
-        AbstractComponent component = (AbstractComponent)components.get(name);
+        AbstractComponent component = (AbstractComponent) components.get(name);
         if (component == null)
         {
             throw new ModelException(new Message(Messages.COMPONENT_X_NOT_REGISTERED, name));
         }
         else
         {
-            if(component.isStarted())
+            if (component.isStarted())
             {
                 logger.info("Component is already started: " + component);
             }
             else if (component.getDescriptor().getInitialState().equals(
-                ImmutableMuleDescriptor.INITIAL_STATE_STARTED))
+                    ImmutableMuleDescriptor.INITIAL_STATE_STARTED))
             {
                 component.start();
                 logger.info("Component " + component + " has been started successfully");
             }
             else if (component.getDescriptor().getInitialState().equals(
-                ImmutableMuleDescriptor.INITIAL_STATE_PAUSED))
+                    ImmutableMuleDescriptor.INITIAL_STATE_PAUSED))
             {
                 component.start(true);
                 logger.info("Component " + component
-                            + " has been started and paused (initial state = 'paused')");
+                        + " has been started and paused (initial state = 'paused')");
             }
             else
             {
                 logger.info("Component " + component
-                            + " has not been started (initial state = 'stopped')");
+                        + " has not been started (initial state = 'stopped')");
             }
             logger.info("Mule " + component.toString() + " has been started successfully");
         }
@@ -388,7 +394,7 @@ public abstract class AbstractModel implements UMOModel
     /**
      * Stops a single Mule Component. This can be useful when stopping and starting
      * some Mule UMOs while letting others continue.
-     * 
+     *
      * @param name the name of the Mule UMO to stop
      * @throws UMOException if the MuleUMO is not registered
      */
@@ -413,10 +419,10 @@ public abstract class AbstractModel implements UMOModel
      * order to persist these queued messages you can set the 'recoverableMode'
      * property on the Muleconfiguration to true. this causes all internal queues to
      * store their state.
-     * 
+     *
      * @param name the name of the Mule UMO to stop
      * @throws org.mule.umo.UMOException if the MuleUMO is not registered or the
-     *             component failed to pause.
+     *                                   component failed to pause.
      * @see org.mule.config.MuleConfiguration
      */
     public void pauseComponent(String name) throws UMOException
@@ -437,10 +443,10 @@ public abstract class AbstractModel implements UMOModel
     /**
      * Resumes a single Mule Component that has been paused. If the component is not
      * paused nothing is executed.
-     * 
+     *
      * @param name the name of the Mule UMO to resume
      * @throws org.mule.umo.UMOException if the MuleUMO is not registered or the
-     *             component failed to resume
+     *                                   component failed to resume
      */
     public void resumeComponent(String name) throws UMOException
     {
@@ -491,7 +497,7 @@ public abstract class AbstractModel implements UMOModel
                 component.initialise();
 
                 logger.info("Component " + component.getDescriptor().getName()
-                            + " has been started successfully");
+                        + " has been started successfully");
             }
             initialised.set(true);
             fireNotification(new ModelNotification(this, ModelNotification.MODEL_INITIALISED));
@@ -519,7 +525,7 @@ public abstract class AbstractModel implements UMOModel
      */
     public void deregister() throws DeregistrationException
     {
-        managementContext.getRegistry().deregisterComponent(registryId);
+        getManagementContext().getRegistry().deregisterComponent(registryId);
         registryId = null;
     }
 
@@ -543,10 +549,10 @@ public abstract class AbstractModel implements UMOModel
         this.exceptionListener = exceptionListener;
     }
 
-    public UMODescriptor getDescriptor(String name)
-    {
-        return (UMODescriptor) descriptors.get(name);
-    }
+//    public UMODescriptor getDescriptor(String name)
+//    {
+//        return (UMODescriptor) descriptors.get(name);
+//    }
 
     public UMOComponent getComponent(String name)
     {
@@ -555,7 +561,7 @@ public abstract class AbstractModel implements UMOModel
 
     /**
      * Gets an iterator of all component names registered in the model
-     * 
+     *
      * @return an iterator of all component names
      */
     public Iterator getComponentNames()
@@ -565,7 +571,7 @@ public abstract class AbstractModel implements UMOModel
 
     void fireNotification(UMOServerNotification notification)
     {
-        managementContext.fireNotification(notification);
+        getManagementContext().fireNotification(notification);
     }
 
 

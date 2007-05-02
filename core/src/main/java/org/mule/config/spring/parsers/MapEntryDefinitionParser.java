@@ -32,11 +32,15 @@ import org.w3c.dom.Element;
 public class MapEntryDefinitionParser extends AbstractChildBeanDefinitionParser
 {
     private String propertyName;
+    private String keyName;
+    private String valueName;
 
 
-    public MapEntryDefinitionParser(String mapName)
+    public MapEntryDefinitionParser(String mapName, String keyName, String valueName)
     {
         this.propertyName = mapName;
+        this.keyName = keyName;
+        this.valueName = valueName;
     }
 
     public String getPropertyName(Element e)
@@ -57,8 +61,8 @@ public class MapEntryDefinitionParser extends AbstractChildBeanDefinitionParser
 
     protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
-        final String prefix = element.getAttribute("prefix");
-        final String uri = element.getAttribute("uri");
+        final String prefix = element.getAttribute(keyName);
+        final String uri = element.getAttribute(valueName);
 
         builder.setSource(new MapEntryDefinitionParser.KeyValuePair(prefix, uri));
         postProcess(builder, element);

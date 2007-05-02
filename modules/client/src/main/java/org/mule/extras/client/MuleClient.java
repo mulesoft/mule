@@ -18,7 +18,8 @@ import org.mule.config.MuleProperties;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.impl.ManagementContext;
+import org.mule.config.spring.RegistryFacade;
+import org.mule.config.spring.TransientRegistry;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
@@ -225,18 +226,19 @@ public class MuleClient implements Disposable
                 logger.info("There is already a managementContext locally available to this client, no need to create a new one");
             }
         }
+        else if(RegistryContext.getRegistry()!=null)
+        {
+            managementContext = RegistryContext.getRegistry().getManagementContext();
+        }
         else
         {
             if (logger.isInfoEnabled())
             {
                 logger.info("There is no managementContext instance locally available for this client, creating a new Manager");
             }
-            managementContext = new ManagementContext();
-            if(RegistryContext.getRegistry()!=null)
-            {
-                managementContext.setRegistry(RegistryContext.getRegistry());
-            }
+            RegistryFacade registry = TransientRegistry.createNew();
 
+            managementContext = registry.getManagementContext();
         }
 
         asyncExecutor = managementContext.getWorkManager();
@@ -1081,12 +1083,12 @@ public class MuleClient implements Disposable
 
     public void setProperty(Object key, Object value)
     {
-       managementContext.getRegistry().setProperty(key, value);
+       managementContext.getRegistry().registerProperty(key, value);
     }
 
     public Object getProperty(Object key)
     {
-        return managementContext.getRegistry().getProperty(key);
+        return managementContext.getRegistry().lookupProperty(key);
     }
 
     public MuleConfiguration getConfiguration()

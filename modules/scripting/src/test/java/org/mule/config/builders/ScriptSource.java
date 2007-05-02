@@ -56,7 +56,7 @@ public class ScriptSource
 managementContext.setId("GroovyScriptTestCase");
 
 //set global properties
-managementContext.getRegistry().setProperty("doCompression", "true");
+managementContext.getRegistry().registerProperty("doCompression", "true");
 //disable the admin agent
 //manager.getConfiguration().setServerUrl("");
 
@@ -82,11 +82,6 @@ c.setName("dummyConnector");
 c.setExceptionListener(new TestExceptionStrategy());
 managementContext.getRegistry().registerConnector(c);
 
-//Endpoint identifiers
-//manager.registerEndpointIdentifier("AppleQueue", "test://apple.queue");
-//manager.registerEndpointIdentifier("Banana_Queue", "test://banana.queue");
-//manager.registerEndpointIdentifier("Test Queue", "test://test.queue");
-
 //Register transformers
 TestCompressionTransformer t = new TestCompressionTransformer();
 t.setReturnClass(String.class);
@@ -102,7 +97,6 @@ Map ns = new HashMap();
 ns.put("foo", "http://foo.com");
 filter.setNamespaces(ns);
 builder.registerEndpoint( "test://fruitBowlPublishQ", "fruitBowlEndpoint", false, null, filter);
-//builder.registerEndpoint("Test Queue", "waterMelonEndpoint", false);
 builder.registerEndpoint("test://AppleQueue", "appleInEndpoint", true);
 builder.registerEndpoint("test://AppleResponseQueue", "appleResponseEndpoint", false);
 builder.registerEndpoint("test://apple.queue", "AppleQueue", false);
@@ -141,7 +135,7 @@ d.setExceptionListener(dces);
 //Create the inbound router
 UMOInboundRouterCollection inRouter = new InboundRouterCollection();
 inRouter.setCatchAllStrategy(new ForwardingCatchAllStrategy());
-inRouter.getCatchAllStrategy().setEndpoint(new MuleEndpoint("test://catch.all", false));
+inRouter.getCatchAllStrategy().setEndpoint(new MuleEndpoint("test2://catch.all", false));
 UMOEndpoint ep2 = builder.createEndpoint("test://orange/", "Orange", true, "TestCompressionTransformer");
 ep2.setResponseTransformer(managementContext.getRegistry().lookupTransformer("TestCompressionTransformer"));
 inRouter.addEndpoint(ep2);
@@ -178,7 +172,7 @@ d.setResponseRouter(responseRouter);
 
 //properties
 Map cprops = new HashMap();
-cprops.put("orange", new Orange());
+//cprops.put("orange", new Orange());
 cprops.put("brand", "Juicy Baby!");
 cprops.put("segments", "9");
 cprops.put("radius", "4.21");
@@ -198,7 +192,9 @@ nested3.add("prop6");
 cprops.put("arrayProperties", nested3);
 d.setProperties(cprops);
 
+d.setModelName("main");
+
 //register components
-managementContext.getRegistry().lookupModel("main").registerComponent(d);
+managementContext.getRegistry().registerService(d);
         }
 }

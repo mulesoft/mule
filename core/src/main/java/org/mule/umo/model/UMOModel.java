@@ -84,7 +84,7 @@ public interface UMOModel extends Lifecycle, Initialisable, Registerable, Manage
      * 
      * @param descriptor the <code>UMODescriptor</code> to register
      */
-    UMOComponent registerComponent(UMODescriptor descriptor) throws UMOException;
+    void registerComponent(UMODescriptor descriptor) throws UMOException;
 
     /**
      * Unregisters a component From the model
@@ -176,7 +176,7 @@ public interface UMOModel extends Lifecycle, Initialisable, Registerable, Manage
      *         component registered by that name
      * @see UMODescriptor
      */
-    UMODescriptor getDescriptor(String name);
+    //UMODescriptor getDescriptor(String name);
 
     /**
      * Returns the UMOComponent object for the given component name

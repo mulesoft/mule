@@ -11,6 +11,18 @@
     <xsd:import namespace="http://www.springframework.org/schema/beans"
                 schemaLocation="http://www.springframework.org/schema/beans"/>
 
+    <xsd:element name="environment-properties">
+
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="spring:mapType">
+                    <!--<xsd:attribute name="map-class" default="java.util.HashMap"/>-->
+                </xsd:extension>
+            </xsd:complexContent>
+           
+        </xsd:complexType>
+    </xsd:element>
+
     <xsd:element name="endpoint" type="endpointType"/>
 
     <xsd:element name="model-seda" type="sedaModelType"/>

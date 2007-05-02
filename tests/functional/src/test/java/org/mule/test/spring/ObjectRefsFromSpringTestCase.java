@@ -10,13 +10,13 @@
 
 package org.mule.test.spring;
 
-import org.mule.tck.FunctionalTestCase;
-import org.mule.tck.testmodels.mule.TestCompressionTransformer;
-import org.mule.tck.testmodels.mule.TestExceptionStrategy;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.providers.SimpleRetryConnectionStrategy;
+import org.mule.config.ConfigurationBuilder;
+import org.mule.config.ExceptionHelper;
+import org.mule.config.builders.MuleXmlConfigurationBuilder;
+import org.mule.config.spring.LegacyXmlException;
+import org.mule.tck.AbstractMuleTestCase;
 
-public class ObjectRefsFromSpringTestCase extends FunctionalTestCase
+public class ObjectRefsFromSpringTestCase extends AbstractMuleTestCase
 {
 
     protected String getConfigResources()
@@ -24,18 +24,32 @@ public class ObjectRefsFromSpringTestCase extends FunctionalTestCase
         return "org/mule/test/spring/test-refs-from-spring.xml";
     }
 
+
     public void testObjectCreation() throws Exception
     {
-        UMOEndpoint ep = managementContext.getRegistry().lookupEndpoint("foo");
-        assertNotNull(ep);
-        assertEquals("testConnector", ep.getConnector().getName());
-        assertTrue(ep.getConnectionStrategy() instanceof SimpleRetryConnectionStrategy);
-        assertTrue(ep.getConnector().getExceptionListener() instanceof TestExceptionStrategy);
+        try
+        {
+            ConfigurationBuilder cb = new MuleXmlConfigurationBuilder();
+            cb.configure(getConfigResources());
+            fail("@ref attributes no longer supported in Mule legacy Xml");
+        }
+        catch (Exception e)
+        {
+            assertTrue(ExceptionHelper.getRootException(e) instanceof LegacyXmlException);
+            LegacyXmlException ex = (LegacyXmlException) ExceptionHelper.getRootException(e);
+            assertEquals(1, ex.getErrors().size());
+        }
 
-        assertNotNull(ep.getTransformer());
-        assertEquals("testTransformer", ep.getTransformer().getName());
-        assertTrue(ep.getTransformer() instanceof TestCompressionTransformer);
-        assertEquals(12, ((TestCompressionTransformer)ep.getTransformer()).getBeanProperty2());
+//        UMOEndpoint ep = managementContext.getRegistry().lookupEndpoint("foo");
+//        assertNotNull(ep);
+//        assertEquals("testConnector", ep.getConnector().getName());
+//        assertTrue(ep.getConnectionStrategy() instanceof SimpleRetryConnectionStrategy);
+//        assertTrue(ep.getConnector().getExceptionListener() instanceof TestExceptionStrategy);
+//
+//        assertNotNull(ep.getTransformer());
+//        assertEquals("testTransformer", ep.getTransformer().getName());
+//        assertTrue(ep.getTransformer() instanceof TestCompressionTransformer);
+//        assertEquals(12, ((TestCompressionTransformer) ep.getTransformer()).getBeanProperty2());
 
     }
 }

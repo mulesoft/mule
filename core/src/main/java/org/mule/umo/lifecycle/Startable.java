@@ -21,5 +21,7 @@ import org.mule.umo.UMOException;
  */
 public interface Startable
 {
+    static final String PHASE_NAME = "start";
+
     void start() throws UMOException;
 }

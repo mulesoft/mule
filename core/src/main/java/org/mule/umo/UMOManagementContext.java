@@ -12,18 +12,18 @@ package org.mule.umo;
 import org.mule.config.spring.RegistryFacade;
 import org.mule.impl.Directories;
 import org.mule.impl.internal.notifications.NotificationException;
+import org.mule.impl.internal.notifications.ServerNotificationManager;
 import org.mule.management.stats.AllStatistics;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.Lifecycle;
 import org.mule.umo.lifecycle.Registerable;
+import org.mule.umo.lifecycle.UMOLifecycleManager;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.manager.UMOServerNotificationListener;
 import org.mule.umo.manager.UMOWorkManager;
 import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.store.UMOStore;
 import org.mule.util.queue.QueueManager;
-
-import java.util.Map;
 
 import javax.transaction.TransactionManager;
 
@@ -32,7 +32,6 @@ import javax.transaction.TransactionManager;
  */
 public interface UMOManagementContext extends Lifecycle, Registerable
 {
-
     //TODO LM: Replce with Real Registry
     RegistryFacade getRegistry();
 
@@ -65,15 +64,11 @@ public interface UMOManagementContext extends Lifecycle, Registerable
      */
     TransactionManager getTransactionManager();
 
-    /**
-     * Gets all properties associated with the UMOManager
-     *
-     * @return a map of properties on the Manager
-     */
-    Map getProperties();
 
-    void addProperties(Map props);
+    ServerNotificationManager getNotificationManager();
 
+    void setNotificationManager(ServerNotificationManager notificationManager);
+    
     /**
      * Determines if the server has been started
      *
@@ -94,6 +89,10 @@ public interface UMOManagementContext extends Lifecycle, Registerable
      * @return true if the server is beening initialised
      */
     boolean isInitialising();
+
+    boolean isDisposed();
+
+    boolean isDisposing();
 
     /**
      * Returns the long date when the server was started
@@ -240,4 +239,7 @@ public interface UMOManagementContext extends Lifecycle, Registerable
     public void setStatistics(AllStatistics stats);
 
     public void initialise() throws UMOException;
+
+    UMOLifecycleManager getLifecycleManager();
+
 }

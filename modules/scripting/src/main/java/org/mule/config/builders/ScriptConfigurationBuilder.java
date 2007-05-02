@@ -10,6 +10,7 @@
 
 package org.mule.config.builders;
 
+import org.mule.RegistryContext;
 import org.mule.components.script.jsr223.Scriptable;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.ConfigurationException;
@@ -17,6 +18,7 @@ import org.mule.config.MuleProperties;
 import org.mule.config.ReaderResource;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.config.spring.TransientRegistry;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.util.FileUtils;
@@ -58,6 +60,17 @@ public class ScriptConfigurationBuilder extends Scriptable implements Configurat
 
     public ScriptConfigurationBuilder(String scriptEngineName) throws UMOException
     {
+        this(scriptEngineName, true);
+    }
+
+    public ScriptConfigurationBuilder(String scriptEngineName, boolean createDefaultRegistry) throws UMOException
+    {
+        //Createa Registry by default if we do not have one
+        if(RegistryContext.getRegistry()==null && createDefaultRegistry)
+        {
+            TransientRegistry registry = TransientRegistry.createNew();
+            RegistryContext.setRegistry(registry);
+        }
         builder = new QuickConfigurationBuilder();
         managementContext = builder.getManagementContext();
         this.setScriptEngineName(scriptEngineName);
@@ -65,7 +78,16 @@ public class ScriptConfigurationBuilder extends Scriptable implements Configurat
 
     public UMOManagementContext configure(String configResources) throws ConfigurationException
     {
-        return configure(configResources, FileUtils.DEFAULT_ENCODING);
+        try
+        {
+            UMOManagementContext context = configure(configResources, FileUtils.DEFAULT_ENCODING);
+            context.start();
+            return context;
+        }
+        catch (UMOException e)
+        {
+            throw new ConfigurationException(e);
+        }
     }
 
     /**
@@ -112,7 +134,7 @@ public class ScriptConfigurationBuilder extends Scriptable implements Configurat
     {
         if (startupProperties != null)
         {
-            managementContext.getRegistry().addProperties(startupProperties);
+            managementContext.getRegistry().registerProperties(startupProperties);
         }
 
         try

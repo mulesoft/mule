@@ -11,7 +11,7 @@
 package org.mule.umo.lifecycle;
 
 /**
- * <code>Lifecycle</code> adds lifecycle methods <code>start</code>,
+ * <code>LifecyclePhase</code> adds lifecycle methods <code>start</code>,
  * <code>stop</code> and <code>dispose</code>.
  */
 public interface Lifecycle extends Startable, Stoppable, Disposable

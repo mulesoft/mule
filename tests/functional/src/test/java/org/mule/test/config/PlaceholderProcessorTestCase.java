@@ -18,8 +18,8 @@ public class PlaceholderProcessorTestCase extends AbstractMuleTestCase
 
     public void testSecondPropNameLongerThanValue() throws Exception
     {
-       managementContext.getRegistry().setProperty("longerPropertyName", "shorterValue");
-       managementContext.getRegistry().setProperty("anotherLongProperty", "anotherValue");
+       managementContext.getRegistry().registerProperty("longerPropertyName", "shorterValue");
+       managementContext.getRegistry().registerProperty("anotherLongProperty", "anotherValue");
         PlaceholderProcessor processor = new PlaceholderProcessor();
         String result = processor.processValue("${longerPropertyName}/${anotherLongProperty}");
         assertEquals("Wrong property substitution.", "shorterValue/anotherValue", result);
@@ -27,8 +27,8 @@ public class PlaceholderProcessorTestCase extends AbstractMuleTestCase
 
     public void testSecondPropNameShorterThanValue() throws Exception
     {
-       managementContext.getRegistry().setProperty("longerPropertyName", "shorterValue");
-       managementContext.getRegistry().setProperty("shortProperty", "anotherVeryLongValue");
+       managementContext.getRegistry().registerProperty("longerPropertyName", "shorterValue");
+       managementContext.getRegistry().registerProperty("shortProperty", "anotherVeryLongValue");
         PlaceholderProcessor processor = new PlaceholderProcessor();
         String result = processor.processValue("${longerPropertyName}/${shortProperty}");
         assertEquals("Wrong property substitution.", "shorterValue/anotherVeryLongValue", result);

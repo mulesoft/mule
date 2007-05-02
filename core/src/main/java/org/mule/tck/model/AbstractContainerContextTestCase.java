@@ -71,7 +71,7 @@ public abstract class AbstractContainerContextTestCase extends AbstractMuleTestC
         assertNotNull(container);
         container.initialise();
         UMODescriptor descriptor = getTestDescriptor("fruit Bowl", "org.mule.tck.testmodels.fruit.FruitBowl");
-        descriptor.setContainer("plexus");
+       // descriptor.setContainer("plexus");
         descriptor.initialise();
         FruitBowl fruitBowl = (FruitBowl) container.getComponent(descriptor.getImplementation());
 

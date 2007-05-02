@@ -29,11 +29,11 @@
     </xsd:complexType>
 
     <xsd:element name="jmx-mx4j-adapter">
-        <xsd:complexType  mixed="true">
-                    <xsd:attribute name="jmxAdaptorUrl" type="xsd:string"/>
-                    <xsd:attribute name="adaptor" type="xsd:string"/>
-                    <xsd:attribute name="mBeanServer" type="xsd:string"/>
-                    <xsd:attribute name="name" type="xsd:string" use="required"/>
+        <xsd:complexType mixed="true">
+            <xsd:attribute name="jmxAdaptorUrl" type="xsd:string"/>
+            <xsd:attribute name="adaptor" type="xsd:string"/>
+            <xsd:attribute name="mBeanServer" type="xsd:string"/>
+            <xsd:attribute name="name" type="xsd:string" use="required"/>
         </xsd:complexType>
     </xsd:element>
 
@@ -45,42 +45,58 @@
 
     <xsd:element name="jmx-default-config">
         <xsd:complexType mixed="true">
-                    <xsd:attribute name="registerMx4jAdapter" type="xsd:boolean"/>
-                    <xsd:attribute name="name" type="xsd:string" use="required"/>
+            <xsd:attribute name="registerMx4jAdapter" type="xsd:boolean"/>
+            <xsd:attribute name="name" type="xsd:string" use="required"/>
         </xsd:complexType>
     </xsd:element>
 
     <xsd:element name="jmx-notifications">
         <xsd:complexType mixed="true">
-                    <xsd:attribute name="registerdefaultListner" type="xsd:boolean"/>
-                    <xsd:attribute name="name" type="xsd:string" use="required"/>
+            <xsd:attribute name="registerdefaultListner" type="xsd:boolean"/>
+            <xsd:attribute name="name" type="xsd:string" use="required"/>
         </xsd:complexType>
     </xsd:element>
 
 
     <xsd:element name="log4j-notifications">
         <xsd:complexType mixed="true">
-                    <xsd:attribute name="logName" type="xsd:string"/>
-                    <xsd:attribute name="logConfigFile" type="xsd:string"/>
-                    <xsd:attribute name="name" type="xsd:string" use="required"/>
+            <xsd:attribute name="logName" type="xsd:string"/>
+            <xsd:attribute name="logConfigFile" type="xsd:string"/>
+            <xsd:attribute name="name" type="xsd:string" use="required"/>
         </xsd:complexType>
     </xsd:element>
 
     <xsd:element name="chainsaw-notifications">
         <xsd:complexType mixed="true">
-                    <xsd:choice minOccurs="0" maxOccurs="1">
-                        <xsd:element name="level-mappings" type="spring:mapType"/>
-                    </xsd:choice>
-                    <xsd:attribute name="chainsawHost" type="xsd:string" use="required"/>
-                    <xsd:attribute name="chainsawPort" type="xsd:int" use="required"/>
-                    <xsd:attribute name="name" type="xsd:string" use="required"/>
+            <xsd:choice minOccurs="0" maxOccurs="1">
+                <xsd:element name="level-mapping">
+                    <xsd:complexType>
+                        <xsd:attribute name="severity" default="INFO">
+                            <xsd:simpleType>
+                                <xsd:restriction base="xsd:NMTOKEN">
+                                    <xsd:enumeration value="DEBUG"/>
+                                    <xsd:enumeration value="INFO"/>
+                                    <xsd:enumeration value="WARN"/>
+                                    <xsd:enumeration value="ERROR"/>
+                                    <xsd:enumeration value="FATAL"/>
+                                </xsd:restriction>
+                            </xsd:simpleType>
+                        </xsd:attribute>
+                        <xsd:attribute name="eventId" type="xsd:string" use="required"/>
+                    </xsd:complexType>
+
+                </xsd:element>
+            </xsd:choice>
+            <xsd:attribute name="chainsawHost" type="xsd:string" use="required"/>
+            <xsd:attribute name="chainsawPort" type="xsd:int" use="required"/>
+            <xsd:attribute name="name" type="xsd:string" use="required"/>
         </xsd:complexType>
     </xsd:element>
 
     <xsd:element name="publish-notifications">
         <xsd:complexType mixed="true">
-                    <xsd:attribute name="endpointAddress" type="xsd:string" use="required"/>
-                    <xsd:attribute name="name" type="xsd:string" use="required"/>
+            <xsd:attribute name="endpointAddress" type="xsd:string" use="required"/>
+            <xsd:attribute name="name" type="xsd:string" use="required"/>
         </xsd:complexType>
     </xsd:element>
 
@@ -88,9 +104,9 @@
     <!-- Rmi Agent -->
     <xsd:element name="rmi-server">
         <xsd:complexType mixed="true">
-                    <xsd:attribute name="serverUri" type="xsd:string"/>
-                    <xsd:attribute name="createRegistry" type="xsd:boolean"/>
-                    <xsd:attribute name="name" type="xsd:string" use="required"/>
+            <xsd:attribute name="serverUri" type="xsd:string"/>
+            <xsd:attribute name="createRegistry" type="xsd:boolean"/>
+            <xsd:attribute name="name" type="xsd:string" use="required"/>
         </xsd:complexType>
     </xsd:element>
 

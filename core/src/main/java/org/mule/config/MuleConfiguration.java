@@ -548,7 +548,7 @@ public class MuleConfiguration
     {
         if(RegistryContext.getRegistry()!=null)
         {
-            RegistryContext.getRegistry().setProperty(name, value);
+            RegistryContext.getRegistry().registerProperty(name, value);
         }
     }
 

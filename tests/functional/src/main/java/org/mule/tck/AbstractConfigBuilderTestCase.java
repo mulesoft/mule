@@ -15,7 +15,6 @@ import org.mule.RegistryContext;
 import org.mule.config.ThreadingProfile;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.MuleDescriptor;
-import org.mule.impl.container.ContainerKeyPair;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.service.TransportFactory;
@@ -92,13 +91,13 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertNotNull(endpoint);
         assertEquals("test.queue", endpoint.getEndpointURI().getAddress());
 
-        UMODescriptor descriptor = managementContext.getRegistry().lookupModel("main").getDescriptor("appleComponent2");
+        UMODescriptor descriptor = managementContext.getRegistry().lookupService("appleComponent2");
         assertNotNull(descriptor);
     }
 
     public void testExceptionStrategy2()
     {
-        UMODescriptor descriptor = managementContext.getRegistry().lookupModel("main").getDescriptor("appleComponent");
+        UMODescriptor descriptor = managementContext.getRegistry().lookupService("appleComponent");
         assertNotNull(descriptor.getExceptionListener());
         assertEquals(DefaultExceptionStrategy.class, descriptor.getExceptionListener().getClass());
     }
@@ -125,7 +124,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     public void testOutboundRouterConfig2()
     {
         // test outbound message router
-        UMODescriptor descriptor = managementContext.getRegistry().lookupModel("main").getDescriptor("appleComponent");
+        UMODescriptor descriptor = managementContext.getRegistry().lookupService("appleComponent");
         assertNotNull(descriptor.getOutboundRouter());
         UMOOutboundRouterCollection router = descriptor.getOutboundRouter();
         assertNotNull(router.getCatchAllStrategy());
@@ -163,7 +162,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
 
     public void testInboundRouterConfig2()
     {
-        UMODescriptor descriptor = managementContext.getRegistry().lookupModel("main").getDescriptor("appleComponent");
+        UMODescriptor descriptor = managementContext.getRegistry().lookupService("appleComponent");
         assertNotNull(descriptor.getInboundRouter());
         UMOInboundRouterCollection messageRouter = descriptor.getInboundRouter();
         assertNotNull(messageRouter.getCatchAllStrategy());
@@ -209,7 +208,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertEquals(ThreadingProfile.DEFAULT_POOL_EXHAUST_ACTION, tp.getPoolExhaustedAction());
         assertEquals(ThreadingProfile.DEFAULT_MAX_THREAD_TTL, tp.getThreadTTL());
 
-        MuleDescriptor descriptor = (MuleDescriptor)managementContext.getRegistry().lookupModel("main").getDescriptor(
+        MuleDescriptor descriptor = (MuleDescriptor)managementContext.getRegistry().lookupService(
             "appleComponent2");
         tp = descriptor.getThreadingProfile();
         assertEquals(6, tp.getMaxBufferSize());
@@ -231,7 +230,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
 //        assertTrue(pp.getPoolFactory() instanceof CommonsPoolFactory);
 
         // test override
-        MuleDescriptor descriptor = (MuleDescriptor)managementContext.getRegistry().lookupModel("main").getDescriptor(
+        MuleDescriptor descriptor = (MuleDescriptor)managementContext.getRegistry().lookupService(
             "appleComponent2");
 //        PoolingProfile pp = descriptor.getPoolingProfile();
 //
@@ -251,7 +250,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
 //        assertTrue(qp.isPersistent());
 
         // test inherit
-        MuleDescriptor descriptor = (MuleDescriptor)managementContext.getRegistry().lookupModel("main").getDescriptor(
+        MuleDescriptor descriptor = (MuleDescriptor)managementContext.getRegistry().lookupService(
             "orangeComponent");
 //        QueueProfile qp = descriptor.getQueueProfile();
 //        assertEquals(100, qp.getMaxOutstandingMessages());
@@ -267,7 +266,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     public void testEndpointProperties() throws Exception
     {
         // test transaction config
-        UMODescriptor descriptor = managementContext.getRegistry().lookupModel("main").getDescriptor("appleComponent2");
+        UMODescriptor descriptor = managementContext.getRegistry().lookupService("appleComponent2");
         MuleEndpoint inEndpoint = (MuleEndpoint)descriptor.getInboundRouter().getEndpoint(
             "transactedInboundEndpoint");
         assertNotNull(inEndpoint);
@@ -279,7 +278,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     public void testTransactionConfig() throws Exception
     {
         // test transaction config
-        UMODescriptor descriptor = managementContext.getRegistry().lookupModel("main").getDescriptor("appleComponent2");
+        UMODescriptor descriptor = managementContext.getRegistry().lookupService("appleComponent2");
         UMOEndpoint inEndpoint = descriptor.getInboundRouter().getEndpoint("transactedInboundEndpoint");
         assertNotNull(inEndpoint);
         assertEquals(1, descriptor.getOutboundRouter().getRouters().size());
@@ -297,7 +296,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
 
     public void testEnvironmentProperties()
     {
-        Map props = managementContext.getRegistry().getProperties();
+        Map props = managementContext.getRegistry().lookupProperties();
         assertNotNull(props);
         assertNotNull(props.get("doCompression"));
         assertEquals("true", props.get("doCompression"));
@@ -308,16 +307,16 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
 
     public void testObjectReferences() throws UMOException
     {
-        MuleDescriptor descriptor = (MuleDescriptor)managementContext.getRegistry().lookupModel("main").getDescriptor(
+        MuleDescriptor descriptor = (MuleDescriptor)managementContext.getRegistry().lookupService(
             "orangeComponent");
-        assertEquals(new ContainerKeyPair(null, "orange"), descriptor.getImplementation());
+        assertEquals("orange", descriptor.getImplementation());
         assertEquals(Orange.class, descriptor.getImplementationClass());
     }
 
     public void testNestedRouterProxyCreation() throws ObjectNotFoundException
     {
         //Test that the proxy object was created and set on the service object
-        Orange orange = (Orange)managementContext.getRegistry().getContainerContext().getComponent("orange");
+        Orange orange = (Orange)managementContext.getRegistry().lookupObject("orange", Orange.class);
         assertNotNull(orange);
         assertNotNull(orange.getCleaner());
     }

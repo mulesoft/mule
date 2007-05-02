@@ -144,12 +144,6 @@ public class EndpointDefinitionParser extends AbstractChildBeanDefinitionParser
     }
 
 
-    //@Override
-    protected String getInitMethodName()
-    {
-        return "initialise";
-    }
-
     protected Class getBeanClass(Element element)
     {
         return MuleEndpoint.class;

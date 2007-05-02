@@ -14,8 +14,7 @@ import org.mule.persistence.Persistable;
 import org.mule.umo.manager.UMOServerNotification;
 
 /**
- * @author 
- * @version $Revision: $
+ * TODO
  */
 public class PersistenceNotification extends UMOServerNotification 
 {
@@ -30,10 +29,5 @@ public class PersistenceNotification extends UMOServerNotification
     protected boolean isReady()
     {
         return (action == PERSISTABLE_READY ? true : false);
-    }
-
-    protected String getActionName(int action)
-    {
-        return (action == PERSISTABLE_READY ? "ready" : "not ready");
     }
 }

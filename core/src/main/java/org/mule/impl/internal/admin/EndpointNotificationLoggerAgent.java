@@ -21,6 +21,7 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOServerNotification;
 
@@ -34,7 +35,7 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
 {
 
     private String endpointAddress;
-    private UMOEndpoint logEndpoint = null;
+    private UMOImmutableEndpoint logEndpoint = null;
     private UMOSession session;
 
 

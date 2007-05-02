@@ -20,6 +20,6 @@ public class SpringEventsWithEmbeddedManagerTestCase extends SpringEventsTestCas
 
     public void testCorrectManagerLoaded()
     {
-        assertNotNull(managementContext.getRegistry().getProperty("embeddedManager"));
+        assertNotNull(managementContext.getRegistry().lookupProperty("embeddedManager"));
     }
 }

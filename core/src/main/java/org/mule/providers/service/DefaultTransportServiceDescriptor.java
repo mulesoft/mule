@@ -79,10 +79,17 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
     {
         super(service, props);
 
-        context = new StaticApplicationContext(appContext);
+        if(appContext!=null)
+        {
+            context = new StaticApplicationContext(appContext);
 
-        AbstractBeanFactory beanFactory = (AbstractBeanFactory)appContext.getAutowireCapableBeanFactory();
-        context.getBeanFactory().copyConfigurationFrom(beanFactory);
+            AbstractBeanFactory beanFactory = (AbstractBeanFactory)appContext.getAutowireCapableBeanFactory();
+            context.getBeanFactory().copyConfigurationFrom(beanFactory);
+        }
+        else
+        {
+            context = new StaticApplicationContext();
+        }
 
         messageReceiver = props.getProperty(MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS);
         messageAdapter = props.getProperty(MuleProperties.CONNECTOR_MESSAGE_ADAPTER);

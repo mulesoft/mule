@@ -108,7 +108,7 @@ public abstract class AbstractServiceDescriptor implements ServiceDescriptor
         // //@Override
         public int hashCode()
         {
-            return 29 * (overrides != null ? overrides.hashCode() : 0) + service.hashCode();
+            return 29 * (overrides != null ? overrides.hashCode() : 0) + (service!=null ? service.hashCode(): 0);
         }
     }
 }

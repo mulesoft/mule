@@ -129,6 +129,14 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
     {
         while (!disposing.get())
         {
+            try
+            {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException e)
+            {
+                break;
+            }
             if (connector.isStarted() && !disposing.get())
             {
                 Socket socket = null;

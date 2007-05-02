@@ -11,21 +11,15 @@
 package org.mule;
 
 import org.mule.config.ConfigurationBuilder;
-import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleShutdownHook;
-import org.mule.umo.UMOException;
 import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
-import org.mule.util.StringMessageUtils;
 import org.mule.util.SystemUtils;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -109,7 +103,7 @@ public class MuleServer implements Runnable
     public static void main(String[] args) throws Exception
     {
         MuleServer server = new MuleServer(args);
-        muleShutdownHook = new MuleShutdownHook(server);
+        muleShutdownHook = new MuleShutdownHook(logger);
         server.start(false, true);
 
     }
@@ -231,6 +225,7 @@ public class MuleServer implements Runnable
         try
         {
             initialize();
+
         }
         catch (Throwable e)
         {
@@ -326,28 +321,30 @@ public class MuleServer implements Runnable
      */
     public void shutdown(Throwable e)
     {
-        Message msg = new Message(Messages.FATAL_ERROR_WHILE_RUNNING);
-        UMOException muleException = ExceptionHelper.getRootMuleException(e);
-        if (muleException != null)
-        {
-            logger.fatal(muleException.getDetailedMessage());
-        }
-        else
-        {
-            logger.fatal(msg.toString() + " " + e.getMessage(), e);
-        }
-        List msgs = new ArrayList();
-        msgs.add(msg.getMessage());
-        Throwable root = ExceptionHelper.getRootException(e);
-        msgs.add(root.getMessage() + " (" + root.getClass().getName() + ")");
-        msgs.add(" ");
-        msgs.add(new Message(Messages.FATAL_ERROR_SHUTDOWN));
-        //TODO msgs.add(new Message(Messages.SERVER_STARTED_AT_X, new Date(managementContext.getStartDate())));
-        msgs.add(new Message(Messages.SERVER_SHUTDOWN_AT_X, new Date().toString()));
+        muleShutdownHook.setException(e);
 
-        shutdownMessage = StringMessageUtils.getBoilerPlate(msgs, '*', 80);
-        logger.fatal(shutdownMessage);
-        System.exit(0);
+//        Message msg = new Message(Messages.FATAL_ERROR_WHILE_RUNNING);
+//        UMOException muleException = ExceptionHelper.getRootMuleException(e);
+//        if (muleException != null)
+//        {
+//            logger.fatal(muleException.getDetailedMessage());
+//        }
+//        else
+//        {
+//            logger.fatal(msg.toString() + " " + e.getMessage(), e);
+//        }
+//        List msgs = new ArrayList();
+//        msgs.add(msg.getMessage());
+//        Throwable root = ExceptionHelper.getRootException(e);
+//        msgs.add(root.getMessage() + " (" + root.getClass().getName() + ")");
+//        msgs.add(" ");
+//        msgs.add(new Message(Messages.FATAL_ERROR_SHUTDOWN));
+//        //msgs.add(new Message(Messages.SERVER_STARTED_AT_X, new Date(RegistryContext.getRegistry().getManagementContext().getStartDate())));
+//        msgs.add(new Message(Messages.SERVER_SHUTDOWN_AT_X, new Date().toString()));
+//
+//        shutdownMessage = StringMessageUtils.getBoilerPlate(msgs, '*', 80);
+//        logger.fatal(shutdownMessage);
+          System.exit(-1);
     }
 
     /**
@@ -355,15 +352,21 @@ public class MuleServer implements Runnable
      */
     public void shutdown()
     {
-        logger.info("Mule server shutting down due to normal shutdown request");
-        List msgs = new ArrayList();
-        msgs.add(new Message(Messages.NORMAL_SHUTDOWN).getMessage());
-        //TODO msgs.add(new Message(Messages.SERVER_STARTED_AT_X, new Date(managementContext.getStartDate())).getMessage());
-        msgs.add(new Message(Messages.SERVER_SHUTDOWN_AT_X, new Date().toString()).getMessage());
-        shutdownMessage = StringMessageUtils.getBoilerPlate(msgs, '*', 80);
+//        logger.info("Mule server shutting down due to normal shutdown request");
+//        List msgs = new ArrayList();
+//        msgs.add(new Message(Messages.NORMAL_SHUTDOWN).getMessage());
+//        //TODO msgs.add(new Message(Messages.SERVER_STARTED_AT_X, new Date(managementContext.getStartDate())).getMessage());
+//        msgs.add(new Message(Messages.SERVER_SHUTDOWN_AT_X, new Date().toString()).getMessage());
+//        shutdownMessage = StringMessageUtils.getBoilerPlate(msgs, '*', 80);
+//        if(shutdownVm)
+//        {
+            System.exit(0);
+       // }
+    }
 
-        System.exit(0);
-
+    public Log getLogger()
+    {
+        return logger;
     }
 
     public void registerShutdownHook(MuleShutdownHook muleShutdownHook)

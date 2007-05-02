@@ -31,8 +31,6 @@ public class JmxAgentDefinitionParser extends AbstractMuleSingleBeanDefinitionPa
 
     public JmxAgentDefinitionParser()
     {
-        this.initMethod = "initialise";
-        this.destroyMethod = "dispose";
     }
 
     protected Class getBeanClass(Element element) {

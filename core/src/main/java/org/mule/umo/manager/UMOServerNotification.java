@@ -15,6 +15,9 @@ import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.util.ClassUtils;
 
 import java.util.EventObject;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * <code>UMOServerNotification</code> is an event triggered by something happening
@@ -50,6 +53,7 @@ public abstract class UMOServerNotification extends EventObject
     protected long timestamp;
 
     protected int action = NULL_ACTION;
+    protected static Map actions = new HashMap();
 
     /**
      * The resourceIdentifier is used when firing inbound server notifications such
@@ -66,7 +70,7 @@ public abstract class UMOServerNotification extends EventObject
         this.action = action;
         if (RegistryContext.getRegistry()!=null)
         {
-            serverId = RegistryContext.getRegistry().getConfiguration().getId();
+            serverId = message.toString();
         }
         timestamp = System.currentTimeMillis();
     }
@@ -76,9 +80,16 @@ public abstract class UMOServerNotification extends EventObject
         super((message == null ? NULL_MESSAGE : message));
         this.action = action;
         this.resourceIdentifier = resourceIdentifier;
-        serverId = RegistryContext.getRegistry().getConfiguration().getId();
+        serverId = message.toString();
         timestamp = System.currentTimeMillis();
     }
+
+    protected static void registerAction(String name, int i)
+    {
+        actions.put(new Integer(i), name.toLowerCase());
+    }
+
+
 
     public int getAction()
     {
@@ -126,5 +137,24 @@ public abstract class UMOServerNotification extends EventObject
         return getActionName(action);
     }
 
-    protected abstract String getActionName(int action);
+    public static String getActionName(int action)
+    {
+        return (String)actions.get(new Integer(action));
+    }
+
+    public static int getActionId(String action)
+    {
+        int i = 0;
+        Map.Entry entry;
+        for (Iterator iterator = actions.entrySet().iterator(); iterator.hasNext();i++)
+        {
+            entry = (Map.Entry) iterator.next();
+            if(entry.getValue().equals(action.toLowerCase()))
+            {
+                return ((Integer)entry.getKey()).intValue();
+            }
+        }
+        throw new IllegalArgumentException("No Action called: " + action);
+
+    }
 }

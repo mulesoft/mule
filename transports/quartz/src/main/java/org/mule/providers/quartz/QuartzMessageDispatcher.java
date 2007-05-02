@@ -102,7 +102,7 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
                 }
                 else
                 {
-                    tempJob = RegistryContext.getRegistry().getContainerContext().getComponent(tempJob);
+                    tempJob = RegistryContext.getRegistry().lookupObject(tempJob);
                     if (!(tempJob instanceof Job))
                     {
                         throw new DispatchException(new Message("quartz", 3), event.getMessage(),

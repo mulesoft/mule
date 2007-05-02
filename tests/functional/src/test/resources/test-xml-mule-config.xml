@@ -82,11 +82,6 @@
         </endpoint>
     </global-endpoints>
 
-    <interceptor-stack name="default">
-        <interceptor className="org.mule.interceptors.LoggingInterceptor"/>
-        <interceptor className="org.mule.interceptors.TimerInterceptor"/>
-    </interceptor-stack>
-
     <model name="main">
         <entry-point-resolver className="org.mule.tck.testmodels.mule.TestEntryPointResolver"/>
 
@@ -133,9 +128,6 @@
                 <global-endpoint name="appleResponseEndpoint"/>
                 <router className="org.mule.tck.testmodels.mule.TestResponseAggregator"/>
             </response-router>
-
-            <interceptor name="default"/>
-            <interceptor className="org.mule.interceptors.TimerInterceptor"/>
 
             <exception-strategy className="org.mule.impl.DefaultComponentExceptionStrategy">
                    <endpoint address="test://orange.exceptions"/>
@@ -191,8 +183,6 @@
                     </filter>
                 </router>
             </outbound-router>
-
-            <interceptor className="org.mule.interceptors.LoggingInterceptor"/>
 
             <exception-strategy className="org.mule.impl.DefaultExceptionStrategy"/>
         </mule-descriptor>

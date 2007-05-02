@@ -45,8 +45,8 @@ public interface MuleProperties
     String MULE_ENCODING_SYSTEM_PROPERTY = SYSTEM_PROPERTY_PREFIX + "encoding";
 
     /** The operatirng system encoding */
-    String MULE_OS_ENCODING_SYSTEM_PROPERTY = "org.mule.osEncoding";
-
+    String MULE_OS_ENCODING_SYSTEM_PROPERTY = SYSTEM_PROPERTY_PREFIX + "osEncoding";
+    
     /**
      * whether a configuration builder should start the server after it has been
      * configured, The default is true
@@ -117,4 +117,22 @@ public interface MuleProperties
     // End Connector Service descriptor properties
 
     String MULE_WORKING_DIRECTORY_PROPERTY = "mule.working.dir";
+
+
+    //Object Name Keys
+
+    String OBJECT_MANAGMENT_CONTEXT = "_muleManagementContext";
+    String OBJECT_SYSTEM_MODEL = "_muleSystemModel";
+    String OBJECT_MANAGMENT_CONTEXT_PROCESSOR = "_muleManagementContextProcessor";
+    String OBJECT_PROPERTY_PLACEHOLDER_PROCESSOR = "_mulePropertyPlaceholderProcessor";
+    String OBJECT_REGISTRY = "_muleRegistry";
+    String OBJECT_OBJECT_NAME_PROCESSOR = "_muleObjectNameProcessor";
+    String OBJECT_LIFECYCLE_MANAGER = "_muleLifecycleManager";
+    String OBJECT_SECURITY_MANAGER = "_muleSecurityManager";
+    String OBJECT_NOTIFICATION_MANAGER = "_muleNotificationManager";
+    String OBJECT_WORK_MANAGER = "_muleWorkManager";
+    String OBJECT_TRANSACTION_MANAGER = "_muleTransactionManager";
+    String OBJECT_QUEUE_MANAGER = "_muleQueueManager";
+    String OBJECT_MULE_APPLICATION_PROPERTIES = "_muleProperties";
+    String OBJECT_MULE_CONFIGURATION = "_muleConfiguration";
 }

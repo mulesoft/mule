@@ -29,7 +29,6 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.umo.model.UMOEntryPoint;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
@@ -41,7 +40,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
  */
 public class JcaComponent implements UMOComponent, ManagementContextAware
 {
-	/**
+    /**
      * Serial version
      */
     private static final long serialVersionUID = -1510441245219710451L;
@@ -64,7 +63,6 @@ public class JcaComponent implements UMOComponent, ManagementContextAware
     protected String registryId;
 
     protected UMOManagementContext managementContext;
-
 
 
     public JcaComponent(MuleDescriptor descriptor)
@@ -97,14 +95,14 @@ public class JcaComponent implements UMOComponent, ManagementContextAware
         catch (Exception e)
         {
             throw new MuleException(new Message(Messages.FAILED_TO_INVOKE_X, "UMO Component: "
-                                                                             + descriptor.getName()), e);
+                    + descriptor.getName()), e);
         }
     }
 
     /**
      * This is the synchronous call method and not supported by components managed in
      * a JCA container
-     * 
+     *
      * @param event
      * @return
      * @throws UMOException
@@ -149,13 +147,13 @@ public class JcaComponent implements UMOComponent, ManagementContextAware
         if (initialised.get())
         {
             throw new InitialisationException(new Message(Messages.OBJECT_X_ALREADY_INITIALISED,
-                "Component '" + descriptor.getName() + "'"), this);
+                    "Component '" + descriptor.getName() + "'"), this);
         }
         descriptor.initialise();
         try
         {
             entryPoint = managementContext.getRegistry().lookupModel(JcaModel.JCA_MODEL_TYPE).getEntryPointResolver().resolveEntryPoint(
-                descriptor);
+                    descriptor);
         }
         catch (UMOException e)
         {
@@ -174,7 +172,7 @@ public class JcaComponent implements UMOComponent, ManagementContextAware
 
         initialised.set(true);
         managementContext.fireNotification(
-            new ComponentNotification(descriptor, ComponentNotification.COMPONENT_INITIALISED));
+                new ComponentNotification(descriptor, ComponentNotification.COMPONENT_INITIALISED));
     }
 
     protected Object getDelegateComponent() throws InitialisationException
@@ -182,25 +180,22 @@ public class JcaComponent implements UMOComponent, ManagementContextAware
         Object impl = descriptor.getImplementation();
         Object component;
 
-        try
+        if (impl instanceof ContainerKeyPair)
         {
-            if (impl instanceof ContainerKeyPair)
-            {
-                component = RegistryContext.getRegistry().getContainerContext().getComponent(impl);
+            component = RegistryContext.getRegistry().lookupObject(impl);
 
-                if (descriptor.isSingleton())
-                {
-                    descriptor.setImplementation(component);
-                }
-            }
-            else
+            if (component == null)
             {
-                component = impl;
+                throw new InitialisationException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER, impl), this);
+            }
+            if (descriptor.isSingleton())
+            {
+                descriptor.setImplementation(component);
             }
         }
-        catch (ObjectNotFoundException e)
+        else
         {
-            throw new InitialisationException(e, this);
+            component = impl;
         }
 
         // Call any custom initialisers
@@ -219,7 +214,7 @@ public class JcaComponent implements UMOComponent, ManagementContextAware
      * and instance, so this method will return the object in initial state. <p/> If
      * the underlying component is Container managed in Spring or another IoC
      * container then the object instance in the IoC container will be returned
-     * 
+     *
      * @return the underlying instance form this component
      */
     public Object getInstance() throws UMOException

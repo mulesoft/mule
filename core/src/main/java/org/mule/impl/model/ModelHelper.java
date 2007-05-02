@@ -10,6 +10,7 @@
 package org.mule.impl.model;
 
 import org.mule.RegistryContext;
+import org.mule.config.MuleProperties;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
@@ -23,8 +24,8 @@ import java.util.Map;
  */
 public final class ModelHelper
 {
-    public static final String SYSTEM_MODEL = "_system";
 
+    public static final String SYSTEM_MODEL = MuleProperties.OBJECT_SYSTEM_MODEL;
     /** Do not instanciate. */
     private ModelHelper ()
     {
@@ -64,25 +65,26 @@ public final class ModelHelper
 
     public static UMODescriptor getDescriptor(String name)
     {
-        for (Iterator iterator = RegistryContext.getRegistry().getModels().values().iterator(); iterator.hasNext();)
-        {
-            UMOModel m = (UMOModel) iterator.next();
-            if (m.isComponentRegistered(name))
-            {
-                return m.getDescriptor(name);
-            }
-        }
-        return null;
+        return RegistryContext.getRegistry().lookupService(name);
+//        for (Iterator iterator = RegistryContext.getRegistry().getModels().values().iterator(); iterator.hasNext();)
+//        {
+//            UMOModel m = (UMOModel) iterator.next();
+//            if (m.isComponentRegistered(name))
+//            {
+//                return m.getDescriptor(name);
+//            }
+//        }
+//        return null;
     }
 
     //TODO RM*: Move this method
     public static void registerSystemComponent(UMODescriptor d) throws UMOException
     {
-        UMOModel model = RegistryContext.getRegistry().lookupModel(SYSTEM_MODEL);
+        UMOModel model = RegistryContext.getRegistry().lookupModel(MuleProperties.OBJECT_SYSTEM_MODEL);
         if(model==null)
         {
             model = ModelFactory.createModel("seda");
-            model.setName(SYSTEM_MODEL);
+            model.setName(MuleProperties.OBJECT_SYSTEM_MODEL);
             RegistryContext.getRegistry().registerModel(model);
         }
         model.registerComponent(d);
@@ -94,7 +96,7 @@ public final class ModelHelper
         for (Iterator iterator = models.values().iterator(); iterator.hasNext();)
         {
             UMOModel model = (UMOModel) iterator.next();
-            if(!model.getName().equals(SYSTEM_MODEL))
+            if(!model.getName().equals(MuleProperties.OBJECT_SYSTEM_MODEL))
             {
                 return model;
             }

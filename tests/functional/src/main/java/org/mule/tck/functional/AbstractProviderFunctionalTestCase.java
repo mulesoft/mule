@@ -99,8 +99,10 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
         props.put("eventCallback", callback);
         descriptor.setProperties(props);
         managementContext.getRegistry().registerConnector(connector);
-        UMOComponent component = managementContext.getRegistry().lookupModel("main").registerComponent(descriptor);
-        return component;
+        UMOModel model = managementContext.getRegistry().lookupModel("main");
+        model.registerComponent(descriptor);
+
+        return model.getComponent(descriptor.getName());
     }
 
     /**

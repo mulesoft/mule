@@ -31,13 +31,6 @@ public class CustomElementDefinitionParser extends AbstractMuleSingleBeanDefinit
         this.singleton = singleton;
     }
 
-    public CustomElementDefinitionParser(boolean singleton, String initMethod, String destroyMethod)
-    {
-        this.singleton = singleton;
-        this.initMethod = initMethod;
-        this.destroyMethod = destroyMethod;
-    }
-
     protected Class getBeanClass(Element element)
     {
         String cls = element.getAttribute(ATTRIBUTE_CLASS);

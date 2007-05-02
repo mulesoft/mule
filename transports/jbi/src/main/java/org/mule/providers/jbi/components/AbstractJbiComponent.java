@@ -202,7 +202,7 @@ public abstract class AbstractJbiComponent implements Component, Work, Component
         this.workManager = workManager;
     }
 
-    // ----------Component Lifecycle methods ----------------//
+    // ----------Component LifecyclePhase methods ----------------//
 
     /*
      * (non-Javadoc)

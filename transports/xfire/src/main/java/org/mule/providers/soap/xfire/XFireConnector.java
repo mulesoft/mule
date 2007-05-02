@@ -10,6 +10,7 @@
 
 package org.mule.providers.soap.xfire;
 
+import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
@@ -60,7 +61,7 @@ public class XFireConnector extends AbstractConnector
 
     private static final String CLASSNAME_ANNOTATIONS = "org.codehaus.xfire.annotations.jsr181.Jsr181WebAnnotations";
     private static final String DEFAULT_BINDING_PROVIDER_CLASS = "org.codehaus.xfire.aegis.AegisBindingProvider";
-    private static final String DEFAULT_TYPE_MAPPING_REGISTRY_CLASS = "org.codehaus.xfire.aegis.type.DefaultTypeMappingRegistry";
+    private static final String DEFAULT_TYPE_MAPPING_muleRegistry_CLASS = "org.codehaus.xfire.aegis.type.DefaultTypeMappingRegistry";
 
     protected MuleDescriptor xfireDescriptor;
 
@@ -187,7 +188,7 @@ public class XFireConnector extends AbstractConnector
 
         if (StringUtils.isBlank(typeMappingRegistry))
         {
-            typeMappingRegistry = DEFAULT_TYPE_MAPPING_REGISTRY_CLASS;
+            typeMappingRegistry = DEFAULT_TYPE_MAPPING_muleRegistry_CLASS;
         }
 
         try
@@ -197,7 +198,7 @@ public class XFireConnector extends AbstractConnector
 
             // Create the argument of TypeMappingRegistry ONLY if the binding 
             // provider is aegis and the type mapping registry is not the default
-            if (bindingProvider.equals(DEFAULT_BINDING_PROVIDER_CLASS) && !typeMappingRegistry.equals(DEFAULT_TYPE_MAPPING_REGISTRY_CLASS))
+            if (bindingProvider.equals(DEFAULT_BINDING_PROVIDER_CLASS) && !typeMappingRegistry.equals(DEFAULT_TYPE_MAPPING_muleRegistry_CLASS))
             {
                 Class registryClazz = ClassUtils.loadClass(typeMappingRegistry, this.getClass());
 
@@ -291,7 +292,7 @@ public class XFireConnector extends AbstractConnector
             // See if the xfire descriptor has already been added. This allows
             // developers to override the default configuration, say to increase
             // the threadpool
-            xfireDescriptor = (MuleDescriptor)managementContext.getRegistry().lookupModel(ModelHelper.SYSTEM_MODEL).getDescriptor(
+            xfireDescriptor = (MuleDescriptor)managementContext.getRegistry().lookupService(
                 XFIRE_SERVICE_COMPONENT_NAME + getName());
             if (xfireDescriptor == null)
             {
@@ -376,8 +377,7 @@ public class XFireConnector extends AbstractConnector
 
     protected MuleDescriptor createxfireDescriptor()
     {
-        MuleDescriptor xfireDescriptor = (MuleDescriptor)managementContext.getRegistry().lookupModel(ModelHelper.SYSTEM_MODEL)
-            .getDescriptor(XFIRE_SERVICE_COMPONENT_NAME + getName());
+        MuleDescriptor xfireDescriptor = (MuleDescriptor)managementContext.getRegistry().lookupService(XFIRE_SERVICE_COMPONENT_NAME + getName());
         if (xfireDescriptor == null)
         {
             xfireDescriptor = new MuleDescriptor(XFIRE_SERVICE_COMPONENT_NAME + getName());
@@ -527,7 +527,8 @@ public class XFireConnector extends AbstractConnector
                     {
                         xfireDescriptor.getProperties().put("xfire", xfire);
                     }
-                    managementContext.getRegistry().lookupModel(ModelHelper.SYSTEM_MODEL).registerComponent(xfireDescriptor);
+                    xfireDescriptor.setModelName(MuleProperties.OBJECT_SYSTEM_MODEL);
+                    managementContext.getRegistry().registerService(xfireDescriptor);
                 }
                 catch (UMOException e)
                 {

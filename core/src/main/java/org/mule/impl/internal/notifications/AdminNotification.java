@@ -31,11 +31,20 @@ public class AdminNotification extends UMOServerNotification
     public static final int ACTION_SEND = ADMIN_EVENT_ACTION_START_RANGE + 3;
     public static final int ACTION_INVOKE = ADMIN_EVENT_ACTION_START_RANGE + 4;
 
-    private static final transient String[] ACTIONS = new String[]{"receive event", "dispatch event",
-        "send event", "invoke component"};
+    static {
+        registerAction("receive event", ACTION_RECEIVE);
+        registerAction("dispatch event", ACTION_DISPATCH);
+        registerAction("send event", ACTION_SEND);
+        registerAction("invoke component", ACTION_INVOKE);
+    }
 
     private Map properties = new HashMap();
     private UMOMessage message;
+
+    public AdminNotification(UMOMessage message, int action)
+    {
+        super(message, action);
+    }
 
     public AdminNotification(UMOMessage message, int action, String resourceIdentifier)
     {
@@ -61,15 +70,5 @@ public class AdminNotification extends UMOServerNotification
     public Map getProperties()
     {
         return properties;
-    }
-
-    protected String getActionName(int action)
-    {
-        int i = action - ADMIN_EVENT_ACTION_START_RANGE;
-        if (i - 1 > ACTIONS.length)
-        {
-            return String.valueOf(action);
-        }
-        return ACTIONS[i - 1];
     }
 }

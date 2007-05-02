@@ -16,6 +16,7 @@ package org.mule.umo.lifecycle;
  */
 public interface Initialisable
 {
+    static final String PHASE_NAME = "initialise";
     /**
      * Method used to perform any initialisation work. If a fatal error occurs during
      * initialisation an <code>InitialisationException</code> should be thrown,

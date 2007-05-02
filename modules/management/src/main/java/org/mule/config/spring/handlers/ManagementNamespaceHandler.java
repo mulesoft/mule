@@ -10,7 +10,7 @@
 package org.mule.config.spring.handlers;
 
 import org.mule.config.spring.parsers.JmxAgentDefinitionParser;
-import org.mule.config.spring.parsers.PropertiesDefinitionParser;
+import org.mule.config.spring.parsers.MapEntryDefinitionParser;
 import org.mule.config.spring.parsers.SingleElementDefinitionParser;
 import org.mule.impl.internal.admin.EndpointNotificationLoggerAgent;
 import org.mule.impl.internal.admin.Log4jNotificationLoggerAgent;
@@ -35,10 +35,10 @@ public class ManagementNamespaceHandler extends AbstractIgnorableNamespaceHandle
         registerBeanDefinitionParser("jmx-notifications", new SingleElementDefinitionParser(JmxServerNotificationAgent.class, true));
         registerBeanDefinitionParser("jmx-default-configuration", new SingleElementDefinitionParser(DefaultJmxSupportAgent.class, true));
         registerBeanDefinitionParser("chainsaw-notifications", new SingleElementDefinitionParser(Log4jNotificationLoggerAgent.class, true));
-        registerBeanDefinitionParser("level-mappings", new PropertiesDefinitionParser("levelMappings"));
+        registerBeanDefinitionParser("level-mapping", new MapEntryDefinitionParser("levelMappings", "severity", "eventId"));
         registerBeanDefinitionParser("log4j-notifications", new SingleElementDefinitionParser(Log4jNotificationLoggerAgent.class, true));
         registerBeanDefinitionParser("publish-notifications", new SingleElementDefinitionParser(EndpointNotificationLoggerAgent.class, true));
-        registerBeanDefinitionParser("rmi-server", new SingleElementDefinitionParser(RmiRegistryAgent.class, true, "initialise", "dispose"));
+        registerBeanDefinitionParser("rmi-server", new SingleElementDefinitionParser(RmiRegistryAgent.class, true));
 
         //This gets processed by the jmx-server parser
         registerIgnoredElement("connector-server");

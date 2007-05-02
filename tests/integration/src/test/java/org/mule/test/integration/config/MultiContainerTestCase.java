@@ -11,13 +11,12 @@
 package org.mule.test.integration.config;
 
 import org.mule.config.builders.QuickConfigurationBuilder;
+import org.mule.config.spring.RegistryFacade;
 import org.mule.impl.container.ContainerKeyPair;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
-import org.mule.umo.manager.ObjectNotFoundException;
-import org.mule.umo.manager.UMOContainerContext;
 
 /**
  * Tests Deploying and referencing components from two different spring container
@@ -32,38 +31,30 @@ public class MultiContainerTestCase extends FunctionalTestCase
 
     public void testContainer() throws Exception
     {
-        UMOContainerContext context = managementContext.getRegistry().getContainerContext();
-        assertNotNull(context);
-        assertNotNull(context.getComponent("spring2-Apple"));
-        assertNotNull(context.getComponent("spring-Apple"));
-        assertNotNull(context.getComponent("spring2-Banana"));
-        assertNotNull(context.getComponent("spring-Banana"));
+        RegistryFacade registryFacade = managementContext.getRegistry();
+        assertNotNull(registryFacade);
+        assertNotNull(registryFacade.lookupObject("spring2-Apple"));
+        assertNotNull(registryFacade.lookupObject("spring-Apple"));
+        assertNotNull(registryFacade.lookupObject("spring2-Banana"));
+        assertNotNull(registryFacade.lookupObject("spring-Banana"));
 
-        try
-        {
-            context.getComponent("WaterMelon");
-            fail("Object should  not found");
-        }
-        catch (ObjectNotFoundException e)
-        {
-            // ignore
-        }
+        assertNull(registryFacade.lookupObject("WaterMelon"));
     }
 
     public void testSpecificContainerAddressing() throws Exception
     {
-        UMOContainerContext context = managementContext.getRegistry().getContainerContext();
-        assertNotNull(context);
-        Orange o = (Orange)context.getComponent(new ContainerKeyPair("spring1", "Orange"));
+        RegistryFacade registry = managementContext.getRegistry();
+        assertNotNull(registry);
+        Orange o = (Orange)registry.lookupObject(new ContainerKeyPair("spring1", "Orange"));
         assertNotNull(o);
         assertEquals(new Integer(8), o.getSegments());
 
-        o = (Orange)context.getComponent(new ContainerKeyPair("spring2", "Orange"));
+        o = (Orange)registry.lookupObject(new ContainerKeyPair("spring2", "Orange"));
         assertNotNull(o);
         assertEquals(new Integer(10), o.getSegments());
 
         // gets the component from the first container
-        o = (Orange)context.getComponent("Orange");
+        o = (Orange)registry.lookupObject("Orange");
         assertNotNull(o);
         assertEquals(new Integer(8), o.getSegments());
     }
@@ -72,7 +63,7 @@ public class MultiContainerTestCase extends FunctionalTestCase
     {
         QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
         UMODescriptor d = builder.createDescriptor("Orange", "myOrange", "test://foo", null, null);
-        d.setContainer("spring2");
+        //d.setContainer("spring2");
         builder.registerComponent(d);
         UMOComponent c = builder.getManagementContext().getRegistry().lookupModel("main").getComponent("myOrange");
         assertNotNull(c);
@@ -82,7 +73,7 @@ public class MultiContainerTestCase extends FunctionalTestCase
         assertEquals(10, orange.getSegments().intValue());
 
         d = builder.createDescriptor("Orange", "myOrange2", "test://bar", null, null);
-        d.setContainer("spring1");
+        //d.setContainer("spring1");
         builder.registerComponent(d);
         c = builder.getManagementContext().getRegistry().lookupModel("main").getComponent("myOrange2");
         assertNotNull(c);

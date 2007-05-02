@@ -316,6 +316,11 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         filter = source.getFilter();
         securityFilter = source.getSecurityFilter();
 
+        if(connectionStrategy == null)
+        {
+            connectionStrategy = source.getConnectionStrategy();
+        }
+
         if(source.getManagementContext()!=null)
         {
             initialise();

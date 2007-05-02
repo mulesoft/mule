@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans default-destroy-method="dispose" default-init-method="initialise">
+
+    <description>
+        The hello sample application has two components -
+        1. The Greeter component that adds a greeting to the event it receives
+        2. The ChitChater component that adds some additional conversation to the event it receives
+        An event is triggered by input through the system console and the outbound event is
+        aslo written out through the system console.
+    </description>
+
+
+    <bean class="org.mule.providers.stream.SystemStreamConnector" depends-on="_muleManagementContext"
+          name="SystemStreamConnector" singleton="true">
+        <property name="promptMessageCode">
+            <value>3</value>
+        </property>
+        <property name="resourceBundle">
+            <value>hello-example</value>
+        </property>
+        <property name="messageDelayTime">
+            <value>1000</value>
+        </property>
+    </bean>
+
+
+    <bean class="org.mule.samples.hello.StringToNameString" name="StringToNameString" singleton="false">
+        <property name="returnClass">
+            <value>org.mule.samples.hello.NameString</value>
+        </property>
+    </bean>
+    <bean class="org.mule.samples.hello.NameStringToChatString" name="NameStringToChatString" singleton="false">
+        <property name="returnClass">
+            <value>org.mule.samples.hello.ChatString</value>
+        </property>
+    </bean>
+    <bean class="org.mule.samples.hello.ChatStringToString" name="ChatStringToString" singleton="false">
+        <property name="returnClass">
+            <value>java.lang.String</value>
+        </property>
+    </bean>
+
+
+    <bean class="org.mule.impl.model.ModelFactory" depends-on="_muleManagementContext" factory-method="createModel"
+          name="helloSample">
+        <constructor-arg index="0" type="java.lang.String">
+            <value>seda</value>
+        </constructor-arg>
+        <constructor-arg index="1" type="java.lang.String">
+            <value>helloSample</value>
+        </constructor-arg>
+    </bean>
+    <bean class="org.mule.impl.MuleDescriptor" depends-on="helloSample" destroy-method="dispose" name="GreeterUMO">
+        <property name="implementation">
+            <value>org.mule.samples.hello.Greeter</value>
+        </property>
+        <property name="modelName" value="helloSample"/>
+        <property name="inboundRouter">
+            <bean class="org.mule.routing.inbound.InboundRouterCollection" singleton="false">
+                <property name="endpoints">
+                    <list>
+                        <bean class="org.mule.impl.endpoint.MuleEndpoint" depends-on="_muleManagementContext"
+                              singleton="false">
+                            <property name="transformer">
+                                <value>StringToNameString</value>
+                            </property>
+                            <property name="endpointURI">
+                                <bean class="org.mule.impl.endpoint.MuleEndpointURI">
+                                    <constructor-arg index="0" type="java.lang.String">
+                                        <value>stream://System.in</value>
+                                    </constructor-arg>
+                                </bean>
+                            </property>
+                            <property name="type">
+                                <value>senderAndReceiver</value>
+                            </property>
+                        </bean>
+                    </list>
+                </property>
+                <property name="routers">
+                    <list/>
+                </property>
+            </bean>
+        </property>
+        <property name="outboundRouter">
+            <bean class="org.mule.routing.outbound.OutboundRouterCollection" singleton="false">
+                <property name="matchAll">
+                    <value>false</value>
+                </property>
+                <property name="routers">
+                    <list>
+                        <bean class="org.mule.routing.outbound.OutboundPassThroughRouter" singleton="false">
+                            <property name="endpoints">
+                                <list>
+                                    <bean class="org.mule.impl.endpoint.MuleEndpoint"
+                                          depends-on="_muleManagementContext" singleton="false">
+                                        <property name="endpointURI">
+                                            <bean class="org.mule.impl.endpoint.MuleEndpointURI">
+                                                <constructor-arg index="0" type="java.lang.String">
+                                                    <value>vm://chitchatter</value>
+                                                </constructor-arg>
+                                            </bean>
+                                        </property>
+                                        <property name="type">
+                                            <value>senderAndReceiver</value>
+                                        </property>
+                                    </bean>
+                                </list>
+                            </property>
+                        </bean>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+    <bean class="org.mule.impl.MuleDescriptor" depends-on="helloSample" destroy-method="dispose" name="ChitChatUMO">
+        <property name="implementation">
+            <value>org.mule.samples.hello.ChitChatter</value>
+        </property>
+        <property name="modelName" value="helloSample"/>
+        <property name="inboundRouter">
+            <bean class="org.mule.routing.inbound.InboundRouterCollection" singleton="false">
+                <property name="endpoints">
+                    <list>
+                        <bean class="org.mule.impl.endpoint.MuleEndpoint" depends-on="_muleManagementContext"
+                              singleton="false">
+                            <property name="transformer">
+                                <value>NameStringToChatString</value>
+                            </property>
+                            <property name="endpointURI">
+                                <bean class="org.mule.impl.endpoint.MuleEndpointURI">
+                                    <constructor-arg index="0" type="java.lang.String">
+                                        <value>vm://chitchatter</value>
+                                    </constructor-arg>
+                                </bean>
+                            </property>
+                            <property name="type">
+                                <value>senderAndReceiver</value>
+                            </property>
+                        </bean>
+                    </list>
+                </property>
+                <property name="routers">
+                    <list/>
+                </property>
+            </bean>
+        </property>
+        <property name="outboundRouter">
+            <bean class="org.mule.routing.outbound.OutboundRouterCollection" singleton="false">
+                <property name="matchAll">
+                    <value>false</value>
+                </property>
+                <property name="routers">
+                    <list>
+                        <bean class="org.mule.routing.outbound.OutboundPassThroughRouter" singleton="false">
+                            <property name="endpoints">
+                                <list>
+                                    <bean class="org.mule.impl.endpoint.MuleEndpoint"
+                                          depends-on="_muleManagementContext" singleton="false">
+                                        <property name="transformer">
+                                            <value>ChatStringToString</value>
+                                        </property>
+                                        <property name="endpointURI">
+                                            <bean class="org.mule.impl.endpoint.MuleEndpointURI">
+                                                <constructor-arg index="0" type="java.lang.String">
+                                                    <value>stream://System.out</value>
+                                                </constructor-arg>
+                                            </bean>
+                                        </property>
+                                        <property name="type">
+                                            <value>senderAndReceiver</value>
+                                        </property>
+                                    </bean>
+                                </list>
+                            </property>
+                        </bean>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+</beans>

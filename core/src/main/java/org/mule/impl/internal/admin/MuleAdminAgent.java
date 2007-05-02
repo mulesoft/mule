@@ -21,8 +21,8 @@ import org.mule.transformers.wire.SerializationWireFormat;
 import org.mule.transformers.wire.WireFormat;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 
@@ -124,8 +124,9 @@ public class MuleAdminAgent extends AbstractAgent
                 }
 
 
+                MuleEndpoint writableEndpoint;
                 // Check to see if we have an endpoint identifier
-                UMOEndpoint endpoint = managementContext.getRegistry().lookupEndpoint(serverUri);
+                UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint(serverUri);
                 if(endpoint==null)
                 {
                     UMOEndpointURI endpointUri = new MuleEndpointURI(serverUri);
@@ -138,14 +139,18 @@ public class MuleAdminAgent extends AbstractAgent
                         connector.initialise();
                         managementContext.getRegistry().registerConnector(connector);
                     }
-                    endpoint = new MuleEndpoint();
-                    endpoint.setConnector(connector);
-                    endpoint.setEndpointURI(endpointUri);
+                    writableEndpoint = new MuleEndpoint();
+                    writableEndpoint.setConnector(connector);
+                    writableEndpoint.setEndpointURI(endpointUri);
+                }
+                else
+                {
+                    writableEndpoint = new MuleEndpoint(endpoint);
                 }
 
 
                 logger.info("Registering Admin listener on: " + serverUri);
-                UMODescriptor descriptor = MuleManagerComponent.getDescriptor(endpoint, wireFormat,
+                UMODescriptor descriptor = MuleManagerComponent.getDescriptor(writableEndpoint, wireFormat,
                         RegistryContext.getConfiguration().getDefaultEncoding(),
                         RegistryContext.getConfiguration().getDefaultSynchronousEventTimeout());
 

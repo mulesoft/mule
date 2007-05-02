@@ -27,7 +27,7 @@ public class ManagerNotification extends UMOServerNotification implements Blocki
      * Serial version
      */
     private static final long serialVersionUID = -3246036188011581121L;
-    public static final int MANAGER_INITIALISNG = MANAGER_EVENT_ACTION_START_RANGE + 1;
+    public static final int MANAGER_INITIALISING = MANAGER_EVENT_ACTION_START_RANGE + 1;
     public static final int MANAGER_INITIALISED = MANAGER_EVENT_ACTION_START_RANGE + 2;
     public static final int MANAGER_STARTING = MANAGER_EVENT_ACTION_START_RANGE + 3;
     public static final int MANAGER_STARTED = MANAGER_EVENT_ACTION_START_RANGE + 4;
@@ -42,22 +42,44 @@ public class ManagerNotification extends UMOServerNotification implements Blocki
     public static final int MANAGER_STOPPING_MODELS = MANAGER_EVENT_ACTION_START_RANGE + 13;
     public static final int MANAGER_STOPPED_MODELS = MANAGER_EVENT_ACTION_START_RANGE + 14;
 
-    private static final transient String[] ACTIONS = new String[]{"initialising", "initialised", "starting",
-        "started", "stopping", "stopped", "disposing", "disposed", "disposing connectors",
-        "disposed connectors", "starting models", "started models", "stopping models", "stopped models"};
+    static {
+        registerAction("initialising", MANAGER_INITIALISING);
+        registerAction("initialised", MANAGER_INITIALISED);
+        registerAction("starting", MANAGER_STARTING);
+        registerAction("started", MANAGER_STARTED);
+        registerAction("stopping", MANAGER_STOPPING);
+        registerAction("stopped", MANAGER_STOPPED);
+        registerAction("disposing", MANAGER_DISPOSING);
+        registerAction("disposed", MANAGER_DISPOSED);
+        registerAction("disposing connectors", MANAGER_DISPOSING_CONNECTORS);
+        registerAction("disposed connectors", MANAGER_DISPOSED_CONNECTORS);
+        registerAction("starting models", MANAGER_STARTING_MODELS);
+        registerAction("started models", MANAGER_STARTED_MODELS);
+        registerAction("stopping models", MANAGER_STOPPING_MODELS);
+        registerAction("stopped models", MANAGER_STOPPED_MODELS);
+    }
 
     private String clusterId;
     private String domain;
 
 
-    public ManagerNotification(String id, String clusterId, String domain, int action)
+    public ManagerNotification(UMOManagementContext context, String action)
     {
-        super(id, action);
-        resourceIdentifier = domain + "." + clusterId + "." + id;
-        this.clusterId = clusterId;
-        this.domain = domain;
+        this(context, getActionId(action));
     }
 
+    public ManagerNotification(UMOManagementContext context, int action)
+    {
+        super(getId(context), action);
+        resourceIdentifier = getId(context);
+        this.clusterId = context.getClusterId();
+        this.domain = context.getDomain();
+    }
+
+    private static String getId(UMOManagementContext context)
+    {
+        return context.getDomain() + "." + context.getClusterId() + "." + context.getId();
+    }
 
     public String getClusterId()
     {
@@ -72,16 +94,6 @@ public class ManagerNotification extends UMOServerNotification implements Blocki
     protected String getPayloadToString()
     {
         return ((UMOManagementContext) source).getId();
-    }
-
-    protected String getActionName(int action)
-    {
-        int i = action - MANAGER_EVENT_ACTION_START_RANGE;
-        if (i - 1 > ACTIONS.length)
-        {
-            return String.valueOf(action);
-        }
-        return ACTIONS[i - 1];
     }
 
     public String toString()

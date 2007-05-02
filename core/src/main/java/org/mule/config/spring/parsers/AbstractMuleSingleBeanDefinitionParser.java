@@ -9,7 +9,12 @@
  */
 package org.mule.config.spring.parsers;
 
+import org.mule.umo.lifecycle.Disposable;
+import org.mule.umo.lifecycle.Initialisable;
+import org.mule.util.ClassUtils;
+
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -72,9 +77,6 @@ public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBea
     protected ParserContext parserContext;
     //By default Mule objects are not singletons
     protected boolean singleton = false;
-
-    protected String initMethod = null;
-    protected String destroyMethod = null;
 
     protected AbstractMuleSingleBeanDefinitionParser()
      {
@@ -182,15 +184,22 @@ public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBea
         BeanDefinitionBuilder builder = createBeanDefinitionBuilder(element, beanClass);
         builder.setSource(parserContext.extractSource(element));
         builder.setSingleton(isSingleton());
-        builder.addDependsOn("_registry");
-        if(getInitMethodName()!=null)
+        builder.addDependsOn("_muleRegistry");
+
+        List interfaces = ClassUtils.getAllInterfaces(beanClass);
+        if(interfaces!=null)
         {
-            builder.setInitMethodName(getInitMethodName());
+            if(interfaces.contains(Initialisable.class))
+            {
+                builder.setInitMethodName(Initialisable.PHASE_NAME);
+            }
+
+            if(interfaces.contains(Disposable.class))
+            {
+                builder.setDestroyMethodName(Disposable.PHASE_NAME);
+            }
         }
-        if(getDisposeMethodName()!=null)
-        {
-            builder.setDestroyMethodName(getDisposeMethodName());
-        }
+
         if (parserContext.isNested())
         {
             // Inner bean definition must receive same singleton status as containing bean.
@@ -258,16 +267,6 @@ public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBea
             return name;
         }
         return super.resolveId(element, definition, parserContext);
-    }
-
-    protected String getInitMethodName()
-    {
-        return initMethod;
-    }
-
-    protected String getDisposeMethodName()
-    {
-        return destroyMethod;
     }
 
     protected boolean isSingleton()

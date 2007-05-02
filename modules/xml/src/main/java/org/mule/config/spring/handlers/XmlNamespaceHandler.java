@@ -22,7 +22,7 @@ public class XmlNamespaceHandler extends AbstractIgnorableNamespaceHandler
     public void init()
     {
         registerBeanDefinitionParser("jxpath-filter", new SimpleChildDefinitionParser("filter", JXPathFilter.class));
-        registerBeanDefinitionParser("namespace", new MapEntryDefinitionParser("namespaces"));
+        registerBeanDefinitionParser("namespace", new MapEntryDefinitionParser("namespaces", "prefix", "uri"));
 
     }
 }

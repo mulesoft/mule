@@ -40,8 +40,12 @@ public class MessageNotification extends UMOServerNotification
     public static final int MESSAGE_SENT = MESSAGE_EVENT_ACTION_START_RANGE + 3;
     public static final int MESSAGE_REQUESTED = MESSAGE_EVENT_ACTION_START_RANGE + 4;
 
-    private static final transient String[] ACTIONS = new String[]{"received", "dispatched", "sent",
-        "requested"};
+    static {
+        registerAction("received", MESSAGE_RECEIVED);
+        registerAction("dispatched", MESSAGE_DISPATCHED);
+        registerAction("sent", MESSAGE_SENT);
+        registerAction("requested", MESSAGE_REQUESTED);
+    }
 
     private UMOImmutableEndpoint endpoint;
 
@@ -72,16 +76,6 @@ public class MessageNotification extends UMOServerNotification
             return ((UMOConnectable) source).getConnectionDescription();
         }
         return source.toString();
-    }
-
-    protected String getActionName(int action)
-    {
-        int i = action - MESSAGE_EVENT_ACTION_START_RANGE;
-        if (i - 1 > ACTIONS.length)
-        {
-            return String.valueOf(action);
-        }
-        return ACTIONS[i - 1];
     }
 
     public String toString()

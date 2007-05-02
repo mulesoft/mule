@@ -12,9 +12,7 @@ package org.mule.test.spring;
 
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
-import org.mule.impl.container.ContainerKeyPair;
 import org.mule.tck.AbstractConfigBuilderTestCase;
-import org.mule.tck.testmodels.fruit.FruitBowl;
 
 public class SpringAutowireConfigBuilderTestCase extends AbstractConfigBuilderTestCase
 {
@@ -30,18 +28,18 @@ public class SpringAutowireConfigBuilderTestCase extends AbstractConfigBuilderTe
         return new MuleXmlConfigurationBuilder();
     }
 
-    public void testComponentResolverConfig() throws Exception
-    {
-        // test container init
-        assertNotNull(managementContext.getRegistry().getContainerContext());
-
-        Object object =managementContext.getRegistry().getContainerContext().getComponent(
-            new ContainerKeyPair("spring", "org.mule.tck.testmodels.fruit.FruitBowl"));
-        assertNotNull(object);
-        assertTrue(object instanceof FruitBowl);
-        FruitBowl bowl = (FruitBowl)object;
-        assertTrue(bowl.hasBanana());
-        assertTrue(bowl.hasApple());
-    }
+//    public void testComponentResolverConfig() throws Exception
+//    {
+//        // test container init
+//        assertNotNull(managementContext.getRegistry().getContainerContext());
+//
+//        Object object =managementContext.getRegistry().getContainerContext().getComponent(
+//            new ContainerKeyPair("spring", "org.mule.tck.testmodels.fruit.FruitBowl"));
+//        assertNotNull(object);
+//        assertTrue(object instanceof FruitBowl);
+//        FruitBowl bowl = (FruitBowl)object;
+//        assertTrue(bowl.hasBanana());
+//        assertTrue(bowl.hasApple());
+//    }
 
 }

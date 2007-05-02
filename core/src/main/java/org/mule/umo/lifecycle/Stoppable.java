@@ -17,5 +17,7 @@ import org.mule.umo.UMOException;
  */
 public interface Stoppable
 {
+    public static final String PHASE_NAME = "stop";
+    
     void stop() throws UMOException;
 }

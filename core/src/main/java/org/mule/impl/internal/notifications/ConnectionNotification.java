@@ -27,8 +27,11 @@ public class ConnectionNotification extends UMOServerNotification
     public static final int CONNECTION_FAILED = CONNECTION_EVENT_ACTION_START_RANGE + 2;
     public static final int CONNECTION_DISCONNECTED = CONNECTION_EVENT_ACTION_START_RANGE + 3;
 
-    private static final transient String[] ACTIONS = new String[]{"connected", "connect failed",
-        "disconnected"};
+    static {
+        registerAction("connected", CONNECTION_CONNECTED);
+        registerAction("connect failed", CONNECTION_FAILED);
+        registerAction("disconnected", CONNECTION_DISCONNECTED);
+    }
 
     public ConnectionNotification(UMOConnectable resource, String identifier, int action)
     {
@@ -43,16 +46,6 @@ public class ConnectionNotification extends UMOServerNotification
             return ((UMOConnectable) source).getConnectionDescription();
         }
         return source.toString();
-    }
-
-    protected String getActionName(int action)
-    {
-        int i = action - CONNECTION_EVENT_ACTION_START_RANGE;
-        if (i - 1 > ACTIONS.length)
-        {
-            return String.valueOf(action);
-        }
-        return ACTIONS[i - 1];
     }
 
     public String getType()

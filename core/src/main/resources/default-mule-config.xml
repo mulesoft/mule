@@ -6,20 +6,24 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 META-INF/mule.xsd">
 
-    <bean name="_muleManagementContextFactoryBean" class="org.mule.config.spring.ManagementContextFactoryBean"
-              depends-on="_registry"/>
+    <bean name="_muleManagementContext" class="org.mule.config.spring.ManagementContextFactoryBean" depends-on="_muleRegistry">
+        <constructor-arg ref="_muleLifecycleManager"/>
+    </bean>
 
-    <bean name="_managementContextProcessor" class="org.mule.config.spring.ManagementContextPostProcessor" depends-on="_registry"/>
+    <bean name="_muleManagementContextProcessor" class="org.mule.config.spring.ManagementContextPostProcessor" depends-on="_muleRegistry"/>
+
+    <bean name="_muleRegisterServiceProcessor" class="org.mule.config.spring.processors.RegisterServicePostProcessor"/>
 
     <bean name="_muleObjectNameProcessor" class="org.mule.config.spring.MuleObjectNameProcessor"/>
 
-    <!--<bean name="_propertyPlaceholderProcessor" class="org.mule.config.spring.processors.PropertyPlaceholderProcessor" depends-on="_muleManagementContextFactoryBean"/>-->
+    <bean name="_mulePropertyPlaceholderProcessor" class="org.mule.config.spring.processors.PropertyPlaceholderProcessor" depends-on="_muleRegistry"/>
     
-    <bean name="_registry" class="org.mule.config.spring.factories.SpringRegistryFactoryBean"/>
+    <bean name="_muleRegistry" class="org.mule.config.spring.factories.SpringRegistryFactoryBean">
+    </bean>
 
-    <bean name="_springRegistryContainerContext" class="org.mule.config.spring.SpringContainerContext" depends-on="_muleManagementContextFactoryBean"/>
+    <!--<bean name="_springRegistryContainerContext" class="org.mule.config.spring.SpringContainerContext" depends-on="_muleManagementContext"/>-->
 
-    <bean name="_system" class="org.mule.config.spring.factories.SystemModelFactoryBean" depends-on="_muleManagementContextFactoryBean"/>
+    <bean name="_muleSystemModel" class="org.mule.config.spring.factories.SystemModelFactoryBean" depends-on="_muleManagementContext"/>
 
     <mule:configuration
             serverId="_defaultx"
@@ -35,7 +39,72 @@
                                         maxThreadsIdle="4" poolExhaustedAction="WAIT"/>
     </mule:configuration>
 
-    <mule:custom-container class="org.mule.impl.container.MultiContainerContext" name="_rootContainerContext"/>
+    <bean name="_muleLifecycleManager" class="org.mule.impl.lifecycle.GenericLifecycleManager" scope="prototype">
+        <property name="lifecycles">
+            <set>
+                <ref bean="_muleInitLifecycle"/>
+                <ref bean="_muleStartLifecycle"/>
+                <ref bean="_muleStopLifecycle"/>
+                <ref bean="_muleDisposeLifecycle"/>
+            </set>
+        </property>
+    </bean>
+
+    <bean name="_muleInitLifecycle" class="org.mule.impl.lifecycle.ContainerManagedLifecyclePhase">
+        <constructor-arg value="initialise"/>
+        <constructor-arg value="org.mule.umo.lifecycle.Initialisable"/>
+    </bean>
+
+    <bean name="_muleStartLifecycle" class="org.mule.impl.lifecycle.phases.StartPhase"/>
+
+    <bean name="_muleStopLifecycle" class="org.mule.impl.lifecycle.phases.StopPhase"/>
+
+    <bean name="_muleDisposeLifecycle" class="org.mule.impl.lifecycle.ContainerManagedLifecyclePhase">
+        <constructor-arg value="dispose"/>
+        <constructor-arg value="org.mule.umo.lifecycle.Disposable"/>
+    </bean>
     
-    <!--<mule:properties-container includeSystemProperties="true" name="_systemProperties"/>-->
+    <bean name="_muleQueueManager" class="org.mule.util.queue.TransactionalQueueManager">
+        <property name="persistenceStrategy">
+            <bean class="org.mule.util.queue.CachingPersistenceStrategy">
+                <constructor-arg>
+                    <bean class="org.mule.util.queue.MemoryPersistenceStrategy"/>
+                </constructor-arg>
+            </bean>
+        </property>
+    </bean>
+
+    <bean name="_muleNotificationManager" class="org.mule.impl.internal.notifications.ServerNotificationManager">
+        <property name="eventTypes">
+            <map>
+                <!-- we'll probably want to encapsulate these in to boolean switches -->
+                <entry key="org.mule.impl.internal.notifications.ManagerNotificationListener" value="org.mule.impl.internal.notifications.ManagerNotification"/>
+                <entry key="org.mule.impl.internal.notifications.ModelNotificationListener" value="org.mule.impl.internal.notifications.ModelNotification"/>
+                <entry key="org.mule.impl.internal.notifications.ComponentNotificationListener" value="org.mule.impl.internal.notifications.ComponentNotification"/>
+                <entry key="org.mule.impl.internal.notifications.SecurityNotificationListener" value="org.mule.impl.internal.notifications.SecurityNotification"/>
+                <entry key="org.mule.impl.internal.notifications.ManagementNotificationListener" value="org.mule.impl.internal.notifications.ManagementNotification"/>
+                <entry key="org.mule.impl.internal.notifications.AdminNotificationListener" value="org.mule.impl.internal.notifications.AdminNotification"/>
+                <entry key="org.mule.impl.internal.notifications.ConnectionNotificationListener" value="org.mule.impl.internal.notifications.ConnectionNotification"/>
+                <entry key="org.mule.impl.internal.notifications.RegistryNotificationListener" value="org.mule.impl.internal.notifications.RegistryNotification"/>
+                <entry key="org.mule.impl.internal.notifications.CustomNotificationListener" value="org.mule.impl.internal.notifications.CustomNotification"/>
+
+                <!--<entry key="org.mule.impl.internal.notifications.MessageNotification" value="org.mule.impl.internal.notifications.MessageNotificationListener"/>-->
+
+            </map>
+        </property>
+    </bean>
+
+    <bean name="_muleWorkManager" class="org.mule.impl.work.MuleWorkManager">
+        <constructor-arg ref="_muleDefaultThreadingProfile"/>
+        <constructor-arg value="MuleServer"/>
+    </bean>
+
+    <bean name="_muleSecurityManager" class="org.mule.impl.security.MuleSecurityManager"/>
+
+    <bean name="_muleDefaultThreadingProfile" class="org.mule.config.ThreadingProfile">
+        <property name="maxThreadsActive" value="8"/>
+        <property name="maxThreadsIdle" value="4"/>
+        <property name="poolExhaustedActionString" value="WAIT"/>
+    </bean>
+    <!--<mule:properties-container includeSystemProperties="true" name="_muleSystemModelProperties"/>-->
 </beans>

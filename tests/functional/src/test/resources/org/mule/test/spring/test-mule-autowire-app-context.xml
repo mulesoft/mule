@@ -5,11 +5,11 @@
 
 <beans default-init-method="initialise" default-destroy-method="dispose">
 
-    <bean id="muleManager" class="org.mule.config.spring.AutowireUMOManagerFactoryBean">
+    <bean id="_muleManager" class="org.mule.config.spring.AutowireUMOManagerFactoryBean">
         <property name="managerId" value="SpringAutowireTestCase"/>
     </bean>
 
-    <bean id="muleEnvironmentProperties" class="java.util.HashMap">
+    <bean id="_muleProperties" class="java.util.HashMap">
         <constructor-arg>
             <map>
                 <!-- Whether mule transfromers should use compression when sending and recieving messages -->
@@ -400,7 +400,7 @@
 
         <property name="responseRouter">
             <bean class="org.mule.routing.response.ResponseRouterCollection">
-                <property name="timeout" value="1000"/>
+                <property name="timeout" value="10001"/>
                 <property name="endpoints">
                     <list>
                         <bean id="response1" singleton="false" class="org.mule.impl.endpoint.MuleEndpoint" >

@@ -13,14 +13,17 @@ package org.mule.persistence;
 import org.mule.umo.manager.UMOServerNotification;
 
 /**
- * @author 
- * @version $Revision: $
+ * TODO
  */
 public class PersistenceNotification extends UMOServerNotification 
 {
-    public static final int PERSISTABLE_NOTREADY = 0;
+    public static final int PERSISTABLE_NOT_READY = 0;
     public static final int PERSISTABLE_READY = 1;
 
+    static {
+        registerAction("ready", PERSISTABLE_READY);
+        registerAction("not ready", PERSISTABLE_NOT_READY);
+    }
     public PersistenceNotification(Persistable object, int action)
     {
         super(object, action);
@@ -31,8 +34,5 @@ public class PersistenceNotification extends UMOServerNotification
         return (action == PERSISTABLE_READY ? true : false);
     }
 
-    protected String getActionName(int action)
-    {
-        return (action == PERSISTABLE_READY ? "ready" : "not ready");
-    }
+
 }

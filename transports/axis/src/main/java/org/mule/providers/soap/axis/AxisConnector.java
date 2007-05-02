@@ -11,6 +11,7 @@
 package org.mule.providers.soap.axis;
 
 import org.mule.config.ExceptionHelper;
+import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
@@ -343,7 +344,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
             // See if the axis descriptor has already been added. This allows
             // developers to override the default configuration, say to increase
             // the threadpool
-            axisDescriptor = (MuleDescriptor)managementContext.getRegistry().lookupModel(ModelHelper.SYSTEM_MODEL).getDescriptor(
+            axisDescriptor = (MuleDescriptor)managementContext.getRegistry().lookupService(
                 AXIS_SERVICE_COMPONENT_NAME);
             if (axisDescriptor == null)
             {
@@ -444,7 +445,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
 
     protected MuleDescriptor createAxisDescriptor()
     {
-        MuleDescriptor axisDescriptor = (MuleDescriptor)managementContext.getRegistry().lookupModel(ModelHelper.SYSTEM_MODEL).getDescriptor(
+        MuleDescriptor axisDescriptor = (MuleDescriptor)managementContext.getRegistry().lookupService(
             AXIS_SERVICE_COMPONENT_NAME);
         if (axisDescriptor == null)
         {
@@ -639,7 +640,8 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
                         axisDescriptor = createAxisDescriptor();
                     }
                     axisDescriptor.addInterceptor(new MethodFixInterceptor());
-                    managementContext.getRegistry().lookupModel(ModelHelper.SYSTEM_MODEL).registerComponent(axisDescriptor);
+                    axisDescriptor.setModelName(MuleProperties.OBJECT_SYSTEM_MODEL);
+                    managementContext.getRegistry().registerService(axisDescriptor);
                     // We have to perform a small hack here to rewrite servlet://
                     // endpoints with the
                     // real http:// address

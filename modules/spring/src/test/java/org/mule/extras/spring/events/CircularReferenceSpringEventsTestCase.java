@@ -26,8 +26,7 @@ public class CircularReferenceSpringEventsTestCase extends FunctionalTestCase
     {
         assertTrue(managementContext.isInitialised());
         assertTrue(managementContext.isStarted());
-        assertNotNull(managementContext.getRegistry().getContainerContext());
-        assertNotNull(managementContext.getRegistry().getContainerContext().getComponent(
-            AbstractApplicationContext.APPLICATION_EVENT_MULTICASTER_BEAN_NAME));
+        assertNotNull(managementContext.getRegistry().lookupObject(
+            AbstractApplicationContext.APPLICATION_EVENT_MULTICASTER_BEAN_NAME, Object.class));
     }
 }

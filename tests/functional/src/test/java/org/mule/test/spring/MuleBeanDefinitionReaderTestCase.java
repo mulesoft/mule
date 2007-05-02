@@ -15,8 +15,8 @@ import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.routing.ForwardingCatchAllStrategy;
 import org.mule.tck.AbstractConfigBuilderTestCase;
-import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
+import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -55,14 +55,14 @@ public class MuleBeanDefinitionReaderTestCase extends AbstractConfigBuilderTestC
 
     public void testEndpointPropertyBean()
     {
-        UMODescriptor d = managementContext.getRegistry().lookupModel("main").getDescriptor("appleComponent3");
+        UMODescriptor d = managementContext.getRegistry().lookupService("appleComponent3");
         assertNotNull(d);
         assertNotNull(d.getInboundRouter());
         UMOEndpoint e = (UMOEndpoint)d.getInboundRouter().getEndpoints().get(0);
         assertNotNull(e);
         assertEquals("Prop2", e.getProperties().get("testEndpointBeanProperty"));
 
-        d = managementContext.getRegistry().lookupModel("main").getDescriptor("orangeComponent");
+        d = managementContext.getRegistry().lookupService("orangeComponent");
         assertNotNull(d);
         UMORouterCatchAllStrategy strategy = d.getInboundRouter().getCatchAllStrategy();
         assertTrue(strategy instanceof ForwardingCatchAllStrategy);
@@ -74,7 +74,7 @@ public class MuleBeanDefinitionReaderTestCase extends AbstractConfigBuilderTestC
 
     public void testPropertyBeansOnDescriptors()
     {
-        UMODescriptor d = managementContext.getRegistry().lookupModel("main").getDescriptor("appleComponent3");
+        UMODescriptor d = managementContext.getRegistry().lookupService("appleComponent3");
         assertNotNull(d);
 
         assertTrue(d.getExceptionListener() instanceof DefaultExceptionStrategy);
@@ -84,7 +84,7 @@ public class MuleBeanDefinitionReaderTestCase extends AbstractConfigBuilderTestC
 
     public void testPropertyBeansInMaps()
     {
-        UMODescriptor d = managementContext.getRegistry().lookupModel("main").getDescriptor("appleComponent3");
+        UMODescriptor d = managementContext.getRegistry().lookupService("appleComponent3");
         assertNotNull(d);
         Map map = (Map)d.getProperties().get("springMap");
         assertNotNull(map);

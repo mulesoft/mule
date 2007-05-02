@@ -12,6 +12,7 @@ package org.mule.config.spring.processors;
 import org.mule.RegistryContext;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Properties;
 
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
@@ -27,7 +28,11 @@ public class PropertyPlaceholderProcessor extends PropertyPlaceholderConfigurer
     protected Properties mergeProperties() throws IOException
     {
         Properties props = super.mergeProperties();
-        props.putAll(RegistryContext.getRegistry().getProperties());
+        Map p = RegistryContext.getRegistry().lookupProperties();
+        if(p!=null)
+        {
+            props.putAll(p);
+        }
         return props;
     }
 }

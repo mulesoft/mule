@@ -13,17 +13,13 @@ package org.mule.impl;
 import org.mule.config.ThreadingProfile;
 import org.mule.registry.RegistrationException;
 import org.mule.umo.UMODescriptor;
-import org.mule.umo.UMOException;
 import org.mule.umo.UMOInterceptor;
 import org.mule.umo.UMOManagementContext;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.model.UMOModel;
 import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.routing.UMONestedRouterCollection;
 import org.mule.umo.routing.UMOOutboundRouterCollection;
 import org.mule.umo.routing.UMOResponseRouterCollection;
 import org.mule.util.FileUtils;
-import org.mule.util.StringUtils;
 
 import java.beans.ExceptionListener;
 import java.io.FileInputStream;
@@ -238,21 +234,6 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
         this.initialState = state;
     }
 
-
-    /**
-     * Sets the name of the contaier where the object for this descriptor resides. If
-     * this value is 'none' the 'implementaiton' attributed is expected to be a fully
-     * qualified class name that will be instanciated.
-     *
-     * @param containerName the container name, or null if it is not known - in which
-     *            case each container will be queried for the component
-     *            implementation.
-     */
-    public void setContainer(String containerName)
-    {
-        this.container = containerName;
-    }
-
     /*
      * (non-Javadoc)
      * 
@@ -277,23 +258,23 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
 
 
     //@java.lang.Override
-    public void initialise() throws InitialisationException
-    {
-        super.initialise();
-        if(StringUtils.isNotEmpty(modelName))
-        {
-            UMOModel model = managementContext.getRegistry().lookupModel(modelName);
-            if(model!=null)
-            {
-                try
-                {
-                    model.registerComponent(this);
-                }
-                catch (UMOException e)
-                {
-                    throw new InitialisationException(e, this);
-                }
-            }
-        }
-    }
+//    public void initialise() throws InitialisationException
+//    {
+//        super.initialise();
+//        if(StringUtils.isNotEmpty(modelName))
+//        {
+//            UMOModel model = managementContext.getRegistry().lookupModel(modelName);
+//            if(model!=null)
+//            {
+//                try
+//                {
+//                    model.registerComponent(this);
+//                }
+//                catch (UMOException e)
+//                {
+//                    throw new InitialisationException(e, this);
+//                }
+//            }
+//        }
+//    }
 }

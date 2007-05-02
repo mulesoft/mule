@@ -31,10 +31,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 import java.util.HashMap;
 
-/**
- * @author Guillaume Nodet
- * @version $Revision$
- */
 public abstract class AbstractJdbcTransactionalFunctionalTestCase extends AbstractJdbcFunctionalTestCase
 {
 
@@ -131,7 +127,8 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
         HashMap props = new HashMap();
         props.put("eventCallback", callback);
         descriptor.setProperties(props);
-        UMOComponent component = model.registerComponent(descriptor);
+        model.registerComponent(descriptor);
+        UMOComponent component = model.getComponent(descriptor.getName());
         return component;
     }
 

@@ -136,16 +136,6 @@ public interface UMOImmutableDescriptor extends Initialisable, Registerable
     String getInitialState();
 
     /**
-     * Returns the name of the contaier where the object for this descriptor resides.
-     * If this value is 'none' the 'implementaiton' attributed is expected to be a
-     * fully qualified class name that will be instanciated.
-     *
-     * @return the container name, or null if it is not known - in which case each
-     *         container will be queried for the component implementation.
-     */
-    String getContainer();
-
-    /**
      * Returns the name of the model that this descriptor is registered with.
      * @return the name of the model that this descriptor is registered with or null
      * if this descriptor has not been registered with a model yet

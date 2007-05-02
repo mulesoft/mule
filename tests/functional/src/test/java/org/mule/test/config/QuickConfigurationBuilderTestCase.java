@@ -65,11 +65,12 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
 
             builder = new QuickConfigurationBuilder();
             RegistryFacade registry = builder.getManagementContext().getRegistry();
+            managementContext = builder.getManagementContext();
             // set global properties
-            registry.setProperty("doCompression", "true");
+            registry.registerProperty("doCompression", "true");
 
             // Set a dummy TX manager
-            registry.setTransactionManager(new TestTransactionManagerFactory().create());
+            managementContext.setTransactionManager(new TestTransactionManagerFactory().create());
             // register agents
             UMOAgent agent = new JmxAgent();
             agent.setName("jmxAgent");
@@ -86,6 +87,8 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
 //            registry.registerEndpointIdentifier("Test Queue", "test://test.queue");
 
             // Register transformers
+
+            //We have to register it twice since the TransientRegistry doesn't not clone objects
             TestCompressionTransformer t = new TestCompressionTransformer();
             t.setReturnClass(String.class);
             t.setBeanProperty2(12);
@@ -93,9 +96,9 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             t.setBeanProperty1("this was set from the manager properties!");
             registry.registerTransformer(t);
 
-            NoActionTransformer t2 = new NoActionTransformer();
-            t2.setReturnClass(byte[].class);
-            registry.registerTransformer(t2);
+            NoActionTransformer nat = new NoActionTransformer();
+            nat.setReturnClass(byte[].class);
+            registry.registerTransformer(nat);
 
             // Register endpoints
             JXPathFilter filter = new JXPathFilter("name");
@@ -111,7 +114,7 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             props.put("testGlobal", "value1");
             builder.registerEndpoint("test://orangeQ", "orangeEndpoint", false, props);
 
-            UMOEndpoint ep = managementContext.getRegistry().getOrCreateEndpointForUri("test://test.queue2", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+            UMOEndpoint ep = builder.getManagementContext().getRegistry().getOrCreateEndpointForUri("test://test.queue2", UMOEndpoint.ENDPOINT_TYPE_SENDER);
             ep.setName("testEPWithCS");
             SimpleRetryConnectionStrategy cs = new SimpleRetryConnectionStrategy();
             cs.setRetryCount(4);
@@ -126,7 +129,7 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             UMOModel model = new SedaModel();
             model.setName("main");
             TestExceptionStrategy es = new TestExceptionStrategy();
-            es.addEndpoint(managementContext.getRegistry().getOrCreateEndpointForUri("test://component.exceptions", UMOEndpoint.ENDPOINT_TYPE_SENDER));
+            es.addEndpoint(builder.getManagementContext().getRegistry().getOrCreateEndpointForUri("test://component.exceptions", UMOEndpoint.ENDPOINT_TYPE_SENDER));
             model.setExceptionListener(es);
             model.setLifecycleAdapterFactory(new TestDefaultLifecycleAdapterFactory());
             model.setEntryPointResolver(new TestEntryPointResolver());
@@ -136,14 +139,14 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             UMOEndpoint ep1 = registry.lookupEndpoint("appleInEndpoint");
             ep1.setTransformer(registry.lookupTransformer("TestCompressionTransformer"));
             UMODescriptor d = builder.createDescriptor("orange", "orangeComponent", null, ep1, props);
-            d.setContainer("descriptor");
+            //d.setContainer("descriptor");
             DefaultComponentExceptionStrategy dces = new DefaultComponentExceptionStrategy();
-            dces.addEndpoint(managementContext.getRegistry().getOrCreateEndpointForUri("test://orange.exceptions", UMOEndpoint.ENDPOINT_TYPE_SENDER));
+            dces.addEndpoint(builder.getManagementContext().getRegistry().getOrCreateEndpointForUri("test://orange.exceptions", UMOEndpoint.ENDPOINT_TYPE_SENDER));
             d.setExceptionListener(dces);
             // Create the inbound router
             UMOInboundRouterCollection inRouter = new InboundRouterCollection();
             inRouter.setCatchAllStrategy(new ForwardingCatchAllStrategy());
-            inRouter.getCatchAllStrategy().setEndpoint(managementContext.getRegistry().getOrCreateEndpointForUri("test://catch.all", UMOEndpoint.ENDPOINT_TYPE_SENDER));
+            inRouter.getCatchAllStrategy().setEndpoint(builder.getManagementContext().getRegistry().getOrCreateEndpointForUri("test2://catch.all", UMOEndpoint.ENDPOINT_TYPE_SENDER));
             UMOEndpoint ep2 = builder.createEndpoint("test://orange/", "Orange", true,
                 "TestCompressionTransformer");
             ep2.setResponseTransformer(registry.lookupTransformer("TestCompressionTransformer"));
@@ -160,12 +163,12 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             //Nested Router
             UMONestedRouterCollection nestedRouter = new NestedRouterCollection();
             NestedRouter nr1 = new NestedRouter();
-            nr1.setEndpoint(managementContext.getRegistry().getOrCreateEndpointForUri("test://do.wash", UMOEndpoint.ENDPOINT_TYPE_SENDER));
+            nr1.setEndpoint(builder.getManagementContext().getRegistry().getOrCreateEndpointForUri("test://do.wash", UMOEndpoint.ENDPOINT_TYPE_SENDER));
             nr1.setInterface(FruitCleaner.class);
             nr1.setMethod("wash");
             nestedRouter.addRouter(nr1);
             NestedRouter nr2 = new NestedRouter();
-            nr2.setEndpoint(managementContext.getRegistry().getOrCreateEndpointForUri("test://do.polish", UMOEndpoint.ENDPOINT_TYPE_SENDER));
+            nr2.setEndpoint(builder.getManagementContext().getRegistry().getOrCreateEndpointForUri("test://do.polish", UMOEndpoint.ENDPOINT_TYPE_SENDER));
             nr2.setInterface(FruitCleaner.class);
             nr2.setMethod("polish");
             nestedRouter.addRouter(nr2);
@@ -174,7 +177,7 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             
             // Response Router
             UMOResponseRouterCollection responseRouter = new ResponseRouterCollection();
-            responseRouter.addEndpoint(managementContext.getRegistry().getOrCreateEndpointForUri("test://response1", UMOEndpoint.ENDPOINT_TYPE_RECEIVER));
+            responseRouter.addEndpoint(builder.getManagementContext().getRegistry().getOrCreateEndpointForUri("test://response1", UMOEndpoint.ENDPOINT_TYPE_RECEIVER));
             responseRouter.addEndpoint(registry.lookupEndpoint("appleResponseEndpoint"));
             responseRouter.addRouter(new TestResponseAggregator());
             responseRouter.setTimeout(10001);
@@ -182,7 +185,6 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
 
             // properties
             Map cprops = new HashMap();
-            cprops.put("orange", new Orange());
             cprops.put("brand", "Juicy Baby!");
             cprops.put("segments", "9");
             cprops.put("radius", "4.21");
@@ -202,14 +204,18 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             cprops.put("arrayProperties", nested3);
             d.setProperties(cprops);
 
+            //register Component instance
+            registry.registerObject("orange", new Orange());
+            d.setModelName("main");
+
             // register components
-            registry.lookupModel("main").registerComponent(d);
+            registry.registerService(d);
             if (StringUtils.isBlank(builder.getManagementContext().getId()))
             {
                 // if running with JMX agent, manager ID is mandatory
                 builder.getManagementContext().setId("" + System.currentTimeMillis());
             }
-            registry.start();
+            //registry.start();
         }
         catch (Exception e)
         {

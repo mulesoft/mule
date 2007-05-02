@@ -11,6 +11,7 @@ package org.mule.config.spring.parsers;
 
 import org.mule.impl.model.ModelFactory;
 import org.mule.registry.ServiceException;
+import org.mule.umo.model.UMOModel;
 import org.mule.util.ClassUtils;
 
 import org.springframework.beans.factory.BeanCreationException;
@@ -22,36 +23,28 @@ import org.w3c.dom.Element;
  */
 public class ModelDefinitionParser extends AbstractMuleSingleBeanDefinitionParser
 {
-    private String type;
+    private static String type;
+    private String name;
 
     public ModelDefinitionParser(String type)
     {
         this.type = type;
         this.singleton = true;
-        this.initMethod = "initialise";
-        this.destroyMethod = "dispose";
     }
 
     protected Class getBeanClass(Element element)
     {
+        name = element.getAttribute(ATTRIBUTE_NAME);
         return ModelFactoryBean.class;
     }
 
-    public class ModelFactoryBean extends AbstractFactoryBean
+    
+
+    public static class ModelFactoryBean extends AbstractFactoryBean
     {
 
-        private String type;
+        private UMOModel model;
 
-
-        public String getType()
-        {
-            return type;
-        }
-
-        public void setType(String type)
-        {
-            this.type = type;
-        }
 
         public Class getObjectType()
         {
@@ -67,7 +60,24 @@ public class ModelDefinitionParser extends AbstractMuleSingleBeanDefinitionParse
 
         protected Object createInstance() throws Exception
         {
-            return ClassUtils.instanciateClass(getObjectType(), ClassUtils.NO_ARGS);
+            model = (UMOModel) ClassUtils.instanciateClass(getObjectType(), ClassUtils.NO_ARGS);
+            return model;
+        }
+
+        //@java.lang.Override
+        public void afterPropertiesSet() throws Exception
+        {
+            super.afterPropertiesSet();
+            model.initialise();
+        }
+
+        //@java.lang.Override
+        public void destroy() throws Exception
+        {
+            super.destroy();
+            model.dispose();
         }
     }
+
+
 }

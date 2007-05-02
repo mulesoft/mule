@@ -13,14 +13,15 @@ import org.mule.config.MuleConfiguration;
 import org.mule.registry.Registry;
 import org.mule.registry.ServiceDescriptor;
 import org.mule.registry.ServiceException;
+import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.umo.manager.UMOAgent;
-import org.mule.umo.manager.UMOContainerContext;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.UMOTransformer;
@@ -28,23 +29,21 @@ import org.mule.umo.transformer.UMOTransformer;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.transaction.TransactionManager;
-
 /**
  * TODO
  */
 
 public interface RegistryFacade extends Initialisable, Registry
 {
+    public static final int SCOPE_IMMEDIATE = 0;
+    public static final int SCOPE_LOCAL = 1;
+    public static final int SCOPE_REMOTE = 2;
+    
+    public static final int DEFAULT_SCOPE = SCOPE_REMOTE;
+
     MuleConfiguration getConfiguration();
 
     void setConfiguration(MuleConfiguration config);
-
-    Object getProperty(Object key);
-
-    Map getProperties();
-
-    TransactionManager getTransactionManager();
 
     UMOConnector lookupConnector(String name);
 
@@ -54,29 +53,31 @@ public interface RegistryFacade extends Initialisable, Registry
 
     void registerConnector(UMOConnector connector) throws UMOException;
 
-    void unregisterConnector(String connectorName) throws UMOException;
+    UMOConnector unregisterConnector(String connectorName) throws UMOException;
 
     void registerEndpoint(UMOEndpoint endpoint)  throws UMOException;;
 
-    void unregisterEndpoint(String endpointName);
+    UMOImmutableEndpoint unregisterEndpoint(String endpointName);
 
     void registerTransformer(UMOTransformer transformer) throws UMOException;
 
-    void unregisterTransformer(String transformerName);
+    UMOTransformer unregisterTransformer(String transformerName);
 
-    void setProperty(Object key, Object value);
+    public void registerService(UMODescriptor service) throws UMOException;
 
-    void addProperties(Map props);
+    public UMODescriptor lookupService(String serviceName);
 
-    void setTransactionManager(TransactionManager newManager) throws UMOException;
+    public UMODescriptor unregisterService(String serviceName);
 
-    void start(String serverUrl) throws UMOException;
+    void registerProperty(Object key, Object value);
+
+    void registerProperties(Map props);
 
     UMOModel lookupModel(String name);
 
     void registerModel(UMOModel model) throws UMOException;
 
-    void unregisterModel(String name);
+    UMOModel unregisterModel(String modelName);
 
     Map getModels();
 
@@ -84,39 +85,79 @@ public interface RegistryFacade extends Initialisable, Registry
 
     Map getEndpoints();
 
-    Map getTransformers();
+    Map getAgents();
 
-    boolean isStarted();
+    Map getServices();
+
+    Map getTransformers();
 
     boolean isInitialised();
 
     boolean isInitialising();
 
-    boolean isStopping();
+    boolean isDisposed();
+
+    boolean isDisposing();
 
     void registerAgent(UMOAgent agent) throws UMOException;
 
-    UMOAgent lookupAgent(String name);
+    //void registerObject(Class type, Object key, Object value);
 
-    UMOAgent unregisterAgent(String name) throws UMOException;
+    void registerObject(Object key, Object value);
 
-    void registerContainerContext(UMOContainerContext container) throws UMOException;
+    Object unregisterObject(String key);
 
-    UMOContainerContext getContainerContext();
+
+    UMOAgent lookupAgent(String agentName);
+
+    UMOAgent unregisterAgent(String agentName) throws UMOException;
 
     ServiceDescriptor lookupServiceDescriptor(String type, String name, Properties overrides) throws ServiceException;
 
-    Object lookupObject(Object key) throws ObjectNotFoundException;
+    Object lookupObject(Object key, Class returnType);
 
-    public UMOEndpoint createEndpointFromUri(UMOEndpointURI uri, String type) throws UMOException;
+    Object lookupObject(Object key, Class returnType, int scope);
 
-    public UMOEndpoint getEndpointFromUri(String uri) throws ObjectNotFoundException;
+    Object lookupObject(Object key);
 
-    public UMOEndpoint getEndpointFromUri(UMOEndpointURI uri) throws UMOException;
+    Object lookupObject(Object key, int scope);
 
-    public UMOEndpoint getOrCreateEndpointForUri(String uriIdentifier, String type) throws UMOException;
+    Map lookupCollection(Class returntype);
 
-    public UMOEndpoint getOrCreateEndpointForUri(UMOEndpointURI uri, String type) throws UMOException;
+    Map lookupCollection(Class returntype, int scope);
 
-    public UMOManagementContext getManagementContext();
+     Object lookupProperty(Object key);
+
+    Object lookupProperty(Object key, int scope);
+
+    Map lookupProperties();
+
+    Map lookupProperties(int scope);
+
+    UMOEndpoint createEndpointFromUri(UMOEndpointURI uri, String type) throws UMOException;
+
+    UMOEndpoint getEndpointFromUri(String uri) throws ObjectNotFoundException;
+
+    UMOEndpoint getEndpointFromUri(UMOEndpointURI uri) throws UMOException;
+
+    UMOEndpoint getOrCreateEndpointForUri(String uriIdentifier, String type) throws UMOException;
+
+    UMOEndpoint getOrCreateEndpointForUri(UMOEndpointURI uri, String type) throws UMOException;
+
+    UMOManagementContext getManagementContext();
+
+    RegistryFacade getParent();
+
+    void setParent(RegistryFacade registry);
+
+    String getRegistryId();
+
+    boolean isReadOnly();
+
+    boolean isRemote();
+
+    void setDefaultScope(int scope);
+
+    int getDefaultScope();
+
 }

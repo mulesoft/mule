@@ -17,11 +17,11 @@ import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.AbstractConnector;
 import org.mule.registry.ServiceDescriptorFactory;
 import org.mule.registry.ServiceException;
+import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.BeanUtils;
@@ -65,8 +65,6 @@ public class TransportFactory
             if (uri.getCreateConnector() == ALWAYS_CREATE_CONNECTOR)
             {
                 connector = createConnector(uri);
-
-                RegistryContext.getRegistry().registerConnector(connector);
             }
             else if (uri.getCreateConnector() == NEVER_CREATE_CONNECTOR)
             {
@@ -87,7 +85,6 @@ public class TransportFactory
                 if (connector == null)
                 {
                     connector = createConnector(uri);
-                    RegistryContext.getRegistry().registerConnector(connector);
                 }
             }
         }
@@ -129,9 +126,10 @@ public class TransportFactory
         }
         try
         {
-            endpoint.initialise();
+            RegistryContext.getRegistry().registerEndpoint(endpoint);
+
         }
-        catch (InitialisationException e)
+        catch (UMOException e)
         {
             throw new TransportFactoryException(e);
         }
@@ -256,15 +254,15 @@ public class TransportFactory
             // these are set on the Manager with a protocol i.e.
             // jms.specification=1.1
             Map props = new HashMap();
-            PropertiesUtils.getPropertiesWithPrefix(RegistryContext.getRegistry().getProperties(),
+            PropertiesUtils.getPropertiesWithPrefix(RegistryContext.getRegistry().lookupProperties(),
                 connector.getProtocol().toLowerCase(), props);
             if (props.size() > 0)
             {
                 props = PropertiesUtils.removeNamespaces(props);
                 BeanUtils.populateWithoutFail(connector, props, true);
             }
-            connector.setManagementContext(RegistryContext.getRegistry().getManagementContext());
-            //connector.initialise();
+            RegistryContext.getRegistry().registerConnector(connector);
+
             return connector;
         }
         catch (Exception e)
@@ -298,7 +296,6 @@ public class TransportFactory
             try
             {
                 BeanUtils.populate(connector, uri.getParams());
-                RegistryContext.getRegistry().registerConnector(connector);
 
             }
             catch (Exception e)

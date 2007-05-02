@@ -9,6 +9,7 @@
  */
 package org.mule.config.spring.handlers;
 
+import org.mule.config.MuleProperties;
 import org.mule.config.spring.parsers.ConfigurationDefinitionParser;
 import org.mule.config.spring.parsers.ConnectionStrategyDefinitionParser;
 import org.mule.config.spring.parsers.CustomElementDefinitionParser;
@@ -16,7 +17,7 @@ import org.mule.config.spring.parsers.EndpointDefinitionParser;
 import org.mule.config.spring.parsers.EndpointRefDefinitionParser;
 import org.mule.config.spring.parsers.FilterDefinitionParser;
 import org.mule.config.spring.parsers.InheritedModelDefinitionParser;
-import org.mule.config.spring.parsers.PropertiesDefinitionParser;
+import org.mule.config.spring.parsers.MapBeanDefinitionParser;
 import org.mule.config.spring.parsers.RouterDefinitionParser;
 import org.mule.config.spring.parsers.ServiceDescriptorDefinitionParser;
 import org.mule.config.spring.parsers.ServiceOverridesDefinitionParser;
@@ -80,6 +81,8 @@ import org.mule.transformers.simple.HexStringToByteArray;
 import org.mule.transformers.simple.ObjectToByteArray;
 import org.mule.transformers.simple.SerializableToByteArray;
 
+import java.util.HashMap;
+
 /**
  * This is the core namespace handler for Mule and configures all Mule configuration elements under the
  * <code>http://www.mulesource.org/schema/mule/core/2.0</code> Namespace.
@@ -91,11 +94,10 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
     {
         //Common elements
         registerBeanDefinitionParser("configuration", new ConfigurationDefinitionParser());
-        registerBeanDefinitionParser("environment-properties", new PropertiesDefinitionParser("_muleEnvironmentProperties"));
+        registerBeanDefinitionParser("environment-properties", new MapBeanDefinitionParser(HashMap.class, MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES));
         registerBeanDefinitionParser("default-threading-profile", new ThreadingProfileDefinitionParser());
         registerBeanDefinitionParser("default-dispatcher-connection-strategy", new ConnectionStrategyDefinitionParser());
         registerBeanDefinitionParser("default-receiver-connection-strategy", new ConnectionStrategyDefinitionParser());
-        registerBeanDefinitionParser("properties", new PropertiesDefinitionParser());
 
         //registerBeanDefinitionParser("mule-configuration", new ManagementContextDefinitionParser());
         registerBeanDefinitionParser("threading-profile", new ThreadingProfileDefinitionParser());
@@ -109,7 +111,7 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("dispatcher-connection-straqtegy", new ConnectionStrategyDefinitionParser());
         registerBeanDefinitionParser("receiver-connection-straqtegy", new ConnectionStrategyDefinitionParser());
         registerBeanDefinitionParser("service-overrides", new ServiceOverridesDefinitionParser());
-        registerBeanDefinitionParser("custom-connector", new CustomElementDefinitionParser(true, "initialise", "dispose"));
+        registerBeanDefinitionParser("custom-connector", new CustomElementDefinitionParser(true));
 
         //Transformer elements
         registerBeanDefinitionParser("custom-transformer", new CustomElementDefinitionParser(false));
@@ -148,18 +150,18 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("transaction", new TransactionConfigDefinitionParser());
 
         //Container contexts
-        registerBeanDefinitionParser("custom-container", new CustomElementDefinitionParser(true, "initialise", "dispose"));
-        registerBeanDefinitionParser("rmi-container", new SingleElementDefinitionParser(RmiContainerContext.class, true, "initialise", "dispose"));
-        registerBeanDefinitionParser("jndi-container", new SingleElementDefinitionParser(JndiContainerContext.class, true, "initialise", "dispose"));
-        registerBeanDefinitionParser("properties-container", new SingleElementDefinitionParser(PropertiesContainerContext.class, true, "initialise", "dispose"));
+        registerBeanDefinitionParser("custom-container", new CustomElementDefinitionParser(true));
+        registerBeanDefinitionParser("rmi-container", new SingleElementDefinitionParser(RmiContainerContext.class, true));
+        registerBeanDefinitionParser("jndi-container", new SingleElementDefinitionParser(JndiContainerContext.class, true));
+        registerBeanDefinitionParser("properties-container", new SingleElementDefinitionParser(PropertiesContainerContext.class, true));
 
         //Model Elements
-        registerBeanDefinitionParser("model-seda", new SingleElementDefinitionParser(SedaModel.class, true, "initialise", "dispose"));
+        registerBeanDefinitionParser("model-seda", new SingleElementDefinitionParser(SedaModel.class, true));
         registerBeanDefinitionParser("model-inherited", new InheritedModelDefinitionParser());
-        registerBeanDefinitionParser("model-seda-optimised", new SingleElementDefinitionParser(OptimisedSedaModel.class, true, "initialise", "dispose"));
-        registerBeanDefinitionParser("model-simple", new SingleElementDefinitionParser(DirectModel.class, true, "initialise", "dispose"));
-        registerBeanDefinitionParser("model-pipeline", new SingleElementDefinitionParser(PipelineModel.class, true, "initialise", "dispose"));
-        registerBeanDefinitionParser("custom-model", new CustomElementDefinitionParser(true, "initialise", "dispose"));
+        registerBeanDefinitionParser("model-seda-optimised", new SingleElementDefinitionParser(OptimisedSedaModel.class, true));
+        registerBeanDefinitionParser("model-simple", new SingleElementDefinitionParser(DirectModel.class, true));
+        registerBeanDefinitionParser("model-pipeline", new SingleElementDefinitionParser(PipelineModel.class, true));
+        registerBeanDefinitionParser("custom-model", new CustomElementDefinitionParser(true));
 
         registerBeanDefinitionParser("component-lifecycle-adapter-factory", new SimpleChildDefinitionParser("lifecycleAdapterFactory", null));
         registerBeanDefinitionParser("callable-entrypoint-resolver", new SimpleChildDefinitionParser("entryPointResolver", CallableEntryPointResolver.class));

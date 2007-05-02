@@ -338,7 +338,7 @@ public abstract class AbstractConnector
     {
         if (initialised.get())
         {
-            throw new AlreadyInitialisedException("Connector '" + getName() + "'", this);
+            throw new AlreadyInitialisedException("Connector '" + getProtocol() + "." + getName() + "'", this);
         }
 
         if (logger.isInfoEnabled())
@@ -381,7 +381,7 @@ public abstract class AbstractConnector
     public void register() throws RegistrationException
     {
 		//TODO
-        registryId = managementContext.getRegistry().registerMuleObject(managementContext, this).getId();
+        registryId = RegistryContext.getRegistry().registerMuleObject(managementContext, this).getId();
     }
 
     /*
@@ -391,7 +391,7 @@ public abstract class AbstractConnector
      */
     public void deregister() throws DeregistrationException
     {
-        managementContext.getRegistry().deregisterComponent(registryId);
+        RegistryContext.getRegistry().deregisterComponent(registryId);
         registryId = null;
     }
 
@@ -861,7 +861,7 @@ public abstract class AbstractConnector
         }
         else
         {
-            endpoint.initialise();
+
             receiver = this.createReceiver(component, endpoint);
             Object receiverKey = getReceiverKey(component, endpoint);
             receiver.setReceiverKey(receiverKey.toString());
@@ -1717,7 +1717,7 @@ public abstract class AbstractConnector
         org.mule.util.BeanUtils.populateWithoutFail(this, props, true);
 
         setName(ObjectNameHelper.getConnectorName(this));
-        initialise();
+        //initialise();
     }
 
     /**
@@ -1762,7 +1762,7 @@ public abstract class AbstractConnector
             // This provides a really convenient way to set properties on an object
             // from unit tests
             Map props = new HashMap();
-            PropertiesUtils.getPropertiesWithPrefix(managementContext.getProperties(), getProtocol()
+            PropertiesUtils.getPropertiesWithPrefix(managementContext.getRegistry().lookupProperties(), getProtocol()
                 .toLowerCase(), props);
             if (props.size() > 0)
             {

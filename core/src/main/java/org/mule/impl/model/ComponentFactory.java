@@ -49,7 +49,7 @@ public final class ComponentFactory
         }
         if (impl instanceof ContainerKeyPair)
         {
-            component = descriptor.getManagementContext().getRegistry().lookupObject(impl);
+            component = descriptor.getManagementContext().getRegistry().lookupObject(((ContainerKeyPair)impl).getKey(), Object.class);
 
             if (descriptor.isSingleton())
             {

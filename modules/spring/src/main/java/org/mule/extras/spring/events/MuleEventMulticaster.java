@@ -12,6 +12,7 @@ package org.mule.extras.spring.events;
 
 import org.mule.MuleRuntimeException;
 import org.mule.RegistryContext;
+import org.mule.config.MuleProperties;
 import org.mule.config.ThreadingProfile;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.config.i18n.Message;
@@ -24,7 +25,6 @@ import org.mule.impl.MuleSession;
 import org.mule.impl.RequestContext;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.impl.model.ModelHelper;
 import org.mule.impl.model.seda.SedaModel;
 import org.mule.providers.AbstractConnector;
 import org.mule.routing.filters.ObjectFilter;
@@ -568,8 +568,6 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
             // tell mule to load component definitions from spring
             SpringContainerContext containerContext = new SpringContainerContext();
             containerContext.setBeanFactory(applicationContext);
-           managementContext.getRegistry().registerContainerContext(null);
-           managementContext.getRegistry().registerContainerContext(containerContext);
 
             // see if there are any UMOConnectors to register
             registerConnectors();
@@ -600,7 +598,9 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
         {
             descriptor = getDefaultDescriptor();
             setSubscriptionsOnDescriptor((MuleDescriptor)descriptor);
-            component = managementContext.getRegistry().lookupModel(ModelHelper.SYSTEM_MODEL).registerComponent(descriptor);
+            UMOModel model = managementContext.getRegistry().lookupModel(MuleProperties.OBJECT_SYSTEM_MODEL);
+            model.registerComponent(descriptor);
+            component = model.getComponent(descriptor.getName());
         }
     }
 
@@ -772,14 +772,14 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
     {
         // When the the beanFactory is refreshed all the beans get
         // reloaded so we need to unregister the component from Mule
-        UMOModel model = managementContext.getRegistry().lookupModel(ModelHelper.SYSTEM_MODEL);
+        UMOModel model = managementContext.getRegistry().lookupModel(MuleProperties.OBJECT_SYSTEM_MODEL);
         if(model==null)
         {
             model = new SedaModel();
-            model.setName(ModelHelper.SYSTEM_MODEL);
+            model.setName(MuleProperties.OBJECT_SYSTEM_MODEL);
             managementContext.getRegistry().registerModel(model);
         }
-        UMODescriptor descriptor = model.getDescriptor(EVENT_MULTICASTER_DESCRIPTOR_NAME);
+        UMODescriptor descriptor = managementContext.getRegistry().lookupService(EVENT_MULTICASTER_DESCRIPTOR_NAME);
         if (descriptor != null)
         {
             model.unregisterComponent(descriptor);

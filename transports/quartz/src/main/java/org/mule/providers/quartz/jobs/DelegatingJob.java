@@ -13,7 +13,6 @@ package org.mule.providers.quartz.jobs;
 import org.mule.RegistryContext;
 import org.mule.config.i18n.Message;
 import org.mule.providers.quartz.QuartzConnector;
-import org.mule.umo.manager.ObjectNotFoundException;
 
 import org.quartz.Job;
 import org.quartz.JobDataMap;
@@ -44,13 +43,10 @@ public class DelegatingJob implements Job
             }
             else
             {
-                try
+                tempJob = RegistryContext.getRegistry().lookupObject(tempJob);
+                if(tempJob==null)
                 {
-                    tempJob = RegistryContext.getRegistry().getContainerContext().getComponent(tempJob);
-                }
-                catch (ObjectNotFoundException e)
-                {
-                    throw new JobExecutionException(e);
+                    throw new JobExecutionException("Job not found: " + tempJob);
                 }
                 if (!(tempJob instanceof Job))
                 {

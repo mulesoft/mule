@@ -7,10 +7,12 @@
     is responsible for determining the UMOManager to implement, creates a default UMOModel
     and autowires the components to the model and all other global objects to the MuleManager.
     -->
-    <bean id="muleManager" class="org.mule.config.spring.AutowireUMOManagerFactoryBean"/>
+    <bean id="muleManager" class="org.mule.config.spring.AutowireUMOManagerFactoryBean">
+        <property name="managerId" value="Hello Spring"/>
+    </bean>
 
     <!-- Used to set mule object names to their corresponding bean id -->
-    <bean id="muleNameProcessor" class="org.mule.config.spring.MuleObjectNameProcessor"/>
+    <!--<bean id="muleNameProcessor" class="org.mule.config.spring.MuleObjectNameProcessor"/>-->
     <!--
         The system stream connector is used to send and receive information via the
         System.in and System.out. Note this connector is only really useful for testing
@@ -20,9 +22,9 @@
         These properties are set as bean properties on the connector.
     -->
     <bean id="systemStreamConnector" class="org.mule.providers.stream.SystemStreamConnector">
-        <property name="promptMessageCode"><value>3</value></property>
-        <property name="resourceBundle"><value>hello-example</value></property>
-        <property name="messageDelayTime"><value>1000</value></property>
+        <property name="promptMessageCode" value="3"/>
+        <property name="resourceBundle" value="hello-example"/>
+        <property name="messageDelayTime" value="1000"/>
     </bean>
 
     <!--
@@ -33,32 +35,15 @@
            transformers.
        -->
     <bean id="StringToNameString" singleton="false" class="org.mule.samples.hello.StringToNameString">
-        <property name="returnClass"><value>org.mule.samples.hello.NameString</value></property>
+        <property name="returnClass" value="org.mule.samples.hello.NameString"/>
     </bean>
 
     <bean id="NameStringToChatString" singleton="false" class="org.mule.samples.hello.NameStringToChatString">
-        <property name="returnClass"><value>org.mule.samples.hello.ChatString</value></property>
+        <property name="returnClass" value="org.mule.samples.hello.ChatString"/>
     </bean>
 
     <bean id="ChatStringToString" singleton="false" class="org.mule.samples.hello.ChatStringToString">
-        <property name="returnClass"><value>java.lang.String</value></property>
-    </bean>
-
-    <!--
-        An interceptor is a peice of code that can be configued to execute
-        before and/or after an event is received for a component.
-        You can define a stack of interceptors that will be executed in sequence.
-        You can then configure the stack on your components.
-        Note the interceptor stack must not be a singleton.  Each component needs its
-        own copy of an interceptor stack.Th
-    -->
-    <bean id="defaultInterceptorStack" singleton="false" class="java.util.ArrayList">
-        <constructor-arg>
-            <list>
-                <bean id="loggingInterceptor" class="org.mule.interceptors.LoggingInterceptor"/>
-                <bean id="timerInterceptor" class="org.mule.interceptors.TimerInterceptor"/>
-            </list>
-        </constructor-arg>
+        <property name="returnClass" value="java.lang.String"/>
     </bean>
 
     <!--
@@ -67,35 +52,50 @@
         Please refer to the Configuration Guide for a full description of all the parameters.
     -->
     <bean id="GreeterUMO" class="org.mule.impl.MuleDescriptor">
-        <property name="inboundEndpoint">
-            <bean  class="org.mule.impl.endpoint.MuleEndpoint">
-                <property name="endpointURI">
-                    <bean class="org.mule.impl.endpoint.MuleEndpointURI">
-                        <constructor-arg>
-                            <value>stream://System.in?transformers=StringToNameString</value>
-                        </constructor-arg>
-                    </bean>
-               </property>
+        <property name="inboundRouter">
+            <bean class="org.mule.routing.inbound.InboundRouterCollection" singleton="false">
+                <property name="endpoints">
+                    <list>
+                        <bean class="org.mule.impl.endpoint.MuleEndpoint"
+                              singleton="false">
+                            <property name="endpointURI">
+                                <bean class="org.mule.impl.endpoint.MuleEndpointURI">
+                                    <constructor-arg index="0" type="java.lang.String" value="stream://System.in?transformers=StringToNameString"/>
+                                </bean>
+                            </property>
+
+                        </bean>
+                    </list>
+                </property>
             </bean>
         </property>
-        <property name="outboundEndpoint">
-            <bean  class="org.mule.impl.endpoint.MuleEndpoint">
-                <property name="endpointURI">
-                    <bean class="org.mule.impl.endpoint.MuleEndpointURI">
-                        <constructor-arg>
-                            <value>vm://chitchatter</value>
-                        </constructor-arg>
-                    </bean>
-               </property>
+
+        <property name="outboundRouter">
+            <bean class="org.mule.routing.outbound.OutboundRouterCollection" singleton="false">
+                <property name="matchAll" value="false"/>
+                <property name="routers">
+                    <list>
+                        <bean class="org.mule.routing.outbound.OutboundPassThroughRouter" singleton="false">
+                            <property name="endpoints">
+                                <list>
+                                    <bean class="org.mule.impl.endpoint.MuleEndpoint">
+                                        <property name="endpointURI">
+                                            <bean class="org.mule.impl.endpoint.MuleEndpointURI">
+                                                <constructor-arg index="0" type="java.lang.String" value="vm://chitchatter"/>
+                                            </bean>
+                                        </property>
+                                    </bean>
+                                </list>
+                            </property>
+                        </bean>
+                    </list>
+                </property>
             </bean>
         </property>
-        <property name="implementation"><value>Greeter</value></property>
-        <!--
-        Here we tell this component to use the interceptor stack defined above
-        -->
-        <property name="interceptors">
-                <ref local="defaultInterceptorStack"/>
-        </property>
+
+        <property name="implementation" value="Greeter"/>
+        <property name="modelName" value="main"/>
+
     </bean>
 
     <!--
@@ -105,35 +105,50 @@
     <bean id="Greeter" singleton="false" class="org.mule.samples.hello.Greeter"/>
 
     <bean id="ChitChatUMO" class="org.mule.impl.MuleDescriptor">
-        <property name="inboundEndpoint">
-            <bean  class="org.mule.impl.endpoint.MuleEndpoint">
-                <property name="endpointURI">
-                    <bean class="org.mule.impl.endpoint.MuleEndpointURI">
-                        <constructor-arg>
-                            <value>vm://chitchatter?transformers=NameStringToChatString</value>
-                        </constructor-arg>
-                    </bean>
-               </property>
+        <property name="inboundRouter">
+            <bean class="org.mule.routing.inbound.InboundRouterCollection" singleton="false">
+                <property name="endpoints">
+                    <list>
+                        <bean class="org.mule.impl.endpoint.MuleEndpoint"
+                              singleton="false">
+                            <property name="endpointURI">
+                                <bean class="org.mule.impl.endpoint.MuleEndpointURI">
+                                    <constructor-arg index="0" type="java.lang.String" value="vm://chitchatter?transformers=NameStringToChatString"/>
+                                </bean>
+                            </property>
+
+                        </bean>
+                    </list>
+                </property>
             </bean>
         </property>
-        <property name="outboundEndpoint">
-            <bean  class="org.mule.impl.endpoint.MuleEndpoint">
-                <property name="endpointURI">
-                    <bean class="org.mule.impl.endpoint.MuleEndpointURI">
-                        <constructor-arg>
-                            <value>stream://System.out?transformers=ChatStringToString</value>
-                        </constructor-arg>
-                    </bean>
-               </property>
+
+        <property name="outboundRouter">
+            <bean class="org.mule.routing.outbound.OutboundRouterCollection" singleton="false">
+                <property name="matchAll" value="false"/>
+                <property name="routers">
+                    <list>
+                        <bean class="org.mule.routing.outbound.OutboundPassThroughRouter" singleton="false">
+                            <property name="endpoints">
+                                <list>
+                                    <bean class="org.mule.impl.endpoint.MuleEndpoint">
+                                        <property name="endpointURI">
+                                            <bean class="org.mule.impl.endpoint.MuleEndpointURI">
+                                                <constructor-arg index="0" type="java.lang.String" value="stream://System.out?transformers=ChatStringToString"/>
+                                            </bean>
+                                        </property>
+                                    </bean>
+                                </list>
+                            </property>
+                        </bean>
+                    </list>
+                </property>
             </bean>
         </property>
-        <property name="implementation"><value>ChitChatter</value></property>
-        <!--
-          Here we tell this component to use the interceptor stack defined above
-        -->
-        <property name="interceptors">
-                <ref local="defaultInterceptorStack"/>
-        </property>
+
+        <property name="implementation" value="ChitChatter"/>
+        <property name="modelName" value="main"/>
+        
     </bean>
 
     <!--
@@ -141,5 +156,8 @@
     important when component pooling is used (which it is by default).
     -->
     <bean id="ChitChatter" singleton="false" class="org.mule.samples.hello.ChitChatter"/>
+
+    <bean name="main" class="org.mule.impl.model.seda.SedaModel"/>
+    
 </beans>
 

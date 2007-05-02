@@ -40,7 +40,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
     public void testComponent3RouterEndpoints() throws Exception
     {
         // test inbound
-        UMODescriptor descriptor = managementContext.getRegistry().lookupModel("main").getDescriptor("TestComponent3");
+        UMODescriptor descriptor = managementContext.getRegistry().lookupService("TestComponent3");
         assertNotNull(descriptor);
         UMOOutboundRouterCollection outboundRouter = descriptor.getOutboundRouter();
         assertNotNull(outboundRouter);
@@ -75,7 +75,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
     public void testComponent4Endpoints() throws Exception
     {
         // test inbound
-        UMODescriptor descriptor = managementContext.getRegistry().lookupModel("main").getDescriptor("TestComponent4");
+        UMODescriptor descriptor = managementContext.getRegistry().lookupService("TestComponent4");
         assertNotNull(descriptor);
         assertNotNull(descriptor.getInboundRouter().getEndpoints());
         assertEquals(1, descriptor.getInboundRouter().getEndpoints().size());
@@ -92,7 +92,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
     public void testComponent4RouterEndpoints() throws Exception
     {
         // test inbound
-        UMODescriptor descriptor = managementContext.getRegistry().lookupModel("main").getDescriptor("TestComponent4");
+        UMODescriptor descriptor = managementContext.getRegistry().lookupService("TestComponent4");
         assertNotNull(descriptor);
         UMOOutboundRouterCollection outboundRouter = descriptor.getOutboundRouter();
         assertNotNull(outboundRouter);
@@ -117,7 +117,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
     public void testComponent5RouterEndpoints() throws Exception
     {
         // test inbound
-        UMODescriptor descriptor = managementContext.getRegistry().lookupModel("main").getDescriptor("TestComponent5");
+        UMODescriptor descriptor = managementContext.getRegistry().lookupService("TestComponent5");
         assertNotNull(descriptor);
         UMOOutboundRouterCollection outboundRouter = descriptor.getOutboundRouter();
         assertNotNull(outboundRouter);

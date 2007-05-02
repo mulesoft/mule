@@ -3,7 +3,7 @@
 <!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
                                 "http://mule.mulesource.org/dtds/mule-configuration.dtd">
 
-<mule-configuration id="Hello_Sample" version="2.0">
+<mule-configuration id="Hello_Sample" version="1.0">
 
     <description>
     The hello sample application has two components -
@@ -68,10 +68,10 @@
         You can define a stack of interceptors that will be executed in sequence.
         You can then configure the stack on your components.
     -->
-    <interceptor-stack name="default">
-        <interceptor className="org.mule.interceptors.LoggingInterceptor"/>
-        <interceptor className="org.mule.interceptors.TimerInterceptor"/>
-    </interceptor-stack>
+    <!--<interceptor-stack name="default">-->
+        <!--<interceptor className="org.mule.interceptors.LoggingInterceptor"/>-->
+        <!--<interceptor className="org.mule.interceptors.TimerInterceptor"/>-->
+    <!--</interceptor-stack>-->
     <!--
         The Mule model initialises and manages your UMO components
     -->
@@ -94,7 +94,7 @@
             <!--
             Here we tell this component to use the interceptor stack defined above
             -->
-            <interceptor name="default"/>
+            <!--<interceptor name="default"/>-->
         </mule-descriptor>
 
         <mule-descriptor name="ChitChatUMO"
@@ -108,7 +108,7 @@
                     <endpoint address="stream://System.out" transformers="ChatStringToString" />
                 </router>
             </outbound-router>
-            <interceptor name="default"/>
+            <!--<interceptor name="default"/>-->
         </mule-descriptor>
     </model>
 </mule-configuration>

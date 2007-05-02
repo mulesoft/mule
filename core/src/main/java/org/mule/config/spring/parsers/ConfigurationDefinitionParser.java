@@ -10,6 +10,7 @@
 package org.mule.config.spring.parsers;
 
 import org.mule.config.MuleConfiguration;
+import org.mule.config.MuleProperties;
 
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -27,9 +28,7 @@ public class ConfigurationDefinitionParser extends AbstractMuleSingleBeanDefinit
 {
 
     public static final String ATTRIBUTE_SERVER_ID = "serverId";
-    public static final String CONFIG_ID = "_muleConfiguration";
     private String parent;
-
 
     public ConfigurationDefinitionParser()
     {
@@ -42,14 +41,15 @@ public class ConfigurationDefinitionParser extends AbstractMuleSingleBeanDefinit
         return MuleConfiguration.class;
     }
 
+    
 
     //@java.lang.Override
     protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
         if(parent==null)
         {
-            builder.addPropertyValue(ATTRIBUTE_ID, CONFIG_ID);
-            parent = CONFIG_ID;
+            builder.addPropertyValue(ATTRIBUTE_ID, MuleProperties.OBJECT_MULE_CONFIGURATION);
+            parent = MuleProperties.OBJECT_MULE_CONFIGURATION;
         }
         super.doParse(element, parserContext, builder);
     }
@@ -57,21 +57,9 @@ public class ConfigurationDefinitionParser extends AbstractMuleSingleBeanDefinit
     //@Override
     protected String resolveId(Element element, AbstractBeanDefinition definition, ParserContext parserContext) throws BeanDefinitionStoreException
     {
-        return CONFIG_ID;
+        return MuleProperties.OBJECT_MULE_CONFIGURATION;
     }
 
-
-    //@Override
-    protected String getInitMethodName()
-    {
-        return null;
-    }
-
-    //@Override
-    protected String getDisposeMethodName()
-    {
-        return null;
-    }
 
     //@java.lang.Override
     protected BeanDefinitionBuilder createBeanDefinitionBuilder(Element element, Class beanClass)

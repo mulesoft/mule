@@ -24,11 +24,18 @@ public final class ModelFactory
 
     public static UMOModel createModel(String type) throws ServiceException
     {
+        return createModel(type, DEFAULT_MODEL_NAME);
+    }
+
+    public static UMOModel createModel(String type, String name) throws ServiceException
+    {
         ModelServiceDescriptor sd = (ModelServiceDescriptor)
             RegistryContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.MODEL_SERVICE_TYPE, type, null);
         if (sd != null)
         {
-            return sd.createModel();
+            UMOModel model = sd.createModel();
+            model.setName(name);
+            return model;
         }
         else return null;
     }

@@ -13,7 +13,7 @@ import org.mule.tck.AbstractConfigBuilderTestCase;
 
 public class SpringNamespaceConfigBuilderTestCase extends AbstractConfigBuilderTestCase
 {
-
+ 
     public String getConfigResources()
     {
         return "org/mule/test/spring/test-xml-mule2-config.xml," +

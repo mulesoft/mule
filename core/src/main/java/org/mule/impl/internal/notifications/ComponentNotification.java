@@ -36,8 +36,15 @@ public class ComponentNotification extends UMOServerNotification
     public static final int COMPONENT_DISPOSED = COMPONENT_EVENT_ACTION_START_RANGE + 6;
     public static final int COMPONENT_STOPPING = COMPONENT_EVENT_ACTION_START_RANGE + 7;
 
-    private static final transient String[] ACTIONS = new String[]{"initialised", "started", "stopped",
-        "paused", "resumed", "disposed", "stopping"};
+    static {
+        registerAction("initialised", COMPONENT_INITIALISED);
+        registerAction("started", COMPONENT_STARTED);
+        registerAction("stopping", COMPONENT_STOPPING);
+        registerAction("stopped", COMPONENT_STOPPED);
+        registerAction("paused", COMPONENT_PAUSED);
+        registerAction("resumed", COMPONENT_RESUMED);
+        registerAction("disposed", COMPONENT_DISPOSED);
+    }
 
     public ComponentNotification(UMODescriptor message, int action)
     {
@@ -48,15 +55,5 @@ public class ComponentNotification extends UMOServerNotification
     protected String getPayloadToString()
     {
         return ((MuleDescriptor) source).getName();
-    }
-
-    protected String getActionName(int action)
-    {
-        int i = action - COMPONENT_EVENT_ACTION_START_RANGE;
-        if (i - 1 > ACTIONS.length)
-        {
-            return String.valueOf(action);
-        }
-        return ACTIONS[i - 1];
     }
 }

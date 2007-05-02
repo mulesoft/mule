@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id:Jbpm.java 6096 2007-04-19 14:01:51Z rossmason $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -54,7 +54,7 @@ public class Jbpm implements BPMS
     protected JbpmConfiguration jbpmConfiguration = null;
 
     // ///////////////////////////////////////////////////////////////////////////
-    // Lifecycle methods
+    // LifecyclePhase methods
     // ///////////////////////////////////////////////////////////////////////////
 
     /**

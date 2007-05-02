@@ -19,25 +19,12 @@
         <!--<mule:custom-storage class="org.mule.util.queue.FilePersistenceStrategy"/>-->
     </mule:configuration>
 
-    <mule:properties-container>
-        <property name="properties">
-        <map>
-                <!-- Whether mule transfromers should use compression when sending and recieving messages -->
-                <entry key="doCompression">
-                    <value>true</value>
-                </entry>
-                <entry key="beanProperty1">
-                    <value>this was set from the manager properties!</value>
-                </entry>
-                <entry key="OS Version">
-                    <value>${os.version}</value>
-                </entry>
-                <entry key="system-prop2">
-                    <value>default</value>
-                </entry>
-        </map>
-        </property>
-    </mule:properties-container>
+    <mule:environment-properties>
+        <entry key="doCompression" value="true"/>
+        <entry key="beanProperty1" value="this was set from the manager properties!"/>
+        <entry key="OS Version" value="not found"/>
+    </mule:environment-properties>
+
 
     <!-- TODO ConnectionStrategies on endpoints -->
     <!-- Remove Endpoint Identifiers -->

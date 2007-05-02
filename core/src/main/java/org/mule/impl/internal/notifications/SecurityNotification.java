@@ -30,7 +30,9 @@ public class SecurityNotification extends UMOServerNotification
 
     public static final int SECURITY_AUTHENTICATION_FAILED = SECURITY_EVENT_ACTION_START_RANGE + 1;
 
-    private static final transient String[] ACTIONS = new String[]{"authentication failed"};
+    static {
+        registerAction("authenitication failed", SECURITY_AUTHENTICATION_FAILED);
+    }
 
     public SecurityNotification(org.mule.umo.security.SecurityException message, int action)
     {
@@ -41,16 +43,6 @@ public class SecurityNotification extends UMOServerNotification
     protected String getPayloadToString()
     {
         return source.toString();
-    }
-
-    protected String getActionName(int action)
-    {
-        int i = action - SECURITY_EVENT_ACTION_START_RANGE;
-        if (i - 1 > ACTIONS.length)
-        {
-            return String.valueOf(action);
-        }
-        return ACTIONS[i - 1];
     }
 
     public String getType()

@@ -60,8 +60,8 @@ public class PropertiesContainerContext extends AbstractContainerContext
             {
                 entry = (Map.Entry)iterator.next();
                 value = entry.getValue().toString();
-                value = templateParser.parse(managementContext.getProperties(), value);
-                managementContext.getRegistry().setProperty(entry.getKey(), value);
+                value = templateParser.parse(managementContext.getRegistry().lookupProperties(), value);
+                managementContext.getRegistry().registerProperty(entry.getKey(), value);
             }
         }
         setSystemProperties(null);
@@ -89,14 +89,14 @@ public class PropertiesContainerContext extends AbstractContainerContext
         {
             throw new ObjectNotFoundException("null");
         }
-        Object value = RegistryContext.getRegistry().getProperty(key.toString());
+        Object value = RegistryContext.getRegistry().lookupProperty(key.toString());
         if (value == null)
         {
             throw new ObjectNotFoundException(key.toString());
         }
         if (value instanceof String && enableTemplates)
         {
-            value = templateParser.parse(managementContext.getProperties(), value.toString());
+            value = templateParser.parse(managementContext.getRegistry().lookupProperties(), value.toString());
         }
         return value;
     }
@@ -118,7 +118,7 @@ public class PropertiesContainerContext extends AbstractContainerContext
                 entry = (Map.Entry) iterator.next();
                 value = entry.getValue().toString();
                 value = templateParser.parse(systemProperties, value);
-                value = templateParser.parse(managementContext.getProperties(), value);
+                value = templateParser.parse(managementContext.getRegistry().lookupProperties(), value);
                 System.setProperty(entry.getKey().toString(), value);
             }
         }
@@ -131,8 +131,8 @@ public class PropertiesContainerContext extends AbstractContainerContext
             {
                 entry = (Map.Entry) iterator.next();
                 value = entry.getValue().toString();
-                value = templateParser.parse(managementContext.getProperties(), value.toString());
-                managementContext.getRegistry().setProperty(entry.getKey(), value);
+                value = templateParser.parse(managementContext.getRegistry().lookupProperties(), value.toString());
+                managementContext.getRegistry().registerProperty(entry.getKey(), value);
             }
         }
     }

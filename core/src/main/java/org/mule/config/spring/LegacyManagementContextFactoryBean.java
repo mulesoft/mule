@@ -14,6 +14,7 @@ import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.UMOLifecycleManager;
 import org.mule.umo.model.UMOModel;
 
 import java.util.Collection;
@@ -42,13 +43,12 @@ public class LegacyManagementContextFactoryBean extends ManagementContextFactory
     protected static Log logger = LogFactory.getLog(LegacyManagementContextFactoryBean.class);
 
     public static final String MULE_MODEL_EXCEPTION_STRATEGY_BEAN_NAME = "muleModelExceptionStrategy";
-    
 
-    public LegacyManagementContextFactoryBean() throws Exception
+
+    public LegacyManagementContextFactoryBean(UMOLifecycleManager lifecycleManager)
     {
-        super();
+        super(lifecycleManager);
     }
-
 
     /**
      * In Mule 1.x all endpoints in the the context should be registered with the manager
@@ -92,7 +92,7 @@ public class LegacyManagementContextFactoryBean extends ManagementContextFactory
                 for (Iterator iterator1 = model.getComponentNames(); iterator1.hasNext();)
                 {
                     String name = (String)iterator1.next();
-                    UMODescriptor descriptor = model.getDescriptor(name);
+                    UMODescriptor descriptor = registry.lookupService(name);
                     realModel.registerComponent(descriptor);
                 }
             }

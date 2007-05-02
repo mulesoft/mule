@@ -316,7 +316,8 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
         HashMap props = new HashMap();
         props.put("eventCallback", callback);
         descriptor.setProperties(props);
-        UMOComponent component = model.registerComponent(descriptor);
+        model.registerComponent(descriptor);
+        UMOComponent component = model.getComponent(descriptor.getName());
         // MuleManager.getInstance().registerConnector(connector);
         return component;
     }

@@ -10,10 +10,11 @@
 
 package org.mule.config.builders;
 
+import org.mule.RegistryContext;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.ConfigurationException;
 import org.mule.config.ReaderResource;
-import org.mule.impl.ManagementContext;
+import org.mule.config.spring.TransientRegistry;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.internal.admin.MuleAdminAgent;
@@ -23,14 +24,12 @@ import org.mule.providers.service.TransportFactory;
 import org.mule.routing.inbound.InboundRouterCollection;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.routing.outbound.OutboundRouterCollection;
-import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.manager.UMOContainerContext;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.util.MuleObjectHelper;
@@ -42,7 +41,10 @@ import java.util.Properties;
 /**
  * <code>QuickConfigurationBuilder</code> is a configuration helper that can be
  * used by clients, configuration scripts or test cases to quickly configure a
- *managementContext.
+ * managementContext.
+ * Note that all other builders create a initialised and started Mule instance, however the Quickconfiguration builder does not
+ * since it is sometimes used by other builders to create specialised Mule instances and it more desirable to
+ * return an non-initialised instance to allow for further customisation
  */
 public class QuickConfigurationBuilder implements ConfigurationBuilder
 {
@@ -77,7 +79,13 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
 
     public QuickConfigurationBuilder(String modeltype, String serverUrl, UMOConnector serverConnector) throws UMOException
     {
-        managementContext = new ManagementContext();
+        if(RegistryContext.getRegistry()==null)
+        {
+            TransientRegistry registry = TransientRegistry.createNew();
+            RegistryContext.setRegistry(registry);
+        }
+        managementContext = RegistryContext.getRegistry().getManagementContext();
+
 
         if(serverConnector!=null)
         {
@@ -106,7 +114,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
             model.setName(defaultModelName);
             managementContext.getRegistry().registerModel(model);
         }
-        managementContext.start();
+        managementContext.getRegistry().initialise();
     }
 
     /**
@@ -230,7 +238,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         return descriptor;
     }
 
-    public UMOComponent registerComponent(String implementation,
+    public void registerComponent(String implementation,
                                           String name,
                                           String inboundEndpoint,
                                           String outboundEndpoint,
@@ -255,17 +263,17 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
             }
         }
         UMODescriptor d = createDescriptor(implementation, name, inEndpoint, outEndpoint, properties);
-        return registerComponent(d);
+        registerComponent(d);
     }
 
-    public UMOComponent registerComponent(String implementation,
+    public void registerComponent(String implementation,
                                           String name,
                                           UMOEndpoint inEndpoint,
                                           UMOEndpoint outEndpoint,
                                           Map properties) throws UMOException
     {
         UMODescriptor d = createDescriptor(implementation, name, inEndpoint, outEndpoint, properties);
-        return registerComponent(d);
+        registerComponent(d);
     }
 
     /**
@@ -283,9 +291,9 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
      *             started
      * @see org.mule.umo.model.UMOModel
      */
-    public UMOComponent registerComponent(UMODescriptor descriptor) throws UMOException
+    public void registerComponent(UMODescriptor descriptor) throws UMOException
     {
-        return getModel().registerComponent(descriptor);
+         getModel().registerComponent(descriptor);
     }
 
     /**
@@ -300,11 +308,11 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
      * @param inboundEndpointUri The url endpointUri to listen to
      * @throws org.mule.umo.UMOException
      */
-    public UMOComponent registerComponent(String implementation,
+    public void registerComponent(String implementation,
                                           String name,
                                           UMOEndpointURI inboundEndpointUri) throws UMOException
     {
-        return registerComponent(implementation, name, inboundEndpointUri, null, null);
+        registerComponent(implementation, name, inboundEndpointUri, null, null);
     }
 
     /**
@@ -320,12 +328,12 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
      * @param properties properties to set on the component
      * @throws org.mule.umo.UMOException
      */
-    public UMOComponent registerComponent(String implementation,
+    public void registerComponent(String implementation,
                                           String name,
                                           UMOEndpointURI inboundEndpointUri,
                                           Map properties) throws UMOException
     {
-        return registerComponent(implementation, name, inboundEndpointUri, null, properties);
+        registerComponent(implementation, name, inboundEndpointUri, null, properties);
     }
 
     /**
@@ -342,12 +350,12 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
      * @param outboundEndpointUri The url endpointUri to dispatch to
      * @throws UMOException
      */
-    public UMOComponent registerComponent(String implementation,
+    public void registerComponent(String implementation,
                                           String name,
                                           UMOEndpointURI inboundEndpointUri,
                                           UMOEndpointURI outboundEndpointUri) throws UMOException
     {
-        return registerComponent(implementation, name, inboundEndpointUri, outboundEndpointUri, null);
+        registerComponent(implementation, name, inboundEndpointUri, outboundEndpointUri, null);
     }
 
     /**
@@ -365,7 +373,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
      * @param properties properties to set on the component
      * @throws UMOException
      */
-    public UMOComponent registerComponent(String implementation,
+    public void registerComponent(String implementation,
                                           String name,
                                           UMOEndpointURI inboundEndpointUri,
                                           UMOEndpointURI outboundEndpointUri,
@@ -373,7 +381,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     {
         UMODescriptor d = createDescriptor(implementation, name, inboundEndpointUri, outboundEndpointUri,
             properties);
-        return getModel().registerComponent(d);
+        getModel().registerComponent(d);
     }
 
     /**
@@ -491,18 +499,6 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     }
 
     /**
-     * Sets the component resolver on the model. Component resolver is used to look
-     * up components in an external container such as Spring or Pico
-     * 
-     * @param ctx
-     * @throws UMOException
-     */
-    public void setContainerContext(UMOContainerContext ctx) throws UMOException
-    {
-       managementContext.getRegistry().registerContainerContext(ctx);
-    }
-
-    /**
      * Unregisters a previously register components. This will also unregister any
      * listeners for the components Calling this method is equivilent to calling
      * UMOModel.unregisterComponent(..)
@@ -516,11 +512,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
      */
     public void unregisterComponent(String name) throws UMOException
     {
-        UMODescriptor descriptor = model.getDescriptor(name);
-        if (descriptor != null)
-        {
-            getModel().unregisterComponent(descriptor);
-        }
+        managementContext.getRegistry().unregisterService(name);
     }
 
     public UMOEndpoint createEndpoint(String uri, String name, boolean inbound) throws UMOException
@@ -634,8 +626,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         {
             throw new ConfigurationException(e);
         }
-        //TODO RM* URGENT return manager;
-        return null;
+        return managementContext;
     }
 
     public boolean isConfigured()

@@ -42,7 +42,7 @@ public class MuleAgentsTestCase extends AbstractMuleTestCase
         agentSecond.setName("mx4jAgent");
         managementContext.getRegistry().registerAgent(agentSecond);
 
-        managementContext.getRegistry().start();
+        managementContext.start();
 
         // should not throw an exception
     }
@@ -65,6 +65,6 @@ public class MuleAgentsTestCase extends AbstractMuleTestCase
         jmxAgent.setLocateServer(false);
         jmxAgent.setMBeanServer(server);
         managementContext.getRegistry().registerAgent(jmxAgent);
-        managementContext.getRegistry().start();
+        managementContext.start();
     }
 }

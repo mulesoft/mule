@@ -10,7 +10,15 @@
 
 package org.mule.config.spring;
 
-import org.springframework.beans.factory.FactoryBean;
+import org.mule.RegistryContext;
+import org.mule.impl.model.ModelFactory;
+import org.mule.umo.UMOException;
+import org.mule.umo.model.UMOModel;
+
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.AbstractFactoryBean;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 /**
  * <code>UMOManagerFactoryBean</code> is a MuleManager factory bean that is used to
@@ -42,13 +50,21 @@ import org.springframework.beans.factory.FactoryBean;
  * @deprecated Should be Using Mule Namespace-aware XML. The equivilent in Mule 2.0 is ManagementContextFactoryBean
  * @see org.mule.config.spring.ManagementContextFactoryBean
  */
-public class AutowireUMOManagerFactoryBean implements FactoryBean
+public class AutowireUMOManagerFactoryBean extends AbstractFactoryBean implements ApplicationContextAware
 {
     private String managerId;
+    private LegacyManager manager;
+    private ApplicationContext context;
+    private static String defaultModel;
 
-    public Object getObject() throws Exception
+    protected Object createInstance() throws Exception
     {
-        return new LegacyManager(getManagerId());
+        throw new IllegalStateException("Legacy beans configuration is no longer supported.  Please migrate your configuration to Mule 2.0 configuration");
+//        if(manager==null)
+//        {
+//            manager = new LegacyManager(getManagerId());
+//        }
+        //return manager;
     }
 
     public Class getObjectType()
@@ -72,6 +88,18 @@ public class AutowireUMOManagerFactoryBean implements FactoryBean
         this.managerId = managerId;
     }
 
+    protected void registerDefaultModel() throws UMOException
+    {
+        UMOModel m = ModelFactory.createModel("seda");
+        RegistryContext.getRegistry().registerModel(m);
+        defaultModel = m.getName();
+    }
+
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
+    {
+        this.context = applicationContext;
+    }
+
     public static class LegacyManager
     {
         private String managerId;
@@ -87,4 +115,5 @@ public class AutowireUMOManagerFactoryBean implements FactoryBean
             return managerId;
         }
     }
+
 }

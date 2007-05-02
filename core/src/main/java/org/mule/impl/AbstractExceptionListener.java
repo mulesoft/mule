@@ -374,7 +374,7 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
     public abstract void handleRoutingException(UMOMessage message, UMOImmutableEndpoint endpoint, Throwable e);
 
     /**
-     * Lifecycle exceptions are thrown when an error occurs during an object's
+     * LifecyclePhase exceptions are thrown when an error occurs during an object's
      * lifecycle call such as start, stop or initialise. The exception contains a
      * reference to the object that failed which can be used for more informative
      * logging.

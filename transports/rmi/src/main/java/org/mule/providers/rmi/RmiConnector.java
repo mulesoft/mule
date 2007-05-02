@@ -51,7 +51,7 @@ public class RmiConnector extends AbstractJndiConnector
     public static final int NO_RMI_SERVICECLASS_SET = 10;
     public static final int RMI_SERVICECLASS_INVOCATION_FAILED = 11;
 
-    public static final int DEFAULT_RMI_REGISTRY_PORT = 1099;
+    public static final int DEFAULT_RMI_muleRegistry_PORT = 1099;
 
     public static final String PROPERTY_RMI_SECURITY_POLICY = "securityPolicy";
 
@@ -325,9 +325,9 @@ public class RmiConnector extends AbstractJndiConnector
             if (logger.isWarnEnabled())
             {
                 logger.warn("RMI port not set on URI: " + endpointUri + ". Using default port: "
-                            + RmiConnector.DEFAULT_RMI_REGISTRY_PORT);
+                            + RmiConnector.DEFAULT_RMI_muleRegistry_PORT);
             }
-            port = RmiConnector.DEFAULT_RMI_REGISTRY_PORT;
+            port = RmiConnector.DEFAULT_RMI_muleRegistry_PORT;
         }
 
         InetAddress inetAddress = InetAddress.getByName(endpointUri.getHost());

@@ -14,7 +14,6 @@ import org.mule.MuleException;
 import org.mule.RegistryContext;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.umo.manager.ObjectNotFoundException;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -38,16 +37,13 @@ public class MuleWsSecurityCallbackHandler implements CallbackHandler
     public MuleWsSecurityCallbackHandler() throws MuleException
     {
         PasswordContainer pass;
-        try
+        pass = (PasswordContainer) RegistryContext.getRegistry().lookupObject("passwords");
+        if(pass==null)
         {
-            pass = (PasswordContainer) RegistryContext.getRegistry().getContainerContext().getComponent(
-                "passwords");
-            passwords = pass.getPasswords();
+            throw new MuleException(new Message(Messages.AUTH_NO_CREDENTIALS));
         }
-        catch (ObjectNotFoundException e)
-        {
-            throw new MuleException(new Message(Messages.AUTH_NO_CREDENTIALS), e);
-        }
+        passwords = pass.getPasswords();
+
     }
 
     /**

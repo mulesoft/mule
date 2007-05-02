@@ -17,7 +17,6 @@ import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.impl.model.ModelHelper;
 import org.mule.providers.http.HttpConstants;
 import org.mule.providers.soap.axis.AxisConnector;
 import org.mule.providers.soap.axis.extras.AxisCleanAndAddProperties;
@@ -224,7 +223,7 @@ public class UniversalSender extends BasicHandler
 
     protected UMOEndpoint lookupEndpoint(String uri, UMOManagementContext context) throws UMOException
     {
-        UMODescriptor axis = RegistryContext.getRegistry().lookupModel(ModelHelper.SYSTEM_MODEL).getDescriptor(
+        UMODescriptor axis = RegistryContext.getRegistry().lookupService(
             AxisConnector.AXIS_SERVICE_COMPONENT_NAME);
         UMOEndpointURI endpoint = new MuleEndpointURI(uri);
         UMOEndpoint ep;

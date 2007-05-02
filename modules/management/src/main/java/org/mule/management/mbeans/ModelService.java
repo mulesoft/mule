@@ -10,6 +10,7 @@
 
 package org.mule.management.mbeans;
 
+import org.mule.RegistryContext;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.model.UMOModel;
@@ -63,7 +64,8 @@ public class ModelService implements ModelServiceMBean
 
     public void unregisterComponent(String name) throws UMOException
     {
-        model.unregisterComponent(model.getDescriptor(name));
+        RegistryContext.getRegistry().unregisterService(name);
+        //model.unregisterComponent(model.getDescriptor(name));
     }
 
     public boolean isComponentRegistered(String name)
@@ -73,7 +75,9 @@ public class ModelService implements ModelServiceMBean
 
     public UMODescriptor getComponentDescriptor(String name)
     {
-        return model.getDescriptor(name);
+        return RegistryContext.getRegistry().lookupService(name);
+
+        //return model.getDescriptor(name);
     }
 
     public String getName()

@@ -40,7 +40,7 @@ public class ThreadingProfileDefinitionParser extends AbstractChildBeanDefinitio
         {
             return "dispatcherThreadingProfile";
         }
-        else if (name.startsWith("default-threading-profile"))
+        else if (name.equals("default-threading-profile"))
         {
             //If this is one of the default profiles they should just be made available in the contianer
             // and retrieved via the Registry

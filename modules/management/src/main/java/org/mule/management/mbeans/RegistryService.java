@@ -28,12 +28,12 @@ public class RegistryService implements RegistryServiceMBean
 
     public void start() throws UMOException
     {
-        registry.start();
+       // registry.start();
     }
 
     public void stop() throws UMOException
     {
-        registry.stop();
+       //registry.stop();
     }
 
     /*

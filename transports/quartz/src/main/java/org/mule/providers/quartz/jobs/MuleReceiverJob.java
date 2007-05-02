@@ -18,7 +18,6 @@ import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.NullPayload;
 import org.mule.providers.quartz.QuartzConnector;
 import org.mule.providers.quartz.QuartzMessageReceiver;
-import org.mule.umo.manager.ObjectNotFoundException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -74,18 +73,16 @@ public class MuleReceiverJob implements Job
                     ref = jobExecutionContext.getJobDetail().getJobDataMap().getString(
                         QuartzConnector.PROPERTY_PAYLOAD_CLASS_NAME);
                 }
-                try
+                if (ref == null)
                 {
-                    if (ref == null)
-                    {
-                        payload = NullPayload.getInstance();
-                    }
-                    else 
-                    {
-                        payload = RegistryContext.getRegistry().getContainerContext().getComponent(ref);
-                    }
+                    payload = NullPayload.getInstance();
                 }
-                catch (ObjectNotFoundException e)
+                else
+                {
+                    payload = RegistryContext.getRegistry().lookupObject(ref);
+                }
+
+                if (payload==null)
                 {
                     logger.warn("There is no payload attached to this quartz job. Sending Null payload");
                     payload = NullPayload.getInstance();

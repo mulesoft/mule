@@ -20,6 +20,7 @@ public class MuleAdminAgentTestCase extends AbstractMuleTestCase
         final String serverEndpoint = "";
         MuleAdminAgent agent = new MuleAdminAgent();
         agent.setServerUri(serverEndpoint);
+        agent.setManagementContext(managementContext);
         agent.initialise();
 
         // if it doesn't here fail, it has been registered

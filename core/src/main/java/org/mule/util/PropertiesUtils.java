@@ -170,6 +170,8 @@ public final class PropertiesUtils
      */
     public static void getPropertiesWithPrefix(Map props, String prefix, Map newProps)
     {
+        if(props==null) return;
+        
         for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();)
         {
             Map.Entry entry = (Map.Entry) iterator.next();

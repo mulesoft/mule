@@ -10,6 +10,7 @@
 
 package org.mule.config.spring;
 
+import org.mule.config.MuleProperties;
 import org.mule.config.spring.editors.TransformerPropertyEditor;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.transformer.UMOTransformer;
@@ -81,7 +82,7 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
     }
     public UMOManagementContext getManagementContext()
     {
-        return (UMOManagementContext)getBeanFactory().getBean("_muleManagementContextFactoryBean");
+        return (UMOManagementContext)getBeanFactory().getBean(MuleProperties.OBJECT_MANAGMENT_CONTEXT);
 
     }
 
