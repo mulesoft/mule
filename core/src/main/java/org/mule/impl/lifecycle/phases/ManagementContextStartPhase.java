@@ -13,6 +13,7 @@ import org.mule.impl.internal.notifications.ManagerNotification;
 import org.mule.impl.lifecycle.LifecyclePhase;
 import org.mule.impl.lifecycle.NotificationLifecycleObject;
 import org.mule.registry.Registry;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.Startable;
 import org.mule.umo.lifecycle.Stoppable;
@@ -30,7 +31,7 @@ public class ManagementContextStartPhase extends LifecyclePhase
 {
     public ManagementContextStartPhase()
     {
-        this(new Class[]{Registry.class});
+        this(new Class[]{Registry.class, UMOManagementContext.class});
     }
 
     public ManagementContextStartPhase(Class[] ignorredObjects)

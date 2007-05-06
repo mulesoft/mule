@@ -103,6 +103,8 @@ public abstract class AbstractRegistry implements RegistryFacade
 
     public final synchronized void dispose()
     {
+        //TODO lifecycleManager.checkPhase(Disposable.PHASE_NAME);
+
         if (isDisposed())
         {
             return;
@@ -136,25 +138,21 @@ public abstract class AbstractRegistry implements RegistryFacade
 
     public boolean isDisposed()
     {
-        //return getManagementContext().isDisposed();
         return lifecycleManager.isPhaseComplete(Disposable.PHASE_NAME);
     }
 
     public boolean isDisposing()
     {
-        //return getManagementContext().isDisposing();
-        return Disposable.PHASE_NAME.equals(lifecycleManager.getExecutingPhase());        
+        return Disposable.PHASE_NAME.equals(lifecycleManager.getExecutingPhase());
     }
 
     public boolean isInitialised()
     {
-        //return getManagementContext().isInitialised();
         return lifecycleManager.isPhaseComplete(Initialisable.PHASE_NAME);
     }
 
     public boolean isInitialising()
     {
-        //return getManagementContext().isInitialising();
         return Initialisable.PHASE_NAME.equals(lifecycleManager.getExecutingPhase());
     }
 

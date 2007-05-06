@@ -186,7 +186,7 @@ public class LifecyclePhase implements UMOLifecyclePhase
         supportedPhases.add(phase);
     }
 
-    protected boolean isPhaseSupported(String phase)
+    public boolean isPhaseSupported(String phase)
     {
         if(getSupportedPhases()==null)
         {

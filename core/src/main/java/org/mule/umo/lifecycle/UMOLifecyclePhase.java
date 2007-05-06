@@ -54,6 +54,8 @@ public interface UMOLifecyclePhase
 
     void registerSupportedPhase(String phase);
 
+    boolean isPhaseSupported(String phase);
+
     void applyLifecycle(Object o) throws LifecycleException;
 
     public int getRegistryScope();

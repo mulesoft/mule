@@ -268,6 +268,8 @@ public class ManagementContext implements UMOManagementContext
 
     public void dispose()
     {
+       //TODO lifecycleManager.checkPhase(Disposable.PHASE_NAME);
+
         fireSystemEvent(new ManagerNotification(this, ManagerNotification.MANAGER_DISPOSING));
 
 

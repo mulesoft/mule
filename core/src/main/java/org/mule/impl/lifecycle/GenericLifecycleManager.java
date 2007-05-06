@@ -13,6 +13,7 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.UMOLifecycleManager;
 import org.mule.umo.lifecycle.UMOLifecyclePhase;
+import org.mule.util.StringMessageUtils;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -51,9 +52,9 @@ public class GenericLifecycleManager implements UMOLifecycleManager
             UMOLifecyclePhase phase = (UMOLifecyclePhase) iterator.next();
             registerLifecycle(phase);
         }
-        
+
     }
-    
+
     public void registerLifecycle(UMOLifecyclePhase lci)
     {
         index.put(lci.getName(), new Integer(lifecycles.size()));
@@ -62,20 +63,20 @@ public class GenericLifecycleManager implements UMOLifecycleManager
 
     public void firePhase(UMOManagementContext managementContext, String phase) throws UMOException
     {
-        if(currentPhase.equalsIgnoreCase(phase))
+        if (currentPhase.equalsIgnoreCase(phase))
         {
             logger.debug("Already in lifecycle phase: " + phase);
             return;
         }
-        Integer phaseIndex = (Integer)index.get(phase);
-        if(phaseIndex==null)
+        Integer phaseIndex = (Integer) index.get(phase);
+        if (phaseIndex == null)
         {
             throw new IllegalArgumentException("No lifeccycle phase registered with name: " + phase);
         }
         try
         {
             setExecutingPhase(phase);
-            UMOLifecyclePhase li = (UMOLifecyclePhase)lifecycles.get(phaseIndex.intValue());
+            UMOLifecyclePhase li = (UMOLifecyclePhase) lifecycles.get(phaseIndex.intValue());
             li.fireLifecycle(managementContext, currentPhase);
             setCurrentPhase(phase);
         }
@@ -92,6 +93,7 @@ public class GenericLifecycleManager implements UMOLifecycleManager
 
     /**
      * Returns the name of the currently executing phase or null if there is not current phase
+     *
      * @return
      */
     public String getExecutingPhase()
@@ -131,43 +133,57 @@ public class GenericLifecycleManager implements UMOLifecycleManager
         for (Iterator iterator = completedPhases.iterator(); iterator.hasNext();)
         {
             phase = (String) iterator.next();
-            phaseIndex = (Integer)index.get(phase);
-            lcp = (UMOLifecyclePhase)lifecycles.get(phaseIndex.intValue());
+            phaseIndex = (Integer) index.get(phase);
+            lcp = (UMOLifecyclePhase) lifecycles.get(phaseIndex.intValue());
             lcp.applyLifecycle(object);
             //startingPhase = phase;
         }
         //If we're currently in a phase, fire that too
-        if(getExecutingPhase()!=null)
+        if (getExecutingPhase() != null)
         {
-            phaseIndex = (Integer)index.get(getExecutingPhase());
-            lcp = (UMOLifecyclePhase)lifecycles.get(phaseIndex.intValue());
+            phaseIndex = (Integer) index.get(getExecutingPhase());
+            lcp = (UMOLifecyclePhase) lifecycles.get(phaseIndex.intValue());
             lcp.applyLifecycle(object);
         }
     }
 
     public void checkPhase(String name) throws IllegalStateException
     {
-        if(completedPhases.contains(name))
+        if (completedPhases.contains(name))
         {
             throw new IllegalStateException("Phase '" + name + "' has already been executed");
         }
 
-        if(name.equalsIgnoreCase(executingPhase))
+        if (name.equalsIgnoreCase(executingPhase))
         {
             throw new IllegalStateException("Phase '" + name + "' is already currently being executed");
         }
 
-        if(executingPhase!=null)
+        if (executingPhase != null)
         {
             throw new IllegalStateException("Currently executing lifecycle phase: " + executingPhase);
         }
 
-        Integer phaseIndex = (Integer)index.get(name);
-        Integer currentPhaseIndex = (Integer)index.get(currentPhase);
-        if(currentPhaseIndex==null) currentPhaseIndex = new Integer(-1);
-        if((currentPhaseIndex.intValue() +1 ) != phaseIndex.intValue())
+        Integer phaseIndex = (Integer) index.get(name);
+        if (phaseIndex == null)
         {
-            throw new IllegalStateException("Phase '" + name + "' cannot be executed after phase '" + currentPhase + "'");
+            throw new IllegalStateException("Phase does not exist: " + name);
+        }
+        if (UMOLifecyclePhase.NOT_IN_LIFECYCLE_PHASE.equals(currentPhase))
+        {
+            if (phaseIndex.intValue() > 0)
+            {
+                throw new IllegalStateException("The first lifecycle phase has to be calle before the '" + name + "' phase");
+            }
+        }
+        else
+        {
+            UMOLifecyclePhase phase = (UMOLifecyclePhase) lifecycles.get(phaseIndex.intValue());
+            if (!phase.isPhaseSupported(currentPhase))
+            {
+                throw new IllegalStateException("Lifecycle phase: " + currentPhase + " does not support current phase: "
+                        + name + ". Phases supported are: " + StringMessageUtils.toString(phase.getSupportedPhases()));
+            }
         }
     }
 }
