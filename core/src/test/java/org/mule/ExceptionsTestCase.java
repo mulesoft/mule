@@ -11,10 +11,10 @@
 package org.mule;
 
 import org.mule.config.i18n.Message;
-import org.mule.impl.ImmutableMuleEndpoint;
+import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOException;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.manager.ManagerException;
 import org.mule.umo.routing.RoutingException;
 
@@ -42,7 +42,7 @@ public class ExceptionsTestCase extends AbstractMuleTestCase
 
     public final void testRoutingExceptionNullUMOMessageValidUMOImmutableEndpoint() throws UMOException
     {
-        UMOImmutableEndpoint endpoint = new ImmutableMuleEndpoint("test://outbound", false);
+        UMOEndpoint endpoint = new MuleEndpoint("test://outbound", false);
         assertNotNull(endpoint);
 
         RoutingException rex = new RoutingException(null, endpoint);

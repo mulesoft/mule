@@ -38,4 +38,6 @@ public interface UMOLifecycleManager
     boolean isPhaseComplete(String phaseName);
 
     void applyLifecycle(UMOManagementContext managementContext, Object object) throws UMOException;
+
+    void checkPhase(String name) throws IllegalStateException;
 }

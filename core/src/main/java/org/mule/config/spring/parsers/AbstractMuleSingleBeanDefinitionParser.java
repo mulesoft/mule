@@ -51,7 +51,7 @@ import org.w3c.dom.NamedNodeMap;
  *
  * The first argument is the bean name to set, the second argument is the set of possible key=value pairs
  *
- * 3. Provides properties for setting the 'init-method' and 'destroy-method' for this object. This will then automatically 
+ * 3. Provides an automatic way of setting the 'init-method' and 'destroy-method' for this object. This will then automatically
  * wire the bean into the lifecycle of the Application context.
  *
  * 4. The 'singleton' property provides a fixed way to make sure the bean is always a singleton or not.

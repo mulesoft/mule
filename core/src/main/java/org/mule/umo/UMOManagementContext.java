@@ -14,6 +14,7 @@ import org.mule.impl.Directories;
 import org.mule.impl.internal.notifications.NotificationException;
 import org.mule.impl.internal.notifications.ServerNotificationManager;
 import org.mule.management.stats.AllStatistics;
+import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.Lifecycle;
 import org.mule.umo.lifecycle.Registerable;
@@ -30,7 +31,7 @@ import javax.transaction.TransactionManager;
 /**
  * TODO document
  */
-public interface UMOManagementContext extends Lifecycle, Registerable
+public interface UMOManagementContext extends Initialisable, Lifecycle, Registerable
 {
     //TODO LM: Replce with Real Registry
     RegistryFacade getRegistry();
@@ -238,7 +239,6 @@ public interface UMOManagementContext extends Lifecycle, Registerable
 
     public void setStatistics(AllStatistics stats);
 
-    public void initialise() throws UMOException;
 
     UMOLifecycleManager getLifecycleManager();
 

@@ -175,7 +175,7 @@ public abstract class AbstractMuleTestCase extends TestCase
             }
             if (!getTestInfo().isDisposeManagerPerSuite())
             {
-                // We dispose here jut in case
+                // We dispose here just in case
                 disposeManager();
             }
             if (!isPrereqsMet(getClass().getName() + ".setUp()"))

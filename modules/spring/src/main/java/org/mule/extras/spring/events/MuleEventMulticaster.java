@@ -598,8 +598,9 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
         {
             descriptor = getDefaultDescriptor();
             setSubscriptionsOnDescriptor((MuleDescriptor)descriptor);
+            descriptor.setModelName(MuleProperties.OBJECT_SYSTEM_MODEL);
+            managementContext.getRegistry().registerService(descriptor);
             UMOModel model = managementContext.getRegistry().lookupModel(MuleProperties.OBJECT_SYSTEM_MODEL);
-            model.registerComponent(descriptor);
             component = model.getComponent(descriptor.getName());
         }
     }

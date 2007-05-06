@@ -144,4 +144,30 @@ public class GenericLifecycleManager implements UMOLifecycleManager
             lcp.applyLifecycle(object);
         }
     }
+
+    public void checkPhase(String name) throws IllegalStateException
+    {
+        if(completedPhases.contains(name))
+        {
+            throw new IllegalStateException("Phase '" + name + "' has already been executed");
+        }
+
+        if(name.equalsIgnoreCase(executingPhase))
+        {
+            throw new IllegalStateException("Phase '" + name + "' is already currently being executed");
+        }
+
+        if(executingPhase!=null)
+        {
+            throw new IllegalStateException("Currently executing lifecycle phase: " + executingPhase);
+        }
+
+        Integer phaseIndex = (Integer)index.get(name);
+        Integer currentPhaseIndex = (Integer)index.get(currentPhase);
+        if(currentPhaseIndex==null) currentPhaseIndex = new Integer(-1);
+        if((currentPhaseIndex.intValue() +1 ) != phaseIndex.intValue())
+        {
+            throw new IllegalStateException("Phase '" + name + "' cannot be executed after phase '" + currentPhase + "'");
+        }
+    }
 }

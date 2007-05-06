@@ -28,19 +28,20 @@ import java.util.Set;
 /**
  * TODO
  */
-public class InitialisePhase extends LifecyclePhase
+public class TransientRegistryInitialisePhase extends LifecyclePhase
 {
-    public InitialisePhase()
+    public TransientRegistryInitialisePhase()
     {
-        this(new Class[]{Registry.class, UMOManagementContext.class});
+        this(new Class[]{Registry.class});
     }
 
-    public InitialisePhase(Class[] ignorredObjects)
+    public TransientRegistryInitialisePhase(Class[] ignorredObjects)
     {
         super(Initialisable.PHASE_NAME, Initialisable.class);
 
         setIgnorredObjectTypes(ignorredObjects);
         Set initOrderedObjects = new LinkedHashSet();
+        initOrderedObjects.add(new NotificationLifecycleObject(UMOManagementContext.class));
         initOrderedObjects.add(new NotificationLifecycleObject(UMOConnector.class));
         initOrderedObjects.add(new NotificationLifecycleObject(UMOTransformer.class));
         initOrderedObjects.add(new NotificationLifecycleObject(UMOImmutableEndpoint.class));

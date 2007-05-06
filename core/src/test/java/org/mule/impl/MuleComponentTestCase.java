@@ -18,6 +18,7 @@ import org.mule.umo.ComponentException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOSession;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOMessageReceiver;
@@ -26,9 +27,23 @@ import java.util.Iterator;
 
 public class MuleComponentTestCase extends AbstractMuleTestCase
 {
+    QuickConfigurationBuilder builder;
+
+    protected UMOManagementContext createManagementContext() throws Exception
+    {
+        //TODO We always need to return a ManagementContext instance so that the base class can create Test objects
+        //correctly. Ideally, thse test objects should be created via the Registry in some way, but I'm not
+        //sure how to do this..
+        builder = new QuickConfigurationBuilder();
+        return builder.getManagementContext();
+    }
+
+
+
     public void testSendToPausedComponent() throws Exception
     {
-        QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
+       //QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
+
         builder.registerComponent(Orange.class.getName(), "orangeComponent", "test://in", "test://out", null);
         UMOModel model = builder.getModel();
 
@@ -97,7 +112,7 @@ public class MuleComponentTestCase extends AbstractMuleTestCase
     // MULE-494
     public void testInitialStateStopped() throws Exception
     {
-        QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
+        //QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
         // Test connector
         builder.getManagementContext().getRegistry().registerConnector(getTestConnector());
         // Test component
@@ -135,7 +150,7 @@ public class MuleComponentTestCase extends AbstractMuleTestCase
     // MULE-503
     public void testStoppingComponentStopsEndpoints() throws Exception
     {
-        QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
+        //QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
         // Test connector
         builder.getManagementContext().getRegistry().registerConnector(getTestConnector());
         // Test component

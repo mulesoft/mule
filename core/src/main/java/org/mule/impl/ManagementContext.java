@@ -28,7 +28,6 @@ import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.FatalException;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.lifecycle.Startable;
 import org.mule.umo.lifecycle.Stoppable;
 import org.mule.umo.lifecycle.UMOLifecycleManager;
@@ -139,37 +138,38 @@ public class ManagementContext implements UMOManagementContext
 
     }
 
-    public void initialise() throws UMOException
+    public void initialise() throws InitialisationException
     {
-        if (!isInitialised())
+        lifecycleManager.checkPhase(Initialisable.PHASE_NAME);
+        if (securityManager == null)
         {
-            if (securityManager == null)
-            {
-                throw new NullPointerException(new Message(Messages.X_IS_NULL, "securityManager").getMessage());
-            }
+            throw new NullPointerException(new Message(Messages.X_IS_NULL, "securityManager").getMessage());
+        }
 
-            if (notificationManager == null)
-            {
-                throw new NullPointerException(new Message(Messages.X_IS_NULL, "notificationManager").getMessage());
-            }
+        if (notificationManager == null)
+        {
+            throw new NullPointerException(new Message(Messages.X_IS_NULL, "notificationManager").getMessage());
+        }
 
-            if (queueManager == null)
-            {
-                throw new NullPointerException(new Message(Messages.X_IS_NULL, "queueManager").getMessage());
-            }
+        if (queueManager == null)
+        {
+            throw new NullPointerException(new Message(Messages.X_IS_NULL, "queueManager").getMessage());
+        }
 
-            if (workManager == null)
-            {
-                throw new NullPointerException(new Message(Messages.X_IS_NULL, "workManager").getMessage());
-            }
+        if (workManager == null)
+        {
+            throw new NullPointerException(new Message(Messages.X_IS_NULL, "workManager").getMessage());
+        }
 
-            config = getRegistry().getConfiguration();
-            if (config == null)
-            {
-                logger.info("A mule configuration object was not registered. Using defualt configuration");
-                config = new MuleConfiguration();
-            }
+        config = getRegistry().getConfiguration();
+        if (config == null)
+        {
+            logger.info("A mule configuration object was not registered. Using defualt configuration");
+            config = new MuleConfiguration();
+        }
 
+        try
+        {
             setupIds();
             validateEncoding();
             validateOSEncoding();
@@ -181,20 +181,15 @@ public class ManagementContext implements UMOManagementContext
 
             fireSystemEvent(new ManagerNotification(this, ManagerNotification.MANAGER_INITIALISING));
 
-            try
-            {
-                directories.createDirectories();
-            }
-            catch (Exception e)
-            {
-                throw new LifecycleException(e, this);
-            }
-
+            directories.createDirectories();
             lifecycleManager.firePhase(this, Initialisable.PHASE_NAME);
 
             fireSystemEvent(new ManagerNotification(this, ManagerNotification.MANAGER_INITIALISED));
         }
-
+        catch (Exception e)
+        {
+            throw new InitialisationException(e, this);
+        }
     }
 
 
@@ -228,8 +223,8 @@ public class ManagementContext implements UMOManagementContext
 
     public synchronized void start() throws UMOException
     {
-        initialise();
-
+        //initialise();
+        lifecycleManager.checkPhase(Startable.PHASE_NAME);
         if (!isStarted())
         {
             fireSystemEvent(new ManagerNotification(this, ManagerNotification.MANAGER_STARTING));
@@ -261,6 +256,8 @@ public class ManagementContext implements UMOManagementContext
      */
     public synchronized void stop() throws UMOException
     {
+        lifecycleManager.checkPhase(Stoppable.PHASE_NAME);
+
         fireSystemEvent(new ManagerNotification(this, ManagerNotification.MANAGER_STOPPING));
         lifecycleManager.firePhase(this, Stoppable.PHASE_NAME);
         //TODO RM* :I dont think the Registry should be started or stopped...

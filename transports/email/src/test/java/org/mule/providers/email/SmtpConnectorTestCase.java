@@ -73,7 +73,8 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
     {
         assertNotNull(connector);
         MuleDescriptor d = getTestDescriptor("anApple", Apple.class.getName());
-        model.registerComponent(d);
+        d.setModelName(model.getName());
+        managementContext.getRegistry().registerService(d);
         UMOComponent component = model.getComponent(d.getName());
         UMOEndpoint endpoint = 
             new MuleEndpoint("test", new MuleEndpointURI(getTestEndpointURI()), connector,

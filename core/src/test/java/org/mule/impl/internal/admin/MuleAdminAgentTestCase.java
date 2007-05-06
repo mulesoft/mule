@@ -30,6 +30,7 @@ public class MuleAdminAgentTestCase extends AbstractMuleTestCase
     {
         final String serverEndpoint = "test://12345";
         MuleAdminAgent agent = new MuleAdminAgent();
+        agent.setManagementContext(managementContext);        
         agent.setServerUri(serverEndpoint);
         agent.initialise();
 

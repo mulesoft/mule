@@ -26,18 +26,22 @@ import java.util.Set;
 /**
  * TODO
  */
-public class DisposePhase extends LifecyclePhase
+public class TransientRegistryDisposePhase extends LifecyclePhase
 {
-    public DisposePhase()
+    public TransientRegistryDisposePhase()
     {
-        this(new Class[]{Registry.class, UMOManagementContext.class});
+        this(new Class[]{Registry.class});
     }
 
-    public DisposePhase(Class[] ignorredObjects)
+    public TransientRegistryDisposePhase(Class[] ignorredObjects)
     {
         super(Disposable.PHASE_NAME, Disposable.class);
 
         Set disposeOrderedObjects = new LinkedHashSet();
+//        disposeOrderedObjects.add(new NotificationLifecycleObject(UMOManagementContext.class, ManagerNotification.class,
+//                ManagerNotification.getActionName(ManagerNotification.MANAGER_DISPOSING),
+//                ManagerNotification.getActionName(ManagerNotification.MANAGER_DISPOSED)));
+        disposeOrderedObjects.add(new NotificationLifecycleObject(UMOManagementContext.class));
         disposeOrderedObjects.add(new NotificationLifecycleObject(UMOConnector.class, ManagerNotification.class,
                 ManagerNotification.getActionName(ManagerNotification.MANAGER_DISPOSING_CONNECTORS),
                 ManagerNotification.getActionName(ManagerNotification.MANAGER_DISPOSED_CONNECTORS)));

@@ -39,15 +39,14 @@ import org.mule.impl.internal.notifications.SecurityNotificationListener;
 import org.mule.impl.internal.notifications.ServerNotificationManager;
 import org.mule.impl.lifecycle.ContainerManagedLifecyclePhase;
 import org.mule.impl.lifecycle.GenericLifecycleManager;
-import org.mule.impl.lifecycle.phases.DisposePhase;
-import org.mule.impl.lifecycle.phases.InitialisePhase;
-import org.mule.impl.lifecycle.phases.StartPhase;
-import org.mule.impl.lifecycle.phases.StopPhase;
+import org.mule.impl.lifecycle.phases.ManagementContextStartPhase;
+import org.mule.impl.lifecycle.phases.ManagementContextStopPhase;
+import org.mule.impl.lifecycle.phases.TransientRegistryDisposePhase;
+import org.mule.impl.lifecycle.phases.TransientRegistryInitialisePhase;
 import org.mule.impl.model.ModelServiceDescriptor;
 import org.mule.impl.security.MuleSecurityManager;
 import org.mule.impl.work.MuleWorkManager;
 import org.mule.registry.AbstractServiceDescriptor;
-import org.mule.registry.Registry;
 import org.mule.registry.ServiceDescriptor;
 import org.mule.registry.ServiceDescriptorFactory;
 import org.mule.registry.ServiceException;
@@ -81,11 +80,18 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * TODO
  */
 public class TransientRegistry extends AbstractRegistry
 {
+    /**
+     * logger used by this class
+     */
+    protected transient final Log logger = LogFactory.getLog(TransientRegistry.class);
     public static final String REGISTRY_ID = "org.mule.Registry.Transient";
     /**
      * Service descriptor cache.
@@ -131,10 +137,10 @@ public class TransientRegistry extends AbstractRegistry
     protected UMOLifecycleManager createLifecycleManager()
     {
         GenericLifecycleManager lcm = new GenericLifecycleManager();
-        UMOLifecyclePhase initPhase = new InitialisePhase();
+        UMOLifecyclePhase initPhase = new TransientRegistryInitialisePhase();
         initPhase.setRegistryScope(RegistryFacade.SCOPE_IMMEDIATE);
         lcm.registerLifecycle(initPhase);
-        UMOLifecyclePhase disposePhase = new DisposePhase();
+        UMOLifecyclePhase disposePhase = new TransientRegistryDisposePhase();
         disposePhase.setRegistryScope(RegistryFacade.SCOPE_IMMEDIATE);
         lcm.registerLifecycle(disposePhase);
         return lcm;
@@ -299,7 +305,7 @@ public class TransientRegistry extends AbstractRegistry
     {
         try
         {
-            lifecycleManager.applyLifecycle(getManagementContext(), object);
+            getManagementContext().getLifecycleManager().applyLifecycle(getManagementContext(), object);
         }
         catch (UMOException e)
         {
@@ -385,6 +391,12 @@ public class TransientRegistry extends AbstractRegistry
     public void registerService(UMODescriptor service) throws UMOException
     {
         String modelName = service.getModelName();
+        if(modelName==null)
+        {
+            logger.warn("Model name not ser on service, using default: " + UMOModel.DEFAULT_MODEL_NAME);
+            modelName = UMOModel.DEFAULT_MODEL_NAME;
+            service.setModelName(modelName);
+        }
         UMOModel model = lookupModel(modelName);
         if(model==null)
         {
@@ -496,13 +508,9 @@ public class TransientRegistry extends AbstractRegistry
         //UMOLifecycleManager lifecycleManager = new DefaultLifecycleManager();
         UMOLifecycleManager lifecycleManager = new GenericLifecycleManager();
 
-
-        //Create Lifecycle phases
-        Class[] ignorredObjects = new Class[]{Registry.class, UMOManagementContext.class};
-
         lifecycleManager.registerLifecycle(new ContainerManagedLifecyclePhase(Initialisable.PHASE_NAME, Initialisable.class));
-        lifecycleManager.registerLifecycle(new StartPhase(ignorredObjects));
-        lifecycleManager.registerLifecycle(new StopPhase(ignorredObjects));
+        lifecycleManager.registerLifecycle(new ManagementContextStartPhase());
+        lifecycleManager.registerLifecycle(new ManagementContextStopPhase());
         lifecycleManager.registerLifecycle(new ContainerManagedLifecyclePhase(Disposable.PHASE_NAME, Disposable.class));
 
         //Create the registry
@@ -536,12 +544,11 @@ public class TransientRegistry extends AbstractRegistry
         UMOManagementContext context = new ManagementContext(lifecycleManager);
         context.setId(UUID.getUUID());
 
-        registry.registerObject(MuleProperties.OBJECT_MANAGMENT_CONTEXT, context);
+        registry.registerObject(UMOManagementContext.class, MuleProperties.OBJECT_MANAGMENT_CONTEXT, context);
         registry.registerObject(ObjectProcessor.class, MuleProperties.OBJECT_MANAGMENT_CONTEXT_PROCESSOR,
                 new ManagementContextDependencyProcessor(context));
 
         //Register objects so we get lifecycle management
-        registry.registerObject(MuleProperties.OBJECT_MANAGMENT_CONTEXT, context);
         registry.registerObject(MuleProperties.OBJECT_SECURITY_MANAGER, securityManager);
         registry.registerObject(MuleProperties.OBJECT_WORK_MANAGER, workManager);
         registry.registerObject(MuleProperties.OBJECT_NOTIFICATION_MANAGER, notificationManager);
@@ -561,6 +568,7 @@ public class TransientRegistry extends AbstractRegistry
         UMOModel model = sd.createModel();
         model.setName(MuleProperties.OBJECT_SYSTEM_MODEL);
         registry.registerModel(model);
+        registry.initialise();
         return registry;
     }
 }

@@ -31,9 +31,7 @@ import org.mule.umo.UMOManagementContext;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.model.UMOModel;
-import org.mule.umo.provider.UMOConnector;
 import org.mule.util.MuleObjectHelper;
-import org.mule.util.StringUtils;
 
 import java.util.Map;
 import java.util.Properties;
@@ -57,7 +55,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
 
     public QuickConfigurationBuilder() throws UMOException
     {
-        this("seda", null, null);
+        this("seda", true);
     }
 
     /**
@@ -68,16 +66,15 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
      */
     public QuickConfigurationBuilder(String modeltype) throws UMOException
     {
-        this(modeltype, null, null);
+        this(modeltype, true);
     }
 
-
-    public QuickConfigurationBuilder(String modeltype, String serverUri) throws UMOException
+    public QuickConfigurationBuilder(boolean startManagementContext) throws UMOException
     {
-        this(modeltype, serverUri, null);
+        this("seda", startManagementContext);
     }
 
-    public QuickConfigurationBuilder(String modeltype, String serverUrl, UMOConnector serverConnector) throws UMOException
+    public QuickConfigurationBuilder(String modeltype, boolean startManagementContext) throws UMOException
     {
         if(RegistryContext.getRegistry()==null)
         {
@@ -86,19 +83,6 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         }
         managementContext = RegistryContext.getRegistry().getManagementContext();
 
-
-        if(serverConnector!=null)
-        {
-            managementContext.getRegistry().registerConnector(serverConnector);
-        }
-
-        if(!StringUtils.isBlank(serverUrl))
-        {
-            MuleAdminAgent agent = new MuleAdminAgent();
-            agent.setServerUri(serverUrl);
-            agent.setName("Mule Admin Agent");
-            managementContext.getRegistry().registerAgent(agent);
-        }
 
         String defaultModelName = UMOModel.DEFAULT_MODEL_NAME + "-qbuilder";
         if(managementContext.getRegistry().lookupModel(defaultModelName)==null)
@@ -114,7 +98,10 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
             model.setName(defaultModelName);
             managementContext.getRegistry().registerModel(model);
         }
-        managementContext.getRegistry().initialise();
+        if(startManagementContext)
+        {
+            managementContext.start();
+        }
     }
 
     /**
@@ -234,7 +221,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         descriptor.getInboundRouter().addEndpoint(sendEndpoint);
 
         // register the components descriptor
-        getModel().registerComponent(descriptor);
+        managementContext.getRegistry().registerService(descriptor);
         return descriptor;
     }
 
@@ -293,7 +280,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
      */
     public void registerComponent(UMODescriptor descriptor) throws UMOException
     {
-         getModel().registerComponent(descriptor);
+         managementContext.getRegistry().registerService(descriptor);
     }
 
     /**
@@ -381,7 +368,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     {
         UMODescriptor d = createDescriptor(implementation, name, inboundEndpointUri, outboundEndpointUri,
             properties);
-        getModel().registerComponent(d);
+        managementContext.getRegistry().registerService(d);
     }
 
     /**
@@ -477,6 +464,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         MuleDescriptor descriptor = new MuleDescriptor();
         descriptor.setImplementation(implementation);
         descriptor.setName(name);
+        descriptor.setModelName(getModel().getName());
         if (properties != null)
         {
             descriptor.getProperties().putAll(properties);

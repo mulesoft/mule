@@ -9,11 +9,11 @@
  */
 package org.mule.config.spring;
 
+import org.mule.RegistryContext;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.impl.AlreadyInitialisedException;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.internal.notifications.RegistryNotification;
 import org.mule.providers.service.TransportFactory;
@@ -108,15 +108,19 @@ public abstract class AbstractRegistry implements RegistryFacade
             return;
         }
 
-        if (getParent() != null)
-        {
-            parent.dispose();
-        }
-
         try
         {
             doDispose();
             lifecycleManager.firePhase(getManagementContext(), Disposable.PHASE_NAME);
+            if (getParent() != null)
+            {
+                parent.dispose();
+            }
+            else
+            {
+                //remove this referenceonce there is no one else left to dispose
+                RegistryContext.setRegistry(null);
+            }
         }
         catch (UMOException e)
         {
@@ -156,10 +160,7 @@ public abstract class AbstractRegistry implements RegistryFacade
 
     public final void initialise() throws InitialisationException
     {
-        if (isInitialised())
-        {
-            throw new AlreadyInitialisedException(id, this);
-        }
+        lifecycleManager.checkPhase(Initialisable.PHASE_NAME);
 
         if (getParent() != null)
         {

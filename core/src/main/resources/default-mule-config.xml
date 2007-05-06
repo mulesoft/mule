@@ -55,9 +55,9 @@
         <constructor-arg value="org.mule.umo.lifecycle.Initialisable"/>
     </bean>
 
-    <bean name="_muleStartLifecycle" class="org.mule.impl.lifecycle.phases.StartPhase"/>
+    <bean name="_muleStartLifecycle" class="org.mule.impl.lifecycle.phases.ManagementContextStartPhase"/>
 
-    <bean name="_muleStopLifecycle" class="org.mule.impl.lifecycle.phases.StopPhase"/>
+    <bean name="_muleStopLifecycle" class="org.mule.impl.lifecycle.phases.ManagementContextStopPhase"/>
 
     <bean name="_muleDisposeLifecycle" class="org.mule.impl.lifecycle.ContainerManagedLifecyclePhase">
         <constructor-arg value="dispose"/>

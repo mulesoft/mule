@@ -87,7 +87,8 @@ public final class ModelHelper
             model.setName(MuleProperties.OBJECT_SYSTEM_MODEL);
             RegistryContext.getRegistry().registerModel(model);
         }
-        model.registerComponent(d);
+        d.setModelName(MuleProperties.OBJECT_SYSTEM_MODEL);
+        RegistryContext.getRegistry().registerService(d);
     }
 
     public static UMOModel getFirstUserModel() throws UMOException

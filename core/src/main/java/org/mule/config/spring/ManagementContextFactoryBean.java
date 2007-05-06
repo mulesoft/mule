@@ -129,8 +129,9 @@ public class ManagementContextFactoryBean extends AbstractFactoryBean
         managementContext.setSecurityManager(securityManager);
         managementContext.setWorkManager(workManager);
         managementContext.setTransactionManager(transactionManager);
-        //managementContext.initialise();
+        managementContext.initialise();
     }
+    
 
 
     //@java.lang.Override

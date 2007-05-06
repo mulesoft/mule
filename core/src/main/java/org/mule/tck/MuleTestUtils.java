@@ -10,7 +10,6 @@
 
 package org.mule.tck;
 
-import org.mule.config.MuleProperties;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.ManagementContext;
 import org.mule.impl.MuleDescriptor;
@@ -52,8 +51,6 @@ import com.mockobjects.dynamic.Mock;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.context.support.StaticApplicationContext;
-
 /**
  * Utilities for creating test and Mock Mule objects
  */
@@ -76,8 +73,6 @@ public final class MuleTestUtils
 
     public static UMOEndpoint getTestEndpoint(String name, String type, UMOManagementContext context) throws Exception
     {
-        StaticApplicationContext factory = getStaticApplicationContext(context);
-
         Map props = new HashMap();
         props.put("name", name);
         props.put("type", type);
@@ -99,14 +94,6 @@ public final class MuleTestUtils
         endpoint.setManagementContext(context);
         endpoint.initialise();
         return endpoint;
-    }
-
-    protected static StaticApplicationContext getStaticApplicationContext(UMOManagementContext context)
-    {
-        StaticApplicationContext ctx = new StaticApplicationContext();
-        ctx.getBeanFactory().registerSingleton(MuleProperties.OBJECT_MANAGMENT_CONTEXT, context);
-        ctx.start();
-        return ctx;
     }
 
     public static UMOEvent getTestEvent(Object data, UMOManagementContext context) throws Exception

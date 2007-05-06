@@ -64,8 +64,8 @@ public class JdbcConnectionTestCase extends AbstractJdbcFunctionalTestCase
     {
 
         MuleDescriptor d = getTestDescriptor("anOrange", Orange.class.getName());
-
-        model.registerComponent(d);
+        d.setModelName(model.getName());
+        managementContext.getRegistry().registerService(d);
         UMOComponent component = model.getComponent(d.getName());
         UMOEndpoint endpoint = new MuleEndpoint("test", new MuleEndpointURI(
             "jdbc://test?sql=SELECT * FROM TABLE"), connector, null, UMOEndpoint.ENDPOINT_TYPE_SENDER, 0,
