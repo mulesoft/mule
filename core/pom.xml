@@ -56,6 +56,15 @@
                     </instructions>
                 </configuration>
             </plugin>
+
+             <plugin>
+                 <artifactId>maven-surefire-plugin</artifactId>
+                 <configuration>
+                     <excludes>
+                         <exclude>**/ServerNotificationsTestCase.*</exclude>
+                     </excludes>
+                 </configuration>
+             </plugin>
          </plugins>
     </build>
     
