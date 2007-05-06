@@ -15,6 +15,10 @@ import org.mule.tck.AbstractMuleTestCase;
 public class SpiUtilsTestCase extends AbstractMuleTestCase
 {
 
+    public void testThisIsJustAnEmptyPlaceholder() {
+        // needed to avoid triggering false TestSuite failures with no test methods.
+    }
+
 //    public void testDiscoverDefault() throws Exception
 //    {
 //        Class c = SpiUtils.findService(Fruit.class, Banana.class.getName(), getClass());
