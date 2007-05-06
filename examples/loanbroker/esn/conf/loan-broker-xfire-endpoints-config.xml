@@ -12,11 +12,11 @@
     </description>
 
     <transformers>
-    	<transformer name="ExtractCustomer" className="org.mule.transformers.simple.GetBeanProperty">
-    		<properties>
-    			<property name="propertyName" value="customerRequest.customer" />
-    		</properties>
-    	</transformer>
+        <transformer name="ExtractCustomer" className="org.mule.transformers.simple.GetBeanProperty">
+            <properties>
+                <property name="propertyName" value="customerRequest.customer" />
+            </properties>
+        </transformer>
         <transformer name="SetLendersAsRecipients" className="org.mule.examples.loanbroker.transformers.SetLendersAsRecipients" />
     </transformers>
     

@@ -43,7 +43,7 @@
         The credit agency service will get the credit profile for a customer
         -->
         <mule-descriptor name="CreditAgencyService"
-            			 implementation="org.mule.examples.loanbroker.credit.DefaultCreditAgency">
+                         implementation="org.mule.examples.loanbroker.credit.DefaultCreditAgency">
             <inbound-router>
                 <global-endpoint name="CreditAgencyIn"/>
             </inbound-router>
@@ -53,7 +53,7 @@
         The Lender service is used to determine which banks to contact for a quote
         -->
         <mule-descriptor name="LenderService"
-            			 implementation="org.mule.examples.loanbroker.lender.DefaultLender">
+                         implementation="org.mule.examples.loanbroker.lender.DefaultLender">
             <inbound-router>
                 <global-endpoint name="LenderService"/>
             </inbound-router>
@@ -65,7 +65,7 @@
         </mule-descriptor>
             
         <mule-descriptor name="BankGateway"
-            			 implementation="org.mule.components.simple.BridgeComponent">
+                         implementation="org.mule.components.simple.BridgeComponent">
             <inbound-router>
                 <global-endpoint name="BankGateway"/>
             </inbound-router>

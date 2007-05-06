@@ -5,32 +5,32 @@
 
 <mule-configuration id="NestedRouter-Test" version="1.0">
 
-	<connector name="VMConnector" className="org.mule.providers.vm.VMConnector">
-		<properties>
-			<property value="true" name="queueEvents"/>
-		</properties>
-	</connector>
+    <connector name="VMConnector" className="org.mule.providers.vm.VMConnector">
+        <properties>
+            <property value="true" name="queueEvents"/>
+        </properties>
+    </connector>
 
-	<model name="NestedRouter">
-		<mule-descriptor name="HelloComponent" implementation="org.mule.test.integration.routing.nested.HelloService">
-			<inbound-router>
-				<endpoint address="vm://hello.in"/>
-			</inbound-router>
-		</mule-descriptor>
-		<mule-descriptor name="InvokerComponent" implementation="org.mule.test.integration.routing.nested.Invoker">
-			<inbound-router>
-				<endpoint address="vm://invoker.in"/>
-			</inbound-router>
-			<nested-router>
-				<binding interface="org.mule.test.integration.routing.nested.HelloInterface">
-					<endpoint address="vm://hello.in" synchronous="true"/>
-				</binding>
-			</nested-router>
-			<outbound-router>
-				<router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-					<endpoint address="vm://invoker.out"/>
-				</router>
-			</outbound-router>
-		</mule-descriptor>
-	</model>
+    <model name="NestedRouter">
+        <mule-descriptor name="HelloComponent" implementation="org.mule.test.integration.routing.nested.HelloService">
+            <inbound-router>
+                <endpoint address="vm://hello.in"/>
+            </inbound-router>
+        </mule-descriptor>
+        <mule-descriptor name="InvokerComponent" implementation="org.mule.test.integration.routing.nested.Invoker">
+            <inbound-router>
+                <endpoint address="vm://invoker.in"/>
+            </inbound-router>
+            <nested-router>
+                <binding interface="org.mule.test.integration.routing.nested.HelloInterface">
+                    <endpoint address="vm://hello.in" synchronous="true"/>
+                </binding>
+            </nested-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="vm://invoker.out"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+    </model>
 </mule-configuration>

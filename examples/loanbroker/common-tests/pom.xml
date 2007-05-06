@@ -23,7 +23,7 @@
             <version>${version}</version>
         </dependency>
         <!-- This should have been pulled in as a transitive dependency from mule-tests-functional but it looks 
-        	like it's yet another m2 workaround. -->
+            like it's yet another m2 workaround. -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

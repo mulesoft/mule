@@ -32,12 +32,12 @@ rem If MULE_BASE is not set, set it to MULE_HOME
 if "%MULE_BASE%" == "" SET MULE_BASE=%MULE_HOME%
 
 if "%MULE_APP%" == "" (
-	set MULE_APP=mule
-	set MULE_APP_LONG=Mule
+    set MULE_APP=mule
+    set MULE_APP_LONG=Mule
 ) else (
-	if "%MULE_APP_LONG%" == "" (
-		set MULE_APP_LONG=%MULE_APP%
-	)
+    if "%MULE_APP_LONG%" == "" (
+        set MULE_APP_LONG=%MULE_APP%
+    )
 )
 
 set _WRAPPER_BASE=%MULE_HOME%\lib\boot\exec\wrapper
@@ -61,14 +61,14 @@ for /F %%v in ('echo %1^|findstr "^console$ ^start$ ^pause$ ^resume$ ^stop$ ^res
 
 if "%COMMAND%" == "" (
     echo Usage: %0 { console : start : pause : resume : stop : restart : install : remove }
-	rem ###############################################################
-	rem Customized for Mule
-	rem ###############################################################
+    rem ###############################################################
+    rem Customized for Mule
+    rem ###############################################################
     echo No command specified, running in console/foreground mode by default, use Ctrl-C to exit...
     set COMMAND=:console
     rem pause
     rem goto :eof
-	rem ###############################################################
+    rem ###############################################################
 ) else (
     shift
 )

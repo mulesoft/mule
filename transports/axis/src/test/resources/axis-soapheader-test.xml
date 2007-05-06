@@ -10,11 +10,11 @@
             <inbound-router>
                 <endpoint address="axis:http://localhost:12181/services"/>
             </inbound-router>
-			<response-router>
-				<endpoint address="http://localhost:12182/reply"/>
-			</response-router>
+            <response-router>
+                <endpoint address="http://localhost:12182/reply"/>
+            </response-router>
         </mule-descriptor>
-		
+
     </model>
-	
+
 </mule-configuration>

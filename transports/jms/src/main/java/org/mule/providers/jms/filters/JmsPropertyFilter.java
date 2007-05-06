@@ -54,68 +54,68 @@ public class JmsPropertyFilter implements UMOFilter
             logger.warn("No property name was specified");
             return false;
         }
-    	
+
         if (StringUtils.isBlank(expression) && pattern == null) {
             logger.warn("Either no expression or pattern was specified");
             return false;
         }
-    	
-    	if (message.getPayload() instanceof javax.jms.Message) {
-    	    try 
-	    {
+
+        if (message.getPayload() instanceof javax.jms.Message) {
+            try
+        {
                 Message m = (javax.jms.Message)message.getPayload();
 
-		if (StringUtils.isBlank(propertyClass)) {
-		    Object object = m.getObjectProperty(propertyName);
-		    if (object == null) return false;
-		    String value = object.toString();
+        if (StringUtils.isBlank(propertyClass)) {
+            Object object = m.getObjectProperty(propertyName);
+            if (object == null) return false;
+            String value = object.toString();
 
-		    if (pattern != null) 
-		    {
-			return pattern.matcher(value).find();
-		    } 
-		    else 
-		    {
-			return value.equals(expression);
-		    }
-		}
-		else if (propertyClass.equals("java.lang.String"))
-		{
-		    String value = m.getStringProperty(propertyName);
-		    if (value == null) return false;
+            if (pattern != null)
+            {
+            return pattern.matcher(value).find();
+            }
+            else
+            {
+            return value.equals(expression);
+            }
+        }
+        else if (propertyClass.equals("java.lang.String"))
+        {
+            String value = m.getStringProperty(propertyName);
+            if (value == null) return false;
 
-		    if (pattern != null) 
-		    {
-			return pattern.matcher(value).find();
-		    } 
-		    else 
-		    {
-			return value.equals(expression);
-		    }
-		} else if (propertyClass.equals("java.lang.Integer")) {
-		    int value = m.getIntProperty(propertyName);
-		    int match = Integer.parseInt(expression);
-		    return (value == match);
-		} else if (propertyClass.equals("java.lang.Short")) {
-		    short value = m.getShortProperty(propertyName);
-		    short match = Short.parseShort(expression);
-		    return (value == match);
-		}
-	    } catch (NumberFormatException nfe) {
-	        logger.warn("Unable to convert expression " +
-		    expression + " to " + propertyClass + ": " + 
-	            nfe.toString());
-	    }
-	    catch (Exception e) 
-	    {
-		logger.warn("Error filtering on property " + propertyName
-		    + ": " + e.toString());
-	    }
+            if (pattern != null)
+            {
+            return pattern.matcher(value).find();
+            }
+            else
+            {
+            return value.equals(expression);
+            }
+        } else if (propertyClass.equals("java.lang.Integer")) {
+            int value = m.getIntProperty(propertyName);
+            int match = Integer.parseInt(expression);
+            return (value == match);
+        } else if (propertyClass.equals("java.lang.Short")) {
+            short value = m.getShortProperty(propertyName);
+            short match = Short.parseShort(expression);
+            return (value == match);
+        }
+        } catch (NumberFormatException nfe) {
+            logger.warn("Unable to convert expression " +
+            expression + " to " + propertyClass + ": " +
+                nfe.toString());
+        }
+        catch (Exception e)
+        {
+        logger.warn("Error filtering on property " + propertyName
+            + ": " + e.toString());
+        }
         } else {
             logger.warn("Expected a payload of javax.jms.Message but instead received " + message.getPayload().getClass().getName());
-    	}
-    	
-     	return false;
+        }
+
+         return false;
     }
 
     /**

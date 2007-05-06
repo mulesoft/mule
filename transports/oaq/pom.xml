@@ -61,7 +61,7 @@
             <scope>provided</scope>
         </dependency>
 
-	    <!-- The Oracle JMS implementation (oracle.jms.*) -->
+        <!-- The Oracle JMS implementation (oracle.jms.*) -->
         <dependency>
             <groupId>oracle</groupId>
             <artifactId>aqapi13</artifactId>

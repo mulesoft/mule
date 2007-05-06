@@ -184,7 +184,7 @@ public class MuleRegistration implements Registration
     }
 
     public void setVersion(ComponentVersion version) {
-    	this.version = version;
+        this.version = version;
     }
 
     /*

@@ -48,7 +48,7 @@
         </properties>
     </connector>
 
-	<!-- TODO Move these to global-endpoints once MULE-1464 is fixed. -->
+    <!-- TODO Move these to global-endpoints once MULE-1464 is fixed. -->
     <endpoint-identifiers>
         <endpoint-identifier name="CustomerRequestsREST" value="jetty:rest://localhost:8080/loanbroker"/>
         <endpoint-identifier name="CustomerRequests" value="vm://customer.requests"/>

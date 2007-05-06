@@ -380,7 +380,7 @@ public abstract class AbstractConnector
      */
     public void register() throws RegistrationException
     {
-		//TODO
+        //TODO
         registryId = RegistryContext.getRegistry().registerMuleObject(managementContext, this).getId();
     }
 

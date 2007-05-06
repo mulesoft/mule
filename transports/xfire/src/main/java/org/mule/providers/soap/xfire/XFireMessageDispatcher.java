@@ -118,17 +118,17 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
 
     protected Client createXFireClient(UMOImmutableEndpoint endpoint, Service service, XFire xfire, String transportClass) throws Exception
     {
-    	Class transportClazz;
+        Class transportClazz;
 
         if (connector.getClientTransport() == null)
         {
             if (!StringUtils.isBlank(transportClass))
             {
-    	        transportClazz = ClassUtils.loadClass(transportClass, this.getClass());
+                transportClazz = ClassUtils.loadClass(transportClass, this.getClass());
             }
             else
             {
-    	        transportClazz = MuleUniversalTransport.class;
+                transportClazz = MuleUniversalTransport.class;
             }
         }
         else
@@ -136,7 +136,7 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
             transportClazz = ClassUtils.loadClass(connector.getClientTransport(), this.getClass());
         }
 
-    	Transport transport = (Transport)transportClazz.getConstructor(null).newInstance(null);
+        Transport transport = (Transport)transportClazz.getConstructor(null).newInstance(null);
         Client client = new Client(transport, service, endpoint.getEndpointURI().toString());
         client.setXFire(xfire);
         client.setEndpointUri(endpoint.getEndpointURI().toString());
@@ -153,8 +153,8 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
         {
             for(int i = 0; i < inList.size(); i++)
             {
-            	Class clazz = ClassUtils.loadClass(inList.get(i).toString(), this.getClass());
-            	Handler handler = (Handler)clazz.getConstructor(null).newInstance(null);
+                Class clazz = ClassUtils.loadClass(inList.get(i).toString(), this.getClass());
+                Handler handler = (Handler)clazz.getConstructor(null).newInstance(null);
                 client.addInHandler(handler);
             }
         }
@@ -164,8 +164,8 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
         {
             for(int i = 0; i < outList.size(); i++)
             {
-            	Class clazz = ClassUtils.loadClass(outList.get(i).toString(), this.getClass());
-            	Handler handler = (Handler)clazz.getConstructor(null).newInstance(null);
+                Class clazz = ClassUtils.loadClass(outList.get(i).toString(), this.getClass());
+                Handler handler = (Handler)clazz.getConstructor(null).newInstance(null);
                 client.addOutHandler(handler);
             }
         }

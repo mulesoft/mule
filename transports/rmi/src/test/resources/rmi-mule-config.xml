@@ -7,40 +7,40 @@
 
     <mule-environment-properties embedded="true"/>
 
-	<connector name="rmi" className="org.mule.providers.rmi.RmiConnector">
-	    <properties>
-			<property name="jndiInitialContextFactory" value="org.mule.impl.jndi.MuleInitialContextFactory"/>
-			<factory-property name="jndiContext" factory="org.mule.providers.rmi.MuleRMIFactory"/>	
-			<property name="securityPolicy" value="rmi.policy"/>
-		</properties>
-	</connector> 
-	
-	<connector name="vmQueue" className="org.mule.providers.vm.VMConnector">
+    <connector name="rmi" className="org.mule.providers.rmi.RmiConnector">
+        <properties>
+            <property name="jndiInitialContextFactory" value="org.mule.impl.jndi.MuleInitialContextFactory"/>
+            <factory-property name="jndiContext" factory="org.mule.providers.rmi.MuleRMIFactory"/>
+            <property name="securityPolicy" value="rmi.policy"/>
+        </properties>
+    </connector>
+
+    <connector name="vmQueue" className="org.mule.providers.vm.VMConnector">
         <properties>
             <property name="queueEvents" value="true"/>
         </properties>
     </connector>
-		
-	<endpoint-identifiers>
-		<endpoint-identifier name="Sender" value="rmi://localhost:1099/SimpleMathsUMO?method=addTen" />
-		<endpoint-identifier name="Sender2" value="rmi://localhost:1099/MatchingUMO?method=reverseString" />
-	</endpoint-identifiers>
-	
- 	<model name="sample"> 
-		<mule-descriptor name="TestUMO" implementation="org.mule.components.simple.BridgeComponent">
-			<inbound-router>
-				<endpoint address="vm://testin"/>
-			</inbound-router>
-			<outbound-router> 
-				<router className="org.mule.routing.outbound.FilteringOutboundRouter">
-					<endpoint address="Sender"/>
-				    <filter expectedType="java.lang.Integer" className="org.mule.routing.filters.PayloadTypeFilter"/>
-				</router>
-				<router className="org.mule.routing.outbound.FilteringOutboundRouter">
-					<endpoint address="Sender2"/>
-					<filter expectedType="java.lang.String" className="org.mule.routing.filters.PayloadTypeFilter"/>
-			    </router>
-			</outbound-router> 
-		</mule-descriptor> 	
-	</model> 
+
+    <endpoint-identifiers>
+        <endpoint-identifier name="Sender" value="rmi://localhost:1099/SimpleMathsUMO?method=addTen" />
+        <endpoint-identifier name="Sender2" value="rmi://localhost:1099/MatchingUMO?method=reverseString" />
+    </endpoint-identifiers>
+
+     <model name="sample">
+        <mule-descriptor name="TestUMO" implementation="org.mule.components.simple.BridgeComponent">
+            <inbound-router>
+                <endpoint address="vm://testin"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
+                    <endpoint address="Sender"/>
+                    <filter expectedType="java.lang.Integer" className="org.mule.routing.filters.PayloadTypeFilter"/>
+                </router>
+                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
+                    <endpoint address="Sender2"/>
+                    <filter expectedType="java.lang.String" className="org.mule.routing.filters.PayloadTypeFilter"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+    </model>
 </mule-configuration> 

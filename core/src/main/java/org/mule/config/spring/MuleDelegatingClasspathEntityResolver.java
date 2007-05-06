@@ -55,10 +55,10 @@ public class MuleDelegatingClasspathEntityResolver extends ResourceEntityResolve
             {
                 InputSource source = new InputSource(resource.getInputStream());
                 source.setPublicId(publicId);
-				source.setSystemId(systemId);
-				if (logger.isDebugEnabled()) {
-					logger.debug("Found XML entity [" + systemId + "]: " + resource);
-				}
+                source.setSystemId(systemId);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Found XML entity [" + systemId + "]: " + resource);
+                }
                 return source;
             }
         }

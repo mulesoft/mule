@@ -33,7 +33,7 @@
     <state name="sendToCreditAgency">
         <event type="node-enter">
             <action class="org.mule.providers.bpm.jbpm.actions.SendMuleEventAndContinue">
-            	<!-- This is the variable we stored in the previous step -->
+                <!-- This is the variable we stored in the previous step -->
                 <payloadSource>customerRequest.customer</payloadSource>
                 <endpoint>CreditAgency</endpoint>
                 <synchronous>false</synchronous>

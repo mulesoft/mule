@@ -30,9 +30,9 @@ public class MuleServerWrapper implements WrapperListener
      *-------------------------------------------------------------*/
     /**
      * The start method is called when the WrapperManager is signaled by the
-     *	native wrapper code that it can start its application.  This
-     *	method call is expected to return, so a new thread should be launched
-     *	if necessary.
+     *    native wrapper code that it can start its application.  This
+     *    method call is expected to return, so a new thread should be launched
+     *    if necessary.
      *
      * @param args List of arguments used to initialize the application.
      *
@@ -42,14 +42,14 @@ public class MuleServerWrapper implements WrapperListener
      */
     public Integer start( String[] args )
     {
-    	try {
-        	mule = new MuleServer( args );
+        try {
+            mule = new MuleServer( args );
             mule.start(false, false);
             return null;
-    	} catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return new Integer(1);
-    	}
+        }
     }
 
     /**

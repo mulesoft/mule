@@ -216,7 +216,7 @@ Assembly descriptor for the full Mule distribution.
         <include>org.springframework.osgi:spring-context</include>
         <include>org.springframework.osgi:spring-beans</include>
         <include>org.springframework.osgi:spring-jmx</include>
-      	<!-- Spring dependencies -->
+          <!-- Spring dependencies -->
         <include>org.springframework.osgi:aopalliance.osgi</include>
         <include>org.springframework.osgi:asm.osgi</include>
         <include>org.springframework.osgi:aspectjrt.osgi</include>

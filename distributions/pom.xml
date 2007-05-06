@@ -305,18 +305,18 @@
     <profiles>
         <profile>
             <id>osgi</id>
-    		<dependencies>
-		        <dependency>
-		            <groupId>org.mule.modules</groupId>
-		            <artifactId>mule-module-osgi</artifactId>
-		            <version>${version}</version>
-		        </dependency>
-		        <dependency>
-		            <groupId>org.mule.examples</groupId>
-		            <artifactId>mule-example-hello-osgi</artifactId>
-		            <version>${version}</version>
-		        </dependency>
-		    </dependencies>
+            <dependencies>
+                <dependency>
+                    <groupId>org.mule.modules</groupId>
+                    <artifactId>mule-module-osgi</artifactId>
+                    <version>${version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.mule.examples</groupId>
+                    <artifactId>mule-example-hello-osgi</artifactId>
+                    <version>${version}</version>
+                </dependency>
+            </dependencies>
         </profile>
     </profiles>
 </project>

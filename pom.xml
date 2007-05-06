@@ -176,13 +176,13 @@
             <id>apache-m2-incubator</id>
             <name>Apache m2 Incubator</name>
             <url>http://people.apache.org/repo/m2-incubating-repository</url>
-	      <snapshots>
-	        <enabled>true</enabled>
-	      </snapshots>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
             <releases>
             <enabled>true</enabled>
             </releases>
-	    </pluginRepository>
+        </pluginRepository>
         <pluginRepository>
             <id>mule-deps</id>
             <name>Mule Dependencies</name>
@@ -221,12 +221,12 @@
                 </configuration>
             </plugin>
 
-	      	<plugin>
+              <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <version>0.9.0-mule-SNAPSHOT</version>
-		        <extensions>true</extensions>
-		        <configuration>
+                <extensions>true</extensions>
+                <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
                         <Bundle-DocURL>${pom.url}</Bundle-DocURL>
@@ -254,8 +254,8 @@
                             META-INF.services.org.mule.*
                         </Private-Package>
                     </instructions>
-		        </configuration>
-		    </plugin>
+                </configuration>
+            </plugin>
 
             <!-- Global test exclusions -->
             <plugin>

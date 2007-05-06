@@ -37,28 +37,28 @@
                 <global-endpoint name="LoanBrokerQuotes"/>
                 <router className="org.mule.examples.loanbroker.routers.BankQuotesInboundAggregator">
                     <filter expectedType="org.mule.examples.loanbroker.messages.LoanQuote" 
-                    		className="org.mule.routing.filters.PayloadTypeFilter"/>
+                            className="org.mule.routing.filters.PayloadTypeFilter"/>
                 </router>
             </inbound-router>
 
             <outbound-router>
-            	<!-- Credit profile requests -->
+                <!-- Credit profile requests -->
                 <router className="org.mule.routing.outbound.FilteringOutboundRouter">
                     <global-endpoint name="CreditAgency" transformers="ExtractCustomer"/>
                     <filter expectedType="org.mule.examples.loanbroker.messages.Customer" 
-                    		className="org.mule.routing.filters.PayloadTypeFilter"/>
+                            className="org.mule.routing.filters.PayloadTypeFilter"/>
                 </router>
                 <!-- Quote requests to the banks -->
                 <router className="org.mule.routing.outbound.FilteringOutboundRouter">
                     <global-endpoint name="LenderService"/>
                     <filter expectedType="org.mule.examples.loanbroker.messages.LoanBrokerQuoteRequest" 
-                    		className="org.mule.routing.filters.PayloadTypeFilter"/>
+                            className="org.mule.routing.filters.PayloadTypeFilter"/>
                 </router>
                 <!-- Final quote response to the customer -->
                 <router className="org.mule.routing.outbound.FilteringOutboundRouter">
                     <global-endpoint name="CustomerResponses"/>
                     <filter expectedType="org.mule.examples.loanbroker.messages.LoanQuote" 
-                    		className="org.mule.routing.filters.PayloadTypeFilter"/>
+                            className="org.mule.routing.filters.PayloadTypeFilter"/>
                 </router>
             </outbound-router>
         </mule-descriptor>
@@ -67,7 +67,7 @@
         The credit agency service will get the credit profile for a customer
         -->
         <mule-descriptor name="CreditAgencyService"
-            			 implementation="org.mule.examples.loanbroker.credit.DefaultCreditAgency">
+                         implementation="org.mule.examples.loanbroker.credit.DefaultCreditAgency">
             <inbound-router>
                 <global-endpoint name="CreditAgency"/>
             </inbound-router>
@@ -77,7 +77,7 @@
         The Lender service is used to determine which banks to contact for a quote
         -->
         <mule-descriptor name="LenderService"
-            			 implementation="org.mule.examples.loanbroker.lender.DefaultLender">
+                         implementation="org.mule.examples.loanbroker.lender.DefaultLender">
             <inbound-router>
                 <global-endpoint name="LenderService"/>
             </inbound-router>
@@ -89,7 +89,7 @@
         </mule-descriptor>
             
         <mule-descriptor name="BankGateway"
-            			 implementation="org.mule.components.simple.BridgeComponent">
+                         implementation="org.mule.components.simple.BridgeComponent">
             <inbound-router>
                 <global-endpoint name="BankGateway"/>
             </inbound-router>

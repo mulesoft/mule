@@ -4,14 +4,14 @@
                                 "http://mule.mulesource.org/dtds/mule-configuration.dtd">
 
 <mule-configuration id="Mule_Sample" version="1.0">
-	
-	<mule-environment-properties serverUrl="" synchronous="true"/>
-	
+
+    <mule-environment-properties serverUrl="" synchronous="true"/>
+
     <security-manager>
-		<security-provider name="JaasProvider" className="org.mule.extras.jaas.JaasSimpleAuthenticationProvider">
+        <security-provider name="JaasProvider" className="org.mule.extras.jaas.JaasSimpleAuthenticationProvider">
             <properties>
                 <property name="loginContextName" value="jaasTest"/> 
-			    <property name="loginConfig" value="jaas.conf"/>
+                <property name="loginConfig" value="jaas.conf"/>
             </properties>
         </security-provider>
         <encryption-strategy name="PBE" className="org.mule.impl.security.PasswordBasedEncryptionStrategy">
@@ -19,19 +19,19 @@
                 <property name="password" value="mule"/>
             </properties>
         </encryption-strategy>
-	</security-manager>
-	
+    </security-manager>
+
     <model name="test">
-		<mule-descriptor name="TestUMO" implementation="org.mule.tck.functional.FunctionalTestComponent">
-			<inbound-router>
-				<endpoint address="vm://test">
-					<security-filter className="org.mule.impl.security.filters.MuleEncryptionEndpointSecurityFilter">
-	                         <properties>
-		                         <property name="strategyName" value="PBE"/>
-			                 </properties>
-				      </security-filter> 
-				</endpoint>			
-			</inbound-router>
-		</mule-descriptor>	
-	</model> 
+        <mule-descriptor name="TestUMO" implementation="org.mule.tck.functional.FunctionalTestComponent">
+            <inbound-router>
+                <endpoint address="vm://test">
+                    <security-filter className="org.mule.impl.security.filters.MuleEncryptionEndpointSecurityFilter">
+                             <properties>
+                                 <property name="strategyName" value="PBE"/>
+                             </properties>
+                      </security-filter>
+                </endpoint>
+            </inbound-router>
+        </mule-descriptor>
+    </model>
 </mule-configuration>

@@ -23,7 +23,7 @@ public interface LoanBrokerService
      * Triggered by an incoming customer request for a loan.
      * @return Outgoing payload will depend on the implementation
      */
-	Object getLoanQuote(CustomerQuoteRequest request) throws LoanBrokerException;
+    Object getLoanQuote(CustomerQuoteRequest request) throws LoanBrokerException;
 
     /**
      * Triggered by an incoming offer from a bank.

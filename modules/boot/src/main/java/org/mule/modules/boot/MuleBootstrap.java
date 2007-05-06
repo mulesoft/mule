@@ -39,8 +39,8 @@ import org.tanukisoftware.wrapper.WrapperSimpleApp;
  */
 public class MuleBootstrap 
 {
-	public static final String MAIN_CLASS_MULE_SERVER = "org.mule.modules.boot.MuleServerWrapper";
-	public static final String MAIN_CLASS_OSGI_FRAMEWORK = "org.mule.modules.osgi.OsgiFrameworkWrapper";
+    public static final String MAIN_CLASS_MULE_SERVER = "org.mule.modules.boot.MuleServerWrapper";
+    public static final String MAIN_CLASS_OSGI_FRAMEWORK = "org.mule.modules.osgi.OsgiFrameworkWrapper";
 
     public static final String CLI_OPTIONS[][] = {
         {"main", "true", "Main Class"},
@@ -81,7 +81,7 @@ public class MuleBootstrap
     }
 
     private static void configureClasspath()
-    	throws IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, IOException
+        throws IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, IOException
     {
         // Make sure MULE_HOME is set.
         File muleHome = null;
@@ -208,20 +208,20 @@ public class MuleBootstrap
      * Imitates ClassUtils.isClassOnPath()
      */
     private static boolean isClassOnPath(String className) {
-    	boolean found = false;   	
-    	try {
-    		found = (Thread.currentThread().getContextClassLoader().loadClass(className) != null);
-    	} catch (ClassNotFoundException e) { }
-    	if (!found) {
-	    	try {
-	    		found = (Class.forName(className) != null);
-	    	} catch (ClassNotFoundException e) { }
-    	}
-    	if (!found) {
-	    	try {
-	    		found = (MuleBootstrap.class.getClassLoader().loadClass(className) != null);
-	    	} catch (ClassNotFoundException e) { }
-    	}
-    	return found;
+        boolean found = false;
+        try {
+            found = (Thread.currentThread().getContextClassLoader().loadClass(className) != null);
+        } catch (ClassNotFoundException e) { }
+        if (!found) {
+            try {
+                found = (Class.forName(className) != null);
+            } catch (ClassNotFoundException e) { }
+        }
+        if (!found) {
+            try {
+                found = (MuleBootstrap.class.getClassLoader().loadClass(className) != null);
+            } catch (ClassNotFoundException e) { }
+        }
+        return found;
     }
 }

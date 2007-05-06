@@ -88,7 +88,7 @@ public class ObjectMetadata extends Metadata
 
     public boolean getPersistable()
     {
-	return persistable;
+    return persistable;
     }
 
 

@@ -47,7 +47,7 @@ public class PropertyMetadata extends Metadata
 
     public boolean getIsKey()
     {
-	return ((flags & PROPERTY_KEY) == PROPERTY_KEY ? true : false);
+    return ((flags & PROPERTY_KEY) == PROPERTY_KEY ? true : false);
     }
 
     public void setIsPersistable()
@@ -57,7 +57,7 @@ public class PropertyMetadata extends Metadata
 
     public boolean getIsPersistable()
     {
-	return ((flags & PROPERTY_PERSISTABLE) == PROPERTY_PERSISTABLE ? true : false);
+    return ((flags & PROPERTY_PERSISTABLE) == PROPERTY_PERSISTABLE ? true : false);
     }
 
     public void setIsMutable()
@@ -67,7 +67,7 @@ public class PropertyMetadata extends Metadata
 
     public boolean getIsMutable()
     {
-	return ((flags & PROPERTY_MUTABLE) == PROPERTY_MUTABLE ? true : false);
+    return ((flags & PROPERTY_MUTABLE) == PROPERTY_MUTABLE ? true : false);
     }
 
     public void setIsTransient()
@@ -77,7 +77,7 @@ public class PropertyMetadata extends Metadata
 
     public boolean getIsTransient()
     {
-	return ((flags & PROPERTY_TRANSIENT) == PROPERTY_TRANSIENT ? true : false);
+    return ((flags & PROPERTY_TRANSIENT) == PROPERTY_TRANSIENT ? true : false);
     }
 
     public void setIsConfigDefined()
@@ -87,7 +87,7 @@ public class PropertyMetadata extends Metadata
 
     public boolean getIsConfigDefined()
     {
-	return ((flags & PROPERTY_CONFIG_DEFINED) == PROPERTY_CONFIG_DEFINED ? true : false);
+    return ((flags & PROPERTY_CONFIG_DEFINED) == PROPERTY_CONFIG_DEFINED ? true : false);
     }
 
 }

@@ -38,8 +38,8 @@
 
     <connector name="dummyConnector2" className="org.mule.tck.testmodels.mule.TestConnector2">
         <exception-strategy className="org.mule.impl.DefaultExceptionStrategy">
-        	<endpoint name="blahEndpoint" address="test://blah" />
-        	<global-endpoint name="orangeEndpoint" />
+            <endpoint name="blahEndpoint" address="test://blah" />
+            <global-endpoint name="orangeEndpoint" />
         </exception-strategy>
     </connector>
 

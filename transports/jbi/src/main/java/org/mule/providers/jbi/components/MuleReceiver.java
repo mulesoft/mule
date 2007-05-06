@@ -231,7 +231,7 @@ public class MuleReceiver extends AbstractEndpointComponent implements InternalM
      */
     class NullUMOComponent implements UMOComponent
     {
-		/**
+        /**
          * Serial version
          */
         private static final long serialVersionUID = 6446394166371870045L;
@@ -327,7 +327,7 @@ public class MuleReceiver extends AbstractEndpointComponent implements InternalM
         {
             RegistryContext.getRegistry().deregisterComponent(registryId);
             registryId = null;
-		}
+        }
 
         /**
          * Returns the registry id.

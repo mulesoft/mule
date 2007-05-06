@@ -38,7 +38,7 @@
             <version>3.1.4</version>
         </dependency>
         <!-- This is the same as spring-modules-jbpm31 but we override the pom in our local 
-        	dependencies repo because the one from Spring includes the kitchen sink. -->
+            dependencies repo because the one from Spring includes the kitchen sink. -->
         <dependency>
             <groupId>org.springmodules</groupId>
             <artifactId>spring-modules-jbpm31-nodeps</artifactId>
@@ -183,7 +183,7 @@
             <version>${version}</version>
             <!-- TODO Change this back to scope=test once 
                 LocalJbpmConfigurationFactoryBeanWorkaround 
-            	is no longer needed in src/main/java -->
+                is no longer needed in src/main/java -->
             <!-- <scope>test</scope> -->
         </dependency>
     </dependencies>

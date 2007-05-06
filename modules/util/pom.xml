@@ -22,17 +22,17 @@
                 <configuration>
                     <instructions>
                         <Export-Package>
-							edu.emory.mathcs.backport.java.util.*,
+                            edu.emory.mathcs.backport.java.util.*,
                             javax.activation,
-							javax.resource,
-							javax.resource.spi.*,
-                        	javax.transaction.*,
+                            javax.resource,
+                            javax.resource.spi.*,
+                            javax.transaction.*,
                             javax.xml.*,
-							org.apache.commons.beanutils.*,
-							org.apache.commons.collections.*,
+                            org.apache.commons.beanutils.*,
+                            org.apache.commons.collections.*,
                             org.apache.commons.io.*,
-							org.apache.commons.lang.*,
-							org.apache.commons.pool.*,
+                            org.apache.commons.lang.*,
+                            org.apache.commons.pool.*,
                             org.xml.sax.*,
                             org.w3c.dom.*
                         </Export-Package>
@@ -43,7 +43,7 @@
     </build>
     
   <dependencies>
-		<!-- The following libraries are provided by the mule-module-util bundle -->
+        <!-- The following libraries are provided by the mule-module-util bundle -->
         <dependency>
             <groupId>backport-util-concurrent</groupId>
             <artifactId>backport-util-concurrent</artifactId>

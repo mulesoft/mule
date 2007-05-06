@@ -52,11 +52,11 @@
             <scope>test</scope>
         </dependency>
 
-		<!-- Note: Ideally, the following list of libraries should be in the Mule project's top-level
-			POM, but Maven has visibility problems when dependencies are more than 2 levels away, so
+        <!-- Note: Ideally, the following list of libraries should be in the Mule project's top-level
+            POM, but Maven has visibility problems when dependencies are more than 2 levels away, so
             this list is repeated in core/pom.xml, modules/pom.xml, transports/pom.xml, examples/pom.xml -->
 
-		<!-- The following libraries are provided by the mule-module-util bundle -->
+        <!-- The following libraries are provided by the mule-module-util bundle -->
         <!--<dependency>-->
             <!--<groupId>backport-util-concurrent</groupId>-->
             <!--<artifactId>backport-util-concurrent</artifactId>-->

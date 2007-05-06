@@ -19,7 +19,7 @@
         </properties>
     </connector>
 
-	<!-- We could use JMS instead of VM to make the example more realistic.
+    <!-- We could use JMS instead of VM to make the example more realistic.
     <connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">
         <properties>
             <property name="connectionFactoryJndiName" value="ConnectionFactory"/>
@@ -32,7 +32,7 @@
     </connector>
     -->
 
-	<!-- TODO Move these to global-endpoints once MULE-1464 is fixed. -->
+    <!-- TODO Move these to global-endpoints once MULE-1464 is fixed. -->
     <endpoint-identifiers>
         <!-- The Loan Broker is driven by a Process Engine -->
         <endpoint-identifier name="ProcessEngine" value="bpm://LoanBroker"/>
