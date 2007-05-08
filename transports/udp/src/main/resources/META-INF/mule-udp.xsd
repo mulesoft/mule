@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.mulesource.org/schema/mule/udp/2.0"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+            targetNamespace="http://www.mulesource.org/schema/mule/udp/2.0"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.springframework.org/schema/beans"
+                schemaLocation="http://www.springframework.org/schema/beans"/>
+    
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"/>
+
+    <xsd:element name="connector" type="udpConnectorType"/>
+
+    <xsd:complexType name="udpConnectorType">
+        <xsd:complexContent mixed="true">
+            <xsd:extension base="mule:connectorType">
+                <xsd:attribute name="receiveBufferSize" type="xsd:int"/>
+                <xsd:attribute name="receiveTimeout" type="xsd:int"/>
+                <xsd:attribute name="sendBufferSize" type="xsd:int"/>
+                <xsd:attribute name="sendTimeout" type="xsd:int"/>
+                <xsd:attribute name="socketLinger" type="xsd:int"/>
+                <xsd:attribute name="broadcast" type="xsd:boolean"/>
+                <xsd:attribute name="keepSendSocketOpen" type="xsd:boolean"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+</xsd:schema>
