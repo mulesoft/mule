@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.mulesource.org/schema/mule/multicast/2.0"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+            xmlns:udp="http://www.mulesource.org/schema/mule/udp/2.0"
+            targetNamespace="http://www.mulesource.org/schema/mule/multicast/2.0"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"/>
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/udp/2.0" schemaLocation="/META-INF/mule-udp.xsd"/>
+
+    <xsd:element name="connector">
+        <xsd:complexType mixed="true">
+            <xsd:complexContent>
+                <xsd:extension base="udp:udpConnectorType">
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+</xsd:schema>
