@@ -36,6 +36,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 import java.util.List;
+import java.text.MessageFormat;
 
 import javax.resource.spi.XATerminator;
 import javax.resource.spi.work.ExecutionContext;
@@ -116,8 +117,12 @@ public class MuleWorkManager implements UMOWorkManager
                 // Wait a while for existing tasks to terminate
                 if (!workExecutorService.awaitTermination(SHUTDOWN_TIMEOUT, TimeUnit.MILLISECONDS))
                 {
-                    logger.warn("Pool " + name + " did not terminate in time; " + outstanding.size()
-                                    + " work items were cancelled.");
+                    if (logger.isWarnEnabled())
+                    {
+                        logger.warn(MessageFormat.format(
+                                "Pool {0} did not terminate in time; {1} work items were cancelled.",
+                                new Object[] {name, outstanding.isEmpty() ? "No" : Integer.toString(outstanding.size())}));
+                    }
                 }
             }
             catch (InterruptedException ie)
