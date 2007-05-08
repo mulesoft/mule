@@ -39,4 +39,18 @@ public class UdpNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.isStarted());
     }
 
+    public void testSingleTimeout() throws Exception
+    {
+        UdpConnector c = (UdpConnector)managementContext.getRegistry().lookupConnector("single");
+        assertNotNull(c);
+
+        Assert.assertEquals(4321, c.getReceiveTimeout());
+        Assert.assertEquals(4321, c.getSendTimeout());
+        Assert.assertEquals(5432, c.getReceiveBufferSize());
+        Assert.assertEquals(5432, c.getSendBufferSize());
+
+        assertTrue(c.isConnected());
+        assertTrue(c.isStarted());
+    }
+
 }
