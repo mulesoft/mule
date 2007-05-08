@@ -236,6 +236,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
     {
         UMOConnector connector = getConnector();
         assertNotNull(connector);
+        connector.setManagementContext(createManagementContext());
         
         UMOMessageDispatcherFactory factory = connector.getDispatcherFactory();
         assertNotNull(factory);
