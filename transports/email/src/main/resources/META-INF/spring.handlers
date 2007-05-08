@@ -1,0 +1,2 @@
+http\://www.mulesource.org/schema/mule/imap/2.0=org.mule.providers.email.config.ImapNamespaceHandler
+http\://www.mulesource.org/schema/mule/pop3/2.0=org.mule.providers.email.config.Pop3NamespaceHandler

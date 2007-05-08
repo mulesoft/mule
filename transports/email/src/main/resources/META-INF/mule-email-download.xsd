@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.mulesource.org/schema/mule/email-download/2.0"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+            targetNamespace="http://www.mulesource.org/schema/mule/email-download/2.0"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.springframework.org/schema/beans"
+                schemaLocation="http://www.springframework.org/schema/beans"/>
+
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"/>
+
+    <xsd:element name="connector" type="emailDownloadConnectorType"/>
+
+    <xsd:complexType name="emailDownloadConnectorType">
+        <xsd:complexContent mixed="true">
+            <xsd:extension base="mule:connectorType">
+                <xsd:attribute name="backupFolder" type="xsd:NMTOKEN"/>
+                <xsd:attribute name="checkFrequency" type="xsd:int"/>
+                <xsd:attribute name="mailboxFolder" type="xsd:NMTOKEN"/>
+                <xsd:attribute name="deleteReadMessages" type="xsd:boolean"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+</xsd:schema>
