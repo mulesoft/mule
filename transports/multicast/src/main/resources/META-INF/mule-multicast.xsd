@@ -14,6 +14,8 @@
         <xsd:complexType mixed="true">
             <xsd:complexContent>
                 <xsd:extension base="udp:udpConnectorType">
+                    <xsd:attribute name="timeToLive" type="xsd:int"/>
+                    <xsd:attribute name="loopback" type="xsd:boolean"/>
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>

@@ -13,7 +13,9 @@
                    receiveTimeout="2345"
                    sendBufferSize="3456"
                    sendTimeout="4567"
+                   timeToLive="5678"
                    broadcast="true"
+                   loopback="true"
                    keepSendSocketOpen="false"
             />
 

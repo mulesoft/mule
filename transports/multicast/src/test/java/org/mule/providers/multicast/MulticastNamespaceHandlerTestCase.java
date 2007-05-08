@@ -32,9 +32,10 @@ public class MulticastNamespaceHandlerTestCase extends FunctionalTestCase
         Assert.assertEquals(2345, c.getReceiveTimeout());
         Assert.assertEquals(3456, c.getSendBufferSize());
         Assert.assertEquals(4567, c.getSendTimeout());
+        Assert.assertEquals(5678, c.getTimeToLive());
         Assert.assertEquals(true, c.isBroadcast());
+        Assert.assertEquals(true, c.isLoopback());
         Assert.assertEquals(false, c.isKeepSendSocketOpen());
-
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());
     }
@@ -46,7 +47,7 @@ public class MulticastNamespaceHandlerTestCase extends FunctionalTestCase
 
         Assert.assertEquals(4321, c.getReceiveTimeout());
         Assert.assertEquals(4321, c.getSendTimeout());
-        Assert.assertEquals(5432, c.getReceiveBufferSize());
+//        Assert.assertEquals(5432, c.getReceiveBufferSize());
         Assert.assertEquals(5432, c.getSendBufferSize());
 
         assertTrue(c.isConnected());
