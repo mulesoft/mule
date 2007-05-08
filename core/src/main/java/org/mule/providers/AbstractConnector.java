@@ -352,6 +352,8 @@ public abstract class AbstractConnector
         // we clearErrors out any registered dispatchers and receivers without resetting
         // the actual containers since this it might actually be a re-initialise
         // (e.g. as in JmsConnector)
+        // TODO this should definitely not call dispose from this method. If anything,
+        // extract the common parts, otherwise intialise() logs dispose messages (?!)
         this.disposeDispatchers();
         this.disposeReceivers();
 
