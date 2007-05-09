@@ -259,7 +259,7 @@
         <!--</xsd:element>-->
         <!--</xsd:choice>-->
         <xsd:attribute name="name" type="xsd:string"/>
-        <xsd:attribute name="returnClass" type="xsd:string"/>
+        <xsd:attribute name="returnClass" type="xsd:NMTOKEN"/>
         <xsd:attribute name="ignoreBadInput" type="xsd:boolean"/>
 
     </xsd:complexType>
@@ -310,7 +310,7 @@
         <xsd:choice>
             <xsd:any namespace="##other" processContents="strict" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:choice>
-        <xsd:attribute name="class" type="xsd:string" use="required"/>
+        <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
         <xsd:attribute name="name" type="xsd:string"/>
     </xsd:complexType>
 
@@ -320,7 +320,7 @@
             <xsd:any namespace="http://www.springframework.org/schema/beans" processContents="strict" minOccurs="0"
                      maxOccurs="unbounded"/>
         </xsd:choice>
-        <xsd:attribute name="class" type="xsd:string" use="required"/>
+        <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
         <xsd:attribute name="name" type="xsd:string" use="required"/>
     </xsd:complexType>
 
@@ -330,7 +330,7 @@
             <xsd:any namespace="##other" minOccurs="0" maxOccurs="unbounded"/>
 
         </xsd:choice>
-        <xsd:attribute name="class" type="xsd:string" use="required"/>
+        <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
     </xsd:complexType>
 
     <xsd:group name="storageTypes">
@@ -375,11 +375,11 @@
             <xsd:element name="security-provider" type="securityProviderType" minOccurs="0" maxOccurs="unbounded"/>
             <xsd:element name="encryption-strategy" type="encryptionStrategyType" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
-        <xsd:attribute name="class" type="xsd:string"/>
+        <xsd:attribute name="class" type="xsd:NMTOKEN"/>
     </xsd:complexType>
 
     <xsd:complexType name="securityProviderType">
-        <xsd:attribute name="class" type="xsd:string"/>
+        <xsd:attribute name="class" type="xsd:NMTOKEN"/>
         <xsd:attribute name="name" type="xsd:string" use="required"/>
     </xsd:complexType>
 
@@ -543,7 +543,7 @@
     <xsd:complexType name="customModelType">
         <xsd:complexContent>
             <xsd:extension base="modelType">
-                <xsd:attribute name="class" type="xsd:string" use="required"/>
+                <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -561,18 +561,18 @@
     <!--==============================================================-->
 
     <xsd:complexType name="componentFactoryType">
-        <xsd:attribute name="class" type="xsd:string" use="required"/>
+        <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
     </xsd:complexType>
 
     <xsd:complexType name="componentLifecycleAdapterFactoryType">
-        <xsd:attribute name="class" type="xsd:string" use="required"/>
+        <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
     </xsd:complexType>
 
     <xsd:complexType name="componentPoolFactoryType">
         <xsd:choice>
             <xsd:any namespace="##other" processContents="strict" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:choice>
-        <xsd:attribute name="class" type="xsd:string" use="required"/>
+        <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
     </xsd:complexType>
 
     <xsd:complexType name="entrypointResolverType">
@@ -581,7 +581,7 @@
     <xsd:complexType name="customEntrypointResolverType">
         <xsd:complexContent>
             <xsd:extension base="entrypointResolverType">
-                <xsd:attribute name="class" type="xsd:string" use="required"/>
+                <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -736,7 +736,7 @@
     <xsd:complexType name="customInboundRouterType">
         <xsd:complexContent>
             <xsd:extension base="nestedInboundRouterType">
-                <xsd:attribute name="class" type="xsd:string" use="required"/>
+                <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -753,7 +753,7 @@
     <xsd:complexType name="customResponseRouterType">
         <xsd:complexContent>
             <xsd:extension base="responseRouterType">
-                <xsd:attribute name="class" type="xsd:string" use="required"/>
+                <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -850,7 +850,7 @@
     <xsd:complexType name="customOutboundRouterType">
         <xsd:complexContent>
             <xsd:extension base="filteringOutboundRouterType">
-                <xsd:attribute name="class" type="xsd:string" use="required"/>
+                <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -951,7 +951,7 @@
     <xsd:complexType name="customTransactionManagersType">
         <xsd:complexContent>
             <xsd:extension base="transactionManagersType">
-                <xsd:attribute name="class" use="required"/>
+                <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
