@@ -249,7 +249,7 @@
     <!--   Transformer elements                                          -->
     <!--==============================================================-->
 
-    <xsd:complexType name="transfomrersType">
+    <xsd:complexType name="transformerType">
 
         <!--<xsd:choice minOccurs="0" maxOccurs="unbounded">-->
         <!--<xsd:element name="source-type" minOccurs="0" maxOccurs="unbounded">-->
@@ -267,7 +267,7 @@
     <xsd:element name="custom-transformer">
         <xsd:complexType>
             <xsd:complexContent>
-                <xsd:extension base="transfomrersType">
+                <xsd:extension base="transformerType">
                     <xsd:choice>
                         <xsd:any namespace="##other" minOccurs="0" maxOccurs="unbounded"/>
                     </xsd:choice>
@@ -278,27 +278,27 @@
     </xsd:element>
 
     <!-- impls -->
-    <xsd:element name="transformer-no-action" type="transfomrersType"/>
-    <xsd:element name="transformer-base64-encoder" type="transfomrersType"/>
-    <xsd:element name="transformer-base64-decoder" type="transfomrersType"/>
-    <xsd:element name="transformer-uc-encoder" type="transfomrersType"/>
-    <xsd:element name="transformer-uc-decoder" type="transfomrersType"/>
-    <xsd:element name="transformer-uu-encoder" type="transfomrersType"/>
-    <xsd:element name="transformer-uu-decoder" type="transfomrersType"/>
-    <xsd:element name="transformer-xml-entity-encoder" type="transfomrersType"/>
-    <xsd:element name="transformer-xml-entity-decoder" type="transfomrersType"/>
-    <xsd:element name="transformer-gzip-compress" type="transfomrersType"/>
-    <xsd:element name="transformer-gzip-uncompress" type="transfomrersType"/>
+    <xsd:element name="transformer-no-action" type="transformerType"/>
+    <xsd:element name="transformer-base64-encoder" type="transformerType"/>
+    <xsd:element name="transformer-base64-decoder" type="transformerType"/>
+    <xsd:element name="transformer-uc-encoder" type="transformerType"/>
+    <xsd:element name="transformer-uc-decoder" type="transformerType"/>
+    <xsd:element name="transformer-uu-encoder" type="transformerType"/>
+    <xsd:element name="transformer-uu-decoder" type="transformerType"/>
+    <xsd:element name="transformer-xml-entity-encoder" type="transformerType"/>
+    <xsd:element name="transformer-xml-entity-decoder" type="transformerType"/>
+    <xsd:element name="transformer-gzip-compress" type="transformerType"/>
+    <xsd:element name="transformer-gzip-uncompress" type="transformerType"/>
     <!-- TODO RM* encryption -->
-    <xsd:element name="transformer-encrypt" type="transfomrersType"/>
-    <xsd:element name="transformer-decrypt" type="transfomrersType"/>
+    <xsd:element name="transformer-encrypt" type="transformerType"/>
+    <xsd:element name="transformer-decrypt" type="transformerType"/>
 
-    <xsd:element name="transformer-byte-array-to-hex-string" type="transfomrersType"/>
-    <xsd:element name="transformer-hex-sting-to-byte-array" type="transfomrersType"/>
-    <xsd:element name="transformer-byte-array-to-object" type="transfomrersType"/>
-    <xsd:element name="transformer-object-to-byte-array" type="transfomrersType"/>
-    <xsd:element name="transformer-byte-array-to-serializable" type="transfomrersType"/>
-    <xsd:element name="transformer-serializable-to-byte-array" type="transfomrersType"/>
+    <xsd:element name="transformer-byte-array-to-hex-string" type="transformerType"/>
+    <xsd:element name="transformer-hex-sting-to-byte-array" type="transformerType"/>
+    <xsd:element name="transformer-byte-array-to-object" type="transformerType"/>
+    <xsd:element name="transformer-object-to-byte-array" type="transformerType"/>
+    <xsd:element name="transformer-byte-array-to-serializable" type="transformerType"/>
+    <xsd:element name="transformer-serializable-to-byte-array" type="transformerType"/>
 
     <!-- TODO RM* Wire formats -->
 
