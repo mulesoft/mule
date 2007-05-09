@@ -149,14 +149,14 @@ public class MuleEndpointURI implements UMOEndpointURI
             throw new MalformedEndpointException(uri, e);
         }
 
-        try
-        {
-            initialise();
-        }
-        catch (InitialisationException e)
-        {
-            throw new EndpointException(e);
-        }
+//        try
+//        {
+//            initialise();
+//        }
+//        catch (InitialisationException e)
+//        {
+//            throw new EndpointException(e);
+//        }
 
 //        try
 //        {
