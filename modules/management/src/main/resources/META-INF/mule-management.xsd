@@ -15,7 +15,7 @@
     <!-- JMX -->
 
     <xsd:element name="jmx-server">
-        <xsd:complexType mixed="true">
+        <xsd:complexType>
             <xsd:choice>
                 <xsd:element name="connector-server" type="connectorServerType" minOccurs="0" maxOccurs="1"/>
             </xsd:choice>
@@ -29,7 +29,7 @@
     </xsd:complexType>
 
     <xsd:element name="jmx-mx4j-adapter">
-        <xsd:complexType mixed="true">
+        <xsd:complexType>
             <xsd:attribute name="jmxAdaptorUrl" type="xsd:string"/>
             <xsd:attribute name="adaptor" type="xsd:string"/>
             <xsd:attribute name="mBeanServer" type="xsd:string"/>
@@ -38,20 +38,20 @@
     </xsd:element>
 
     <xsd:element name="jmx-log4j">
-        <xsd:complexType mixed="true">
+        <xsd:complexType>
             <xsd:attribute name="name" type="xsd:string" use="required"/>
         </xsd:complexType>
     </xsd:element>
 
     <xsd:element name="jmx-default-config">
-        <xsd:complexType mixed="true">
+        <xsd:complexType>
             <xsd:attribute name="registerMx4jAdapter" type="xsd:boolean"/>
             <xsd:attribute name="name" type="xsd:string" use="required"/>
         </xsd:complexType>
     </xsd:element>
 
     <xsd:element name="jmx-notifications">
-        <xsd:complexType mixed="true">
+        <xsd:complexType>
             <xsd:attribute name="registerdefaultListner" type="xsd:boolean"/>
             <xsd:attribute name="name" type="xsd:string" use="required"/>
         </xsd:complexType>
@@ -59,7 +59,7 @@
 
 
     <xsd:element name="log4j-notifications">
-        <xsd:complexType mixed="true">
+        <xsd:complexType>
             <xsd:attribute name="logName" type="xsd:string"/>
             <xsd:attribute name="logConfigFile" type="xsd:string"/>
             <xsd:attribute name="name" type="xsd:string" use="required"/>
@@ -67,7 +67,7 @@
     </xsd:element>
 
     <xsd:element name="chainsaw-notifications">
-        <xsd:complexType mixed="true">
+        <xsd:complexType>
             <xsd:choice minOccurs="0" maxOccurs="1">
                 <xsd:element name="level-mapping">
                     <xsd:complexType>
@@ -94,7 +94,7 @@
     </xsd:element>
 
     <xsd:element name="publish-notifications">
-        <xsd:complexType mixed="true">
+        <xsd:complexType>
             <xsd:attribute name="endpointAddress" type="xsd:string" use="required"/>
             <xsd:attribute name="name" type="xsd:string" use="required"/>
         </xsd:complexType>
@@ -103,7 +103,7 @@
 
     <!-- Rmi Agent -->
     <xsd:element name="rmi-server">
-        <xsd:complexType mixed="true">
+        <xsd:complexType>
             <xsd:attribute name="serverUri" type="xsd:string"/>
             <xsd:attribute name="createRegistry" type="xsd:boolean"/>
             <xsd:attribute name="name" type="xsd:string" use="required"/>

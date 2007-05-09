@@ -15,7 +15,7 @@
     <xsd:element name="connector" type="tcpConnectorType"/>
 
     <xsd:complexType name="tcpConnectorType">
-        <xsd:complexContent mixed="true">
+        <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
                 <xsd:attribute name="sendBufferSize" type="xsd:int"/>
                 <xsd:attribute name="receiveBufferSize" type="xsd:int"/>

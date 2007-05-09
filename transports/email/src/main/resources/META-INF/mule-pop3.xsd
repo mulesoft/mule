@@ -16,7 +16,7 @@
     <xsd:element name="connector" type="pop3ConnectorType"/>
 
     <xsd:complexType name="pop3ConnectorType">
-        <xsd:complexContent mixed="true">
+        <xsd:complexContent>
             <xsd:extension base="email-download:emailDownloadConnectorType">
             </xsd:extension>
         </xsd:complexContent>

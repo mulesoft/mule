@@ -11,7 +11,7 @@
     <xsd:import namespace="http://www.mulesource.org/schema/mule/tcp/2.0" schemaLocation="/META-INF/mule-tcp.xsd"/>
 
     <xsd:element name="connector">
-        <xsd:complexType mixed="true">
+        <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="tcp:tcpConnectorType">
                     <xsd:sequence minOccurs="1" maxOccurs="1">

@@ -11,7 +11,7 @@
     <xsd:import namespace="http://www.mulesource.org/schema/mule/udp/2.0" schemaLocation="/META-INF/mule-udp.xsd"/>
 
     <xsd:element name="connector">
-        <xsd:complexType mixed="true">
+        <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="udp:udpConnectorType">
                     <xsd:attribute name="timeToLive" type="xsd:int"/>

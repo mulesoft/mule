@@ -15,7 +15,7 @@
     <xsd:element name="connector" type="emailDownloadConnectorType"/>
 
     <xsd:complexType name="emailDownloadConnectorType">
-        <xsd:complexContent mixed="true">
+        <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
                 <xsd:attribute name="backupFolder" type="xsd:NMTOKEN"/>
                 <xsd:attribute name="checkFrequency" type="xsd:int"/>
