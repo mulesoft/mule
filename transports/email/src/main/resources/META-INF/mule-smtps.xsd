@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.mulesource.org/schema/mule/smtps/2.0"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+            xmlns:smtp="http://www.mulesource.org/schema/mule/smtp/2.0"
+            targetNamespace="http://www.mulesource.org/schema/mule/smtps/2.0"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/smtp/2.0"
+                schemaLocation="/META-INF/mule-smtp.xsd"/>
+
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"/>
+
+    <xsd:element name="connector" type="smtpsConnectorType"/>
+
+    <xsd:complexType name="smtpsConnectorType">
+        <xsd:complexContent>
+            <xsd:extension base="smtp:baseSmtpConnectorType">
+                <xsd:sequence minOccurs="1" maxOccurs="1">
+                    <xsd:sequence minOccurs="1" maxOccurs="1">
+                        <xsd:element name="tls-client" type="mule:tlsClientKeyStoreType"/>
+                        <xsd:element name="tls-trust-store" type="mule:tlsTrustStoreType"/>
+                    </xsd:sequence>
+                    <!-- these have to be last or the definition parser attempts to set values
+                         on the tls related elements -->
+                    <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+                        <xsd:element name="header" type="smtp:headerType"/>
+                    </xsd:sequence>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+</xsd:schema>

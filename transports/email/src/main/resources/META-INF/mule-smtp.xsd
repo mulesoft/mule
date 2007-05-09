@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.mulesource.org/schema/mule/smtp/2.0"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+            targetNamespace="http://www.mulesource.org/schema/mule/smtp/2.0"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.springframework.org/schema/beans"
+                schemaLocation="http://www.springframework.org/schema/beans"/>
+
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"/>
+
+    <xsd:element name="connector" type="smtpConnectorType"/>
+
+    <xsd:complexType name="headerType">
+        <xsd:attribute name="name" type="xsd:string" use="required"/>
+        <xsd:attribute name="value" type="xsd:string" use="required"/>
+    </xsd:complexType>
+
+    <!-- separate base so that header is separate and in local namespace -->
+    <xsd:complexType name="baseSmtpConnectorType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:connectorType">
+                <!-- seems like we should be able to better restrict some of these types -->
+                <xsd:attribute name="bccAddresses" type="xsd:string"/>
+                <xsd:attribute name="ccAddresses" type="xsd:string"/>
+                <xsd:attribute name="contentType" type="xsd:string"/>
+                <xsd:attribute name="customHeaders" type="xsd:string"/>
+                <xsd:attribute name="fromAddress" type="xsd:string"/>
+                <xsd:attribute name="host" type="xsd:string"/>
+                <xsd:attribute name="mailboxFolder" type="xsd:string"/>
+                <xsd:attribute name="password" type="xsd:string"/>
+                <xsd:attribute name="port" type="xsd:unsignedShort"/>
+                <xsd:attribute name="replyToAddresses" type="xsd:string"/>
+                <xsd:attribute name="subject" type="xsd:string"/>
+                <xsd:attribute name="username" type="xsd:string"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="smtpConnectorType">
+        <xsd:complexContent>
+            <xsd:extension base="baseSmtpConnectorType">
+                <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+                    <xsd:element name="header" type="headerType"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+</xsd:schema>

@@ -16,7 +16,7 @@
     <xsd:element name="connector" type="imapsConnectorType"/>
 
     <xsd:complexType name="imapsConnectorType">
-        <xsd:complexContent mixed="true">
+        <xsd:complexContent>
             <xsd:extension base="imap:imapConnectorType">
                 <xsd:sequence minOccurs="1" maxOccurs="1">
                     <xsd:element name="tls-client" type="mule:tlsClientKeyStoreType"/>

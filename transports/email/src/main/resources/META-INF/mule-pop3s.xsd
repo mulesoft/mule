@@ -16,7 +16,7 @@
     <xsd:element name="connector" type="pop3sConnectorType"/>
 
     <xsd:complexType name="pop3sConnectorType">
-        <xsd:complexContent mixed="true">
+        <xsd:complexContent>
             <xsd:extension base="pop3:pop3ConnectorType">
                 <xsd:sequence minOccurs="1" maxOccurs="1">
                     <xsd:element name="tls-client" type="mule:tlsClientKeyStoreType"/>

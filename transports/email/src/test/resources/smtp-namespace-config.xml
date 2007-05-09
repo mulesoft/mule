@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:smtp="http://www.mulesource.org/schema/mule/smtp/2.0"
+       xmlns:smtps="http://www.mulesource.org/schema/mule/smtps/2.0"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 META-INF/mule.xsd
+       http://www.mulesource.org/schema/mule/smtp/2.0 META-INF/mule-smtp.xsd
+       http://www.mulesource.org/schema/mule/smtps/2.0 META-INF/mule-smtps.xsd">
+
+    <smtp:connector name="smtpConnector"
+                   bccAddresses="abc@example.com"
+                   ccAddresses="bcd@example.com"
+                   contentType="foo/bar"
+                   fromAddress="cde@example.com"
+                   host="example.com"
+                   mailboxFolder="newMailbox"
+                   password="password"
+                   port="1234"
+                   replyToAddresses="def@example.com"
+                   subject="subject"
+                   username="bob@example.com">
+        <smtp:header name="foo" value="bar"/>
+        <smtp:header name="baz" value="boz"/>
+    </smtp:connector>
+
+    <!-- need too revisit this once tests are working - it's not clear to me what
+         key store is being used in the tests -->
+
+    <smtps:connector name="smtpsConnector"
+                     bccAddresses="abc@example.com"
+                     ccAddresses="bcd@example.com"
+                     contentType="foo/bar"
+                     fromAddress="cde@example.com"
+                     host="example.com"
+                     mailboxFolder="newMailbox"
+                     password="password"
+                     port="1234"
+                     replyToAddresses="def@example.com"
+                     subject="subject"
+                     username="bob@example.com">
+        <smtps:tls-client clientKeyStore="greenmail-truststore"
+                          clientKeyStorePassword="password"/>
+        <smtps:tls-trust-store trustStore="greenmail-truststore"
+                               trustStorePassword="password"/>
+        <smtps:header name="foo" value="bar"/>
+        <smtps:header name="baz" value="boz"/>
+    </smtps:connector>
+
+</beans>
