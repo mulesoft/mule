@@ -11,6 +11,7 @@
 package org.mule.providers.tcp;
 
 import org.mule.impl.MuleDescriptor;
+import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
@@ -25,7 +26,6 @@ public class TcpConnectorTestCase extends AbstractConnectorTestCase
     {
         TcpConnector c = new TcpConnector();
         c.setName("TcpConnector");
-        c.initialise();
         return c;
     }
 
@@ -43,42 +43,23 @@ public class TcpConnectorTestCase extends AbstractConnectorTestCase
     {
         MuleDescriptor d = getTestDescriptor("orange", Orange.class.getName());
         UMOComponent component = getTestComponent(d);
-        UMOEndpoint endpoint = getTestEndpoint("Test", UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
-        endpoint.setEndpointURI(null);
-        endpoint.setConnector(connector);
+        UMOEndpoint endpoint = new MuleEndpoint(getTestEndpointURI(), true);
+
+       // endpoint.setConnector(connector);
 
         try
         {
-            connector.registerListener(component, endpoint);
-            fail("cannot register with null endpointUri");
+            endpoint.setEndpointURI(null);
+            //connector.registerListener(component, endpoint);
+            fail("endpointUri cannot be null");
         }
         catch (Exception e)
         {
             /* expected */
         }
 
-        endpoint.setEndpointURI(null);
-        try
-        {
-            connector.registerListener(component, endpoint);
-            fail("cannot register with empty endpointUri");
-        }
-        catch (Exception e)
-        {
-            /* expected */
-        }
-
-        endpoint.setEndpointURI(new MuleEndpointURI("tcp://localhost:30303"));
+        endpoint.setEndpointURI(new MuleEndpointURI(getTestEndpointURI()));
         connector.registerListener(component, endpoint);
-        try
-        {
-            // connector.registerListener(component, endpoint);
-            // fail("cannot register on the same endpointUri");
-        }
-        catch (Exception e)
-        {
-            /* expected */
-        }
     }
 
     public void testProperties() throws Exception
