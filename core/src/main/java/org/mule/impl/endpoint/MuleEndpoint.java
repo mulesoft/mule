@@ -20,11 +20,11 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOTransactionConfig;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOEndpointSecurityFilter;
 import org.mule.umo.transformer.UMOTransformer;
@@ -90,6 +90,11 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint, 
                 Messages.CONNECTOR_SCHEME_X_INCOMPATIBLE_WITH_ENDPOINT_SCHEME_X, connector.getProtocol(),
                 endpointUri).getMessage());
         }
+        if(endpointUri==null)
+        {
+            throw new NullPointerException(new Message(Messages.X_IS_NULL, "endpointURI").getMessage());
+        }
+
         this.endpointUri = endpointUri;
         if (endpointUri != null)
         {
