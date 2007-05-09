@@ -255,7 +255,14 @@ public abstract class AbstractRegistry implements RegistryFacade
     public UMOEndpoint lookupEndpoint(String name)
     {
         //This will grab a new prototype from the context
-        return (UMOEndpoint) lookupObject(name, UMOImmutableEndpoint.class);
+        UMOEndpoint ep = (UMOEndpoint) lookupObject(name, UMOImmutableEndpoint.class);
+        //If endpoint type is not explicitly set, set it here once the object has been requested
+        if(ep!=null && ep.getType().equals(UMOEndpoint.ENDPOINT_TYPE_GLOBAL))
+        {
+            ep.setType(UMOEndpoint.ENDPOINT_TYPE_SENDER_AND_RECEIVER);
+        }
+
+        return ep;
     }
 
 
@@ -621,6 +628,7 @@ public abstract class AbstractRegistry implements RegistryFacade
 
     public UMOEndpoint createEndpointFromUri(UMOEndpointURI uri, String type) throws UMOException
     {
+        uri.initialise();
         UMOEndpoint endpoint = TransportFactory.createEndpoint(uri, type);
         endpoint.initialise();
         return endpoint;
@@ -665,7 +673,7 @@ public abstract class AbstractRegistry implements RegistryFacade
         }
         else
         {
-            if (!endpoint.getType().equals(type))
+            if (!endpoint.getType().equals(type) && !endpoint.getType().equals(UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER_AND_RECEIVER))
             {
                 throw new IllegalArgumentException("Endpoint matching: " + uriIdentifier
                         + " is not of type: " + type + ". It is of type: "
