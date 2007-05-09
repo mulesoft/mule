@@ -227,7 +227,7 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
 
     public void doStop() throws UMOException
     {
-        workManager.stop();
+        workManager.dispose();
         if (proxyPool != null)
         {
             try

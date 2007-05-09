@@ -35,8 +35,8 @@ import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
-import java.util.List;
 import java.text.MessageFormat;
+import java.util.List;
 
 import javax.resource.spi.XATerminator;
 import javax.resource.spi.work.ExecutionContext;
@@ -105,7 +105,7 @@ public class MuleWorkManager implements UMOWorkManager
         }
     }
 
-    public synchronized void stop() throws UMOException
+    public synchronized void dispose()
     {
         if (workExecutorService != null)
         {
@@ -139,18 +139,6 @@ public class MuleWorkManager implements UMOWorkManager
         }
     }
 
-    public void dispose()
-    {
-        try
-        {
-            stop();
-        }
-        catch (UMOException e)
-        {
-            // TODO MULE-863: Is this serious?
-            logger.warn("Error while disposing Work Manager: " + e.getMessage(), e);
-        }
-    }
 
     // TODO
     public XATerminator getXATerminator()
