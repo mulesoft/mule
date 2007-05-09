@@ -53,22 +53,22 @@ public interface TlsDirectKeyStore
     /**
      * @return The password used to protect the keystore itself
      */
-    String getStorePassword();
+    String getKeyStorePassword();
 
     /**
      * @param storePassword The password used to protect the keystore itself
      */
-    void setStorePassword(String storePassword);
+    void setKeyStorePassword(String storePassword);
 
     /**
      * @return The type of keystore used in {@link #getKeyStore()}
      */
-    String getKeystoreType();
+    String getKeyStoreType();
 
     /**
      * @param keystoreType The type of keystore used in {@link #setKeyStore(String)}
      */
-    void setKeystoreType(String keystoreType);
+    void setKeyStoreType(String keystoreType);
 
     /**
      * @return The algorithm used by the key store.  The default comes from {

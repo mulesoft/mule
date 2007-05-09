@@ -204,7 +204,7 @@ public final class TlsConfiguration implements TlsDirectTrustStore, TlsDirectKey
         {
             assertNotNull(getKeyStore(), "The KeyStore location cannot be null");
             assertNotNull(getKeyPassword(), "The Key password cannot be null");
-            assertNotNull(getStorePassword(), "The KeyStore password cannot be null");
+            assertNotNull(getKeyStorePassword(), "The KeyStore password cannot be null");
             assertNotNull(getKeyManagerAlgorithm(), "The Key Manager Algorithm cannot be null");
         }
     }
@@ -401,22 +401,22 @@ public final class TlsConfiguration implements TlsDirectTrustStore, TlsDirectKey
         this.keyPassword = keyPassword;
     }
 
-    public String getStorePassword()
+    public String getKeyStorePassword()
     {
         return keyStorePassword;
     }
 
-    public void setStorePassword(String storePassword)
+    public void setKeyStorePassword(String storePassword)
     {
         this.keyStorePassword = storePassword;
     }
 
-    public String getKeystoreType()
+    public String getKeyStoreType()
     {
         return keystoreType;
     }
 
-    public void setKeystoreType(String keystoreType)
+    public void setKeyStoreType(String keystoreType)
     {
         this.keystoreType = keystoreType;
     }

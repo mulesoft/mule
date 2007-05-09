@@ -37,4 +37,28 @@ public class Pop3NamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.isStarted());
 
     }
+
+    public void testSecureConfig() throws Exception
+    {
+        Pop3sConnector c = (Pop3sConnector)managementContext.getRegistry().lookupConnector("pop3sConnector");
+        assertNotNull(c);
+
+        assertEquals("newBackup", c.getBackupFolder());
+        assertEquals(1234, c.getCheckFrequency());
+        assertEquals("newMailbox", c.getMailboxFolder());
+        assertEquals(false, c.isDeleteReadMessages());
+
+        // authenticator?
+
+        //The full path gets resolved, we're just checkng that the property got set
+        assertTrue(c.getClientKeyStore().endsWith("/greenmail-truststore"));
+        assertEquals("password", c.getClientKeyStorePassword());
+        //The full path gets resolved, we're just checkng that the property got set
+        assertTrue(c.getTrustStore().endsWith("/greenmail-truststore"));
+        assertEquals("password", c.getTrustStorePassword());
+
+        assertTrue(c.isConnected());
+        assertTrue(c.isStarted());
+    }
+
 }

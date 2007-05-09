@@ -113,7 +113,7 @@
     <!--==============================================================-->
 
 
-    <xsd:complexType name="baseEndpointType">
+    <xsd:complexType name="baseEndpointType" mixed="true">
         <xsd:choice minOccurs="0" maxOccurs="unbounded">
             <xsd:element name="transaction" type="transactionType" minOccurs="0" maxOccurs="1"/>
             <xsd:group ref="filters" minOccurs="0" maxOccurs="unbounded"/>
@@ -142,7 +142,7 @@
         </xsd:attribute>
     </xsd:complexType>
 
-    <xsd:complexType name="endpointType">
+    <xsd:complexType name="endpointType" mixed="true">
         <xsd:complexContent>
             <xsd:extension base="baseEndpointType">
                 <xsd:attribute name="address" type="xsd:string" use="required"/>
@@ -150,7 +150,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="endpointRefType">
+    <xsd:complexType name="endpointRefType" mixed="true">
         <xsd:complexContent>
             <xsd:extension base="baseEndpointType">
                 <xsd:attribute name="nameref" type="xsd:string" use="required"/>
@@ -159,7 +159,7 @@
     </xsd:complexType>
 
 
-    <xsd:complexType name="transactionType">
+    <xsd:complexType name="transactionType" mixed="true">
         <xsd:attribute name="factory" type="xsd:NMTOKEN"/>
         <xsd:attribute name="action">
             <xsd:simpleType>
@@ -199,35 +199,35 @@
         </xsd:sequence>
     </xsd:group>
 
-    <xsd:complexType name="collectionFilterType">
-        <xsd:complexContent>
+    <xsd:complexType name="collectionFilterType" mixed="true">
+        <xsd:complexContent mixed="true">
             <xsd:extension base="filterType">
                 <xsd:group ref="filters" maxOccurs="unbounded" minOccurs="2"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="expressionFilterType">
-        <xsd:complexContent>
+    <xsd:complexType name="expressionFilterType" mixed="true">
+        <xsd:complexContent mixed="true">
             <xsd:extension base="filterType">
                 <xsd:attribute name="expression" type="xsd:string" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="typeFilterType">
-        <xsd:complexContent>
+    <xsd:complexType name="typeFilterType" mixed="true">
+        <xsd:complexContent mixed="true">
             <xsd:extension base="filterType">
                 <xsd:attribute name="expectedType" type="xsd:string" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="filterType">
+    <xsd:complexType name="filterType" mixed="true">
         <xsd:attribute name="not" type="xsd:boolean"/>
     </xsd:complexType>
 
-    <xsd:complexType name="customFilterType">
+    <xsd:complexType name="customFilterType" mixed="true">
         <xsd:choice>
             <xsd:any namespace="##other" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:choice>
@@ -236,7 +236,7 @@
 
 
     <!-- Todo schemas for each security filter type -->
-    <xsd:complexType name="securityFilterType">
+    <xsd:complexType name="securityFilterType" mixed="true">
         <xsd:sequence>
             <xsd:any namespace="http://www.springframework.org/schema/beans" processContents="strict" minOccurs="0"
                      maxOccurs="unbounded"/>
@@ -249,7 +249,7 @@
     <!--   Transformer elements                                          -->
     <!--==============================================================-->
 
-    <xsd:complexType name="transfomrersType">
+    <xsd:complexType name="transfomrersType" mixed="true">
 
         <!--<xsd:choice minOccurs="0" maxOccurs="unbounded">-->
         <!--<xsd:element name="source-type" minOccurs="0" maxOccurs="unbounded">-->
@@ -265,7 +265,7 @@
     </xsd:complexType>
 
     <xsd:element name="custom-transformer">
-        <xsd:complexType>
+        <xsd:complexType mixed="true">
             <xsd:complexContent>
                 <xsd:extension base="transfomrersType">
                     <xsd:choice>
@@ -366,7 +366,7 @@
 
 
     <xsd:complexType name="queueProfileType">
-        <xsd:attribute name="maxOutstandingMessages" type="xsd:int" default="0"/>
+        <xsd:attribute name="maxOutstandingMessages" type="xsd:string"/>
         <xsd:attribute name="persistent" type="xsd:boolean" default="false"/>
     </xsd:complexType>
 
@@ -409,7 +409,7 @@
 
     <!-- Custom connector element -->
 
-    <xsd:complexType name="customExceptionStrategyType">
+    <xsd:complexType name="customExceptionStrategyType" mixed="true">
         <xsd:complexContent>
             <xsd:extension base="exceptionStrategyType">
                 <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
@@ -418,7 +418,7 @@
     </xsd:complexType>
 
 
-    <xsd:complexType name="exceptionStrategyType">
+    <xsd:complexType name="exceptionStrategyType" mixed="true">
         <xsd:choice maxOccurs="unbounded" minOccurs="0">
             <xsd:element name="endpoint" type="endpointType" minOccurs="0" maxOccurs="unbounded"/>
             <xsd:element name="endpoint-ref" type="endpointRefType" minOccurs="0" maxOccurs="unbounded"/>
@@ -440,7 +440,7 @@
     <!--==============================================================-->
 
 
-    <xsd:complexType name="connectorType">
+    <xsd:complexType name="connectorType" mixed="true">
         <xsd:choice minOccurs="0" maxOccurs="unbounded">
             <xsd:element name="receiver-threading-profile" type="threadingProfileType" minOccurs="0"
                          maxOccurs="1"/>
@@ -480,7 +480,7 @@
         </xsd:sequence>
     </xsd:group>
 
-    <xsd:complexType name="connectionStrategyType">
+    <xsd:complexType name="connectionStrategyType" mixed="true">
         <xsd:attribute name="inbound" type="xsd:boolean" use="required"/>
     </xsd:complexType>
 
@@ -522,7 +522,7 @@
     <!--   Model Types                                                -->
     <!--==============================================================-->
 
-    <xsd:complexType name="sedaModelType">
+    <xsd:complexType name="sedaModelType" mixed="true">
         <xsd:choice minOccurs="1" maxOccurs="unbounded">
             <xsd:element name="pooling-profile" type="poolingProfileType" minOccurs="0" maxOccurs="1"/>
             <xsd:element name="queue-profile" type="queueProfileType" minOccurs="0" maxOccurs="1"/>
@@ -540,15 +540,15 @@
         <xsd:attribute name="name" type="xsd:string" use="required"/>
     </xsd:complexType>
 
-    <xsd:complexType name="customModelType">
-        <xsd:complexContent>
+    <xsd:complexType name="customModelType" mixed="true">
+        <xsd:complexContent mixed="true">
             <xsd:extension base="modelType">
                 <xsd:attribute name="class" type="xsd:string" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="modelType">
+    <xsd:complexType name="modelType" mixed="true">
         <xsd:choice minOccurs="0" maxOccurs="unbounded">
             <xsd:group ref="exceptionStrategies" maxOccurs="1" minOccurs="0"/>
             <xsd:element name="service" type="muleServiceType" minOccurs="0" maxOccurs="unbounded"/>
@@ -622,7 +622,7 @@
     <!--==============================================================-->
 
 
-    <xsd:complexType name="inboundRouterCollectionType">
+    <xsd:complexType name="inboundRouterCollectionType" mixed="true">
         <xsd:choice maxOccurs="unbounded">
             <xsd:element name="endpoint" type="endpointType" minOccurs="0" maxOccurs="unbounded"/>
             <xsd:element name="endpoint-ref" type="endpointRefType" minOccurs="0" maxOccurs="unbounded"/>
@@ -633,14 +633,14 @@
     </xsd:complexType>
 
 
-    <xsd:complexType name="nestedRouterCollectionType">
+    <xsd:complexType name="nestedRouterCollectionType" mixed="true">
         <xsd:choice maxOccurs="unbounded" minOccurs="1">
             <xsd:element name="binding" type="nestedBindingType"/>
         </xsd:choice>
     </xsd:complexType>
 
     <!--Nested Binding-->
-    <xsd:complexType name="nestedBindingType">
+    <xsd:complexType name="nestedBindingType" mixed="true">
         <xsd:choice minOccurs="1" maxOccurs="1">
             <xsd:element name="endpoint" type="endpointType" minOccurs="0" maxOccurs="unbounded"/>
             <xsd:element name="endpoint-ref" type="endpointRefType" minOccurs="0" maxOccurs="unbounded"/>
@@ -649,7 +649,7 @@
         <xsd:attribute name="method" use="optional"/>
     </xsd:complexType>
 
-    <xsd:complexType name="responseRouterCollectionType">
+    <xsd:complexType name="responseRouterCollectionType" mixed="true">
         <xsd:choice maxOccurs="unbounded">
             <xsd:element name="endpoint" type="endpointType" minOccurs="0" maxOccurs="unbounded"/>
             <xsd:element name="endpoint-ref" type="endpointRefType" minOccurs="0" maxOccurs="unbounded"/>
@@ -659,7 +659,7 @@
         <xsd:attribute name="timeout" type="xsd:string"/>
     </xsd:complexType>
 
-    <xsd:complexType name="outboundRouterCollectionType">
+    <xsd:complexType name="outboundRouterCollectionType" mixed="true">
         <xsd:sequence>
             <xsd:group ref="catchAllStrategies" minOccurs="0" maxOccurs="1"/>
             <xsd:group ref="outboundRouters" minOccurs="1" maxOccurs="unbounded"/>
@@ -670,7 +670,7 @@
 
     <!-- Inbound Routers -->
 
-    <xsd:complexType name="nestedInboundRouterType">
+    <xsd:complexType name="nestedInboundRouterType" mixed="true">
         <xsd:choice maxOccurs="unbounded">
             <xsd:element name="endpoint" type="endpointType" minOccurs="0"/>
             <xsd:element name="endpoint-ref" type="endpointRefType" minOccurs="0"/>
@@ -694,7 +694,7 @@
         </xsd:choice>
     </xsd:group>
 
-    <xsd:complexType name="idempotentReceiverType">
+    <xsd:complexType name="idempotentReceiverType" mixed="true">
         <xsd:complexContent>
             <xsd:extension base="nestedInboundRouterType">
                 <xsd:choice minOccurs="0" maxOccurs="1">
@@ -704,7 +704,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="wireTapType">
+    <xsd:complexType name="wireTapType" mixed="true">
         <xsd:complexContent>
             <xsd:extension base="nestedInboundRouterType">
                 <xsd:choice minOccurs="0" maxOccurs="1">
@@ -716,7 +716,7 @@
     </xsd:complexType>
 
 
-    <xsd:complexType name="selectiveConsumerRouterType">
+    <xsd:complexType name="selectiveConsumerRouterType" mixed="true">
         <xsd:complexContent>
             <xsd:extension base="nestedInboundRouterType">
                 <xsd:attribute name="transformers" type="xsd:string"/>
@@ -725,7 +725,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="correlationRouterType">
+    <xsd:complexType name="correlationRouterType" mixed="true">
         <xsd:complexContent>
             <xsd:extension base="nestedInboundRouterType">
                 <xsd:attribute name="correlationExpression" type="xsd:string"/>
@@ -733,7 +733,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="customInboundRouterType">
+    <xsd:complexType name="customInboundRouterType" mixed="true">
         <xsd:complexContent>
             <xsd:extension base="nestedInboundRouterType">
                 <xsd:attribute name="class" type="xsd:string" use="required"/>
@@ -742,7 +742,7 @@
     </xsd:complexType>
 
     <!-- ResponseRouters -->
-    <xsd:complexType name="responseRouterType">
+    <xsd:complexType name="responseRouterType" mixed="true">
         <xsd:choice maxOccurs="unbounded">
             <xsd:element name="endpoint" type="endpointType" minOccurs="0"/>
             <xsd:element name="endpoint-ref" type="endpointRefType" minOccurs="0"/>
@@ -766,7 +766,7 @@
     </xsd:group>
 
 
-    <xsd:complexType name="outboundRouterType">
+    <xsd:complexType name="outboundRouterType" mixed="true">
         <xsd:choice maxOccurs="unbounded">
             <xsd:element name="endpoint" type="endpointType" minOccurs="0"/>
             <xsd:element name="endpoint-ref" type="endpointRefType" minOccurs="0"/>
@@ -804,7 +804,7 @@
         </xsd:choice>
     </xsd:group>
 
-    <xsd:complexType name="filteringOutboundRouterType">
+    <xsd:complexType name="filteringOutboundRouterType" mixed="true">
         <xsd:complexContent>
             <xsd:extension base="outboundRouterType">
                 <xsd:attribute name="transformers" type="xsd:string"/>
@@ -812,7 +812,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="endpointSelectorRouterType">
+    <xsd:complexType name="endpointSelectorRouterType" mixed="true">
         <xsd:complexContent>
             <xsd:extension base="filteringOutboundRouterType">
                 <xsd:attribute name="selectorProperty" type="xsd:string" use="required"/>
@@ -820,7 +820,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="messageSplitterendpointSelectorRouterType">
+    <xsd:complexType name="messageSplitterendpointSelectorRouterType" mixed="true">
         <xsd:complexContent>
             <xsd:extension base="filteringOutboundRouterType">
                 <xsd:attribute name="multimatch" type="xsd:boolean"/>
@@ -829,7 +829,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="chunkingRouterType">
+    <xsd:complexType name="chunkingRouterType" mixed="true">
         <xsd:complexContent>
             <xsd:extension base="filteringOutboundRouterType">
                 <xsd:attribute name="messageSize" type="xsd:int"/>
@@ -838,7 +838,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="staticRecipientListRouterType">
+    <xsd:complexType name="staticRecipientListRouterType" mixed="true">
         <xsd:complexContent>
             <xsd:extension base="filteringOutboundRouterType">
                 <xsd:attribute name="recipientsProperty" type="xsd:string"/>
@@ -847,7 +847,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="customOutboundRouterType">
+    <xsd:complexType name="customOutboundRouterType" mixed="true">
         <xsd:complexContent>
             <xsd:extension base="filteringOutboundRouterType">
                 <xsd:attribute name="class" type="xsd:string" use="required"/>
@@ -857,7 +857,7 @@
 
 
     <!-- Catch all strategy Types -->
-    <xsd:complexType name="forwardingCatchAllStrategyType">
+    <xsd:complexType name="forwardingCatchAllStrategyType" mixed="true">
         <xsd:choice maxOccurs="unbounded">
             <xsd:element name="endpoint" type="endpointType" minOccurs="0"/>
             <xsd:element name="endpoint-ref" type="endpointRefType" minOccurs="0"/>
@@ -865,11 +865,11 @@
     </xsd:complexType>
 
 
-    <xsd:complexType name="customCatchAllStrategyType">
+    <xsd:complexType name="customCatchAllStrategyType" mixed="true">
         <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
     </xsd:complexType>
 
-    <xsd:complexType name="loggingCatchAllStrategyType">
+    <xsd:complexType name="loggingCatchAllStrategyType" mixed="true">
     </xsd:complexType>
 
 
@@ -897,14 +897,14 @@
     <xsd:element name="hivemind-container" type="iocContainerContextType"/>
     <xsd:element name="jndi-container" type="baseContainerContextType"/>
 
-    <xsd:complexType name="baseContainerContextType">
+    <xsd:complexType name="baseContainerContextType" mixed="true">
         <xsd:choice>
             <xsd:any namespace="##other" processContents="strict" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:choice>
     </xsd:complexType>
 
-    <xsd:complexType name="rmiContainerContextType">
-        <xsd:complexContent>
+    <xsd:complexType name="rmiContainerContextType" mixed="true">
+        <xsd:complexContent mixed="true">
             <xsd:extension base="baseContainerContextType">
                 <xsd:attribute name="securityPolicy" type="xsd:string"/>
                 <xsd:attribute name="securityManager" type="xsd:string"/>
@@ -913,7 +913,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="propertiesContainerContextType">
+    <xsd:complexType name="propertiesContainerContextType" mixed="true">
         <xsd:choice>
             <xsd:any namespace="##other" processContents="strict" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:choice>
@@ -922,8 +922,8 @@
         <xsd:attribute name="enableTemplates" type="xsd:boolean"/>
     </xsd:complexType>
 
-    <xsd:complexType name="iocContainerContextType">
-        <xsd:complexContent>
+    <xsd:complexType name="iocContainerContextType" mixed="true">
+        <xsd:complexContent mixed="true">
             <xsd:extension base="baseContainerContextType">
                 <xsd:attribute name="configLocation" type="xsd:string"/>
                 <xsd:attribute name="configurationText" type="xsd:string"/>
@@ -931,8 +931,8 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="customContainerContextType">
-        <xsd:complexContent>
+    <xsd:complexType name="customContainerContextType" mixed="true">
+        <xsd:complexContent mixed="true">
             <xsd:extension base="baseContainerContextType">
                 <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
                 <xsd:attribute name="name" type="xsd:string" use="required"/>
@@ -956,16 +956,8 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="tlsConfigurationType">
-        <xsd:attribute name="protocolHandler" type="xsd:string"/>
-        <xsd:attribute name="keyStore" type="xsd:string"/>
-        <xsd:attribute name="keyPassword" type="xsd:string"/>
-        <xsd:attribute name="storePassword" type="xsd:string"/>
-        <xsd:attribute name="storeType" type="xsd:string"/>
-        <xsd:attribute name="keyManagerAlgorithm" type="xsd:string"/>
-        <!-- should be of type KeyManagerFactory -->
-        <xsd:attribute name="keyManagerFactory" type="xsd:NMTOKEN"/>
-
+    <!-- corresponds to TlsIndirectKeyStore, named as tls-client in transport namespace -->
+    <xsd:complexType name="tlsClientKeyStoreType">
         <!-- this is the key store defined in system properties that is used implicitly.
         note that some transports use different namespaces within system properties,
         so this is typically global across a particular transport.
@@ -975,17 +967,39 @@
         <xsd:attribute name="clientKeyStore" type="xsd:string"/>
         <xsd:attribute name="clientKeyStorePassword" type="xsd:string"/>
         <xsd:attribute name="clientKeyStoreType" type="xsd:string"/>
+    </xsd:complexType>
 
-        <!--this is the trust store used to construct sockets both explicitly
-and globally (if not set, see client key above) via the jvm defaults. -->
+    <!-- corresponds to TlsDirectKeyStore, named as tls-key-store in transport namespace -->
+    <xsd:complexType name="tlsKeyStoreType">
+        <xsd:attribute name="keyStore" type="xsd:string"/>
+        <xsd:attribute name="keyStoreType" type="xsd:string"/>
+        <xsd:attribute name="keyPassword" type="xsd:string"/>
+        <xsd:attribute name="keyStorePassword" type="xsd:string"/>
+        <xsd:attribute name="keyManagerAlgorithm" type="xsd:string"/>
+    </xsd:complexType>
+
+    <!-- corresponds to TlsIndirectTrustStore, named as tls-trust-store in transport namespace -->
+    <xsd:complexType name="tlsTrustStoreType">
+        <!-- this is the trust store used to construct sockets both explicitly
+             and globally (if not set, see client key above) via the jvm defaults. -->
         <xsd:attribute name="trustStore" type="xsd:string"/>
         <xsd:attribute name="trustStorePassword" type="xsd:string"/>
-        <xsd:attribute name="trustStoreType" type="xsd:string"/>
-        <xsd:attribute name="trustManagerAlgorithm" type="xsd:string"/>
-        <!-- should be of type TrustManagerFactory -->
-        <xsd:attribute name="trustManagerFactory" type="xsd:NMTOKEN"/>
-
-        <xsd:attribute name="explicitTrustStoreOnly" type="xsd:boolean"/>
-        <xsd:attribute name="requireClientAuthentication" type="xsd:boolean"/>
     </xsd:complexType>
+
+    <!-- corresponds to TlsDirectTrustStore, named as tls-server in transport namespace
+         note that this extends tlsStrustStoreType, so only one of the two is needed -->
+    <xsd:complexType name="tlsServerTrustStoreType">
+        <xsd:complexContent mixed="true">
+            <xsd:extension base="tlsTrustStoreType">
+                <xsd:attribute name="protocolHandler" type="xsd:string"/>
+                <xsd:attribute name="trustStoreType" type="xsd:string"/>
+                <xsd:attribute name="trustManagerAlgorithm" type="xsd:string"/>
+                <!-- should be of type TrustManagerFactory -->
+                <xsd:attribute name="trustManagerFactory" type="xsd:NMTOKEN"/>
+                <xsd:attribute name="explicitTrustStoreOnly" type="xsd:boolean"/>
+                <xsd:attribute name="requireClientAuthentication" type="xsd:boolean"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
 </xsd:schema>

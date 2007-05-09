@@ -29,9 +29,9 @@ public class SslNamespaceHandlerTestCase extends FunctionalTestCase
         //The full path gets resolved, we're just checkng that the property got set
         assertTrue(connector.getKeyStore().endsWith("/serverKeystore"));
         assertEquals("mulepassword", connector.getKeyPassword());
-        assertEquals("mulepassword", connector.getStorePassword());
+        assertEquals("mulepassword", connector.getKeyStorePassword());
         //The full path gets resolved, we're just checkng that the property got set
-        assertTrue(connector.getClientKeyStore().endsWith("/clientKeyStore"));
+        assertTrue(connector.getClientKeyStore().endsWith("/clientKeystore"));
         assertEquals("mulepassword", connector.getClientKeyStorePassword());
         //The full path gets resolved, we're just checkng that the property got set
         assertTrue(connector.getTrustStore().endsWith("/trustStore"));

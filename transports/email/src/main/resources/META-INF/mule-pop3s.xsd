@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.mulesource.org/schema/mule/pop3s/2.0"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+            xmlns:pop3="http://www.mulesource.org/schema/mule/pop3/2.0"
+            targetNamespace="http://www.mulesource.org/schema/mule/pop3s/2.0"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/pop3/2.0"
+                schemaLocation="/META-INF/mule-pop3.xsd"/>
+
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"/>
+
+    <xsd:element name="connector" type="pop3sConnectorType"/>
+
+    <xsd:complexType name="pop3sConnectorType">
+        <xsd:complexContent mixed="true">
+            <xsd:extension base="pop3:pop3ConnectorType">
+                <xsd:sequence minOccurs="1" maxOccurs="1">
+                    <xsd:element name="tls-client" type="mule:tlsClientKeyStoreType"/>
+                    <xsd:element name="tls-trust-store" type="mule:tlsTrustStoreType"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+</xsd:schema>

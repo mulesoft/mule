@@ -121,10 +121,10 @@ public class TlsPropertiesMapper
     {
         configuration.setKeyStore(
             getProperty(properties, KEY_NAME_SUFFIX, configuration.getKeyStore()));
-        configuration.setKeystoreType(
-            getProperty(properties, KEY_TYPE_SUFFIX, configuration.getKeystoreType()));
-        configuration.setStorePassword(
-            getProperty(properties, KEY_PASSWORD_SUFFIX, configuration.getStorePassword()));
+        configuration.setKeyStoreType(
+            getProperty(properties, KEY_TYPE_SUFFIX, configuration.getKeyStoreType()));
+        configuration.setKeyStorePassword(
+            getProperty(properties, KEY_PASSWORD_SUFFIX, configuration.getKeyStorePassword()));
     }
 
 

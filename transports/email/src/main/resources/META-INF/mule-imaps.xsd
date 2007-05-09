@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.mulesource.org/schema/mule/imaps/2.0"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+            xmlns:imap="http://www.mulesource.org/schema/mule/imap/2.0"
+            targetNamespace="http://www.mulesource.org/schema/mule/imaps/2.0"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/imap/2.0"
+                schemaLocation="/META-INF/mule-imap.xsd"/>
+
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"/>
+
+    <xsd:element name="connector" type="imapsConnectorType"/>
+
+    <xsd:complexType name="imapsConnectorType">
+        <xsd:complexContent mixed="true">
+            <xsd:extension base="imap:imapConnectorType">
+                <xsd:sequence minOccurs="1" maxOccurs="1">
+                    <xsd:element name="tls-client" type="mule:tlsClientKeyStoreType"/>
+                    <xsd:element name="tls-trust-store" type="mule:tlsTrustStoreType"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+</xsd:schema>

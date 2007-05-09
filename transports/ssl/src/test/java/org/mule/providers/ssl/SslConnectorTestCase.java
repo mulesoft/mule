@@ -38,7 +38,7 @@ public class SslConnectorTestCase extends AbstractConnectorTestCase
         cnn.setClientKeyStore("clientKeystore");
         cnn.setClientKeyStorePassword("mulepassword");
         cnn.setKeyPassword("mulepassword");
-        cnn.setStorePassword("mulepassword");
+        cnn.setKeyStorePassword("mulepassword");
         cnn.setTrustStore("trustStore");
         cnn.setTrustStorePassword("mulepassword");
         cnn.getDispatcherThreadingProfile().setDoThreading(false);

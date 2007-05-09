@@ -3,10 +3,12 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:imap="http://www.mulesource.org/schema/mule/imap/2.0"
+       xmlns:imaps="http://www.mulesource.org/schema/mule/imaps/2.0"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 META-INF/mule.xsd
-       http://www.mulesource.org/schema/mule/imap/2.0 META-INF/mule-imap.xsd">
+       http://www.mulesource.org/schema/mule/imap/2.0 META-INF/mule-imap.xsd
+       http://www.mulesource.org/schema/mule/imaps/2.0 META-INF/mule-imaps.xsd">
 
     <imap:connector name="imapConnector"
                    backupFolder="newBackup"
@@ -14,5 +16,19 @@
                    mailboxFolder="newMailbox"
                    deleteReadMessages="false"
             />
+
+    <!-- need too revisit this once tests are working - it's not clear to me what
+         key store is being used in the tests -->
+
+    <imaps:connector name="imapsConnector"
+                   backupFolder="newBackup"
+                   checkFrequency="1234"
+                   mailboxFolder="newMailbox"
+                   deleteReadMessages="false">
+        <imaps:tls-client clientKeyStore="greenmail-truststore"
+                          clientKeyStorePassword="password"/>
+        <imaps:tls-trust-store trustStore="greenmail-truststore"
+                               trustStorePassword="password"/>
+    </imaps:connector>
 
 </beans>

@@ -7,25 +7,24 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.providers.ssl.config;
+package org.mule.providers.email.config;
 
 import org.mule.config.spring.parsers.CompoundElementDefinitionParser;
 import org.mule.config.spring.parsers.SingleElementDefinitionParser;
-import org.mule.providers.ssl.SslConnector;
+import org.mule.providers.email.Pop3sConnector;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 /**
- * Reigsters a Bean Definition Parser for handling <code><ssl:connector></code> elements.
+ * Reigsters a Bean Definition Parser for handling <code><tcp:connector></code> elements.
+ *
  */
-public class SslNamespaceHandler extends NamespaceHandlerSupport
+public class Pop3sNamespaceHandler extends NamespaceHandlerSupport
 {
     public void init()
     {
-        registerBeanDefinitionParser("connector", new SingleElementDefinitionParser(SslConnector.class, true));
-        registerBeanDefinitionParser("tls-key-store", new CompoundElementDefinitionParser());
+        registerBeanDefinitionParser("connector", new SingleElementDefinitionParser(Pop3sConnector.class, true));
+        registerBeanDefinitionParser("tls-trust-store", new CompoundElementDefinitionParser());
         registerBeanDefinitionParser("tls-client", new CompoundElementDefinitionParser());
-        registerBeanDefinitionParser("tls-server", new CompoundElementDefinitionParser());
     }
-    
 }

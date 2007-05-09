@@ -10,9 +10,18 @@
 
 
     <ssl:connector name="sslConnector" sendBufferSize="1024" receiveBufferSize="2048" keepAlive="true">
-        <ssl:tls-configuration keyStore="serverKeystore" keyPassword="mulepassword" storePassword="mulepassword"
-                clientKeyStore="clientKeyStore" clientKeyStorePassword="mulepassword" trustStore="trustStore"
-                trustStorePassword="mulepassword" explicitTrustStoreOnly="true" requireClientAuthentication="true"/>
+        <ssl:tls-key-store
+                keyPassword="mulepassword"
+                keyStore="serverKeystore"
+                keyStorePassword="mulepassword"/>
+        <ssl:tls-client
+                clientKeyStore="clientKeystore"
+                clientKeyStorePassword="mulepassword"/>
+        <ssl:tls-server
+                trustStore="trustStore"
+                trustStorePassword="mulepassword"
+                explicitTrustStoreOnly="true"
+                requireClientAuthentication="true"/>
     </ssl:connector>
 
 </beans>

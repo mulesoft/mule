@@ -106,9 +106,9 @@ implements TlsDirectKeyStore, TlsIndirectKeyStore, TlsDirectTrustStore
         return tls.getKeyStore();
     }
 
-    public String getKeystoreType()
+    public String getKeyStoreType()
     {
-        return tls.getKeystoreType();
+        return tls.getKeyStoreType();
     }
 
     public String getProtocolHandler()
@@ -131,9 +131,9 @@ implements TlsDirectKeyStore, TlsIndirectKeyStore, TlsDirectTrustStore
         return tls.getSslType();
     }
 
-    public String getStorePassword()
+    public String getKeyStorePassword()
     {
-        return tls.getStorePassword();
+        return tls.getKeyStorePassword();
     }
 
     public String getTrustManagerAlgorithm()
@@ -206,9 +206,9 @@ implements TlsDirectKeyStore, TlsIndirectKeyStore, TlsDirectTrustStore
         tls.setKeyStore(keyStore);
     }
 
-    public void setKeystoreType(String keystoreType)
+    public void setKeyStoreType(String keystoreType)
     {
-        tls.setKeystoreType(keystoreType);
+        tls.setKeyStoreType(keystoreType);
     }
 
     public void setProtocolHandler(String protocolHandler)
@@ -236,9 +236,9 @@ implements TlsDirectKeyStore, TlsIndirectKeyStore, TlsDirectTrustStore
         tls.setSslType(sslType);
     }
 
-    public void setStorePassword(String storePassword)
+    public void setKeyStorePassword(String storePassword)
     {
-        tls.setStorePassword(storePassword);
+        tls.setKeyStorePassword(storePassword);
     }
 
     public void setTrustManagerAlgorithm(String trustManagerAlgorithm)

@@ -10,6 +10,7 @@
 package org.mule.providers.email.config;
 
 import org.mule.config.spring.parsers.SingleElementDefinitionParser;
+import org.mule.config.spring.parsers.CompoundElementDefinitionParser;
 import org.mule.providers.email.ImapConnector;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;

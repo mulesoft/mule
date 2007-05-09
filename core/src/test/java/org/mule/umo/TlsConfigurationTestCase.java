@@ -41,7 +41,7 @@ public class TlsConfigurationTestCase extends TestCase
         {
             assertNotNull("expected", e);
         }
-        configuration.setStorePassword("mulepassword");
+        configuration.setKeyStorePassword("mulepassword");
         configuration.setKeyStore(""); // guaranteed to not exist
         try 
         {
@@ -58,7 +58,7 @@ public class TlsConfigurationTestCase extends TestCase
     {
         TlsConfiguration configuration = new TlsConfiguration(TlsConfiguration.DEFAULT_KEYSTORE);
         configuration.setKeyPassword("mulepassword");
-        configuration.setStorePassword("mulepassword");
+        configuration.setKeyStorePassword("mulepassword");
         configuration.setKeyStore("clientKeystore");
         configuration.initialise(false, TlsConfiguration.JSSE_NAMESPACE);
         SSLSocketFactory socketFactory = configuration.getSocketFactory();
