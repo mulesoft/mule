@@ -17,6 +17,12 @@
             outputPattern="cde"
             pollingFrequency="2345"
             serialiseObjects="true"
-            writeToDirectory="efg"/>
+            writeToDirectory="efg">
+        <file:filename-parser class="org.mule.providers.file.DummyFilenameParser"/>
+    </file:connector>
+
+    <file:connector name="secondConnector">
+        <file:filename-parser class="org.mule.providers.file.SecondDummyFilenameParser"/>
+    </file:connector>
 
 </beans>

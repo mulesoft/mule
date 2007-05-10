@@ -12,6 +12,8 @@ package org.mule.config.spring.parsers;
 import org.mule.util.ClassUtils;
 
 import org.w3c.dom.Element;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.xml.ParserContext;
 
 /**
  * Creates a definitionparser that will construct a single child element and set
@@ -20,17 +22,37 @@ import org.w3c.dom.Element;
  * The parser will set all attributes defined in the Xml as bean properties and will
  * process any nested elements as bean properties too, except the correct Definition parser
  * for the element will be looked up automatically.
+ *
+ * If the class is read from an attribute (when class is null) then it is checked against
+ * the constraint - it must be a subclass of the constraint.
  */
 public class SimpleChildDefinitionParser extends AbstractChildBeanDefinitionParser
 {
 
+    private Class constraint;
     private Class clazz;
     private String setterMethod;
+    private boolean isDynamic;
 
     public SimpleChildDefinitionParser(String setterMethod, Class clazz)
     {
+        this(setterMethod, clazz, null);
+    }
+
+    public SimpleChildDefinitionParser(String setterMethod, Class clazz, Class constraint)
+    {
+        this.constraint = constraint;
         this.clazz = clazz;
         this.setterMethod = setterMethod;
+        isDynamic = null == clazz;
+    }
+
+    protected void preProcess()
+    {
+        if (isDynamic)
+        {
+            clazz = null; // reset for this element
+        }
     }
 
     protected Class getBeanClass(Element element)
@@ -49,6 +71,11 @@ public class SimpleChildDefinitionParser extends AbstractChildBeanDefinitionPars
             }
         }
         element.removeAttribute(ATTRIBUTE_CLASS);
+        if (null != clazz && null != constraint && !constraint.isAssignableFrom(clazz))
+        {
+            logger.error(clazz + " not a subclass of " + constraint);
+            clazz = null;
+        }
         return clazz;
     }
 
@@ -56,4 +83,5 @@ public class SimpleChildDefinitionParser extends AbstractChildBeanDefinitionPars
     {
         return setterMethod;
     }
+
 }

@@ -11,8 +11,6 @@ package org.mule.providers.file;
 
 import org.mule.tck.FunctionalTestCase;
 
-import junit.framework.Assert;
-
 public class FileNamespaceHandlerTestCase extends FunctionalTestCase
 {
     protected String getConfigResources()
@@ -25,15 +23,29 @@ public class FileNamespaceHandlerTestCase extends FunctionalTestCase
         FileConnector c = (FileConnector)managementContext.getRegistry().lookupConnector("fileConnector");
         assertNotNull(c);
         
-        Assert.assertEquals(1234, c.getFileAge());
-        Assert.assertEquals("abc", c.getMoveToDirectory());
-        Assert.assertEquals("bcd", c.getMoveToPattern());
-        Assert.assertEquals("cde", c.getOutputPattern());
-        Assert.assertEquals(2345, c.getPollingFrequency());
-        Assert.assertEquals("efg", c.getWriteToDirectory());
-        Assert.assertEquals(false, c.isAutoDelete());
-        Assert.assertEquals(true, c.isOutputAppend());
-        Assert.assertEquals(true, c.isSerialiseObjects());
+        assertEquals(1234, c.getFileAge());
+        assertEquals("abc", c.getMoveToDirectory());
+        assertEquals("bcd", c.getMoveToPattern());
+        assertEquals("cde", c.getOutputPattern());
+        assertEquals(2345, c.getPollingFrequency());
+        assertEquals("efg", c.getWriteToDirectory());
+        assertEquals(false, c.isAutoDelete());
+        assertEquals(true, c.isOutputAppend());
+        assertEquals(true, c.isSerialiseObjects());
+        FilenameParser parser = c.getFilenameParser();
+        assertTrue(parser.getClass().getName(), c.getFilenameParser() instanceof DummyFilenameParser);
+
+        assertTrue(c.isConnected());
+        assertTrue(c.isStarted());
+    }
+
+    public void testSecondConnector() throws Exception
+    {
+        FileConnector c = (FileConnector)managementContext.getRegistry().lookupConnector("secondConnector");
+        assertNotNull(c);
+
+        FilenameParser parser = c.getFilenameParser();
+        assertTrue(parser.getClass().getName(), c.getFilenameParser() instanceof SecondDummyFilenameParser);
 
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());

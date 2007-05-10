@@ -160,6 +160,14 @@ public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBea
     {
     }
 
+    /**
+     * Hook method that derived classes can implement to modify internal state before processing.
+     * <p>The default implementation does nothing.
+     */
+    protected void preProcess()
+    {
+    }
+
     //-----------------------------------------------------------------------------------
     //- Taken from AbstractSingleBeanDefinitionParser to allow pluggable BeanDefinitionParser
     //-----------------------------------------------------------------------------------
@@ -179,6 +187,7 @@ public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBea
     protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext)
     {
         this.parserContext = parserContext;
+        preProcess();
         Class beanClass = getBeanClass(element);
         Assert.state(beanClass != null, "Class returned from getBeanClass(Element) must not be null, element is: " + element.getNodeName());
         BeanDefinitionBuilder builder = createBeanDefinitionBuilder(element, beanClass);

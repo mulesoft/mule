@@ -14,9 +14,16 @@
 
     <xsd:element name="connector" type="fileConnectorType"/>
 
+    <xsd:complexType name="filenameParserType">
+        <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
+    </xsd:complexType>
+
     <xsd:complexType name="fileConnectorType">
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
+                <xsd:sequence minOccurs="1" maxOccurs="1">
+                    <xsd:element name="filename-parser" type="filenameParserType" minOccurs="0" maxOccurs="1"/>
+                </xsd:sequence>
                 <xsd:attribute name="fileAge" type="xsd:long"/>
                 <xsd:attribute name="moveToDirectory" type="xsd:string"/>
                 <xsd:attribute name="moveToPattern" type="xsd:string"/>
