@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.mulesource.org/schema/mule/ftp/2.0"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+            targetNamespace="http://www.mulesource.org/schema/mule/ftp/2.0"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.springframework.org/schema/beans"
+                schemaLocation="http://www.springframework.org/schema/beans"/>
+    
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"/>
+
+    <xsd:element name="connector" type="ftpConnectorType"/>
+
+    <xsd:complexType name="filenameParserType">
+        <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="ftpConnectorType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:connectorType">
+                <xsd:sequence minOccurs="1" maxOccurs="1">
+                    <xsd:element name="filename-parser" type="filenameParserType" minOccurs="0" maxOccurs="1"/>
+                </xsd:sequence>
+                <xsd:attribute name="outputPattern" type="xsd:string"/>
+                <xsd:attribute name="pollingFrequency" type="xsd:int"/>
+                <xsd:attribute name="binary" type="xsd:boolean"/>
+                <xsd:attribute name="passive" type="xsd:boolean"/>
+                <xsd:attribute name="validateConnections" type="xsd:boolean"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+</xsd:schema>
