@@ -9,11 +9,9 @@
  */
 package org.mule.providers.ftp;
 
-import org.mule.tck.FunctionalTestCase;
-import org.mule.providers.file.FilenameParser;
 import org.mule.providers.file.DummyFilenameParser;
-
-import junit.framework.Assert;
+import org.mule.providers.file.FilenameParser;
+import org.mule.tck.FunctionalTestCase;
 
 public class FtpNamespaceHandlerTestCase extends FunctionalTestCase
 {
@@ -27,11 +25,11 @@ public class FtpNamespaceHandlerTestCase extends FunctionalTestCase
         FtpConnector c = (FtpConnector)managementContext.getRegistry().lookupConnector("ftpConnector");
         assertNotNull(c);
 
-        Assert.assertEquals("abc", c.getOutputPattern());
-        Assert.assertEquals(1234, c.getPollingFrequency());
-        Assert.assertEquals(false, c.isBinary());
-        Assert.assertEquals(false, c.isPassive());
-        Assert.assertEquals(false, c.isValidateConnections());
+        assertEquals("abc", c.getOutputPattern());
+        assertEquals(1234, c.getPollingFrequency());
+        assertEquals(false, c.isBinary());
+        assertEquals(false, c.isPassive());
+        assertEquals(false, c.isValidateConnections());
 
         FilenameParser parser = c.getFilenameParser();
         assertTrue(parser.getClass().getName(), c.getFilenameParser() instanceof DummyFilenameParser);
