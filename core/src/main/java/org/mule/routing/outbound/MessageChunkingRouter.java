@@ -29,17 +29,17 @@ import org.mule.umo.routing.RoutingException;
  */
 public class MessageChunkingRouter extends FilteringOutboundRouter
 {
-    private int chunkSize = 0;
+    private int messageSize = 0;
     private int numberOfMessages = 1;
 
-    public int getChunkSize()
+    public int getMessageSize()
     {
-        return chunkSize;
+        return messageSize;
     }
 
-    public void setChunkSize(int chunkSize)
+    public void setMessageSize(int messageSize)
     {
-        this.chunkSize = chunkSize;
+        this.messageSize = messageSize;
     }
 
     public int getNumberOfMessages()
@@ -55,11 +55,11 @@ public class MessageChunkingRouter extends FilteringOutboundRouter
     public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous)
         throws RoutingException
     {
-        if (chunkSize == 0 && numberOfMessages < 2)
+        if (messageSize == 0 && numberOfMessages < 2)
         {
             return super.route(message, session, synchronous);
         }
-        else if (chunkSize > 0)
+        else if (messageSize > 0)
         {
             byte[] data = new byte[0];
             try
@@ -73,12 +73,12 @@ public class MessageChunkingRouter extends FilteringOutboundRouter
                     message, getEndpoint(0, message), e);
             }
 
-            int parts = data.length / chunkSize;
-            if ((parts * chunkSize) < data.length)
+            int parts = data.length / messageSize;
+            if ((parts * messageSize) < data.length)
             {
                 parts++;
             }
-            int len = chunkSize;
+            int len = messageSize;
             UMOMessage part = null;
             int count = 0;
             int pos = 0;
@@ -98,7 +98,17 @@ public class MessageChunkingRouter extends FilteringOutboundRouter
                     part.setCorrelationId(message.getUniqueId());
                     part.setCorrelationGroupSize(parts);
                     part.setCorrelationSequence(count);
+                    // TODO - remove or downgrade once MULE-1718 is fixed,
+                    // for now these really help see the problem if you set the level for this class to INFO
+                    if (logger.isInfoEnabled())
+                    {
+                        logger.info("sending part " + count + " of " + parts);
+                    }
                     super.route(part, session, synchronous);
+                    if (logger.isInfoEnabled())
+                    {
+                        logger.info("sent");
+                    }
                 }
 
             }

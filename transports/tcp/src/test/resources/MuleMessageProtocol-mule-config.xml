@@ -1,51 +1,49 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:tcp="http://www.mulesource.org/schema/mule/tcp/2.0"
+       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+       xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+               http://www.mulesource.org/schema/mule/core/2.0 META-INF/mule.xsd
+               http://www.mulesource.org/schema/mule/vm/2.0 META-INF/mule-vm.xsd
+               http://www.mulesource.org/schema/mule/tcp/2.0 META-INF/mule-tcp.xsd">
 
-<mule-configuration id="test" version="1.0">
+    <vm:connector name="quedvm"
+                  queueEvents="true"/>
 
-    <connector name="quedvm" className="org.mule.providers.vm.VMConnector">
-        <properties>
-            <property name="queueEvents" value="true"/>
-        </properties>
-    </connector>
+    <tcp:connector name="tcpConnector"
+                   tcpProtocolClassName="org.mule.providers.tcp.protocols.MuleMessageEOFProtocol"
+                   keepSendSocketOpen="false"/>
 
-    <connector name="tcpConnector" className="org.mule.providers.tcp.TcpConnector">
-        <properties>
-            <!-- this is more reliable on slow networks (and IDEs!) -->
-            <property name="tcpProtocolClassName" value="org.mule.providers.tcp.protocols.MuleMessageEOFProtocol"/>
-            <!-- property name="tcpProtocolClassName" value="org.mule.providers.tcp.protocols.MuleMessageProtocol"/ -->
-            <property name="keepSendSocketOpen" value="false"/>
-        </properties>
-    </connector>
+    <mule:model-seda name="model">
 
-    <!-- Container context -->
-    <model name="model">
-        <mule-descriptor name="BridgeIn" implementation="org.mule.components.simple.PassThroughComponent">
-            <inbound-router>
-                <endpoint address="vm://in"/>
-            </inbound-router>
-            <outbound-router>
-                <router className="org.mule.routing.outbound.MessageChunkingRouter">
-                    <endpoint address="tcp://localhost:9994"/>
-                    <properties>
-                      <property name="chunkSize" value="90" />
-                    </properties>
-                </router>
-            </outbound-router>
-        </mule-descriptor>
+        <mule:service name="BridgeIn"
+                      implementation="org.mule.components.simple.PassThroughComponent">
+            <mule:inbound-router>
+                <mule:endpoint address="vm://in"/>
+            </mule:inbound-router>
+            <mule:outbound-router>
+                <mule:message-chunking-router messageSize="90">
+                    <mule:endpoint address="tcp://localhost:9994"/>
+                </mule:message-chunking-router>
+            </mule:outbound-router>
+        </mule:service>
 
-        <mule-descriptor name="BridgeOut" implementation="org.mule.components.simple.PassThroughComponent">
-            <inbound-router>
-                <endpoint address="tcp://localhost:9994"/>
-                <router className="org.mule.routing.inbound.MessageChunkingAggregator"/>
-            </inbound-router>
-            <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="vm://out"/>
-                </router>
-            </outbound-router>
-        </mule-descriptor>
+        <mule:service name="BridgeOut"
+                      implementation="org.mule.components.simple.PassThroughComponent">
+            <mule:inbound-router>
+                <mule:endpoint address="tcp://localhost:9994"/>
+                <mule:message-chunking-aggregator-router/>
+            </mule:inbound-router>
+            <mule:outbound-router>
+                <mule:pass-through-router>
+                    <mule:endpoint address="vm://out"/>
+                </mule:pass-through-router>
+            </mule:outbound-router>
+        </mule:service>
 
-    </model>
-</mule-configuration>
+    </mule:model-seda>
+
+</beans>
