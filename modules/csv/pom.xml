@@ -9,6 +9,7 @@
         <version>2.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-csv</artifactId>
+    <!--<packaging>bundle</packaging>-->
     <name>CSV Extensions</name>
     <description>Functionality for working with CSV data</description>
     

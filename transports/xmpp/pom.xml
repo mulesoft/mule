@@ -9,7 +9,7 @@
         <version>2.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-xmpp</artifactId>
-    <packaging>bundle</packaging>
+    <!--<packaging>bundle</packaging>-->
     <name>XMPP Transport</name>
     <description>A Mule transport that enables event sending and receiving over XMPP (Jabber).</description>
 

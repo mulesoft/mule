@@ -9,7 +9,7 @@
         <version>2.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-file</artifactId>
-    <packaging>bundle</packaging>
+    <!--<packaging>bundle</packaging>-->
     <name>File Transport</name>
     <description>A Mule transport for File Connectivity. This transport allows files to be read and written to
         directories on the local file system. The transport can be configured to filter the file it reads and the way

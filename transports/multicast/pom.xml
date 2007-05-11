@@ -9,7 +9,7 @@
         <version>2.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-multicast</artifactId>
-    <packaging>bundle</packaging>
+    <!--<packaging>bundle</packaging>-->
     <name>Multicast Transport</name>
     <description>A Mule transport for Udp Multicasting. This transport supplies a Multicast Data Packet dispatcher and client implementation.</description>
 

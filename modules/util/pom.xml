@@ -10,7 +10,7 @@
     </parent>
     <groupId>org.mule.modules</groupId>
     <artifactId>mule-module-util</artifactId>
-    <packaging>bundle</packaging>
+    <!--<packaging>bundle</packaging>-->
     <name>Utility libraries</name>
     <description>Utility libraries, not specific to any module/transport</description>
 

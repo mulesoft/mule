@@ -9,7 +9,7 @@
         <version>2.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-ssl</artifactId>
-    <packaging>bundle</packaging>
+    <!--<packaging>bundle</packaging>-->
     <name>SSL Transport</name>
     <description>A Mule transport for Socket connectivity using SSL authentication. This transport supplies a tcp Server and client implementation over SSL.</description>
 

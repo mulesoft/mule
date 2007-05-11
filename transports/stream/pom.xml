@@ -9,7 +9,7 @@
         <version>2.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-stream</artifactId>
-    <packaging>bundle</packaging>
+    <!--<packaging>bundle</packaging>-->
     <name>Stream Transport</name>
     <description>A Mule transport for Stream Connectivity. This transport allows connectivity to Streams and is useful for testing.</description>
 

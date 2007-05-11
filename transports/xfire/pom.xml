@@ -8,7 +8,7 @@
         <version>2.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-xfire</artifactId>
-    <packaging>bundle</packaging>
+    <!--<packaging>bundle</packaging>-->
     <name>XFire Transport</name>
     <description>A Mule transport for SOAP connectivity using XFire, a STaX-based SOAP stack.</description>
     

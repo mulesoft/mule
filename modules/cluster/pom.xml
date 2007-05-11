@@ -8,7 +8,7 @@
         <version>2.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-cluster</artifactId>
-    <packaging>bundle</packaging>
+    <!--<packaging>bundle</packaging>-->
     <name>Cluster</name>
     <description>Mule object cluster</description>
     

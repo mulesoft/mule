@@ -9,7 +9,7 @@
         <version>2.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-tcp</artifactId>
-    <packaging>bundle</packaging>
+    <!--<packaging>bundle</packaging>-->
     <name>Tcp Transport</name>
     <description>A Mule transport for Tcp Connectivity. This transport supplies a tcp Server and client implementation.</description>
 

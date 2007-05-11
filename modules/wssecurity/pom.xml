@@ -9,7 +9,7 @@
         <version>2.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-wssecurity</artifactId>
-    <packaging>bundle</packaging>
+    <!--<packaging>bundle</packaging>-->
     <name>Web Service Security</name>
     <description>Mule WS-Security uses Apache's WSS4J and XFire's WSS4JHandlers to secure WebServices using SOAP</description>
 

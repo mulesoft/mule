@@ -9,7 +9,7 @@
         <version>2.0.0-SNAPSHOT</version>
     </parent>
   <artifactId>mule-module-ognl</artifactId>
-    <packaging>bundle</packaging>
+    <!--<packaging>bundle</packaging>-->
   <name>OGNL Filter</name>
   <description>Support for filtering events using OGNL notation.</description>
 
