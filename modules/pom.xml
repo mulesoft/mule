@@ -21,7 +21,7 @@
         <module>builders</module>
         <module>boot</module>
         <module>client</module>
-        <module>hivemind</module>
+        <!--<module>hivemind</module>-->
         <module>jaas</module>
         <module>jca</module>
         <module>jotm</module>
@@ -29,12 +29,11 @@
         <!-- Note: osgi module is in the osgi profile, below -->
         <module>ognl</module>
         <module>pgp</module>
-        <module>picocontainer</module>
-        <module>persistence</module>
-        <module>registry</module>
+        <!--<module>persistence</module>-->
+        <!--<module>registry</module>-->
         <module>scripting</module>
         <module>spring</module>
-        <module>util</module>
+        <!--<module>util</module>-->
         <module>wssecurity</module>
         <module>xml</module>
     </modules>
