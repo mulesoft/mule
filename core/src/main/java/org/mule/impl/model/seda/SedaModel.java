@@ -56,14 +56,6 @@ public class SedaModel extends AbstractModel
     protected QueueProfile queueProfile;
 
 
-    public SedaModel()
-    {
-        super();
-        poolingProfile = new PoolingProfile();
-        queueProfile = new QueueProfile();
-    }
-
-
     /**
      * Returns the model type name. This is a friendly identifier that is used to
      * look up the SPI class for the model
