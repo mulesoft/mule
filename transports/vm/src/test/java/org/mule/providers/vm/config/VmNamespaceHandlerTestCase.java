@@ -7,9 +7,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.providers.vm;
+package org.mule.providers.vm.config;
 
 import org.mule.config.QueueProfile;
+import org.mule.providers.vm.VMConnector;
 import org.mule.tck.FunctionalTestCase;
 
 
