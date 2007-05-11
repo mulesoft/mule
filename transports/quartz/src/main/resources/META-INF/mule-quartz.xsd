@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.mulesource.org/schema/mule/quartz/2.0"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:spring="http://www.springframework.org/schema/beans"
+            xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+            targetNamespace="http://www.mulesource.org/schema/mule/quartz/2.0"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.springframework.org/schema/beans"
+                schemaLocation="http://www.springframework.org/schema/beans"/>
+    
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"/>
+
+    <xsd:element name="connector" type="quartzConnectorType"/>
+
+    <xsd:complexType name="quartzConnectorType">
+    	<xsd:complexContent>
+    		<xsd:extension base="mule:connectorType">
+		    	<xsd:choice>
+		    		<xsd:element name="factory-properties" type="mule:propsType" minOccurs="0"/>
+		            <xsd:any namespace="##other" minOccurs="0"/>
+		    	</xsd:choice>
+		    </xsd:extension>
+    	</xsd:complexContent>
+   </xsd:complexType>
+</xsd:schema>

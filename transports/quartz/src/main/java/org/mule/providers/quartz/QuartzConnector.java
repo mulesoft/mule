@@ -16,7 +16,6 @@ import org.mule.providers.AbstractConnector;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.ConnectorException;
-import org.mule.util.ClassUtils;
 
 import java.util.Properties;
 
@@ -52,13 +51,17 @@ public class QuartzConnector extends AbstractConnector
 
     public static final String DEFAULT_GROUP_NAME = "mule";
 
-    private String factoryClassName = StdSchedulerFactory.class.getName();
+    /**
+     * Properties to be used for creating the scheduler.  If no properties are given, the 
+     * scheduler will be created by StdSchedulerFactory.getDefaultScheduler()
+     */
+    private Properties factoryProperties = null;
 
-    private SchedulerFactory factory;
-
-    private Properties factoryProperties;
-
-    private Scheduler quartzScheduler;
+    /**
+     * The scheduler instance.  This can be configured by the user and injected as a bean
+     * or if not, it will be created by Mule upon initialization.  
+     */
+    private Scheduler quartzScheduler = null;
 
     protected void doInitialise() throws InitialisationException
     {
@@ -66,16 +69,15 @@ public class QuartzConnector extends AbstractConnector
         {
             if (quartzScheduler == null)
             {
-                if (factory == null)
+                if (factoryProperties != null)
                 {
-                    Object[] args = null;
-                    if (factoryProperties != null)
-                    {
-                        args = new Object[]{factoryProperties};
-                    }
-                    factory = (SchedulerFactory)ClassUtils.instanciateClass(factoryClassName, args);
+                    SchedulerFactory factory = new StdSchedulerFactory(factoryProperties);
+                    quartzScheduler = factory.getScheduler();
                 }
-                quartzScheduler = factory.getScheduler();
+                else 
+                {
+                    quartzScheduler = StdSchedulerFactory.getDefaultScheduler();
+                }
             }
         }
         catch (Exception e)
@@ -132,16 +134,6 @@ public class QuartzConnector extends AbstractConnector
         return "quartz";
     }
 
-    public SchedulerFactory getFactory()
-    {
-        return factory;
-    }
-
-    public void setFactory(SchedulerFactory factory)
-    {
-        this.factory = factory;
-    }
-
     public Scheduler getQuartzScheduler()
     {
         return quartzScheduler;
@@ -150,16 +142,6 @@ public class QuartzConnector extends AbstractConnector
     public void setQuartzScheduler(Scheduler scheduler)
     {
         this.quartzScheduler = scheduler;
-    }
-
-    public String getFactoryClassName()
-    {
-        return factoryClassName;
-    }
-
-    public void setFactoryClassName(String factoryClassName)
-    {
-        this.factoryClassName = factoryClassName;
     }
 
     public Properties getFactoryProperties()

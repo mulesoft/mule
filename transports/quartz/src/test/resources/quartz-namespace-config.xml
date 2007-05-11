@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:quartz="http://www.mulesource.org/schema/mule/quartz/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 META-INF/mule.xsd
+       http://www.mulesource.org/schema/mule/quartz/2.0 META-INF/mule-quartz.xsd">
+
+    <quartz:connector name="quartzConnectorDefaults"/>
+
+    <quartz:connector name="quartzConnector1">
+        <property name="quartzScheduler">
+        	<ref local="myScheduler"/>
+        </property>
+    </quartz:connector>
+    
+    <bean id="myScheduler" factory-bean="mySchedulerFactory" factory-method="getScheduler"/>
+
+    <bean id="mySchedulerFactory" class="org.quartz.impl.StdSchedulerFactory">
+    	<constructor-arg>
+    		<props>
+    			<prop key="org.quartz.scheduler.instanceName">MuleScheduler1</prop>
+    			<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+    			<prop key="org.quartz.threadPool.threadCount">3</prop>
+    			<prop key="org.quartz.scheduler.rmi.export">false</prop>
+    			<prop key="org.quartz.scheduler.rmi.proxy">false</prop>
+    			<prop key="org.quartz.jobStore.class">org.quartz.simpl.RAMJobStore</prop>
+			</props>
+    	</constructor-arg>
+    </bean>
+
+    <quartz:connector name="quartzConnector2">
+    	<quartz:factory-properties>
+  			<prop key="org.quartz.scheduler.instanceName">MuleScheduler2</prop>
+   			<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+   			<prop key="org.quartz.threadPool.threadCount">3</prop>
+   			<prop key="org.quartz.scheduler.rmi.export">false</prop>
+   			<prop key="org.quartz.scheduler.rmi.proxy">false</prop>
+   			<prop key="org.quartz.jobStore.class">org.quartz.simpl.RAMJobStore</prop>
+    	</quartz:factory-properties>
+    </quartz:connector>
+</beans>
