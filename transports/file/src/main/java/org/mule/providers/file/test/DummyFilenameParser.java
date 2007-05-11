@@ -8,8 +8,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.providers.file;
+package org.mule.providers.file.test;
 
+import org.mule.providers.file.FilenameParser;
 import org.mule.umo.provider.UMOMessageAdapter;
 
 public class DummyFilenameParser implements FilenameParser

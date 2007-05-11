@@ -9,6 +9,7 @@
  */
 package org.mule.providers.file;
 
+import org.mule.providers.file.test.DummyFilenameParser;
 import org.mule.tck.FunctionalTestCase;
 
 public class FileNamespaceHandlerTestCase extends FunctionalTestCase
