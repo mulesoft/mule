@@ -448,6 +448,7 @@
                          maxOccurs="1"/>
             <xsd:group ref="exceptionStrategies" minOccurs="0" maxOccurs="1"/>
             <xsd:element name="service-overrides" type="serviceOverridesType" minOccurs="0" maxOccurs="1"/>
+            <xsd:any namespace="##any" processContents="lax"/>
         </xsd:choice>
 
         <xsd:attribute name="name" type="xsd:string" use="required"/>
