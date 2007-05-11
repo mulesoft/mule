@@ -1002,4 +1002,26 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <!--==============================================================-->
+    <!--  Utils / Standard Types                                      -->
+    <!--==============================================================-->
+
+	<xsd:complexType name="mapType">
+		<xsd:complexContent>
+			<xsd:extension base="spring:mapType">
+                <xsd:attribute name="mapClass" type="xsd:string"/>
+                <xsd:attribute name="name" type="xsd:string"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="propsType">
+		<xsd:complexContent>
+			<xsd:extension base="spring:propsType">
+                <xsd:attribute name="location" type="xsd:string"/>
+                <xsd:attribute name="fileEncoding" type="xsd:string"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
 </xsd:schema>
