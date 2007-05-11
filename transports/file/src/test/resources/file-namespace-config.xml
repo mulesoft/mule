@@ -22,7 +22,10 @@
     </file:connector>
 
     <file:connector name="secondConnector">
-        <file:filename-parser class="org.mule.providers.file.SecondDummyFilenameParser"/>
+        <!-- Test using a 'Spring style' property -->
+        <property name="filenameParser">
+            <bean class="org.mule.providers.file.SecondDummyFilenameParser"/>
+        </property>
     </file:connector>
 
 </beans>
