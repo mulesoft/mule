@@ -12,8 +12,6 @@ package org.mule.config.spring.parsers;
 import org.mule.util.ClassUtils;
 
 import org.w3c.dom.Element;
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
-import org.springframework.beans.factory.xml.ParserContext;
 
 /**
  * Creates a definitionparser that will construct a single child element and set
@@ -51,7 +49,7 @@ public class SimpleChildDefinitionParser extends AbstractChildBeanDefinitionPars
     {
         if (isDynamic)
         {
-            clazz = null; // reset for this element
+           clazz = null; // reset for this element
         }
     }
 

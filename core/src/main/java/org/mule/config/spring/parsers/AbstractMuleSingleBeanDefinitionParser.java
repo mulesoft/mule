@@ -34,7 +34,7 @@ import org.w3c.dom.NamedNodeMap;
 
 /**
  * This parser extends the Spring provided {@link AbstractBeanDefinitionParser} to provide additional features for
- * consitently customising bean represnetations for Mule bean definition parsers.  Most custom bean definition parsers
+ * consistently customising bean representations for Mule bean definition parsers.  Most custom bean definition parsers
  * in Mule will use this base class. The following enhancements are made -
  *
  * 1. Attribute mappings can be registered to control how an attribute name in Mule Xml maps to the bean name in the

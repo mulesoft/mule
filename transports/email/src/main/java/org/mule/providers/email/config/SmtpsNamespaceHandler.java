@@ -9,9 +9,9 @@
  */
 package org.mule.providers.email.config;
 
-import org.mule.config.spring.parsers.SingleElementDefinitionParser;
 import org.mule.config.spring.parsers.CompoundElementDefinitionParser;
 import org.mule.config.spring.parsers.MapEntryDefinitionParser;
+import org.mule.config.spring.parsers.SingleElementDefinitionParser;
 import org.mule.providers.email.SmtpsConnector;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
@@ -29,4 +29,5 @@ public class SmtpsNamespaceHandler extends NamespaceHandlerSupport
         registerBeanDefinitionParser("tls-trust-store", new CompoundElementDefinitionParser());
         registerBeanDefinitionParser("tls-client", new CompoundElementDefinitionParser());
     }
+    
 }

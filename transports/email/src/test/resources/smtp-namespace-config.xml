@@ -41,12 +41,12 @@
                      replyToAddresses="def@example.com"
                      subject="subject"
                      username="bob@example.com">
+        <smtps:header name="foo" value="bar"/>
+        <smtps:header name="baz" value="boz"/>
         <smtps:tls-client clientKeyStore="greenmail-truststore"
                           clientKeyStorePassword="password"/>
         <smtps:tls-trust-store trustStore="greenmail-truststore"
                                trustStorePassword="password"/>
-        <smtps:header name="foo" value="bar"/>
-        <smtps:header name="baz" value="boz"/>
     </smtps:connector>
 
 </beans>

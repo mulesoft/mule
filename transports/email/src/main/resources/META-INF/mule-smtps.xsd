@@ -18,15 +18,13 @@
     <xsd:complexType name="smtpsConnectorType">
         <xsd:complexContent>
             <xsd:extension base="smtp:baseSmtpConnectorType">
-                <xsd:sequence minOccurs="1" maxOccurs="1">
-                    <xsd:sequence minOccurs="1" maxOccurs="1">
-                        <xsd:element name="tls-client" type="mule:tlsClientKeyStoreType"/>
-                        <xsd:element name="tls-trust-store" type="mule:tlsTrustStoreType"/>
-                    </xsd:sequence>
-                    <!-- these have to be last or the definition parser attempts to set values
-                         on the tls related elements -->
+                <xsd:sequence>
                     <xsd:sequence minOccurs="0" maxOccurs="unbounded">
                         <xsd:element name="header" type="smtp:headerType"/>
+                    </xsd:sequence>
+                    <xsd:sequence>
+                        <xsd:element name="tls-client" type="mule:tlsClientKeyStoreType"/>
+                        <xsd:element name="tls-trust-store" type="mule:tlsTrustStoreType"/>
                     </xsd:sequence>
                 </xsd:sequence>
             </xsd:extension>

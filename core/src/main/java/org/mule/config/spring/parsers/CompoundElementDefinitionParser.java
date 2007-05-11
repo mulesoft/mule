@@ -20,8 +20,9 @@ import org.w3c.dom.Element;
  * useful when an object has lots of properties and its more readable to break those properties into
  * groups that can be represented as a sub-element in Xml.
  */
-public class CompoundElementDefinitionParser extends AbstractMuleSingleBeanDefinitionParser
+public class CompoundElementDefinitionParser  extends AbstractChildDefinitionParser
 {
+
     protected Class getBeanClass(Element element)
     {
         //this has no impact since we just use the bean definition to hold property configurations
@@ -30,6 +31,8 @@ public class CompoundElementDefinitionParser extends AbstractMuleSingleBeanDefin
 
     protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext)
     {
+        setRegistry(parserContext.getRegistry());
+
         parserContext.getContainingBeanDefinition();
         this.parserContext = parserContext;
         Class beanClass = getBeanClass(element);
@@ -42,12 +45,14 @@ public class CompoundElementDefinitionParser extends AbstractMuleSingleBeanDefin
             builder.setSingleton(parserContext.getContainingBeanDefinition().isSingleton());
         }
         doParse(element, parserContext, builder);
-        AbstractBeanDefinition bd = (AbstractBeanDefinition)parserContext.getContainingBeanDefinition();
+
         for (int i=0;i < builder.getBeanDefinition().getPropertyValues().getPropertyValues().length; i++)
         {
-            bd.getPropertyValues().addPropertyValue(builder.getBeanDefinition().getPropertyValues().getPropertyValues()[i]);
+            addParentPropertyValue(element,
+                    builder.getBeanDefinition().getPropertyValues().getPropertyValues()[i]);
 
         }
-        return bd;
+        return (AbstractBeanDefinition)parserContext.getContainingBeanDefinition();
     }
+
 }

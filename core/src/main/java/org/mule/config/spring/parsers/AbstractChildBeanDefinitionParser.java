@@ -10,47 +10,45 @@
 package org.mule.config.spring.parsers;
 
 import org.mule.util.StringUtils;
+import org.mule.util.ClassUtils;
 
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
- * This definition parser introduces the notion of Heirarchical processing to nested Xml elements. Definition
- * parsers that exnd this are always child beans that get set on the parent Definition Parser.
+ * This definition parser supports the definition of beans that are then set on the parent bean.
+ * It also extends {@link org.mule.config.spring.parsers.AbstractChildDefinitionParser} with
+ * methods that assume the data are associated with a single property.
  *
- * A single method needs to be overriden called {@link #getPropertyName} that determines the name of the property to
- * set on the parent bean with this bean. Note that the property name can be dynamically resolved depending on the parent
- * element.
- *
- * This implementation also supports collections and Maps. For collections is a child element is repeated it will be assumed
+ * This supports collections and Maps. For collections if a child element is repeated it will be assumed
  * that it is a collection.
  *
  * If the Bean Class for this element is set to {@link MapEntryDefinitionParser.KeyValuePair} it is assumed that a Map
  * is being processed and any child elements will be added to the parent Map.
  *
+ * A single method needs to be overriden called {@link #getPropertyName} that determines the name of the property to
+ * set on the parent bean with this bean. Note that the property name can be dynamically resolved depending on the parent
+ * element.
  *
  * @see SimpleChildDefinitionParser
  * @see MapEntryDefinitionParser.KeyValuePair
  * @see AbstractMuleSingleBeanDefinitionParser
  */
-public abstract class AbstractChildBeanDefinitionParser extends AbstractMuleSingleBeanDefinitionParser
+public abstract class AbstractChildBeanDefinitionParser extends AbstractChildDefinitionParser
 {
-    //Make the registry available to the parsers in the post process method
-    protected BeanDefinitionRegistry registry;
 
     protected final void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
-        //Child parces
-        registry = parserContext.getRegistry();
+        setRegistry(parserContext.getRegistry());
         parseChild(element, parserContext, builder);
     }
 
@@ -62,71 +60,55 @@ public abstract class AbstractChildBeanDefinitionParser extends AbstractMuleSing
 
     protected void postProcess(BeanDefinitionBuilder builder, Element element)
     {
-        String parentBean = getParentBeanName(element);
-        if (StringUtils.isBlank(parentBean))
+        String name = generateChildBeanName(element);
+        element.setAttribute(ATTRIBUTE_NAME, name);
+
+        PropertyValue pv;
+        try
         {
-            //TODO RM*: This should probably be an exception
-            logger.info("Bean: " + element.getNodeName() + " has no parent");
+            pv = getParentPropertyValue(element);
+        }
+        catch (Exception e)
+        {
+            // MULE-1737 - remove this once fixed.
+            logger.warn("Skipping process for " + element, e);
             return;
         }
 
-        String name = generateChildBeanName(element);
-        element.setAttribute(ATTRIBUTE_NAME, name);
-        BeanDefinition parent = registry.getBeanDefinition(parentBean);
-
-        String propertyName = getPropertyName(element);
-
-        PropertyValue pv;
-        pv = parent.getPropertyValues().getPropertyValue(propertyName);
-
         if (isMap(element))
         {
-            if(pv==null)
+            if (pv == null)
             {
-                 ManagedMap m = new ManagedMap();
-                pv = new PropertyValue(propertyName, m);
-                parent.getPropertyValues().addPropertyValue(pv);
+                pv = newParentPropertyValue(element, new ManagedMap());
             }
-            MapEntryDefinitionParser.KeyValuePair pair = (MapEntryDefinitionParser.KeyValuePair)
-                    builder.getBeanDefinition().getSource();
+            MapEntryDefinitionParser.KeyValuePair pair =
+                    (MapEntryDefinitionParser.KeyValuePair) builder.getBeanDefinition().getSource();
             ((Map) pv.getValue()).put(pair.getKey(), pair.getValue());
 
         }
         else if (isCollection(element))
         {
-            if(pv==null)
+            if (pv == null)
             {
-                pv = parent.getPropertyValues().getPropertyValue(propertyName + "s");
-            }
-            if(pv==null)
-            {
-                ManagedList l = new ManagedList();
-                pv = new PropertyValue(propertyName + "s", l);
-                parent.getPropertyValues().addPropertyValue(pv);
+                pv = newParentPropertyValue(element, new ManagedList());
             }
             ((List) pv.getValue()).add(builder.getBeanDefinition());
         }
         else
         {
-            pv = new PropertyValue(propertyName, builder.getBeanDefinition());
+            pv = newParentPropertyValue(element, builder.getBeanDefinition());
         }
-        parent.getPropertyValues().addPropertyValue(pv);
-    }
-
-    protected String getParentBeanName(Element element)
-    {
-        return ((Element) element.getParentNode()).getAttribute(ATTRIBUTE_NAME);
+        addParentPropertyValue(element, pv);
     }
 
     protected String generateChildBeanName(Element e)
     {
-        String parentId = ((Element) e.getParentNode()).getAttribute(ATTRIBUTE_NAME);
-        //String parentBean = e.getLocalName() + ":" + ((Element) e.getParentNode()).getAttribute("id");
+        String parentId = getParentBeanId(e);
         String id = e.getAttribute(ATTRIBUTE_NAME);
         if (StringUtils.isBlank(id))
         {
             String idref = e.getAttribute(ATTRIBUTE_IDREF);
-            if(StringUtils.isBlank(idref))
+            if (StringUtils.isBlank(idref))
             {
                 id = e.getLocalName();
             }
@@ -135,7 +117,7 @@ public abstract class AbstractChildBeanDefinitionParser extends AbstractMuleSing
                 id = "ref:" + idref;
             }
 
-            if(!parentId.startsWith("."))
+            if (!parentId.startsWith("."))
             {
                 parentId = "." + parentId;
             }
@@ -145,8 +127,57 @@ public abstract class AbstractChildBeanDefinitionParser extends AbstractMuleSing
         {
             return id;
         }
-
     }
+
+    protected PropertyValue getParentPropertyValue(Element element)
+    {
+        return getParentBeanDefinition(element)
+                .getPropertyValues().getPropertyValue(getBestGuessName(element));
+    }
+
+    protected PropertyValue newParentPropertyValue(Element element, Object value)
+    {
+        return new PropertyValue(getBestGuessName(element), value);
+    }
+
+    protected String getBestGuessName(Element element)
+    {
+        String name = getPropertyName(element);
+        if (! isCollection(element))
+        {
+            return name;
+        }
+        else
+        {
+            BeanDefinition parent = getParentBeanDefinition(element);
+            try
+            {
+                // is there a better way than this?!
+                // BeanWrapperImpl instantiates an instance, which we don't want.
+                // if there really is no better way, i guess it should go in
+                // class or bean utils.
+                Class clazz = ClassUtils.getClass(parent.getBeanClassName());
+                Method[] methods = clazz.getMethods();
+                String setter = "set" + name;
+                for (int i = 0; i < methods.length; ++i)
+                {
+                    if (methods[i].getName().equalsIgnoreCase(setter))
+                    {
+                        return name;
+                    }
+                }
+                // otherwise, guess this
+                return name + "s";
+            }
+            catch (Exception e)
+            {
+                logger.debug("Could not access bean class " + parent.getBeanClassName(), e);
+                return name;
+            }
+        }
+    }
+
+    public abstract String getPropertyName(Element element);
 
     public boolean isCollection(Element element)
     {
@@ -158,5 +189,4 @@ public abstract class AbstractChildBeanDefinitionParser extends AbstractMuleSing
         return getBeanClass(element).equals(MapEntryDefinitionParser.KeyValuePair.class);
     }
 
-    public abstract String getPropertyName(Element e);
 }
