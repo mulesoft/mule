@@ -28,8 +28,22 @@ public class TcpNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals(1024, c.getReceiveBufferSize());
         assertEquals(2048, c.getSendBufferSize());
         assertEquals(50, c.getReceiveBacklog());
-        assertEquals(3000, c.getReceiveTimeout());
+        // this is what we want - i was worried that the client was used as default if the server
+        // wasn't set, but that's not the case
+        assertEquals(-1, c.getServerSoTimeout());
+        assertEquals(3000, c.getClientSoTimeout());
         assertTrue(c.isKeepAlive());
+        assertTrue(c.isConnected());
+        assertTrue(c.isStarted());
+
+    }
+    
+    public void testSeparateTimeouts() throws Exception
+    {
+        TcpConnector c = (TcpConnector)managementContext.getRegistry().lookupConnector("separateTimeouts");
+        assertNotNull(c);
+        assertEquals(4000, c.getServerSoTimeout());
+        assertEquals(3000, c.getClientSoTimeout());
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());
 

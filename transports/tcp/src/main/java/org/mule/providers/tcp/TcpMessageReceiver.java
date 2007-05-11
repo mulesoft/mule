@@ -7,7 +7,6 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.providers.tcp;
 
 import org.mule.config.i18n.Message;
@@ -26,8 +25,6 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
@@ -44,6 +41,8 @@ import java.net.URI;
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkManager;
+
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * <code>TcpMessageReceiver</code> acts like a TCP server to receive socket
@@ -248,10 +247,10 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
                 {
                     socket.setSendBufferSize(tcpConnector.getSendBufferSize());
                 }
-                if (tcpConnector.getReceiveTimeout() != UMOConnector.INT_VALUE_NOT_SET
-                    && socket.getSoTimeout() != tcpConnector.getReceiveTimeout())
+                if (tcpConnector.getServerSoTimeout() != UMOConnector.INT_VALUE_NOT_SET
+                    && socket.getSoTimeout() != tcpConnector.getServerSoTimeout())
                 {
-                    socket.setSoTimeout(tcpConnector.getReceiveTimeout());
+                    socket.setSoTimeout(tcpConnector.getServerSoTimeout());
                 }
 
                 socket.setTcpNoDelay(tcpConnector.isSendTcpNoDelay());

@@ -80,7 +80,7 @@ public class TcpStreamingMessageReceiver extends AbstractPollingMessageReceiver
             TcpConnector connector = (TcpConnector)this.connector;
             clientSocket.setReceiveBufferSize(connector.getReceiveBufferSize());
             clientSocket.setSendBufferSize(connector.getSendBufferSize());
-            clientSocket.setSoTimeout(connector.getReceiveTimeout());
+            clientSocket.setSoTimeout(connector.getServerSoTimeout());
 
             dataIn = new DataInputStream(new BufferedInputStream(clientSocket.getInputStream()));
             logger.debug("Connected to server socket");

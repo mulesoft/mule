@@ -9,24 +9,98 @@
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.springframework.org/schema/beans"
                 schemaLocation="http://www.springframework.org/schema/beans"/>
-    
+
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"/>
 
-    <xsd:element name="connector" type="tcpConnectorType"/>
+    <xsd:element name="connector" type="tcpConnectorType">
+        <xsd:annotation>
+            <xsd:documentation>Connect Mule to a TCP socket, to send or receive data via the network.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
 
     <xsd:complexType name="tcpConnectorType">
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
-                <xsd:attribute name="sendBufferSize" type="xsd:int"/>
-                <xsd:attribute name="receiveBufferSize" type="xsd:int"/>
-                <xsd:attribute name="receiveBacklog" type="xsd:int"/>
-                <xsd:attribute name="socketLinger" type="xsd:int"/>
-                <xsd:attribute name="sendTcpNoDelay" type="xsd:boolean"/>
-                <xsd:attribute name="tcpProtocolClassName" type="xsd:NMTOKEN"/>
-                <xsd:attribute name="sendTimeout" type="xsd:int"/>
-                <xsd:attribute name="receiveTimeout" type="xsd:int"/>
-                <xsd:attribute name="keepSendSocketOpen" type="xsd:boolean"/>
-                <xsd:attribute name="keepAlive" type="xsd:boolean"/>
+                <xsd:attribute name="sendBufferSize" type="xsd:int">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The size of the buffer (in bytes) used when sending data, set on the socket itself.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="receiveBufferSize" type="xsd:int">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The size of the buffer (in bytes) used when receiving data, set on the socket itself.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="receiveBacklog" type="xsd:int">
+                    <xsd:annotation>
+                        <xsd:documentation>The maximum queue length for incoming connections.</xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="socketLinger" type="xsd:int">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The time (in seconds) for which sockets "linger" on close (this allows unset data to be
+                            transmitted).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="sendTcpNoDelay" type="xsd:boolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            If set, transmitted data are not collected together for greater efficiency, but sent
+                            immediately.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="tcpProtocolClassName" type="xsd:NMTOKEN">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The class name for the protocol handler. This controls how the raw data stream is converted
+                            into messages. By default messages are constructed as dara are received, with no correction
+                            for multiple packets or fragmentation. You nearly always want to change this (or use a
+                            transport that includes a protocol, like HTTP).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="clientSoTimeout" type="xsd:int">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            This sets the socket's SO_TIMEOUT value when the socket is used as a client. Reading from
+                            the socket will block for up to this long (in milliseconds) before the read fails.  A value
+                            of 0 (the default) causes the read to wait indefinitely (if no data arrive).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="serverSoTimeout" type="xsd:int">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            This sets the socket's SO_TIMEOUT value when the socket is used as a server. Reading from
+                            the socket will block for up to this long (in milliseconds) before the read fails.  A value
+                            of 0 (the default) causes the read to wait indefinitely (if no data arrive).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="keepSendSocketOpen" type="xsd:boolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            If set, the socket is not closed after sending a message.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="keepAlive" type="xsd:boolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Enables SO_KEEPALIVE behaviour on open sockets. This automatically checks socket connections
+                            which are open but unused for long periods and closes them if the connection becomes
+                            unavailable.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

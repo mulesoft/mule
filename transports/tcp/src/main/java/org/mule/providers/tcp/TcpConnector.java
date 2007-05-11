@@ -47,8 +47,8 @@ public class TcpConnector extends AbstractConnector
     public static final int DEFAULT_BUFFER_SIZE = INT_VALUE_NOT_SET;
     public static final int DEFAULT_BACKLOG = INT_VALUE_NOT_SET;
 
-    private int sendTimeout = DEFAULT_SOCKET_TIMEOUT;
-    private int receiveTimeout = DEFAULT_SOCKET_TIMEOUT;
+    private int clientSoTimeout = DEFAULT_SOCKET_TIMEOUT;
+    private int serverSoTimeout = DEFAULT_SOCKET_TIMEOUT;
     private int sendBufferSize = DEFAULT_BUFFER_SIZE;
     private int receiveBufferSize = DEFAULT_BUFFER_SIZE;
     private int receiveBacklog = DEFAULT_BACKLOG;
@@ -207,28 +207,28 @@ public class TcpConnector extends AbstractConnector
      */
     public void setTimeout(int timeout)
     {
-        setSendTimeout(timeout);
-        setReceiveTimeout(timeout);
+        setClientSoTimeout(timeout);
+        setServerSoTimeout(timeout);
     }
 
-    public int getSendTimeout()
+    public int getClientSoTimeout()
     {
-        return this.sendTimeout;
+        return this.clientSoTimeout;
     }
 
-    public void setSendTimeout(int timeout)
+    public void setClientSoTimeout(int timeout)
     {
-        this.sendTimeout = valueOrDefault(timeout, 0, DEFAULT_SOCKET_TIMEOUT);
+        this.clientSoTimeout = valueOrDefault(timeout, 0, DEFAULT_SOCKET_TIMEOUT);
     }
 
-    public int getReceiveTimeout()
+    public int getServerSoTimeout()
     {
-        return receiveTimeout;
+        return serverSoTimeout;
     }
 
-    public void setReceiveTimeout(int timeout)
+    public void setServerSoTimeout(int timeout)
     {
-        this.receiveTimeout = valueOrDefault(timeout, 0, DEFAULT_SOCKET_TIMEOUT);
+        this.serverSoTimeout = valueOrDefault(timeout, 0, DEFAULT_SOCKET_TIMEOUT);
     }
 
     /**

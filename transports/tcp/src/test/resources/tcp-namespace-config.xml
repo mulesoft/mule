@@ -8,7 +8,15 @@
        http://www.mulesource.org/schema/mule/core/2.0 META-INF/mule.xsd
        http://www.mulesource.org/schema/mule/tcp/2.0 META-INF/mule-tcp.xsd">
 
-    <tcp:connector name="tcpConnector" keepAlive="true" receiveBufferSize="1024" sendBufferSize="2048" 
-                   receiveBacklog="50" receiveTimeout="3000"/>
+    <tcp:connector name="tcpConnector"
+                   keepAlive="true"
+                   receiveBufferSize="1024"
+                   sendBufferSize="2048"
+                   receiveBacklog="50"
+                   clientSoTimeout="3000"/>
+
+    <tcp:connector name="separateTimeouts"
+                   clientSoTimeout="3000"
+                   serverSoTimeout="4000"/>
 
 </beans>

@@ -52,10 +52,10 @@ public class TcpSocketFactory implements PooledSocketFactory
         {
             socket.setSendBufferSize(connector.getSendBufferSize());
         }
-        if (connector.getReceiveTimeout() != UMOConnector.INT_VALUE_NOT_SET
-            && socket.getSoTimeout() != connector.getReceiveTimeout())
+        if (connector.getClientSoTimeout() != UMOConnector.INT_VALUE_NOT_SET
+            && socket.getSoTimeout() != connector.getClientSoTimeout())
         {
-            socket.setSoTimeout(connector.getSendTimeout());
+            socket.setSoTimeout(connector.getClientSoTimeout());
         }
         socket.setTcpNoDelay(connector.isSendTcpNoDelay());
         socket.setKeepAlive(connector.isKeepAlive());
