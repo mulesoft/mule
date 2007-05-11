@@ -6,13 +6,13 @@
     <parent>
         <groupId>org.mule.tools</groupId>
         <artifactId>mule-tools</artifactId>
-        <version>2.0-SNAPSHOT</version>
+        <version>2.0.0-SNAPSHOT</version>
     </parent>
     <packaging>maven-plugin</packaging>
     <name>Mule Config Visualizer</name>
     <artifactId>mule-tools-visualizer</artifactId>
     <groupId>org.mule.tools</groupId>
-    <version>2.0-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
     <inceptionYear>2005</inceptionYear>
     <description>A tool for generating visual representations of configuration Xml config files</description>
 
