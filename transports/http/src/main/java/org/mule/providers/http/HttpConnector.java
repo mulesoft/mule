@@ -98,7 +98,7 @@ public class HttpConnector extends TcpConnector
             HttpConnectionManagerParams params = new HttpConnectionManagerParams();
             if(getSendBufferSize()!= INT_VALUE_NOT_SET ) params.setSendBufferSize(getSendBufferSize());
             if(getReceiveBufferSize()!= INT_VALUE_NOT_SET ) params.setReceiveBufferSize(getReceiveBufferSize());
-            if(getSendTimeout()!= INT_VALUE_NOT_SET ) params.setSoTimeout(getSendTimeout());
+            if(getClientSoTimeout()!= INT_VALUE_NOT_SET ) params.setSoTimeout(getClientSoTimeout());
             if(getSendSocketLinger()!= INT_VALUE_NOT_SET ) params.setLinger(getSendSocketLinger());
 
             params.setTcpNoDelay(isSendTcpNoDelay());
