@@ -10,14 +10,12 @@
 package org.mule.config.spring;
 
 import java.io.IOException;
+import java.net.URL;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.xml.ResourceEntityResolver;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
+import org.springframework.beans.factory.xml.PluggableSchemaResolver;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 /**
  * This is a convenience Entity Resolver that will resolve all entities defined in
@@ -27,42 +25,47 @@ import org.xml.sax.SAXException;
  * By using this resolver, users only have to reference schameLocations relative to the META-INF classpath.  This is
  * commonly used when defining custom namespases for a Mule module or transport.
  */
-public class MuleDelegatingClasspathEntityResolver extends ResourceEntityResolver
+public class MuleDelegatingClasspathEntityResolver extends PluggableSchemaResolver
 {
     /**
      * logger used by this class
      */
     protected transient final Log logger = LogFactory.getLog(MuleDelegatingClasspathEntityResolver.class);
 
-    public static final String BASE_RESOURCE_PATH = "/META-INF";
+    public static final String BASE_RESOURCE_PATH = "META-INF";
 
-    private ResourceLoader resourceLoader;
-    public MuleDelegatingClasspathEntityResolver(ResourceLoader resourceLoader)
+    private ClassLoader resourceLoader;
+    public MuleDelegatingClasspathEntityResolver(ClassLoader resourceLoader)
     {
         super(resourceLoader);
         this.resourceLoader = resourceLoader;
     }
 
     //@Override
-    public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException
+    public InputSource resolveEntity(String publicId, String systemId) throws IOException
     {
+        String resourcePath = systemId;
         if(systemId.indexOf(BASE_RESOURCE_PATH) > 0)
         {
-            String resourcePath = systemId.substring(systemId.lastIndexOf(BASE_RESOURCE_PATH));
-
-            Resource resource = this.resourceLoader.getResource(resourcePath);
-            if(resource!=null)
-            {
-                InputSource source = new InputSource(resource.getInputStream());
-                source.setPublicId(publicId);
-                source.setSystemId(systemId);
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Found XML entity [" + systemId + "]: " + resource);
-                }
-                return source;
-            }
+            resourcePath = systemId.substring(systemId.lastIndexOf(BASE_RESOURCE_PATH));
         }
-        return super.resolveEntity(publicId, systemId);
+        else
+        {
+            resourcePath = BASE_RESOURCE_PATH + resourcePath.substring(resourcePath.lastIndexOf("/"));
+        }
+
+        URL resource = this.resourceLoader.getResource(resourcePath);
+        if(resource!=null)
+        {
+            InputSource source = new InputSource(resource.openStream());
+            source.setPublicId(publicId);
+            source.setSystemId(resourcePath);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Found XML entity [" + systemId + "]: " + resource);
+            }
+            return source;
+        }
+        return null; //super.resolveEntity(publicId, systemId);
     }
 }
 

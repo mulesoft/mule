@@ -219,7 +219,7 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
         }
         else
         {
-            setEntityResolver(new MuleDelegatingClasspathEntityResolver(getResourceLoader()));
+            setEntityResolver(new MuleDelegatingClasspathEntityResolver(getClass().getClassLoader()));
         }
         return i;
     }
