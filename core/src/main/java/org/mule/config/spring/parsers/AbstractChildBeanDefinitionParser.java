@@ -9,8 +9,8 @@
  */
 package org.mule.config.spring.parsers;
 
-import org.mule.util.StringUtils;
 import org.mule.util.ClassUtils;
+import org.mule.util.StringUtils;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -63,6 +63,13 @@ public abstract class AbstractChildBeanDefinitionParser extends AbstractChildDef
         String name = generateChildBeanName(element);
         element.setAttribute(ATTRIBUTE_NAME, name);
 
+        //Some objects may or may not have a parent.  We need to check if
+        //If this bean has a property name (that will be set on the parent)
+        //If not, we can skip the post processing here
+        if(getPropertyName(element)==null)
+        {
+            return;
+        }
         PropertyValue pv;
         try
         {
@@ -71,6 +78,7 @@ public abstract class AbstractChildBeanDefinitionParser extends AbstractChildDef
         catch (Exception e)
         {
             // MULE-1737 - remove this once fixed.
+            //RM*: I think we should still leave this in here for the time being, JIC
             logger.warn("Skipping process for " + element, e);
             return;
         }
