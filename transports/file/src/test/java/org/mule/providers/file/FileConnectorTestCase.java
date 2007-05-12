@@ -64,7 +64,6 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
     {
         UMOConnector connector = new FileConnector();
         connector.setName("testFile");
-        connector.initialise();
         return connector;
     }
 
