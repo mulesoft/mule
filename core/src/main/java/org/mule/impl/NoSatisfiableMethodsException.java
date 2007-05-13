@@ -10,10 +10,8 @@
 
 package org.mule.impl;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.UMOException;
-import org.mule.util.StringMessageUtils;
 
 import java.util.List;
 
@@ -41,8 +39,7 @@ public class NoSatisfiableMethodsException extends UMOException
 
     public NoSatisfiableMethodsException(Object component, List args, Exception cause)
     {
-        super(new Message(Messages.NO_ENTRY_POINT_FOUND_ON_X_WITH_ARGS_X,
-            StringMessageUtils.toString(component), StringMessageUtils.toString(args)), cause);
+        super(CoreMessages.noEntryPointFoundWithArgs(component, args), cause);
     }
 
     public NoSatisfiableMethodsException(Object component, Class[] args)
@@ -52,20 +49,16 @@ public class NoSatisfiableMethodsException extends UMOException
 
     public NoSatisfiableMethodsException(Object component, Class[] args, Exception cause)
     {
-        super(new Message(Messages.NO_ENTRY_POINT_FOUND_ON_X_WITH_ARGS_X,
-            StringMessageUtils.toString(component), StringMessageUtils.toString(args)), cause);
+        super(CoreMessages.noEntryPointFoundWithArgs(component, args), cause);
     }
 
     public NoSatisfiableMethodsException(Object component, Class returnType)
     {
-        super(new Message(Messages.NO_MATCHING_METHODS_WHICH_RETURN_X_ON_X, StringMessageUtils.toString(component),
-                returnType.getName()));
+        super(CoreMessages.noMatchingMethodsOnObjectReturning(component, returnType));
     }
 
     public NoSatisfiableMethodsException(Object component, Class returnType, Exception cause)
     {
-        super(new Message(Messages.NO_MATCHING_METHODS_WHICH_RETURN_X_ON_X, StringMessageUtils.toString(component),
-                returnType.getName(), cause));
+        super(CoreMessages.noMatchingMethodsOnObjectReturning(component, returnType), cause);
     }
-
 }

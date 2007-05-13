@@ -83,7 +83,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
         if (receiveMessagesInTransaction)
         {
             // Receive messages and process them in a single transaction
-            // Do not enable threading here, but serveral workers
+            // Do not enable threading here, but several workers
             // may have been started
             TransactionCallback cb = new TransactionCallback()
             {

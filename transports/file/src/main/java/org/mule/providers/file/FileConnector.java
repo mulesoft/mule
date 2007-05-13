@@ -11,8 +11,7 @@
 package org.mule.providers.file;
 
 import org.mule.config.MuleProperties;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.file.filters.FilenameWildcardFilter;
 import org.mule.transformers.NoActionTransformer;
@@ -180,8 +179,10 @@ public class FileConnector extends AbstractConnector
                 }
             }
             Map srvOverride = (Map) props.get(PROPERTY_SERVICE_OVERRIDE);
-            if (srvOverride != null) {
-                if (serviceOverrides == null) {
+            if (srvOverride != null) 
+            {
+                if (serviceOverrides == null) 
+                {
                     serviceOverrides = new Properties();
                 }
                 serviceOverrides.setProperty(MuleProperties.CONNECTOR_INBOUND_TRANSFORMER,
@@ -199,16 +200,12 @@ public class FileConnector extends AbstractConnector
         }
         catch (Exception e)
         {
-            throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X,
-                "Message Receiver"), e, this);
+            throw new InitialisationException(
+                CoreMessages.failedToCreateObjectWith("Message Receiver", 
+                    serviceDescriptor), e, this);
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.providers.UMOConnector#getProtocol()
-     */
     public String getProtocol()
     {
         return "file";
@@ -519,7 +516,7 @@ public class FileConnector extends AbstractConnector
         }
         catch (IOException e)
         {
-            throw new DispatchException(new Message(Messages.STREAMING_FAILED_NO_STREAM), message,
+            throw new DispatchException(CoreMessages.streamingFailedNoStream(), message,
                 endpoint, e);
         }
     }

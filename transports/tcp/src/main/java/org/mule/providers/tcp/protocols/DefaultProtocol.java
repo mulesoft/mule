@@ -12,6 +12,7 @@ package org.mule.providers.tcp.protocols;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.MessageFormat;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.logging.Log;
@@ -34,15 +35,17 @@ public class DefaultProtocol extends ByteProtocol
     private static final int DEFAULT_BUFFER_SIZE = 8192;
     private static final int UNLIMITED = -1;
 
+
     private int bufferSize;
 
     public DefaultProtocol()
     {
-        this(DEFAULT_BUFFER_SIZE);
+        this(STREAM_OK, DEFAULT_BUFFER_SIZE);
     }
 
-    public DefaultProtocol(int bufferSize)
+    public DefaultProtocol(boolean streamOk, int bufferSize)
     {
+        super(streamOk);
         this.bufferSize = bufferSize;
     }
 
@@ -64,13 +67,16 @@ public class DefaultProtocol extends ByteProtocol
             boolean repeat;
             do
             {
+
                 len = copy(is, buffer, baos, remain);
                 remain = remaining(limit, remain, len);
                 repeat = EOF != len && remain > 0 && isRepeat(len, is.available());
 
                 if (logger.isDebugEnabled())
                 {
-                    logger.debug("len/limit/repeat: " + len + "/" + limit + "/" + repeat);
+                    logger.debug(MessageFormat.format(
+                            "len/limit/repeat: {0}/{1}/{2}",
+                            new Object[] {new Integer(len), new Integer(limit), Boolean.valueOf(repeat)}));
                 }
             }
             while (repeat);

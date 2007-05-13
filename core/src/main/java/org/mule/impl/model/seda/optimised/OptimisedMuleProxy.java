@@ -10,8 +10,7 @@
 
 package org.mule.impl.model.seda.optimised;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.ImmutableMuleDescriptor;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleMessage;
@@ -100,8 +99,7 @@ public class OptimisedMuleProxy implements MuleProxy
             catch (Exception e)
             {
                 throw new ModelException(
-                    new Message(Messages.FAILED_TO_START_X, "Component '" + descriptor.getName() + "'"), 
-                    e);
+                    CoreMessages.failedToStart("Component '" + descriptor.getName() + "'"), e);
             }
         }
 
@@ -126,8 +124,7 @@ public class OptimisedMuleProxy implements MuleProxy
             catch (Exception e)
             {
                 throw new ModelException(
-                    new Message(Messages.FAILED_TO_STOP_X, "Component '" + descriptor.getName() + "'"), 
-                    e);
+                    CoreMessages.failedToStop("Component '" + descriptor.getName() + "'"), e);
             }
         }
     }
@@ -279,7 +276,7 @@ public class OptimisedMuleProxy implements MuleProxy
             {
                 handleException(
                     new MessagingException(
-                        new Message(Messages.EVENT_PROCESSING_FAILED_FOR_X, descriptor.getName()), 
+                        CoreMessages.eventProcessingFailedFor(descriptor.getName()), 
                         event.getMessage(), e));
             }
         }
@@ -314,11 +311,6 @@ public class OptimisedMuleProxy implements MuleProxy
         descriptor.getExceptionListener().exceptionThrown(exception);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#toString()
-     */
     public String toString()
     {
         return "optimised proxy for: " + descriptor.toString();
@@ -377,11 +369,6 @@ public class OptimisedMuleProxy implements MuleProxy
     // }
     // }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Runnable#run()
-     */
     public void run()
     {
         if (logger.isTraceEnabled())
@@ -454,7 +441,7 @@ public class OptimisedMuleProxy implements MuleProxy
             {
                 handleException(
                     new MessagingException(
-                        new Message(Messages.EVENT_PROCESSING_FAILED_FOR_X, descriptor.getName()), 
+                        CoreMessages.eventProcessingFailedFor(descriptor.getName()), 
                         event.getMessage(), e));
             }
         }
@@ -483,11 +470,6 @@ public class OptimisedMuleProxy implements MuleProxy
         // nothing to do
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.UMOLifecycleAdapter#getDescriptor()
-     */
     public UMOImmutableDescriptor getDescriptor()
     {
         return descriptor;

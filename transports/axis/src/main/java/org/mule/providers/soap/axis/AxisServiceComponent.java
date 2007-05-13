@@ -12,6 +12,7 @@ package org.mule.providers.soap.axis;
 
 import org.mule.RegistryContext;
 import org.mule.config.MuleProperties;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
 import org.mule.impl.endpoint.MuleEndpointURI;
@@ -518,7 +519,7 @@ public class AxisServiceComponent implements Initialisable, Callable
         if (engine == null)
         {
 
-            throw new MessagingException(new org.mule.config.i18n.Message(org.mule.config.i18n.Messages.X_IS_NULL, "Axis Engine"), context.getMessage());
+            throw new MessagingException(CoreMessages.objectIsNull("Axis Engine"), context.getMessage());
         }
         MessageContext msgContext = new MessageContext(engine);
 

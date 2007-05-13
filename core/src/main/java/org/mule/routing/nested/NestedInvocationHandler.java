@@ -11,7 +11,8 @@
 package org.mule.routing.nested;
 
 import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
+import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
 import org.mule.umo.UMOEvent;
@@ -51,7 +52,7 @@ public class NestedInvocationHandler implements InvocationHandler
             }
             else
             {
-                throw new IllegalArgumentException(new Message(Messages.MUST_SET_METHOD_NAMES_ON_BINDING).toString());
+                throw new IllegalArgumentException(CoreMessages.mustSetMethodNamesOnBinding().getMessage());
             }
         }
         else
@@ -72,7 +73,8 @@ public class NestedInvocationHandler implements InvocationHandler
 
         if (router == null)
         {
-            throw new IllegalArgumentException(new Message(Messages.CANNOT_FINDE_BINDING_FOR_METHOD_X, method.getName()).toString());
+            throw new IllegalArgumentException(
+                CoreMessages.cannotFindBindingForMethod(method.getName()).toString());
         }
 
         UMOMessage reply;
@@ -90,5 +92,4 @@ public class NestedInvocationHandler implements InvocationHandler
             return null;
         }
     }
-
 }

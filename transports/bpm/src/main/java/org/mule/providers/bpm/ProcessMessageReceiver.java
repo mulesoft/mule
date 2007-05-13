@@ -38,7 +38,12 @@ public class ProcessMessageReceiver extends AbstractMessageReceiver {
 
     public UMOMessage generateSynchronousEvent(String endpoint, Object payload, Map messageProperties) throws UMOException {
         logger.debug("Executing process is sending an event (synchronously) to Mule endpoint = " + endpoint);
-        return generateEvent(endpoint, payload, messageProperties, true);
+        UMOMessage response = generateEvent(endpoint, payload, messageProperties, true);
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Synchronous response is " + (response != null ? response.getPayload() : null ));
+        }
+        return response;
     }
 
     public void generateAsynchronousEvent(String endpoint, Object payload, Map messageProperties) throws UMOException {

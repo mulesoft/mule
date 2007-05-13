@@ -11,7 +11,6 @@
 package org.mule.providers.soap.xfire;
 
 import org.mule.config.MuleProperties;
-import org.mule.config.i18n.Message;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.internal.notifications.ManagerNotification;
@@ -22,6 +21,7 @@ import org.mule.providers.AbstractConnector;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
 import org.mule.providers.soap.MethodFixInterceptor;
+import org.mule.providers.soap.xfire.i18n.XFireMessages;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -134,8 +134,8 @@ public class XFireConnector extends AbstractConnector
                 }
                 catch (ClassNotFoundException e)
                 {
-                    throw new InitialisationException(new Message("xfire", 10, clientServices
-                        .get(i)), e, this);
+                    throw new InitialisationException(
+                        XFireMessages.couldNotInitAnnotationProcessor(clientServices.get(i)), e, this);
                 }
             }
         }
@@ -147,18 +147,20 @@ public class XFireConnector extends AbstractConnector
                 // are we running under Java 5 (at least)?
                 if (!SystemUtils.isJavaVersionAtLeast(150))
                 {
-                    throw new InitialisationException(new Message("xfire", 9), this);
+                    throw new InitialisationException(
+                        XFireMessages.annotationsRequireJava5(), this);
                 }
                 try
                 {
                     WebAnnotations wa = (WebAnnotations)ClassUtils.instanciateClass(
                         CLASSNAME_ANNOTATIONS, null, this.getClass());
                     serviceFactory = new AnnotationServiceFactory(wa, xfire.getTransportManager());
+                    configureBindingProvider((ObjectServiceFactory)serviceFactory);
                 }
                 catch (Exception ex)
                 {
-                    throw new InitialisationException(new Message("xfire", 10,
-                        CLASSNAME_ANNOTATIONS), ex, this);
+                    throw new InitialisationException(
+                        XFireMessages.couldNotInitAnnotationProcessor(CLASSNAME_ANNOTATIONS), ex, this);
                 }
             }
             else
@@ -240,8 +242,8 @@ public class XFireConnector extends AbstractConnector
         }
         catch (Exception ex)
         {
-            throw new InitialisationException(new Message("xfire", 11,
-                bindingProvider), ex, this);
+            throw new InitialisationException(
+                XFireMessages.unableToInitBindingProvider(bindingProvider), ex, this);
         }
 
     }

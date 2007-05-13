@@ -29,8 +29,11 @@ public class ObjectUtils extends org.apache.commons.lang.ObjectUtils
         }
         else
         {
-            return new StringBuffer(40).append(ClassUtils.getShortClassName(obj.getClass())).append('@')
-                .append(Integer.toHexString(System.identityHashCode(obj))).toString();
+            return new StringBuffer(40).append(
+                    ClassUtils.getSimpleName(obj.getClass()))
+                    .append('@')
+                    .append(Integer.toHexString(System.identityHashCode(obj))
+                    ).toString();
         }
     }
 

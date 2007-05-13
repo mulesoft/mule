@@ -10,8 +10,7 @@
 package org.mule.config.spring.editors;
 
 import org.mule.RegistryContext;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.transformer.UMOTransformer;
 
 import java.beans.PropertyEditorSupport;
@@ -36,8 +35,7 @@ public class TransformerPropertyEditor extends PropertyEditorSupport
 
             if (tempTrans == null)
             {
-                //return;
-                throw new IllegalArgumentException(new Message(Messages.OBJECT_NOT_FOUND_X, name).toString());
+                throw new IllegalArgumentException(CoreMessages.objectNotFound(name).getMessage());
             }
 
             if (currentTrans == null)

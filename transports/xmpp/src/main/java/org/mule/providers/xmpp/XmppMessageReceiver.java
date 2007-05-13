@@ -10,18 +10,7 @@
 
 package org.mule.providers.xmpp;
 
-import javax.resource.spi.work.Work;
-import javax.resource.spi.work.WorkException;
-import javax.resource.spi.work.WorkManager;
-
-import org.jivesoftware.smack.PacketListener;
-import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.filter.PacketFilter;
-import org.jivesoftware.smack.filter.PacketTypeFilter;
-import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.packet.Packet;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
 import org.mule.providers.AbstractConnector;
@@ -33,6 +22,18 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOMessageAdapter;
+
+import javax.resource.spi.work.Work;
+import javax.resource.spi.work.WorkException;
+import javax.resource.spi.work.WorkManager;
+
+import org.jivesoftware.smack.PacketListener;
+import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.filter.PacketFilter;
+import org.jivesoftware.smack.filter.PacketTypeFilter;
+import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.packet.Packet;
 
 /**
  * <code>XmppMessageReceiver</code> is responsible for receiving Mule events over XMPP.
@@ -65,8 +66,7 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements Pack
         }
         catch (XMPPException e)
         {
-            throw new ConnectException(new org.mule.config.i18n.Message(Messages.FAILED_TO_CREATE_X,
-                "XMPP Connection"), e, this);
+            throw new ConnectException(CoreMessages.failedToCreate("XMPP Connection"), e, this);
         }
     }
 

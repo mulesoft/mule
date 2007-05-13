@@ -10,8 +10,7 @@
 
 package org.mule.extras.picocontainer;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.extras.picocontainer.i18n.PicocontainerMessages;
 import org.mule.impl.container.AbstractContainerContext;
 import org.mule.impl.container.ContainerKeyPair;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -64,11 +63,6 @@ public class PicoContainerContext extends AbstractContainerContext
         this.extension = extension;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.model.UMOContainerContext#getComponent(java.lang.Object)
-     */
     public Object getComponent(Object key) throws ObjectNotFoundException
     {
         if (container == null)
@@ -155,7 +149,7 @@ public class PicoContainerContext extends AbstractContainerContext
         }
         catch (ClassNotFoundException e)
         {
-            throw new ContainerException(new Message(Messages.FAILED_TO_CONFIGURE_CONTAINER), e);
+            throw new ContainerException(PicocontainerMessages.failedToConfigureContainer(), e);
         }
 
         ContainerBuilder builder = scriptedContainerBuilderFactory.getContainerBuilder();

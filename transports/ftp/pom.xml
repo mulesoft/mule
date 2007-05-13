@@ -38,13 +38,8 @@
                 </configuration></plugin>
         </plugins>
     </build>
-
+                                              
     <dependencies>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-file</artifactId>
-            <version>${version}</version>
-        </dependency>
         <dependency>
             <artifactId>commons-net</artifactId>
             <groupId>commons-net</groupId>
@@ -55,5 +50,39 @@
             <groupId>oro</groupId>
             <version>2.0.7</version>
         </dependency>
-    </dependencies>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-client</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-file</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-tcp</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ftpserver</groupId>
+            <artifactId>ftpserver-core</artifactId>
+            <version>1.0-mule-temp</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ftpserver</groupId>
+            <artifactId>ftplet-api</artifactId>
+            <version>1.0-mule-temp</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.mina</groupId>
+            <artifactId>mina-core</artifactId>
+            <version>1.0.2</version>
+        </dependency>
+     </dependencies>
 </project>

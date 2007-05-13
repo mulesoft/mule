@@ -31,12 +31,14 @@ public class SerializedUMOMessageTransformersTestCase extends AbstractTransforme
 {
     private UMOMessage testObject = null;
 
+    // @Override
     protected void doSetUp() throws Exception
     {
         RequestContext.setEvent(new MuleEvent(testObject, getTestEndpoint("test", "sender"), MuleTestUtils
             .getTestSession(), true));
     }
 
+    // @Override
     protected void doTearDown() throws Exception
     {
         RequestContext.clear();

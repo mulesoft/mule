@@ -9,7 +9,7 @@
  */
 package org.mule.impl.lifecycle;
 
-import org.mule.config.i18n.Message;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.config.spring.RegistryFacade;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
@@ -220,7 +220,7 @@ public class LifecyclePhase implements UMOLifecyclePhase
         }
         catch (Exception e)
         {
-            throw new LifecycleException(Message.createStaticMessage("Failed to invoke lifecycle method: " + lifecycleMethod + " on object: " + o), e, this);
+            throw new LifecycleException(CoreMessages.failedToInvokeLifecycle(lifecycleMethod.getName(), o), e, this);
         }
     }
 

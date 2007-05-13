@@ -11,8 +11,8 @@
 package org.mule.umo.security;
 
 import org.mule.MuleException;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOEncryptionStrategy;
 
 /**
@@ -53,7 +53,7 @@ public class CryptoFailureException extends MuleException
 
     public CryptoFailureException(UMOEncryptionStrategy strategy, Throwable cause)
     {
-        super(new Message(Messages.CRYPTO_FAILURE), cause);
+        super(CoreMessages.cryptoFailure(), cause);
         String s = (strategy == null ? "null" : strategy.toString());
         addInfo("Encryption", s);
         this.encryptionStrategy = strategy;

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC
+          "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+          "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="TcpSynchStreaming" version="1.0">
+
+    <mule-environment-properties serverUrl="" synchronous="true"/>
+
+    <connector name="default" className="org.mule.providers.tcp.TcpConnector">
+        <properties>
+            <property name="validateConnections" value="false"/>
+        </properties>
+    </connector>
+
+    <model name="echo" type="streaming">
+
+        <mule-descriptor name="echo" implementation="org.mule.components.simple.StreamingBridgeComponent">
+            <inbound-router>
+                <endpoint address="tcp://localhost:65432" streaming="true"/>
+            </inbound-router>
+        </mule-descriptor>
+        
+    </model>
+
+</mule-configuration>

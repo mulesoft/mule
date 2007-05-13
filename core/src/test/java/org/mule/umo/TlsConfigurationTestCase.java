@@ -10,13 +10,12 @@
 
 package org.mule.umo;
 
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.security.tls.TlsConfiguration;
 
 import javax.net.ssl.SSLSocketFactory;
 
-import junit.framework.TestCase;
-
-public class TlsConfigurationTestCase extends TestCase
+public class TlsConfigurationTestCase extends AbstractMuleTestCase
 {
 
     public void testEmptyConfiguration() throws Exception
@@ -27,7 +26,7 @@ public class TlsConfigurationTestCase extends TestCase
             configuration.initialise(false, TlsConfiguration.JSSE_NAMESPACE);
             fail("no key password");
         }
-        catch (NullPointerException e)
+        catch (IllegalArgumentException e)
         {
             assertNotNull("expected", e);
         }
@@ -37,7 +36,7 @@ public class TlsConfigurationTestCase extends TestCase
             configuration.initialise(false, TlsConfiguration.JSSE_NAMESPACE);
             fail("no store password");
         }
-        catch (NullPointerException e)
+        catch (IllegalArgumentException e)
         {
             assertNotNull("expected", e);
         }

@@ -15,6 +15,7 @@ import org.mule.impl.message.ExceptionPayload;
 import org.mule.providers.soap.xfire.XFireConnector;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.manager.UMOWorkManager;
 import org.mule.util.StringUtils;
 
@@ -45,6 +46,7 @@ import org.codehaus.xfire.exchange.AbstractMessage;
 import org.codehaus.xfire.exchange.InMessage;
 import org.codehaus.xfire.exchange.OutMessage;
 import org.codehaus.xfire.service.Service;
+import org.codehaus.xfire.soap.SoapConstants;
 import org.codehaus.xfire.transport.AbstractChannel;
 import org.codehaus.xfire.transport.Channel;
 import org.codehaus.xfire.transport.Session;
@@ -373,6 +375,9 @@ public class MuleLocalChannel extends AbstractChannel
 
             InMessage in = new InMessage(reader, getUri());
 
+            String soapAction = getSoapAction(ctx.getMessage());
+            in.setProperty(SoapConstants.SOAP_ACTION, soapAction);
+
             receive(context, in);
 
             Object result = null;
@@ -410,4 +415,16 @@ public class MuleLocalChannel extends AbstractChannel
             throw e;
         }
     }
+
+    private String getSoapAction(UMOMessage message) {
+        String action = (String) message.getProperty(SoapConstants.SOAP_ACTION);
+        
+        if (action != null && action.startsWith("\"") && action.endsWith("\"") && action.length() >= 2)
+        {
+            action = action.substring(1, action.length() - 1);
+        }
+        
+        return action;
+    }
+
 }

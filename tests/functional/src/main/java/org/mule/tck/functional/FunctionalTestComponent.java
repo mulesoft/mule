@@ -11,7 +11,7 @@
 package org.mule.tck.functional;
 
 import org.mule.MuleException;
-import org.mule.config.i18n.Message;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.impl.RequestContext;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.lifecycle.Callable;
@@ -32,6 +32,8 @@ public class FunctionalTestComponent implements Callable
 {
     protected transient Log logger = LogFactory.getLog(getClass());
 
+    public static final int STREAM_SAMPLE_SIZE = 4;
+    public static final int STREAM_BUFFER_SIZE = 4096;
     private EventCallback eventCallback;
     private Object returnMessage = null;
     private boolean appendComponentName = false;
@@ -66,7 +68,7 @@ public class FunctionalTestComponent implements Callable
 
         if (throwException)
         {
-            throw new MuleException(Message.createStaticMessage("Functional Test Component Exception"));
+            throw new MuleException(MessageFactory.createStaticMessage("Functional Test Component Exception"));
         }
 
         return replyMessage;
@@ -103,7 +105,7 @@ public class FunctionalTestComponent implements Callable
 
         if (throwException)
         {
-            throw new MuleException(Message.createStaticMessage("Functional Test Component Exception"));
+            throw new MuleException(MessageFactory.createStaticMessage("Functional Test Component Exception"));
         }
 
         return replyMessage;
@@ -139,7 +141,6 @@ public class FunctionalTestComponent implements Callable
         this.throwException = throwException;
     }
 
-
     public boolean isAppendComponentName()
     {
         return appendComponentName;
@@ -149,4 +150,6 @@ public class FunctionalTestComponent implements Callable
     {
         this.appendComponentName = appendComponentName;
     }
+
 }
+

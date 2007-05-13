@@ -10,8 +10,7 @@
 
 package org.mule.transformers.codec;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.Base64;
@@ -30,11 +29,6 @@ public class Base64Encoder extends AbstractTransformer
         setReturnClass(String.class);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.transformer.UMOTransformer#transform(java.lang.Object)
-     */
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         try
@@ -63,8 +57,8 @@ public class Base64Encoder extends AbstractTransformer
         }
         catch (Exception ex)
         {
-            throw new TransformerException(new Message(Messages.TRANSFORM_FAILED_FROM_X_TO_X, src.getClass()
-                .getName(), "base64"), this, ex);
+            throw new TransformerException(
+                CoreMessages.transformFailed(src.getClass().getName(), "base64"), this, ex);
         }
     }
 

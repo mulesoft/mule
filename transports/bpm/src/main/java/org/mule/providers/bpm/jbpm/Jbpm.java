@@ -166,14 +166,10 @@ public class Jbpm implements BPMS
     // Process manipulation
     // ///////////////////////////////////////////////////////////////////////////
 
-    /**
-     * Start a new process.
-     * 
-     * @return the newly-created ProcessInstance
-     */
-    public synchronized Object startProcess(Object processType) throws Exception
+    public synchronized Object startProcess(Object processType, Object transition, Map processVariables) throws Exception
     {
-        return startProcess(processType, /* processVariables */null);
+        //TODO Travis: Can you check that this method impl is correct after the merge
+        return startProcess(processType, processVariables );
     }
 
     /**

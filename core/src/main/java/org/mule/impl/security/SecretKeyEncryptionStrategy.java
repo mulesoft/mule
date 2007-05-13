@@ -10,8 +10,7 @@
 
 package org.mule.impl.security;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.ObjectFactory;
 import org.mule.util.StringMessageUtils;
@@ -52,7 +51,7 @@ public class SecretKeyEncryptionStrategy extends AbstractJCEEncryptionStrategy
         {
             if (keyFactory == null)
             {
-                throw new InitialisationException(new Message(Messages.X_IS_NULL, "Key / KeyFactory"), this);
+                throw new InitialisationException(CoreMessages.objectIsNull("Key / KeyFactory"), this);
             }
             else
             {

@@ -8,9 +8,9 @@
 
     <connector name="oracleJmsConnector" className="org.mule.providers.oracle.jms.OracleJmsConnector">
         <properties>
-            <property name="url" value="jdbc:oracle:oci:@eaid" />
-            <property name="username" value="jms" />
-            <property name="password" value="jms" />
+	    <property name="url" value="jdbc:oracle:thin:@//127.0.0.1:1521/xe" />
+            <property name="username" value="mule" />
+            <property name="password" value="mule" />
             <property name="payloadFactory" value="oracle.xdb.XMLTypeFactory" />
         </properties>
     </connector>

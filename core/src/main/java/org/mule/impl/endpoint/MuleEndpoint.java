@@ -10,8 +10,7 @@
 
 package org.mule.impl.endpoint;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.ImmutableMuleEndpoint;
 import org.mule.impl.ManagementContextAware;
 import org.mule.providers.ConnectionStrategy;
@@ -76,23 +75,18 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint, 
         super(uri, receiver);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.endpoint.UMOEndpoint#setEndpointURI(java.lang.String)
-     */
     public void setEndpointURI(UMOEndpointURI endpointUri) throws EndpointException
     {
         if (connector != null && endpointUri != null
             && !connector.supportsProtocol(endpointUri.getFullScheme()))
         {
-            throw new IllegalArgumentException(new Message(
-                Messages.CONNECTOR_SCHEME_X_INCOMPATIBLE_WITH_ENDPOINT_SCHEME_X, connector.getProtocol(),
+            throw new IllegalArgumentException(
+                CoreMessages.connectorSchemeIncompatibleWithEndpointScheme(connector.getProtocol(),
                 endpointUri).getMessage());
         }
         if(endpointUri==null)
         {
-            throw new NullPointerException(new Message(Messages.X_IS_NULL, "endpointURI").getMessage());
+            throw new NullPointerException(CoreMessages.objectIsNull("endpointURI").getMessage());
         }
 
         this.endpointUri = endpointUri;
@@ -118,48 +112,28 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint, 
         this.endpointEncoding = endpointEncoding;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.endpoint.UMOEndpoint#setType(String)
-     */
     public void setType(String type)
     {
         this.type = type;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.endpoint.UMOEndpoint#setConnector(org.mule.umo.provider.UMOConnector)
-     */
     public void setConnector(UMOConnector connector)
     {
         if (connector != null && endpointUri != null
             && !connector.supportsProtocol(endpointUri.getFullScheme()))
         {
-            throw new IllegalArgumentException(new Message(
-                Messages.CONNECTOR_SCHEME_X_INCOMPATIBLE_WITH_ENDPOINT_SCHEME_X, connector.getProtocol(),
+            throw new IllegalArgumentException(
+                CoreMessages.connectorSchemeIncompatibleWithEndpointScheme(connector.getProtocol(),
                 endpointUri).getMessage());
         }
         this.connector = connector;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.endpoint.UMOEndpoint#setName(java.lang.String)
-     */
     public void setName(String name)
     {
         this.name = name;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.endpoint.UMOEndpoint#setTransformer(org.mule.umo.transformer.UMOTransformer)
-     */
     public void setTransformer(UMOTransformer trans)
     {
         transformer = trans;
@@ -169,32 +143,17 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint, 
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.endpoint.UMOEndpoint#getPropertiesForURI(java.util.Map)
-     */
     public void setProperties(Map props)
     {
         properties.clear();
         properties.putAll(props);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.endpoint.UMOEndpoint#isReadOnly()
-     */
     public boolean isReadOnly()
     {
         return false;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.endpoint.UMOEndpoint#setTransactionConfig(org.mule.umo.UMOTransactionConfig)
-     */
     public void setTransactionConfig(UMOTransactionConfig config)
     {
         transactionConfig = config;

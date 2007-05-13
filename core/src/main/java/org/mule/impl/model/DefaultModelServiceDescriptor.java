@@ -11,7 +11,7 @@
 package org.mule.impl.model;
 
 import org.mule.config.MuleProperties;
-import org.mule.config.i18n.Message;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.registry.AbstractServiceDescriptor;
 import org.mule.registry.ServiceException;
 import org.mule.umo.model.UMOModel;
@@ -55,7 +55,7 @@ public class DefaultModelServiceDescriptor extends AbstractServiceDescriptor imp
             }
             catch (Exception e)
             {
-                throw new ServiceException(Message.createStaticMessage("Unable to instantiate model"), e);
+                throw new ServiceException(CoreMessages.failedToCreate(modelClass), e);
             }            
         }
         else return null;
@@ -68,7 +68,7 @@ public class DefaultModelServiceDescriptor extends AbstractServiceDescriptor imp
         }
         catch (ClassNotFoundException e)
         {
-            throw new ServiceException(Message.createStaticMessage("Model class not found."), e);
+            throw new ServiceException(CoreMessages.cannotLoadFromClasspath(modelClass), e);
         }
     }
 }

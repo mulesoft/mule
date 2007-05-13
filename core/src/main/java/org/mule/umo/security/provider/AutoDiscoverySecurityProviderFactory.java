@@ -11,8 +11,7 @@
 package org.mule.umo.security.provider;
 
 import org.mule.MuleRuntimeException;
-import org.mule.config.i18n.CoreMessageConstants;
-import org.mule.config.i18n.Message;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ClassUtils;
 import org.mule.util.SystemUtils;
 
@@ -95,9 +94,7 @@ public class AutoDiscoverySecurityProviderFactory implements SecurityProviderFac
         catch (Exception ex)
         {
             throw new MuleRuntimeException(
-                new Message("core", CoreMessageConstants.FAILED_TO_INITIALIZE_SECURITY_PROVIDER, 
-                    info.getProviderClass()),
-                ex);
+                CoreMessages.failedToInitSecurityProvider(info.getProviderClass()), ex);
         }
     }
 }

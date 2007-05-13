@@ -17,4 +17,5 @@ import org.mule.config.builders.MuleXmlConfigurationBuilder;
  */
 public class SpringConfigurationBuilder extends MuleXmlConfigurationBuilder
 {
+
 }

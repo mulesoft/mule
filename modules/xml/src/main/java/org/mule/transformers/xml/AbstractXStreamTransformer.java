@@ -10,7 +10,7 @@
 
 package org.mule.transformers.xml;
 
-import org.mule.config.i18n.Message;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.transformer.TransformerException;
 
@@ -51,7 +51,7 @@ public abstract class AbstractXStreamTransformer extends AbstractEventAwareTrans
             }
             catch (Exception e)
             {
-                throw new TransformerException(Message.createStaticMessage("Unable to initialize XStream"), e);
+                throw new TransformerException(MessageFactory.createStaticMessage("Unable to initialize XStream"), e);
             }
         }
 

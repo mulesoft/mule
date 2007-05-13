@@ -10,8 +10,7 @@
 
 package org.mule.routing.outbound;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleMessage;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
@@ -69,7 +68,7 @@ public class MessageChunkingRouter extends FilteringOutboundRouter
             catch (Exception e)
             {
                 throw new RoutingException(
-                    new Message(Messages.FAILED_TO_READ_PAYLOAD), 
+                    CoreMessages.failedToReadPayload(), 
                     message, getEndpoint(0, message), e);
             }
 

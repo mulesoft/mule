@@ -148,7 +148,7 @@
 
         <property name="implementation" value="ChitChatter"/>
         <property name="modelName" value="main"/>
-        
+
     </bean>
 
     <!--
@@ -158,6 +158,6 @@
     <bean id="ChitChatter" singleton="false" class="org.mule.samples.hello.ChitChatter"/>
 
     <bean name="main" class="org.mule.impl.model.seda.SedaModel"/>
-    
+
 </beans>
 

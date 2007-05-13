@@ -11,8 +11,7 @@
 package org.mule.impl;
 
 import org.mule.config.MuleProperties;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.transformers.codec.Base64Decoder;
 import org.mule.transformers.codec.Base64Encoder;
 import org.mule.umo.UMOException;
@@ -83,8 +82,8 @@ public class MuleSessionHandler implements UMOSessionHandler
                 int i = pair.indexOf("=");
                 if (i == -1)
                 {
-                    throw new IllegalArgumentException(new Message(Messages.SESSION_VALUE_X_IS_MALFORMED,
-                        pair).toString());
+                    throw new IllegalArgumentException(
+                        CoreMessages.sessionValueIsMalformed(pair).toString());
                 }
                 name = pair.substring(0, i).trim();
                 value = pair.substring(i + 1).trim();

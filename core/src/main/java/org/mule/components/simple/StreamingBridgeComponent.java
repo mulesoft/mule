@@ -35,5 +35,10 @@ public class StreamingBridgeComponent implements StreamingService
         // allow to detect stream corruption and broken connections by comparing the actually read
         // and size values
         IOUtils.copyLarge(in, out);
+
+        // once all data are copied we may as well close - it loses nothing and helps avoid
+        // timing errors in tests.
+        out.close();
     }
+
 }

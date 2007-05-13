@@ -29,6 +29,7 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import org.codehaus.xfire.handler.Handler;
 import org.codehaus.xfire.service.Service;
 
 /**
@@ -121,6 +122,17 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
                     props);
             }
 
+            List inList = connector.getServerInHandlers();
+            if(inList != null)
+            {
+                for(int i = 0; i < inList.size(); i++)
+                {
+                    Class clazz = ClassUtils.loadClass(inList.get(i).toString(), this.getClass());
+                    Handler handler = (Handler)clazz.getConstructor(null).newInstance(null);
+                    service.addInHandler(handler);
+                }
+            }
+            
             boolean sync = endpoint.isSynchronous();
             // default to synchronous if using http
             if (endpoint.getEndpointURI().getScheme().startsWith("http")
@@ -142,6 +154,10 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
             throw new InitialisationException(e, this);
         }
         catch (MalformedURLException e)
+        {
+            throw new InitialisationException(e, this);
+        }
+        catch (Exception e)
         {
             throw new InitialisationException(e, this);
         }

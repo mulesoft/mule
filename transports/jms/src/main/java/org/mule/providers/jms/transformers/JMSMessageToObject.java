@@ -11,6 +11,7 @@
 package org.mule.providers.jms.transformers;
 
 import org.mule.umo.transformer.TransformerException;
+import org.mule.util.ClassUtils;
 
 import javax.jms.Message;
 
@@ -45,14 +46,14 @@ public class JMSMessageToObject extends AbstractJmsTransformer
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug("Source object is " + src.getClass().getName());
+                logger.debug("Source object is " + ClassUtils.getSimpleName(src.getClass()));
             }
 
             Object result = transformFromMessage((Message)src);
 
             if (logger.isDebugEnabled())
             {
-                logger.debug("Resulting object is " + result.getClass().getName());
+                logger.debug("Resulting object is " + ClassUtils.getSimpleName(result.getClass()));
             }
 
             return result;

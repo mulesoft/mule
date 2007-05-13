@@ -32,9 +32,9 @@ public class MuleUniversalTransport extends AbstractTransport implements WSDL11T
 {
     public static final String SOAP11_HTTP_BINDING = "http://schemas.xmlsoap.org/soap/http";
     public static final String SOAP12_HTTP_BINDING = "http://www.w3.org/2003/05/soap/bindings/HTTP/";
-    public final static String HTTP_BINDING = "http://www.w3.org/2004/08/wsdl/http";
-    public final static String HTTP_TRANSPORT_NS = "http://schemas.xmlsoap.org/soap/mule";
-    private final static String URI_PREFIX = "urn:xfire:transport:mule:";
+    public static final String HTTP_BINDING = "http://www.w3.org/2004/08/wsdl/http";
+    public static final String HTTP_TRANSPORT_NS = "http://schemas.xmlsoap.org/soap/mule";
+    private static final String URI_PREFIX = "urn:xfire:transport:mule:";
 
     /**
      * logger used by this class
@@ -67,7 +67,7 @@ public class MuleUniversalTransport extends AbstractTransport implements WSDL11T
     public String getServiceURL(Service service)
     {
         //return "http://localhost/services/" + service.getSimpleName();
-        String ep = ((MuleInvoker)service.getInvoker()).getEndpoint().getEndpointURI().getAddress();
+        String ep = ((MuleInvoker) service.getInvoker()).getEndpoint().getEndpointURI().getAddress();
         return ep + "/" + service.getSimpleName();
     }
 

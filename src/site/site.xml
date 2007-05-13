@@ -2,7 +2,7 @@
 <project name="Mule">
     <bannerLeft>
         <name>Mule</name>
-        <src>http://www.mulesource.com/images/mulesource_logo.gif</src>
+        <src>images/mulesource_logo.gif</src>
         <href>http://mule.mulesource.org/</href>
     </bannerLeft>
     <!--
@@ -15,9 +15,13 @@
             <item name="Mule" href="http://mule.codehaus.org/"/>
         </links>
 
+        <!--
+            TODO this link only works from the top level. Navigting to a module
+                 first generates the wrong link
         <menu name="Mule">
             <item name="Javadocs" href="apidocs"/>
         </menu>
+        -->
 
         <!-- link to parent from submodules -->
         ${parentProject}

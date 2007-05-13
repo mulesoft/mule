@@ -11,8 +11,7 @@
 package org.mule.management.agents;
 
 import org.mule.RegistryContext;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.AbstractAgent;
 import org.mule.management.support.AutoDiscoveryJmxSupportFactory;
 import org.mule.management.support.JmxSupport;
@@ -179,7 +178,7 @@ public class Mx4jAgent extends AbstractAgent
         }
         catch (Exception e)
         {
-            throw new InitialisationException(new Message(Messages.FAILED_TO_START_X, "mx4j agent"), e, this);
+            throw new InitialisationException(CoreMessages.failedToStart("mx4j agent"), e, this);
         }
     }
 
@@ -192,13 +191,13 @@ public class Mx4jAgent extends AbstractAgent
         }
         catch (InstanceNotFoundException e)
         {
-            throw new JmxManagementException(new Message(Messages.FAILED_TO_START_X, "Mx4j agent"),
-                adaptorName, e);
+            throw new JmxManagementException(
+                CoreMessages.failedToStart("Mx4j agent"), adaptorName, e);
         }
         catch (MBeanException e)
         {
-            throw new JmxManagementException(new Message(Messages.FAILED_TO_START_X, "Mx4j agent"),
-                adaptorName, e);
+            throw new JmxManagementException(
+                CoreMessages.failedToStart("Mx4j agent"), adaptorName, e);
         }
         catch (ReflectionException e)
         {
@@ -219,13 +218,13 @@ public class Mx4jAgent extends AbstractAgent
         }
         catch (InstanceNotFoundException e)
         {
-            throw new JmxManagementException(new Message(Messages.FAILED_TO_STOP_X, "Mx4j agent"),
-                adaptorName, e);
+            throw new JmxManagementException(
+                CoreMessages.failedToStop("Mx4j agent"), adaptorName, e);
         }
         catch (MBeanException e)
         {
-            throw new JmxManagementException(new Message(Messages.FAILED_TO_STOP_X, "Mx4j agent"),
-                adaptorName, e);
+            throw new JmxManagementException(
+                CoreMessages.failedToStop("Mx4j agent"), adaptorName, e);
         }
         catch (ReflectionException e)
         {

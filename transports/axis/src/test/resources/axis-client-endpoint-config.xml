@@ -6,7 +6,7 @@
 <mule-configuration id="axis_client_endpoint" version="1.0">
 
     <global-endpoints>
-        <endpoint name="calculatorAddEndpoint" address="axis:http://localhost:8080/axis/Calculator.jws?method=add">
+        <endpoint name="calculatorAddEndpoint" address="axis:http://localhost:8080/mule-tests-external-axis/axis/Calculator.jws?method=add">
             <properties>
                 <property name="style" value="wrapped"/>
                 <property name="use" value="literal"/>

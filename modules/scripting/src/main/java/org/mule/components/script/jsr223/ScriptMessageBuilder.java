@@ -52,7 +52,7 @@ public class ScriptMessageBuilder extends AbstractMessageBuilder implements Init
         }
         if (result == null)
         {
-            throw new NullPointerException("A result payload must be returned from the groovy script");
+            throw new IllegalArgumentException("A result payload must be returned from the groovy script");
         }
         return result;
     }

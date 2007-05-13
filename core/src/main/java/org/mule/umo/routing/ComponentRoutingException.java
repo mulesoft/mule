@@ -10,8 +10,8 @@
 
 package org.mule.umo.routing;
 
+import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
@@ -72,8 +72,8 @@ public class ComponentRoutingException extends RoutingException
                                            UMOComponent component)
     {
 
-        Message m = new Message(Messages.COMPONENT_X_ROUTING_FAILED_ON_ENDPOINT_X, component.getDescriptor()
-            .getName(), endpoint.getEndpointURI());
+        Message m = CoreMessages.routingFailedOnEndpoint(component.getDescriptor().getName(), 
+            endpoint.getEndpointURI());
         if (message != null)
         {
             message.setNextMessage(m);

@@ -10,8 +10,7 @@
 
 package org.mule.providers.quartz;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.providers.AbstractConnector;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -82,8 +81,7 @@ public class QuartzConnector extends AbstractConnector
         }
         catch (Exception e)
         {
-            throw new InitialisationException(new Message(Messages.INITIALISATION_FAILURE_X,
-                "Quartz provider"), e);
+            throw new InitialisationException(CoreMessages.initialisationFailure("Quartz provider"), e);
         }
     }
 
@@ -110,7 +108,7 @@ public class QuartzConnector extends AbstractConnector
         }
         catch (Exception e)
         {
-            throw new ConnectorException(new Message(Messages.FAILED_TO_START_X, "Quartz provider"), this, e);
+            throw new ConnectorException(CoreMessages.failedToStart("Quartz provider"), this, e);
         }
     }
 
@@ -125,7 +123,7 @@ public class QuartzConnector extends AbstractConnector
         }
         catch (Exception e)
         {
-            throw new ConnectorException(new Message(Messages.FAILED_TO_STOP_X, "Quartz provider"), this, e);
+            throw new ConnectorException(CoreMessages.failedToStop("Quartz provider"), this, e);
         }
     }
 

@@ -10,8 +10,8 @@
 
 package org.mule.providers.tcp.protocols;
 
-import java.io.IOException;
 import java.io.InputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 
 /**
@@ -32,7 +32,7 @@ public class MuleMessageLengthProtocol extends LengthProtocol
     // @Override
     public void write(OutputStream os, Object unused) throws IOException
     {
-        MuleMessageWorker.doWrite(os);
+        super.write(os, MuleMessageWorker.doWrite());
     }
 
 }

@@ -18,10 +18,7 @@ import org.mule.samples.errorhandler.exceptions.BusinessException;
 import org.mule.util.StringMessageUtils;
 
 /**
- * <code>BusinessHandler</code> TODO (document class)
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>BusinessHandler</code>
  */
 public class BusinessHandler extends AbstractExceptionHandler
 {
@@ -34,8 +31,7 @@ public class BusinessHandler extends AbstractExceptionHandler
 
     protected void processException(ErrorMessage message, Throwable t) throws HandlerException
     {
-        String msg = LocaleMessage.getString(LocaleMessage.BUSINESS_HANDLER_MESSAGE);
+        String msg = LocaleMessage.businessHandlerMessage();
         System.out.println(StringMessageUtils.getBoilerPlate(msg));
     }
-
 }

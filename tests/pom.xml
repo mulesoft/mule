@@ -31,7 +31,6 @@
         <dependency>
             <groupId>javax.activation</groupId>
             <artifactId>activation</artifactId>
-            <version>1.1</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
@@ -42,6 +41,12 @@
             <modules>
                 <module>integration</module>
                 <module>vendor</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>tests-external</id>
+            <modules>
+                <module>external</module>
             </modules>
         </profile>
     </profiles>

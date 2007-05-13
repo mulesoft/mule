@@ -12,8 +12,7 @@ package org.mule.providers.soap.xfire;
 
 import org.mule.MuleRuntimeException;
 import org.mule.config.ConfigurationException;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.UMODescriptorAware;
@@ -85,8 +84,7 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
         }
         catch (UMOException e)
         {
-            throw new MuleRuntimeException(new Message(Messages.FAILED_TO_START_X,
-                "local channel work manager", e));
+            throw new MuleRuntimeException(CoreMessages.failedToStart("local channel work manager"), e);
         }
         if(transportClass == null)
         {
@@ -115,7 +113,7 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
         }
         catch(Exception e)
         {
-            throw new MuleRuntimeException(new Message(Messages.FAILED_LOAD_X, "xfire service transport", e));
+            throw new MuleRuntimeException(CoreMessages.failedToLoad("xfire service transport"), e);
         }
     }
         
@@ -183,7 +181,7 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
     {
         if (xfire == null)
         {
-            throw new InitialisationException(new Message(Messages.X_IS_NULL, "xfire"), this);
+            throw new InitialisationException(CoreMessages.objectIsNull("xfire"), this);
         }
     }
 

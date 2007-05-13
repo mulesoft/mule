@@ -9,8 +9,7 @@
  */
 package org.mule.management.agents;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.internal.admin.AbstractNotificationLoggerAgent;
 import org.mule.management.support.AutoDiscoveryJmxSupportFactory;
 import org.mule.management.support.JmxSupport;
@@ -75,7 +74,7 @@ public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent
             }
         } catch (Exception e)
         {
-            throw new InitialisationException(new Message(Messages.FAILED_TO_START_X, "JMX Server Notification Agent"), e, this);
+            throw new InitialisationException(CoreMessages.failedToStart("JMX Server Notification Agent"), e, this);
         }
     }
 

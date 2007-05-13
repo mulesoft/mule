@@ -10,8 +10,7 @@
 
 package org.mule.transaction;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.TransactionException;
 import org.mule.umo.UMOTransaction;
 
@@ -52,7 +51,7 @@ public final class TransactionCoordination
             UMOTransaction oldTx = (UMOTransaction) transactions.get();
             if (oldTx != null && !oldTx.equals(transaction))
             {
-                throw new IllegalTransactionStateException(new Message(Messages.TX_CANT_UNBIND));
+                throw new IllegalTransactionStateException(CoreMessages.transactionCannotUnbind());
             }
         }
         finally
@@ -74,7 +73,7 @@ public final class TransactionCoordination
         UMOTransaction oldTx = (UMOTransaction) transactions.get();
         if (oldTx != null)
         {
-            throw new IllegalTransactionStateException(new Message(Messages.TX_CANT_BIND_ALREADY_BOUND));
+            throw new IllegalTransactionStateException(CoreMessages.transactionAlreadyBound());
         }
 
         transactions.set(transaction);

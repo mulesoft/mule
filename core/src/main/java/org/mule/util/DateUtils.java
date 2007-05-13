@@ -10,8 +10,7 @@
 
 package org.mule.util;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
@@ -71,10 +70,10 @@ public class DateUtils extends org.apache.commons.lang.time.DateUtils
         mills = mills - (secs * 1000);
 
         StringBuffer bf = new StringBuffer(60);
-        bf.append(days).append(" ").append(new Message(Messages.DAYS).getMessage()).append(", ");
-        bf.append(hours).append(" ").append(new Message(Messages.HOURS).getMessage()).append(", ");
-        bf.append(mins).append(" ").append(new Message(Messages.MINS).getMessage()).append(", ");
-        bf.append(secs).append(".").append(mills).append(" ").append(new Message(Messages.SEC).getMessage());
+        bf.append(days).append(" ").append(CoreMessages.days().getMessage()).append(", ");
+        bf.append(hours).append(" ").append(CoreMessages.hours().getMessage()).append(", ");
+        bf.append(mins).append(" ").append(CoreMessages.minutes().getMessage()).append(", ");
+        bf.append(secs).append(".").append(mills).append(" ").append(CoreMessages.seconds().getMessage());
         return bf.toString();
     }
 

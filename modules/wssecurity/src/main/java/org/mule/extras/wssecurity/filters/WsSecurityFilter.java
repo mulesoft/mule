@@ -11,7 +11,7 @@
 package org.mule.extras.wssecurity.filters;
 
 import org.mule.RegistryContext;
-import org.mule.config.i18n.Message;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.extras.wssecurity.handlers.MuleWSSInHandler;
 import org.mule.extras.wssecurity.headers.WsSecurityHeadersSetter;
 import org.mule.impl.MuleMessage;
@@ -190,7 +190,7 @@ public class WsSecurityFilter extends AbstractEndpointSecurityFilter
             }
             catch (ConfigurationException e)
             {
-                throw new UnsupportedAuthenticationSchemeException(Message.createStaticMessage("A Configurtation Exception occured while configuring WS-Security on Axis "),new MuleMessage(e.getMessage()));
+                throw new UnsupportedAuthenticationSchemeException(MessageFactory.createStaticMessage("A Configurtation Exception occured while configuring WS-Security on Axis "),new MuleMessage(e.getMessage()));
             }
         }
     }

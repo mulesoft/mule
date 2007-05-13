@@ -33,13 +33,21 @@
         </dependency>
         <dependency>
             <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
+            <!-- this is the dist pom that does not have a parent set. Make sure
+                 that the version declared here matches the version in mule's
+                 toplevel pom's dependencyManagement section.
+            -->
             <version>1.4</version>
+            <artifactId>mail</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javax.activation</groupId>
             <artifactId>activation</artifactId>
+            <!-- this is the dist pom that does not have a parent set. Make sure
+                 that the version declared here matches the version in mule's
+                 toplevel pom's dependencyManagement section.
+            -->
             <version>1.1</version>
             <scope>provided</scope>
         </dependency>
@@ -288,12 +296,10 @@
                                 <artifactItem>
                                     <groupId>javax.mail</groupId>
                                     <artifactId>mail</artifactId>
-                                    <version>1.4</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>javax.activation</groupId>
                                     <artifactId>activation</artifactId>
-                                    <version>1.1</version>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>

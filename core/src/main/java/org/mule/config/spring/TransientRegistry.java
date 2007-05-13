@@ -14,8 +14,7 @@ import org.mule.RegistryContext;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.MuleProperties;
 import org.mule.config.ThreadingProfile;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.ManagementContext;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.internal.notifications.AdminNotification;
@@ -260,7 +259,7 @@ public class TransientRegistry extends AbstractRegistry
         Properties props = SpiUtils.findServiceDescriptor(type, name);
         if (props == null)
         {
-            throw new ServiceException(new Message(Messages.FAILED_LOAD_X, type + " " + name));
+            throw new ServiceException(CoreMessages.failedToLoad(type + " " + name));
         }
         return ServiceDescriptorFactory.create(type, name, props, overrides, null);
     }
@@ -309,8 +308,8 @@ public class TransientRegistry extends AbstractRegistry
         }
         catch (UMOException e)
         {
-            //TODO
-            throw new MuleRuntimeException(Message.createStaticMessage("Failed to invoke Lifecycle on object: " + object), e);
+            throw new MuleRuntimeException(CoreMessages.failedToInvokeLifecycle(
+                    getManagementContext().getLifecycleManager().getCurrentPhase(), object), e);
         }
     }
     /**

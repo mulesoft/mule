@@ -10,7 +10,7 @@
 
 package org.mule.transformers.simple;
 
-import org.mule.config.i18n.Message;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 
@@ -44,7 +44,7 @@ public class StringToByteArray extends AbstractTransformer
             }
             catch (UnsupportedEncodingException e)
             {
-                throw new TransformerException(Message
+                throw new TransformerException(MessageFactory
                     .createStaticMessage("Unable to convert String to byte[]."), e);
             }
         }

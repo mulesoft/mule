@@ -12,8 +12,7 @@ package org.mule.providers;
 
 import org.mule.RegistryContext;
 import org.mule.config.MuleProperties;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.model.AbstractComponent;
@@ -93,7 +92,7 @@ public class DefaultReplyToHandler implements ReplyToHandler
         catch (Exception e)
         {
             throw new DispatchException(
-                new Message(Messages.FAILED_TO_DISPATCH_TO_REPLYTO_X, endpoint),
+                CoreMessages.failedToDispatchToReplyto(endpoint),
                 replyToEvent.getMessage(), replyToEvent.getEndpoint(), e);
         }
 

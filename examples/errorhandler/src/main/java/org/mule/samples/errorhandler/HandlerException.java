@@ -10,7 +10,7 @@
 
 package org.mule.samples.errorhandler;
 
-import org.mule.config.i18n.Message;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.umo.UMOException;
 
 public class HandlerException extends UMOException
@@ -23,12 +23,12 @@ public class HandlerException extends UMOException
 
     public HandlerException(String message)
     {
-        super(Message.createStaticMessage(message));
+        super(MessageFactory.createStaticMessage(message));
     }
 
     public HandlerException(String message, Throwable cause)
     {
-        super(Message.createStaticMessage(message), cause);
+        super(MessageFactory.createStaticMessage(message), cause);
     }
 
 }

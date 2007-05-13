@@ -12,8 +12,7 @@ package org.mule.util;
 
 import org.mule.MuleException;
 import org.mule.RegistryContext;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.routing.filters.EqualsFilter;
 import org.mule.routing.filters.ObjectFilter;
@@ -64,8 +63,8 @@ public final class MuleObjectHelper
 
             if (tempTrans == null)
             {
-                throw new MuleException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER, "Transformer: "
-                                                                                            + key));
+                throw new MuleException(
+                    CoreMessages.objectNotRegisteredWithManager("Transformer: " + key));
             }
 
             if (currentTrans == null)

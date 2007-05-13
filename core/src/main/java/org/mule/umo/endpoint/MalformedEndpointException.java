@@ -10,16 +10,14 @@
 
 package org.mule.umo.endpoint;
 
+import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 
 /**
  * <code>MalformedEndpointException</code> is thrown by the MuleEndpointURI class
  * if it fails to parse a Url
  * 
  * @see org.mule.impl.endpoint.MuleEndpointURI
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class MalformedEndpointException extends EndpointException
@@ -34,7 +32,7 @@ public class MalformedEndpointException extends EndpointException
      */
     public MalformedEndpointException(String endpoint)
     {
-        super(new Message(Messages.ENPOINT_X_IS_MALFORMED, endpoint));
+        super(CoreMessages.endpointIsMalformed(endpoint));
     }
 
     /**
@@ -42,7 +40,7 @@ public class MalformedEndpointException extends EndpointException
      */
     public MalformedEndpointException(Message message, String endpoint)
     {
-        super(new Message(Messages.ENPOINT_X_IS_MALFORMED, endpoint).setNextMessage(message));
+        super(CoreMessages.endpointIsMalformed(endpoint).setNextMessage(message));
     }
 
     /**
@@ -51,7 +49,7 @@ public class MalformedEndpointException extends EndpointException
      */
     public MalformedEndpointException(String endpoint, Throwable cause)
     {
-        super(new Message(Messages.ENPOINT_X_IS_MALFORMED, endpoint), cause);
+        super(CoreMessages.endpointIsMalformed(endpoint), cause);
     }
 
     public MalformedEndpointException(Throwable cause)

@@ -10,8 +10,7 @@
 
 package org.mule.transformers.encryption;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.UMOEncryptionStrategy;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -110,9 +109,7 @@ public abstract class AbstractEncryptionTransformer extends AbstractTransformer
             {
                 if (strategy == null)
                 {
-                    throw new InitialisationException(new Message(Messages.AUTH_SECURITY_MANAGER_NOT_SET),
-                        this);
-
+                    throw new InitialisationException(CoreMessages.authSecurityManagerNotSet(), this);
                 }
             }
             else
@@ -122,7 +119,7 @@ public abstract class AbstractEncryptionTransformer extends AbstractTransformer
         }
         if (strategy == null)
         {
-            throw new InitialisationException(new Message(Messages.ENCRYPT_STRATEGY_NOT_SET), this);
+            throw new InitialisationException(CoreMessages.encryptionStrategyNotSet(), this);
         }
     }
 

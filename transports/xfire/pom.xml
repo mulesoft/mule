@@ -9,7 +9,7 @@
     </parent>
     <artifactId>mule-transport-xfire</artifactId>
     <!--<packaging>bundle</packaging>-->
-    <name>XFire Transport</name>
+    <name>SOAP Transport: XFire</name>
     <description>A Mule transport for SOAP connectivity using XFire, a STaX-based SOAP stack.</description>
     
     <build>
@@ -21,7 +21,7 @@
                     <excludes>
                         <!-- MULE-1134 -->
                         <exclude>**/XFireConnectorVMFunctionalTestCase.java</exclude>
-                        <!-- MULE-1515 -->
+                        <!-- Only run tests with external dependencies in the tests-external profile -->
                         <exclude>**/XFireWsdlTestCase.java</exclude>
                         <!-- Makes for cyclic dependency with axis ... hold for now -->
                         <exclude>**/XFireServiceUsingAxisEndpointTestCase.java</exclude>
@@ -42,6 +42,36 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>tests-external</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <!-- MULE-1134 -->
+                                <exclude>**/XFireConnectorVMFunctionalTestCase.java</exclude>
+                                <!-- Makes for cyclic dependency with axis ... hold for now -->
+                                <exclude>**/XFireServiceUsingAxisEndpointTestCase.java</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+            <dependencies>
+                <dependency>
+                    <groupId>org.mule.tests</groupId>
+                    <artifactId>mule-tests-external-xfire</artifactId>
+                    <version>${version}</version>
+                    <type>war</type>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 
     <repositories>
         <repository>
@@ -81,7 +111,7 @@
         <dependency>
             <groupId>org.codehaus.xfire</groupId>
             <artifactId>xfire-core</artifactId>
-            <version>1.2.5</version>
+            <version>1.2.6</version>
             <exclusions>
                 <!-- we like slf4j -->
                 <exclusion>
@@ -110,12 +140,12 @@
         <dependency>
             <groupId>org.codehaus.xfire</groupId>
             <artifactId>xfire-aegis</artifactId>
-            <version>1.2.5</version>
+            <version>1.2.6</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.xfire</groupId>
             <artifactId>xfire-annotations</artifactId>
-            <version>1.2.5</version>
+            <version>1.2.6</version>
             <exclusions>
                 <exclusion>
                     <groupId>qdox</groupId>
@@ -134,27 +164,26 @@
         <dependency>
             <groupId>org.codehaus.xfire</groupId>
             <artifactId>xfire-java5</artifactId>
-            <version>1.2.5</version>
+            <version>1.2.6</version>
         </dependency>
         <!-- the following dependency will be needed for xmlbeans testing
         <dependency>
             <groupId>org.codehaus.xfire</groupId>
             <artifactId>xfire-xmlbeans</artifactId>
-            <version>1.2.5</version>
+            <version>1.2.6</version>
         </dependency>
         -->
         <!-- the following dependency will be needed for jaxb2 model annotations
         <dependency>
             <groupId>org.codehaus.xfire</groupId>
             <artifactId>xfire-jaxb2</artifactId>
-            <version>1.2.5</version>
+            <version>1.2.6</version>
         </dependency>
         -->
         <!-- need to explicitly mark javax.mail as provided -->
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
-            <version>1.4</version>
             <scope>provided</scope>
         </dependency>
         <!-- use new jaxen/jdom versions for xfire-core -->
@@ -179,7 +208,7 @@
         <dependency>
             <groupId>org.codehaus.woodstox</groupId>
             <artifactId>wstx-asl</artifactId>
-            <version>3.2.0</version>
+            <version>3.2.1</version>
         </dependency>
 
         <!-- Test dependencies -->

@@ -32,7 +32,7 @@ public class MuleMessageProtocol extends DefaultProtocol
     // @Override
     public void write(OutputStream os, byte[] data) throws IOException
     {
-        MuleMessageWorker.doWrite(os);
+        super.write(os, MuleMessageWorker.doWrite());
     }
 
 }

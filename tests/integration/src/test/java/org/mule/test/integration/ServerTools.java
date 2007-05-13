@@ -73,7 +73,7 @@ public class ServerTools
         String activeMqHome = System.getProperty(ACTIVEMQ_HOME);
         if (activeMqHome == null)
         {
-            throw new NullPointerException(
+            throw new IllegalArgumentException(
                 "You must set the "
                                 + ACTIVEMQ_HOME
                                 + " system property to the root path of an ActiveMq distribution (v3.0 and greater) before running these tests");

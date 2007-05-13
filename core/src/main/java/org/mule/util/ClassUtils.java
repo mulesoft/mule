@@ -11,6 +11,9 @@
 package org.mule.util;
 
 import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.CharArrayReader;
+import java.io.Reader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -27,9 +30,11 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * This class is useful for loading resources and classes in a fault tolerant manner
+ * Extend the Apache Commons ClassUtils to provide additional functionality.
+ *
+ * <p>This class is useful for loading resources and classes in a fault tolerant manner
  * that works across different applications servers. The resource and classloading
- * methods are SecurityManager friendly.
+ * methods are SecurityManager friendly.</p>
  */
 // @ThreadSafe
 public class ClassUtils extends org.apache.commons.lang.ClassUtils
@@ -54,7 +59,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
     {
         if (clazz == null)
         {
-            throw new NullPointerException("clazz");
+            throw new IllegalArgumentException("clazz may not be null");
         }
         return !(clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers()));
     }
@@ -618,4 +623,70 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         return primitives;
     }
 
+    /**
+     * Provide a simple-to-understand class name (with access to only Java 1.4 API).
+     * @param clazz The class whose name we will generate
+     * @return A readable name for the class
+     */
+    public static String getSimpleName(Class clazz)
+    {
+        if (null == clazz)
+        {
+            return "null";
+        }
+        else
+        {
+            return classNameHelper(new BufferedReader(new CharArrayReader(clazz.getName().toCharArray())));
+        }
+    }
+
+    private static String classNameHelper(Reader encodedName)
+    {
+        // I did consider separating this data from the code, but I could not find a
+        // solution that was as clear to read, or clearly motivated (these data are not
+        // used elsewhere).
+
+        try
+        {
+            encodedName.mark(1);
+            switch(encodedName.read())
+            {
+                case -1: return "null";
+                case 'Z': return "boolean";
+                case 'B': return "byte";
+                case 'C': return "char";
+                case 'D': return "double";
+                case 'F': return "float";
+                case 'I': return "int";
+                case 'J': return "long";
+                case 'S': return "short";
+                case '[': return classNameHelper(encodedName) + "[]";
+                case 'L': return shorten(new BufferedReader(encodedName).readLine());
+                default:
+                    encodedName.reset();
+                    return shorten(new BufferedReader(encodedName).readLine());
+            }
+        }
+        catch (IOException e)
+        {
+            return "unknown type: " + e.getMessage();
+        }
+    }
+
+    /**
+     * @param clazz A class name (with possible package and trailing semicolon)
+     * @return The short name for the class
+     */
+    private static String shorten(String clazz)
+    {
+        if (null != clazz && clazz.endsWith(";"))
+        {
+            clazz = clazz.substring(0, clazz.length() - 1);
+        }
+        if (null != clazz && clazz.lastIndexOf(".") > -1)
+        {
+            clazz = clazz.substring(clazz.lastIndexOf(".") + 1, clazz.length());
+        }
+        return clazz;
+    }
 }

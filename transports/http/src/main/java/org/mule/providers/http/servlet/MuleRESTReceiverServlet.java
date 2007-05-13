@@ -11,9 +11,9 @@
 package org.mule.providers.http.servlet;
 
 import org.mule.RegistryContext;
-import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageReceiver;
+import org.mule.providers.http.i18n.HttpMessages;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.EndpointNotFoundException;
@@ -176,7 +176,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
         String endpointName = httpServletRequest.getParameter("endpoint");
         if (endpointName == null)
         {
-            throw new EndpointException(new Message("http", 8, "endpoint"));
+            throw new EndpointException(HttpMessages.httpParameterNotSet("endpoint"));
         }
 
         UMOEndpoint endpoint = RegistryContext.getRegistry().lookupEndpoint(endpointName);

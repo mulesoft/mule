@@ -36,7 +36,7 @@ public abstract class AbstractLoanBrokerTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
         Customer c = new Customer("Ross Mason", 1234);
         CustomerQuoteRequest request = new CustomerQuoteRequest(c, 100000, 48);
-        UMOMessage result = client.send("vm://customer.requests", request, null);
+        UMOMessage result = client.send("CustomerRequests", request, null);
         assertNotNull("Result is null", result);
         assertFalse("Result is null", result.getPayload() instanceof NullPayload);
         assertTrue("Result should be LoanQuote but is " + result.getPayload().getClass().getName(), 
@@ -64,7 +64,7 @@ public abstract class AbstractLoanBrokerTestCase extends FunctionalTestCase
             {
                 CustomerQuoteRequest loanRequest = requests[i % 3];
 
-                UMOMessage result = client.send("vm://customer.requests", loanRequest, null);
+                UMOMessage result = client.send("CustomerRequests", loanRequest, null);
                 assertNotNull(result);
                 assertFalse("received a NullPayload", result.getPayload() instanceof NullPayload);
                 assertTrue("did not receive a LoanQuote but: " + result.getPayload(),

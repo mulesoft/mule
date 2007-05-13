@@ -10,8 +10,8 @@
 
 package org.mule.umo.provider;
 
+import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 import org.mule.umo.endpoint.EndpointException;
 
 /**
@@ -31,7 +31,7 @@ public class NoReceiverForEndpointException extends EndpointException
      */
     public NoReceiverForEndpointException(String endpoint)
     {
-        super(new Message(Messages.ENDPOINT_X_NOT_FOUND, endpoint));
+        super(CoreMessages.endpointNotFound(endpoint));
     }
 
     /**

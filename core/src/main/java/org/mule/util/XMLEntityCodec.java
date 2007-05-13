@@ -1094,7 +1094,7 @@ public final class XMLEntityCodec
             {
                 if (value == null)
                 {
-                    throw new NullPointerException();
+                    throw new IllegalArgumentException("parameter value may not be null");
                 }
 
                 Entry tab[] = table;

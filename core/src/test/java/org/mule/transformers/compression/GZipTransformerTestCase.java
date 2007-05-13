@@ -16,33 +16,24 @@ import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.compression.GZipCompression;
 
 import java.io.Serializable;
-import java.util.Arrays;
 
 import org.apache.commons.lang.SerializationUtils;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class GZipTransformerTestCase extends AbstractTransformerTestCase
 {
-    private GZipCompression strat;
+    protected GZipCompression strat;
 
+    // @Override
     protected void doSetUp() throws Exception
     {
         strat = new GZipCompression();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.AbstractTransformerTestCase#getResultData()
-     */
     public Object getResultData()
     {
         try
         {
-            return strat.compressByteArray(SerializationUtils.serialize((Serializable)getTestData()));
+            return strat.compressByteArray(SerializationUtils.serialize((Serializable) this.getTestData()));
         }
         catch (Exception e)
         {
@@ -51,42 +42,21 @@ public class GZipTransformerTestCase extends AbstractTransformerTestCase
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.AbstractTransformerTestCase#getTestData()
-     */
     public Object getTestData()
     {
         return "the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog";
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.AbstractTransformerTestCase#getTransformers()
-     */
     public UMOTransformer getTransformer()
     {
-        GZipCompressTransformer transformer = new GZipCompressTransformer();
-        return transformer;
+        return new GZipCompressTransformer();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see junit.framework.TestCase#setUp()
-     */
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.AbstractTransformerTestCase#getRoundTripTransformer()
-     */
     public UMOTransformer getRoundTripTransformer()
     {
         GZipUncompressTransformer transformer = new GZipUncompressTransformer();
         transformer.setReturnClass(String.class);
+
         try
         {
             transformer.initialise();
@@ -95,51 +65,8 @@ public class GZipTransformerTestCase extends AbstractTransformerTestCase
         {
             fail(e.getMessage());
         }
+
         return transformer;
-    }
-
-    public boolean compareResults(Object src, Object result)
-    {
-        if (src == null && result == null)
-        {
-            return true;
-        }
-
-        if (src == null || result == null)
-        {
-            return false;
-        }
-
-        if (src instanceof byte[] && result instanceof byte[])
-        {
-            return Arrays.equals((byte[])src, (byte[])result);
-        }
-        else
-        {
-            return super.compareResults(src, result);
-        }
-    }
-
-    public boolean compareRoundtripResults(Object src, Object result)
-    {
-        if (src == null && result == null)
-        {
-            return true;
-        }
-
-        if (src == null || result == null)
-        {
-            return false;
-        }
-
-        if (src instanceof byte[] && result instanceof byte[])
-        {
-            return Arrays.equals((byte[])src, (byte[])result);
-        }
-        else
-        {
-            return super.compareResults(src, result);
-        }
     }
 
 }

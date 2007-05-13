@@ -15,8 +15,10 @@ import org.mule.config.PoolingProfile;
 import org.mule.impl.ImmutableMuleEndpoint;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
+import org.mule.impl.MuleSession;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.model.seda.SedaModel;
+import org.mule.providers.AbstractConnector;
 import org.mule.providers.soap.axis.AxisConnector;
 import org.mule.providers.soap.axis.AxisMessageDispatcher;
 import org.mule.tck.functional.AbstractProviderFunctionalTestCase;
@@ -42,7 +44,7 @@ public class SoapAttachmentsFunctionalTestCase extends AbstractProviderFunctiona
 
         SedaModel model = new SedaModel();
         model.getPoolingProfile().setInitialisationPolicy(
-            PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
+            PoolingProfile.INITIALISE_ONE);
 
         model.setName("main");
        managementContext.getRegistry().registerModel(model);
@@ -107,7 +109,8 @@ public class SoapAttachmentsFunctionalTestCase extends AbstractProviderFunctiona
             File tempFile = File.createTempFile("test", ".att");
             tempFile.deleteOnExit();
             msg.addAttachment("testAttachment", new DataHandler(new FileDataSource(tempFile)));
-            MuleEvent event = new MuleEvent(msg, ep, null, true);
+            MuleSession session = new MuleSession(msg, ((AbstractConnector) ep.getConnector()).getSessionHandler());
+            MuleEvent event = new MuleEvent(msg, ep, session, true);
             UMOMessage result = client.send(event);
             assertNotNull(result);
             assertNotNull(result.getPayload());

@@ -39,7 +39,7 @@ public interface BPMS
      * @param processVariables - optional process variables/parameters to set
      * @return an object representing the new process
      */
-    public Object startProcess(Object processType, Map processVariables) throws Exception;
+    public Object startProcess(Object processType, Object transition, Map processVariables) throws Exception;
 
     /**
      * Advance an already-running process.
@@ -55,8 +55,8 @@ public interface BPMS
 
     /**
      * Update the variables/parameters for an already-running process.
-     * This method is REQUIRED.
-     * 
+     * This method is OPTIONAL.
+     *
      * @param processId - an ID which identifies the running process
      * @param processVariables - process variables/parameters to set
      * @return an object representing the process in its new (i.e., updated) state
@@ -65,7 +65,7 @@ public interface BPMS
 
     /**
      * Abort a running process (end abnormally).
-     * This method is REQUIRED.
+     * This method is OPTIONAL.
      * 
      * @param processId - an ID which identifies the running process
      */

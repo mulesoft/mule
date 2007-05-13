@@ -10,7 +10,7 @@
     </parent>
     <artifactId>mule-transport-axis</artifactId>
     <!--<packaging>bundle</packaging>-->
-    <name>Axis Transport</name>
+    <name>SOAP Transport: Axis</name>
     <description>A Mule transport for Soap Connectivity using Axis.</description>
     
     <build>
@@ -31,24 +31,60 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <!-- TODO Requires an external Axis server running in Tomcat on 8080 with the Calculator.jws service deployed to it -->
-                        <!-- MULE-1515 -->
+
+                        <!-- Only run tests with external dependencies in the tests-external profile -->
                         <exclude>**/AxisExternalServerTest.java</exclude>
+                        <exclude>**/VmToAxisProxyTestCase.java</exclude>
 
                         <!-- MULE-1553 -->
                         <exclude>**/AxisConnectorHttpsTestCase.java</exclude>
                         <exclude>**/AxisConnectorJmsFunctionalTestCase.java</exclude>
                         <exclude>**/AxisConnectorJmsTopicsFunctionalTestCase.java</exclude>
                         <exclude>**/AxisConnectorVMFunctionalTestCase.java</exclude>
-                        <exclude>**/AxisEndpointTestCase.java</exclude>
                         <exclude>**/AxisServletBindingTestCase.java</exclude>
-                        <exclude>**/SoapAttachmentsFunctionalTestCase.java</exclude>
-                        <exclude>**/VmToAxisProxyTestCase.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>tests-external</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <!-- MULE-1553 -->
+                                <exclude>**/AxisConnectorHttpsTestCase.java</exclude>
+                                <exclude>**/AxisConnectorJmsFunctionalTestCase.java</exclude>
+                                <exclude>**/AxisConnectorJmsTopicsFunctionalTestCase.java</exclude>
+                                <exclude>**/AxisConnectorVMFunctionalTestCase.java</exclude>
+                                <exclude>**/AxisServletBindingTestCase.java</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+            <dependencies>
+                <dependency>
+                    <groupId>org.mule.tests</groupId>
+                    <artifactId>mule-tests-external-axis</artifactId>
+                    <version>${version}</version>
+                    <type>war</type>
+                </dependency>
+                <dependency>
+                    <groupId>org.mule.tests</groupId>
+                    <artifactId>mule-tests-external-common</artifactId>
+                    <version>${version}</version>
+                    <type>jar</type>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 
     <dependencies>
         <dependency>
@@ -68,7 +104,7 @@
         <dependency>
             <groupId>axis</groupId>
             <artifactId>axis</artifactId>
-            <version>1.3</version>
+            <version>1.4</version>
             <exclusions>
                 <!-- we like slf4j -->
                 <exclusion>
@@ -76,6 +112,13 @@
                     <artifactId>commons-logging</artifactId>
                 </exclusion>                
             </exclusions>
+        </dependency>
+        <!-- In Axis 1.4, this is a runtime dependency so we need to pull
+             it in explicitly -->
+        <dependency>
+            <groupId>axis</groupId>
+            <artifactId>axis-wsdl4j</artifactId>
+            <version>1.5.1</version>
         </dependency>
         <dependency>
             <groupId>commons-httpclient</groupId>
@@ -100,7 +143,6 @@
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
-            <version>1.4</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

@@ -15,7 +15,7 @@ import java.util.Map;
 
 import org.mule.MuleException;
 import org.mule.config.ExceptionHelper;
-import org.mule.config.i18n.Message;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.tck.AbstractMuleTestCase;
 
 public class ExceptionHelperTestCase extends AbstractMuleTestCase
@@ -47,7 +47,7 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase
     private Exception getException()
     {
 
-        return new MuleException(Message.createStaticMessage("foo"), new MuleException(
-            Message.createStaticMessage("bar"), new Exception("blah")));
+        return new MuleException(MessageFactory.createStaticMessage("foo"), new MuleException(
+            MessageFactory.createStaticMessage("bar"), new Exception("blah")));
     }
 }

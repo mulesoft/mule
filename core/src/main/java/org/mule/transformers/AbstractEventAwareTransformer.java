@@ -10,8 +10,7 @@
 
 package org.mule.transformers;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.RequestContext;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.transformer.TransformerException;
@@ -36,7 +35,7 @@ public abstract class AbstractEventAwareTransformer extends AbstractTransformer
         UMOEventContext event = RequestContext.getEventContext();
         if (event == null && requiresCurrentEvent())
         {
-            throw new TransformerException(new Message(Messages.NO_CURRENT_EVENT_FOR_TRANSFORMER), this);
+            throw new TransformerException(CoreMessages.noCurrentEventForTransformer(), this);
         }
         return transform(src, encoding, event);
     }

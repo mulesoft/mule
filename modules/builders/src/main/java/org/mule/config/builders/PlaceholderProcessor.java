@@ -11,8 +11,7 @@
 package org.mule.config.builders;
 
 import org.mule.config.ConfigurationException;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.builders.i18n.BuildersMessages;
 import org.mule.impl.security.PasswordBasedEncryptionStrategy;
 import org.mule.util.TemplateParser;
 
@@ -69,8 +68,9 @@ public class PlaceholderProcessor
             value = processValue(value);
             if (value == null)
             {
-                throw new ConfigurationException(new Message(Messages.PROPERTY_TEMPLATE_MALFORMED_X,
-                    "<" + elementName + attribs.getLocalName(i) + "='" + value + "' ...>"));
+                throw new ConfigurationException(
+                    BuildersMessages.propertyTemplateMalformed(
+                        "<" + elementName + attribs.getLocalName(i) + "='" + value + "' ...>"));
             }
             attribs.setValue(i, value);
         }

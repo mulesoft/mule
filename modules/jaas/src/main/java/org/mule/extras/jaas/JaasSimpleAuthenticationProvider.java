@@ -10,7 +10,7 @@
 
 package org.mule.extras.jaas;
 
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.security.MuleAuthentication;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.UMOAuthentication;
@@ -207,8 +207,8 @@ public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider
         }
         catch (LoginException e)
         {
-            throw new org.mule.umo.security.UnauthorisedException(new org.mule.config.i18n.Message(
-                org.mule.config.i18n.Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE, loginContextName));
+            throw new org.mule.umo.security.UnauthorisedException(
+                CoreMessages.cannotLoadFromClasspath(loginContextName));
         }
 
         // Attempt to login the user
@@ -218,8 +218,7 @@ public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider
         }
         catch (LoginException le)
         {
-            throw new UnauthorisedException(new org.mule.config.i18n.Message(
-                org.mule.config.i18n.Messages.AUTH_FAILED_FOR_USER_X, auth.getPrincipal()));
+            throw new UnauthorisedException(CoreMessages.authFailedForUser(auth.getPrincipal()));
         }
 
         auth.setAuthenticated(true);
@@ -312,8 +311,7 @@ public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider
         }
         catch (Exception e)
         {
-            throw new InitialisationException(new org.mule.config.i18n.Message(Messages.FAILED_TO_CREATE_X,
-                "JaasProvider"), e);
+            throw new InitialisationException(CoreMessages.failedToCreate("JaasProvider"), e);
         }
     }
 
@@ -368,7 +366,7 @@ public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider
 
             if (applicationName == null)
             {
-                throw new NullPointerException("applicationName passed in was null.");
+                throw new IllegalArgumentException("applicationName passed in was null.");
             }
 
             AppConfigurationEntry entry = (AppConfigurationEntry)appConfigEntries.get(applicationName);

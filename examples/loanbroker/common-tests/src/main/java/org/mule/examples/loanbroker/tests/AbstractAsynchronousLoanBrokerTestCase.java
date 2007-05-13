@@ -12,12 +12,15 @@ package org.mule.examples.loanbroker.tests;
 
 import org.mule.examples.loanbroker.messages.Customer;
 import org.mule.examples.loanbroker.messages.CustomerQuoteRequest;
+import org.mule.examples.loanbroker.messages.LoanQuote;
 import org.mule.extras.client.MuleClient;
+import org.mule.providers.NullPayload;
+import org.mule.umo.UMOMessage;
 
 /**
  * Tests the Loan Broker application asynchronously.  Note that a simple thread delay is used to wait for the 
  * incoming responses to arrive.  This may or may not be sufficient depending on external factors (processor 
- * speed, logging detail, etc.).  To make the tests reliable, a more accurate mechanism must be employed 
+ * speed, logging detail, etc.).  To make the tests reliable, a more accurate mechanism should be employed 
  * (notifications, thread-safe counter, etc.)
  */
 public abstract class AbstractAsynchronousLoanBrokerTestCase extends AbstractLoanBrokerTestCase
@@ -25,8 +28,7 @@ public abstract class AbstractAsynchronousLoanBrokerTestCase extends AbstractLoa
     // @Override
     protected int getNumberOfRequests()
     {
-        // TODO Once we actually make the asynchronous tests work (see comment above), increase this number.
-        return 2;
+        return 100;
     }
     
     /**
@@ -34,7 +36,7 @@ public abstract class AbstractAsynchronousLoanBrokerTestCase extends AbstractLoa
      */
     protected int getDelay()
     {
-        return 1000;
+        return 3000;
     }
     
     public void testSingleLoanRequest() throws Exception
@@ -43,24 +45,16 @@ public abstract class AbstractAsynchronousLoanBrokerTestCase extends AbstractLoa
         Customer c = new Customer("Ross Mason", 1234);
         CustomerQuoteRequest request = new CustomerQuoteRequest(c, 100000, 48);
         // Send asynchronous request
-        client.dispatch("vm://customer.requests", request, null);
-        // Wait for asynchronous response
-        Thread.sleep(getDelay());
-        
-        /* TODO The code below would work if an asynchronous transport (such as JMS) were used for 
-         * vm://customer.responses 
-         * Theoretically, in-memory queues (queueStore = true in VM connector) should work also, but
-         * I wasn't able to get it working. - TC
+        client.dispatch("CustomerRequests", request, null);
         
         // Wait for asynchronous response
-        UMOMessage result = client.receive("vm://customer.responses", getDelay());
+        UMOMessage result = client.receive("CustomerResponses", getDelay());
         assertNotNull("Result is null", result);
         assertFalse("Result is null", result.getPayload() instanceof NullPayload);
         assertTrue("Result should be LoanQuote but is " + result.getPayload().getClass().getName(), 
                     result.getPayload() instanceof LoanQuote);
         LoanQuote quote = (LoanQuote)result.getPayload();
         assertTrue(quote.getInterestRate() > 0);
-        */
     }
 
     public void testLotsOfLoanRequests() throws Exception
@@ -76,18 +70,23 @@ public abstract class AbstractAsynchronousLoanBrokerTestCase extends AbstractLoa
 
         int numRequests = getNumberOfRequests();
         int i = 0;
+        UMOMessage result;
         try
         {
-            for (; i < numRequests; i++)
+            for (i = 0; i < numRequests; i++)
             {
-                CustomerQuoteRequest loanRequest = requests[i % 3];
-                client.dispatch("vm://customer.requests", loanRequest, null);
+                client.dispatch("CustomerRequests", requests[i % 3], null);
             }
-            Thread.sleep(getDelay() * numRequests);
-            // TODO Look up the LoanBroker component from the registry and check its statistics.
-            //LoanBrokerService lb = MuleManager.getInstance().lookupComponent(LoanBrokerService.class);
-            //assertEquals(numRequests, lb.getRequests());
-            //assertEquals(numRequests*5, lb.getQuotes());
+            for (i = 0; i < numRequests; i++)
+            {
+                result = client.receive("CustomerResponses", getDelay() * numRequests);
+                assertNotNull("Result is null", result);
+                assertFalse("Result is null", result.getPayload() instanceof NullPayload);
+                assertTrue("Result should be LoanQuote but is " + result.getPayload().getClass().getName(), 
+                            result.getPayload() instanceof LoanQuote);
+                LoanQuote quote = (LoanQuote)result.getPayload();
+                assertTrue(quote.getInterestRate() > 0);
+            }
         }
         finally
         {

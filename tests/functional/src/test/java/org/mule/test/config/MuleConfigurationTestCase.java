@@ -62,4 +62,5 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase
 //        pp.setExhaustedActionString(null);
 //        assertEquals(ObjectPool.DEFAULT_EXHAUSTED_ACTION, pp.getExhaustedAction());
 //    }
+    
 }

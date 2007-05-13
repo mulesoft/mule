@@ -12,8 +12,7 @@ package org.mule.impl;
 
 import org.mule.MuleException;
 import org.mule.RegistryContext;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractConnector;
@@ -518,10 +517,6 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     private int appendHash(int hash, Object component)
     {
         int delta = component != null ? component.hashCode() : 0;
-//        if (logger.isDebugEnabled())
-//        {
-//            logger.debug(component + ": " + delta);
-//        }
         return 29 * hash + delta;
     }
 
@@ -568,14 +563,14 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
                     connector = TransportFactory.getOrCreateConnectorByProtocol(this);
                     if (connector == null)
                     {
-                        throw new InitialisationException(new Message(
-                            Messages.CONNECTOR_WITH_PROTOCOL_X_NOT_REGISTERED, endpointUri.getScheme()), this);
+                        throw new InitialisationException(
+                            CoreMessages.connectorWithProtocolNotRegistered(endpointUri.getScheme()), this);
                     }
                 }
                 catch (TransportFactoryException e)
                 {
-                    throw new InitialisationException(new Message(
-                        Messages.FAILED_TO_CREATE_CONNECTOR_FROM_URI_X, endpointUri), e, this);
+                    throw new InitialisationException(
+                        CoreMessages.failedToCreateConnectorFromUri(endpointUri), e, this);
                 }
             }
 

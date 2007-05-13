@@ -10,8 +10,7 @@
 
 package org.mule.umo.manager;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 
 /**
  * <code>ObjectNotFoundException</code> is thrown when a reference to a component
@@ -32,7 +31,7 @@ public class ObjectNotFoundException extends ContainerException
      */
     public ObjectNotFoundException(String componentName)
     {
-        super(new Message(Messages.OBJECT_NOT_FOUND_X, componentName));
+        super(CoreMessages.objectNotFound(componentName));
     }
 
     /**
@@ -41,6 +40,6 @@ public class ObjectNotFoundException extends ContainerException
      */
     public ObjectNotFoundException(String componentName, Throwable cause)
     {
-        super(new Message(Messages.OBJECT_NOT_FOUND_X, componentName), cause);
+        super(CoreMessages.objectNotFound(componentName), cause);
     }
 }

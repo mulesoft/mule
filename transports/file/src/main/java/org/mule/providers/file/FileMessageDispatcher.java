@@ -12,10 +12,10 @@ package org.mule.providers.file;
 
 import org.mule.MuleException;
 import org.mule.RegistryContext;
-import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.providers.file.filters.FilenameWildcardFilter;
+import org.mule.providers.file.i18n.FileMessages;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
@@ -133,10 +133,11 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
                 }
 
                 MuleMessage message = new MuleMessage(connector.getMessageAdapter(result));
+                File destinationFile = null;
                 if (connector.getMoveToDirectory() != null)
                 {
                     {
-                        File destinationFile = new File(connector.getMoveToDirectory(), result
+                        destinationFile = new File(connector.getMoveToDirectory(), result
                             .getName());
                         if (!result.renameTo(destinationFile))
                         {
@@ -145,7 +146,26 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
                         }
                     }
                 }
-                result.delete();
+                
+                if (((FileConnector) connector).isAutoDelete())
+                {
+                    // no moveTo directory
+                    if (destinationFile == null)
+                    {
+                        // delete source
+                        if (!result.delete())
+                        {
+                            throw new MuleException(
+                                FileMessages.failedToDeleteFile(result.getAbsolutePath()));
+                        }
+                    }
+                    else
+                    {
+                        // nothing to do here since moveFile() should have deleted
+                        // the source file for us
+                    }
+                }
+                
                 return message;
             }
         }
@@ -185,7 +205,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
         }
         catch (Exception e)
         {
-            throw new MuleException(new Message("file", 1), e);
+            throw new MuleException(FileMessages.errorWhileListingFiles(), e);
         }
     }
 

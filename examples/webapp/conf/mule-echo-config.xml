@@ -5,7 +5,7 @@
 
 <mule-configuration id="Mule_Samples" version="1.0">
 
-    <model name="main" type="inherited">
+    <model name="samples" type="inherited">
         <mule-descriptor name="echoUMO" implementation="org.mule.components.simple.EchoComponent">
             <inbound-router>
                 <endpoint address="vm://echo"/>
@@ -17,5 +17,4 @@
             </inbound-router>
         </mule-descriptor>
     </model>
-
 </mule-configuration>

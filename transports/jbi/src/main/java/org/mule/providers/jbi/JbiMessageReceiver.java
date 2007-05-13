@@ -10,8 +10,7 @@
 
 package org.mule.providers.jbi;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.umo.UMOComponent;
@@ -81,7 +80,7 @@ public class JbiMessageReceiver extends AbstractMessageReceiver implements Work
         }
         catch (WorkException e)
         {
-            throw new LifecycleException(new Message(Messages.FAILED_TO_START_X, name), e, this);
+            throw new LifecycleException(CoreMessages.failedToStart(name), e, this);
         }
     }
 

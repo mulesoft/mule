@@ -57,7 +57,7 @@ public abstract class AbstractJdbcFunctionalTestCase extends AbstractMuleTestCas
         SedaModel model = new SedaModel();
         model.setName("main");
         model.getPoolingProfile().setInitialisationPolicy(
-            PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
+            PoolingProfile.INITIALISE_ONE);
         managementContext.getRegistry().registerModel(model);
         // Create and register connector
         connector = createConnector();

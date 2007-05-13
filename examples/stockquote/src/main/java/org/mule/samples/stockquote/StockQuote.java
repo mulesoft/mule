@@ -133,9 +133,7 @@ public class StockQuote implements Serializable
 
     public String toString()
     {
-        String[] params = { symbol, name, date, last, change, open, high,
-            low, volume, previousClose };
-        return LocaleMessage.getStockQuoteMessage(params);
+        return LocaleMessage.getStockQuoteMessage(symbol, name, date, last, change, open, high,
+            low, volume, previousClose);
     }
-
 }

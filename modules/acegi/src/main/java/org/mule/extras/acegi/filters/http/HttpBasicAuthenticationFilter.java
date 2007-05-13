@@ -10,15 +10,10 @@
 
 package org.mule.extras.acegi.filters.http;
 
-import org.acegisecurity.AuthenticationException;
-import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.config.MuleProperties;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.extras.acegi.AcegiAuthenticationAdapter;
+import org.mule.extras.acegi.i18n.AcegiMessages;
 import org.mule.impl.security.AbstractEndpointSecurityFilter;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
@@ -32,6 +27,12 @@ import org.mule.umo.security.UMOSecurityContext;
 import org.mule.umo.security.UnauthorisedException;
 import org.mule.umo.security.UnknownAuthenticationTypeException;
 import org.mule.umo.security.UnsupportedAuthenticationSchemeException;
+
+import org.acegisecurity.AuthenticationException;
+import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>HttpBasicAuthenticationFilter</code> TODO
@@ -63,14 +64,13 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
         {
             if (isRealmRequired())
             {
-                throw new InitialisationException(new Message(Messages.AUTH_REALM_MUST_SET_ON_FILTER), this);
+                throw new InitialisationException(AcegiMessages.authRealmMustBeSetOnFilter(), this);
             }
             else
             {
                 logger.warn("There is no security realm set, using default: null");
             }
         }
-
     }
 
     public String getRealm()
@@ -145,7 +145,7 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
                     logger.debug("Authentication request for user: " + username + " failed: " + e.toString());
                 }
                 setUnauthenticated(event);
-                throw new UnauthorisedException(new Message(Messages.AUTH_FAILED_FOR_USER_X, username), e);
+                throw new UnauthorisedException(CoreMessages.authFailedForUser(username), e);
             }
 
             // Authentication success
@@ -167,7 +167,8 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
         else
         {
             setUnauthenticated(event);
-            throw new UnsupportedAuthenticationSchemeException(new Message("acegi", 1, header),
+            throw new UnsupportedAuthenticationSchemeException(
+                AcegiMessages.basicFilterCannotHandleHeader(header),
                 event.getMessage());
         }
     }

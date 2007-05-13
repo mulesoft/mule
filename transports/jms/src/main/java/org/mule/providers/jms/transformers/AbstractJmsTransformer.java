@@ -21,6 +21,7 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.TransformerException;
+import org.mule.util.ClassUtils;
 
 import java.util.Iterator;
 
@@ -83,7 +84,8 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug("Message type received is: " + source.getClass().getName());
+                logger.debug("Message type received is: " +
+                        ClassUtils.getSimpleName(source.getClass()));
             }
 
             // Try to figure out our endpoint's JMS Specification and fall back to
@@ -141,7 +143,8 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer
                         if (logger.isDebugEnabled())
                         {
                             logger.debug("Unable to set property '" + key + "' of type "
-                                            + value.getClass().getName() + "': " + e.getMessage());
+                                    + ClassUtils.getSimpleName(value.getClass())
+                                    + "': " + e.getMessage());
                         }
                     }
                 }

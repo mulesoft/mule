@@ -11,7 +11,7 @@
 package org.mule.providers.vm;
 
 import org.mule.config.QueueProfile;
-import org.mule.config.i18n.Message;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractConnector;
@@ -44,11 +44,6 @@ public class VMConnector extends AbstractConnector
     private QueueProfile queueProfile;
     private int queueTimeout = 1000;
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.providers.AbstractConnector#create()
-     */
     protected void doInitialise() throws InitialisationException
     {
         if (queueEvents)
@@ -63,6 +58,7 @@ public class VMConnector extends AbstractConnector
                 }
             }
         }
+
     }
 
     protected void doDispose()
@@ -90,12 +86,6 @@ public class VMConnector extends AbstractConnector
         // template method
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.provider.UMOConnector#registerListener(org.mule.umo.UMOSession,
-     *      org.mule.umo.endpoint.UMOEndpoint)
-     */
     public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception
     {
         if (queueEvents)
@@ -105,16 +95,11 @@ public class VMConnector extends AbstractConnector
         return serviceDescriptor.createMessageReceiver(this, component, endpoint);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.provider.UMOConnector#getMessageAdapter(java.lang.Object)
-     */
     public UMOMessageAdapter getMessageAdapter(Object message) throws MessagingException
     {
         if (message == null)
         {
-            throw new MessagingException(Message.createStaticMessage("Message is null."), null);
+            throw new NullPointerException(CoreMessages.objectIsNull("message").getMessage());
         }
         else if (message instanceof MuleMessage)
         {
@@ -126,15 +111,10 @@ public class VMConnector extends AbstractConnector
         }
         else
         {
-            throw new MessagingException(Message.createStaticMessage("Message is not a Mule Message."), null);
+            throw new MessagingException(CoreMessages.objectNotOfCorrectType(message.getClass(), UMOMessageAdapter.class), null);
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.provider.UMOConnector#getProtocol()
-     */
     public String getProtocol()
     {
         return "VM";

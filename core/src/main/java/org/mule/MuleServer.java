@@ -11,12 +11,13 @@
 package org.mule;
 
 import org.mule.config.ConfigurationBuilder;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleShutdownHook;
 import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.SystemUtils;
+import org.mule.util.StringMessageUtils;
 
 import java.net.URL;
 import java.util.Collections;
@@ -147,7 +148,7 @@ public class MuleServer implements Runnable
             }
             else
             {
-                System.out.println(new Message(Messages.CONFIG_NOT_FOUND_USAGE));
+                System.out.println(CoreMessages.configNotFoundUsage());
                 System.exit(-1);
             }
         }
@@ -158,7 +159,7 @@ public class MuleServer implements Runnable
         }
 
         // Configuration builder
-        String cfgBuilderClassName = (String)options.get("builder");
+        String cfgBuilderClassName = (String) options.get("builder");
 
         if (options.containsKey("idle"))
         {
@@ -180,7 +181,10 @@ public class MuleServer implements Runnable
             }
             catch (Exception e)
             {
-                throw new IllegalArgumentException(new Message(Messages.FAILED_LOAD_X, "Builder: " + cfgBuilderClassName).toString());
+                logger.fatal(e);
+                final Message message = CoreMessages.failedToLoad("Builder: " + cfgBuilderClassName);
+                System.err.println(StringMessageUtils.getBoilerPlate("FATAL: " + message.toString()));
+                System.exit(1);
             }
         }
 
@@ -294,8 +298,8 @@ public class MuleServer implements Runnable
         // install an RMI security manager in case we expose any RMI objects
         //if (System.getSecurityManager() == null)
         //{
-            // TODO Why is this disabled?
-            // System.setSecurityManager(new RMISecurityManager());
+        // TODO Why is this disabled?
+        // System.setSecurityManager(new RMISecurityManager());
         //}
 
         // create a new ConfigurationBuilder that is disposed afterwards
@@ -322,29 +326,7 @@ public class MuleServer implements Runnable
     public void shutdown(Throwable e)
     {
         muleShutdownHook.setException(e);
-
-//        Message msg = new Message(Messages.FATAL_ERROR_WHILE_RUNNING);
-//        UMOException muleException = ExceptionHelper.getRootMuleException(e);
-//        if (muleException != null)
-//        {
-//            logger.fatal(muleException.getDetailedMessage());
-//        }
-//        else
-//        {
-//            logger.fatal(msg.toString() + " " + e.getMessage(), e);
-//        }
-//        List msgs = new ArrayList();
-//        msgs.add(msg.getMessage());
-//        Throwable root = ExceptionHelper.getRootException(e);
-//        msgs.add(root.getMessage() + " (" + root.getClass().getName() + ")");
-//        msgs.add(" ");
-//        msgs.add(new Message(Messages.FATAL_ERROR_SHUTDOWN));
-//        //msgs.add(new Message(Messages.SERVER_STARTED_AT_X, new Date(RegistryContext.getRegistry().getManagementContext().getStartDate())));
-//        msgs.add(new Message(Messages.SERVER_SHUTDOWN_AT_X, new Date().toString()));
-//
-//        shutdownMessage = StringMessageUtils.getBoilerPlate(msgs, '*', 80);
-//        logger.fatal(shutdownMessage);
-          System.exit(-1);
+        System.exit(-1);
     }
 
     /**
@@ -352,16 +334,7 @@ public class MuleServer implements Runnable
      */
     public void shutdown()
     {
-//        logger.info("Mule server shutting down due to normal shutdown request");
-//        List msgs = new ArrayList();
-//        msgs.add(new Message(Messages.NORMAL_SHUTDOWN).getMessage());
-//        //TODO msgs.add(new Message(Messages.SERVER_STARTED_AT_X, new Date(managementContext.getStartDate())).getMessage());
-//        msgs.add(new Message(Messages.SERVER_SHUTDOWN_AT_X, new Date().toString()).getMessage());
-//        shutdownMessage = StringMessageUtils.getBoilerPlate(msgs, '*', 80);
-//        if(shutdownVm)
-//        {
-            System.exit(0);
-       // }
+        System.exit(0);
     }
 
     public Log getLogger()

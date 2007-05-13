@@ -10,8 +10,7 @@
 
 package org.mule.impl;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.lifecycle.InitialisationException;
 
 /**
@@ -32,6 +31,6 @@ public class AlreadyInitialisedException extends InitialisationException
      */
     public AlreadyInitialisedException(String name, Object object)
     {
-        super(new Message(Messages.OBJECT_X_ALREADY_INITIALISED, name), object);
+        super(CoreMessages.objectAlreadyInitialised(name), object);
     }
 }

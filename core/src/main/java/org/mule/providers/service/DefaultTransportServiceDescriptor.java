@@ -11,8 +11,7 @@
 package org.mule.providers.service;
 
 import org.mule.config.MuleProperties;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleSessionHandler;
 import org.mule.impl.endpoint.EndpointBuilder;
 import org.mule.providers.NullPayload;
@@ -210,8 +209,8 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         {
     
             // If the stream.message.adapter is not set streaming should not be used
-            throw new TransportServiceException(new Message(Messages.X_NOT_SET_IN_SERVICE_X,
-                "stream.message.adapter", service + " service descriptor"));
+            throw new TransportServiceException(CoreMessages.objectNotSetInService(
+                    MuleProperties.CONNECTOR_STREAM_MESSAGE_ADAPTER, service));
         }
         try
         {
@@ -228,8 +227,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         }
         catch (Exception e)
         {
-            throw new TransportServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X,
-                "Message Adapter", streamMessageAdapter), e);
+            throw new TransportServiceException(CoreMessages.failedToCreateObjectWith("Message Adapter", streamMessageAdapter), e);
         }
     }
 
@@ -249,14 +247,12 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
             }
             catch (Exception e)
             {
-                throw new TransportServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X,
-                    "Message Adapter", clazz), e);
+                throw new TransportServiceException(CoreMessages.failedToCreateObjectWith("Message Adapter", clazz), e);
             }
         }
         else
         {
-            throw new TransportServiceException(new Message(Messages.X_NOT_SET_IN_SERVICE_X,
-                "Message Adapter", getService()));
+            throw new TransportServiceException(CoreMessages.objectNotSetInService("Message Adapter", getService()));
         }
     }
 
@@ -277,8 +273,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         }
         catch (BeansException e)
         {
-            throw new TransportServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X,
-                name, classType), e);
+            throw new TransportServiceException(CoreMessages.failedToCreateObjectWith(name, classType), e);
         }
 
     }
@@ -348,15 +343,13 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
             }
             catch (Exception e)
             {
-                throw new TransportServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X,
-                    "Message Receiver", getService()), e);
+                throw new TransportServiceException(CoreMessages.failedToCreateObjectWith("Message Receiver", getService()), e);
             }
 
         }
         else
         {
-            throw new TransportServiceException(new Message(Messages.X_NOT_SET_IN_SERVICE_X,
-                "Message Receiver", getService()));
+            throw new TransportServiceException(CoreMessages.failedToCreateObjectWith("Message Receiver", getService()));
         }
     }
 
@@ -414,8 +407,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
                 }
                 else
                 {
-                    throw new TransportServiceException(new Message(Messages.X_NOT_SET_IN_SERVICE_X,
-                        "Connector", getService()));
+                    throw new TransportServiceException(CoreMessages.objectNotSetInService("Connector", getService()));
                 }
             }
         }
@@ -425,7 +417,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         }
         catch (Exception e)
         {
-            throw new TransportServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X, "Connector",
+            throw new TransportServiceException(CoreMessages.failedToCreateObjectWith("Connector",
                 connector), e);
 
         }
@@ -452,9 +444,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
             }
             catch (Exception e)
             {
-                //TODO Improve message
-                throw new TransportFactoryException(new Message(Messages.FAILED_LOAD_X_TRANSFORMER_X,
-                    "inbound", MuleProperties.CONNECTOR_INBOUND_TRANSFORMER), e);
+                throw new TransportFactoryException(CoreMessages.failedToLoadTransformer("inbound", MuleProperties.CONNECTOR_INBOUND_TRANSFORMER), e);
             }
         }
         return null;
@@ -475,9 +465,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
             }
             catch (Exception e)
             {
-                //TODO Improve message
-                throw new TransportFactoryException(new Message(Messages.FAILED_LOAD_X_TRANSFORMER_X,
-                    "outbound", MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER), e);
+                throw new TransportFactoryException(CoreMessages.failedToLoadTransformer("outbound", MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER), e);
             }
         }
         return null;
@@ -490,18 +478,16 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
     {
         if (context.containsBean(MuleProperties.CONNECTOR_RESPONSE_TRANSFORMER))
         {
-//            try
-//            {
+            try
+            {
                 UMOTransformer t = (UMOTransformer)context.getBean(MuleProperties.CONNECTOR_RESPONSE_TRANSFORMER);
                 logger.info("Loaded default response transformer: " + t);
                 return t;
-//            }
-//            catch (Exception e)
-//            {
-//                //TODO Improve message
-//                throw new TransportFactoryException(new Message(Messages.FAILED_LOAD_X_TRANSFORMER_X,
-//                    "response", MuleProperties.CONNECTOR_RESPONSE_TRANSFORMER), e);
-//            }
+            }
+            catch (Exception e)
+            {
+                throw new TransportFactoryException(CoreMessages.failedToLoadTransformer("response", MuleProperties.CONNECTOR_RESPONSE_TRANSFORMER), e);
+            }
         }
         return null;
     }
@@ -518,7 +504,8 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         }
         if(epb==null)
         {
-            throw new TransportFactoryException(new Message(Messages.FAILED_LOAD_X, "Endpointbuilder for: " + getService()));
+            throw new TransportFactoryException(CoreMessages.objectNotSetInService(
+                    MuleProperties.CONNECTOR_ENDPOINT_BUILDER, getService()));
         }
         return epb;
     }

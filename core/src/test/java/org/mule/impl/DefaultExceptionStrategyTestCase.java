@@ -10,16 +10,16 @@
 
 package org.mule.impl;
 
-import junit.framework.TestCase;
+import org.mule.tck.AbstractMuleTestCase;
 
-public class DefaultExceptionStrategyTestCase extends TestCase
+public class DefaultExceptionStrategyTestCase extends AbstractMuleTestCase
 {
 
     // MULE-1404
     public void testExceptions() throws Exception
     {
         Instrumented instrumented = new Instrumented();
-        instrumented.exceptionThrown(new NullPointerException("boom"));
+        instrumented.exceptionThrown(new IllegalArgumentException("boom"));
         assertEquals(1, instrumented.getCount());
     }
 

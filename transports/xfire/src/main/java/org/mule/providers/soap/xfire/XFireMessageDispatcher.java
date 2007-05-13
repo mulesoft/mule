@@ -26,6 +26,23 @@ import org.mule.umo.transformer.TransformerException;
 import org.mule.util.ClassUtils;
 import org.mule.util.TemplateParser;
 
+import org.mule.config.MuleProperties;
+import org.mule.impl.MuleMessage;
+import org.mule.providers.AbstractMessageDispatcher;
+import org.mule.providers.FatalConnectException;
+import org.mule.providers.soap.SoapConstants;
+import org.mule.providers.soap.i18n.SoapMessages;
+import org.mule.providers.soap.xfire.i18n.XFireMessages;
+import org.mule.providers.soap.xfire.transport.MuleUniversalTransport;
+import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.provider.DispatchException;
+import org.mule.umo.transformer.TransformerException;
+import org.mule.util.ClassUtils;
+import org.mule.util.TemplateParser;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -61,7 +78,7 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
     public XFireMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
         super(endpoint);
-        this.connector = (XFireConnector)endpoint.getConnector();
+        this.connector = (XFireConnector) endpoint.getConnector();
     }
 
     protected void doConnect() throws Exception
@@ -74,27 +91,27 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
 
             if (service == null)
             {
-                throw new FatalConnectException(new Message("xfire", 8, serviceName), this);
+                throw new FatalConnectException(XFireMessages.serviceIsNull(serviceName), this);
             }
 
             List inList = connector.getServerInHandlers();
-            if(inList != null)
+            if (inList != null)
             {
-                for(int i = 0; i < inList.size(); i++)
+                for (int i = 0; i < inList.size(); i++)
                 {
-                    Class clazz = ClassUtils.loadClass(inList.get(i).toString(), this.getClass());
-                    Handler handler = (Handler)clazz.getConstructor(null).newInstance(null);
+                    Handler handler = (Handler) ClassUtils.instanciateClass(
+                                        inList.get(i).toString(), ClassUtils.NO_ARGS, this.getClass());
                     service.addInHandler(handler);
                 }
             }
 
             List outList = connector.getServerOutHandlers();
-            if(outList != null)
+            if (outList != null)
             {
-                for(int i = 0; i < outList.size(); i++)
+                for (int i = 0; i < outList.size(); i++)
                 {
-                    Class clazz = ClassUtils.loadClass(outList.get(i).toString(), this.getClass());
-                    Handler handler = (Handler)clazz.getConstructor(null).newInstance(null);
+                    Handler handler = (Handler) ClassUtils.instanciateClass(
+                                        outList.get(i).toString(), ClassUtils.NO_ARGS, this.getClass());
                     service.addOutHandler(handler);
                 }
             }
@@ -149,9 +166,9 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
         client.addOutHandler(new MuleHeadersOutHandler());
 
         List inList = connector.getClientInHandlers();
-        if(inList != null)
+        if (inList != null)
         {
-            for(int i = 0; i < inList.size(); i++)
+            for (int i = 0; i < inList.size(); i++)
             {
                 Class clazz = ClassUtils.loadClass(inList.get(i).toString(), this.getClass());
                 Handler handler = (Handler)clazz.getConstructor(null).newInstance(null);
@@ -160,9 +177,9 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
         }
 
         List outList = connector.getClientOutHandlers();
-        if(outList != null)
+        if (outList != null)
         {
-            for(int i = 0; i < outList.size(); i++)
+            for (int i = 0; i < outList.size(); i++)
             {
                 Class clazz = ClassUtils.loadClass(outList.get(i).toString(), this.getClass());
                 Handler handler = (Handler)clazz.getConstructor(null).newInstance(null);
@@ -199,8 +216,8 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
 
         if (method == null)
         {
-            throw new DispatchException(new org.mule.config.i18n.Message("soap", 4), event.getMessage(),
-               event.getEndpoint());
+            throw new DispatchException(SoapMessages.cannotInvokeCallWithoutOperation(), 
+                event.getMessage(), event.getEndpoint());
         }
 
         return method;

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE connection-factories PUBLIC
+          "-//JBoss//DTD JBOSS JCA Config 1.5//EN"
+          "http://www.jboss.org/j2ee/dtd/jboss-ds_1_5.dtd">
+
+<!--
+ Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+
+ The software in this package is published under the terms of the MuleSource MPL
+ license, a copy of which has been included with this distribution in the
+ LICENSE.txt file.
+
+ NOTE: this file HAS to end with -ds.xml
+
+ $Id$
+-->
+
+<connection-factories>
+    <tx-connection-factory>
+        <jndi-name>mule/ConnectionFactory</jndi-name>
+        <local-transaction/>
+        <!--<xa-transaction/>-->
+        <!-- Maintain a 1:1 relationship between a TX and connection -->
+        <track-connection-by-tx/>
+        <!-- This should go in sync with the currently built Mule version -->
+        <!-- <rar-name>mule-jca-${version}.rar</rar-name> -->
+        <rar-name>mule-jca-jboss-${version}.rar</rar-name>
+        <connection-definition>org.mule.ra.MuleConnectionFactory</connection-definition>
+        <!--
+            Uncomment and override with custom settings, don't edit ra.xml directly.
+
+        <config-property name="ConfigurationBuilder"
+                         type="java.lang.String">org.mule.extras.spring.config.SpringConfigurationBuilder</config-property>
+        <config-property name="Configurations"
+                         type="java.lang.String">my-custom-mule-config.xml</config-property>
+        -->
+    </tx-connection-factory>
+</connection-factories> 

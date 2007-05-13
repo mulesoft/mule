@@ -12,7 +12,6 @@ package org.mule.providers.jbi.components;
 
 import org.mule.RegistryContext;
 import org.mule.config.converters.QNameConverter;
-import org.mule.config.i18n.Message;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageReceiver;
@@ -21,6 +20,7 @@ import org.mule.providers.jbi.JbiMessageAdapter;
 import org.mule.providers.jbi.JbiUtils;
 import org.mule.registry.DeregistrationException;
 import org.mule.registry.RegistrationException;
+import org.mule.providers.jbi.i18n.JbiMessages;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
@@ -104,7 +104,8 @@ public class MuleReceiver extends AbstractEndpointComponent implements InternalM
 
             if (receiver == null)
             {
-                throw new NullPointerException(new Message("jbi", 1, getName()).toString());
+                throw new IllegalArgumentException(
+                    JbiMessages.receiverMustBeSet(this.getName()).toString());
             }
             else if (receiver instanceof AbstractMessageReceiver)
             {
@@ -112,8 +113,8 @@ public class MuleReceiver extends AbstractEndpointComponent implements InternalM
             }
             else
             {
-                throw new IllegalArgumentException(new Message("jbi", 2, getName(),
-                    AbstractMessageReceiver.class.getName()).toString());
+                throw new IllegalArgumentException(
+                    JbiMessages.invalidReceiverType(this.getName(), AbstractMessageReceiver.class).toString());
             }
 
             this.receiver.setListener(this);

@@ -102,7 +102,6 @@
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-servlet_2.4_spec</artifactId>
-            <version>1.0.1</version>
             <!-- TODO MULE-1021
                 This library causes conflicts when Mule is deployed to a Web/J2EE server but is
                 needed otherwise.

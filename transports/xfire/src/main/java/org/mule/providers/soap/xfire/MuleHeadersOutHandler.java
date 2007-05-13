@@ -31,11 +31,11 @@ public class MuleHeadersOutHandler extends AbstractHandler
      */
     public void invoke(MessageContext context) throws Exception
     {
-        UMOEvent event = (UMOEvent)context.getProperty(MuleProperties.MULE_EVENT_PROPERTY);
+        UMOEvent event = (UMOEvent) context.getProperty(MuleProperties.MULE_EVENT_PROPERTY);
 
         if (event == null && context.getClient() != null)
         {
-            event = (UMOEvent)context.getClient().getProperty(MuleProperties.MULE_EVENT_PROPERTY);
+            event = (UMOEvent) context.getClient().getProperty(MuleProperties.MULE_EVENT_PROPERTY);
         }
 
         if (event != null)

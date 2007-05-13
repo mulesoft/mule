@@ -10,7 +10,7 @@
 
 package org.mule.transformers.simple;
 
-import org.mule.config.i18n.Message;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 
@@ -41,13 +41,13 @@ public class MapLookup extends AbstractTransformer
             }
             else
             {
-                throw new TransformerException(Message
+                throw new TransformerException(MessageFactory
                         .createStaticMessage("Property 'key' must be set in order to use this transformer."));
             }
         }
         else
         {
-            throw new TransformerException(Message
+            throw new TransformerException(MessageFactory
                     .createStaticMessage("Message to transform must be of type java.util.Map"));
         }
     }

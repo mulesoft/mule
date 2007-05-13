@@ -10,8 +10,7 @@
 
 package org.mule.providers.http;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.providers.tcp.TcpConnector;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -242,8 +241,8 @@ public class HttpConnector extends TcpConnector
     {
         if (!(cookieSpec.equalsIgnoreCase(COOKIE_SPEC_NETSCAPE) && cookieSpec.equalsIgnoreCase(COOKIE_SPEC_RFC2109)))
         {
-            throw new IllegalArgumentException(new Message(Messages.PROPERTY_X_HAS_INVALID_VALUE_X,
-                "cookieSpec", cookieSpec).toString());
+            throw new IllegalArgumentException(
+                CoreMessages.propertyHasInvalidValue("cookieSpec", cookieSpec).toString());
         }
         this.cookieSpec = cookieSpec;
     }

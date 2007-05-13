@@ -10,8 +10,7 @@
 
 package org.mule.transaction.lookup;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.container.JndiContextHelper;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOTransactionManagerFactory;
@@ -119,7 +118,7 @@ public class GenericTransactionManagerLookupFactory implements UMOTransactionMan
     {
         if (txManager == null && StringUtils.isEmpty(StringUtils.trim(jndiName)))
         {
-            throw new InitialisationException(new Message(Messages.PROPERTIES_X_NOT_SET, "jndiName"), this);
+            throw new InitialisationException(CoreMessages.propertiesNotSet("jndiName"), this);
         }
 
         try
@@ -131,8 +130,7 @@ public class GenericTransactionManagerLookupFactory implements UMOTransactionMan
         }
         catch (NamingException e)
         {
-            throw new InitialisationException(
-                new Message(Messages.FAILED_TO_CREATE_X, "Jndi context"), 
+            throw new InitialisationException(CoreMessages.failedToCreate("Jndi context"), 
                 e, this);
         }
     }

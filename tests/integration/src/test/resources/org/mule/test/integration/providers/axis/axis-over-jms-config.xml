@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="Axis-Over-Jms" version="1.0">
+		
+	<!-- Embed Spring configuration to create a Jms Connection factory -->
+    <container-context className="org.mule.extras.spring.SpringContainerContext">
+        <properties>
+            <text-property name="configuration">
+                <![CDATA[
+                <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+                <beans>
+                    <bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+                        <property name="brokerURL"><value>vm://localhost?broker.persistent=false&amp;broker.useJmx=false</value></property>
+                    </bean>
+                </beans>
+                ]]>
+            </text-property>
+        </properties>
+    </container-context>
+
+    <connector name="jmsConnector" className="org.mule.providers.jms.activemq.ActiveMqJmsConnector">
+        <properties>
+            <!-- The ActiveMQ ConnectionFactory is configured as a Spring bean. -->
+            <container-property name="connectionFactory" reference="jmsConnectionFactory"/>
+            <property name="specification" value="1.1"/>
+        </properties>
+    </connector>
+
+	<model name="Test-Case" type="seda">		
+		<mule-descriptor name="TestComponent" implementation="org.mule.components.simple.EchoComponent" singleton="true">
+			<inbound-router>
+				<endpoint address="axis:jms://TestComponent">
+					<transaction action="ALWAYS_BEGIN" factory="org.mule.providers.jms.JmsTransactionFactory"/>
+				</endpoint> 
+			</inbound-router>
+			<outbound-router>
+				<router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+					<endpoint address="jms://testout"/>
+				</router>
+			</outbound-router>
+		</mule-descriptor>		
+	</model>
+</mule-configuration>

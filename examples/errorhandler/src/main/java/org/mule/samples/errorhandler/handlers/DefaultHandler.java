@@ -19,8 +19,6 @@ import org.mule.util.StringMessageUtils;
 /**
  * <code>DefaultHandler</code> TODO (document class)
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class DefaultHandler extends AbstractExceptionHandler
 {
@@ -33,7 +31,7 @@ public class DefaultHandler extends AbstractExceptionHandler
 
     public void processException(ErrorMessage message, Throwable t) throws HandlerException
     {
-        String msg = LocaleMessage.getString(LocaleMessage.DEFAULT_HANDLER_MESSAGE);
+        String msg = LocaleMessage.defaultHandlerMessage();
         System.out.println(StringMessageUtils.getBoilerPlate(msg));
     }
 

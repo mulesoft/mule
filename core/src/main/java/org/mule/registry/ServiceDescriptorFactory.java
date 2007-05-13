@@ -12,8 +12,7 @@ package org.mule.registry;
 
 import org.mule.RegistryContext;
 import org.mule.config.MuleProperties;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.model.DefaultModelServiceDescriptor;
 import org.mule.providers.service.DefaultTransportServiceDescriptor;
 import org.mule.providers.service.TransportServiceDescriptor;
@@ -66,7 +65,7 @@ public class ServiceDescriptorFactory
         }
         else 
         {
-            throw new ServiceException(Message.createStaticMessage("Unrecognized service type: " + type));
+            throw new ServiceException(CoreMessages.unrecognisedServiceType(type));
         }
         
         // Set overrides, if any.
@@ -82,7 +81,7 @@ public class ServiceDescriptorFactory
             }
             catch (Exception e)
             {
-                throw new ServiceException(new Message(Messages.CANT_INSTANCIATE_FINDER_X, serviceFinderClass), e);
+                throw new ServiceException(CoreMessages.cannotInstanciateFinder(serviceFinderClass), e);
             }
             String realService = finder.findService(name, sd, props);
             if (realService != null)
@@ -92,7 +91,7 @@ public class ServiceDescriptorFactory
             }
             else 
             {
-                throw new ServiceException(Message.createStaticMessage("ServiceFinder unable to locate the real service."));
+                throw new ServiceException(CoreMessages.serviceFinderCantFindService(name));
             }
         }
         return sd;

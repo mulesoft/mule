@@ -10,8 +10,7 @@
 
 package org.mule.providers.soap;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.providers.soap.i18n.SoapMessages;
 import org.mule.registry.ServiceDescriptor;
 import org.mule.registry.ServiceException;
 import org.mule.registry.ServiceFinder;
@@ -53,7 +52,7 @@ public class SoapServiceFinder implements ServiceFinder
                     ")").append(", ");
             }
         }
-        throw new ServiceException(new Message(Messages.COULD_NOT_FIND_SOAP_PROVIDER_X, buf.toString()));
+        throw new ServiceException(SoapMessages.couldNotFindSoapProvider(buf.toString()));
     }
 
     protected String getProtocolFromKey(String key)

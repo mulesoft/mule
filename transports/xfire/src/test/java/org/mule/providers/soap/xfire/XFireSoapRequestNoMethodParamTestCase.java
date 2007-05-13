@@ -18,7 +18,7 @@ import org.mule.umo.UMOMessage;
 public class XFireSoapRequestNoMethodParamTestCase extends FunctionalTestCase
 {
     private static final String request = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><soap:Body><receive xmlns=\"http://www.muleumo.org\"><src xmlns=\"http://www.muleumo.org\">Test String</src></receive></soap:Body></soap:Envelope>";
-    private static final String response = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><soap:Body><receiveResponse xmlns=\"http://www.muleumo.org\"><out xmlns=\"http://www.muleumo.org\">Received: Test String</out></receiveResponse></soap:Body></soap:Envelope>";
+    private static final String response = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><soap:Body><ns1:receiveResponse xmlns:ns1=\"http://www.muleumo.org\"><ns1:out>Received: Test String</ns1:out></ns1:receiveResponse></soap:Body></soap:Envelope>";
 
     public void testXFireSoapRequest() throws Exception
     {
@@ -29,8 +29,6 @@ public class XFireSoapRequestNoMethodParamTestCase extends FunctionalTestCase
 
         assertNotNull(msg);
         assertNotNull(msg.getPayload());
-        System.out.println("1: " + response);
-        System.out.println("2: " + msg.getPayloadAsString());
         assertEquals(response, msg.getPayloadAsString());
     }
 

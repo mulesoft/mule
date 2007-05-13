@@ -14,11 +14,13 @@ import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.provider.UMOStreamMessageAdapter;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.endpoint.UMOEndpointURI;
 
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +37,7 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
     public FtpMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
         super(endpoint);
-        this.connector = (FtpConnector)endpoint.getConnector();
+        this.connector = (FtpConnector) endpoint.getConnector();
     }
 
     protected void doDispose()
@@ -45,33 +47,33 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
 
     protected void doDispatch(UMOEvent event) throws Exception
     {
-        FTPClient client = null;
-        UMOEndpointURI uri = event.getEndpoint().getEndpointURI();
+        Object data = event.getTransformedMessage();
+        OutputStream out = connector.getOutputStream(event.getEndpoint(), event.getMessage());
 
         try
         {
-            Object data = event.getTransformedMessage();
-            byte[] dataBytes;
-
-            if (data instanceof byte[])
+            if (data instanceof UMOStreamMessageAdapter)
             {
-                dataBytes = (byte[])data;
+                IOUtils.copy(((UMOStreamMessageAdapter) data).getInputStream(), out);
+                ((UMOStreamMessageAdapter) data).getOutputStream().close();
             }
             else
             {
-                dataBytes = data.toString().getBytes();
+                byte[] dataBytes;
+                if (data instanceof byte[])
+                {
+                    dataBytes = (byte[]) data;
+                }
+                else
+                {
+                    dataBytes = data.toString().getBytes();
+                }
+                IOUtils.write(dataBytes, out);
             }
-
-            FtpOutputStreamWrapper out = (FtpOutputStreamWrapper)connector.getOutputStream(event.getEndpoint(),
-                event.getMessage());
-            client = out.getFtpClient();
-            IOUtils.write(dataBytes, out);
-            // This will ensure that the completePendingRequest is called
-            out.close();
         }
         finally
         {
-            connector.releaseFtp(uri, client);
+            out.close();
         }
     }
 
@@ -83,14 +85,22 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
 
     protected void doConnect() throws Exception
     {
-        FTPClient client = connector.getFtp(endpoint.getEndpointURI());
-        connector.releaseFtp(endpoint.getEndpointURI(), client);
+        // what was this for?!
+        //connector.releaseFtp(endpoint.getEndpointURI());
     }
 
     protected void doDisconnect() throws Exception
     {
-        FTPClient client = connector.getFtp(endpoint.getEndpointURI());
-        connector.destroyFtp(endpoint.getEndpointURI(), client);
+        try
+        {
+            UMOEndpointURI uri = endpoint.getEndpointURI();
+            FTPClient client = connector.getFtp(uri);
+            connector.destroyFtp(uri, client);
+        }
+        catch (Exception e)
+        {
+            // pool may be closed
+        }
     }
 
     /**
@@ -106,13 +116,9 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
      */
     protected UMOMessage doReceive(long timeout) throws Exception
     {
-        FTPClient client = null;
-
+        FTPClient client = connector.getFtp(endpoint.getEndpointURI());
         try
         {
-
-            client = connector.getFtp(endpoint.getEndpointURI());
-            // not sure this getParams() will always work, there's a TODO in the code
             connector.enterActiveOrPassiveMode(client, endpoint);
             connector.setupFileType(client, endpoint);
             if (!client.changeWorkingDirectory(endpoint.getEndpointURI().getPath()))
@@ -123,7 +129,7 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
             FilenameFilter filenameFilter = null;
             if (endpoint.getFilter() instanceof FilenameFilter)
             {
-                filenameFilter = (FilenameFilter)endpoint.getFilter();
+                filenameFilter = (FilenameFilter) endpoint.getFilter();
             }
 
             FTPFile[] files = client.listFiles();
@@ -153,7 +159,7 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
                 return null;
             }
 
-            FTPFile file = (FTPFile)fileList.get(0);
+            FTPFile file = (FTPFile) fileList.get(0);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             if (!client.retrieveFile(file.getName(), baos))
             {
@@ -164,6 +170,7 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
         }
         finally
         {
+            logger.debug("leaving doReceive()");
             connector.releaseFtp(endpoint.getEndpointURI(), client);
         }
     }

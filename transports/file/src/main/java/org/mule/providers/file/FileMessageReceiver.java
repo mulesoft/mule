@@ -11,11 +11,10 @@
 package org.mule.providers.file;
 
 import org.mule.MuleException;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractPollingMessageReceiver;
 import org.mule.providers.ConnectException;
+import org.mule.providers.file.i18n.FileMessages;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -77,7 +76,8 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
         else if(endpoint.getFilter()!=null)
         {
-            throw new InitialisationException(new Message("file", 6, endpoint.getEndpointURI()), this);
+            throw new InitialisationException(
+                FileMessages.invalidFileFilter(endpoint.getEndpointURI()), this);
         }
     }
 
@@ -88,8 +88,8 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             readDirectory = FileUtils.openDirectory(readDir);
             if (!(readDirectory.canRead()))
             {
-                throw new ConnectException(new Message(Messages.FILE_X_DOES_NOT_EXIST,
-                    readDirectory.getAbsolutePath()), this);
+                throw new ConnectException(
+                    FileMessages.fileDoesNotExist(readDirectory.getAbsolutePath()), this);
             }
             else
             {
@@ -102,7 +102,8 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             moveDirectory = FileUtils.openDirectory((moveDir));
             if (!(moveDirectory.canRead()) || !moveDirectory.canWrite())
             {
-                throw new ConnectException(new Message("file", 5), this);
+                throw new ConnectException(
+                    FileMessages.moveToDirectoryNotWritable(), this);
             }
         }
     }
@@ -201,7 +202,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             // Perform some quick checks to make sure file can be processed
             if (!(sourceFile.canRead() && sourceFile.exists() && sourceFile.isFile()))
             {
-                throw new MuleException(new Message(Messages.FILE_X_DOES_NOT_EXIST, sourceFileOriginalName));
+                throw new MuleException(FileMessages.fileDoesNotExist(sourceFileOriginalName));
             }
 
             //If we are moving the file to a read directory, move it there now and hand over a reference to the
@@ -214,8 +215,9 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                 // move didn't work - bail out (will attempt rollback)
                 if (!fileWasMoved)
                 {
-                    throw new MuleException(new Message("file", 4, sourceFile.getAbsolutePath(),
-                        destinationFile.getAbsolutePath()));
+                    throw new MuleException(
+                        FileMessages.failedToMoveFile(
+                            sourceFile.getAbsolutePath(), destinationFile.getAbsolutePath()));
                 }
 
                 // create new MessageAdapter for destinationFile
@@ -244,7 +246,8 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                     // delete source
                     if (!sourceFile.delete())
                     {
-                        throw new MuleException(new Message("file", 3, sourceFile.getAbsolutePath()));
+                        throw new MuleException(
+                            FileMessages.failedToDeleteFile(sourceFile.getAbsolutePath()));
                     }
                 }
                 else
@@ -265,7 +268,8 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             }
 
             // wrap exception & handle it
-            Exception ex = new RoutingException(new Message("file", 2, sourceFile.getName(),
+            Exception ex = new RoutingException(
+                FileMessages.exceptionWhileProcessing(sourceFile.getName(),
                 (fileWasRolledBack ? "successful" : "unsuccessful")), new MuleMessage(msgAdapter), endpoint,
                 e);
             this.handleException(ex);
@@ -419,7 +423,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
         catch (Exception e)
         {
-            throw new MuleException(new Message("file", 1), e);
+            throw new MuleException(FileMessages.errorWhileListingFiles(), e);
         }
     }
 

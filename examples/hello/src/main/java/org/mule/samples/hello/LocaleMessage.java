@@ -10,64 +10,29 @@
 
 package org.mule.samples.hello;
 
-import org.mule.config.i18n.LocaleMessageHandler;
+import org.mule.config.i18n.MessageFactory;
 
 /**
  * <code>LocaleMessage</code> is a convenience interface for retrieving
  * internationalised strings from resource bundles. The actual work is done by
- * the LocaleMessageHandler in core.
- *
- * The <code>LocaleMessage</code> at minimum provides the same methods in the
- * LocaleMessageHandler except that the bundle name is provided. 
- *
- * Optionally, the LocaleMessage can contain convenience methods for accessing
- * specific string resources so the resource codes don't have to be used directly.
+ * the MessageFactory in core.
  */
-public class LocaleMessage
+public class LocaleMessage extends MessageFactory
 {
-    // The bundle name for this package
-    public static String bundleName = "hello-example";
-
-    // Identifies for specific string resources
-    public static String GREETING_PART_2 = "1";
-    public static String GREETING_PART_1 = "2";
-    public static String PROMPT = "3";
-
-    public static String getString(String code)
-    {
-        return LocaleMessageHandler.getString(bundleName, code);
-    }
-
-    public static String getString(String code, Object arg1)
-    {
-        return LocaleMessageHandler.getString(bundleName, code, arg1);
-    }
-
-    public static String getString(String code, Object arg1, Object arg2)
-    {
-        return LocaleMessageHandler.getString(bundleName, code, arg1, arg2);
-    }
-
-    public static String getString(String code, Object[] args)
-    {
-        return LocaleMessageHandler.getString(bundleName, code, args);
-    }
-
-    /* Convenience methods start here */
-
-    public static String getGreetingPart1()
-    {
-        return LocaleMessageHandler.getString(bundleName, GREETING_PART_1);
-    }
+    private static final String BUNDLE_PATH = "messages.hello-example-messages";
 
     public static String getGreetingPart2()
     {
-        return LocaleMessageHandler.getString(bundleName, GREETING_PART_2);
+        return getString(BUNDLE_PATH, 1);
+    }
+
+    public static String getGreetingPart1()
+    {
+        return getString(BUNDLE_PATH, 2);
     }
 
     public static String getPrompt()
     {
-        return LocaleMessageHandler.getString(bundleName, PROMPT);
+        return getString(BUNDLE_PATH, 3);
     }
-
 }

@@ -12,6 +12,7 @@ package org.mule.config;
 
 import org.mule.impl.work.MuleWorkManager;
 import org.mule.umo.manager.UMOWorkManager;
+import org.mule.util.MapUtils;
 import org.mule.util.concurrent.NamedThreadFactory;
 import org.mule.util.concurrent.WaitPolicy;
 
@@ -22,6 +23,10 @@ import edu.emory.mathcs.backport.java.util.concurrent.SynchronousQueue;
 import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
+import java.util.Map;
+
+import org.apache.commons.collections.map.CaseInsensitiveMap;
 
 /**
  * <code>ThreadingProfile</code> is used to configure a thread pool. Mule uses a
@@ -75,6 +80,35 @@ public class ThreadingProfile
      * Default action to perform on pool exhaustion
      */
     public static final int DEFAULT_POOL_EXHAUST_ACTION = WHEN_EXHAUSTED_RUN;
+
+    // map pool exhaustion strings to their respective values
+    private static final Map POOL_EXHAUSTED_ACTIONS = new CaseInsensitiveMap()
+    {
+        private static final long serialVersionUID = 1L;
+
+        // static initializer
+        {
+            Integer value = new Integer(WHEN_EXHAUSTED_WAIT);
+            this.put("WHEN_EXHAUSTED_WAIT", value);
+            this.put("WAIT", value);
+
+            value = new Integer(WHEN_EXHAUSTED_DISCARD);
+            this.put("WHEN_EXHAUSTED_DISCARD", value);
+            this.put("DISCARD", value);
+
+            value = new Integer(WHEN_EXHAUSTED_DISCARD_OLDEST);
+            this.put("WHEN_EXHAUSTED_DISCARD_OLDEST", value);
+            this.put("DISCARD_OLDEST", value);
+
+            value = new Integer(WHEN_EXHAUSTED_ABORT);
+            this.put("WHEN_EXHAUSTED_ABORT", value);
+            this.put("ABORT", value);
+
+            value = new Integer(WHEN_EXHAUSTED_RUN);
+            this.put("WHEN_EXHAUSTED_RUN", value);
+            this.put("RUN", value);
+        }
+    };
 
     private int maxThreadsActive = DEFAULT_MAX_THREADS_ACTIVE;
     private int maxThreadsIdle = DEFAULT_MAX_THREADS_IDLE;
@@ -186,29 +220,8 @@ public class ThreadingProfile
 
     public void setPoolExhaustedActionString(String poolExhaustPolicy)
     {
-        if (poolExhaustPolicy != null)
-        {
-            if ("WAIT".equals(poolExhaustPolicy))
-            {
-                this.poolExhaustPolicy = WHEN_EXHAUSTED_WAIT;
-            }
-            else if ("ABORT".equals(poolExhaustPolicy))
-            {
-                this.poolExhaustPolicy = WHEN_EXHAUSTED_ABORT;
-            }
-            else if ("DISCARD".equals(poolExhaustPolicy))
-            {
-                this.poolExhaustPolicy = WHEN_EXHAUSTED_DISCARD;
-            }
-            else if ("DISCARD_OLDEST".equals(poolExhaustPolicy))
-            {
-                this.poolExhaustPolicy = WHEN_EXHAUSTED_DISCARD_OLDEST;
-            }
-            else
-            {
-                this.poolExhaustPolicy = WHEN_EXHAUSTED_RUN;
-            }
-        }
+        this.poolExhaustPolicy = MapUtils.getIntValue(POOL_EXHAUSTED_ACTIONS, poolExhaustPolicy,
+            DEFAULT_POOL_EXHAUST_ACTION);
     }
 
     public void setRejectedExecutionHandler(RejectedExecutionHandler rejectedExecutionHandler)
@@ -303,10 +316,8 @@ public class ThreadingProfile
                 case WHEN_EXHAUSTED_DISCARD :
                     pool.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
                     break;
-                case WHEN_EXHAUSTED_WAIT :
-                    pool.setRejectedExecutionHandler(new WaitPolicy(threadWaitTimeout, TimeUnit.MILLISECONDS));
-                    break;
                 default :
+                    // WHEN_EXHAUSTED_WAIT
                     pool.setRejectedExecutionHandler(new WaitPolicy(threadWaitTimeout, TimeUnit.MILLISECONDS));
                     break;
             }

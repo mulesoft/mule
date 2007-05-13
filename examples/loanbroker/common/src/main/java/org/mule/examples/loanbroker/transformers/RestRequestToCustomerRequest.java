@@ -56,7 +56,7 @@ public class RestRequestToCustomerRequest extends AbstractEventAwareTransformer
         String value = context.getMessage().getStringProperty(name, null);
         if (value == null)
         {
-            throw new NullPointerException("Parameter '" + name + "' must be set on the request");
+            throw new IllegalArgumentException("Parameter '" + name + "' must be set on the request");
         }
         return value;
     }

@@ -5,10 +5,63 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.mule.examples</groupId>
-        <artifactId>mule-example-loanbroker-esb-parent</artifactId>
+        <artifactId>mule-example-loanbroker-parent</artifactId>
         <version>1.0</version>
     </parent>
-    <artifactId>mule-example-loanbroker-esb-credit-agency</artifactId>
+    <artifactId>mule-example-loanbroker-credit-agency</artifactId>
     <packaging>ejb</packaging>
-    <name>Loan Broker ESB Example: Credit Agency EJB</name>
+    <name>Loan Broker Example: Credit Agency EJB</name>
+    
+    <dependencies>
+        <dependency>
+            <groupId>openejb</groupId>
+            <artifactId>openejb-core</artifactId>
+            <version>1.0</version>
+            <scope>provided</scope> 
+            <exclusions>
+                <!-- Tries to pull an unpublished castor version -->
+                <exclusion>
+                    <groupId>castor</groupId>
+                    <artifactId>castor</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>commons-logging</groupId>
+                  <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
+
+    <build>    
+        <plugins>
+            <!-- "mvn install" will copy the target jar to the $MULE_HOME/lib/user directory,
+                overwriting the previous one. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-artifact</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${MULE_HOME}/lib/user</outputDirectory>
+                            <overWriteReleases>true</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${groupId}</groupId>
+                                    <artifactId>${artifactId}</artifactId>
+                                    <version>${version}</version>
+                                    <destFileName>${artifactId}.jar</destFileName>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>    
 </project>

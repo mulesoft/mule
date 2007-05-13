@@ -10,8 +10,7 @@
 
 package org.mule.impl.model.streaming;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.RequestContext;
 import org.mule.impl.model.AbstractComponent;
@@ -63,15 +62,14 @@ public class StreamingComponent extends AbstractComponent
             UMOImmutableEndpoint ep = (UMOImmutableEndpoint) iterator.next();
             if (!ep.isStreaming())
             {
-                throw new InitialisationException(new Message(
-                    Messages.STREAMING_ENDPOINTS_MUST_BE_USED_WITH_STREAMING_MODEL), this);
-
+                throw new InitialisationException(
+                    CoreMessages.streamingEndpointsMustBeUsedWithStreamingModel(), this);
             }
             // TODO RM*: This restriction could be lifted in future
             if (ep.getTransformer() != null)
             {
-                throw new InitialisationException(new Message(
-                    Messages.STREAMING_ENDPOINTS_DONT_SUPPORT_TRANSFORMERS), this);
+                throw new InitialisationException(
+                    CoreMessages.streamingEndpointsDoNotSupportTransformers(), this);
             }
         }
         if (component instanceof Initialisable)
@@ -120,4 +118,5 @@ public class StreamingComponent extends AbstractComponent
             ((Disposable) component).dispose();
         }
     }
+
 }

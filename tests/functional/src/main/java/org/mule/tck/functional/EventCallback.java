@@ -21,5 +21,5 @@ import org.mule.umo.UMOEventContext;
 
 public interface EventCallback
 {
-    public void eventReceived(UMOEventContext context, Object Component) throws Exception;
+    public void eventReceived(UMOEventContext context, Object component) throws Exception;
 }

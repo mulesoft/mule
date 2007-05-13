@@ -10,7 +10,7 @@
 
 package org.mule.samples.voipservice.routers;
 
-import org.mule.config.i18n.Message;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.impl.MuleMessage;
 import org.mule.routing.inbound.EventGroup;
 import org.mule.routing.response.ResponseCorrelationAggregator;
@@ -53,7 +53,7 @@ public class PaymentValidationResponseAggregator extends ResponseCorrelationAggr
         }
         catch (TransformerException e)
         {
-            throw new RoutingException(Message.createStaticMessage("Failed to validate payment service"),
+            throw new RoutingException(MessageFactory.createStaticMessage("Failed to validate payment service"),
                 new MuleMessage(events, (Map)null), null, e);
         }
 

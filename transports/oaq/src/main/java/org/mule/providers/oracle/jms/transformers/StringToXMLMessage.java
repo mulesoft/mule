@@ -10,7 +10,7 @@
 
 package org.mule.providers.oracle.jms.transformers;
 
-import org.mule.config.i18n.Message;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.providers.jms.JmsConnector;
 import org.mule.providers.oracle.jms.OracleJmsConnector;
 import org.mule.transformers.AbstractEventAwareTransformer;
@@ -34,7 +34,7 @@ import oracle.xdb.XMLType;
  * Transformer for use with the Oracle Jms Connector. Expects a string containing
  * properly-formed XML. Creates a JMS message whose payload is Oracle's native XML
  * data type.
- * 
+ *
  * @see OracleJmsConnector
  * @see <a href="http://otn.oracle.com/pls/db102/">XML DB Developer's Guide</a>
  */
@@ -66,25 +66,32 @@ public class StringToXMLMessage extends AbstractEventAwareTransformer
                 // The tranformation _must_ occur within the same session used previously by the 
                 // dispatcher, otherwise we get "JMS-204: An error occurred in the AQ JNI layer"
                 // Using a transacted endpoint should ensure that the same session is used.
-                throw new TransformerException(Message.createStaticMessage("This transformer may only be used with a transacted endpoint.  Refer to http://mule.codehaus.org/display/MULE/Transaction+Management for more information."), this);
+                throw new TransformerException(MessageFactory.createStaticMessage("This transformer may only be used with a transacted endpoint.  Refer to http://mule.codehaus.org/display/MULE/Transaction+Management for more information."), this);
             }
             session = ((JmsConnector) endpoint.getConnector()).getSessionFromTransaction();
-            if (session == null) {
-                throw new TransformerException(Message.createStaticMessage("No JMS session associated with this endpoint."), this);
+            if (session == null)
+            {
+                throw new TransformerException(MessageFactory.createStaticMessage("No JMS session associated with this endpoint."), this);
             }
-            if ((session instanceof AQjmsSession) == false) {
-                throw new TransformerException(Message.createStaticMessage("Endpoint must be an OracleAQ session."), this);
+            if ((session instanceof AQjmsSession) == false)
+            {
+                throw new TransformerException(MessageFactory.createStaticMessage("Endpoint must be an OracleAQ session."), this);
             }
 
             // Prepare the XML string.
             String xml;
-            if (src instanceof byte[]) {
+            if (src instanceof byte[])
+            {
                 xml = new String((byte[]) src, encoding);
             }
-            else if (src instanceof String) {
+            else if (src instanceof String)
+            {
                 xml = (String) src;
             }
-            else throw new TransformerException(Message.createStaticMessage("Object to transform is not one of the supported types for this transformer."), this);
+            else
+            {
+                throw new TransformerException(MessageFactory.createStaticMessage("Object to transform is not one of the supported types for this transformer."), this);
+            }
 
             logger.debug("Creating an Oracle XMLType based on the following XML:\n" + StringMessageUtils.truncate(xml, 200, false));
 
@@ -93,11 +100,15 @@ public class StringToXMLMessage extends AbstractEventAwareTransformer
             // parameter, the character set is not preserved properly (probably a bug
             // in the Oracle library).
             CLOB clob = CLOB.createTemporary(((AQjmsSession) session).getDBConnection(), true, CLOB.DURATION_SESSION);
-            try {
+            try
+            {
                 Writer clobStream = clob.getCharacterOutputStream();
-                try {
+                try
+                {
                     clobStream.write(xml);
-                } finally {
+                }
+                finally
+                {
                     clobStream.close();
                 }
                 xmltype = XMLType.createXML(((AQjmsSession) session).getDBConnection(), clob);
@@ -106,13 +117,24 @@ public class StringToXMLMessage extends AbstractEventAwareTransformer
                 message = ((AQjmsSession) session).createAdtMessage();
                 message.setAdtPayload(xmltype);
                 return message;
-            } finally {
+            }
+            finally
+            {
                 // TODO Need to put this somewhere but apparently not here...
                 //clob.freeTemporary();
             }
         }
-        catch (JMSException e) { throw new TransformerException(this, e); }
-        catch (SQLException e) { throw new TransformerException(this, e); }
-        catch (IOException e) { throw new TransformerException(this, e); }
+        catch (JMSException e)
+        {
+            throw new TransformerException(this, e);
+        }
+        catch (SQLException e)
+        {
+            throw new TransformerException(this, e);
+        }
+        catch (IOException e)
+        {
+            throw new TransformerException(this, e);
+        }
     }
 }

@@ -10,8 +10,7 @@
 
 package org.mule.config.pool;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleDescriptor;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.model.UMOModel;
@@ -37,31 +36,16 @@ public class CommonsPoolProxyFactory extends AbstractProxyFactory implements Poo
         super(descriptor, model);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.commons.pool.PoolableObjectFactory#activateObject(java.lang.Object)
-     */
     public void activateObject(Object arg0) throws Exception
     {
         // nothing to do
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.commons.pool.PoolableObjectFactory#destroyObject(java.lang.Object)
-     */
     public void destroyObject(Object object) throws Exception
     {
         pool.onRemove(object);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.commons.pool.PoolableObjectFactory#makeObject()
-     */
     public Object makeObject() throws Exception
     {
         Object object = create();
@@ -69,21 +53,11 @@ public class CommonsPoolProxyFactory extends AbstractProxyFactory implements Poo
         return object;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.commons.pool.PoolableObjectFactory#passivateObject(java.lang.Object)
-     */
     public void passivateObject(Object arg0) throws Exception
     {
         // nothing to do
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.commons.pool.PoolableObjectFactory#validateObject(java.lang.Object)
-     */
     public boolean validateObject(Object arg0)
     {
         return true;
@@ -98,8 +72,7 @@ public class CommonsPoolProxyFactory extends AbstractProxyFactory implements Poo
         catch (Exception e)
         {
             throw new InitialisationException(
-                new Message(Messages.FAILED_TO_SET_PROPERTIES_ON_X, "Component '" 
-                    + descriptor.getName() + "'"), 
+                CoreMessages.failedToSetPropertiesOn("Component '" + descriptor.getName() + "'"), 
                 e, descriptor);
         }
     }

@@ -10,8 +10,8 @@
 
 package org.mule.umo;
 
+import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 
 /**
  * <code>ComponentException</code> should be thrown when some action on a component
@@ -59,7 +59,7 @@ public class ComponentException extends MessagingException
 
     private static Message generateMessage(Message previousMessage, UMOComponent component)
     {
-        Message returnMessage = new Message(Messages.COMPONENT_CAUSED_ERROR_IS_X, component);
+        Message returnMessage = CoreMessages.componentCausedErrorIs(component);
         if (previousMessage != null)
         {
             previousMessage.setNextMessage(returnMessage);
@@ -70,5 +70,4 @@ public class ComponentException extends MessagingException
             return returnMessage;
         }
     }
-
 }

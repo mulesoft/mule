@@ -10,10 +10,10 @@
 
 package org.mule.providers.quartz.jobs;
 
-import org.mule.config.i18n.Message;
 import org.mule.extras.client.MuleClient;
 import org.mule.providers.NullPayload;
 import org.mule.providers.quartz.QuartzConnector;
+import org.mule.providers.quartz.i18n.QuartzMessages;
 import org.mule.umo.UMOException;
 
 import org.apache.commons.logging.Log;
@@ -46,8 +46,8 @@ public class MuleClientDispatchJob implements Job
         String dispatchEndpoint = jobDataMap.getString(QuartzConnector.PROPERTY_JOB_DISPATCH_ENDPOINT);
         if (dispatchEndpoint == null)
         {
-            throw new JobExecutionException(new Message("quartz", 4,
-                QuartzConnector.PROPERTY_JOB_DISPATCH_ENDPOINT).getMessage());
+            throw new JobExecutionException(
+                QuartzMessages.missingJobDetail(QuartzConnector.PROPERTY_JOB_DISPATCH_ENDPOINT).getMessage());
         }
 
         try
@@ -61,5 +61,4 @@ public class MuleClientDispatchJob implements Job
             throw new JobExecutionException(e);
         }
     }
-
 }

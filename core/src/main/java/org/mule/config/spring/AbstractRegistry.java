@@ -12,8 +12,7 @@ package org.mule.config.spring;
 import org.mule.RegistryContext;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.MuleProperties;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.internal.notifications.RegistryNotification;
 import org.mule.providers.service.TransportFactory;
@@ -76,7 +75,7 @@ public abstract class AbstractRegistry implements RegistryFacade
     {
         if (id == null)
         {
-            throw new NullPointerException(new Message(Messages.X_IS_NULL, "RegistryID").getMessage());
+            throw new NullPointerException(CoreMessages.objectIsNull("RegistryID").getMessage());
         }
         this.id = id;
         lifecycleManager = createLifecycleManager();

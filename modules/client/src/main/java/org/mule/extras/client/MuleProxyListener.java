@@ -11,7 +11,7 @@
 package org.mule.extras.client;
 
 import org.mule.MuleException;
-import org.mule.config.i18n.Message;
+import org.mule.extras.client.i18n.ClientMessages;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.UMOTransformer;
@@ -117,7 +117,7 @@ public class MuleProxyListener implements InvocationHandler
     {
         if (args.length == 0)
         {
-            throw new MuleException(new Message("client", 2));
+            throw new MuleException(ClientMessages.noArgsForProxy());
         }
         UMOMessage message = eventTransformer.transform(args[0], method);
         if (!"void".equals(method.getReturnType().getName()))

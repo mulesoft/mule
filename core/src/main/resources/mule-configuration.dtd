@@ -149,26 +149,29 @@ on the mule-configuration.
 <!--
     Determines how components in a pool should be initialised. the possible values are -
     <ul>
-        <li>INITIALISE_NONE : Will not load any components in the pool on startup</li>
-        <li>INITIALISE_FIRST : Will load only the first component in the pool on startup</li>
+        <li>INITIALISE_NONE : Will not load any components into the pool on startup</li>
+        <li>INITIALISE_ONE : Will load one initial component into the pool on startup</li>
         <li>INITIALISE_ALL : Will load all components in the pool on startup</li>
     </ul>
-   The default for this value is INITIALISE_FIRST.
-
+   The default for this value is INITIALISE_ONE.
+   <p>
+   The value INITIALISE_FIRST is deprecated; use INITIALIZE_ONE.
 -->
-<!ATTLIST pooling-profile initialisationPolicy          (INITIALISE_NONE | INITIALISE_FIRST | INITIALISE_ALL)        "INITIALISE_FIRST">
+<!ATTLIST pooling-profile initialisationPolicy    (INITIALISE_NONE | INITIALISE_ONE | INITIALISE_FIRST | INITIALISE_ALL)    "INITIALISE_ONE">
 <!--
      Specifies the behaviour of the Mule UMO pool when the pool is exhausted:
-      <p/>
-      0 (WHEN_EXHAUSTED_FAIL) : will throw a NoSuchElementException
-      1 (WHEN_EXHAUSTED_BLOCK): will block (invoke Object.wait(long) until a new or idle object is available.
-      2 (WHEN_EXHAUSTED_GROW) : will create a new Mule and return it(essentially making maxActive meaningless.)
-     <p/>
+      <ul>
+      <li>WHEN_EXHAUSTED_FAIL : will throw a NoSuchElementException</li>
+      <li>WHEN_EXHAUSTED_WAIT: will block (invoke Object.wait(long) until a new or idle object is available.<li>
+      <li>WHEN_EXHAUSTED_GROW : will create a new Mule and return it(essentially making maxActive meaningless.)</li>
+     </ul>
      If a positive maxWait value is supplied, it will block for at most that many milliseconds,
-     after which a NoSuchElementException will be thrown. If maxThraedWait is non-positive, it will block
+     after which a NoSuchElementException will be thrown. If maxWait is non-positive, it will block
      indefinitely.
+     <p>
+     The values FAIL, WAIT, BLOCK and GROW are deprecated.
 -->
-<!ATTLIST pooling-profile exhaustedAction          (GROW | WAIT | FAIL)      "GROW">
+<!ATTLIST pooling-profile exhaustedAction    (WHEN_EXHAUSTED_GROW | GROW | WHEN_EXHAUSTED_WAIT | WAIT | BLOCK | WHEN_EXHAUSTED_FAIL | FAIL)    "WHEN_EXHAUSTED_GROW">
 <!--
 Specifies the number of milliseconds to wait for a pooled component to become available
 when the pool is exhausted and the exhaustedAction is set to 'wait'.
@@ -212,20 +215,22 @@ Detemines how long an inactive thread is kept in the pool before being discarded
 If the maximum pool size or queue size is bounded, then it is possible for incoming execute requests to block.
 There are five supported policies for handling this situation.
 
-<ol>
-<li>RUN (the default) - The thread making the execute request runs the task itself.
+<ul>
+<li>WHEN_EXHAUSTED_RUN (the default) - The thread making the execute request runs the task itself.
  This policy helps guard against lockup.
 </li>
-<li>WAIT - Wait until a thread becomes available (or until the configurable timeout expires).
-This policy should, in general, not be used if the minimum number of of threads is zero, in
+<li>WHEN_EXHAUSTED_WAIT - Wait until a thread becomes available (or until the configurable timeout expires).
+This policy should, in general, not be used if the minimum number of threads is zero, in
  which case a thread may never become available.
 </li>
-<li>ABORT - Throw a RuntimeException
+<li>WHEN_EXHAUSTED_ABORT - Throw a RuntimeException
 </li>
-<li>DISCARD  - Throw away the current request and return.
+<li>WHEN_EXHAUSTED_DISCARD  - Throw away the current request and return.
 </li>
-<li>DISCARD_OLDEST - Throw away the oldest request and return.
-</li></ol>
+<li>WHEN_EXHAUSTED_DISCARD_OLDEST - Throw away the oldest request and return.
+</li>
+</ul>
+The shorthand values WAIT, DISCARD, DISCARD_OLDEST, ABORT and RUN are deprecated; please use their canonical equivalents.
 -->
 
 <!ATTLIST threading-profile poolExhaustedAction     (WAIT | DISCARD | DISCARD_OLDEST | ABORT | RUN)       "RUN">

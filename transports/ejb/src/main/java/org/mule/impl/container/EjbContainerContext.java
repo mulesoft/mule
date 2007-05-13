@@ -10,15 +10,14 @@
 
 package org.mule.impl.container;
 
+import org.mule.providers.ejb.i18n.EjbMessages;
+import org.mule.umo.manager.ObjectNotFoundException;
+import org.mule.util.ClassUtils;
+
 import java.lang.reflect.Method;
 
 import javax.ejb.EJBHome;
 import javax.naming.NamingException;
-
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.umo.manager.ObjectNotFoundException;
-import org.mule.util.ClassUtils;
 
 /**
  * <code>EjbContainerContext</code> is a container implementaiton that allows EJB
@@ -62,8 +61,8 @@ public class EjbContainerContext extends RmiContainerContext
             Method method = ClassUtils.getMethod(homeObject.getClass(), "create", null);
             if (method == null)
             {
-                throw new ObjectNotFoundException(key.toString(), new IllegalArgumentException(new Message(
-                    Messages.EJB_OBJECT_X_MISSING_CREATE, key).toString()));
+                throw new ObjectNotFoundException(key.toString(), new IllegalArgumentException(
+                    EjbMessages.ejbObjectMissingCreate(key).toString()));
             }
             try
             {
@@ -76,8 +75,8 @@ public class EjbContainerContext extends RmiContainerContext
         }
         else
         {
-            throw new ObjectNotFoundException(key.toString(), new IllegalArgumentException(new Message(
-                Messages.EJB_KEY_REF_X_NOT_VALID, key).toString()));
+            throw new ObjectNotFoundException(key.toString(), new IllegalArgumentException(
+                EjbMessages.ejbKeyRefNotValid(key).toString()));
         }
     }
 }

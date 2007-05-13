@@ -11,7 +11,7 @@
 package org.mule.util;
 
 import org.mule.MuleRuntimeException;
-import org.mule.config.i18n.Message;
+import org.mule.config.i18n.MessageFactory;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
@@ -295,7 +295,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         catch (IOException e)
         {
             throw new MuleRuntimeException(
-                    Message.createStaticMessage("Unable to create a canonical file for " + pathName), 
+                    MessageFactory.createStaticMessage("Unable to create a canonical file for " + pathName), 
                     e);
         }
     }
@@ -320,7 +320,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         catch (IOException e)
         {
             throw new MuleRuntimeException(
-                    Message.createStaticMessage("Unable to create a canonical file for " + uri),
+                    MessageFactory.createStaticMessage("Unable to create a canonical file for " + uri),
                     e);
         }
     }
@@ -345,7 +345,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         catch (IOException e)
         {
             throw new MuleRuntimeException(
-                    Message.createStaticMessage("Unable to create a canonical file for parent: " 
+                    MessageFactory.createStaticMessage("Unable to create a canonical file for parent: " 
                         + parent + " and child: " + child),
                     e);
         }
@@ -371,7 +371,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         catch (IOException e)
         {
             throw new MuleRuntimeException(
-                    Message.createStaticMessage("Unable to create a canonical file for parent: " 
+                    MessageFactory.createStaticMessage("Unable to create a canonical file for parent: " 
                         + parent + " and child: " + child),
                     e);
         }

@@ -14,6 +14,7 @@ import org.mule.config.MuleProperties;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractPollingMessageReceiver;
 import org.mule.providers.ConnectException;
+import org.mule.providers.rmi.i18n.RmiMessages;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -78,8 +79,7 @@ public class RmiMessageReceiver extends AbstractPollingMessageReceiver
 
             if (null == methodName)
             {
-                throw new ConnectException(new org.mule.config.i18n.Message("rmi",
-                    RmiConnector.MSG_PARAM_SERVICE_METHOD_NOT_SET), this);
+                throw new ConnectException(RmiMessages.messageParamServiceMethodNotSet(), this);
             }
         }
 

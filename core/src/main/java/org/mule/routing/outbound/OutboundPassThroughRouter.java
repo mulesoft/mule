@@ -19,7 +19,7 @@ import org.mule.umo.routing.RoutingException;
 import java.util.List;
 
 /**
- * <code>InboundPassThroughRouter</code> allows outbound routing over a single
+ * <code>OutboundPassThroughRouter</code> allows outbound routing over a single
  * endpoint without any filtering. This class is used by Mule when a single outbound
  * router is set on a UMODescriptor.
  * 

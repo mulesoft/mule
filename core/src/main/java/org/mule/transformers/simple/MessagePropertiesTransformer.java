@@ -12,6 +12,7 @@ package org.mule.transformers.simple;
 
 import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.UMOEventContext;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
 
 import java.util.HashMap;
@@ -19,18 +20,21 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.text.MessageFormat;
 
 /**
- * A configurable message transformer that allows users to add, overwrite and delete
- * properties on the current message. Users can set a {@link Set} of
- * 'deleteProperties' names to remove from the message and can also set a {@link Map}
- * of 'addProperties' that will be added to the message and possibly overwrite
- * existing properties with the same name.
+ * A configurable message transformer that allows users to add, overwrite and delete properties on the current message.
+ * Users can set a {@link Set} of 'deleteProperties' names to remove from the message and can also set a {@link Map} of
+ * 'addProperties' that will be added to the message and possibly overwrite existing properties with the same name.
+ * <p/>
+ * If {@link #overwrite} is set to {@code false}, and a property exists on the message (even if the value is {@code
+ * null}, it will be left intact. The transformer then acts as a more gentle 'enricher'. Default setting is {@code true}.
  */
 public class MessagePropertiesTransformer extends AbstractEventAwareTransformer
 {
     private Set deleteProperties = null;
     private Map addProperties = null;
+    private boolean overwrite = true;
 
     public MessagePropertiesTransformer()
     {
@@ -58,17 +62,19 @@ public class MessagePropertiesTransformer extends AbstractEventAwareTransformer
 
     public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
     {
+        final UMOMessage message = context.getMessage();
         if (deleteProperties != null && deleteProperties.size() > 0)
         {
             for (Iterator iterator = deleteProperties.iterator(); iterator.hasNext();)
             {
                 Object o = iterator.next();
-                context.getMessage().removeProperty(o.toString());
+                message.removeProperty(o.toString());
             }
         }
 
         if (addProperties != null && addProperties.size() > 0)
         {
+            final Set propertyNames = message.getPropertyNames();
             for (Iterator iterator = addProperties.entrySet().iterator(); iterator.hasNext();)
             {
                 Map.Entry entry = (Map.Entry) iterator.next();
@@ -78,12 +84,37 @@ public class MessagePropertiesTransformer extends AbstractEventAwareTransformer
                 }
                 else
                 {
-                    context.getMessage().setProperty(entry.getKey().toString(), entry.getValue());
+                    final String key = entry.getKey().toString();
+
+                    final Object value = entry.getValue();
+                    if (overwrite)
+                    {
+                        if (logger.isDebugEnabled())
+                        {
+                            if (!propertyNames.contains(key))
+                            {
+                                logger.debug("Overwriting message property " + key);
+                            }
+                        }
+                        message.setProperty(key, value);
+                    }
+                    else
+                    {
+                        if (propertyNames.contains(key))
+                        {
+                            if (logger.isDebugEnabled())
+                            {
+                                logger.debug(MessageFormat.format(
+                                        "Message already contains the property and overwrite is false, skipping: key={0}, value={1}",
+                                        new Object[] {key, value}));
+                            }
+                        }
+                    }
                 }
             }
         }
 
-        return context.getMessage();
+        return src;
     }
 
     public Set getDeleteProperties()
@@ -106,4 +137,13 @@ public class MessagePropertiesTransformer extends AbstractEventAwareTransformer
         this.addProperties = addProperties;
     }
 
+    public boolean isOverwrite()
+    {
+        return overwrite;
+    }
+
+    public void setOverwrite(final boolean overwrite)
+    {
+        this.overwrite = overwrite;
+    }
 }

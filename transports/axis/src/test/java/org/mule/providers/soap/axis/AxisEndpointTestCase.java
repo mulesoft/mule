@@ -17,10 +17,6 @@ import org.mule.registry.ServiceDescriptorFactory;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.UMOEndpointURI;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class AxisEndpointTestCase extends AbstractMuleTestCase
 {
     public void testEndpoint() throws Exception

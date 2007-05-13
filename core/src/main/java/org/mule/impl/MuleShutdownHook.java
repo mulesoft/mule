@@ -12,7 +12,7 @@ package org.mule.impl;
 import org.mule.RegistryContext;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.config.spring.RegistryFacade;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
@@ -63,7 +63,7 @@ public class MuleShutdownHook extends Thread
 
     protected void shutdown(Throwable t)
     {
-        Message msg = new Message(Messages.FATAL_ERROR_WHILE_RUNNING);
+        Message msg = CoreMessages.fatalErrorWhileRunning();
         UMOException muleException = ExceptionHelper.getRootMuleException(t);
         if (muleException != null)
         {
@@ -73,18 +73,19 @@ public class MuleShutdownHook extends Thread
         {
             logger.fatal(msg.toString() + " " + t.getMessage(), t);
         }
+
         List msgs = new ArrayList();
         msgs.add(msg.getMessage());
         Throwable root = ExceptionHelper.getRootException(t);
         msgs.add(root.getMessage() + " (" + root.getClass().getName() + ")");
         msgs.add(" ");
-        msgs.add(new Message(Messages.FATAL_ERROR_SHUTDOWN));
+        msgs.add(CoreMessages.fatalErrorInShutdown());
         UMOManagementContext context = RegistryContext.getRegistry().getManagementContext();
         if(context!=null)
         {
-            msgs.add(new Message(Messages.SERVER_STARTED_AT_X, new Date(context.getStartDate())));
+            msgs.add(CoreMessages.serverStartedAt(context.getStartDate()));
         }
-        msgs.add(new Message(Messages.SERVER_SHUTDOWN_AT_X, new Date().toString()));
+        msgs.add(CoreMessages.serverShutdownAt(new Date()));
 
         String shutdownMessage = StringMessageUtils.getBoilerPlate(msgs, '*', 80);
 
@@ -102,7 +103,7 @@ public class MuleShutdownHook extends Thread
     {
         logger.info("Mule server shutting down due to normal shutdown request");
         List msgs = new ArrayList();
-        msgs.add(new Message(Messages.NORMAL_SHUTDOWN).getMessage());
+        msgs.add(CoreMessages.normalShutdown());
 
         UMOManagementContext context = null;
         RegistryFacade registry = RegistryContext.getRegistry();
@@ -113,9 +114,9 @@ public class MuleShutdownHook extends Thread
         }
         if(context!=null)
         {
-            msgs.add(new Message(Messages.SERVER_STARTED_AT_X, new Date(context.getStartDate())));
+            msgs.add(CoreMessages.serverStartedAt(context.getStartDate()));
         }
-        msgs.add(new Message(Messages.SERVER_SHUTDOWN_AT_X, new Date().toString()).getMessage());
+        msgs.add(CoreMessages.serverShutdownAt(new Date()));
         String shutdownMessage = StringMessageUtils.getBoilerPlate(msgs, '*', 80);
         if (logger.isInfoEnabled())
         {

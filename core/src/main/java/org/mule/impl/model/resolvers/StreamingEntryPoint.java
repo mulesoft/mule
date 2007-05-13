@@ -26,6 +26,9 @@ import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Will discover the correct entrypoint to invoke when an event is received. The
  * follow are checked for - 1. If the component implements
@@ -37,6 +40,7 @@ import java.util.List;
  */
 public class StreamingEntryPoint implements UMOEntryPoint
 {
+    protected static final Log logger = LogFactory.getLog(StreamingEntryPoint.class);
     private Method streamingMethod;
     private boolean inAndOut = false;
 
@@ -111,6 +115,11 @@ public class StreamingEntryPoint implements UMOEntryPoint
             }
 
             return result;
+        }
+        catch (Exception e)
+        {
+            logger.warn("Failed to route streaming event via " + component + ": " + e.getMessage(), e);
+            throw e;
         }
         finally
         {

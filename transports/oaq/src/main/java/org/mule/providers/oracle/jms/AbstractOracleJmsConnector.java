@@ -11,8 +11,8 @@
 
 package org.mule.providers.oracle.jms;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+
+import org.mule.config.i18n.CoreMessages;
 import org.mule.providers.ConnectException;
 import org.mule.providers.jms.JmsConnector;
 import org.mule.providers.jms.JmsConstants;
@@ -92,8 +92,8 @@ public abstract class AbstractOracleJmsConnector extends JmsConnector
             setJmsSupport(new OracleJmsSupport(this, null, false, false));
         }
         catch (Exception e) {
-            throw new ConnectException(new Message(Messages.FAILED_TO_CREATE_X, "Oracle Jms Connector"), e,
-                    this);
+            throw new ConnectException(CoreMessages.failedToCreate("Oracle Jms Connector"), 
+                e, this);
         }
 
         // Note it doesn't make sense to start a connection at this point

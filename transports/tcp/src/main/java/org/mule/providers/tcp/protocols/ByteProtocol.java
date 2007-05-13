@@ -12,6 +12,9 @@ package org.mule.providers.tcp.protocols;
 
 import org.mule.providers.tcp.TcpProtocol;
 import org.mule.umo.provider.UMOMessageAdapter;
+import org.mule.umo.provider.UMOStreamMessageAdapter;
+import org.mule.util.ClassUtils;
+import org.mule.util.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,23 +41,41 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class ByteProtocol implements TcpProtocol
 {
-
     private static final Log logger = LogFactory.getLog(DefaultProtocol.class);
     private static final long PAUSE_PERIOD = 100;
     public static final int EOF = -1;
 
+    // make this really clear in subclasses, because otherwise people will forget
+    public static final boolean STREAM_OK = true;
+    public static final boolean NO_STREAM = false;
+    private boolean streamOk;
+
+    public ByteProtocol(boolean streamOk)
+    {
+        this.streamOk = streamOk;
+    }
+
     public void write(OutputStream os, Object data) throws IOException
     {
-        // By default the UMOMessageAdapter object itself is passed in, I guess so
-        // that the whole adapter can be serialised if necessary. I'm doing the check
-        // here to extract the real payload, rather than extracting it in the
-        // TcpMessageReceiver where the protocol is called
-        if (data instanceof UMOMessageAdapter)
+        if (data instanceof UMOStreamMessageAdapter)
         {
-            data = ((UMOMessageAdapter) data).getPayload();
+            if (streamOk)
+            {
+                IOUtils.copy(((UMOStreamMessageAdapter) data).getInputStream(), os);
+                os.flush();
+                os.close();
+            }
+            else
+            {
+                throw new IOException("TCP protocol " + ClassUtils.getSimpleName(getClass())
+                        + " cannot handle streaming");
+            }
         }
-
-        if (data instanceof byte[])
+        else if (data instanceof UMOMessageAdapter)
+        {
+            write(os, ((UMOMessageAdapter) data).getPayload());
+        }
+        else if (data instanceof byte[])
         {
             writeByteArray(os, (byte[]) data);
         }

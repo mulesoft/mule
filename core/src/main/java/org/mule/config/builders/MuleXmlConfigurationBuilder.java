@@ -15,7 +15,7 @@ import org.mule.config.ConfigurationBuilder;
 import org.mule.config.ConfigurationException;
 import org.mule.config.ReaderResource;
 import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.config.spring.MuleApplicationContext;
 import org.mule.umo.UMOManagementContext;
 import org.mule.util.IOUtils;
@@ -89,14 +89,13 @@ public class
             }
             catch (IOException e)
             {
-                throw new ConfigurationException(new Message(Messages.FAILED_TO_START_X,
-                    "Mule server from builder"), e);
+                throw new ConfigurationException(CoreMessages.failedToLoad(startupPropertiesFile), e);
             }
         }
 
         if (configResource == null)
         {
-            throw new ConfigurationException(new Message(Messages.X_IS_NULL, "Configuration Resource"));
+            throw new ConfigurationException(CoreMessages.objectIsNull("Configuration Resource"));
         }
         String[] resources = org.springframework.util.StringUtils.tokenizeToStringArray(configResource, ",;",
             true, true);
@@ -147,8 +146,7 @@ public class
         }
         catch (Exception e)
         {
-            throw new ConfigurationException(new Message(Messages.FAILED_TO_START_X,
-                "Mule server from builder"), e);
+            throw new ConfigurationException(CoreMessages.failedToInvokeLifecycle("start", "Mule"), e);
         }
     }
 
@@ -180,8 +178,7 @@ public class
         }
         catch (IOException e)
         {
-            throw new ConfigurationException(new Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE,
-                configResource), e);
+            throw new ConfigurationException(CoreMessages.cannotLoadFromClasspath(configResource), e);
         }
 
         if (is != null)
@@ -190,8 +187,7 @@ public class
         }
         else
         {
-            throw new ConfigurationException(new Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE,
-                configResource));
+            throw new ConfigurationException(CoreMessages.cannotLoadFromClasspath(configResource));
         }
     }
 

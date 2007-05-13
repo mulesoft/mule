@@ -12,6 +12,7 @@ package org.mule.impl.endpoint;
 
 import org.mule.RegistryContext;
 import org.mule.config.i18n.Message;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.providers.service.TransportFactory;
 import org.mule.providers.service.TransportServiceDescriptor;
 import org.mule.registry.ServiceDescriptorFactory;
@@ -184,7 +185,7 @@ public class MuleEndpointURI implements UMOEndpointURI
             sd = (TransportServiceDescriptor)RegistryContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, scheme, null);
             if (sd == null)
             {
-                throw new ServiceException(Message.createStaticMessage("No service descriptor found for transport: " + scheme + ".  This transport does not appear to be installed."));
+                throw new ServiceException(CoreMessages.noServiceTransportDescriptor(scheme));
             }
             EndpointBuilder builder = sd.createEndpointBuilder();
             UMOEndpointURI built = builder.build(this.uri);

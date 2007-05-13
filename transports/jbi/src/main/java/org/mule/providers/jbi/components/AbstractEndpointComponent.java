@@ -74,7 +74,7 @@ public abstract class AbstractEndpointComponent extends AbstractJbiComponent
             {
                 if (endpoint == null)
                 {
-                    throw new NullPointerException("A Mule muleEndpoint must be set on this component");
+                    throw new IllegalArgumentException("A Mule muleEndpoint must be set on this component");
                 }
                 else
                 {

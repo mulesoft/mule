@@ -10,8 +10,7 @@
 
 package org.mule.umo.security;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.UMOException;
 
 /**
@@ -31,11 +30,11 @@ public class EncryptionStrategyNotFoundException extends UMOException
 
     public EncryptionStrategyNotFoundException(String strategyName)
     {
-        super(new Message(Messages.AUTH_NO_ENCRYPTION_STRATEGY_X, strategyName));
+        super(CoreMessages.authNoEncryptionStrategy(strategyName));
     }
 
     public EncryptionStrategyNotFoundException(String strategyName, Throwable cause)
     {
-        super(new Message(Messages.AUTH_NO_ENCRYPTION_STRATEGY_X, strategyName), cause);
+        super(CoreMessages.authNoEncryptionStrategy(strategyName), cause);
     }
 }

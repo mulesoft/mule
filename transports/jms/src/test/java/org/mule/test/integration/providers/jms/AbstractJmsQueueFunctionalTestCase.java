@@ -41,7 +41,7 @@ public abstract class AbstractJmsQueueFunctionalTestCase extends AbstractJmsFunc
 
         EventCallback callback = new EventCallback()
         {
-            public synchronized void eventReceived(UMOEventContext context, Object Component)
+            public synchronized void eventReceived(UMOEventContext context, Object component)
             {
                 callbackCalled = true;
                 assertNull(context.getCurrentTransaction());
@@ -93,7 +93,7 @@ public abstract class AbstractJmsQueueFunctionalTestCase extends AbstractJmsFunc
 
         EventCallback callback = new EventCallback()
         {
-            public synchronized void eventReceived(UMOEventContext context, Object Component)
+            public synchronized void eventReceived(UMOEventContext context, Object component)
             {
                 callbackCalled = true;
                 assertNull(context.getCurrentTransaction());

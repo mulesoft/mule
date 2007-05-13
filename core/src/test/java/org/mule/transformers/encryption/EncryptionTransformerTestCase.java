@@ -22,6 +22,7 @@ public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
 {
     private PasswordBasedEncryptionStrategy strat;
 
+    // @Override
     protected void doSetUp() throws Exception
     {
         strat = new PasswordBasedEncryptionStrategy();
@@ -29,11 +30,6 @@ public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
         strat.initialise();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.AbstractTransformerTestCase#getResultData()
-     */
     public Object getResultData()
     {
         try
@@ -47,21 +43,11 @@ public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.AbstractTransformerTestCase#getTestData()
-     */
     public Object getTestData()
     {
         return "the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog";
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.AbstractTransformerTestCase#getTransformers()
-     */
     public UMOTransformer getTransformer()
     {
         EncryptionTransformer transformer = new EncryptionTransformer();
@@ -77,17 +63,6 @@ public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
         return transformer;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see junit.framework.TestCase#setUp()
-     */
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.AbstractTransformerTestCase#getRoundTripTransformer()
-     */
     public UMOTransformer getRoundTripTransformer()
     {
         DecryptionTransformer transformer = new DecryptionTransformer();

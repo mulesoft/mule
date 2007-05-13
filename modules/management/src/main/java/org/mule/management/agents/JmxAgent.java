@@ -11,12 +11,12 @@ package org.mule.management.agents;
 
 import org.mule.MuleRuntimeException;
 import org.mule.RegistryContext;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.AbstractAgent;
 import org.mule.impl.internal.notifications.ManagerNotification;
 import org.mule.impl.internal.notifications.ManagerNotificationListener;
 import org.mule.impl.internal.notifications.NotificationException;
+import org.mule.management.i18n.ManagementMessages;
 import org.mule.management.mbeans.ComponentService;
 import org.mule.management.mbeans.ComponentServiceMBean;
 import org.mule.management.mbeans.ConnectorService;
@@ -143,8 +143,8 @@ public class JmxAgent extends AbstractAgent
         }
     }
 
-    /** {@inheritDoc}
-     * (non-Javadoc)
+    /** 
+     * {@inheritDoc}
      *
      */
     public void initialise() throws InitialisationException
@@ -153,7 +153,7 @@ public class JmxAgent extends AbstractAgent
             return;
         }
         if (mBeanServer == null && !locateServer && !createServer) {
-            throw new InitialisationException(new Message(Messages.JMX_CREATE_OR_LOCATE_SHOULD_BE_SET), this);
+            throw new InitialisationException(ManagementMessages.createOrLocateShouldBeSet(), this);
         }
         if (mBeanServer == null && locateServer) {
             List l = MBeanServerFactory.findMBeanServer(null);
@@ -166,7 +166,7 @@ public class JmxAgent extends AbstractAgent
             serverCreated.set(true);
         }
         if (mBeanServer == null) {
-            throw new InitialisationException(new Message(Messages.JMX_CANT_LOCATE_CREATE_SERVER), this);
+            throw new InitialisationException(ManagementMessages.cannotLocateOrCreateServer(), this);
         }
         if (connectorServerUrl != null) {
             try {
@@ -186,7 +186,7 @@ public class JmxAgent extends AbstractAgent
                 }
                 connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url, connectorServerProperties, mBeanServer);
             } catch (Exception e) {
-                throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X, "Jmx Connector"), e, this);
+                throw new InitialisationException(CoreMessages.failedToCreate("Jmx Connector"), e, this);
             }
         }
 
@@ -205,7 +205,7 @@ public class JmxAgent extends AbstractAgent
                         registerEndpointServices();
                         registerConnectorServices();
                     } catch (Exception e) {
-                        throw new MuleRuntimeException(new Message(Messages.X_FAILED_TO_INITIALISE, "MBeans"), e);
+                        throw new MuleRuntimeException(CoreMessages.objectFailedToInitialise("MBeans"), e);
                     }
                 }
             }
@@ -239,7 +239,7 @@ public class JmxAgent extends AbstractAgent
                 logger.info("Starting JMX agent connector Server");
                 connectorServer.start();
             } catch (Exception e) {
-                throw new JmxManagementException(new Message(Messages.FAILED_TO_START_X, "Jmx Connector"), e);
+                throw new JmxManagementException(CoreMessages.failedToStart("Jmx Connector"), e);
             }
         }
     }
@@ -255,7 +255,7 @@ public class JmxAgent extends AbstractAgent
             try {
                 connectorServer.stop();
             } catch (Exception e) {
-                throw new JmxManagementException(new Message(Messages.FAILED_TO_STOP_X, "Jmx Connector"), e);
+                throw new JmxManagementException(CoreMessages.failedToStop("Jmx Connector"), e);
             }
         }
     }

@@ -10,8 +10,8 @@
 
 package org.mule.providers.stream;
 
-import org.mule.config.i18n.Message;
 import org.mule.providers.AbstractMessageDispatcher;
+import org.mule.providers.stream.i18n.StreamMessages;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
@@ -50,19 +50,15 @@ public class StreamMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.provider.UMOConnector#dispatch(org.mule.umo.UMOEvent)
-     */
     protected synchronized void doDispatch(UMOEvent event) throws Exception
     {
         OutputStream out = connector.getOutputStream();
 
         if (out == null)
         {
-            throw new DispatchException(new Message("stream", 1, event.getEndpoint().getEndpointURI().getAddress()), event.getMessage(),
-                event.getEndpoint());
+            throw new DispatchException(
+                StreamMessages.couldNotFindStreamWithName(event.getEndpoint().getEndpointURI().getAddress()), 
+                event.getMessage(), event.getEndpoint());
         }
 
         if (connector instanceof SystemStreamConnector)

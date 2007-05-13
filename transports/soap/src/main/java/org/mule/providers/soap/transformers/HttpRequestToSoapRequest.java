@@ -11,8 +11,7 @@
 package org.mule.providers.soap.transformers;
 
 import org.mule.config.MuleProperties;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
@@ -71,8 +70,8 @@ public class HttpRequestToSoapRequest extends AbstractEventAwareTransformer
         String method = (String)p.remove(MuleProperties.MULE_METHOD_PROPERTY);
         if (method == null)
         {
-            throw new TransformerException(new Message(Messages.PROPERTIES_X_NOT_SET,
-                MuleProperties.MULE_METHOD_PROPERTY), this);
+            throw new TransformerException(
+                CoreMessages.propertiesNotSet(MuleProperties.MULE_METHOD_PROPERTY), this);
         }
 
         if (httpMethod.equals("POST"))

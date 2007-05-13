@@ -10,7 +10,7 @@
 
 package org.mule.impl.model;
 
-import org.mule.config.i18n.Message;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.umo.model.ModelException;
 
 /**
@@ -28,7 +28,7 @@ public class ModelServiceNotFoundException extends ModelException
      */
     public ModelServiceNotFoundException(String location)
     {
-        super(Message.createStaticMessage(location));
+        super(MessageFactory.createStaticMessage(location));
     }
 
     /**
@@ -37,6 +37,6 @@ public class ModelServiceNotFoundException extends ModelException
      */
     public ModelServiceNotFoundException(String location, Throwable cause)
     {
-        super(Message.createStaticMessage(location), cause);
+        super(MessageFactory.createStaticMessage(location), cause);
     }
 }

@@ -11,8 +11,7 @@
 package org.mule.providers.jms;
 
 import org.mule.config.ExceptionHelper;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.internal.notifications.ConnectionNotification;
 import org.mule.impl.internal.notifications.ConnectionNotificationListener;
 import org.mule.impl.internal.notifications.NotificationException;
@@ -20,6 +19,7 @@ import org.mule.providers.AbstractConnector;
 import org.mule.providers.ConnectException;
 import org.mule.providers.FatalConnectException;
 import org.mule.providers.ReplyToHandler;
+import org.mule.providers.jms.i18n.JmsMessages;
 import org.mule.providers.jms.xa.ConnectionFactoryWrapper;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.MessagingException;
@@ -190,7 +190,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
             else if (jndiProviderProperties == null
                      || !jndiProviderProperties.containsKey(Context.INITIAL_CONTEXT_FACTORY))
             {
-                throw new InitialisationException(new Message(Messages.X_IS_NULL, "jndiInitialFactory"), this);
+                throw new InitialisationException(CoreMessages.objectIsNull("jndiInitialFactory"), this);
             }
 
             if (jndiProviderUrl != null)
@@ -222,8 +222,9 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         }
         else
         {
-            throw new InitialisationException(new Message(Messages.INVALID_RESOURCE_TYPE_X_EXPECTED_X,
-                ConnectionFactory.class, temp == null ? null : temp.getClass()), this);
+            throw new InitialisationException(
+                JmsMessages.invalidResourceType(ConnectionFactory.class, 
+                    (temp == null ? null : temp.getClass())), this);
         }
     }
 
@@ -354,7 +355,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         }
         catch (Exception e)
         {
-            throw new ConnectException(new Message(Messages.FAILED_TO_CREATE_X, "Jms Connector"), e, this);
+            throw new ConnectException(CoreMessages.failedToCreate("Jms Connector"), e, this);
         }
 
         try
@@ -479,7 +480,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
             }
             catch (JMSException e)
             {
-                throw new LifecycleException(new Message(Messages.FAILED_TO_START_X, "Jms Connection"), e);
+                throw new LifecycleException(CoreMessages.failedToStart("Jms Connection"), e);
             }
         }
     }

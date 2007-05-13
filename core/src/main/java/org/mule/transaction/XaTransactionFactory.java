@@ -10,8 +10,7 @@
 
 package org.mule.transaction;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.TransactionException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOTransaction;
@@ -33,7 +32,7 @@ public class XaTransactionFactory implements UMOTransactionFactory
         }
         catch (Exception e)
         {
-            throw new TransactionException(new Message(Messages.TX_CANT_START_X_TRANSACTION, "XA"), e);
+            throw new TransactionException(CoreMessages.cannotStartTransaction("XA"), e);
         }
     }
 

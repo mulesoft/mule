@@ -104,7 +104,7 @@ public class MuleSecurityManager implements UMOSecurityManager
     {
         if (name == null)
         {
-            throw new NullPointerException("provider Name cannot be null");
+            throw new IllegalArgumentException("provider Name cannot be null");
         }
         return (UMOSecurityProvider) providers.get(name);
     }

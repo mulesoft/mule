@@ -10,8 +10,7 @@
 
 package org.mule.impl.model;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.container.ContainerKeyPair;
 import org.mule.umo.UMODescriptor;
@@ -68,8 +67,7 @@ public final class ComponentFactory
         catch (Exception e)
         {
             throw new InitialisationException(
-                new Message(Messages.FAILED_TO_SET_PROPERTIES_ON_X,
-                    "Component '" + descriptor.getName() + "'"), 
+                CoreMessages.failedToSetPropertiesOn("Component '" + descriptor.getName() + "'"), 
                 e, descriptor);
         }
 

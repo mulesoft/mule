@@ -10,7 +10,7 @@
 
 package org.mule.routing.outbound;
 
-import org.mule.config.i18n.Message;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
@@ -57,7 +57,7 @@ public class EndpointSelector extends FilteringOutboundRouter
         if (ep == null)
         {
             throw new CouldNotRouteOutboundMessageException(
-                Message.createStaticMessage("No endpoint found with the name " + endpointName), message, ep);
+                MessageFactory.createStaticMessage("No endpoint found with the name " + endpointName), message, ep);
         }
 
         try

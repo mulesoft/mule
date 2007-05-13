@@ -11,6 +11,7 @@
 package org.mule.providers.jms.transformers;
 
 import org.mule.umo.transformer.TransformerException;
+import org.mule.util.ClassUtils;
 
 /**
  * <code>ObjectToJMSMessage</code> will convert any object to a
@@ -36,14 +37,14 @@ public class ObjectToJMSMessage extends AbstractJmsTransformer
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug("Source object is " + src.getClass().getName());
+                logger.debug("Source object is " + ClassUtils.getSimpleName(src.getClass()));
             }
 
             Object result = transformToMessage(src);
 
             if (logger.isDebugEnabled())
             {
-                logger.debug("Resulting object is " + result.getClass().getName());
+                logger.debug("Resulting object is " + ClassUtils.getSimpleName(result.getClass()));
             }
 
             return result;

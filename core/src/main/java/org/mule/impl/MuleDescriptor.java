@@ -171,7 +171,7 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
     {
         if (name == null)
         {
-            throw new NullPointerException("UMODescriptor.name");
+            throw new IllegalArgumentException("UMODescriptor.name may not be null");
         }
         setImplementationInstance(instance);
     }

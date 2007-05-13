@@ -13,9 +13,10 @@ package org.mule.providers.file;
 import java.io.File;
 
 import org.mule.MuleException;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractMessageAdapter;
+import org.mule.providers.file.i18n.FileMessages;
 import org.mule.providers.file.transformers.FileToByteArray;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
@@ -24,8 +25,8 @@ import org.mule.util.ObjectUtils;
 /**
  * <code>FileMessageAdapter</code> provides a wrapper for a file reference. Users
  * can obtain the contents of the message through the payload property and can get
- * the filename and directory in the properties using PROPERTY_FILENAME and
- * PROPERTY_DIRECTORY.
+ * the filename and directory in the properties using FileConnector.PROPERTY_FILENAME and
+ * FileConnector.PROPERTY_DIRECTORY.
  */
 public class FileMessageAdapter extends AbstractMessageAdapter
 {
@@ -53,21 +54,11 @@ public class FileMessageAdapter extends AbstractMessageAdapter
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.providers.UMOMessageAdapter#getPayload()
-     */
     public Object getPayload()
     {
         return file;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.providers.UMOMessageAdapter#getPayloadAsBytes()
-     */
     public byte[] getPayloadAsBytes() throws Exception
     {
         synchronized (this)
@@ -83,7 +74,7 @@ public class FileMessageAdapter extends AbstractMessageAdapter
                 }
                 catch (Exception noPayloadException)
                 {
-                    throw new MuleException(new Message(Messages.FAILED_TO_READ_PAYLOAD), noPayloadException);
+                    throw new MuleException(CoreMessages.failedToReadPayload(), noPayloadException);
                 }
             }
             return contents;
@@ -106,11 +97,6 @@ public class FileMessageAdapter extends AbstractMessageAdapter
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.providers.UMOMessageAdapter#setMessage(java.lang.Object)
-     */
     protected void setMessage(File message) throws MessagingException
     {
         boolean fileIsValid;
@@ -141,7 +127,7 @@ public class FileMessageAdapter extends AbstractMessageAdapter
                 exceptionArg = ObjectUtils.toString(message, "null");
             }
 
-            Message msg = new Message(Messages.FILE_X_DOES_NOT_EXIST, ObjectUtils.toString(message, "null"));
+            Message msg = FileMessages.fileDoesNotExist(ObjectUtils.toString(message, "null"));
 
             throw new MessagingException(msg, exceptionArg);
         }
@@ -156,5 +142,4 @@ public class FileMessageAdapter extends AbstractMessageAdapter
     {
         return file.getAbsolutePath();
     }
-
 }

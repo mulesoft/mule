@@ -10,8 +10,7 @@
 
 package org.mule.util.xa;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -274,7 +273,7 @@ public abstract class AbstractResourceManager
         assureReady();
         if (context.status == Status.STATUS_MARKED_ROLLBACK)
         {
-            throw new ResourceManagerException(new Message(Messages.TX_MARKED_FOR_ROLLBACK));
+            throw new ResourceManagerException(CoreMessages.transactionMarkedForRollback());
         }
         synchronized (context)
         {
@@ -419,13 +418,13 @@ public abstract class AbstractResourceManager
     {
         if (operationMode != OPERATION_MODE_STARTED)
         {
-            throw new ResourceManagerSystemException(new Message(Messages.RESOURCE_MANAGER_NOT_STARTED));
+            throw new ResourceManagerSystemException(CoreMessages.resourceManagerNotStarted());
         }
         // do not allow any further writing or commit or rollback when db is
         // corrupt
         if (dirty)
         {
-            throw new ResourceManagerSystemException(new Message(Messages.RESOURCE_MANAGER_DIRTY));
+            throw new ResourceManagerSystemException(CoreMessages.resourceManagerDirty());
         }
     }
 
@@ -439,13 +438,13 @@ public abstract class AbstractResourceManager
     {
         if (operationMode != OPERATION_MODE_STARTED && operationMode != OPERATION_MODE_STOPPING)
         {
-            throw new ResourceManagerSystemException(new Message(Messages.RESOURCE_MANAGER_NOT_READY));
+            throw new ResourceManagerSystemException(CoreMessages.resourceManagerNotReady());
         }
         // do not allow any further writing or commit or rollback when db is
         // corrupt
         if (dirty)
         {
-            throw new ResourceManagerSystemException(new Message(Messages.RESOURCE_MANAGER_DIRTY));
+            throw new ResourceManagerSystemException(CoreMessages.resourceManagerDirty());
         }
     }
 

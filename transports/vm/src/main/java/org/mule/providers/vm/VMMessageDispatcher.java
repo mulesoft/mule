@@ -10,10 +10,10 @@
 
 package org.mule.providers.vm;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
+import org.mule.providers.vm.i18n.VMMessages;
 import org.mule.transformers.simple.ObjectToByteArray;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
@@ -116,19 +116,14 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.provider.UMOConnector#dispatch(org.mule.umo.UMOEvent)
-     */
     protected void doDispatch(UMOEvent event) throws Exception
     {
         UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
 
         if (endpointUri == null)
         {
-            throw new DispatchException(new Message(Messages.X_IS_NULL, "Endpoint"), event.getMessage(),
-                event.getEndpoint());
+            throw new DispatchException(
+                CoreMessages.objectIsNull("Endpoint"), event.getMessage(), event.getEndpoint());
         }
         if (connector.isQueueEvents())
         {
@@ -161,11 +156,6 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.provider.UMOConnector#send(org.mule.umo.UMOEvent)
-     */
     protected UMOMessage doSend(UMOEvent event) throws Exception
     {
         UMOMessage retMessage;
@@ -186,8 +176,9 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
             }
             else
             {
-                throw new NoReceiverForEndpointException(new Message(Messages.NO_RECEIVER_X_FOR_ENDPOINT_X,
-                    connector.getName(), event.getEndpoint().getEndpointURI()));
+                throw new NoReceiverForEndpointException(
+                    VMMessages.noReceiverForEndpoint(connector.getName(), 
+                        event.getEndpoint().getEndpointURI()));
             }
         }
         if (event.isStreaming())

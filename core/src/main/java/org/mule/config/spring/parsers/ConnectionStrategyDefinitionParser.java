@@ -9,8 +9,7 @@
  */
 package org.mule.config.spring.parsers;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.providers.SimpleRetryConnectionStrategy;
 import org.mule.util.ClassUtils;
 
@@ -37,7 +36,7 @@ public class ConnectionStrategyDefinitionParser extends AbstractChildBeanDefinit
             }
             catch (ClassNotFoundException e)
             {
-                throw new FatalBeanException(new Message(Messages.CLASS_X_NOT_FOUND, clazz).getMessage(), e);
+                throw new FatalBeanException(CoreMessages.cannotLoadFromClasspath(clazz).getMessage(), e);
             }
         }
         return ConnectionStrategyDefinitionParser.DEFAULT_CONNECTION_STRATEGY;

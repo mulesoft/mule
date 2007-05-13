@@ -10,8 +10,7 @@
 
 package org.mule.umo.security;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.UMOException;
 
 /**
@@ -31,11 +30,11 @@ public class SecurityProviderNotFoundException extends UMOException
 
     public SecurityProviderNotFoundException(String providerName)
     {
-        super(new Message(Messages.AUTH_NO_SECURITY_PROVIDER_X, providerName));
+        super(CoreMessages.authNoSecurityProvider(providerName));
     }
 
     public SecurityProviderNotFoundException(String providerName, Throwable cause)
     {
-        super(new Message(Messages.AUTH_NO_SECURITY_PROVIDER_X, providerName), cause);
+        super(CoreMessages.authNoSecurityProvider(providerName), cause);
     }
 }

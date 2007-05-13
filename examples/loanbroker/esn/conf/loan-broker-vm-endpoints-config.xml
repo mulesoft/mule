@@ -11,6 +11,15 @@
     model where each component is invoked from the LoanBroker component.
     </description>
 
+    <connector name="syncVm" className="org.mule.providers.vm.VMConnector" />
+    
+    <connector name="asyncVm" className="org.mule.providers.vm.VMConnector">
+        <properties>
+            <!-- Queue up events for asynchronous communication. -->
+            <property name="queueEvents" value="true"/>
+        </properties>
+    </connector>
+    
     <transformers>
         <transformer name="ExtractCustomer" className="org.mule.transformers.simple.GetBeanProperty">
             <properties>
@@ -21,30 +30,30 @@
     </transformers>
 
     <global-endpoints>
-        <endpoint name="CustomerRequests" address="vm://customer.requests"/>
+        <endpoint name="CustomerRequests" address="vm://customer.requests" connector="syncVm"/>
         <!-- only used for the async loan broker to send the lowest quote back to the customer -->
-        <endpoint name="CustomerResponses" address="vm://customer.responses"/>
+        <endpoint name="CustomerResponses" address="vm://customer.responses" connector="asyncVm"/>
 
-        <endpoint name="LoanBrokerQuotes" address="vm://loan.quotes"/>
-        <endpoint name="CreditAgency" address="vm://credit.agency"/>
-        <endpoint name="CreditAgencyIn" address="vm://credit.agency"/>
-        <endpoint name="LenderService" address="vm://lender.service?method=setLenderList"/>
-        <endpoint name="BankGateway" address="vm://bank.gateway"/>
+        <endpoint name="LoanBrokerQuotes" address="vm://loan.quotes" connector="syncVm"/>
+        <endpoint name="CreditAgency" address="vm://credit.agency" connector="syncVm"/>
+        <endpoint name="CreditAgencyIn" address="vm://credit.agency" connector="syncVm"/>
+        <endpoint name="LenderService" address="vm://lender.service?method=setLenderList" connector="syncVm"/>
+        <endpoint name="BankGateway" address="vm://bank.gateway" connector="syncVm"/>
 
-        <endpoint name="Bank1" address="vm://bank.1"/>
-        <endpoint name="Bank1In" address="vm://bank.1"/>
+        <endpoint name="Bank1" address="vm://bank.1" connector="syncVm"/>
+        <endpoint name="Bank1In" address="vm://bank.1" connector="syncVm"/>
 
-        <endpoint name="Bank2" address="vm://bank.2"/>
-        <endpoint name="Bank2In" address="vm://bank.2"/>
+        <endpoint name="Bank2" address="vm://bank.2" connector="syncVm"/>
+        <endpoint name="Bank2In" address="vm://bank.2" connector="syncVm"/>
 
-        <endpoint name="Bank3" address="vm://bank.3"/>
-        <endpoint name="Bank3In" address="vm://bank.3"/>
+        <endpoint name="Bank3" address="vm://bank.3" connector="syncVm"/>
+        <endpoint name="Bank3In" address="vm://bank.3" connector="syncVm"/>
 
-        <endpoint name="Bank4" address="vm://bank.4"/>
-        <endpoint name="Bank4In" address="vm://bank.4"/>
+        <endpoint name="Bank4" address="vm://bank.4" connector="syncVm"/>
+        <endpoint name="Bank4In" address="vm://bank.4" connector="syncVm"/>
 
-        <endpoint name="Bank5" address="vm://bank.5"/>
-        <endpoint name="Bank5In" address="vm://bank.5"/>
+        <endpoint name="Bank5" address="vm://bank.5" connector="syncVm"/>
+        <endpoint name="Bank5In" address="vm://bank.5" connector="syncVm"/>
     </global-endpoints>
 
 </mule-configuration>

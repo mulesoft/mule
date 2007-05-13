@@ -10,8 +10,8 @@
 
 package org.mule.umo.provider;
 
+import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
@@ -55,8 +55,7 @@ public class ReceiveException extends UMOException
 
     public ReceiveException(UMOImmutableEndpoint endpoint, long timeout, Throwable cause)
     {
-        this(new Message(Messages.FAILED_TO_RECEIVE_OVER_X_TIMEOUT_X, endpoint, String.valueOf(timeout)),
+        this(CoreMessages.failedToRecevieWithTimeout(endpoint, timeout),
             endpoint, timeout, cause);
     }
-
 }

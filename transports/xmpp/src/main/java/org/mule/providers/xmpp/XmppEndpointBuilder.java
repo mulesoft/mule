@@ -10,12 +10,12 @@
 
 package org.mule.providers.xmpp;
 
+import org.mule.impl.endpoint.UserInfoEndpointBuilder;
+import org.mule.providers.xmpp.i18n.XmppMessages;
+import org.mule.umo.endpoint.MalformedEndpointException;
+
 import java.net.URI;
 import java.util.Properties;
-
-import org.mule.config.i18n.Message;
-import org.mule.impl.endpoint.UserInfoEndpointBuilder;
-import org.mule.umo.endpoint.MalformedEndpointException;
 
 /**
  * Does the same as the UserINfoEndpointBuilder but also ensures that a path is set
@@ -28,13 +28,13 @@ public class XmppEndpointBuilder extends UserInfoEndpointBuilder
     {
         if (uri.getPath().length() == 0)
         {
-            throw new MalformedEndpointException(new Message("xmpp", 1), uri.toString());
+            throw new MalformedEndpointException(XmppMessages.noRecipientInUri(), uri.toString());
         }
         if (props.getProperty(XmppConnector.XMPP_GROUP_CHAT, "false").equalsIgnoreCase("true"))
         {
             if (props.getProperty(XmppConnector.XMPP_NICKNAME, null) == null)
             {
-                throw new MalformedEndpointException(new Message("xmpp", 2), uri.toString());
+                throw new MalformedEndpointException(XmppMessages.nicknameMustBeSet(), uri.toString());
             }
         }
         super.setEndpoint(uri, props);

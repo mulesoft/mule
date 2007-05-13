@@ -39,7 +39,7 @@ public class BankQuotesAggregationLogic
         {
             event = (UMOEvent)iterator.next();
             quote = (LoanQuote)event.getTransformedMessage();
-            logger.info(LocaleMessage.getString(LocaleMessage.PROCESSING_QUOTE, quote.toString()));
+            logger.info(LocaleMessage.processingQuote(quote));
 
             if (lowestQuote == null)
             {
@@ -54,9 +54,7 @@ public class BankQuotesAggregationLogic
             }
         }
 
-        logger.info(LocaleMessage.getString(LocaleMessage.LOWEST_QUOTE, lowestQuote.toString()));
+        logger.info(LocaleMessage.lowestQuote(lowestQuote));
         return new MuleMessage(lowestQuote, event.getMessage());
     }
 }
-
-

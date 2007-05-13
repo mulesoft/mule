@@ -10,8 +10,7 @@
 
 package org.mule.transformers.simple;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 
@@ -48,8 +47,8 @@ public class ByteArrayToSerializable extends AbstractTransformer
         }
         catch (Exception e)
         {
-            throw new TransformerException(new Message(Messages.TRANSFORM_FAILED_FROM_X_TO_X, "byte[]",
-                "Object"), this, e);
+            throw new TransformerException(
+                CoreMessages.transformFailed("byte[]", "Object"), this, e);
         }
     }
 

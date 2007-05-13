@@ -10,12 +10,10 @@
 
 package org.mule.impl.model.seda.optimised;
 
-import org.mule.config.PoolingProfile;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.model.seda.SedaComponent;
 import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.util.ObjectPool;
 
 /**
  * A Seda component runs inside a Seda Model and is responsible for managing a Seda
@@ -37,38 +35,10 @@ public class OptimisedSedaComponent extends SedaComponent
         super(descriptor, model);
     }
 
-    protected void initialisePool() throws InitialisationException
+    // @Override
+    protected ObjectPool createPool() throws InitialisationException
     {
-        try
-        {
-            // Initialise the proxy pool
-            proxyPool = getPoolingProfile().getPoolFactory().createPool(descriptor, model,
-                    new OptimisedProxyFactory(descriptor, model), getPoolingProfile());
-
-            // overload the default Proxy Factory impl
-            proxyPool = getPoolingProfile().getPoolFactory().createPool(descriptor, model,
-                new OptimisedProxyFactory(descriptor, model), getPoolingProfile());
-
-            if (getPoolingProfile().getInitialisationPolicy() == PoolingProfile.POOL_INITIALISE_ALL_COMPONENTS)
-            {
-                int threads = getPoolingProfile().getMaxActive();
-                for (int i = 0; i < threads; i++)
-                {
-                    proxyPool.returnObject(proxyPool.borrowObject());
-                }
-            }
-            else if (getPoolingProfile().getInitialisationPolicy() == PoolingProfile.POOL_INITIALISE_ONE_COMPONENT)
-            {
-                proxyPool.returnObject(proxyPool.borrowObject());
-            }
-
-            poolInitialised.set(true);
-        }
-        catch (Exception e)
-        {
-            throw new InitialisationException(
-                new Message(Messages.X_FAILED_TO_INITIALISE, "Proxy Pool"),
-                e, this);
-        }
+        return this.getPoolingProfile().getPoolFactory().createPool(descriptor, model,
+            new OptimisedProxyFactory(descriptor, model), getPoolingProfile());
     }
 }

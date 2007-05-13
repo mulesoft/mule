@@ -26,7 +26,7 @@ public class ExceptionTypeFilterTestCase extends AbstractMuleTestCase
         assertNull(filter.getExpectedType());
         UMOMessage m = new MuleMessage("test");
         assertTrue(!filter.accept(m));
-        m.setExceptionPayload(new ExceptionPayload(new NullPointerException("test")));
+        m.setExceptionPayload(new ExceptionPayload(new IllegalArgumentException("test")));
         assertTrue(filter.accept(m));
 
         filter = new ExceptionTypeFilter(IOException.class);

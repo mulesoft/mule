@@ -10,8 +10,7 @@
 
 package org.mule.transaction;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.TransactionException;
 
 import java.util.HashMap;
@@ -45,17 +44,12 @@ public class XaTransaction extends AbstractTransaction
         this.txManager = txManager;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.UMOTransaction#begin()
-     */
     protected void doBegin() throws TransactionException
     {
         if (txManager == null)
         {
-            throw new IllegalStateException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER,
-                "Transaction Manager").getMessage());
+            throw new IllegalStateException(
+                CoreMessages.objectNotRegisteredWithManager("Transaction Manager").getMessage());
         }
 
         try
@@ -68,15 +62,10 @@ public class XaTransaction extends AbstractTransaction
         }
         catch (Exception e)
         {
-            throw new TransactionException(new Message(Messages.TX_CANT_START_X_TRANSACTION, "XA"), e);
+            throw new TransactionException(CoreMessages.cannotStartTransaction("XA"), e);
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.UMOTransaction#commit()
-     */
     protected void doCommit() throws TransactionException
     {
         try
@@ -88,23 +77,18 @@ public class XaTransaction extends AbstractTransaction
         }
         catch (RollbackException e)
         {
-            throw new TransactionRollbackException(new Message(Messages.TX_MARKED_FOR_ROLLBACK), e);
+            throw new TransactionRollbackException(CoreMessages.transactionMarkedForRollback(), e);
         }
         catch (HeuristicRollbackException e)
         {
-            throw new TransactionRollbackException(new Message(Messages.TX_MARKED_FOR_ROLLBACK), e);
+            throw new TransactionRollbackException(CoreMessages.transactionMarkedForRollback(), e);
         }
         catch (Exception e)
         {
-            throw new IllegalTransactionStateException(new Message(Messages.TX_COMMIT_FAILED), e);
+            throw new IllegalTransactionStateException(CoreMessages.transactionCommitFailed(), e);
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.UMOTransaction#rollback()
-     */
     protected void doRollback() throws TransactionRollbackException
     {
         try
@@ -121,11 +105,6 @@ public class XaTransaction extends AbstractTransaction
 
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.UMOTransaction#getStatus()
-     */
     public int getStatus() throws TransactionStatusException
     {
         synchronized (this)
@@ -146,11 +125,6 @@ public class XaTransaction extends AbstractTransaction
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.UMOTransaction#setRollbackOnly()
-     */
     public void setRollbackOnly()
     {
         try
@@ -168,11 +142,6 @@ public class XaTransaction extends AbstractTransaction
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.UMOTransaction#getResource(java.lang.Object)
-     */
     public Object getResource(Object key)
     {
         synchronized (this)
@@ -181,11 +150,6 @@ public class XaTransaction extends AbstractTransaction
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.UMOTransaction#hasResource(java.lang.Object)
-     */
     public boolean hasResource(Object key)
     {
         synchronized (this)
@@ -194,12 +158,6 @@ public class XaTransaction extends AbstractTransaction
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.UMOTransaction#enlistResource(java.lang.Object,
-     *      java.lang.Object)
-     */
     public void bindResource(Object key, Object resource) throws TransactionException
     {
         synchronized (this)
@@ -211,8 +169,8 @@ public class XaTransaction extends AbstractTransaction
 
             if (resources.containsKey(key))
             {
-                throw new IllegalTransactionStateException(new Message(
-                    Messages.TX_RESOURCE_ALREADY_LISTED_FOR_KEY_X, key));
+                throw new IllegalTransactionStateException(
+                    CoreMessages.transactionResourceAlreadyListedForKey(key));
             }
 
             resources.put(key, resource);

@@ -55,6 +55,12 @@ public class AxisSoapHeadersTestCase extends FunctionalTestCase
 
         UMOMessage reply = client.send("http://localhost:12181/services/component", soapRequest, properties);
 
+        // Put this in so that no spurious exceptions are thrown
+        // TODO research and see why sometimes we get 404 or Connection refused
+        // errors without this line. Note that the test completes even when the
+        // exceptions are thrown.
+        Thread.sleep(2000);
+
         assertEquals(
             reply.getPayloadAsString(),
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?><soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><soapenv:Body><echoResponse soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><echoReturn xsi:type=\"xsd:string\">Test Message</echoReturn></echoResponse></soapenv:Body></soapenv:Envelope>");

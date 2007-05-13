@@ -10,7 +10,7 @@
 
 package org.mule.providers.email;
 
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 
 import javax.mail.Address;
 import javax.mail.internet.AddressException;
@@ -88,9 +88,7 @@ public class MailUtils
         }
         else
         {
-            throw new NullPointerException(new org.mule.config.i18n.Message(Messages.X_IS_NULL,
-                "Email address").toString());
+            throw new IllegalArgumentException(CoreMessages.objectIsNull("Email address").toString());
         }
     }
-
 }

@@ -10,8 +10,7 @@
 
 package org.mule.test.usecases.routing;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
@@ -25,7 +24,6 @@ import org.mule.umo.routing.RoutingException;
 
 public class InboundTransformingForwardingCatchAllStrategy extends AbstractCatchAllStrategy
 {
-
     public UMOMessage catchMessage(UMOMessage message, UMOSession session, boolean synchronous)
         throws RoutingException
     {
@@ -33,8 +31,8 @@ public class InboundTransformingForwardingCatchAllStrategy extends AbstractCatch
 
         if (endpoint == null)
         {
-            throw new ComponentRoutingException(new Message(Messages.NO_CATCH_ALL_ENDPOINT_SET), message,
-                getEndpoint(), session.getComponent());
+            throw new ComponentRoutingException(
+                CoreMessages.noCatchAllEndpointSet(), message, this.getEndpoint(), session.getComponent());
         }
         try
         {

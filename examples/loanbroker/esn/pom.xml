@@ -36,9 +36,6 @@
         </dependency>
     </dependencies>
     <build>
-        <defaultGoal>install</defaultGoal>
-        <finalName>${artifactId}</finalName>
-
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -51,34 +48,6 @@
                         <exclude>org/mule/examples/loanbroker/esn/XFireLoanBrokerSynchronousFunctionalTestCase.java</exclude>
                     </excludes>
                 </configuration>
-            </plugin>
-            <!-- "mvn install" will copy the target jar to the $MULE_HOME/lib/user directory,
-                overwriting the previous one. -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-artifact</id>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${MULE_HOME}/lib/user</outputDirectory>
-                            <overWriteReleases>true</overWriteReleases>
-                            <overWriteSnapshots>true</overWriteSnapshots>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>${groupId}</groupId>
-                                    <artifactId>${artifactId}</artifactId>
-                                    <version>${version}</version>
-                                    <destFileName>${artifactId}.jar</destFileName>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

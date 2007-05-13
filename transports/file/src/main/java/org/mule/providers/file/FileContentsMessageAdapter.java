@@ -10,12 +10,11 @@
 
 package org.mule.providers.file;
 
-import java.io.File;
-
 import org.mule.MuleRuntimeException;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.MessagingException;
+
+import java.io.File;
 
 /**
  * <code>FileContentsMessageAdapter</code> provides a wrapper for file data. Users
@@ -42,11 +41,6 @@ public class FileContentsMessageAdapter extends FileMessageAdapter
         this.getPayload();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.providers.UMOMessageAdapter#getPayload()
-     */
     public Object getPayload()
     {
         synchronized (this)
@@ -57,10 +51,8 @@ public class FileContentsMessageAdapter extends FileMessageAdapter
             }
             catch (Exception noPayloadException)
             {
-                throw new MuleRuntimeException(new Message(Messages.FAILED_TO_READ_PAYLOAD),
-                    noPayloadException);
+                throw new MuleRuntimeException(CoreMessages.failedToReadPayload(), noPayloadException);
             }
         }
     }
-
 }

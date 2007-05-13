@@ -11,9 +11,9 @@
 package org.mule.providers.rmi;
 
 import org.mule.config.MuleProperties;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.providers.AbstractJndiConnector;
+import org.mule.providers.rmi.i18n.RmiMessages;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
@@ -45,12 +45,6 @@ import org.apache.commons.collections.MapUtils;
  */
 public class RmiConnector extends AbstractJndiConnector
 {
-    // Messages
-    public static final int MSG_PARAM_SERVICE_METHOD_NOT_SET = 1;
-    public static final int MSG_PROPERTY_SERVICE_METHOD_PARAM_TYPES_NOT_SET = 2;
-    public static final int NO_RMI_SERVICECLASS_SET = 10;
-    public static final int RMI_SERVICECLASS_INVOCATION_FAILED = 11;
-
     public static final int DEFAULT_RMI_muleRegistry_PORT = 1099;
 
     public static final String PROPERTY_RMI_SECURITY_POLICY = "securityPolicy";
@@ -238,8 +232,9 @@ public class RmiConnector extends AbstractJndiConnector
 
             if (null == methodName)
             {
-                throw new DispatchException(new org.mule.config.i18n.Message("rmi",
-                    RmiConnector.MSG_PARAM_SERVICE_METHOD_NOT_SET), event.getMessage(), event.getEndpoint());
+                throw new DispatchException(
+                    RmiMessages.messageParamServiceMethodNotSet(), 
+                    event.getMessage(), event.getEndpoint());
             }
         }
 
@@ -283,8 +278,9 @@ public class RmiConnector extends AbstractJndiConnector
         }
         catch (NoSuchMethodException e)
         {
-            throw new NoSuchMethodException(new Message(Messages.METHOD_X_WITH_PARAMS_X_NOT_FOUND_ON_X,
-                methodName, ArrayUtils.toString(argTypes), remoteObject.getClass().getName()).toString());
+            throw new NoSuchMethodException(
+                CoreMessages.methodWithParamsNotFoundOnObject(methodName, ArrayUtils.toString(argTypes),
+                    remoteObject.getClass()).toString());
         }
         catch (SecurityException e)
         {

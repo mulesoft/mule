@@ -28,7 +28,7 @@
     <connector name="SystemStreamConnector" className="org.mule.providers.stream.SystemStreamConnector">
         <properties>
             <property name="promptMessageCode" value="3"/>
-            <property name="resourceBundle" value="hello-example"/>
+            <property name="resourceBundle" value="messages.hello-example-messages"/>
             <property name="messageDelayTime" value="1000"/>
         </properties>
     </connector>

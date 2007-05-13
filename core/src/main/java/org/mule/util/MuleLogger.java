@@ -27,7 +27,7 @@ public class MuleLogger implements Log
     {
         if (logger == null)
         {
-            throw new NullPointerException("logger");
+            throw new IllegalArgumentException("logger may not be null");
         }
 
         this.logger = logger;

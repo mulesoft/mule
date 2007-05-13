@@ -36,6 +36,7 @@ public class StringObjectArrayTransformersTestCase extends AbstractTransformerTe
         return new String[]{"test1", "test2", "test3"};
     }
 
+    // @Override
     public boolean compareResults(Object src, Object result)
     {
         if (src == null || result == null)
@@ -45,7 +46,7 @@ public class StringObjectArrayTransformersTestCase extends AbstractTransformerTe
 
         if (result instanceof Object[])
         {
-            Object[] out = (Object[])result;
+            Object[] out = (Object[]) result;
             assertEquals(out[0].toString(), "test1");
             assertEquals(out[1].toString(), "test2");
             assertEquals(out[2].toString(), "test3");
@@ -55,6 +56,7 @@ public class StringObjectArrayTransformersTestCase extends AbstractTransformerTe
         return false;
     }
 
+    // @Override
     public boolean compareRoundtripResults(Object src, Object result)
     {
         if (src == null || result == null)
@@ -63,5 +65,5 @@ public class StringObjectArrayTransformersTestCase extends AbstractTransformerTe
         }
         return src.equals(result);
     }
-}
 
+}

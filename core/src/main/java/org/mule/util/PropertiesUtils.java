@@ -10,8 +10,8 @@
 
 package org.mule.util;
 
+import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
@@ -118,7 +118,7 @@ public final class PropertiesUtils
         /* tryAsFile */true, /* tryAsUrl */false);
         if (is == null)
         {
-            Message error = new Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE, fileName);
+            Message error = CoreMessages.cannotLoadFromClasspath(fileName);
             throw new IOException(error.toString());
         }
 

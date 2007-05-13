@@ -11,8 +11,7 @@
 package org.mule.impl;
 
 import org.mule.MuleException;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.model.resolvers.DynamicEntryPoint;
 import org.mule.impl.model.resolvers.DynamicEntryPointResolver;
 import org.mule.routing.nested.NestedInvocationHandler;
@@ -107,11 +106,6 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
         configureNestedRouter();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.lifecycle.Startable#start()
-     */
     public void start() throws UMOException
     {
         if (isStartable)
@@ -123,18 +117,12 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
             catch (Exception e)
             {
                 throw new MuleException(
-                    new Message(Messages.FAILED_TO_START_X, "UMO Component: " + descriptor.getName()), 
-                    e);
+                    CoreMessages.failedToStart("UMO Component: " + descriptor.getName()), e);
             }
         }
         started = true;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.lifecycle.Stoppable#stop()
-     */
     public void stop() throws UMOException
     {
         if (isStoppable)
@@ -146,18 +134,12 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
             catch (Exception e)
             {
                 throw new MuleException(
-                    new Message(Messages.FAILED_TO_STOP_X, "UMO Component: " + descriptor.getName()), 
-                    e);
+                    CoreMessages.failedToStop("UMO Component: " + descriptor.getName()), e);
             }
         }
         started = false;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.lifecycle.Disposable#dispose()
-     */
     public void dispose()
     {
         if (isDisposable)
@@ -201,11 +183,6 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
         descriptor.getExceptionListener().exceptionThrown(e);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.UMOInterceptor#intercept(org.mule.umo.UMOEvent)
-     */
     public UMOMessage intercept(Invocation invocation) throws UMOException
     {
         // Invoke method
@@ -221,7 +198,7 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
             // should all Exceptions caught here be a ComponentException?!?
             // TODO MULE-863: See above
             throw new ComponentException(
-                new Message(Messages.FAILED_TO_INVOKE_X, component.getClass().getName()),
+                CoreMessages.failedToInvoke(component.getClass().getName()),
                 invocation.getMessage(), event.getComponent(), e);
         }
 
@@ -245,11 +222,6 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
         return resultMessage;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.lifecycle.Initialisable#initialise()
-     */
     public void initialise() throws InitialisationException
     {
         if (Initialisable.class.isInstance(component))
@@ -307,11 +279,9 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
                     catch (Exception e)
                     {
                         throw new InitialisationException(
-                            new Message(Messages.FAILED_TO_SET_PROXY_X_ON_SERVICE_X, 
-                                nestedRouter, component.getClass().getName()), 
-                            e, this);
+                            CoreMessages.failedToSetProxyOnService(nestedRouter, 
+                                component.getClass()), e, this);
                     }
-
                 }
                 else
                 {

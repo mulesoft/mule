@@ -10,8 +10,8 @@
 
 package org.mule.components.builder;
 
+import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOMessage;
 
@@ -38,6 +38,6 @@ public class MessageBuilderException extends MessagingException
 
     public MessageBuilderException(UMOMessage umoMessage, Throwable cause)
     {
-        super(new Message(Messages.FAILED_TO_BUILD_MESSAGE), umoMessage, cause);
+        super(CoreMessages.failedToBuildMessage(), umoMessage, cause);
     }
 }

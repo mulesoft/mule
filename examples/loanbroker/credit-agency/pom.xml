@@ -24,6 +24,21 @@
                     <groupId>castor</groupId>
                     <artifactId>castor</artifactId>
                 </exclusion>
+                <!-- we like slf4j -->
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+                <!-- no old xerces please -->
+                <!-- apparently scope=provided and dependencyManagement don't get along? -->
+                <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xercesImpl</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
     </dependencies>

@@ -10,8 +10,7 @@
 
 package org.mule.providers;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.provider.UMOConnectable;
 
 /**
@@ -28,8 +27,7 @@ public class SingleAttemptConnectionStrategy extends AbstractConnectionStrategy
         catch (Exception e)
         {
             throw new FatalConnectException(
-                new Message(Messages.RECONNECT_STRATEGY_X_FAILED_ENDPOINT_X, 
-                    getClass().getName(), getDescription(connectable)), 
+                CoreMessages.reconnectStrategyFailed(this.getClass(), this.getDescription(connectable)), 
                 e, connectable);
 
         }

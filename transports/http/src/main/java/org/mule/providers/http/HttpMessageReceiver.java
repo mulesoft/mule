@@ -11,8 +11,6 @@
 package org.mule.providers.http;
 
 import org.mule.RegistryContext;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
@@ -21,6 +19,7 @@ import org.mule.impl.RequestContext;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.ConnectException;
 import org.mule.providers.NullPayload;
+import org.mule.providers.http.i18n.HttpMessages;
 import org.mule.providers.tcp.TcpMessageReceiver;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
@@ -304,7 +303,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
 
                             response = new HttpResponse();
                             response.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_NOT_FOUND);
-                            response.setBodyString(new Message(Messages.CANNOT_BIND_TO_ADDRESS_X, failedPath).toString());
+                            response.setBodyString(HttpMessages.cannotBindToAddress(failedPath).toString());
                             RequestContext.setEvent(new MuleEvent(new MuleMessage(response), endpoint,
                                 new MuleSession(component), true));
                             // The DefaultResponseTransformer will set the necessary
@@ -324,7 +323,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                         RequestContext.setEvent(event);
                         response = new HttpResponse();
                         response.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_METHOD_NOT_ALLOWED);
-                        response.setBodyString(new Message("http", 12, method).toString() + HttpConstants.CRLF);
+                        response.setBodyString(HttpMessages.methodNotAllowed(method).toString() + HttpConstants.CRLF);
                         response = (HttpResponse)connector.getDefaultResponseTransformer().transform(response);
                     }
                     else
@@ -334,7 +333,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                         RequestContext.setEvent(event);
                         response = new HttpResponse();
                         response.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_BAD_REQUEST);
-                        response.setBodyString(new Message("http", 11).toString() + HttpConstants.CRLF);
+                        response.setBodyString(HttpMessages.malformedSyntax().toString() + HttpConstants.CRLF);
                         response = (HttpResponse)connector.getDefaultResponseTransformer().transform(response);
                     }
 

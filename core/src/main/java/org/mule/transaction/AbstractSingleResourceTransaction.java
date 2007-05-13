@@ -10,8 +10,7 @@
 
 package org.mule.transaction;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.TransactionException;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
@@ -120,15 +119,15 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
     {
         if (key == null)
         {
-            throw new IllegalTransactionStateException(new Message(Messages.TX_CANT_BIND_TO_NULL_KEY));
+            throw new IllegalTransactionStateException(CoreMessages.transactionCannotBindToNullKey());
         }
         if (resource == null)
         {
-            throw new IllegalTransactionStateException(new Message(Messages.TX_CANT_BIND_NULL_RESOURCE));
+            throw new IllegalTransactionStateException(CoreMessages.transactionCannotBindNullResource());
         }
         if (this.key != null)
         {
-            throw new IllegalTransactionStateException(new Message(Messages.TX_SINGLE_RESOURCE_ONLY));
+            throw new IllegalTransactionStateException(CoreMessages.transactionSingleResourceOnly());
         }
         this.key = key;
         this.resource = resource;

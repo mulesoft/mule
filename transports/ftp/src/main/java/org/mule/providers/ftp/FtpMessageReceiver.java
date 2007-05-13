@@ -10,6 +10,16 @@
 
 package org.mule.providers.ftp;
 
+import org.mule.impl.MuleMessage;
+import org.mule.providers.AbstractPollingMessageReceiver;
+import org.mule.providers.file.FileConnector;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.provider.UMOConnector;
+
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,15 +34,6 @@ import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
-import org.mule.impl.MuleMessage;
-import org.mule.providers.AbstractPollingMessageReceiver;
-import org.mule.providers.file.FileConnector;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.provider.UMOConnector;
 
 public class FtpMessageReceiver extends AbstractPollingMessageReceiver
 {
@@ -87,11 +88,10 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
     protected FTPFile[] listFiles() throws Exception
     {
         final UMOEndpointURI uri = endpoint.getEndpointURI();
-        FTPClient client = null;
+        FTPClient client = connector.getFtp(uri);
 
         try
         {
-            client = connector.getFtp(uri);
             connector.enterActiveOrPassiveMode(client, endpoint);
             connector.setupFileType(client, endpoint);
 
@@ -135,12 +135,12 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
 
     protected void processFile(FTPFile file) throws Exception
     {
-        FTPClient client = null;
+        logger.debug("entering processFile()");
         UMOEndpointURI uri = endpoint.getEndpointURI();
+        FTPClient client = connector.getFtp(uri);
 
         try
         {
-            client = connector.getFtp(uri);
             connector.enterActiveOrPassiveMode(client, endpoint);
             connector.setupFileType(client, endpoint);
 
@@ -149,13 +149,22 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
                 throw new IOException("Ftp error: " + client.getReplyCode());
             }
 
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            if (!client.retrieveFile(file.getName(), baos))
+            UMOMessage message;
+            if (endpoint.isStreaming())
             {
-                throw new IOException("Ftp error: " + client.getReplyCode());
+                message = new MuleMessage(
+                        connector.getStreamMessageAdapter(client.retrieveFileStream(file.getName()), null));
+            }
+            else
+            {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                if (!client.retrieveFile(file.getName(), baos))
+                {
+                    throw new IOException("Ftp error: " + client.getReplyCode());
+                }
+                message = new MuleMessage(connector.getMessageAdapter(baos.toByteArray()));
             }
 
-            UMOMessage message = new MuleMessage(connector.getMessageAdapter(baos.toByteArray()));
             message.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, file.getName());
             routeMessage(message);
 
@@ -166,14 +175,15 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
         }
         finally
         {
+            logger.debug("leaving processFile()");
             connector.releaseFtp(uri, client);
         }
     }
 
     protected void doConnect() throws Exception
     {
-        FTPClient client = connector.getFtp(getEndpointURI());
-        connector.releaseFtp(getEndpointURI(), client);
+        // why?!
+        //connector.releaseFtp(getEndpointURI());
     }
 
     protected void doDisconnect() throws Exception

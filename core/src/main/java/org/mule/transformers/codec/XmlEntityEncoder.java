@@ -10,8 +10,7 @@
 
 package org.mule.transformers.codec;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.XMLEntityCodec;
@@ -49,9 +48,8 @@ public class XmlEntityEncoder extends AbstractTransformer
         catch (Exception ex)
         {
             throw new TransformerException(
-                new Message(Messages.TRANSFORM_FAILED_FROM_X_TO_X, src.getClass().getName(), "XML"), 
+                CoreMessages.transformFailed(src.getClass().getName(), "XML"), 
                 this, ex);
-
         }
     }
 

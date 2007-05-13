@@ -249,7 +249,7 @@ public class EventGroup implements Comparable, Serializable
     public String toString()
     {
         StringBuffer buf = new StringBuffer(80);
-        buf.append(ClassUtils.getShortClassName(this.getClass()));
+        buf.append(ClassUtils.getSimpleName(this.getClass()));
         buf.append(" {");
         buf.append("id=").append(groupId);
         buf.append(", expected size=").append(expectedSize);

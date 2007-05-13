@@ -10,8 +10,7 @@
 
 package org.mule.transaction;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.TransactionException;
 import org.mule.umo.UMOTransaction;
 
@@ -92,7 +91,7 @@ public abstract class AbstractTransaction implements UMOTransaction
 
             if (isRollbackOnly())
             {
-                throw new IllegalTransactionStateException(new Message(Messages.TX_MARKED_FOR_ROLLBACK));
+                throw new IllegalTransactionStateException(CoreMessages.transactionMarkedForRollback());
             }
 
             doCommit();

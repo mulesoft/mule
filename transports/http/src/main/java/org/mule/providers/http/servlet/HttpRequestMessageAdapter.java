@@ -10,6 +10,15 @@
 
 package org.mule.providers.http.servlet;
 
+import org.mule.config.MuleProperties;
+import org.mule.config.i18n.CoreMessages;
+import org.mule.providers.AbstractMessageAdapter;
+import org.mule.providers.http.HttpConstants;
+import org.mule.providers.http.i18n.ServletMessages;
+import org.mule.umo.MessagingException;
+import org.mule.umo.provider.MessageTypeNotSupportedException;
+import org.mule.umo.provider.UniqueIdNotSupportedException;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Enumeration;
@@ -21,14 +30,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.mule.config.MuleProperties;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.providers.AbstractMessageAdapter;
-import org.mule.providers.http.HttpConstants;
-import org.mule.umo.MessagingException;
-import org.mule.umo.provider.MessageTypeNotSupportedException;
-import org.mule.umo.provider.UniqueIdNotSupportedException;
 import org.mule.util.SystemUtils;
 
 /**
@@ -209,7 +210,8 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
         }
         catch (IOException e)
         {
-            throw new MessagingException(new Message("servlet", 3, request.getRequestURL().toString()), e);
+            throw new MessagingException(
+                ServletMessages.failedToReadPayload(request.getRequestURL().toString()), e);
         }
     }
 
@@ -230,11 +232,11 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
         }
         catch (Exception e)
         {
-            throw new UniqueIdNotSupportedException(this, new Message(Messages.X_IS_NULL, "Http session"));
+            throw new UniqueIdNotSupportedException(this, CoreMessages.objectIsNull("Http session"));
         }
         if (session == null)
         {
-            throw new UniqueIdNotSupportedException(this, new Message(Messages.X_IS_NULL, "Http session"));
+            throw new UniqueIdNotSupportedException(this, CoreMessages.objectIsNull("Http session"));
         }
         return session.getId();
     }

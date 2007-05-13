@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration version="1.0">
+    
+    <mule-environment-properties serverUrl=""/>
+
+    <transformers>
+        <transformer name="hop1ResponseEnricher" className="org.mule.transformers.simple.MessagePropertiesTransformer">
+            <properties>
+                <map name="addProperties">
+                    <property name="TICKET" value="hop1"/>
+                </map>
+            </properties>
+        </transformer>
+        <transformer name="hop2enricher" className="org.mule.transformers.simple.MessagePropertiesTransformer">
+            <properties>
+                <map name="addProperties">
+                    <property name="TTL" value="10000"/>
+                </map>
+            </properties>
+        </transformer>
+    </transformers>
+
+    <global-endpoints>
+        <endpoint name="inbound" address="vm://inbound"/>
+        <endpoint name="hop1" address="vm://hop1"/>
+        <endpoint name="hop2" address="vm://hop2"/>
+    </global-endpoints>
+
+    <model name="main">
+        <mule-descriptor name="chainingComponent" implementation="org.mule.components.simple.BridgeComponent">
+            <inbound-router>
+                <global-endpoint name="inbound" synchronous="true"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.ChainingRouter">
+                    <global-endpoint name="hop1"/>
+                    <global-endpoint name="hop2"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="hop1" implementation="org.mule.tck.functional.FunctionalTestComponent" singleton="true">
+            <inbound-router>
+                <global-endpoint name="hop1" responseTransformers="hop1ResponseEnricher"/>
+            </inbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="hop2" implementation="org.mule.tck.functional.FunctionalTestComponent" singleton="true">
+            <inbound-router>
+                <global-endpoint name="hop2" transformers="hop2enricher"/>
+            </inbound-router>
+        </mule-descriptor>
+
+    </model>
+    
+</mule-configuration>

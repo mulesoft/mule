@@ -10,10 +10,8 @@
 
 package org.mule.impl;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.UMOException;
-import org.mule.util.StringMessageUtils;
 
 import java.util.List;
 
@@ -36,38 +34,31 @@ public class TooManySatisfiableMethodsException extends UMOException
      */
     public TooManySatisfiableMethodsException(Object component, List types)
     {
-        super(new Message(Messages.TOO_MANY_ACCEPTIBLE_METHODS_ON_X_FOR_TYPES_X, StringMessageUtils.toString(component),
-                StringMessageUtils.toString(types)));
+        super(CoreMessages.tooManyAcceptableMethodsOnObjectForTypes(component, types));
     }
 
     public TooManySatisfiableMethodsException(Object component, List types, Exception cause)
     {
-        super(new Message(Messages.TOO_MANY_ACCEPTIBLE_METHODS_ON_X_FOR_TYPES_X, StringMessageUtils.toString(component),
-                StringMessageUtils.toString(types)), cause);
+        super(CoreMessages.tooManyAcceptableMethodsOnObjectForTypes(component, types), cause);
     }
 
     public TooManySatisfiableMethodsException(Object component, Object[] types)
     {
-        super(new Message(Messages.TOO_MANY_ACCEPTIBLE_METHODS_ON_X_FOR_TYPES_X, StringMessageUtils.toString(component),
-                StringMessageUtils.toString(types)));
+        super(CoreMessages.tooManyAcceptableMethodsOnObjectForTypes(component, types));
     }
 
     public TooManySatisfiableMethodsException(Object component, Object[] types, Exception cause)
     {
-        super(new Message(Messages.TOO_MANY_ACCEPTIBLE_METHODS_ON_X_FOR_TYPES_X, StringMessageUtils.toString(component),
-                StringMessageUtils.toString(types)), cause);
+        super(CoreMessages.tooManyAcceptableMethodsOnObjectForTypes(component, types), cause);
     }
 
     public TooManySatisfiableMethodsException(Object component, Class returnType)
     {
-        super(new Message(Messages.TOO_MANY_MATCHING_METHODS_WHICH_RETURN_X_ON_X, StringMessageUtils.toString(component),
-                returnType.getName()));
+        super(CoreMessages.tooManyMatchingMethodsOnObjectWhichReturn(component, returnType));
     }
 
     public TooManySatisfiableMethodsException(Object component, Class returnType, Exception cause)
     {
-        super(new Message(Messages.TOO_MANY_MATCHING_METHODS_WHICH_RETURN_X_ON_X, StringMessageUtils.toString(component),
-                returnType.getName(), cause));
+        super(CoreMessages.tooManyMatchingMethodsOnObjectWhichReturn(component, returnType), cause);
     }
-
 }

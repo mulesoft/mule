@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="bpmTestConfig" version="1.0">
+    <mule-environment-properties serverUrl=""/>
+
+    <connector name="bpmConnector" className="org.mule.providers.bpm.ProcessConnector">
+        <properties>
+            <property name="bpmsClass" value="org.mule.providers.bpm.jbpm.Jbpm"/>
+            <property name="allowGlobalDispatcher" value="true"/>
+        </properties>
+    </connector>
+
+    <model name="processModel">
+        <mule-descriptor name="fromSimpleProcess" implementation="org.mule.components.simple.LogComponent">
+            <inbound-router>
+                <endpoint address="bpm://simple" />
+            </inbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="fromMessageProcess" implementation="org.mule.components.simple.LogComponent">
+            <inbound-router>
+                <endpoint address="bpm://message" />
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                	<endpoint address="vm://echo" />
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="echoService" implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <endpoint address="vm://echo" />
+            </inbound-router>
+        </mule-descriptor>
+    </model>
+</mule-configuration>

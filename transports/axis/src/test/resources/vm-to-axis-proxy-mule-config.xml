@@ -4,9 +4,6 @@
                                 "http://mule.mulesource.org/dtds/mule-configuration.dtd">
 
 <mule-configuration id="axis_test" version="1.0">
-
-    
-
     <model name="test">
         <mule-descriptor name="proxy" implementation="org.mule.components.simple.BridgeComponent">
             <inbound-router>
@@ -14,11 +11,11 @@
             </inbound-router>
             <outbound-router>
                 <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="axis:http://www.webservicex.net/stockquote.asmx?method=GetQuote">
+                    <endpoint address="axis:http://localhost:8080/mule-tests-external-xfire/services/TestService?method=getTest">
                         <properties>
                             <property name="soapAction" value="${methodNamespace}${method}"/>
                             <map name="soapMethods">
-                                <property name="qname{GetQuote:http://www.webserviceX.NET/}" value="symbol;string;in,GetQuoteResult;string;out,return;string"/>
+                                <property name="qname{getTest:http://mule.mulesource.org/Tests/TestService/}" value="in0;string;in,out;ns1:Test;out,returnClass;org.mule.tck.external.applications.Test"/>
                             </map>
                         </properties>
                     </endpoint>

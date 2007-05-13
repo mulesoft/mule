@@ -13,8 +13,7 @@ import org.mule.MuleRuntimeException;
 import org.mule.RegistryContext;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.MuleProperties;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.config.spring.RegistryFacade;
 import org.mule.impl.internal.notifications.ManagerNotification;
 import org.mule.impl.internal.notifications.NotificationException;
@@ -32,12 +31,12 @@ import org.mule.umo.lifecycle.Startable;
 import org.mule.umo.lifecycle.Stoppable;
 import org.mule.umo.lifecycle.UMOLifecycleManager;
 import org.mule.umo.lifecycle.UMOLifecyclePhase;
+import org.mule.umo.manager.UMOAgent;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.manager.UMOServerNotificationListener;
 import org.mule.umo.manager.UMOWorkManager;
 import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.store.UMOStore;
-import org.mule.util.DateUtils;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.queue.QueueManager;
 
@@ -48,6 +47,7 @@ import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.jar.Manifest;
@@ -129,7 +129,7 @@ public class ManagementContext implements UMOManagementContext
     {
         if (lifecycleManager == null)
         {
-            throw new NullPointerException(new Message(Messages.X_IS_NULL, "lifecycleManager").getMessage());
+            throw new NullPointerException(CoreMessages.objectIsNull("lifecycleManager").getMessage());
         }
 
 
@@ -143,22 +143,22 @@ public class ManagementContext implements UMOManagementContext
         lifecycleManager.checkPhase(Initialisable.PHASE_NAME);
         if (securityManager == null)
         {
-            throw new NullPointerException(new Message(Messages.X_IS_NULL, "securityManager").getMessage());
+            throw new NullPointerException(CoreMessages.objectIsNull("securityManager").getMessage());
         }
 
         if (notificationManager == null)
         {
-            throw new NullPointerException(new Message(Messages.X_IS_NULL, "notificationManager").getMessage());
+            throw new NullPointerException(CoreMessages.objectIsNull("notificationManager").getMessage());
         }
 
         if (queueManager == null)
         {
-            throw new NullPointerException(new Message(Messages.X_IS_NULL, "queueManager").getMessage());
+            throw new NullPointerException(CoreMessages.objectIsNull("queueManager").getMessage());
         }
 
         if (workManager == null)
         {
-            throw new NullPointerException(new Message(Messages.X_IS_NULL, "workManager").getMessage());
+            throw new NullPointerException(CoreMessages.objectIsNull("workManager").getMessage());
         }
 
         config = getRegistry().getConfiguration();
@@ -201,11 +201,11 @@ public class ManagementContext implements UMOManagementContext
 
         if (id == null)
         {
-            throw new InitialisationException(new Message(Messages.X_IS_NULL, "Instance ID"), this);
+            throw new InitialisationException(CoreMessages.objectIsNull("Instance ID"), this);
         }
         if (clusterId == null)
         {
-            clusterId = new Message(Messages.NOT_CLUSTERED).toString();
+            clusterId = CoreMessages.notClustered().getMessage();
         }
         if (domain == null)
         {
@@ -223,14 +223,11 @@ public class ManagementContext implements UMOManagementContext
 
     public synchronized void start() throws UMOException
     {
-        //initialise();
         lifecycleManager.checkPhase(Startable.PHASE_NAME);
         if (!isStarted())
         {
             fireSystemEvent(new ManagerNotification(this, ManagerNotification.MANAGER_STARTING));
 
-            //TODO RM* :I dont think the Registry should be started or stopped...
-            //getRegistry().start();
             directories.deleteMarkedDirectories();
 
             lifecycleManager.firePhase(this, Startable.PHASE_NAME);
@@ -387,7 +384,7 @@ public class ManagementContext implements UMOManagementContext
         //Check we have a valid and supported encoding
         if (!Charset.isSupported(config.getDefaultEncoding()))
         {
-            throw new FatalException(new Message(Messages.PROPERTY_X_HAS_INVALID_VALUE_X, "encoding", config.getDefaultEncoding()), this);
+            throw new FatalException(CoreMessages.propertyHasInvalidValue("encoding", config.getDefaultEncoding()), this);
         }
     }
 
@@ -406,7 +403,7 @@ public class ManagementContext implements UMOManagementContext
         // Check we have a valid and supported encoding
         if (!Charset.isSupported(config.getDefaultOSEncoding()))
         {
-            throw new FatalException(new Message(Messages.PROPERTY_X_HAS_INVALID_VALUE_X, "osEncoding",
+            throw new FatalException(CoreMessages.propertyHasInvalidValue("osEncoding",
                     config.getDefaultOSEncoding()), this);
         }
     }
@@ -499,7 +496,7 @@ public class ManagementContext implements UMOManagementContext
     {
         if (notificationManager == null)
         {
-            throw new MuleRuntimeException(new Message(Messages.SERVER_EVENT_MANAGER_NOT_ENABLED));
+            throw new MuleRuntimeException(CoreMessages.serverNotificationManagerNotEnabled());
         }
         notificationManager.registerListener(l, resourceIdentifier);
     }
@@ -724,7 +721,7 @@ public class ManagementContext implements UMOManagementContext
      */
     protected String getStartSplash()
     {
-        String notset = new Message(Messages.NOT_SET).getMessage();
+        String notset = CoreMessages.notSet().getMessage();
 
         // Mule Version, Timestamp, and Server ID
         List message = new ArrayList();
@@ -733,7 +730,7 @@ public class ManagementContext implements UMOManagementContext
         if (att.values().size() > 0)
         {
             message.add(StringUtils.defaultString(config.getProductDescription(), notset) + " "
-                    + new Message(Messages.VERSION).getMessage() + " "
+                    + CoreMessages.version().getMessage() + " "
                     + StringUtils.defaultString(config.getProductVersion(), notset));
 
             message.add(StringUtils.defaultString(config.getVendorName(), notset));
@@ -741,11 +738,11 @@ public class ManagementContext implements UMOManagementContext
         }
         else
         {
-            message.add(new Message(Messages.VERSION_INFO_NOT_SET).getMessage());
+            message.add(CoreMessages.versionNotSet().getMessage());
         }
         message.add(" ");
         DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
-        message.add(new Message(Messages.SERVER_STARTED_AT_X, df.format(new Date(getStartDate()))).getMessage());
+        message.add(CoreMessages.serverStartedAt(getStartDate()).getMessage());
         message.add("Server ID: " + id);
 
         // JDK, OS, and Host
@@ -767,22 +764,23 @@ public class ManagementContext implements UMOManagementContext
 
         // Mule Agents
         message.add(" ");
-        //TODO LM: get agensts from the registry
-//        if (agents.size() == 0)
-//        {
-//            message.add(new Message(Messages.AGENTS_RUNNING).getMessage() + " "
-//                        + new Message(Messages.NONE).getMessage());
-//        }
-//        else
-//        {
-//            message.add(new Message(Messages.AGENTS_RUNNING).getMessage());
-//            UMOAgent umoAgent;
-//            for (Iterator iterator = agents.values().iterator(); iterator.hasNext();)
-//            {
-//                umoAgent = (UMOAgent)iterator.next();
-//                message.add("  " + umoAgent.getDescription());
-//            }
-//        }
+        //List agents
+        Map agents = getRegistry().getAgents();
+        if (agents.size() == 0)
+        {
+            message.add(CoreMessages.agentsRunning().getMessage() + " "
+                        + CoreMessages.none().getMessage());
+        }
+        else
+        {
+            message.add(CoreMessages.agentsRunning().getMessage());
+            UMOAgent umoAgent;
+            for (Iterator iterator = agents.values().iterator(); iterator.hasNext();)
+            {
+                umoAgent = (UMOAgent)iterator.next();
+                message.add("  " + umoAgent.getDescription());
+            }
+        }
         return StringMessageUtils.getBoilerPlate(message, '*', 70);
     }
 
@@ -791,13 +789,13 @@ public class ManagementContext implements UMOManagementContext
         List message = new ArrayList(2);
         long currentTime = System.currentTimeMillis();
         DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
-        message.add(new Message(Messages.SHUTDOWN_NORMALLY_ON_X, df.format(new Date())).getMessage());
+        message.add(CoreMessages.shutdownNormally(new Date()).getMessage());
         long duration = 10;
         if (startDate > 0)
         {
             duration = currentTime - startDate;
         }
-        message.add(new Message(Messages.SERVER_WAS_UP_FOR_X, DateUtils.getFormattedDuration(duration)).getMessage());
+        message.add(CoreMessages.serverWasUpForDuration(duration).getMessage());
 
         return StringMessageUtils.getBoilerPlate(message, '*', 78);
     }

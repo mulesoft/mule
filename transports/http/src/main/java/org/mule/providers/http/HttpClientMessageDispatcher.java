@@ -10,11 +10,11 @@
 
 package org.mule.providers.http;
 
-import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.message.ExceptionPayload;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.providers.ConnectException;
+import org.mule.providers.http.i18n.HttpMessages;
 import org.mule.providers.http.transformers.HttpClientMethodResponseToObject;
 import org.mule.providers.http.transformers.ObjectToHttpClientMethodRequest;
 import org.mule.providers.streaming.StreamMessageAdapter;
@@ -96,7 +96,8 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             }
             catch (Exception e)
             {
-                throw new ConnectException(new Message("http", 13, endpoint.getEndpointURI().getUri()), e, this);
+                throw new ConnectException(
+                    HttpMessages.failedToConnect(endpoint.getEndpointURI().getUri()), e, this);
             }
         }
 
@@ -107,11 +108,6 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         client = null;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.providers.AbstractConnectorSession#doDispatch(org.mule.umo.UMOEvent)
-     */
     protected void doDispatch(UMOEvent event) throws Exception
     {
         HttpMethod httpMethod = getMethod(event);
@@ -161,7 +157,8 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             }
             else
             {
-                throw new ReceiveException(new Message("http", 3, httpMethod.getStatusLine().toString()),
+                throw new ReceiveException(
+                    HttpMessages.requestFailedWithStatus(httpMethod.getStatusLine().toString()),
                     endpoint, timeout);
             }
         }

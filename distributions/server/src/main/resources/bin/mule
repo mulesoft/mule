@@ -177,6 +177,7 @@ then
         exit 1
     fi
 fi
+PSKEYWORD="args"
 
 # Resolve the os
 DIST_OS=`uname -s | tr [:upper:] [:lower:] | tr -d [:blank:]`
@@ -189,6 +190,7 @@ case "$DIST_OS" in
         ;;
     'darwin')
         DIST_OS="macosx"
+        PSKEYWORD="command"
         ;;
     'unix_sv')
         DIST_OS="unixware"
@@ -415,7 +417,7 @@ getpid() {
                 # TODO: ps -o args gets truncated to 80 columns on Solaris which makes
                 # this test fail if the path is too long.
                 ######################################################################
-                pidtest=`$PSEXE -p $pid -o args | grep "$WRAPPER_CMD" | tail -1`
+                pidtest=`$PSEXE -p $pid -o $PSKEYWORD | grep "$WRAPPER_CMD" | tail -1`
                 if [ "X$pidtest" = "X" ]
                 then
                     # This is a stale pid file.

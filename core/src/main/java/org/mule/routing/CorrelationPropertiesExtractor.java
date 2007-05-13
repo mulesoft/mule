@@ -49,7 +49,7 @@ public class CorrelationPropertiesExtractor extends MessagePropertyExtractor
             }
             if (result == null)
             {
-                throw new NullPointerException(
+                throw new IllegalArgumentException(
                     "Property Extractor cannot return a null value. Extractor is: " + getClass().getName());
             }
         }

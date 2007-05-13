@@ -15,8 +15,8 @@ import org.mule.RegistryContext;
 import org.mule.config.MuleProperties;
 import org.mule.config.ThreadingProfile;
 import org.mule.config.builders.QuickConfigurationBuilder;
-import org.mule.config.i18n.Message;
 import org.mule.extras.spring.SpringContainerContext;
+import org.mule.extras.spring.i18n.SpringMessages;
 import org.mule.impl.ManagementContextAware;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleEvent;
@@ -278,7 +278,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                 }
                 catch (UMOException ex)
                 {
-                    throw new MuleRuntimeException(new Message("spring", 1), ex);
+                    throw new MuleRuntimeException(SpringMessages.failedToReinitMule(), ex);
                 }
             }
             else
@@ -587,7 +587,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
         }
         catch (UMOException e)
         {
-            throw new MuleRuntimeException(new Message("spring", 1), e);
+            throw new MuleRuntimeException(SpringMessages.failedToReinitMule(), e);
         }
     }
 
@@ -914,7 +914,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
         }
         else
         {
-            throw new NullPointerException("exceptionListener");
+            throw new IllegalArgumentException("exceptionListener may not be null");
         }
     }
 

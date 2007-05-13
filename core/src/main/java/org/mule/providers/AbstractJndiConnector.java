@@ -10,8 +10,7 @@
 
 package org.mule.providers;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.lifecycle.InitialisationException;
 
 import java.util.Hashtable;
@@ -84,8 +83,7 @@ public abstract class AbstractJndiConnector extends AbstractConnector
         catch (Exception e)
         {
             throw new InitialisationException(
-                new Message(Messages.FAILED_TO_CREATE_X, "AbstractJndiConnector"), 
-                e, this);
+                CoreMessages.failedToCreate("AbstractJndiConnector"), e, this);
         }
 
         return jndiContext;

@@ -10,8 +10,7 @@
 
 package org.mule.impl.container;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.ContainerException;
 import org.mule.umo.manager.ObjectNotFoundException;
@@ -57,8 +56,8 @@ public class MultiContainerContext implements UMOContainerContext
     {
         if (containers.containsKey(container.getName()))
         {
-            throw new IllegalArgumentException(new Message(Messages.CONTAINER_X_ALREADY_REGISTERED,
-                container.getName()).toString());
+            throw new IllegalArgumentException(
+                CoreMessages.containerAlreadyRegistered(container.getName()).toString());
         }
         containers.put(container.getName(), container);
     }

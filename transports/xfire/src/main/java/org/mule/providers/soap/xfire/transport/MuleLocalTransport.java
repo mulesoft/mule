@@ -50,7 +50,7 @@ public class MuleLocalTransport extends AbstractTransport implements SoapTranspo
 
     public String getServiceURL(Service service)
     {
-        String ep = ((MuleInvoker)service.getInvoker()).getEndpoint().getEndpointURI().getAddress();
+        String ep = ((MuleInvoker) service.getInvoker()).getEndpoint().getEndpointURI().getAddress();
         return ep + "/" + service.getSimpleName();
     }
 

@@ -11,6 +11,7 @@
 package org.mule;
 
 import org.mule.config.i18n.Message;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.umo.UMOException;
 
 /**
@@ -26,7 +27,7 @@ public class MuleException extends UMOException
 
     public MuleException(String message)
     {
-        this(Message.createStaticMessage(message));
+        this(MessageFactory.createStaticMessage(message));
     }
 
     /**
@@ -39,7 +40,7 @@ public class MuleException extends UMOException
 
     public MuleException(String message, Throwable cause)
     {
-        this(Message.createStaticMessage(message), cause);
+        this(MessageFactory.createStaticMessage(message), cause);
     }
 
     /**

@@ -10,8 +10,7 @@
 
 package org.mule.components.script.jsr223;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.IOUtils;
@@ -75,8 +74,9 @@ public class Scriptable implements Initialisable
                 }
                 if (scriptEngine == null)
                 {
-                    throw new InitialisationException(new Message(Messages.PROPERTIES_X_NOT_SET,
-                        "scriptEngine, scriptEngineName, compiledScript"), this);
+                    throw new InitialisationException(
+                        CoreMessages.propertiesNotSet("scriptEngine, scriptEngineName, compiledScript"), 
+                        this);
                 }
             }
             else
@@ -91,8 +91,8 @@ public class Scriptable implements Initialisable
             {
                 if (scriptText == null && scriptFile == null)
                 {
-                    throw new InitialisationException(new Message(Messages.PROPERTIES_X_NOT_SET,
-                        "scriptText, scriptFile"), this);
+                    throw new InitialisationException(
+                        CoreMessages.propertiesNotSet("scriptText, scriptFile"), this);
                 }
                 else if (scriptText != null)
                 {
@@ -108,8 +108,8 @@ public class Scriptable implements Initialisable
                     }
                     catch (IOException e)
                     {
-                        throw new InitialisationException(new Message(
-                            Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE, scriptFile), e, this);
+                        throw new InitialisationException(
+                            CoreMessages.cannotLoadFromClasspath(scriptFile), e, this);
                     }
                 }
             }

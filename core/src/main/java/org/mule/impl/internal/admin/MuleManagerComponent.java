@@ -12,8 +12,7 @@ package org.mule.impl.internal.admin;
 
 import org.mule.MuleException;
 import org.mule.config.MuleProperties;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
@@ -80,7 +79,7 @@ public class MuleManagerComponent implements Callable, Initialisable
     {
         if (wireFormat == null)
         {
-            throw new InitialisationException(new Message(Messages.X_IS_NULL, "wireFormat"), this);
+            throw new InitialisationException(CoreMessages.objectIsNull("wireFormat"), this);
         }
     }
 
@@ -108,8 +107,8 @@ public class MuleManagerComponent implements Callable, Initialisable
         }
         else
         {
-            result = handleException(null, new MuleException(new Message(
-                Messages.EVENT_TYPE_X_NOT_RECOGNISED, "AdminNotification:" + action.getAction())));
+            result = handleException(null, new MuleException(
+                CoreMessages.eventTypeNotRecognised("AdminNotification:" + action.getAction())));
         }
         return result;
     }
@@ -156,8 +155,8 @@ public class MuleManagerComponent implements Callable, Initialisable
         }
         else
         {
-            return handleException(result, new MuleException(new Message(
-                Messages.COULD_NOT_DETERMINE_DESTINATION_COMPONENT_FROM_ENDPOINT_X, endpoint)));
+            return handleException(result, new MuleException(
+                CoreMessages.couldNotDetermineDestinationComponentFromEndpoint(endpoint)));
         }
     }
 

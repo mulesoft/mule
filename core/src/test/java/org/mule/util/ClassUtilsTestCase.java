@@ -172,6 +172,19 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
         assertEquals("setFruit", ((Method)methods.get(0)).getName());
     }
 
+    public void testSimpleName()
+    {
+        simpleNameHelper("String", "foo".getClass());
+        simpleNameHelper("int[]", (new int[0]).getClass());
+        simpleNameHelper("Object[][]", (new Object[0][0]).getClass());
+        simpleNameHelper("null", null);
+    }
+
+    private void simpleNameHelper(String target, Class clazz)
+    {
+        assertEquals(target, ClassUtils.getSimpleName(clazz));
+    }
+
     private static class DummyObject
     {
         public void doSomething(Object object)

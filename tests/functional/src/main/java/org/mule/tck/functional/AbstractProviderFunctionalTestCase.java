@@ -157,7 +157,7 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
     {
         EventCallback callback = new EventCallback()
         {
-            public void eventReceived(UMOEventContext context, Object Component)
+            public void eventReceived(UMOEventContext context, Object component)
             {
                 synchronized (callbackLock)
                 {

@@ -10,6 +10,22 @@
 
 package org.mule.providers.soap.axis;
 
+import org.mule.config.i18n.CoreMessages;
+import org.mule.impl.MuleDescriptor;
+import org.mule.providers.AbstractMessageReceiver;
+import org.mule.providers.soap.NamedParameter;
+import org.mule.providers.soap.ServiceProxy;
+import org.mule.providers.soap.SoapMethod;
+import org.mule.providers.soap.axis.extensions.MuleMsgProvider;
+import org.mule.providers.soap.axis.extensions.MuleRPCProvider;
+import org.mule.providers.soap.axis.i18n.AxisMessages;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOException;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.provider.UMOConnector;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -26,21 +42,6 @@ import org.apache.axis.handlers.soap.SOAPService;
 import org.apache.axis.providers.java.JavaProvider;
 import org.apache.axis.wsdl.fromJava.Namespaces;
 import org.apache.commons.lang.StringUtils;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.impl.MuleDescriptor;
-import org.mule.providers.AbstractMessageReceiver;
-import org.mule.providers.soap.NamedParameter;
-import org.mule.providers.soap.ServiceProxy;
-import org.mule.providers.soap.SoapMethod;
-import org.mule.providers.soap.axis.extensions.MuleMsgProvider;
-import org.mule.providers.soap.axis.extensions.MuleRPCProvider;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOException;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.provider.UMOConnector;
 
 /**
  * <code>AxisMessageReceiver</code> is used to register a component as a service
@@ -138,7 +139,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         if (interfaces.length == 0)
         {
             throw new InitialisationException(
-                new Message(Messages.X_MUST_IMPLEMENT_AN_INTERFACE, serviceName), component);
+                AxisMessages.objectMustImplementAnInterface(serviceName), component);
         }
         // You must supply a class name if you want to restrict methods
         // or specify the 'allowedMethods' property in the axisOptions property
@@ -259,8 +260,8 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
             Style s = Style.getStyle(style);
             if (s == null)
             {
-                throw new InitialisationException(new Message(Messages.VALUE_X_IS_INVALID_FOR_X, style,
-                    "style"), this);
+                throw new InitialisationException(
+                    CoreMessages.valueIsInvalidFor(style, "style"), this);
             }
             else
             {
@@ -273,7 +274,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
             Use u = Use.getUse(use);
             if (u == null)
             {
-                throw new InitialisationException(new Message(Messages.VALUE_X_IS_INVALID_FOR_X, use, "use"),
+                throw new InitialisationException(CoreMessages.valueIsInvalidFor(use, "use"),
                     this);
             }
             else

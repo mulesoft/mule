@@ -31,7 +31,7 @@
     </build>
 
     <dependencies>
-        <!-- jBPM --> 
+        <!-- Only used if allowGlobalDispatcher = true -->
         <dependency>
             <groupId>org.jbpm</groupId>
             <artifactId>jbpm</artifactId>
@@ -175,17 +175,15 @@
             <artifactId>mule-module-client</artifactId>
             <version>${version}</version>
         </dependency>
-
-        <!-- For unit tests only -->
+        <!-- This is needed for org.mule.providers.bpm.tests -->
         <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-spring</artifactId>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
             <version>${version}</version>
-            <!-- TODO Change this back to scope=test once 
+            <!-- TODO Change this back to scope=test once
                 LocalJbpmConfigurationFactoryBeanWorkaround 
                 is no longer needed in src/main/java -->
             <!-- <scope>test</scope> -->
         </dependency>
     </dependencies>
-
 </project>

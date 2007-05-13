@@ -10,8 +10,7 @@
 
 package org.mule.providers.soap;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ParameterMode;
@@ -128,8 +127,7 @@ public class NamedParameter
         }
         else
         {
-            throw new IllegalArgumentException(
-                new Message(Messages.VALUE_X_IS_INVALID_FOR_X, mode, "mode").toString());
+            throw new IllegalArgumentException(CoreMessages.valueIsInvalidFor(mode, "mode").toString());
         }
     }
 

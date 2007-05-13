@@ -62,7 +62,6 @@
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
-            <version>1.0.1</version>
         </dependency>
     </dependencies>
 </project>

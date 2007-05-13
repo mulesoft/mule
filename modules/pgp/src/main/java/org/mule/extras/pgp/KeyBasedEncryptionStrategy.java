@@ -10,7 +10,6 @@
 
 package org.mule.extras.pgp;
 
-import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOEncryptionStrategy;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.CryptoFailureException;
@@ -21,6 +20,11 @@ import java.util.Collection;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.mule.config.i18n.CoreMessages;
+import org.mule.umo.UMOEncryptionStrategy;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.security.CryptoFailureException;
+
 import cryptix.message.EncryptedMessage;
 import cryptix.message.EncryptedMessageBuilder;
 import cryptix.message.LiteralMessageBuilder;
@@ -29,6 +33,12 @@ import cryptix.message.MessageFactory;
 import cryptix.message.SignedMessageBuilder;
 import cryptix.openpgp.PGPArmouredMessage;
 import cryptix.pki.KeyBundle;
+
+import java.io.ByteArrayInputStream;
+import java.util.Collection;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class KeyBasedEncryptionStrategy implements UMOEncryptionStrategy
 {
@@ -39,11 +49,6 @@ public class KeyBasedEncryptionStrategy implements UMOEncryptionStrategy
 
     private PGPKeyRing keyManager;
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.UMOEncryptionStrategy#encrypt(byte[])
-     */
     public byte[] encrypt(byte[] data, Object cryptInfo) throws CryptoFailureException
     {
         try
@@ -80,11 +85,6 @@ public class KeyBasedEncryptionStrategy implements UMOEncryptionStrategy
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.UMOEncryptionStrategy#decrypt(byte[])
-     */
     public byte[] decrypt(byte[] data, Object cryptInfo) throws CryptoFailureException
     {
         try
@@ -113,11 +113,6 @@ public class KeyBasedEncryptionStrategy implements UMOEncryptionStrategy
         return data;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.lifecycle.Initialisable#initialise()
-     */
     public void initialise() throws InitialisationException
     {
         try
@@ -127,8 +122,8 @@ public class KeyBasedEncryptionStrategy implements UMOEncryptionStrategy
         }
         catch (Exception e)
         {
-            throw new InitialisationException(new org.mule.config.i18n.Message(Messages.FAILED_TO_CREATE_X,
-                "KeyBasedEncryptionStrategy"), e, this);
+            throw new InitialisationException(
+                CoreMessages.failedToCreate("KeyBasedEncryptionStrategy"), e, this);
         }
     }
 

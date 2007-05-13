@@ -10,8 +10,8 @@
 
 package org.mule.providers.jms;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
+import org.mule.providers.jms.i18n.JmsMessages;
 import org.mule.transaction.AbstractSingleResourceTransaction;
 import org.mule.transaction.IllegalTransactionStateException;
 import org.mule.umo.TransactionException;
@@ -27,19 +27,12 @@ import javax.jms.Session;
  */
 public class JmsTransaction extends AbstractSingleResourceTransaction
 {
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.UMOTransaction#bindResource(java.lang.Object,
-     *      java.lang.Object)
-     */
     public void bindResource(Object key, Object resource) throws TransactionException
     {
         if (!(key instanceof Connection) || !(resource instanceof Session))
         {
-            throw new IllegalTransactionStateException(new Message(
-                Messages.TX_CAN_ONLY_BIND_TO_X_TYPE_RESOURCES, "javax.jms.Connection/javax.jms.Session"));
+            throw new IllegalTransactionStateException(
+                CoreMessages.transactionCanOnlyBindToResources("javax.jms.Connection/javax.jms.Session"));
         }
 
         Session session = (Session)resource;
@@ -47,32 +40,22 @@ public class JmsTransaction extends AbstractSingleResourceTransaction
         {
             if (!session.getTransacted())
             {
-                throw new IllegalTransactionStateException(new Message("jms", 4));
+                throw new IllegalTransactionStateException(JmsMessages.sessionShouldBeTransacted());
             }
         }
         catch (JMSException e)
         {
-            throw new IllegalTransactionStateException(new Message(Messages.TX_CANT_READ_STATE), e);
+            throw new IllegalTransactionStateException(CoreMessages.transactionCannotReadState(), e);
         }
 
         super.bindResource(key, resource);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transaction.AbstractSingleResourceTransaction#doBegin()
-     */
     protected void doBegin() throws TransactionException
     {
         // do nothing
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transaction.AbstractSingleResourceTransaction#doCommit()
-     */
     protected void doCommit() throws TransactionException
     {
         try
@@ -81,15 +64,10 @@ public class JmsTransaction extends AbstractSingleResourceTransaction
         }
         catch (JMSException e)
         {
-            throw new TransactionException(new Message(Messages.TX_COMMIT_FAILED), e);
+            throw new TransactionException(CoreMessages.transactionCommitFailed(), e);
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transaction.AbstractSingleResourceTransaction#doRollback()
-     */
     protected void doRollback() throws TransactionException
     {
         try
@@ -98,8 +76,7 @@ public class JmsTransaction extends AbstractSingleResourceTransaction
         }
         catch (JMSException e)
         {
-            throw new TransactionException(new Message(Messages.TX_ROLLBACK_FAILED), e);
+            throw new TransactionException(CoreMessages.transactionRollbackFailed(), e);
         }
     }
-
 }

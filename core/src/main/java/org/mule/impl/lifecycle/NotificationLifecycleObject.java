@@ -10,7 +10,7 @@
 package org.mule.impl.lifecycle;
 
 import org.mule.MuleRuntimeException;
-import org.mule.config.i18n.Message;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.util.ClassUtils;
@@ -105,7 +105,7 @@ public class NotificationLifecycleObject extends LifecycleObject
         }
         catch (Exception e)
         {
-            throw new MuleRuntimeException(Message.createStaticMessage("Failed to create Notification") ,e);
+            throw new MuleRuntimeException(CoreMessages.failedToCreate("Notification:" + action) ,e);
         }
     }
 }

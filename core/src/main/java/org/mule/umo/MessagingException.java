@@ -10,8 +10,8 @@
 
 package org.mule.umo;
 
+import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
 import org.mule.providers.NullPayload;
@@ -94,7 +94,7 @@ public class MessagingException extends UMOException
                 payload = NullPayload.getInstance();
             }
 
-            buf.append(Messages.get(Messages.MESSAGE_IS_OF_TYPE_X, payload.getClass().getName()));
+            buf.append(CoreMessages.messageIsOfType(payload.getClass()).getMessage());
             addInfo("Payload", payload.toString());
         }
         else

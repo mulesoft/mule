@@ -10,8 +10,7 @@
 
 package org.mule.impl.container;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.ContainerException;
 import org.mule.umo.manager.ObjectNotFoundException;
@@ -109,9 +108,7 @@ public class JndiContainerContext extends AbstractContainerContext
         }
         catch (NamingException e)
         {
-            throw new InitialisationException(
-                new Message(Messages.FAILED_TO_CREATE_X, "Jndi context"), 
-                e, this);
+            throw new InitialisationException(CoreMessages.failedToCreate("Jndi context"), e, this);
         }
     }
 }

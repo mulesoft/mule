@@ -20,4 +20,10 @@ public class AxisLoanBrokerAsynchronousFunctionalTestCase extends AbstractAsynch
     {
         return "loan-broker-axis-endpoints-config.xml, loan-broker-async-config.xml";
     }
+
+    // @Override
+    protected int getNumberOfRequests()
+    {
+        return 10;
+    }
 }

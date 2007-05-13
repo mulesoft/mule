@@ -10,8 +10,8 @@
 
 package org.mule.umo.lifecycle;
 
+import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOException;
 
 import org.apache.commons.lang.ObjectUtils;
@@ -56,7 +56,7 @@ public class LifecycleException extends UMOException
      */
     public LifecycleException(Throwable cause, Object component)
     {
-        super(new Message(Messages.INITIALISATION_FAILURE_X, cause.getMessage()), cause);
+        super(CoreMessages.initialisationFailure(cause.getMessage()), cause);
         this.component = component;
         addInfo("Object", ObjectUtils.toString(component, "null"));
     }
@@ -65,5 +65,4 @@ public class LifecycleException extends UMOException
     {
         return component;
     }
-
 }

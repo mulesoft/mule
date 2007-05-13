@@ -10,7 +10,7 @@
 
 package org.mule.samples.errorhandler.exceptions;
 
-import org.mule.config.i18n.Message;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.umo.UMOException;
 
 /**
@@ -40,7 +40,7 @@ public class BusinessException extends UMOException
      */
     public BusinessException(String message, Throwable cause)
     {
-        super(Message.createStaticMessage(message), cause);
+        super(MessageFactory.createStaticMessage(message), cause);
     }
 
 }

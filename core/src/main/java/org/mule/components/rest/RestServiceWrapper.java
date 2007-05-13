@@ -10,8 +10,7 @@
 
 package org.mule.components.rest;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.NullPayload;
@@ -145,7 +144,7 @@ public class RestServiceWrapper implements Callable, Initialisable
     {
         if (serviceUrl == null && !urlFromMessage)
         {
-            throw new InitialisationException(new Message(Messages.X_IS_NULL, "serviceUrl"), this);
+            throw new InitialisationException(CoreMessages.objectIsNull("serviceUrl"), this);
         }
         else if (serviceUrl != null)
         {
@@ -184,8 +183,8 @@ public class RestServiceWrapper implements Callable, Initialisable
             tempUrl = eventContext.getMessage().getStringProperty(REST_SERVICE_URL, null);
             if (tempUrl == null)
             {
-                throw new IllegalArgumentException(new Message(Messages.X_PROPERTY_IS_NOT_SET_ON_EVENT,
-                    REST_SERVICE_URL).toString());
+                throw new IllegalArgumentException(
+                    CoreMessages.propertyIsNotSetOnEvent(REST_SERVICE_URL).toString());
             }
         }
         else
@@ -217,8 +216,8 @@ public class RestServiceWrapper implements Callable, Initialisable
 
         if (isErrorPayload(result))
         {
-            handleException(new RestServiceException(new Message(Messages.FAILED_TO_INVOKE_REST_SERVICE_X,
-                tempUrl), result), result);
+            handleException(new RestServiceException(
+                CoreMessages.failedToInvokeRestService(tempUrl), result), result);
         }
         return result;
     }
@@ -248,7 +247,7 @@ public class RestServiceWrapper implements Callable, Initialisable
                 if (!optional)
                 {
                     throw new IllegalArgumentException(
-                        new Message(Messages.X_PROPERTY_IS_NOT_SET_ON_EVENT, exp).toString());
+                        CoreMessages.propertyIsNotSetOnEvent(exp).toString());
                 }
             }
             else

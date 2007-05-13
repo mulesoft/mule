@@ -10,60 +10,99 @@
 
 package org.mule.samples.errorhandler;
 
-import org.mule.config.i18n.LocaleMessageHandler;
+import org.mule.config.i18n.MessageFactory;
+import org.mule.util.ObjectUtils;
+import org.mule.util.StringMessageUtils;
 
 /**
  * <code>LocaleMessage</code> is a convenience interface for retrieving
  * internationalised strings from resource bundles. The actual work is done by
- * the LocaleMessageHandler in core.
- *
- * The <code>LocaleMessage</code> at minimum provides the same methods in the
- * LocaleMessageHandler except that the bundle name is provided. 
- *
- * Optionally, the LocaleMessage can contain convenience methods for accessing
- * specific string resources so the resource codes don't have to be used directly.
+ * the MessageFactory in core.
  */
-public class LocaleMessage
+public class LocaleMessage extends MessageFactory
 {
-    // The bundle name for this package
-    public static String bundleName = "errorhandler-example";
+    private static final String BUNDLE_PATH = "messages.errorhandler-example-messages";
 
-    // Identifies for specific string resources
-    public static String UNRETRIEVED_EXCEPTION = "1";
-    public static String UNHANDLED_EXCEPTION = "2";
-    public static String BUSINESS_ERROR_MANAGER_ERROR = "3";
-    public static String ERROR_DETAIL = "4";
-    public static String ERROR_CLASS = "5";
-    public static String HANDLER_FAILURE = "6";
-    public static String DEFAULT_FATAL_HANDLING = "7";
-    public static String FATAL_HANDLING = "8";
-    public static String DEFAULT_HANDLING = "9";
-    public static String DEFAULT_EXCEPTION = "10";
-    public static String DEFAULT_HANDLER_EXCEPTION = "11";
-    public static String FATAL_EXCEPTION = "12";
-    public static String BUSINESS_HANDLER_MESSAGE = "13";
-    public static String DEFAULT_HANDLER_MESSAGE = "14";
-    public static String FATAL_HANDLER_MESSAGE = "15";
-    public static String FATAL_HANDLER_EXCEPTION = "16";
-
-    public static String getString(String code)
+    public static String unretrievedException(Exception e)
     {
-        return LocaleMessageHandler.getString(bundleName, code);
+        return getString(BUNDLE_PATH, 1, e);
     }
 
-    public static String getString(String code, Object arg1)
+    public static String unhandledException(Class class1, Class class2)
     {
-        return LocaleMessageHandler.getString(bundleName, code, arg1);
+        return getString(BUNDLE_PATH, 2, StringMessageUtils.toString(class1), 
+            StringMessageUtils.toString(class2));
     }
 
-    public static String getString(String code, Object arg1, Object arg2)
+    public static String businessErrorManagerError()
     {
-        return LocaleMessageHandler.getString(bundleName, code, arg1, arg2);
+        return getString(BUNDLE_PATH, 3);
     }
 
-    public static String getString(String code, Object[] args)
+    public static String errorDetail(String detailMessage)
     {
-        return LocaleMessageHandler.getString(bundleName, code, args);
+        return getString(BUNDLE_PATH, 4, detailMessage);
     }
 
+    public static String errorClass(Class class1)
+    {
+        return getString(BUNDLE_PATH, 5, class1.getName());
+    }
+
+    public static String handlerFailure(ExceptionHandler eh)
+    {
+        String handlerDescription = ObjectUtils.toString(eh.getClass().getName(), "null");
+        return getString(BUNDLE_PATH, 6, handlerDescription);
+    }
+
+    public static String defaultFatalHandling(Class class1)
+    {
+        return getString(BUNDLE_PATH, 7, StringMessageUtils.toString(class1));
+    }
+
+    public static String fatalHandling(Exception e)
+    {
+        return getString(BUNDLE_PATH, 8, e);
+    }
+
+    public static String defaultHandling(Class class1, ExceptionHandler eh, Exception e)
+    {
+        return getString(BUNDLE_PATH, 9, StringMessageUtils.toString(class1),
+            ObjectUtils.toString(eh.getClass().getName() + " : " + e, "null"));
+    }
+
+    public static String defaultException(Exception e)
+    {
+        return getString(BUNDLE_PATH, 10, e);
+    }
+
+    public static String defaultHandlerException(HandlerException e)
+    {
+        return getString(BUNDLE_PATH, 11, e);
+    }
+
+    public static String fatalException(Throwable t)
+    {
+        return getString(BUNDLE_PATH, 12, t);
+    }
+
+    public static String businessHandlerMessage()
+    {
+        return getString(BUNDLE_PATH, 13);
+    }
+
+    public static String defaultHandlerMessage()
+    {
+        return getString(BUNDLE_PATH, 14);
+    }
+
+    public static String fatalHandlerMessage()
+    {
+        return getString(BUNDLE_PATH, 15);
+    }
+
+    public static String fatalHandlerException(Throwable t)
+    {
+        return getString(BUNDLE_PATH, 16, t);
+    }
 }

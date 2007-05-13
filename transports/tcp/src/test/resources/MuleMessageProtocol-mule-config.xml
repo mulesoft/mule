@@ -17,8 +17,7 @@
                    tcpProtocolClassName="org.mule.providers.tcp.protocols.MuleMessageEOFProtocol"
                    keepSendSocketOpen="false"/>
 
-    <mule:model-seda name="model">
-
+    <mule:model-seda name="main">
         <mule:service name="BridgeIn"
                       implementation="org.mule.components.simple.PassThroughComponent">
             <mule:inbound-router>

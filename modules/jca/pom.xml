@@ -8,37 +8,24 @@
         <artifactId>mule-modules</artifactId>
         <version>2.0.0-SNAPSHOT</version>
     </parent>
-    <artifactId>mule-module-jca</artifactId>
-    <name>JCA Resource Adapter</name>
-    <!--<packaging>bundle</packaging>-->
-    <description>A Resource Adapter implementation that allows a Mule instance to be deployed to a Java EE application server and exposes Mule services via the JCA connector architecture.</description>
+    <artifactId>mule-module-jca-parent</artifactId>
+    <groupId>org.mule.modules.jca</groupId>
+    <name>JCA Resource Adapter Parent</name>
+    <packaging>pom</packaging>
+    <description>
+        This module is the parent for the core jca module (jca-core) and all
+        appserver specific jca modules.
 
-    <build>
-         <plugins>
-              <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <configuration>
-                    <instructions>
-                        <Export-Package>
-                            org.mule.ra.*
-                        </Export-Package>
-                    </instructions>
-                </configuration>
-            </plugin>
-         </plugins>
+        It serves mainly as a container for dependencies which are common to all
+        jca modules
+    </description>
 
-        <resources>
-            <!--
-                Need to inject the final RAR name into some
-                vendor-specific deployment descriptors.
-             -->
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
-    </build>
+    <modules>
+        <module>jca-core</module>
+        <module>jca-generic</module>
+        <module>jca-jboss</module>
+    </modules>
+
     <dependencies>
         <dependency>
             <groupId>org.mule.modules</groupId>
@@ -77,48 +64,4 @@
             <version>${version}</version>
         </dependency>
     </dependencies>
-    
-    <!-- it's not enough to have resources declared globally and only resources for the jboss
-         jca in a profile. 
-         Resources from profiles are added to maven's runtime model so you'll end up with the
-         same directory included twice and ignoring the exclude.
-    -->
-    <profiles>
-        <profile>
-            <id>default</id>
-            <activation>
-                <activeByDefault/>
-            </activation>
-            <build>
-                <resources>
-                    <!--
-                        Need to inject the final RAR name into some
-                        vendor-specific deployment descriptors.
-                        -->
-                    <resource>
-                        <directory>src/main/resources</directory>
-                        <filtering>true</filtering>
-                    </resource>
-                </resources>
-            </build>
-        </profile>
-        <profile>
-            <id>jboss</id>
-            <build>
-                <resources>
-                    <resource>
-                        <directory>src/main/resources</directory>
-                        <filtering>true</filtering>
-                        <!-- see http://jira.jboss.com/jira/browse/JBAS-4283
-                             JBoss sees other vendor specific deployment descriptors
-                             which have to be excluded when building this module for jboss
-                        -->
-                        <excludes>
-                            <exclude>**/oc4j*</exclude>
-                        </excludes>
-                    </resource>
-                </resources>
-            </build>
-        </profile>
-    </profiles>
 </project>

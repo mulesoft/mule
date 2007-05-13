@@ -120,7 +120,7 @@
         <transition to="loanApproved">
             <!-- Send the final loan quote back to the customer. -->
             <action class="org.mule.providers.bpm.jbpm.actions.SendMuleEvent">
-                <endpoint>LoanQuotes</endpoint>
+                <endpoint>CustomerResponses</endpoint>
                 <synchronous>false</synchronous>
             </action>
         </transition>

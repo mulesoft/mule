@@ -27,15 +27,7 @@
                         <exclude>org/mule/test/integration/client/MuleClientWsdlSoapExternalTestCase.java</exclude>
                         <exclude>org/mule/test/integration/providers/http/HttpFunctionalTestCase.java</exclude>
                         <exclude>org/mule/test/integration/providers/xmpp/XmppFunctionalTestCase.java</exclude>
-                        <!-- Requires an external Axis server running in Tomcat on 8080 with the Calculator.jws service deployed to it -->
-                        <exclude>org/mule/test/integration/providers/soap/axis/AxisExternalServerTest.java</exclude>
-                        <!-- This has never worked, maybe we should just ditch it? -->
-                        <exclude>org/mule/test/integration/providers/soap/axis/AxisConnectorJmsTopicsFunctionalTestCase.java</exclude>
-                        <!-- to implement VM streaming -->
-                        <exclude>org/mule/test/integration/providers/soap/xfire/XFireConnectorVMFunctionalTestCase.java</exclude>
-
                         <exclude>org/mule/test/integration/providers/email/EMailFunctionalTestCase.java</exclude>
-                        
                         <exclude>org/mule/test/integration/routing/replyto/ReplytoChainIntegration2TestCase.java</exclude>
                         <exclude>org/mule/test/integration/routing/replyto/ReplytoChainIntegration4TestCase.java</exclude>
                     </excludes>
@@ -146,6 +138,13 @@
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-jms</artifactId>
+            <version>${version}</version>
+            <type>test-jar</type>
+        </dependency>
+        <!-- also include SOAP tests -->
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-soap</artifactId>
             <version>${version}</version>
             <type>test-jar</type>
         </dependency>

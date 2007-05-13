@@ -10,8 +10,7 @@
 
 package org.mule.umo.provider;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.MessagingException;
 
 /**
@@ -29,16 +28,17 @@ public class MessageTypeNotSupportedException extends MessagingException
 
     public MessageTypeNotSupportedException(Object message, Class adapterClass)
     {
-        super(new Message(Messages.MESSAGE_X_NOT_SUPPORTED_BY_ADAPTER_X, (message != null
-                        ? message.getClass().getName() : "null"), (adapterClass != null
-                        ? adapterClass.getName() : "null class")), message);
+        super(CoreMessages.messageNotSupportedByAdapter(
+            (message != null ? message.getClass().getName() : "null"),
+            (adapterClass != null ? adapterClass.getName() : "null class")), 
+            message);
     }
 
     public MessageTypeNotSupportedException(Object message, Class adapterClass, Throwable cause)
     {
-        super(new Message(Messages.MESSAGE_X_NOT_SUPPORTED_BY_ADAPTER_X, (message != null
-                        ? message.getClass().getName() : "null"), (adapterClass != null
-                        ? adapterClass.getName() : "null class")), message, cause);
+        super(CoreMessages.messageNotSupportedByAdapter(
+            (message != null ? message.getClass().getName() : "null"), 
+            (adapterClass != null ? adapterClass.getName() : "null class")), 
+            message, cause);
     }
-
 }

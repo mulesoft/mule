@@ -10,16 +10,12 @@
 
 package org.mule.umo.security;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.UMOException;
 
 /**
  * <code>UnknownAuthenticationTypeException</code> is thrown if a security context
  * request is make with an unrecognised UMOAuthentication type.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class UnknownAuthenticationTypeException extends UMOException
@@ -31,7 +27,7 @@ public class UnknownAuthenticationTypeException extends UMOException
 
     public UnknownAuthenticationTypeException(UMOAuthentication authentication)
     {
-        super(new Message(Messages.AUTH_TYPE_NOT_RECOGNISED, (authentication == null
+        super(CoreMessages.authTypeNotRecognised((authentication == null
                         ? "null" : authentication.getClass().getName())));
     }
 }

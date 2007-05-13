@@ -1,7 +1,61 @@
 <html>
-<head><title>Mule</title>
-</head>
+    <head>
+        <title>Mule</title>
+    </head>
 <body>
 Internationalisation support for Mule messages and exception messages.
+<p/>
+The <code>Message</code> class is a wrapper for an error message,
+its error code and other information. The messages are read from <code>ResourceBundle</code>s
+usually from classpath.
+<p/>
+The class <code>MessageFactory</code> encapsulates the lookup of
+<code>ResourceBundle</code>s and creation of messages. Since each mule
+module should provide its own messages, subclasses of <code>MessageFactory</code>
+should be created. It is convention to put the module specific class in
+a subpackage called <code>i18n</code>.
+<p />
+<h3>Subclassing MessageFactory</h3>
+For a mule module <em>foo</em> with base package <code>org.mule.modules.foo</code>
+a MessageFactory subclass would typcially look like this:
+<pre>
+package org.mule.modules.foo.i18n;
+
+public class FooMessages extends MessageFactory
+{
+	private static final String BUNDLE_PATH = getBundlePath("foo");
+	
+	public static final Message foo()
+	{
+		return createMessage(BUNDLE_PATH, 1);
+	}
+	
+	public static final Message bar(String arg)
+	{
+		return createMessage(BUNDLE_PATH, 2, arg);
+	}
+	
+	.
+	.
+	.
+}
+</pre>
+
+Note that the only publicly available methods are those from
+<code>FooMessages</code>. This approach has various advantages:
+<ul>
+    <li><code>Message</code> instances are created using meaningful
+    java methods, i.e. client code is less cluttered with message
+    cration details.</li>
+    <li>The method signature ensures that the right number of
+    arguments is passed in to format the message.</li>
+    <li>No more constants for message codes needed as there is
+    exactly one occurrence of the constant in the code.</li>
+    <li>By using the right <code>MessageFactory</code> subclass it
+    is ensured that the correct <code>ResourceBundle</code> will be
+    chosen for lookup.
+    <li>Formatting the input to messages can be taken out of the
+    client code by putting it in this class</li>
+</ul>
 </body>
 </html>

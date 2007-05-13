@@ -4,11 +4,14 @@
                                 "http://mule.mulesource.org/dtds/mule-spring-configuration.dtd">
 
 <mule-configuration id="Mule_Loan_broker_BPM" version="1.0">
+
     <description>
     Loan Broker example which uses a BPMS (a.k.a. Process Engine) for managing process flow and decision making.
     See http://mule.mulesource.org/wiki/display/MULE/LoanBroker+BPM for details.
     </description>
 
+    <mule-environment-properties serverUrl=""/>
+    
     <connector name="jBpmConnector" className="org.mule.providers.bpm.ProcessConnector">
         <properties>
             <!-- This field in LoanQuoteRequest holds the unique process ID. -->
@@ -19,7 +22,16 @@
         </properties>
     </connector>
 
-    <!-- We could use JMS instead of VM to make the example more realistic.
+    <connector name="syncVm" className="org.mule.providers.vm.VMConnector" />
+    
+    <connector name="asyncVm" className="org.mule.providers.vm.VMConnector">
+        <properties>
+        	<!-- Queue up events for asynchronous communication. -->
+            <property name="queueEvents" value="true"/>
+        </properties>
+    </connector>
+    
+	<!-- We could use JMS instead of VM to make the example more realistic.
     <connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">
         <properties>
             <property name="connectionFactoryJndiName" value="ConnectionFactory"/>
@@ -32,25 +44,23 @@
     </connector>
     -->
 
-    <!-- TODO Move these to global-endpoints once MULE-1464 is fixed. -->
-    <endpoint-identifiers>
+    <global-endpoints>
         <!-- The Loan Broker is driven by a Process Engine -->
-        <endpoint-identifier name="ProcessEngine" value="bpm://LoanBroker"/>
+        <endpoint name="ProcessEngine" address="bpm://LoanBroker"/>
 
         <!-- Customer loan requests to the Loan Broker -->
-        <endpoint-identifier name="CustomerRequests" value="vm://customer.requests"/>
+        <endpoint name="CustomerRequests" address="vm://customer.requests" connector="syncVm"/>
         <!-- Requests to the credit agency -->
-        <endpoint-identifier name="CreditAgency" value="vm://credit.agency"/>
+        <endpoint name="CreditAgency" address="vm://credit.agency" connector="syncVm"/>
         <!-- Customer credit profiles from the credit agency -->
-        <endpoint-identifier name="CreditProfiles" value="vm://credit.profiles"/>
-        <!-- Loan quotes from the banks -->
-        <endpoint-identifier name="LoanQuotes" value="vm://loan.quotes"/>
-    </endpoint-identifiers>
+        <endpoint name="CreditProfiles" address="vm://credit.profiles" connector="syncVm"/>
+        <!-- Final loan quote to the customer -->
+        <endpoint name="CustomerResponses" address="vm://customer.responses" connector="asyncVm"/>
 
-    <global-endpoints>
-        <endpoint name="BigBank" address="vm://big.bank"/>
-        <endpoint name="MediumBank" address="vm://medium.bank"/>
-        <endpoint name="SmallBank" address="vm://small.bank"/>
+		<!-- Bigger banks handle bigger loans.  -->
+        <endpoint name="BigBank" address="vm://big.bank" connector="syncVm"/>
+        <endpoint name="MediumBank" address="vm://medium.bank" connector="syncVm"/>
+        <endpoint name="SmallBank" address="vm://small.bank" connector="syncVm"/>
     </global-endpoints>
     
     <model name="loan-broker">
@@ -62,13 +72,13 @@
         <mule-descriptor name="ToBPMS" implementation="org.mule.examples.loanbroker.DefaultLoanBroker">
             <inbound-router>
                 <!-- Incoming message = CustomerRequest -->
-                <endpoint address="CustomerRequests"/>
+                <global-endpoint name="CustomerRequests"/>
                 <!-- Incoming message = CreditProfile -->
-                <endpoint address="CreditProfiles"/>
+                <global-endpoint name="CreditProfiles"/>
             </inbound-router>
             <outbound-router>
                 <router className="org.mule.routing.outbound.FilteringOutboundRouter">
-                    <endpoint address="ProcessEngine" synchronous="false" />
+                    <global-endpoint name="ProcessEngine" synchronous="false" />
                 </router>
             </outbound-router>
         </mule-descriptor>
@@ -76,15 +86,15 @@
         <!-- Messages generated from the process engine -->
         <mule-descriptor name="FromBPMS" implementation="org.mule.examples.loanbroker.DefaultLoanBroker">
             <inbound-router>
-                <endpoint address="ProcessEngine" />
+                <global-endpoint name="ProcessEngine" />
             </inbound-router>
             <outbound-router>
                 <router className="org.mule.routing.outbound.EndpointSelector">
                     <!-- Outgoing message = Customer -->
-                    <endpoint address="CreditAgency"/>
+                    <global-endpoint name="CreditAgency"/>
 
                     <!-- Outgoing message = LoanQuote -->
-                    <endpoint address="LoanQuotes"/>
+                    <global-endpoint name="CustomerResponses"/>
 
                     <!-- Outgoing message = LoanQuoteRequest -->
                     <global-endpoint name="BigBank" synchronous="true">
@@ -104,14 +114,14 @@
              Services
              *************************************************** -->
         <!-- The credit agency service will get the credit profile for a customer -->
-        <mule-descriptor name="CreditAgency"
+        <mule-descriptor name="ACreditAgency"
             implementation="org.mule.examples.loanbroker.credit.DefaultCreditAgency">
             <inbound-router>
-                <endpoint address="CreditAgency" />
+                <global-endpoint name="CreditAgency" />
             </inbound-router>
             <outbound-router>
                 <router className="org.mule.routing.outbound.FilteringOutboundRouter">
-                    <endpoint address="CreditProfiles" />
+                    <global-endpoint name="CreditProfiles" />
                 </router>
             </outbound-router>
         </mule-descriptor>
@@ -177,22 +187,23 @@
         </spring-property>
         <spring-property name="hibernateProperties">
             <props>
+                <!-- These properties may depend on your database -->
                 <prop key="hibernate.dialect">org.hibernate.dialect.HSQLDialect</prop>
-                <prop key="hibernate.c3p0.min_size">1</prop>
-                <prop key="hibernate.c3p0.max_size">3</prop>
-                <prop key="hibernate.show_sql">false</prop>
                 <prop key="hibernate.query.substitutions">true 1, false 0</prop>
                 <prop key="hibernate.jdbc.batch_size">0</prop>
                 <!-- Create/update the database tables automatically when the JVM starts up -->
                 <prop key="hibernate.hbm2ddl.auto">update</prop>
+                <!-- EhCache is no longer the default cache provider as of Hibernate 3.2 
+                  Refer to http://www.hibernate.org/hib_docs/v3/reference/en/html/performance.html
+                  for Hibernate's different cache providers. -->
+                <prop key="hibernate.cache.provider_class">org.hibernate.cache.HashtableCacheProvider</prop>
+                <!-- C3P0 (connection pooling) properties -->
+                <prop key="hibernate.c3p0.min_size">1</prop>
+                <prop key="hibernate.c3p0.max_size">3</prop>
+                <!-- Write SQL statements to log -->
+                <prop key="hibernate.show_sql">false</prop>
             </props>
         </spring-property>
-    </bean>
-
-    <!-- JBPM data types -->
-    <bean id="jbpmTypes" class="org.springframework.orm.hibernate3.TypeDefinitionBean">
-        <spring-property name="typeName"><value>string_max</value></spring-property>
-        <spring-property name="typeClass"><value>org.jbpm.db.hibernate.StringMax</value></spring-property>
     </bean>
 
     <!-- JBPM Datasource -->
@@ -201,5 +212,11 @@
         <spring-property name="url"><value>jdbc:hsqldb:mem:.;sql.enforce_strict_size=true</value></spring-property>
         <spring-property name="username"><value>sa</value></spring-property>
         <spring-property name="password"><value></value></spring-property>
+    </bean>
+
+    <!-- JBPM data types -->
+    <bean id="jbpmTypes" class="org.springframework.orm.hibernate3.TypeDefinitionBean">
+        <spring-property name="typeName"><value>string_max</value></spring-property>
+        <spring-property name="typeClass"><value>org.jbpm.db.hibernate.StringMax</value></spring-property>
     </bean>
 </mule-configuration>

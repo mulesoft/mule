@@ -10,7 +10,7 @@
 
 package org.mule.providers.email;
 
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
@@ -69,9 +69,7 @@ public class SimpleMailMessageAdapter extends AbstractMessageAdapter
         } 
         catch (Exception e) 
         {
-            throw new MessagingException(
-                new org.mule.config.i18n.Message(Messages.FAILED_TO_CREATE_X, "Message Adapter"), 
-                e);
+            throw new MessagingException(CoreMessages.failedToCreate("Message Adapter"), e);
         }
     }
 

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.mule.transports</groupId>
+        <artifactId>mule-transports</artifactId>
+        <version>2.0.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>mule-transport-jbpm</artifactId>
+    <packaging>jar</packaging>
+    <name>BPM Transport: JBoss jBPM</name>
+    <description>Classes which allow Mule to integrate with JBoss jBPM via the BPM Connector.</description>
+
+    <dependencies>
+        <!-- Generic BPM Transport -->
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-bpm</artifactId>
+            <version>${version}</version>
+        </dependency>
+
+        <!-- jBPM --> 
+        <dependency>
+            <groupId>org.jbpm</groupId>
+            <artifactId>jbpm</artifactId>
+            <version>3.1.4</version>
+        </dependency>
+        <!-- Only needed for scripting in jPDL -->
+        <dependency>
+            <groupId>bsh</groupId>
+            <artifactId>bsh</artifactId>
+            <version>1.3.0</version>
+            <optional>true</optional>
+        </dependency>        
+
+        <!-- Only needed for Spring-based configuration -->
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-spring</artifactId>
+            <version>${version}</version>
+            <!-- TODO Change this back to scope=test once 
+                LocalJbpmConfigurationFactoryBeanWorkaround 
+            	is no longer needed in src/main/java -->
+            <!-- <scope>test</scope> -->
+        </dependency>
+        <!-- This is the same as spring-modules-jbpm31 but we override the pom in our local 
+        	dependencies repo because the one from Spring includes the kitchen sink. -->
+        <dependency>
+            <groupId>org.springmodules</groupId>
+            <artifactId>spring-modules-jbpm31-nodeps</artifactId>
+            <version>0.8a</version>
+        </dependency>
+
+        <!-- Hibernate --> 
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate</artifactId>
+            <version>3.2.2.ga</version>
+            <exclusions>
+                <!-- We need commons-collections 3.2 -->
+                <exclusion>
+                    <groupId>commons-collections</groupId>
+                    <artifactId>commons-collections</artifactId>
+                </exclusion>
+                <!-- we like slf4j -->
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+                <!-- We've already got the geronimo-jta spec -->
+                <exclusion>
+                    <groupId>javax.transaction</groupId>
+                    <artifactId>jta</artifactId>
+                </exclusion>
+                <!-- Use the combined cglib-nodep instead of separate cglib and asm dependencies -->
+                <exclusion>
+                    <groupId>cglib</groupId>
+                    <artifactId>cglib</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>asm</groupId>
+                    <artifactId>asm</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>asm</groupId>
+                    <artifactId>asm-attrs</artifactId>
+                </exclusion>
+                <!-- EhCache is no longer the default cache provider for Hibernate -->
+                <exclusion>
+                    <groupId>net.sf.ehcache</groupId>
+                    <artifactId>ehcache</artifactId>
+                </exclusion>
+            </exclusions>    
+        </dependency>
+        <!-- Use the combined cglib-nodep instead of separate cglib and asm dependencies -->
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib-nodep</artifactId>
+            <version>2.1_3</version>
+        </dependency>        
+        <!-- Used to pool connections in Hibernate -->
+        <dependency>
+            <groupId>c3p0</groupId>
+            <artifactId>c3p0</artifactId>
+            <version>0.9.0.4</version>
+        </dependency>
+
+        <!-- Simple Java DB for persistence -->
+        <dependency>
+            <groupId>hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <version>1.8.0.7</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-vm</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

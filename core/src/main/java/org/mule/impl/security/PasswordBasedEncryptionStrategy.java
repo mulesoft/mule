@@ -10,8 +10,7 @@
 
 package org.mule.impl.security;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.lifecycle.InitialisationException;
 
 import java.security.GeneralSecurityException;
@@ -56,7 +55,7 @@ public class PasswordBasedEncryptionStrategy extends AbstractJCEEncryptionStrate
 
         if (password == null)
         {
-            throw new InitialisationException(new Message(Messages.X_IS_NULL, "Password"), this);
+            throw new InitialisationException(CoreMessages.objectIsNull("Password"), this);
         }
         super.initialise();
     }

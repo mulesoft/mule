@@ -10,12 +10,11 @@
 
 package org.mule.providers.tcp.protocols;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PushbackInputStream;
+
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 
 /**
  * <p>
@@ -58,6 +57,11 @@ public class XmlMessageProtocol extends ByteProtocol
     private static final int PUSHBACK_BUFFER_SIZE = READ_BUFFER_SIZE * 2;
 
     private ConcurrentHashMap pbMap = new ConcurrentHashMap();
+
+    public XmlMessageProtocol()
+    {
+        super(STREAM_OK);
+    }
 
     public Object read(InputStream is) throws IOException
     {
@@ -126,11 +130,6 @@ public class XmlMessageProtocol extends ByteProtocol
         }
     }
 
-    public void write(OutputStream os, byte[] data) throws IOException
-    {
-        os.write(data);
-    }
-
     /**
      * Show we continue reading?  This class, following previous implementations, only
      * reads while input is saturated.
@@ -145,5 +144,4 @@ public class XmlMessageProtocol extends ByteProtocol
     {
         return patternIndex < 0 && len == READ_BUFFER_SIZE && available > 0;
     }
-
 }

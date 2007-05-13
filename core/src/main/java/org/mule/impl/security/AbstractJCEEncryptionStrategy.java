@@ -10,8 +10,7 @@
 
 package org.mule.impl.security;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.UMOEncryptionStrategy;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.CryptoFailureException;
@@ -51,7 +50,7 @@ public abstract class AbstractJCEEncryptionStrategy implements UMOEncryptionStra
     {
         if (algorithm == null)
         {
-            throw new InitialisationException(new Message(Messages.X_IS_NULL, "Algorithm"), this);
+            throw new InitialisationException(CoreMessages.objectIsNull("Algorithm"), this);
         }
         else
         {
@@ -82,8 +81,7 @@ public abstract class AbstractJCEEncryptionStrategy implements UMOEncryptionStra
         }
         catch (Exception e)
         {
-            throw new InitialisationException(
-                new Message(Messages.FAILED_TO_CREATE_X, "encryption ciphers"),
+            throw new InitialisationException(CoreMessages.failedToCreate("encryption ciphers"),
                 e, this);
         }
     }

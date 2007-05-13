@@ -10,8 +10,7 @@
 
 package org.mule.routing;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.umo.UMOEvent;
@@ -37,7 +36,7 @@ public class ForwardingCatchAllStrategy extends AbstractCatchAllStrategy
     {
         if (getEndpoint() == null)
         {
-            throw new ComponentRoutingException(new Message(Messages.NO_CATCH_ALL_ENDPOINT_SET), message,
+            throw new ComponentRoutingException(CoreMessages.noCatchAllEndpointSet(), message,
                 getEndpoint(), session.getComponent());
         }
         try

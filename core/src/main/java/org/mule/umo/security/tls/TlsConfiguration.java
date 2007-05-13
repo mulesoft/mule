@@ -11,7 +11,7 @@
 package org.mule.umo.security.tls;
 
 import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.TlsDirectKeyStore;
 import org.mule.umo.security.TlsDirectTrustStore;
@@ -222,16 +222,15 @@ public final class TlsConfiguration implements TlsDirectTrustStore, TlsDirectKey
             InputStream is = IOUtils.getResourceAsStream(keyStoreName, getClass());
             if (null == is)
             {
-                throw new FileNotFoundException(new Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE,
-                    "Keystore: " + keyStoreName).getMessage());
+                throw new FileNotFoundException(
+                    CoreMessages.cannotLoadFromClasspath("Keystore: " + keyStoreName).getMessage());
             }
             tempKeyStore.load(is, keyStorePassword.toCharArray());
         }
         catch (Exception e)
         {
             throw new InitialisationException(
-                new Message(Messages.FAILED_LOAD_X, "KeyStore: " + keyStoreName), 
-                e, this);
+                CoreMessages.failedToLoad("KeyStore: " + keyStoreName), e, this);
         }
         try
         {
@@ -240,7 +239,7 @@ public final class TlsConfiguration implements TlsDirectTrustStore, TlsDirectKey
         }
         catch (Exception e)
         {
-            throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "Key Manager"), e, this);
+            throw new InitialisationException(CoreMessages.failedToLoad("Key Manager"), e, this);
         }
     }
 
@@ -265,8 +264,7 @@ public final class TlsConfiguration implements TlsDirectTrustStore, TlsDirectKey
             catch (Exception e)
             {
                 throw new InitialisationException(
-                    new Message(Messages.FAILED_LOAD_X, "TrustStore: " + trustStoreName), 
-                    e, this);
+                    CoreMessages.failedToLoad("TrustStore: " + trustStoreName), e, this);
             }
 
             try
@@ -277,8 +275,7 @@ public final class TlsConfiguration implements TlsDirectTrustStore, TlsDirectKey
             catch (Exception e)
             {
                 throw new InitialisationException(
-                    new Message(Messages.FAILED_LOAD_X, "Trust Manager (" + trustManagerAlgorithm + ")"), 
-                    e, this);
+                    CoreMessages.failedToLoad("Trust Manager (" + trustManagerAlgorithm + ")"), e, this);
             }
         }
     }
@@ -288,7 +285,7 @@ public final class TlsConfiguration implements TlsDirectTrustStore, TlsDirectKey
     {
         if (null == value)
         {
-            throw new NullPointerException(message);
+            throw new IllegalArgumentException(message);
         }
     }
 

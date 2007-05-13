@@ -11,8 +11,7 @@
 package org.mule.transformers.wire;
 
 import org.mule.MuleException;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.UMOException;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
@@ -44,7 +43,7 @@ public class TransformerPairWireFormat implements WireFormat
     {
         if (inboundTransformer == null)
         {
-            throw new NullPointerException(new Message(Messages.X_IS_NULL, "inboundTransformer").getMessage());
+            throw new IllegalArgumentException(CoreMessages.objectIsNull("inboundTransformer").getMessage());
         }
         if (inboundTransformer.isSourceTypeSupported(InputStream.class))
         {
@@ -60,7 +59,7 @@ public class TransformerPairWireFormat implements WireFormat
             }
             catch (IOException e)
             {
-                throw new MuleException(new Message(Messages.FAILED_TO_READ_PAYLOAD), e);
+                throw new MuleException(CoreMessages.failedToReadPayload(), e);
             }
         }
     }
@@ -69,8 +68,7 @@ public class TransformerPairWireFormat implements WireFormat
     {
         if (outboundTransformer == null)
         {
-            throw new NullPointerException(new Message(Messages.X_IS_NULL, "outboundTransformer")
-                .getMessage());
+            throw new IllegalArgumentException(CoreMessages.objectIsNull("outboundTransformer").getMessage());
         }
         try
         {
@@ -106,13 +104,12 @@ public class TransformerPairWireFormat implements WireFormat
             }
             else
             {
-                throw new TransformerException(new Message(Messages.TRANSFORM_FAILED_FROM_X, o.getClass()));
+                throw new TransformerException(CoreMessages.transformFailedFrom(o.getClass()));
             }
         }
         catch (IOException e)
         {
-            throw new TransformerException(
-                new Message(Messages.TRANSFORM_FAILED_FROM_X, o.getClass()), e);
+            throw new TransformerException(CoreMessages.transformFailedFrom(o.getClass()), e);
         }
     }
 

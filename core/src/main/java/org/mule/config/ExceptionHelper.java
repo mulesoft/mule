@@ -10,6 +10,8 @@
 
 package org.mule.config;
 
+import org.mule.MuleRuntimeException;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.UMOException;
 import org.mule.util.ClassUtils;
 import org.mule.util.SpiUtils;
@@ -93,36 +95,40 @@ public final class ExceptionHelper
 
     public static void initialise()
     {
-
-        if (initialised)
+        try
         {
-            return;
-        }
+            if (initialised)
+            {
+                return;
+            }
 
-        registerExceptionReader(new UMOExceptionReader());
-        registerExceptionReader(new NamingExceptionReader());
-        J2SE_VERSION = System.getProperty("java.specification.version");
+            registerExceptionReader(new UMOExceptionReader());
+            registerExceptionReader(new NamingExceptionReader());
+            J2SE_VERSION = System.getProperty("java.specification.version");
 
-        errorCodes = SpiUtils.findServiceDescriptor("org/mule/config",
+            errorCodes = SpiUtils.findServiceDescriptor("org/mule/config",
                 "mule-exception-codes.properties", ExceptionHelper.class);
-        if (errorCodes == null)
-        {
-            throw new NullPointerException(
+            if (errorCodes == null)
+            {
+                throw new IllegalArgumentException(
                     "Failed to load resource: META_INF/services/org/mule/config/mule-exception-codes.properties");
-        }
-
-        reverseErrorCodes = MapUtils.invertMap(errorCodes);
-        errorDocs = SpiUtils.findServiceDescriptor("org/mule/config", "mule-exception-config.properties",
+            }
+            reverseErrorCodes = MapUtils.invertMap(errorCodes);
+            errorDocs = SpiUtils.findServiceDescriptor("org/mule/config", "mule-exception-config.properties",
                 ExceptionHelper.class);
-        if (errorDocs == null)
-        {
-            throw new NullPointerException(
+            if (errorDocs == null)
+            {
+                throw new IllegalArgumentException(
                     "Failed to load resource: META_INF/services/org/mule/config/mule-exception-config.properties");
+            }
+            initialised = true;
         }
-
-        initialised = true;
-
+        catch (Exception e)
+        {
+            throw new MuleRuntimeException(CoreMessages.failedToLoad("Exception resources"), e);
+        }
     }
+
 
     public static int getErrorCode(Class exception)
     {

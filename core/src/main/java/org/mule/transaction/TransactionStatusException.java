@@ -10,8 +10,8 @@
 
 package org.mule.transaction;
 
+import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 import org.mule.umo.TransactionException;
 
 public class TransactionStatusException extends TransactionException
@@ -40,6 +40,6 @@ public class TransactionStatusException extends TransactionException
 
     public TransactionStatusException(Throwable cause)
     {
-        super(new Message(Messages.TX_CANT_READ_STATE), cause);
+        super(CoreMessages.transactionCannotReadState(), cause);
     }
 }

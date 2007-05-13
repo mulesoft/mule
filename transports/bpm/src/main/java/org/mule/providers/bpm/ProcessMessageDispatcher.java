@@ -11,7 +11,7 @@
 package org.mule.providers.bpm;
 
 import org.mule.config.MuleProperties;
-import org.mule.config.i18n.Message;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.providers.NullPayload;
@@ -56,7 +56,7 @@ public class ProcessMessageDispatcher extends AbstractMessageDispatcher
         }
         else
         {
-            throw new DispatchException(Message
+            throw new DispatchException(MessageFactory
                 .createStaticMessage("Synchronous process invocation must return the new process state."),
                 event.getMessage(), event.getEndpoint());
         }
@@ -109,6 +109,8 @@ public class ProcessMessageDispatcher extends AbstractMessageDispatcher
         true);
         processVariables.remove(ProcessConnector.PROPERTY_PROCESS_TYPE);
 
+        // TODO MULE-1220 The processId for BPM is sort of like a session and so we could probably use
+        // Mule's SessionHandler interface for managing this.  
         Object processId;
         String processIdField = connector.getProcessIdField();
         if (StringUtils.isNotEmpty(processIdField))
@@ -159,7 +161,7 @@ public class ProcessMessageDispatcher extends AbstractMessageDispatcher
         {
             if (processType != null)
             {
-                process = connector.getBpms().startProcess(processType, processVariables);
+                process = connector.getBpms().startProcess(processType, transition, processVariables);
                 if ((process != null) && logger.isInfoEnabled())
                 {
                     logger.info("New process started, ID = " + connector.getBpms().getId(process));

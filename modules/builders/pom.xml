@@ -9,28 +9,8 @@
         <version>2.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-builders</artifactId>
-    <!--<packaging>bundle</packaging>-->
     <name>Mule Configuration Builders</name>
     <description>Standard configuration builders for Mule</description>
-
-    <build>
-         <plugins>
-              <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <configuration>
-                    <instructions>
-                        <!-- TODO Limit exports to the minimum necessary,
-                            in particular "impl" packages should not be exported. --> 
-                        <Export-Package>
-                            org.mule.config.builders,
-                            org.mule.config.converters
-                        </Export-Package>
-                    </instructions>
-                </configuration>
-            </plugin>
-         </plugins>
-    </build>
 
     <profiles>
         <profile>
@@ -44,12 +24,33 @@
                 <dependency>
                     <groupId>xml-apis</groupId>
                     <artifactId>xml-apis</artifactId>
-                    <version>1.3.03</version>
                 </dependency>
                 <dependency>
                     <groupId>xerces</groupId>
                     <artifactId>xercesImpl</artifactId>
-                    <version>2.8.1</version>
+                </dependency>
+                <!-- Used by MuleXmlConfigurationBuilder -->
+                <dependency>
+                    <groupId>commons-digester</groupId>
+                    <artifactId>commons-digester</artifactId>
+                    <version>1.7</version>
+                    <exclusions>
+                        <!-- we want newer collections via core -->
+                        <exclusion>
+                            <groupId>commons-collections</groupId>
+                            <artifactId>commons-collections</artifactId>
+                        </exclusion>
+                        <!-- we want newer beanutils via core -->
+                        <exclusion>
+                            <groupId>commons-beanutils</groupId>
+                            <artifactId>commons-beanutils</artifactId>
+                        </exclusion>
+                        <!-- we like slf4j -->
+                        <exclusion>
+                            <groupId>commons-logging</groupId>
+                            <artifactId>commons-logging</artifactId>
+                        </exclusion>
+                    </exclusions>
                 </dependency>
             </dependencies>
         </profile>
@@ -58,6 +59,35 @@
             <activation>
                 <jdk>1.5</jdk>
             </activation>
+            <dependencies>
+                <!-- Used by MuleXmlConfigurationBuilder -->
+                <dependency>
+                    <groupId>commons-digester</groupId>
+                    <artifactId>commons-digester</artifactId>
+                    <version>1.7</version>
+                    <exclusions>
+                        <!-- we want newer collections via core -->
+                        <exclusion>
+                            <groupId>commons-collections</groupId>
+                            <artifactId>commons-collections</artifactId>
+                        </exclusion>
+                        <!-- we want newer beanutils via core -->
+                        <exclusion>
+                            <groupId>commons-beanutils</groupId>
+                            <artifactId>commons-beanutils</artifactId>
+                        </exclusion>
+                        <!-- we like slf4j -->
+                        <exclusion>
+                            <groupId>commons-logging</groupId>
+                            <artifactId>commons-logging</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>xml-apis</groupId>
+                            <artifactId>xml-apis</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+            </dependencies>
         </profile>
     </profiles>
 
@@ -66,10 +96,12 @@
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-servlet_2.4_spec</artifactId>
-            <version>1.0.1</version>
+            <!-- TODO MULE-10221
+            This library causes conflicts when Mule is deployed to a Web/J2EE server but is
+            needed otherwise.
             <scope>provided</scope>
+            -->
         </dependency>
     </dependencies>
-
 
 </project>

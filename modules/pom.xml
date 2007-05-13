@@ -21,7 +21,7 @@
         <module>builders</module>
         <module>boot</module>
         <module>client</module>
-        <!--<module>hivemind</module>-->
+        <module>hivemind</module>
         <module>jaas</module>
         <module>jca</module>
         <module>jotm</module>
@@ -47,10 +47,16 @@
 
         <!-- TODO Creates cyclic dependency: mule-tests-functional -> mule-module-builders -> mule-tests-functional
         <dependency>
+<<<<<<< .working
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
             <version>${version}</version>
             <scope>test</scope>
+=======
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+            <scope>provided</scope>
+>>>>>>> .merge-right.r6496
         </dependency>
         -->
 

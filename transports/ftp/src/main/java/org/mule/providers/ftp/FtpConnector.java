@@ -10,8 +10,10 @@
 
 package org.mule.providers.ftp;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.MuleRuntimeException;
+import org.mule.config.i18n.CoreMessages;
+import org.mule.config.i18n.MessageFactory;
+import org.mule.impl.model.streaming.CallbackOutputStream;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.file.FilenameParser;
 import org.mule.providers.file.SimpleFilenameParser;
@@ -25,6 +27,7 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.ConnectorException;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.UMOMessageReceiver;
+import org.mule.util.ClassUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -34,9 +37,7 @@ import java.util.Map;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPReply;
 import org.apache.commons.pool.ObjectPool;
-import org.apache.commons.pool.PoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericObjectPool;
 
 public class FtpConnector extends AbstractConnector
@@ -47,12 +48,20 @@ public class FtpConnector extends AbstractConnector
     public static final String PROPERTY_PASSIVE_MODE = "passive";
     public static final String PROPERTY_BINARY_TRANSFER = "binary";
 
+    public static final int DEFAULT_POLLING_FREQUENCY = 1000;
+
+    /**
+     *  TODO it makes sense to have a type-safe adapter for FTP specifically, but without
+     *  Java 5's covariant return types the benefits are diminished. Keeping it simple for now.
+     */
+    public static final String DEFAULT_FTP_CONNECTION_FACTORY_CLASS = "org.mule.providers.ftp.FtpConnectionFactory";
+
     /**
      * Time in milliseconds to poll. On each poll the poll() method is called
      */
-    private long pollingFrequency = 0;
+    private long pollingFrequency;
 
-    private String outputPattern = null;
+    private String outputPattern;
 
     private FilenameParser filenameParser = new SimpleFilenameParser();
 
@@ -67,6 +76,8 @@ public class FtpConnector extends AbstractConnector
 
     private Map pools = new HashMap();
 
+    private String connectionFactoryClass = DEFAULT_FTP_CONNECTION_FACTORY_CLASS;
+
     public String getProtocol()
     {
         return "ftp";
@@ -79,7 +90,7 @@ public class FtpConnector extends AbstractConnector
         if (props != null)
         {
             // Override properties on the endpoint for the specific endpoint
-            String tempPolling = (String)props.get(PROPERTY_POLLING_FREQUENCY);
+            String tempPolling = (String) props.get(PROPERTY_POLLING_FREQUENCY);
             if (tempPolling != null)
             {
                 polling = Long.parseLong(tempPolling);
@@ -87,11 +98,11 @@ public class FtpConnector extends AbstractConnector
         }
         if (polling <= 0)
         {
-            polling = 1000;
+            polling = DEFAULT_POLLING_FREQUENCY;
         }
-        logger.debug("set polling frequency to: " + polling);
-        return serviceDescriptor.createMessageReceiver(this, component, endpoint, new Object[]{new Long(
-            polling)});
+        logger.debug("set polling frequency to " + polling);
+        return serviceDescriptor.createMessageReceiver(this, component, endpoint,
+                new Object[]{new Long(polling)});
     }
 
     /**
@@ -110,134 +121,114 @@ public class FtpConnector extends AbstractConnector
         this.pollingFrequency = pollingFrequency;
     }
 
+    /**
+     * Getter for property 'connectionFactoryClass'.
+     *
+     * @return Value for property 'connectionFactoryClass'.
+     */
+    public String getConnectionFactoryClass()
+    {
+        return connectionFactoryClass;
+    }
+
+    /**
+     * Setter for property 'connectionFactoryClass'. Should be an instance of
+     * {@link FtpConnectionFactory}.
+     *
+     * @param connectionFactoryClass Value to set for property 'connectionFactoryClass'.
+     */
+    public void setConnectionFactoryClass(final String connectionFactoryClass)
+    {
+        this.connectionFactoryClass = connectionFactoryClass;
+    }
+
     public FTPClient getFtp(UMOEndpointURI uri) throws Exception
     {
-        ObjectPool pool = getFtpPool(uri);
-        return (FTPClient)pool.borrowObject();
+        if (logger.isDebugEnabled())
+        {
+            logger.debug(">>> retrieving client for " + uri);
+        }
+        return (FTPClient) getFtpPool(uri).borrowObject();
     }
 
     public void releaseFtp(UMOEndpointURI uri, FTPClient client) throws Exception
     {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("<<< releasing client for " + uri);
+        }
         if (dispatcherFactory.isCreateDispatcherPerRequest())
         {
             destroyFtp(uri, client);
         }
         else
         {
-            if (client != null && client.isConnected())
-            {
-                ObjectPool pool = getFtpPool(uri);
-                pool.returnObject(client);
-            }
+            getFtpPool(uri).returnObject(client);
         }
     }
 
     public void destroyFtp(UMOEndpointURI uri, FTPClient client) throws Exception
     {
-        if (client != null && client.isConnected())
+        if (logger.isDebugEnabled())
         {
-            ObjectPool pool = getFtpPool(uri);
-            pool.invalidateObject(client);
+            logger.debug("<<< destroying client for " + uri);
+        }
+        try
+        {
+            getFtpPool(uri).invalidateObject(client);
+        }
+        catch (Exception e)
+        {
+            // no way to test if pool is closed except try to access it
+            logger.debug(e.getMessage());
         }
     }
 
     protected synchronized ObjectPool getFtpPool(UMOEndpointURI uri)
     {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("=== get pool for " + uri);
+        }
         String key = uri.getUsername() + ":" + uri.getPassword() + "@" + uri.getHost() + ":" + uri.getPort();
-        ObjectPool pool = (ObjectPool)pools.get(key);
+        ObjectPool pool = (ObjectPool) pools.get(key);
         if (pool == null)
         {
-            pool = new GenericObjectPool(new FtpConnectionFactory(uri));
-            ((GenericObjectPool)pool).setTestOnBorrow(this.validateConnections);
-            pools.put(key, pool);
+            try
+            {
+                FtpConnectionFactory connectionFactory =
+                        (FtpConnectionFactory) ClassUtils.instanciateClass(getConnectionFactoryClass(),
+                                                                            new Object[] {uri}, getClass());
+                pool = new GenericObjectPool(connectionFactory);
+                ((GenericObjectPool) pool).setTestOnBorrow(this.validateConnections);
+                pools.put(key, pool);
+            }
+            catch (Exception ex)
+            {
+                throw new MuleRuntimeException(
+                        MessageFactory.createStaticMessage("Hmm, couldn't instanciate FTP connection factory."), ex);
+            }
         }
         return pool;
-    }
-
-    protected class FtpConnectionFactory implements PoolableObjectFactory
-    {
-        private UMOEndpointURI uri;
-
-        public FtpConnectionFactory(UMOEndpointURI uri)
-        {
-            this.uri = uri;
-        }
-
-        public Object makeObject() throws Exception
-        {
-            FTPClient client = new FTPClient();
-            try
-            {
-                if (uri.getPort() > 0)
-                {
-                    client.connect(uri.getHost(), uri.getPort());
-                }
-                else
-                {
-                    client.connect(uri.getHost());
-                }
-                if (!FTPReply.isPositiveCompletion(client.getReplyCode()))
-                {
-                    throw new IOException("Ftp error: " + client.getReplyCode());
-                }
-                if (!client.login(uri.getUsername(), uri.getPassword()))
-                {
-                    throw new IOException("Ftp error: " + client.getReplyCode());
-                }
-                if (!client.setFileType(FTP.BINARY_FILE_TYPE))
-                {
-                    throw new IOException("Ftp error. Couldn't set BINARY transfer type.");
-                }
-            }
-            catch (Exception e)
-            {
-                if (client.isConnected())
-                {
-                    client.disconnect();
-                }
-                throw e;
-            }
-            return client;
-        }
-
-        public void destroyObject(Object obj) throws Exception
-        {
-            FTPClient client = (FTPClient)obj;
-            client.logout();
-            client.disconnect();
-        }
-
-        public boolean validateObject(Object obj)
-        {
-            FTPClient client = (FTPClient)obj;
-            try
-            {
-                client.sendNoOp();
-                return true;
-            }
-            catch (IOException e)
-            {
-                return false;
-            }
-        }
-
-        public void activateObject(Object obj) throws Exception
-        {
-            FTPClient client = (FTPClient)obj;
-            client.setReaderThread(true);
-        }
-
-        public void passivateObject(Object obj) throws Exception
-        {
-            FTPClient client = (FTPClient)obj;
-            client.setReaderThread(false);
-        }
     }
 
 
     protected void doInitialise() throws InitialisationException
     {
-        // template method, nothing to do
+        try
+        {
+            Class objectFactoryClass = ClassUtils.loadClass(this.connectionFactoryClass, getClass());
+            if (!FtpConnectionFactory.class.isAssignableFrom(objectFactoryClass))
+            {
+                throw new InitialisationException(MessageFactory.createStaticMessage(
+                        "FTP connectionFactoryClass is not an instance of org.mule.providers.ftp.FtpConnectionFactory"),
+                        this);
+            }
+        }
+        catch (ClassNotFoundException e)
+        {
+            throw new InitialisationException(e, this);
+        }
     }
 
     protected void doDispose()
@@ -262,6 +253,10 @@ public class FtpConnector extends AbstractConnector
 
     protected void doStop() throws UMOException
     {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("!!! stopping all pools");
+        }
         try
         {
             for (Iterator it = pools.values().iterator(); it.hasNext();)
@@ -272,7 +267,7 @@ public class FtpConnector extends AbstractConnector
         }
         catch (Exception e)
         {
-            throw new ConnectorException(new Message(Messages.FAILED_TO_STOP_X, "FTP Connector"), this, e);
+            throw new ConnectorException(CoreMessages.failedToStop("FTP Connector"), this, e);
         }
     }
 
@@ -495,45 +490,72 @@ public class FtpConnector extends AbstractConnector
     public OutputStream getOutputStream(UMOImmutableEndpoint endpoint, UMOMessage message)
         throws UMOException
     {
-        FTPClient client = null;
-
-        UMOEndpointURI uri = endpoint.getEndpointURI();
-        String filename = (String)message.getProperty(FtpConnector.PROPERTY_FILENAME);
-
         try
         {
-            if (filename == null)
+            final UMOEndpointURI uri = endpoint.getEndpointURI();
+            String filename = getFilename(endpoint, message);
+            final FTPClient client = getFtp(uri);
+
+            try
             {
-                String outPattern = (String)endpoint.getProperty(FtpConnector.PROPERTY_OUTPUT_PATTERN);
-                if (outPattern == null){
-                    outPattern = message.getStringProperty(FtpConnector.PROPERTY_OUTPUT_PATTERN,
-                    getOutputPattern());
+                enterActiveOrPassiveMode(client, endpoint);
+                setupFileType(client, endpoint);
+                if (!client.changeWorkingDirectory(uri.getPath()))
+                {
+                    throw new IOException("Ftp error: " + client.getReplyCode());
                 }
-                filename = generateFilename(message, outPattern);
+                OutputStream out = client.storeFileStream(filename);
+                return new CallbackOutputStream(out,
+                        new CallbackOutputStream.Callback()
+                        {
+                            public void onClose() throws Exception
+                            {
+                                try
+                                {
+                                    if (!client.completePendingCommand())
+                                    {
+                                        client.logout();
+                                        client.disconnect();
+                                        throw new IOException("FTP Stream failed to complete pending request");
+                                    }
+                                }
+                                finally
+                                {
+                                    releaseFtp(uri, client);
+                                }
+                            }
+                        });
             }
-
-            if (filename == null)
+            catch (Exception e)
             {
-                throw new IOException("Filename is null");
+                logger.debug("Error getting output stream: ", e);
+                releaseFtp(uri, client);
+                throw e;
             }
-
-            client = getFtp(uri);
-            enterActiveOrPassiveMode(client, endpoint);
-            setupFileType(client, endpoint);
-            if (!client.changeWorkingDirectory(uri.getPath()))
-            {
-                throw new IOException("Ftp error: " + client.getReplyCode());
-            }
-            OutputStream out = client.storeFileStream(filename);
-            // We wrap the ftp outputstream to ensure that the
-            // completePendingRequest() method is called when the stream is closed
-            return new FtpOutputStreamWrapper(client, out);
         }
         catch (Exception e)
         {
-            throw new DispatchException(new Message(Messages.STREAMING_FAILED_NO_STREAM), message, endpoint,
-                e);
+            throw new DispatchException(CoreMessages.streamingFailedNoStream(), message, endpoint, e);
         }
+    }
+
+    private String getFilename(UMOImmutableEndpoint endpoint, UMOMessage message) throws IOException
+    {
+        String filename = (String)message.getProperty(FtpConnector.PROPERTY_FILENAME);
+        if (filename == null)
+        {
+            String outPattern = (String) endpoint.getProperty(FtpConnector.PROPERTY_OUTPUT_PATTERN);
+            if (outPattern == null){
+                outPattern = message.getStringProperty(FtpConnector.PROPERTY_OUTPUT_PATTERN,
+                        getOutputPattern());
+            }
+            filename = generateFilename(message, outPattern);
+        }
+        if (filename == null)
+        {
+            throw new IOException("Filename is null");
+        }
+        return filename;
     }
 
     private String generateFilename(UMOMessage message, String pattern)

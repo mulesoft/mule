@@ -10,8 +10,7 @@
 
 package org.mule.impl.model;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.DefaultComponentExceptionStrategy;
 import org.mule.impl.DefaultLifecycleAdapterFactory;
 import org.mule.impl.ImmutableMuleDescriptor;
@@ -153,7 +152,7 @@ public abstract class AbstractModel implements UMOModel
     {
         if (descriptor == null)
         {
-            throw new ModelException(new Message(Messages.X_IS_NULL, "UMO Descriptor"));
+            throw new ModelException(CoreMessages.objectIsNull("UMO Descriptor"));
         }
 
         if(descriptor.getModelName()==null)
@@ -162,18 +161,8 @@ public abstract class AbstractModel implements UMOModel
         }
         else if(!descriptor.getModelName().equals(getName()))
         {
-            //TODO
-            throw new ModelException(Message.createStaticMessage("Model name on descriptor: " + descriptor.getName() + "." + descriptor.getModelName() + " doesn't match this model: " + getName()));
+            throw new ModelException(CoreMessages.modelNameDoesNotMatchModel(descriptor, getName()));
         }
-
-        //TODO this is a bit hacky. The API needs to change I think. Right now you can register a Descriptor on the
-        //model or through the registry
-//        if (RegistryContext.getRegistry().lookupService(descriptor.getName()) == null)
-//        {
-//            RegistryContext.getRegistry().registerService(descriptor);
-//            return;
-//        }
-
 
         // Set the es if one wasn't set in the configuration
         if (descriptor.getExceptionListener() == null)
@@ -184,7 +173,7 @@ public abstract class AbstractModel implements UMOModel
         // detect duplicate descriptor declarations
         if (descriptors.get(descriptor.getName()) != null)
         {
-            throw new ModelException(new Message(Messages.DESCRIPTOR_X_ALREADY_EXISTS, descriptor.getName()));
+            throw new ModelException(CoreMessages.descriptorAlreadyExists(descriptor.getName()));
         }
         
         UMOComponent component = (UMOComponent) components.get(descriptor.getName());
@@ -214,12 +203,12 @@ public abstract class AbstractModel implements UMOModel
     {
         if (descriptor == null)
         {
-            throw new ModelException(new Message(Messages.X_IS_NULL, "UMO Descriptor"));
+            throw new ModelException(CoreMessages.objectIsNull("UMO Descriptor"));
         }
 
         if (!isComponentRegistered(descriptor.getName()))
         {
-            throw new ModelException(new Message(Messages.COMPONENT_X_NOT_REGISTERED, descriptor.getName()));
+            throw new ModelException(CoreMessages.componentNotRegistered(descriptor.getName()));
         }
         UMOComponent component = (UMOComponent) components.remove(descriptor.getName());
 
@@ -361,7 +350,7 @@ public abstract class AbstractModel implements UMOModel
         AbstractComponent component = (AbstractComponent) components.get(name);
         if (component == null)
         {
-            throw new ModelException(new Message(Messages.COMPONENT_X_NOT_REGISTERED, name));
+            throw new ModelException(CoreMessages.componentNotRegistered(name));
         }
         else
         {
@@ -403,7 +392,7 @@ public abstract class AbstractModel implements UMOModel
         UMOComponent component = (UMOComponent) components.get(name);
         if (component == null)
         {
-            throw new ModelException(new Message(Messages.COMPONENT_X_NOT_REGISTERED, name));
+            throw new ModelException(CoreMessages.componentNotRegistered(name));
         }
         else
         {
@@ -436,7 +425,7 @@ public abstract class AbstractModel implements UMOModel
         }
         else
         {
-            throw new ModelException(new Message(Messages.COMPONENT_X_NOT_REGISTERED, name));
+            throw new ModelException(CoreMessages.componentNotRegistered(name));
         }
     }
 
@@ -459,7 +448,7 @@ public abstract class AbstractModel implements UMOModel
         }
         else
         {
-            throw new ModelException(new Message(Messages.COMPONENT_X_NOT_REGISTERED, name));
+            throw new ModelException(CoreMessages.componentNotRegistered(name));
         }
     }
 

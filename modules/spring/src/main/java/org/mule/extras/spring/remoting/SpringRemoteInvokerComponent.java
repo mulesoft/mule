@@ -10,8 +10,7 @@
 
 package org.mule.extras.spring.remoting;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Initialisable;
@@ -65,13 +64,13 @@ public class SpringRemoteInvokerComponent implements Initialisable, Callable
     public void initialise() throws InitialisationException {
         if (serviceClass == null && serviceBean == null)
         {
-            throw new InitialisationException(new Message(Messages.PROPERTIES_X_NOT_SET,
-                "serviceClass or serviceBean"), this);
+            throw new InitialisationException(
+                CoreMessages.propertiesNotSet("serviceClass or serviceBean"), this);
         }
         if (serviceInterface == null)
         {
-            throw new InitialisationException(new Message(Messages.PROPERTIES_X_NOT_SET, "serviceInterface"),
-                this);
+            throw new InitialisationException(
+                CoreMessages.propertiesNotSet("serviceInterface"), this);
         }
 
         if (serviceClass != null)

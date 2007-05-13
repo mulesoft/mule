@@ -11,11 +11,10 @@
 package org.mule.providers.http.transformers;
 
 import org.mule.config.MuleProperties;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 import org.mule.providers.NullPayload;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
+import org.mule.providers.http.i18n.HttpMessages;
 import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.UMOEventContext;
@@ -109,7 +108,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
         if (endpoint == null)
         {
             throw new TransformerException(
-                new Message(Messages.EVENT_PROPERTY_X_NOT_SET_CANT_PROCESS_REQUEST,
+                HttpMessages.eventPropertyNotSetCannotProcessRequest(
                     MuleProperties.MULE_ENDPOINT_PROPERTY), this);
         }
 

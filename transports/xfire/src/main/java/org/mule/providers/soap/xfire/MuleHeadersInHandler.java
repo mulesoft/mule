@@ -36,7 +36,10 @@ public class MuleHeadersInHandler extends AbstractHandler
         if (context.getInMessage() != null)
         {
             Element header = context.getInMessage().getHeader();
-            if (header == null) return;
+            if (header == null)
+            {
+                return;
+            }
 
             Element muleHeaders = header.getChild(MuleSoapHeaders.MULE_HEADER, ns);
             if (muleHeaders != null)

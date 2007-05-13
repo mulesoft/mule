@@ -15,11 +15,13 @@ import org.mule.umo.transformer.UMOTransformer;
 public class ObjectByteArrayTransformersWithObjectsTestCase extends SerialisedObjectTransformersTestCase
 {
 
+    // @Override
     public UMOTransformer getTransformer() throws Exception
     {
         return new ObjectToByteArray();
     }
 
+    // @Override
     public UMOTransformer getRoundTripTransformer() throws Exception
     {
         return new ByteArrayToObject();

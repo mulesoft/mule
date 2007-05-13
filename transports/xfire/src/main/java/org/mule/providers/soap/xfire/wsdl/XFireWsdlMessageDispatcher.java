@@ -28,7 +28,7 @@ import org.codehaus.xfire.service.Service;
  */
 public class XFireWsdlMessageDispatcher extends XFireMessageDispatcher
 {
-    public String DEFAULT_WSDL_TRANSPORT = "org.codehaus.xfire.transport.http.SoapHttpTransport";
+    public static final String DEFAULT_WSDL_TRANSPORT = "org.codehaus.xfire.transport.http.SoapHttpTransport";
 
     public XFireWsdlMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
@@ -47,7 +47,7 @@ public class XFireWsdlMessageDispatcher extends XFireMessageDispatcher
             // If the property specified an alternative WSDL url, use it
             if (endpoint.getProperty("wsdlUrl") != null && StringUtils.isNotBlank(endpoint.getProperty("wsdlUrl").toString()))
             {
-                wsdlUrl = (String)endpoint.getProperty("wsdlUrl");
+                wsdlUrl = (String) endpoint.getProperty("wsdlUrl");
             }
 
             if (serviceName.indexOf("?") > -1)

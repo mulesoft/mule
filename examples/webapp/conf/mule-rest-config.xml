@@ -9,16 +9,11 @@
         <endpoint name="restFileEndpoint" address="file://./.mule/restFile"/>
     </global-endpoints>
 
-    <model name="main" type="inherited">
-        <mule-descriptor name="RestTesterUMO" implementation="org.mule.samples.rest.RestTester">
-            <inbound-router>
-                <endpoint address="servlet://restPUTTest"/>
-            </inbound-router>
-            <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="restFileEndpoint"/>
-                </router>
-            </outbound-router>
+    <model name="samples" type="inherited">
+        <mule-descriptor name="RestTesterUMO"
+            inboundEndpoint="servlet://restPUTTest"
+            outboundEndpoint="restFileEndpoint" 
+            implementation="org.mule.samples.rest.RestTester">
             <properties>
                 <property name="prefix" value="Received: "/>
             </properties>

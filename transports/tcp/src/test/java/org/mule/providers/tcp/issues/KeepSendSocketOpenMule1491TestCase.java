@@ -15,15 +15,15 @@ import org.mule.providers.tcp.protocols.LengthProtocol;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
-
-import java.io.BufferedInputStream;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
+import java.io.BufferedInputStream;
+
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 public class KeepSendSocketOpenMule1491TestCase  extends FunctionalTestCase 
 {

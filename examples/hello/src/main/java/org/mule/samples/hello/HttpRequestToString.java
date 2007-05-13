@@ -10,7 +10,7 @@
 
 package org.mule.samples.hello;
 
-import org.mule.config.i18n.Message;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 
@@ -69,7 +69,7 @@ public class HttpRequestToString extends AbstractTransformer
         }
         else
         {
-            throw new TransformerException(Message.createStaticMessage("Failed to parse param string: "
+            throw new TransformerException(MessageFactory.createStaticMessage("Failed to parse param string: "
                             + param), this);
         }
     }

@@ -10,8 +10,7 @@
 
 package org.mule.impl.model.pipeline;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
@@ -59,8 +58,8 @@ public class PipelineComponent extends DirectComponent
         }
         else
         {
-            throw new InitialisationException(new Message(Messages.OBJECT_X_NOT_OF_CORRECT_TYPE_SHOULD_BE_X,
-                component.getClass().getName(), Callable.class.getName()), this);
+            throw new InitialisationException(
+                CoreMessages.objectNotOfCorrectType(component.getClass(), Callable.class), this);
         }
 
         if (component instanceof Initialisable)

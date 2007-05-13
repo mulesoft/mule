@@ -1,10 +1,18 @@
 #! /bin/sh
 
 <<<<<<< .working
+<<<<<<< .working
 =======
 # 3rd party libraries needed to run the example
 ACTIVEMQ=apache-activemq-4.1.0-incubator.jar
+=======
+# 3rd party libraries for LoanBroker ESB
+ACTIVEMQ=activemq-core-4.1.0-incubator.jar
+>>>>>>> .merge-right.r6496
 OPENEJB=openejb-core-1.0.jar
+# 3rd party libraries for LoanBroker BPM
+BSH=bsh-1.3.0.jar
+HSQLDB=hsqldb-1.8.0.7.jar
 
 >>>>>>> .merge-right.r6089
 # There is no need to call this if you set the MULE_HOME in your environment
@@ -24,9 +32,13 @@ MULE_LIB=./conf
 export MULE_LIB
 
 <<<<<<< .working
+<<<<<<< .working
 exec $MULE_BASE/bin/mule -main org.mule.samples.loanbroker.LoanConsumer
 =======
 echo "The Loan Broker example is available in three flavors:"
+=======
+echo "The Loan Broker example is available in three flavors:"
+>>>>>>> .merge-right.r6496
 echo "  1. Loan Broker ESB"
 echo "  2. Loan Broker ESN"
 echo "  3. Loan Broker BPM"
@@ -48,18 +60,50 @@ then
           MISSING_LIB=1
        fi
     fi
-
     if [ -z "$MISSING_LIB" ]
     then
+<<<<<<< .working
         exec "$MULE_BASE/bin/mule" -main org.mule.examples.loanbroker.esb.LoanBrokerApp
     else
         echo "This example requires additional libraries which need to be downloaded by the build script.  Please follow the instructions in the README.txt file."
+=======
+        exec "$MULE_BASE/bin/mule" -main org.mule.examples.loanbroker.esb.LoanBrokerApp
+>>>>>>> .merge-right.r6496
     fi
 elif [ 2 = $i ]
 then
+<<<<<<< .working
     exec "$MULE_BASE/bin/mule" -main org.mule.examples.loanbroker.esn.LoanBrokerApp
 elif [ 3 = $i ]
 then
     exec "$MULE_BASE/bin/mule" -main org.mule.examples.loanbroker.bpm.LoanBrokerApp
+=======
+    exec "$MULE_BASE/bin/mule" -main org.mule.examples.loanbroker.esn.LoanBrokerApp
+elif [ 3 = $i ]
+then
+    if [ ! -f "$MULE_BASE/lib/user/${BSH}" ]; then
+       if [ ! -f "$MULE_HOME/lib/user/${BSH}" ]; then
+          MISSING_LIB=1
+       fi
+    fi
+    if [ ! -f "$MULE_BASE/lib/user/${HSQLDB}" ]; then
+       if [ ! -f "$MULE_HOME/lib/user/${HSQLDB}" ]; then
+          MISSING_LIB=1
+       fi
+    fi
+    if [ -z "$MISSING_LIB" ]
+    then
+        exec "$MULE_BASE/bin/mule" -main org.mule.examples.loanbroker.bpm.LoanBrokerApp
+    fi
+>>>>>>> .merge-right.r6496
 fi
+<<<<<<< .working
 >>>>>>> .merge-right.r6089
+=======
+
+if [ 1 = "$MISSING_LIB" ]
+then
+    echo "This example requires additional libraries which need to be downloaded by the build script.  Please follow the instructions in the README.txt file."
+fi
+
+>>>>>>> .merge-right.r6496

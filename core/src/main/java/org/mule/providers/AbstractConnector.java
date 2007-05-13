@@ -13,8 +13,8 @@ package org.mule.providers;
 import org.mule.MuleRuntimeException;
 import org.mule.RegistryContext;
 import org.mule.config.ThreadingProfile;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 import org.mule.impl.AlreadyInitialisedException;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.MuleSessionHandler;
@@ -57,6 +57,7 @@ import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
 import org.mule.util.ObjectNameHelper;
 import org.mule.util.PropertiesUtils;
+import org.mule.util.ObjectUtils;
 import org.mule.util.concurrent.NamedThreadFactory;
 import org.mule.util.concurrent.WaitableBoolean;
 
@@ -318,7 +319,7 @@ public abstract class AbstractConnector
     {
         if (newName == null)
         {
-            throw new IllegalArgumentException(new Message(Messages.X_IS_NULL, "Connector name").toString());
+            throw new IllegalArgumentException(CoreMessages.objectIsNull("Connector name").toString());
         }
 
         if (logger.isDebugEnabled())
@@ -347,7 +348,7 @@ public abstract class AbstractConnector
         }
 
         // Initialise the structure of this connector
-        //TODO RM* THis should be called here this.initFromServiceDescriptor();
+        this.initFromServiceDescriptor();
 
         // we clearErrors out any registered dispatchers and receivers without resetting
         // the actual containers since this it might actually be a re-initialise
@@ -365,14 +366,6 @@ public abstract class AbstractConnector
         }
 
         initialised.set(true);
-
-        try
-        {
-            register();
-        }
-        catch (RegistrationException re)
-        {
-        }
     }
 
     /*
@@ -659,8 +652,8 @@ public abstract class AbstractConnector
     {
         if (exceptionListener == null)
         {
-            throw new MuleRuntimeException(new Message(
-                Messages.EXCEPTION_ON_CONNECTOR_X_NO_EXCEPTION_LISTENER, getName()), exception);
+            throw new MuleRuntimeException(
+                CoreMessages.exceptionOnConnectorNotExceptionListener(this.getName()), exception);
         }
         else
         {
@@ -763,11 +756,12 @@ public abstract class AbstractConnector
 
         if (!supportsProtocol(endpoint.getConnector().getProtocol()))
         {
-            throw new IllegalArgumentException(new Message(
-                Messages.CONNECTOR_SCHEME_X_INCOMPATIBLE_WITH_ENDPOINT_SCHEME_X, getProtocol(), endpoint
-                    .getEndpointURI().toString()).getMessage());
+            throw new IllegalArgumentException(
+                CoreMessages.connectorSchemeIncompatibleWithEndpointScheme(this.getProtocol(), 
+                    endpoint.getEndpointURI().toString()).getMessage());
         }
 
+        UMOMessageDispatcher dispatcher = null;
         try
         {
             if (logger.isDebugEnabled())
@@ -775,7 +769,7 @@ public abstract class AbstractConnector
                 logger.debug("Borrowing a dispatcher for endpoint: " + endpoint.getEndpointURI());
             }
 
-            UMOMessageDispatcher dispatcher = (UMOMessageDispatcher)dispatchers.borrowObject(endpoint);
+            dispatcher = (UMOMessageDispatcher)dispatchers.borrowObject(endpoint);
 
             if (logger.isDebugEnabled())
             {
@@ -787,7 +781,21 @@ public abstract class AbstractConnector
         }
         catch (Exception ex)
         {
-            throw new ConnectorException(new Message(Messages.CONNECTOR_CAUSED_ERROR), this, ex);
+            throw new ConnectorException(CoreMessages.connectorCausedError(), this, ex);
+        }
+        finally
+        {
+            try
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Borrowed dispatcher: " + ObjectUtils.toString(dispatcher, "null"));
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ConnectorException(CoreMessages.connectorCausedError(), this, ex);
+            }
         }
     }
 
@@ -830,7 +838,7 @@ public abstract class AbstractConnector
     {
         if (this.isDisposed())
         {
-            throw new DisposeException(new Message(Messages.CANT_USE_DISPOSED_CONNECTOR), this);
+            throw new DisposeException(CoreMessages.cannotUseDisposedConnector(), this);
         }
     }
 
@@ -849,7 +857,7 @@ public abstract class AbstractConnector
         UMOEndpointURI endpointUri = endpoint.getEndpointURI();
         if (endpointUri == null)
         {
-            throw new ConnectorException(new Message(Messages.ENDPOINT_NULL_FOR_LISTENER), this);
+            throw new ConnectorException(CoreMessages.endpointIsNullForListener(), this);
         }
 
         logger.info("Registering listener: " + component.getDescriptor().getName() + " on endpointUri: "
@@ -859,7 +867,7 @@ public abstract class AbstractConnector
 
         if (receiver != null)
         {
-            throw new ConnectorException(new Message(Messages.LISTENER_ALREADY_REGISTERED, endpointUri), this);
+            throw new ConnectorException(CoreMessages.listenerAlreadyRegistered(endpointUri), this);
         }
         else
         {
@@ -1099,7 +1107,7 @@ public abstract class AbstractConnector
         }
         catch (Exception e)
         {
-            throw new MuleRuntimeException(new Message(Messages.FAILED_TO_CLONE_X, "connectionStrategy"), e);
+            throw new MuleRuntimeException(CoreMessages.failedToClone("connectionStrategy"), e);
         }
     }
 
@@ -1598,7 +1606,7 @@ public abstract class AbstractConnector
         }
         else
         {
-            throw new MuleRuntimeException(new Message(Messages.CONNECTOR_CAUSED_ERROR, getName()), e);
+            throw new MuleRuntimeException(CoreMessages.connectorCausedError(this.getName()), e);
         }
     }
 
@@ -1690,8 +1698,9 @@ public abstract class AbstractConnector
     {
         if (!supportsProtocol(endpointUri.getFullScheme()))
         {
-            throw new InitialisationException(new Message(Messages.SCHEME_X_NOT_COMPATIBLE_WITH_CONNECTOR_X,
-                endpointUri.getFullScheme(), getClass().getName()), this);
+            throw new InitialisationException(
+                CoreMessages.schemeNotCompatibleWithConnector(endpointUri.getFullScheme(), 
+                    this.getClass()), this);
         }
         Properties props = new Properties();
         props.putAll(endpointUri.getParams());
@@ -1738,7 +1747,7 @@ public abstract class AbstractConnector
                 RegistryContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, getProtocol().toLowerCase(), serviceOverrides);
             if (serviceDescriptor == null)
             {
-                throw new ServiceException(Message.createStaticMessage("No service descriptor found for transport: " + getProtocol() + ".  This transport does not appear to be installed."));
+                throw new ServiceException(CoreMessages.noServiceTransportDescriptor(getProtocol()));
             }
 
             if (logger.isDebugEnabled())
@@ -1833,7 +1842,7 @@ public abstract class AbstractConnector
         }
         catch (TransportServiceException e)
         {
-            throw new MessagingException(new Message(Messages.FAILED_TO_CREATE_X, "Message Adapter"),
+            throw new MessagingException(CoreMessages.failedToCreate("Message Adapter"),
                 message, e);
         }
     }
@@ -1858,7 +1867,7 @@ public abstract class AbstractConnector
         }
         catch (TransportServiceException e)
         {
-            throw new MessagingException(new Message(Messages.FAILED_TO_CREATE_X, "Stream Message Adapter"),
+            throw new MessagingException(CoreMessages.failedToCreate("Stream Message Adapter"),
                 in, e);
         }
     }
@@ -1886,22 +1895,22 @@ public abstract class AbstractConnector
     }
 
     /**
-     * Well get the output stream (if any) for this type of transport. Typically this
-     * will be called only when Streaming is being used on an outbound endpoint. If
-     * Streaming is not supported by this transport an
-     * {@link UnsupportedOperationException} is thrown
+     * Will get the output stream for this type of transport. Typically this
+     * will be called only when Streaming is being used on an outbound endpoint.
+     * If Streaming is not supported by this transport an {@link UnsupportedOperationException}
+     * is thrown.   Note that the stream MUST release resources on close.  For help doing so, see
+     * {@link org.mule.impl.model.streaming.CallbackOutputStream}.
      *
      * @param endpoint the endpoint that releates to this Dispatcher
      * @param message the current message being processed
-     * @return the output stream to use for this request or null if the transport
-     *         does not support streaming
-     * @throws org.mule.umo.UMOException
+     * @return the output stream to use for this request
+     * @throws UMOException in case of any error
      */
     public OutputStream getOutputStream(UMOImmutableEndpoint endpoint, UMOMessage message)
         throws UMOException
     {
-        throw new UnsupportedOperationException(new Message(Messages.STREAMING_NOT_SUPPORTED_FOR_X,
-            getProtocol()).toString());
+        throw new UnsupportedOperationException(
+            CoreMessages.streamingNotSupported(this.getProtocol()).toString());
     }
 
     public UMOManagementContext getManagementContext()
@@ -1912,22 +1921,13 @@ public abstract class AbstractConnector
     public void setManagementContext(UMOManagementContext context)
     {
         this.managementContext = context;
-        //TODO RM* This shouldn't be here
-        try
-        {
-            this.initFromServiceDescriptor();
-        }
-        catch (InitialisationException e)
-        {
-            throw new MuleRuntimeException(Message.createStaticMessage("Failed to init for service descriptor"), e);
-        }
     }
 
     // @Override
     public String toString()
     {
         final StringBuffer sb = new StringBuffer(120);
-        sb.append(ClassUtils.getShortClassName(this.getClass()));
+        sb.append(ClassUtils.getSimpleName(this.getClass()));
         sb.append("{this=").append(Integer.toHexString(System.identityHashCode(this)));
         sb.append(", started=").append(started);
         sb.append(", initialised=").append(initialised);

@@ -29,6 +29,19 @@
         -->
     </modules>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${muleVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-client</artifactId>
+            <version>${muleVersion}</version>
+        </dependency>
+    </dependencies>
+    
     <repositories>
         <repository>
             <id>codehaus</id>
@@ -76,66 +89,5 @@
                 <directory>src/main/resources</directory>
             </resource>
         </resources>
-
-        <plugins>
-            <!-- "mvn install" will copy the target jar to the $MULE_HOME/lib/user directory,
-                overwriting the previous one. -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-artifact</id>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${MULE_HOME}/lib/user</outputDirectory>
-                            <overWriteReleases>true</overWriteReleases>
-                            <overWriteSnapshots>true</overWriteSnapshots>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.apache.activemq</groupId>
-                                    <!-- TODO:
-                                         Import activemq-core artifact rather than
-                                         apache-activemq wich will include the entire kitchen sink.
-                                         Using it for now to make examples work
-                                    -->
-                                    <!--artifactId>activemq-core</artifactId-->
-                                    <artifactId>apache-activemq</artifactId>
-                                    <version>4.1.0-incubator</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>openejb</groupId>
-                                    <artifactId>openejb-core</artifactId>
-                                    <version>1.0</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>castor</groupId>
-                                    <artifactId>castor</artifactId>
-                                    <version>0.9.9</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.apache.activemq</groupId>
-                                    <artifactId>activeio-core</artifactId>
-                                    <version>3.0.0-incubator</version>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <!-- The Glue tests require a proprietary library. -->
-                        <exclude>**/GlueLoanBrokerSynchronousFunctionalTestCase.*</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-        </plugins>
     </build>
 </project>

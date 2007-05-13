@@ -22,33 +22,33 @@
         </properties>
     </container-context>
 
-    <connector name="JMSConnector" className="org.mule.providers.jms.JmsConnector">
-        <properties>
-            <property name="specification" value="1.1"/>
-            <container-property name="connectionFactory" reference="jmsConnectionFactory" container="spring"/>
-        </properties>
-    </connector>
+	<connector name="JMSConnector" className="org.mule.providers.jms.JmsConnector">
+		<properties>
+			<property name="specification" value="1.1"/>
+			<container-property name="connectionFactory" reference="jmsConnectionFactory" container="spring"/>
+		</properties>
+	</connector>
 
-    <model name="NestedRouter">
-        <mule-descriptor name="HelloComponent" implementation="org.mule.test.integration.routing.nested.HelloService">
-            <inbound-router>
-                <endpoint address="jms://hello.in"/>
-            </inbound-router>
-        </mule-descriptor>
-        <mule-descriptor name="InvokerComponent" implementation="org.mule.test.integration.routing.nested.Invoker">
-            <inbound-router>
-                <endpoint address="jms://invoker.in"/>
-            </inbound-router>
-            <nested-router>
-                <binding interface="org.mule.test.integration.routing.nested.HelloInterface">
-                    <endpoint address="jms://hello.in" remoteSync="true"/>
-                </binding>
-            </nested-router>
-            <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="jms://invoker.out"/>
-                </router>
-            </outbound-router>
-        </mule-descriptor>
-    </model>
+	<model name="NestedRouter">
+		<mule-descriptor name="HelloComponent" implementation="org.mule.test.integration.routing.nested.HelloService">
+			<inbound-router>
+				<endpoint address="jms://hello.in"/>
+			</inbound-router>
+		</mule-descriptor>
+		<mule-descriptor name="InvokerComponent" implementation="org.mule.test.integration.routing.nested.Invoker">
+			<inbound-router>
+				<endpoint address="jms://invoker.in"/>
+			</inbound-router>
+			<nested-router>
+				<binding interface="org.mule.test.integration.routing.nested.HelloInterface">
+					<endpoint address="jms://hello.in" remoteSync="true"/>
+				</binding>
+			</nested-router>
+			<outbound-router>
+				<router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+					<endpoint address="jms://invoker.out"/>
+				</router>
+			</outbound-router>
+		</mule-descriptor>
+	</model>
 </mule-configuration>

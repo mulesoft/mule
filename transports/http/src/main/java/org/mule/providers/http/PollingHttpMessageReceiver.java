@@ -10,8 +10,7 @@
 
 package org.mule.providers.http;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractPollingMessageReceiver;
 import org.mule.umo.UMOComponent;
@@ -20,8 +19,8 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
-import org.mule.util.MapUtils;
 import org.mule.util.Base64;
+import org.mule.util.MapUtils;
 
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -70,8 +69,9 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
         }
         catch (MalformedURLException e)
         {
-            throw new InitialisationException(new Message(Messages.VALUE_X_IS_INVALID_FOR_X,
-                endpoint.getEndpointURI().getAddress(), "uri"), e, this);
+            throw new InitialisationException(
+                CoreMessages.valueIsInvalidFor(endpoint.getEndpointURI().getAddress(), "uri"), 
+                e, this);
         }
     }
 

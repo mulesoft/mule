@@ -85,7 +85,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
 
         EventCallback callback = new EventCallback()
         {
-            public synchronized void eventReceived(UMOEventContext context, Object Component)
+            public synchronized void eventReceived(UMOEventContext context, Object component)
             {
                 callbackCalled = true;
                 assertNull(context.getCurrentTransaction());
@@ -120,7 +120,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
 
         EventCallback callback = new EventCallback()
         {
-            public synchronized void eventReceived(UMOEventContext context, Object Component) throws Exception
+            public synchronized void eventReceived(UMOEventContext context, Object component) throws Exception
             {
                 callbackCalled = true;
                 currentTx = context.getCurrentTransaction();
@@ -176,7 +176,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
 
         EventCallback callback = new EventCallback()
         {
-            public synchronized void eventReceived(UMOEventContext context, Object Component) throws Exception
+            public synchronized void eventReceived(UMOEventContext context, Object component) throws Exception
             {
                 callbackCalled = true;
                 currentTx = context.getCurrentTransaction();
@@ -242,7 +242,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
 
         EventCallback callback = new EventCallback()
         {
-            public synchronized void eventReceived(UMOEventContext context, Object Component) throws Exception
+            public synchronized void eventReceived(UMOEventContext context, Object component) throws Exception
             {
                 callbackCalled = true;
                 currentTx = context.getCurrentTransaction();
@@ -513,7 +513,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
 
         EventCallback callback = new EventCallback()
         {
-            public synchronized void eventReceived(UMOEventContext context, Object Component) throws Exception
+            public synchronized void eventReceived(UMOEventContext context, Object component) throws Exception
             {
                 callbackCalled = true;
                 currentTx = context.getCurrentTransaction();

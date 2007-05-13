@@ -38,6 +38,7 @@ public class StringByteArrayTransformersTestCase extends AbstractTransformerTest
         return "Test".getBytes();
     }
 
+    // @Override
     public boolean compareResults(Object src, Object result)
     {
         if (src == null && result == null)
@@ -51,6 +52,7 @@ public class StringByteArrayTransformersTestCase extends AbstractTransformerTest
         return Arrays.equals((byte[])src, (byte[])result);
     }
 
+    // @Override
     public boolean compareRoundtripResults(Object src, Object result)
     {
         if (src == null && result == null)

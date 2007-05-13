@@ -66,8 +66,9 @@ public interface TransportServiceDescriptor extends ServiceDescriptor
     public UMOTransformer createResponseTransformer() throws TransportFactoryException;
 
     public EndpointBuilder createEndpointBuilder() throws TransportFactoryException;
-    
+
     public void setExceptionMappings(Properties props);
-    
+
     public Properties getExceptionMappings();
+
 }

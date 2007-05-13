@@ -11,8 +11,7 @@
 package org.mule.providers.vm;
 
 import org.mule.MuleException;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractPollingMessageReceiver;
 import org.mule.providers.TransactedPollingMessageReceiver;
@@ -87,8 +86,8 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
             }
             catch (InterruptedException e)
             {
-                throw new MuleException(new Message(Messages.INTERRUPTED_QUEUING_EVENT_FOR_X,
-                    this.endpoint.getEndpointURI()), e);
+                throw new MuleException(
+                    CoreMessages.interruptedQueuingEventFor(this.endpoint.getEndpointURI()), e);
             }
         }
         else

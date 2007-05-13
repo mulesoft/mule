@@ -28,6 +28,8 @@ import java.beans.ExceptionListener;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import edu.emory.mathcs.backport.java.util.concurrent.ScheduledExecutorService;
+
 /**
  * <code>UMOConnector</code> is the mechanism used to connect to external systems
  * and protocols in order to send and receive data.
@@ -202,15 +204,15 @@ public interface UMOConnector extends Lifecycle, Initialisable, Registerable, Ma
 
 
     /**
-     * Well get the output stream for this type of transport. Typically this
+     * Will get the output stream for this type of transport. Typically this
      * will be called only when Streaming is being used on an outbound endpoint.
      * If Streaming is not supported by this transport an {@link UnsupportedOperationException}
-     * is thrown
+     * is thrown.   Note that the stream MUST release resources on close.  For help doing so, see
+     * {@link org.mule.impl.model.streaming.CallbackOutputStream}.
      *
      * @param endpoint the endpoint that releates to this Dispatcher
      * @param message the current message being processed
-     * @return the output stream to use for this request or null if the transport
-     *         does not support streaming
+     * @return the output stream to use for this request
      * @throws UMOException
      */
     OutputStream getOutputStream(UMOImmutableEndpoint endpoint, UMOMessage message) throws UMOException;

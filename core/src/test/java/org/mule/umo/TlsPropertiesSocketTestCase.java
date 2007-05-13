@@ -10,12 +10,11 @@
 
 package org.mule.umo;
 
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.security.tls.TlsConfiguration;
 import org.mule.umo.security.tls.TlsPropertiesSocketFactory;
 
-import junit.framework.TestCase;
-
-public class TlsPropertiesSocketTestCase extends TestCase
+public class TlsPropertiesSocketTestCase extends AbstractMuleTestCase
 {
 
     public void testSimpleSocket() throws Exception

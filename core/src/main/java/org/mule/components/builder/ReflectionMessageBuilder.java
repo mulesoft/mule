@@ -10,8 +10,7 @@
 
 package org.mule.components.builder;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.NoSatisfiableMethodsException;
 import org.mule.impl.TooManySatisfiableMethodsException;
 import org.mule.umo.UMOMessage;
@@ -69,9 +68,8 @@ public class ReflectionMessageBuilder extends AbstractMessageBuilder
             catch (Exception e)
             {
                 throw new MessageBuilderException(
-                    new Message(Messages.FAILED_TO_INVOKE_X, m.getName() + " on " + master.getClass().getName()), 
+                    CoreMessages.failedToInvoke(m.getName() + " on " + master.getClass().getName()), 
                     request, e);
-
             }
         }
         return master;

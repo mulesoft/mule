@@ -50,8 +50,9 @@
 
     <!-- TODO Move these to global-endpoints once MULE-1464 is fixed. -->
     <endpoint-identifiers>
-        <endpoint-identifier name="CustomerRequestsREST" value="jetty:rest://localhost:8080/loanbroker"/>
+        <endpoint-identifier name="CustomerRequestsREST" value="jetty:rest://localhost:8888/loanbroker"/>
         <endpoint-identifier name="CustomerRequests" value="vm://customer.requests"/>
+        <endpoint-identifier name="CustomerResponses" value="LoanQuotes"/>
         <endpoint-identifier name="LoanQuotes" value="jms://esb.loan.quotes"/>
         <endpoint-identifier name="CreditAgencyGateway" value="jms://esb.credit.agency"/>
         <!-- here we're telling Mule to invoke a remote Ejb directly (not host a

@@ -14,9 +14,7 @@ import org.mule.RegistryContext;
 import org.mule.config.CachedResource;
 import org.mule.config.ConfigurationException;
 import org.mule.config.ReaderInputStream;
-import org.mule.config.i18n.CoreMessageConstants;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.container.AbstractContainerContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.ContainerException;
@@ -166,9 +164,7 @@ public class SpringContainerContext extends AbstractContainerContext implements 
         }
         catch (UnsupportedEncodingException e)
         {
-            final Message message = new Message("core",
-                CoreMessageConstants.FAILED_TO_CONVERT_STRING_USING_X_ENCODING, encoding);
-            throw new ContainerException(message, e);
+            throw new ContainerException(CoreMessages.failedToConvertStringUsingEncoding(encoding), e);
         }
     }
 
@@ -210,8 +206,7 @@ public class SpringContainerContext extends AbstractContainerContext implements 
         }
         catch (BeansException e)
         {
-            throw new InitialisationException(new ConfigurationException(new Message(Messages.FAILED_LOAD_X,
-                "Application Context: " + configFile), e), this);
+            throw new InitialisationException(new ConfigurationException(CoreMessages.failedToLoad("Application Context: " + configFile), e), this);
         }
     }
 

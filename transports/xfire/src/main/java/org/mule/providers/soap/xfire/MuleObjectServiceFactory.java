@@ -89,7 +89,10 @@ public class MuleObjectServiceFactory extends ObjectServiceFactory
 
     protected boolean isValidMethod(final Method method)
     {
-        if (excludedMethods.contains(getMethodName(method))) return false;
+        if (excludedMethods.contains(getMethodName(method)))
+        {
+            return false;
+        }
 
         final int modifiers = method.getModifiers();
 

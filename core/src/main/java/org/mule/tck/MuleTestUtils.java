@@ -58,7 +58,6 @@ public final class MuleTestUtils
 {
     public static UMOModel getDefaultModel(UMOManagementContext context) throws UMOException
     {
-
         UMOModel m = context.getRegistry().lookupModel(UMOModel.DEFAULT_MODEL_NAME);
         if (m == null)
         {

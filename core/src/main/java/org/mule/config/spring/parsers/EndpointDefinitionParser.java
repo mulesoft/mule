@@ -9,8 +9,7 @@
  */
 package org.mule.config.spring.parsers;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.umo.endpoint.EndpointException;
@@ -101,7 +100,7 @@ public class EndpointDefinitionParser extends AbstractChildBeanDefinitionParser
                 }
                 catch (EndpointException e)
                 {
-                    throw new BeanCreationException(new Message(Messages.ENPOINT_X_IS_MALFORMED, address).getMessage(), e);
+                    throw new BeanCreationException(CoreMessages.endpointIsMalformed(address).getMessage(), e);
                 }
             }
         else {

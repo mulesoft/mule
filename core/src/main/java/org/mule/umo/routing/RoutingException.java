@@ -10,8 +10,8 @@
 
 package org.mule.umo.routing;
 
+import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
@@ -65,7 +65,7 @@ public class RoutingException extends MessagingException
 
     private static Message generateMessage(Message message, UMOImmutableEndpoint endpoint)
     {
-        Message m = new Message(Messages.FAILED_TO_ROUTER_VIA_ENDPOINT, endpoint);
+        Message m = CoreMessages.failedToRouterViaEndpoint(endpoint);
         if (message != null)
         {
             message.setNextMessage(m);

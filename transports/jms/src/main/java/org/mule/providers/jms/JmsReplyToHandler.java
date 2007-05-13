@@ -12,6 +12,7 @@ package org.mule.providers.jms;
 
 import org.mule.impl.model.AbstractComponent;
 import org.mule.providers.DefaultReplyToHandler;
+import org.mule.providers.jms.i18n.JmsMessages;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
@@ -26,8 +27,6 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.Topic;
 import javax.jms.Queue;
-
-import org.apache.commons.lang.ObjectUtils;
 
 /**
  * <code>JmsReplyToHandler</code> will process a JMS replyTo or hand off to the
@@ -137,8 +136,8 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
         }
         catch (Exception e)
         {
-            throw new DispatchException(new org.mule.config.i18n.Message("jms", 8, ObjectUtils.toString(
-                replyToDestination, "null")), returnMessage, null, e);
+            throw new DispatchException(
+                JmsMessages.failedToCreateAndDispatchResponse(replyToDestination), returnMessage, null, e);
         }
         finally
         {

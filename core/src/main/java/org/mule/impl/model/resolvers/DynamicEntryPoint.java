@@ -11,8 +11,7 @@
 package org.mule.impl.model.resolvers;
 
 import org.mule.config.MuleProperties;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.NoSatisfiableMethodsException;
 import org.mule.impl.RequestContext;
@@ -353,8 +352,9 @@ public class DynamicEntryPoint implements UMOEntryPoint
         {
             if (!fallback)
             {
-                throw new NoSuchMethodException(new Message(Messages.METHOD_X_WITH_PARAMS_X_NOT_FOUND_ON_X,
-                    methodName, "unknown", component.getClass().getName()).toString());
+                throw new NoSuchMethodException(
+                    CoreMessages.methodWithParamsNotFoundOnObject(methodName, "unknown", 
+                        component.getClass()).toString());
             }
         }
     }

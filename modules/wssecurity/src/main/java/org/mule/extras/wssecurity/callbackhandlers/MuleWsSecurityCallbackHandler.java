@@ -12,8 +12,7 @@ package org.mule.extras.wssecurity.callbackhandlers;
 
 import org.mule.MuleException;
 import org.mule.RegistryContext;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -40,10 +39,9 @@ public class MuleWsSecurityCallbackHandler implements CallbackHandler
         pass = (PasswordContainer) RegistryContext.getRegistry().lookupObject("passwords");
         if(pass==null)
         {
-            throw new MuleException(new Message(Messages.AUTH_NO_CREDENTIALS));
+            throw new MuleException(CoreMessages.authNoCredentials());
         }
         passwords = pass.getPasswords();
-
     }
 
     /**

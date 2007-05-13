@@ -14,7 +14,6 @@ import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
 
 import java.io.IOException;
-import java.io.OutputStream;
 
 import org.apache.commons.lang.SerializationUtils;
 
@@ -30,11 +29,10 @@ class MuleMessageWorker
         // no-op
     }
 
-    public static void doWrite(OutputStream os) throws IOException
+    public static byte[] doWrite() throws IOException
     {
         MuleMessage msg = (MuleMessage) RequestContext.getEvent().getMessage();
-        byte[] data = SerializationUtils.serialize(msg);
-        os.write(data);
+        return SerializationUtils.serialize(msg);
     }
 
     public static Object doRead(Object message) throws IOException

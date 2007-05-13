@@ -10,8 +10,8 @@
 
 package org.mule.providers.http.jetty;
 
-import org.mule.config.i18n.Message;
 import org.mule.providers.AbstractMessageReceiver;
+import org.mule.providers.http.i18n.HttpMessages;
 import org.mule.providers.http.servlet.MuleReceiverServlet;
 import org.mule.umo.endpoint.EndpointException;
 
@@ -33,7 +33,7 @@ public class JettyReceiverServlet extends MuleReceiverServlet
         receiver = (AbstractMessageReceiver)servletConfig.getServletContext().getAttribute("messageReceiver");
         if (receiver == null)
         {
-            throw new ServletException(new Message("http", 7).toString());
+            throw new ServletException(HttpMessages.receiverPropertyNotSet().toString());
         }
     }
 

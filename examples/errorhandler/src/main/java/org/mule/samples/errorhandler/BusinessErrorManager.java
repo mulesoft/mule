@@ -31,20 +31,15 @@ public class BusinessErrorManager implements Callable
     /** logger used by this class */
     private static transient Log logger = LogFactory.getLog(BusinessErrorManager.class);
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.lifecycle.AsynchronousCallable#onEvent(org.mule.umo.UMOEvent)
-     */
     public Object onCall(UMOEventContext context) throws UMOException
     {
         ErrorMessage msg = (ErrorMessage)context.getTransformedMessage();
         // Do something with the error message
         List msgs = new ArrayList();
 
-        msgs.add(LocaleMessage.getString(LocaleMessage.BUSINESS_ERROR_MANAGER_ERROR));
-        msgs.add(LocaleMessage.getString(LocaleMessage.ERROR_DETAIL, msg.getException().getDetailMessage()));
-        msgs.add(LocaleMessage.getString(LocaleMessage.ERROR_CLASS, msg.getException().getClass().getName()));
+        msgs.add(LocaleMessage.businessErrorManagerError());
+        msgs.add(LocaleMessage.errorDetail(msg.getException().getDetailMessage()));
+        msgs.add(LocaleMessage.errorClass(msg.getException().getClass()));
 
         logger.info("\n" + StringMessageUtils.getBoilerPlate(msgs, '*', 80));
         context.setStopFurtherProcessing(true);

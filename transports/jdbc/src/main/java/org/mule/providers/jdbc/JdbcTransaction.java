@@ -10,17 +10,17 @@
 
 package org.mule.providers.jdbc;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-
-import javax.sql.DataSource;
-
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
+import org.mule.providers.jdbc.i18n.JdbcMessages;
 import org.mule.transaction.AbstractSingleResourceTransaction;
 import org.mule.transaction.IllegalTransactionStateException;
 import org.mule.transaction.TransactionRollbackException;
 import org.mule.umo.TransactionException;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+
+import javax.sql.DataSource;
 
 /**
  * TODO
@@ -33,18 +33,12 @@ public class JdbcTransaction extends AbstractSingleResourceTransaction
         super();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.UMOTransaction#bindResource(java.lang.Object,
-     *      java.lang.Object)
-     */
     public void bindResource(Object key, Object resource) throws TransactionException
     {
         if (!(key instanceof DataSource) || !(resource instanceof Connection))
         {
-            throw new IllegalTransactionStateException(new Message(
-                Messages.TX_CAN_ONLY_BIND_TO_X_TYPE_RESOURCES, "javax.sql.DataSource/java.sql.Connection"));
+            throw new IllegalTransactionStateException(
+                CoreMessages.transactionCanOnlyBindToResources("javax.sql.DataSource/java.sql.Connection"));
         }
         Connection con = (Connection)resource;
         try
@@ -56,26 +50,16 @@ public class JdbcTransaction extends AbstractSingleResourceTransaction
         }
         catch (SQLException e)
         {
-            throw new TransactionException(new Message(Messages.TX_SET_AUTO_COMMIT_FAILED), e);
+            throw new TransactionException(JdbcMessages.transactionSetAutoCommitFailed(), e);
         }
         super.bindResource(key, resource);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transaction.AbstractSingleResourceTransaction#doBegin()
-     */
     protected void doBegin() throws TransactionException
     {
         // Do nothing
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transaction.AbstractSingleResourceTransaction#doCommit()
-     */
     protected void doCommit() throws TransactionException
     {
         try
@@ -85,15 +69,10 @@ public class JdbcTransaction extends AbstractSingleResourceTransaction
         }
         catch (SQLException e)
         {
-            throw new TransactionException(new Message(Messages.TX_COMMIT_FAILED), e);
+            throw new TransactionException(CoreMessages.transactionCommitFailed(), e);
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transaction.AbstractSingleResourceTransaction#doRollback()
-     */
     protected void doRollback() throws TransactionException
     {
         try
@@ -103,8 +82,7 @@ public class JdbcTransaction extends AbstractSingleResourceTransaction
         }
         catch (SQLException e)
         {
-            throw new TransactionRollbackException(new Message(Messages.TX_ROLLBACK_FAILED), e);
+            throw new TransactionRollbackException(CoreMessages.transactionRollbackFailed(), e);
         }
     }
-
 }

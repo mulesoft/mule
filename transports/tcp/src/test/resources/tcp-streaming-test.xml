@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC
+          "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+          "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="TcpStreaming" version="1.0">
+
+    <mule-environment-properties serverUrl="" synchronous="false"/>
+
+    <connector name="default" className="org.mule.providers.tcp.TcpConnector">
+        <properties>
+            <property name="validateConnections" value="false"/>
+        </properties>
+    </connector>
+
+    <model name="echo" type="streaming">
+
+        <mule-descriptor name="echo" implementation="org.mule.components.simple.StreamingBridgeComponent">
+            <inbound-router>
+                <endpoint address="tcp://localhost:65432" streaming="true"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="tcp://localhost:65433" streaming="true"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+        
+        <mule-descriptor name="testComponent" singleton="true"
+                         implementation="org.mule.tck.functional.FunctionalStreamingTestComponent">
+            <inbound-router>
+                <endpoint address="tcp://localhost:65433" streaming="true"/>
+            </inbound-router>
+        </mule-descriptor>
+
+    </model>
+
+</mule-configuration>

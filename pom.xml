@@ -51,14 +51,122 @@
         <url>http://svn.mule.codehaus.org/</url>
     </scm>
 
+    <properties>
+        <springVersion>2.0.5</springVersion>
+        <coberturaVersion>2.1</coberturaVersion>
+    </properties>
+
+    <!-- declare all dependencies that are used in more than one module here. -->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-ejb_2.1_spec</artifactId>
+                <version>1.0.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
+                <version>1.0.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-j2ee-management_1.0_spec</artifactId>
+                <version>1.0.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-jaxrpc_1.1_spec</artifactId>
+                <version>1.0.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-jms_1.1_spec</artifactId>
+                <version>1.0.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-jta_1.0.1B_spec</artifactId>
+                <version>1.0.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-qname_1.1_spec</artifactId>
+                <version>1.0.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-saaj_1.1_spec</artifactId>
+                <version>1.0.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-servlet_2.4_spec</artifactId>
+                <version>1.0.1</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.activation</groupId>
+                <artifactId>activation</artifactId>
+                <version>1.1</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.mail</groupId>
+                <artifactId>mail</artifactId>
+                <version>1.4</version>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>3.8.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring</artifactId>
+                <version>${springVersion}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>commons-logging</artifactId>
+                        <groupId>commons-logging</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-core</artifactId>
+                <version>${springVersion}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>commons-logging</artifactId>
+                        <groupId>commons-logging</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <!-- 
+                 The JDK version is fixed to 1.4 for now (see maven-enforcer-plugin config).
+                 This means that we can hard-code the xml parser versions here to shield
+                 us from all kinds of bad dependencies coming in transitively.
+            -->
+            <dependency>
+                <groupId>xml-apis</groupId>
+                <artifactId>xml-apis</artifactId>
+                <version>1.3.03</version>
+            </dependency>
+            <dependency>
+                <groupId>xerces</groupId>
+                <artifactId>xercesImpl</artifactId>
+                <version>2.8.1</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <ciManagement>
-        <system>continuum</system>
-        <url>http://localhost:8080/continuum</url>
+        <system>bamboo</system>
+        <url>http://bamboo.mulesource.org/bamboo</url>
         <notifiers>
             <notifier>
                 <type>mail</type>
                 <configuration>
-                    <address>tcarlson@impsat.com</address>
+                    <address>scm@mule.codehaus.org</address>
                 </configuration>
             </notifier>
         </notifiers>
@@ -80,7 +188,7 @@
         <site>
             <id>mule-site</id>
             <name>Mule Website</name>
-            <url>dav:https://dav.codehaus.org/mule/docs/</url>
+            <url>dav:https://dav.codehaus.org/mule/docs/${version}</url>
         </site>
     </distributionManagement>
 
@@ -176,11 +284,11 @@
             <id>apache-m2-incubator</id>
             <name>Apache m2 Incubator</name>
             <url>http://people.apache.org/repo/m2-incubating-repository</url>
-          <snapshots>
-            <enabled>true</enabled>
-          </snapshots>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
             <releases>
-            <enabled>true</enabled>
+                <enabled>true</enabled>
             </releases>
         </pluginRepository>
         <pluginRepository>
@@ -210,50 +318,97 @@
         -->
 
         <plugins>
+            <!-- Enforce minimum maven version.
+                 This must be done through the maven-enforcer-plugin as per 
+                 http://jira.codehaus.org/browse/MNG-2423 the prerequisites are not inherited.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-maven-version</id>
+                        <goals>
+                            <goal>enforce-once</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion>
+                                    <!-- minimum version is 2.0.6, higher versions allowed -->
+                                    <version>[2.0.6,)</version>
+                                </requireMavenVersion>
+                                <requireJavaVersion>
+                                    <!-- minimum version is 1.4, higher versions allowed -->
+                                    <version>[1.4.2,1.5.0)</version>
+                                </requireJavaVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <!-- Compile to JDK 1.4 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
+                    <!--
+                        we should really, really use the eclipse compiler but cannot:
+                        http://jira.codehaus.org/browse/MCOMPILER-43
+                        http://jira.codehaus.org/browse/PLXCOMP-59
+                    -->
+                    <!-- <compilerId>eclipse</compilerId> -->
                     <source>1.4</source>
                     <target>1.4</target>
                     <encoding>ISO-8859-1</encoding>
                 </configuration>
+                <!--
+                <dependencies>
+                  <dependency>
+                    <groupId>org.codehaus.plexus</groupId>
+                    <artifactId>plexus-compiler-eclipse</artifactId>
+                    <version>1.5.1</version>
+                  </dependency>
+                </dependencies>
+                -->
             </plugin>
 
-              <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <version>0.9.0-mule-SNAPSHOT</version>
-                <extensions>true</extensions>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+
                 <configuration>
-                    <instructions>
-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
-                        <Bundle-DocURL>${pom.url}</Bundle-DocURL>
-                        <!-- These packages are part of the JDK and should not appear in the imports list -->
-                        <Import-Package>
-                            !com.ccg.net.ethernet,
-                            !com.sun.activation.registries,
-                            !com.sun.net.ssl,
-                            !com.sun.net.ssl.internal.ssl,
-                            !javax.crypto,
-                            !javax.crypto.spec,
-                            !javax.naming,
-                            !javax.naming.spi,
-                            !javax.net,
-                            !javax.net.ssl,
-                            !javax.security.auth,
-                            !javax.security.cert,
-                            !javax.xml.namespace,
-                            !javax.xml.transform,
-                            !org.xml.sax,
-                            !sun.misc,
-                            *
-                        </Import-Package>
-                        <Private-Package>
-                            META-INF.services.org.mule.*
-                        </Private-Package>
-                    </instructions>
+
+                    <archive>
+                        <!--
+                            Disabled for http://mule.mulesource.org/jira/browse/MULE-1153
+                            and http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4408526
+                         -->
+                        <index>false</index>
+                        <!-- List dependencies in the MANIFEST.MF -->
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+
+                        </manifest>
+                        <!-- Custom Entries -->
+                        <manifestEntries>
+                            <More-Info>For more information go to ${pom.url}</More-Info>
+                            <Support>Get commercial support: ${pom.organization.url}/support</Support>
+                            <Description>Mule ESB and Integration Platform</Description>
+                            <License>MulesSource MPL http://www.mulesource.com/MSPL/</License>
+                            <Vendor-Url>${pom.organization.url}</Vendor-Url>
+                            <Product-Url>${pom.url}</Product-Url>
+                            <Dtd-Public-Id>-//${pom.organization.name} //DTD mule-configuration XML V1.0//EN
+                            </Dtd-Public-Id>
+                            <Dtd-System-Id>${pom.url}/dtds</Dtd-System-Id>
+                            <!-- This would work if this issue gets closed: http://jira.codehaus.org/browse/MNG-1832 -->
+                            <Build-Date>${mvn.timestamp.yyyy-MM-dd-HH:mm:ss}</Build-Date>
+                        </manifestEntries>
+                    </archive>
+
                 </configuration>
             </plugin>
 
@@ -295,7 +450,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>cobertura-maven-plugin</artifactId>
-                <version>2.0</version>
+                <version>${coberturaVersion}</version>
                 <!--<configuration>-->
                 <!--<instrumentation>-->
                 <!--<ignore>com.example.boringcode.*</ignore>-->
@@ -351,6 +506,42 @@
                 <configuration>
                     <downloadSources>true</downloadSources>
                     <jdkName>1.4</jdkName>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <version>0.9.0-mule-SNAPSHOT</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
+                        <Bundle-DocURL>${pom.url}</Bundle-DocURL>
+                        <!-- These packages are part of the JDK and should not appear in the imports list -->
+                        <Import-Package>
+                            !com.ccg.net.ethernet,
+                            !com.sun.activation.registries,
+                            !com.sun.net.ssl,
+                            !com.sun.net.ssl.internal.ssl,
+                            !javax.crypto,
+                            !javax.crypto.spec,
+                            !javax.naming,
+                            !javax.naming.spi,
+                            !javax.net,
+                            !javax.net.ssl,
+                            !javax.security.auth,
+                            !javax.security.cert,
+                            !javax.xml.namespace,
+                            !javax.xml.transform,
+                            !org.xml.sax,
+                            !sun.misc,
+                            *
+                        </Import-Package>
+                        <Private-Package>
+                            META-INF.services.org.mule.*
+                        </Private-Package>
+                    </instructions>
                 </configuration>
             </plugin>
 
@@ -434,7 +625,7 @@
                         </group>
                         <group>
                             <title>Modules (not part of the Mule core)</title>
-                            <packages>org.mule.extras.*</packages>
+                            <packages>org.mule.extras.*:org.mule.components.*</packages>
                         </group>
                         <group>
                             <title>Transports (a.k.a. Providers)</title>
@@ -445,8 +636,12 @@
                             <packages>org.mule.tck*</packages>
                         </group>
                         <group>
+                            <title>Tools</title>
+                            <packages>org.mule.tools.*</packages>
+                        </group>
+                        <group>
                             <title>Examples</title>
-                            <packages>org.mule.samples.*</packages>
+                            <packages>org.mule.samples.*:org.mule.examples.*</packages>
                         </group>
                     </groups>
                 </configuration>
@@ -488,7 +683,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>cobertura-maven-plugin</artifactId>
-                <version>2.0</version>
+                <version>${coberturaVersion}</version>
             </plugin>
 
             <!-- Code Coverage by Clover -->
@@ -579,12 +774,10 @@
             <id>ci-server</id>
             <distributionManagement>
                 <site>
-                    <url>file:///home/luntbuild/publish/mule/docs</url>
+                    <url>file:///home/luntbuild/publish/mule/docs/${version}</url>
                 </site>
             </distributionManagement>
         </profile>
-
     </profiles>
-
 </project>
 

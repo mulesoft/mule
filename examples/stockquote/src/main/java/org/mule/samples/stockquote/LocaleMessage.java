@@ -10,51 +10,26 @@
 
 package org.mule.samples.stockquote;
 
-import org.mule.config.i18n.LocaleMessageHandler;
+import org.mule.config.i18n.MessageFactory;
 
 /**
  * <code>LocaleMessage</code> is a convenience interface for retrieving
  * internationalised strings from resource bundles. The actual work is done by
- * the LocaleMessageHandler in core.
- *
- * The <code>LocaleMessage</code> at minimum provides the same methods in the
- * LocaleMessageHandler except that the bundle name is provided. 
- *
- * Optionally, the LocaleMessage can contain convenience methods for accessing
- * specific string resources so the resource codes don't have to be used directly.
+ * the {@link MessageFactory} in core.
  */
-public class LocaleMessage
+public class LocaleMessage extends MessageFactory
 {
-    // The bundle name for this package
-    public static String bundleName = "stockquote-example";
+    /**
+     * Note that the messages for this example are not in mule's standard
+     * META-INF/services/org/mule/i18n folder but in a different resource bundle.
+     */
+    private static final String BUNDLE_PATH = "messages.stockquote-example-messages";
 
-    // Identifies for specific string resources
-    public static String STOCK_QUOTE = "1";
-
-    public static String getString(String code)
+    public static String getStockQuoteMessage(String symbol, String name, String date, String last, 
+        String change, String open, String high, String low, String volume, String previousClose)
     {
-        return LocaleMessageHandler.getString(bundleName, code);
-    }
-
-    public static String getString(String code, Object arg1)
-    {
-        return LocaleMessageHandler.getString(bundleName, code, arg1);
-    }
-
-    public static String getString(String code, Object arg1, Object arg2)
-    {
-        return LocaleMessageHandler.getString(bundleName, code, arg1, arg2);
-    }
-
-    public static String getString(String code, Object[] args)
-    {
-        return LocaleMessageHandler.getString(bundleName, code, args);
-    }
-
-    /* Convenience methods start here */
-
-    public static String getStockQuoteMessage(Object[] args)
-    {
-        return getString(STOCK_QUOTE, args);
+        String[] params = { symbol, name, date, last, change, open, high,
+            low, volume, previousClose };
+        return getString(BUNDLE_PATH, 1, params);
     }
 }

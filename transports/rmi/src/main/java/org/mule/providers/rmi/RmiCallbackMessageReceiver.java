@@ -13,6 +13,7 @@ package org.mule.providers.rmi;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.ConnectException;
+import org.mule.providers.rmi.i18n.RmiMessages;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
@@ -21,6 +22,7 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
+import org.mule.util.ClassUtils;
 
 import java.lang.reflect.Method;
 import java.net.InetAddress;
@@ -174,20 +176,18 @@ public class RmiCallbackMessageReceiver extends AbstractMessageReceiver
 
         if (null == className)
         {
-            throw new InitialisationException(new org.mule.config.i18n.Message("rmi",
-                RmiConnector.NO_RMI_SERVICECLASS_SET), this);
+            throw new InitialisationException(RmiMessages.messageReceiverNeedsRmiAble(), this);
         }
 
         RmiAble remote = null;
 
         try
         {
-            remote = (RmiAble)Class.forName(className).newInstance();
+            remote = (RmiAble)ClassUtils.instanciateClass(className, new Object[] { }, this.getClass());
         }
         catch (Exception e)
         {
-            throw new InitialisationException(new org.mule.config.i18n.Message("rmi",
-                RmiConnector.RMI_SERVICECLASS_INVOCATION_FAILED), e);
+            throw new InitialisationException(RmiMessages.serviceClassInvocationFailed(), e);
         }
 
         return (remote);

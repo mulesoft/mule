@@ -68,13 +68,12 @@ public abstract class AbstractExceptionHandler implements ExceptionHandler
         }
         catch (Exception e)
         {
-            throw new HandlerException(LocaleMessage.getString(LocaleMessage.UNRETRIEVED_EXCEPTION, e), e);
+            throw new HandlerException(LocaleMessage.unretrievedException(e), e);
         }
 
         if (!isRegisteredFor(t.getClass()))
         {
-            throw new HandlerException(LocaleMessage.getString(LocaleMessage.UNHANDLED_EXCEPTION, t.getClass().getName(), getClass().getName()));
-
+            throw new HandlerException(LocaleMessage.unhandledException(t.getClass(), this.getClass()));
         }
         processException(message, t);
     }

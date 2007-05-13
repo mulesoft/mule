@@ -11,16 +11,13 @@
 package org.mule.test.integration.providers.jms;
 
 import org.mule.RegistryContext;
-import org.mule.config.PoolingProfile;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.impl.model.seda.SedaModel;
 import org.mule.providers.jms.JmsConnector;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
-import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.model.UMOModel;
 

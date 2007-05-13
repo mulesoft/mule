@@ -219,7 +219,7 @@ public abstract class AbstractJbiComponent implements Component, Work, Component
             }
             if (name == null)
             {
-                throw new NullPointerException("No name has been set for this component");
+                throw new IllegalArgumentException("No name has been set for this component");
             }
 
             if (service == null)

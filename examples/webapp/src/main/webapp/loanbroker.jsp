@@ -1,7 +1,7 @@
 <%@ page import="org.mule.extras.client.MuleClient,
-                 org.mule.samples.loanbroker.Customer,
-                 org.mule.samples.loanbroker.LoanConsumer,
-                 org.mule.samples.loanbroker.LoanRequest,
+                 org.mule.examples.loanbroker.messages.Customer,
+                 org.mule.examples.loanbroker.esn.LoanBrokerApp,
+                 org.mule.examples.loanbroker.messages.CustomerQuoteRequest,
                  org.mule.umo.UMOMessage,
                  java.util.Iterator,
                  java.util.List"%>
@@ -19,7 +19,7 @@
     String random = request.getParameter("random");
 
     if(random!=null) {
-        LoanConsumer consumer = new LoanConsumer();
+        LoanBrokerApp consumer = new LoanBrokerApp();
         int requests = Integer.parseInt(random);
         //to get all the result and print them out
         List results = consumer.requestSend(requests, "vm://LoanBrokerRequests");
@@ -38,7 +38,7 @@
         Customer cust = new Customer(name, 1234);
         double amount = Double.valueOf(amountString).doubleValue();
         int duration = Integer.parseInt(durationString);
-        LoanRequest loanRequest = new LoanRequest(cust, amount,  duration);
+        CustomerQuoteRequest loanRequest = new CustomerQuoteRequest(cust, amount,  duration);
         UMOMessage message = client.send("vm://LoanBrokerRequests", loanRequest, null);
         %>
 <h3>The best quote was received from: <br/> <%=message.getPayload()%></h3>

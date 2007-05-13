@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+  <bean name="TestService" class="org.codehaus.xfire.spring.ServiceBean">
+    <property name="serviceBean" ref="TestImpl"/>
+    <property name="serviceClass" value="org.mule.tck.external.applications.TestService"/>
+  </bean>
+
+  <bean id="TestImpl" class="org.mule.tck.external.applications.TestServiceImpl"/>
+</beans>
+
+

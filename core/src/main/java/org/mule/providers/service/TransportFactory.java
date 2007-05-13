@@ -11,8 +11,8 @@
 package org.mule.providers.service;
 
 import org.mule.RegistryContext;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.AbstractConnector;
 import org.mule.registry.ServiceDescriptorFactory;
@@ -75,8 +75,8 @@ public class TransportFactory
                 connector = RegistryContext.getRegistry().lookupConnector(uri.getConnectorName());
                 if (connector == null)
                 {
-                    throw new TransportFactoryException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER,
-                        "Connector: " + uri.getConnectorName()));
+                    throw new TransportFactoryException(
+                        CoreMessages.objectNotRegisteredWithManager("Connector: " + uri.getConnectorName()));
                 }
             }
             else
@@ -95,8 +95,8 @@ public class TransportFactory
 
         if (connector == null)
         {
-            Message m = new Message(Messages.FAILED_TO_CREATE_X_WITH_X, "Endpoint", "Uri: " + uri);
-            m.setNextMessage(new Message(Messages.X_IS_NULL, "connector"));
+            Message m = CoreMessages.failedToCreateObjectWith("Endpoint", "Uri: " + uri);
+            m.setNextMessage(CoreMessages.objectIsNull("connector"));
             throw new TransportFactoryException(m);
 
         }
@@ -197,7 +197,7 @@ public class TransportFactory
                 }
                 else
                 {
-                    throw new ServiceException(Message.createStaticMessage("No service descriptor found for transport: " + scheme + ".  This transport does not appear to be installed."));
+                    throw new ServiceException(CoreMessages.noServiceTransportDescriptor(scheme));
                 }
             }
             return trans;
@@ -223,6 +223,7 @@ public class TransportFactory
      */
     public static UMOConnector createConnector(UMOEndpointURI url) throws TransportFactoryException
     {
+
         try
         {
             UMOConnector connector;
@@ -232,7 +233,7 @@ public class TransportFactory
                 RegistryContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, scheme, null);
             if (sd == null)
             {
-                throw new ServiceException(Message.createStaticMessage("No service descriptor found for transport: " + scheme + ".  This transport does not appear to be installed."));
+                throw new ServiceException(CoreMessages.noServiceTransportDescriptor(scheme));
             }
 
             connector = sd.createConnector();
@@ -245,9 +246,10 @@ public class TransportFactory
             }
             else
             {
-                throw new TransportFactoryException(new Message(Messages.X_NOT_SET_IN_SERVICE_X,
-                    "Connector", scheme));
+                throw new TransportFactoryException(
+                    CoreMessages.objectNotSetInService("Connector", scheme));
             }
+
             connector.setName(ObjectNameHelper.getConnectorName(connector));
 
             // set any manager default properties for the connector
@@ -268,8 +270,7 @@ public class TransportFactory
         catch (Exception e)
         {
             throw new TransportFactoryException(
-                new Message(Messages.FAILED_TO_CREATE_X_WITH_X, "Endpoint", url),
-                e);
+                CoreMessages.failedToCreateObjectWith("Endpoint", url), e);
         }
     }
 
@@ -301,8 +302,7 @@ public class TransportFactory
             catch (Exception e)
             {
                 throw new TransportFactoryException(
-                    new Message(Messages.FAILED_TO_SET_PROPERTIES_ON_X, "Connector"),
-                    e);
+                    CoreMessages.failedToSetPropertiesOn("Connector"), e);
             }
         }
         else if (create == NEVER_CREATE_CONNECTOR && connector == null)
@@ -329,7 +329,8 @@ public class TransportFactory
                 }
                 else
                 {
-                    throw new IllegalStateException(new Message(Messages.MORE_THAN_ONE_CONNECTOR_WITH_PROTOCOL_X, protocol).getMessage());
+                    throw new IllegalStateException(
+                        CoreMessages.moreThanOneConnectorWithProtocol(protocol).getMessage());
                 }
             }
         }

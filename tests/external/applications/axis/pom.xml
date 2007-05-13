@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.mule.tests</groupId>
+        <artifactId>mule-tests-external-applications</artifactId>
+        <version>2.0.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>mule-tests-external-axis</artifactId>
+    <packaging>war</packaging>
+    <name>Axis webapp for external testing</name>
+    <description>Axis webapp for external testing</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>axis</groupId>
+            <artifactId>axis</artifactId>
+            <version>1.4</version>
+            <exclusions>
+                <!-- we like slf4j -->
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>                
+            </exclusions>
+        </dependency>
+    </dependencies>
+
+    <!-- This section defines the Tomcat plugin for deploying this war to.
+         To build this war, just type "mvn install".
+         To deploy it, type "mvn tomcat:deploy". Note that you must:
+           - have a local Tomcat installed
+           - have it running
+           - have the manager application working
+           - have the manager login defined in your settings.xml in the
+             <servers> section under the id "localTomcat"
+    -->
+    <build>
+        <!-- Use this to prevent constant renaming of URLs in the tests -->
+        <finalName>mule-tests-external-axis</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>tomcat-maven-plugin</artifactId>
+                <version>1.0-alpha-1</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>tomcat-maven-plugin</artifactId>
+                        <version>1.0-alpha-1</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>mx4j</groupId>
+                        <artifactId>mx4j</artifactId>
+                        <version>3.0.1</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <server>localTomcat</server>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <!-- For now, only install on the Tomcat server when the specific
+         "tests-external-deploy" profile is used and only deinstall when
+         the "tests-external-undeploy" profile is used.
+    -->
+    <profiles>
+        <profile>
+            <id>tests-external-deploy</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>tomcat-maven-plugin</artifactId>
+                        <version>1.0-alpha-1</version>
+                        <dependencies>
+                            <dependency>
+                                <groupId>mx4j</groupId>
+                                <artifactId>mx4j</artifactId>
+                                <version>3.0.1</version>
+                            </dependency>
+                        </dependencies>
+                        <configuration>
+                            <server>myServer</server>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>deploy</id>
+                                <goals>
+                                    <goal>deploy</goal>
+                                </goals>
+                                <phase>test</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>tests-external-undeploy</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>tomcat-maven-plugin</artifactId>
+                        <version>1.0-alpha-1</version>
+                        <dependencies>
+                            <dependency>
+                                <groupId>mx4j</groupId>
+                                <artifactId>mx4j</artifactId>
+                                <version>3.0.1</version>
+                            </dependency>
+                        </dependencies>
+                        <configuration>
+                            <server>myServer</server>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>undeploy</id>
+                                <goals>
+                                    <goal>undeploy</goal>
+                                </goals>
+                                <phase>test</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+</project>

@@ -10,8 +10,7 @@
 
 package org.mule.routing.response;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.routing.inbound.AbstractEventAggregator;
 import org.mule.routing.inbound.EventGroup;
 import org.mule.umo.UMOEvent;
@@ -60,7 +59,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
         final Object groupId = this.getReplyAggregateIdentifier(event.getMessage());
         if (groupId == null || groupId.equals("-1"))
         {
-            throw new RoutingException(new Message(Messages.NO_CORRELATION_ID), event.getMessage(), event
+            throw new RoutingException(CoreMessages.noCorrelationId(), event.getMessage(), event
                 .getEndpoint());
         }
 
@@ -293,8 +292,9 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
                 logger.trace("Current responses are: \n" + MapUtils.toString(responseMessages, true));
             }
 
-            throw new ResponseTimeoutException(new Message(Messages.RESPONSE_TIMED_OUT_X_WAITING_FOR_ID_X,
-                String.valueOf(getTimeout()), responseId), message, null);
+            throw new ResponseTimeoutException(
+                CoreMessages.responseTimedOutWaitingForId(
+                    this.getTimeout(), responseId), message, null);
         }
 
         if (result == null)

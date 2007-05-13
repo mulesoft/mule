@@ -15,11 +15,11 @@
         </transformer>
     </transformers>
 
-    <model name="main" type="inherited">
-        <mule-descriptor name="HTTPPostSample" implementation="org.mule.components.rest.RestServiceWrapper">
-            <inbound-router>
-                <endpoint address="vm://stockquote" responseTransformers="SgmlDecoder Xslt XmlToObject"/>
-            </inbound-router>
+    <model name="samples" type="inherited">
+        <mule-descriptor name="HTTPPostSample"
+            inboundEndpoint="vm://stockquote"
+            responseTransformer="XmlDecoder Xslt XmlToObject"
+            implementation="org.mule.components.rest.RestServiceWrapper">
 
             <properties>
                 <property name="serviceUrl" value="http://www.webservicex.net/stockquote.asmx/GetQuote"/>
@@ -29,4 +29,5 @@
 
         </mule-descriptor>
      </model>
+
 </mule-configuration>

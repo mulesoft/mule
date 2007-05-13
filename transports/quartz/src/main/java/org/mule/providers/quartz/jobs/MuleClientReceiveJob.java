@@ -10,9 +10,9 @@
 
 package org.mule.providers.quartz.jobs;
 
-import org.mule.config.i18n.Message;
 import org.mule.extras.client.MuleClient;
 import org.mule.providers.quartz.QuartzConnector;
+import org.mule.providers.quartz.i18n.QuartzMessages;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 
@@ -40,15 +40,15 @@ public class MuleClientReceiveJob implements Job
         String dispatchEndpoint = jobDataMap.getString(QuartzConnector.PROPERTY_JOB_DISPATCH_ENDPOINT);
         if (dispatchEndpoint == null)
         {
-            throw new JobExecutionException(new Message("quartz", 4,
-                QuartzConnector.PROPERTY_JOB_DISPATCH_ENDPOINT).getMessage());
+            throw new JobExecutionException(
+                QuartzMessages.missingJobDetail(QuartzConnector.PROPERTY_JOB_DISPATCH_ENDPOINT).getMessage());
         }
 
         String receiveEndpoint = jobDataMap.getString(QuartzConnector.PROPERTY_JOB_RECEIVE_ENDPOINT);
         if (receiveEndpoint == null)
         {
-            throw new JobExecutionException(new Message("quartz", 4,
-                QuartzConnector.PROPERTY_JOB_RECEIVE_ENDPOINT).getMessage());
+            throw new JobExecutionException(
+                QuartzMessages.missingJobDetail(QuartzConnector.PROPERTY_JOB_RECEIVE_ENDPOINT).getMessage());
         }
         long timeout = 5000;
         String timeoutString = jobDataMap.getString(QuartzConnector.PROPERTY_JOB_RECEIVE_TIMEOUT);

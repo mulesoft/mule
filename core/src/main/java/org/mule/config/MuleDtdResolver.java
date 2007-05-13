@@ -42,7 +42,7 @@ public class MuleDtdResolver implements EntityResolver
     protected static final Log logger = LogFactory.getLog(MuleDtdResolver.class);
 
     public static final String DEFAULT_MULE_DTD = "mule-configuration.dtd";
-    private String dtdName = null;
+//    private String dtdName = null;
 
     // Maybe the dtd should go in the META-INF??
     private static final String SEARCH_PATH = "";
@@ -73,7 +73,7 @@ public class MuleDtdResolver implements EntityResolver
 
     public MuleDtdResolver(String dtdName, String xsl, EntityResolver delegate)
     {
-        this.dtdName = dtdName;
+//        this.dtdName = dtdName;
         this.delegate = delegate;
         this.xsl = xsl;
         if (logger.isDebugEnabled())

@@ -10,8 +10,7 @@
 
 package org.mule.impl.internal.admin;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
@@ -56,8 +55,8 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
             }
             else
             {
-                throw new InitialisationException(new Message(Messages.PROPERTIES_X_NOT_SET,
-                    "endpointAddress"), this);
+                throw new InitialisationException(
+                    CoreMessages.propertiesNotSet("endpointAddress"), this);
             }
             // Create a session for sending notifications
             session = new MuleSession(new MuleMessage(NullPayload.getInstance(), (Map) null), new NullSessionHandler());

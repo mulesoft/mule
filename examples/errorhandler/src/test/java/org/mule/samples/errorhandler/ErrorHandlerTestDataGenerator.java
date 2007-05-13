@@ -11,7 +11,7 @@
 package org.mule.samples.errorhandler;
 
 import org.mule.MuleException;
-import org.mule.config.i18n.Message;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.samples.errorhandler.exceptions.BusinessException;
 import org.mule.transformers.xml.ObjectToXml;
 import org.mule.umo.lifecycle.FatalException;
@@ -31,8 +31,8 @@ public class ErrorHandlerTestDataGenerator
         }
 
         ObjectToXml trans = new ObjectToXml();
-        MuleException exception = new MuleException(Message.createStaticMessage("Some default exception"));
-        FatalException fatal = new FatalException(Message.createStaticMessage("Some fatal exception"),
+        MuleException exception = new MuleException(MessageFactory.createStaticMessage("Some default exception"));
+        FatalException fatal = new FatalException(MessageFactory.createStaticMessage("Some fatal exception"),
             new IOException("Some IO exception"));
         BusinessException business = new BusinessException("Some business exception");
 

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<conditions>
+	<condition type="variable" id="download">
+		<name>radioselection</name>
+		<value>download</value>
+	</condition>
+	<condition type="variable" id="skip">
+		<name>radioselection</name>
+		<value>skip</value>
+	</condition>
+	<panelcondition conditionid="download" panelid="download3rdparty"/>
+	<panelcondition conditionid="skip" panelid="skipdownload"/>
+
+	<condition type="variable" id="show.lib.standard">
+		<name>radioselection</name>
+		<value>skip</value>
+	</condition>
+	<condition type="variable" id="show.lib.full">
+		<name>radioselection</name>
+		<value>download</value>
+	</condition>
+	<packcondition packid="standard library" conditionid="show.lib.standard"/>
+	<packcondition packid="full library" conditionid="show.lib.full"/>
+</conditions>

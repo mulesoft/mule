@@ -12,7 +12,7 @@ package org.mule.providers.http;
 
 import org.mule.MuleException;
 import org.mule.config.ExceptionHelper;
-import org.mule.config.i18n.Message;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.routing.RoutingException;
 import org.mule.umo.security.UnauthorisedException;
@@ -32,7 +32,7 @@ public class StatusCodeMappingsTestCase extends AbstractMuleTestCase
 
         code = ExceptionHelper.getErrorMapping("blah", MuleException.class);
         assertEquals(
-            String.valueOf(new MuleException(Message.createStaticMessage("test")).getExceptionCode()), code);
+            String.valueOf(new MuleException(MessageFactory.createStaticMessage("test")).getExceptionCode()), code);
 
     }
 

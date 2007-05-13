@@ -10,8 +10,8 @@
 
 package org.mule.transaction;
 
+import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 import org.mule.umo.TransactionException;
 
 public class TransactionRollbackException extends TransactionException
@@ -40,7 +40,7 @@ public class TransactionRollbackException extends TransactionException
 
     public TransactionRollbackException(Throwable cause)
     {
-        super(new Message(Messages.TX_ROLLBACK_FAILED), cause);
+        super(CoreMessages.transactionRollbackFailed(), cause);
     }
 
 }

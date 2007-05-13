@@ -54,4 +54,5 @@ public class StreamingModel extends AbstractModel
         }
         super.setEntryPointResolver(entryPointResolver);
     }
+    
 }

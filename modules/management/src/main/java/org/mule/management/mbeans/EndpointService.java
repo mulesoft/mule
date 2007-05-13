@@ -10,13 +10,13 @@
 
 package org.mule.management.mbeans;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.ObjectNameHelper;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * The EndpointServiceMBean allows you to check the confiugration of an endpoint and
@@ -47,7 +47,7 @@ public class EndpointService implements EndpointServiceMBean
     {
         if (receiver == null)
         {
-            throw new NullPointerException(new Message(Messages.X_IS_NULL, "Receiver").getMessage());
+            throw new IllegalArgumentException(CoreMessages.objectIsNull("Receiver").getMessage());
         }
         this.endpoint = receiver.getEndpoint();
         this.receiver = receiver;
@@ -59,7 +59,7 @@ public class EndpointService implements EndpointServiceMBean
     {
         if (endpoint == null)
         {
-            throw new NullPointerException(new Message(Messages.X_IS_NULL, "Endpoint").getMessage());
+            throw new IllegalArgumentException(CoreMessages.objectIsNull("Endpoint").getMessage());
         }
         if (receiver == null && !UMOEndpoint.ENDPOINT_TYPE_RECEIVER.equals(endpoint.getType()))
         {

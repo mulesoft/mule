@@ -38,4 +38,25 @@ public class NumberUtils extends org.apache.commons.lang.math.NumberUtils
         }
     }
 
+    public static int toInt(Object obj)
+    {
+        if (obj == null)
+        {
+            throw new IllegalArgumentException("Unable to convert null object to int");
+        }
+        else if (obj instanceof String)
+        {
+            return toInt((String) obj);
+        }
+        else if (obj instanceof Number)
+        {
+            return ((Number) obj).intValue();
+        }
+        else
+        {
+            throw new IllegalArgumentException("Unable to convert object of type: "
+                                               + obj.getClass().getName() + " to int.");
+        }
+    }
+
 }

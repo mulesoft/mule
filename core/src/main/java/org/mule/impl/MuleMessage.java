@@ -11,8 +11,7 @@
 package org.mule.impl;
 
 import org.mule.MuleRuntimeException;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.providers.DefaultMessageAdapter;
 import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.UMOMessage;
@@ -87,9 +86,7 @@ public class MuleMessage implements UMOMessage
                     }
                     catch (Exception e)
                     {
-                        throw new MuleRuntimeException(
-                            new Message(Messages.FAILED_TO_READ_ATTACHMENT_X, s),
-                            e);
+                        throw new MuleRuntimeException(CoreMessages.failedToReadAttachment(s), e);
                     }
                 }
             }

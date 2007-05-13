@@ -10,67 +10,166 @@
 
 package org.mule.examples.loanbroker;
 
-import org.mule.config.i18n.LocaleMessageHandler;
+import org.mule.config.i18n.MessageFactory;
+import org.mule.examples.loanbroker.messages.LoanQuote;
+import org.mule.util.StringMessageUtils;
 
-public class LocaleMessage
+public class LocaleMessage extends MessageFactory
 {
-    public static String bundleName = "loanbroker-example";
+    private static final String BUNDLE_PATH = "messages.loanbroker-example-messages";
 
-    public static String RECEIVED_REQUEST = "1";
-    public static String RECEIVED_QUOTE = "2";
-    public static String RECEIVED_RATE = "3";
-    public static String LOAN_QUOTE = "4";
-    public static String PROCESSING_QUOTE = "5";
-    public static String LOWEST_QUOTE = "6";
-    public static String RECEIVED_PROFILE = "7";
-
-    public static String RESPONSE_NUM_QUOTES = "10";
-    public static String RESPONSE_AVG_REQUEST = "10";
-    public static String REQUEST_ERROR = "12";
-    public static String REQUEST_RESPONSE = "13";
-    public static String EXITING = "14";
-    public static String MENU_ERROR = "15";
-    public static String ENTER_NAME = "16";
-    public static String ENTER_LOAN_AMT = "17";
-    public static String ENTER_LOAN_DURATION = "18";
-    public static String LOAN_DURATION_ERROR = "19";
-    public static String LOAN_AMT_ERROR = "20";
-
-    public static String MENU_OPTION_NUM_REQUESTS = "22";
-    public static String MENU_ERROR_NUM_REQUESTS = "23";
-    public static String REQUEST = "24";
-
-    public static String ESB_WELCOME = "30";
-    public static String LOADING_ENDPOINT_EJB = "31";
-    public static String BYE = "32";
-    public static String LOADING_MANAGED_EJB = "33";
-
-    public static String WELCOME = "40";
-    public static String MENU = "41";
-    public static String SENT_ASYNC = "42";
-    public static String MENU_OPTION_SOAP = "43";
-    public static String MENU_OPTION_MODE = "44";
-    public static String LOADING_ASYNC = "45";
-    public static String LOADING_SYNC = "46";
-
-    public static String getString(String code)
+    public static String receivedRequest(String[] params)
     {
-        return LocaleMessageHandler.getString(bundleName, code);
+        return getString(BUNDLE_PATH, 1, StringMessageUtils.toString(params));
     }
 
-    public static String getString(String code, Object arg1)
+    public static String receivedQuote(String[] params)
     {
-        return LocaleMessageHandler.getString(bundleName, code, arg1);
+        return getString(BUNDLE_PATH, 2, StringMessageUtils.toString(params));
     }
 
-    public static String getString(String code, Object arg1, Object arg2)
+    public static String receivedRate(LoanQuote quote)
     {
-        return LocaleMessageHandler.getString(bundleName, code, arg1, arg2);
+        return getString(BUNDLE_PATH, 3, quote.toString());
     }
 
-    public static String getString(String code, Object[] args)
+    public static String loanQuote(String bankName, double interestRate)
     {
-        return LocaleMessageHandler.getString(bundleName, code, args);
+        return getString(BUNDLE_PATH, 4, bankName, String.valueOf(interestRate));
     }
 
+    public static String processingQuote(LoanQuote quote)
+    {
+        return getString(BUNDLE_PATH, 5, quote.toString());
+    }
+    
+    public static String lowestQuote(LoanQuote lowestQuote)
+    {
+        return getString(BUNDLE_PATH, 6, lowestQuote.toString());
+    }
+
+    public static String receivedProfile(String[] params)
+    {
+        return getString(BUNDLE_PATH, 7, StringMessageUtils.toString(params));
+    }
+
+    public static String responseNumQuotes(int i)
+    {
+        return getString(BUNDLE_PATH, 10, String.valueOf(i));
+    }
+
+    public static String responseAvgRequest(long l)
+    {
+        return getString(BUNDLE_PATH, 11, String.valueOf(l));
+    }
+
+    public static String requestError()
+    {
+        return getString(BUNDLE_PATH, 12);
+    }
+
+    public static String requestResponse(Object payload)
+    {
+        return getString(BUNDLE_PATH, 13, payload);
+    }
+
+    public static String exiting()
+    {
+        return getString(BUNDLE_PATH, 14);
+    }
+
+    public static String menuError()
+    {
+        return getString(BUNDLE_PATH, 15);
+    }
+
+    public static String enterName()
+    {
+        return getString(BUNDLE_PATH, 16);
+    }
+
+    public static String enterLoanAmount()
+    {
+        return getString(BUNDLE_PATH, 17);
+    }
+
+    public static String enterLoanDuration()
+    {
+        return getString(BUNDLE_PATH, 18);
+    }
+
+    public static String loanDurationError(String duration)
+    {
+        return getString(BUNDLE_PATH, 19, duration);
+    }
+
+    public static String loanAmountError(String amount)
+    {
+        return getString(BUNDLE_PATH, 20, amount);
+    }
+
+    public static String menuOptionNumberOfRequests()
+    {
+        return getString(BUNDLE_PATH, 22);
+    }
+
+    public static String menuErrorNumberOfRequests()
+    {
+        return getString(BUNDLE_PATH, 23);
+    }
+
+    public static String request(int i, Object object)
+    {
+        return getString(BUNDLE_PATH, 24, String.valueOf(i), object);
+    }
+
+    public static String esbWelcome()
+    {
+        return getString(BUNDLE_PATH, 30);
+    }
+
+    public static String loadingEndpointEjb()
+    {
+        return getString(BUNDLE_PATH, 31);
+    }
+
+    public static String loadingManagedEjb()
+    {
+        return getString(BUNDLE_PATH, 33);
+    }
+
+    public static String welcome()
+    {
+        return getString(BUNDLE_PATH, 40);
+    }
+
+    public static String menu()
+    {
+        return getString(BUNDLE_PATH, 41);
+    }
+
+    public static String sentAsync()
+    {
+        return getString(BUNDLE_PATH, 42);
+    }
+
+    public static String menuOptionSoap()
+    {
+        return getString(BUNDLE_PATH, 43);
+    }
+
+    public static String menuOptionMode()
+    {
+        return getString(BUNDLE_PATH, 44);
+    }
+
+    public static String loadingAsync()
+    {
+        return getString(BUNDLE_PATH, 45);
+    }
+
+    public static String loadingSync()
+    {
+        return getString(BUNDLE_PATH, 46);
+    }
 }

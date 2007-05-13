@@ -10,8 +10,8 @@
 
 package org.mule.umo.provider;
 
+import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOException;
 
 /**
@@ -56,7 +56,7 @@ public class ConnectorException extends UMOException
 
     private static Message generateMessage(Message message, UMOConnector connector)
     {
-        Message m = new Message(Messages.CONNECTOR_CAUSED_ERROR, connector);
+        Message m = CoreMessages.connectorCausedError(connector);
         if (message != null)
         {
             message.setNextMessage(m);

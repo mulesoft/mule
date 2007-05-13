@@ -10,7 +10,8 @@
 
 package org.mule.providers.jms;
 
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
+import org.mule.providers.jms.i18n.JmsMessages;
 import org.mule.transaction.AbstractSingleResourceTransaction;
 import org.mule.transaction.IllegalTransactionStateException;
 import org.mule.umo.TransactionException;
@@ -51,14 +52,14 @@ public class JmsClientAcknowledgeTransaction extends AbstractSingleResourceTrans
         {
             if (message == null)
             {
-                throw new IllegalTransactionStateException(new org.mule.config.i18n.Message("jms", 6));
+                throw new IllegalTransactionStateException(
+                    JmsMessages.noMessageBoundForAck());
             }
             message.acknowledge();
         }
         catch (JMSException e)
         {
-            throw new IllegalTransactionStateException(new org.mule.config.i18n.Message(
-                Messages.TX_COMMIT_FAILED), e);
+            throw new IllegalTransactionStateException(CoreMessages.transactionCommitFailed(), e);
         }
     }
 
@@ -91,8 +92,8 @@ public class JmsClientAcknowledgeTransaction extends AbstractSingleResourceTrans
         }
         if (!(key instanceof Connection) || !(resource instanceof Session))
         {
-            throw new IllegalTransactionStateException(new org.mule.config.i18n.Message(
-                Messages.TX_CAN_ONLY_BIND_TO_X_TYPE_RESOURCES, "javax.jms.Connection/javax.jms.Session"));
+            throw new IllegalTransactionStateException(
+                CoreMessages.transactionCanOnlyBindToResources("javax.jms.Connection/javax.jms.Session"));
         }
 
         Session session = (Session)resource;
@@ -100,13 +101,12 @@ public class JmsClientAcknowledgeTransaction extends AbstractSingleResourceTrans
         {
             if (session.getTransacted())
             {
-                throw new IllegalTransactionStateException(new org.mule.config.i18n.Message("jms", 5));
+                throw new IllegalTransactionStateException(JmsMessages.sessionShouldNotBeTransacted());
             }
         }
         catch (JMSException e)
         {
-            throw new IllegalTransactionStateException(new org.mule.config.i18n.Message(
-                Messages.TX_CANT_READ_STATE), e);
+            throw new IllegalTransactionStateException(CoreMessages.transactionCannotReadState(), e);
         }
 
         super.bindResource(key, resource);

@@ -10,8 +10,7 @@
 
 package org.mule.providers;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOMessageDispatcher;
@@ -38,7 +37,7 @@ public class KeyedPoolMessageDispatcherFactoryAdapter
 
         if (factory == null)
         {
-            throw new IllegalArgumentException(new Message(Messages.X_IS_NULL, "factory").toString());
+            throw new IllegalArgumentException(CoreMessages.objectIsNull("factory").toString());
         }
 
         this.factory = factory;

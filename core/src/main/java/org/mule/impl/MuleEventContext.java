@@ -12,8 +12,7 @@ package org.mule.impl;
 
 import org.mule.RegistryContext;
 import org.mule.config.MuleProperties;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.FutureMessageResult;
 import org.mule.umo.TransactionException;
@@ -118,9 +117,9 @@ public class MuleEventContext implements UMOEventContext
         }
         else
         {
-            throw new TransformerException(new Message(Messages.TRANSFORM_ON_X_NOT_OF_SPECIFIED_TYPE_X,
-                this.getComponentDescriptor().getName(), expectedType), this.event.getEndpoint()
-                .getTransformer());
+            throw new TransformerException(
+                CoreMessages.transformOnObjectNotOfSpecifiedType(this.getComponentDescriptor().getName(), 
+                    expectedType), this.event.getEndpoint().getTransformer());
         }
     }
 
@@ -685,7 +684,7 @@ public class MuleEventContext implements UMOEventContext
             else
             {
                 throw new IllegalStateException(
-                    new Message(Messages.CANNOT_USE_TX_AND_REMOTE_SYNC).getMessage());
+                    CoreMessages.cannotUseTxAndRemoteSync().getMessage());
             }
         }
     }

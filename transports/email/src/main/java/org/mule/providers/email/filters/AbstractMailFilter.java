@@ -12,6 +12,7 @@ package org.mule.providers.email.filters;
 
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
+import org.mule.util.ClassUtils;
 
 import javax.mail.Message;
 
@@ -44,7 +45,7 @@ public abstract class AbstractMailFilter implements UMOFilter
         else
         {
             throw new IllegalArgumentException("The Mail filter does not understand: "
-                                               + object.getClass().getName());
+                                               + ClassUtils.getSimpleName(object.getClass()));
         }
     }
 

@@ -10,8 +10,7 @@
 package org.mule.config.spring;
 
 import org.mule.config.MuleConfiguration;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.container.MultiContainerContext;
 import org.mule.impl.lifecycle.ContainerManagedLifecyclePhase;
 import org.mule.impl.lifecycle.GenericLifecycleManager;
@@ -139,7 +138,7 @@ public class SpringRegistry extends AbstractRegistry implements ApplicationConte
         Properties props = SpiUtils.findServiceDescriptor(type, name);
         if (props == null)
         {
-            throw new ServiceException(new Message(Messages.FAILED_LOAD_X, type + " " + name));
+            throw new ServiceException(CoreMessages.failedToLoad(type + " " + name));
         }
         return ServiceDescriptorFactory.create(type, name, props, overrides, applicationContext);
     }

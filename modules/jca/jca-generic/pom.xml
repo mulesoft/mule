@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.mule.modules.jca</groupId>
+        <artifactId>mule-module-jca-parent</artifactId>
+        <version>2.0.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>mule-module-jca-generic</artifactId>
+    <name>Generic JCA Resource Adapter</name>
+    <packaging>jar</packaging>
+    <description>A Resource Adapter implementation that allows a Mule instance to be deployed to a Java EE application server and exposes Mule services via the JCA connector architecture.</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.mule.modules.jca</groupId>
+            <artifactId>mule-module-jca-core</artifactId>
+            <version>${version}</version>
+        </dependency>
+    </dependencies>
+</project>

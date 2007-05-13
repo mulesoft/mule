@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<!-- This is a simple Mule Installer built with IzPack -->
+
+<installation version="1.0">
+
+    <!-- The info section -->
+    <info>
+        <appname>Mule</appname>
+        <appversion>1.4</appversion>
+        <authors>
+            <author name="MuleSource" email="support@mulesource.com"/>
+        </authors>
+        <url>http://mule.mulesource.org/</url>
+        <javaversion>1.4</javaversion>
+    </info>
+    
+    <!-- The gui preferences indication -->
+    <guiprefs width="800" height="600" resizable="no">
+      <modifier key="useButtonIcons" value="yes"/>
+	<modifier key="useLabelIcons" value="yes"/>
+  	<modifier key="labelGap" value="5"/>    
+  	<modifier key="layoutAnchor" value="CENTER"/>
+  	<modifier key="textXGap" value="5"/>
+  	<modifier key="textYGap" value="5"/>
+  	<modifier key="useHeadingPanel" value="yes"/>
+  	<modifier key="headingLineCount" value="0"/>
+  	<modifier key="headingFontSize" value="1"/>
+  	<modifier key="headingBackgroundColor" value="0x00ffffff"/>
+      <modifier key="headingPanelCounter" value="progressbar"/>
+  	<modifier key="headingPanelCounterPos" value="inNavigationPanel"/>
+    </guiprefs>
+	  
+    <!-- The locale section. I'm setting this to English.-->
+    <locale>
+        <langpack iso3="eng"/>
+    </locale>
+    
+    <!-- The resources section -->
+    <resources>
+        <res id="LicencePanel.licence" src="../resources/LICENSE.txt"/>
+        <res id="Installer.image.0" src="../images/image_bar1.jpg" />
+        <res id="Installer.image.1" src="../images/image_bar2.jpg" />
+        <res id="Installer.image.2" src="../images/image_bar2.jpg" />
+        <res id="Installer.image.3" src="../images/image_bar3.jpg" />
+        <res id="Installer.image.4" src="../images/image_bar3.jpg" />
+        <res id="Installer.image.5" src="../images/image_bar4.jpg" />
+        <res id="Installer.image.6" src="../images/image_bar5.jpg" />
+        <res id="Installer.image.7" src="../images/image_bar5.jpg" />
+        <res id="Installer.image.8" src="../images/image_bar6.jpg" />
+        <res id="Heading.image.0" src="../images/Installer_bar.1of7.rs.jpg"/>
+	  <res id="Heading.image.1" src="../images/Installer_bar.2of7.rs.jpg"/>
+        <res id="Heading.image.2" src="../images/Installer_bar.UserOptions.jpg"/>
+	  <res id="Heading.image.3" src="../images/Installer_bar.3of7.rs.jpg"/>
+        <res id="Heading.image.4" src="../images/Installer_bar.ProxySettings.jpg"/>
+        <res id="Heading.image.5" src="../images/Installer_bar.4of7.rs.jpg"/>
+        <res id="Heading.image.6" src="../images/Installer_bar.5of7.rs.jpg"/>
+        <res id="Heading.image.7" src="../images/Installer_bar.6of7.rs.jpg"/>
+        <res id="Heading.image.8" src="../images/Installer_bar.7of7.rs.jpg"/>
+        <res id="userInputSpec.xml" src="userInput.xml"/>
+	  <res id="InfoPanel.info" src="../resources/INSTALL.txt"/>
+        <res id="conditions.xml" src="conditions.xml" /> 
+    </resources>
+
+    <!-- The panels section. We indicate here which panels we want to use. The order will be respected. -->
+    <panels>
+        <panel classname="HelloPanel"/>
+        <panel classname="LicencePanel"/>
+	  <panel order="0" classname="UserInputPanel"/>
+        <panel classname="TargetPanel"/>
+	  <panel classname="UserInputPanel" id="download3rdparty"/>
+        <panel classname="PacksPanel"/>
+        <panel classname="InstallPanel"/>
+	  <panel classname="InfoPanel" id="skipdownload"/>
+        <panel classname="SimpleFinishPanel"/>
+    </panels>
+    
+    <!-- The listener will delete the installed files if the installation fails -->
+    <listeners>
+    	<listener installer="MuleInstallerListener"/>
+    </listeners>
+
+    <!-- The Variables Section. These variables will be substituted by the user input -->
+    <variables>
+      <variable name="PROXYHOST" value=""/>
+      <variable name="PROXYPORT" value=""/>
+      <variable name="PROXYUSERNAME" value=""/>
+      <variable name="PROXYPASSWORD" value=""/>
+    </variables>
+
+    <!-- The packs section. We specify here our packs, i.e. the folders that will be installed with this installer -->
+    <packs>
+        <pack name="Base" required="yes">
+            <description>The base files</description>
+            <file src="../resources/INSTALL.txt" targetdir="$INSTALL_PATH"/>
+            <file src="../resources/LICENSE.txt" targetdir="$INSTALL_PATH"/>
+            <file src="../resources/USAGE.txt" targetdir="$INSTALL_PATH"/>
+        </pack>
+        <pack name="bin" required="yes">
+            <description>The compiled distribution code</description>
+            <file src="../distribution/bin" targetdir="$INSTALL_PATH"/>
+        </pack>
+        <pack name="conf" required="yes">
+            <description>The configuration files for Mule</description>
+            <file src="../distribution/conf" targetdir="$INSTALL_PATH"/>
+        </pack>
+        <pack name="standard library" id="standard library" required="yes" conditionid="show.lib.standard">
+            <description>Contains the standard Mule Library</description>
+            <file src="../distribution/lib" targetdir="$INSTALL_PATH"/> 
+	    <executable targetfile="$INSTALL_PATH/lib/boot/mule-module-boot-1.4-SNAPSHOT.jar" class="org.mule.modules.boot.GuiInstallerLicenseHandler" failure="abort" type="jar" stage="postinstall" keep="true">
+	        <args>
+		    <arg value="$INSTALL_PATH"/>
+		</args> 
+	    </executable>
+        </pack>
+		<pack name="full library" id="full library" required="yes" conditionid="show.lib.full">
+		    <description> Contains the standard Mule Library plus the third party libraries not distributed with mule</description>
+		    <file src="../distribution/lib" targetdir="$INSTALL_PATH"/>
+		    <executable targetfile="$INSTALL_PATH/lib/boot/mule-module-boot-1.4-SNAPSHOT.jar" class="org.mule.modules.boot.GuiInstallerLicenseHandler" failure="abort" type="jar" stage="postinstall" keep="true">
+			<args>
+		  	    <arg value="$INSTALL_PATH"/>
+			</args> 
+		    </executable>
+	            <executable targetfile="$INSTALL_PATH/lib/boot/mule-module-boot-1.4-SNAPSHOT.jar" class="org.mule.modules.boot.GuiInstallerLibraryDownloader" failure="abort" type="jar" stage="postinstall" keep="true">
+			<args>
+		 	    <arg value="$INSTALL_PATH"/>
+			    <arg value="$PROXYHOST"/>
+			    <arg value="$PROXYPORT"/>
+			    <arg value="$PROXYUSERNAME"/>
+			    <arg value="$PROXYPASSWORD"/>
+			</args> 
+		    </executable> 
+		</pack>
+        <pack name="licenses" required="yes">
+            <description>The License files</description>
+            <file src="../distribution/licenses" targetdir="$INSTALL_PATH"/>
+        </pack>
+        <pack name="sbin" required="yes">
+            <description>The wrapper</description>
+            <file src="../distribution/sbin" targetdir="$INSTALL_PATH"/>
+        </pack>
+        <pack name="src" required="yes">
+            <description>The sources</description>
+            <file src="../distribution/src" targetdir="$INSTALL_PATH"/>
+        </pack>
+        <pack name="logs" required="no">
+            <description>The log files</description>
+            <file src="../distribution/logs" targetdir="$INSTALL_PATH"/>
+        </pack>
+        <pack name="docs" required="no">
+            <description>The documentation</description>
+            <file src="../distribution/docs" targetdir="$INSTALL_PATH"/>
+        </pack>
+        <pack name="examples" required="no">
+            <description>The samples</description>
+            <file src="../distribution/examples" targetdir="$INSTALL_PATH"/>
+        </pack>
+    </packs>
+</installation>

@@ -18,6 +18,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
+import org.mule.util.ClassUtils;
 
 import javax.jms.Message;
 import javax.resource.spi.work.Work;
@@ -41,7 +42,7 @@ public class JmsMessageReceiver extends SingleJmsMessageReceiver
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug("Message received of type: " + message.getClass().getName());
+                logger.debug("Message received of type: " + ClassUtils.getSimpleName(message.getClass()));
                 if (message.getJMSDestination() != null)
                 {
                     logger.debug("Message received on " + message.getJMSDestination() + " ("

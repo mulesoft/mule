@@ -38,6 +38,13 @@ public class LoanBrokerApp extends AbstractLoanBrokerApp
 
     private static boolean synchronous = false;
 
+    // Needed for webapp version!
+    // TODO Travis ... sadly, it doesn't quite work
+    public LoanBrokerApp() throws Exception
+    {
+        super();
+    }
+
     public LoanBrokerApp(String config) throws Exception
     {
         super(config);
@@ -72,8 +79,8 @@ public class LoanBrokerApp extends AbstractLoanBrokerApp
             if (synchronous)
             {
                 long start = System.currentTimeMillis();
-                List results = loanBrokerApp.requestSend(i, "vm://customer.requests");
-                System.out.println(LocaleMessage.getString(LocaleMessage.RESPONSE_NUM_QUOTES, String.valueOf(results.size())));
+                List results = loanBrokerApp.requestSend(i, "CustomerRequests");
+                System.out.println(LocaleMessage.responseNumQuotes(results.size()));
                 List output = new ArrayList(results.size());
                 int x = 1;
                 for (Iterator iterator = results.iterator(); iterator.hasNext(); x++)
@@ -84,11 +91,11 @@ public class LoanBrokerApp extends AbstractLoanBrokerApp
                 System.out.println(StringMessageUtils.getBoilerPlate(output, '*', 80));
                 long cur = System.currentTimeMillis();
                 System.out.println(DateUtils.getFormattedDuration(cur - start));
-                System.out.println(LocaleMessage.getString(LocaleMessage.RESPONSE_AVG_REQUEST, String.valueOf( ((cur - start) / x) )));
+                System.out.println(LocaleMessage.responseAvgRequest(((cur - start) / x) ));
             }
             else
             {
-                loanBrokerApp.requestDispatch(i, "vm://customer.requests");
+                loanBrokerApp.requestDispatch(i, "CustomerRequests");
             }
         }
         /////////////////////////////////////////
@@ -103,14 +110,14 @@ public class LoanBrokerApp extends AbstractLoanBrokerApp
 
     protected static String getInteractiveConfig() throws IOException
     {
-        System.out.println(StringMessageUtils.getBoilerPlate(LocaleMessage.getString(LocaleMessage.WELCOME)));
+        System.out.println(StringMessageUtils.getBoilerPlate(LocaleMessage.welcome()));
                     
         int response = 0;
         String provider = "axis";
 
         while (response != 'a' && response != 'x')
         {
-            System.out.println("\n" + LocaleMessage.getString(LocaleMessage.MENU_OPTION_SOAP));
+            System.out.println("\n" + LocaleMessage.menuOptionSoap());
             response = readCharacter();
             switch (response)
             {
@@ -130,20 +137,20 @@ public class LoanBrokerApp extends AbstractLoanBrokerApp
         response = 0;
         while (response != 'a' && response != 's')
         {
-            System.out.println("\n" + LocaleMessage.getString(LocaleMessage.MENU_OPTION_MODE));
+            System.out.println("\n" + LocaleMessage.menuOptionMode());
             response = readCharacter();
             switch (response)
             {
                 case 'a' :
                 {
-                    System.out.println(LocaleMessage.getString(LocaleMessage.LOADING_ASYNC));
+                    System.out.println(LocaleMessage.loadingAsync());
                     synchronous = false;
                     break;
                 }
 
                 case 's' :
                 {
-                    System.out.println(LocaleMessage.getString(LocaleMessage.LOADING_SYNC));
+                    System.out.println(LocaleMessage.loadingSync());
                     synchronous = true;
                     break;
                 }

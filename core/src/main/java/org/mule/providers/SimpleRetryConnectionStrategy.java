@@ -11,8 +11,7 @@
 package org.mule.providers;
 
 import org.mule.config.ExceptionHelper;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.provider.UMOConnectable;
 import org.mule.util.ObjectUtils;
 
@@ -86,10 +85,9 @@ public class SimpleRetryConnectionStrategy extends AbstractConnectionStrategy
                 // If we were interrupted it's probably because the server is
                 // shutting down
                 throw new FatalConnectException(
-                        // TODO it's not only endpoint that is reconnected, connectors too
-                        new Message(Messages.RECONNECT_STRATEGY_X_FAILED_ENDPOINT_X,
-                                    getClass().getName(), getDescription(connectable)),
-                        ie, connectable);
+                    // TODO it's not only endpoint that is reconnected, connectors too
+                    CoreMessages.reconnectStrategyFailed(this.getClass(), 
+                        this.getDescription(connectable)), ie, connectable);
             }
             catch (Exception e)
             {
@@ -101,10 +99,9 @@ public class SimpleRetryConnectionStrategy extends AbstractConnectionStrategy
                 if (retryCounter.current().get() >= retryCount)
                 {
                     throw new FatalConnectException(
-                            // TODO it's not only endpoint that is reconnected, connectors too
-                            new Message(Messages.RECONNECT_STRATEGY_X_FAILED_ENDPOINT_X,
-                                        getClass().getName(), getDescription(connectable)),
-                            e, connectable);
+                        // TODO it's not only endpoint that is reconnected, connectors too
+                        CoreMessages.reconnectStrategyFailed(this.getClass(),
+                            this.getDescription(connectable)), e, connectable);
                 }
 
                 if (logger.isErrorEnabled())
@@ -130,10 +127,9 @@ public class SimpleRetryConnectionStrategy extends AbstractConnectionStrategy
                 catch (InterruptedException e1)
                 {
                     throw new FatalConnectException(
-                            // TODO it's not only endpoint that is reconnected, connectors too
-                            new Message(Messages.RECONNECT_STRATEGY_X_FAILED_ENDPOINT_X,
-                                        getClass().getName(), getDescription(connectable)),
-                            e, connectable);
+                        // TODO it's not only endpoint that is reconnected, connectors too
+                        CoreMessages.reconnectStrategyFailed(this.getClass(), 
+                            this.getDescription(connectable)), e, connectable);
                 }
             }
             finally

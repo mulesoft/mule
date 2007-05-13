@@ -20,4 +20,10 @@ public class VMLoanBrokerAsynchronousFunctionalTestCase extends AbstractAsynchro
     {
         return "loan-broker-vm-endpoints-config.xml, loan-broker-async-config.xml";
     }
+    
+    // @Override
+    protected int getNumberOfRequests()
+    {
+        return 10;
+    }
 }

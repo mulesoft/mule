@@ -10,14 +10,14 @@
 
 package org.mule.providers.http;
 
+import org.mule.config.i18n.CoreMessages;
+import org.mule.providers.streaming.StreamMessageAdapter;
+import org.mule.umo.provider.OutputHandler;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.apache.commons.httpclient.HttpMethod;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.providers.streaming.StreamMessageAdapter;
-import org.mule.umo.provider.OutputHandler;
 
 /**
  * A HttpStream adapter that can be used with the HttpClientMessageDispatcher who
@@ -68,7 +68,7 @@ public class HttpStreamMessageAdapter extends StreamMessageAdapter
     {
         if (httpMethod == null)
         {
-            throw new IllegalStateException(new Message(Messages.X_IS_NULL, "httpMethod object").toString());
+            throw new IllegalStateException(CoreMessages.objectIsNull("httpMethod object").toString());
         }
         else
         {

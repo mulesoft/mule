@@ -10,8 +10,7 @@
 
 package org.mule.providers;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -78,7 +77,7 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
         catch (Exception ex)
         {
             this.stop();
-            throw new InitialisationException(new Message(Messages.FAILED_TO_SCHEDULE_WORK), ex, this);
+            throw new InitialisationException(CoreMessages.failedToScheduleWork(), ex, this);
         }
     }
 

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+
+ The software in this package is published under the terms of the MuleSource MPL
+ license, a copy of which has been included with this distribution in the
+ LICENSE.txt file.
+
+ $Id$
+-->
+
+
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="DummyJCA" version="1.0">
+
+    <description>A dummy Mule config, serves as a placeholder to make JCA deployable only.</description>
+
+    <agents>
+        <agent name="jmxAgent" className="org.mule.management.agents.JmxAgent"/>
+    </agents>
+
+    <model name="Dummy">
+
+    </model>
+
+</mule-configuration>

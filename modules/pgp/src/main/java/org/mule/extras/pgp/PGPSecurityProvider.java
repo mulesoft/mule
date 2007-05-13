@@ -10,7 +10,8 @@
 
 package org.mule.extras.pgp;
 
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
+import org.mule.extras.pgp.i18n.PGPMessages;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.SecurityException;
 import org.mule.umo.security.UMOAuthentication;
@@ -66,33 +67,33 @@ public class PGPSecurityProvider implements UMOSecurityProvider
 
         if (userId == null)
         {
-            throw new UnauthorisedException(new org.mule.config.i18n.Message(Messages.X_IS_NULL, "UserId"));
+            throw new UnauthorisedException(CoreMessages.objectIsNull("UserId"));
         }
 
         KeyBundle userKeyBundle = keyManager.getKeyBundle(userId);
 
         if (userKeyBundle == null)
         {
-            throw new UnauthorisedException(new org.mule.config.i18n.Message("pgp", 1, userId));
+            throw new UnauthorisedException(PGPMessages.noPublicKeyForUser(userId));
         }
 
         Message msg = (Message)auth.getCredentials();
 
         if (!((msg != null) && msg instanceof SignedMessage))
         {
-            throw new UnauthorisedException(new org.mule.config.i18n.Message("pgp", 2));
+            throw new UnauthorisedException(PGPMessages.noSignedMessageFound());
         }
 
         try
         {
             if (!((SignedMessage)msg).verify(userKeyBundle))
             {
-                throw new UnauthorisedException(new org.mule.config.i18n.Message("pgp", 3));
+                throw new UnauthorisedException(PGPMessages.invalidSignature());
             }
         }
         catch (MessageException e)
         {
-            throw new UnauthorisedException(new org.mule.config.i18n.Message("pgp", 4), e);
+            throw new UnauthorisedException(PGPMessages.errorVerifySignature(), e);
         }
 
         auth.setAuthenticated(true);
@@ -138,8 +139,7 @@ public class PGPSecurityProvider implements UMOSecurityProvider
         }
         catch (Exception e)
         {
-            throw new InitialisationException(new org.mule.config.i18n.Message(Messages.FAILED_TO_CREATE_X,
-                "PGPProvider"), e);
+            throw new InitialisationException(CoreMessages.failedToCreate("PGPProvider"), e);
         }
     }
 

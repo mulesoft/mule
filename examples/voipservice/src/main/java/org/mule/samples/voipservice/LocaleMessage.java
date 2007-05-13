@@ -10,142 +10,94 @@
 
 package org.mule.samples.voipservice;
 
-import org.mule.config.i18n.LocaleMessageHandler;
+import org.mule.config.i18n.MessageFactory;
 
 /**
  * <code>LocaleMessage</code> is a convenience interface for retrieving
  * internationalised strings from resource bundles. The actual work is done by
- * the LocaleMessageHandler in core.
- *
- * The <code>LocaleMessage</code> at minimum provides the same methods in the
- * LocaleMessageHandler except that the bundle name is provided. 
- *
- * Optionally, the LocaleMessage can contain convenience methods for accessing
- * specific string resources so the resource codes don't have to be used directly.
+ * the MessageFactory in core.
  */
-public class LocaleMessage
+public class LocaleMessage extends MessageFactory
 {
-    // The bundle name for this package
-    public static String bundleName = "voip-example";
-
-    // Identifies for specific string resources
-    public static String WELCOME = "1";
-    public static String MENU_OPTION_1 = "2";
-    public static String MENU_OPTION_QUIT = "3";
-    public static String MENU_PROMPT = "4";
-    public static String GOODBYE = "5";
-    public static String MENU_ERROR = "6";
-    public static String HOUSE_CAPTION = "7";
-    public static String STREET_CAPTION = "8";
-    public static String CITY_CAPTION = "9";
-    public static String CARD_NUMBER_CAPTION = "10";
-    public static String VALID_TILL_CAPTION = "11";
-    public static String CARD_TYPE_CAPTION = "12";
-    public static String FIRST_NAME_CAPTION = "13";
-    public static String ADDRESS_CAPTION = "14";
-    public static String CUSTOMER_CAPTION = "15";
-    public static String CARD_CAPTION = "16";
-
-    public static String getString(String code)
-    {
-        return LocaleMessageHandler.getString(bundleName, code);
-    }
-
-    public static String getString(String code, Object arg1)
-    {
-        return LocaleMessageHandler.getString(bundleName, code, arg1);
-    }
-
-    public static String getString(String code, Object arg1, Object arg2)
-    {
-        return LocaleMessageHandler.getString(bundleName, code, arg1, arg2);
-    }
-
-    public static String getString(String code, Object[] args)
-    {
-        return LocaleMessageHandler.getString(bundleName, code, args);
-    }
-
-    /* Convenience methods start here */
-
+    private static final String BUNDLE_PATH = "messages.voip-example-messages";
+    
     public static String getWelcomeMessage()
     {
-        return getString(WELCOME);
+        return getString(BUNDLE_PATH, 1);
     }
 
     public static String getMenuOption1()
     {
-        return getString(MENU_OPTION_1);
+        return getString(BUNDLE_PATH, 2);
     }
 
     public static String getMenuOptionQuit()
     {
-        return getString(MENU_OPTION_QUIT);
+        return getString(BUNDLE_PATH, 3);
     }
 
     public static String getMenuPromptMessage()
     {
-        return getString(MENU_PROMPT);
+        return getString(BUNDLE_PATH, 4);
     }
 
     public static String getGoodbyeMessage()
     {
-        return getString(GOODBYE);
+        return getString(BUNDLE_PATH, 5);
     }
 
     public static String getMenuErrorMessage()
     {
-        return getString(MENU_ERROR);
+        return getString(BUNDLE_PATH, 6);
     }
 
     public static String getHouseCaption(Object arg1)
     {
-        return getString(HOUSE_CAPTION, arg1);
+        return getString(BUNDLE_PATH, 7, arg1);
     }
 
     public static String getStreetCaption(Object arg1)
     {
-        return getString(STREET_CAPTION, arg1);
+        return getString(BUNDLE_PATH, 8, arg1);
     }
 
     public static String getCityCaption(Object arg1)
     {
-        return getString(CITY_CAPTION, arg1);
+        return getString(BUNDLE_PATH, 9, arg1);
     }
 
     public static String getCardNumberCaption(Object arg1)
     {
-        return getString(CARD_NUMBER_CAPTION, arg1);
+        return getString(BUNDLE_PATH, 10, arg1);
     }
 
     public static String getValidTillCaption(Object arg1)
     {
-        return getString(VALID_TILL_CAPTION, arg1);
+        return getString(BUNDLE_PATH, 11, arg1);
     }
 
     public static String getCardTypeCaption(Object arg1)
     {
-        return getString(CARD_TYPE_CAPTION, arg1);
+        return getString(BUNDLE_PATH, 12, arg1);
     }
 
     public static String getFirstNameCaption(Object arg1)
     {
-        return getString(FIRST_NAME_CAPTION, arg1);
+        return getString(BUNDLE_PATH, 13, arg1);
     }
 
     public static String getAddressCaption(Object arg1)
     {
-        return getString(ADDRESS_CAPTION, arg1);
+        return getString(BUNDLE_PATH, 14, arg1);
     }
 
     public static String getCustomerCaption(Object arg1)
     {
-        return getString(CUSTOMER_CAPTION, arg1);
+        return getString(BUNDLE_PATH, 15, arg1);
     }
 
     public static String getCardCaption(Object arg1)
     {
-        return getString(CARD_CAPTION, arg1);
+        return getString(BUNDLE_PATH, 16, arg1);
     }
-
 }

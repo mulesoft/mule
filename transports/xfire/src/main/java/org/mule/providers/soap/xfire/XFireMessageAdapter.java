@@ -68,7 +68,7 @@ public class XFireMessageAdapter extends AbstractMessageAdapter
      */
     public byte[] getPayloadAsBytes() throws Exception
     {
-        return (byte[])trans.transform(payload);
+        return (byte[]) trans.transform(payload);
     }
 
     /**
@@ -109,7 +109,10 @@ public class XFireMessageAdapter extends AbstractMessageAdapter
         if (messageContext.getInMessage() != null)
         {
             Element header = messageContext.getInMessage().getHeader();
-            if (header == null) return;
+            if (header == null)
+            {
+                return;
+            }
 
             Namespace ns = Namespace.getNamespace(MuleSoapHeaders.MULE_NAMESPACE,
                 MuleSoapHeaders.MULE_10_ACTOR);
@@ -150,7 +153,7 @@ public class XFireMessageAdapter extends AbstractMessageAdapter
             {
                 for (Iterator i = atts.getParts(); i.hasNext();)
                 {
-                    Attachment att = ((Attachment)i.next());
+                    Attachment att = ((Attachment) i.next());
                     super.addAttachment(att.getId(), att.getDataHandler());
                 }
             }

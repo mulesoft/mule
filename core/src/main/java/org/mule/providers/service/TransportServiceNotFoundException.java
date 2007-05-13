@@ -10,7 +10,7 @@
 
 package org.mule.providers.service;
 
-import org.mule.config.i18n.Message;
+import org.mule.config.i18n.MessageFactory;
 
 /**
  * <code>TransportServiceNotFoundException</code> is thorown if no matching service
@@ -30,7 +30,7 @@ public class TransportServiceNotFoundException extends TransportFactoryException
      */
     public TransportServiceNotFoundException(String location)
     {
-        super(Message.createStaticMessage(location));
+        super(MessageFactory.createStaticMessage(location));
     }
 
     /**
@@ -39,6 +39,6 @@ public class TransportServiceNotFoundException extends TransportFactoryException
      */
     public TransportServiceNotFoundException(String location, Throwable cause)
     {
-        super(Message.createStaticMessage(location), cause);
+        super(MessageFactory.createStaticMessage(location), cause);
     }
 }

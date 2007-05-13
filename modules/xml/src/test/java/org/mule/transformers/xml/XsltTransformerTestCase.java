@@ -10,6 +10,7 @@
 
 package org.mule.transformers.xml;
 
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.IOUtils;
 
@@ -56,4 +57,24 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         return resultData;
     }
 
+    public void testCustomTransformerFactoryClass() throws InitialisationException
+    {
+        XsltTransformer t = new XsltTransformer();
+        t.setXslTransformerFactory("com.nosuchclass.TransformerFactory");
+        t.setXslFile("cdcatalog.xsl");
+
+        try
+        {
+            t.initialise();
+            fail("should have failed with ClassNotFoundException");
+        }
+        catch (InitialisationException iex)
+        {
+            assertEquals(ClassNotFoundException.class, iex.getCause().getClass());
+        }
+
+        // try again with JDK default
+        t.setXslTransformerFactory(null);
+        t.initialise();
+    }
 }

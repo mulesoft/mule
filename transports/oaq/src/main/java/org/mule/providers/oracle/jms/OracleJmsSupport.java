@@ -14,6 +14,7 @@ import oracle.jms.AQjmsSession;
 
 import org.mule.providers.jms.Jms102bSupport;
 import org.mule.providers.jms.JmsConnector;
+import org.mule.util.ClassUtils;
 
 import java.util.Map;
 
@@ -215,7 +216,7 @@ public class OracleJmsSupport extends Jms102bSupport
             try
             {
                 // TODO ClassUtils call is more suitable here
-                payloadFactory = Class.forName(payloadFactoryClass).newInstance();
+                payloadFactory = ClassUtils.loadClass(payloadFactoryClass, this.getClass()).newInstance();
             }
             catch (ClassNotFoundException e)
             {

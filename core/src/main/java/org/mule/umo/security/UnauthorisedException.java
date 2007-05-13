@@ -10,8 +10,8 @@
 
 package org.mule.umo.security;
 
+import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 import org.mule.impl.RequestContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
@@ -66,13 +66,13 @@ public class UnauthorisedException extends SecurityException
         Message m = null;
         if (context == null)
         {
-            m = new Message(Messages.AUTH_SET_TO_X_BUT_NO_CONTEXT, filter.getClass().getName());
+            m = CoreMessages.authSetButNoContext(filter.getClass().getName());
         }
         else
         {
-            m = new Message(Messages.AUTH_FAILED_FOR_USER_X, context.getAuthentication().getPrincipal());
+            m = CoreMessages.authFailedForUser(context.getAuthentication().getPrincipal());
         }
-        m.setNextMessage(new Message(Messages.AUTH_DENIED_ON_ENDPOINT_X, endpoint.getEndpointURI()));
+        m.setNextMessage(CoreMessages.authDeniedOnEndpoint(endpoint.getEndpointURI()));
         return m;
     }
 }

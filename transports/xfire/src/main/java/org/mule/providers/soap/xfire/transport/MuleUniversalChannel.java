@@ -72,7 +72,7 @@ public class MuleUniversalChannel extends AbstractChannel
     /**
      * logger used by this class
      */
-    protected transient final Log logger = LogFactory.getLog(getClass());
+    protected final transient Log logger = LogFactory.getLog(getClass());
 
     public MuleUniversalChannel(String uri, Transport transport)
     {

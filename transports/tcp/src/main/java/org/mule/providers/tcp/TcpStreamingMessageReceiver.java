@@ -10,10 +10,10 @@
 
 package org.mule.providers.tcp;
 
-import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
-import org.mule.providers.ConnectException;
 import org.mule.providers.AbstractPollingMessageReceiver;
+import org.mule.providers.ConnectException;
+import org.mule.providers.tcp.i18n.TcpMessages;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -88,7 +88,7 @@ public class TcpStreamingMessageReceiver extends AbstractPollingMessageReceiver
         catch (Exception e)
         {
             logger.error(e);
-            throw new ConnectException(new Message("tcp", 1, uri), e, this);
+            throw new ConnectException(TcpMessages.failedToBindToUri(uri), e, this);
         }
     }
 

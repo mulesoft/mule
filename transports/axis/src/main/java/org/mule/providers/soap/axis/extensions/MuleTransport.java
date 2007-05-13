@@ -10,14 +10,14 @@
 
 package org.mule.providers.soap.axis.extensions;
 
+import org.mule.MuleException;
+import org.mule.config.i18n.CoreMessages;
+import org.mule.providers.soap.axis.AxisConnector;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.axis.client.Transport;
-import org.mule.MuleException;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.providers.soap.axis.AxisConnector;
 
 /**
  * A container for all Mule supported transports for Axis.
@@ -69,12 +69,12 @@ public class MuleTransport extends Transport
     {
         if (protocol == null)
         {
-            throw new NullPointerException(new Message(Messages.X_IS_NULL, "protocol").toString());
+            throw new IllegalArgumentException(CoreMessages.objectIsNull("protocol").toString());
         }
         if (!isTransportSupported(protocol))
         {
-            throw new MuleException(new Message(Messages.SCHEME_X_NOT_COMPATIBLE_WITH_CONNECTOR_X, protocol,
-                AxisConnector.class.getName()));
+            throw new MuleException(
+                CoreMessages.schemeNotCompatibleWithConnector(protocol, AxisConnector.class));
         }
         return (Class)transports.get(protocol);
     }

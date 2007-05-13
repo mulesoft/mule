@@ -10,8 +10,7 @@
 
 package org.mule.routing.inbound;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleMessage;
 import org.mule.routing.AbstractRouter;
 import org.mule.umo.MessagingException;
@@ -66,8 +65,8 @@ public class SelectiveConsumer extends AbstractRouter implements UMOInboundRoute
             catch (TransformerException e)
             {
                 throw new RoutingException(
-                    new Message(Messages.TRANSFORM_FAILED_BEFORE_FILTER), 
-                    event.getMessage(), event.getEndpoint(), e);
+                    CoreMessages.transformFailedBeforeFilter(), event.getMessage(), 
+                    event.getEndpoint(), e);
             }
         }
 

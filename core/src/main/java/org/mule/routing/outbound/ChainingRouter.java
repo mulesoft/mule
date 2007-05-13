@@ -10,8 +10,7 @@
 
 package org.mule.routing.outbound;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
@@ -34,7 +33,7 @@ public class ChainingRouter extends FilteringOutboundRouter
         UMOMessage resultToReturn = null;
         if (endpoints == null || endpoints.size() == 0)
         {
-            throw new RoutePathNotFoundException(new Message(Messages.NO_ENDPOINTS_FOR_ROUTER), message, null);
+            throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), message, null);
         }
 
         final int endpointsCount = endpoints.size();

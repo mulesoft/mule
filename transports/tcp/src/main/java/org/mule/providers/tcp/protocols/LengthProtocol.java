@@ -30,14 +30,13 @@ import org.apache.commons.logging.LogFactory;
  */
 public class LengthProtocol extends DefaultProtocol
 {
-
     private static final Log logger = LogFactory.getLog(LengthProtocol.class);
     // TODO - can we not get this from the API somewhere?
     private static final int SIZE_INT = 4;
 
     public LengthProtocol()
     {
-        super(SIZE_INT);
+        super(NO_STREAM, SIZE_INT);
     }
 
     public Object read(InputStream is) throws IOException

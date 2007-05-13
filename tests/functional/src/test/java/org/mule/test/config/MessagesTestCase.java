@@ -10,41 +10,40 @@
 
 package org.mule.test.config;
 
+import org.mule.config.i18n.CoreMessages;
+import org.mule.config.i18n.Message;
+import org.mule.tck.AbstractMuleTestCase;
+
 import java.util.MissingResourceException;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.tck.AbstractMuleTestCase;
+import junit.framework.Assert;
 
 public class MessagesTestCase extends AbstractMuleTestCase
 {
-
     public void testMessageLoading() throws Exception
     {
-        Message message = new Message(Messages.AUTH_FAILED_FOR_USER_X, "Fred");
-        assertEquals("Authentication failed for principal Fred", message.getMessage());
-        assertEquals(Messages.DEFAULT_BUNDLE, message.getBundle());
-        assertEquals(Messages.AUTH_FAILED_FOR_USER_X, message.getCode());
+        Message message = CoreMessages.authFailedForUser("Fred");
+        Assert.assertEquals("Authentication failed for principal Fred", message.getMessage());
+        Assert.assertEquals(135, message.getCode());
     }
 
     public void testBadBundle()
     {
         try
         {
-            new Message("blah", 1);
-            fail("should throw resource bundle not found exception");
+            InvalidMessageFactory.getInvalidMessage();
+            Assert.fail("should throw resource bundle not found exception");
         }
         catch (MissingResourceException e)
         {
-            assertTrue(e.getMessage().startsWith("Can't find bundle"));
+            Assert.assertTrue(e.getMessage().startsWith("Can't find bundle"));
         }
     }
 
     public void testGoodBundle()
     {
-        Message message = new Message("test", 1, "one", "two", "three");
-        assertEquals("Testing, Testing, one, two, three", message.getMessage());
-        assertEquals("test", message.getBundle());
-        assertEquals(1, message.getCode());
+        Message message = TestMessages.testMessage("one", "two", "three");
+        Assert.assertEquals("Testing, Testing, one, two, three", message.getMessage());
+        Assert.assertEquals(1, message.getCode());
     }
 }

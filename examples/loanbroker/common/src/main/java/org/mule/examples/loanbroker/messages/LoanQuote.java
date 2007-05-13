@@ -55,6 +55,6 @@ public class LoanQuote implements Serializable
 
     public String toString()
     {
-        return LocaleMessage.getString(LocaleMessage.LOAN_QUOTE, bankName, String.valueOf(interestRate));
+        return LocaleMessage.loanQuote(bankName, interestRate);
     }
 }

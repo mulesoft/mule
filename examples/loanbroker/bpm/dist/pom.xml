@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.mule.examples</groupId>
+        <artifactId>mule-example-loanbroker-parent</artifactId>
+        <version>1.0</version>
+    </parent>
+    <artifactId>mule-example-loanbroker-bpm</artifactId>
+    <packaging>jar</packaging>
+    <name>Loan Broker BPM Example</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.mule.examples</groupId>
+            <artifactId>mule-example-loanbroker-common</artifactId>
+            <version>${muleVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.examples</groupId>
+            <artifactId>mule-example-loanbroker-common-tests</artifactId>
+            <version>${muleVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-jbpm</artifactId>
+            <version>${muleVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>bsh</groupId>
+            <artifactId>bsh</artifactId>
+            <version>1.3.0</version>
+            <scope>provided</scope> 
+        </dependency>        
+        <dependency>
+            <groupId>hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <version>1.8.0.7</version>
+            <scope>provided</scope> 
+        </dependency>
+    </dependencies>
+
+    <build>    
+        <plugins>
+            <!-- "mvn install" will copy the target jar to the $MULE_HOME/lib/user directory,
+                overwriting the previous one. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-artifact</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${MULE_HOME}/lib/user</outputDirectory>
+                            <overWriteReleases>true</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${groupId}</groupId>
+                                    <artifactId>${artifactId}</artifactId>
+                                    <version>${version}</version>
+                                    <destFileName>${artifactId}.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>hsqldb</groupId>
+                                    <artifactId>hsqldb</artifactId>
+                                    <version>1.8.0.7</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>bsh</groupId>
+                                    <artifactId>bsh</artifactId>
+                                    <version>1.3.0</version>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>    
+</project>

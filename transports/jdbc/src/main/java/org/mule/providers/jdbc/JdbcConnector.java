@@ -11,9 +11,9 @@
 package org.mule.providers.jdbc;
 
 import org.mule.config.ExceptionHelper;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.providers.AbstractConnector;
+import org.mule.providers.jdbc.i18n.JdbcMessages;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.TransactionException;
 import org.mule.umo.UMOComponent;
@@ -123,8 +123,7 @@ public class JdbcConnector extends AbstractConnector
         }
         catch (Exception e)
         {
-            throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X, "Jdbc Connector"), e,
-                this);
+            throw new InitialisationException(CoreMessages.failedToCreate("Jdbc Connector"), e, this);
         }
     }
 
@@ -215,8 +214,8 @@ public class JdbcConnector extends AbstractConnector
         }
         else
         {
-            throw new InitialisationException(new Message(Messages.JNDI_RESOURCE_X_NOT_FOUND,
-                this.dataSourceJndiName), this);
+            throw new InitialisationException(
+                JdbcMessages.jndiResourceNotFound(this.dataSourceJndiName), this);
         }
     }
 

@@ -11,6 +11,7 @@
 package org.mule.transaction.lookup;
 
 import org.mule.umo.manager.UMOTransactionManagerFactory;
+import org.mule.util.ClassUtils;
 
 import java.lang.reflect.Method;
 
@@ -49,7 +50,7 @@ public class WebsphereTransactionManagerLookupFactory implements UMOTransactionM
         try
         {
             logger.debug("Trying WebSphere 5.1+: " + FACTORY_CLASS_5_1_AND_ABOVE);
-            clazz = Class.forName(FACTORY_CLASS_5_1_AND_ABOVE);
+            clazz = ClassUtils.loadClass(FACTORY_CLASS_5_1_AND_ABOVE, this.getClass());
             logger.info("Found WebSphere 5.1+: " + FACTORY_CLASS_5_1_AND_ABOVE);
         }
         catch (ClassNotFoundException ex)
@@ -58,7 +59,7 @@ public class WebsphereTransactionManagerLookupFactory implements UMOTransactionM
             try
             {
                 logger.debug("Trying WebSphere 5.0: " + FACTORY_CLASS_5_0);
-                clazz = Class.forName(FACTORY_CLASS_5_0);
+                clazz = ClassUtils.loadClass(FACTORY_CLASS_5_0, this.getClass());
                 logger.info("Found WebSphere 5.0: " + FACTORY_CLASS_5_0);
             }
             catch (ClassNotFoundException ex2)
@@ -67,7 +68,7 @@ public class WebsphereTransactionManagerLookupFactory implements UMOTransactionM
                 try
                 {
                     logger.debug("Trying WebSphere 4: " + FACTORY_CLASS_4);
-                    clazz = Class.forName(FACTORY_CLASS_4);
+                    clazz = ClassUtils.loadClass(FACTORY_CLASS_4, this.getClass());
                     logger.info("Found WebSphere 4: " + FACTORY_CLASS_4);
                 }
                 catch (ClassNotFoundException ex3)

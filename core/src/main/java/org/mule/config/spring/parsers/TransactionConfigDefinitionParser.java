@@ -9,8 +9,7 @@
  */
 package org.mule.config.spring.parsers;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleTransactionConfig;
 import org.mule.util.ClassUtils;
 
@@ -52,7 +51,7 @@ public class TransactionConfigDefinitionParser extends SimpleChildDefinitionPars
                 }
                 catch (Exception e)
                 {
-                    throw new BeanCreationException(new Message(Messages.CLASS_X_NOT_FOUND, clazz).getMessage(), e);
+                    throw new BeanCreationException(CoreMessages.cannotLoadFromClasspath(clazz).getMessage(), e);
                 }
             }
         else {

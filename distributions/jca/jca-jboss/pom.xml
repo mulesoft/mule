@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.mule.distributions.jca</groupId>
+        <artifactId>mule-jca-parent</artifactId>
+        <version>2.0.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>mule-jca-jboss</artifactId>
+    <name>JCA Resource Adapter for JBoss</name>
+    <packaging>rar</packaging>
+    <description>
+        A Resource Adapter implementation that allows a Mule instance to
+        be deployed to a JBoss application server and exposes Mule
+        services via the JCA connector architecture.
+    </description>
+
+    <build>
+        <defaultGoal>package</defaultGoal>
+        <plugins>
+            <plugin>
+                <artifactId>maven-rar-plugin</artifactId>
+                <configuration>
+                    <rarSourceDirectory>../../../modules/jca/jca-core/src/rar</rarSourceDirectory>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <!--
+            HACK: if mule-module-jca is not specified as a direct pom dependency, m2 project object never
+            sees it as a module nor dependency, and assembly inclusion filters then just skip it.
+            -->
+        <dependency>
+            <groupId>org.mule.modules.jca</groupId>
+            <artifactId>mule-module-jca-jboss</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>mx4j</groupId>
+            <artifactId>mx4j-jmx</artifactId>
+            <version>2.1.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.14</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+</project>
