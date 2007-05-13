@@ -8,45 +8,23 @@
         <artifactId>mule-distributions</artifactId>
         <version>2.0.0-SNAPSHOT</version>
     </parent>
-    <artifactId>mule-jca</artifactId>
-    <name>JCA Resource Adapter</name>
-    <packaging>jar</packaging>
-    <description>A Resource Adapter implementation that allows a Mule instance to be deployed to a J2EE application server and exposes Mule services via the JCA connector architecture.</description>
+    <groupId>org.mule.distributions.jca</groupId>
+    <artifactId>mule-jca-parent</artifactId>
+    <name>Parent for appserver specific JCA Resource Adapters</name>
+    <packaging>pom</packaging>
+    <description>
+        This is the parent module for the appserver specific jca modules. This does not
+        produce any output but serves as container for the dependencies that are common
+        for all appserver specific jca distributions.
+    </description>
 
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-rar-plugin</artifactId>
-                <!--
-                    Download a fix for http://jira.codehaus.org/browse/MRAR-8 , not yet released.
-                    Otherwise all kinds of garbage end up in the RA.
-                -->
-                <version>2.2-20060926.202808-1</version>
-                <configuration>
-                    <rarSourceDirectory>../../modules/jca/src/rar</rarSourceDirectory>
-                </configuration>
-            </plugin>
+    <modules>
+        <module>jca</module>
+        <module>jca-jboss</module>
+    </modules>
 
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <descriptors>
-                        <descriptor>assembly.xml</descriptor>
-                    </descriptors>
-                    <appendAssemblyId>false</appendAssemblyId>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>assembly</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
-
+    <!--
+        TODO DO: is this needed now we don't use a snapshot of the rar plugin any more?
     <pluginRepositories>
         <pluginRepository>
             <id>mule-deps-plugins</id>
@@ -60,17 +38,156 @@
             </releases>
         </pluginRepository>
     </pluginRepositories>
-
-    <!--
-        HACK: if mule-module-jca is not specified as a direct pom dependency, m2 project object never
-        sees it as a module nor dependency, and assembly inclusion filters then just skip it.
     -->
+
     <dependencies>
+        <!--
+          HACK: if mule-module-jca is not specified as a direct pom dependency, m2 project 
+          object never sees it as a module nor dependency, and assembly inclusion filters 
+          then just skip it.
+        -->
+        <!--
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.modules.jca</groupId>
             <artifactId>mule-module-jca</artifactId>
             <version>${version}</version>
+            <scope>provided</scope>
+        </dependency>
+        -->
+        <!-- TODO dirk: I'm pretty sure that including the examples in the parent pom
+            is not what we want. Only some distros want them, include them there
+        -->
+        <dependency>
+            <groupId>org.mule.examples</groupId>
+            <artifactId>mule-example-echo</artifactId>
+            <version>${version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.examples</groupId>
+            <artifactId>mule-example-errorhandler</artifactId>
+            <version>${version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.examples</groupId>
+            <artifactId>mule-example-hello</artifactId>
+            <version>${version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.examples</groupId>
+            <artifactId>mule-example-loanbroker-bpm</artifactId>
+            <version>${version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.examples</groupId>
+            <artifactId>mule-example-loanbroker-esb</artifactId>
+            <version>${version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.examples</groupId>
+            <artifactId>mule-example-loanbroker-esn</artifactId>
+            <version>${version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.examples</groupId>
+            <artifactId>mule-example-scripting</artifactId>
+            <version>${version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.examples</groupId>
+            <artifactId>mule-example-stockquote</artifactId>
+            <version>${version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.examples</groupId>
+            <artifactId>mule-example-voipservice</artifactId>
+            <version>${version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-jotm</artifactId>
+            <version>${version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.objectweb.carol</groupId>
+                    <artifactId>carol</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>jotm</groupId>
+                    <artifactId>jotm</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- re-declaration of dependencies that never ever may end up in the .rar -->
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-ejb_2.1_spec</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-j2ee-management_1.0_spec</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-jaxrpc_1.1_spec</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-jms_1.1_spec</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-jta_1.0.1B_spec</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-qname_1.1_spec</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-saaj_1.1_spec</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-servlet_2.4_spec</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
-
 </project>

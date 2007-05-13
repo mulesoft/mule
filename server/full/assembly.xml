@@ -125,7 +125,7 @@ Assembly descriptor for the full Mule distribution.
           <fileMode>744</fileMode>
       </fileSet>
       <fileSet>
-          <directory>../../../examples/loanbroker/common</directory>
+          <directory>../../../examples/loanbroker/common/dist</directory>
           <outputDirectory>examples/loanbroker/common</outputDirectory>
           <includes>
               <include>pom.xml</include>
@@ -137,7 +137,7 @@ Assembly descriptor for the full Mule distribution.
           <outputDirectory>examples/loanbroker/common/src</outputDirectory>
       </fileSet>
       <fileSet>
-          <directory>../../../examples/loanbroker/common-tests</directory>
+          <directory>../../../examples/loanbroker/common-tests/dist</directory>
           <outputDirectory>examples/loanbroker/common-tests</outputDirectory>
           <includes>
               <include>pom.xml</include>
@@ -149,7 +149,7 @@ Assembly descriptor for the full Mule distribution.
           <outputDirectory>examples/loanbroker/common-tests/src</outputDirectory>
       </fileSet>
       <fileSet>
-          <directory>../../../examples/loanbroker/credit-agency</directory>
+          <directory>../../../examples/loanbroker/credit-agency/dist</directory>
           <outputDirectory>examples/loanbroker/credit-agency</outputDirectory>
           <includes>
               <include>pom.xml</include>
@@ -161,7 +161,7 @@ Assembly descriptor for the full Mule distribution.
           <outputDirectory>examples/loanbroker/credit-agency/src</outputDirectory>
       </fileSet>
       <fileSet>
-          <directory>../../../examples/loanbroker/esb</directory>
+          <directory>../../../examples/loanbroker/esb/dist</directory>
           <outputDirectory>examples/loanbroker/esb</outputDirectory>
           <includes>
               <include>pom.xml</include>
@@ -177,7 +177,7 @@ Assembly descriptor for the full Mule distribution.
           <outputDirectory>examples/loanbroker/esb/src</outputDirectory>
       </fileSet>
       <fileSet>
-          <directory>../../../examples/loanbroker/esn</directory>
+          <directory>../../../examples/loanbroker/esn/dist</directory>
           <outputDirectory>examples/loanbroker/esn</outputDirectory>
           <includes>
               <include>pom.xml</include>
@@ -193,7 +193,7 @@ Assembly descriptor for the full Mule distribution.
           <outputDirectory>examples/loanbroker/esn/src</outputDirectory>
       </fileSet>
       <fileSet>
-          <directory>../../../examples/loanbroker/bpm</directory>
+          <directory>../../../examples/loanbroker/bpm/dist</directory>
           <outputDirectory>examples/loanbroker/bpm</outputDirectory>
           <includes>
               <include>pom.xml</include>
@@ -433,6 +433,7 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.transports:mule-transport-ftp</include>
         <include>org.mule.transports:mule-transport-http</include>
         <include>org.mule.transports:mule-transport-jbi</include>
+        <include>org.mule.transports:mule-transport-jbpm</include>
         <include>org.mule.transports:mule-transport-jdbc</include>
         <include>org.mule.transports:mule-transport-jms</include>
         <include>org.mule.transports:mule-transport-multicast</include>
@@ -481,6 +482,7 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule.transports:mule-transport-ftp</exclude>
         <exclude>org.mule.transports:mule-transport-http</exclude>
         <exclude>org.mule.transports:mule-transport-jbi</exclude>
+        <exclude>org.mule.transports:mule-transport-jbpm</exclude>
         <exclude>org.mule.transports:mule-transport-jdbc</exclude>
         <exclude>org.mule.transports:mule-transport-jms</exclude>
         <exclude>org.mule.transports:mule-transport-multicast</exclude>
