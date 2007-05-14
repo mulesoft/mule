@@ -5,8 +5,6 @@
 
 <mule-configuration id="quartz_test" version="1.0">
 
-    <mule-environment-properties serverUrl="" />
-
     <global-endpoints>
         <endpoint name="quartz.in.1" address="quartz:/myService1">
             <properties>
@@ -24,36 +22,29 @@
         </endpoint>
     </global-endpoints>
 
-    <model name="quartz">
+    <model name="quartz" type="seda">
 
-        <mule-descriptor
-            name="quartzService1"
-            implementation="org.mule.providers.quartz.TestComponent"
-            inboundEndpoint="quartz.in.1">
-
-        <!--
-            we want exactly one TestComponent for this test,
-            otherwise counter bookkeeping would be more difficult
-            than necessary.
-        -->
-        <pooling-profile maxActive="1" exhaustedAction="WAIT" />
-
+        <mule-descriptor name="quartzService1" implementation="org.mule.providers.quartz.TestComponent">
+            <inbound-router>
+                <global-endpoint name="quartz.in.1"/>
+            </inbound-router>
+		    <!--
+		        we want exactly one TestComponent for this test, otherwise counter 
+		        bookkeeping would be more difficult than necessary.
+		    <pooling-profile maxActive="1" exhaustedAction="WAIT" />
+		    -->
         </mule-descriptor>
 
-        <mule-descriptor
-            name="quartzService2"
-            implementation="org.mule.providers.quartz.TestComponent"
-            inboundEndpoint="quartz.in.2">
-
-        <!--
-            we want exactly one TestComponent for this test,
-            otherwise counter bookkeeping would be more difficult
-            than necessary.
-        -->
-        <pooling-profile maxActive="1" exhaustedAction="WAIT" />
-
+        <mule-descriptor name="quartzService2" implementation="org.mule.providers.quartz.TestComponent">
+            <inbound-router>
+                <global-endpoint name="quartz.in.2"/>
+            </inbound-router>
+		    <!--
+		        we want exactly one TestComponent for this test, otherwise counter 
+		        bookkeeping would be more difficult than necessary.
+		    <pooling-profile maxActive="1" exhaustedAction="WAIT" />
+		    -->
         </mule-descriptor>
-
     </model>
-
+    
 </mule-configuration>

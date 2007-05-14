@@ -10,29 +10,29 @@
 
 package org.mule.providers.quartz;
 
-import org.mule.config.ConfigurationBuilder;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.FunctionalTestCase;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
-public class QuartzReceiverFunctionalTestCase extends AbstractMuleTestCase
+public class QuartzFunctionalTestCase extends FunctionalTestCase
 {
 
-    public QuartzReceiverFunctionalTestCase()
+    public QuartzFunctionalTestCase()
     {
         super();
-        this.setDisposeManagerPerSuite(true);
+        setDisposeManagerPerSuite(true);
+    }
+
+    protected String getConfigResources()
+    {
+        return "quartz-functional-test.xml";
     }
 
     public void testMuleReceiverJob() throws Exception
     {
         CountDownLatch counter = TestComponent.QUARTZ_COUNTER;
         assertEquals(4, counter.getCount());
-
-        ConfigurationBuilder configBuilder = new MuleXmlConfigurationBuilder();
-        configBuilder.configure("quartz-receive.xml");
 
         // we wait up to 60 seconds here which is WAY too long for three ticks with 1
         // second interval, but it seems that "sometimes" it takes a very long time
