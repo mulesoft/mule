@@ -28,7 +28,7 @@ public class TcpFunctionalLegacyTestCase extends FunctionalTestCase {
 
     protected String getConfigResources()
     {
-        return "tcp-legacy-functional-test.xml";
+        return "tcp-functional-legacy-test.xml";
     }
 
     public void testSend() throws Exception
