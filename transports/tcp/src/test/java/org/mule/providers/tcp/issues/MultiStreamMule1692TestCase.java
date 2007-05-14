@@ -73,7 +73,7 @@ public class MultiStreamMule1692TestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
 
-        UMOModel model = managementContext.getRegistry().lookupModel("echo");
+        UMOModel model = managementContext.getRegistry().lookupModel("echoModel");
         FunctionalStreamingTestComponent ftc =
                 (FunctionalStreamingTestComponent) model.getComponent("testComponent").getInstance();
 //        assertNotNull(ftc);

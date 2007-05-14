@@ -80,7 +80,7 @@ public class StreamingTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
 
         // this works only if singleton set in descriptor
-        UMOModel model = managementContext.getRegistry().lookupModel("echo");
+        UMOModel model = managementContext.getRegistry().lookupModel("echoModel");
         FunctionalStreamingTestComponent ftc =
                 (FunctionalStreamingTestComponent) model.getComponent("testComponent").getInstance();
 //       assertNotNull(ftc);
