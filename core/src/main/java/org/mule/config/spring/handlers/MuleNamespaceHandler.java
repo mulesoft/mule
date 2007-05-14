@@ -10,6 +10,7 @@
 package org.mule.config.spring.handlers;
 
 import org.mule.config.MuleProperties;
+import org.mule.config.QueueProfile;
 import org.mule.config.spring.parsers.ConfigurationDefinitionParser;
 import org.mule.config.spring.parsers.ConnectionStrategyDefinitionParser;
 import org.mule.config.spring.parsers.CustomElementDefinitionParser;
@@ -18,6 +19,8 @@ import org.mule.config.spring.parsers.EndpointRefDefinitionParser;
 import org.mule.config.spring.parsers.FilterDefinitionParser;
 import org.mule.config.spring.parsers.InheritedModelDefinitionParser;
 import org.mule.config.spring.parsers.MapBeanDefinitionParser;
+import org.mule.config.spring.parsers.PoolingProfileDefinitionParser;
+import org.mule.config.spring.parsers.PropertiesBeanDefinitionParser;
 import org.mule.config.spring.parsers.RouterDefinitionParser;
 import org.mule.config.spring.parsers.ServiceDescriptorDefinitionParser;
 import org.mule.config.spring.parsers.ServiceOverridesDefinitionParser;
@@ -104,6 +107,8 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("custom-exception-strategy", new SimpleChildDefinitionParser("exceptionListener", null));
         registerBeanDefinitionParser("default-component-exception-strategy", new SimpleChildDefinitionParser("exceptionListener", DefaultComponentExceptionStrategy.class));
         registerBeanDefinitionParser("default-connector-exception-strategy", new SimpleChildDefinitionParser("exceptionListener", DefaultExceptionStrategy.class));
+        registerBeanDefinitionParser("pooling-profile", new PoolingProfileDefinitionParser());
+        registerBeanDefinitionParser("queue-profile", new SimpleChildDefinitionParser("queueProfile", QueueProfile.class));
 
         //Connector elements
         registerBeanDefinitionParser("dispatcher-threading-profile", new ThreadingProfileDefinitionParser());
@@ -219,5 +224,7 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("wildcard-filter", new FilterDefinitionParser());
         registerBeanDefinitionParser("equals-filter", new FilterDefinitionParser());
 
+        // Utils / Standard Types
+        registerBeanDefinitionParser("properties", new PropertiesBeanDefinitionParser("properties"));
     }
 }

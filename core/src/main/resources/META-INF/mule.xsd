@@ -119,7 +119,7 @@
             <xsd:group ref="filters" minOccurs="0" maxOccurs="unbounded"/>
             <!--<xsd:group ref="securityFilters" minOccurs="0" maxOccurs="1"/>-->
             <xsd:group ref="connectionStrategies" minOccurs="0" maxOccurs="1"/>
-            <!--<xsd:element name="properties" type="propertiesType" minOccurs="0" maxOccurs="1"/>-->
+            <xsd:element name="properties" type="propsType" minOccurs="0" maxOccurs="1"/>
             <xsd:choice minOccurs="0" maxOccurs="unbounded">
                 <xsd:any namespace="##other"/>
             </xsd:choice>
@@ -361,7 +361,7 @@
             </xsd:simpleType>
         </xsd:attribute>
         <xsd:attribute name="maxWait" type="xsd:string"/>
-        <xsd:attribute name="factory" type="xsd:string" default="org.mule.config.pool.CommonsPoolFactory"/>
+        <!-- <xsd:attribute name="factory" type="xsd:string" default="org.mule.config.pool.CommonsPoolFactory"/> -->
     </xsd:complexType>
 
 
