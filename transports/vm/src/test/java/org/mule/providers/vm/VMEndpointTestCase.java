@@ -19,6 +19,7 @@ public class VMEndpointTestCase extends AbstractMuleTestCase
     public void testUrlWithConnector() throws Exception
     {
         UMOEndpointURI url = new MuleEndpointURI("vm://some.queue?createConnector=vmConnector2");
+        url.initialise();
         assertEquals("vm", url.getScheme());
         assertEquals("some.queue", url.getAddress());
         assertNull(url.getEndpointName());
@@ -31,6 +32,7 @@ public class VMEndpointTestCase extends AbstractMuleTestCase
     public void testUrlWithProvider() throws Exception
     {
         UMOEndpointURI url = new MuleEndpointURI("vm://some.queue?endpointName=vmProvider");
+        url.initialise();
         assertEquals("vm", url.getScheme());
         assertEquals("some.queue", url.getAddress());
         assertEquals("vmProvider", url.getEndpointName());

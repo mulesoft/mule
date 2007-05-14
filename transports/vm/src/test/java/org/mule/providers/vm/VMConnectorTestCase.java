@@ -26,7 +26,6 @@ public class VMConnectorTestCase extends AbstractConnectorTestCase
     {
         VMConnector conn = new VMConnector();
         conn.setName("TestVM");
-        conn.initialise();
         return conn;
     }
 
