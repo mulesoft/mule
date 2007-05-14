@@ -24,9 +24,9 @@
         </dependency>
         <!-- This should have been pulled in as a transitive dependency from mule-tests-functional but it looks 
             like it's yet another m2 workaround. -->
-        <!--dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-        </dependency>-->
+        </dependency>
     </dependencies>
 </project>
