@@ -44,8 +44,7 @@ public class StreamingTestCase extends FunctionalTestCase
 
     protected String getConfigResources()
     {
-//        return "tcp-streaming-test.xml";
-        return "tcp-streaming-test-xsd.xml";
+        return "tcp-streaming-test.xml";
     }
 
     public void testSend() throws Exception

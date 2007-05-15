@@ -13,6 +13,7 @@ package org.mule.impl.model.streaming;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.RequestContext;
+import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.model.AbstractComponent;
 import org.mule.umo.ComponentException;
 import org.mule.umo.UMOEvent;
@@ -62,8 +63,13 @@ public class StreamingComponent extends AbstractComponent
             UMOImmutableEndpoint ep = (UMOImmutableEndpoint) iterator.next();
             if (!ep.isStreaming())
             {
-                throw new InitialisationException(
-                    CoreMessages.streamingEndpointsMustBeUsedWithStreamingModel(), this);
+                logger.error("***********************************************");
+                logger.error("setting streaming = true");
+                logger.error("MULE-1752");
+                logger.error("***********************************************");
+                ((MuleEndpoint) ep).setStreaming(true);
+//                throw new InitialisationException(
+//                    CoreMessages.streamingEndpointsMustBeUsedWithStreamingModel(), this);
             }
             // TODO RM*: This restriction could be lifted in future
             if (ep.getTransformer() != null)
