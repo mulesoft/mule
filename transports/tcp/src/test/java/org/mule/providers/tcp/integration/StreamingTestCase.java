@@ -17,13 +17,12 @@ import org.mule.tck.functional.FunctionalStreamingTestComponent;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.model.UMOModel;
 
+import java.util.HashMap;
+
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
-
-import java.util.HashMap;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -45,7 +44,8 @@ public class StreamingTestCase extends FunctionalTestCase
 
     protected String getConfigResources()
     {
-        return "tcp-streaming-test.xml";
+//        return "tcp-streaming-test.xml";
+        return "tcp-streaming-test-xsd.xml";
     }
 
     public void testSend() throws Exception
@@ -79,12 +79,23 @@ public class StreamingTestCase extends FunctionalTestCase
 
         MuleClient client = new MuleClient();
 
+        // this just creates another class - not the one used
+//        FunctionalStreamingTestComponent ftc =
+//                (FunctionalStreamingTestComponent) MuleManager.getInstance()
+//                        .getContainerContext().getComponent(
+//                        new ContainerKeyPair("mule", "testComponent"));
+
+        // this creates a new instance too
+//        UMOModel model = (UMOModel) MuleManager.getInstance().getModels().get("echo");
+//        FunctionalStreamingTestComponent ftc =
+//                (FunctionalStreamingTestComponent) model.getComponent("testComponent").getInstance();
+
         // this works only if singleton set in descriptor
         UMOModel model = managementContext.getRegistry().lookupModel("echoModel");
         FunctionalStreamingTestComponent ftc =
                 (FunctionalStreamingTestComponent) model.getComponent("testComponent").getInstance();
-//       assertNotNull(ftc);
-//       assertEquals(1, ftc.getNumber());
+        assertNotNull(ftc);
+        assertEquals(1, ftc.getNumber());
 
         // this works with or without singleton, but required adding getComponent method
 //        UMOModel model = (UMOModel) MuleManager.getInstance().getModels().get("echo");

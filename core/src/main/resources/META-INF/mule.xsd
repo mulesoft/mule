@@ -28,6 +28,7 @@
     <xsd:element name="model-seda" type="sedaModelType"/>
     <xsd:element name="model-inherited" type="modelType"/>
     <xsd:element name="model-custom" type="customModelType"/>
+    <xsd:element name="model-streaming" type="streamingModelType"/>
 
     <xsd:element name="jndi-transaction-manager" type="transactionManagersType"/>
     <xsd:element name="weblogic-transaction-manager" type="transactionManagersType"/>
@@ -544,6 +545,13 @@
         <xsd:complexContent>
             <xsd:extension base="modelType">
                 <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="streamingModelType">
+        <xsd:complexContent>
+            <xsd:extension base="modelType">
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

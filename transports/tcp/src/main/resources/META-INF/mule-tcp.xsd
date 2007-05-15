@@ -101,6 +101,14 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="validateConnections" type="xsd:boolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            This "blips" the socket, opening and closing it to validate the connection, when first
+                            accessed.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

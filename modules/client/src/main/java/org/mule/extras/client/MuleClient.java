@@ -17,9 +17,9 @@ import org.mule.config.MuleConfiguration;
 import org.mule.config.MuleProperties;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.extras.client.i18n.ClientMessages;
 import org.mule.config.spring.RegistryFacade;
 import org.mule.config.spring.TransientRegistry;
+import org.mule.extras.client.i18n.ClientMessages;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
@@ -48,15 +48,14 @@ import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.MuleObjectHelper;
 import org.mule.util.StringUtils;
 
-import edu.emory.mathcs.backport.java.util.concurrent.Callable;
-import edu.emory.mathcs.backport.java.util.concurrent.Executor;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import edu.emory.mathcs.backport.java.util.concurrent.Callable;
+import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -901,7 +900,7 @@ public class MuleClient implements Disposable
             UMOConnector connector = null;
             UMOEndpointURI defaultEndpointUri = new MuleEndpointURI("vm://mule.client");
             connector = TransportFactory.createConnector(defaultEndpointUri);
-           managementContext.getRegistry().registerConnector(connector);
+            managementContext.getRegistry().registerConnector(connector);
             connector.start();
             endpoint = new MuleEndpoint("muleClientProvider", defaultEndpointUri, connector, null,
                 UMOEndpoint.ENDPOINT_TYPE_RECEIVER, 0, null, null);

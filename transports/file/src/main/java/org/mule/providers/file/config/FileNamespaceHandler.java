@@ -26,6 +26,6 @@ public class FileNamespaceHandler extends NamespaceHandlerSupport
     {
         registerBeanDefinitionParser("connector", new SingleElementDefinitionParser(FileConnector.class, true));
         registerBeanDefinitionParser("filename-parser",
-                new SimpleChildDefinitionParser("filenameParser", null, FilenameParser.class));
+                    new SimpleChildDefinitionParser("filenameParser", null, FilenameParser.class));
     }
 }
