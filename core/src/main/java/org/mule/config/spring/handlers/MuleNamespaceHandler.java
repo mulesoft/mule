@@ -38,6 +38,7 @@ import org.mule.impl.model.pipeline.PipelineModel;
 import org.mule.impl.model.resolvers.CallableEntryPointResolver;
 import org.mule.impl.model.seda.SedaModel;
 import org.mule.impl.model.seda.optimised.OptimisedSedaModel;
+import org.mule.impl.model.streaming.StreamingModel;
 import org.mule.routing.ForwardingCatchAllStrategy;
 import org.mule.routing.inbound.CorrelationAggregator;
 import org.mule.routing.inbound.CorrelationEventResequencer;
@@ -166,7 +167,8 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("model-seda-optimised", new SingleElementDefinitionParser(OptimisedSedaModel.class, true));
         registerBeanDefinitionParser("model-simple", new SingleElementDefinitionParser(DirectModel.class, true));
         registerBeanDefinitionParser("model-pipeline", new SingleElementDefinitionParser(PipelineModel.class, true));
-        registerBeanDefinitionParser("custom-model", new CustomElementDefinitionParser(true));
+        registerBeanDefinitionParser("model-streaming", new SingleElementDefinitionParser(StreamingModel.class, true));
+        registerBeanDefinitionParser("model-custom", new CustomElementDefinitionParser(true));
 
         registerBeanDefinitionParser("component-lifecycle-adapter-factory", new SimpleChildDefinitionParser("lifecycleAdapterFactory", null));
         registerBeanDefinitionParser("callable-entrypoint-resolver", new SimpleChildDefinitionParser("entryPointResolver", CallableEntryPointResolver.class));
