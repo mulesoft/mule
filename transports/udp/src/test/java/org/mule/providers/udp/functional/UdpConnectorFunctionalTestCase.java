@@ -55,4 +55,5 @@ public class UdpConnectorFunctionalTestCase extends FunctionalTestCase
             assertTrue("checking for received message '" + message + "'", receivedMessages.contains(message));
         }
     }
+
 }

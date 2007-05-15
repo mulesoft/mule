@@ -1,43 +1,34 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:udp="http://www.mulesource.org/schema/mule/udp/2.0"
+       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+       xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+               http://www.mulesource.org/schema/mule/core/2.0 META-INF/mule.xsd
+               http://www.mulesource.org/schema/mule/vm/2.0 META-INF/mule-vm.xsd
+               http://www.mulesource.org/schema/mule/udp/2.0 META-INF/mule-udp.xsd">
 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+    <!-- MULE-1751 -->
+    <!-- mule:configuration serverId=""/ -->
 
-<mule-configuration id="test" version="1.0">
+    <vm:connector name="vm-queue" queueEvents="true"/>
 
-    <mule-environment-properties serverUrl=""/>
-    
-    <connector name="vm-queue" className="org.mule.providers.vm.VMConnector">
-        <properties>
-            <property name="queueEvents" value="true"/>
-        </properties>
-    </connector>
+    <mule:endpoint name="serverEndpoint" address="udp://null:60131"/>
 
-    <global-endpoints>
-        <endpoint name="serverEndpoint" address="udp://null:60131"/>
-        <!--<endpoint name="clientEndpoint" address="udp://localhost:60132"/>-->
-    </global-endpoints>
-    <model name="main">
-        <mule-descriptor name="testUDP1" implementation="org.mule.tck.functional.FunctionalTestComponent">
-            <inbound-router>
-                <global-endpoint name="serverEndpoint"/>
-            </inbound-router>
-            <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="vm://foo"/>
-                </router>
-            </outbound-router>
-        </mule-descriptor>
+    <mule:model-seda name="main">
+        <mule:service name="testUDP1" implementation="org.mule.tck.functional.FunctionalTestComponent">
+            <mule:inbound-router>
+                <mule:endpoint-ref nameref="serverEndpoint"/>
+            </mule:inbound-router>
+            <mule:outbound-router>
+                <mule:pass-through-router>
+                    <mule:endpoint address="vm://foo"/>
+                </mule:pass-through-router>
+            </mule:outbound-router>
+        </mule:service>
+    </mule:model-seda>
 
-       <!--<mule-descriptor name="testUDP2" implementation="org.mule.tck.functional.FunctionalTestComponent">-->
-            <!--<inbound-router>-->
-                <!--<global-endpoint name="serverEndpoint"/>-->
-            <!--</inbound-router>-->
-            <!--<outbound-router>-->
-                <!--<router className="org.mule.routing.outbound.OutboundPassThroughRouter">-->
-                    <!--<endpoint address="vm://foo"/>-->
-                <!--</router>-->
-            <!--</outbound-router>-->
-        <!--</mule-descriptor> -->
-    </model>
-</mule-configuration>
+</beans>
+        
