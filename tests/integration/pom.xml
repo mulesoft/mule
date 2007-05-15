@@ -229,11 +229,14 @@
             <artifactId>mule-module-pgp</artifactId>
             <version>${version}</version>
         </dependency>
+        <!-- dirk: picocontainer is not part of the 2.0 release and will not 
+             be built. Do not reference it here.
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-picocontainer</artifactId>
             <version>${version}</version>
         </dependency>
+        -->
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring</artifactId>
