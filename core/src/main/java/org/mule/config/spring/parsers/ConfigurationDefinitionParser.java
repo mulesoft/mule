@@ -14,7 +14,6 @@ import org.mule.config.MuleProperties;
 
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
@@ -28,7 +27,6 @@ public class ConfigurationDefinitionParser extends AbstractMuleSingleBeanDefinit
 {
 
     public static final String ATTRIBUTE_SERVER_ID = "serverId";
-    private String parent;
 
     public ConfigurationDefinitionParser()
     {
@@ -42,35 +40,9 @@ public class ConfigurationDefinitionParser extends AbstractMuleSingleBeanDefinit
     }
 
     
-
-    //@java.lang.Override
-    protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
-    {
-        if(parent==null)
-        {
-            builder.addPropertyValue(ATTRIBUTE_ID, MuleProperties.OBJECT_MULE_CONFIGURATION);
-            parent = MuleProperties.OBJECT_MULE_CONFIGURATION;
-        }
-        super.doParse(element, parserContext, builder);
-    }
-
     //@Override
     protected String resolveId(Element element, AbstractBeanDefinition definition, ParserContext parserContext) throws BeanDefinitionStoreException
     {
         return MuleProperties.OBJECT_MULE_CONFIGURATION;
-    }
-
-
-    //@java.lang.Override
-    protected BeanDefinitionBuilder createBeanDefinitionBuilder(Element element, Class beanClass)
-    {
-        if(parent!=null)
-        {
-            return BeanDefinitionBuilder.childBeanDefinition(parent);
-        }
-        else
-        {
-            return super.createBeanDefinitionBuilder(element, beanClass);
-        }
     }
 }
