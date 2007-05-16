@@ -11,8 +11,8 @@ package org.mule.impl;
 
 import org.mule.RegistryContext;
 import org.mule.config.ExceptionHelper;
-import org.mule.config.i18n.Message;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.config.i18n.Message;
 import org.mule.config.spring.RegistryFacade;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
@@ -80,10 +80,13 @@ public class MuleShutdownHook extends Thread
         msgs.add(root.getMessage() + " (" + root.getClass().getName() + ")");
         msgs.add(" ");
         msgs.add(CoreMessages.fatalErrorInShutdown());
-        UMOManagementContext context = RegistryContext.getRegistry().getManagementContext();
-        if(context!=null)
+        if(RegistryContext.getRegistry()!=null)
         {
-            msgs.add(CoreMessages.serverStartedAt(context.getStartDate()));
+            UMOManagementContext context = RegistryContext.getRegistry().getManagementContext();
+            if(context!=null)
+            {
+                msgs.add(CoreMessages.serverStartedAt(context.getStartDate()));
+            }
         }
         msgs.add(CoreMessages.serverShutdownAt(new Date()));
 
