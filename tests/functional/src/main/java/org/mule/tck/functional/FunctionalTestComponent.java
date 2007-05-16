@@ -24,8 +24,14 @@ import org.apache.commons.logging.LogFactory;
  * <code>FunctionalTestComponent</code> is a component that can be used by
  * functional tests. This component accepts an EventCallback that can be used to
  * assert the state of the current event.
- * 
- * @see EventCallback
+ * <p/>
+ * Also, this component fires {@link FunctionalTestNotification} via Mule for every message received.
+ * Tests can register with Mule to receive these events by implementing
+ * {@link FunctionalTestNotificationListener}.
+ *
+ * @see org.mule.tck.functional.EventCallback
+ * @see org.mule.tck.functional.FunctionalTestNotification
+ * @see org.mule.tck.functional.FunctionalTestNotificationListener
  */
 
 public class FunctionalTestComponent implements Callable
@@ -39,12 +45,15 @@ public class FunctionalTestComponent implements Callable
     private boolean appendComponentName = false;
     private boolean throwException = false;
 
+    /**
+     * {@inheritDoc}
+     */
     public Object onCall(UMOEventContext context) throws Exception
     {
         String contents = context.getTransformedMessageAsString();
         String msg = StringMessageUtils.getBoilerPlate("Message Received in component: "
-                        + context.getComponentDescriptor().getName() + ". Content is: "
-                        + StringMessageUtils.truncate(contents, 100, true), '*', 80);
+                + context.getComponentDescriptor().getName() + ". Content is: "
+                + StringMessageUtils.truncate(contents, 100, true), '*', 80);
 
         logger.info(msg);
 
@@ -60,11 +69,11 @@ public class FunctionalTestComponent implements Callable
         }
         else
         {
-            replyMessage = contents + " Received" + (appendComponentName ?  " " + context.getComponentDescriptor().getName() : "");
+            replyMessage = contents + " Received" + (appendComponentName ? " " + context.getComponentDescriptor().getName() : "");
         }
 
         context.getManagementContext().fireNotification(
-            new FunctionalTestNotification(context, replyMessage, FunctionalTestNotification.EVENT_RECEIVED));
+                new FunctionalTestNotification(context, replyMessage, FunctionalTestNotification.EVENT_RECEIVED));
 
         if (throwException)
         {
@@ -74,14 +83,21 @@ public class FunctionalTestComponent implements Callable
         return replyMessage;
     }
 
+    /**
+     * @param data the event data received
+     * @return the processed message
+     * @throws Exception
+     *
+     * @deprecated Not sure why we have this duplicate method here. Need to investigate...
+     */
     public Object onReceive(Object data) throws Exception
     {
         UMOEventContext context = RequestContext.getEventContext();
 
         String contents = data.toString();
         String msg = StringMessageUtils.getBoilerPlate("Message Received in component: "
-                        + context.getComponentDescriptor().getName() + ". Content is: "
-                        + StringMessageUtils.truncate(contents, 100, true), '*', 80);
+                + context.getComponentDescriptor().getName() + ". Content is: "
+                + StringMessageUtils.truncate(contents, 100, true), '*', 80);
 
         logger.info(msg);
 
@@ -101,51 +117,134 @@ public class FunctionalTestComponent implements Callable
         }
 
         context.getManagementContext().fireNotification(
-            new FunctionalTestNotification(context, replyMessage, FunctionalTestNotification.EVENT_RECEIVED));
+                new FunctionalTestNotification(context, replyMessage, FunctionalTestNotification.EVENT_RECEIVED));
 
         if (throwException)
         {
-            throw new MuleException(MessageFactory.createStaticMessage("Functional Test Component Exception"));
+            if(returnMessage!=null && returnMessage instanceof Exception)
+            {
+                throw (Exception)returnMessage;
+            }
+            else
+            {
+                throw new MuleException(MessageFactory.createStaticMessage("Functional Test Component Exception"));                
+            }
         }
 
         return replyMessage;
     }
 
+    /**
+     * An event callback is called when a message is received by the component.
+     * An Event callback isn't strictly required but it is usfal for performing assertions
+     * on the current message being received.
+     * Note that the FunctionalTestComponent should be made a singleton
+     * {@link org.mule.umo.UMODescriptor#setSingleton} when using Event callbacks
+     * <p/>
+     * Another option is to register a {@link FunctionalTestNotificationListener} with Mule and this
+     * will deleiver a {@link FunctionalTestNotification} for every message received by this component
+     *
+     * @return the callback to call when a message is received
+     * @see org.mule.umo.UMODescriptor
+     * @see org.mule.tck.functional.FunctionalTestNotification
+     * @see org.mule.tck.functional.FunctionalTestNotificationListener
+     */
     public EventCallback getEventCallback()
     {
         return eventCallback;
     }
 
+    /**
+     * An event callback is called when a message is received by the component.
+     * An Event callback isn't strictly required but it is usfal for performing assertions
+     * on the current message being received.
+     * Note that the FunctionalTestComponent should be made a singleton
+     * {@link org.mule.umo.UMODescriptor#setSingleton} when using Event callbacks
+     * <p/>
+     * Another option is to register a {@link FunctionalTestNotificationListener} with Mule and this
+     * will deleiver a {@link FunctionalTestNotification} for every message received by this component
+     *
+     * @param eventCallback the callback to call when a message is received
+     * @see org.mule.umo.UMODescriptor
+     * @see org.mule.tck.functional.FunctionalTestNotification
+     * @see org.mule.tck.functional.FunctionalTestNotificationListener
+     */
     public void setEventCallback(EventCallback eventCallback)
     {
         this.eventCallback = eventCallback;
     }
 
+    /**
+     * Often you will may want to return a fixed message payload to simulate and external system call.
+     * This can be done using the 'returnMessage' property. Note that you can return complex objects by
+     * using the <container-property> element in the Xml configuration.
+     *
+     * @return the message payload to always return from this component instance
+     */
     public Object getReturnMessage()
     {
         return returnMessage;
     }
 
+    /**
+     * Often you will may want to return a fixed message payload to simulate and external system call.
+     * This can be done using the 'returnMessage' property. Note that you can return complex objects by
+     * using the <container-property> element in the Xml configuration.
+     *
+     * @param returnMessage the message payload to always return from this component instance
+     */
     public void setReturnMessage(Object returnMessage)
     {
         this.returnMessage = returnMessage;
     }
 
+    /**
+     * Sometimes you will want the component to always throw an exception, if this is the case you can
+     * set the 'throwException' property to true.
+     *
+     * @return throwException true if an exception should always be thrown from this instance.
+     *         If the {@link #returnMessage} property is set and is of type
+     *         java.lang.Exception, that exception will be thrown.
+     */
     public boolean isThrowException()
     {
         return throwException;
     }
 
+    /**
+     * Sometimes you will want the component to always throw an exception, if this is the case you can
+     * set the 'throwException' property to true.
+     *
+     * @param throwException true if an exception should always be thrown from this instance.
+     *                       If the {@link #returnMessage} property is set and is of type
+     *                       java.lang.Exception, that exception will be thrown.
+     */
     public void setThrowException(boolean throwException)
     {
         this.throwException = throwException;
     }
 
+    /**
+     * This will cause the component to append the compoent name to the end of the message
+     * returned from this component. This only works when processing String messages.
+     * This feature is useful when processing multiple messages using a pool of FunctionalTestComponents
+     * to determine who processed the resulting message
+     *
+     * @return true if the component name will be appended to the return message
+     */
     public boolean isAppendComponentName()
     {
         return appendComponentName;
     }
 
+    /**
+     * This will cause the component to append the compoent name to the end of the message
+     * returned from this component. This only works when processing String messages.
+     * This feature is useful when processing multiple messages using a pool of FunctionalTestComponents
+     * to determine who processed the resulting message
+     *
+     * @param appendComponentName true if the component name will be appended to the return message
+     */
     public void setAppendComponentName(boolean appendComponentName)
     {
         this.appendComponentName = appendComponentName;

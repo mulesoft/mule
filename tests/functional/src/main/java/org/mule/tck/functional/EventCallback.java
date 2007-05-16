@@ -13,10 +13,12 @@ package org.mule.tck.functional;
 import org.mule.umo.UMOEventContext;
 
 /**
- * The scope of the Event Callback is to be able to get a component we are using
- * and to control it. This is especially useful when we have beans configured in
- * Spring that we need to exercise some form of control on, example setting
- * properties at runtime instead of in the configuration.
+ * The scope of the Event Callback is to be able to get a the message currently
+ * being processed by the {@link FunctionalTestComponent} and make assertions
+ * on the message payload, headers or attachments or to make changes required
+ * for the test.
+ *
+ * @see org.mule.tck.functional.FunctionalTestComponent
  */
 
 public interface EventCallback

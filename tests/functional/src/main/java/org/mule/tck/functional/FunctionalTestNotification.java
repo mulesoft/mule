@@ -15,7 +15,24 @@ import org.mule.umo.UMOEventContext;
 import org.mule.umo.transformer.TransformerException;
 
 /**
- * TODO document
+ * A <code>FunctionlTestNotification</code> is fired by the {@link org.mule.tck.functional.FunctionalTestComponent}
+ * when it receives an event. Test cases can register a {@link org.mule.tck.functional.FunctionalTestNotificationListener}
+ * with Mule to receive these notifications and make assertions about the number of messages received or the content
+ * of the message.
+ *
+ * This Notification contains the current EventContext and reply message. The resource Identifier for this event
+ * is the component name that received the message.  This means you can register to listen to Notifications from a
+ * selected {@link org.mule.tck.functional.FunctionalTestComponent}. i.e.
+ * <code>
+ * managementContext.registerListener(this, "*JmsTestCompoennt");
+ * </code>
+ *
+ * This registration would only receive {@link org.mule.tck.functional.FunctionalTestNotification} objects
+ * from components called 'MyJmsTestComponent' and 'YourJmsTestComponent' but not 'HerFileTestComponent'.
+ *
+ * @see org.mule.tck.functional.FunctionalTestComponent
+ * @see org.mule.tck.functional.FunctionalTestNotificationListener
+ * @see org.mule.umo.UMOManagementContext
  */
 public class FunctionalTestNotification extends CustomNotification
 {
