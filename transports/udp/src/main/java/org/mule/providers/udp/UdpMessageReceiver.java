@@ -158,6 +158,10 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
                     DatagramPacket packet = createPacket();
                     try
                     {
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.debug("Receiving packet on " + uri);
+                        }
                         socket.receive(packet);
 
                         if (logger.isTraceEnabled())

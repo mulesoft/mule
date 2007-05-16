@@ -12,6 +12,7 @@ package org.mule.providers.multicast;
 
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.umo.UMOMessage;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -28,9 +29,10 @@ public class MulticastConnectorFunctionalTestCase extends FunctionalTestCase
 
     public void testSendTestData() throws Exception
     {
-        final int numberOfMessages = 100;
+        final int numberOfMessages = 2;
         MuleClient client = new MuleClient();
 
+        logger.debug("sending messages");
         for (int sentPackets = 0; sentPackets < numberOfMessages; sentPackets++)
         {
             String msg = MESSAGE + sentPackets;
@@ -40,31 +42,34 @@ public class MulticastConnectorFunctionalTestCase extends FunctionalTestCase
         int broadcastMessages = numberOfMessages * 3; //3 components
         Set receivedMessages = new HashSet(broadcastMessages);
 
+        logger.debug("receiving messages");
         int receivedPackets = 0;
         for (; receivedPackets < broadcastMessages; receivedPackets++)
         {
-            receivedMessages.add(client.receive("vm://foo", 2000).getPayloadAsString());
-
+            UMOMessage message = client.receive("vm://foo", 2000);
+            assertNotNull(message);
+            receivedMessages.add(message.getPayloadAsString());
         }
 
         assertEquals(broadcastMessages, receivedPackets);
 
         //Check all broadcasts were received from Component1
-        checkBroadcastMessagesForComponent(receivedMessages, "Component1");
+        checkBroadcastMessagesForComponent(numberOfMessages, receivedMessages, "Component1");
 
         //Check all broadcasts were received from Component2
-        checkBroadcastMessagesForComponent(receivedMessages, "Component2");
+        checkBroadcastMessagesForComponent(numberOfMessages, receivedMessages, "Component2");
 
         //Check all broadcasts were received from Component3
-        checkBroadcastMessagesForComponent(receivedMessages, "Component3");
+        checkBroadcastMessagesForComponent(numberOfMessages, receivedMessages, "Component3");
 
         assertEquals(0, receivedMessages.size());
     }
 
-    protected void checkBroadcastMessagesForComponent(Set receivedMessages, String name)
+    protected void checkBroadcastMessagesForComponent(int numberOfMessages,
+                                                      Set receivedMessages, String name)
     {
         //Check all broadcasts were received from Component2
-        for (int x = 0; x <100; x++)
+        for (int x = 0; x < numberOfMessages; x++)
         {
             String expected = MESSAGE + x + " Received " + name;
 
@@ -72,4 +77,5 @@ public class MulticastConnectorFunctionalTestCase extends FunctionalTestCase
             assertTrue(receivedMessages.remove(expected));
         }
     }
+    
 }

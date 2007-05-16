@@ -10,11 +10,11 @@
 
 package org.mule.tck;
 
-import org.mule.RegistryContext;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.manager.DefaultWorkListener;
 import org.mule.util.ClassUtils;
+import org.mule.RegistryContext;
 
 import javax.resource.spi.work.WorkEvent;
 

@@ -12,6 +12,7 @@ package org.mule.providers.multicast;
 
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.umo.UMOComponent;
@@ -42,24 +43,25 @@ public class MulticastConnectorTestCase extends AbstractConnectorTestCase
 
     public void testValidListener() throws Exception
     {
-        MulticastConnector connector = new MulticastConnector();
         MuleDescriptor d = getTestDescriptor("orange", Orange.class.getName());
         UMOComponent component = getTestComponent(d);
         UMOEndpoint endpoint = getTestEndpoint("Test", UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
-        endpoint.setEndpointURI(null);
-        endpoint.setConnector(connector);
+
 
         try
         {
+            endpoint.setEndpointURI(null);
+            endpoint.setConnector(connector);
             connector.registerListener(component, endpoint);
             fail("cannot register with null endpointUri");
         }
         catch (Exception e)
         { /* expected */
         }
-        endpoint.setEndpointURI(null);
+
         try
         {
+            endpoint.setEndpointURI(null);
             connector.registerListener(component, endpoint);
             fail("cannot register with empty endpointUri");
         }
@@ -67,6 +69,7 @@ public class MulticastConnectorTestCase extends AbstractConnectorTestCase
         { /* expected */
         }
 
+        endpoint = new MuleEndpoint();
         endpoint.setEndpointURI(new MuleEndpointURI("multicast://228.2.3.4:10100"));
         connector.registerListener(component, endpoint);
         try
@@ -83,7 +86,6 @@ public class MulticastConnectorTestCase extends AbstractConnectorTestCase
     public void testProperties() throws Exception
     {
         MulticastConnector c = new MulticastConnector();
-        c.initialise();
         c.setReceiveBufferSize(1024);
         assertEquals(1024, c.getReceiveBufferSize());
         c.setReceiveBufferSize(0);
