@@ -10,7 +10,7 @@
     </parent>
     <artifactId>mule-transport-http</artifactId>
     <!--<packaging>bundle</packaging>-->
-    <name>Http Transport</name>
+    <name>HTTP Transport</name>
     <description>A Mule transport for Http Connectivity. This transport supplies a simple Http Server implementation.</description>
 
     <build>

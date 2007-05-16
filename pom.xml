@@ -163,7 +163,7 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-            <!-- 
+            <!--
                  The JDK version is fixed to 1.4 for now (see maven-enforcer-plugin config).
                  This means that we can hard-code the xml parser versions here to shield
                  us from all kinds of bad dependencies coming in transitively.
@@ -177,6 +177,16 @@
                 <groupId>xerces</groupId>
                 <artifactId>xercesImpl</artifactId>
                 <version>2.8.1</version>
+            </dependency>
+            <dependency>
+                <groupId>mx4j</groupId>
+                <artifactId>mx4j-jmx</artifactId>
+                <version>2.1.1</version>
+            </dependency>
+            <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>1.2.14</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -313,10 +323,18 @@
                 <enabled>true</enabled>
             </releases>
         </pluginRepository>
+
         <pluginRepository>
             <id>mule-deps</id>
             <name>Mule Dependencies</name>
             <url>http://dist.codehaus.org/mule/dependencies/maven2</url>
+        </pluginRepository>
+
+        <!-- for buildnumber plugin -->
+        <pluginRepository>
+            <id>tlc</id>
+            <name>TLC Repository</name>
+            <url>http://commons.ucalgary.ca/pub/m2</url>
         </pluginRepository>
     </pluginRepositories>
 
@@ -341,7 +359,7 @@
 
         <plugins>
             <!-- Enforce minimum maven version.
-                 This must be done through the maven-enforcer-plugin as per 
+                 This must be done through the maven-enforcer-plugin as per
                  http://jira.codehaus.org/browse/MNG-2423 the prerequisites are not inherited.
             -->
             <plugin>
@@ -395,6 +413,30 @@
                 -->
             </plugin>
 
+            <!-- add repository revision to manifests -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>maven-buildnumber-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>create</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!-- never touch svn -->
+                    <doCheck>false</doCheck>
+                    <doUpdate>false</doUpdate>
+                    <!--
+                    <format>{0,date,yyyy-MMM-dd-HH:mm:ss}</format>
+                    <items>
+                        <item>timestamp</item>
+                    </items>
+                    -->
+                </configuration>
+            </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -413,7 +455,6 @@
                             <addClasspath>true</addClasspath>
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-
                         </manifest>
                         <!-- Custom Entries -->
                         <manifestEntries>
@@ -427,7 +468,9 @@
                             </Dtd-Public-Id>
                             <Dtd-System-Id>${pom.url}/dtds</Dtd-System-Id>
                             <!-- This would work if this issue gets closed: http://jira.codehaus.org/browse/MNG-1832 -->
-                            <Build-Date>${mvn.timestamp.yyyy-MM-dd-HH:mm:ss}</Build-Date>
+                            <!--Build-Date>${mvn.timestamp.yyyy-MM-dd-HH:mm:ss}</Build-Date-->
+                            <!-- include repository revision from buildnumber plugin -->
+                            <Build-Revision>${buildNumber}</Build-Revision>
                         </manifestEntries>
                     </archive>
 

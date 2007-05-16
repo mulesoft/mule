@@ -10,8 +10,8 @@
     </parent>
     <artifactId>mule-transport-stream</artifactId>
     <!--<packaging>bundle</packaging>-->
-    <name>Stream Transport</name>
-    <description>A Mule transport for Stream Connectivity. This transport allows connectivity to Streams and is useful for testing.</description>
+    <name>System I/O Transport</name>
+    <description>A Mule transport used as the interface to Java's System.out and System.in objects, typically for testing purposes.</description>
 
     <build>
          <plugins>

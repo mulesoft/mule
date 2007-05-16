@@ -10,7 +10,7 @@
     </parent>
     <artifactId>mule-transport-jdbc</artifactId>
     <!--<packaging>bundle</packaging>-->
-    <name>Jdbc Transport</name>
+    <name>JDBC Transport</name>
     <description>A Mule transport for JDBC connectivity.</description>
     
     <build>

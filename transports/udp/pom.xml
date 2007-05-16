@@ -10,7 +10,7 @@
     </parent>
     <artifactId>mule-transport-udp</artifactId>
     <!--<packaging>bundle</packaging>-->
-    <name>Udp Transport</name>
+    <name>UDP Transport</name>
     <description>A Mule transport for Udp Connectivity. This transport supplies a Udp Data Packet dispatcher and client implementation.</description>
 
     <build>

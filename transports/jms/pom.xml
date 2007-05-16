@@ -10,7 +10,7 @@
     </parent>
     <artifactId>mule-transport-jms</artifactId>
     <!--<packaging>bundle</packaging>-->
-    <name>Jms Transport</name>
+    <name>JMS Transport</name>
     <description>A Mule transport for Jms Connectivity.</description>
 
     <build>

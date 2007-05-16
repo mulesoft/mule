@@ -10,7 +10,7 @@
     </parent>
     <artifactId>mule-transport-tcp</artifactId>
     <!--<packaging>bundle</packaging>-->
-    <name>Tcp Transport</name>
+    <name>TCP Transport</name>
     <description>A Mule transport for Tcp Connectivity. This transport supplies a tcp Server and client implementation.</description>
 
     <build>

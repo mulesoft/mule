@@ -10,7 +10,7 @@
     </parent>
     <artifactId>mule-transport-email</artifactId>
     <!--<packaging>bundle</packaging>-->
-    <name>Email Transport</name>
+    <name>E-Mail Transport</name>
     <description>A Mule transport for Email Connectivity. This transport supplies a Pop3 connector, Smtp connector and a Mail connector which is an aggregation of the two.</description>
 
     <build>

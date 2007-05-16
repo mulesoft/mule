@@ -10,7 +10,7 @@
     </parent>
     <artifactId>mule-transport-oracleaq</artifactId>
     <!--<packaging>bundle</packaging>-->
-    <name>Oracle Advanced Queuing Transport</name>
+    <name>JMS Transport: Oracle AQ</name>
     <description>Adds Oracle-specific functionality to the standard Mule JMS transport.</description>
 
     <build>

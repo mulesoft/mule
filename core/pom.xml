@@ -67,7 +67,7 @@
              </plugin>
          </plugins>
     </build>
-    
+
     <dependencies>
         <!-- Spring-based configuration is part of mule-core for 2.x -->
         <dependency>
@@ -116,7 +116,7 @@
             <version>1.0</version>
         </dependency>
 
- 
+
         <!-- Note: Ideally, the following list of libraries should be in the Mule project's top-level
             POM, but Maven has visibility problems when dependencies are more than 2 levels away, so
             this list is repeated in core/pom.xml, modules/pom.xml, transports/pom.xml, examples/pom.xml -->
@@ -215,10 +215,8 @@
         </dependency>
         <!-- UMOMesage attachment support; not needed for JDK 6 -->
         <dependency>
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
-            <version>1.1</version>
-            <scope>provided</scope>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
         </dependency>
 
         <!-- These are used by the TCK, which will hopefully be in its own project some day -->

@@ -51,7 +51,6 @@
         <dependency>
             <groupId>mx4j</groupId>
             <artifactId>mx4j-jmx</artifactId>
-            <version>2.1.1</version>
         </dependency>
         <dependency>
             <groupId>mx4j</groupId>

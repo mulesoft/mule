@@ -10,7 +10,7 @@
     </parent>
     <artifactId>mule-transport-ftp</artifactId>
     <!--<packaging>bundle</packaging>-->
-    <name>Ftp Transport</name>
+    <name>FTP Transport</name>
     <description>A Mule transport for Ftp Connectivity.</description>
 
     <build>
@@ -83,6 +83,7 @@
             <groupId>org.apache.mina</groupId>
             <artifactId>mina-core</artifactId>
             <version>1.0.2</version>
+            <scope>test</scope>
         </dependency>
      </dependencies>
 </project>

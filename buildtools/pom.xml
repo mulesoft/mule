@@ -10,7 +10,7 @@
     </parent>
     <artifactId>mule-buildtools</artifactId>
     <packaging>jar</packaging>
-    <name>Mule's build tools</name>
+    <name>Mule Build Tools</name>
     <description>These are the tools used by the Mule's build procedure</description>
     <dependencies>
         <dependency>
