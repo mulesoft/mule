@@ -10,10 +10,10 @@
 
 package org.mule.config.i18n;
 
+import org.mule.umo.UMOImmutableDescriptor;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.UMOImmutableDescriptor;
 import org.mule.util.ClassUtils;
 import org.mule.util.DateUtils;
 import org.mule.util.StringMessageUtils;
@@ -341,9 +341,9 @@ public class CoreMessages extends MessageFactory
         return createMessage(BUNDLE_PATH, 81);
     }
 
-    public static Message objectNotRegisteredWithManager(String string)
+    public static Message objectNotRegistered(String type, String name)
     {
-        return createMessage(BUNDLE_PATH, 82, string);
+        return createMessage(BUNDLE_PATH, 82, type, name);
     }
 
     public static Message failedToSetPropertiesOn(String string)

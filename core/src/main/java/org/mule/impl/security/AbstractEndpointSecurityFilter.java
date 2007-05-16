@@ -14,8 +14,8 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.ManagementContextAware;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOManagementContext;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.CryptoFailureException;
 import org.mule.umo.security.EncryptionStrategyNotFoundException;
@@ -24,8 +24,8 @@ import org.mule.umo.security.SecurityProviderNotFoundException;
 import org.mule.umo.security.UMOCredentialsAccessor;
 import org.mule.umo.security.UMOEndpointSecurityFilter;
 import org.mule.umo.security.UMOSecurityManager;
-import org.mule.umo.security.UnknownAuthenticationTypeException;
 import org.mule.umo.security.UMOSecurityProvider;
+import org.mule.umo.security.UnknownAuthenticationTypeException;
 import org.mule.util.StringUtils;
 
 import org.apache.commons.logging.Log;
@@ -88,8 +88,8 @@ public abstract class AbstractEndpointSecurityFilter implements UMOEndpointSecur
                 else
                 {
                     throw new InitialisationException(
-                        CoreMessages.objectNotRegisteredWithManager(
-                            "Security Provider '" + sp[i] + "'"), this);
+                        CoreMessages.objectNotRegistered(
+                            "Security Provider", sp[i]), this);
                 }
             }
             securityManager = localManager;

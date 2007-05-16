@@ -35,7 +35,7 @@ public class TransformerPropertyEditor extends PropertyEditorSupport
 
             if (tempTrans == null)
             {
-                throw new IllegalArgumentException(CoreMessages.objectNotFound(name).getMessage());
+                throw new IllegalArgumentException(CoreMessages.objectNotRegistered("Transformer", name).getMessage());
             }
 
             if (currentTrans == null)

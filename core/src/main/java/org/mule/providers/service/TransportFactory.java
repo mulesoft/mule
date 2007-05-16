@@ -76,7 +76,7 @@ public class TransportFactory
                 if (connector == null)
                 {
                     throw new TransportFactoryException(
-                        CoreMessages.objectNotRegisteredWithManager("Connector: " + uri.getConnectorName()));
+                        CoreMessages.objectNotRegistered("Connector", uri.getConnectorName()));
                 }
             }
             else

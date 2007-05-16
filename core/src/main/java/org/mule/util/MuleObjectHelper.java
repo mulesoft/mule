@@ -63,8 +63,7 @@ public final class MuleObjectHelper
 
             if (tempTrans == null)
             {
-                throw new MuleException(
-                    CoreMessages.objectNotRegisteredWithManager("Transformer: " + key));
+                throw new MuleException(CoreMessages.objectNotRegistered("Transformer", key));
             }
 
             if (currentTrans == null)
