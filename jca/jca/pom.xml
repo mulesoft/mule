@@ -18,7 +18,6 @@
     </description>
 
     <build>
-        <defaultGoal>package</defaultGoal>
         <plugins>
             <plugin>
                 <artifactId>maven-rar-plugin</artifactId>
@@ -26,6 +25,24 @@
                     <rarSourceDirectory>../../../modules/jca/jca-core/src/rar</rarSourceDirectory>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.mule.tools</groupId>
+                <artifactId>mule-assembly-verifier</artifactId>
+                <executions>
+                    <execution>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!-- Default is under src/main/resources, pull it to the root for this project -->
+                    <whitelist>assembly-whitelist.txt</whitelist>
+                </configuration>
+            </plugin>
+
         </plugins>
     </build>
 
