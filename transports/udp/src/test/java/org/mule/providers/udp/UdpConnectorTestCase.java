@@ -12,6 +12,7 @@ package org.mule.providers.udp;
 
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.umo.UMOComponent;
@@ -27,7 +28,6 @@ public class UdpConnectorTestCase extends AbstractConnectorTestCase
     {
         UdpConnector c = new UdpConnector();
         c.setName("UdpConnector");
-        c.initialise();
         return c;
     }
 
@@ -46,11 +46,10 @@ public class UdpConnectorTestCase extends AbstractConnectorTestCase
         MuleDescriptor d = getTestDescriptor("orange", Orange.class.getName());
         UMOComponent component = getTestComponent(d);
         UMOEndpoint endpoint = getTestEndpoint("Test", UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
-        endpoint.setEndpointURI(null);
-        endpoint.setConnector(connector);
-
         try
         {
+            endpoint.setEndpointURI(null);
+            endpoint.setConnector(connector);
             connector.registerListener(component, endpoint);
             fail("cannot register with null endpointUri");
         }
@@ -58,9 +57,11 @@ public class UdpConnectorTestCase extends AbstractConnectorTestCase
         {
             /* expected */
         }
-        endpoint.setEndpointURI(null);
+
+        endpoint = getTestEndpoint("Test", UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
         try
         {
+            endpoint.setEndpointURI(null);
             connector.registerListener(component, endpoint);
             fail("cannot register with empty endpointUri");
         }
@@ -69,6 +70,7 @@ public class UdpConnectorTestCase extends AbstractConnectorTestCase
             /* expected */
         }
 
+        endpoint = new MuleEndpoint();
         endpoint.setEndpointURI(new MuleEndpointURI("udp://localhost:3456"));
         connector.registerListener(component, endpoint);
         try
@@ -78,6 +80,7 @@ public class UdpConnectorTestCase extends AbstractConnectorTestCase
         }
         catch (Exception e)
         {
+            logger.debug(e, e);
             /* expected */
         }
         connector.dispose();

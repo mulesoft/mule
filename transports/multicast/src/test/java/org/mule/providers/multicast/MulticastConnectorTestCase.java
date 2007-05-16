@@ -27,7 +27,6 @@ public class MulticastConnectorTestCase extends AbstractConnectorTestCase
     {
         MulticastConnector c = new MulticastConnector();
         c.setName("MulticastConnector");
-        c.initialise();
         return c;
     }
 
@@ -44,7 +43,6 @@ public class MulticastConnectorTestCase extends AbstractConnectorTestCase
     public void testValidListener() throws Exception
     {
         MulticastConnector connector = new MulticastConnector();
-        connector.initialise();
         MuleDescriptor d = getTestDescriptor("orange", Orange.class.getName());
         UMOComponent component = getTestComponent(d);
         UMOEndpoint endpoint = getTestEndpoint("Test", UMOEndpoint.ENDPOINT_TYPE_RECEIVER);

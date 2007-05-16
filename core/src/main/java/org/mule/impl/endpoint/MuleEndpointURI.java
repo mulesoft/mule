@@ -11,7 +11,6 @@
 package org.mule.impl.endpoint;
 
 import org.mule.RegistryContext;
-import org.mule.config.i18n.Message;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.providers.service.TransportFactory;
 import org.mule.providers.service.TransportServiceDescriptor;
@@ -68,7 +67,6 @@ public class MuleEndpointURI implements UMOEndpointURI
     private int createConnector = TransportFactory.GET_OR_CREATE_CONNECTOR;
     private Properties params = new Properties();
     private URI uri;
-    private String uriString;
     private String userInfo;
     private String schemeMetaInfo;
     private String resourceInfo;
@@ -108,7 +106,6 @@ public class MuleEndpointURI implements UMOEndpointURI
         this.createConnector = createConnector;
         this.params = properties;
         this.uri = uri;
-        this.uriString = uri.toASCIIString();
         this.userInfo = uri.getUserInfo();
         if (properties != null)
         {
@@ -232,7 +229,6 @@ public class MuleEndpointURI implements UMOEndpointURI
         this.createConnector = endpointUri.getCreateConnector();
         this.params = endpointUri.getParams();
         this.uri = endpointUri.getUri();
-        this.uriString = this.uri.toASCIIString();
         this.resourceInfo = endpointUri.getResourceInfo();
         this.userInfo = endpointUri.getUserInfo();
     }
@@ -387,7 +383,7 @@ public class MuleEndpointURI implements UMOEndpointURI
 
     public String toString()
     {
-        return uriString;
+        return uri.toASCIIString();
     }
 
     public String getTransformers()

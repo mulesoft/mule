@@ -147,11 +147,8 @@ public class UdpConnector extends AbstractConnector
      */
     public void setBufferSize(int bufferSize)
     {
-        if (bufferSize < 1)
-        {
-            bufferSize = DEFAULT_BUFFER_SIZE;
-        }
-        this.sendBufferSize = bufferSize;
+        setSendBufferSize(bufferSize);
+        setReceiveBufferSize(bufferSize);
     }
 
 

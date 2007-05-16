@@ -43,7 +43,7 @@ public class UdpConnectorFunctionalTestCase extends FunctionalTestCase
         int receivedPackets = 0;
         for (; receivedPackets < numberOfMessages; receivedPackets++)
         {
-            receivedMessages.add(client.receive("vm://foo", 2000).getPayloadAsString());
+            receivedMessages.add(client.receive("vm://foo", 5000).getPayloadAsString());
 
         }
 

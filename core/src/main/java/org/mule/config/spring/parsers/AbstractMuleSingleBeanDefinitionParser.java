@@ -112,10 +112,10 @@ public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBea
     protected void processProperty(Attr attribute, BeanDefinitionBuilder builder)
     {
         String propertyName = extractPropertyName(attribute.getNodeName());
-            String propertyValue = extractPropertyValue(propertyName, attribute.getValue());
-            Assert.state(StringUtils.hasText(propertyName),
-                    "Illegal property name returned from 'extractPropertyName(String)': cannot be null or empty.");
-            builder.addPropertyValue(propertyName, propertyValue);
+        String propertyValue = extractPropertyValue(propertyName, attribute.getValue());
+        Assert.state(StringUtils.hasText(propertyName),
+                "Illegal property name returned from 'extractPropertyName(String)': cannot be null or empty.");
+        builder.addPropertyValue(propertyName, propertyValue);
     }
 
     /**
