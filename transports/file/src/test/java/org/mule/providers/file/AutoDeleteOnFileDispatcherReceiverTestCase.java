@@ -10,16 +10,14 @@
 
 package org.mule.providers.file;
 
-import java.io.File;
-
-import org.mule.MuleManager;
 import org.mule.impl.RequestContext;
-import org.mule.providers.file.FileConnector;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.util.FileUtils;
+
+import java.io.File;
 
 public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleTestCase
 {
@@ -66,7 +64,7 @@ public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleTest
     {
         super.doSetUp();
         // The working directory is deleted on tearDown
-        tempDir = new File(MuleManager.getConfiguration().getWorkingDirectory(), tempDirName);
+        tempDir = new File(managementContext.getRegistry().getConfiguration().getWorkingDirectory(), tempDirName);
         if (!tempDir.exists())
         {
             tempDir.mkdirs();
@@ -87,14 +85,12 @@ public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleTest
     public UMOConnector getConnector() throws Exception {
         UMOConnector connector = new FileConnector();
         connector.setName("FileConnector");
-        MuleManager.getInstance().registerConnector(connector);
-        connector.initialise();
-        connector.startConnector();
+        managementContext.getRegistry().registerConnector(connector);
         return connector;
     }
 
     public String getTestEndpointURI()
     {
-        return "file://" + MuleManager.getConfiguration().getWorkingDirectory();
+        return "file://" + managementContext.getRegistry().getConfiguration().getWorkingDirectory();
     }
 }
