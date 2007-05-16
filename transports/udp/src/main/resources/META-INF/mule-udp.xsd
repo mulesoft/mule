@@ -17,13 +17,11 @@
     <xsd:complexType name="udpConnectorType">
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
-                <xsd:attribute name="bufferSize" type="xsd:int"/>
                 <xsd:attribute name="receiveBufferSize" type="xsd:int"/>
                 <xsd:attribute name="receiveTimeout" type="xsd:int"/>
                 <xsd:attribute name="sendBufferSize" type="xsd:int"/>
                 <xsd:attribute name="sendTimeout" type="xsd:int"/>
                 <xsd:attribute name="socketLinger" type="xsd:int"/>
-                <xsd:attribute name="timeout" type="xsd:int"/>
                 <xsd:attribute name="broadcast" type="xsd:boolean"/>
                 <xsd:attribute name="keepSendSocketOpen" type="xsd:boolean"/>
             </xsd:extension>

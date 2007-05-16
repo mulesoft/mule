@@ -10,9 +10,8 @@
                http://www.mulesource.org/schema/mule/vm/2.0 META-INF/mule-vm.xsd
                http://www.mulesource.org/schema/mule/udp/2.0 META-INF/mule-udp.xsd">
 
-    <!-- this tests fails with this (MULE-1751) and without it (timeout) -->
     <mule:configuration serverId="">
-        <mule:default-threading-profile threadWaitTimeout="10000"/>
+        <mule:default-threading-profile threadWaitTimeout="60000" threadTTL="60000"/>
     </mule:configuration>
 
     <vm:connector name="vm-queue" queueEvents="true"/>

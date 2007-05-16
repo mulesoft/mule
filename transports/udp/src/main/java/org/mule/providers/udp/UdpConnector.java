@@ -31,7 +31,6 @@ public class UdpConnector extends AbstractConnector
 
     public static final String KEEP_SEND_SOCKET_OPEN_PROPERTY = "keepSendSocketOpen";
 
-
     protected int sendTimeout = DEFAULT_SOCKET_TIMEOUT;
 
     protected int receiveTimeout = DEFAULT_SOCKET_TIMEOUT;
@@ -93,17 +92,6 @@ public class UdpConnector extends AbstractConnector
         return "udp";
     }
 
-    /**
-     * A shorthand property setting timeout for both SEND and RECEIVE sockets.
-     *
-     * @deprecated The time out should be set explicitly for each
-     */
-    public void setTimeout(int timeout)
-    {
-        setSendTimeout(timeout);
-        setReceiveTimeout(timeout);
-    }
-
     public int getSendTimeout()
     {
         return this.sendTimeout;
@@ -131,26 +119,6 @@ public class UdpConnector extends AbstractConnector
         }
         this.receiveTimeout = timeout;
     }
-
-    /**
-     * @return
-     * @deprecated Should use {@link #getSendBufferSize()} or {@link #getReceiveBufferSize()}
-     */
-    public int getBufferSize()
-    {
-        return sendBufferSize;
-    }
-
-    /**
-     * @param bufferSize
-     * @deprecated Should use {@link #setSendBufferSize(int)} or {@link #setReceiveBufferSize(int)}
-     */
-    public void setBufferSize(int bufferSize)
-    {
-        setSendBufferSize(bufferSize);
-        setReceiveBufferSize(bufferSize);
-    }
-
 
     public int getSendBufferSize()
     {

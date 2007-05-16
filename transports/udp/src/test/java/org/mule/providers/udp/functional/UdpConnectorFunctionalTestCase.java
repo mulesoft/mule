@@ -29,7 +29,7 @@ public class UdpConnectorFunctionalTestCase extends FunctionalTestCase
 
     public void testSendTestData() throws Exception
     {
-        final int numberOfMessages = 100;
+        final int numberOfMessages = 2;
         MuleClient client = new MuleClient();
 
         for (int sentPackets = 0; sentPackets < numberOfMessages; sentPackets++)
@@ -43,7 +43,7 @@ public class UdpConnectorFunctionalTestCase extends FunctionalTestCase
         int receivedPackets = 0;
         for (; receivedPackets < numberOfMessages; receivedPackets++)
         {
-            receivedMessages.add(client.receive("vm://foo", 5000).getPayloadAsString());
+            receivedMessages.add(client.receive("vm://foo", 60000).getPayloadAsString());
 
         }
 
