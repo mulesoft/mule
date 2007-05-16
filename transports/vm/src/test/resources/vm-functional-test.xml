@@ -14,11 +14,11 @@
     
         <mule:service name="myAsynchService" implementation="marcoPolo">
             <mule:inbound-router>
-                <mule:endpoint address="vm://in" />
+                <mule:endpoint address="vm://in" connector="asynchVm"/>
             </mule:inbound-router>
             <mule:outbound-router>
                 <mule:pass-through-router>
-	                <mule:endpoint address="vm://out" />
+	                <mule:endpoint address="vm://out" connector="asynchVm"/>
                 </mule:pass-through-router>
             </mule:outbound-router>
         </mule:service>

@@ -11,9 +11,7 @@
 package org.mule.config.spring;
 
 import org.mule.config.MuleProperties;
-import org.mule.config.spring.editors.TransformerPropertyEditor;
 import org.mule.umo.UMOManagementContext;
-import org.mule.umo.transformer.UMOTransformer;
 
 import java.io.IOException;
 
@@ -69,10 +67,6 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
 
     protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException
     {
-        //RM* Custom editors need to be registered outside the contaner (it seems) would be better if these were part of
-        //the default config
-        beanFactory.registerCustomEditor(UMOTransformer.class, new TransformerPropertyEditor());
-
         XmlBeanDefinitionReader beanDefinitionReader = new MuleBeanDefinitionReader(beanFactory, configLocations.length);
         //hook in our customheirarchical reader
         beanDefinitionReader.setDocumentReaderClass(MuleBeanDefinitionDocumentReader.class);

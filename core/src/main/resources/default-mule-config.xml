@@ -6,24 +6,41 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 META-INF/mule.xsd">
 
-    <bean name="_muleManagementContext" class="org.mule.config.spring.ManagementContextFactoryBean" depends-on="_muleRegistry">
+    <bean name="_muleManagementContext" class="org.mule.config.spring.ManagementContextFactoryBean"
+          depends-on="_muleRegistry">
         <constructor-arg ref="_muleLifecycleManager"/>
     </bean>
 
-    <bean name="_muleManagementContextProcessor" class="org.mule.config.spring.ManagementContextPostProcessor" depends-on="_muleRegistry"/>
+    <bean id="customEditorConfigurer" class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+        <property name="customEditors">
+            <map>
+                <entry key="org.mule.umo.transformer.UMOTransformer">
+                    <bean class="org.mule.config.spring.editors.TransformerPropertyEditor"/>
+                </entry>
+                <entry key="org.mule.umo.provider.UMOConnector">
+                    <bean class="org.mule.config.spring.editors.ConnectorPropertyEditor"/>
+                </entry>
+            </map>
+        </property>
+    </bean>
+
+    <bean name="_muleManagementContextProcessor" class="org.mule.config.spring.ManagementContextPostProcessor"
+          depends-on="_muleRegistry"/>
 
     <bean name="_muleRegisterServiceProcessor" class="org.mule.config.spring.processors.RegisterServicePostProcessor"/>
 
     <bean name="_muleObjectNameProcessor" class="org.mule.config.spring.MuleObjectNameProcessor"/>
 
-    <bean name="_mulePropertyPlaceholderProcessor" class="org.mule.config.spring.processors.PropertyPlaceholderProcessor" depends-on="_muleRegistry"/>
-    
+    <bean name="_mulePropertyPlaceholderProcessor"
+          class="org.mule.config.spring.processors.PropertyPlaceholderProcessor" depends-on="_muleRegistry"/>
+
     <bean name="_muleRegistry" class="org.mule.config.spring.factories.SpringRegistryFactoryBean">
     </bean>
 
     <!--<bean name="_springRegistryContainerContext" class="org.mule.config.spring.SpringContainerContext" depends-on="_muleManagementContext"/>-->
 
-    <bean name="_muleSystemModel" class="org.mule.config.spring.factories.SystemModelFactoryBean" depends-on="_muleManagementContext"/>
+    <bean name="_muleSystemModel" class="org.mule.config.spring.factories.SystemModelFactoryBean"
+          depends-on="_muleManagementContext"/>
 
     <mule:configuration
             serverId="_defaultx"
@@ -63,7 +80,7 @@
         <constructor-arg value="dispose"/>
         <constructor-arg value="org.mule.umo.lifecycle.Disposable"/>
     </bean>
-    
+
     <bean name="_muleQueueManager" class="org.mule.util.queue.TransactionalQueueManager">
         <property name="persistenceStrategy">
             <bean class="org.mule.util.queue.CachingPersistenceStrategy">
@@ -78,15 +95,24 @@
         <property name="eventTypes">
             <map>
                 <!-- we'll probably want to encapsulate these in to boolean switches -->
-                <entry key="org.mule.impl.internal.notifications.ManagerNotificationListener" value="org.mule.impl.internal.notifications.ManagerNotification"/>
-                <entry key="org.mule.impl.internal.notifications.ModelNotificationListener" value="org.mule.impl.internal.notifications.ModelNotification"/>
-                <entry key="org.mule.impl.internal.notifications.ComponentNotificationListener" value="org.mule.impl.internal.notifications.ComponentNotification"/>
-                <entry key="org.mule.impl.internal.notifications.SecurityNotificationListener" value="org.mule.impl.internal.notifications.SecurityNotification"/>
-                <entry key="org.mule.impl.internal.notifications.ManagementNotificationListener" value="org.mule.impl.internal.notifications.ManagementNotification"/>
-                <entry key="org.mule.impl.internal.notifications.AdminNotificationListener" value="org.mule.impl.internal.notifications.AdminNotification"/>
-                <entry key="org.mule.impl.internal.notifications.ConnectionNotificationListener" value="org.mule.impl.internal.notifications.ConnectionNotification"/>
-                <entry key="org.mule.impl.internal.notifications.RegistryNotificationListener" value="org.mule.impl.internal.notifications.RegistryNotification"/>
-                <entry key="org.mule.impl.internal.notifications.CustomNotificationListener" value="org.mule.impl.internal.notifications.CustomNotification"/>
+                <entry key="org.mule.impl.internal.notifications.ManagerNotificationListener"
+                       value="org.mule.impl.internal.notifications.ManagerNotification"/>
+                <entry key="org.mule.impl.internal.notifications.ModelNotificationListener"
+                       value="org.mule.impl.internal.notifications.ModelNotification"/>
+                <entry key="org.mule.impl.internal.notifications.ComponentNotificationListener"
+                       value="org.mule.impl.internal.notifications.ComponentNotification"/>
+                <entry key="org.mule.impl.internal.notifications.SecurityNotificationListener"
+                       value="org.mule.impl.internal.notifications.SecurityNotification"/>
+                <entry key="org.mule.impl.internal.notifications.ManagementNotificationListener"
+                       value="org.mule.impl.internal.notifications.ManagementNotification"/>
+                <entry key="org.mule.impl.internal.notifications.AdminNotificationListener"
+                       value="org.mule.impl.internal.notifications.AdminNotification"/>
+                <entry key="org.mule.impl.internal.notifications.ConnectionNotificationListener"
+                       value="org.mule.impl.internal.notifications.ConnectionNotification"/>
+                <entry key="org.mule.impl.internal.notifications.RegistryNotificationListener"
+                       value="org.mule.impl.internal.notifications.RegistryNotification"/>
+                <entry key="org.mule.impl.internal.notifications.CustomNotificationListener"
+                       value="org.mule.impl.internal.notifications.CustomNotification"/>
 
                 <!--<entry key="org.mule.impl.internal.notifications.MessageNotification" value="org.mule.impl.internal.notifications.MessageNotificationListener"/>-->
 
