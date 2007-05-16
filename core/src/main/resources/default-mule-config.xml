@@ -32,7 +32,15 @@
     <bean name="_muleObjectNameProcessor" class="org.mule.config.spring.MuleObjectNameProcessor"/>
 
     <bean name="_mulePropertyPlaceholderProcessor"
-          class="org.mule.config.spring.processors.PropertyPlaceholderProcessor" depends-on="_muleRegistry"/>
+          class="org.mule.config.spring.processors.PropertyPlaceholderProcessor" depends-on="_muleRegistry">
+        <property name="factories">
+            <map>
+                <entry key="hostname">
+                    <bean class="org.mule.config.factories.HostNameFactory"/>
+                </entry>
+            </map>
+        </property>
+    </bean>
 
     <bean name="_muleRegistry" class="org.mule.config.spring.factories.SpringRegistryFactoryBean">
     </bean>
