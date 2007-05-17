@@ -12,6 +12,7 @@
     <vm:connector name="vm-queue" queueEvents="true"/>
 
     <mule:endpoint name="queue" address="vm://foo" connector="vm-queue"/>
+    <mule:endpoint name="entry" address="vm://entry" connector="vm-normal"/>
 
     <mule:model-seda name="main">
         <mule:service name="test" implementation="org.mule.tck.functional.FunctionalTestComponent">

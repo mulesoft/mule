@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.StringTokenizer;
 
 public class VMQueueTestCase extends FunctionalTestCase
 {
@@ -62,7 +63,7 @@ public class VMQueueTestCase extends FunctionalTestCase
         Iterator people = polos.iterator();
         while (people.hasNext())
         {
-            client.dispatch("vm://entry", people.next(), null);
+            client.dispatch("vm://entry?connector=vm-normal", people.next(), null);
         }
 
         for (int i = 0; i < 3; ++i)
@@ -70,8 +71,30 @@ public class VMQueueTestCase extends FunctionalTestCase
             UMOMessage response = client.receive("queue", 1000);
             assertNotNull("Response is null", response);
             String person = (String) response.getPayload();
-            assertTrue(person, polos.contains(person));
-            polos.remove(person);
+            String name = new StringTokenizer(person).nextToken();
+            assertTrue(name, polos.contains(name));
+            polos.remove(name);
+        }
+    }
+
+    public void testNamedEndpoint() throws Exception
+    {
+        MuleClient client = new MuleClient();
+        Set polos = new HashSet(Arrays.asList(new String[]{"Marco", "Niccolo", "Maffeo"}));
+        Iterator people = polos.iterator();
+        while (people.hasNext())
+        {
+            client.dispatch("entry", people.next(), null);
+        }
+
+        for (int i = 0; i < 3; ++i)
+        {
+            UMOMessage response = client.receive("queue", 1000);
+            assertNotNull("Response is null", response);
+            String person = (String) response.getPayload();
+            String name = new StringTokenizer(person).nextToken();
+            assertTrue(name, polos.contains(name));
+            polos.remove(name);
         }
     }
 
