@@ -1,34 +1,74 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:tls="http://www.mulesource.org/schema/mule/tls/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 META-INF/mule.xsd
+       http://www.mulesource.org/schema/mule/tls/2.0 META-INF/mule-tls.xsd">
 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+    <!-- keepSendSocketOpen is required for the Async test case?  see TCP -->
+    <tls:connector name="tlsConnector" keepSendSocketOpen="true">
+        <tls:tls-client
+                clientKeyStore="clientKeyStore"
+                clientKeyStorePassword="mulepassword"/>
+        <tls:tls-key-store
+                keyStore="serverKeystore"
+                keyStorePassword="mulepassword"
+                keyPassword="mulepassword"/>
+        <tls:tls-server
+                trustStore="trustStore"
+                trustStorePassword="mulepassword"/>
+    </tls:connector>
 
-<mule-configuration id="tls_fuctional_test" version="1.0">
+    <mule:endpoint name="sendEndpoint" connector="tlsConnector"
+                   address="tls://localhost:60198" synchronous="true"/>
 
-    <mule-environment-properties serverUrl=""/>
+    <mule:endpoint name="sendManyEndpoint" connector="tlsConnector"
+                   address="tls://localhost:60197" synchronous="true"/>
 
-    <connector name="TlsConnector" className="org.mule.providers.ssl.TlsConnector">
-        <properties>
-            <property name="keyStore" value="serverKeystore" />
-            <property name="keyPassword" value="mulepassword" />
-            <property name="storePassword" value="mulepassword" />
-            <property name="clientKeyStore" value="clientKeystore" />
-            <property name="clientKeyPassword" value="mulepassword" />
-            <property name="trustStore" value="trustStore" />
-            <property name="trustStorePassword" value="mulepassword" />
-        </properties>
-    </connector>
+    <mule:endpoint name="asyncEndpoint" connector="tlsConnector"
+                   address="tls://localhost:60196" synchronous="false"/>
 
-    <global-endpoints>
-        <endpoint name="clientEndpoint" address="tls://localhost:60198" synchronous="true"/>
-    </global-endpoints>
+    <bean id="reply" class="org.mule.tck.functional.FunctionalTestComponent">
+        <property name="eventCallback">
+            <bean class="org.mule.providers.tcp.integration.ResponseWriterCallback"/>
+        </property>
+    </bean>
 
-    <model name="main">
-        <mule-descriptor name="testComponent" implementation="org.mule.tck.functional.FunctionalTestComponent">
-            <inbound-router>
-                <global-endpoint name="clientEndpoint"/>
-            </inbound-router>
-        </mule-descriptor>
-    </model>
+    <bean id="countAndReply" class="org.mule.tck.functional.FunctionalTestComponent">
+        <property name="eventCallback">
+            <bean class="org.mule.providers.tcp.integration.ResponseWriterCallback"/>
+        </property>
+    </bean>
 
-</mule-configuration>
+    <bean id="asynchronous" class="org.mule.tck.functional.FunctionalTestComponent">
+        <property name="eventCallback">
+            <bean class="org.mule.providers.tcp.integration.ResponseWriterCallback"/>
+        </property>
+    </bean>
+
+    <mule:model-seda name="main">
+
+        <mule:service name="testComponent1" implementation="reply">
+            <mule:inbound-router>
+                <mule:endpoint-ref nameref="sendEndpoint"/>
+            </mule:inbound-router>
+        </mule:service>
+
+        <mule:service name="testComponent2" implementation="countAndReply" singleton="true">
+            <mule:inbound-router>
+                <mule:endpoint-ref nameref="sendManyEndpoint"/>
+            </mule:inbound-router>
+        </mule:service>
+
+        <mule:service name="testComponent3" implementation="asynchronous">
+            <mule:inbound-router>
+                <mule:endpoint-ref nameref="asyncEndpoint"/>
+            </mule:inbound-router>
+        </mule:service>
+
+    </mule:model-seda>
+
+</beans>

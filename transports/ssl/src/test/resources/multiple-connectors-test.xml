@@ -9,14 +9,14 @@
        http://www.mulesource.org/schema/mule/ssl/2.0 META-INF/mule-ssl.xsd">
 
     <ssl:connector name="SslConnector">
-        <ssl:tls-client
+        <ssl:ssl-client
                 clientKeyStore="clientKeyStore"
                 clientKeyStorePassword="mulepassword"/>
-        <ssl:tls-key-store
+        <ssl:ssl-key-store
                 keyStore="serverKeystore"
                 keyStorePassword="mulepassword"
                 keyPassword="mulepassword"/>
-        <ssl:tls-server
+        <ssl:ssl-server
                 trustStore="trustStore"
                 trustStorePassword="mulepassword"/>
     </ssl:connector>

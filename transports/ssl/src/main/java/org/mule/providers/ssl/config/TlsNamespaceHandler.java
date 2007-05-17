@@ -11,21 +11,21 @@ package org.mule.providers.ssl.config;
 
 import org.mule.config.spring.parsers.CompoundElementDefinitionParser;
 import org.mule.config.spring.parsers.SingleElementDefinitionParser;
-import org.mule.providers.ssl.SslConnector;
+import org.mule.providers.ssl.TlsConnector;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 /**
  * Reigsters a Bean Definition Parser for handling <code><ssl:connector></code> elements.
  */
-public class SslNamespaceHandler extends NamespaceHandlerSupport
+public class TlsNamespaceHandler extends NamespaceHandlerSupport
 {
     public void init()
     {
-        registerBeanDefinitionParser("connector", new SingleElementDefinitionParser(SslConnector.class, true));
-        registerBeanDefinitionParser("ssl-key-store", new CompoundElementDefinitionParser());
-        registerBeanDefinitionParser("ssl-client", new CompoundElementDefinitionParser());
-        registerBeanDefinitionParser("ssl-server", new CompoundElementDefinitionParser());
+        registerBeanDefinitionParser("connector", new SingleElementDefinitionParser(TlsConnector.class, true));
+        registerBeanDefinitionParser("tls-key-store", new CompoundElementDefinitionParser());
+        registerBeanDefinitionParser("tls-client", new CompoundElementDefinitionParser());
+        registerBeanDefinitionParser("tls-server", new CompoundElementDefinitionParser());
     }
-    
+
 }

@@ -19,9 +19,4 @@
                    keepSendSocketOpen="false"
             />
 
-    <multicast:connector name="single"
-                   timeout="4321"
-                   bufferSize="5432"
-            />
-
 </beans>

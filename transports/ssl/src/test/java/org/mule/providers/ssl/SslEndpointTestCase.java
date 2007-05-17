@@ -20,6 +20,7 @@ public class SslEndpointTestCase extends AbstractMuleTestCase
     public void testHostPortUrl() throws Exception
     {
         UMOEndpointURI url = new MuleEndpointURI("ssl://localhost:7856");
+        url.initialise();
         assertEquals("ssl", url.getScheme());
         assertEquals("ssl://localhost:7856", url.getAddress());
         assertNull(url.getEndpointName());
@@ -32,6 +33,7 @@ public class SslEndpointTestCase extends AbstractMuleTestCase
     public void testQueryParams1() throws Exception
     {
         UMOEndpointURI url = new MuleEndpointURI("ssl://localhost:7856?param=1");
+        url.initialise();
         assertEquals("ssl", url.getScheme());
         assertEquals("ssl://localhost:7856", url.getAddress());
         assertNull(url.getEndpointName());
@@ -46,6 +48,7 @@ public class SslEndpointTestCase extends AbstractMuleTestCase
     {
         UMOEndpointURI url = new MuleEndpointURI(
             "ssl://localhost:7856?param=1&endpointName=sslProvider&blankParam=");
+        url.initialise();
         assertEquals("ssl", url.getScheme());
         assertEquals("ssl://localhost:7856", url.getAddress());
         assertNotNull(url.getEndpointName());

@@ -12,7 +12,7 @@
         <mule:default-threading-profile threadWaitTimeout="60000" threadTTL="60000"/>
     </mule:configuration>
 
-   <mule:model-seda name="asynchTestModel">
+   <mule:model-seda name="synchTestModel">
     
         <mule:service name="mySynchService" implementation="marcoPolo">
             <mule:inbound-router>

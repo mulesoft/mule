@@ -2,26 +2,26 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
-       xmlns:ssl="http://www.mulesource.org/schema/mule/ssl/2.0"
+       xmlns:tls="http://www.mulesource.org/schema/mule/tls/2.0"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 META-INF/mule.xsd
-       http://www.mulesource.org/schema/mule/ssl/2.0 META-INF/mule-ssl.xsd">
+       http://www.mulesource.org/schema/mule/tls/2.0 META-INF/mule-tls.xsd">
 
 
-    <ssl:connector name="sslConnector" sendBufferSize="1024" receiveBufferSize="2048" keepAlive="true">
-        <ssl:ssl-client
+    <tls:connector name="sslConnector" sendBufferSize="1024" receiveBufferSize="2048" keepAlive="true">
+        <tls:tls-client
                 clientKeyStore="clientKeystore"
                 clientKeyStorePassword="mulepassword"/>
-        <ssl:ssl-key-store
+        <tls:tls-key-store
                 keyPassword="mulepassword"
                 keyStore="serverKeystore"
                 keyStorePassword="mulepassword"/>
-        <ssl:ssl-server
+        <tls:tls-server
                 trustStore="trustStore"
                 trustStorePassword="mulepassword"
                 explicitTrustStoreOnly="true"
                 requireClientAuthentication="true"/>
-    </ssl:connector>
+    </tls:connector>
 
 </beans>

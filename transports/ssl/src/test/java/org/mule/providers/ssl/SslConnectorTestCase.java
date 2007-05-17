@@ -12,6 +12,7 @@ package org.mule.providers.ssl;
 
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.umo.UMOComponent;
@@ -43,6 +44,7 @@ public class SslConnectorTestCase extends AbstractConnectorTestCase
         cnn.setTrustStorePassword("mulepassword");
         cnn.getDispatcherThreadingProfile().setDoThreading(false);
         //TODO FIX URGENT
+        // can this go?!  who added it?  when was it urgent?
 //        if (initialised)
 //        {
 //            cnn.initialise(managementContext);
@@ -56,7 +58,6 @@ public class SslConnectorTestCase extends AbstractConnectorTestCase
         cnn.setClientKeyStore("clientKeystore");
         cnn.setClientKeyStorePassword("mulepassword");
         cnn.getDispatcherThreadingProfile().setDoThreading(false);
-        cnn.initialise();
     }
 
     public String getTestEndpointURI()
@@ -74,11 +75,11 @@ public class SslConnectorTestCase extends AbstractConnectorTestCase
         MuleDescriptor d = getTestDescriptor("orange", Orange.class.getName());
         UMOComponent component = getTestComponent(d);
         UMOEndpoint endpoint = getTestEndpoint("Test", UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
-        endpoint.setEndpointURI(null);
-        endpoint.setConnector(connector);
 
         try
         {
+            endpoint.setEndpointURI(null);
+            endpoint.setConnector(connector);
             connector.registerListener(component, endpoint);
             fail("cannot register with null endpointUri");
         }
@@ -87,9 +88,9 @@ public class SslConnectorTestCase extends AbstractConnectorTestCase
             /* expected */
         }
 
-        endpoint.setEndpointURI(null);
         try
         {
+            endpoint.setEndpointURI(null);
             connector.registerListener(component, endpoint);
             fail("cannot register with empty endpointUri");
         }
@@ -98,12 +99,15 @@ public class SslConnectorTestCase extends AbstractConnectorTestCase
             /* expected */
         }
 
-        endpoint.setEndpointURI(new MuleEndpointURI("ssl://localhost:30303"));
+        endpoint = new MuleEndpoint();
+        MuleEndpointURI uri = new MuleEndpointURI("ssl://localhost:30303");
+        uri.initialise();
+        endpoint.setEndpointURI(uri);
         connector.registerListener(component, endpoint);
         try
         {
-            // connector.registerListener(component, endpoint);
-            // fail("cannot register on the same endpointUri");
+            connector.registerListener(component, endpoint);
+            fail("cannot register on the same endpointUri");
         }
         catch (Exception e)
         {
