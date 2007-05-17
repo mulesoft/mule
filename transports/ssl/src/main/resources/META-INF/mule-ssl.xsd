@@ -15,10 +15,10 @@
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="tcp:tcpConnectorType">
-                    <xsd:sequence minOccurs="1" maxOccurs="1">
-                        <xsd:element name="tls-key-store" type="mule:tlsKeyStoreType"/>
-                        <xsd:element name="tls-client" type="mule:tlsClientKeyStoreType"/>
-                        <xsd:element name="tls-server" type="mule:tlsServerTrustStoreType"/>
+                    <xsd:sequence>
+                        <xsd:element maxOccurs="1" name="tls-client" type="mule:tlsClientKeyStoreType"/>
+                        <xsd:element maxOccurs="1" name="tls-key-store" type="mule:tlsKeyStoreType"/>
+                        <xsd:element maxOccurs="1" name="tls-server" type="mule:tlsServerTrustStoreType"/>
                     </xsd:sequence>
                 </xsd:extension>
             </xsd:complexContent>
