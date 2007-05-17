@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:tcp="http://www.mulesource.org/schema/mule/tcp/2.0"
+       xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+               http://www.mulesource.org/schema/mule/core/2.0 META-INF/mule.xsd
+               http://www.mulesource.org/schema/mule/tcp/2.0 META-INF/mule-tcp.xsd">
+
+    <!-- MULE-1751 -->
+    <!-- mule:configuration serverId="" defaultSynchronousEndpoints="false"/ -->
+
+    <tcp:connector name="default" validateConnections="false"/>
+
+    <mule:model-streaming name="echoModel">
+    <!-- mule:model-custom class="org.mule.impl.model.streaming.StreamingModel" name="echoModel" -->
+    <!-- mule:model-seda name="echoModel" -->
+
+        <mule:service name="echo" implementation="org.mule.components.simple.StreamingBridgeComponent">
+            <mule:inbound-router>
+                <!-- in the old config this had streaming="true" -->
+                <mule:endpoint address="tcp://localhost:65432" synchronous="false"/>
+            </mule:inbound-router>
+            <mule:outbound-router>
+                <mule:pass-through-router>
+                    <!-- in the old config this had streaming="true" -->
+                    <mule:endpoint address="tcp://localhost:65433" synchronous="false"/>
+                </mule:pass-through-router>
+            </mule:outbound-router>
+        </mule:service>
+
+        <mule:service name="testComponent" singleton="true"
+                      implementation="org.mule.tck.functional.FunctionalStreamingTestComponent">
+            <mule:inbound-router>
+                <!-- in the old config this had streaming="true" -->
+                <mule:endpoint address="tcp://localhost:65433" synchronous="false"/>
+            </mule:inbound-router>
+        </mule:service>
+
+    </mule:model-streaming>
+    <!-- /mule:model-custom -->
+    <!-- /mule:model-seda -->
+
+
+</beans>
