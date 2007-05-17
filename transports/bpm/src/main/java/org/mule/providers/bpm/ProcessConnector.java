@@ -17,7 +17,6 @@ import org.mule.providers.AbstractConnector;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 
 import java.util.Map;
@@ -32,12 +31,6 @@ public class ProcessConnector extends AbstractConnector implements MessageServic
     /** The underlying BPMS */
     protected BPMS bpms;
 
-    /**
-     * If the BPMS instance itself is not provided, it will be instantiated from this class 
-     * (using the default constructor). 
-     */
-    protected String bpmsClass;
-    
     /** This field will be used to correlate messages with processes. */
     protected String processIdField;
 
@@ -86,16 +79,8 @@ public class ProcessConnector extends AbstractConnector implements MessageServic
         {
             if (bpms == null)
             {
-                if (bpmsClass != null)
-                {
-                    logger.info("Instantiating BPMS from the default constructor for " + bpmsClass);
-                    bpms = (BPMS) ClassUtils.instanciateClass(bpmsClass, new Object[0]);
-                }
-                else 
-                {
-                    throw new ConfigurationException(
-                        MessageFactory.createStaticMessage("Either the bpms or bpmsClass property must be set for this connector."));
-                }
+                throw new ConfigurationException(
+                    MessageFactory.createStaticMessage("The bpms property must be set for this connector."));
             }
 
             // Set a callback so that the BPMS may generate messages within Mule.
@@ -230,16 +215,6 @@ public class ProcessConnector extends AbstractConnector implements MessageServic
     public void setBpms(BPMS bpms)
     {
         this.bpms = bpms;
-    }
-
-    public String getBpmsClass()
-    {
-        return bpmsClass;
-    }
-
-    public void setBpmsClass(String bpmsClass)
-    {
-        this.bpmsClass = bpmsClass;
     }
 
     public MuleClient getMuleClient()

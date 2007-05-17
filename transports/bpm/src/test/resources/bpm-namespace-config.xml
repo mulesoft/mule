@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:bpm="http://www.mulesource.org/schema/mule/bpm/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 META-INF/mule.xsd
+       http://www.mulesource.org/schema/mule/bpm/2.0 META-INF/mule-bpm.xsd">
+
+    <bpm:connector name="bpmConnectorDefaults" bpms-ref="testBpms"/>
+
+    <bpm:connector name="bpmConnector1" bpms-ref="testBpms"
+    	allowGlobalReceiver="true" allowGlobalDispatcher="true" processIdField="myId"/>
+
+	<bean id="testBpms" class="org.mule.providers.bpm.test.TestBpms">
+		<property name="foo" value="bar"/>
+	</bean>
+
+</beans>
