@@ -62,6 +62,9 @@
                  <configuration>
                      <excludes>
                          <exclude>**/ServerNotificationsTestCase.*</exclude>
+                         <!-- Do we intend to support other containers for 2.0? -->
+                         <exclude>**/MuleContainerContextTestCase.*</exclude>
+                         <exclude>**/JndiContainerContextTestCase.*</exclude>
                      </excludes>
                  </configuration>
              </plugin>
