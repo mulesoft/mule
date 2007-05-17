@@ -11,13 +11,13 @@
     <vm:connector name="vm-normal" queueEvents="false"/>
     <vm:connector name="vm-queue" queueEvents="true"/>
 
-    <mule:endpoint name="queue" address="vm://foo" connector="vm-queue"/>
-    <mule:endpoint name="entry" address="vm://entry" connector="vm-normal"/>
+    <mule:endpoint name="queue" address="vm://foo" connector-ref="vm-queue"/>
+    <mule:endpoint name="entry" address="vm://entry" connector-ref="vm-normal"/>
 
     <mule:model-seda name="main">
-        <mule:service name="test" implementation="org.mule.tck.functional.FunctionalTestComponent">
+        <mule:service name="testService" service-ref="test">
             <mule:inbound-router>
-                <mule:endpoint address="vm://entry" connector="vm-normal"/>
+                <mule:endpoint address="vm://entry" connector-ref="vm-normal"/>
             </mule:inbound-router>
             <mule:outbound-router>
                 <mule:pass-through-router>
@@ -27,4 +27,5 @@
         </mule:service>
     </mule:model-seda>
 
+    <bean id="test" class="org.mule.tck.functional.FunctionalTestComponent" scope="prototype"/>
 </beans>

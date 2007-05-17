@@ -14,7 +14,7 @@
 
    <mule:model-seda name="synchTestModel">
     
-        <mule:service name="mySynchService" implementation="marcoPolo">
+        <mule:service name="mySynchService" service-ref="marcoPolo">
             <mule:inbound-router>
                 <mule:endpoint address="vm://s-in" synchronous="true"/>
             </mule:inbound-router>
