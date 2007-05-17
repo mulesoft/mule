@@ -131,7 +131,7 @@
         <xsd:attribute name="synchronous" type="xsd:boolean"/>
         <xsd:attribute name="remoteSync" type="xsd:boolean"/>
         <xsd:attribute name="remoteSyncTimeout" type="xsd:NMTOKEN"/>
-        <xsd:attribute name="connector" type="xsd:string"/>
+        <xsd:attribute name="connector-ref" type="xsd:NMTOKEN"/>
         <xsd:attribute name="createConnector">
             <xsd:simpleType>
                 <xsd:restriction base="xsd:NMTOKEN">
@@ -612,7 +612,9 @@
             <xsd:any namespace="##other" processContents="strict" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:choice>
         <xsd:attribute name="name" type="xsd:string" use="required"/>
-        <xsd:attribute name="implementation" type="xsd:string"/>
+        <xsd:attribute name="service-ref" type="xsd:NMTOKEN"/>
+        <!-- Deprecated, use "service-ref" instead. -->
+        <xsd:attribute name="implementation" type="xsd:NMTOKEN"/>
         <xsd:attribute name="version" type="xsd:string"/>
         <xsd:attribute name="singleton" type="xsd:boolean" default="false"/>
         <xsd:attribute name="initialState" default="started">

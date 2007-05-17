@@ -76,12 +76,9 @@ public interface UMODescriptor extends UMOImmutableDescriptor
     void setVersion(String ver);
 
     /**
-     * The String used to instanciate create the object, this can be a FQ class name
-     * or a reference to an object in a configured container
-     *
-     * @param reference The String object reference
+     * @param The actual bean backing the UMO.
      */
-    void setImplementation(Object reference);
+    void setService(Object service);
 
     /**
      * Inbound Routers control how events are received by a component. If no router

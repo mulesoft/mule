@@ -486,12 +486,12 @@
                 <xsl:otherwise>org.mule.impl.MuleDescriptor</xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
-        <bean name="{$name}" class="{$type}" depends-on="{$currentModel}"
-              destroy-method="dispose">
-            <property name="implementation">
-                <value>
-                    <xsl:value-of select="@implementation"/>
-                </value>
+        <xsl:variable name="implClass">
+            <xsl:value-of select="@implementation"/>
+        </xsl:variable>
+        <bean name="{$name}" class="{$type}" depends-on="{$currentModel},{$name}-impl" destroy-method="dispose">
+            <property name="service">
+                <value><xsl:value-of select="$name"/>-impl</value>
             </property>
 
             <property name="modelName" value="{$currentModel}"/>
@@ -563,6 +563,9 @@
             <xsl:apply-templates select="pooling-profile" mode="deprecated"/>
             <xsl:apply-templates select="bean" mode="asProperty"/>
         </bean>
+
+		<!-- The backing service bean. -->
+        <bean name="{$name}-impl" class="{$implClass}" singleton="false"/>
     </xsl:template>
 
 

@@ -13,7 +13,6 @@ package org.mule.impl;
 import org.mule.RegistryContext;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.ThreadingProfile;
-import org.mule.impl.container.ContainerKeyPair;
 import org.mule.registry.DeregistrationException;
 import org.mule.registry.RegistrationException;
 import org.mule.routing.inbound.InboundPassThroughRouter;
@@ -22,11 +21,9 @@ import org.mule.routing.nested.NestedRouterCollection;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.routing.outbound.OutboundRouterCollection;
 import org.mule.routing.response.ResponseRouterCollection;
-import org.mule.umo.UMOException;
 import org.mule.umo.UMOImmutableDescriptor;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.ContainerException;
 import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.routing.UMONestedRouterCollection;
 import org.mule.umo.routing.UMOOutboundRouterCollection;
@@ -67,11 +64,9 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     protected ExceptionListener exceptionListener;
 
     /**
-     * The implementationReference used to create the Object UMO instance. Can either
-     * be a string such as a container reference or classname or can be an instance
-     * of the implementation.
+     * The actual bean backing the UMO instance. 
      */
-    protected Object implementationReference;
+    protected Object service;
 
     /**
      * The descriptor name
@@ -141,7 +136,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         outboundRouter = descriptor.getOutboundRouter();
         responseRouter = descriptor.getResponseRouter();
         nestedRouter = descriptor.getNestedRouter();
-        implementationReference = descriptor.getImplementation();
+        service = descriptor.getService();
         version = descriptor.getVersion();
         intecerptorList = descriptor.getInterceptors();
         properties = descriptor.getProperties();
@@ -190,11 +185,6 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
             outboundRouter = new OutboundRouterCollection();
             outboundRouter.addRouter(new OutboundPassThroughRouter());
         }
-        // Is a reference of an implementation object?
-//        if (implementationReference instanceof String)
-//        {
-//            implementationReference = new ContainerKeyPair(container, implementationReference);
-//        }
 //        inboundRouter.initialise();
 //        outboundRouter.initialise();
 //        if(responseRouter !=null)
@@ -297,9 +287,9 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
      *
      * @see org.mule.umo.UMODescriptor#getImplementation()
      */
-    public Object getImplementation()
+    public Object getService()
     {
-        return implementationReference;
+        return service;
     }
 
     public UMOInboundRouterCollection getInboundRouter()
@@ -324,37 +314,6 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     public ThreadingProfile getThreadingProfile()
     {
         return threadingProfile;
-    }
-
-    public Class getImplementationClass() throws UMOException
-    {
-        // check for other types of references
-        Class implClass;
-        if (implementationReference instanceof String || implementationReference instanceof ContainerKeyPair)
-        {
-            Object object = RegistryContext.getRegistry().lookupObject(implementationReference, Object.class);
-            implClass = object.getClass();
-        }
-        else
-        {
-            implClass = implementationReference.getClass();
-        }
-
-        return implClass;
-    }
-
-    /**
-     * A helper method that will resolved a component for a given reference id. For
-     * example, for a component declared in a Spring Application context the id would
-     * be the bean id, in Pico the id would be a fully qualified class name.
-     *
-     * @param reference the reference to use when resolving the component
-     * @return the Implementation of the component
-     */
-    protected Class getImplementationForReference(String reference) throws ContainerException
-    {
-        Object object = RegistryContext.getRegistry().lookupObject(reference, Object.class);
-        return object.getClass();
     }
 
     public void fireInitialisationCallbacks(Object component) throws InitialisationException
@@ -397,7 +356,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         final StringBuffer sb = new StringBuffer();
         sb.append("ImmutableMuleDescriptor");
         sb.append("{exceptionListener=").append(exceptionListener);
-        sb.append(", implementationReference=").append(implementationReference);
+        sb.append(", service=").append(service);
         sb.append(", name='").append(name).append('\'');
         sb.append(", properties=").append(properties);
         sb.append(", version='").append(version).append('\'');

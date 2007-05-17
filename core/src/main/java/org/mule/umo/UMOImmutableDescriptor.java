@@ -67,21 +67,9 @@ public interface UMOImmutableDescriptor extends Initialisable, Registerable
     String getVersion();
 
     /**
-     * String used to instansiate the object, this can be a class name or a reference
-     * to an object in a container
-     *
-     * @return the Object's class r reference name or an instance of the object to
-     *         use
+     * @return the actual bean backing the UMO.
      */
-    Object getImplementation();
-
-    /**
-     * Class used to instansiate the object, this can be a class name or a reference
-     * to an object in a container
-     *
-     * @return the Object's class representation
-     */
-    Class getImplementationClass() throws UMOException;
+    Object getService();
 
     /**
      * Inbound Routers control how events are received by a component. If no router

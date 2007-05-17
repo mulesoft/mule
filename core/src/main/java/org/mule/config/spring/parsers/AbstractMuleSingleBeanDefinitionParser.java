@@ -13,6 +13,7 @@ import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.util.ClassUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,24 +38,33 @@ import org.w3c.dom.NamedNodeMap;
  * consistently customising bean representations for Mule bean definition parsers.  Most custom bean definition parsers
  * in Mule will use this base class. The following enhancements are made -
  *
- * 1. Attribute mappings can be registered to control how an attribute name in Mule Xml maps to the bean name in the
+ * 1. A property name which ends with the suffix "-ref" is assumed to be a reference to another bean.
+ * Alternatively, a property can be explicitly registered as a bean reference via registerBeanReference()
+ *
+ * For example,
+ * 
+ *     <code> <bpm:connector bpms-ref="testBpms"/> </code>
+ * 
+ * will automatically set a property "bpms" on the connector to reference a bean named "testBpms"
+ *
+ * 2. Attribute mappings can be registered to control how an attribute name in Mule Xml maps to the bean name in the
  * object being created. For example -
  *
  * <code>registerAttributeMapping("poolExhaustedAction", "poolExhaustedActionString");</code>
  *
  * Map the 'poolExhaustedAction' to the 'poolExhaustedActionString' property on the bean being created.
  *
- * 2. Value Mappings can be used to map key value pairs from selection lists in the XML schema to property values on the
+ * 3. Value Mappings can be used to map key value pairs from selection lists in the XML schema to property values on the
  * bean being created. These are a comma-separated list of key=value pairs. For example -
  *
  *     <code> registerValueMapping("action", "NONE=0,ALWAYS_BEGIN=1,BEGIN_OR_JOIN=2,JOIN_IF_POSSIBLE=3");</code>
  *
  * The first argument is the bean name to set, the second argument is the set of possible key=value pairs
  *
- * 3. Provides an automatic way of setting the 'init-method' and 'destroy-method' for this object. This will then automatically
+ * 4. Provides an automatic way of setting the 'init-method' and 'destroy-method' for this object. This will then automatically
  * wire the bean into the lifecycle of the Application context.
  *
- * 4. The 'singleton' property provides a fixed way to make sure the bean is always a singleton or not.
+ * 5. The 'singleton' property provides a fixed way to make sure the bean is always a singleton or not.
  *
  * @see  AbstractBeanDefinitionParser
  */
@@ -64,6 +74,7 @@ public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBea
     public static final String ATTRIBUTE_NAME = "name";
     public static final String ATTRIBUTE_IDREF = "nameref";
     public static final String ATTRIBUTE_CLASS = "class";
+    public static final String ATTRIBUTE_REF_SUFFIX = "-ref";
     /**
      * logger used by this class
      */
@@ -74,6 +85,7 @@ public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBea
 
     protected Properties attributeMappings;
     protected Map valueMappings;
+    protected List beanReferences;
     protected ParserContext parserContext;
     //By default Mule objects are not singletons
     protected boolean singleton = false;
@@ -82,6 +94,7 @@ public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBea
      {
          attributeMappings = new Properties();
          valueMappings = new HashMap();
+         beanReferences = new ArrayList();
      }
 
     public void registerValueMapping(ValueMap mapping)
@@ -104,6 +117,11 @@ public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBea
         attributeMappings.put(alias, propertyName);
     }
 
+    public void registerBeanReference(String propertyName)
+    {
+        beanReferences.add(propertyName);
+    }
+
     protected String getAttributeMapping(String alias)
     {
         return attributeMappings.getProperty(alias, alias);
@@ -111,13 +129,32 @@ public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBea
 
     protected void processProperty(Attr attribute, BeanDefinitionBuilder builder)
     {
+        boolean isBeanReference = isBeanReference(attribute.getNodeName());
         String propertyName = extractPropertyName(attribute.getNodeName());
         String propertyValue = extractPropertyValue(propertyName, attribute.getValue());
         Assert.state(StringUtils.hasText(propertyName),
                 "Illegal property name returned from 'extractPropertyName(String)': cannot be null or empty.");
-        builder.addPropertyValue(propertyName, propertyValue);
+
+        // The property may be a reference to another bean.
+        if (isBeanReference)
+        {
+            builder.addPropertyReference(propertyName, propertyValue);
+        }
+        else
+        {
+            builder.addPropertyValue(propertyName, propertyValue);
+        }
     }
 
+    /**
+     * A property can be explicitly registered as a bean reference via registerBeanReference()
+     * or it can simply use the "-ref" suffix.
+     */
+    protected boolean isBeanReference(String attributeName)
+    {
+        return (beanReferences.contains(attributeName) || attributeName.endsWith(ATTRIBUTE_REF_SUFFIX));
+    }
+    
     /**
      * Extract a JavaBean property name from the supplied attribute name.
      * <p>The default implementation uses the {@link org.springframework.core.Conventions#attributeNameToPropertyName(String)}
@@ -132,7 +169,11 @@ public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBea
      */
     protected String extractPropertyName(String attributeName)
     {
+        // Remove the bean reference suffix if any.
+        attributeName = org.mule.util.StringUtils.chomp(attributeName, ATTRIBUTE_REF_SUFFIX);
+        // Map to the real property name if necessary.
         attributeName = getAttributeMapping(attributeName);
+        // JavaBeans property convention.
         return Conventions.attributeNameToPropertyName(attributeName);
     }
 

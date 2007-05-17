@@ -33,9 +33,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * <code>MuleDescriptor</code> describes all the properties for a Mule UMO. New
  * Mule UMOs can be initialised as needed from their descriptor.
- *
  */
-
 public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescriptor, ManagementContextAware
 {
     /**
@@ -158,22 +156,13 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
      * (non-Javadoc)
      * @see org.mule.umo.UMODescriptor#setImplementation(java.lang.String)
      */
-    public void setImplementation(Object reference)
+    public void setService(Object service)
     {
-        if (reference == null)
+        if (service == null)
         {
-            throw new IllegalArgumentException("ImplementationReference cannot be null");
+            throw new IllegalArgumentException("Service cannot be null");
         }
-        implementationReference = reference;
-    }
-
-    public void setImplementationInstance(Object instance)
-    {
-        if (name == null)
-        {
-            throw new IllegalArgumentException("UMODescriptor.name may not be null");
-        }
-        setImplementationInstance(instance);
+        this.service = service;
     }
 
     public void setInboundRouter(UMOInboundRouterCollection router)

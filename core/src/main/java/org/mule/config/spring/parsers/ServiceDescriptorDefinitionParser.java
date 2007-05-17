@@ -10,7 +10,10 @@
 package org.mule.config.spring.parsers;
 
 import org.mule.impl.MuleDescriptor;
+import org.mule.util.StringUtils;
 
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
@@ -34,6 +37,21 @@ public class ServiceDescriptorDefinitionParser extends AbstractMuleSingleBeanDef
         builder.setSingleton(true);
         builder.addDependsOn(modelName);
 
+        // For backwards-compatibility only.
+        String implClass = element.getAttribute("implementation");
+        if (StringUtils.isNotBlank(implClass))
+        {
+            BeanDefinitionBuilder serviceBean = BeanDefinitionBuilder.rootBeanDefinition(implClass);
+            String serviceName = element.getAttribute("name") + "-impl";
+            serviceBean.setScope(BeanDefinition.SCOPE_PROTOTYPE);
+            // Reference this bean from the service descriptor.
+            builder.addPropertyReference("service", serviceName);
+            // Register the new bean.
+            BeanDefinitionHolder holder = new BeanDefinitionHolder(serviceBean.getBeanDefinition(), serviceName);
+            registerBeanDefinition(holder, parserContext.getRegistry());
+            element.removeAttribute("implementation");
+        }
+        
         super.doParse(element, parserContext, builder);
     }
 
