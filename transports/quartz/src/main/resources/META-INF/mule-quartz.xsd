@@ -16,10 +16,10 @@
     <xsd:complexType name="quartzConnectorType">
     	<xsd:complexContent>
     		<xsd:extension base="mule:connectorType">
-		    	<xsd:choice>
+		    	<xsd:sequence>
 		    		<xsd:element name="factory-properties" type="mule:propsType" minOccurs="0"/>
-		            <xsd:any namespace="##other" minOccurs="0"/>
-		    	</xsd:choice>
+		    	</xsd:sequence>
+		        <xsd:attribute name="scheduler-ref" type="xsd:NMTOKEN"/>
 		    </xsd:extension>
     	</xsd:complexContent>
    </xsd:complexType>

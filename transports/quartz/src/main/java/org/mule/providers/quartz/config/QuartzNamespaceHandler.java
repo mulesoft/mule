@@ -22,7 +22,16 @@ public class QuartzNamespaceHandler extends NamespaceHandlerSupport
 {
     public void init()
     {
-        registerBeanDefinitionParser("connector", new SingleElementDefinitionParser(QuartzConnector.class, true));
+        registerBeanDefinitionParser("connector", new QuartzConnectorDefinitionParser());
         registerBeanDefinitionParser("factory-properties", new PropertiesBeanDefinitionParser("factoryProperties"));
+    }
+}
+
+class QuartzConnectorDefinitionParser extends SingleElementDefinitionParser
+{
+    public QuartzConnectorDefinitionParser()
+    {
+        super(QuartzConnector.class, true);
+        registerAttributeMapping("scheduler", "quartzScheduler");
     }
 }

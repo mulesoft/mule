@@ -15,13 +15,6 @@ import org.mule.umo.provider.UMOConnector;
 
 public class QuartzConnectorTestCase extends AbstractConnectorTestCase
 {
-
-    public QuartzConnectorTestCase()
-    {
-        super();
-        this.setDisposeManagerPerSuite(true);
-    }
-
     /*
      * (non-Javadoc)
      * 

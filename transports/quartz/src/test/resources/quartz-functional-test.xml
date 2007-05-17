@@ -27,6 +27,7 @@
 
     <mule:model-seda name="quartz" >
     	<mule:pooling-profile maxActive="1" exhaustedAction="WAIT"/>
+    	
         <mule:service name="quartzService1" implementation="org.mule.providers.quartz.TestComponent">
             <mule:inbound-router>
                 <mule:endpoint-ref nameref="quartz.in.1"/>

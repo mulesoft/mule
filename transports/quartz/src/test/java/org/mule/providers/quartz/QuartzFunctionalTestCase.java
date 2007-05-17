@@ -17,13 +17,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public class QuartzFunctionalTestCase extends FunctionalTestCase
 {
-
-    public QuartzFunctionalTestCase()
-    {
-        super();
-        setDisposeManagerPerSuite(true);
-    }
-
     protected String getConfigResources()
     {
         return "quartz-functional-test.xml";

@@ -8,13 +8,11 @@
        http://www.mulesource.org/schema/mule/core/2.0 META-INF/mule.xsd
        http://www.mulesource.org/schema/mule/quartz/2.0 META-INF/mule-quartz.xsd">
 
+	<!-- Default config -->
     <quartz:connector name="quartzConnectorDefaults"/>
 
-    <quartz:connector name="quartzConnector1">
-        <property name="quartzScheduler">
-        	<ref local="myScheduler"/>
-        </property>
-    </quartz:connector>
+	<!-- Inject the scheduler as a bean. -->
+    <quartz:connector name="quartzConnector1" scheduler-ref="myScheduler"/>
     
     <bean id="myScheduler" factory-bean="mySchedulerFactory" factory-method="getScheduler"/>
 
@@ -31,6 +29,7 @@
     	</constructor-arg>
     </bean>
 
+	<!-- Default config but provide some factory properties. -->
     <quartz:connector name="quartzConnector2">
     	<quartz:factory-properties>
   			<prop key="org.quartz.scheduler.instanceName">MuleScheduler2</prop>
