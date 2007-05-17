@@ -12,8 +12,10 @@ package org.mule.config.spring;
 
 import org.mule.config.MuleDtdResolver;
 import org.mule.config.XslHelper;
+import org.mule.util.ClassUtils;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 
 import javax.xml.transform.ErrorListener;
 import javax.xml.transform.Source;
@@ -49,6 +51,8 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
      */
     protected static transient final Log logger = LogFactory.getLog(MuleBeanDefinitionReader.class);
 
+    private static final String XML_UTILS_CLASS = "org.mule.util.XMLUtils";
+    
     private int contextCount = 0;
     private int configCount = 0;
     private MuleDtdResolver dtdResolver = null;
@@ -63,6 +67,7 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
     {
         try
         {
+            logger.debug("Transforming legacy (Mule 1.x) config to Spring beans");
             Document newDocument = transformDocument(document);
             return super.registerBeanDefinitions(newDocument, resource);
         }
@@ -130,17 +135,17 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
                 {
                     logger.warn(XslHelper.getWarningReport());
                 }
+                else
+                {
+                    logger.debug("Transformation sucessful: No errors or warnings");
+                }
                 XslHelper.clearReport();
             }
 
-            try
+            if (logger.isDebugEnabled())
             {
-                //If we have Dom4J on the classpath we can print out the generated XML
+                // If we have mule-module-xml on the classpath we can print out the generated XML
                 printResult(result);
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
             }
             return (Document)result.getNode();
         }
@@ -153,16 +158,25 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
 
     protected void printResult(DOMResult result)
     {
-        //If we have Dom4J on the classpath we can print out the generated XML
-        //TODO RM*  this relies on Dom4j which is not in core, either we scrap this or do some reflection
-        // trickery to print the XML. This is definitely useful for debugging
-//        String xml = new DOMReader().read((Document)result.getNode()).asXML();
-//        System.out.println(xml);
-        if (logger.isDebugEnabled())
+        // Since mule-module-xml isn't (and can't be) a dependency of mule-core, we don't know 
+        // whether we have it on the classpath or not.  
+        try
         {
-            //logger.debug("Transformed document is:\n" + xml);
+            Class xmlUtils = ClassUtils.loadClass(XML_UTILS_CLASS, getClass());
+            Method toXml = ClassUtils.getMethod(xmlUtils, "toXml", new Class[]{Document.class});
+            String xml = (String) toXml.invoke(null, new Object[]{result.getNode()});
+            logger.debug("Transformed document is:\n" + xml);
+        }
+        catch (ClassNotFoundException e)
+        {
+            logger.debug("Unable to print out transformed document because XMLUtils is not on the classpath.");
+        }
+        catch (Exception e)
+        {
+            logger.warn("Unable to dynamically invoke the XMLUtils.toXml() method", e);
         }
     }
+    
     protected Source createXslSource() throws IOException
     {
         return new StreamSource(getXslResource().getInputStream(), getXslResource().getURL().toString());
