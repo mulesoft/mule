@@ -14,7 +14,7 @@ import org.mule.util.ClassUtils;
 import org.w3c.dom.Element;
 
 /**
- * Creates a definitionparser that will construct a single child element and set
+ * Creates a definition parser that will construct a single child element and set
  * the beanDefinition on the parent object.
  *
  * The parser will set all attributes defined in the Xml as bean properties and will

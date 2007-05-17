@@ -109,7 +109,7 @@ public class MuleContainerContextTestCase extends AbstractContainerContextTestCa
         assertNotNull(ctx);
 
         UMODescriptor descriptor = getTestDescriptor("fruit Bowl", "org.mule.tck.testmodels.fruit.FruitBowl");
-        FruitBowl fruitBowl = (FruitBowl)ctx.getComponent(descriptor.getImplementation());
+        FruitBowl fruitBowl = (FruitBowl)ctx.getComponent(descriptor.getService());
 
         assertNotNull(fruitBowl);
     }

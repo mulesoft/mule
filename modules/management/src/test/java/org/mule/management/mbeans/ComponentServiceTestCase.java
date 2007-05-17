@@ -24,7 +24,7 @@ public class ComponentServiceTestCase extends AbstractMuleJmxTestCase
         final String domainOriginal = "TEST_DOMAIN_1";
 
         final MuleDescriptor descriptor = new MuleDescriptor("TEST_SERVICE");
-        descriptor.setImplementation(new Object());
+        descriptor.setService(new Object());
         getDefaultModel(managementContext).registerComponent(descriptor);
 
        managementContext.start();

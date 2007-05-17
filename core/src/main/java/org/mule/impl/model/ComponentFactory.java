@@ -39,7 +39,7 @@ public final class ComponentFactory
      */
     public static Object createComponent(UMODescriptor descriptor) throws UMOException
     {
-        Object impl = descriptor.getImplementation();
+        Object impl = descriptor.getService();
         Object component;
 
         if (impl instanceof String)
@@ -52,7 +52,7 @@ public final class ComponentFactory
 
             if (descriptor.isSingleton())
             {
-                descriptor.setImplementation(component);
+                descriptor.setService(component);
             }
         }
         else

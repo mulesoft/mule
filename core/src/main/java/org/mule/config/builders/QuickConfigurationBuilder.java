@@ -30,7 +30,9 @@ import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.model.UMOModel;
+import org.mule.util.ClassUtils;
 import org.mule.util.MuleObjectHelper;
 
 import java.util.Map;
@@ -210,7 +212,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     {
         MuleDescriptor descriptor = new MuleDescriptor();
         descriptor.setName(name);
-        descriptor.setImplementationInstance(component);
+        descriptor.setService(component);
 
 
         descriptor.setOutboundRouter(new OutboundRouterCollection());
@@ -461,29 +463,36 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
                                           UMOEndpoint outboundEndpoint,
                                           Map properties) throws UMOException
     {
-        MuleDescriptor descriptor = new MuleDescriptor();
-        descriptor.setImplementation(implementation);
-        descriptor.setName(name);
-        descriptor.setModelName(getModel().getName());
-        if (properties != null)
+        try
         {
-            descriptor.getProperties().putAll(properties);
+            MuleDescriptor descriptor = new MuleDescriptor();
+            descriptor.setService(ClassUtils.instanciateClass(implementation, null));
+            descriptor.setName(name);
+            descriptor.setModelName(getModel().getName());
+            if (properties != null)
+            {
+                descriptor.getProperties().putAll(properties);
+            }
+    
+            descriptor.setOutboundRouter(new OutboundRouterCollection());
+            if(outboundEndpoint!=null)
+            {
+                OutboundPassThroughRouter router = new OutboundPassThroughRouter();
+                router.addEndpoint(outboundEndpoint);
+                descriptor.getOutboundRouter().addRouter(router);
+            }
+            descriptor.setInboundRouter(new InboundRouterCollection());
+            if(inboundEndpoint!=null)
+            {
+                descriptor.getInboundRouter().addEndpoint(inboundEndpoint);
+            }
+    
+            return descriptor;
         }
-
-        descriptor.setOutboundRouter(new OutboundRouterCollection());
-        if(outboundEndpoint!=null)
+        catch (Exception e)
         {
-            OutboundPassThroughRouter router = new OutboundPassThroughRouter();
-            router.addEndpoint(outboundEndpoint);
-            descriptor.getOutboundRouter().addRouter(router);
+            throw new InitialisationException(e, this);
         }
-        descriptor.setInboundRouter(new InboundRouterCollection());
-        if(inboundEndpoint!=null)
-        {
-            descriptor.getInboundRouter().addEndpoint(inboundEndpoint);
-        }
-
-        return descriptor;
     }
 
     /**

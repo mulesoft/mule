@@ -119,7 +119,7 @@ public class EndpointDefinitionParser extends AbstractChildBeanDefinitionParser
             builder.addPropertyValue("type", UMOImmutableEndpoint.ENDPOINT_TYPE_GLOBAL);
         }
 
-        //Register non-descriptive deendencies i.e. string values for objects listed in the container
+        //Register non-descriptive dependencies i.e. string values for objects listed in the container
         if(StringUtils.isNotBlank(element.getAttribute("connector")))
         {
             builder.addDependsOn(element.getAttribute("connector"));
@@ -141,7 +141,6 @@ public class EndpointDefinitionParser extends AbstractChildBeanDefinitionParser
             }
         }
     }
-
 
     protected Class getBeanClass(Element element)
     {

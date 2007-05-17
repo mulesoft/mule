@@ -194,6 +194,5 @@ public abstract class AbstractEntryPointDiscoveryTestCase extends AbstractMuleTe
             return componentClass.getName() + "." + methodName + "(" + methodArgumentType.getName()
                    + "), Expected to fail= " + shouldFail;
         }
-
     }
 }

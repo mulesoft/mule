@@ -13,6 +13,7 @@ package org.mule.tck;
 import org.mule.RegistryContext;
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleDescriptor;
+import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
@@ -30,12 +31,12 @@ import org.mule.util.StringMessageUtils;
 import java.util.HashMap;
 import java.util.Map;
 
+import junit.framework.TestCase;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import junit.framework.TestCase;
 
 /**
  * <code>AbstractMuleTestCase</code> is a base class for Mule testcases. This
@@ -344,6 +345,11 @@ public abstract class AbstractMuleTestCase extends TestCase
     public static UMOComponent getTestComponent(MuleDescriptor descriptor)
     {
         return MuleTestUtils.getTestComponent(descriptor);
+    }
+
+    public static MuleDescriptor getTestDescriptor() throws Exception
+    {
+        return getTestDescriptor("appleService", Apple.class.getName());
     }
 
     public static MuleDescriptor getTestDescriptor(String name, String implementation) throws Exception

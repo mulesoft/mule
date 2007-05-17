@@ -167,7 +167,7 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         };
         messageRouter.setCatchAllStrategy(strategy);
 
-        UMOSession session = getTestSession(getTestComponent(getTestDescriptor("test", "test")));
+        UMOSession session = getTestSession(getTestComponent(getTestDescriptor()));
 
         messageRouter.route(new MuleMessage("hello"), session, true);
         assertEquals(1, catchAllCount[0]);

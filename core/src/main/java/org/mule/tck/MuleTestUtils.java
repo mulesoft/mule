@@ -175,7 +175,7 @@ public final class MuleTestUtils
         MuleDescriptor descriptor = new MuleDescriptor();
         descriptor.setExceptionListener(new DefaultExceptionStrategy());
         descriptor.setName(name);
-        descriptor.setImplementation(implementation);
+        descriptor.setService(ClassUtils.instanciateClass(implementation, ClassUtils.NO_ARGS));
         UMOOutboundRouter router = new OutboundPassThroughRouter();
         router.addEndpoint(getTestEndpoint("test1", UMOEndpoint.ENDPOINT_TYPE_SENDER, context));
         descriptor.getOutboundRouter().addRouter(router);

@@ -39,7 +39,7 @@ public class MuleDescriptorTestCase extends AbstractMuleTestCase
 //        assertEquals("1.0", descriptor.getVersion());
         // assertEquals(2, descriptor.getInitialisationPolicy());
 
-        assertNull(descriptor.getImplementation());
+        assertNull(descriptor.getService());
         assertNull(descriptor.getName());
         assertEquals(0, descriptor.getProperties().size());
     }
@@ -70,8 +70,8 @@ public class MuleDescriptorTestCase extends AbstractMuleTestCase
 
         try
         {
-            descriptor.setImplementation(null);
-            fail("setting implementation to null should fail");
+            descriptor.setService(null);
+            fail("setting service to null should fail");
         }
         catch (RuntimeException e)
         {
@@ -86,7 +86,7 @@ public class MuleDescriptorTestCase extends AbstractMuleTestCase
 
         try
         {
-            descriptor.setImplementation(null);
+            descriptor.setService(null);
             fail("setting implementation to null should fail");
         }
         catch (RuntimeException e)

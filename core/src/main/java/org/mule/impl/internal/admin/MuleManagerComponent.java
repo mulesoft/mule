@@ -39,6 +39,7 @@ import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.transformer.UMOTransformer;
+import org.mule.util.ClassUtils;
 import org.mule.util.MapUtils;
 
 import java.io.ByteArrayInputStream;
@@ -240,21 +241,27 @@ public class MuleManagerComponent implements Callable, Initialisable
                                                     String encoding,
                                                     int eventTimeout) throws UMOException
     {
-
-        endpoint.setName(MANAGER_ENDPOINT_NAME);
-        endpoint.setType(UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
-
-        MuleDescriptor descriptor = new MuleDescriptor();
-        descriptor.setName(MANAGER_COMPONENT_NAME);
-
-        descriptor.getInboundRouter().addEndpoint(endpoint);
-        descriptor.setImplementation(MuleManagerComponent.class.getName());
-        Map props = new HashMap();
-        props.put("wireFormat", wireFormat);
-        props.put("encoding", encoding);
-        props.put("synchronousEventTimeout", new Integer(eventTimeout));
-        descriptor.setProperties(props);
-        return descriptor;
+        try
+        {
+            endpoint.setName(MANAGER_ENDPOINT_NAME);
+            endpoint.setType(UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
+    
+            MuleDescriptor descriptor = new MuleDescriptor();
+            descriptor.setName(MANAGER_COMPONENT_NAME);
+    
+            descriptor.getInboundRouter().addEndpoint(endpoint);
+            descriptor.setService(ClassUtils.instanciateClass(MuleManagerComponent.class, null));
+            Map props = new HashMap();
+            props.put("wireFormat", wireFormat);
+            props.put("encoding", encoding);
+            props.put("synchronousEventTimeout", new Integer(eventTimeout));
+            descriptor.setProperties(props);
+            return descriptor;
+        }
+        catch (Exception e)
+        {
+            throw new InitialisationException(e, null);
+        }
     }
 
     /**
