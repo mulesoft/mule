@@ -12,7 +12,6 @@ package org.mule.test.integration.providers.jms;
 
 import org.mule.config.MuleProperties;
 import org.mule.impl.DefaultExceptionStrategy;
-import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleTransactionConfig;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
@@ -78,7 +77,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
 
     public void testSendNotTransacted() throws Exception
     {
-        UMODescriptor descriptor = getDescriptor("testComponent", FunctionalTestComponent.class.getName());
+        UMODescriptor descriptor = getTestDescriptor("testComponent", FunctionalTestComponent.class.getName());
 
         final int countDownInitialCount = 2;
         final CountDownLatch countDown = new CountDownLatch(countDownInitialCount);
@@ -116,7 +115,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
         final CountDownLatch countDown = new CountDownLatch(countDownInitialCount);
 
         // setup the component and start Mule
-        UMODescriptor descriptor = getDescriptor("testComponent", FunctionalTestComponent.class.getName());
+        UMODescriptor descriptor = getTestDescriptor("testComponent", FunctionalTestComponent.class.getName());
 
         EventCallback callback = new EventCallback()
         {
@@ -172,7 +171,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
         final CountDownLatch countDown = new CountDownLatch(countDownInitialCount);
 
         // setup the component and start Mule
-        UMODescriptor descriptor = getDescriptor("testComponent", FunctionalTestComponent.class.getName());
+        UMODescriptor descriptor = getTestDescriptor("testComponent", FunctionalTestComponent.class.getName());
 
         EventCallback callback = new EventCallback()
         {
@@ -238,7 +237,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
         // after a rollback
 
         // setup the component and start Mule
-        UMODescriptor descriptor = getDescriptor("testComponent", FunctionalTestComponent.class.getName());
+        UMODescriptor descriptor = getTestDescriptor("testComponent", FunctionalTestComponent.class.getName());
 
         EventCallback callback = new EventCallback()
         {
@@ -321,15 +320,6 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
         UMOComponent component = model.getComponent(descriptor.getName());
         // MuleManager.getInstance().registerConnector(connector);
         return component;
-    }
-
-    public static UMODescriptor getDescriptor(String name, String implementation)
-    {
-        UMODescriptor descriptor = new MuleDescriptor();
-        descriptor.setExceptionListener(new DefaultExceptionStrategy());
-        descriptor.setName(name);
-        descriptor.setImplementation(implementation);
-        return descriptor;
     }
 
     public void afterInitialise() throws Exception
@@ -509,7 +499,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
         final CountDownLatch countDown = new CountDownLatch(countDownInitialCount);
 
         // setup the component and start Mule
-        UMODescriptor descriptor = getDescriptor("testComponent", FunctionalTestComponent.class.getName());
+        UMODescriptor descriptor = getTestDescriptor("testComponent", FunctionalTestComponent.class.getName());
 
         EventCallback callback = new EventCallback()
         {

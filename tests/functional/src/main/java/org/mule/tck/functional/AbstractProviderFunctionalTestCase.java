@@ -11,7 +11,6 @@
 package org.mule.tck.functional;
 
 import org.mule.RegistryContext;
-import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.model.seda.SedaModel;
@@ -137,15 +136,6 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
             UMOEndpoint.ENDPOINT_TYPE_RECEIVER, 0, null, null);
         ep.setSynchronous(true);
         return ep;
-    }
-
-    public static MuleDescriptor getTestDescriptor(String name, String implementation)
-    {
-        MuleDescriptor descriptor = new MuleDescriptor();
-        descriptor.setExceptionListener(new DefaultExceptionStrategy());
-        descriptor.setName(name);
-        descriptor.setImplementation(implementation);
-        return descriptor;
     }
 
     public void afterInitialise() throws Exception

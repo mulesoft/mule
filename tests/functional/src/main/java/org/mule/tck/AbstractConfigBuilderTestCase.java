@@ -309,8 +309,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     {
         MuleDescriptor descriptor = (MuleDescriptor)managementContext.getRegistry().lookupService(
             "orangeComponent");
-        assertEquals("orange", descriptor.getImplementation());
-        assertEquals(Orange.class, descriptor.getImplementationClass());
+        assertTrue("orangeComponent is not an Orange", descriptor.getService() instanceof Orange);
     }
 
     public void testNestedRouterProxyCreation() throws ObjectNotFoundException

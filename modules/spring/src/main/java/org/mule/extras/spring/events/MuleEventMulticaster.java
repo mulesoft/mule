@@ -15,7 +15,7 @@ import org.mule.RegistryContext;
 import org.mule.config.MuleProperties;
 import org.mule.config.ThreadingProfile;
 import org.mule.config.builders.QuickConfigurationBuilder;
-import org.mule.extras.spring.SpringContainerContext;
+import org.mule.config.spring.SpringContainerContext;
 import org.mule.extras.spring.i18n.SpringMessages;
 import org.mule.impl.ManagementContextAware;
 import org.mule.impl.MuleDescriptor;
@@ -65,7 +65,6 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.context.support.AbstractApplicationContext;
 
 /**
  * <code>MuleEventMulticaster</code> is an implementation of a Spring
@@ -809,8 +808,9 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                 messageRouter.addEndpoint(endpoint);
             }
         }
-        // set the implementation name to this bean so Mule will manage it
-        descriptor.setImplementation(AbstractApplicationContext.APPLICATION_EVENT_MULTICASTER_BEAN_NAME);
+        // TODO RM: Need to put the actual instance here (not just the name reference), 
+        // please review whether the following is correct?
+        descriptor.setService(new MuleEventMulticaster());
         return descriptor;
     }
 

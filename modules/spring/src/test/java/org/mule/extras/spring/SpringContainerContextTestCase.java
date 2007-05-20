@@ -10,6 +10,7 @@
 
 package org.mule.extras.spring;
 
+import org.mule.config.spring.SpringContainerContext;
 import org.mule.tck.model.AbstractContainerContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.umo.manager.ObjectNotFoundException;
