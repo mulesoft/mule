@@ -6,16 +6,16 @@
 
     <mule-environment-properties synchronous="false" synchronousEventTimeout="5000" serverUrl="" />
 
-   <container-context className="org.mule.extras.spring.SpringContainerContext">
+    <!-- Embed Spring configuration to create a Jms Connection factory -->
+    <container-context className="org.mule.extras.spring.SpringContainerContext">
         <properties>
             <text-property name="configuration">
                 <![CDATA[
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+                <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
                 <beans>
-                <bean id="jmsConnectionFactory"
-        class="org.apache.activemq.ActiveMQConnectionFactory">
-        <property name="brokerURL"><value>vm://localhost</value></property>
-    </bean>
+                    <bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+                        <property name="brokerURL"><value>vm://localhost?broker.persistent=false&amp;broker.useJmx=false</value></property>
+                    </bean>
                 </beans>
                 ]]>
             </text-property>
@@ -26,9 +26,9 @@
     <transaction-manager
         factory="org.mule.extras.jotm.JotmTransactionManagerFactory"/>
 
-    <!-- Testing with ActiveMq -->
-    <connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">
+    <connector name="jmsConnector" className="org.mule.providers.jms.activemq.ActiveMqJmsConnector">
         <properties>
+            <!-- The ActiveMQ ConnectionFactory is configured as a Spring bean. -->
             <container-property name="connectionFactory" reference="jmsConnectionFactory"/>
             <property name="specification" value="1.1"/>
         </properties>

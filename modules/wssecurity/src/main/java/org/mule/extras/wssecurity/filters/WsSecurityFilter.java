@@ -1,5 +1,5 @@
 /*
- * $Id:
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -44,8 +44,10 @@ import org.apache.ws.axis.security.WSDoAllReceiver;
 import org.apache.ws.axis.security.WSDoAllSender;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.codehaus.xfire.XFire;
+import org.codehaus.xfire.security.wss4j.WSS4JOutHandler;
 import org.codehaus.xfire.service.Service;
 import org.codehaus.xfire.util.dom.DOMInHandler;
+import org.codehaus.xfire.util.dom.DOMOutHandler;
 
 public class WsSecurityFilter extends AbstractEndpointSecurityFilter
 {
@@ -116,7 +118,14 @@ public class WsSecurityFilter extends AbstractEndpointSecurityFilter
                 Object[] outhandlers = service.getOutHandlers().toArray();
                 for (i = 0; i < outhandlers.length; i++)
                 {
-                    connector.getClientOutHandlers().remove(i);
+                    if (outhandlers[i] instanceof DOMOutHandler)
+                    {
+                        connector.getClientOutHandlers().remove(i);
+                    }
+                    if (outhandlers[i] instanceof WSS4JOutHandler)
+                    {
+                        connector.getClientOutHandlers().remove(i);
+                    }
                 }
     
                 // add security out handlers if not present
@@ -172,7 +181,7 @@ public class WsSecurityFilter extends AbstractEndpointSecurityFilter
 
             String prefix = event.getEndpoint().getProtocol() + ":";
             String serviceName = event.getEndpoint().getName().substring(prefix.length());
-            SOAPService soapService = null;
+            SOAPService soapService;
 
             // set required security handlers
             try
@@ -230,7 +239,7 @@ public class WsSecurityFilter extends AbstractEndpointSecurityFilter
 
             String prefix = event.getEndpoint().getProtocol() + ":";
             String serviceName = event.getEndpoint().getName().substring(prefix.length());
-            SOAPService soapService = null;
+            SOAPService soapService;
 
             try
             {

@@ -115,20 +115,20 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
 
     public void testLoadingResources() throws Exception
     {
-        URL resource = ClassUtils.getResource("test-dummy.properties", getClass());
+        URL resource = ClassUtils.getResource("log4j.properties", getClass());
         assertNotNull(resource);
 
-        resource = ClassUtils.getResource("test-dummyX.properties", getClass());
+        resource = ClassUtils.getResource("does-not-exist.properties", getClass());
         assertNull(resource);
     }
 
     public void testLoadingResourceEnumeration() throws Exception
     {
-        Enumeration enumeration = ClassUtils.getResources("test-dummy.properties", getClass());
+        Enumeration enumeration = ClassUtils.getResources("log4j.properties", getClass());
         assertNotNull(enumeration);
         assertTrue(enumeration.hasMoreElements());
 
-        enumeration = ClassUtils.getResources("test-dummyX.properties", getClass());
+        enumeration = ClassUtils.getResources("does-not-exist.properties", getClass());
         assertNotNull(enumeration);
         assertTrue(!enumeration.hasMoreElements());
     }

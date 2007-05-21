@@ -49,6 +49,7 @@ import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.xfire.XFire;
+import org.codehaus.xfire.XFireFactory;
 import org.codehaus.xfire.service.Service;
 import org.codehaus.xfire.service.ServiceRegistry;
 import org.codehaus.xfire.transport.Transport;
@@ -119,6 +120,9 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
         
         universalTransport = new MuleUniversalTransport();
         
+        if(xfire == null){
+            xfire = XFireFactory.newInstance().getXFire();
+        }
         getTransportManager().register(transport);
         getTransportManager().register(universalTransport);
     }

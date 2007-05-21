@@ -11,7 +11,7 @@ import org.apache.maven.project.MavenProject
 class AssemblyContentsVerifier extends GroovyMojoSupport
 {
     /**
-     * The file to touch.
+     * The library list to check against.
      *
      * @parameter default-value="src/main/resources/assembly-whitelist.txt"
      */

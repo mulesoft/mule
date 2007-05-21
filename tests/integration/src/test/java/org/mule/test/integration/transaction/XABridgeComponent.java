@@ -18,8 +18,6 @@ import java.util.Map;
 /**
  * Simple component that receives messages from jdbc or jms and just forward the
  * interesting part.
- * 
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a> $Revision$
  */
 public class XABridgeComponent
 {

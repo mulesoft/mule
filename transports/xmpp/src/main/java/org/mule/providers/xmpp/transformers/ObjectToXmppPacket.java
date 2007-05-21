@@ -17,7 +17,6 @@ import org.jivesoftware.smack.packet.XMPPError;
 import org.mule.providers.xmpp.XmppConnector;
 import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.UMOEventContext;
-import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
 
@@ -35,16 +34,7 @@ public class ObjectToXmppPacket extends AbstractEventAwareTransformer
 
     public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
     {
-        Message result = null;
-
-        try
-        {
-            result = new Message(context.getMessageAsString(encoding));
-        }
-        catch (UMOException e)
-        {
-            throw new TransformerException(this, e);
-        }
+        Message result = new Message();
 
         UMOMessage msg = context.getMessage();
         if (msg.getExceptionPayload() != null)
@@ -54,28 +44,31 @@ public class ObjectToXmppPacket extends AbstractEventAwareTransformer
 
         for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();)
         {
-            String name = (String)iterator.next();
+            String name = (String) iterator.next();
             if (name.equals(XmppConnector.XMPP_THREAD))
             {
-                result.setThread((String)msg.getProperty(name));
+                result.setThread((String) msg.getProperty(name));
             }
             else if (name.equals(XmppConnector.XMPP_SUBJECT))
             {
-                result.setSubject((String)msg.getProperty(name));
+                result.setSubject((String) msg.getProperty(name));
             }
             else if (name.equals(XmppConnector.XMPP_FROM))
             {
-                result.setFrom((String)msg.getProperty(name));
+                result.setFrom((String) msg.getProperty(name));
             }
             else if (name.equals(XmppConnector.XMPP_TO))
             {
-                result.setTo((String)msg.getProperty(name));
+                result.setTo((String) msg.getProperty(name));
             }
             else
             {
                 result.setProperty(name, msg.getProperty(name));
             }
         }
+
+        result.setBody((String) src);
+        
         return result;
     }
 
