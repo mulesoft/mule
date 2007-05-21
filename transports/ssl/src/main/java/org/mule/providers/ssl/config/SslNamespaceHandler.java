@@ -26,6 +26,7 @@ public class SslNamespaceHandler extends NamespaceHandlerSupport
         registerBeanDefinitionParser("ssl-key-store", new CompoundElementDefinitionParser());
         registerBeanDefinitionParser("ssl-client", new CompoundElementDefinitionParser());
         registerBeanDefinitionParser("ssl-server", new CompoundElementDefinitionParser());
+        registerBeanDefinitionParser("ssl-protocol-handler", new CompoundElementDefinitionParser());
     }
     
 }

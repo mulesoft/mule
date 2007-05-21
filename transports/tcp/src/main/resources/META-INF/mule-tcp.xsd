@@ -14,7 +14,8 @@
 
     <xsd:element name="connector" type="tcpConnectorType">
         <xsd:annotation>
-            <xsd:documentation>Connect Mule to a TCP socket, to send or receive data via the network.
+            <xsd:documentation>
+                Connect Mule to a TCP socket, to send or receive data via the network.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

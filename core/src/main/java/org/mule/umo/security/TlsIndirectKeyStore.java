@@ -16,7 +16,7 @@ import java.io.IOException;
  * Configure indirect key stores.
  * TLS/SSL connections are made on behalf of an entity, which can be anonymous or identified by a 
  * certificate - this interface specifies how a keystore can be used to provide the certificates
- * (and assocaited private keys) necessary for identification.
+ * (and associated private keys) necessary for identification.
  * 
  * <p>The information specified in this interface is used to configure a key store indirectly.
  * For more information see the documentation for the connector or protocol in question.
@@ -49,17 +49,17 @@ public interface TlsIndirectKeyStore
     String getClientKeyStorePassword();
 
     /**
-     * @param storePassword The password used to protect the keystore itself
+     * @param clientKeyStorePassword The password used to protect the keystore itself
      */
     void setClientKeyStorePassword(String clientKeyStorePassword);
 
     /**
-     * @return The type of keystore used in {@link #getKeyStore()}
+     * @return The type of keystore used in {@link #getClientKeyStore()}
      */
     void setClientKeyStoreType(String clientKeyStoreType);
 
     /**
-     * @param keystoreType The type of keystore used in {@link #setKeyStore(String)}
+     * @return The type of keystore used in {@link #setClientKeyStore(String)}
      */
     String getClientKeyStoreType();
 

@@ -22,6 +22,7 @@
                 trustStorePassword="mulepassword"
                 explicitTrustStoreOnly="true"
                 requireClientAuthentication="true"/>
+        <tls:tls-protocol-handler protocolHandler="foo"/>
     </tls:connector>
 
 </beans>

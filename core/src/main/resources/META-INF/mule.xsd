@@ -968,32 +968,115 @@
 
     <!-- corresponds to TlsIndirectKeyStore, named as tls-client in transport namespace -->
     <xsd:complexType name="tlsClientKeyStoreType">
-        <!-- this is the key store defined in system properties that is used implicitly.
-        note that some transports use different namespaces within system properties,
-        so this is typically global across a particular transport.
-        it is also used as the trust store defined in system properties if no other trust
-        store is given and explicitTrustStoreOnly is false
-        -->
-        <xsd:attribute name="clientKeyStore" type="xsd:string"/>
-        <xsd:attribute name="clientKeyStorePassword" type="xsd:string"/>
-        <xsd:attribute name="clientKeyStoreType" type="xsd:string"/>
+        <xsd:annotation>
+            <xsd:documentation>
+                Configure client key stores.
+                TLS/SSL connections are made on behalf of an entity, which can be anonymous or identified by a
+                certificate - this interface specifies how a keystore can be used to provide the certificates
+                (and associated private keys) necessary for identification.
+                This is also used as the trust store if no other trust store is specified and the
+                explicitTrustStoreOnly parameter in the server trust store configuration is false.
+                WARNING - due to restrictions in library implementations the values specified here typically apply
+                to all connectors using this transport.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:attribute name="clientKeyStore" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The location (which will be resolved relative to the current classpath and file system, if
+                    possible) of the keystore that contains public certificates and private keys for identification.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="clientKeyStorePassword" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The password used to protect the keystore.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="clientKeyStoreType" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The type of keystore used (a Java class name).
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:complexType>
 
     <!-- corresponds to TlsDirectKeyStore, named as tls-key-store in transport namespace -->
     <xsd:complexType name="tlsKeyStoreType">
-        <xsd:attribute name="keyStore" type="xsd:string"/>
-        <xsd:attribute name="keyStoreType" type="xsd:string"/>
-        <xsd:attribute name="keyPassword" type="xsd:string"/>
-        <xsd:attribute name="keyStorePassword" type="xsd:string"/>
-        <xsd:attribute name="keyManagerAlgorithm" type="xsd:string"/>
+        <xsd:annotation>
+            <xsd:documentation>
+                Configure key stores.
+                TLS/SSL connections are made on behalf of an entity, which can be anonymous or identified by a
+                certificate - this interface specifies how a keystore can be used to provide the certificates
+                (and associated private keys) necessary for identification.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:attribute name="keyStore" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The location (which will be resolved relative to the current classpath and file system, if
+                    possible) of the keystore that contains public certificates and private keys for identification.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="keyStoreType" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The type of keystore used (a Java class name).
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="keyPassword" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The password used to protect the private key.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="keyStorePassword" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The password used to protect the keystore.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="keyManagerAlgorithm" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The algorithm used by the key store.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:complexType>
 
     <!-- corresponds to TlsIndirectTrustStore, named as tls-trust-store in transport namespace -->
     <xsd:complexType name="tlsTrustStoreType">
-        <!-- this is the trust store used to construct sockets both explicitly
-             and globally (if not set, see client key above) via the jvm defaults. -->
-        <xsd:attribute name="trustStore" type="xsd:string"/>
-        <xsd:attribute name="trustStorePassword" type="xsd:string"/>
+        <xsd:annotation>
+            <xsd:documentation>
+                Configure a trust store.
+                TLS/SSL connections are made to trusted systems - the public certificates of trusted systems are store
+                in a keystore (called a trust store) and used to verify that the connection made to a remote system
+                "really is" the expected identity.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:attribute name="trustStore" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The location (which will be resolved relative to the current classpath and file system, if
+                    possible) of the keystore that contains public certificates of trusted servers.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="trustStorePassword" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The password used to protected the trust store.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:complexType>
 
     <!-- corresponds to TlsDirectTrustStore, named as tls-server in transport namespace
@@ -1001,7 +1084,6 @@
     <xsd:complexType name="tlsServerTrustStoreType">
         <xsd:complexContent>
             <xsd:extension base="tlsTrustStoreType">
-                <xsd:attribute name="protocolHandler" type="xsd:string"/>
                 <xsd:attribute name="trustStoreType" type="xsd:string"/>
                 <xsd:attribute name="trustManagerAlgorithm" type="xsd:string"/>
                 <!-- should be of type TrustManagerFactory -->
@@ -1010,6 +1092,23 @@
                 <xsd:attribute name="requireClientAuthentication" type="xsd:boolean"/>
             </xsd:extension>
         </xsd:complexContent>
+    </xsd:complexType>
+
+    <!-- corresponds to TlsProtocolHandler, named as tls-protocol-handler -->
+    <xsd:complexType name="tlsProtocolHandler">
+        <xsd:annotation>
+            <xsd:documentation>
+                Configure the global Java protocol handler.
+                WARNING - Untested.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:attribute name="protocolHandler" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Set the java.protocol.handler.pkgs system property.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:complexType>
 
     <!--==============================================================-->

@@ -12,13 +12,19 @@
                 schemaLocation="/META-INF/mule-tcp.xsd"/>
 
     <xsd:element name="connector">
+        <xsd:annotation>
+            <xsd:documentation>
+                Connect Mule to an SSL socket, to send or receive data via the network.
+            </xsd:documentation>
+        </xsd:annotation>
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="tcp:tcpConnectorType">
                     <xsd:sequence>
-                        <xsd:element maxOccurs="1" name="ssl-client" type="mule:tlsClientKeyStoreType"/>
-                        <xsd:element maxOccurs="1" name="ssl-key-store" type="mule:tlsKeyStoreType"/>
-                        <xsd:element maxOccurs="1" name="ssl-server" type="mule:tlsServerTrustStoreType"/>
+                        <xsd:element minOccurs="0" maxOccurs="1" name="ssl-client" type="mule:tlsClientKeyStoreType"/>
+                        <xsd:element minOccurs="0" maxOccurs="1" name="ssl-key-store" type="mule:tlsKeyStoreType"/>
+                        <xsd:element minOccurs="0" maxOccurs="1" name="ssl-server" type="mule:tlsServerTrustStoreType"/>
+                        <xsd:element minOccurs="0" maxOccurs="1" name="ssl-protocol-handler" type="mule:tlsProtocolHandler"/>
                     </xsd:sequence>
                 </xsd:extension>
             </xsd:complexContent>

@@ -10,12 +10,12 @@
 
 package org.mule.umo.security.tls;
 
-import org.mule.config.i18n.Message;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.TlsDirectKeyStore;
 import org.mule.umo.security.TlsDirectTrustStore;
 import org.mule.umo.security.TlsIndirectKeyStore;
+import org.mule.umo.security.TlsProtocolHandler;
 import org.mule.umo.security.provider.AutoDiscoverySecurityProviderFactory;
 import org.mule.umo.security.provider.SecurityProviderFactory;
 import org.mule.umo.security.provider.SecurityProviderInfo;
@@ -109,7 +109,8 @@ import org.apache.commons.logging.LogFactory;
  * the "indirect" properties are supplied as "direct" values, meaning that the "indirect"
  * socket factory can be retrieved from {@link #getKeyManagerFactory()}.  It just works.</p>
  */
-public final class TlsConfiguration implements TlsDirectTrustStore, TlsDirectKeyStore, TlsIndirectKeyStore
+public final class TlsConfiguration
+        implements TlsDirectTrustStore, TlsDirectKeyStore, TlsIndirectKeyStore, TlsProtocolHandler
 {
 
     public static final String DEFAULT_KEYSTORE = ".keystore";

@@ -15,6 +15,7 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.TlsDirectKeyStore;
 import org.mule.umo.security.TlsDirectTrustStore;
 import org.mule.umo.security.TlsIndirectKeyStore;
+import org.mule.umo.security.TlsProtocolHandler;
 import org.mule.umo.security.provider.SecurityProviderFactory;
 import org.mule.umo.security.tls.TlsConfiguration;
 
@@ -33,7 +34,7 @@ import javax.net.ssl.TrustManagerFactory;
  * provide SSL enabled sockets.  All other logic is identical to TCP.
  */
 public class SslConnector extends TcpConnector
-implements TlsDirectKeyStore, TlsIndirectKeyStore, TlsDirectTrustStore
+implements TlsDirectKeyStore, TlsIndirectKeyStore, TlsDirectTrustStore, TlsProtocolHandler
 {
 
     // null initial keystore - see below

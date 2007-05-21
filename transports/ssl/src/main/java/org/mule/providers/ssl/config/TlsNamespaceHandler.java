@@ -16,7 +16,7 @@ import org.mule.providers.ssl.TlsConnector;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 /**
- * Reigsters a Bean Definition Parser for handling <code><ssl:connector></code> elements.
+ * Reigsters a Bean Definition Parser for handling <code><tls:connector></code> elements.
  */
 public class TlsNamespaceHandler extends NamespaceHandlerSupport
 {
@@ -26,6 +26,7 @@ public class TlsNamespaceHandler extends NamespaceHandlerSupport
         registerBeanDefinitionParser("tls-key-store", new CompoundElementDefinitionParser());
         registerBeanDefinitionParser("tls-client", new CompoundElementDefinitionParser());
         registerBeanDefinitionParser("tls-server", new CompoundElementDefinitionParser());
+        registerBeanDefinitionParser("tls-protocol-handler", new CompoundElementDefinitionParser());
     }
 
 }

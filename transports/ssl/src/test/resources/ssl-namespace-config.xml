@@ -22,6 +22,7 @@
                 trustStorePassword="mulepassword"
                 explicitTrustStoreOnly="true"
                 requireClientAuthentication="true"/>
+        <ssl:ssl-protocol-handler protocolHandler="foo"/>
     </ssl:connector>
 
 </beans>
