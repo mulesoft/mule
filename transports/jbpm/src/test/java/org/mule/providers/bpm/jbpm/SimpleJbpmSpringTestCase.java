@@ -10,18 +10,11 @@
 
 package org.mule.providers.bpm.jbpm;
 
-import org.mule.config.ConfigurationBuilder;
-import org.mule.extras.spring.config.SpringConfigurationBuilder;
-
 /**
  * Tests the connector against jBPM with a simple process.
  * jBPM is instantiated by Spring using the Spring jBPM module.
  */
 public class SimpleJbpmSpringTestCase extends SimpleJbpmTestCase {
-
-    protected ConfigurationBuilder getBuilder() throws Exception {
-        return new SpringConfigurationBuilder();
-    }
 
     protected String getConfigResources() {
         return "mule-jbpm-spring-config.xml";

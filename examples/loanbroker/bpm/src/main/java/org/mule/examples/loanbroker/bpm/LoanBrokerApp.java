@@ -10,9 +10,7 @@
 
 package org.mule.examples.loanbroker.bpm;
 
-import org.mule.config.ConfigurationBuilder;
 import org.mule.examples.loanbroker.AbstractLoanBrokerApp;
-import org.mule.extras.spring.config.SpringConfigurationBuilder;
 import org.mule.umo.UMOException;
 
 /**
@@ -30,10 +28,4 @@ public class LoanBrokerApp extends AbstractLoanBrokerApp
         LoanBrokerApp loanBrokerApp = new LoanBrokerApp("loan-broker-bpm-mule-config.xml");
         loanBrokerApp.run(false);
     }
-
-    protected ConfigurationBuilder getConfigBuilder() throws UMOException
-    {
-        return new SpringConfigurationBuilder();
-    }
-    
 }
