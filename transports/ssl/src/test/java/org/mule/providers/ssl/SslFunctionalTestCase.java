@@ -6,7 +6,7 @@ import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.model.UMOModel;
 import org.mule.impl.model.seda.SedaComponent;
-import org.mule.providers.tcp.integration.ResponseWriterCallback;
+import org.mule.providers.tcp.test.ResponseWriterCallback;
 
 import java.util.HashMap;
 import java.util.Map;
