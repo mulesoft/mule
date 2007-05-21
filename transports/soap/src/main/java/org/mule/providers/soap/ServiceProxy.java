@@ -38,7 +38,7 @@ public class ServiceProxy
         List ifaces = (List)component.getDescriptor().getProperties().get("serviceInterfaces");
         if (ifaces == null || ifaces.size() == 0)
         {
-            final Class implementationClass = component.getDescriptor().getImplementationClass();
+            final Class implementationClass = component.getDescriptor().getService().getClass();
             // get all implemented interfaces from superclasses as well
             final List intfList = ClassUtils.getAllInterfaces(implementationClass);
             interfaces = (Class[])intfList.toArray(new Class[intfList.size()]);

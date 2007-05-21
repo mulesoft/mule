@@ -162,7 +162,7 @@ public class JcaComponent implements UMOComponent, ManagementContextAware
         stats.setOutboundRouterStat(getDescriptor().getOutboundRouter().getStatistics());
         stats.setInboundRouterStat(getDescriptor().getInboundRouter().getStatistics());
 
-        component = descriptor.getImplementation();
+        component = descriptor.getService();
 
         initialised.set(true);
         managementContext.fireNotification(
@@ -171,7 +171,7 @@ public class JcaComponent implements UMOComponent, ManagementContextAware
 
     protected Object getDelegateComponent() throws InitialisationException
     {
-        Object impl = descriptor.getImplementation();
+        Object impl = descriptor.getService();
         Object component = null;
 
             if (impl instanceof ContainerKeyPair)
@@ -180,7 +180,7 @@ public class JcaComponent implements UMOComponent, ManagementContextAware
 
                 if (descriptor.isSingleton())
                 {
-                    descriptor.setImplementation(component);
+                    descriptor.setService(component);
                 }
             }
             else

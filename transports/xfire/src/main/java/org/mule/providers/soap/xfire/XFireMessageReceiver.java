@@ -93,7 +93,7 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
             Class exposedInterface;
 
             if (serviceInterfaces == null)
-                exposedInterface = component.getDescriptor().getImplementationClass();
+                exposedInterface = component.getDescriptor().getService().getClass();
 
             else
             {
@@ -141,11 +141,6 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
                 sync = true;
             }
             service.setInvoker(new MuleInvoker(this, sync));
-
-        }
-        catch (UMOException e)
-        {
-            throw new InitialisationException(e, this);
         }
         catch (ClassNotFoundException e)
         {

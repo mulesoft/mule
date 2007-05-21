@@ -167,7 +167,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
                 String name = "JcaComponent#" + messageEndpoint.hashCode();
                 MuleDescriptor descriptor = new MuleDescriptor(name);
                 descriptor.getInboundRouter().addEndpoint(endpoint);
-                descriptor.setImplementationInstance(messageEndpoint);
+                descriptor.setService(messageEndpoint);
                 managementContext.getRegistry().lookupModel(JcaModel.JCA_MODEL_TYPE).registerComponent(descriptor);
 
                 MuleEndpointKey key = new MuleEndpointKey(endpointFactory, (MuleActivationSpec)activationSpec);

@@ -458,7 +458,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
         if (axisDescriptor == null)
         {
             axisDescriptor = new MuleDescriptor(AXIS_SERVICE_COMPONENT_NAME);
-            axisDescriptor.setImplementation(AxisServiceComponent.class.getName());
+            axisDescriptor.setService(new AxisServiceComponent());
         }
         return axisDescriptor;
     }

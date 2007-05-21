@@ -106,7 +106,7 @@ public class EjbContainerContextTestCase extends AbstractContainerContextTestCas
         assertNotNull(container);
         container.initialise();
         UMODescriptor descriptor = getTestDescriptor("some Ejb service", EJB_NAME);
-        DummyEjbBean dummyEjbBean = (DummyEjbBean)container.getComponent(descriptor.getImplementation());
+        DummyEjbBean dummyEjbBean = (DummyEjbBean)container.getComponent(descriptor.getService());
 
         assertNotNull(dummyEjbBean);
     }

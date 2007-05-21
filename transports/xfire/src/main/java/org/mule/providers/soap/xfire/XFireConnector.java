@@ -380,7 +380,7 @@ public class XFireConnector extends AbstractConnector
         if (xfireDescriptor == null)
         {
             xfireDescriptor = new MuleDescriptor(XFIRE_SERVICE_COMPONENT_NAME + getName());
-            xfireDescriptor.setImplementation(XFireServiceComponent.class.getName());
+            xfireDescriptor.setService(new XFireServiceComponent());
         }
         return xfireDescriptor;
     }
