@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.providers.email;
+package org.mule.providers.email.connectors;
 
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.impl.MuleDescriptor;
@@ -24,6 +24,8 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.providers.email.SmtpConnector;
+import org.mule.providers.email.MailProperties;
 
 import java.util.HashMap;
 
@@ -99,14 +101,11 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
     {
         HashMap props = new HashMap();
 
-        QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
+        QuickConfigurationBuilder builder = new QuickConfigurationBuilder(false);
         managementContext.getRegistry().registerConnector(getConnector(false));
         UMOEndpoint endpoint = new MuleEndpoint(getTestEndpointURI(), false);
         builder.registerComponent(FunctionalTestComponent.class.getName(), 
             "testComponent", null, endpoint, props);
-
-        logger.debug("starting mule");
-        managementContext.start();
 
         // default transformer is string to mail message, so send string
         UMOMessage message = new MuleMessage(MESSAGE);

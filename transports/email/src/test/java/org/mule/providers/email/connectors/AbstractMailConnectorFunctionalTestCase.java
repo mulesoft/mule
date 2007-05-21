@@ -8,26 +8,19 @@
  * LICENSE.txt file.
  */
 
-package org.mule.providers.email;
+package org.mule.providers.email.connectors;
 
+import org.mule.providers.email.GreenMailUtilities;
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.umo.provider.UMOConnector;
 
-import com.icegreen.greenmail.user.GreenMailUser;
-import com.icegreen.greenmail.user.UserManager;
 import com.icegreen.greenmail.util.ServerSetup;
 import com.icegreen.greenmail.util.Servers;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
-
-import java.util.Properties;
-
 import javax.mail.Message;
-import javax.mail.Message.RecipientType;
-import javax.mail.Session;
-import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -85,17 +78,8 @@ public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractCo
 
     private void storeEmail() throws Exception
     {
-        // note that with greenmail 1.1 the Servers object is unreliable
-        // and the approach taken in their examples will not work.
-        // the following does work, but may break in a later version
-        // (there is some confusion in the greenmail code about
-        // whether users are identified by email or name alone)
-        // in which case try retrieving by EMAIL rather than USER
-        UserManager userManager = servers.getManagers().getUserManager();
-        userManager.createUser(EMAIL, USER, PASSWORD);
-        GreenMailUser bob = userManager.getUser(USER);
-        assertNotNull("Failure in greenmail - see comments in test code.", bob);
-        bob.deliver((MimeMessage) getValidMessage());
+        GreenMailUtilities.storeEmail(servers.getManagers().getUserManager(),
+                EMAIL, USER, PASSWORD, (MimeMessage) getValidMessage());
         assertEquals(1, servers.getReceivedMessages().length);
     }
     
@@ -145,9 +129,7 @@ public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractCo
     {
         if (null == message)
         {
-            message = new MimeMessage(Session.getDefaultInstance(new Properties()));
-            message.setContent(MESSAGE, "text/plain");
-            message.setRecipient(RecipientType.TO, new InternetAddress(EMAIL));
+            message = GreenMailUtilities.toMessage(MESSAGE, EMAIL);
         }
         return message;
     }
@@ -159,7 +141,7 @@ public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractCo
     
     public UMOConnector getConnector() throws Exception
     {
-        return getConnector(true);
+        return getConnector(false);
     }
     
     public abstract UMOConnector getConnector(boolean init) throws Exception;

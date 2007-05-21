@@ -8,25 +8,27 @@
  * LICENSE.txt file.
  */
 
-package org.mule.providers.email;
+package org.mule.providers.email.connectors;
 
 import org.mule.umo.provider.UMOConnector;
+import org.mule.providers.email.Pop3Connector;
 
-public class SmtpsConnectorTestCase extends SmtpConnectorTestCase
+/**
+ * Simple tests for pulling from a POP3 server.
+ */
+public class Pop3ConnectorTestCase extends AbstractReceivingMailConnectorTestCase
 {
-    
-    public SmtpsConnectorTestCase()
+
+    public Pop3ConnectorTestCase()
     {
-        super("SmtpsConnector");
+        super("Pop3Connector");
     }
     
-    // @Override
     public UMOConnector getConnector(boolean init) throws Exception
     {
-        SmtpsConnector connector = new SmtpsConnector();
+        Pop3Connector connector = new Pop3Connector();
         connector.setName(getConnectorName());
-        connector.setTrustStorePassword("password");
-        connector.setTrustStore("greenmail-truststore");
+        connector.setCheckFrequency(POLL_PERIOD_MS);
         if (init)
         {
             connector.initialise();
@@ -36,7 +38,7 @@ public class SmtpsConnectorTestCase extends SmtpConnectorTestCase
 
     public String getTestEndpointURI()
     {
-        return getSmtpsTestEndpointURI();
+        return getPop3TestEndpointURI();
     }
 
 }

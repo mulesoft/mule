@@ -7,23 +7,25 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.providers.email;
+package org.mule.providers.email.config;
 
 import org.mule.tck.FunctionalTestCase;
+import org.mule.providers.email.ImapConnector;
+import org.mule.providers.email.ImapsConnector;
 
 /**
  * TODO
  */
-public class Pop3NamespaceHandlerTestCase extends FunctionalTestCase
+public class ImapNamespaceHandlerTestCase extends FunctionalTestCase
 {
     protected String getConfigResources()
     {
-        return "pop3-namespace-config.xml";
+        return "imap-namespace-config.xml";
     }
 
     public void testConfig() throws Exception
     {
-        Pop3Connector c = (Pop3Connector)managementContext.getRegistry().lookupConnector("pop3Connector");
+        ImapConnector c = (ImapConnector)managementContext.getRegistry().lookupConnector("imapConnector");
         assertNotNull(c);
 
         assertEquals("newBackup", c.getBackupFolder());
@@ -35,12 +37,11 @@ public class Pop3NamespaceHandlerTestCase extends FunctionalTestCase
 
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());
-
     }
 
     public void testSecureConfig() throws Exception
     {
-        Pop3sConnector c = (Pop3sConnector)managementContext.getRegistry().lookupConnector("pop3sConnector");
+        ImapsConnector c = (ImapsConnector)managementContext.getRegistry().lookupConnector("imapsConnector");
         assertNotNull(c);
 
         assertEquals("newBackup", c.getBackupFolder());

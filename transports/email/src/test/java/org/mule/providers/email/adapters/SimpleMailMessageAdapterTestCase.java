@@ -8,9 +8,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.providers.email;
+package org.mule.providers.email.adapters;
 
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.providers.email.SimpleMailMessageAdapter;
 
 import java.util.List;
 import java.util.Properties;

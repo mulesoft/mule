@@ -8,17 +8,17 @@
  * LICENSE.txt file.
  */
 
-package org.mule.providers.email;
+package org.mule.providers.email.connectors;
 
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.umo.UMOEventContext;
 
+import java.util.HashMap;
+
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
-import java.util.HashMap;
 
 /**
  * Given an endpoint ({@link #getTestEndpointURI()}) this waits for up to 10 seconds,
@@ -66,13 +66,13 @@ public abstract class AbstractReceivingMailConnectorTestCase extends AbstractMai
             }
         });
 
-        QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
+        QuickConfigurationBuilder builder = new QuickConfigurationBuilder(false);
         managementContext.getRegistry().registerConnector(getConnector(false));
         builder.registerComponent(
             FunctionalTestComponent.class.getName(), "testComponent", getTestEndpointURI(), null, props);
 
-        logger.debug("starting mule");
-        managementContext.start();
+//        logger.debug("starting mule");
+//        managementContext.start();
 
         logger.debug("waiting for count down");
         assertTrue(countDown.await(WAIT_PERIOD_MS, TimeUnit.MILLISECONDS));

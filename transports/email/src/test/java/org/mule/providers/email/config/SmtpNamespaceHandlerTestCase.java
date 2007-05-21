@@ -7,9 +7,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.providers.email;
+package org.mule.providers.email.config;
 
 import org.mule.tck.FunctionalTestCase;
+import org.mule.providers.email.SmtpConnector;
+import org.mule.providers.email.SmtpsConnector;
 
 import java.util.Properties;
 

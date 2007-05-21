@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:smtps="http://www.mulesource.org/schema/mule/smtps/2.0"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 META-INF/mule.xsd
+       http://www.mulesource.org/schema/mule/smtps/2.0 META-INF/mule-smtps.xsd">
+
+    <smtps:connector name="smtpsConnector">
+        <smtps:tls-client
+                clientKeyStore="clientKeystore"
+                clientKeyStorePassword="mulepassword"/>
+        <smtps:tls-trust-store
+            trustStore="greenmail-truststore"
+            trustStorePassword="password"/>
+    </smtps:connector>
+
+    <bean name="bridge" class="org.mule.components.simple.BridgeComponent"/>
+
+    <mule:model-seda name="test">
+
+        <mule:service name="relay" implementation="bridge">
+            <mule:inbound-router>
+                <mule:endpoint address="vm://send"/>
+            </mule:inbound-router>
+            <mule:outbound-router>
+                <mule:pass-through-router>
+                    <!-- connector needed for MULE-1765 -->
+                    <mule:endpoint address="smtps://localhost:65432" connector="smtpsConnector">
+                        <mule:properties>
+                            <prop key="toAddresses">bob@example.com</prop>
+                        </mule:properties>
+                    </mule:endpoint>
+                </mule:pass-through-router>
+            </mule:outbound-router>
+        </mule:service>
+
+    </mule:model-seda>
+
+</beans>
