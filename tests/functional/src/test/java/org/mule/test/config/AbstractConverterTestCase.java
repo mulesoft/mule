@@ -11,8 +11,8 @@
 package org.mule.test.config;
 
 import org.mule.RegistryContext;
-import org.mule.config.spring.RegistryFacade;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.umo.registry.RegistryFacade;
 
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;

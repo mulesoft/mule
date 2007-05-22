@@ -13,9 +13,9 @@ import org.mule.RegistryContext;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
-import org.mule.config.spring.RegistryFacade;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
+import org.mule.umo.registry.RegistryFacade;
 import org.mule.util.StringMessageUtils;
 
 import java.util.ArrayList;

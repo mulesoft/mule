@@ -9,7 +9,6 @@
  */
 package org.mule.umo;
 
-import org.mule.config.spring.RegistryFacade;
 import org.mule.impl.Directories;
 import org.mule.impl.internal.notifications.NotificationException;
 import org.mule.impl.internal.notifications.ServerNotificationManager;
@@ -22,6 +21,7 @@ import org.mule.umo.lifecycle.UMOLifecycleManager;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.manager.UMOServerNotificationListener;
 import org.mule.umo.manager.UMOWorkManager;
+import org.mule.umo.registry.RegistryFacade;
 import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.store.UMOStore;
 import org.mule.util.queue.QueueManager;

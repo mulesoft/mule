@@ -102,7 +102,7 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
         UMODescriptor descriptor = new MuleDescriptor();
         descriptor.setExceptionListener(new DefaultExceptionStrategy());
         descriptor.setName("testComponent");
-        descriptor.setImplementation(JdbcFunctionalTestComponent.class.getName());
+        descriptor.setService(JdbcFunctionalTestComponent.class.getName());
 
         UMOEndpoint endpoint = new MuleEndpoint("testIn", getInDest(), connector, null,
             UMOEndpoint.ENDPOINT_TYPE_RECEIVER, 0, null, null);

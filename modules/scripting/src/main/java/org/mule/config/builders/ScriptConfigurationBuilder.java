@@ -17,7 +17,7 @@ import org.mule.config.ConfigurationException;
 import org.mule.config.MuleProperties;
 import org.mule.config.ReaderResource;
 import org.mule.config.builders.i18n.BuildersMessages;
-import org.mule.config.spring.TransientRegistry;
+import org.mule.impl.registry.TransientRegistry;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.util.FileUtils;

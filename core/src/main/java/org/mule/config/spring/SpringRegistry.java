@@ -14,6 +14,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.container.MultiContainerContext;
 import org.mule.impl.lifecycle.ContainerManagedLifecyclePhase;
 import org.mule.impl.lifecycle.GenericLifecycleManager;
+import org.mule.impl.registry.AbstractRegistry;
 import org.mule.registry.ServiceDescriptor;
 import org.mule.registry.ServiceDescriptorFactory;
 import org.mule.registry.ServiceException;

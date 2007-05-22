@@ -12,7 +12,7 @@
     </bean>
 
     <!-- Used to set mule object names to their corresponding bean id -->
-    <!--<bean id="muleNameProcessor" class="org.mule.config.spring.MuleObjectNameProcessor"/>-->
+    <!--<bean id="muleNameProcessor" class="org.mule.extras.spring.MuleObjectNameProcessor"/>-->
     <!--
         The system stream connector is used to send and receive information via the
         System.in and System.out. Note this connector is only really useful for testing

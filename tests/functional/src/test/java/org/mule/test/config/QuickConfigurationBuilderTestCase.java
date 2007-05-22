@@ -12,7 +12,6 @@ package org.mule.test.config;
 
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.QuickConfigurationBuilder;
-import org.mule.config.spring.RegistryFacade;
 import org.mule.impl.DefaultComponentExceptionStrategy;
 import org.mule.impl.model.seda.SedaModel;
 import org.mule.management.agents.JmxAgent;
@@ -39,6 +38,7 @@ import org.mule.umo.UMODescriptor;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.manager.UMOAgent;
 import org.mule.umo.model.UMOModel;
+import org.mule.umo.registry.RegistryFacade;
 import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.routing.UMONestedRouterCollection;
 import org.mule.umo.routing.UMOResponseRouterCollection;

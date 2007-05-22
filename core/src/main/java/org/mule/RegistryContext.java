@@ -10,7 +10,7 @@
 package org.mule;
 
 import org.mule.config.MuleConfiguration;
-import org.mule.config.spring.RegistryFacade;
+import org.mule.umo.registry.RegistryFacade;
 
 /**
  * TODO

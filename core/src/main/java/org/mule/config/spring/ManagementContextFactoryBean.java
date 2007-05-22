@@ -17,6 +17,7 @@ import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.UMOLifecycleManager;
 import org.mule.umo.manager.UMOTransactionManagerFactory;
 import org.mule.umo.manager.UMOWorkManager;
+import org.mule.umo.registry.RegistryFacade;
 import org.mule.umo.security.UMOSecurityManager;
 import org.mule.util.ClassUtils;
 import org.mule.util.queue.QueueManager;

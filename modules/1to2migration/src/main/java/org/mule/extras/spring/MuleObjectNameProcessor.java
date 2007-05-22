@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config.spring;
+package org.mule.extras.spring;
 
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.umo.UMODescriptor;

@@ -10,11 +10,11 @@
 package org.mule.impl.lifecycle;
 
 import org.mule.config.i18n.CoreMessages;
-import org.mule.config.spring.RegistryFacade;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.lifecycle.UMOLifecyclePhase;
+import org.mule.umo.registry.RegistryFacade;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringMessageUtils;
 

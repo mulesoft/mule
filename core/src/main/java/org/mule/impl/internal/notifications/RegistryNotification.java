@@ -10,8 +10,8 @@
 
 package org.mule.impl.internal.notifications;
 
-import org.mule.config.spring.RegistryFacade;
 import org.mule.umo.manager.UMOServerNotification;
+import org.mule.umo.registry.RegistryFacade;
 
 /**
  * <code>RegistyNotification</code> is fired when an event such as an object being

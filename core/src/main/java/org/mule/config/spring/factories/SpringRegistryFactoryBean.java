@@ -10,9 +10,9 @@
 package org.mule.config.spring.factories;
 
 import org.mule.RegistryContext;
-import org.mule.config.spring.RegistryFacade;
 import org.mule.config.spring.SpringRegistry;
-import org.mule.config.spring.TransientRegistry;
+import org.mule.impl.registry.TransientRegistry;
+import org.mule.umo.registry.RegistryFacade;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.AbstractFactoryBean;

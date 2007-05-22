@@ -11,12 +11,12 @@
 package org.mule.test.integration.config;
 
 import org.mule.config.builders.QuickConfigurationBuilder;
-import org.mule.config.spring.RegistryFacade;
 import org.mule.impl.container.ContainerKeyPair;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
+import org.mule.umo.registry.RegistryFacade;
 
 /**
  * Tests Deploying and referencing components from two different spring container
