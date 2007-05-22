@@ -33,19 +33,19 @@
 
     <bean id="reply" class="org.mule.tck.functional.FunctionalTestComponent">
         <property name="eventCallback">
-            <bean class="org.mule.providers.tcp.integration.ResponseWriterCallback"/>
+            <bean class="org.mule.tck.functional.ResponseWriterCallback"/>
         </property>
     </bean>
 
     <bean id="countAndReply" class="org.mule.tck.functional.FunctionalTestComponent">
         <property name="eventCallback">
-            <bean class="org.mule.providers.tcp.integration.ResponseWriterCallback"/>
+            <bean class="org.mule.tck.functional.ResponseWriterCallback"/>
         </property>
     </bean>
 
     <bean id="asynchronous" class="org.mule.tck.functional.FunctionalTestComponent">
         <property name="eventCallback">
-            <bean class="org.mule.providers.tcp.integration.ResponseWriterCallback"/>
+            <bean class="org.mule.tck.functional.ResponseWriterCallback"/>
         </property>
     </bean>
 

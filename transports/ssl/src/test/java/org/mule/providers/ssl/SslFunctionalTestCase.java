@@ -3,10 +3,10 @@ package org.mule.providers.ssl;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.functional.ResponseWriterCallback;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.model.UMOModel;
 import org.mule.impl.model.seda.SedaComponent;
-import org.mule.providers.tcp.test.ResponseWriterCallback;
 
 import java.util.HashMap;
 import java.util.Map;

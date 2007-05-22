@@ -42,12 +42,6 @@
     </build>    
 
     <dependencies>
-        <!-- Needed for org.mule.providers.tcp.test.ResponseWriterCallback -->
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-functional</artifactId>
-            <version>${version}</version>
-        </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>
