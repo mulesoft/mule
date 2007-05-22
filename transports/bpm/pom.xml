@@ -9,7 +9,7 @@
         <version>2.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-bpm</artifactId>
-    <packaging>bundle</packaging>
+    <!--<packaging>bundle</packaging>-->
     <name>BPM Transport</name>
     <description>Allows Mule events to initiate and/or advance processes in an external or embedded Business Process Management System (BPMS). It also allows executing processes to generate Mule events.</description>
 
@@ -21,8 +21,7 @@
                 <configuration>
                     <instructions>
                         <Export-Package>
-                            org.mule.providers.bpm.*,
-                            org.jbpm.*
+                            org.mule.providers.bpm.*
                         </Export-Package>
                     </instructions>
                 </configuration>
@@ -31,144 +30,6 @@
     </build>
 
     <dependencies>
-        <!-- Only used if allowGlobalDispatcher = true -->
-        <dependency>
-            <groupId>org.jbpm</groupId>
-            <artifactId>jbpm</artifactId>
-            <version>3.1.4</version>
-        </dependency>
-        <!-- This is the same as spring-modules-jbpm31 but we override the pom in our local 
-            dependencies repo because the one from Spring includes the kitchen sink. -->
-        <dependency>
-            <groupId>org.springmodules</groupId>
-            <artifactId>spring-modules-jbpm31-nodeps</artifactId>
-            <version>0.8a</version>
-            <!-- Exclude older Spring version -->
-            <exclusions>
-                <!--
-                <exclusion>
-                    <groupId>commons-collections</groupId>
-                    <artifactId>commons-collections</artifactId>
-                </exclusion>
-                -->
-                <exclusion>
-                    <groupId>jboss</groupId>
-                    <artifactId>jbpm</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-beans</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-context</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-dao</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-support</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-orm</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-hibernate</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-jdbc</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-aop</artifactId>
-                </exclusion>
-                <!-- Provided by OSGi -->
-                <exclusion>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <!-- Only needed if using jBpm's built-in identity management
-        <dependency>
-            <groupId>org.jbpm</groupId>
-            <artifactId>jbpm-identity</artifactId>
-            <version>3.1.4</version>
-        </dependency>
-        -->
-        <!-- Only needed for scripting in jBpm -->
-        <dependency>
-            <groupId>bsh</groupId>
-            <artifactId>bsh</artifactId>
-            <version>1.3.0</version>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- Hibernate --> 
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate</artifactId>
-            <version>3.1.3</version>
-            <exclusions>
-                <!-- We need commons-collections 3.2 -->
-                <exclusion>
-                    <groupId>commons-collections</groupId>
-                    <artifactId>commons-collections</artifactId>
-                </exclusion>
-                <!-- we like slf4j -->
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-                <!-- We've already got the geronimo-jta spec -->
-                <exclusion>
-                    <groupId>javax.transaction</groupId>
-                    <artifactId>jta</artifactId>
-                </exclusion>
-                <!-- Use the combined cglib-nodep instead of separate cglib and asm dependencies -->
-                <exclusion>
-                    <groupId>cglib</groupId>
-                    <artifactId>cglib</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>asm</groupId>
-                    <artifactId>asm</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>asm</groupId>
-                    <artifactId>asm-attrs</artifactId>
-                </exclusion>
-            </exclusions>    
-        </dependency>
-        <!-- Use the combined cglib-nodep instead of separate cglib and asm dependencies -->
-        <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib-nodep</artifactId>
-            <version>2.1_3</version>
-        </dependency>
-        
-        <!-- Used to pool connections in Hibernate -->
-        <dependency>
-            <groupId>c3p0</groupId>
-            <artifactId>c3p0</artifactId>
-            <version>0.9.0.4</version>
-        </dependency>
-        <dependency>
-            <groupId>hsqldb</groupId>
-            <artifactId>hsqldb</artifactId>
-            <version>1.8.0.7</version>
-            <scope>test</scope>
-        </dependency>
-
         <!-- Only used if allowGlobalDispatcher = true -->
         <dependency>
             <groupId>org.mule.modules</groupId>
@@ -180,10 +41,6 @@
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
             <version>${version}</version>
-            <!-- TODO Change this back to scope=test once
-                LocalJbpmConfigurationFactoryBeanWorkaround 
-                is no longer needed in src/main/java -->
-            <!-- <scope>test</scope> -->
         </dependency>
     </dependencies>
 </project>
