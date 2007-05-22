@@ -21,10 +21,10 @@ import org.mule.util.NumberUtils;
  * processes its response.
  * jBPM is instantiated by Spring using the Spring jBPM module.
  */
-public class MessagingJbpmSpringTestCase extends AbstractBpmTestCase {
+public class MessagingJbpmTestCase extends AbstractBpmTestCase {
 
     protected String getConfigResources() {
-        return "mule-jbpm-spring-config.xml";
+        return "jbpm-functional-test.xml";
     }
 
     public void testSendMessageProcess() throws Exception {

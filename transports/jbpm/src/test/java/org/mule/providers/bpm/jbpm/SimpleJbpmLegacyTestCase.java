@@ -14,9 +14,9 @@ package org.mule.providers.bpm.jbpm;
  * Tests the connector against jBPM with a simple process.
  * jBPM is instantiated by Spring using the Spring jBPM module.
  */
-public class SimpleJbpmSpringTestCase extends SimpleJbpmTestCase {
+public class SimpleJbpmLegacyTestCase extends SimpleJbpmTestCase {
 
     protected String getConfigResources() {
-        return "mule-jbpm-spring-config.xml";
+        return "jbpm-functional-legacy-test.xml";
     }
 }

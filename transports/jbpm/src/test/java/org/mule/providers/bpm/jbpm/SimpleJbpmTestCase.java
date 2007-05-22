@@ -23,7 +23,7 @@ import org.mule.util.NumberUtils;
 public class SimpleJbpmTestCase extends AbstractBpmTestCase {
 
     protected String getConfigResources() {
-        return "mule-jbpm-config.xml";
+        return "jbpm-functional-test.xml";
     }
 
     public void testSimpleProcess() throws Exception {

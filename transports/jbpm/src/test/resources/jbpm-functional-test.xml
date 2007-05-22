@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:bpm="http://www.mulesource.org/schema/mule/bpm/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 META-INF/mule.xsd
+       http://www.mulesource.org/schema/mule/bpm/2.0 META-INF/mule-bpm.xsd">
+
+    <bpm:connector name="bpmConnector" bpms-ref="jbpm"/>
+
+    <mule:model-seda name="processModel">
+        <mule:service name="fromSimpleProcess" service-ref="logger">
+            <mule:inbound-router>
+                <mule:endpoint address="bpm://simple" />
+            </mule:inbound-router>
+        </mule:service>
+
+        <mule:service name="fromMessageProcess" service-ref="logger">
+            <mule:inbound-router>
+                <mule:endpoint address="bpm://message" />
+            </mule:inbound-router>
+            <mule:outbound-router>
+                <mule:pass-through-router>
+                	<mule:endpoint address="vm://echo"/>
+                </mule:pass-through-router>
+            </mule:outbound-router>
+        </mule:service>
+
+        <mule:service name="echoService" service-ref="echo">
+            <mule:inbound-router>
+                <mule:endpoint address="vm://echo" />
+            </mule:inbound-router>
+        </mule:service>
+    </mule:model-seda>
+    
+    <bean id="logger" class="org.mule.components.simple.LogComponent" scope="prototype"/>
+
+    <bean id="echo" class="org.mule.components.simple.EchoComponent" scope="prototype"/>
+
+    <!-- ***************************************************
+         BPMS Configuration
+         *************************************************** -->
+         
+    <!-- BPMS object for Mule's BPM Connector -->
+    <bean id="jbpm" class="org.mule.providers.bpm.jbpm.Jbpm" destroy-method="destroy">
+        <property name="jbpmConfiguration">
+            <ref local="jbpmConfig" />
+        </property>
+    </bean>
+
+    <!-- jBPM Configuration -->
+    <bean id="jbpmConfig" class="org.springmodules.workflow.jbpm31.LocalJbpmConfigurationFactoryBeanWorkaround">
+        <property name="sessionFactory">
+            <ref local="jbpmSessionFactory"/>
+        </property>
+        <property name="configuration">
+            <value>jbpm.cfg.xml</value>
+        </property>
+        <property name="createSchema"><value>false</value></property>
+    </bean>
+
+    <!-- JBPM Hibernate SessionFactory -->
+    <bean id="jbpmSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+        <property name="dataSource">
+            <ref local="jbpmDataSource" />
+        </property>
+        <property name="mappingLocations">
+            <value>classpath*:/org/jbpm/**/*.hbm.xml</value>
+        </property>
+        <property name="typeDefinitions">
+            <ref local="jbpmTypes" />
+        </property>
+        <property name="hibernateProperties">
+            <props>
+                <!-- These properties may depend on your database -->
+                <prop key="hibernate.dialect">org.hibernate.dialect.HSQLDialect</prop>
+                <prop key="hibernate.query.substitutions">true 1, false 0</prop>
+                <prop key="hibernate.jdbc.batch_size">0</prop>
+                <!-- Create/update the database tables automatically when the JVM starts up -->
+                <prop key="hibernate.hbm2ddl.auto">update</prop>
+                <!-- EhCache is no longer the default cache provider as of Hibernate 3.2 
+                  Refer to http://www.hibernate.org/hib_docs/v3/reference/en/html/performance.html
+                  for Hibernate's different cache providers. -->
+                <prop key="hibernate.cache.provider_class">org.hibernate.cache.HashtableCacheProvider</prop>
+                <!-- C3P0 (connection pooling) properties -->
+                <prop key="hibernate.c3p0.min_size">1</prop>
+                <prop key="hibernate.c3p0.max_size">3</prop>
+                <!-- Write SQL statements to log -->
+                <prop key="hibernate.show_sql">false</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!-- JBPM Datasource -->
+    <bean id="jbpmDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName"><value>org.hsqldb.jdbcDriver</value></property>
+        <property name="url"><value>jdbc:hsqldb:mem:.;sql.enforce_strict_size=true</value></property>
+        <property name="username"><value>sa</value></property>
+        <property name="password"><value></value></property>
+    </bean>
+
+    <!-- JBPM data types -->
+    <bean id="jbpmTypes" class="org.springframework.orm.hibernate3.TypeDefinitionBean">
+        <property name="typeName"><value>string_max</value></property>
+        <property name="typeClass"><value>org.jbpm.db.hibernate.StringMax</value></property>
+    </bean>
+</beans>
