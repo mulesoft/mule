@@ -21,7 +21,7 @@ public class ObjectRefsFromSpringTestCase extends AbstractMuleTestCase
 
     protected String getConfigResources()
     {
-        return "org/mule/test/spring/test-refs-from-spring.xml";
+        return "test-refs-from-spring.xml";
     }
 
 

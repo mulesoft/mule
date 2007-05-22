@@ -46,6 +46,11 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-1to2migration</artifactId>
+            <version>${version}</version>
+        </dependency>
     </dependencies>
 
 </project>

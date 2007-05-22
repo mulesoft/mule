@@ -8,7 +8,7 @@
     <!--
         Define a Spring context and we can have our POJOs come from there
         -->
-    <container-context className='org.mule.config.spring.SpringContainerContext'>
+    <container-context className='org.mule.extras.spring.SpringContainerContext'>
         <properties>
             <property name='configFile' value='remoting-applicationContext.xml'/>
         </properties>

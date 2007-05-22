@@ -22,7 +22,7 @@ public class EmbeddedBeansXmlTestCase extends AbstractMuleTestCase
 
     protected String getConfigResources()
     {
-        return "org/mule/test/spring/test-embedded-spring-config.xml";
+        return "test-embedded-spring-config.xml";
     }
 
 

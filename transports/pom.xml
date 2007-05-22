@@ -63,73 +63,16 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Note: Ideally, the following list of libraries should be in the Mule project's top-level
-            POM, but Maven has visibility problems when dependencies are more than 2 levels away, so
-            this list is repeated in core/pom.xml, modules/pom.xml, transports/pom.xml, examples/pom.xml -->
-
-        <!-- The following libraries are provided by the mule-module-util bundle -->
-        <!--<dependency>-->
-            <!--<groupId>backport-util-concurrent</groupId>-->
-            <!--<artifactId>backport-util-concurrent</artifactId>-->
-            <!--<version>3.0</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>commons-beanutils</groupId>-->
-            <!--<artifactId>commons-beanutils</artifactId>-->
-            <!--<version>1.7.0</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>commons-collections</groupId>-->
-            <!--<artifactId>commons-collections</artifactId>-->
-            <!--<version>3.2</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>commons-io</groupId>-->
-            <!--<artifactId>commons-io</artifactId>-->
-            <!--<version>1.2</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>commons-lang</groupId>-->
-            <!--<artifactId>commons-lang</artifactId>-->
-            <!--<version>2.2</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>commons-logging</groupId>-->
-            <!--<artifactId>commons-logging</artifactId>-->
-            <!--<version>1.0.4</version>-->
-        <!--</dependency>-->
-        <!-- Used by mules default component pooling mechanism -->
-        <!--<dependency>-->
-            <!--<groupId>commons-pool</groupId>-->
-            <!--<artifactId>commons-pool</artifactId>-->
-            <!--<version>1.3</version>-->
-        <!--</dependency>-->
-        <!-- UMOMesage attachment support; not needed for JDK 6 -->
-        <!--<dependency>-->
-            <!--<groupId>javax.activation</groupId>-->
-            <!--<artifactId>activation</artifactId>-->
-            <!--<version>1.1</version>-->
-            <!--<scope>provided</scope>-->
-        <!--</dependency>-->
-        <!-- Used for the WorkManager API & for the Mule RA -->
-        <!--<dependency>-->
-            <!--<groupId>org.apache.geronimo.specs</groupId>-->
-            <!--<artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>-->
-            <!--<version>1.0.1</version>-->
-        <!--</dependency>-->
-        <!-- Used for XA Transactions -->
-        <!--<dependency>-->
-            <!--<groupId>org.apache.geronimo.specs</groupId>-->
-            <!--<artifactId>geronimo-jta_1.0.1B_spec</artifactId>-->
-            <!--<version>1.0.1</version>-->
-        <!--</dependency>-->
-        <!-- Unit tests -->
-        <!--<dependency>-->
-            <!--<groupId>junit</groupId>-->
-            <!--<artifactId>junit</artifactId>-->
-            <!--<version>3.8.2</version>-->
-            <!--<scope>test</scope>-->
-        <!--</dependency>-->
+        <!-- This is required if the Tests use Mule 1.x configuration format
+             over tie we may revome this dependency, but I think its a good idea
+             to maintain backward compatability until Mule 3.0
+         -->
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-1to2migration</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <profiles>

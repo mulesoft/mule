@@ -10,7 +10,6 @@
 
 package org.mule.extras.spring;
 
-import org.mule.config.spring.SpringContainerContext;
 import org.mule.tck.model.AbstractContainerContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.umo.manager.ObjectNotFoundException;
@@ -38,7 +37,7 @@ public class SpringContainerContextTestCase extends AbstractContainerContextTest
     protected void doSetUp() throws Exception
     {
         context = new SpringContainerContext();
-        context.setConfigFile("../../../../../../../../../tests/functional/src/test/resources/org/mule/test/spring/test-application-context.xml");
+        context.setConfigFile("test-application-context.xml");
     }
 
     public void testContainerContext() throws Exception

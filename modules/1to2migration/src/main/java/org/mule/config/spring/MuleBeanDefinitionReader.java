@@ -52,7 +52,7 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
     protected static transient final Log logger = LogFactory.getLog(MuleBeanDefinitionReader.class);
 
     private static final String XML_UTILS_CLASS = "org.mule.util.XMLUtils";
-    
+
     private int contextCount = 0;
     private int configCount = 0;
     private MuleDtdResolver dtdResolver = null;
@@ -158,8 +158,8 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
 
     protected void printResult(DOMResult result)
     {
-        // Since mule-module-xml isn't (and can't be) a dependency of mule-core, we don't know 
-        // whether we have it on the classpath or not.  
+        // Since mule-module-xml isn't (and can't be) a dependency of mule-core, we don't know
+        // whether we have it on the classpath or not.
         try
         {
             Class xmlUtils = ClassUtils.loadClass(XML_UTILS_CLASS, getClass());
@@ -176,7 +176,7 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
             logger.warn("Unable to dynamically invoke the XMLUtils.toXml() method", e);
         }
     }
-    
+
     protected Source createXslSource() throws IOException
     {
         return new StreamSource(getXslResource().getInputStream(), getXslResource().getURL().toString());

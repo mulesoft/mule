@@ -12,6 +12,7 @@ package org.mule.config.spring;
 
 import org.mule.config.MuleProperties;
 import org.mule.umo.UMOManagementContext;
+import org.mule.util.ClassUtils;
 
 import java.io.IOException;
 
@@ -31,6 +32,8 @@ import org.springframework.context.support.AbstractXmlApplicationContext;
  */
 public class MuleApplicationContext extends AbstractXmlApplicationContext
 {
+    public static final String LEGACY_BEAN_READER_CLASS = "org.mule.config.spring.MuleBeanDefinitionReader";
+
     private final String[] configLocations;
 
 
@@ -67,7 +70,27 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
 
     protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException
     {
-        XmlBeanDefinitionReader beanDefinitionReader = new MuleBeanDefinitionReader(beanFactory, configLocations.length);
+        XmlBeanDefinitionReader beanDefinitionReader = null;
+
+        //If the migration module is on the classpath, lets use the MuleBeanDefinitionReader, that allws use
+        //to process Mule 1.x configuration as well as Mule 2.x.
+        if(ClassUtils.isClassOnPath(LEGACY_BEAN_READER_CLASS, getClass()))
+        {
+            try
+            {
+                beanDefinitionReader = (XmlBeanDefinitionReader)ClassUtils.instanciateClass(
+                        LEGACY_BEAN_READER_CLASS, new Object[]{beanFactory, configLocations});
+            }
+            catch (Exception e)
+            {
+                //TODO
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+        }
+        else
+        {
+            beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
+        }
         //hook in our customheirarchical reader
         beanDefinitionReader.setDocumentReaderClass(MuleBeanDefinitionDocumentReader.class);
 

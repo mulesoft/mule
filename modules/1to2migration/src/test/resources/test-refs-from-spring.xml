@@ -7,7 +7,7 @@
 
     <mule-environment-properties serverUrl=""/>
     
-    <container-context className="org.mule.config.spring.SpringContainerContext">
+    <container-context className="org.mule.extras.spring.SpringContainerContext">
         <properties>
             <property name="configFile" value="refs-application-context.xml"/>
         </properties>

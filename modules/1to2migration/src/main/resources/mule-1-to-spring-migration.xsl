@@ -15,18 +15,33 @@
     <xsl:template match="mule-configuration">
         <beans default-init-method="initialise" default-destroy-method="dispose">
             <xsl:if test="$firstContext">
+
                 <bean name="_mulePropertyPlaceholderProcessor"
-                      class="org.mule.config.spring.processors.PropertyPlaceholderProcessor"
-                      depends-on="_muleRegistry"/>
+                      class="org.mule.config.spring.processors.PropertyPlaceholderProcessor" depends-on="_muleRegistry">
+                    <property name="factories">
+                        <map>
+                            <entry key="hostname">
+                                <bean class="org.mule.config.factories.HostNameFactory"/>
+                            </entry>
+                        </map>
+                    </property>
+                </bean>
 
-                <!--<bean id="_muleManagementContext"-->
-                <!--class="org.mule.config.spring.LegacyManagementContextFactoryBean"/>-->
-                <!--<bean id="_muleNameProcessor" class="org.mule.config.spring.MuleObjectNameProcessor"/>-->
-                <!--<bean id="_muleRegistry" class="org.mule.config.spring.SpringRegistry"/>-->
-
+                <bean id="customEditorConfigurer"
+                      class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+                    <property name="customEditors">
+                        <map>
+                            <entry key="org.mule.umo.transformer.UMOTransformer">
+                                <bean class="org.mule.config.spring.editors.TransformerPropertyEditor"/>
+                            </entry>
+                            <entry key="org.mule.umo.provider.UMOConnector">
+                                <bean class="org.mule.config.spring.editors.ConnectorPropertyEditor"/>
+                            </entry>
+                        </map>
+                    </property>
+                </bean>
             </xsl:if>
             <xsl:apply-templates/>
-            <!--<bean id="_muleManagementContextProcessor" class="org.mule.config.spring.ManagementContextPostProcessor"/>-->
         </beans>
     </xsl:template>
 
@@ -43,35 +58,35 @@
             <xsl:if test="@model">
 
                 <xsl:variable name="err"
-                              select="helper:reportWarning('The @model attribute is no longer supported on the [mule-configuration] element, since Mule now supports multiple models.')"/>
+                              select="helper:modelAttributeNotSupported()"/>
             </xsl:if>
 
             <xsl:if test="@recoverableMode">
                 <xsl:variable name="err"
-                              select="helper:reportWarning('The @recoverableMode attribute is no longer supported on the [mule-configuration] element.')"/>
+                              select="helper:recoverableModeNotSupported()"/>
             </xsl:if>
             <xsl:if test="@clientMode">
                 <xsl:variable name="err"
-                              select="helper:reportWarning('The @clientMode attribute can no longer be set by the user on the [mule-configuration] element.')"/>
+                              select="helper:clientModeNotSupported()"/>
             </xsl:if>
             <xsl:if test="@embedded">
                 <xsl:variable name="err"
-                              select="helper:reportWarning('The @embedded attribute can no longer be set by the user on the [mule-configuration] element.')"/>
+                              select="helper:embeddedModeNotSupported()"/>
             </xsl:if>
             <xsl:if test="@serverUrl">
                 <xsl:if test="string-length(@serverUrl) = 0">
                     <xsl:variable name="err"
-                                  select="helper:reportWarning('The @serverUrl attribute is no longer supported on the [mule-configuration] element. However, the value is set to @serverUrl= . This means that the AdminAgent is not run and is the default for Mule 2.0.')"/>
+                                  select="helper:blankServerUrl()"/>
                 </xsl:if>
                 <xsl:if test="string-length(@serverUrl) != 0">
                     <xsl:variable name="err"
-                                  select="helper:reportError('The @serverUrl attribute is no longer supported on the [mule-configuration] element. To enable the Mule Admin agent you need to configure the agent like all other agents. For mor information see http://muledocs.org/Mule+Management+Agent')"/>
+                                  select="helper:serverUrlNotSupported()"/>
                 </xsl:if>
             </xsl:if>
 
             <xsl:if test="@enableMessageEvents">
                 <xsl:variable name="err"
-                              select="helper:reportError('The @enableMessageEvents attribute is no longer supported on the [mule-configuration] element. To enable the Message Notification events see http://muledocs.org/Server+Notifications')"/>
+                              select="helper:enableMessageEventsNotSupported()"/>
             </xsl:if>
             <xsl:if test="@synchronous">
                 <property name="defaultSynchronousEndpoints">
@@ -139,7 +154,8 @@
     <!--</xsl:template>-->
 
     <xsl:template match="@ref">
-        <xsl:variable name="err" select="helper:reportError('The @ref attribute is no longer supported on legacy Xml configurations when using Mule 2.0')"/>
+        <xsl:variable name="err"
+                      select="helper:refAttributeNotSupported()"/>
 
     </xsl:template>
 
@@ -230,14 +246,15 @@
 
     <xsl:template match="container-context">
         <xsl:choose>
-            <xsl:when test="@className='org.mule.extras.spring.SpringContainerContext' or @className='org.mule.config.spring.SpringContainerContext'">
+            <xsl:when
+                    test="@className='org.mule.extras.spring.SpringContainerContext' or @className='org.mule.config.spring.SpringContainerContext'">
                 <xsl:choose>
                     <xsl:when test="properties/property/@name='configFile'">
                         <import resource="{properties/property/@value}"/>
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:variable name="err"
-                                      select="helper:reportError('Using embedded Spring Xml as text inside your Mule Xml file is no longer supported since you can declare your beens directly in the configuration with Mule 2.0. Either move your bean configurations to an external file or switch to Mule 2.0 Xml configuration')"/>
+                                      select="helper:cannotEmbedSpringXml()"/>
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:when>
@@ -245,7 +262,7 @@
                 <xsl:choose>
                     <xsl:when test="@className='org.mule.impl.container.JndiContainerContext'">
                         <xsl:variable name="err"
-                                      select="helper:reportError('The Jndi [cotainer-context] is no longer supported in Mule 2.0. Instead declare a JnidRegistry in your configuration.')"/>
+                                      select="helper:jndiContainerContextNotSupported()"/>
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:element name="bean">
@@ -271,7 +288,7 @@
 
     <xsl:template match="endpoint-identifier">
         <xsl:variable name="err"
-                      select="helper:reportError('[endpoint-identifier] elements are no longer supported in Mule 2.0.  Instead you need to use standard top-level endpoint elements (In Mule 1.x [global-endpoint] elements) ad use endpoint-ref elements in your service configuration. For more information see http://muledocs.org/Endpoints')"/>
+                      select="helper:endpointIdentifiersNotSupported()"/>
         <!--<xsl:element name="bean">-->
         <!--<xsl:attribute name="name"><xsl:value-of select="@name"/></xsl:attribute>-->
         <!--<xsl:attribute name="class">org.mule.impl.endpoint.MuleEndpoint</xsl:attribute>-->
@@ -381,12 +398,12 @@
 
     <xsl:template match="interceptor-stack">
         <xsl:variable name="err"
-                      select="helper:reportError('[interceptor] and [interceptor-stack] elements are no longer supported in Mule 2.0.  Instead we recommend you use Spring AOP to inject additional behaviour around your services. For more information see http://muledocs.org/Interceptors')"/>
+                      select="helper:interceptorsNotSupported()"/>
     </xsl:template>
 
     <xsl:template match="interceptor">
         <xsl:variable name="err"
-                      select="helper:reportError('[interceptor] and [interceptor-stack] elements are no longer supported in Mule 2.0.  Instead we recommend you use Spring AOP to inject additional behaviour around your services. For more information see http://muledocs.org/Interceptors')"/>
+                      select="helper:interceptorsNotSupported()"/>
     </xsl:template>
 
     <xsl:template match="model[@type='inherited']">
@@ -401,7 +418,7 @@
 
     <xsl:template match="model">
         <xsl:apply-templates select="@ref"/>
-        
+
         <xsl:variable name="type">
             <xsl:value-of select="@type"/>
         </xsl:variable>
@@ -486,18 +503,18 @@
                 <xsl:otherwise>org.mule.impl.MuleDescriptor</xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
-        <xsl:variable name="implClass">
-            <xsl:value-of select="@implementation"/>
-        </xsl:variable>
-        <bean name="{$name}" class="{$type}" depends-on="{$currentModel},{$name}-impl" destroy-method="dispose">
-            <property name="service">
-                <value><xsl:value-of select="$name"/>-impl</value>
+        <bean name="{$name}" class="{$type}" depends-on="{$currentModel}"
+              destroy-method="dispose">
+            <property name="implementation">
+                <value>
+                    <xsl:value-of select="@implementation"/>
+                </value>
             </property>
 
             <property name="modelName" value="{$currentModel}"/>
             <xsl:if test="@containerManaged">
                 <xsl:variable name="err"
-                              select="helper:reportError('The @containerManaged attribute is no longer supported')"/>
+                              select="helper:containerManagedAttributeNotSupported()"/>
                 <property name="containerManaged">
                     <value>
                         <xsl:value-of select="@containerManaged"/>
@@ -512,43 +529,31 @@
                 </property>
             </xsl:if>
             <xsl:if test="@container">
-                <xsl:choose>
-                    <xsl:when test="@container='descriptor'">
                         <xsl:variable name="err"
-                                      select="helper:reportError('The @container attribute can no longer be set to _descriptor_. You need to use either a class name or container reference')"/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <property name="container">
-                            <value>
-                                <xsl:value-of select="@container"/>
-                            </value>
-                        </property>
-                    </xsl:otherwise>
-
-                </xsl:choose>
+                                      select="helper:containerAttributeNotSupported()"/>
             </xsl:if>
 
             <xsl:if test="@inboundEndpoint">
                 <xsl:variable name="err"
-                              select="helper:reportError('The @inboundEndpoint attribute is no longer supported on service descriptors, Use [endpoint] elements within the [inbound-router] instead.')"/>
+                              select="helper:inboundEndpointAttributeNotSupported()"/>
             </xsl:if>
             <xsl:if test="@inboundTransformer">
                 <xsl:variable name="err"
-                              select="helper:reportError('The @inboundtransformer attribute is no longer supported on service descriptors, Configure the transformer on the [endpoints] within the [inbound-router] instead.')"/>
+                              select="helper:inboundTransformerAttributeNotSupported()"/>
             </xsl:if>
 
             <xsl:if test="@outboundEndpoint">
                 <xsl:variable name="err"
-                              select="helper:reportError('The @outboundEndpoint attribute is no longer supported on service descriptors, Use [endpoint] elements within the [outbound-router] instead.')"/>
+                              select="helper:outboundEndpointAttributeNotSupported()"/>
             </xsl:if>
             <xsl:if test="@outboundTransformer">
                 <xsl:variable name="err"
-                              select="helper:reportError('The @outboundtransformer attribute is no longer supported on service descriptors, Configure the transformer on the [endpoint] within the [outbound-router] instead.')"/>
+                              select="helper:outboundTransformerAttributeNotSupported()"/>
             </xsl:if>
 
             <xsl:if test="@responseTransformer">
                 <xsl:variable name="err"
-                              select="helper:reportError('The @responseTransformer attribute is no longer supported on service descriptors, Configure the @responseTransformer attribute on the [endpoint] elements themselves.')"/>
+                              select="helper:responseTransformerAttributeNotSupported()"/>
             </xsl:if>
 
             <xsl:apply-templates select="properties" mode="asMap"/>
@@ -563,9 +568,6 @@
             <xsl:apply-templates select="pooling-profile" mode="deprecated"/>
             <xsl:apply-templates select="bean" mode="asProperty"/>
         </bean>
-
-		<!-- The backing service bean. -->
-        <bean name="{$name}-impl" class="{$implClass}" singleton="false"/>
     </xsl:template>
 
 
@@ -878,12 +880,12 @@
 
     <xsl:template match="queue-profile" mode="deprecated">
         <xsl:variable name="err"
-                      select="helper:reportError('[queue-profile] elements are no longer supported within the mule-configuration or on non-seda service objects in Mule 2.0. For more information see http://muledocs.org/Seda+Model')"/>
+                      select="helper:queueProfileElementNotSupportedInMuleConfiguration()"/>
     </xsl:template>
 
     <xsl:template match="pooling-profile" mode="deprecated">
         <xsl:variable name="err"
-                      select="helper:reportError('[pooling-profile] elements are no longer supported within the mule-configuration or on non-seda service objects in Mule 2.0. For more information see http://muledocs.org/Seda+Model')"/>
+                      select="helper:poolingProfileElementNotSupportedInMuleConfiguration()"/>
     </xsl:template>
 
     <!-- security templates -->
@@ -964,7 +966,7 @@
 
     <xsl:template match="persistence-strategy" mode="deprecated">
         <xsl:variable name="err"
-                      select="helper:reportError('[persistence-strategy] elements are no longer supported within the mule-configuration in Mule 2.0. For more information see http://muledocs.org/Persistence')"/>
+                      select="helper:persistenceElementNotSupported()"/>
     </xsl:template>
 
     <xsl:template match="@connector">

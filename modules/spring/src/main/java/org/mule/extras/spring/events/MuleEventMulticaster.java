@@ -15,7 +15,6 @@ import org.mule.RegistryContext;
 import org.mule.config.MuleProperties;
 import org.mule.config.ThreadingProfile;
 import org.mule.config.builders.QuickConfigurationBuilder;
-import org.mule.config.spring.SpringContainerContext;
 import org.mule.extras.spring.i18n.SpringMessages;
 import org.mule.impl.ManagementContextAware;
 import org.mule.impl.MuleDescriptor;
@@ -565,8 +564,8 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                 registerEndpointMappings();
             }
             // tell mule to load component definitions from spring
-            SpringContainerContext containerContext = new SpringContainerContext();
-            containerContext.setBeanFactory(applicationContext);
+            //SpringContainerContext containerContext = new SpringContainerContext();
+            //containerContext.setBeanFactory(applicationContext);
 
             // see if there are any UMOConnectors to register
             registerConnectors();

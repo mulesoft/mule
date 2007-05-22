@@ -15,6 +15,9 @@
     To view the WSDL for the EchoUMO service go to -
     http://localhost:8081/services/EchoUMO?wsdl
     </description>
+    
+    <mule-environment-properties serverUrl="tcp://localhost:12333"/>
+
 
     <!--
         The system stream connector is used to send and receive information via the

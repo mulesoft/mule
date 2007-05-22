@@ -45,8 +45,6 @@
     <bean name="_muleRegistry" class="org.mule.config.spring.factories.SpringRegistryFactoryBean">
     </bean>
 
-    <!--<bean name="_springRegistryContainerContext" class="org.mule.config.spring.SpringContainerContext" depends-on="_muleManagementContext"/>-->
-
     <bean name="_muleSystemModel" class="org.mule.config.spring.factories.SystemModelFactoryBean"
           depends-on="_muleManagementContext"/>
 

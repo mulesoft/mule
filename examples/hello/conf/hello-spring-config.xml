@@ -7,7 +7,7 @@
     is responsible for determining the UMOManager to implement, creates a default UMOModel
     and autowires the components to the model and all other global objects to the MuleManager.
     -->
-    <bean id="muleManager" class="org.mule.config.spring.AutowireUMOManagerFactoryBean">
+    <bean id="muleManager" class="org.mule.extras.spring.config.AutowireUMOManagerFactoryBean">
         <property name="managerId" value="Hello Spring"/>
     </bean>
 

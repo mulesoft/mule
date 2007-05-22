@@ -10,6 +10,7 @@
 package org.mule.config.spring;
 
 import org.mule.RegistryContext;
+import org.mule.config.MuleProperties;
 import org.mule.impl.ManagementContext;
 import org.mule.impl.internal.notifications.ServerNotificationManager;
 import org.mule.umo.UMOManagementContext;
@@ -17,6 +18,7 @@ import org.mule.umo.lifecycle.UMOLifecycleManager;
 import org.mule.umo.manager.UMOTransactionManagerFactory;
 import org.mule.umo.manager.UMOWorkManager;
 import org.mule.umo.security.UMOSecurityManager;
+import org.mule.util.ClassUtils;
 import org.mule.util.queue.QueueManager;
 
 import java.util.Map;
@@ -61,6 +63,8 @@ import org.springframework.context.ApplicationContextAware;
 public class ManagementContextFactoryBean extends AbstractFactoryBean
         implements ApplicationContextAware
 {
+
+    public static final String LEGACY_MANAGER_PLACEHOLDER_CLASS = "org.mule.extras.spring.LegacyManagerPlaceholder";
     /**
      * logger used by this class
      */
@@ -68,7 +72,6 @@ public class ManagementContextFactoryBean extends AbstractFactoryBean
 
     protected UMOManagementContext managementContext;
 
-    //TODO LM: Replace
     protected RegistryFacade registry;
 
     private ApplicationContext context;
@@ -95,7 +98,7 @@ public class ManagementContextFactoryBean extends AbstractFactoryBean
 
     protected Object createInstance() throws Exception
     {
-        if(managementContext==null)
+        if (managementContext == null)
         {
 
             this.managementContext = new ManagementContext(lifecycleManager);
@@ -131,7 +134,6 @@ public class ManagementContextFactoryBean extends AbstractFactoryBean
         managementContext.setTransactionManager(transactionManager);
         managementContext.initialise();
     }
-    
 
 
     //@java.lang.Override
@@ -146,42 +148,46 @@ public class ManagementContextFactoryBean extends AbstractFactoryBean
     {
         try
         {
-            boolean legacy = false;
+            Map temp = null;
             //Legacy handling.  If the context contains an AutowireUMOManagerFactoryBean, then we're dealing
             //with an old Mule config file and we change the way we deal with some of the components
-            Map temp = context.getBeansOfType(AutowireUMOManagerFactoryBean.LegacyManager.class);
-            if(temp.size() > 0)
+            if (ClassUtils.isClassOnPath(LEGACY_MANAGER_PLACEHOLDER_CLASS, getClass()))
             {
-                legacy = true;
-                registry.getConfiguration().setId(((AutowireUMOManagerFactoryBean.LegacyManager)temp.values().iterator().next()).getManagerId());
-                // set environment properties
                 try
                 {
-                    setLegacyProperties((Map)context.getBean("muleEnvironmentProperties", Map.class));
+                    Class clazz = ClassUtils.loadClass(LEGACY_MANAGER_PLACEHOLDER_CLASS, getClass());
+                    temp = context.getBeansOfType(clazz);
+                    if (temp.size() > 0)
+                    {
+                        try
+                        {
+                            setLegacyProperties((Map) context.getBean(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES, Map.class));
+                            //TODO what about handling ContainerContexts?
+                        }
+                        catch (BeansException e)
+                        {
+                            //ignore
+                        }
+                    }
                 }
-                catch (BeansException e)
+                catch (ClassNotFoundException e)
                 {
-                    //ignore
+                    //ignore, since we've already tested for its existance
                 }
-
             }
-
-            // Set the container Context
-            //Map containers = context.getBeansOfType(UMOContainerContext.class, true, false);
-            //setContainerContext(containers);
 
             // set mule transaction manager
             temp = context.getBeansOfType(UMOTransactionManagerFactory.class, true, false);
             if (temp.size() > 0)
             {
-                transactionManager = (((UMOTransactionManagerFactory)temp.values().iterator().next()).create());
+                transactionManager = (((UMOTransactionManagerFactory) temp.values().iterator().next()).create());
             }
             else
             {
                 temp = context.getBeansOfType(TransactionManager.class, true, false);
                 if (temp.size() > 0)
                 {
-                    transactionManager = (((TransactionManager)temp.values().iterator().next()));
+                    transactionManager = (((TransactionManager) temp.values().iterator().next()));
                 }
             }
 
@@ -189,28 +195,28 @@ public class ManagementContextFactoryBean extends AbstractFactoryBean
             temp = context.getBeansOfType(UMOSecurityManager.class, true, false);
             if (temp.size() > 0)
             {
-               securityManager = ((UMOSecurityManager)temp.values().iterator().next());
+                securityManager = ((UMOSecurityManager) temp.values().iterator().next());
             }
 
             // set notification manager
             temp = context.getBeansOfType(ServerNotificationManager.class, true, false);
             if (temp.size() > 0)
             {
-               notificationManager = ((ServerNotificationManager)temp.values().iterator().next());
+                notificationManager = ((ServerNotificationManager) temp.values().iterator().next());
             }
 
             // set notification manager
             temp = context.getBeansOfType(UMOWorkManager.class, true, false);
             if (temp.size() > 0)
             {
-               workManager = ((UMOWorkManager)temp.values().iterator().next());
+                workManager = ((UMOWorkManager) temp.values().iterator().next());
             }
 
             // set queue manager
             temp = context.getBeansOfType(QueueManager.class, true, false);
             if (temp.size() > 0)
             {
-               queueManager = ((QueueManager)temp.values().iterator().next());
+                queueManager = ((QueueManager) temp.values().iterator().next());
             }
 
         }
@@ -221,11 +227,10 @@ public class ManagementContextFactoryBean extends AbstractFactoryBean
     }
 
 
-    
     public void destroy() throws Exception
     {
         super.destroy();
-        if(managementContext!=null)
+        if (managementContext != null)
         {
             managementContext.dispose();
         }
@@ -233,13 +238,13 @@ public class ManagementContextFactoryBean extends AbstractFactoryBean
 
     public void setManagerId(String managerId)
     {
-       managementContext.setId(managerId);
+        managementContext.setId(managerId);
     }
 
 
     protected void setLegacyProperties(Map props)
     {
-        if(props!=null)
+        if (props != null)
         {
             registry.registerProperties(props);
         }

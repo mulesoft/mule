@@ -10,8 +10,8 @@
 package org.mule.config.spring;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Exception thrown when a legacy xml file is being processed and it contains configuration violations

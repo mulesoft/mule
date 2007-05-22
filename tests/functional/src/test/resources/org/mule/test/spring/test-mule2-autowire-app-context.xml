@@ -314,7 +314,7 @@
 
     <!-- by default the componet builder will use this context to resolve objects, though you can
     specify a different context config if you want -->
-    <bean id="spring" class="org.mule.config.spring.SpringContainerContext" init-method="initialise" destroy-method="dispose"/>
+    <bean id="spring" class="org.mule.extras.spring.SpringContainerContext" init-method="initialise" destroy-method="dispose"/>
 
     <bean id="orangeComponent" class="org.mule.impl.MuleDescriptor">
         <property name="implementation"><bean class="org.mule.tck.testmodels.fruit.Orange"/></property>

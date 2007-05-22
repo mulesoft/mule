@@ -84,7 +84,7 @@ public final class StringMessageUtils
                 messages.remove(i);
                 while (temp.length() > 0)
                 {
-                    len = (trimLength < temp.length() ? trimLength : temp.length());
+                    len = (trimLength <= temp.length() ? trimLength : temp.length());
                     String msg = temp.substring(0, len);
                     x = msg.indexOf(SystemUtils.LINE_SEPARATOR);
 

@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config.spring;
+package org.mule.extras.spring.config;
 
 import org.mule.RegistryContext;
 import org.mule.impl.model.ModelFactory;
@@ -53,7 +53,7 @@ import org.springframework.context.ApplicationContextAware;
 public class AutowireUMOManagerFactoryBean extends AbstractFactoryBean implements ApplicationContextAware
 {
     private String managerId;
-    private LegacyManager manager;
+    private LegacyManagerPlaceholder manager;
     private ApplicationContext context;
     private static String defaultModel;
 
@@ -69,7 +69,7 @@ public class AutowireUMOManagerFactoryBean extends AbstractFactoryBean implement
 
     public Class getObjectType()
     {
-        return LegacyManager.class;
+        return LegacyManagerPlaceholder.class;
     }
 
     public boolean isSingleton()
@@ -98,22 +98,6 @@ public class AutowireUMOManagerFactoryBean extends AbstractFactoryBean implement
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
     {
         this.context = applicationContext;
-    }
-
-    public static class LegacyManager
-    {
-        private String managerId;
-
-
-        public LegacyManager(String managerId)
-        {
-            this.managerId = managerId;
-        }
-
-        public String getManagerId()
-        {
-            return managerId;
-        }
     }
 
 }

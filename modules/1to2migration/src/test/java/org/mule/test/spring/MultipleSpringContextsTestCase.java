@@ -10,22 +10,25 @@
 
 package org.mule.test.spring;
 
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.FruitBowl;
+
+import junit.framework.Assert;
 
 public class MultipleSpringContextsTestCase extends FunctionalTestCase
 {
 
     protected String getConfigResources()
     {
-        return "org/mule/test/spring/multiple-spring-contexts-mule.xml";
+        return "multiple-spring-contexts-mule.xml";
     }
 
     public void testMultiptleSpringContexts() throws Exception
     {
-        Object bowl1 = managementContext.getRegistry().lookupObject("org.mule.tck.testmodels.fruit.FruitBowl", FruitBowl.class);
-        assertNotNull(bowl1);
-        Object bowl2 = managementContext.getRegistry().lookupObject("org.mule.tck.testmodels.fruit.FruitBowl2", FruitBowl.class);
-        assertNotNull(bowl2);
+        Object bowl1 = AbstractMuleTestCase.managementContext.getRegistry().lookupObject("org.mule.tck.testmodels.fruit.FruitBowl", FruitBowl.class);
+        Assert.assertNotNull(bowl1);
+        Object bowl2 = AbstractMuleTestCase.managementContext.getRegistry().lookupObject("org.mule.tck.testmodels.fruit.FruitBowl2", FruitBowl.class);
+        Assert.assertNotNull(bowl2);
     }
 }

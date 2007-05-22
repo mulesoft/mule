@@ -15,6 +15,7 @@ import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.routing.ForwardingCatchAllStrategy;
 import org.mule.tck.AbstractConfigBuilderTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.umo.UMODescriptor;
@@ -27,17 +28,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import junit.framework.Assert;
+
 public class MuleBeanDefinitionReaderTestCase extends AbstractConfigBuilderTestCase
 {
 
     public String getConfigResources()
     {
         // A Mule Xml config file and a Spring context file
-        return "org/mule/test/spring/test-xml-mule-config-split-with-beans.xml," +
-                "org/mule/test/spring/test-xml-mule-config.xml," +
-                "org/mule/test/spring/test-application-context.xml," +
-                "org/mule/test/spring/test-xml-mule-config-split.xml," +
-                "org/mule/test/spring/test-mule-to-spring-with-xslt.xml";
+        return "test-xml-mule-config-split-with-beans.xml," +
+                "test-xml-mule-config.xml," +
+                "test-application-context.xml," +
+                "test-xml-mule-config-split.xml," +
+                "test-mule-to-spring-with-xslt.xml";
     }
 
     public ConfigurationBuilder getBuilder()
@@ -48,58 +51,58 @@ public class MuleBeanDefinitionReaderTestCase extends AbstractConfigBuilderTestC
     // Test spring bean configs
     public void testTransformerBean()
     {
-        TestCompressionTransformer c = (TestCompressionTransformer)managementContext.getRegistry().lookupTransformer("beanTransformer");
-        assertNotNull(c);
-        assertEquals("hello",c.getBeanProperty1());
+        TestCompressionTransformer c = (TestCompressionTransformer) AbstractMuleTestCase.managementContext.getRegistry().lookupTransformer("beanTransformer");
+        Assert.assertNotNull(c);
+        Assert.assertEquals("hello",c.getBeanProperty1());
     }
 
     public void testEndpointPropertyBean()
     {
-        UMODescriptor d = managementContext.getRegistry().lookupService("appleComponent3");
-        assertNotNull(d);
-        assertNotNull(d.getInboundRouter());
+        UMODescriptor d = AbstractMuleTestCase.managementContext.getRegistry().lookupService("appleComponent3");
+        Assert.assertNotNull(d);
+        Assert.assertNotNull(d.getInboundRouter());
         UMOEndpoint e = (UMOEndpoint)d.getInboundRouter().getEndpoints().get(0);
-        assertNotNull(e);
-        assertEquals("Prop2", e.getProperties().get("testEndpointBeanProperty"));
+        Assert.assertNotNull(e);
+        Assert.assertEquals("Prop2", e.getProperties().get("testEndpointBeanProperty"));
 
-        d = managementContext.getRegistry().lookupService("orangeComponent");
-        assertNotNull(d);
+        d = AbstractMuleTestCase.managementContext.getRegistry().lookupService("orangeComponent");
+        Assert.assertNotNull(d);
         UMORouterCatchAllStrategy strategy = d.getInboundRouter().getCatchAllStrategy();
-        assertTrue(strategy instanceof ForwardingCatchAllStrategy);
+        Assert.assertTrue(strategy instanceof ForwardingCatchAllStrategy);
         UMOConnector conn = strategy.getEndpoint().getConnector();
-        assertTrue(conn instanceof TestConnector);
-        assertEquals("dummyConnector2", conn.getName());
+        Assert.assertTrue(conn instanceof TestConnector);
+        Assert.assertEquals("dummyConnector2", conn.getName());
         
     }
 
     public void testPropertyBeansOnDescriptors()
     {
-        UMODescriptor d = managementContext.getRegistry().lookupService("appleComponent3");
-        assertNotNull(d);
+        UMODescriptor d = AbstractMuleTestCase.managementContext.getRegistry().lookupService("appleComponent3");
+        Assert.assertNotNull(d);
 
-        assertTrue(d.getExceptionListener() instanceof DefaultExceptionStrategy);
+        Assert.assertTrue(d.getExceptionListener() instanceof DefaultExceptionStrategy);
 
         // assertEquals("1.1", d.getVersion());
     }
 
     public void testPropertyBeansInMaps()
     {
-        UMODescriptor d = managementContext.getRegistry().lookupService("appleComponent3");
-        assertNotNull(d);
+        UMODescriptor d = AbstractMuleTestCase.managementContext.getRegistry().lookupService("appleComponent3");
+        Assert.assertNotNull(d);
         Map map = (Map)d.getProperties().get("springMap");
-        assertNotNull(map);
-        assertEquals(2, map.size());
+        Assert.assertNotNull(map);
+        Assert.assertEquals(2, map.size());
         List list = (List)d.getProperties().get("springList");
-        assertNotNull(list);
-        assertEquals(2, list.size());
+        Assert.assertNotNull(list);
+        Assert.assertEquals(2, list.size());
         Set set = (Set)d.getProperties().get("springSet");
-        assertNotNull(set);
-        assertEquals(2, set.size());
-        assertNotNull(d.getProperties().get("springBean"));
+        Assert.assertNotNull(set);
+        Assert.assertEquals(2, set.size());
+        Assert.assertNotNull(d.getProperties().get("springBean"));
     }
 
     public void testConvertedSpringBeans() throws UMOException
     {
-        assertNotNull(managementContext.getRegistry().lookupModel("main").getComponent("TestComponent"));
+        Assert.assertNotNull(AbstractMuleTestCase.managementContext.getRegistry().lookupModel("main").getComponent("TestComponent"));
     }
 }

@@ -17,7 +17,7 @@
 -->
 <beans>
 
-    <bean id="muleManager" class="org.mule.config.spring.AutowireUMOManagerFactoryBean"/>
+    <bean id="muleManager" class="org.mule.extras.spring.config.AutowireUMOManagerFactoryBean"/>
 
     <bean id="muleNameProcessor" class="org.mule.config.spring.MuleObjectNameProcessor"/>
 

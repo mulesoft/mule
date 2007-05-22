@@ -90,7 +90,7 @@ public class MuleShutdownHook extends Thread
         }
         msgs.add(CoreMessages.serverShutdownAt(new Date()));
 
-        String shutdownMessage = StringMessageUtils.getBoilerPlate(msgs, '*', 80);
+        String shutdownMessage = StringMessageUtils.getBoilerPlate(msgs, '*', 86);
 
         if (logger.isFatalEnabled())
         {
@@ -120,7 +120,7 @@ public class MuleShutdownHook extends Thread
             msgs.add(CoreMessages.serverStartedAt(context.getStartDate()));
         }
         msgs.add(CoreMessages.serverShutdownAt(new Date()));
-        String shutdownMessage = StringMessageUtils.getBoilerPlate(msgs, '*', 80);
+        String shutdownMessage = StringMessageUtils.getBoilerPlate(msgs, '*', 86);
         if (logger.isInfoEnabled())
         {
             logger.info(shutdownMessage);
