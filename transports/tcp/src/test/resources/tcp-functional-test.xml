@@ -24,13 +24,13 @@
     </bean>
 
     <mule:model-seda name="main">
-        <mule:service name="testComponent1" implementation="test1">
+        <mule:service name="testComponent1" service-ref="test1">
             <mule:inbound-router>
                 <mule:endpoint-ref nameref="clientEndpoint"/>
             </mule:inbound-router>
         </mule:service>
 
-        <mule:service name="testComponent2" implementation="test2">
+        <mule:service name="testComponent2" service-ref="test2">
             <mule:inbound-router>
                 <mule:endpoint-ref nameref="asyncClientEndpoint"/>
             </mule:inbound-router>

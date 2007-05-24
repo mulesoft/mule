@@ -1,28 +1,25 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:tcp="http://www.mulesource.org/schema/mule/tcp/2.0"
+       xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+               http://www.mulesource.org/schema/mule/core/2.0 META-INF/mule.xsd
+               http://www.mulesource.org/schema/mule/tcp/2.0 META-INF/mule-tcp.xsd">
 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+    <tcp:connector name="tcpConnector"
+        tcpProtocolClassName="org.mule.providers.tcp.protocols.MuleMessageLengthProtocol"/>
 
-<mule-configuration id="tcp_mplength_test" version="1.0">
+    <mule:endpoint address="tcp://localhost:60198" synchronous="true" name="clientEndpoint"/>
 
-    <mule-environment-properties serverUrl=""/>
+    <mule:model-seda name="main">
+        <mule:service name="testComponent" implementation="org.mule.tck.functional.FunctionalTestComponent">
+            <mule:inbound-router>
+                <mule:endpoint-ref nameref="clientEndpoint"/>
+            </mule:inbound-router>
+        </mule:service>
+    </mule:model-seda>
 
-    <connector name="tcpConnector" className="org.mule.providers.tcp.TcpConnector">
-        <properties>
-            <property name="tcpProtocolClassName" value="org.mule.providers.tcp.protocols.MuleMessageLengthProtocol"/>
-        </properties>
-    </connector>
-
-    <global-endpoints>
-        <endpoint name="clientEndpoint" address="tcp://localhost:60198" synchronous="true"/>
-    </global-endpoints>
-
-    <model name="main">
-        <mule-descriptor name="testComponent" implementation="org.mule.tck.functional.FunctionalTestComponent">
-            <inbound-router>
-                <global-endpoint name="clientEndpoint"/>
-            </inbound-router>
-        </mule-descriptor>
-    </model>
-
-</mule-configuration>
+</beans>
+        
