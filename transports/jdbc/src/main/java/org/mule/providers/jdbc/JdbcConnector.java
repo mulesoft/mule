@@ -12,8 +12,8 @@ package org.mule.providers.jdbc;
 
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.impl.jndi.JndiResource;
 import org.mule.providers.AbstractConnector;
+import org.mule.providers.jdbc.i18n.JdbcMessages;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.TransactionException;
 import org.mule.umo.UMOComponent;
@@ -33,6 +33,7 @@ import org.mule.util.properties.PropertyExtractor;
 
 import java.sql.Connection;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbutils.QueryRunner;
@@ -66,31 +69,28 @@ public class JdbcConnector extends AbstractConnector
     }
 
     protected long pollingFrequency = 0;
+    protected DataSource dataSource;
+    protected String dataSourceJndiName;
+    protected Context jndiContext;
+    protected String jndiInitialFactory;
+    protected String jndiProviderUrl;
+    protected Map providerProperties;
     protected Map queries;
     protected String resultSetHandler = DEFAULT_RESULTSET_HANDLER;
     protected String queryRunner = DEFAULT_QUERY_RUNNER;
     protected Set queryValueExtractors;
     protected Set propertyExtractors;
-    
-    /**
-     * JDBC Data source to use with the connector.  Can be set directly or looked up via JNDI.
-     * @see jndiResource
-     */
-    protected DataSource dataSource;
-    
-    /**
-     * Information for obtaining the data source via JNDI.
-     */
-    protected JndiResource jndiResource = new JndiResource();
 
     protected void doInitialise() throws InitialisationException
     {
         try
         {
-            // If the Data Source has not been provided directly, look it up via JNDI.
+            // If we have a dataSource, there is no need to initialise
+            // the JndiContext
             if (dataSource == null)
             {
-                dataSource = (DataSource) jndiResource.lookup();
+                initJndiContext();
+                createDataSource();
             }
             // setup property Extractors for queries
             if (queryValueExtractors == null)
@@ -181,6 +181,42 @@ public class JdbcConnector extends AbstractConnector
 
         String[] params = getReadAndAckStatements(endpoint);
         return getServiceDescriptor().createMessageReceiver(this, component, endpoint, params);
+    }
+
+    protected void initJndiContext() throws NamingException
+    {
+        if (this.jndiContext == null)
+        {
+            Hashtable props = new Hashtable();
+            if (this.jndiInitialFactory != null)
+            {
+                props.put(Context.INITIAL_CONTEXT_FACTORY, this.jndiInitialFactory);
+            }
+            if (this.jndiProviderUrl != null)
+            {
+                props.put(Context.PROVIDER_URL, jndiProviderUrl);
+            }
+            if (this.providerProperties != null)
+            {
+                props.putAll(this.providerProperties);
+            }
+            this.jndiContext = new InitialContext(props);
+        }
+
+    }
+
+    protected void createDataSource() throws InitialisationException, NamingException
+    {
+        Object temp = this.jndiContext.lookup(this.dataSourceJndiName);
+        if (temp instanceof DataSource)
+        {
+            dataSource = (DataSource)temp;
+        }
+        else
+        {
+            throw new InitialisationException(
+                JdbcMessages.jndiResourceNotFound(this.dataSourceJndiName), this);
+        }
     }
 
     public String[] getReadAndAckStatements(UMOImmutableEndpoint endpoint)
@@ -311,6 +347,86 @@ public class JdbcConnector extends AbstractConnector
     public void setQueries(Map queries)
     {
         this.queries = queries;
+    }
+
+    /**
+     * @return Returns the dataSourceJndiName.
+     */
+    public String getDataSourceJndiName()
+    {
+        return dataSourceJndiName;
+    }
+
+    /**
+     * @param dataSourceJndiName The dataSourceJndiName to set.
+     */
+    public void setDataSourceJndiName(String dataSourceJndiName)
+    {
+        this.dataSourceJndiName = dataSourceJndiName;
+    }
+
+    /**
+     * @return Returns the jndiContext.
+     */
+    public Context getJndiContext()
+    {
+        return jndiContext;
+    }
+
+    /**
+     * @param jndiContext The jndiContext to set.
+     */
+    public void setJndiContext(Context jndiContext)
+    {
+        this.jndiContext = jndiContext;
+    }
+
+    /**
+     * @return Returns the jndiInitialFactory.
+     */
+    public String getJndiInitialFactory()
+    {
+        return jndiInitialFactory;
+    }
+
+    /**
+     * @param jndiInitialFactory The jndiInitialFactory to set.
+     */
+    public void setJndiInitialFactory(String jndiInitialFactory)
+    {
+        this.jndiInitialFactory = jndiInitialFactory;
+    }
+
+    /**
+     * @return Returns the jndiProviderUrl.
+     */
+    public String getJndiProviderUrl()
+    {
+        return jndiProviderUrl;
+    }
+
+    /**
+     * @param jndiProviderUrl The jndiProviderUrl to set.
+     */
+    public void setJndiProviderUrl(String jndiProviderUrl)
+    {
+        this.jndiProviderUrl = jndiProviderUrl;
+    }
+
+    /**
+     * @return Returns the providerProperties.
+     */
+    public Map getProviderProperties()
+    {
+        return providerProperties;
+    }
+
+    /**
+     * @param providerProperties The providerProperties to set.
+     */
+    public void setProviderProperties(Map providerProperties)
+    {
+        this.providerProperties = providerProperties;
     }
 
     public Connection getConnection() throws Exception
@@ -492,105 +608,5 @@ public class JdbcConnector extends AbstractConnector
             params[i] = value;
         }
         return params;
-    }
-
-    public JndiResource getJndiResource()
-    {
-        return jndiResource;
-    }
-
-    public void setJndiResource(JndiResource jndiResource)
-    {
-        this.jndiResource = jndiResource;
-    }
-
-    /**
-     * @return Returns the dataSourceJndiName.
-     * @deprecated For Mule 1.x compatibility only
-     */
-    public String getDataSourceJndiName()
-    {
-        return jndiResource.getResourceName();
-    }
-
-    /**
-     * @param dataSourceJndiName The dataSourceJndiName to set.
-     * @deprecated For Mule 1.x compatibility only
-     */
-    public void setDataSourceJndiName(String dataSourceJndiName)
-    {
-        jndiResource.setResourceName(dataSourceJndiName);
-    }
-
-    /**
-     * @return Returns the jndiContext.
-     * @deprecated For Mule 1.x compatibility only
-     */
-    public Context getJndiContext()
-    {
-        return jndiResource.getContext();
-    }
-
-    /**
-     * @param jndiContext The jndiContext to set.
-     * @deprecated For Mule 1.x compatibility only
-     */
-    public void setJndiContext(Context jndiContext)
-    {
-        jndiResource.setContext(jndiContext);
-    }
-
-    /**
-     * @return Returns the jndiInitialFactory.
-     * @deprecated For Mule 1.x compatibility only
-     */
-    public String getJndiInitialFactory()
-    {
-        return jndiResource.getInitialContextFactory();
-    }
-
-    /**
-     * @param jndiInitialFactory The jndiInitialFactory to set.
-     * @deprecated For Mule 1.x compatibility only
-     */
-    public void setJndiInitialFactory(String jndiInitialFactory)
-    {
-        jndiResource.setInitialContextFactory(jndiInitialFactory);
-    }
-
-    /**
-     * @return Returns the jndiProviderUrl.
-     * @deprecated For Mule 1.x compatibility only
-     */
-    public String getJndiProviderUrl()
-    {
-        return jndiResource.getProviderUrl();
-    }
-
-    /**
-     * @param jndiProviderUrl The jndiProviderUrl to set.
-     * @deprecated For Mule 1.x compatibility only
-     */
-    public void setJndiProviderUrl(String jndiProviderUrl)
-    {
-        jndiResource.setProviderUrl(jndiProviderUrl);
-    }
-
-    /**
-     * @return Returns the providerProperties.
-     * @deprecated For Mule 1.x compatibility only
-     */
-    public Map getProviderProperties()
-    {
-        return jndiResource.getProviderProperties();
-    }
-
-    /**
-     * @param providerProperties The providerProperties to set.
-     * @deprecated For Mule 1.x compatibility only
-     */
-    public void setProviderProperties(Map providerProperties)
-    {
-        jndiResource.setProviderProperties(providerProperties);
     }
 }
