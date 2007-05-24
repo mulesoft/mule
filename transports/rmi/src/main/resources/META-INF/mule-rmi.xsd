@@ -21,7 +21,7 @@
 
     <xsd:complexType name="rmiConnectorType">
         <xsd:complexContent>
-            <xsd:extension base="mule:connectorType">
+            <xsd:extension base="mule:jndiConnectorType">
                 <xsd:attribute name="pollingFrequency" type="xsd:long">
                     <xsd:annotation>
                         <xsd:documentation>

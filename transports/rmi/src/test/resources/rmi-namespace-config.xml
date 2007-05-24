@@ -11,11 +11,29 @@
     <bean name="securityManager"
         class="org.mule.providers.rmi.DummySecurityManager"/>
 
+    <bean name="jndiContext"
+        class="org.mule.tck.jndi.InMemoryContext"/>
+
     <rmi:connector name="rmiConnector"
                    pollingFrequency="1234"
                    securityManager-ref="securityManager"
                    securityPolicy="rmi.policy"
                    serverClassName="bcd"
-                   serverCodebase="cde"/>
+                   serverCodebase="cde"
+                   jndiInitialFactory="org.mule.tck.jndi.InMemoryContextFactory"
+                   jndiProviderUrl="efg"
+                   jndiUrlPkgPrefixes="fgh">
+        <mule:jndi-provider-properties>
+            <prop key="ghi">hij</prop>
+        </mule:jndi-provider-properties>
+    </rmi:connector>
+
+     <rmi:connector name="rmiConnector2"
+                   pollingFrequency="1234"
+                   securityManager-ref="securityManager"
+                   securityPolicy="rmi.policy"
+                   serverClassName="bcd"
+                   serverCodebase="cde"
+                   jndiContext-ref="jndiContext"/>
 
 </beans>

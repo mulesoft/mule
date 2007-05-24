@@ -966,6 +966,10 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <!--==============================================================-->
+    <!--  Utils / Standard Types                                      -->
+    <!--==============================================================-->
+
     <!-- corresponds to TlsIndirectKeyStore, named as tls-client in transport namespace -->
     <xsd:complexType name="tlsClientKeyStoreType">
         <xsd:annotation>
@@ -1111,11 +1115,58 @@
         </xsd:attribute>
     </xsd:complexType>
 
-    <!--==============================================================-->
-    <!--  Utils / Standard Types                                      -->
-    <!--==============================================================-->
+    <xsd:complexType name="jndiConnectorType">
+        <xsd:complexContent>
+            <xsd:extension base="connectorType">
+                <xsd:sequence>
+                    <xsd:element name="jndi-provider-properties" type="propsType" minOccurs="0" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Direct setting of JNDI properties.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+                <xsd:attribute name="jndiContext-ref" type="xsd:NMTOKEN">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Set the complete context directly, via a bean reference.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="jndiInitialFactory" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The initial context factory to use. The value
+                            of the property should be the fully qualified class name
+                            of the factory class that will create an initial context.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="jndiProviderUrl" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The service provider to use. The value of the property
+                            should contain a URL string (e.g. "ldap://somehost:389").
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="jndiUrlPkgPrefixes" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The list of package prefixes to use when
+                            loading in URL context factories. The value
+                            of the property should be a colon-separated list of package
+                            prefixes for the class name of the factory class that will create
+                            a URL context factory.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
-	<xsd:complexType name="mapType">
+    <xsd:complexType name="mapType">
 		<xsd:complexContent>
 			<xsd:extension base="spring:mapType">
                 <xsd:attribute name="mapClass" type="xsd:string"/>

@@ -228,5 +228,6 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
 
         // Utils / Standard Types
         registerBeanDefinitionParser("properties", new PropertiesBeanDefinitionParser("properties"));
+        registerBeanDefinitionParser("jndi-provider-properties", new PropertiesBeanDefinitionParser("jndiProviderProperties"));
     }
 }
