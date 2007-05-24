@@ -1,11 +1,17 @@
-<?xml version="1.0" encoding="UTF-8"?> 
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:rmi="http://www.mulesource.org/schema/mule/rmi/2.0"
+       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+       xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+               http://www.mulesource.org/schema/mule/core/2.0 META-INF/mule.xsd
+               http://www.mulesource.org/schema/mule/vm/2.0 META-INF/mule-vm.xsd
+               http://www.mulesource.org/schema/mule/rmi/2.0 META-INF/mule-rmi.xsd">
 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN" 
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd"> 
+    <rmi:connector name="rmi"
 
-<mule-configuration id="Mule_Login_Sample" version="1.0"> 
-
-    <mule-environment-properties embedded="true"/>
 
     <connector name="rmi" className="org.mule.providers.rmi.RmiConnector">
         <properties>
