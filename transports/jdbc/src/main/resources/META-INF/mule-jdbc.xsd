@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.mulesource.org/schema/mule/jdbc/2.0"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:spring="http://www.springframework.org/schema/beans"
+            xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+            targetNamespace="http://www.mulesource.org/schema/mule/jdbc/2.0"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.springframework.org/schema/beans"/>
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"/>
+
+    <xsd:element name="connector" type="jdbcConnectorType"/>
+
+    <xsd:complexType name="jdbcConnectorType">
+    	<xsd:complexContent>
+    		<xsd:extension base="mule:connectorType">
+				<xsd:attribute name="dataSource-ref" type="xsd:NMTOKEN"/>
+		        <xsd:attribute name="pollingFrequency" type="xsd:long"/>
+		    </xsd:extension>
+    	</xsd:complexContent>
+   </xsd:complexType>
+</xsd:schema>
+
+<!--  
+    protected Map queries;
+    protected String resultSetHandler = DEFAULT_RESULTSET_HANDLER;
+    protected String queryRunner = DEFAULT_QUERY_RUNNER;
+    protected Set queryValueExtractors;
+    protected Set propertyExtractors;
+-->
