@@ -21,14 +21,14 @@
 
     <mule:model-seda name="test">
 
-        <mule:service name="relay" implementation="bridge">
+        <mule:service name="relay" service-ref="bridge">
             <mule:inbound-router>
                 <mule:endpoint address="vm://send"/>
             </mule:inbound-router>
             <mule:outbound-router>
                 <mule:pass-through-router>
                     <!-- connector needed for MULE-1765 -->
-                    <mule:endpoint address="smtps://localhost:65432" connector="smtpsConnector">
+                    <mule:endpoint address="smtps://localhost:65432" connector-ref="smtpsConnector">
                         <mule:properties>
                             <prop key="toAddresses">bob@example.com</prop>
                         </mule:properties>

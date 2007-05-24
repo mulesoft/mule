@@ -9,7 +9,6 @@
  */
 package org.mule.providers.file;
 
-import org.mule.providers.file.test.DummyFilenameParser;
 import org.mule.tck.FunctionalTestCase;
 
 public class FileNamespaceHandlerTestCase extends FunctionalTestCase
@@ -29,7 +28,8 @@ public class FileNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals("bcd", c.getMoveToPattern());
         assertEquals("cde", c.getOutputPattern());
         assertEquals(2345, c.getPollingFrequency());
-        assertEquals("efg", c.getWriteToDirectory());
+        assertEquals("efg", c.getReadFromDirectory());
+        assertEquals("fgh", c.getWriteToDirectory());
         assertEquals(false, c.isAutoDelete());
         assertEquals(true, c.isOutputAppend());
         assertEquals(true, c.isSerialiseObjects());

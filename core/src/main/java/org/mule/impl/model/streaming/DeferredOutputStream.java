@@ -12,8 +12,6 @@ package org.mule.impl.model.streaming;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.providers.streaming.StreamMessageAdapter;
 import org.mule.umo.MessagingException;
-import org.mule.providers.streaming.StreamMessageAdapter;
-import org.mule.umo.MessagingException;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;

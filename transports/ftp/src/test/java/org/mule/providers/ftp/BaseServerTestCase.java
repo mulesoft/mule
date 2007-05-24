@@ -57,12 +57,12 @@ public abstract class BaseServerTestCase extends FunctionalTestCase
         }
     }
 
-    protected void doPostFunctionalSetUp() throws Exception
+    protected void doSetUp() throws Exception
     {
         startServer();
     }
 
-    protected void doFunctionalTearDown() throws Exception
+    protected void doTearDown() throws Exception
     {
         stopServer();
     }

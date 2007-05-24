@@ -17,8 +17,7 @@
 
     <xsd:complexType name="imapConnectorType">
         <xsd:complexContent>
-            <xsd:extension base="email-download:emailDownloadConnectorType">
-            </xsd:extension>
+            <xsd:extension base="email-download:emailDownloadConnectorType"/>
         </xsd:complexContent>
     </xsd:complexType>
 

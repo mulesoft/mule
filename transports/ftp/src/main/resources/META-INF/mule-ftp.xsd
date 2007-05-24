@@ -23,11 +23,41 @@
                 <xsd:sequence minOccurs="1" maxOccurs="1">
                     <xsd:element name="filename-parser" type="file:filenameParserType" minOccurs="0" maxOccurs="1"/>
                 </xsd:sequence>
-                <xsd:attribute name="outputPattern" type="xsd:string"/>
-                <xsd:attribute name="pollingFrequency" type="xsd:int"/>
-                <xsd:attribute name="binary" type="xsd:boolean"/>
-                <xsd:attribute name="passive" type="xsd:boolean"/>
-                <xsd:attribute name="validateConnections" type="xsd:boolean"/>
+                <xsd:attribute name="outputPattern" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Pattern to generate output file name.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="pollingFrequency" type="xsd:int">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Time (ms) between polling reads.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="binary" type="xsd:boolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Select/disable binary file transfer type.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="passive" type="xsd:boolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Select/disable passive protocol (more likely to work through firewalls).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="validateConnections" type="xsd:boolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Validate connection (via NOOP) before use.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

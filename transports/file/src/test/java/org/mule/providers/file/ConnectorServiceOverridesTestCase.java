@@ -30,13 +30,11 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
 
     public void testServiceOverrides() throws InterruptedException
     {
-        // TODO initialised wait?
-        Thread.sleep(1000);
         FileConnector c = (FileConnector)managementContext.getRegistry().lookupConnector("fileConnector2");
         assertNotNull(c);
         assertNotNull(c.getServiceOverrides());
-        assertEquals("org.mule.transformers.simple.ByteArrayToSerializable", c.getServiceOverrides().get(
-            "inbound.transformer"));
+        assertEquals("org.mule.transformers.simple.ByteArrayToSerializable",
+                c.getServiceOverrides().get("inbound.transformer"));
         assertNotNull(c.getDefaultInboundTransformer());
         assertNotNull(c.getDefaultOutboundTransformer());
         assertTrue(c.getDefaultInboundTransformer() instanceof ByteArrayToSerializable);

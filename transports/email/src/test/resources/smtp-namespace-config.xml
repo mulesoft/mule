@@ -15,10 +15,7 @@
                    ccAddresses="bcd@example.com"
                    contentType="foo/bar"
                    fromAddress="cde@example.com"
-                   host="example.com"
-                   mailboxFolder="newMailbox"
                    password="password"
-                   port="1234"
                    replyToAddresses="def@example.com"
                    subject="subject"
                    username="bob@example.com">
@@ -34,10 +31,7 @@
                      ccAddresses="bcd@example.com"
                      contentType="foo/bar"
                      fromAddress="cde@example.com"
-                     host="example.com"
-                     mailboxFolder="newMailbox"
                      password="password"
-                     port="1234"
                      replyToAddresses="def@example.com"
                      subject="subject"
                      username="bob@example.com">

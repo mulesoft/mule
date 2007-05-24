@@ -28,8 +28,6 @@ import java.beans.ExceptionListener;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ScheduledExecutorService;
-
 /**
  * <code>UMOConnector</code> is the mechanism used to connect to external systems
  * and protocols in order to send and receive data.

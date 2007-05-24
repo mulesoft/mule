@@ -26,16 +26,6 @@
                     </instructions>
                 </configuration>
             </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <!-- Exclude the functional test, requires FTP server to be up -->
-                        <exclude implementation="java.lang.String">org/mule/providers/ftp/FtpConnectorFunctionalTestCase.java</exclude>
-                    </excludes>
-                </configuration></plugin>
         </plugins>
     </build>
                                               
@@ -51,6 +41,11 @@
             <version>2.0.7</version>
         </dependency>
         <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-file</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>
             <version>${version}</version>
@@ -60,6 +55,8 @@
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-file</artifactId>
             <version>${version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>

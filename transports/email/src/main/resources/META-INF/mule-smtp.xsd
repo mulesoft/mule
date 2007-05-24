@@ -24,18 +24,62 @@
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
                 <!-- seems like we should be able to better restrict some of these types -->
-                <xsd:attribute name="bccAddresses" type="xsd:string"/>
-                <xsd:attribute name="ccAddresses" type="xsd:string"/>
-                <xsd:attribute name="contentType" type="xsd:string"/>
-                <xsd:attribute name="customHeaders" type="xsd:string"/>
-                <xsd:attribute name="fromAddress" type="xsd:string"/>
-                <xsd:attribute name="host" type="xsd:string"/>
-                <xsd:attribute name="mailboxFolder" type="xsd:string"/>
-                <xsd:attribute name="password" type="xsd:string"/>
-                <xsd:attribute name="port" type="xsd:unsignedShort"/>
-                <xsd:attribute name="replyToAddresses" type="xsd:string"/>
-                <xsd:attribute name="subject" type="xsd:string"/>
-                <xsd:attribute name="username" type="xsd:string"/>
+                <xsd:attribute name="bccAddresses" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Comma separated list of addresses for blind copies.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="ccAddresses" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Comma separated list of addresses for copies.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="contentType" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Mime type for the outgoing message.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="fromAddress" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The from address for the outgoing message.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="password" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Password needed for authentication at the server.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="replyToAddresses" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The reply-to address for the outgoing message.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="subject" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The subject for the outgoing message.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="username" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Username needed for authentication at the server.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -44,7 +88,13 @@
         <xsd:complexContent>
             <xsd:extension base="baseSmtpConnectorType">
                 <xsd:sequence minOccurs="0" maxOccurs="unbounded">
-                    <xsd:element name="header" type="headerType"/>
+                    <xsd:element name="header" type="headerType">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Additional header name and value.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>

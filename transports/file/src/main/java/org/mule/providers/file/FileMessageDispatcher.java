@@ -73,6 +73,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
         }
         finally
         {
+            logger.debug("Closing file");
             fos.close();
         }
     }

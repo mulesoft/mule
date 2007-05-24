@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:file="http://www.mulesource.org/schema/mule/file/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 META-INF/mule.xsd
+       http://www.mulesource.org/schema/mule/file/2.0 META-INF/mule-file.xsd">
 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+    <file:connector name="fileConnector1"/>
 
-<mule-configuration id="Test_Mule_Properties" version="1.0">
+    <file:connector name="fileConnector2">
+        <mule:service-overrides
+                outboundTransformer="org.mule.transformers.simple.SerializableToByteArray"
+                inboundTransformer="org.mule.transformers.simple.ByteArrayToSerializable"/>
+    </file:connector>
 
-    <mule-environment-properties serverUrl=""/>
+    <file:connector name="fileConnector3"/>
 
-    <connector name="fileConnector1" className="org.mule.providers.file.FileConnector"/>
-
-    <connector name="fileConnector2" className="org.mule.providers.file.FileConnector">
-        <properties>
-            <map name="serviceOverrides">
-                <property name="outbound.transformer" value="org.mule.transformers.simple.SerializableToByteArray"/>
-                <property name="inbound.transformer" value="org.mule.transformers.simple.ByteArrayToSerializable"/>
-            </map>
-        </properties>
- </connector>
-
- <connector name="fileConnector3" className="org.mule.providers.file.FileConnector"/>
-</mule-configuration>
+</beans>
+        

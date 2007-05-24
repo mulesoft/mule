@@ -26,8 +26,6 @@ public class SmtpConnector extends AbstractMailConnector
     public static final int DEFAULT_SMTP_PORT = 25;
     public static final String DEFAULT_CONTENT_TYPE = "text/plain";
 
-    private String host = DEFAULT_SMTP_HOST;
-    private int port = DEFAULT_SMTP_PORT;
     private String username;
     private String password;
 
@@ -177,16 +175,6 @@ public class SmtpConnector extends AbstractMailConnector
         return DEFAULT_SMTP_PORT;
     }
 
-    public String getHost()
-    {
-        return host;
-    }
-
-    public void setHost(String host)
-    {
-        this.host = host;
-    }
-
     public String getPassword()
     {
         return password;
@@ -195,16 +183,6 @@ public class SmtpConnector extends AbstractMailConnector
     public void setPassword(String password)
     {
         this.password = password;
-    }
-
-    public int getPort()
-    {
-        return port;
-    }
-
-    public void setPort(int port)
-    {
-        this.port = port;
     }
 
     public String getUsername()

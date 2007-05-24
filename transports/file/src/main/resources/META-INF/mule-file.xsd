@@ -15,24 +15,91 @@
     <xsd:element name="connector" type="fileConnectorType"/>
 
     <xsd:complexType name="filenameParserType">
-        <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
+        <xsd:attribute name="class" type="xsd:NMTOKEN" use="required">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Controls the mapping from filename patterns to filenames.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:complexType>
 
     <xsd:complexType name="fileConnectorType">
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
-                <xsd:sequence minOccurs="1" maxOccurs="1">
+                <xsd:sequence minOccurs="0" maxOccurs="1">
                     <xsd:element name="filename-parser" type="filenameParserType" minOccurs="0" maxOccurs="1"/>
                 </xsd:sequence>
-                <xsd:attribute name="fileAge" type="xsd:long"/>
-                <xsd:attribute name="moveToDirectory" type="xsd:string"/>
-                <xsd:attribute name="moveToPattern" type="xsd:string"/>
-                <xsd:attribute name="outputPattern" type="xsd:string"/>
-                <xsd:attribute name="pollingFrequency" type="xsd:int"/>
-                <xsd:attribute name="writeToDirectory" type="xsd:string"/>
-                <xsd:attribute name="autoDelete" type="xsd:boolean"/>
-                <xsd:attribute name="outputAppend" type="xsd:boolean"/>
-                <xsd:attribute name="serialiseObjects" type="xsd:boolean"/>
+                <xsd:attribute name="fileAge" type="xsd:long">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Miniumum age (ms) for a file to be processed.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="moveToDirectory" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Target directory for file backup when read.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="moveToPattern" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            File pattern for name of file when moved to backup directory.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="outputPattern" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            File pattern for name of file when writing to destination.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="pollingFrequency" type="xsd:int">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Period (ms) between poll connections to the server.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="writeToDirectory" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Destination directory for file.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="readFromDirectory" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Source directory for file.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="autoDelete" type="xsd:boolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Should file be deleted once read?
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="outputAppend" type="xsd:boolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Should output append to existing file?
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="serialiseObjects" type="xsd:boolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Forces use of transformers between serializable objects and byte arrays.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

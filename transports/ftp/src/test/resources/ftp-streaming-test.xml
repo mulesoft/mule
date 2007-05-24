@@ -1,46 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mule-configuration PUBLIC
-        "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-        "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:ftp="http://www.mulesource.org/schema/mule/ftp/2.0"
+       xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+               http://www.mulesource.org/schema/mule/core/2.0 META-INF/mule.xsd
+               http://www.mulesource.org/schema/mule/ftp/2.0 META-INF/mule-ftp.xsd">
 
-<mule-configuration id="streaming-out-ftp" version="1.0">
+    <ftp:connector name="ftp" pollingFrequency="2000">
+        <mule:custom-exception-strategy class="org.mule.providers.ftp.DebugExceptionStrategy"/>
+    </ftp:connector>
 
-    <mule-environment-properties serverUrl=""/>
+    <bean name="bridgeImplementation"
+        class="org.mule.components.simple.StreamingBridgeComponent"/>
 
-    <connector name="ftp" className="org.mule.providers.ftp.FtpConnector">
-        <exception-strategy className="org.mule.providers.ftp.DebugExceptionStrategy"/>
-        <connection-strategy className="org.mule.providers.SimpleRetryConnectionStrategy">
-            <properties>
-                 <property name="retryCount" value="3"/>
-                 <property name="frequency" value="2000"/>
-            </properties>
-        </connection-strategy>
-    </connector>
+    <bean name="ftc"
+        class="org.mule.tck.functional.FunctionalTestComponent"/>
 
-    <model name="main" type="streaming">
+    <mule:model-streaming name="main">
 
-        <mule-descriptor name="bridge" implementation="org.mule.components.simple.StreamingBridgeComponent">
-            <inbound-router>
-                <endpoint address="tcp://localhost:60196" streaming="true"/>
-            </inbound-router>
-            <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="ftp://anonymous:email@localhost:60197" streaming="true"/>
-                </router>
-            </outbound-router>
-        </mule-descriptor>
+        <mule:service name="bridge" service-ref="bridgeImplementation">
+            <mule:inbound-router>
+                <mule:endpoint address="tcp://localhost:60196" connector-ref="ftp"/>
+            </mule:inbound-router>
+            <mule:outbound-router>
+                <mule:pass-through-router>
+                    <mule:endpoint address="ftp://anonymous:email@localhost:60197">
+                        <mule:retry-connection-strategy
+                                inbound="false"
+                                retryCount="3"
+                                retryFrequency="2000"/>
+                    </mule:endpoint>
+                </mule:pass-through-router>
+            </mule:outbound-router>
+        </mule:service>
 
-        <mule-descriptor name="testComponent" singleton="true"
-                         implementation="org.mule.tck.functional.FunctionalStreamingTestComponent">
-            <inbound-router>
-                <endpoint address="ftp://anonymous:email@localhost:60197" streaming="true">
-                    <properties>
-                        <property name="pollingFrequency" value="2000"/>
-                    </properties>
-                </endpoint>
-            </inbound-router>
-        </mule-descriptor>
+        <mule:service name="testComponent" singleton="true">
+            <mule:inbound-router>
+                <mule:endpoint address="ftp://anonymous:email@localhost:60197"/>
+            </mule:inbound-router>
+        </mule:service>
 
-    </model>
+    </mule:model-streaming>
 
-</mule-configuration>
+</beans>

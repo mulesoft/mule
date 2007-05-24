@@ -2,13 +2,22 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
-       xmlns:pop3="http://www.mulesource.org/schema/mule/pop3/2.0"
+       xmlns:imap="http://www.mulesource.org/schema/mule/imap/2.0"
+       xmlns:imaps="http://www.mulesource.org/schema/mule/imaps/2.0"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 META-INF/mule.xsd
-       http://www.mulesource.org/schema/mule/pop3/2.0 META-INF/mule-pop3.xsd">
+       http://www.mulesource.org/schema/mule/imap/2.0 META-INF/mule-imap.xsd
+       http://www.mulesource.org/schema/mule/imaps/2.0 META-INF/mule-imaps.xsd">
 
-    <pop3:connector name="pop3Connector"/>
+    <imaps:connector name="imapsConnector">
+        <imaps:tls-client
+                clientKeyStore="clientKeystore"
+                clientKeyStorePassword="mulepassword"/>
+        <imaps:tls-trust-store
+                trustStore="greenmail-truststore"
+                trustStorePassword="password"/>
+    </imaps:connector>
 
     <bean name="bridge" class="org.mule.components.simple.BridgeComponent"/>
 
@@ -16,7 +25,7 @@
 
         <mule:service name="relay" service-ref="bridge">
             <mule:inbound-router>
-                <mule:endpoint address="pop3://bob%40example.com:password@localhost:65432">
+                <mule:endpoint address="imaps://bob%40example.com:password@localhost:65432" connector-ref="imapsConnector">
                     <mule:retry-connection-strategy inbound="true" retryCount="5" retryFrequency="1000"/>
                 </mule:endpoint>
             </mule:inbound-router>

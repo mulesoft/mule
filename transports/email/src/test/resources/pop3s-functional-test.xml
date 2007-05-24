@@ -3,12 +3,21 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:pop3="http://www.mulesource.org/schema/mule/pop3/2.0"
+       xmlns:pop3s="http://www.mulesource.org/schema/mule/pop3s/2.0"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 META-INF/mule.xsd
-       http://www.mulesource.org/schema/mule/pop3/2.0 META-INF/mule-pop3.xsd">
+       http://www.mulesource.org/schema/mule/pop3/2.0 META-INF/mule-pop3.xsd
+       http://www.mulesource.org/schema/mule/pop3s/2.0 META-INF/mule-pop3s.xsd">
 
-    <pop3:connector name="pop3Connector"/>
+    <pop3s:connector name="pop3sConnector">
+        <pop3s:tls-client
+                clientKeyStore="clientKeystore"
+                clientKeyStorePassword="mulepassword"/>
+        <pop3s:tls-trust-store
+                trustStore="greenmail-truststore"
+                trustStorePassword="password"/>
+    </pop3s:connector>
 
     <bean name="bridge" class="org.mule.components.simple.BridgeComponent"/>
 
@@ -16,7 +25,7 @@
 
         <mule:service name="relay" service-ref="bridge">
             <mule:inbound-router>
-                <mule:endpoint address="pop3://bob%40example.com:password@localhost:65432">
+                <mule:endpoint address="pop3s://bob%40example.com:password@localhost:65432" connector-ref="pop3sConnector">
                     <mule:retry-connection-strategy inbound="true" retryCount="5" retryFrequency="1000"/>
                 </mule:endpoint>
             </mule:inbound-router>

@@ -9,7 +9,6 @@
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.springframework.org/schema/beans"
                 schemaLocation="http://www.springframework.org/schema/beans"/>
-
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"/>
 
     <xsd:element name="connector" type="emailDownloadConnectorType"/>
@@ -17,10 +16,34 @@
     <xsd:complexType name="emailDownloadConnectorType">
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
-                <xsd:attribute name="backupFolder" type="xsd:NMTOKEN"/>
-                <xsd:attribute name="checkFrequency" type="xsd:int"/>
-                <xsd:attribute name="mailboxFolder" type="xsd:NMTOKEN"/>
-                <xsd:attribute name="deleteReadMessages" type="xsd:boolean"/>
+                <xsd:attribute name="backupFolder" type="xsd:NMTOKEN">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The folder to which messages are moved when read.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="checkFrequency" type="xsd:int">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Period (ms) between poll connections to the server.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="mailboxFolder" type="xsd:NMTOKEN">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The folder to check for email.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="deleteReadMessages" type="xsd:boolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether or not to delete messages from the server when they have been downloaded.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

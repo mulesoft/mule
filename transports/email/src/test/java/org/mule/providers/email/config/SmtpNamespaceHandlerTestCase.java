@@ -38,10 +38,7 @@ public class SmtpNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals("bar", headers.getProperty("foo"));
         assertEquals("boz", headers.getProperty("baz"));
         assertEquals("cde@example.com", c.getFromAddress());
-        assertEquals("example.com", c.getHost());
-        assertEquals("newMailbox", c.getMailboxFolder());
         assertEquals("password", c.getPassword());
-        assertEquals(1234, c.getPort());
         assertEquals("def@example.com", c.getReplyToAddresses());
         assertEquals("subject", c.getSubject());
         assertEquals("bob@example.com", c.getUsername());
@@ -65,10 +62,7 @@ public class SmtpNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals("bar", headers.getProperty("foo"));
         assertEquals("boz", headers.getProperty("baz"));
         assertEquals("cde@example.com", c.getFromAddress());
-        assertEquals("example.com", c.getHost());
-        assertEquals("newMailbox", c.getMailboxFolder());
         assertEquals("password", c.getPassword());
-        assertEquals(1234, c.getPort());
         assertEquals("def@example.com", c.getReplyToAddresses());
         assertEquals("subject", c.getSubject());
         assertEquals("bob@example.com", c.getUsername());

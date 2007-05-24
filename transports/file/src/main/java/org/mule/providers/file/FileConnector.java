@@ -64,6 +64,7 @@ public class FileConnector extends AbstractConnector
     public static final String PROPERTY_DIRECTORY = "directory";
     public static final String PROPERTY_SERVICE_OVERRIDE = "serviceOverrides";
     public static final String PROPERTY_WRITE_TO_DIRECTORY = "writeToDirectoryName";
+    public static final String PROPERTY_READ_FROM_DIRECTORY = "readFromDirectoryName";
 
     public static final long DEFAULT_POLLING_FREQUENCY = 1000;
 
@@ -77,6 +78,8 @@ public class FileConnector extends AbstractConnector
     private String writeToDirectoryName = null;
 
     private String moveToDirectoryName = null;
+
+    private String readFromDirectoryName = null;
 
     private String outputPattern = null;
 
@@ -127,6 +130,11 @@ public class FileConnector extends AbstractConnector
     public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception
     {
         String readDir = endpoint.getEndpointURI().getAddress();
+        if (null != getReadFromDirectory())
+        {
+            readDir = getReadFromDirectory();
+        }
+
         long polling = this.pollingFrequency;
 
         String moveTo = moveToDirectoryName;
@@ -136,6 +144,11 @@ public class FileConnector extends AbstractConnector
         if (props != null)
         {
             // Override properties on the endpoint for the specific endpoint
+            String read = (String)props.get(PROPERTY_READ_FROM_DIRECTORY);
+            if (read != null)
+            {
+                readDir = read;
+            }
             String move = (String)props.get(PROPERTY_MOVE_TO_DIRECTORY);
             if (move != null)
             {
@@ -392,6 +405,31 @@ public class FileConnector extends AbstractConnector
             {
                 throw new IOException(
                     "Error on initialization, Write To directory does not exist or is not read/write");
+            }
+        }
+    }
+
+    /**
+     * @return Returns the readFromDirectory.
+     */
+    public String getReadFromDirectory()
+    {
+        return readFromDirectoryName;
+    }
+
+    /**
+     * @param dir The readFromDirectory to set.
+     */
+    public void setReadFromDirectory(String dir) throws IOException
+    {
+        this.readFromDirectoryName = dir;
+        if (readFromDirectoryName != null)
+        {
+            File readFromDirectory = FileUtils.openDirectory((readFromDirectoryName));
+            if (!readFromDirectory.canRead())
+            {
+                throw new IOException(
+                    "Error on initialization, read from directory does not exist or is not readable");
             }
         }
     }
