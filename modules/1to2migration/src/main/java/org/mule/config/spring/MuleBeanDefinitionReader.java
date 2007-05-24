@@ -57,10 +57,10 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
     private int configCount = 0;
     private MuleDtdResolver dtdResolver = null;
 
-    public MuleBeanDefinitionReader(BeanDefinitionRegistry beanDefinitionRegistry, int configCount)
+    public MuleBeanDefinitionReader(BeanDefinitionRegistry beanDefinitionRegistry, String[] configs)
     {
         super(beanDefinitionRegistry);
-        this.configCount = configCount;
+        this.configCount = configs.length;
     }
 
     public int registerBeanDefinitions(Document document, Resource resource) throws BeansException
