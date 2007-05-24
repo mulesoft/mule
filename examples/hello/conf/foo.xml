@@ -10,7 +10,7 @@
     </description>
 
 
-    <bean class="org.mule.providers.stream.SystemStreamConnector" depends-on="_muleManagementContext"
+    <bean class="org.mule.providers.stdio.SystemStreamConnector" depends-on="_muleManagementContext"
           name="SystemStreamConnector" singleton="true">
         <property name="promptMessageCode">
             <value>3</value>

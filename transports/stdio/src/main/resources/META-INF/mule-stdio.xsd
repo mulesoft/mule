@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.mulesource.org/schema/mule/stdio/2.0"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+            targetNamespace="http://www.mulesource.org/schema/mule/stdio/2.0"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.springframework.org/schema/beans"
+                schemaLocation="http://www.springframework.org/schema/beans"/>
+    
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"/>
+
+    <xsd:element name="connector" type="stdioConnectorType"/>
+
+    <xsd:complexType name="stdioConnectorType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:connectorType">
+                <xsd:attribute name="messageDelayTime" type="xsd:long">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Delay (ms) before printing prompt to stdout.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="outputMessage" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Text printed to stdout when a message is sent.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="promptMessage" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Text printed to stdout when waiting for input.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="promptMessageCode" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Code used to retrieve prompt message from resource bundle.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="resourceBundle" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Resource bundle to provide prompt, with promptMessageCode.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+</xsd:schema>

@@ -5,7 +5,7 @@
 <mule-configuration id="Mule_Echo_Sample" version="1.0">
 
     <connector name="SystemStreamConnector"
-               className="org.mule.providers.stream.SystemStreamConnector">
+               className="org.mule.providers.stdio.SystemStreamConnector">
         <properties>
             <property name="promptMessage" value="Please enter something: "/>
             <property name="messageDelayTime" value="1000"/>

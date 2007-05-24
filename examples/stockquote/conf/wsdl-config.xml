@@ -17,7 +17,7 @@
 
     <mule-environment-properties synchronous="true"/>
 
-    <connector name="SystemStreamConnector" className="org.mule.providers.stream.SystemStreamConnector">
+    <connector name="SystemStreamConnector" className="org.mule.providers.stdio.SystemStreamConnector">
         <properties>
             <property name="promptMessageCode" value="2"/>
             <property name="resourceBundle" value="messages.stockquote-example-messages"/>

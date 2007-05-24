@@ -25,7 +25,7 @@
         messageDelayTime - is the time in milliseconds before the user is prompted again.
         These properties are set as bean properties on the connector.
     -->
-    <connector name="SystemStreamConnector" className="org.mule.providers.stream.SystemStreamConnector">
+    <connector name="SystemStreamConnector" className="org.mule.providers.stdio.SystemStreamConnector">
         <properties>
             <property name="promptMessageCode" value="3"/>
             <property name="resourceBundle" value="messages.hello-example-messages"/>
