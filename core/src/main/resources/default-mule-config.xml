@@ -29,7 +29,7 @@
 
     <bean name="_muleRegisterServiceProcessor" class="org.mule.config.spring.processors.RegisterServicePostProcessor"/>
 
-    <bean name="_muleObjectNameProcessor" class="org.mule.extras.spring.MuleObjectNameProcessor"/>
+    <bean name="_muleObjectNameProcessor" class="org.mule.config.spring.processors.MuleObjectNameProcessor"/>
 
     <bean name="_mulePropertyPlaceholderProcessor"
           class="org.mule.config.spring.processors.PropertyPlaceholderProcessor" depends-on="_muleRegistry">
