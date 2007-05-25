@@ -120,6 +120,7 @@ public abstract class AbstractFunctionalTestCase extends FunctionalTestCase
         // what we really want is (i think) is to be able to specify the endpoint proeprties
         // in the xml config, but i don't know how to do that, so i sent an email to dev.
         // once that is resolved, we can fix this.  otehrwise, please leave as failing for now.
+        // MULE-1790
         ep.setProperty(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES, StringBuffer.class.getName());
         try
         {
@@ -139,6 +140,7 @@ public abstract class AbstractFunctionalTestCase extends FunctionalTestCase
         // what we really want is (i think) is to be able to specify the endpoint proeprties
         // in the xml config, but i don't know how to do that, so i sent an email to dev.
         // once that is resolved, we can fix this.  otehrwise, please leave as failing for now.
+        // MULE-1790
         ep.setProperty(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES, String.class.getName());
         try
         {

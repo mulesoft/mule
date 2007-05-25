@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:ejb="http://www.mulesource.org/schema/mule/ejb/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 META-INF/mule.xsd
+       http://www.mulesource.org/schema/mule/ejb/2.0 META-INF/mule-ejb.xsd">
+
+    <bean name="securityManager"
+        class="org.mule.providers.rmi.DummySecurityManager"/>
+
+    <bean name="jndiContext"
+        class="org.mule.tck.jndi.InMemoryContext"/>
+
+    <ejb:connector name="ejbConnector"
+                   pollingFrequency="1234"
+                   securityManager-ref="securityManager"
+                   securityPolicy="rmi.policy"
+                   serverClassName="bcd"
+                   serverCodebase="cde"
+                   jndiInitialFactory="org.mule.tck.jndi.InMemoryContextFactory"
+                   jndiProviderUrl="efg"
+                   jndiUrlPkgPrefixes="fgh">
+        <mule:jndi-provider-properties>
+            <prop key="ghi">hij</prop>
+        </mule:jndi-provider-properties>
+    </ejb:connector>
+
+     <ejb:connector name="ejbConnector2"
+                   pollingFrequency="1234"
+                   securityManager-ref="securityManager"
+                   securityPolicy="rmi.policy"
+                   serverClassName="bcd"
+                   serverCodebase="cde"
+                   jndiContext-ref="jndiContext"/>
+
+</beans>

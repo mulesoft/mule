@@ -21,7 +21,9 @@ import javax.naming.NamingException;
 
 /**
  * <code>EjbContainerContext</code> is a container implementaiton that allows EJB
- * Session beans to be referenced as Mule managed UMOs
+ * Session beans to be referenced as Mule managed UMOs.
+ *
+ * This no longer needed in 2.0 since Spring provides this functionality directly.
  */
 public class EjbContainerContext extends RmiContainerContext
 {
