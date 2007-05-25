@@ -25,31 +25,4 @@
 
     <ejb:connector name="ejb" jndiContext-ref="jndiContext" securityPolicy="rmi.policy"/>
 
-    <vm:connector name="vmQueue" queueEvents="true"/>
-
-    <!-- mule:endpoint name="Sender" address="ejb://localhost:1099/SimpleMathsUMO?method=addTen"/>
-    <mule:endpoint name="Sender2" address="ejb://localhost:1099/MatchingUMO?method=reverseString"/>
-
-    <bean name="bridge" class="org.mule.components.simple.BridgeComponent"/>
-
-    <mule:model-seda name="sample">
-
-        <mule:service name="TestUMO" service-ref="bridge">
-            <mule:inbound-router>
-                <mule:endpoint address="vm://testin"/>
-            </mule:inbound-router>
-            <mule:outbound-router>
-                <mule:filtering-router>
-                    <mule:endpoint-ref nameref="Sender"/>
-                    <mule:payload-type-filter expectedType="java.lang.Integer"/>
-                </mule:filtering-router>
-                <mule:filtering-router>
-                    <mule:endpoint-ref nameref="Sender2"/>
-                    <mule:payload-type-filter expectedType="java.lang.String"/>
-                </mule:filtering-router>
-            </mule:outbound-router>
-        </mule:service>
-
-    </mule:model-seda -->
-
 </beans>
