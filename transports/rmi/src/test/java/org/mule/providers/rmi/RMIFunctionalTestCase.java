@@ -10,12 +10,21 @@
 
 package org.mule.providers.rmi;
 
+import org.mule.config.i18n.Message;
 import org.mule.extras.client.MuleClient;
+import org.mule.providers.rmi.i18n.RmiMessages;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.provider.DispatchException;
+
+import java.util.HashMap;
 
 public class RMIFunctionalTestCase extends FunctionalTestCase
 {
+
+    // from earlier multiple target test case
 
     public void testCase() throws Exception
     {
@@ -43,6 +52,94 @@ public class RMIFunctionalTestCase extends FunctionalTestCase
         payload = (Integer)message.getPayload();
         assertEquals(payload, new Integer(25));
     }
+
+    // from earlier invocation test case
+
+    private UMOMessage send(String uri, String message) throws Exception
+    {
+        MuleClient client = new MuleClient();
+        return client.send(uri, message, new HashMap());
+    }
+
+    public void testReverseString() throws Exception
+    {
+        UMOMessage message = send("rmi://localhost/TestService?method=reverseString", "hello");
+        assertNotNull(message.getPayload());
+        assertEquals("olleh", message.getPayloadAsString());
+    }
+
+    public void testUpperCaseString() throws Exception
+    {
+        UMOMessage message = send("rmi://localhost/TestService?method=upperCaseString", "hello");
+        assertNotNull(message.getPayload());
+        assertEquals("HELLO", message.getPayloadAsString());
+    }
+
+    public void testNoMethodSet() throws Exception
+    {
+        try
+        {
+            send("rmi://localhost/TestService", "hello");
+        }
+        catch (UMOException e)
+        {
+            assertTrue(e instanceof DispatchException);
+
+            Message message = RmiMessages.messageParamServiceMethodNotSet();
+            assertTrue(e.getMessage().startsWith(message.toString()));
+        }
+    }
+
+    public void testBadMethodName() throws Exception
+    {
+        try
+        {
+            send("rmi://localhost/TestService?method=foo", "hello");
+        }
+        catch (UMOException e)
+        {
+            assertTrue(e.getCause() instanceof NoSuchMethodException);
+        }
+    }
+
+    public void testBadMethodType() throws Exception
+    {
+        UMOEndpoint ep =
+                managementContext.getRegistry().getEndpointFromUri("rmi://localhost/TestService?method=reverseString");
+        // this fails here because of an NPE.
+        // what we really want is (i think) is to be able to specify the endpoint proeprties
+        // in the xml config, but i don't know how to do that, so i sent an email to dev.
+        // once that is resolved, we can fix this.  otehrwise, please leave as failing for now.
+        ep.setProperty(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES, StringBuffer.class.getName());
+        try
+        {
+            ep.send(getTestEvent("hello", ep));
+        }
+        catch (UMOException e)
+        {
+            assertTrue(e.getCause() instanceof NoSuchMethodException);
+        }
+    }
+
+    public void testCorrectMethodType() throws Exception
+    {
+        UMOEndpoint ep =
+                managementContext.getRegistry().getEndpointFromUri("rmi://localhost/TestService?method=reverseString");
+        // this fails here because of an NPE.
+        // what we really want is (i think) is to be able to specify the endpoint proeprties
+        // in the xml config, but i don't know how to do that, so i sent an email to dev.
+        // once that is resolved, we can fix this.  otehrwise, please leave as failing for now.
+        ep.setProperty(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES, String.class.getName());
+        try
+        {
+            ep.send(getTestEvent("hello", ep));
+        }
+        catch (UMOException e)
+        {
+            assertTrue(e.getCause() instanceof NoSuchMethodException);
+        }
+    }
+
 
     protected String getConfigResources()
     {

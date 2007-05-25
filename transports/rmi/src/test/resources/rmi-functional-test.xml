@@ -23,9 +23,7 @@
         </constructor-arg>
     </bean>
 
-    <rmi:connector name="rmi" jndiContext-ref="jndiContext"
-            securityPolicy="rmi.policy"
-            />
+    <rmi:connector name="rmi" jndiContext-ref="jndiContext" securityPolicy="rmi.policy"/>
 
     <vm:connector name="vmQueue" queueEvents="true"/>
 

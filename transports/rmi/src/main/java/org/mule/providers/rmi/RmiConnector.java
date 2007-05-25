@@ -248,6 +248,8 @@ public class RmiConnector extends AbstractJndiConnector
 
         if (args instanceof List)
         {
+            // TODO - this looks odd.  we're taking the first list entry and splitting it
+            // in a string tokenizer.  shouldn't we be using the list directly?
             List arguments = (List) args;
             argumentString = (String) arguments.get(0);
         }
