@@ -20,7 +20,6 @@ public class JnpConnectorTestCase extends AbstractConnectorTestCase
         JnpConnector c = new JnpConnector();
         c.setName("JnpConnector");
         c.setSecurityManager(null);
-        c.initialise();
         return c;
     }
 

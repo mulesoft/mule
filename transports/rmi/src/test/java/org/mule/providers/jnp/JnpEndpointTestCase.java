@@ -20,6 +20,7 @@ public class JnpEndpointTestCase extends AbstractMuleTestCase
     public void testHostPortUrl() throws Exception
     {
         UMOEndpointURI url = new MuleEndpointURI("jnp://localhost:1099");
+        url.initialise();
         assertEquals("jnp", url.getScheme());
         assertEquals("jnp://localhost:1099", url.getAddress());
         assertNull(url.getEndpointName());
@@ -32,6 +33,7 @@ public class JnpEndpointTestCase extends AbstractMuleTestCase
     public void testQueryParams1() throws Exception
     {
         UMOEndpointURI url = new MuleEndpointURI("jnp://localhost:1099/BeeShirtsjnpServer?method=testMethod");
+        url.initialise();
         assertEquals("jnp", url.getScheme());
         assertEquals("jnp://localhost:1099", url.getAddress());
         assertEquals("/BeeShirtsjnpServer", url.getPath());
@@ -47,6 +49,7 @@ public class JnpEndpointTestCase extends AbstractMuleTestCase
     {
         UMOEndpointURI url = new MuleEndpointURI(
             "jnp://localhost:1099/BeeShirtsjnpServer?method=testMethod&endpointName=jnpProvider&blankParam=");
+        url.initialise();
         assertEquals("jnp", url.getScheme());
         assertEquals("jnp://localhost:1099", url.getAddress());
         assertEquals("/BeeShirtsjnpServer", url.getPath());
