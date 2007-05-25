@@ -10,9 +10,9 @@
 
 package org.mule.providers.rmi;
 
-import org.mule.providers.AbstractBaseFunctionalTestCase;
+import org.mule.providers.AbstractFunctionalTestCase;
 
-public class RmiFunctionalTestCase extends AbstractBaseFunctionalTestCase
+public class RmiFunctionalTestCase extends AbstractFunctionalTestCase
 {
 
     public RmiFunctionalTestCase()

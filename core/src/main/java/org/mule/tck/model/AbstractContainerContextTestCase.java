@@ -20,43 +20,48 @@ import org.mule.umo.manager.UMOContainerContext;
 
 public abstract class AbstractContainerContextTestCase extends AbstractMuleTestCase
 {
+
     public void testContainerContext() throws Exception
     {
         UMOContainerContext container = getContainerContext();
         container.initialise();
         assertNotNull(container);
 
-        Object result = null;
+        doNullTest(container);
+        doBadKeyTest(container);
+        doContentTest(container);
+    }
 
+    protected void doNullTest(UMOContainerContext container)
+    {
         try
         {
-            result = container.getComponent(null);
+            container.getComponent(null);
             fail("Should throw ObjectNotFoundException for null key");
         }
         catch (ObjectNotFoundException e)
         {
             // expected
         }
+    }
 
+    protected void doBadKeyTest(UMOContainerContext container)
+    {
         try
         {
-            result = container.getComponent("abcdefg123456!£$%^n");
+            container.getComponent("abcdefg123456!ï¿½$%^n");
             fail("Should throw ObjectNotFoundException for a key that doesn't exist");
         }
         catch (ObjectNotFoundException e)
         {
             // expected
         }
+    }
 
-        try
-        {
-            result = container.getComponent(Apple.class);
-            assertNotNull("Component should exist in container", result);
-        }
-        catch (ObjectNotFoundException e)
-        {
-            fail("Component should exist in the container");
-        }
+    protected void doContentTest(UMOContainerContext container) throws Exception
+    {
+        Object result = container.getComponent(Apple.class);
+        assertNotNull("Component should exist in container", result);
     }
 
     /**
@@ -67,13 +72,27 @@ public abstract class AbstractContainerContextTestCase extends AbstractMuleTestC
      */
     public void testExternalUMOReference() throws Exception
     {
+        getAndVerifyExternalReference(
+                getTestDescriptor("fruit Bowl", "org.mule.tck.testmodels.fruit.FruitBowl"));
+    }
+
+    protected void getAndVerifyExternalReference(UMODescriptor descriptor) throws Exception
+    {
+        verifyExternalReference(getExternalReference(descriptor));
+    }
+
+    protected Object getExternalReference(UMODescriptor descriptor) throws Exception
+    {
         UMOContainerContext container = getContainerContext();
         assertNotNull(container);
         container.initialise();
-        UMODescriptor descriptor = getTestDescriptor("fruit Bowl", "org.mule.tck.testmodels.fruit.FruitBowl");
-       // descriptor.setContainer("plexus");
         descriptor.initialise();
-        FruitBowl fruitBowl = (FruitBowl) container.getComponent(descriptor.getService());
+        return container.getComponent(descriptor.getService());
+    }
+
+    protected void verifyExternalReference(Object object)
+    {
+        FruitBowl fruitBowl = (FruitBowl) object;
 
         assertNotNull(fruitBowl);
         assertTrue(fruitBowl.hasApple());

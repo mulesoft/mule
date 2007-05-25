@@ -8,11 +8,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.providers.rmi;
+package org.mule.providers;
 
 import org.mule.config.i18n.Message;
 import org.mule.extras.client.MuleClient;
 import org.mule.providers.rmi.i18n.RmiMessages;
+import org.mule.providers.rmi.RmiConnector;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
@@ -21,8 +22,17 @@ import org.mule.umo.provider.DispatchException;
 
 import java.util.HashMap;
 
-public class RMIFunctionalTestCase extends FunctionalTestCase
+public abstract class AbstractFunctionalTestCase extends FunctionalTestCase
 {
+
+    private String prefix;
+    private String config;
+
+    public AbstractFunctionalTestCase(String prefix, String config)
+    {
+        this.prefix = prefix;
+        this.config = config;
+    }
 
     // from earlier multiple target test case
 
@@ -58,19 +68,19 @@ public class RMIFunctionalTestCase extends FunctionalTestCase
     private UMOMessage send(String uri, String message) throws Exception
     {
         MuleClient client = new MuleClient();
-        return client.send(uri, message, new HashMap());
+        return client.send(prefix + uri, message, new HashMap());
     }
 
     public void testReverseString() throws Exception
     {
-        UMOMessage message = send("rmi://localhost/TestService?method=reverseString", "hello");
+        UMOMessage message = send("://localhost/TestService?method=reverseString", "hello");
         assertNotNull(message.getPayload());
         assertEquals("olleh", message.getPayloadAsString());
     }
 
     public void testUpperCaseString() throws Exception
     {
-        UMOMessage message = send("rmi://localhost/TestService?method=upperCaseString", "hello");
+        UMOMessage message = send("://localhost/TestService?method=upperCaseString", "hello");
         assertNotNull(message.getPayload());
         assertEquals("HELLO", message.getPayloadAsString());
     }
@@ -79,7 +89,7 @@ public class RMIFunctionalTestCase extends FunctionalTestCase
     {
         try
         {
-            send("rmi://localhost/TestService", "hello");
+            send("://localhost/TestService", "hello");
         }
         catch (UMOException e)
         {
@@ -94,7 +104,7 @@ public class RMIFunctionalTestCase extends FunctionalTestCase
     {
         try
         {
-            send("rmi://localhost/TestService?method=foo", "hello");
+            send("://localhost/TestService?method=foo", "hello");
         }
         catch (UMOException e)
         {
@@ -105,7 +115,7 @@ public class RMIFunctionalTestCase extends FunctionalTestCase
     public void testBadMethodType() throws Exception
     {
         UMOEndpoint ep =
-                managementContext.getRegistry().getEndpointFromUri("rmi://localhost/TestService?method=reverseString");
+                managementContext.getRegistry().getEndpointFromUri(prefix + "://localhost/TestService?method=reverseString");
         // this fails here because of an NPE.
         // what we really want is (i think) is to be able to specify the endpoint proeprties
         // in the xml config, but i don't know how to do that, so i sent an email to dev.
@@ -124,7 +134,7 @@ public class RMIFunctionalTestCase extends FunctionalTestCase
     public void testCorrectMethodType() throws Exception
     {
         UMOEndpoint ep =
-                managementContext.getRegistry().getEndpointFromUri("rmi://localhost/TestService?method=reverseString");
+                managementContext.getRegistry().getEndpointFromUri(prefix + "://localhost/TestService?method=reverseString");
         // this fails here because of an NPE.
         // what we really want is (i think) is to be able to specify the endpoint proeprties
         // in the xml config, but i don't know how to do that, so i sent an email to dev.
@@ -143,7 +153,7 @@ public class RMIFunctionalTestCase extends FunctionalTestCase
 
     protected String getConfigResources()
     {
-        return "rmi-functional-test.xml";
+        return config;
     }
 
 }

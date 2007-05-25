@@ -10,9 +10,9 @@
 
 package org.mule.providers.jnp;
 
-import org.mule.providers.AbstractBaseFunctionalTestCase;
+import org.mule.providers.AbstractFunctionalTestCase;
 
-public class JnpFunctionalTestCase extends AbstractBaseFunctionalTestCase
+public class JnpFunctionalTestCase extends AbstractFunctionalTestCase
 {
 
     public JnpFunctionalTestCase()
