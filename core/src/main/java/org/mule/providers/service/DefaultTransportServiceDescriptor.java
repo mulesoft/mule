@@ -58,17 +58,6 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
     private String streamMessageAdapter;
     private String messageReceiver;
     private String transactedMessageReceiver;
-    private String endpointBuilder;
-    private String sessionHandler;
-    private String defaultInboundTransformer;
-    private String defaultOutboundTransformer;
-    private String defaultResponseTransformer;
-
-    private UMOTransformer inboundTransformer;
-    private UMOTransformer outboundTransformer;
-    private UMOTransformer responseTransformer;
-    // private EndpointBuilder endpointBuilderImpl;
-
     private Properties exceptionMappings = new Properties();
     private Properties servicePorperties;
 
@@ -92,6 +81,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
 
         messageReceiver = props.getProperty(MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS);
         messageAdapter = props.getProperty(MuleProperties.CONNECTOR_MESSAGE_ADAPTER);
+        streamMessageAdapter = props.getProperty(MuleProperties.CONNECTOR_STREAM_MESSAGE_ADAPTER);
 
         registerService(MuleProperties.CONNECTOR_CLASS, null, false);
         registerService(MuleProperties.CONNECTOR_FACTORY, null, false);
