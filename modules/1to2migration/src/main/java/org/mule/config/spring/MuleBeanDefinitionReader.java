@@ -200,8 +200,8 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
         if (dtdResolver == null)
         {
             MuleDtdResolver muleSpringResolver = new MuleDtdResolver("mule-spring-configuration.dtd",
-                "mule-to-spring.xsl", new BeansDtdResolver());
-            dtdResolver = new MuleDtdResolver("mule-configuration.dtd", "mule-to-spring.xsl",
+                "mule-1-to-spring-migration.xsl", new BeansDtdResolver());
+            dtdResolver = new MuleDtdResolver("mule-configuration.dtd", "mule-1-to-spring-migration.xsl",
                 muleSpringResolver);
         }
         return dtdResolver;
