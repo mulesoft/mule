@@ -15,4 +15,5 @@
     <util:properties id="jndiEnv">
     	<prop key="java.naming.factory.initial">org.mule.tck.jndi.TestContextFactory</prop>
     </util:properties>
+
 </beans>

@@ -45,6 +45,13 @@
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-rmi</artifactId>
             <version>${version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-rmi</artifactId>
+            <version>${version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
