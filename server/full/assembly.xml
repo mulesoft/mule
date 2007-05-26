@@ -375,12 +375,12 @@ Assembly descriptor for the full Mule distribution.
       <outputDirectory>docs/api</outputDirectory>
     </fileSet>
 
-    <!-- Copy source bundles ("mvn -DperformRelease=true" must have been run previously) -->
+    <!-- Copy source bundle ("mvn -DperformRelease=true" must have been run previously) -->
     <fileSet>
-      <directory>../../..</directory>
+      <directory>target</directory>
       <outputDirectory>src</outputDirectory>
       <includes>
-          <include>**/*-sources.jar</include>
+          <include>mule-*-src.zip</include>
       </includes>
     </fileSet>
 

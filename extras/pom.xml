@@ -16,6 +16,11 @@
         <plugins>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
+                <!--
+                    Don't upgrade because of http://jira.codehaus.org/browse/MASSEMBLY-194,
+                    Needs to be fixed and then assembly descriptors should be updated.
+                 -->
+                <version>2.1</version>
                 <configuration>
                     <descriptors>
                         <descriptor>assembly.xml</descriptor>

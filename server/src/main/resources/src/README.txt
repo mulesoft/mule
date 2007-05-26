@@ -2,4 +2,4 @@ Source "bundles" are included in this directory for importing into your IDE.  Th
 helpful while debugging your application.
 
 If you wish to browse or work with the Mule source code, please read the information at
-http://mule.mulesource.org/wiki/display/MULE/Subversion
+http://www.muledocs.org/Subversion
