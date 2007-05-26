@@ -28,6 +28,16 @@
                     </instructions>
                 </configuration>
             </plugin>
+
+             <plugin>
+                 <artifactId>maven-surefire-plugin</artifactId>
+                 <configuration>
+                     <excludes>
+                         <!-- See MULE-1700 for more info -->
+                         <exclude>**/XmlUMOMessageTransformersTestCase.*</exclude>
+                     </excludes>
+                 </configuration>
+             </plugin>
          </plugins>
     </build>
 
