@@ -22,6 +22,12 @@
     </endpoint>
    </inbound-router>
   </mule-descriptor>
+ 
+ <mule-descriptor name="echoService3" implementation="org.mule.components.simple.EchoComponent">
+   <inbound-router>
+    <endpoint address="xfire:http://localhost:10083/services" synchronous="true"/>
+   </inbound-router>
+  </mule-descriptor>
  </model>
-
+  
 </mule-configuration> 

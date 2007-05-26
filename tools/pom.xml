@@ -21,17 +21,6 @@
         <module>mule-assembly-verifier</module>
     </modules>
 
-    <repositories>
-        <repository>
-            <id>mule-snapshots</id>
-            <name>Mule Snapshot Dependencies</name>
-            <url>http://dist.codehaus.org/mule/dependencies/maven2</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-
     <pluginRepositories>
         <pluginRepository>
             <id>mule-plugins</id>

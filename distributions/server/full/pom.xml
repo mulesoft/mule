@@ -20,10 +20,10 @@
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <!--
-                   Uncomment when it's published, contains wildcards functionality.
-                   Don't want to go with a SNAPSHOT yet.
+                    Don't upgrade because of http://jira.codehaus.org/browse/MASSEMBLY-194,
+                    Needs to be fixed and then assembly descriptors should be updated.
                  -->
-                <!-- version>2.2</version -->
+                <version>2.1</version>
                 <configuration>
                     <finalName>mule-${version}</finalName>
                     <descriptors>
@@ -35,7 +35,11 @@
                     <execution>
                         <phase>package</phase>
                         <goals>
-                            <goal>assembly</goal>
+                            <!--
+                                'attached' ensures there's only a single run bound to m2's lifecycle.
+                                The default 'assembly' goal would run every plugin in this pom twice.
+                            -->
+                            <goal>attached</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -62,16 +66,6 @@
                 </executions>
             </plugin>
 
-            <!--
-                This is currently disabled until the assembly-whitelist.txt is populated.
-                The format is:
-                    1. Each line corresponds to a single library entry.
-                    2. Each line contains an expected library jar name.
-                    3. Library names should have no extension (".jar" stripped)
-                    4. For Mule libraries *strip* the version completely. It will be derived from
-                       the project version.
-                    5. For 3rd-party libraries leave the version in (only strip the jar suffix from #3).
-             -->
             <plugin>
                 <groupId>org.mule.tools</groupId>
                 <artifactId>mule-assembly-verifier</artifactId>
@@ -90,6 +84,46 @@
                     <whitelist>assembly-whitelist.txt</whitelist>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo.groovy</groupId>
+                <artifactId>groovy-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <source>
+                                // splash
+                                log.info '*' * 80
+                                log.info('Repackaging sources'.center(80))
+                                log.info('(full build with a -DperformRelease=true must have run before)'.center(80))
+                                log.info '*' * 80
+
+                                def muleRoot = "${project.build.directory}/../../../../"
+
+                                log.info("Mule project root: ${new File(muleRoot).canonicalPath}")
+                                
+                                def tempDir = "$project.build.directory/sources-temp"
+                                ant.mkdir(dir: tempDir)
+
+                                ant.unjar(dest: tempDir) {
+                                    fileset(dir: muleRoot) {
+                                        include(name: '**/*-sources.jar')
+                                    }
+                                }
+
+                                ant.zip(basedir: tempDir,
+                                        destfile: "${project.build.directory}/mule-${project.version}-src.zip")
+                            </source>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            
+
         </plugins>
     </build>
 

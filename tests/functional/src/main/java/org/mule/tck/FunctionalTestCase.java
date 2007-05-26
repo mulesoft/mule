@@ -44,7 +44,7 @@ public abstract class FunctionalTestCase extends AbstractMuleTestCase
         else
         {
             ConfigurationBuilder builder = getBuilder();
-            context = builder.configure(getConfigResources(), null);
+            context = builder.configure(getConfigResources());
             RegistryContext.getConfiguration().setDefaultWorkListener(new TestingWorkListener());
         }
         return context;

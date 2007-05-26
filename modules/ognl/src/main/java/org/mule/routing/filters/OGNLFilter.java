@@ -32,7 +32,14 @@ public class OGNLFilter implements UMOFilter
         return expression;
     }
 
-    // TODO MULE-350
+    /**
+     * Sets the expression for this filter. The argument must be a valid expression
+     * as described ini the OGNL documentation.
+     * 
+     * @param expression the expression to use for message evaluation
+     * @throws ConfigurationException if the expression cannot be parsed
+     * @see {@link Ognl#parseExpression(String)}
+     */
     public void setExpression(String expression) throws ConfigurationException
     {
         try

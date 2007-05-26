@@ -255,6 +255,7 @@ public abstract class AbstractComponent implements UMOComponent
 
             doStop();
             stopped.set(true);
+            initialised.set(false);
             fireComponentNotification(ComponentNotification.COMPONENT_STOPPED);
         }
     }

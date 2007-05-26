@@ -91,7 +91,7 @@ public class LicenseHandler
             if (!licenseFile.exists() || !muleLib.exists())
             {
                 System.out
-                    .println("\nYour Mule installation seems to be incomplete. Please try downloading it again from http://mule.mulesource.org/wiki/display/MULE/Download and start again.");
+                    .println("\nYour Mule installation seems to be incomplete. Please try downloading it again from http://mule.mulesource.org/display/MULE/Download and start again.");
                 return false;
             }
 

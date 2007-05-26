@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import junit.framework.TestCase;
+import junit.framework.TestResult;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -44,13 +45,12 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  */
 public abstract class AbstractMuleTestCase extends TestCase
 {
+    private static final Log junitLogger = LogFactory.getLog(AbstractMuleTestCase.class.getName()
+        + ".JUnit");
     protected final Log logger = LogFactory.getLog(getClass());
 
     // This should be set to a string message describing any prerequisites not met
-    protected String prereqs = null;
     private boolean offline = System.getProperty("org.mule.offline", "false").equalsIgnoreCase("true");
-    private boolean testLogging = System.getProperty("org.mule.test.logging", "false").equalsIgnoreCase(
-        "true");
 
     private static Map testCounters;
 
@@ -99,7 +99,6 @@ public abstract class AbstractMuleTestCase extends TestCase
         {
             testCounters.clear();
         }
-        log("Cleared all counters");
     }
 
     private void clearCounter()
@@ -108,15 +107,6 @@ public abstract class AbstractMuleTestCase extends TestCase
         {
             testCounters.remove(getClass().getName());
         }
-        log("Cleared counter: " + getClass().getName());
-    }
-
-    private void log(String s)
-    {
-        if (testLogging)
-        {
-            System.err.println(s);
-        }
     }
 
     public String getName()
@@ -124,44 +114,71 @@ public abstract class AbstractMuleTestCase extends TestCase
         return super.getName().substring(4).replaceAll("([A-Z])", " $1").toLowerCase() + " ";
     }
 
-    /**
-     * Use this method to do any validation such as check for an installation of a
-     * required server If the current environment does not have the preReqs of the
-     * test return false and the test will be skipped.
-     * 
-     */
-    protected String checkPreReqs()
+    public void run(TestResult result)
     {
-        return null;
+        if (this.isDisabledInThisEnvironment())
+        {
+            junitLogger.info(this.getClass().getName() + " disabled");
+            return;
+        }
+
+        super.run(result);
+    }
+
+    /**
+     * Subclasses can override this method to skip the execution of the entire test class.
+     *
+     * @return <code>true</code> if the test class should not be run.
+     */
+    protected boolean isDisabledInThisEnvironment()
+    {
+        return false;
+    }
+
+    /**
+     * Shamelessly copy from Spring's ConditionalTestCase so in MULE-2.0 we can extend
+     * this class from ConditionalTestCase.
+     * <p/>
+     * Subclasses can override <code>isDisabledInThisEnvironment</code> to skip a single test.
+     */
+    public void runBare() throws Throwable
+    {
+        // getName will return the name of the method being run. Use the real JUnit implementation,
+        // this class has a different implementation
+        if (this.isDisabledInThisEnvironment(super.getName()))
+        {
+            junitLogger.warn(this.getClass().getName() + "." + super.getName() + " disabled in this environment");
+            return;
+        }
+
+        // Let JUnit handle execution
+        super.runBare();
+    }
+
+    /**
+     * Should this test run?
+     * @param testMethodName name of the test method
+     * @return whether the test should execute in the current envionment
+     */
+    protected boolean isDisabledInThisEnvironment(String testMethodName)
+    {
+        return false;
     }
 
     public boolean isOffline(String method)
     {
         if (offline)
         {
-            System.out.println(StringMessageUtils.getBoilerPlate(
+            logger.warn(StringMessageUtils.getBoilerPlate(
                 "Working offline cannot run test: " + method, '=', 80));
         }
         return offline;
     }
 
-    public boolean isPrereqsMet(String method)
-    {
-        prereqs = checkPreReqs();
-        if (prereqs != null)
-        {
-            System.out.println(StringMessageUtils.getBoilerPlate(
-                "WARNING\nPrerequisites for test: " + method + " were not met. skipping test: " + prereqs,
-                '=', 80));
-        }
-        return prereqs == null;
-    }
-
     protected final void setUp() throws Exception
     {
-        System.out.println(StringMessageUtils.getBoilerPlate("Testing: " + toString(), '=', 80));
+        junitLogger.info("Testing: " + toString());
         
-
         try
         {
             if (getTestInfo().getRunCount() == 0)
@@ -171,7 +188,6 @@ public abstract class AbstractMuleTestCase extends TestCase
                     // We dispose here jut in case
                     disposeManager();
                 }
-                log("Pre suiteSetup for test: " + getTestInfo());
                 suitePreSetUp();
             }
             if (!getTestInfo().isDisposeManagerPerSuite())
@@ -179,16 +195,11 @@ public abstract class AbstractMuleTestCase extends TestCase
                 // We dispose here just in case
                 disposeManager();
             }
-            if (!isPrereqsMet(getClass().getName() + ".setUp()"))
-            {
-                return;
-            }
             managementContext = createManagementContext();
 
             doSetUp();
             if (getTestInfo().getRunCount() == 0)
             {
-                log("Post suiteSetup for test: " + getTestInfo());
                 suitePostSetUp();
             }
         }
@@ -235,7 +246,6 @@ public abstract class AbstractMuleTestCase extends TestCase
         {
             if (getTestInfo().getRunCount() == getTestInfo().getTestCount())
             {
-                log("Pre suiteTearDown for test: " + getTestInfo());
                 suitePreTearDown();
             }
             doTearDown();
@@ -251,7 +261,6 @@ public abstract class AbstractMuleTestCase extends TestCase
             {
                 try
                 {
-                    log("Post suiteTearDown for test: " + getTestInfo());
                     suitePostTearDown();
                 }
                 finally
@@ -267,8 +276,7 @@ public abstract class AbstractMuleTestCase extends TestCase
     {
         try
         {
-            log("disposing manager. disposeManagerPerSuite=" + getTestInfo().isDisposeManagerPerSuite());
-            if (managementContext!=null)
+            if (managementContext != null)
             {
                 FileUtils.deleteTree(FileUtils.newFile(RegistryContext.getConfiguration().getWorkingDirectory()));
                 managementContext.dispose();
@@ -389,19 +397,16 @@ public abstract class AbstractMuleTestCase extends TestCase
         {
             testCount = 0;
             runCount = 0;
-            log("Cleared counts for: " + name);
         }
 
         public void incTestCount()
         {
             testCount++;
-            log("Added test: " + name + " " + testCount);
         }
 
         public void incRunCount()
         {
             runCount++;
-            log("Finished Run: " + toString());
         }
 
         public int getTestCount()

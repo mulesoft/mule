@@ -3,7 +3,7 @@
 +-----------------------+
 The JMS example demonstrates some JMS test cases using ActiveMQ.
 
-For more information, refer to http://mule.mulesource.org/wiki/display/MULE/Examples
+For more information, refer to http://www.muledocs.org/Examples
 
 +----------------------+
 | Building the example |

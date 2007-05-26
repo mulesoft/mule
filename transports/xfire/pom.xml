@@ -11,7 +11,7 @@
     <!--<packaging>bundle</packaging>-->
     <name>SOAP Transport: XFire</name>
     <description>A Mule transport for SOAP connectivity using XFire, a STaX-based SOAP stack.</description>
-    
+
     <build>
         <plugins>
             <plugin>
@@ -91,7 +91,7 @@
             <artifactId>mule-transport-soap</artifactId>
             <version>${version}</version>
         </dependency>
-        
+
         <!-- Needed for common SOAP test classes -->
         <dependency>
             <groupId>org.mule.transports</groupId>
@@ -100,14 +100,14 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-        
+
         <!-- This is needed by org.mule.providers.soap.xfire.transport.MuleUniversalChannel -->
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>
             <version>${version}</version>
         </dependency>
-        
+
         <!-- XFire dependencies -->
         <dependency>
             <groupId>org.codehaus.xfire</groupId>
@@ -191,7 +191,30 @@
         <dependency>
             <groupId>jaxen</groupId>
             <artifactId>jaxen</artifactId>
-            <version>1.1</version>
+            <version>1.1.1</version>
+            <!-- see http://jira.codehaus.org/browse/MNG-3007
+                 depending on whether jaxen is resolved via dist.codehaus.org
+                 or the central repo we get transitive dependencies that we
+                 don't want here
+            -->
+            <exclusions>
+                <exclusion>
+                    <groupId>com.ibm.icu</groupId>
+                    <artifactId>icu4j</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xalan</groupId>
+                    <artifactId>xalan</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xmlParserAPIs</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xom</groupId>
+                    <artifactId>xom</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>jdom</groupId>
@@ -219,7 +242,7 @@
             <version>${version}</version>
             <scope>test</scope>
         </dependency>
-        
+
         <!-- Remove for now since it introduces cyclic dependencies
         <dependency>
             <groupId>org.mule.transports</groupId>

@@ -4,7 +4,7 @@
 This example is described in the feature Java.net article
 "Service Provisioning Through ESB".
 
-For more information, refer to http://mule.mulesource.org/wiki/display/MULE/Examples
+For more information, refer to http://www.muledocs.org/Examples
 
 +---------------------+
 | Running the example |

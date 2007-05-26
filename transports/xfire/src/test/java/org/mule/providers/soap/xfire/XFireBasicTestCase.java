@@ -33,7 +33,13 @@ public class XFireBasicTestCase extends FunctionalTestCase
         UMOMessage result = client.send("xfire:http://localhost:10081/services/echoService?method=echo", "Hello!", null);
         assertEquals("Hello!", result.getPayload());
     }
-
+    public void testEchoServiceSynchronous() throws Exception
+    {
+        MuleClient client = new MuleClient();
+        UMOMessage result = client.send("xfire:http://localhost:10083/services/echoService3?method=echo", "Hello!", null);
+        assertEquals("Hello!", result.getPayload());
+    }
+    
     public void testEchoWsdl() throws Exception
     {
         MuleClient client = new MuleClient();

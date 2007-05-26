@@ -164,7 +164,7 @@ public abstract class MessageFactory extends Object
         return getString(bundlePath, code, arguments);
     }
 
-    private static String getString(String bundlePath, int code, Object[] args)
+    protected static String getString(String bundlePath, int code, Object[] args)
     {
         // We will throw a MissingResourceException if the bundle name is invalid
         // This happens if the code references a bundle name that just doesn't exist

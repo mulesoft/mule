@@ -52,6 +52,11 @@
     </scm>
 
     <properties>
+        <!--
+            The above project.url will not be picked up in the manifest,
+            instead a module artifact id is erroneously substituted.
+         -->
+        <productUrl>http://mule.mulesource.org</productUrl>
         <springVersion>2.0.5</springVersion>
         <coberturaVersion>2.1</coberturaVersion>
     </properties>
@@ -216,7 +221,7 @@
     </ciManagement>
 
     <distributionManagement>
-        <downloadUrl>http://mule.mulesource.org/Download</downloadUrl>
+        <downloadUrl>http://mule.mulesource.org/display/MULE/Download</downloadUrl>
         <repository>
             <id>mule-releases</id>
             <name>Mule Release Repository</name>
@@ -389,7 +394,7 @@
                                     <version>[2.0.6,)</version>
                                 </requireMavenVersion>
                                 <requireJavaVersion>
-                                    <!-- minimum version is 1.4, higher versions allowed -->
+                                    <!-- minimum version is 1.4.2, Java 5 and higher not allowed -->
                                     <version>[1.4.2,1.5.0)</version>
                                 </requireJavaVersion>
                             </rules>
@@ -469,15 +474,15 @@
                         </manifest>
                         <!-- Custom Entries -->
                         <manifestEntries>
-                            <More-Info>For more information go to ${pom.url}</More-Info>
+                            <More-Info>For more information go to ${productUrl}</More-Info>
                             <Support>Get commercial support: ${pom.organization.url}/support</Support>
                             <Description>Mule ESB and Integration Platform</Description>
                             <License>MulesSource MPL http://www.mulesource.com/MSPL/</License>
                             <Vendor-Url>${pom.organization.url}</Vendor-Url>
-                            <Product-Url>${pom.url}</Product-Url>
+                            <Product-Url>${productUrl}</Product-Url>
                             <Dtd-Public-Id>-//${pom.organization.name} //DTD mule-configuration XML V1.0//EN
                             </Dtd-Public-Id>
-                            <Dtd-System-Id>${pom.url}/dtds</Dtd-System-Id>
+                            <Dtd-System-Id>${productUrl}/dtds</Dtd-System-Id>
                             <!-- This would work if this issue gets closed: http://jira.codehaus.org/browse/MNG-1832 -->
                             <!--Build-Date>${mvn.timestamp.yyyy-MM-dd-HH:mm:ss}</Build-Date-->
                             <!-- include repository revision from buildnumber plugin -->

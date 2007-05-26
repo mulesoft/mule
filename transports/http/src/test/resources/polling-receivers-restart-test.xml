@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="StartAndStopTest" version="1.0">
+
+    <description>
+       This configuration is for a test that tests whether polling connectors work after being stopped and then started.
+    </description>
+
+    <mule-environment-properties synchronous="true"/>
+
+    <connector name="nonPollingHttp" className="org.mule.providers.http.HttpConnector"/>
+
+    <connector name="pollingHttp" className="org.mule.providers.http.HttpConnector">
+        <properties>
+            <map name="serviceOverrides">
+                <property name="message.receiver" value="org.mule.providers.http.PollingHttpMessageReceiver"/>
+            </map>
+        </properties>
+    </connector>
+
+    <model name="PollingHttpRestart">
+
+        <!-- singleton for easier testing only -->
+        <mule-descriptor name="Test" implementation="org.mule.tck.functional.FunctionalTestComponent" singleton="true">
+            <inbound-router>
+                <!-- This is the polling http endpoint, downloading data from our test feed  -->
+                <endpoint name="httpEndpoint" connector="pollingHttp" address="http://localhost:12345/TestServer"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="stream://System.out"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="TestServer" implementation="org.mule.components.simple.StaticComponent">
+            <inbound-router>
+                <!-- This is the server URL hosting our test feed -->
+                <endpoint address="http://localhost:12345" connector="nonPollingHttp"/>
+            </inbound-router>
+            <properties>
+                <property name="data" value="Here's your content."/>
+            </properties>
+        </mule-descriptor>
+    </model>
+</mule-configuration>
+

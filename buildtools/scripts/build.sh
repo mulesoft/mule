@@ -21,7 +21,7 @@ fi
 mvn -Ptests,distributions clean
 
 # Build all modules
-mvn -Dmaven.test.skip=true -Ptests compile test-compile install
+mvn -Dmaven.test.skip.exec=true -Ptests install
 
 # Run unit tests only
 mvn -Dmaven.test.failure.ignore=true test
@@ -30,16 +30,14 @@ mvn -Dmaven.test.failure.ignore=true test
 # mvn -Dmaven.test.failure.ignore=true -Ptests test
 
 # Generate HTML reports
-# mvn -Dmaven.test.skip=true -Ptests site:site
+# mvn -Dmaven.test.skip.exec=true -Ptests site:site
 
 # Generate javadocs
-mvn -Dmaven.test.skip=true -Ptests -Daggregate=true javadoc:javadoc
+mvn -Dmaven.test.skip.exec=true -Ptests -Daggregate=true javadoc:javadoc
 
-# Generate source bundles
-mvn -Dmaven.test.skip=true -Ptests source:jar
-
-# Generate all distributions
-mvn -Dmaven.test.skip=true -Pdistributions install
+# Generate all distributions (-DperformRelease=true to generate source bundles,
+# will be repackaged by the full distro script into a single source zip)
+mvn -Dmaven.test.skip.exec=true -Pdistributions -DperformRelease=true install
 
 # Upload all modules, javadocs, and sources to the public repository
-# mvn -Dmaven.test.skip=true -Ptests -DperformRelease=true deploy
+# mvn -Dmaven.test.skip.exec=true -Ptests -DperformRelease=true deploy

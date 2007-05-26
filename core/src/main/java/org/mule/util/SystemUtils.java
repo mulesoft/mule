@@ -15,8 +15,10 @@ import org.mule.MuleException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.commons.cli.BasicParser;
@@ -32,11 +34,19 @@ import org.apache.commons.logging.LogFactory;
 // @ThreadSafe
 public class SystemUtils extends org.apache.commons.lang.SystemUtils
 {
+    // class logger
     protected static final Log logger = LogFactory.getLog(SystemUtils.class);
+
+    // the generally accepted prefix for defined property key-value pairs on a
+    // command line
+    private static final String PROPERTY_DEFINITION_PREFIX = "-D";
 
     // bash prepends: declare -x
     // zsh prepends: typeset -x
     private static final String[] UNIX_ENV_PREFIXES = new String[]{"declare -", "typeset -"};
+
+    // the environment of the VM process
+    private static Map environment = null;
 
     /**
      * Get the operating system environment variables. This should work for Windows
@@ -46,31 +56,33 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
      */
     public static synchronized Map getenv()
     {
-        Map env = Collections./* <String, String> */EMPTY_MAP;
-
-        try
+        if (environment == null)
         {
-            if (SystemUtils.IS_JAVA_1_4)
+            try
             {
-                // fallback to external process
-                env = getenvJDK14();
+                if (SystemUtils.IS_JAVA_1_4)
+                {
+                    // fallback to external process
+                    environment = Collections.unmodifiableMap(getenvJDK14());
+                }
+                else
+                {
+                    // the following runaround is necessary since we still want to
+                    // compile on JDK 1.4
+                    Class target = System.class;
+                    Method envMethod = target.getMethod("getenv", ArrayUtils.EMPTY_CLASS_ARRAY);
+                    environment = Collections.unmodifiableMap((Map) envMethod.invoke(target, (Class[]) null));
+                }
             }
-            else
+            catch (Exception ex)
             {
-                // the following runaround is necessary since we still want to
-                // compile on JDK 1.4
-                Class target = System.class;
-                Method envMethod = target.getMethod("getenv", ArrayUtils.EMPTY_CLASS_ARRAY);
-                env = (Map) envMethod.invoke(target, (Class[] )null);
+                // TODO MULE-863: Is this bad enough to fail?
+                logger.error("Could not access OS environment: ", ex);
+                environment = Collections.EMPTY_MAP;
             }
         }
-        catch (Exception ex)
-        {
-            // TODO MULE-863: Is this bad enough to fail?
-            logger.error("Could not access OS environment: ", ex);
-        }
 
-        return env;
+        return environment;
     }
 
     private static Map getenvJDK14() throws Exception
@@ -232,6 +244,64 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
         }
 
         return ret;
+    }
+
+    /**
+     * Returns a Map of all valid property definitions in <code>-Dkey=value</code>
+     * format. <code>-Dkey</code> is interpreted as <code>-Dkey=true</code>,
+     * everything else is ignored.
+     * 
+     * @param input String with property definitionn
+     * @return a {@link Map} of property String keys with their defined values
+     *         (Strings). If no valid key-value pairs can be parsed, the map is
+     *         empty.
+     */
+    public static Map parsePropertyDefinitions(String input)
+    {
+        Map result = new HashMap();
+
+        // split all elements
+        String[] pairs = StringUtils.split(StringUtils.defaultIfEmpty(input, ""), ' ');
+
+        for (Iterator i = Arrays.asList(pairs).iterator(); i.hasNext();)
+        {
+            String pair = (String) i.next();
+
+            // skip over everything that does not start with -D
+            if (!pair.startsWith(PROPERTY_DEFINITION_PREFIX))
+            {
+                continue;
+            }
+
+            // split into -Dkey and some value
+            String[] split = StringUtils.split(pair, '=');
+
+            // normalize -Dsomething, but only if there's a key
+            if (split[0].startsWith(PROPERTY_DEFINITION_PREFIX)
+                            && split[0].length() > PROPERTY_DEFINITION_PREFIX.length())
+            {
+                split[0] = split[0].substring(PROPERTY_DEFINITION_PREFIX.length());
+            }
+            else
+            {
+                // no key - skip this pair
+                continue;
+            }
+
+            // value missing?
+            if (split.length == 1)
+            {
+                // yes: provide default value
+                result.put(split[0], "true");
+            }
+            else
+            {
+                // no: valid key and value
+                result.put(split[0], StringUtils.defaultIfEmpty(split[1], "true"));
+            }
+        }
+
+        return result;
     }
 
 }

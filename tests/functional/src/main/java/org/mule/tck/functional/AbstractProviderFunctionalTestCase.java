@@ -68,11 +68,6 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
 
     public void testSend() throws Exception
     {
-        if (!isPrereqsMet("org.mule.tck.functional.AbstractProviderFunctionalTestCase.testSend()"))
-        {
-            return;
-        }
-
         descriptor = getTestDescriptor("testComponent", FunctionalTestComponent.class.getName());
 
         initialiseComponent(descriptor, this.createEventCallback());

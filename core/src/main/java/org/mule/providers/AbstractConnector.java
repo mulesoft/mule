@@ -531,6 +531,8 @@ public abstract class AbstractConnector
         // make sure the scheduler is gone
         scheduler.set(null);
 
+        this.initialised.set(false);
+        // started=false already issued above right after doStop()
         if (logger.isInfoEnabled())
         {
             logger.info("Stopped: " + this);

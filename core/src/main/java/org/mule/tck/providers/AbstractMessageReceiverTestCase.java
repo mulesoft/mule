@@ -17,10 +17,6 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOMessageReceiver;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public abstract class AbstractMessageReceiverTestCase extends AbstractMuleTestCase
 {
     protected UMOComponent component;
@@ -47,7 +43,8 @@ public abstract class AbstractMessageReceiverTestCase extends AbstractMuleTestCa
             fail("Provider cannot be set to null");
         }
         catch (IllegalArgumentException e)
-        { /* expected */
+        {
+            // expected
         }
 
         try
@@ -56,7 +53,8 @@ public abstract class AbstractMessageReceiverTestCase extends AbstractMuleTestCa
             fail("component cannot be set to null");
         }
         catch (IllegalArgumentException e)
-        { /* expected */
+        {
+            // expected
         }
 
         receiver.setComponent(component);

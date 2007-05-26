@@ -16,7 +16,7 @@
     <property name="dir.classes" value="build/classes"/>
     <property name="dir.common.tests" value="../common-tests"/>
 
-    <property name="url.maven.repo" value="http://www.ibiblio.org/maven2"/>
+    <property name="url.maven.repo" value="http://repo1.maven.org/maven2"/>
     <property name="url.maven.repo2" value="http://people.apache.org/repo/m2-incubating-repository"/>
 
 

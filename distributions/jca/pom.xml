@@ -23,37 +23,7 @@
         <module>jca-jboss</module>
     </modules>
 
-    <!--
-        TODO DO: is this needed now we don't use a snapshot of the rar plugin any more?
-    <pluginRepositories>
-        <pluginRepository>
-            <id>mule-deps-plugins</id>
-            <name>Mule Plugin Repository (All)</name>
-            <url>http://dist.codehaus.org/mule/dependencies/maven2</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </pluginRepository>
-    </pluginRepositories>
-    -->
-
     <dependencies>
-        <!--
-          HACK: if mule-module-jca is not specified as a direct pom dependency, m2 project 
-          object never sees it as a module nor dependency, and assembly inclusion filters 
-          then just skip it.
-        -->
-        <!--
-        <dependency>
-            <groupId>org.mule.modules.jca</groupId>
-            <artifactId>mule-module-jca</artifactId>
-            <version>${version}</version>
-            <scope>provided</scope>
-        </dependency>
-        -->
         <!-- TODO dirk: I'm pretty sure that including the examples in the parent pom
             is not what we want. Only some distros want them, include them there
         -->

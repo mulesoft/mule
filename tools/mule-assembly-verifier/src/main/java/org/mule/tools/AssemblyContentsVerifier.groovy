@@ -69,7 +69,15 @@ class AssemblyContentsVerifier extends GroovyMojoSupport
         def actualNames = jars.collect {
             if (it ==~ /^mule.*/) {
                 // for Mule libs
-                return it - "-${muleVersion}.jar"
+
+                // small demo on what it does and a test
+                String s1 = 'mule-core-1.4.2-SNAPSHOT.jar'
+                String s2 = 'mule-core-1.4.2-SNAPSHOT-sources.jar'
+                String testVersion = '1.4.2-SNAPSHOT'
+                assert 'mule-core' == s1.replaceAll("-$testVersion", '') - '.jar'
+                assert 'mule-core-sources' == s2.replaceAll("-$testVersion", '') - '.jar'
+
+                return it.replaceAll("-$muleVersion", '') - '.jar'
             } else {
                 // for 3rd-party libs
                 return it - ".jar"
