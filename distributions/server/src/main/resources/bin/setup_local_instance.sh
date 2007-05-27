@@ -25,7 +25,6 @@ echo "Copying Mule files ..."
 
 cp -r $MULE_HOME/bin $MULE_BASE/
 cp -r $MULE_HOME/conf $MULE_BASE/
-cp -r $MULE_HOME/lib/boot $MULE_BASE/lib
 
 if [ ! -z "$MULE_HOME/examples" ]; then
    echo "Do you want to copy the examples directories to your local"

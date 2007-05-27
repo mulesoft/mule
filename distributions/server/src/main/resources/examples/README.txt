@@ -1,6 +1,6 @@
 The Mule examples can be built using either of the following build tools:
     Ant (version 1.6.5 or newer)   http://ant.apache.org
-    Maven (version 2.0 or newer)   http://maven.apache.org
+    Maven (version 2.0.6 or newer)   http://maven.apache.org
 
 Although Maven aims to make your build simple, the process itself is quite complex, so
 if you are not familiar with either tool, you will most likely want to start with Ant.
