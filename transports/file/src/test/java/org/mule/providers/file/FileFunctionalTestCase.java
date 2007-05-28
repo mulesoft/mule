@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.Writer;
+import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -70,8 +71,15 @@ public class FileFunctionalTestCase extends FunctionalTestCase
     {
         File target = initForReceive();
         MuleClient client = new MuleClient();
-        UMOMessage message = client.receive("file://" + target.getAbsolutePath() + "?connector=receiveConnector", 1000);
+        String url = fileToUrl(target) + "?connector=receiveConnector";
+        logger.debug(url);
+        UMOMessage message = client.receive(url, 1000);
         checkReceivedMessage(message);
+    }
+
+    protected String fileToUrl(File file) throws MalformedURLException
+    {
+        return file.getAbsoluteFile().toURI().toURL().toString();
     }
 
     public void testIndirectReceive() throws Exception
@@ -83,9 +91,10 @@ public class FileFunctionalTestCase extends FunctionalTestCase
         assertNotNull(model);
         UMOComponent relay = model.getComponent("relay");
         assertNotNull(relay);
+        String url = fileToUrl(target) + "?connector=receiveConnector";
+        logger.debug(url);
         relay.getDescriptor().getInboundRouter().addEndpoint(
-                new MuleEndpoint("file://" + target.getAbsolutePath() + "?connector=receiveConnector",
-                        true));
+	    new MuleEndpoint(url, true));
 
         // then read from the queue that the polling receiver will write to
         MuleClient client = new MuleClient();
@@ -107,7 +116,7 @@ public class FileFunctionalTestCase extends FunctionalTestCase
         File tmpDir = File.createTempFile("mule-file-test-", "-dir");
         tmpDir.delete();
         tmpDir.mkdir();
-        tmpDir.deleteOnExit();
+	tmpDir.deleteOnExit();
         File target = File.createTempFile("mule-file-test-", ".txt", tmpDir);
         Writer out = new FileWriter(target);
         out.write(TEST_MESSAGE);
