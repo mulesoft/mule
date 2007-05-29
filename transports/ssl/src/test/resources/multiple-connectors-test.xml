@@ -31,7 +31,7 @@
 
     <mule:model-seda name="main">
 
-        <mule:service name="testComponent1" implementation="reply">
+        <mule:service name="testComponent1" service-ref="reply">
             <mule:inbound-router>
                 <mule:endpoint-ref nameref="clientEndpoint"/>
             </mule:inbound-router>
