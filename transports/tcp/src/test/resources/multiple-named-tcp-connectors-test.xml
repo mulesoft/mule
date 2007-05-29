@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="Test_Multiple_Connectors" version="1.0">
+
+    <mule-environment-properties serverUrl="tcp://localhost:60504?connector=tcpConnector2"/>
+
+    <connector name="tcpConnector1" className="org.mule.providers.tcp.TcpConnector"/>
+    <connector name="tcpConnector2" className="org.mule.providers.tcp.TcpConnector"/>
+
+    <model name="MultilpleConnectorsTestModel">
+        <mule-descriptor name="testDescriptor" implementation="org.mule.components.simple.BridgeComponent">
+            <inbound-router>
+                <!--
+                    Removing the connector name from endpoint will fail initialisation,
+                    as there are multiple connectors available for the same transport.
+                 -->
+                <endpoint address="tcp://localhost:12345" connector="tcpConnector1"/>
+            </inbound-router>
+        </mule-descriptor>
+
+    </model>
+</mule-configuration>

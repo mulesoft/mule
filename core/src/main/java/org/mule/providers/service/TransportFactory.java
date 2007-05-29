@@ -289,7 +289,15 @@ public class TransportFactory
     private static UMOConnector getOrCreateConnectorByProtocol(UMOEndpointURI uri, int create)
         throws TransportFactoryException
     {
-        UMOConnector connector = getConnectorByProtocol(uri.getFullScheme());
+        final String connectorName = uri.getConnectorName();
+        // TODO this lookup fails currently on Mule 2.x! MuleAdminAgentTestCase
+        UMOConnector connector = RegistryContext.getRegistry().lookupConnector(connectorName);
+        if (connector != null)
+        {
+            return connector;
+        }
+
+        connector = getConnectorByProtocol(uri.getFullScheme());
         if (ALWAYS_CREATE_CONNECTOR == create
             || (connector == null && create == GET_OR_CREATE_CONNECTOR))
         {

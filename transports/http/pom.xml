@@ -123,5 +123,12 @@
             <version>${version}</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-stream</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>

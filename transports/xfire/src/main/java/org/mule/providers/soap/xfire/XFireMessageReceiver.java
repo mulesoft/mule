@@ -29,6 +29,8 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import org.codehaus.xfire.annotations.WebAnnotations;
+import org.codehaus.xfire.annotations.WebServiceAnnotation;
 import org.codehaus.xfire.handler.Handler;
 import org.codehaus.xfire.service.Service;
 
@@ -65,7 +67,19 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
             // check if there is the namespace property on the component
             String namespace = (String)component.getDescriptor().getProperties().get(
                 SoapConstants.SOAP_NAMESPACE_PROPERTY);
-            if (namespace == null)
+            
+            // check for namespace set as annotation
+            if (connector.isEnableJSR181Annotations())
+            {
+                WebAnnotations wa = (WebAnnotations)ClassUtils.instanciateClass(
+                    connector.CLASSNAME_ANNOTATIONS, null, this.getClass());
+                throw new UnsupportedOperationException("Has to be reimplemented for Mule 2.x");
+                // TODO MR - UMODescriptor.getImplementationClass() is no longer available
+                //WebServiceAnnotation webServiceAnnotation = wa.getWebServiceAnnotation(component.getDescriptor().getImplementationClass());
+                //namespace = webServiceAnnotation.getTargetNamespace();
+            }
+            
+            if((namespace == null)||(namespace.equalsIgnoreCase("")))
             {
                 namespace = MapUtils.getString(props, "namespace",
                     XFireConnector.DEFAULT_MULE_NAMESPACE_URI);

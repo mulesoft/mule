@@ -147,7 +147,7 @@ public class ConnectionFactoryWrapper
         return proxy;
     }
 
-    protected class ConnectionInvocationHandler implements InvocationHandler
+    public class ConnectionInvocationHandler implements InvocationHandler
     {
 
         private Object xac;
@@ -155,6 +155,16 @@ public class ConnectionFactoryWrapper
         public ConnectionInvocationHandler(Object xac)
         {
             this.xac = xac;
+        }
+
+        /**
+         * Can be one of 3 types.
+         * TODO check if we can portably cast it (JMS 1.1 vs 1.0.2b), see Jms102bSupport why
+         * @return underlying XAConnection instance
+         */
+        public Object getTargetObject()
+        {
+            return xac;
         }
 
         /*
