@@ -34,7 +34,8 @@ public class DummyInitialContextFactory implements ObjectFactory
         c.bind("Log4JAgent", new Log4jAgent());
         c.bind("XmlToObject", new XmlToObject());
         MuleDescriptor d = new MuleDescriptor("EchoUMO");
-        d.setImplementation("echoBean");
+        // TODO no longer available
+        //d.setImplementation("echoBean");
         c.bind("EchoUMO", d);
         c.bind("echoBean", new EchoComponent());
         return c;

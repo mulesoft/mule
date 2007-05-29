@@ -63,7 +63,7 @@ public class MuleClientListenerTestCase extends FunctionalTestCase
         String name = "myComponent";
         MuleDescriptor descriptor = new MuleDescriptor();
         descriptor.setName(name);
-        descriptor.setImplementationInstance(receiver);
+        descriptor.setService(receiver);
 
         MuleEndpoint endpoint = new MuleEndpoint(urlString, true);
         // We get a byte[] from a tcp endpoint so we need to convert it
