@@ -22,13 +22,13 @@
                 trustStorePassword="mulepassword"/>
     </tls:connector>
 
-    <mule:endpoint name="sendEndpoint" connector="tlsConnector"
+    <mule:endpoint name="sendEndpoint" connector-ref="tlsConnector"
                    address="tls://localhost:60198" synchronous="true"/>
 
-    <mule:endpoint name="sendManyEndpoint" connector="tlsConnector"
+    <mule:endpoint name="sendManyEndpoint" connector-ref="tlsConnector"
                    address="tls://localhost:60197" synchronous="true"/>
 
-    <mule:endpoint name="asyncEndpoint" connector="tlsConnector"
+    <mule:endpoint name="asyncEndpoint" connector-ref="tlsConnector"
                    address="tls://localhost:60196" synchronous="false"/>
 
     <bean id="reply" class="org.mule.tck.functional.FunctionalTestComponent">
@@ -51,19 +51,19 @@
 
     <mule:model-seda name="main">
 
-        <mule:service name="testComponent1" implementation="reply">
+        <mule:service name="testComponent1" service-ref="reply">
             <mule:inbound-router>
                 <mule:endpoint-ref nameref="sendEndpoint"/>
             </mule:inbound-router>
         </mule:service>
 
-        <mule:service name="testComponent2" implementation="countAndReply" singleton="true">
+        <mule:service name="testComponent2" service-ref="countAndReply" singleton="true">
             <mule:inbound-router>
                 <mule:endpoint-ref nameref="sendManyEndpoint"/>
             </mule:inbound-router>
         </mule:service>
 
-        <mule:service name="testComponent3" implementation="asynchronous">
+        <mule:service name="testComponent3" service-ref="asynchronous">
             <mule:inbound-router>
                 <mule:endpoint-ref nameref="asyncEndpoint"/>
             </mule:inbound-router>
