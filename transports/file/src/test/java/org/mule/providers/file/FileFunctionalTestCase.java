@@ -116,7 +116,7 @@ public class FileFunctionalTestCase extends FunctionalTestCase
         File tmpDir = File.createTempFile("mule-file-test-", "-dir");
         tmpDir.delete();
         tmpDir.mkdir();
-	tmpDir.deleteOnExit();
+        tmpDir.deleteOnExit();
         File target = File.createTempFile("mule-file-test-", ".txt", tmpDir);
         Writer out = new FileWriter(target);
         out.write(TEST_MESSAGE);
