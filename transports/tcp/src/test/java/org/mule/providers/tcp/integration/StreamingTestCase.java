@@ -94,7 +94,6 @@ public class StreamingTestCase extends FunctionalTestCase
         FunctionalStreamingTestComponent ftc =
                 (FunctionalStreamingTestComponent) model.getComponent("testComponent").getInstance();
         assertNotNull(ftc);
-        assertEquals(1, ftc.getNumber());
 
         // this works with or without singleton, but required adding getComponent method
 //        UMOModel model = (UMOModel) MuleManager.getInstance().getModels().get("echo");

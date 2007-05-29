@@ -34,6 +34,10 @@ public class SynchStreamingMule1687TestCase extends FunctionalTestCase
 
     public void testSendAndReceive() throws Exception
     {
+        if (true)
+        {
+            throw new Exception("This test hangs - remove this exception when a fix has been added");
+        }
         MuleClient client = new MuleClient();
 
         UMOMessage message = client.send("tcp://localhost:65432", TEST_MESSAGE, new HashMap());

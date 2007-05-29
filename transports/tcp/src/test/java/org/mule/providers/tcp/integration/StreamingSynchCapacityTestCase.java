@@ -11,7 +11,9 @@
 package org.mule.providers.tcp.integration;
 
 /**
- * Tests a model for which synchonous=true for environment and connector.
+ * Tests a model for which synchonous=true for environment (was "and connector", but that is
+ * no longer possible).
+ * 
  * Not the same as issue MULE-1687.
  *
  * This will happily send 1GB while running in significantly less memory, but it takes some time.
