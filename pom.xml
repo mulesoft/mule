@@ -309,11 +309,6 @@
                 <enabled>false</enabled>
             </releases>
         </repository>
-        <repository>
-            <id>objectweb</id>
-            <name>ObjectWeb Repository</name>
-            <url>http://maven.objectweb.org/maven2</url>
-        </repository>
     </repositories>
 
     <pluginRepositories>
