@@ -17,7 +17,7 @@
 
     <mule:model-seda name="main">
 
-        <mule:service name="Component1" implementation="testComponent1">
+        <mule:service name="Component1" service-ref="testComponent1">
             <mule:inbound-router>
                 <mule:endpoint-ref nameref="serverEndpoint"/>
             </mule:inbound-router>
@@ -28,7 +28,7 @@
             </mule:outbound-router>
         </mule:service>
 
-        <mule:service name="Component2" implementation="testComponent2">
+        <mule:service name="Component2" service-ref="testComponent2">
             <mule:inbound-router>
                 <mule:endpoint-ref nameref="serverEndpoint"/>
             </mule:inbound-router>
@@ -39,7 +39,7 @@
             </mule:outbound-router>
         </mule:service>
 
-        <mule:service name="Component3" implementation="testComponent3">
+        <mule:service name="Component3" service-ref="testComponent3">
             <mule:inbound-router>
                 <mule:endpoint-ref nameref="serverEndpoint"/>
             </mule:inbound-router>
