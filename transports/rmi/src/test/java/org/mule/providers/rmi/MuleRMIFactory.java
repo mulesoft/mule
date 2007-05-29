@@ -14,14 +14,12 @@ import org.mule.impl.jndi.MuleInitialContextFactory;
 import org.mule.tck.services.MatchingMethodsComponent;
 import org.mule.tck.services.SimpleMathsComponent;
 
-import java.util.Map;
-
 import javax.naming.InitialContext;
 
-public class MuleRMIFactory implements org.mule.config.PropertyFactory
+public class MuleRMIFactory
 {
 
-    public Object create(Map properties) throws Exception
+    public Object create() throws Exception
     {
         InitialContext ic = new InitialContext();
         ic.addToEnvironment(InitialContext.INITIAL_CONTEXT_FACTORY, MuleInitialContextFactory.class.getName());

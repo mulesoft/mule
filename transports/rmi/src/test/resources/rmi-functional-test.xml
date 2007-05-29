@@ -12,16 +12,7 @@
 
     <bean name="jndiFactory" class="org.mule.providers.rmi.MuleRMIFactory"/>
 
-    <bean name="jndiContext"
-          factory-bean="jndiFactory"
-          factory-method="create">
-        <constructor-arg>
-            <props>
-                <!-- present in original example, either here or as param to RMI connector, but ignored in either case -->
-                <!-- prop key="jndiInitialContextFactory">org.mule.impl.jndi.MuleInitialContextFactory</prop -->
-            </props>
-        </constructor-arg>
-    </bean>
+    <bean name="jndiContext" factory-bean="jndiFactory" factory-method="create"/>
 
     <rmi:connector name="rmi" jndiContext-ref="jndiContext" securityPolicy="rmi.policy"/>
 
