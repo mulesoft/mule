@@ -39,7 +39,7 @@ public class TcpSocketFactory implements PooledSocketFactory
         socket.setReuseAddress(true);
 
         TcpConnector connector = (TcpConnector)ep.getConnector();
-        connector.configureSocket(socket);
+        connector.configureSocket(TcpConnector.CLIENT, socket);
 
         return socket;
     }

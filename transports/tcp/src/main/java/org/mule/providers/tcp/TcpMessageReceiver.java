@@ -239,7 +239,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
 
             try
             {
-                tcpConnector.configureSocket(socket);
+                tcpConnector.configureSocket(TcpConnector.SERVER, socket);
             }
             catch (SocketException e)
             {

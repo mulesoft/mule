@@ -10,7 +10,8 @@
 
     <!-- keepSendSocketOpen is required for the Async test case -->
     <tcp:connector name="tcpConnector"
-                   keepSendSocketOpen="true"/>
+                   keepSendSocketOpen="true"
+                   socketSoLinger="0"/>
 
     <mule:endpoint name="clientEndpoint" address="tcp://localhost:60198" synchronous="true"/>
 

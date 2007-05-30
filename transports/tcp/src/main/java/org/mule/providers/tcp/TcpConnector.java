@@ -50,6 +50,10 @@ public class TcpConnector extends AbstractConnector
     public static final int DEFAULT_BUFFER_SIZE = INT_VALUE_NOT_SET;
     public static final int DEFAULT_BACKLOG = INT_VALUE_NOT_SET;
 
+    // to clarify arg to configureSocket 
+    public static final boolean SERVER = false;
+    public static final boolean CLIENT = true;
+
     private int clientSoTimeout = DEFAULT_SOCKET_TIMEOUT;
     private int serverSoTimeout = DEFAULT_SOCKET_TIMEOUT;
     private int sendBufferSize = DEFAULT_BUFFER_SIZE;
@@ -73,7 +77,7 @@ public class TcpConnector extends AbstractConnector
         setTcpProtocolClassName(DefaultProtocol.class.getName());
     }
 
-    public void configureSocket(Socket socket) throws SocketException
+    public void configureSocket(boolean client, Socket socket) throws SocketException
     {
         // There is some overhead in stting socket timeout and buffer size, so we're
         // careful here only to set if needed
@@ -86,9 +90,19 @@ public class TcpConnector extends AbstractConnector
         {
             socket.setSendBufferSize(getSendBufferSize());
         }
-        if (newValue(getClientSoTimeout(), socket.getSoTimeout()))
+        if (client)
         {
-            socket.setSoTimeout(getClientSoTimeout());
+            if (newValue(getClientSoTimeout(), socket.getSoTimeout()))
+            {
+                socket.setSoTimeout(getClientSoTimeout());
+            }
+        }
+        else
+        {
+            if (newValue(getServerSoTimeout(), socket.getSoTimeout()))
+            {
+                socket.setSoTimeout(getServerSoTimeout());
+            }
         }
         if (newValue(getSocketSoLinger(), socket.getSoLinger()))
         {
