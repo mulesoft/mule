@@ -18,6 +18,7 @@ import org.mule.providers.tcp.protocols.DefaultProtocol;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.ClassUtils;
@@ -29,6 +30,7 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URI;
+import java.net.SocketException;
 
 import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 
@@ -55,7 +57,7 @@ public class TcpConnector extends AbstractConnector
     private int receiveBacklog = DEFAULT_BACKLOG;
     private boolean sendTcpNoDelay;
     private boolean validateConnections = true;
-    private int socketLinger = INT_VALUE_NOT_SET;
+    private int socketSoLinger = INT_VALUE_NOT_SET;
     private String tcpProtocolClassName;
     private TcpProtocol tcpProtocol;
     private boolean keepSendSocketOpen = false;
@@ -69,6 +71,36 @@ public class TcpConnector extends AbstractConnector
         setSocketFactory (new TcpSocketFactory());
         setServerSocketFactory(new TcpServerSocketFactory());
         setTcpProtocolClassName(DefaultProtocol.class.getName());
+    }
+
+    public void configureSocket(Socket socket) throws SocketException
+    {
+        // There is some overhead in stting socket timeout and buffer size, so we're
+        // careful here only to set if needed
+
+        if (newValue(getReceiveBufferSize(), socket.getReceiveBufferSize()))
+        {
+            socket.setReceiveBufferSize(getReceiveBufferSize());
+        }
+        if (newValue(getSendBufferSize(), socket.getSendBufferSize()))
+        {
+            socket.setSendBufferSize(getSendBufferSize());
+        }
+        if (newValue(getClientSoTimeout(), socket.getSoTimeout()))
+        {
+            socket.setSoTimeout(getClientSoTimeout());
+        }
+        if (newValue(getSocketSoLinger(), socket.getSoLinger()))
+        {
+            socket.setSoLinger(true, getSocketSoLinger());
+        }
+        socket.setTcpNoDelay(isSendTcpNoDelay());
+        socket.setKeepAlive(isKeepAlive());
+    }
+
+    private boolean newValue(int parameter, int socketValue)
+    {
+        return parameter != UMOConnector.INT_VALUE_NOT_SET && parameter != socketValue;
     }
 
     protected void doInitialise() throws InitialisationException
@@ -277,14 +309,14 @@ public class TcpConnector extends AbstractConnector
         this.receiveBacklog = valueOrDefault(receiveBacklog, 0, DEFAULT_BACKLOG);
     }
 
-    public int getSendSocketLinger()
+    public int getSocketSoLinger()
     {
-        return socketLinger;
+        return socketSoLinger;
     }
 
-    public void setSendSocketLinger(int soLinger)
+    public void setSocketSoLinger(int soLinger)
     {
-        this.socketLinger = valueOrDefault(soLinger, 0, INT_VALUE_NOT_SET);
+        this.socketSoLinger = valueOrDefault(soLinger, 0, INT_VALUE_NOT_SET);
     }
 
     /**

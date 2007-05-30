@@ -42,14 +42,6 @@
                         <xsd:documentation>The maximum queue length for incoming connections.</xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="socketLinger" type="xsd:int">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The time (in seconds) for which sockets "linger" on close (this allows unset data to be
-                            transmitted).
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
                 <xsd:attribute name="sendTcpNoDelay" type="xsd:boolean">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -83,6 +75,14 @@
                             This sets the socket's SO_TIMEOUT value when the socket is used as a server. Reading from
                             the socket will block for up to this long (in milliseconds) before the read fails.  A value
                             of 0 (the default) causes the read to wait indefinitely (if no data arrive).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="socketSoLinger" type="xsd:int">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            This sets the socket's SO_LINGER value.  This is related to how long (in milliseconds) the
+                            socket will take to close so that any remaining data are transmitted correctly.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

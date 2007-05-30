@@ -10,7 +10,6 @@
 package org.mule.providers.tcp;
 
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.provider.UMOConnector;
 import org.mule.util.MapUtils;
 
 import java.io.IOException;
@@ -40,25 +39,8 @@ public class TcpSocketFactory implements PooledSocketFactory
         socket.setReuseAddress(true);
 
         TcpConnector connector = (TcpConnector)ep.getConnector();
-        //There is some overhead in stting socket timeout and buffer size, so we're
-        //careful here only to set if needed
-        if (connector.getReceiveBufferSize() != UMOConnector.INT_VALUE_NOT_SET
-            && socket.getReceiveBufferSize() != connector.getReceiveBufferSize())
-        {
-            socket.setReceiveBufferSize(connector.getReceiveBufferSize());
-        }
-        if (connector.getSendBufferSize() != UMOConnector.INT_VALUE_NOT_SET
-            && socket.getSendBufferSize() != connector.getSendBufferSize())
-        {
-            socket.setSendBufferSize(connector.getSendBufferSize());
-        }
-        if (connector.getClientSoTimeout() != UMOConnector.INT_VALUE_NOT_SET
-            && socket.getSoTimeout() != connector.getClientSoTimeout())
-        {
-            socket.setSoTimeout(connector.getClientSoTimeout());
-        }
-        socket.setTcpNoDelay(connector.isSendTcpNoDelay());
-        socket.setKeepAlive(connector.isKeepAlive());
+        connector.configureSocket(socket);
+
         return socket;
     }
 

@@ -13,7 +13,8 @@
                    receiveBufferSize="1024"
                    sendBufferSize="2048"
                    receiveBacklog="50"
-                   clientSoTimeout="3000"/>
+                   clientSoTimeout="3000"
+                   socketSoLinger="1234"/>
 
     <tcp:connector name="separateTimeouts"
                    clientSoTimeout="3000"
