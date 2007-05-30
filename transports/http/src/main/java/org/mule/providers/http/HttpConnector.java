@@ -98,7 +98,7 @@ public class HttpConnector extends TcpConnector
             if(getSendBufferSize()!= INT_VALUE_NOT_SET ) params.setSendBufferSize(getSendBufferSize());
             if(getReceiveBufferSize()!= INT_VALUE_NOT_SET ) params.setReceiveBufferSize(getReceiveBufferSize());
             if(getClientSoTimeout()!= INT_VALUE_NOT_SET ) params.setSoTimeout(getClientSoTimeout());
-            if(getSendSocketLinger()!= INT_VALUE_NOT_SET ) params.setLinger(getSendSocketLinger());
+            if(getSocketSoLinger()!= INT_VALUE_NOT_SET ) params.setLinger(getSocketSoLinger());
 
             params.setTcpNoDelay(isSendTcpNoDelay());
             params.setMaxTotalConnections(getDispatcherThreadingProfile().getMaxThreadsActive());
@@ -239,7 +239,7 @@ public class HttpConnector extends TcpConnector
 
     public void setCookieSpec(String cookieSpec)
     {
-        if (!(cookieSpec.equalsIgnoreCase(COOKIE_SPEC_NETSCAPE) && cookieSpec.equalsIgnoreCase(COOKIE_SPEC_RFC2109)))
+        if (!(cookieSpec.equalsIgnoreCase(COOKIE_SPEC_NETSCAPE) || cookieSpec.equalsIgnoreCase(COOKIE_SPEC_RFC2109)))
         {
             throw new IllegalArgumentException(
                 CoreMessages.propertyHasInvalidValue("cookieSpec", cookieSpec).toString());

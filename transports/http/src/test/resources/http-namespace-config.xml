@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 META-INF/mule.xsd
+       http://www.mulesource.org/schema/mule/http/2.0 META-INF/mule-http.xsd">
+
+    <http:connector name="httpConnector"
+                    clientSoTimeout="1234"
+                    cookieSpec="netscape"
+                    proxyHostname="bcd"
+                    proxyPassword="cde"
+                    proxyPort="2345"
+                    proxyUsername="def"
+                    receiveBacklog="34"
+                    receiveBufferSize="4567"
+                    sendBufferSize="5678"
+                    socketSoLinger="6789"
+                    serverSoTimeout="7890"
+                    enableCookies="true"
+                    keepAlive="true"
+                    keepSendSocketOpen="true"
+                    sendTcpNoDelay="true"
+                    validateConnections="false"
+    />
+
+</beans>
