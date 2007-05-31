@@ -31,6 +31,10 @@ import org.mule.config.ThreadingProfile;
 import org.mule.umo.UMOException;
 import org.mule.umo.manager.UMOWorkManager;
 
+import edu.emory.mathcs.backport.java.util.concurrent.Executor;
+import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 import java.text.MessageFormat;
 import java.util.List;
 
@@ -41,9 +45,6 @@ import javax.resource.spi.work.WorkCompletedException;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkListener;
 
-import edu.emory.mathcs.backport.java.util.concurrent.Executor;
-import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -147,7 +148,7 @@ public class MuleWorkManager implements UMOWorkManager
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.resource.spi.work.MuleWorkManager#doWork(javax.resource.spi.work.Work)
      */
     public void doWork(Work work) throws WorkException
@@ -157,7 +158,7 @@ public class MuleWorkManager implements UMOWorkManager
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.resource.spi.work.MuleWorkManager#doWork(javax.resource.spi.work.Work,
      *      long, javax.resource.spi.work.ExecutionContext,
      *      javax.resource.spi.work.WorkListener)
@@ -172,7 +173,7 @@ public class MuleWorkManager implements UMOWorkManager
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.resource.spi.work.MuleWorkManager#startWork(javax.resource.spi.work.Work)
      */
     public long startWork(Work work) throws WorkException
@@ -185,7 +186,7 @@ public class MuleWorkManager implements UMOWorkManager
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.resource.spi.work.MuleWorkManager#startWork(javax.resource.spi.work.Work,
      *      long, javax.resource.spi.work.ExecutionContext,
      *      javax.resource.spi.work.WorkListener)
@@ -203,7 +204,7 @@ public class MuleWorkManager implements UMOWorkManager
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.resource.spi.work.MuleWorkManager#scheduleWork(javax.resource.spi.work.Work)
      */
     public void scheduleWork(Work work) throws WorkException
@@ -215,7 +216,7 @@ public class MuleWorkManager implements UMOWorkManager
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.resource.spi.work.MuleWorkManager#scheduleWork(javax.resource.spi.work.Work,
      *      long, javax.resource.spi.work.ExecutionContext,
      *      javax.resource.spi.work.WorkListener)
@@ -237,7 +238,7 @@ public class MuleWorkManager implements UMOWorkManager
     {
         if (workExecutorService == null || workExecutorService.isShutdown())
         {
-            throw new IllegalStateException("This MuleWorkManager is stopped");
+            throw new IllegalStateException("This MuleWorkManager '" + name + "' is stopped");
         }
 
         workExecutorService.execute(work);
@@ -245,7 +246,7 @@ public class MuleWorkManager implements UMOWorkManager
 
     /**
      * Execute the specified Work.
-     * 
+     *
      * @param work Work to be executed.
      * @exception WorkException Indicates that the Work execution has been
      *                unsuccessful.
@@ -254,7 +255,7 @@ public class MuleWorkManager implements UMOWorkManager
     {
         if (workExecutorService == null || workExecutorService.isShutdown())
         {
-            throw new IllegalStateException("This MuleWorkManager is stopped");
+            throw new IllegalStateException("This MuleWorkManager '" + name + "' is stopped");
         }
 
         try
@@ -269,7 +270,7 @@ public class MuleWorkManager implements UMOWorkManager
         }
         catch (InterruptedException e)
         {
-            WorkCompletedException wcj = new WorkCompletedException("The execution has been interrupted.", e);
+            WorkCompletedException wcj = new WorkCompletedException("The execution has been interrupted for WorkManager: " + name, e);
             wcj.setErrorCode(WorkException.INTERNAL);
             throw wcj;
         }
