@@ -10,7 +10,7 @@
                http://www.mulesource.org/schema/mule/vm/2.0 META-INF/mule-vm.xsd
                http://www.mulesource.org/schema/mule/udp/2.0 META-INF/mule-udp.xsd">
 
-    <mule:environment-properties>
+    <!--<mule:environment-properties>-->
         <!-- what to do here? -->
         <!-- container-context className="org.mule.impl.container.PropertiesContainerContext">
             <properties>
@@ -18,13 +18,13 @@
                     factory="org.mule.config.factories.HostNameFactory"/>
             </properties>
         </container-context -->
-    </mule:environment-properties>
+    <!--</mule:environment-properties>-->
 
     <mule:transformer-serializable-to-byte-array name="SerializableToByteArray"/>
 
     <mule:model-seda name="main">
 
-        <mule:service name="PassingThrough" implementation="Just">
+        <mule:service name="PassingThrough" service-ref="Just">
             <mule:inbound-router>
                 <mule:endpoint address="udp://${hostname}:9001"/>
             </mule:inbound-router>

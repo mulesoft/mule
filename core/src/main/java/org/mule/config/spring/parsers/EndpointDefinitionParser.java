@@ -9,17 +9,12 @@
  */
 package org.mule.config.spring.parsers;
 
-import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.util.StringUtils;
 
-import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
 /**
@@ -35,6 +30,7 @@ public class EndpointDefinitionParser extends AbstractChildBeanDefinitionParser
 
     public EndpointDefinitionParser()
     {
+        registerAttributeMapping("address", "endpointURI");
         registerAttributeMapping("transformers", "transformer");
         registerAttributeMapping("responseTransformers", "responseTransformer");
         registerValueMapping("createConnector", "GET_OR_CREATE=0,ALWAYS_CREATE=1,NEVER_CREATE=2");
@@ -87,27 +83,6 @@ public class EndpointDefinitionParser extends AbstractChildBeanDefinitionParser
         }
         return true;
     }
-
-    //@Override
-    protected void processProperty(Attr attribute, BeanDefinitionBuilder builder)
-    {
-         if (ADDRESS_ATTRIBUTE.equals(attribute.getNodeName()))
-            {
-                String address = attribute.getNodeValue();
-                try
-                {
-                    builder.addPropertyValue("endpointURI", new MuleEndpointURI(address));
-                }
-                catch (EndpointException e)
-                {
-                    throw new BeanCreationException(CoreMessages.endpointIsMalformed(address).getMessage(), e);
-                }
-            }
-        else {
-            super.processProperty(attribute, builder);
-         }
-    }
-
 
     //@Override
     protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
