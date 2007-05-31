@@ -130,25 +130,25 @@
         Clean, Regenerate installer and installer with reg support. Avoid use of bad jars during installation.
     
     18.07.2005: (by Julien Ponge)
-    	Enforce source / target compatibility, now 1.4 / 1.4.
+        Enforce source / target compatibility, now 1.4 / 1.4.
     
     02.09.2005: (by Klaus Bartz)
-    	Unicode support of ShellLink.
+        Unicode support of ShellLink.
     
     09.09.2005: (Marc.Eppelmann)
-		Added start.sh to the shipped files in bin-folder.
-		
-	10.01.2006: (by Fabrice Mirabile)
-		Added the splashscreen to the cleandistreg target
-		
-	06.04.2006: (Marc Eppelmann)
-	    Inserted the fix.crlf target in the depends-list of target "all" to prevent encoding problems.
-	    
-	26.06.2006: (Marc Eppelmann)
-	    Extracted / Reordered some dist related targets to prevent double copy actions.
+        Added start.sh to the shipped files in bin-folder.
+
+    10.01.2006: (by Fabrice Mirabile)
+        Added the splashscreen to the cleandistreg target
+
+    06.04.2006: (Marc Eppelmann)
+        Inserted the fix.crlf target in the depends-list of target "all" to prevent encoding problems.
+
+    26.06.2006: (Marc Eppelmann)
+        Extracted / Reordered some dist related targets to prevent double copy actions.
         Also fixed the fix.crlf basedir
         
-	27.08.2006: (Marc Eppelmann)
+    27.08.2006: (Marc Eppelmann)
       Embedd ShortcutPanel*.java     
         
   14.09.2006: (Marc Eppelmann)   
@@ -158,7 +158,7 @@
       Added DataCheckPanel
 
   10.10.2006: (Fabrice Mirabile)   
-	  Fixed target src.tar.gz and clean.src.tar.gz
+      Fixed target src.tar.gz and clean.src.tar.gz
               
   Mini-HowTo:
 
@@ -539,11 +539,11 @@
             <include name="com/izforge/izpack/panels/HelloPanel.java" />
         </build-panel>
         <build-panel name="SelectPrinterPanel">
-	          <include name="com/izforge/izpack/panels/SelectPrinterPanel.java"/>
-	      </build-panel>
-	      <build-panel name="DataCheckPanel">
-				  <include name="com/izforge/izpack/panels/DataCheckPanel.java" />
-				</build-panel>
+              <include name="com/izforge/izpack/panels/SelectPrinterPanel.java"/>
+          </build-panel>
+          <build-panel name="DataCheckPanel">
+                  <include name="com/izforge/izpack/panels/DataCheckPanel.java" />
+                </build-panel>
         <build-panel name="CheckedHelloPanel">
             <include name="com/izforge/izpack/panels/CheckedHelloPanel.java" />
             <include name="com/izforge/izpack/panels/HelloPanel.java" />
@@ -654,7 +654,7 @@
          <include name="com/izforge/izpack/panels/InstallationGroupPanel.java"/>
          <include name="com/izforge/izpack/panels/InstallationGroupPanelAutomationHelper.java"/>
         </build-panel>
-	  <build-panel name="CustomInfoPanel">
+      <build-panel name="CustomInfoPanel">
             <include name="com/izforge/izpack/panels/CustomInfoPanel.java" />
         </build-panel>
     </target>
@@ -784,12 +784,12 @@
          This also acts as a check to help limit dependancies.
     -->
     <target name="build.listeners" depends="build.compiler,build.installer,build.listener-base">
-    	<!-- This dependency is mandatory -->
-    	<build-installer-listener name="LateShortcutInstallListener" classpath-ext="${bin.dir}/panels/ShortcutPanel.jar">
+        <!-- This dependency is mandatory -->
+        <build-installer-listener name="LateShortcutInstallListener" classpath-ext="${bin.dir}/panels/ShortcutPanel.jar">
             <include name="com/izforge/izpack/event/LateShortcutInstallListener.java" />
         </build-installer-listener>
 
-    	<build-installer-listener name="AntActionInstallerListener">
+        <build-installer-listener name="AntActionInstallerListener">
             <include name="com/izforge/izpack/event/AntActionInstallerListener.java" />
             <include name="com/izforge/izpack/event/AntAction.java" />
         </build-installer-listener>
@@ -837,9 +837,9 @@
         </build-installer-listener>
         COSTOM ACTION test END -->
 
-	<build-installer-listener name="MuleInstallerListener">
-	      <include name="com/izpack/mule/installer/custom/listener/MuleInstallerListener.java"/>
-	</build-installer-listener>	
+    <build-installer-listener name="MuleInstallerListener">
+          <include name="com/izpack/mule/installer/custom/listener/MuleInstallerListener.java"/>
+    </build-installer-listener>
     </target>
 
     <!-- ====================================================================== -->
@@ -866,7 +866,7 @@
                 <include name="uninstaller-ext.jar" />
             </fileset>
         </delete>
-    	    <delete file="bin/native/3rdparty/COIOSHelper.dll" />
+            <delete file="bin/native/3rdparty/COIOSHelper.dll" />
         <delete dir="${basedir}/bin/native/izpack" />
         <delete includeEmptyDirs="true" dir="${basedir}/doc/izpack" />
         <delete dir="${basedir}/_src${dist.subdir}"/>
@@ -905,8 +905,8 @@
             description="Creates the javadoc-api and customer documentation">
 
     </target>
-	
-	
+
+
     <!-- - - - - - - - - - - - - - - - - - 
           target: taskdef                      
          - - - - - - - - - - - - - - - - - -->
@@ -916,8 +916,8 @@
                  classpath="${basedir}/lib/compiler.jar"
                  classname="com.izforge.izpack.ant.IzPackTask" />
     </target>
-	
-	
+
+
     <!-- - - - - - - - - - - - - - - - - - 
           target: copy.natives                      
          - - - - - - - - - - - - - - - - - -->
@@ -927,9 +927,9 @@
         <mkdir dir="${basedir}/bin/native/izpack" />
         <!-- If unicode support of ShellLink.dll will be not used, change between  both copy blocks -->
         <!--
-		<copy todir="${basedir}/bin/native/izpack" file="${basedir}/src/native/ShellLink/Release/ShellLink.dll" verbose="true" overwrite="yes"/>
-		<copy todir="${basedir}/bin/native/3rdparty" file="${basedir}/src/native/win/COIOSHelper/Release/COIOSHelper.dll" verbose="true" overwrite="yes"/>
-		-->
+        <copy todir="${basedir}/bin/native/izpack" file="${basedir}/src/native/ShellLink/Release/ShellLink.dll" verbose="true" overwrite="yes"/>
+        <copy todir="${basedir}/bin/native/3rdparty" file="${basedir}/src/native/win/COIOSHelper/Release/COIOSHelper.dll" verbose="true" overwrite="yes"/>
+        -->
         <copy todir="${basedir}/bin/native/izpack"
               file="${basedir}/src/native/ShellLink/Release_Unicode/ShellLink.dll"
               verbose="true"
@@ -981,9 +981,9 @@
         <echo message="Copies the bin files to the dist directory" />
         <copy todir="${dist.dir}/bin" includeEmptyDirs="yes" overwrite="yes">
             <fileset dir="${dist-files.dir}">
-                <include name="compile*" />            	
+                <include name="compile*" />
                 <include name="lcp.bat" />
-            	<include name="start.sh"/>
+                <include name="start.sh"/>
             </fileset>
         </copy>
     </target>
@@ -1021,23 +1021,23 @@
                 izPackDir="${dist.dir}/"
                 compression="deflate"
                 compressionlevel="9" />
-    	<echo>
+        <echo>
 sucessfully created:
-${dist.dir}/${installer.name}${ver}.${rel}.jar    		
-    	</echo>
+${dist.dir}/${installer.name}${ver}.${rel}.jar
+        </echo>
     </target>
-	
-	
+
+
     <!-- - - - - - - - - - - - - - - - - - 
           target: prepare.install.dist                      
          - - - - - - - - - - - - - - - - - -->
     <target name="prepare.install.dist" depends="taskdef.dist, copy.dist.natives, copy.dist.files, replace.dist.buildnumber, fix.crlf">
             
     </target>
-	
+
     <!-- =================================
-	   Creates a normal installer for IzPack 
-	  ================================= -->
+       Creates a normal installer for IzPack
+      ================================= -->
   <!--  <target name="generate.installer" depends="prepare.install.dist">
         <antcall target="exec.izpack.compiler">
             <param name="installer.xmlfile" value="IzPack-install.xml" />
@@ -1047,12 +1047,12 @@ ${dist.dir}/${installer.name}${ver}.${rel}.jar
 
     <!-- My Test -->
     <target name="generate.installer" depends="prepare.install.dist">
-	<antcall target="install.listener.simple">
-		<param name="listener" value="MuleInstallerListener"/>
-		<param name="listener-dir" value="MuleInstallerListener"/>
-		<param name="listener-include" value="com\izpack\mule\installer\custom\listener"/>
-	</antcall>
-    </target>	
+    <antcall target="install.listener.simple">
+        <param name="listener" value="MuleInstallerListener"/>
+        <param name="listener-dir" value="MuleInstallerListener"/>
+        <param name="listener-include" value="com\izpack\mule\installer\custom\listener"/>
+    </antcall>
+    </target>
 
     <!--
         Fixes CR/LF by applying the Unix convention (\n for endlines).
@@ -1060,7 +1060,7 @@ ${dist.dir}/${installer.name}${ver}.${rel}.jar
     -->
     <target name="fix.crlf">
         <property name="dist.src.dir" location="${dist.dir}/src"/>
-    	<property name="dist.bin.dir" location="${dist.dir}/bin"/>
+        <property name="dist.bin.dir" location="${dist.dir}/bin"/>
         <echo>
 Fixing linefeeds for several files in:
  "${dist.src.dir}"
@@ -1072,14 +1072,14 @@ Fixing linefeeds for several files in:
             <include name="**/*.xml" />
             <include name="**/*.properties" />
         </fixcrlf>
-    	<fixcrlf srcdir="${dist.dir}" eol="unix" eof="remove">
+        <fixcrlf srcdir="${dist.dir}" eol="unix" eof="remove">
             <include name="**/*.sh"/>
-    	    <include name="dist-files/compile"/>
+            <include name="dist-files/compile"/>
         </fixcrlf>
-    	<fixcrlf srcdir="${dist.bin.dir}" eol="unix" eof="remove">
-    	  <include name="**/*.sh"/>
-    	  <include name="compile"/>	    	
-    	</fixcrlf>
+        <fixcrlf srcdir="${dist.bin.dir}" eol="unix" eof="remove">
+          <include name="**/*.sh"/>
+          <include name="compile"/>
+        </fixcrlf>
     </target>
 
     <!-- Runs a testing installer. -->
@@ -1130,9 +1130,9 @@ Fixing linefeeds for several files in:
             description="makes a complete installer and runs them" />
 
     <!-- ** splashscreen **
-	  shows some ANT specific- and JAVA-
-	  but Platform and Project-independed Properties.
-	================================================================ -->
+      shows some ANT specific- and JAVA-
+      but Platform and Project-independed Properties.
+    ================================================================ -->
     <target name="splashscreen"
             depends="time"
             description="shows the used environment and project settings">

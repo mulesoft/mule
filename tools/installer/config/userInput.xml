@@ -3,25 +3,25 @@
 <userInput>
     <panel order="0" layout="right"> 
         <field type="radio" variable="radioselection">
-	    <description align="left" txt="Setting proxy details will enable the download of important libraries that cannot be distributed with Mule if behind a Firewall" id="description.radio"/>
-	    <spec>
-	        <choice txt="Download 3rd Party Dependencies" id="radio.label.1" value="download" set="true"/>
-		<choice txt="Skip Download of 3rd Party Dependencies" id="radio.label.2" value="skip"/>
-	    </spec>
-	</field>
+        <description align="left" txt="Setting proxy details will enable the download of important libraries that cannot be distributed with Mule if behind a Firewall" id="description.radio"/>
+        <spec>
+            <choice txt="Download 3rd Party Dependencies" id="radio.label.1" value="download" set="true"/>
+        <choice txt="Skip Download of 3rd Party Dependencies" id="radio.label.2" value="skip"/>
+        </spec>
+    </field>
     </panel>
     <panel order="1" layout="right" id="download3rdparty" conditionid="download">
-	<field type="text" variable="PROXYHOST">
-	    <description align="left" txt="Set the proxy details using the fields below:" id="description.text"/>
+    <field type="text" variable="PROXYHOST">
+        <description align="left" txt="Set the proxy details using the fields below:" id="description.text"/>
             <spec txt="Proxy Host:" id="text.label.1" size="15" set=""/>
         </field>
-	<field type="text" variable="PROXYPORT">
+    <field type="text" variable="PROXYPORT">
             <spec txt="Proxy PORT:" id="text.label.2" size="6" set=""/>
         </field>
-	<field type="text" variable="PROXYUSERNAME">
+    <field type="text" variable="PROXYUSERNAME">
             <spec txt="Proxy User Name:" id="text.label.3" size="25" set=""/>
         </field>
-	<field type="text" variable="PROXYPASSWORD">
+    <field type="text" variable="PROXYPASSWORD">
             <spec txt="Proxy Password:" id="text.label.4" size="25" set=""/>
         </field>
     </panel>

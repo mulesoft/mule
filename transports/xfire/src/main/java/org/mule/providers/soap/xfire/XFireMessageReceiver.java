@@ -72,7 +72,7 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
             if (connector.isEnableJSR181Annotations())
             {
                 WebAnnotations wa = (WebAnnotations)ClassUtils.instanciateClass(
-                    connector.CLASSNAME_ANNOTATIONS, null, this.getClass());
+                    XFireConnector.CLASSNAME_ANNOTATIONS, null, this.getClass());
                 throw new UnsupportedOperationException("Has to be reimplemented for Mule 2.x");
                 // TODO MR - UMODescriptor.getImplementationClass() is no longer available
                 //WebServiceAnnotation webServiceAnnotation = wa.getWebServiceAnnotation(component.getDescriptor().getImplementationClass());

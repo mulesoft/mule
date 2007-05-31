@@ -18,19 +18,19 @@
     <!-- The gui preferences indication -->
     <guiprefs width="780" height="600" resizable="no">
       <modifier key="useButtonIcons" value="yes"/>
-	<modifier key="useLabelIcons" value="yes"/>
-  	<modifier key="labelGap" value="5"/>    
-  	<modifier key="layoutAnchor" value="CENTER"/>
-  	<modifier key="textXGap" value="5"/>
-  	<modifier key="textYGap" value="5"/>
-  	<modifier key="useHeadingPanel" value="yes"/>
-  	<modifier key="headingLineCount" value="0"/>
-  	<modifier key="headingFontSize" value="1"/>
-  	<modifier key="headingBackgroundColor" value="0x00ffffff"/>
+    <modifier key="useLabelIcons" value="yes"/>
+      <modifier key="labelGap" value="5"/>
+      <modifier key="layoutAnchor" value="CENTER"/>
+      <modifier key="textXGap" value="5"/>
+      <modifier key="textYGap" value="5"/>
+      <modifier key="useHeadingPanel" value="yes"/>
+      <modifier key="headingLineCount" value="0"/>
+      <modifier key="headingFontSize" value="1"/>
+      <modifier key="headingBackgroundColor" value="0x00ffffff"/>
       <modifier key="headingPanelCounter" value="progressbar"/>
-  	<modifier key="headingPanelCounterPos" value="inNavigationPanel"/>
+      <modifier key="headingPanelCounterPos" value="inNavigationPanel"/>
     </guiprefs>
-	  
+
     <!-- The locale section. I'm setting this to English.-->
     <locale>
         <langpack iso3="eng"/>
@@ -49,16 +49,16 @@
         <res id="Installer.image.7" src="../images/image_bar5.jpg" />
         <res id="Installer.image.8" src="../images/image_bar6.jpg" />
         <res id="Heading.image.0" src="../images/Installer_bar.1of7.rs.jpg"/>
-	  <res id="Heading.image.1" src="../images/Installer_bar.2of7.rs.jpg"/>
+      <res id="Heading.image.1" src="../images/Installer_bar.2of7.rs.jpg"/>
         <res id="Heading.image.2" src="../images/Installer_bar.UserOptions.jpg"/>
-	  <res id="Heading.image.3" src="../images/Installer_bar.3of7.rs.jpg"/>
+      <res id="Heading.image.3" src="../images/Installer_bar.3of7.rs.jpg"/>
         <res id="Heading.image.4" src="../images/Installer_bar.ProxySettings.jpg"/>
         <res id="Heading.image.5" src="../images/Installer_bar.4of7.rs.jpg"/>
         <res id="Heading.image.6" src="../images/Installer_bar.5of7.rs.jpg"/>
         <res id="Heading.image.7" src="../images/Installer_bar.6of7.rs.jpg"/>
         <res id="Heading.image.8" src="../images/Installer_bar.7of7.rs.jpg"/>
         <res id="userInputSpec.xml" src="userInput.xml"/>
-	  <res id="InfoPanel.info" src="../resources/INSTALL.txt"/>
+      <res id="InfoPanel.info" src="../resources/INSTALL.txt"/>
         <res id="conditions.xml" src="conditions.xml" /> 
     </resources>
 
@@ -66,18 +66,18 @@
     <panels>
         <panel classname="HelloPanel"/>
         <panel classname="LicencePanel"/>
-	  <panel order="0" classname="UserInputPanel"/>
+      <panel order="0" classname="UserInputPanel"/>
         <panel classname="TargetPanel"/>
-	  <panel classname="UserInputPanel" id="download3rdparty"/>
+      <panel classname="UserInputPanel" id="download3rdparty"/>
         <panel classname="PacksPanel"/>
         <panel classname="InstallPanel"/>
-	  <panel classname="InfoPanel" id="skipdownload"/>
+      <panel classname="InfoPanel" id="skipdownload"/>
         <panel classname="SimpleFinishPanel"/>
     </panels>
     
     <!-- The listener will delete the installed files if the installation fails -->
     <listeners>
-    	<listener installer="MuleInstallerListener"/>
+        <listener installer="MuleInstallerListener"/>
     </listeners>
 
     <!-- The Variables Section. These variables will be substituted by the user input -->
@@ -107,30 +107,30 @@
         <pack name="standard library" id="standard library" required="yes" conditionid="show.lib.standard">
             <description>Contains the standard Mule Library</description>
             <file src="../distribution/lib" targetdir="$INSTALL_PATH"/> 
-	    <executable targetfile="$INSTALL_PATH/lib/boot/mule-module-boot.jar" class="org.mule.modules.boot.GuiInstallerLicenseHandler" failure="abort" type="jar" stage="postinstall" keep="true">
-	        <args>
-		    <arg value="$INSTALL_PATH"/>
-		</args> 
-	    </executable>
+        <executable targetfile="$INSTALL_PATH/lib/boot/mule-module-boot.jar" class="org.mule.modules.boot.GuiInstallerLicenseHandler" failure="abort" type="jar" stage="postinstall" keep="true">
+            <args>
+            <arg value="$INSTALL_PATH"/>
+        </args>
+        </executable>
         </pack>
-		<pack name="full library" id="full library" required="yes" conditionid="show.lib.full">
-		    <description> Contains the standard Mule Library plus the third party libraries not distributed with mule</description>
-		    <file src="../distribution/lib" targetdir="$INSTALL_PATH"/>
-		    <executable targetfile="$INSTALL_PATH/lib/boot/mule-module-boot.jar" class="org.mule.modules.boot.GuiInstallerLicenseHandler" failure="abort" type="jar" stage="postinstall" keep="true">
-			<args>
-		  	    <arg value="$INSTALL_PATH"/>
-			</args> 
-		    </executable>
-	            <executable targetfile="$INSTALL_PATH/lib/boot/mule-module-boot.jar" class="org.mule.modules.boot.GuiInstallerLibraryDownloader" failure="abort" type="jar" stage="postinstall" keep="true">
-			<args>
-		 	    <arg value="$INSTALL_PATH"/>
-			    <arg value="$PROXYHOST"/>
-			    <arg value="$PROXYPORT"/>
-			    <arg value="$PROXYUSERNAME"/>
-			    <arg value="$PROXYPASSWORD"/>
-			</args> 
-		    </executable> 
-		</pack>
+        <pack name="full library" id="full library" required="yes" conditionid="show.lib.full">
+            <description> Contains the standard Mule Library plus the third party libraries not distributed with mule</description>
+            <file src="../distribution/lib" targetdir="$INSTALL_PATH"/>
+            <executable targetfile="$INSTALL_PATH/lib/boot/mule-module-boot.jar" class="org.mule.modules.boot.GuiInstallerLicenseHandler" failure="abort" type="jar" stage="postinstall" keep="true">
+            <args>
+                  <arg value="$INSTALL_PATH"/>
+            </args>
+            </executable>
+                <executable targetfile="$INSTALL_PATH/lib/boot/mule-module-boot.jar" class="org.mule.modules.boot.GuiInstallerLibraryDownloader" failure="abort" type="jar" stage="postinstall" keep="true">
+            <args>
+                 <arg value="$INSTALL_PATH"/>
+                <arg value="$PROXYHOST"/>
+                <arg value="$PROXYPORT"/>
+                <arg value="$PROXYUSERNAME"/>
+                <arg value="$PROXYPASSWORD"/>
+            </args>
+            </executable>
+        </pack>
         <pack name="licenses" required="yes">
             <description>The License files</description>
             <file src="../distribution/licenses" targetdir="$INSTALL_PATH"/>
