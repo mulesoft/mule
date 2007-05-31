@@ -18,11 +18,13 @@
 
     <vm:connector name="vmQueue" queueEvents="true"/>
 
-    <bean name="ftc" class="org.mule.tck.functional.FunctionalTestComponent"/>
+    <bean name="ftc1" class="org.mule.tck.functional.FunctionalTestComponent"/>
+
+    <bean name="ftc2" class="org.mule.tck.functional.FunctionalTestComponent"/>
 
     <mule:model-seda name="http polling test model">
 
-        <mule:service name="pollingUMO" service-ref="ftc">
+        <mule:service name="pollingUMO" service-ref="ftc1">
             <mule:inbound-router>
                 <mule:endpoint address="http://marie:marie@localhost:4567"
                                connector-ref="PollingHttpConnector">
@@ -34,6 +36,13 @@
                     <mule:endpoint address="vm://toclient"/>
                 </mule:pass-through-router>
             </mule:outbound-router>
+        </mule:service>
+
+        <mule:service name="polledUMO" service-ref="ftc2">
+            <mule:inbound-router>
+                <mule:endpoint address="http://localhost:4567"
+                               connector-ref="HttpConnector"/>
+            </mule:inbound-router>
         </mule:service>
 
     </mule:model-seda>
