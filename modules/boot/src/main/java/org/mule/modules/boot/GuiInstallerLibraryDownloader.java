@@ -46,10 +46,10 @@ public class GuiInstallerLibraryDownloader
             if (args.length > 2){
                 proxyPort = args[2].toString();
             }
-            if (args.length > 2){
+            if (args.length > 3){
                 proxyUsername = args[3].toString();
             }
-            if (args.length > 3){
+            if (args.length > 4){
                 proxyPassword = args[4].toString();               
             }
             LibraryDownloader downloader = new LibraryDownloader(muleHome, proxyHost, proxyPort, proxyUsername, proxyPassword);

@@ -7,16 +7,16 @@
     <!-- The info section -->
     <info>
         <appname>Mule</appname>
-        <appversion>1.4</appversion>
+        <appversion>1.4.2-SNAPSHOT</appversion>
         <authors>
             <author name="MuleSource" email="support@mulesource.com"/>
         </authors>
         <url>http://mule.mulesource.org/</url>
-        <javaversion>1.4</javaversion>
+        <javaversion>1.4.2</javaversion>
     </info>
     
     <!-- The gui preferences indication -->
-    <guiprefs width="800" height="600" resizable="no">
+    <guiprefs width="780" height="600" resizable="no">
       <modifier key="useButtonIcons" value="yes"/>
 	<modifier key="useLabelIcons" value="yes"/>
   	<modifier key="labelGap" value="5"/>    
@@ -107,7 +107,7 @@
         <pack name="standard library" id="standard library" required="yes" conditionid="show.lib.standard">
             <description>Contains the standard Mule Library</description>
             <file src="../distribution/lib" targetdir="$INSTALL_PATH"/> 
-	    <executable targetfile="$INSTALL_PATH/lib/boot/mule-module-boot-1.4-SNAPSHOT.jar" class="org.mule.modules.boot.GuiInstallerLicenseHandler" failure="abort" type="jar" stage="postinstall" keep="true">
+	    <executable targetfile="$INSTALL_PATH/lib/boot/mule-module-boot.jar" class="org.mule.modules.boot.GuiInstallerLicenseHandler" failure="abort" type="jar" stage="postinstall" keep="true">
 	        <args>
 		    <arg value="$INSTALL_PATH"/>
 		</args> 
@@ -116,12 +116,12 @@
 		<pack name="full library" id="full library" required="yes" conditionid="show.lib.full">
 		    <description> Contains the standard Mule Library plus the third party libraries not distributed with mule</description>
 		    <file src="../distribution/lib" targetdir="$INSTALL_PATH"/>
-		    <executable targetfile="$INSTALL_PATH/lib/boot/mule-module-boot-1.4-SNAPSHOT.jar" class="org.mule.modules.boot.GuiInstallerLicenseHandler" failure="abort" type="jar" stage="postinstall" keep="true">
+		    <executable targetfile="$INSTALL_PATH/lib/boot/mule-module-boot.jar" class="org.mule.modules.boot.GuiInstallerLicenseHandler" failure="abort" type="jar" stage="postinstall" keep="true">
 			<args>
 		  	    <arg value="$INSTALL_PATH"/>
 			</args> 
 		    </executable>
-	            <executable targetfile="$INSTALL_PATH/lib/boot/mule-module-boot-1.4-SNAPSHOT.jar" class="org.mule.modules.boot.GuiInstallerLibraryDownloader" failure="abort" type="jar" stage="postinstall" keep="true">
+	            <executable targetfile="$INSTALL_PATH/lib/boot/mule-module-boot.jar" class="org.mule.modules.boot.GuiInstallerLibraryDownloader" failure="abort" type="jar" stage="postinstall" keep="true">
 			<args>
 		 	    <arg value="$INSTALL_PATH"/>
 			    <arg value="$PROXYHOST"/>

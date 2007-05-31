@@ -27,13 +27,14 @@ import org.mule.umo.model.UMOModel;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.FileUtils;
 import org.mule.util.StringMessageUtils;
+import org.mule.util.StringUtils;
+import org.mule.util.SystemUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import junit.framework.TestCase;
 import junit.framework.TestResult;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
@@ -45,9 +46,12 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  */
 public abstract class AbstractMuleTestCase extends TestCase
 {
-    private static final Log junitLogger = LogFactory.getLog(AbstractMuleTestCase.class.getName()
-        + ".JUnit");
-    protected final Log logger = LogFactory.getLog(getClass());
+    /**
+     * This flag controls whether the text boxes will be logged when starting each test case.
+     */
+    private static final boolean verbose;
+
+    protected final Log logger = LogFactory.getLog(this.getClass());
 
     // This should be set to a string message describing any prerequisites not met
     private boolean offline = System.getProperty("org.mule.offline", "false").equalsIgnoreCase("true");
@@ -55,6 +59,22 @@ public abstract class AbstractMuleTestCase extends TestCase
     private static Map testCounters;
 
     protected static UMOManagementContext managementContext;
+
+    static
+    {
+        String muleOpts = SystemUtils.getenv("MULE_TEST_OPTS");
+        if (StringUtils.isNotBlank(muleOpts))
+        {
+            Map parsedOpts = SystemUtils.parsePropertyDefinitions(muleOpts);
+            String optVerbose = (String)parsedOpts.get("mule.verbose");
+            verbose = Boolean.valueOf(optVerbose).booleanValue();
+        }
+        else
+        {
+            // per default, revert to the old behaviour
+            verbose = true;
+        }
+    }
 
     public AbstractMuleTestCase()
     {
@@ -118,7 +138,7 @@ public abstract class AbstractMuleTestCase extends TestCase
     {
         if (this.isDisabledInThisEnvironment())
         {
-            junitLogger.info(this.getClass().getName() + " disabled");
+            logger.info(this.getClass().getName() + " disabled");
             return;
         }
 
@@ -147,7 +167,7 @@ public abstract class AbstractMuleTestCase extends TestCase
         // this class has a different implementation
         if (this.isDisabledInThisEnvironment(super.getName()))
         {
-            junitLogger.warn(this.getClass().getName() + "." + super.getName() + " disabled in this environment");
+            logger.warn(this.getClass().getName() + "." + super.getName() + " disabled in this environment");
             return;
         }
 
@@ -177,8 +197,13 @@ public abstract class AbstractMuleTestCase extends TestCase
 
     protected final void setUp() throws Exception
     {
-        junitLogger.info("Testing: " + toString());
-        
+        if (verbose)
+        {
+            System.out.println(StringMessageUtils.getBoilerPlate("Testing: " + toString(), '=', 80));
+        }
+        //MuleManager.getConfiguration().getDefaultThreadingProfile().setDoThreading(false);
+        //MuleManager.getConfiguration().setServerUrl(StringUtils.EMPTY);
+
         try
         {
             if (getTestInfo().getRunCount() == 0)

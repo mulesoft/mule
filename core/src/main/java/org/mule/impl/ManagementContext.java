@@ -236,10 +236,6 @@ public class ManagementContext implements UMOManagementContext
             {
                 logger.info(getStartSplash());
             }
-            else
-            {
-                System.out.println(getStartSplash());
-            }
             fireSystemEvent(new ManagerNotification(this, ManagerNotification.MANAGER_STARTED));
         }
     }
@@ -302,13 +298,9 @@ public class ManagementContext implements UMOManagementContext
             getRegistry().dispose();
         }
 
-        if (logger.isInfoEnabled())
+        if ((startDate > 0) && logger.isInfoEnabled())
         {
             logger.info(getEndSplash());
-        }
-        else
-        {
-            System.out.println(getEndSplash());
         }
         lifecycleManager.reset();
     }
@@ -719,7 +711,7 @@ public class ManagementContext implements UMOManagementContext
      *
      * @return a string summary of the server information
      */
-    protected String getStartSplash()
+    private String getStartSplash()
     {
         String notset = CoreMessages.notSet().getMessage();
 

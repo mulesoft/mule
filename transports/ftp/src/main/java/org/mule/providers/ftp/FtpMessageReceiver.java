@@ -22,6 +22,7 @@ import org.mule.umo.provider.UMOConnector;
 
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -95,16 +96,18 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
             connector.enterActiveOrPassiveMode(client, endpoint);
             connector.setupFileType(client, endpoint);
 
-            if (!client.changeWorkingDirectory(uri.getPath()))
+            final String path = uri.getPath();
+            if (!client.changeWorkingDirectory(path))
             {
-                throw new IOException("Ftp error: " + client.getReplyCode());
+                throw new IOException(MessageFormat.format("Failed to change working directory to {0}. Ftp error: {1}",
+                                                           new Object[] {path, new Integer(client.getReplyCode())}));
             }
 
             FTPFile[] files = client.listFiles();
 
             if (!FTPReply.isPositiveCompletion(client.getReplyCode()))
             {
-                throw new IOException("Ftp error: " + client.getReplyCode());
+                throw new IOException("Failed to list files. Ftp error: " + client.getReplyCode());
             }
 
             if (files == null || files.length == 0)
@@ -125,7 +128,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
                 }
             }
 
-            return (FTPFile[])v.toArray(new FTPFile[v.size()]);
+            return (FTPFile[]) v.toArray(new FTPFile[v.size()]);
         }
         finally
         {
@@ -144,33 +147,38 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
             connector.enterActiveOrPassiveMode(client, endpoint);
             connector.setupFileType(client, endpoint);
 
-            if (!client.changeWorkingDirectory(endpoint.getEndpointURI().getPath()))
+            final String fileName = file.getName();
+            final String path = uri.getPath();
+            
+            if (!client.changeWorkingDirectory(path))
             {
-                throw new IOException("Ftp error: " + client.getReplyCode());
-            }
+                throw new IOException(MessageFormat.format("Failed to change working directory to {0}. Ftp error: {1}",
+                                                           new Object[] {path, new Integer(client.getReplyCode())}));            }
 
             UMOMessage message;
             if (endpoint.isStreaming())
             {
                 message = new MuleMessage(
-                        connector.getStreamMessageAdapter(client.retrieveFileStream(file.getName()), null));
+                        connector.getStreamMessageAdapter(client.retrieveFileStream(fileName), null));
             }
             else
             {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                if (!client.retrieveFile(file.getName(), baos))
+                if (!client.retrieveFile(fileName, baos))
                 {
-                    throw new IOException("Ftp error: " + client.getReplyCode());
+                    throw new IOException(MessageFormat.format("Failed to retrieve file {0}. Ftp error: {1}",
+                                                               new Object[] {fileName, new Integer(client.getReplyCode())}));
                 }
                 message = new MuleMessage(connector.getMessageAdapter(baos.toByteArray()));
             }
 
-            message.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, file.getName());
+            message.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, fileName);
             routeMessage(message);
 
-            if (!client.deleteFile(file.getName()))
+            if (!client.deleteFile(fileName))
             {
-                throw new IOException("Ftp error: " + client.getReplyCode());
+                throw new IOException(MessageFormat.format("Failed to delete file {0}. Ftp error: {1}",
+                                                           new Object[] {fileName, new Integer(client.getReplyCode())}));
             }
         }
         finally
@@ -198,21 +206,21 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
 
     private final class FtpWork implements Work
     {
-        private final String _name;
-        private final FTPFile _file;
+        private final String name;
+        private final FTPFile file;
 
         private FtpWork(String name, FTPFile file)
         {
-            _name = name;
-            _file = file;
+            this.name = name;
+            this.file = file;
         }
 
         public void run()
         {
             try
             {
-                currentFiles.add(_name);
-                processFile(_file);
+                currentFiles.add(name);
+                processFile(file);
             }
             catch (Exception e)
             {
@@ -220,8 +228,8 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
             }
             finally
             {
-                currentFiles.remove(_name);
-                scheduledFiles.remove(_name);
+                currentFiles.remove(name);
+                scheduledFiles.remove(name);
             }
         }
 
