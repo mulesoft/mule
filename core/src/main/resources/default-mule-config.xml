@@ -3,7 +3,7 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
        xsi:schemaLocation="
-       http://www.springframework.org/schema/beans META-INF/spring-beans-2.0.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 META-INF/mule.xsd">
 
     <bean name="_muleManagementContext" class="org.mule.config.spring.ManagementContextFactoryBean"
