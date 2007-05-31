@@ -195,8 +195,8 @@
                 <mule:filtering-router>
                     <mule:endpoint-ref nameref="waterMelonEndpoint"/>
                     <mule:and-filter>
-                        <mule:regex-filter expression="the quick brown (.*)"/>
-                        <mule:regex-filter expression="(.*) brown (.*)"/>
+                        <mule:regex-filter pattern="the quick brown (.*)"/>
+                        <mule:regex-filter pattern="(.*) brown (.*)"/>
                     </mule:and-filter>
                 </mule:filtering-router>
             </mule:outbound-router>

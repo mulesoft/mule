@@ -35,7 +35,7 @@ public class JXPathFilter implements UMOFilter
 
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    private String expression;
+    private String pattern;
     private String expectedValue;
     private Map namespaces = null;
     private Map contextProperties = null;
@@ -47,14 +47,14 @@ public class JXPathFilter implements UMOFilter
         super();
     }
 
-    public JXPathFilter(String expression)
+    public JXPathFilter(String pattern)
     {
-        this.expression = expression;
+        this.pattern = pattern;
     }
 
-    public JXPathFilter(String expression, String expectedValue)
+    public JXPathFilter(String pattern, String expectedValue)
     {
-        this.expression = expression;
+        this.pattern = pattern;
         this.expectedValue = expectedValue;
     }
 
@@ -70,7 +70,7 @@ public class JXPathFilter implements UMOFilter
             logger.warn("Applying JXPathFilter to null object.");
             return false;
         }
-        if (expression == null)
+        if (pattern == null)
         {
             logger.warn("Expression for JXPathFilter is not set.");
             return false;
@@ -78,10 +78,10 @@ public class JXPathFilter implements UMOFilter
         if (expectedValue == null)
         {
             // Handle the special case where the expected value really is null.
-            if (expression.endsWith("= null") || expression.endsWith("=null"))
+            if (pattern.endsWith("= null") || pattern.endsWith("=null"))
             {
                 expectedValue = "null";
-                expression = expression.substring(0, expression.lastIndexOf("="));
+                pattern = pattern.substring(0, pattern.lastIndexOf("="));
             }
             else
             {
@@ -102,12 +102,12 @@ public class JXPathFilter implements UMOFilter
             if (namespaces == null)
             {
                 // no namespace defined, let's perform a direct evaluation
-                xpathResult = ((Document)obj).valueOf(expression);
+                xpathResult = ((Document)obj).valueOf(pattern);
             }
             else
             {
                 // create an xpath expression with namespaces and evaluate it
-                XPath xpath = DocumentHelper.createXPath(expression);
+                XPath xpath = DocumentHelper.createXPath(pattern);
                 xpath.setNamespaceURIs(namespaces);
                 xpathResult = xpath.valueOf(obj);
             }
@@ -137,7 +137,7 @@ public class JXPathFilter implements UMOFilter
             }
             JXPathContext context = JXPathContext.newContext(obj);
             initialise(context);
-            xpathResult = context.getValue(expression);
+            xpathResult = context.getValue(pattern);
         }
 
         if (logger.isDebugEnabled())
@@ -160,7 +160,7 @@ public class JXPathFilter implements UMOFilter
             // A null result was not expected, something probably went wrong.
             else
             {
-                logger.warn("JXPathFilter expression evaluates to null: " + expression);
+                logger.warn("JXPathFilter expression evaluates to null: " + pattern);
             }
         }
 
@@ -220,17 +220,17 @@ public class JXPathFilter implements UMOFilter
     /**
      * @return XPath expression
      */
-    public String getExpression()
+    public String getPattern()
     {
-        return expression;
+        return pattern;
     }
 
     /**
-     * @param expression The XPath expression
+     * @param pattern The XPath expression
      */
-    public void setExpression(String expression)
+    public void setPattern(String pattern)
     {
-        this.expression = expression;
+        this.pattern = pattern;
     }
 
     /**

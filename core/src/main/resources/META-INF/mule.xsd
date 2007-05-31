@@ -117,7 +117,7 @@
     <xsd:complexType name="baseEndpointType">
         <xsd:choice minOccurs="0" maxOccurs="unbounded">
             <xsd:element name="transaction" type="transactionType" minOccurs="0" maxOccurs="1"/>
-            <xsd:group ref="filters" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:group ref="filter" minOccurs="0" maxOccurs="unbounded"/>
             <!--<xsd:group ref="securityFilters" minOccurs="0" maxOccurs="1"/>-->
             <xsd:group ref="connectionStrategies" minOccurs="0" maxOccurs="1"/>
             <xsd:element name="properties" type="propsType" minOccurs="0" maxOccurs="1"/>
@@ -184,34 +184,42 @@
     <!--   Filter elements                                          -->
     <!--==============================================================-->
 
-    <xsd:group name="filters">
+    <xsd:group name="filter">
         <xsd:sequence>
-            <xsd:choice maxOccurs="unbounded">
+            <xsd:choice minOccurs="1" maxOccurs="1">
                 <xsd:element name="and-filter" type="collectionFilterType"/>
                 <xsd:element name="or-filter" type="collectionFilterType"/>
-                <xsd:element name="not-filter" type="collectionFilterType"/>
+                <xsd:element name="not-filter" type="unitaryFilterType"/>
                 <xsd:element name="exception-type-filter" type="typeFilterType"/>
                 <xsd:element name="payload-type-filter" type="typeFilterType"/>
-                <xsd:element name="wildcard-filter" type="expressionFilterType"/>
-                <xsd:element name="regex-filter" type="expressionFilterType"/>
-                <xsd:element name="message-property-filter" type="expressionFilterType"/>
+                <xsd:element name="wildcard-filter" type="patternFilterType"/>
+                <xsd:element name="regex-filter" type="patternFilterType"/>
+                <xsd:element name="message-property-filter" type="patternFilterType"/>
                 <xsd:element name="equals-filter" type="filterType"/>
             </xsd:choice>
         </xsd:sequence>
     </xsd:group>
 
-    <xsd:complexType name="collectionFilterType">
+    <xsd:complexType name="unitaryFilterType">
         <xsd:complexContent>
             <xsd:extension base="filterType">
-                <xsd:group ref="filters" maxOccurs="unbounded" minOccurs="2"/>
+                <xsd:group ref="filter" minOccurs="1" maxOccurs="1"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="expressionFilterType">
+    <xsd:complexType name="collectionFilterType">
         <xsd:complexContent>
             <xsd:extension base="filterType">
-                <xsd:attribute name="expression" type="xsd:string" use="required"/>
+                <xsd:group ref="filter" minOccurs="2" maxOccurs="unbounded"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="patternFilterType">
+        <xsd:complexContent>
+            <xsd:extension base="filterType">
+                <xsd:attribute name="pattern" type="xsd:string" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -684,7 +692,7 @@
         <xsd:choice maxOccurs="unbounded">
             <xsd:element name="endpoint" type="endpointType" minOccurs="0"/>
             <xsd:element name="endpoint-ref" type="endpointRefType" minOccurs="0"/>
-            <xsd:group ref="filters" minOccurs="0"/>
+            <xsd:group ref="filter" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:choice>
         <xsd:attribute name="propertyExtractor" type="xsd:NMTOKEN"/>
     </xsd:complexType>
@@ -782,7 +790,7 @@
             <xsd:element name="endpoint-ref" type="endpointRefType" minOccurs="0"/>
             <xsd:element name="reply-to" type="replyToType" minOccurs="0"/>
             <xsd:element name="transaction" type="transactionType" minOccurs="0"/>
-            <xsd:group ref="filters" minOccurs="0"/>
+            <xsd:group ref="filter" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:choice>
         <xsd:attribute name="enableCorrelation" default="IF_NOT_SET">
             <xsd:simpleType>

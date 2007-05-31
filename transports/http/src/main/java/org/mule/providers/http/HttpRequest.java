@@ -36,11 +36,6 @@ public class HttpRequest
     private HeaderGroup headers = new HeaderGroup();
     private InputStream entity = null;
 
-    public HttpRequest()
-    {
-        super();
-    }
-
     public HttpRequest(final RequestLine requestLine, final Header[] headers, final InputStream content)
         throws IOException
     {

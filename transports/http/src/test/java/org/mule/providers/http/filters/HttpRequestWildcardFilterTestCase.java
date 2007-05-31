@@ -22,7 +22,6 @@ import java.util.Map;
 public class HttpRequestWildcardFilterTestCase extends FunctionalTestCase
 {
 
-
     public HttpRequestWildcardFilterTestCase()
     {
         setDisposeManagerPerSuite(true);
@@ -65,4 +64,5 @@ public class HttpRequestWildcardFilterTestCase extends FunctionalTestCase
         assertEquals(result.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0), HttpConstants.SC_NOT_ACCEPTABLE);
         assertNotNull(result.getExceptionPayload());
     }
+
 }

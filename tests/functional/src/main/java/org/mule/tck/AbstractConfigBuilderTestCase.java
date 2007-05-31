@@ -77,7 +77,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertEquals(endpoint.getEndpointURI().getAddress(), "fruitBowlPublishQ");
         assertNotNull(endpoint.getFilter());
         JXPathFilter filter = (JXPathFilter)endpoint.getFilter();
-        assertEquals("name", filter.getExpression());
+        assertEquals("name", filter.getPattern());
         assertEquals("bar", filter.getExpectedValue());
         assertNotNull(filter.getNamespaces());
         assertEquals("http://foo.com", filter.getNamespaces().get("foo"));

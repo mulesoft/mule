@@ -13,7 +13,7 @@
     <xsd:element name="jxpath-filter">
         <xsd:complexType>
             <xsd:complexContent>
-                <xsd:extension base="mule:expressionFilterType">
+                <xsd:extension base="mule:patternFilterType">
                     <xsd:choice>
                         <xsd:element name="namespace" type="namespaceType" minOccurs="0" maxOccurs="unbounded"/>
                         <xsd:element name="contextProperty" type="spring:propertyType" minOccurs="0" maxOccurs="unbounded"/>

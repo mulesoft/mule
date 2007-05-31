@@ -36,11 +36,11 @@ public class FilterDefinitionParser extends AbstractChildBeanDefinitionParser
         }
         else if (element.getLocalName().equals("or-filter"))
         {
-            return NotFilter.class;
+            return OrFilter.class;
         }
         else if (element.getLocalName().equals("not-filter"))
         {
-            return OrFilter.class;
+            return NotFilter.class;
         }
         else if (element.getLocalName().equals("regex-filter"))
         {

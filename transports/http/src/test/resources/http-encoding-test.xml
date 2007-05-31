@@ -1,31 +1,32 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 META-INF/mule.xsd
+       http://www.mulesource.org/schema/mule/http/2.0 META-INF/mule-http.xsd">
 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+    <bean name="ftc" class="org.mule.tck.functional.FunctionalTestComponent"/>
 
-<mule-configuration id="http_fuctional_test" version="1.0">
+    <mule:custom-transformer name="setResponseType"
+            class="org.mule.transformers.simple.MessagePropertiesTransformer">
+        <property name="addProperties">
+            <map>
+                <entry key="Content-Type" value="text/baz;charset=UTF-16BE"/>
+            </map>
+        </property>
+    </mule:custom-transformer>
 
-    <mule-environment-properties serverUrl=""/>
+    <mule:endpoint name="clientEndpoint" address="http://localhost:60198" synchronous="true"/>
 
-    <transformers>
-        <transformer name="setResponseContentType" className="org.mule.transformers.simple.MessagePropertiesTransformer">
-            <properties>
-                <map name="addProperties">
-                    <property name="Content-Type" value="text/baz;charset=UTF-16BE"/>
-                </map>
-            </properties>
-        </transformer>
-    </transformers>
+    <mule:model-seda name="main">
+        <mule:service name="testComponent" service-ref="ftc">
+            <mule:inbound-router>
+                <mule:endpoint-ref nameref="clientEndpoint" responseTransformers="setResponseType"/>
+            </mule:inbound-router>
+        </mule:service>
+    </mule:model-seda>
 
-    <global-endpoints>
-        <endpoint name="clientEndpoint" address="http://localhost:60198" synchronous="true"/>
-    </global-endpoints>
-
-    <model name="main">
-        <mule-descriptor name="testComponent" implementation="org.mule.tck.functional.FunctionalTestComponent">
-            <inbound-router>
-                <global-endpoint name="clientEndpoint" responseTransformers="setResponseContentType"/>
-            </inbound-router>
-        </mule-descriptor>
-    </model>
-</mule-configuration>
+</beans>

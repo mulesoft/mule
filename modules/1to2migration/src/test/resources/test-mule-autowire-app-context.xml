@@ -165,7 +165,7 @@
         </property>
         <property name="filter">
             <bean class="org.mule.routing.filters.xml.JXPathFilter" singleton="false">
-                <property name="expression">
+                <property name="pattern">
                     <value>name</value>
                 </property>
                 <property name="value">
@@ -314,7 +314,7 @@
     <bean id="orange" class="org.mule.tck.testmodels.fruit.Orange"/>
 
     <bean id="orangeComponent" class="org.mule.impl.MuleDescriptor">
-        <property name="implementation" value="orange"/>
+        <property name="service" value="orange"/>
         <property name="modelName" value="main"/>
         <property name="inboundRouter">
             <bean id="orangeInboundMessageRouter" class="org.mule.routing.inbound.InboundRouterCollection">
@@ -502,7 +502,7 @@
     </bean>
 
     <bean id="appleComponent" class="org.mule.impl.MuleDescriptor">
-        <property name="implementation" value="org.mule.tck.testmodels.fruit.Apple"/>
+        <property name="service" value="org.mule.tck.testmodels.fruit.Apple"/>
         <property name="modelName" value="main"/>
         <property name="outboundRouter">
             <ref local="testOutboundMessageRouter"/>
@@ -517,7 +517,7 @@
     </bean>
 
     <bean id="appleComponent2" class="org.mule.impl.MuleDescriptor">
-        <property name="implementation" value="apple"/>
+        <property name="service" value="apple"/>
         <property name="modelName" value="main"/>
         <property name="inboundRouter">
             <bean class="org.mule.routing.inbound.InboundRouterCollection">

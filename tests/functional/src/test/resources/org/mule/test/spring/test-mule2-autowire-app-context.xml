@@ -167,7 +167,7 @@
         </property>
         <property name="filter">
             <bean class="org.mule.routing.filters.xml.JXPathFilter" singleton="false">
-                <property name="expression">
+                <property name="pattern">
                     <value>name</value>
                 </property>
                 <property name="value">

@@ -195,24 +195,6 @@ public abstract class AbstractConnector
     protected volatile int numberOfConcurrentTransactedReceivers = DEFAULT_NUM_CONCURRENT_TX_RECEIVERS;
 
 
-    /**
-     * The service descriptor can define a default inbound transformer to be used on
-     * an endpoint if no other is set
-     */
-    protected volatile UMOTransformer defaultInboundTransformer;
-
-    /**
-     * The service descriptor can define a default outbound transformer to be used on
-     * an endpoint if no other is set
-     */
-    protected volatile UMOTransformer defaultOutboundTransformer;
-
-    /**
-     * For some connectors such as http, a response transformer is required or where
-     * a replyTo needs a trnasformer
-     */
-    protected volatile UMOTransformer defaultResponseTransformer;
-
     protected volatile ConnectionStrategy connectionStrategy;
 
     protected final WaitableBoolean connected = new WaitableBoolean(false);
@@ -274,8 +256,6 @@ public abstract class AbstractConnector
 
     public AbstractConnector()
     {
-        super();
-
         // make sure we always have an exception strategy
         exceptionListener = new DefaultExceptionStrategy();
         //Todo RM*
@@ -989,11 +969,6 @@ public abstract class AbstractConnector
      */
     protected abstract void doStop() throws UMOException;
 
-    /**
-     * Getter for property 'defaultInboundTransformer'.
-     *
-     * @return Value for property 'defaultInboundTransformer'.
-     */
     public UMOTransformer getDefaultInboundTransformer()
     {
         try
@@ -1010,11 +985,6 @@ public abstract class AbstractConnector
         }
     }
 
-    /**
-     * Getter for property 'defaultResponseTransformer'.
-     *
-     * @return Value for property 'defaultResponseTransformer'.
-     */
     public UMOTransformer getDefaultResponseTransformer()
     {
         try
@@ -1031,11 +1001,6 @@ public abstract class AbstractConnector
         }
     }
 
-    /**
-     * Getter for property 'defaultOutboundTransformer'.
-     *
-     * @return Value for property 'defaultOutboundTransformer'.
-     */
     public UMOTransformer getDefaultOutboundTransformer()
     {
         try

@@ -21,7 +21,7 @@ public class TcpMessages extends MessageFactory
 
     public static Message failedToBindToUri(URI uri)
     {
-        return createMessage(BUNDLE_PATH, 1);
+        return createMessage(BUNDLE_PATH, 1, uri);
     }
 
     public static Message failedToCloseSocket()

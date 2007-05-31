@@ -39,7 +39,9 @@
                 </xsd:attribute>
                 <xsd:attribute name="receiveBacklog" type="xsd:int">
                     <xsd:annotation>
-                        <xsd:documentation>The maximum queue length for incoming connections.</xsd:documentation>
+                        <xsd:documentation>
+                            The maximum queue length for incoming connections.
+                        </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="sendTcpNoDelay" type="xsd:boolean">

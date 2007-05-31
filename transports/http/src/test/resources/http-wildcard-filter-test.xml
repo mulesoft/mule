@@ -1,18 +1,25 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 META-INF/mule.xsd
+       http://www.mulesource.org/schema/mule/http/2.0 META-INF/mule-http.xsd">
 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+    <bean name="echo" class="org.mule.components.simple.EchoComponent"/>
 
-<mule-configuration id="http_wildcard_filter_test" version="1.0">
-    <model name="main">
-        <mule-descriptor name="httpIn" implementation="org.mule.components.simple.EchoComponent">
-            <inbound-router>
-                <endpoint address="http://localhost:60198" synchronous="true">
-                    <filter className="org.mule.routing.filters.logic.NotFilter">
-                        <filter className="org.mule.routing.filters.WildcardFilter" pattern="*xyz*"/>
-                    </filter>
-                </endpoint>
-            </inbound-router>
-        </mule-descriptor>
-    </model>
-</mule-configuration>
+    <mule:model-seda name="main">
+        <mule:service name="httpIn" service-ref="echo">
+            <mule:inbound-router>
+                <mule:endpoint address="http://localhost:60198" synchronous="true">
+                    <mule:not-filter>
+                        <mule:wildcard-filter pattern="*xyz*"/>
+                    </mule:not-filter>
+                </mule:endpoint>
+            </mule:inbound-router>
+        </mule:service>
+    </mule:model-seda>
+
+</beans>
