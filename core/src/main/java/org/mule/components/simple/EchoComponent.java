@@ -21,7 +21,7 @@ public class EchoComponent extends LogComponent implements EchoService
     public Object onCall(UMOEventContext context) throws Exception
     {
         super.onCall(context);
-        return context.getTransformedMessage();
+        return context.getMessage();
     }
 
     public String echo(String echo)
