@@ -661,6 +661,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
         sb.append(ClassUtils.getSimpleName(this.getClass()));
         sb.append("{this=").append(Integer.toHexString(System.identityHashCode(this)));
         sb.append(", endpoint=").append(endpoint.getEndpointURI());
+        sb.append(", disposed=").append(disposed);
         sb.append('}');
         return sb.toString();
     }
