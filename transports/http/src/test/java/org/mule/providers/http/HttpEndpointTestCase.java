@@ -19,6 +19,7 @@ public class HttpEndpointTestCase extends AbstractMuleTestCase
     public void testHostPortOnlyUrl() throws Exception
     {
         UMOEndpointURI endpointUri = new MuleEndpointURI("http://localhost:8080");
+        endpointUri.initialise();
         assertEquals("http", endpointUri.getScheme());
         assertEquals("http://localhost:8080", endpointUri.getAddress());
         assertNull(endpointUri.getEndpointName());
@@ -31,6 +32,7 @@ public class HttpEndpointTestCase extends AbstractMuleTestCase
     public void testHostPortOnlyUrlAndUserInfo() throws Exception
     {
         UMOEndpointURI endpointUri = new MuleEndpointURI("http://admin:pwd@localhost:8080");
+        endpointUri.initialise();
         assertEquals("http", endpointUri.getScheme());
         assertEquals("http://localhost:8080", endpointUri.getAddress());
         assertNull(endpointUri.getEndpointName());
@@ -45,20 +47,22 @@ public class HttpEndpointTestCase extends AbstractMuleTestCase
 
     public void testHostPortAndPathUrl() throws Exception
     {
-        UMOEndpointURI url = new MuleEndpointURI("http://localhost:8080/app/path");
-        assertEquals("http", url.getScheme());
-        assertEquals("http://localhost:8080/app/path", url.getAddress());
-        assertNull(url.getEndpointName());
-        assertEquals(8080, url.getPort());
-        assertEquals("localhost", url.getHost());
-        assertEquals("http://localhost:8080/app/path", url.getAddress());
-        assertEquals(url.getPath(), "/app/path");
-        assertEquals(0, url.getParams().size());
+        UMOEndpointURI endpointUri = new MuleEndpointURI("http://localhost:8080/app/path");
+        endpointUri.initialise();
+        assertEquals("http", endpointUri.getScheme());
+        assertEquals("http://localhost:8080/app/path", endpointUri.getAddress());
+        assertNull(endpointUri.getEndpointName());
+        assertEquals(8080, endpointUri.getPort());
+        assertEquals("localhost", endpointUri.getHost());
+        assertEquals("http://localhost:8080/app/path", endpointUri.getAddress());
+        assertEquals(endpointUri.getPath(), "/app/path");
+        assertEquals(0, endpointUri.getParams().size());
     }
 
     public void testHostPortAndPathUrlAndUserInfo() throws Exception
     {
         UMOEndpointURI endpointUri = new MuleEndpointURI("http://admin:pwd@localhost:8080/app/path");
+        endpointUri.initialise();
         assertEquals("http", endpointUri.getScheme());
         assertEquals("http://localhost:8080/app/path", endpointUri.getAddress());
         assertNull(endpointUri.getEndpointName());

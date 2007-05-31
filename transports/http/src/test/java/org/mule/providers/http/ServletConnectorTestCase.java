@@ -21,7 +21,6 @@ public class ServletConnectorTestCase extends AbstractConnectorTestCase
     {
         ServletConnector c = new ServletConnector();
         c.setName("test");
-        c.initialise();
         return c;
     }
 

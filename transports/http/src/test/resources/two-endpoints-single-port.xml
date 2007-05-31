@@ -1,32 +1,38 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 META-INF/mule.xsd
+       http://www.mulesource.org/schema/mule/http/2.0 META-INF/mule-http.xsd">
 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
 
-<mule-configuration id="http_test" version="1.0">
+    <http:connector name="httpConnector" keepAlive="false"/>
 
-    <environment-properties>
-        <property name="http.keepAlive" value="false"/>
-    </environment-properties>
-    <model name="test">
-        <mule-descriptor name="mycomponent1"
-            implementation="org.mule.tck.functional.FunctionalTestComponent">
-            <inbound-router>
-                <endpoint address="http://localhost:8081/mycomponent1" synchronous="true"/>
-            </inbound-router>
-            <properties>
-                <property name="returnMessage" value="mycomponent1"/>
-            </properties>
-        </mule-descriptor>
+    <bean name="ftc1" class="org.mule.tck.functional.FunctionalTestComponent">
+        <property name="returnMessage" value="mycomponent1"/>
+    </bean>
 
-        <mule-descriptor name="mycomponent2"
-            implementation="org.mule.tck.functional.FunctionalTestComponent">
-            <inbound-router>
-                <endpoint address="http://localhost:8081/mycomponent2" synchronous="true"/>
-            </inbound-router>
-            <properties>
-                <property name="returnMessage" value="mycomponent2"/>
-            </properties>
-        </mule-descriptor>
-    </model>
-</mule-configuration>
+    <bean name="ftc2" class="org.mule.tck.functional.FunctionalTestComponent">
+        <property name="returnMessage" value="mycomponent2"/>
+    </bean>
+
+    <mule:model-seda name="test">
+
+        <mule:service name="mycomponent1" service-ref="ftc1">
+            <mule:inbound-router>
+                <mule:endpoint address="http://localhost:8081/mycomponent1" synchronous="true"/>
+            </mule:inbound-router>
+        </mule:service>
+
+        <mule:service name="mycomponent2" service-ref="ftc2">
+            <mule:inbound-router>
+                <mule:endpoint address="http://localhost:8081/mycomponent2" synchronous="true"/>
+            </mule:inbound-router>
+        </mule:service>
+
+    </mule:model-seda>
+
+</beans>

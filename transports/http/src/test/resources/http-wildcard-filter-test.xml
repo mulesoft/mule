@@ -11,6 +11,7 @@
     <bean name="echo" class="org.mule.components.simple.EchoComponent"/>
 
     <mule:model-seda name="main">
+
         <mule:service name="httpIn" service-ref="echo">
             <mule:inbound-router>
                 <mule:endpoint address="http://localhost:60198" synchronous="true">
@@ -20,6 +21,14 @@
                 </mule:endpoint>
             </mule:inbound-router>
         </mule:service>
-    </mule:model-seda>
+
+        <mule:service name="reference" service-ref="echo">
+            <mule:inbound-router>
+                <mule:endpoint address="http://localhost:60199" synchronous="true">
+                </mule:endpoint>
+            </mule:inbound-router>
+        </mule:service>
+
+   </mule:model-seda>
 
 </beans>

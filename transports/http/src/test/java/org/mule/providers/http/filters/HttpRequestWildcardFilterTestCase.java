@@ -33,9 +33,18 @@ public class HttpRequestWildcardFilterTestCase extends FunctionalTestCase
     }
 
     private static final String HTTP_ENDPOINT = "http://localhost:60198";
+    private static final String REF_ENDPOINT = "http://localhost:60199";
     private static final String TEST_MESSAGE = "Hello=World";
     private static final String TEST_BAD_MESSAGE = "xyz";
 
+
+    public void testReference() throws Exception
+    {
+        MuleClient client = new MuleClient();
+        UMOMessage result = client.send(REF_ENDPOINT, TEST_MESSAGE, null);
+
+        assertEquals(TEST_MESSAGE, result.getPayloadAsString());
+    }
 
     public void testHttpPost() throws Exception
     {

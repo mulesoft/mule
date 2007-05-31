@@ -45,12 +45,9 @@ public class TcpConnectorTestCase extends AbstractConnectorTestCase
         UMOComponent component = getTestComponent(d);
         UMOEndpoint endpoint = new MuleEndpoint(getTestEndpointURI(), true);
 
-       // endpoint.setConnector(connector);
-
         try
         {
             endpoint.setEndpointURI(null);
-            //connector.registerListener(component, endpoint);
             fail("endpointUri cannot be null");
         }
         catch (Exception e)

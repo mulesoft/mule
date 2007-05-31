@@ -1,50 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
+       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 META-INF/mule.xsd
+       http://www.mulesource.org/schema/mule/vm/2.0 META-INF/mule-vm.xsd
+       http://www.mulesource.org/schema/mule/http/2.0 META-INF/mule-http.xsd">
 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+    <http:connector name="PollingHttpConnector">
+        <mule:service-overrides messageReceiver="org.mule.providers.http.PollingHttpMessageReceiver"/>
+    </http:connector>
 
-<mule-configuration id="HTTP_Polling_Config" version="1.0">
+    <http:connector name="HttpConnector"/>
 
-    <connector name="PollingHttpConnector" className="org.mule.providers.http.HttpConnector">
-        <properties>
-            <map name="serviceOverrides">
-                <property name="message.receiver" value="org.mule.providers.http.PollingHttpMessageReceiver"/>
-            </map>
-        </properties>
-    </connector>
+    <vm:connector name="vmQueue" queueEvents="true"/>
 
-    <connector name="HttpConnector" className="org.mule.providers.http.HttpConnector"/>
+    <bean name="ftc" class="org.mule.tck.functional.FunctionalTestComponent"/>
 
-    <connector name="vmQueue" className="org.mule.providers.vm.VMConnector">
-        <properties>
-            <property name="queueEvents" value="true"/>
-        </properties>
-    </connector>
+    <mule:model-seda name="http polling test model">
 
-    <!--
-        This uses the polling HTTP connector every 30 seconds
-    -->
-    <model name="http polling test model">
+        <mule:service name="pollingUMO" service-ref="ftc">
+            <mule:inbound-router>
+                <mule:endpoint address="http://marie:marie@localhost:4567"
+                               connector-ref="PollingHttpConnector">
+                    <property name="pollingFrequency" value="300000"/>
+                </mule:endpoint>
+            </mule:inbound-router>
+            <mule:outbound-router>
+                <mule:pass-through-router>
+                    <mule:endpoint address="vm://toclient"/>
+                </mule:pass-through-router>
+            </mule:outbound-router>
+        </mule:service>
 
-        <mule-descriptor name="pollingUMO" implementation="org.mule.tck.functional.FunctionalTestComponent">
-            <inbound-router>
-                <endpoint address="http://marie:marie@localhost:4567" connector="PollingHttpConnector">
-                    <properties>
-                        <property value="300000" name="pollingFrequency"/>
-                    </properties>
-                </endpoint>
-            </inbound-router>
-            <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="vm://toclient"/>
-                </router>
-            </outbound-router>
-        </mule-descriptor>
+    </mule:model-seda>
 
-        <mule-descriptor name="SecureUMO" implementation="org.mule.tck.functional.FunctionalTestComponent">
-            <inbound-router>
-                <endpoint address="http://localhost:4567" connector="HttpConnector"/>
-            </inbound-router>
-        </mule-descriptor>
-    </model>
-</mule-configuration>
+</beans>
