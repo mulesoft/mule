@@ -38,13 +38,13 @@ import org.mule.umo.registry.RegistryFacade;
 import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.store.UMOStore;
 import org.mule.util.StringMessageUtils;
+import org.mule.util.StringUtils;
 import org.mule.util.queue.QueueManager;
 
 import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -54,7 +54,6 @@ import java.util.jar.Manifest;
 
 import javax.transaction.TransactionManager;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -467,7 +466,6 @@ public class ManagementContext implements UMOManagementContext
     /**
      * Sets statistics on this instance
      *
-     * @param stat
      */
     public void setStatistics(AllStatistics stat)
     {
@@ -733,7 +731,6 @@ public class ManagementContext implements UMOManagementContext
             message.add(CoreMessages.versionNotSet().getMessage());
         }
         message.add(" ");
-        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
         message.add(CoreMessages.serverStartedAt(getStartDate()).getMessage());
         message.add("Server ID: " + id);
 
@@ -780,7 +777,6 @@ public class ManagementContext implements UMOManagementContext
     {
         List message = new ArrayList(2);
         long currentTime = System.currentTimeMillis();
-        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
         message.add(CoreMessages.shutdownNormally(new Date()).getMessage());
         long duration = 10;
         if (startDate > 0)
