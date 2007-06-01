@@ -40,12 +40,11 @@ import org.mule.util.ClassUtils;
 import org.mule.util.MuleObjectHelper;
 import org.mule.util.ObjectNameHelper;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import java.util.Collections;
 import java.util.Map;
 
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -613,7 +612,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
                 }
                 else if (UMOEndpoint.ENDPOINT_TYPE_SENDER_AND_RECEIVER.equals(type))
                 {
-                    transformer = ((AbstractConnector)connector).getDefaultOutboundTransformer();
+                    transformer = ((AbstractConnector)connector).getDefaultInboundTransformer();
                     responseTransformer = ((AbstractConnector)connector).getDefaultResponseTransformer();
                 }
                 else
