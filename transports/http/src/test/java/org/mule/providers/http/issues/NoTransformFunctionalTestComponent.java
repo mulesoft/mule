@@ -8,9 +8,11 @@
  * LICENSE.txt file.
  */
 
-package org.mule.tck.functional;
+package org.mule.providers.http.issues;
 
 import org.mule.MuleException;
+import org.mule.tck.functional.EventCallback;
+import org.mule.tck.functional.FunctionalTestNotification;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.impl.RequestContext;
 import org.mule.umo.UMOEventContext;
@@ -25,16 +27,16 @@ import org.apache.commons.logging.LogFactory;
  * functional tests. This component accepts an EventCallback that can be used to
  * assert the state of the current event.
  * <p/>
- * Also, this component fires {@link FunctionalTestNotification} via Mule for every message received.
+ * Also, this component fires {@link org.mule.tck.functional.FunctionalTestNotification} via Mule for every message received.
  * Tests can register with Mule to receive these events by implementing
- * {@link FunctionalTestNotificationListener}.
+ * {@link org.mule.tck.functional.FunctionalTestNotificationListener}.
  *
  * @see org.mule.tck.functional.EventCallback
  * @see org.mule.tck.functional.FunctionalTestNotification
  * @see org.mule.tck.functional.FunctionalTestNotificationListener
  */
 
-public class FunctionalTestComponent implements Callable
+public class NoTransformFunctionalTestComponent implements Callable
 {
     protected transient Log logger = LogFactory.getLog(getClass());
 
@@ -50,7 +52,7 @@ public class FunctionalTestComponent implements Callable
      */
     public Object onCall(UMOEventContext context) throws Exception
     {
-        String contents = context.getTransformedMessageAsString();
+        String contents = context.getMessageAsString();
         String msg = StringMessageUtils.getBoilerPlate("Message Received in component: "
                 + context.getComponentDescriptor().getName() + ". Content is: "
                 + StringMessageUtils.truncate(contents, 100, true), '*', 80);
@@ -139,7 +141,7 @@ public class FunctionalTestComponent implements Callable
             }
             else
             {
-                throw new MuleException(MessageFactory.createStaticMessage("Functional Test Component Exception"));                
+                throw new MuleException(MessageFactory.createStaticMessage("Functional Test Component Exception"));
             }
         }
 
@@ -153,8 +155,8 @@ public class FunctionalTestComponent implements Callable
      * Note that the FunctionalTestComponent should be made a singleton
      * {@link org.mule.umo.UMODescriptor#setSingleton} when using Event callbacks
      * <p/>
-     * Another option is to register a {@link FunctionalTestNotificationListener} with Mule and this
-     * will deleiver a {@link FunctionalTestNotification} for every message received by this component
+     * Another option is to register a {@link org.mule.tck.functional.FunctionalTestNotificationListener} with Mule and this
+     * will deleiver a {@link org.mule.tck.functional.FunctionalTestNotification} for every message received by this component
      *
      * @return the callback to call when a message is received
      * @see org.mule.umo.UMODescriptor
@@ -173,8 +175,8 @@ public class FunctionalTestComponent implements Callable
      * Note that the FunctionalTestComponent should be made a singleton
      * {@link org.mule.umo.UMODescriptor#setSingleton} when using Event callbacks
      * <p/>
-     * Another option is to register a {@link FunctionalTestNotificationListener} with Mule and this
-     * will deleiver a {@link FunctionalTestNotification} for every message received by this component
+     * Another option is to register a {@link org.mule.tck.functional.FunctionalTestNotificationListener} with Mule and this
+     * will deleiver a {@link org.mule.tck.functional.FunctionalTestNotification} for every message received by this component
      *
      * @param eventCallback the callback to call when a message is received
      * @see org.mule.umo.UMODescriptor
@@ -263,4 +265,3 @@ public class FunctionalTestComponent implements Callable
     }
 
 }
-

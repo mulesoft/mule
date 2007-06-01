@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.mulesource.org/schema/mule/http/2.0"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+            xmlns:tcp="http://www.mulesource.org/schema/mule/tcp/2.0"
+            targetNamespace="http://www.mulesource.org/schema/mule/http/2.0"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.springframework.org/schema/beans"
+                schemaLocation="http://www.springframework.org/schema/beans"/>
+
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"/>
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/tcp/2.0"
+                schemaLocation="/META-INF/mule-tcp.xsd"/>
+
+    <xsd:element name="connector" type="httpConnectorType">
+        <xsd:annotation>
+            <xsd:documentation>
+                HTTP connector.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <!-- NOTE - it's not very easy to work out what parameters inherited from TCP are actually
+         used.  But it appears that the client parameters are used to set the HttpConnectionManager
+         while the server parameters are used directly (the server socket appears to come from
+         the underlying TcpConnector). -->
+
+    <xsd:complexType name="httpConnectorType">
+        <xsd:complexContent>
+            <xsd:extension base="tcp:noProtocolTcpConnectorType">
+                <xsd:attribute name="cookieSpec">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The type of cookie used.  Either "netscape" or "rfc2109".
+                        </xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:NMTOKEN">
+                            <xsd:enumeration value="netscape"/>
+                            <xsd:enumeration value="rfc2109"/>
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+                <xsd:attribute name="proxyHostname" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The proxy host name or address
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="proxyPassword" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The password to use for proxy access.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="proxyPort" type="xsd:int">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The proxy port number.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="proxyUsername" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The username to use for preoxy access.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="enableCookies" type="xsd:boolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether or not to support cookies.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+</xsd:schema>
