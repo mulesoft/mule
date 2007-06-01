@@ -792,13 +792,26 @@ public abstract class AbstractConnector
                                     + dispatcher.toString());
                 }
 
-                dispatchers.returnObject(endpoint, dispatcher);
             }
             catch (Exception ex)
             {
-                // TODO MULE-863: What should we really do?
-                // ignore - if the dispatcher is broken, it will likely get cleaned
-                // up by the factory
+                //Logging failed
+            }
+            finally
+            {
+                try
+                {
+                    dispatchers.returnObject(endpoint, dispatcher);
+                }
+                catch (Exception e)
+                {
+                    // TODO MULE-863: What should we really do?
+                    // ignore - if the dispatcher is broken, it will likely get cleaned
+                    // up by the factory
+                    //RM* I think we should at least log this error so give some indication of what is failing
+                    logger.error("Failed to dispose dispatcher for endpoint: " + endpoint +
+                            ". This will cause a memory leak. Please report to", e);
+                }
             }
         }
     }
