@@ -50,7 +50,7 @@ public class FunctionalTestComponent implements Callable
      */
     public Object onCall(UMOEventContext context) throws Exception
     {
-        String contents = context.getMessageAsString();
+        String contents = context.getTransformedMessageAsString();
         String msg = StringMessageUtils.getBoilerPlate("Message Received in component: "
                 + context.getComponentDescriptor().getName() + ". Content is: "
                 + StringMessageUtils.truncate(contents, 100, true), '*', 80);
