@@ -613,7 +613,6 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
                 else if (UMOEndpoint.ENDPOINT_TYPE_SENDER_AND_RECEIVER.equals(type))
                 {
                     transformer = ((AbstractConnector)connector).getDefaultInboundTransformer();
-                    responseTransformer = ((AbstractConnector)connector).getDefaultResponseTransformer();
                 }
                 else
                 {

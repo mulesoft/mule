@@ -17,14 +17,14 @@ import org.mule.tck.functional.StringAppendTestTranformer;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 
-public class HttpTransformersMule1815TestCase extends FunctionalTestCase
+public class HttpTransformersMule1822TestCase extends FunctionalTestCase
 {
 
     public static final String OUTBOUND_MESSAGE = "Test message";
 
     protected String getConfigResources()
     {
-        return "http-transformers-mule-1815-test.xml";
+        return "http-transformers-mule-1822-test.xml";
     }
 
     private UMOMessage sendTo(String uri) throws UMOException
@@ -48,43 +48,35 @@ public class HttpTransformersMule1815TestCase extends FunctionalTestCase
     }
 
     /**
-     * Adapted model, which should not apply transformers
+     * But response transformers on the base model should be applied
      *
      * @throws Exception
      */
-    public void testAdapted() throws Exception
+    public void testResponse() throws Exception
     {
         assertEquals(
-                FunctionalTestComponent.received(OUTBOUND_MESSAGE),
-                sendTo("adapted").getPayloadAsString());
-    }
-
-    /**
-     * Transformers on the adapted model should be ignored
-     *
-     * @throws Exception
-     */
-    public void testIgnored() throws Exception
-    {
-        assertEquals(
-                FunctionalTestComponent.received(OUTBOUND_MESSAGE),
-                sendTo("ignored").getPayloadAsString());
-    }
-
-    /**
-     * But transformers on the base model should be applied
-     *
-     * @throws Exception
-     */
-    public void testInbound() throws Exception
-    {
-        assertEquals(
-                // this reads backwards - innermost is first in chain
-                FunctionalTestComponent.received(
-                        StringAppendTestTranformer.append(" transformed 2",
-                                StringAppendTestTranformer.appendDefault(
+                StringAppendTestTranformer.append(" response",
+                        StringAppendTestTranformer.append(" response 2",
+                                FunctionalTestComponent.received(
                                         OUTBOUND_MESSAGE))),
-                sendTo("inbound").getPayloadAsString());
+                sendTo("response").getPayloadAsString());
+    }
+
+    /**
+     * Shouldalso work with inbound transformers
+     *
+     * @throws Exception
+     */
+    public void testBoth() throws Exception
+    {
+        assertEquals(
+                StringAppendTestTranformer.append(" response",
+                        StringAppendTestTranformer.append(" response 2",
+                                FunctionalTestComponent.received(
+                                        StringAppendTestTranformer.append(" transformed 2",
+                                                StringAppendTestTranformer.appendDefault(
+                                        OUTBOUND_MESSAGE))))),
+                sendTo("both").getPayloadAsString());
     }
 
 }
