@@ -11,25 +11,27 @@ package org.mule.tck.functional;
 
 import org.mule.umo.UMOEventContext;
 
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
+
 /**
- * A test callback that counts the number of messages was received
+ * A test callback that counts the number of messages received.
  */
 public class CounterCallback implements EventCallback
 {
-    private int callbackCount = 0;
+    private AtomicInteger callbackCount = new AtomicInteger(0);
 
     public void eventReceived(UMOEventContext context, Object Component) throws Exception
     {
         incCallbackCount();
     }
 
-    protected synchronized void incCallbackCount()
+    protected void incCallbackCount()
     {
-        callbackCount = callbackCount + 1;
+        callbackCount.incrementAndGet();
     }
 
     public int getCallbackCount()
     {
-        return callbackCount;
+        return callbackCount.intValue();
     }
 }
