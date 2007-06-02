@@ -127,8 +127,8 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
             return;
         }
         //Check to see if the Bean Definition represents a compound element - one represents a subset of
-        //configuration for the partent bean. Compound bean definitions should not be registered since the properties
-        //set on them are really set on the partent bean.
+        //configuration for the parent bean. Compound bean definitions should not be registered since the properties
+        //set on them are really set on the parent bean.
         Boolean compoundElement = (Boolean)bd.getAttribute(CompoundElementDefinitionParser.COMPOUND_ELEMENT);
         if(Boolean.TRUE.equals(compoundElement))
         {
