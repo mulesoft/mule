@@ -5,8 +5,8 @@
        xmlns:ssl="http://www.mulesource.org/schema/mule/ssl/2.0"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-       http://www.mulesource.org/schema/mule/core/2.0 META-INF/mule.xsd
-       http://www.mulesource.org/schema/mule/ssl/2.0 META-INF/mule-ssl.xsd">
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/ssl/2.0 http://www.mulesource.org/schema/mule/ssl/2.0/mule-ssl.xsd">
 
     <!-- keepSendSocketOpen is required for the Async test case?  see TCP -->
     <ssl:connector name="SslConnector" keepSendSocketOpen="true">
@@ -22,24 +22,21 @@
                 trustStorePassword="mulepassword"/>
     </ssl:connector>
 
-    <mule:endpoint name="sendEndpoint" connector-ref="SslConnector"
-                   address="ssl://localhost:60198" synchronous="true"/>
+    <mule:endpoint name="sendEndpoint" address="ssl://localhost:60198" synchronous="true"/>
 
-    <mule:endpoint name="sendManyEndpoint" connector-ref="SslConnector"
-                   address="ssl://localhost:60197" synchronous="true"/>
+    <mule:endpoint name="sendManyEndpoint" address="ssl://localhost:60197" synchronous="true"/>
 
-    <mule:endpoint name="asyncEndpoint" connector-ref="SslConnector"
-                   address="ssl://localhost:60196" synchronous="false"/>
+    <mule:endpoint name="asyncEndpoint" address="ssl://localhost:60196" synchronous="false"/>
 
     <bean id="reply" class="org.mule.tck.functional.FunctionalTestComponent">
         <property name="eventCallback">
-            <bean class="org.mule.tck.functional.ResponseWriterCallback"/>
+            <bean class="org.mule.tck.functional.CounterCallback"/>
         </property>
     </bean>
 
     <bean id="countAndReply" class="org.mule.tck.functional.FunctionalTestComponent">
         <property name="eventCallback">
-            <bean class="org.mule.tck.functional.ResponseWriterCallback"/>
+            <bean class="org.mule.tck.functional.CounterCallback"/>
         </property>
     </bean>
 
