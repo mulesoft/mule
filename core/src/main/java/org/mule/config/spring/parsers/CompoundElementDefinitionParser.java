@@ -20,7 +20,7 @@ import org.w3c.dom.Element;
  * useful when an object has lots of properties and its more readable to break those properties into
  * groups that can be represented as a sub-element in Xml.
  */
-public class CompoundElementDefinitionParser  extends AbstractChildDefinitionParser
+public class CompoundElementDefinitionParser  extends AbstractHierarchicalDefinitionParser
 {
 
     public static final String COMPOUND_ELEMENT = "compound";

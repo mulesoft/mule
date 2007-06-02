@@ -26,7 +26,7 @@ import org.w3c.dom.Element;
 
 /**
  * This definition parser supports the definition of beans that are then set on the parent bean.
- * It also extends {@link org.mule.config.spring.parsers.AbstractChildDefinitionParser} with
+ * It also extends {@link org.mule.config.spring.parsers.AbstractHierarchicalDefinitionParser} with
  * methods that assume the data are associated with a single property.
  *
  * This supports collections and Maps. For collections if a child element is repeated it will be assumed
@@ -43,7 +43,7 @@ import org.w3c.dom.Element;
  * @see MapEntryDefinitionParser.KeyValuePair
  * @see AbstractMuleSingleBeanDefinitionParser
  */
-public abstract class AbstractChildBeanDefinitionParser extends AbstractChildDefinitionParser
+public abstract class AbstractChildBeanDefinitionParser extends AbstractHierarchicalDefinitionParser
 {
 
     protected final void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
