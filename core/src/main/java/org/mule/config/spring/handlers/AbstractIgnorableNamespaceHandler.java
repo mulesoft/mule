@@ -31,7 +31,27 @@ public abstract class AbstractIgnorableNamespaceHandler extends NamespaceHandler
 
         public BeanDefinition parse(Element element, ParserContext parserContext)
         {
-            return parserContext.getContainingBeanDefinition();
+            /*
+               This MUST return null, otherwise duplicate BeanDefinitions will be registered,
+               which is wrong. E.g. for this config snippet we want only 1 SSL connector
+               created, not 4!
+
+                   <ssl:connector name="SslConnector">
+                       <ssl:ssl-client
+                               clientKeyStore="clientKeyStore"
+                               clientKeyStorePassword="mulepassword"/>
+                       <ssl:ssl-key-store
+                               keyStore="serverKeystore"
+                               keyStorePassword="mulepassword"
+                               keyPassword="mulepassword"/>
+                       <ssl:ssl-server
+                               trustStore="trustStore"
+                               trustStorePassword="mulepassword"/>
+                   </ssl:connector>
+
+
+            */
+            return null;
         }
     }
 }
