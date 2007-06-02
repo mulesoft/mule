@@ -9,9 +9,6 @@
  */
 package org.mule.config.spring.parsers;
 
-// TODO MERGE this class is in the management module
-//import org.mule.ManagementContext;
-
 import org.mule.config.MuleProperties;
 import org.mule.util.StringUtils;
 
@@ -56,7 +53,7 @@ public class ServiceOverridesDefinitionParser extends AbstractChildBeanDefinitio
         addOverride(overrides, element, "serviceFinder", MuleProperties.SERVICE_FINDER);
         builder.setSource(overrides);
 
-        addParentPropertyValue(element, new PropertyValue("serviceOverrides", overrides));
+        addParentPropertyValue(element, new PropertyValue(getPropertyName(element), overrides));
     }
 
     protected void addOverride(Map overrides, Element e, String attributeName, String overrideName)
