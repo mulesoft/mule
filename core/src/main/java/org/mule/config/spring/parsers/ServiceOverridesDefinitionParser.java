@@ -31,8 +31,7 @@ public class ServiceOverridesDefinitionParser extends AbstractChildBeanDefinitio
 
     protected Class getBeanClass(Element element)
     {
-        // Not used;
-        return null;
+        return HashMap.class;
     }
 
 
@@ -56,12 +55,8 @@ public class ServiceOverridesDefinitionParser extends AbstractChildBeanDefinitio
         addOverride(overrides, element, "endpointBuilder", MuleProperties.CONNECTOR_ENDPOINT_BUILDER);
         addOverride(overrides, element, "serviceFinder", MuleProperties.SERVICE_FINDER);
         builder.setSource(overrides);
-    }
 
-    protected void postProcess(BeanDefinitionBuilder beanDefinition, Element element)
-    {
-        String parentBean = ((Element) element.getParentNode()).getAttribute("id");
-        beanDefinition.getBeanDefinition().getPropertyValues().addPropertyValue(new PropertyValue("id", parentBean + "-" + element.getNodeName()));
+        addParentPropertyValue(element, new PropertyValue("serviceOverrides", overrides));
     }
 
     protected void addOverride(Map overrides, Element e, String attributeName, String overrideName)
