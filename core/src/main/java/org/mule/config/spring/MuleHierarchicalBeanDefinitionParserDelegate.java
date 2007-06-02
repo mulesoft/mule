@@ -9,6 +9,7 @@
  */
 package org.mule.config.spring;
 
+import org.mule.config.spring.parsers.CompoundElementDefinitionParser;
 import org.mule.util.StringUtils;
 
 import org.apache.commons.logging.Log;
@@ -62,6 +63,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
         }
         BeanDefinition bd = handler.parse(ele, new ParserContext(getReaderContext(), this, containingBd));
         registerBean(ele, bd);
+
         root = bd;
         //Grab all nested elements lised as children to this element
         NodeList list = ele.getChildNodes();
@@ -103,6 +105,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
         return root;
     }
 
+
     private String writeNode(Element e)
     {
         StringBuffer buf = new StringBuffer();
@@ -123,6 +126,15 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
         {
             return;
         }
+        //Check to see if the Bean Definition represents a compound element - one represents a subset of
+        //configuration for the partent bean. Compound bean definitions should not be registered since the properties
+        //set on them are really set on the partent bean.
+        Boolean compoundElement = (Boolean)bd.getAttribute(CompoundElementDefinitionParser.COMPOUND_ELEMENT);
+        if(Boolean.TRUE.equals(compoundElement))
+        {
+            return;
+        }
+
         String name =  generateChildBeanName(ele);
         BeanDefinitionHolder bdHolder = new BeanDefinitionHolder(bd, name);
 

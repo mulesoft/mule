@@ -23,6 +23,8 @@ import org.w3c.dom.Element;
 public class CompoundElementDefinitionParser  extends AbstractChildDefinitionParser
 {
 
+    public static final String COMPOUND_ELEMENT = "compound";
+    
     protected Class getBeanClass(Element element)
     {
         //this has no impact since we just use the bean definition to hold property configurations
@@ -52,7 +54,9 @@ public class CompoundElementDefinitionParser  extends AbstractChildDefinitionPar
                     builder.getBeanDefinition().getPropertyValues().getPropertyValues()[i]);
 
         }
-        return (AbstractBeanDefinition)parserContext.getContainingBeanDefinition();
+        AbstractBeanDefinition bd = (AbstractBeanDefinition)parserContext.getContainingBeanDefinition();
+        bd.setAttribute(COMPOUND_ELEMENT, Boolean.TRUE);
+        return bd;
     }
 
 }
