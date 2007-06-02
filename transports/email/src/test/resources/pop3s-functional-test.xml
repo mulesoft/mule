@@ -6,9 +6,9 @@
        xmlns:pop3s="http://www.mulesource.org/schema/mule/pop3s/2.0"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-       http://www.mulesource.org/schema/mule/core/2.0 META-INF/mule.xsd
-       http://www.mulesource.org/schema/mule/pop3/2.0 META-INF/mule-pop3.xsd
-       http://www.mulesource.org/schema/mule/pop3s/2.0 META-INF/mule-pop3s.xsd">
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/pop3/2.0 http://www.mulesource.org/schema/mule/pop3/2.0/mule-pop3.xsd
+       http://www.mulesource.org/schema/mule/pop3s/2.0 http://www.mulesource.org/schema/mule/pop3s/2.0/mule-pop3s.xsd">
 
     <pop3s:connector name="pop3sConnector">
         <pop3s:tls-client

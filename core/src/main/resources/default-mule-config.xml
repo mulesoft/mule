@@ -4,7 +4,7 @@
        xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-       http://www.mulesource.org/schema/mule/core/2.0 META-INF/mule.xsd">
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
     <bean name="_muleManagementContext" class="org.mule.config.spring.ManagementContextFactoryBean"
           depends-on="_muleRegistry">

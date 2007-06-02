@@ -131,6 +131,7 @@
         <xsd:attribute name="synchronous" type="xsd:boolean"/>
         <xsd:attribute name="remoteSync" type="xsd:boolean"/>
         <xsd:attribute name="remoteSyncTimeout" type="xsd:NMTOKEN"/>
+        <xsd:attribute name="encoding" type="xsd:string"/>
         <xsd:attribute name="connector-ref" type="xsd:NMTOKEN"/>
         <xsd:attribute name="createConnector">
             <xsd:simpleType>

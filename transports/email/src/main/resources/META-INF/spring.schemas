@@ -1,0 +1,7 @@
+http\://www.mulesource.org/schema/mule/mule-email-download/2.0/mule-email-download.xsd=META-INF/mule-email-download.xsd
+http\://www.mulesource.org/schema/mule/smtp/2.0/mule-smtp.xsd=META-INF/mule-smtp.xsd
+http\://www.mulesource.org/schema/mule/smtps/2.0/mule-smtps.xsd=META-INF/mule-smtps.xsd
+http\://www.mulesource.org/schema/mule/pop3/2.0/mule-pop3.xsd=META-INF/mule-pop3.xsd
+http\://www.mulesource.org/schema/mule/pop3s/2.0/mule-pop3s.xsd=META-INF/mule-pop3s.xsd
+http\://www.mulesource.org/schema/mule/imap/2.0/mule-imap.xsd=META-INF/mule-imap.xsd
+http\://www.mulesource.org/schema/mule/imaps/2.0/mule-imaps.xsd=META-INF/mule-imaps.xsd

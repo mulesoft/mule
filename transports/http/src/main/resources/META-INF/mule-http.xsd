@@ -12,8 +12,7 @@
                 schemaLocation="http://www.springframework.org/schema/beans"/>
 
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"/>
-    <xsd:import namespace="http://www.mulesource.org/schema/mule/tcp/2.0"
-                schemaLocation="/META-INF/mule-tcp.xsd"/>
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/tcp/2.0"/>
 
     <xsd:element name="connector" type="httpConnectorType">
         <xsd:annotation>
