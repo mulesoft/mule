@@ -33,6 +33,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.xml.BeansDtdResolver;
+import org.springframework.beans.factory.xml.PluggableSchemaResolver;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -197,6 +198,12 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
 
     protected EntityResolver createEntityResolver()
     {
+        return new PluggableSchemaResolver(getBeanClassLoader());
+    }
+
+
+    protected EntityResolver createLegacyEntityResolver()
+    {
         if (dtdResolver == null)
         {
             MuleDtdResolver muleSpringResolver = new MuleDtdResolver("mule-spring-configuration.dtd",
@@ -228,12 +235,11 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
         int i = super.detectValidationMode(resource);
         if(i==VALIDATION_DTD)
         {
-            setEntityResolver(createEntityResolver());
-
+            setEntityResolver(createLegacyEntityResolver());
         }
         else
         {
-            setEntityResolver(new MuleDelegatingClasspathEntityResolver(getClass().getClassLoader()));
+            setEntityResolver(createEntityResolver());
         }
         return i;
     }
