@@ -10,7 +10,7 @@
 
 package org.mule.providers.soap.axis;
 
-import org.mule.RegistryContext;
+import org.mule.config.MuleManifest;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleMessage;
@@ -427,7 +427,7 @@ public class AxisServiceComponent implements Initialisable, Callable
         AxisEngine engine = getAxisServer();
         response.setProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/html");
         response.write("<h2>And now... Some Services</h2>");
-        String version = RegistryContext.getConfiguration().getProductVersion();
+        String version = MuleManifest.getProductVersion();
         if (version == null)
         {
             version = "Version Not Set";

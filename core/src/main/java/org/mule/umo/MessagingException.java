@@ -10,6 +10,7 @@
 
 package org.mule.umo;
 
+import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
@@ -99,7 +100,7 @@ public class MessagingException extends UMOException
         }
         else
         {
-            buf.append("The current UMOMessage is null! Please report this to dev@mule.codehaus.org.");
+            buf.append("The current UMOMessage is null! Please report this to ").append(MuleManifest.getDevListEmail());
             addInfo("Payload", NullPayload.getInstance().toString());
         }
 

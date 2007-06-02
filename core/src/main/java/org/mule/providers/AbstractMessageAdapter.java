@@ -10,6 +10,7 @@
 
 package org.mule.providers;
 
+import org.mule.config.MuleManifest;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.UMOExceptionPayload;
@@ -139,7 +140,7 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
             else
             {
                 logger.warn("setProperty(key, value) called with null value; removing key: " + key
-                            + "; please report the following stack trace to dev@mule.codehaus.org.",
+                            + "; please report the following stack trace to " + MuleManifest.getDevListEmail(),
                     new Throwable());
                 properties.remove(key);
             }
@@ -147,7 +148,7 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
         else
         {
             logger.warn("setProperty(key, value) ignored because of null key for object: " + value
-                        + "; please report the following stack trace to dev@mule.codehaus.org.",
+                        + "; please report the following stack trace to " + MuleManifest.getDevListEmail(),
                 new Throwable());
         }
     }

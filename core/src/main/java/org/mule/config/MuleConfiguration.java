@@ -19,14 +19,6 @@ import org.mule.umo.manager.DefaultWorkListener;
 import org.mule.util.UUID;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.Enumeration;
-import java.util.jar.Attributes;
-import java.util.jar.Manifest;
 
 import javax.resource.spi.work.WorkListener;
 
@@ -150,11 +142,6 @@ public class MuleConfiguration
      * The configuration resources used to configure the MuleManager instance
      */
     private String[] configResources = new String[]{};
-
-    /**
-     * The Mule Jar manifest object
-     */
-    private Manifest manifest = null;
 
     /**
      * Whether the server instance is running in client mode, which means that some
@@ -312,120 +299,7 @@ public class MuleConfiguration
         }
     }
 
-    public String getProductVersion()
-    {
-        return getManifestProperty("Implementation-Version");
-    }
-
-    public String getVendorName()
-    {
-        return getManifestProperty("Specification-Vendor");
-    }
-
-    public String getVendorUrl()
-    {
-        return getManifestProperty("Vendor-Url");
-    }
-
-    public String getProductUrl()
-    {
-        return getManifestProperty("Product-Url");
-    }
-
-    public String getProductName()
-    {
-        return getManifestProperty("Implementation-Title");
-    }
-
-    public String getProductMoreInfo()
-    {
-        return getManifestProperty("More-Info");
-    }
-
-    public String getProductSupport()
-    {
-        return getManifestProperty("Support");
-    }
-
-    public String getProductLicenseInfo()
-    {
-        return getManifestProperty("License");
-    }
-
-    public String getProductDescription()
-    {
-        return getManifestProperty("Description");
-    }
-
-    public String getBuildDate()
-    {
-        return getManifestProperty("Build-Date");
-    }
-
-    public Manifest getManifest()
-    {
-        if (manifest == null)
-        {
-            manifest = new Manifest();
-
-            InputStream is = null;
-            try
-            {
-                // We want to load the MANIFEST.MF from the mule-core jar. Sine we
-                // don't the version we're using
-                // we have to search for the jar on the classpath
-                URL url = (URL) AccessController.doPrivileged(new PrivilegedAction()
-                {
-                    public Object run()
-                    {
-                        try
-                        {
-                            Enumeration e = MuleConfiguration.class.getClassLoader().getResources(
-                                ("META-INF/MANIFEST.MF"));
-                            while (e.hasMoreElements())
-                            {
-                                URL url = (URL) e.nextElement();
-                                if (url.toExternalForm().indexOf("mule-core") > -1)
-                                {
-                                    return url;
-                                }
-                            }
-                        }
-                        catch (IOException e1)
-                        {
-                            // TODO MULE-863: Is this sufficient (was printStackTrace) and correct?
-                            logger.debug("Failure reading manifest: " + e1.getMessage(), e1);
-                        }
-                        return null;
-                    }
-                });
-
-                if (url != null)
-                {
-                    is = url.openStream();
-                }
-
-                if (is != null)
-                {
-                    manifest.read(is);
-                }
-
-            }
-            catch (IOException e)
-            {
-                // TODO MULE-863
-                logger.warn("Failed to read manifest Info, Manifest information will not display correctly: "
-                            + e.getMessage());
-            }
-        }
-        return manifest;
-    }
-
-    protected String getManifestProperty(String name)
-    {
-        return getManifest().getMainAttributes().getValue(new Attributes.Name(name));
-    }
-
+   
     public int getDefaultTransactionTimeout()
     {
         return defaultTransactionTimeout;

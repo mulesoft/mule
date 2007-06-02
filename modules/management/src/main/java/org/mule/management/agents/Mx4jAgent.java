@@ -10,7 +10,7 @@
 
 package org.mule.management.agents;
 
-import org.mule.RegistryContext;
+import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.AbstractAgent;
 import org.mule.management.support.AutoDiscoveryJmxSupportFactory;
@@ -82,7 +82,7 @@ public class Mx4jAgent extends AbstractAgent
 
     // TODO AH check how an embedded scenario can be handled (no mule home) 
     private String xslFilePath = System.getProperty("mule.home") + "/lib/mule/mule-module-management-" +
-            RegistryContext.getConfiguration().getProductVersion() + ".jar";
+            MuleManifest.getProductVersion() + ".jar";
 
     private String pathInJar = DEFAULT_PATH_IN_JAR;
 

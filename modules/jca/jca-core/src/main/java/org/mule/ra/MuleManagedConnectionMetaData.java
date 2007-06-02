@@ -10,7 +10,7 @@
 
 package org.mule.ra;
 
-import org.mule.RegistryContext;
+import org.mule.config.MuleManifest;
 import org.mule.ra.i18n.JcaMessages;
 
 import javax.resource.ResourceException;
@@ -30,12 +30,12 @@ public class MuleManagedConnectionMetaData implements ManagedConnectionMetaData
 
     public String getEISProductName() throws ResourceException
     {
-        return RegistryContext.getConfiguration().getVendorName();
+        return MuleManifest.getVendorName();
     }
 
     public String getEISProductVersion() throws ResourceException
     {
-        return RegistryContext.getConfiguration().getProductVersion();
+        return MuleManifest.getProductVersion();
     }
 
     // TODO

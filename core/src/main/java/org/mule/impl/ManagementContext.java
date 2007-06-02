@@ -12,6 +12,7 @@ package org.mule.impl;
 import org.mule.MuleRuntimeException;
 import org.mule.RegistryContext;
 import org.mule.config.MuleConfiguration;
+import org.mule.config.MuleManifest;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.internal.notifications.ManagerNotification;
@@ -715,16 +716,16 @@ public class ManagementContext implements UMOManagementContext
 
         // Mule Version, Timestamp, and Server ID
         List message = new ArrayList();
-        Manifest mf = config.getManifest();
+        Manifest mf = MuleManifest.getManifest();
         Map att = mf.getMainAttributes();
         if (att.values().size() > 0)
         {
-            message.add(StringUtils.defaultString(config.getProductDescription(), notset) + " "
+            message.add(StringUtils.defaultString(MuleManifest.getProductDescription(), notset) + " "
                     + CoreMessages.version().getMessage() + " "
-                    + StringUtils.defaultString(config.getProductVersion(), notset));
+                    + StringUtils.defaultString(MuleManifest.getProductVersion(), notset));
 
-            message.add(StringUtils.defaultString(config.getVendorName(), notset));
-            message.add(StringUtils.defaultString(config.getProductMoreInfo(), notset));
+            message.add(StringUtils.defaultString(MuleManifest.getVendorName(), notset));
+            message.add(StringUtils.defaultString(MuleManifest.getProductMoreInfo(), notset));
         }
         else
         {

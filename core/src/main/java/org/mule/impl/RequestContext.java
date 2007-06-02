@@ -10,6 +10,7 @@
 
 package org.mule.impl;
 
+import org.mule.config.MuleManifest;
 import org.mule.config.MuleProperties;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOEventContext;
@@ -91,7 +92,7 @@ public final class RequestContext
                     String key = (String) iterator.next();
                     if (key == null)
                     {
-                        logger.warn("Message property key is null: please report the following stack trace to dev@mule.codehaus.org.",
+                        logger.warn("Message property key is null: please report the following stack trace to " + MuleManifest.getDevListEmail(),
                             new IllegalArgumentException());
                     }
                     else

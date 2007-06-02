@@ -10,7 +10,7 @@
 
 package org.mule.management.mbeans;
 
-import org.mule.RegistryContext;
+import org.mule.config.MuleManifest;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.util.IOUtils;
@@ -62,7 +62,7 @@ public class MuleService implements MuleServiceMBean
         }
         os += " (" + System.getProperty("os.version") + ", " + System.getProperty("os.arch") + ")";
 
-        buildDate = RegistryContext.getConfiguration().getBuildDate();
+        buildDate = MuleManifest.getBuildNumber();
         try
         {
             InetAddress iad = InetAddress.getLocalHost();
@@ -101,7 +101,7 @@ public class MuleService implements MuleServiceMBean
     {
         if (version == null)
         {
-            version = RegistryContext.getConfiguration().getProductVersion();
+            version = MuleManifest.getProductVersion();
             if (version == null)
             {
                 version = "Mule Version Info Not Set";
@@ -114,7 +114,7 @@ public class MuleService implements MuleServiceMBean
     {
         if (vendor == null)
         {
-            vendor = RegistryContext.getConfiguration().getVendorName();
+            vendor = MuleManifest.getVendorName();
             if (vendor == null)
             {
                 vendor = "Mule Vendor Info Not Set";

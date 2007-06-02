@@ -12,6 +12,7 @@ package org.mule.impl;
 
 import org.mule.MuleException;
 import org.mule.RegistryContext;
+import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
@@ -40,11 +41,12 @@ import org.mule.util.ClassUtils;
 import org.mule.util.MuleObjectHelper;
 import org.mule.util.ObjectNameHelper;
 
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 import java.util.Collections;
 import java.util.Map;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -849,7 +851,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         else
         {
             //TODO: Either remove because this should never happen or i18n the message
-            throw new IllegalStateException("The connector on the endpoint: " + toString() + "is null. Please contact dev@mule.codehaus.org");
+            throw new IllegalStateException("The connector on the endpoint: " + toString() + "is null. Please contact " + MuleManifest.getDevListEmail());
         }
     }
 
@@ -862,7 +864,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         else
         {
             //TODO: Either remove because this should never happen or i18n the message
-            throw new IllegalStateException("The connector on the endpoint: " + toString() + "is null. Please contact dev@mule.codehaus.org");
+            throw new IllegalStateException("The connector on the endpoint: " + toString() + "is null. Please contact " + MuleManifest.getDevListEmail());
         }
     }
 
@@ -875,7 +877,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         else
         {
             //TODO: Either remove because this should never happen or i18n the message
-            throw new IllegalStateException("The connector on the endpoint: " + toString() + "is null. Please contact dev@mule.codehaus.org");
+            throw new IllegalStateException("The connector on the endpoint: " + toString() + "is null. Please contact " + MuleManifest.getDevListEmail());
         }
     }
 
