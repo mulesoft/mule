@@ -6,7 +6,7 @@
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
-       http://www.mulesource.org/schema/mule/tls/2.0 META-INF/mule-tls.xsd">
+       http://www.mulesource.org/schema/mule/tls/2.0 http://www.mulesource.org/schema/mule/tls/2.0/mule-tls.xsd">
 
 
     <tls:connector name="sslConnector" sendBufferSize="1024" receiveBufferSize="2048" keepAlive="true">
