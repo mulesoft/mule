@@ -13,6 +13,28 @@
     <name>Mule Functional Test Framework (TCK)</name>
     <description>Mule functional test framework (TCK)</description>
 
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>**/QuickConfigurationBuilderTestCase.*</exclude>
+                        <exclude>**/AlwaysCreateConnectorTestCase.*</exclude>
+                        <exclude>**/PlaceholderProcessorTestCase.*</exclude>
+                        <exclude>**/MuleConfigurationTestCase.*</exclude>
+                        <exclude>**/PropertyTemplatesTestCase.*</exclude>
+                        <exclude>**/MuleXmlConfigBuilderTestCase.*</exclude>
+                        <exclude>**/MuleXmlConfigBuilderSplitComponentsTestCase.*</exclude>
+                        <exclude>**/ConnectorConverterTestCase.*</exclude>
+                        <exclude>**/MuleClasspathConfigBuilderTestCase.*</exclude>
+                        <exclude>**/SpringNamespaceConfigBuilderTestCase.*</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
         <!-- required for JXPathFilter -->
         <dependency>
