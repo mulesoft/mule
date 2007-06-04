@@ -15,7 +15,17 @@
 
     <build>
         <plugins>
-              <plugin>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <!-- waiting on MULE-1771 -->
+                        <exclude>**/MultiStreamMule1696TestCase.*</exclude>
+                        <exclude>**/FtpStreamingTestCase.*</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
