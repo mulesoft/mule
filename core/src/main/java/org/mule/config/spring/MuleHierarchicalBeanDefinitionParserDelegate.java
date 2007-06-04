@@ -123,6 +123,15 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
                 parseSetElement(element, bd);
                 return true;
             }
+
+        }
+        //This is a slight hack since if we get a spring namespaced element here it means that we have a Mule element
+        //that has a spring element embedded. This is not ideal, and we could just mandate that nested spring properties
+        //within Mule elements should always use the mule namespace.
+        //Currently only property collections (such as on the <mule:endpoint>) will hit this code
+        else if(BEANS_NAMESPACE_URI.equals(ns))
+        {
+            return true;
         }
         return false;
     }

@@ -21,8 +21,6 @@ import org.w3c.dom.Element;
  */
 public class PropertiesBeanDefinitionParser extends SimpleChildDefinitionParser
 {
-    private String location;
-    private String fileEncoding;
 
     public PropertiesBeanDefinitionParser(String setterMethod)
     {
@@ -40,14 +38,5 @@ public class PropertiesBeanDefinitionParser extends SimpleChildDefinitionParser
         
         Properties parsedProps = parserContext.getDelegate().parsePropsElement(element);
         builder.addPropertyValue("properties", parsedProps);
-
-        if (location != null)
-        {
-            builder.addPropertyValue("location", location);
-        }
-        if (fileEncoding != null)
-        {
-            builder.addPropertyValue("fileEncoding", fileEncoding);
-        }
     }
 }

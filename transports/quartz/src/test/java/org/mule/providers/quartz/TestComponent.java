@@ -18,7 +18,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 
 public class TestComponent implements Callable
 {
-    protected static final CountDownLatch QUARTZ_COUNTER = new CountDownLatch(4);
+    protected static CountDownLatch QUARTZ_COUNTER = new CountDownLatch(4);
 
     public Object onCall(UMOEventContext eventContext) throws Exception
     {
@@ -41,4 +41,8 @@ public class TestComponent implements Callable
         return null;
     }
 
+    public static void resetCounter()
+    {
+        QUARTZ_COUNTER = new CountDownLatch(4);
+    }
 }
