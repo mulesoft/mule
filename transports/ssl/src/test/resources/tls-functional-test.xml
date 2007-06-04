@@ -33,13 +33,13 @@
 
     <bean id="reply" class="org.mule.tck.functional.FunctionalTestComponent">
         <property name="eventCallback">
-            <bean class="org.mule.tck.functional.ResponseWriterCallback"/>
+            <bean class="org.mule.tck.functional.CounterCallback"/>
         </property>
     </bean>
 
     <bean id="countAndReply" class="org.mule.tck.functional.FunctionalTestComponent">
         <property name="eventCallback">
-            <bean class="org.mule.tck.functional.ResponseWriterCallback"/>
+            <bean class="org.mule.tck.functional.CounterCallback"/>
         </property>
     </bean>
 

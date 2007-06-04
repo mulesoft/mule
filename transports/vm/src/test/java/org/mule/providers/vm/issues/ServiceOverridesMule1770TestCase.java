@@ -23,7 +23,7 @@ public class ServiceOverridesMule1770TestCase extends FunctionalTestCase
         return "service-overrides-mule-1770-test.xml";
     }
 
-    public void testServiceOVerrides()
+    public void testServiceOverrides()
     {
         AbstractConnector c = (AbstractConnector)managementContext.getRegistry().lookupConnector("test");
         assertNotNull("Connector should not be null", c);

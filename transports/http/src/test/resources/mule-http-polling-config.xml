@@ -28,7 +28,11 @@
             <mule:inbound-router>
                 <mule:endpoint address="http://marie:marie@localhost:4567"
                                connector-ref="PollingHttpConnector">
-                    <property name="pollingFrequency" value="300000"/>
+                    <property name="properties">
+                        <map>
+                            <entry key="pollingFrequency" value="30000"/>
+                        </map>
+                    </property>
                 </mule:endpoint>
             </mule:inbound-router>
             <mule:outbound-router>

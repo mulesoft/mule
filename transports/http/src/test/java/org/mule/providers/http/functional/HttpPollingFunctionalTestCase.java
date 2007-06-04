@@ -19,9 +19,7 @@ public class HttpPollingFunctionalTestCase extends FunctionalTestCase
 
     public void testPollingHttpConnector() throws Exception
     {
-        // this is broken because of MULE-1770, but even then, what is it doing?
-        // if this passes, why?  where does the message come from?  
-        // it makes no sense to me...
+        // this is broken because of MULE-1770
         MuleClient client = new MuleClient();
         UMOMessage result = client.receive("vm://toclient", 5000);
         assertNotNull(result.getPayload());
