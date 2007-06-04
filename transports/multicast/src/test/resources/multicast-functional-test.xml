@@ -8,7 +8,7 @@
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
                http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
                http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd
-               http://www.mulesource.org/schema/mule/multicast/2.0 META-INF/mule-multicast.xsd">
+               http://www.mulesource.org/schema/mule/multicast/2.0 http://www.mulesource.org/schema/mule/multicast/2.0/mule-multicast.xsd">
 
     <vm:connector name="vm-queue" queueEvents="true"/>
 

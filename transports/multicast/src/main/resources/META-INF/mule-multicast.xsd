@@ -8,7 +8,8 @@
             attributeFormDefault="unqualified">
 
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"/>
-    <xsd:import namespace="http://www.mulesource.org/schema/mule/udp/2.0" schemaLocation="/META-INF/mule-udp.xsd"/>
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/udp/2.0"
+                schemaLocation="http://www.mulesource.org/schema/mule/udp/2.0/mule-udp.xsd"/>
 
     <xsd:element name="connector">
         <xsd:complexType>
