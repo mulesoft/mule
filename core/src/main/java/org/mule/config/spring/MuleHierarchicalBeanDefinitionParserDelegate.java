@@ -37,6 +37,8 @@ import org.w3c.dom.NodeList;
  */
 public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinitionParserDelegate
 {
+    public static final String MULE_DEFAULT_NAMESPACE = "http://www.mulesource.org/schema/mule/core";
+
     /**
      * logger used by this class
      */
@@ -50,21 +52,28 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
 
     public BeanDefinition parseCustomElement(Element ele, BeanDefinition containingBd)
     {
+        BeanDefinition root;
+        BeanDefinition bd = containingBd;
+
         if (logger.isDebugEnabled()) {
             logger.debug("parsing: " + writeNode(ele));
         }
-        BeanDefinition root;
-        String namespaceUri = ele.getNamespaceURI();
-        NamespaceHandler handler = getReaderContext().getNamespaceHandlerResolver().resolve(namespaceUri);
-        if (handler == null)
-        {
-            getReaderContext().error("Unable to locate NamespaceHandler for namespace [" + namespaceUri + "]", ele);
-            return null;
-        }
-        BeanDefinition bd = handler.parse(ele, new ParserContext(getReaderContext(), this, containingBd));
-        registerBean(ele, bd);
 
+        //If element is not a Spring property element, use a custom handler
+        if(!tryParsingSpringPropertyElements(ele, bd))
+        {
+            String namespaceUri = ele.getNamespaceURI();
+            NamespaceHandler handler = getReaderContext().getNamespaceHandlerResolver().resolve(namespaceUri);
+            if (handler == null)
+            {
+                getReaderContext().error("Unable to locate NamespaceHandler for namespace [" + namespaceUri + "]", ele);
+                return null;
+            }
+            bd = handler.parse(ele, new ParserContext(getReaderContext(), this, containingBd));
+            registerBean(ele, bd);
+        }
         root = bd;
+
         //Grab all nested elements lised as children to this element
         NodeList list = ele.getChildNodes();
         for (int i = 0; i < list.getLength() ; i++)
@@ -76,26 +85,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
                 if (logger.isDebugEnabled()) {
                     logger.debug("parsing: " + writeNode(element));
                 }
-                if (isDefaultNamespace(element.getNamespaceURI()))
-                {
-                    if(PROPERTY_ELEMENT.equals(element.getLocalName()))
-                    {
-                        parsePropertyElement(element, root);
-                    }
-                    else if(MAP_ELEMENT.equals(element.getLocalName()))
-                    {
-                        parseMapElement(element, root);
-                    }
-                    else if(LIST_ELEMENT.equals(element.getLocalName()))
-                    {
-                        parseListElement(element, root);
-                    }
-                    else if(SET_ELEMENT.equals(element.getLocalName()))
-                    {
-                        parseSetElement(element, root);
-                    } 
-                }
-                else
+                if (!tryParsingSpringPropertyElements(element, bd))
                 {
                     bd = parseCustomElement(element, bd);
                     registerBean(element, bd);
@@ -103,6 +93,38 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
             }
         }
         return root;
+    }
+
+
+    protected boolean tryParsingSpringPropertyElements(Element element, BeanDefinition bd)
+    {
+        //We add the Spting propertyType to the mule.xsd schema so property elements must match the
+        //mule namespace URI for this custom parser to process them
+        String ns = (element.getNamespaceURI());
+        if (StringUtils.isNotBlank(ns) && ns.startsWith(MULE_DEFAULT_NAMESPACE))
+        {
+            if (PROPERTY_ELEMENT.equals(element.getLocalName()))
+            {
+                parsePropertyElement(element, bd);
+                return true;
+            }
+            else if (MAP_ELEMENT.equals(element.getLocalName()))
+            {
+                parseMapElement(element, bd);
+                return true;
+            }
+            else if (LIST_ELEMENT.equals(element.getLocalName()))
+            {
+                parseListElement(element, bd);
+                return true;
+            }
+            else if (SET_ELEMENT.equals(element.getLocalName()))
+            {
+                parseSetElement(element, bd);
+                return true;
+            }
+        }
+        return false;
     }
 
 
