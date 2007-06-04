@@ -17,6 +17,17 @@
 
     <build>
          <plugins>
+             <plugin>
+                 <artifactId>maven-surefire-plugin</artifactId>
+                 <configuration>
+                     <excludes>
+                         <!-- waiting on MULE-1841 -->
+                         <exclude>**/ConnectorServiceOverridesTestCase.*</exclude>
+                         <!-- waiting on MULE-1842 -->
+                         <exclude>**/IndirectReceiveMule1842TestCase.*</exclude>
+                     </excludes>
+                 </configuration>
+             </plugin>
               <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
