@@ -13,11 +13,9 @@ package org.mule.providers;
 import org.mule.config.i18n.Message;
 import org.mule.extras.client.MuleClient;
 import org.mule.providers.rmi.i18n.RmiMessages;
-import org.mule.providers.rmi.RmiConnector;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.DispatchException;
 
 import java.util.HashMap;
@@ -105,6 +103,7 @@ public abstract class AbstractFunctionalTestCase extends FunctionalTestCase
         try
         {
             send("://localhost/TestService?method=foo", "hello");
+            fail("expected error");
         }
         catch (UMOException e)
         {
@@ -114,17 +113,10 @@ public abstract class AbstractFunctionalTestCase extends FunctionalTestCase
 
     public void testBadMethodType() throws Exception
     {
-        UMOEndpoint ep =
-                managementContext.getRegistry().getEndpointFromUri(prefix + "://localhost/TestService?method=reverseString");
-        // this fails here because of an NPE.
-        // what we really want is (i think) is to be able to specify the endpoint proeprties
-        // in the xml config, but i don't know how to do that, so i sent an email to dev.
-        // once that is resolved, we can fix this.  otehrwise, please leave as failing for now.
-        // MULE-1790
-        ep.setProperty(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES, StringBuffer.class.getName());
         try
         {
-            ep.send(getTestEvent("hello", ep));
+            new MuleClient().send("BadType", "hello", null);
+            fail("expected error");
         }
         catch (UMOException e)
         {
@@ -134,22 +126,9 @@ public abstract class AbstractFunctionalTestCase extends FunctionalTestCase
 
     public void testCorrectMethodType() throws Exception
     {
-        UMOEndpoint ep =
-                managementContext.getRegistry().getEndpointFromUri(prefix + "://localhost/TestService?method=reverseString");
-        // this fails here because of an NPE.
-        // what we really want is (i think) is to be able to specify the endpoint proeprties
-        // in the xml config, but i don't know how to do that, so i sent an email to dev.
-        // once that is resolved, we can fix this.  otehrwise, please leave as failing for now.
-        // MULE-1790
-        ep.setProperty(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES, String.class.getName());
-        try
-        {
-            ep.send(getTestEvent("hello", ep));
-        }
-        catch (UMOException e)
-        {
-            assertTrue(e.getCause() instanceof NoSuchMethodException);
-        }
+        UMOMessage message = new MuleClient().send("GoodType", "hello", null);
+        assertNotNull(message);
+        assertEquals("olleh", message.getPayloadAsString());
     }
 
 
