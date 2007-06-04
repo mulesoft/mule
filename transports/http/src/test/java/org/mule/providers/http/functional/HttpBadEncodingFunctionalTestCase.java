@@ -20,7 +20,7 @@ import java.util.Map;
 
 public class HttpBadEncodingFunctionalTestCase extends HttpEncodingFunctionalTestCase
 {
-    protected static String TEST_MESSAGE = "Test Http Request (Rødgrød), 57 = \u06f7\u06f5 in Arabic";
+    protected static String TEST_MESSAGE = "Test Http Request (Rï¿½dgrï¿½d), 57 = \u06f7\u06f5 in Arabic";
 
     protected String getConfigResources()
     {
@@ -37,4 +37,5 @@ public class HttpBadEncodingFunctionalTestCase extends HttpEncodingFunctionalTes
         assertEquals("500", reply.getProperty(HttpConnector.HTTP_STATUS_PROPERTY));
         assertNotNull(reply.getExceptionPayload());
     }
+
 }
