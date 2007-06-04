@@ -141,14 +141,13 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("transformer-serializable-to-byte-array", new SingleElementDefinitionParser(SerializableToByteArray.class, false));
 
         //Transaction Managers
-        //TODO RM*: Better implementation of transaction manager properties
+        //TODO RM*: Need to review these, since Spring have some facilities for configuring the transactionMaanger
         registerBeanDefinitionParser("jndi-transaction-manager", new SingleElementDefinitionParser(GenericTransactionManagerLookupFactory.class, true));
         registerBeanDefinitionParser("weblogic-transaction-manager", new SingleElementDefinitionParser(WeblogicTransactionManagerLookupFactory.class, true));
         registerBeanDefinitionParser("jboss-transaction-manager", new SingleElementDefinitionParser(JBossTransactionManagerLookupFactory.class, true));
         registerBeanDefinitionParser("jrun-transaction-manager", new SingleElementDefinitionParser(JRunTransactionManagerLookupFactory.class, true));
         registerBeanDefinitionParser("resin3-transaction-manager", new SingleElementDefinitionParser(Resin3TransactionManagerLookupFactory.class, true));
         registerBeanDefinitionParser("websphere-transaction-manager", new SingleElementDefinitionParser(WebsphereTransactionManagerLookupFactory.class, true));
-        registerBeanDefinitionParser("custom-transaction-manager-factory", new CustomElementDefinitionParser(true));
 
         //Endpoint elements
         registerBeanDefinitionParser("endpoint", new EndpointDefinitionParser());
