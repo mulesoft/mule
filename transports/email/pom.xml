@@ -16,6 +16,22 @@
     <build>
         <plugins>
             <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <!-- waiting on MULE-1771 -->
+                        <exclude>**/Pop3FunctionalTestCase.*</exclude>
+                        <exclude>**/Pop3sFunctionalTestCase.*</exclude>
+                        <exclude>**/ImapFunctionalTestCase.*</exclude>
+                        <exclude>**/ImapsFunctionalTestCase.*</exclude>
+                        <!-- waiting on MULE-1840 -->
+                        <exclude>**/SmtpFunctionalTestCase.*</exclude>
+                        <exclude>**/SmtpMimeFunctionalTestCase.*</exclude>
+                        <exclude>**/SmtpsFunctionalTestCase.*</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>

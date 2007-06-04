@@ -9,7 +9,7 @@
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesource.org/schema/mule/email-download/2.0"
-                schemaLocation="/META-INF/mule-email-download.xsd"/>
+                schemaLocation="http://www.mulesource.org/schema/mule/mule-email-download/2.0/mule-email-download.xsd"/>
 
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"/>
 
