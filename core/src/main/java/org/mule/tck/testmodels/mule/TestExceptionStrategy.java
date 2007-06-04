@@ -13,13 +13,20 @@ package org.mule.tck.testmodels.mule;
 import org.mule.impl.DefaultExceptionStrategy;
 
 /**
- * <code>TestExceptionStrategy</code> TODO
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>TestExceptionStrategy</code> is used by the Mule test cases as a direct replacement of the {@link org.mule.impl.DefaultExceptionStrategy}
+ * This is used to test that overriding the default Exception strategy works
  */
-
 public class TestExceptionStrategy extends DefaultExceptionStrategy
 {
-    // no methods yet
+    private String testProperty;
+
+    public String getTestProperty()
+    {
+        return testProperty;
+    }
+
+    public void setTestProperty(String testProperty)
+    {
+        this.testProperty = testProperty;
+    }
 }

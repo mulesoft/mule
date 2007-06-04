@@ -18,7 +18,9 @@ import org.mule.routing.filters.WildcardFilter;
 import org.mule.routing.filters.logic.AndFilter;
 import org.mule.routing.filters.logic.NotFilter;
 import org.mule.routing.filters.logic.OrFilter;
+import org.mule.util.ClassUtils;
 
+import org.springframework.beans.factory.BeanCreationException;
 import org.w3c.dom.Element;
 
 /**
@@ -28,6 +30,7 @@ import org.w3c.dom.Element;
  */
 public class FilterDefinitionParser extends AbstractChildBeanDefinitionParser
 {
+
     protected Class getBeanClass(Element element)
     {
         if (element.getLocalName().equals("and-filter"))
@@ -70,6 +73,20 @@ public class FilterDefinitionParser extends AbstractChildBeanDefinitionParser
         {
             return EqualsFilter.class;
         }
+        else if (element.getLocalName().equals("custom-filter"))
+        {
+            try
+            {
+                String clazz = element.getAttribute("class");
+                element.removeAttribute("class");
+                assert clazz!=null;
+                return ClassUtils.loadClass(clazz, getClass());
+            }
+            catch (ClassNotFoundException e)
+            {
+                throw new BeanCreationException("Failed to create custom Filter", e);
+            }
+        }
         return null;
     }
 
@@ -96,5 +113,11 @@ public class FilterDefinitionParser extends AbstractChildBeanDefinitionParser
         {
             return false;
         }
+    }
+
+    //@java.lang.Override
+    protected boolean isMap(Element element)
+    {
+        return false;
     }
 }

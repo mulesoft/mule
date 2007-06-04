@@ -36,7 +36,6 @@
     <xsd:element name="jrun-transaction-manager" type="transactionManagersType"/>
     <xsd:element name="jboss-transaction-manager" type="transactionManagersType"/>
     <xsd:element name="resin-transaction-manager" type="transactionManagersType"/>
-    <xsd:element name="custom-transaction-manager-factory" type="customTransactionManagersType"/>
 
 
     <!--<xsd:element name="security-manager" type="shared:securityManagerType" minOccurs="0"/>-->
@@ -197,6 +196,7 @@
                 <xsd:element name="regex-filter" type="patternFilterType"/>
                 <xsd:element name="message-property-filter" type="patternFilterType"/>
                 <xsd:element name="equals-filter" type="filterType"/>
+                <xsd:element name="custom-filter" type="customFilterType"/>
             </xsd:choice>
         </xsd:sequence>
     </xsd:group>
@@ -239,8 +239,9 @@
 
     <xsd:complexType name="customFilterType">
         <xsd:choice>
-            <xsd:any namespace="##other" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element name="property" type="spring:propertyType" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:choice>
+        <xsd:attribute name="class" type="xsd:NMTOKEN"/>
         <xsd:attribute name="not" type="xsd:boolean"/>
     </xsd:complexType>
 
@@ -252,7 +253,7 @@
                      maxOccurs="unbounded"/>
         </xsd:sequence>
         <xsd:attribute name="useProviders" type="xsd:string"/>
-        <xsd:attribute name="className" type="xsd:NMTOKEN" use="required"/>
+        <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
     </xsd:complexType>
 
     <!--==============================================================-->
@@ -260,28 +261,19 @@
     <!--==============================================================-->
 
     <xsd:complexType name="transformerType">
-
-        <!--<xsd:choice minOccurs="0" maxOccurs="unbounded">-->
-        <!--<xsd:element name="source-type" minOccurs="0" maxOccurs="unbounded">-->
-        <!--<xsd:complexType>-->
-        <!--<xsd:attribute name="class" use="required"/>-->
-        <!--</xsd:complexType>-->
-        <!--</xsd:element>-->
-        <!--</xsd:choice>-->
         <xsd:attribute name="name" type="xsd:string"/>
         <xsd:attribute name="returnClass" type="xsd:NMTOKEN"/>
         <xsd:attribute name="ignoreBadInput" type="xsd:boolean"/>
-
     </xsd:complexType>
 
     <xsd:element name="custom-transformer">
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="transformerType">
-                    <xsd:choice>
-                        <xsd:any namespace="##other" minOccurs="0" maxOccurs="unbounded"/>
-                    </xsd:choice>
-                    <xsd:attribute name="class" type="xsd:NMTOKEN"/>
+                    <xsd:sequence>
+                        <xsd:element name="property" type="spring:propertyType" minOccurs="0" maxOccurs="unbounded"/>
+                    </xsd:sequence>
+                    <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>
@@ -422,6 +414,9 @@
     <xsd:complexType name="customExceptionStrategyType">
         <xsd:complexContent>
             <xsd:extension base="exceptionStrategyType">
+                <xsd:sequence>
+                    <xsd:element name="property" type="spring:propertyType" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
                 <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -451,20 +446,23 @@
 
 
     <xsd:complexType name="connectorType">
-        <xsd:choice minOccurs="0" maxOccurs="unbounded">
-            <xsd:element name="receiver-threading-profile" type="threadingProfileType" minOccurs="0"
-                         maxOccurs="1"/>
-            <xsd:element name="dispatcher-threading-profile" type="threadingProfileType" minOccurs="0"
-                         maxOccurs="1"/>
-            <xsd:group ref="exceptionStrategies" minOccurs="0" maxOccurs="1"/>
-            <xsd:element name="service-overrides" type="serviceOverridesType" minOccurs="0" maxOccurs="1"/>
-        </xsd:choice>
+        <xsd:group ref="connectorElements"/>
 
         <xsd:attribute name="name" type="xsd:string" use="required"/>
         <xsd:attribute name="createDispatcherPerRequest" type="xsd:boolean"/>
         <xsd:attribute name="createMultipleTransactedReceivers" type="xsd:boolean"/>
     </xsd:complexType>
 
+    <xsd:group name="connectorElements">
+        <xsd:sequence>
+            <xsd:element name="receiver-threading-profile" type="threadingProfileType" minOccurs="0"
+                         maxOccurs="1"/>
+            <xsd:element name="dispatcher-threading-profile" type="threadingProfileType" minOccurs="0"
+                         maxOccurs="1"/>
+            <xsd:group ref="exceptionStrategies" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="service-overrides" type="serviceOverridesType" minOccurs="0" maxOccurs="1"/>
+        </xsd:sequence>
+    </xsd:group>
     <xsd:complexType name="serviceOverridesType">
         <xsd:attribute name="messageReceiver" type="xsd:NMTOKEN"/>
         <xsd:attribute name="transactedMessageReceiver" type="xsd:NMTOKEN"/>
@@ -521,6 +519,13 @@
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="connectorType">
+                    <xsd:sequence>
+                        <xsd:element name="property" type="spring:propertyType" minOccurs="0" maxOccurs="unbounded"/>
+                        <!-- RM*: after much experimentation I couldn't get custom-connector to extend connectorType and add
+                         mover elements without the parser complaining. Instead I separated the connector elements into their
+                         own group and reference them from this type and the connectorType. -->
+                        <xsd:group ref="connectorElements"/>
+                    </xsd:sequence>
                     <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
                 </xsd:extension>
             </xsd:complexContent>
@@ -961,19 +966,9 @@
 
     <!--Transaction Managers -->
     <xsd:complexType name="transactionManagersType">
-        <xsd:choice maxOccurs="unbounded" minOccurs="0">
-            <xsd:any namespace="##other"/>
-        </xsd:choice>
-        <xsd:attribute name="id" default="transactionManagerFactory" use="optional"/>
+        <xsd:attribute name="name" default="transactionManagerFactory" use="optional"/>
     </xsd:complexType>
 
-    <xsd:complexType name="customTransactionManagersType">
-        <xsd:complexContent>
-            <xsd:extension base="transactionManagersType">
-                <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
 
     <!--==============================================================-->
     <!--  Utils / Standard Types                                      -->

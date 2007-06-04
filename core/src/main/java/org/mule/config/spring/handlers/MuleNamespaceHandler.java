@@ -225,6 +225,7 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("payload-type-filter", new FilterDefinitionParser());
         registerBeanDefinitionParser("wildcard-filter", new FilterDefinitionParser());
         registerBeanDefinitionParser("equals-filter", new FilterDefinitionParser());
+        registerBeanDefinitionParser("custom-filter", new FilterDefinitionParser());
 
         // Utils / Standard Types
         registerBeanDefinitionParser("properties", new PropertiesBeanDefinitionParser("properties"));
