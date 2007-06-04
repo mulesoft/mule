@@ -18,9 +18,6 @@
              <plugin>
                  <artifactId>maven-surefire-plugin</artifactId>
                  <configuration>
-                     <excludes>
-                         <exclude>**/QuartzFunctionalLegacyTestCase.*</exclude>
-                     </excludes>
                  </configuration>
              </plugin>
               <plugin>
