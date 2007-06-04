@@ -30,7 +30,6 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.Startable;
 import org.mule.umo.lifecycle.Stoppable;
 import org.mule.umo.lifecycle.UMOLifecycleManager;
-import org.mule.umo.lifecycle.UMOLifecyclePhase;
 import org.mule.umo.manager.UMOAgent;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.manager.UMOServerNotificationListener;
@@ -548,8 +547,9 @@ public class ManagementContext implements UMOManagementContext
 
     public void setId(String id)
     {
-        checkLifecycleForPropertySet("id");
-
+        //TODO AP: Some of the management tests require the ID to be set after initialisation.
+        //I don't think this is a good idea if we can help it. Can you take a look at the tests.
+        checkLifecycleForPropertySet("id", Startable.PHASE_NAME);
         this.id = id;
     }
 
@@ -566,7 +566,7 @@ public class ManagementContext implements UMOManagementContext
 
     public void setDomain(String domain)
     {
-        checkLifecycleForPropertySet("domain");
+        checkLifecycleForPropertySet("domain", Initialisable.PHASE_NAME);
         this.domain = domain;
     }
 
@@ -577,7 +577,7 @@ public class ManagementContext implements UMOManagementContext
 
     public void setClusterId(String clusterId)
     {
-        checkLifecycleForPropertySet("clusterId");
+        checkLifecycleForPropertySet("clusterId", Initialisable.PHASE_NAME);
         this.clusterId = clusterId;
     }
 
@@ -591,7 +591,7 @@ public class ManagementContext implements UMOManagementContext
      */
     public void setSecurityManager(UMOSecurityManager securityManager) throws InitialisationException
     {
-        checkLifecycleForPropertySet("securityManager");
+        checkLifecycleForPropertySet("securityManager", Initialisable.PHASE_NAME);
         this.securityManager = securityManager;
     }
 
@@ -652,7 +652,7 @@ public class ManagementContext implements UMOManagementContext
      */
     public void setWorkManager(UMOWorkManager workManager)
     {
-        checkLifecycleForPropertySet("workManager");
+        checkLifecycleForPropertySet("workManager", Initialisable.PHASE_NAME);
         this.workManager = workManager;
     }
 
@@ -663,7 +663,7 @@ public class ManagementContext implements UMOManagementContext
 
     public void setQueueManager(QueueManager queueManager)
     {
-        checkLifecycleForPropertySet("queueManager");
+        checkLifecycleForPropertySet("queueManager", Initialisable.PHASE_NAME);
         this.queueManager = queueManager;
     }
 
@@ -674,7 +674,7 @@ public class ManagementContext implements UMOManagementContext
 
     public void setNotificationManager(ServerNotificationManager notificationManager)
     {
-        checkLifecycleForPropertySet("notificationManager");
+        checkLifecycleForPropertySet("notificationManager", Initialisable.PHASE_NAME);
         this.notificationManager = notificationManager;
     }
 
@@ -806,12 +806,11 @@ public class ManagementContext implements UMOManagementContext
     }
 
 
-    protected void checkLifecycleForPropertySet(String propertyName) throws IllegalStateException
+    protected void checkLifecycleForPropertySet(String propertyName, String phase) throws IllegalStateException
     {
-        if (lifecycleManager.getCurrentPhase().equals(UMOLifecyclePhase.NOT_IN_LIFECYCLE_PHASE))
+        if (lifecycleManager.isPhaseComplete(phase))
         {
-            return;
+            throw new IllegalStateException("Cannot set property: '" + propertyName + "' once the server has been gone through the " + phase + " phase.");
         }
-        throw new IllegalStateException("Cannot set property: '" + propertyName + "' once the server has been initialised");
     }
 }
