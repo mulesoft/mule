@@ -57,7 +57,7 @@
 
     <global-endpoints>
         <endpoint name="fruitBowlEndpoint" address="test://fruitBowlPublishQ">
-            <filter className="org.mule.routing.filters.xml.JXPathFilter" expression="name">
+            <filter className="org.mule.routing.filters.xml.JXPathFilter" pattern="name">
                 <properties>
                     <property name="value" value="bar"/>
                     <map name="namespaces">
