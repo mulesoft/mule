@@ -33,8 +33,8 @@ import org.springframework.context.support.FileSystemXmlApplicationContext;
 import org.springframework.core.io.InputStreamResource;
 
 /**
- * {@inheritDoc}
- * 
+ * Provides an acess facade to the Spring bean factory
+ * @deprecated No longer required in Mule 2.0 since Mule's Xml configuration is based on Spring
  */
 public class SpringContainerContext extends AbstractContainerContext
 {

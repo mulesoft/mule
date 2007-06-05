@@ -148,7 +148,7 @@ public class XslHelper
         reportWarning(MigrationMessages.clientModeAttributeNotSupported().getMessage());
     }
 
-    public static void embeddedAttributeNotSupported()
+    public static void embeddedModeAttributeNotSupported()
     {
         reportWarning(MigrationMessages.embeddedAttributeNotSupported().getMessage());
     }
@@ -158,12 +158,12 @@ public class XslHelper
         reportWarning(MigrationMessages.blankServerUrl().getMessage());
     }
 
-    public static void serverUrlNotSupported()
+    public static void serverUrlAttributeNotSupported()
     {
         reportError(MigrationMessages.serverUrlNotSupported().getMessage());
     }
 
-    public static void enableMessageEventsNotSupported()
+    public static void enableMessageEventsAttributeNotSupported()
     {
         reportError(MigrationMessages.enableMessageEventsNotSupported().getMessage());
     }
@@ -224,7 +224,7 @@ public class XslHelper
     }
 
 
-    public static void responseTtransformerAttributeNotSupported()
+    public static void responseTransformerAttributeNotSupported()
     {
         reportError(MigrationMessages.responseTransformerAttributeNotSupported().getMessage());
     }

@@ -47,6 +47,10 @@ import org.xml.sax.EntityResolver;
  */
 public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
 {
+    public static final String MULE_MIGRATION_STYLE_SHEET = "mule-1-to-spring-migration.xsl";
+    //Legacy DTD documents
+    public static final String MULE_SPRING_DTD = "mule-spring-configuration.dtd";
+    public static final String MULE_DTD = "mule-configuration.dtd";
     /**
      * logger used by this class
      */
@@ -105,6 +109,7 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
                 logger.fatal("failed to create transformer: " + exception.getMessage(), exception);
             }
         });
+        System.out.println("Creating transformer from source: " + source);
         Transformer transformer = factory.newTransformer(source);
         return transformer;
     }
@@ -206,9 +211,9 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
     {
         if (dtdResolver == null)
         {
-            MuleDtdResolver muleSpringResolver = new MuleDtdResolver("mule-spring-configuration.dtd",
-                "mule-1-to-spring-migration.xsl", new BeansDtdResolver());
-            dtdResolver = new MuleDtdResolver("mule-configuration.dtd", "mule-1-to-spring-migration.xsl",
+            MuleDtdResolver muleSpringResolver = new MuleDtdResolver(MULE_SPRING_DTD,
+                MULE_MIGRATION_STYLE_SHEET, new BeansDtdResolver());
+            dtdResolver = new MuleDtdResolver(MULE_DTD, MULE_MIGRATION_STYLE_SHEET,
                 muleSpringResolver);
         }
         return dtdResolver;

@@ -41,9 +41,10 @@ public class EmbeddedBeansXmlTestCase extends AbstractMuleTestCase
         }
         catch (Exception e)
         {
-            assertTrue(ExceptionHelper.getRootException(e) instanceof LegacyXmlException);
-            LegacyXmlException ex = (LegacyXmlException)ExceptionHelper.getRootException(e);
-            assertEquals(1, ex.getErrors().size());
+            Throwable ex = ExceptionHelper.getRootException(e);
+            assertTrue("Root exception should be of type LegacyXmlException not: " + ex.getClass(), ex instanceof LegacyXmlException);
+            LegacyXmlException lxe = (LegacyXmlException)ex;
+            assertEquals(1, lxe.getErrors().size());
         }
     }
 }

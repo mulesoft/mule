@@ -35,21 +35,10 @@ public class ObjectRefsFromSpringTestCase extends AbstractMuleTestCase
         }
         catch (Exception e)
         {
-            assertTrue(ExceptionHelper.getRootException(e) instanceof LegacyXmlException);
-            LegacyXmlException ex = (LegacyXmlException) ExceptionHelper.getRootException(e);
-            assertEquals(1, ex.getErrors().size());
+            Throwable ex = ExceptionHelper.getRootException(e);
+            assertTrue("Root exception should be of type LegacyXmlException not: " + ex.getClass(), ex instanceof LegacyXmlException);
+            LegacyXmlException lxe = (LegacyXmlException)ex;
+            assertEquals(1, lxe.getErrors().size());
         }
-
-//        UMOEndpoint ep = managementContext.getRegistry().lookupEndpoint("foo");
-//        assertNotNull(ep);
-//        assertEquals("testConnector", ep.getConnector().getName());
-//        assertTrue(ep.getConnectionStrategy() instanceof SimpleRetryConnectionStrategy);
-//        assertTrue(ep.getConnector().getExceptionListener() instanceof TestExceptionStrategy);
-//
-//        assertNotNull(ep.getTransformer());
-//        assertEquals("testTransformer", ep.getTransformer().getName());
-//        assertTrue(ep.getTransformer() instanceof TestCompressionTransformer);
-//        assertEquals(12, ((TestCompressionTransformer) ep.getTransformer()).getBeanProperty2());
-
     }
 }

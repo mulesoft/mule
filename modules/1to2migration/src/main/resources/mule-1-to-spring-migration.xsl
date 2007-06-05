@@ -63,15 +63,15 @@
 
             <xsl:if test="@recoverableMode">
                 <xsl:variable name="err"
-                              select="helper:recoverableModeNotSupported()"/>
+                              select="helper:recoverableModeAttributeNotSupported()"/>
             </xsl:if>
             <xsl:if test="@clientMode">
                 <xsl:variable name="err"
-                              select="helper:clientModeNotSupported()"/>
+                              select="helper:clientModeAttributeNotSupported()"/>
             </xsl:if>
             <xsl:if test="@embedded">
                 <xsl:variable name="err"
-                              select="helper:embeddedModeNotSupported()"/>
+                              select="helper:embeddedModeAttributeNotSupported()"/>
             </xsl:if>
             <xsl:if test="@serverUrl">
                 <xsl:if test="string-length(@serverUrl) = 0">
@@ -80,13 +80,13 @@
                 </xsl:if>
                 <xsl:if test="string-length(@serverUrl) != 0">
                     <xsl:variable name="err"
-                                  select="helper:serverUrlNotSupported()"/>
+                                  select="helper:serverUrlAttributeNotSupported()"/>
                 </xsl:if>
             </xsl:if>
 
             <xsl:if test="@enableMessageEvents">
                 <xsl:variable name="err"
-                              select="helper:enableMessageEventsNotSupported()"/>
+                              select="helper:enableMessageEventsAttributeNotSupported()"/>
             </xsl:if>
             <xsl:if test="@synchronous">
                 <property name="defaultSynchronousEndpoints">

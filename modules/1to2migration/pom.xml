@@ -18,7 +18,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <!-- Autowire configuration is not supported at the moment -->
+                        <!-- Autowire configuration is not supported at the moment. See MULE-1852 -->
                         <exclude>**/SpringAutowireConfigBuilderTestCase.*</exclude>
                     </excludes>
                 </configuration>
