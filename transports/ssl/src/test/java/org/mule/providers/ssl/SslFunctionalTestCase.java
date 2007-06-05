@@ -54,13 +54,14 @@ public class SslFunctionalTestCase extends FunctionalTestCase {
         assertEquals(NUM_MESSAGES, cc.getCallbackCount());
     }
 
-    public void testAsynchronous() throws Exception
-    {
-        MuleClient client = new MuleClient();
-        client.dispatch("asyncEndpoint", TEST_MESSAGE, null);
-        UMOMessage response = client.receive("asyncEndpoint", 5000);
-        assertNotNull("Response is null", response);
-        assertEquals(TEST_MESSAGE + " Received Async", response.getPayloadAsString());
-    }
+    // see AsynchronousSslMule1854TestCase
+//    public void testAsynchronous() throws Exception
+//    {
+//        MuleClient client = new MuleClient();
+//        client.dispatch("asyncEndpoint", TEST_MESSAGE, null);
+//        UMOMessage response = client.receive("asyncEndpoint", 5000);
+//        assertNotNull("Response is null", response);
+//        assertEquals(TEST_MESSAGE + " Received Async", response.getPayloadAsString());
+//    }
 
 }
