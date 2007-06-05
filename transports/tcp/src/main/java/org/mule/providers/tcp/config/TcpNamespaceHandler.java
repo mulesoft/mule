@@ -15,7 +15,7 @@ import org.mule.providers.tcp.TcpConnector;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 /**
- * Reigsters a Bean Definition Parser for handling <code><tcp:connector></code> elements.
+ * Registers a Bean Definition Parser for handling <code><tcp:connector></code> elements.
  *
  */
 public class TcpNamespaceHandler extends NamespaceHandlerSupport
