@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.providers.tcp;
+package org.mule.providers.tcp.issues;
 
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
@@ -17,12 +17,12 @@ import org.mule.extras.client.MuleClient;
 import java.util.Map;
 import java.util.HashMap;
 
-public class TcpFunctionalTestCase extends FunctionalTestCase 
+public class AsynchMule1869TestCase extends FunctionalTestCase
 {
 
     protected static String TEST_MESSAGE = "Test TCP Request";
 
-    public TcpFunctionalTestCase()
+    public AsynchMule1869TestCase()
     {
         setDisposeManagerPerSuite(true);
     }
@@ -32,24 +32,17 @@ public class TcpFunctionalTestCase extends FunctionalTestCase
         return "tcp-functional-test.xml";
     }
 
-    public void testSend() throws Exception
+    // have we changed this during translation?
+    // not clear to me why it should work without a queue somewhere...
+    public void testDispatchAndReply() throws Exception
     {
         MuleClient client = new MuleClient();
         Map props = new HashMap();
-        UMOMessage result = client.send("clientEndpoint", TEST_MESSAGE, props);
-        assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
-    }
+        client.dispatch("asyncClientEndpoint", TEST_MESSAGE, props);
 
-    // see AsynchMule1869TestCase
-//    public void testDispatchAndReply() throws Exception
-//    {
-//        MuleClient client = new MuleClient();
-//        Map props = new HashMap();
-//        client.dispatch("asyncClientEndpoint", TEST_MESSAGE, props);
-//
-//        UMOMessage result =  client.receive("asyncClientEndpoint", 10000);
-//        assertNotNull(result);
-//        assertEquals(TEST_MESSAGE + " Received Async", result.getPayloadAsString());
-//    }
+        UMOMessage result =  client.receive("asyncClientEndpoint", 10000);
+        assertNotNull(result);
+        assertEquals(TEST_MESSAGE + " Received Async", result.getPayloadAsString());
+    }
 
 }
