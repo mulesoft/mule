@@ -12,7 +12,6 @@
     <packaging>jar</packaging>
     <name>Loan Broker ESB Example</name>
 
-
     <dependencies>
         <dependency>
             <groupId>org.mule.examples</groupId>
@@ -186,6 +185,7 @@
             <version>${version}</version>
         </dependency>
     </dependencies>
+
     <build>
         <defaultGoal>install</defaultGoal>
         <finalName>${artifactId}</finalName>
@@ -209,6 +209,8 @@
                         during startup/shutdown. -->
                     <forkMode>pertest</forkMode>
                     <excludes>
+                        <!-- MULE-1864 -->
+                        <exclude>**/*.*</exclude>
                         <exclude implementation="java.lang.String">**/*LoanBrokerEsb*.*</exclude>
                     </excludes>
                 </configuration>
