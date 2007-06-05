@@ -503,12 +503,32 @@
                 <xsl:otherwise>org.mule.impl.MuleDescriptor</xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
-        <xsl:variable name="implClass">
-            <xsl:value-of select="@implementation"/>
+
+        <xsl:variable name="implName">
+            <xsl:choose>
+                <xsl:when test="contains(@implementation, '.') = false">
+                    <xsl:value-of select="@implementation"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="concat(@name, '-impl')"/>
+                    <xsl:variable name="err"
+                      select="helper:implementationShouldBeServiceRef()"/>
+                </xsl:otherwise>
+            </xsl:choose>
         </xsl:variable>
-        <bean name="{$name}" class="{$type}" depends-on="{$currentModel},{$name}-impl">
+
+        <xsl:variable name="impl" select="@implementation"/>
+
+        <xsl:if test="contains(@implementation, '.')">
+            <!-- The backing service bean. -->
+            <bean name="{$name}-impl" class="{$impl}" singleton="false"/>
+        </xsl:if>
+
+        <bean name="{$name}" class="{$type}" depends-on="{$currentModel},{$implName}">
             <property name="service">
-                <value><xsl:value-of select="$name"/>-impl</value>
+                <value>
+                    <xsl:value-of select="$implName"/>
+                </value>
             </property>
 
             <property name="modelName" value="{$currentModel}"/>
@@ -568,8 +588,7 @@
             <xsl:apply-templates select="pooling-profile" mode="deprecated"/>
             <xsl:apply-templates select="bean" mode="asProperty"/>
         </bean>
-        <!-- The backing service bean. -->
-        <bean name="{$name}-impl" class="{$implClass}" singleton="false"/>
+
     </xsl:template>
 
 

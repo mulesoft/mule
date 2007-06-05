@@ -32,7 +32,6 @@ import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
 import org.mule.umo.UMODescriptor;
-import org.mule.umo.UMOException;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -305,12 +304,12 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertNotNull(props.get("OS Version"));
     }
 
-    public void testObjectReferences() throws UMOException
-    {
-        MuleDescriptor descriptor = (MuleDescriptor)managementContext.getRegistry().lookupService(
-            "orangeComponent");
-        assertTrue("orangeComponent is not an Orange", descriptor.getService() instanceof Orange);
-    }
+//    public void testObjectReferences() throws UMOException
+//    {
+//        MuleDescriptor descriptor = (MuleDescriptor)managementContext.getRegistry().lookupService(
+//            "orangeComponent");
+//        assertTrue("orangeComponent is not an Orange", descriptor.getService() instanceof Orange);
+//    }
 
     public void testNestedRouterProxyCreation() throws ObjectNotFoundException
     {

@@ -126,5 +126,10 @@ public class MigrationMessages extends MessageFactory
     {
         return createMessage(BUNDLE_PATH, 21);
     }
+
+    public static Message implementationShouldBeServiceRef()
+    {
+        return createMessage(BUNDLE_PATH, 22);
+    }
 }
 

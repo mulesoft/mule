@@ -244,5 +244,10 @@ public class XslHelper
         reportError(MigrationMessages.persistenceElementNotSupported().getMessage());
     }
 
+    public static void implementationShouldBeServiceRef()
+    {
+        reportWarning(MigrationMessages.implementationShouldBeServiceRef().getMessage());
+    }
+
 
 }
