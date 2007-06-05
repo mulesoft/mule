@@ -8,19 +8,19 @@
         <artifactId>mule-distributions</artifactId>
         <version>2.0.0-SNAPSHOT</version>
     </parent>
-    <groupId>org.mule.distributions.jca</groupId>
-    <artifactId>mule-jca-parent</artifactId>
-    <name>Parent for appserver specific JCA Resource Adapters</name>
+    <groupId>org.mule.distributions.ear</groupId>
+    <artifactId>mule-ear-parent</artifactId>
+    <name>Parent for appserver specific Enterprise Archives</name>
     <packaging>pom</packaging>
     <description>
-        This is the parent module for the appserver specific jca modules. This does not
+        This is the parent module for the appserver specific ear modules. This does not
         produce any output but serves as container for the dependencies that are common
-        for all appserver specific jca distributions.
+        for all appserver specific ear distributions.
     </description>
 
     <modules>
-        <module>jca</module>
-        <module>jca-jboss</module>
+        <module>ear</module>
+<!--         <module>ear-jboss</module> -->
     </modules>
 
     <build>
@@ -37,48 +37,82 @@
     </build>
 
     <dependencies>
+        <!-- TODO dirk: I'm pretty sure that including the examples in the parent pom
+            is not what we want. Only some distros want them, include them there
+        -->
         <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-modules-all</artifactId>
+            <groupId>org.mule.examples</groupId>
+            <artifactId>mule-example-echo</artifactId>
             <version>${version}</version>
-            <type>pom</type>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.examples</groupId>
+            <artifactId>mule-example-errorhandler</artifactId>
+            <version>${version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.examples</groupId>
+            <artifactId>mule-example-hello</artifactId>
+            <version>${version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.examples</groupId>
+            <artifactId>mule-example-loanbroker-bpm</artifactId>
+            <version>${version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.examples</groupId>
+            <artifactId>mule-example-loanbroker-esb</artifactId>
+            <version>${version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.examples</groupId>
+            <artifactId>mule-example-loanbroker-esn</artifactId>
+            <version>${version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.examples</groupId>
+            <artifactId>mule-example-scripting</artifactId>
+            <version>${version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.examples</groupId>
+            <artifactId>mule-example-stockquote</artifactId>
+            <version>${version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.examples</groupId>
+            <artifactId>mule-example-voipservice</artifactId>
+            <version>${version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+<!--        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-jotm</artifactId>
+            <version>${version}</version>
             <exclusions>
-                <exclusion>
-                    <groupId>jotm</groupId>
-                    <artifactId>jotm</artifactId>
-                </exclusion>
                 <exclusion>
                     <groupId>org.objectweb.carol</groupId>
                     <artifactId>carol</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>org.mule.modules</groupId>
-                    <artifactId>mule-module-boot</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.mule.modules</groupId>
-                    <artifactId>mule-module-registry</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>xalan</groupId>
-                    <artifactId>xalan</artifactId>
+                    <groupId>jotm</groupId>
+                    <artifactId>jotm</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transports-all</artifactId>
-            <version>${version}</version>
-            <type>pom</type>
-        </dependency>
+        </dependency>-->
 
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-        </dependency>
-
-        <!-- re-declaration of dependencies that never ever may end up in the .rar -->
-        <dependency>
+        <!-- re-declaration of dependencies that never ever may end up in the .ear -->
+<!--        <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-ejb_2.1_spec</artifactId>
             <scope>provided</scope>
@@ -124,6 +158,10 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+        <dependency>
             <groupId>javax.activation</groupId>
             <artifactId>activation</artifactId>
             <scope>provided</scope>
@@ -132,6 +170,6 @@
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
             <scope>provided</scope>
-        </dependency>
+        </dependency>-->
     </dependencies>
 </project>

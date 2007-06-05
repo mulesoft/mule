@@ -14,6 +14,7 @@
     <name>Mule Transports</name>
 
     <modules>
+        <module>all-transports</module>
         <module>axis</module>
         <module>bpm</module>
         <module>ejb</module>

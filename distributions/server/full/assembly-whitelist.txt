@@ -5,6 +5,7 @@ axis-jaxrpc-1.4
 axis-saaj-1.4
 axis-wsdl4j-1.5.1
 backport-util-concurrent-3.0
+bcprov-jdk14-133
 c3p0-0.9.0.4
 carol-2.0.5
 cglib-nodep-2.1_3
@@ -69,6 +70,7 @@ mule-example-loanbroker-esn
 mule-example-scripting
 mule-example-stockquote
 mule-example-voipservice
+mule-example-webapp
 mule-module-acegi
 mule-module-boot
 mule-module-builders
@@ -82,6 +84,7 @@ mule-module-pgp
 mule-module-picocontainer
 mule-module-scripting
 mule-module-spring
+mule-module-wssecurity
 mule-module-xml
 mule-tests-functional
 mule-transport-axis
@@ -113,6 +116,7 @@ mx4j-remote-2.1.1
 mx4j-tools-2.1.1
 nanocontainer-1.0
 ognl-2.6.9
+opensaml-1.0.1
 org.mortbay.jetty-5.1.12
 oro-2.0.7
 picocontainer-1.2
@@ -128,6 +132,7 @@ stax-api-1.0.1
 stax-utils-20040917
 wrapper-3.2.3
 wsdl4j-1.6.1
+wss4j-1.5.0
 wstx-asl-3.2.1
 xapool-1.4
 xercesImpl-2.8.1
@@ -136,7 +141,9 @@ xfire-annotations-1.2.6
 xfire-core-1.2.6
 xfire-java5-1.2.6
 xfire-jsr181-api-1.0-M1
+xfire-ws-security-1.2.6
 xml-apis-1.3.03
 XmlSchema-1.1
+xmlsec-1.3.0
 xpp3_min-1.1.3.4.O
 xstream-1.2.1

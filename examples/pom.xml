@@ -16,6 +16,7 @@
 
     <!-- Note: osgi examples are in the osgi profile section, below -->
     <modules>
+        <module>all-examples</module>
         <module>echo</module>
         <module>errorhandler</module>
         <module>hello</module>

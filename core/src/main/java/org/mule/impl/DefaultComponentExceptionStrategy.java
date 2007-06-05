@@ -81,14 +81,8 @@ public class DefaultComponentExceptionStrategy extends DefaultExceptionStrategy
         {
             statistics.incExecutionError();
         }
-
-        if (component != null)
-        {
-            logger.error("Caught exception in Exception Strategy for: " + component.getDescriptor().getName()
-                         + ": " + t, t);
-        }
+        
         super.defaultHandler(t);
-
     }
 
     protected void logFatal(UMOMessage message, Throwable t)

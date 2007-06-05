@@ -9,9 +9,9 @@
         <version>2.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-custom</artifactId>
-    <!-- This should be "pom" not "jar" but if it is set to "pom", the list of dependencies gets ignored
-    by the assembly plugin. -->
-    <packaging>jar</packaging>
+    <!-- Packaging 'pom' ensures that maven does not try to bind a plugin to the 
+         'package' phase. We bind the assembly plugin here, that's enough. -->
+    <packaging>pom</packaging>
     <name>Minimal (Custom) Distribution</name>
     <description>Assembles the Mule distribution without including any libraries.</description>
 
@@ -39,6 +39,14 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <configuration>
+                    <!-- Do not publish (empty) source jars -->
+                    <attach>false</attach>
+                </configuration>
             </plugin>
         </plugins>
     </build>

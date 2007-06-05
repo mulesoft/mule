@@ -12,6 +12,7 @@
     <packaging>jar</packaging>
     <name>Mule Build Tools</name>
     <description>These are the tools used by the Mule's build procedure</description>
+
     <dependencies>
         <dependency>
             <artifactId>junit</artifactId>
@@ -19,6 +20,7 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
     <build>
         <plugins>
             <plugin>
@@ -30,8 +32,14 @@
                     </archive>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <configuration>
+                    <!-- Do not publish (empty) source jars -->
+                    <attach>false</attach>
+                </configuration>
+            </plugin>
         </plugins>
-
     </build>
-
 </project>

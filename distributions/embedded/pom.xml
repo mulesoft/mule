@@ -9,9 +9,9 @@
         <version>2.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule</artifactId>
-    <!-- This should be "pom" not "jar" but if it is set to "pom", the list of dependencies gets ignored
-    by the assembly plugin. -->
-    <packaging>jar</packaging>
+    <!-- Packaging 'pom' ensures that maven does not try to bind a plugin to the 
+         'package' phase. We bind the assembly plugin here, that's enough. -->
+    <packaging>pom</packaging>
     <name>Embedded (Single jar file)</name>
     <description>Assembles the Mule core, modules, and transports into a single library (jar). This is useful for embedding Mule into an existing project.</description>
 
@@ -40,6 +40,35 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <configuration>
+                    <!-- Do not publish (empty) source jars -->
+                    <attach>false</attach>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.mule.examples</groupId>
+            <artifactId>mule-examples-all</artifactId>
+            <version>${version}</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-modules-all</artifactId>
+            <version>${version}</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transports-all</artifactId>
+            <version>${version}</version>
+            <type>pom</type>
+        </dependency>
+    </dependencies>
 </project>

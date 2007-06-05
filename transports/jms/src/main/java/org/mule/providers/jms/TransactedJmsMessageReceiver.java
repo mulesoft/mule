@@ -286,7 +286,7 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
             ctx.consumer = null;
         }
         // Do not close session if a transaction is in progress
-        // the session will be close by the transaction
+        // the session will be closed by the transaction
         if (force || !reuseSession)
         {
             connector.closeQuietly(ctx.session);

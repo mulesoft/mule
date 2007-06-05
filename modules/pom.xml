@@ -19,6 +19,7 @@
     <modules>
         <module>1to2migration</module>
         <module>acegi</module>
+        <module>all-modules</module>
         <module>builders</module>
         <module>boot</module>
         <module>client</module>

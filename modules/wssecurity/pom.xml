@@ -76,6 +76,11 @@
                             <groupId>org.codehaus.xfire</groupId>
                             <artifactId>bcprov-jdk15</artifactId>
                         </exclusion>
+                        <!-- this should really be in test scope -->
+                        <exclusion>
+                            <groupId>jmock</groupId>
+                            <artifactId>jmock</artifactId>
+                        </exclusion>
                     </exclusions>
                 </dependency>
                 <!-- re-add BouncyCastle provider for JDK 1.4 -->
