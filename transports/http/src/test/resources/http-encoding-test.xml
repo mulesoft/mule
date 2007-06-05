@@ -12,11 +12,11 @@
 
     <mule:custom-transformer name="setResponseType"
             class="org.mule.transformers.simple.MessagePropertiesTransformer">
-        <property name="addProperties">
+        <mule:property name="addProperties">
             <map>
                 <entry key="Content-Type" value="text/baz;charset=UTF-16BE"/>
             </map>
-        </property>
+        </mule:property>
     </mule:custom-transformer>
 
     <mule:endpoint name="clientEndpoint" address="http://localhost:60198" synchronous="true"/>

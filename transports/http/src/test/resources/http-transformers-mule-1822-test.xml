@@ -19,17 +19,17 @@
 
     <mule:custom-transformer name="appendString2"
                              class="org.mule.tck.functional.StringAppendTestTranformer">
-        <property name="message" value=" transformed 2"/>
+        <mule:property name="message" value=" transformed 2"/>
     </mule:custom-transformer>
 
     <mule:custom-transformer name="appendResponse"
                              class="org.mule.tck.functional.StringAppendTestTranformer">
-        <property name="message" value=" response"/>
+        <mule:property name="message" value=" response"/>
     </mule:custom-transformer>
 
     <mule:custom-transformer name="appendResponse2"
                              class="org.mule.tck.functional.StringAppendTestTranformer">
-        <property name="message" value=" response 2"/>
+        <mule:property name="message" value=" response 2"/>
     </mule:custom-transformer>
 
 

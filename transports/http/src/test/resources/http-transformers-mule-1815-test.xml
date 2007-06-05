@@ -20,7 +20,7 @@
 
     <mule:custom-transformer name="appendString2"
                              class="org.mule.tck.functional.StringAppendTestTranformer">
-        <property name="message" value=" transformed 2"/>
+        <mule:property name="message" value=" transformed 2"/>
     </mule:custom-transformer>
 
     <!-- first, the simple two service model we use in all cases, with no additional
