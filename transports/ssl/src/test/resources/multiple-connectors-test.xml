@@ -23,11 +23,7 @@
 
     <mule:endpoint name="clientEndpoint" address="ssl://localhost:60198" synchronous="true"/>
 
-    <bean id="reply" class="org.mule.tck.functional.FunctionalTestComponent">
-        <property name="eventCallback">
-            <bean class="org.mule.tck.functional.ResponseWriterCallback"/>
-        </property>
-    </bean>
+    <bean id="reply" class="org.mule.tck.functional.FunctionalTestComponent"/>
 
     <mule:model-seda name="main">
 
