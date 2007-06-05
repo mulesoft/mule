@@ -1,0 +1,62 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the MuleSource MPL
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
+package org.mule.providers.http;
+
+import org.mule.tck.FunctionalTestCase;
+
+public class HttpsNamespaceHandlerTestCase extends FunctionalTestCase
+{
+
+    protected String getConfigResources()
+    {
+        return "https-namespace-config.xml";
+    }
+
+    public void testConnectorProperties()
+    {
+        HttpsConnector connector =
+                (HttpsConnector) managementContext.getRegistry().lookupConnector("httpsConnector");
+        assertNotNull(connector);
+
+        assertEquals(1234, connector.getClientSoTimeout());
+        assertEquals("netscape", connector.getCookieSpec());
+        assertEquals("bcd", connector.getProxyHostname());
+        assertEquals("cde", connector.getProxyPassword());
+        assertEquals(2345, connector.getProxyPort());
+        assertEquals("def", connector.getProxyUsername());
+        assertEquals(34, connector.getReceiveBacklog());
+        assertEquals(4567, connector.getReceiveBufferSize());
+        assertEquals(5678, connector.getSendBufferSize());
+        assertEquals(6789, connector.getSocketSoLinger());
+        assertEquals(7890, connector.getServerSoTimeout());
+        assertEquals(true, connector.isEnableCookies());
+        assertEquals(true, connector.isKeepAlive());
+        assertEquals(true, connector.isKeepSendSocketOpen());
+        assertEquals(true, connector.isSendTcpNoDelay());
+        assertEquals(false, connector.isValidateConnections());
+
+        //The full path gets resolved, we're just checkng that the property got set
+        assertTrue(connector.getKeyStore().endsWith("/serverKeystore"));
+        assertEquals("mulepassword", connector.getKeyPassword());
+        assertEquals("mulepassword", connector.getKeyStorePassword());
+        //The full path gets resolved, we're just checkng that the property got set
+        assertTrue(connector.getClientKeyStore().endsWith("/clientKeystore"));
+        assertEquals("mulepassword", connector.getClientKeyStorePassword());
+        //The full path gets resolved, we're just checkng that the property got set
+        assertTrue(connector.getTrustStore().endsWith("/trustStore"));
+        assertEquals("mulepassword", connector.getTrustStorePassword());
+        assertTrue(connector.isExplicitTrustStoreOnly());
+        assertTrue(connector.isRequireClientAuthentication());
+
+        assertEquals("foo", connector.getProtocolHandler());
+    }
+
+}

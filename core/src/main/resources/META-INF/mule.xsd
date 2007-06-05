@@ -1088,7 +1088,7 @@
     </xsd:complexType>
 
     <!-- corresponds to TlsDirectTrustStore, named as tls-server in transport namespace
-         note that this extends tlsStrustStoreType, so only one of the two is needed -->
+         note that this extends tlsTrustStoreType, so only one of the two is needed -->
     <xsd:complexType name="tlsServerTrustStoreType">
         <xsd:complexContent>
             <xsd:extension base="tlsTrustStoreType">

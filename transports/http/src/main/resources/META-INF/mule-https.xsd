@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.mulesource.org/schema/mule/https/2.0"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+            xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
+            targetNamespace="http://www.mulesource.org/schema/mule/https/2.0"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/http/2.0"
+                schemaLocation="http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd"/>
+
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"/>
+
+    <xsd:element name="connector" type="httpsConnectorType"/>
+
+    <xsd:complexType name="httpsConnectorType">
+        <xsd:complexContent>
+            <xsd:extension base="http:httpConnectorType">
+                <xsd:sequence minOccurs="1" maxOccurs="1">
+                    <xsd:element minOccurs="0" maxOccurs="1" name="tls-client" type="mule:tlsClientKeyStoreType"/>
+                    <xsd:element minOccurs="0" maxOccurs="1" name="tls-key-store" type="mule:tlsKeyStoreType"/>
+                    <xsd:element minOccurs="0" maxOccurs="1" name="tls-server" type="mule:tlsServerTrustStoreType"/>
+                    <xsd:element minOccurs="0" maxOccurs="1" name="tls-protocol-handler" type="mule:tlsProtocolHandler"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+</xsd:schema>
