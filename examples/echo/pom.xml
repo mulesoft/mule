@@ -13,6 +13,17 @@
     <description>Is a simple component example that demostrates how to expose a component over multiple transports (soap and stream).</description>
 
     <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <!-- MULE-1863 -->
+                        <exclude>**/*.*</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
         <!-- Allow config files to be in the "conf" directory to make it easier for users to find them. -->
         <resources>
             <resource>
