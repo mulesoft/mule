@@ -12,7 +12,7 @@ package org.mule.providers.xmpp;
 
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.umo.endpoint.MalformedEndpointException;
+import org.mule.umo.lifecycle.InitialisationException;
 
 public class XmppEndpointTestCase extends AbstractMuleTestCase
 {
@@ -20,10 +20,11 @@ public class XmppEndpointTestCase extends AbstractMuleTestCase
     {
         try
         {
-            new MuleEndpointURI("xmpp://mule:secret@jabber.org");
+            MuleEndpointURI uri = new MuleEndpointURI("xmpp://mule:secret@jabber.org");
+            uri.initialise();
             fail("There is no path set on the endpoint");
         }
-        catch (MalformedEndpointException e)
+        catch (InitialisationException e)
         {
             // expected
         }
@@ -33,6 +34,8 @@ public class XmppEndpointTestCase extends AbstractMuleTestCase
     {
         MuleEndpointURI endpointUri = new MuleEndpointURI(
             "xmpp://mule:secret@jabber.org:6666/ross@jabber.org");
+        endpointUri.initialise();
+        
         assertEquals("xmpp", endpointUri.getScheme());
         assertEquals("mule@jabber.org:6666", endpointUri.getAddress());
         assertNull(endpointUri.getEndpointName());
@@ -48,6 +51,8 @@ public class XmppEndpointTestCase extends AbstractMuleTestCase
     {
         MuleEndpointURI endpointUri = new MuleEndpointURI(
             "xmpp://mule:secret@jabber.org:6666/ross@jabber.org?groupChat=true&nickname=ross");
+        endpointUri.initialise();
+        
         assertEquals("xmpp", endpointUri.getScheme());
         assertEquals("mule@jabber.org:6666", endpointUri.getAddress());
         assertNull(endpointUri.getEndpointName());
@@ -66,14 +71,19 @@ public class XmppEndpointTestCase extends AbstractMuleTestCase
     {
         try
         {
-            new MuleEndpointURI("xmpp://mule:secret@jabber.org:6666/ross@jabber.org?groupChat=true");
+            MuleEndpointURI uri = 
+                new MuleEndpointURI("xmpp://mule:secret@jabber.org:6666/ross@jabber.org?groupChat=true");
+            uri.initialise();
+            
             fail("if groupchat is set to true a nickname must be set");
         }
-        catch (MalformedEndpointException e)
+        catch (InitialisationException e)
         {
             // expected
         }
 
-        new MuleEndpointURI("xmpp://mule:secret@jabber.org:6666/ross@jabber.org?groupChat=false");
+        MuleEndpointURI uri = 
+            new MuleEndpointURI("xmpp://mule:secret@jabber.org:6666/ross@jabber.org?groupChat=false");
+        uri.initialise();
     }
 }
