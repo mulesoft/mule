@@ -48,14 +48,18 @@
     </build>
 
     <dependencies>
-        <!--
-            HACK: if mule-module-jca is not specified as a direct pom dependency, m2 project object never
-            sees it as a module nor dependency, and assembly inclusion filters then just skip it.
-            -->
         <dependency>
             <groupId>org.mule.modules.jca</groupId>
             <artifactId>mule-module-jca-jboss</artifactId>
             <version>${version}</version>
+        </dependency>
+
+        <!-- redefinitions of unwanted dependencies -->
+        <dependency>
+            <groupId>org.mule.modules.jca</groupId>
+            <artifactId>mule-module-jca-generic</artifactId>
+            <version>${version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>mx4j</groupId>
