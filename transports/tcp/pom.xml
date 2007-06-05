@@ -20,6 +20,7 @@
                  <configuration>
                      <excludes>
                          <exclude>**/MuleMessageProtocolChunkingTestCase.*</exclude>
+                         <exclude>**/SynchStreamingMule1687TestCase.*</exclude>
                      </excludes>
                  </configuration>
              </plugin>
