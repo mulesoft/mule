@@ -26,7 +26,7 @@ public class MultipleConnectorsMule1765TestCase extends FunctionalTestCase {
         MuleClient client = new MuleClient();
         Map props = new HashMap();
         UMOMessage result = client.send("clientEndpoint", TEST_MESSAGE, props);
-        assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
+        assertEquals(TEST_MESSAGE + " Received Async", result.getPayloadAsString());
     }
 
 }

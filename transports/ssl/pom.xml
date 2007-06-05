@@ -20,7 +20,6 @@
                  <configuration>
                      <excludes>
                          <exclude>**/AsynchronousSslMule1854TestCase.*</exclude>
-                         <exclude>**/MultipleConnectorsMule1765TestCase.*</exclude>
                      </excludes>
                  </configuration>
              </plugin>
