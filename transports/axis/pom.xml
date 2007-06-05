@@ -15,14 +15,6 @@
     
     <build>
         <plugins>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>**/*</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
               <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
@@ -39,6 +31,9 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <excludes>
+
+                        <!-- MULE-1839 -->
+                        <exclude>**/*</exclude>
 
                         <!-- Only run tests with external dependencies in the tests-external profile -->
                         <exclude>**/AxisExternalServerTest.java</exclude>
