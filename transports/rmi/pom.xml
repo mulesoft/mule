@@ -14,8 +14,16 @@
     <description>A Mule transport for RMI Connectivity.</description>
 
     <build>
-         <plugins>
-              <plugin>
+        <plugins>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>**/*Mule1857TestCase.*</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>

@@ -111,27 +111,6 @@ public abstract class AbstractFunctionalTestCase extends FunctionalTestCase
         }
     }
 
-    public void testBadMethodType() throws Exception
-    {
-        try
-        {
-            new MuleClient().send("BadType", "hello", null);
-            fail("expected error");
-        }
-        catch (UMOException e)
-        {
-            assertTrue(e.getCause() instanceof NoSuchMethodException);
-        }
-    }
-
-    public void testCorrectMethodType() throws Exception
-    {
-        UMOMessage message = new MuleClient().send("GoodType", "hello", null);
-        assertNotNull(message);
-        assertEquals("olleh", message.getPayloadAsString());
-    }
-
-
     protected String getConfigResources()
     {
         return config;
