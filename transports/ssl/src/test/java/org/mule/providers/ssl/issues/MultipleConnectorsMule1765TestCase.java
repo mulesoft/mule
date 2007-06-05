@@ -9,7 +9,8 @@ import java.util.Map;
 
 public class MultipleConnectorsMule1765TestCase extends FunctionalTestCase {
 
-    protected static String TEST_MESSAGE = "Test SSL Request (R�dgr�d), 57 = \u06f7\u06f5 in Arabic";
+//    protected static String TEST_MESSAGE = "Test SSL Request (R�dgr�d), 57 = \u06f7\u06f5 in Arabic";
+    protected static String TEST_MESSAGE = "Test SSL Request";
 
     public MultipleConnectorsMule1765TestCase()
     {
