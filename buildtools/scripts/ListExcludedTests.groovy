@@ -1,16 +1,22 @@
 /**
     Recursively scan for pom.xml files and report excluded tests for each project.
-    Run from the Mule project root for best results.
+    Runs from the currend directory, work dir is Mule project root.
 
     $Id$
 */
+def muleRoot = '../..'
 def parser = new XmlSlurper()
 
-new File('.').eachFileRecurse { file ->
-    if (!file.directory && file.name == 'pom.xml') {
-        def project = parser.parse(file)
-        printExcludes(project)
+def ant = new AntBuilder()
+def scanner = ant.fileScanner {
+    fileset (dir: muleRoot) {
+        include(name: "**/pom.xml")
     }
+}
+
+scanner.each { file ->
+    def project = parser.parse(file)
+    printExcludes(project)
 }
 
 /**

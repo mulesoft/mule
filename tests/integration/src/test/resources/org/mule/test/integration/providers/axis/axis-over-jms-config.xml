@@ -4,8 +4,8 @@
                                 "http://mule.mulesource.org/dtds/mule-configuration.dtd">
 
 <mule-configuration id="Axis-Over-Jms" version="1.0">
-		
-	<!-- Embed Spring configuration to create a Jms Connection factory -->
+        
+    <!-- Embed Spring configuration to create a Jms Connection factory -->
     <container-context className="org.mule.extras.spring.SpringContainerContext">
         <properties>
             <text-property name="configuration">
@@ -29,18 +29,18 @@
         </properties>
     </connector>
 
-	<model name="Test-Case" type="seda">		
-		<mule-descriptor name="TestComponent" implementation="org.mule.components.simple.EchoComponent" singleton="true">
-			<inbound-router>
-				<endpoint address="axis:jms://TestComponent">
-					<transaction action="ALWAYS_BEGIN" factory="org.mule.providers.jms.JmsTransactionFactory"/>
-				</endpoint> 
-			</inbound-router>
-			<outbound-router>
-				<router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-					<endpoint address="jms://testout"/>
-				</router>
-			</outbound-router>
-		</mule-descriptor>		
-	</model>
+    <model name="Test-Case" type="seda">
+        <mule-descriptor name="TestComponent" implementation="org.mule.components.simple.EchoComponent" singleton="true">
+            <inbound-router>
+                <endpoint address="axis:jms://TestComponent">
+                    <transaction action="ALWAYS_BEGIN" factory="org.mule.providers.jms.JmsTransactionFactory"/>
+                </endpoint>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="jms://testout"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+    </model>
 </mule-configuration>
