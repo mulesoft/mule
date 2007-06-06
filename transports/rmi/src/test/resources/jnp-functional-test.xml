@@ -22,19 +22,15 @@
     <mule:endpoint name="Sender2" address="jnp://localhost:1099/MatchingUMO?method=reverseString"/>
 
     <mule:endpoint name="GoodType" address="jnp://localhost:1099/MatchingUMO?method=reverseString">
-        <property name="properties">
-            <map>
-                <entry key="methodArgumentTypes" value="java.lang.String"/>
-            </map>
-        </property>
+        <mule:properties>
+            <prop key="methodArgumentTypes">java.lang.String</prop>
+        </mule:properties>
     </mule:endpoint>
 
     <mule:endpoint name="BadType" address="jnp://localhost:1099/MatchingUMO?method=reverseString">
-        <property name="properties">
-            <map>
-                <entry key="methodArgumentTypes" value="java.lang.StringBuffer"/>
-            </map>
-        </property>
+        <mule:properties>
+            <prop key="methodArgumentTypes">java.lang.StringBuffer</prop>
+        </mule:properties>
     </mule:endpoint>
 
     <bean name="bridge" class="org.mule.components.simple.BridgeComponent"/>

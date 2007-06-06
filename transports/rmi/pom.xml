@@ -19,7 +19,6 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <exclude>**/*Mule1857TestCase.*</exclude>
                     </excludes>
                 </configuration>
             </plugin>
