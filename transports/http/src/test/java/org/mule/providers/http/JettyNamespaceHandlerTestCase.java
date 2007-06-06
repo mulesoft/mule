@@ -10,18 +10,20 @@
 
 package org.mule.providers.http;
 
-public class HttpNamespaceHandlerTestCase extends AbstractNamespaceHandlerTestCase
+import org.mule.providers.http.jetty.JettyConnector;
+
+public class JettyNamespaceHandlerTestCase extends AbstractNamespaceHandlerTestCase
 {
 
-    public HttpNamespaceHandlerTestCase()
+    public JettyNamespaceHandlerTestCase()
     {
-        super("http");
+        super("jetty");
     }
 
     public void testConnectorProperties()
     {
-        HttpConnector connector =
-                (HttpConnector) managementContext.getRegistry().lookupConnector("httpConnector");
+        JettyConnector connector =
+                (JettyConnector) managementContext.getRegistry().lookupConnector("jettyConnector");
         testBasicProperties(connector);
     }
 

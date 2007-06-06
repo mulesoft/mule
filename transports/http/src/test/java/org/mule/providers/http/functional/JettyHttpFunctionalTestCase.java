@@ -18,4 +18,5 @@ public class JettyHttpFunctionalTestCase extends HttpFunctionalTestCase
     {
         return "jetty-http-functional-test.xml";
     }
+
 }

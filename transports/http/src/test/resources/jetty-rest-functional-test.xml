@@ -1,25 +1,24 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+    <!-- for this test the client and server endponts have to be different since, Jetty is a server-only transport so
+         we still use the http transport on the client side-->
+    <mule:endpoint address="http://localhost:60198/rest/Echo" name="clientEndpoint" synchronous="true"/>
+    <mule:endpoint address="jetty:rest://localhost:60198/rest/Echo" name="serverEndpoint" synchronous="true"/>
 
-<mule-configuration id="http_fuctional_test" version="1.0">
+    <bean name="ftc" class="org.mule.tck.functional.FunctionalTestComponent"/>
 
-    <mule-environment-properties serverUrl=""/>
+    <mule:model-seda name="main">
+        <mule:service name="testComponent" service-ref="ftc">
+            <mule:inbound-router>
+                <mule:endpoint-ref nameref="serverEndpoint"/>
+            </mule:inbound-router>
+        </mule:service>
+    </mule:model-seda>
 
-    <global-endpoints>
-        <!-- for this test the client and server endponts have to be different since, Jetty is a server-only transport so
-        we still use the http transport on the client side-->
-        <endpoint name="clientEndpoint" address="http://localhost:60198/rest/Echo" synchronous="true"/>
-        <endpoint name="serverEndpoint" address="jetty:rest://localhost:60198/rest/Echo" synchronous="true"/>
-    </global-endpoints>
-
-    <model name="main">
-        <mule-descriptor name="testComponent" implementation="org.mule.tck.functional.FunctionalTestComponent">
-            <inbound-router>
-                <global-endpoint name="serverEndpoint"/>
-            </inbound-router>
-        </mule-descriptor>
-    </model>
-    
-</mule-configuration>
+</beans>

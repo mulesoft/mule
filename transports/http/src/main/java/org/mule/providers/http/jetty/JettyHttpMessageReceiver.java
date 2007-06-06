@@ -50,8 +50,8 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
 
         if ("rest".equals(endpoint.getEndpointURI().getScheme()))
         {
-            //We need to a Servlet Connecotor pointing to our servlet so the Servlets can
-            //find the listeners for incoming requests
+            // We need tohave  a Servlet Connector pointing to our servlet so the Servlets can
+            // find the listeners for incoming requests
             ServletConnector scon = (ServletConnector) RegistryContext.getRegistry().lookupConnector(JETTY_SERVLET_CONNECTOR_NAME);
             if(scon!=null) {
                 throw new InitialisationException(
