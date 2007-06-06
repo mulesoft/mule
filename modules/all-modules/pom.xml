@@ -77,11 +77,11 @@
             <artifactId>mule-module-pgp</artifactId>
             <version>${version}</version>
         </dependency>
-        <dependency>
+        <!-- dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-picocontainer</artifactId>
             <version>${version}</version>
-        </dependency>
+        </dependency -->
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-registry</artifactId>
