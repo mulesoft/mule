@@ -14,6 +14,8 @@ import org.mule.config.MuleProperties;
 import org.mule.providers.AbstractConnector;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestMessageDispatcherFactory;
+import org.mule.umo.transformer.UMOTransformer;
+import org.mule.transformers.NoActionTransformer;
 
 public class ServiceOverridesMule1770TestCase extends FunctionalTestCase
 {
@@ -31,6 +33,9 @@ public class ServiceOverridesMule1770TestCase extends FunctionalTestCase
         String temp =  (String)c.getServiceOverrides().get(MuleProperties.CONNECTOR_DISPATCHER_FACTORY);
         assertNotNull("DispatcherFactory override should not be null", temp);
         assertEquals(TestMessageDispatcherFactory.class.getName(), temp);
+        UMOTransformer transformer = c.getDefaultInboundTransformer();
+        assertNotNull("InboundTransformer should not be null", transformer);
+        assertEquals(NoActionTransformer.class, transformer.getClass());
     }
 
 }

@@ -9,7 +9,10 @@
                http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
 
     <vm:connector name="test">
-        <mule:service-overrides dispatcherFactory="org.mule.tck.testmodels.mule.TestMessageDispatcherFactory"/>
+        <mule:service-overrides
+                dispatcherFactory="org.mule.tck.testmodels.mule.TestMessageDispatcherFactory"
+                inboundTransformer="org.mule.transformers.NoActionTransformer"
+                />
     </vm:connector>
 
 </beans>
