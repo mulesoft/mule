@@ -11,8 +11,6 @@
 package org.mule.persistence;
 
 import org.mule.MuleException;
-import org.mule.umo.UMOException;
-import org.mule.umo.manager.UMOServerNotificationListener;
 
 /**
  * <code>PersistenceException</code> is the exception thrown by

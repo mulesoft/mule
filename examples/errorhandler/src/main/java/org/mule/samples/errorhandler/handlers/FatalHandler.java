@@ -10,8 +10,6 @@
 
 package org.mule.samples.errorhandler.handlers;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.samples.errorhandler.ErrorMessage;
 import org.mule.samples.errorhandler.HandlerException;
 import org.mule.samples.errorhandler.LocaleMessage;

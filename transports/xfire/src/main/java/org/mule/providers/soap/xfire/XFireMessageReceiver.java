@@ -30,7 +30,6 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 
 import org.codehaus.xfire.annotations.WebAnnotations;
-import org.codehaus.xfire.annotations.WebServiceAnnotation;
 import org.codehaus.xfire.handler.Handler;
 import org.codehaus.xfire.service.Service;
 

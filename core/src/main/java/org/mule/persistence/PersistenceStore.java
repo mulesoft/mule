@@ -10,10 +10,8 @@
 
 package org.mule.persistence;
 
-import org.mule.umo.UMOException;
-import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.Disposable;
-import org.mule.umo.manager.UMOServerNotificationListener;
+import org.mule.umo.lifecycle.Initialisable;
 
 /**
  * <code>PersistenceStore</code> is the actual store where persisted

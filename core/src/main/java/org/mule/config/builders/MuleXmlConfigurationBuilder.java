@@ -14,7 +14,6 @@ import org.mule.RegistryContext;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.ConfigurationException;
 import org.mule.config.ReaderResource;
-import org.mule.config.i18n.Message;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.spring.MuleApplicationContext;
 import org.mule.umo.UMOManagementContext;

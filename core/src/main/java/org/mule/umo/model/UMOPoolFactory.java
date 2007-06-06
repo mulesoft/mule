@@ -14,7 +14,6 @@ import org.mule.config.PoolingProfile;
 import org.mule.umo.UMODescriptor;
 import org.mule.util.ObjectFactory;
 import org.mule.util.ObjectPool;
-import org.mule.config.PoolingProfile;
 
 /**
  * <code>UMOPoolFactory</code> is a factory interface for created a component pool

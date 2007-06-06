@@ -14,8 +14,6 @@ import org.mule.providers.bpm.test.TestBpms;
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.umo.provider.UMOConnector;
 
-import com.mockobjects.dynamic.Mock;
-
 /**
  * Generic connector tests.
  */

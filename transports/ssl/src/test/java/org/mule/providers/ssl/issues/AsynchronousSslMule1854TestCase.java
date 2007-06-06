@@ -1,15 +1,8 @@
 package org.mule.providers.ssl.issues;
 
 import org.mule.extras.client.MuleClient;
-import org.mule.impl.model.seda.SedaComponent;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.tck.functional.CounterCallback;
-import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.model.UMOModel;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class AsynchronousSslMule1854TestCase extends FunctionalTestCase {
 

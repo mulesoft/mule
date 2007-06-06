@@ -10,16 +10,6 @@
 
 package org.mule.extras.pgp;
 
-import org.mule.umo.UMOEncryptionStrategy;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.security.CryptoFailureException;
-
-import java.io.ByteArrayInputStream;
-import java.util.Collection;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.UMOEncryptionStrategy;
 import org.mule.umo.lifecycle.InitialisationException;

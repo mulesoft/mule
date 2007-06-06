@@ -10,9 +10,7 @@
 
 package org.mule.routing.nested;
 
-import org.mule.config.i18n.Message;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
 import org.mule.umo.UMOEvent;

@@ -10,7 +10,6 @@
 
 package org.mule.registry;
 
-import java.util.HashMap;
 
 /**
  * The ComponentVersion simply tracks the version of a component. 

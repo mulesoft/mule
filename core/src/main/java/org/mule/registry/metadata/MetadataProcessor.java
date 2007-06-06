@@ -10,17 +10,10 @@
 
 package org.mule.registry.metadata;
 
+import org.mule.umo.lifecycle.Registerable;
+
 import java.lang.reflect.Field;
 
-import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.umo.UMODescriptor;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.lifecycle.Registerable;
-import org.mule.umo.manager.UMOAgent;
-import org.mule.umo.model.UMOModel;
-import org.mule.umo.provider.UMOConnector;
-import org.mule.umo.transformer.UMOTransformer;
-import org.mule.util.MuleObjectHelper;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 

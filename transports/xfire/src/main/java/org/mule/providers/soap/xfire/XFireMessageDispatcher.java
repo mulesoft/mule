@@ -11,22 +11,6 @@
 package org.mule.providers.soap.xfire;
 
 import org.mule.config.MuleProperties;
-import org.mule.config.i18n.Message;
-import org.mule.impl.MuleMessage;
-import org.mule.providers.AbstractMessageDispatcher;
-import org.mule.providers.FatalConnectException;
-import org.mule.providers.soap.SoapConstants;
-import org.mule.providers.soap.xfire.transport.MuleUniversalTransport;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.provider.DispatchException;
-import org.mule.umo.transformer.TransformerException;
-import org.mule.util.ClassUtils;
-import org.mule.util.TemplateParser;
-
-import org.mule.config.MuleProperties;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.providers.FatalConnectException;

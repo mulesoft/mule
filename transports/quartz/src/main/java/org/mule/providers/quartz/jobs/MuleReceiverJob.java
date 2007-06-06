@@ -17,11 +17,7 @@ import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.NullPayload;
 import org.mule.providers.quartz.QuartzConnector;
 import org.mule.providers.quartz.QuartzMessageReceiver;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.providers.quartz.i18n.QuartzMessages;
-import org.mule.umo.manager.ObjectNotFoundException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

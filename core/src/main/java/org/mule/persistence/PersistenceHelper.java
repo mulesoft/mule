@@ -10,9 +10,6 @@
 
 package org.mule.persistence;
 
-import java.io.File;
-
-import org.mule.umo.lifecycle.Initialisable;
 
 /**
  * A PersistenceHelper is an object that can carry out some optional

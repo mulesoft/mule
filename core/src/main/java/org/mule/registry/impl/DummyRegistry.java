@@ -10,16 +10,20 @@
 
 package org.mule.registry.impl;
 
-import java.util.HashMap;
+import org.mule.registry.DeregistrationException;
+import org.mule.registry.Registration;
+import org.mule.registry.RegistrationException;
+import org.mule.registry.Registry;
+import org.mule.registry.RegistryStore;
+import org.mule.registry.metadata.ObjectMetadata;
+import org.mule.umo.UMOException;
+import org.mule.umo.lifecycle.Registerable;
+
 import java.util.Map;
 import java.util.Random;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.registry.*;
-import org.mule.registry.metadata.ObjectMetadata;
-import org.mule.umo.UMOException;
-import org.mule.umo.lifecycle.Registerable;
 
 /**
  * This dummy registry just reports on registration events but

@@ -10,14 +10,10 @@
 
 package org.mule.registry.impl;
 
-import org.mule.registry.Registration;
 import org.mule.registry.ComponentVersion;
-import org.mule.util.StringUtils;
+import org.mule.registry.Registration;
 
-import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  * The MuleRegistration provides a basic implementation

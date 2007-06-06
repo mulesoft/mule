@@ -13,7 +13,6 @@ package org.mule.test.mule.model;
 import org.mule.config.MuleProperties;
 import org.mule.impl.RequestContext;
 import org.mule.impl.TooManySatisfiableMethodsException;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.model.resolvers.DynamicEntryPointResolver;
 import org.mule.routing.inbound.InboundRouterCollection;
 import org.mule.tck.model.AbstractEntryPointDiscoveryTestCase;

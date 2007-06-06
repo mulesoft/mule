@@ -11,7 +11,6 @@
 package org.mule.examples.loanbroker.bpm;
 
 import org.mule.examples.loanbroker.AbstractLoanBrokerApp;
-import org.mule.umo.UMOException;
 
 /**
  * Executes the LoanBroker BPM example.
