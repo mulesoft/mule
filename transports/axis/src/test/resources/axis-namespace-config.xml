@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:axis="http://www.mulesource.org/schema/mule/axis/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/axis/2.0/mule-axis.xsd">
+
+    <bean name="mockEngineConfig" class="org.mule.providers.soap.axis.mock.MockEngineConfiguration"/>
+    <bean name="axisServer" class="org.mule.providers.soap.axis.mock.MockAxisServer">
+        <constructor-arg ref="mockEngineConfig"/>
+    </bean>
+    <bean name="mockProvider" class="org.mule.providers.soap.axis.mock.MockProvider"/>
+
+    <axis:connector name="axisConnector"
+        clientConfig="test-axis-config.wsdd"
+        serverConfig="test-axis-config.wsdd"
+        treatMapAsNamedParams="false"/>
+
+    <axis:connector name="axisConnector2"
+        axisServer-ref="axisServer"
+        clientProvider-ref="mockProvider"
+        doAutoTypes="false"
+        serverProvider-ref="mockProvider"/>
+</beans>

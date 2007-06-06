@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.mulesource.org/schema/mule/axis/2.0"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+    xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+    targetNamespace="http://www.mulesource.org/schema/mule/axis/2.0" 
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:import namespace="http://www.springframework.org/schema/beans"
+                schemaLocation="http://www.springframework.org/schema/beans" />
+
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0" />
+
+    <xsd:element name="connector" type="axisConnectorType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Consume and provide web services via axis.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="axisConnectorType">
+        <xsd:complexContent>        
+            <xsd:extension base="mule:connectorType">
+                <xsd:attribute name="axisServer-ref" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Bean reference to the axis server that should be used.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="clientConfig" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Configuration file to use when building the axis client.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="clientProvider-ref" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Bean reference to the client provider that should be used to
+                            create the axis client.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="doAutoTypes" type="xsd:boolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Use this property to configure whether AxisServer should automatically map types.
+                            This property has only effect if you don't provide your own axisServer via the
+                            'axisServer-ref' property.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="serverConfig" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Configuration file to use when building the axis server.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="serverProvider-ref" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Bean reference to the server provider that should be used to create the
+                            AxisServer.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="treatMapAsNamedParams" type="xsd:boolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The AxisConnector treats a Map as container for named parameters, which 
+                            eventually will be unpacked. This will result into a problem if your exposed 
+                            service needs to take a Map as a parameter, because the actual Map will never 
+                            reach the service intact. In this case set this property to false.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <!-- xsd:element name="beanTypes" type="beanTypes" / -->
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+<!-- 
+    <xsd:complexType name="beanTypes">
+        <xsd:complexContent>
+            <xsd:element name="beanType" type="xsd:NMTOKEN" minOccurs="1" maxOccurs="unbounded" />        
+        </xsd:complexContent>    
+    </xsd:complexType>
+     -->
+</xsd:schema>

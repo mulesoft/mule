@@ -26,6 +26,7 @@ import org.mule.providers.soap.axis.extensions.MuleConfigProvider;
 import org.mule.providers.soap.axis.extensions.MuleTransport;
 import org.mule.providers.soap.axis.extensions.WSDDFileProvider;
 import org.mule.providers.soap.axis.extensions.WSDDJavaMuleProvider;
+import org.mule.providers.soap.axis.i18n.AxisMessages;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -35,6 +36,7 @@ import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.ClassUtils;
+import org.mule.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -87,21 +89,21 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
 
     public static final String WSDL_URL_PROPERTY = "wsdlUrl";
 
-    private String serverConfig;
-    private AxisServer axisServer;
-    private SimpleProvider serverProvider;
-    private String clientConfig;
-    private SimpleProvider clientProvider;
+    private String serverConfig = DEFAULT_MULE_AXIS_SERVER_CONFIG;
+    private AxisServer axisServer = null;
+    private SimpleProvider serverProvider = null;
+    private String clientConfig = DEFAULT_MULE_AXIS_CLIENT_CONFIG;
+    private SimpleProvider clientProvider = null;
 
     private List beanTypes;
     private MuleDescriptor axisDescriptor;
 
     /**
-     * These protocols will be set on client invocations. by default Mule uses it's
+     * These protocols will be set on client invocations. By default Mule uses it's
      * own transports rather that Axis's. This is only because it gives us more
      * flexibility inside Mule and simplifies the code
      */
-    private Map axisTransportProtocols;
+    private Map axisTransportProtocols = null;
 
     /**
      * A store of registered servlet services that need to have their endpoints
@@ -111,7 +113,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
      */
     private List servletServices = new ArrayList();
 
-    private List supportedSchemes;
+    private List supportedSchemes = null;
 
     private boolean doAutoTypes = true;
 
@@ -126,23 +128,26 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
 
     protected void registerProtocols()
     {
-        // Default supported schemes, these can be restricted
-        // through configuration
-        supportedSchemes = new ArrayList();
-        supportedSchemes.add("http");
-        supportedSchemes.add("https");
-        supportedSchemes.add("servlet");
-        supportedSchemes.add("vm");
-        supportedSchemes.add("jms");
-        supportedSchemes.add("xmpp");
-        supportedSchemes.add("smtp");
-        supportedSchemes.add("smtps");
-        supportedSchemes.add("pop3");
-        supportedSchemes.add("pop3s");
-        supportedSchemes.add("imap");
-        supportedSchemes.add("imaps");
-        supportedSchemes.add("ssl");
-        supportedSchemes.add("tcp");
+        if (supportedSchemes == null)
+        {
+            // Default supported schemes, these can be restricted
+            // through configuration
+            supportedSchemes = new ArrayList();
+            supportedSchemes.add("http");
+            supportedSchemes.add("https");
+            supportedSchemes.add("servlet");
+            supportedSchemes.add("vm");
+            supportedSchemes.add("jms");
+            supportedSchemes.add("xmpp");
+            supportedSchemes.add("smtp");
+            supportedSchemes.add("smtps");
+            supportedSchemes.add("pop3");
+            supportedSchemes.add("pop3s");
+            supportedSchemes.add("imap");
+            supportedSchemes.add("imaps");
+            supportedSchemes.add("ssl");
+            supportedSchemes.add("tcp");
+        }
 
         for (Iterator iterator = supportedSchemes.iterator(); iterator.hasNext();)
         {
@@ -153,38 +158,58 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
 
     protected void doInitialise() throws InitialisationException
     {
-        axisTransportProtocols = new HashMap();
-
-        try
+        if (axisTransportProtocols == null)
         {
-            for (Iterator iterator = supportedSchemes.iterator(); iterator.hasNext();)
+            axisTransportProtocols = new HashMap();
+            try
             {
-                String s = (String)iterator.next();
-                axisTransportProtocols.put(s, MuleTransport.getTransportClass(s));
-                registerSupportedProtocol(s);
+                for (Iterator iterator = supportedSchemes.iterator(); iterator.hasNext();)
+                {
+                    String s = (String)iterator.next();
+                    axisTransportProtocols.put(s, MuleTransport.getTransportClass(s));
+                    registerSupportedProtocol(s);
+                }
+                managementContext.registerListener(this);
             }
-            managementContext.registerListener(this);
+            catch (Exception e)
+            {
+                throw new InitialisationException(e, this);
+            }
         }
-        catch (Exception e)
+        // TODO DO: call registerSupportedProtocol if axisTransportProtocols are set from external?
+            
+        if (clientProvider == null)
         {
-            throw new InitialisationException(e, this);
+            clientProvider = createAxisProvider(clientConfig);
+        }
+        else
+        {
+            if (clientConfig.equals(DEFAULT_MULE_AXIS_CLIENT_CONFIG) == false)
+            {
+                logger.warn(AxisMessages.clientProviderAndClientConfigConfigured());
+            }
         }
 
-        if (serverConfig == null)
+        if (axisServer == null)
         {
-            serverConfig = DEFAULT_MULE_AXIS_SERVER_CONFIG;
-        }
-        if (clientConfig == null)
-        {
-            clientConfig = DEFAULT_MULE_AXIS_CLIENT_CONFIG;
-        }
-        serverProvider = createAxisProvider(serverConfig);
-        clientProvider = createAxisProvider(clientConfig);
+            if (serverProvider == null)
+            {
+                serverProvider = this.createAxisProvider(serverConfig);
+            }
+            else
+            {
+                if (serverConfig.equals(DEFAULT_MULE_AXIS_SERVER_CONFIG) == false)
+                {
+                    logger.warn(AxisMessages.serverProviderAndServerConfigConfigured());
+                }
+            }
 
-        // Create the AxisServer
-        axisServer = new AxisServer(serverProvider);
-        axisServer.setOption("axis.doAutoTypes", Boolean.valueOf(doAutoTypes));
-
+            // Create the AxisServer
+            axisServer = new AxisServer(serverProvider);
+            // principle of least surprise: doAutoTypes only has effect on our self-configured AxisServer
+            axisServer.setOption("axis.doAutoTypes", Boolean.valueOf(doAutoTypes));
+        }
+        
         // Register the Mule service serverProvider
         WSDDProvider.registerProvider(QNAME_MULE_PROVIDER, new WSDDJavaMuleProvider(this));
 
@@ -221,7 +246,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
         {
             throw new InitialisationException(e, this);
         }
-    }
+   }
 
     protected void registerTransportTypes() throws ClassNotFoundException
     {
@@ -249,9 +274,8 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
     protected SimpleProvider createAxisProvider(String config) throws InitialisationException
     {
         // Use our custom file provider that does not require services to be declared
-        // ni the WSDD. Thi only affects the
-        // client side as the client will fallback to the FileProvider when invoking
-        // a service.
+        // in the WSDD. This only affects the client side as the client will fallback 
+        // to the FileProvider when invoking a service.
         WSDDFileProvider fileProvider = new WSDDFileProvider(config);
         fileProvider.setSearchClasspath(true);
         /*

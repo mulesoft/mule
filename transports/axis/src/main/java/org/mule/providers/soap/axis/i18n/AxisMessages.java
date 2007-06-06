@@ -21,6 +21,16 @@ public class AxisMessages extends MessageFactory
     {
         return createMessage(BUNDLE_PATH, 1, name);
     }
+
+    public static String serverProviderAndServerConfigConfigured()
+    {
+        return getString(BUNDLE_PATH, 2);
+    }
+
+    public static String clientProviderAndClientConfigConfigured()
+    {
+        return getString(BUNDLE_PATH, 3);
+    }
 }
 
 

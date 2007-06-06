@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deployment xmlns="http://xml.apache.org/axis/wsdd/" xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
+	<!--
+		This file exists only to support AxisNamespaceHandlerTestCase.
+		The AxisConnector tries to initialize with the server config specified, if that file is missing
+		the init fails (and so does the test).
+	-->
+</deployment>
