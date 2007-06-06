@@ -15,7 +15,7 @@ import org.mule.providers.rmi.RmiConnector;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 /**
- * Reigsters a Bean Definition Parser for handling <code><tcp:connector></code> elements.
+ * Reigsters a Bean Definition Parser for handling <code><rmi:connector></code> elements.
  *
  */
 public class RmiNamespaceHandler extends NamespaceHandlerSupport
