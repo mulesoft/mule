@@ -104,7 +104,7 @@
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-stream</artifactId>
+            <artifactId>mule-transport-stdio</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
