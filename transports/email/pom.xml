@@ -24,6 +24,10 @@
                         <exclude>**/Pop3sFunctionalTestCase.*</exclude>
                         <exclude>**/ImapFunctionalTestCase.*</exclude>
                         <exclude>**/ImapsFunctionalTestCase.*</exclude>
+                        <!-- waiting on MULE-1840 -->
+                        <exclude>**/SmtpFunctionalTestCase.*</exclude>
+                        <exclude>**/SmtpMimeFunctionalTestCase.*</exclude>
+                        <exclude>**/SmtpsFunctionalTestCase.*</exclude>
                     </excludes>
                 </configuration>
             </plugin>

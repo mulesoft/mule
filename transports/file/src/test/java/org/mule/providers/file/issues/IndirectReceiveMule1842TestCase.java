@@ -36,8 +36,7 @@ public class IndirectReceiveMule1842TestCase extends AbstractFileFunctionalTestC
         assertNotNull(relay);
         String url = fileToUrl(target) + "?connector=receiveConnector";
         logger.debug(url);
-        relay.getDescriptor().getInboundRouter().addEndpoint(
-	    new MuleEndpoint(url, true));
+        relay.getDescriptor().getInboundRouter().addEndpoint(new MuleEndpoint(url, true));
 
         // then read from the queue that the polling receiver will write to
         MuleClient client = new MuleClient();

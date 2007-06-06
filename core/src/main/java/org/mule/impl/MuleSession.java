@@ -437,33 +437,15 @@ public final class MuleSession implements UMOSession
                          + ", for endpoint: " + endpoint);
         }
 
-        /**
-         * acooke 2007-06-06
-         *
-         * I am somewhat nervous about deleting this - it has been here since early 2005 in the
-         * first version of the code in subversion - but it is causing problems with the SMTP
-         * mime mail message test.  Reasons why I think this should go are:
-         *
-         * 1 - it assumes that the transformer is the outbound transformer, but for some endpoint
-         * types endpoint.transformer is the inbound transformer;
-         * 2 - the move to Spring has cleaned up (or at least shaken up) the initialisation code
-         * considerably, and defaults are explicitly set much earlier, so this should not be needed;
-         * 3 - it breaks the correct behaviour for SMTP MIME, while removing it doesn't harm any
-         * other currently running test (and it wasn't added to fix any issue, at least within the
-         * current svn history).
-         *
-         * Since I may be wrong on this I am leaving the code here; if you re-enable this then
-         * please address 1=3 above.  Thanks.
-         */
-//        if (endpoint.getTransformer() == null && endpoint instanceof UMOEndpoint)
-//        {
-//            if (endpoint.getConnector() instanceof AbstractConnector)
-//            {
-//                ((UMOEndpoint)endpoint).setTransformer(((AbstractConnector) endpoint.getConnector()).getDefaultOutboundTransformer());
-//                logger.debug("Using default connector outbound transformer: " + endpoint.getTransformer());
-//            }
-//        }
-        
+        // Use default transformer if none is set
+        if (endpoint.getTransformer() == null && endpoint instanceof UMOEndpoint)
+        {
+            if (endpoint.getConnector() instanceof AbstractConnector)
+            {
+                ((UMOEndpoint)endpoint).setTransformer(((AbstractConnector) endpoint.getConnector()).getDefaultOutboundTransformer());
+                logger.debug("Using default connector outbound transformer: " + endpoint.getTransformer());
+            }
+        }
         try
         {
             UMOEvent event;
