@@ -19,7 +19,7 @@
                  <artifactId>maven-surefire-plugin</artifactId>
                  <configuration>
                      <excludes>
-                         <exclude>**/ServceOverridesMule1770TestCase.*</exclude>
+                         <exclude>**/ServiceOverridesMule1770TestCase.*</exclude>
                      </excludes>
                  </configuration>
              </plugin>
