@@ -11,8 +11,8 @@
     <property environment="env"/>
 
     <property name="dir.java" value="src"/>
-    <property name="dir.build" value="build"/>
-    <property name="dir.classes" value="build/classes"/>
+    <property name="dir.build" value="target"/>
+    <property name="dir.classes" value="${dir.build}/classes"/>
     <property name="dir.common" value="../common"/>
 
     <target name="clean"
@@ -42,8 +42,8 @@
             <fileset dir="${dir.mule.home}/lib">
                 <include name="**/*.jar"/>
             </fileset>
-            <!-- Include dependencies --> 
-           <fileset dir="${dir.common}/build">
+            <!-- Include dependencies -->
+           <fileset dir="${dir.common}/${dir.build}">
                 <include name="*.jar"/>
             </fileset> 
        </path>

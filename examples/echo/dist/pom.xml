@@ -16,8 +16,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-core</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-vm</artifactId>
             <version>${muleVersion}</version>
         </dependency>
         <dependency>
@@ -29,6 +29,13 @@
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-xfire</artifactId>
             <version>${muleVersion}</version>
+        </dependency>
+        <!-- Better testing of XML -->        
+        <dependency>
+            <groupId>xmlunit</groupId>
+            <artifactId>xmlunit</artifactId>
+            <version>1.0</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

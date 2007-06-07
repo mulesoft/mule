@@ -81,5 +81,5 @@ public abstract class AbstractLoanBrokerTestCase extends FunctionalTestCase
             int mps = (int)(numRequests/((double)el/(double)1000));
             System.out.println("Msg/sec: " + mps + " (no warm up)");
         }
-    }
+    }    
 }

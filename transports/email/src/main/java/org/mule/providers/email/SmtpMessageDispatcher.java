@@ -130,6 +130,20 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
         // sent date
         message.setSentDate(Calendar.getInstance().getTime());
 
+        /*
+         * Double check that the transport is still connected as some SMTP servers may 
+         * disconnect idle connections.
+         */
+        if (!transport.isConnected())
+        {
+            UMOEndpointURI uri = endpoint.getEndpointURI();
+            if (logger.isInfoEnabled())
+            {
+                logger.info("Connection closed by remote server. Reconnecting.");
+            }
+            transport.connect(uri.getHost(), uri.getPort(), uri.getUsername(), uri.getPassword());
+        }
+
         transport.sendMessage(message, message.getAllRecipients());
 
         if (logger.isDebugEnabled())

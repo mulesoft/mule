@@ -37,63 +37,6 @@
     </build>
 
     <dependencies>
-        <!-- TODO dirk: I'm pretty sure that including the examples in the parent pom
-            is not what we want. Only some distros want them, include them there
-        -->
-        <dependency>
-            <groupId>org.mule.examples</groupId>
-            <artifactId>mule-example-echo</artifactId>
-            <version>${version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.examples</groupId>
-            <artifactId>mule-example-errorhandler</artifactId>
-            <version>${version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.examples</groupId>
-            <artifactId>mule-example-hello</artifactId>
-            <version>${version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.examples</groupId>
-            <artifactId>mule-example-loanbroker-bpm</artifactId>
-            <version>${version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.examples</groupId>
-            <artifactId>mule-example-loanbroker-esb</artifactId>
-            <version>${version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.examples</groupId>
-            <artifactId>mule-example-loanbroker-esn</artifactId>
-            <version>${version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.examples</groupId>
-            <artifactId>mule-example-scripting</artifactId>
-            <version>${version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.examples</groupId>
-            <artifactId>mule-example-stockquote</artifactId>
-            <version>${version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.examples</groupId>
-            <artifactId>mule-example-voipservice</artifactId>
-            <version>${version}</version>
-            <scope>provided</scope>
-        </dependency>
 
 <!--        <dependency>
             <groupId>org.mule.modules</groupId>

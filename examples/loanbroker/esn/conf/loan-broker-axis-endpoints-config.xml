@@ -25,15 +25,6 @@
         </properties>
     </connector>
 
-    <connector name="syncVm" className="org.mule.providers.vm.VMConnector" />
-    
-    <connector name="asyncVm" className="org.mule.providers.vm.VMConnector">
-        <properties>
-            <!-- Queue up events for asynchronous communication. -->
-            <property name="queueEvents" value="true"/>
-        </properties>
-    </connector>
-    
     <transformers>
         <transformer name="ExtractCustomer" className="org.mule.transformers.simple.GetBeanProperty">
             <properties>
@@ -45,10 +36,6 @@
     
     <global-endpoints>
         <endpoint name="CustomerRequests" address="vm://customer.requests" connector="syncVm"/>
-        
-        <!-- only used for the async loan broker to send the lowest quote back to the customer -->
-        <endpoint name="CustomerResponses" address="vm://customer.responses" connector="asyncVm"/>
-
         <endpoint name="LoanBrokerQuotes" address="vm://loan.quotes" connector="syncVm"/>
         <endpoint name="CreditAgency" address="axis:http://localhost:18080/mule/CreditAgencyService?method=getCreditProfile"/>
         <endpoint name="CreditAgencyIn" address="axis:http://localhost:18080/mule"/>

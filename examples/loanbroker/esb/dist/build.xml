@@ -12,8 +12,8 @@
 
     <property name="dir.java" value="src"/>
     <property name="dir.conf" value="conf"/>
-    <property name="dir.build" value="build"/>
-    <property name="dir.classes" value="build/classes"/>
+    <property name="dir.build" value="target"/>
+    <property name="dir.classes" value="${dir.build}/classes"/>
     <property name="dir.common.tests" value="../common-tests"/>
 
     <property name="url.maven.repo" value="http://repo1.maven.org/maven2"/>
@@ -72,7 +72,7 @@
                 <include name="**/*.jar"/>
             </fileset>
             <!-- Include dependent test jar-->
-            <fileset dir="${dir.common.tests}/build">
+            <fileset dir="${dir.common.tests}/${dir.build}">
                 <include name="*.jar"/>
             </fileset>
         </path>

@@ -4,14 +4,8 @@
                                 "http://mule.mulesource.org/dtds/mule-configuration.dtd">
 
 <mule-configuration id="Mule_Samples" version="1.0">
-
-    <mule-environment-properties synchronous="true"/>
-
     <agents>
         <agent name="JmxAgent" className="org.mule.management.agents.JmxAgent"/>
         <agent name="mx4jAgent" className="org.mule.management.agents.Mx4jAgent"/>
     </agents>
-
-    <model name="main"/>
-
 </mule-configuration>

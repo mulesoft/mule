@@ -32,7 +32,10 @@ public class SystemUtilsTestCase extends AbstractMuleTestCase
         if (SystemUtils.IS_OS_WINDOWS)
         {
             String term = (String) env.get("TERM");
-            if (term != null && term.equals("cygwin")) envVarToTest = "PATH";
+            if (term != null && term.equals("cygwin"))
+            {
+                envVarToTest = "PATH";
+            }
         }
 
         assertNotNull(env.get(envVarToTest));
@@ -40,20 +43,65 @@ public class SystemUtilsTestCase extends AbstractMuleTestCase
 
     public void testParsePropertyDefinitions()
     {
-        assertEquals(Collections.EMPTY_MAP, SystemUtils.parsePropertyDefinitions(null));
-        assertEquals(Collections.EMPTY_MAP, SystemUtils.parsePropertyDefinitions(""));
-        assertEquals(Collections.EMPTY_MAP, SystemUtils.parsePropertyDefinitions(" "));
-        assertEquals(Collections.EMPTY_MAP, SystemUtils.parsePropertyDefinitions("foo"));
-        assertEquals(Collections.EMPTY_MAP, SystemUtils.parsePropertyDefinitions("-D"));
+        Map expected = Collections.EMPTY_MAP;
+        String input;
+
+        assertEquals(expected, SystemUtils.parsePropertyDefinitions(null));
+        assertEquals(expected, SystemUtils.parsePropertyDefinitions(""));
+        assertEquals(expected, SystemUtils.parsePropertyDefinitions(" "));
+        assertEquals(expected, SystemUtils.parsePropertyDefinitions("foo"));
+        assertEquals(expected, SystemUtils.parsePropertyDefinitions("-D"));
+        assertEquals(expected, SystemUtils.parsePropertyDefinitions("-D="));
+
+        expected = Collections.singletonMap("-D", "true");
+        assertEquals(expected, SystemUtils.parsePropertyDefinitions("-D-D"));
+
+        expected = Collections.singletonMap("-D-D", "true");
+        assertEquals(expected, SystemUtils.parsePropertyDefinitions("-D-D-D"));
+
+        expected = Collections.singletonMap("-D-D-D", "true");
+        assertEquals(expected, SystemUtils.parsePropertyDefinitions("-D-D-D-D"));
+
+        assertEquals(Collections.EMPTY_MAP, SystemUtils.parsePropertyDefinitions("-D=noKey"));
         assertEquals(Collections.EMPTY_MAP, SystemUtils.parsePropertyDefinitions("=-D"));
-        assertEquals(Collections.EMPTY_MAP, SystemUtils.parsePropertyDefinitions("=foo"));
-        assertEquals(Collections.EMPTY_MAP, SystemUtils.parsePropertyDefinitions("-D=-Dfoo-D=="));
+        assertEquals(Collections.EMPTY_MAP, SystemUtils.parsePropertyDefinitions("foo =foo foo"));
 
-        Map expected = MapUtils.mapWithKeysAndValues(HashMap.class, new String[]{"keyOnly", "mule.foo",
-            "mule.bar"}, new String[]{"true", "true", "false"});
+        expected = Collections.singletonMap("k", "true");
+        assertEquals(expected, SystemUtils.parsePropertyDefinitions(" -Dk "));
 
-        String input = "  standalone key=value -D -D= -DkeyOnly -D=noKey -Dmule.foo=true -Dmule.bar=false ";
+        expected = Collections.singletonMap("key", "true");
+        assertEquals(expected, SystemUtils.parsePropertyDefinitions("-Dkey"));
 
+        expected = Collections.singletonMap("k", "v");
+        assertEquals(expected, SystemUtils.parsePropertyDefinitions(" -Dk=v "));
+
+        expected = Collections.singletonMap("key", "value");
+        assertEquals(expected, SystemUtils.parsePropertyDefinitions("-Dkey=value"));
+
+        expected = Collections.singletonMap("key", "quoted");
+        assertEquals(expected, SystemUtils.parsePropertyDefinitions("-Dkey=\"quoted\""));
+
+        expected = MapUtils.mapWithKeysAndValues(HashMap.class, new String[]{"key", "foo"}, new String[]{
+            "-Dvalue", "bar"});
+        assertEquals(expected, SystemUtils.parsePropertyDefinitions("-Dkey=-Dvalue -Dfoo=bar"));
+
+        assertEquals(Collections.EMPTY_MAP, SystemUtils.parsePropertyDefinitions("-D=-Dfoo-D== =foo"));
+
+        expected = Collections.singletonMap("key", "split value");
+        assertEquals(expected, SystemUtils.parsePropertyDefinitions("-Dkey=\"split value\""));
+
+        expected = MapUtils.mapWithKeysAndValues(HashMap.class, new String[]{"key1", "key2"}, new String[]{
+            "split one", "split two"});
+        input = "-Dkey1=\"split one\" -Dkey2=\"split two\" ";
+        assertEquals(expected, SystemUtils.parsePropertyDefinitions(input));
+
+        expected = Collections.singletonMap("key", "open end");
+        input = "-Dkey=\"open end";
+        assertEquals(expected, SystemUtils.parsePropertyDefinitions(input));
+
+        expected = MapUtils.mapWithKeysAndValues(HashMap.class, new String[]{"keyOnly", "mule.foo",
+            "mule.bar"}, new String[]{"true", "xfoo", "xbar"});
+        input = "  standalone key=value -D -D= -DkeyOnly -D=noKey -Dmule.foo=xfoo -Dmule.bar=xbar ";
         assertEquals(expected, SystemUtils.parsePropertyDefinitions(input));
     }
 

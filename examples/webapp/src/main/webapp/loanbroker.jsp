@@ -22,8 +22,7 @@
         LoanBrokerApp consumer = new LoanBrokerApp();
         int requests = Integer.parseInt(random);
         //to get all the result and print them out
-        List results = consumer.requestSend(requests, "vm://LoanBrokerRequests");
-        //consumer.requestDispatch(requests, "vm://LoanBrokerRequests");
+        List results = consumer.requestSend(requests, "CustomerRequests");
         %>
         <b>You have just made <%=requests%> Loan Requests!</b>
         <ol>
@@ -39,7 +38,7 @@
         double amount = Double.valueOf(amountString).doubleValue();
         int duration = Integer.parseInt(durationString);
         CustomerQuoteRequest loanRequest = new CustomerQuoteRequest(cust, amount,  duration);
-        UMOMessage message = client.send("vm://LoanBrokerRequests", loanRequest, null);
+        UMOMessage message = client.send("CustomerRequests", loanRequest, null);
         %>
 <h3>The best quote was received from: <br/> <%=message.getPayload()%></h3>
      <%} else {%>
@@ -74,7 +73,7 @@
 
 <p/>
 <table border="1" bordercolor="#990000"  align="left">
-<tr><td>For more information about Loan Broker example go <a target="_blank" href="http://www.muledocs.org/Loan+Broker+Example">here</a>.<br/>
+<tr><td>For more information about Loan Broker example go <a target="_blank" href="http://www.muledocs.org/display/MULE/Loan+Broker+Example">here</a>.<br/>
 To view the source and configuration go <a target="_blank" href="http://svn.mule.codehaus.org/browse/mule/trunk/mule/examples/loanbroker/">here</a>.</td></tr>
 </table>
 </body>

@@ -8,14 +8,14 @@
 
 <project name="Mule Examples: WebApp" default="package">
 
-  <property name="app.name" value="mule-example-webapp"/>
+  <property name="app.name" value="mule-examples"/>
 
     <property name="dir.java" value="src"/>
     <property name="dir.conf" value="conf"/>
-    <property name="dir.resources" value="resources"/>
-    <property name="dir.webapp" value="webapp"/>
-    <property name="dir.build" value="build"/>
-    <property name="dir.classes" value="build/classes"/>
+    <property name="dir.resources" value="src/main/resources"/>
+    <property name="dir.webapp" value="src/main/webapp"/>
+    <property name="dir.build" value="target"/>
+    <property name="dir.classes" value="${dir.build}/classes"/>
 
     <target name="clean"
             description="Clean the output directory (start from scratch).">
@@ -85,7 +85,7 @@
            depends="compile"
            description="Package the application">
 
-        <war destfile="${dir.build}/${app.name}.war" webxml="${dir.webapp}/web.xml">
+        <war destfile="${dir.build}/${app.name}.war" webxml="${dir.webapp}/WEB-INF/web.xml">
             <lib dir="${dir.mule.home}/lib/user">
                 <include name="**/*.jar"/>
             </lib>

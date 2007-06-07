@@ -13,6 +13,9 @@
 
     <mule-environment-properties synchronous="true" serverUrl=""/>
  
+    <!-- Synchronous VM connector (messages are processed in the same execution thread) -->
+    <connector name="syncVm" className="org.mule.providers.vm.VMConnector" />
+    
     <model name="loan-broker">
         <mule-descriptor name="LoanBroker" implementation="org.mule.examples.loanbroker.esn.SynchronousLoanBroker">
 

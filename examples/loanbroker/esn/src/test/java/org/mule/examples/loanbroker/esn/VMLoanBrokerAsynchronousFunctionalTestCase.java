@@ -18,7 +18,7 @@ public class VMLoanBrokerAsynchronousFunctionalTestCase extends AbstractAsynchro
     // @Override
     protected String getConfigResources()
     {
-        return "loan-broker-vm-endpoints-config.xml, loan-broker-async-config.xml";
+        return "loan-broker-async-config.xml, loan-broker-vm-endpoints-config.xml";
     }
     
     // @Override

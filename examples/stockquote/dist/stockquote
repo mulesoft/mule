@@ -20,18 +20,23 @@ echo "(make sure you have configured your HTTP proxy if behind a firewall - see 
 echo
 echo "The Stock Quote example is available in three variations:"
 echo "  1. REST"
-echo "  2. SOAP"
-echo "  3. WSDL"
+echo "  2. WSDL"
+echo "  3. SOAP"
 echo "Select the one you wish to execute and press Enter..."
 read i
 
+# Use the SpringConfigurationBuilder because the MuleXmlConfigurationBuilder (Commons Digester) has issues 
+# when merging config files.
+# Note: We can't use it for stockquote-soap-config.xml, because Spring chokes on the line:
+#   <property name="soapAction" value="${methodNamespace}${method}"/>
+
 if [ 1 = $i ]
 then
-    exec "$MULE_BASE/bin/mule" -config ./conf/rest-config.xml
+    exec "$MULE_BASE/bin/mule" -config "./conf/stdio-config.xml,./conf/stockquote-rest-config.xml" -builder spring
 elif [ 2 = $i ]
 then
-    exec "$MULE_BASE/bin/mule" -config ./conf/soap-config.xml
+    exec "$MULE_BASE/bin/mule" -config "./conf/stdio-config.xml,./conf/stockquote-wsdl-config.xml" -builder spring
 elif [ 3 = $i ]
 then
-    exec "$MULE_BASE/bin/mule" -config ./conf/wsdl-config.xml
+    exec "$MULE_BASE/bin/mule" -config "./conf/stdio-config.xml,./conf/stockquote-soap-config.xml"
 fi

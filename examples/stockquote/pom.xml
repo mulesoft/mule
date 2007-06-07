@@ -36,5 +36,12 @@
             <artifactId>mule-transport-xfire</artifactId>
             <version>${version}</version>
         </dependency>
+        <!-- Use the SpringConfigurationBuilder as a workaround because the MuleXmlConfigurationBuilder 
+        (Commons Digester) has issues when merging config files. -->        
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-spring</artifactId>
+            <version>${version}</version>
+        </dependency>
     </dependencies>
 </project>

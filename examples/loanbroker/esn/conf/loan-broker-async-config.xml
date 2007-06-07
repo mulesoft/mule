@@ -14,6 +14,22 @@
 
     <mule-environment-properties serverUrl=""/>
 
+    <!-- Synchronous VM connector (messages are processed in the same execution thread) -->
+    <connector name="syncVm" className="org.mule.providers.vm.VMConnector" />
+    
+    <!-- Asynchronous VM connector (uses in-memory queues) -->
+    <connector name="asyncVm" className="org.mule.providers.vm.VMConnector">
+        <properties>
+            <!-- Queue up events for asynchronous communication. -->
+            <property name="queueEvents" value="true"/>
+        </properties>
+    </connector>
+    
+    <global-endpoints>
+        <!-- only used for the async loan broker to send the lowest quote back to the customer -->
+        <endpoint name="CustomerResponses" address="vm://customer.responses" connector="asyncVm"/>
+    </global-endpoints>
+    
     <!--
        The Mule model initialises and manages your UMO components
     -->

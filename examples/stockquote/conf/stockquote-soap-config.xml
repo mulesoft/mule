@@ -15,9 +15,7 @@
     using the XmlToObject transformer.
     </description>
 
-    <mule-environment-properties synchronous="true"/>
-
-    <connector name="SystemStreamConnector" className="org.mule.providers.stdio.SystemStreamConnector">
+    <connector name="SystemStreamConnector" className="org.mule.providers.stream.SystemStreamConnector">
         <properties>
             <property name="promptMessageCode" value="2"/>
             <property name="resourceBundle" value="messages.stockquote-example-messages"/>
@@ -43,19 +41,34 @@
     <!--
         The Mule model initialises and manages your UMO components
     -->
-    <model name="soapDotNetSample">
-        <!--
-            This component can proxy external web service calls over Jms, tcp, ssl or any other transport.
-            For this example we use Vm.
-        -->
-        <mule-descriptor name="serviceProxy" implementation="org.mule.components.simple.BridgeComponent">
+    <model name="Sample">
+        <mule-descriptor name="Console I/O"
+            			 implementation="org.mule.components.simple.BridgeComponent">
             <inbound-router>
                 <endpoint address="stream://System.in"/>
             </inbound-router>
             <outbound-router>
-                <!-- we use a chaining transformer to send the results of one endpoint execution as the input
+                <!-- we use a chaining router to send the results of one endpoint execution as the input
                 for the next endpoint.  In this case it writes it out to System.out -->
                 <router className="org.mule.routing.outbound.ChainingRouter">
+	                <endpoint address="vm://stockquote"/>
+                    <endpoint address="stream://System.out"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+
+        <!--
+            This component can proxy external web service calls over Jms, tcp, ssl or any other transport.
+            For this example we use Vm.
+        -->
+        <mule-descriptor name="serviceProxy" 
+        				 implementation="org.mule.components.simple.BridgeComponent"
+        				 responseTransformer="XmlDecoder Xslt XmlToObject">
+            <inbound-router>
+                <endpoint address="vm://stockquote"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
                     <endpoint address="axis:http://www.webservicex.net/stockquote.asmx?method=GetQuote">
                         <properties>
                             <property name="soapAction" value="${methodNamespace}${method}"/>
@@ -67,10 +80,8 @@
                             </map>
                         </properties>
                     </endpoint>
-                    <endpoint address="stream://System.out" transformers="XmlDecoder Xslt XmlToObject"/>
                 </router>
             </outbound-router>
         </mule-descriptor>
-
     </model>
 </mule-configuration>

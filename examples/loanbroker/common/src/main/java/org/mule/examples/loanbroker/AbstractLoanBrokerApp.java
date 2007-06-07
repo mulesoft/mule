@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Runs the LoanBroker example application.
@@ -213,11 +214,16 @@ public abstract class AbstractLoanBrokerApp
 
     public List requestSend(int number, String endpoint) throws Exception
     {
+        return requestSend(number, endpoint, null);
+    }
+    
+    public List requestSend(int number, String endpoint, Map properties) throws Exception
+    {
         List results = new ArrayList(number);
         UMOMessage result;
         for (int i = 0; i < number; i++)
         {
-            result = client.send(endpoint, createRequest(), null);
+            result = client.send(endpoint, createRequest(), properties);
             if (result != null)
             {
                 results.add(result.getPayload());

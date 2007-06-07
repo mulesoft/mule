@@ -13,16 +13,6 @@
     using the XmlToObject transformer.
     </description>
 
-    <mule-environment-properties synchronous="true"/>
-
-    <connector name="SystemStreamConnector" className="org.mule.providers.stdio.SystemStreamConnector">
-        <properties>
-            <property name="promptMessageCode" value="2"/>
-            <property name="resourceBundle" value="messages.stockquote-example-messages"/>
-            <property name="messageDelayTime" value="1000"/>
-        </properties>
-    </connector>
-
     <connector name="HttpConnector" className="org.mule.providers.http.HttpConnector">
         <properties>
             <file-properties location="proxy.properties" />
@@ -38,33 +28,19 @@
             </properties>
         </transformer>
     </transformers>
-    <!--
-        The Mule model initialises and manages your UMO components
-    -->
-    <model name="httpSample">
-        <!--
-            A Mule descriptor defines all the necessary information about
-            how your components will interact with the framework, other
-            components in the system and external sources.
-            Please refer to the Configuration Guide for a full description
-            of all the parameters.
-        -->
+
+    <model name="Sample">
         <mule-descriptor name="HTTPPostSample"
-            implementation="org.mule.components.rest.RestServiceWrapper">
+            			 implementation="org.mule.components.rest.RestServiceWrapper"
+            			 responseTransformer="XmlDecoder Xslt XmlToObject">
             <inbound-router>
-                <endpoint address="stream://System.in"/>
+                <endpoint address="vm://stockquote"/>
             </inbound-router>
-            <outbound-router>
-                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
-                    <endpoint address="stream://System.out" transformers="XmlDecoder Xslt XmlToObject"/>
-                </router>
-            </outbound-router>
             <properties>
                 <property name="serviceUrl" value="http://www.webservicex.net/stockquote.asmx/GetQuote"/>
                 <property name="payloadParameterName" value="symbol"/>
                 <property name="httpMethod" value="POST"/>
             </properties>
         </mule-descriptor>
-
     </model>
 </mule-configuration>

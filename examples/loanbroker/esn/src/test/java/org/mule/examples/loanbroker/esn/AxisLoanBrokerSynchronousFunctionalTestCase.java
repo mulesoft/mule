@@ -16,6 +16,6 @@ public class AxisLoanBrokerSynchronousFunctionalTestCase extends AbstractLoanBro
 {
     protected String getConfigResources()
     {
-        return "loan-broker-axis-endpoints-config.xml, loan-broker-sync-config.xml";
+        return "loan-broker-sync-config.xml, loan-broker-axis-endpoints-config.xml";
     }
 }

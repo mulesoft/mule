@@ -15,10 +15,8 @@ import org.mule.MuleException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.commons.cli.BasicParser;
@@ -36,10 +34,6 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
 {
     // class logger
     protected static final Log logger = LogFactory.getLog(SystemUtils.class);
-
-    // the generally accepted prefix for defined property key-value pairs on a
-    // command line
-    private static final String PROPERTY_DEFINITION_PREFIX = "-D";
 
     // bash prepends: declare -x
     // zsh prepends: typeset -x
@@ -249,7 +243,8 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
     /**
      * Returns a Map of all valid property definitions in <code>-Dkey=value</code>
      * format. <code>-Dkey</code> is interpreted as <code>-Dkey=true</code>,
-     * everything else is ignored.
+     * everything else is ignored. Whitespace in values is properly handled but needs
+     * to be quoted properly: <code>-Dkey="some value"</code>.
      * 
      * @param input String with property definitionn
      * @return a {@link Map} of property String keys with their defined values
@@ -258,47 +253,135 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
      */
     public static Map parsePropertyDefinitions(String input)
     {
-        Map result = new HashMap();
-
-        // split all elements
-        String[] pairs = StringUtils.split(StringUtils.defaultIfEmpty(input, ""), ' ');
-
-        for (Iterator i = Arrays.asList(pairs).iterator(); i.hasNext();)
+        if (StringUtils.isEmpty(input))
         {
-            String pair = (String) i.next();
+            return Collections.EMPTY_MAP;
+        }
 
-            // skip over everything that does not start with -D
-            if (!pair.startsWith(PROPERTY_DEFINITION_PREFIX))
+        // the result map of property key/value pairs
+        final Map result = new HashMap();
+
+        // where to begin looking for key/value tokens
+        int tokenStart = 0;
+
+        // this is the main loop that scans for all tokens
+        findtoken : while (tokenStart < input.length())
+        {
+            // find first definition or bail
+            tokenStart = StringUtils.indexOf(input, "-D", tokenStart);
+            if (tokenStart == StringUtils.INDEX_NOT_FOUND)
             {
-                continue;
-            }
-
-            // split into -Dkey and some value
-            String[] split = StringUtils.split(pair, '=');
-
-            // normalize -Dsomething, but only if there's a key
-            if (split[0].startsWith(PROPERTY_DEFINITION_PREFIX)
-                            && split[0].length() > PROPERTY_DEFINITION_PREFIX.length())
-            {
-                split[0] = split[0].substring(PROPERTY_DEFINITION_PREFIX.length());
+                break findtoken;
             }
             else
             {
-                // no key - skip this pair
-                continue;
+                // skip leading -D
+                tokenStart += 2;
             }
 
-            // value missing?
-            if (split.length == 1)
+            // find key
+            int keyStart = tokenStart;
+            int keyEnd = keyStart;
+
+            if (keyStart == input.length())
             {
-                // yes: provide default value
-                result.put(split[0], "true");
+                // short input: '-D' only
+                break;
             }
-            else
+
+            // let's check out what we have next
+            char cursor = input.charAt(keyStart);
+
+            // '-D xxx'
+            if (cursor == ' ')
             {
-                // no: valid key and value
-                result.put(split[0], StringUtils.defaultIfEmpty(split[1], "true"));
+                continue findtoken;
             }
+
+            // '-D='
+            if (cursor == '=')
+            {
+                // skip over garbage to next potential definition
+                tokenStart = StringUtils.indexOf(input, ' ', tokenStart);
+                if (tokenStart != StringUtils.INDEX_NOT_FOUND)
+                {
+                    // '-D= ..' - continue with next token
+                    continue findtoken;
+                }
+                else
+                {
+                    // '-D=' - get out of here
+                    break findtoken;
+                }
+            }
+
+            // apparently there's a key, so find the end
+            findkey : while (keyEnd < input.length())
+            {
+                cursor = input.charAt(keyEnd);
+
+                // '-Dkey ..'
+                if (cursor == ' ')
+                {
+                    tokenStart = keyEnd;
+                    break findkey;
+                }
+
+                // '-Dkey=..'
+                if (cursor == '=')
+                {
+                    break findkey;
+                }
+
+                // keep looking
+                keyEnd++;
+            }
+
+            // yay, finally a key
+            String key = StringUtils.substring(input, keyStart, keyEnd);
+
+            // assume that there is no value following
+            int valueStart = keyEnd;
+            int valueEnd = keyEnd;
+
+            // default value
+            String value = "true";
+
+            // now find the value, but only if the current cursor is not a space
+            if (keyEnd < input.length() && cursor != ' ')
+            {
+                // bump value start/end
+                valueStart = keyEnd + 1;
+                valueEnd = valueStart;
+
+                // '-Dkey="..'
+                cursor = input.charAt(valueStart);
+                if (cursor == '"')
+                {
+                    // opening "
+                    valueEnd = StringUtils.indexOf(input, '"', ++valueStart);
+                }
+                else
+                {
+                    // unquoted value
+                    valueEnd = StringUtils.indexOf(input, ' ', valueStart);
+                }
+
+                // no '"' or ' ' delimiter found - use the rest of the string
+                if (valueEnd == StringUtils.INDEX_NOT_FOUND)
+                {
+                    valueEnd = input.length();
+                }
+
+                // create value
+                value = StringUtils.substring(input, valueStart, valueEnd);
+            }
+
+            // finally create key and value && loop again for next token
+            result.put(key, value);
+
+            // start next search at end of value
+            tokenStart = valueEnd;
         }
 
         return result;

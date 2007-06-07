@@ -11,44 +11,66 @@
 package org.mule.config.builders;
 
 import org.mule.config.ConfigurationException;
+import org.mule.config.i18n.CoreMessages;
+import org.mule.util.IOUtils;
 
+import java.io.File;
 import java.io.InputStream;
+import java.io.IOException;
 
 import javax.servlet.ServletContext;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>WebappMuleXmlConfigurationBuilder</code> will first try and load config
  * resources from the Servlet context. If this fails it fails back to the methods
  * used by the MuleXmlConfigurationBuilder.
- * 
+ *
  * @see org.mule.config.builders.MuleXmlConfigurationBuilder
  */
 public class WebappMuleXmlConfigurationBuilder extends MuleXmlConfigurationBuilder
 {
-    private ServletContext context;
+    /**
+     * Logger used by this class
+     */
+    protected transient final Log logger = LogFactory.getLog(getClass());    private ServletContext context;
 
-    public WebappMuleXmlConfigurationBuilder(ServletContext context) throws ConfigurationException
+    /**
+     * Classpath within the servlet context (e.g., "WEB-INF/classes").  Mule will attempt to load config
+     * files from here first, and then from the remaining classpath.
+     */
+    private String webappClasspath;
+
+    public WebappMuleXmlConfigurationBuilder(ServletContext context, String webappClasspath)
+        throws ConfigurationException
     {
         super();
         this.context = context;
+        this.webappClasspath = webappClasspath;
     }
 
     /**
-     * ConfigResource can be a url, a path on the local file system or a resource
-     * name on the classpath Finds and loads the configuration resource by doing the
-     * following - 1. load it from the servelet context /WEB-INF 2. load it form the
-     * classpath 3. load it from from the local file system 4. load it as a url
-     * 
-     * @param configResource a single configuration resource
-     * @return an inputstream to the resource
-     * @throws org.mule.config.ConfigurationException
+     * TODO TC MERGE THIS DOES NOT OVERRIDE SUPER NOW! Recheck.
+     * Attempt to load any resource from the Servlet Context first, then from the classpath.
      */
-    protected InputStream loadConfig(String configResource) throws ConfigurationException
+    protected InputStream loadResource(String resource) throws ConfigurationException
     {
-        InputStream is = context.getResourceAsStream(configResource);
+        String resourcePath = new File(webappClasspath, resource).getPath();
+        logger.debug("Searching for resource " + resourcePath + " in Servlet Context.");
+        InputStream is = context.getResourceAsStream(resourcePath);
         if (is == null)
         {
-            is = super.loadConfig(configResource);
+            try
+            {
+                logger.debug("Resource " + resourcePath + " not found in Servlet Context, loading from classpath");
+                is = IOUtils.getResourceAsStream(resource, getClass());
+            }
+            catch (IOException ioex)
+            {
+                throw new ConfigurationException(CoreMessages.cannotLoadFromClasspath(resource), ioex);
+            }
         }
         return is;
     }

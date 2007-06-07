@@ -47,7 +47,7 @@ howl-logger-0.1.11
 javassist-3.0
 jaxen-1.1.1
 jbpm-3.1.4
-jcl104-over-slf4j-1.3.1
+jcl104-over-slf4j-1.4.0
 jdom-1.0
 jotm_jrmp_stubs-2.0.10
 jotm-2.0.10
@@ -70,7 +70,6 @@ mule-example-loanbroker-esn
 mule-example-scripting
 mule-example-stockquote
 mule-example-voipservice
-mule-example-webapp
 mule-module-acegi
 mule-module-boot
 mule-module-builders
@@ -123,8 +122,8 @@ picocontainer-1.2
 quartz-all-1.5.2
 retrotranslator-runtime-1.2.1
 script-api-1.0-jdk14
-slf4j-api-1.3.1
-slf4j-log4j12-1.3.1
+slf4j-api-1.4.0
+slf4j-log4j12-1.4.0
 smack-2.2.1
 spring-2.0.5
 spring-modules-jbpm31-nodeps-0.8a

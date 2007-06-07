@@ -4,16 +4,25 @@
     <display-name>Mule</display-name>
     <description>Mule Web App Samples</description>
 
+    <!-- Classpath within the servlet context.  Mule will attempt to load config 
+         files from here first, and then from the remaining classpath. -->
+    <context-param>
+        <param-name>org.mule.webapp.classpath</param-name>
+        <param-value>/WEB-INF/classes</param-value>
+    </context-param>
+
     <context-param>
         <!-- If using the SpringContextLoaderListener, use this param name -->
         <!--<param-name>contextConfigLocation</param-name>-->
         <param-name>org.mule.config</param-name>
-        <param-value>/WEB-INF/mule-config.xml,
-                     /WEB-INF/mule-loanbroker-config.xml,
-                     /WEB-INF/mule-hello-config.xml,
-                     /WEB-INF/mule-echo-config.xml,
-                     /WEB-INF/mule-rest-config.xml,
-                     /WEB-INF/mule-stockquote-config.xml
+        <param-value>
+            jmx-config.xml,
+            echo-config.xml,
+            hello-http-config.xml,
+            servlet-config.xml,
+            stockquote-rest-config.xml,
+            loan-broker-sync-config.xml,
+            loan-broker-vm-endpoints-config.xml
         </param-value>
     </context-param>
 

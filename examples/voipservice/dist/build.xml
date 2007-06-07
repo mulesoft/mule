@@ -12,8 +12,8 @@
 
     <property name="dir.java" value="src"/>
     <property name="dir.conf" value="conf"/>
-    <property name="dir.build" value="build"/>
-    <property name="dir.classes" value="build/classes"/>
+    <property name="dir.build" value="target"/>
+    <property name="dir.classes" value="${dir.build}/classes"/>
 
     <target name="clean"
             description="Clean the output directory (start from scratch).">
