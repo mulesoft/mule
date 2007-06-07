@@ -53,7 +53,7 @@ public class AxisConnectorHttpFunctionalTestCase extends AbstractSoapUrlEndpoint
     {
         try
         {
-            QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
+            QuickConfigurationBuilder builder = new QuickConfigurationBuilder(false);
             builder.registerComponent(ComponentWithoutInterfaces.class.getName(),
                 "testComponentWithoutInterfaces", getComponentWithoutInterfacesEndpoint(), null, null);
             fail();
