@@ -1,3 +1,4 @@
 http\://www.mulesource.org/schema/mule/http/2.0=org.mule.providers.http.config.HttpNamespaceHandler
 http\://www.mulesource.org/schema/mule/https/2.0=org.mule.providers.http.config.HttpsNamespaceHandler
 http\://www.mulesource.org/schema/mule/jetty/2.0=org.mule.providers.http.config.JettyNamespaceHandler
+http\://www.mulesource.org/schema/mule/servlet/2.0=org.mule.providers.http.config.ServletNamespaceHandler

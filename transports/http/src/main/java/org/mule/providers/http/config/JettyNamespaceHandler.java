@@ -15,7 +15,7 @@ import org.mule.providers.http.jetty.JettyConnector;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 /**
- * Reigsters a Bean Definition Parser for handling <code><ssl:connector></code> elements.
+ * Reigsters a Bean Definition Parser for handling <code><jetty:connector></code> elements.
  */
 public class JettyNamespaceHandler extends NamespaceHandlerSupport
 {

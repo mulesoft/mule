@@ -1,3 +1,4 @@
 http\://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd=META-INF/mule-http.xsd
 http\://www.mulesource.org/schema/mule/https/2.0/mule-https.xsd=META-INF/mule-https.xsd
 http\://www.mulesource.org/schema/mule/jetty/2.0/mule-jetty.xsd=META-INF/mule-jetty.xsd
+http\://www.mulesource.org/schema/mule/servlet/2.0/mule-servlet.xsd=META-INF/mule-servlet.xsd

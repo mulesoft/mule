@@ -10,18 +10,18 @@
 package org.mule.providers.http.config;
 
 import org.mule.config.spring.parsers.SingleElementDefinitionParser;
-import org.mule.providers.http.HttpConnector;
+import org.mule.providers.http.servlet.ServletConnector;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 /**
- * Reigsters a Bean Definition Parser for handling <code><http:connector></code> elements.
+ * Reigsters a Bean Definition Parser for handling <code><servlet:connector></code> elements.
  */
-public class HttpNamespaceHandler extends NamespaceHandlerSupport
+public class ServletNamespaceHandler extends NamespaceHandlerSupport
 {
     public void init()
     {
-        registerBeanDefinitionParser("connector", new SingleElementDefinitionParser(HttpConnector.class, true));
+        registerBeanDefinitionParser("connector", new SingleElementDefinitionParser(ServletConnector.class, true));
     }
 
 }

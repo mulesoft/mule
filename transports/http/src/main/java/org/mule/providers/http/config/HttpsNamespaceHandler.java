@@ -16,7 +16,7 @@ import org.mule.providers.http.HttpsConnector;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 /**
- * Reigsters a Bean Definition Parser for handling <code><ssl:connector></code> elements.
+ * Reigsters a Bean Definition Parser for handling <code><https:connector></code> elements.
  */
 public class HttpsNamespaceHandler extends NamespaceHandlerSupport
 {
