@@ -57,7 +57,7 @@ public abstract class BaseServerTestCase extends FunctionalTestCase
         }
     }
 
-    protected void doSetUp() throws Exception
+    protected void suitePreSetUp() throws Exception
     {
         startServer();
     }

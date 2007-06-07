@@ -16,19 +16,18 @@
         class="org.mule.components.simple.StreamingBridgeComponent"/>
 
     <bean name="ftc"
-        class="org.mule.tck.functional.FunctionalTestComponent"/>
+        class="org.mule.tck.functional.FunctionalStreamingTestComponent"/>
 
     <mule:model-streaming name="main">
 
         <mule:service name="bridge" service-ref="bridgeImplementation">
             <mule:inbound-router>
-                <mule:endpoint address="tcp://localhost:60196" connector-ref="ftp"/>
+                <mule:endpoint address="tcp://localhost:60196"/>
             </mule:inbound-router>
             <mule:outbound-router>
                 <mule:pass-through-router>
                     <mule:endpoint address="ftp://anonymous:email@localhost:60197">
                         <mule:retry-connection-strategy
-                                inbound="false"
                                 retryCount="3"
                                 retryFrequency="2000"/>
                     </mule:endpoint>
@@ -36,7 +35,7 @@
             </mule:outbound-router>
         </mule:service>
 
-        <mule:service name="testComponent" singleton="true">
+        <mule:service name="testComponent" service-ref="ftc" singleton="true">
             <mule:inbound-router>
                 <mule:endpoint address="ftp://anonymous:email@localhost:60197"/>
             </mule:inbound-router>

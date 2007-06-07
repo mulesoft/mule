@@ -19,9 +19,6 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <!-- waiting on MULE-1771 -->
-                        <exclude>**/MultiStreamMule1696TestCase.*</exclude>
-                        <exclude>**/FtpStreamingTestCase.*</exclude>
                     </excludes>
                 </configuration>
             </plugin>

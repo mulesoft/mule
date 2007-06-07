@@ -19,14 +19,13 @@ import org.mule.umo.UMOEventContext;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOStreamMessageAdapter;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
 
+import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -79,7 +78,7 @@ public abstract class AbstractStreamingCapacityTestCase extends FunctionalTestCa
         UMOModel model = managementContext.getRegistry().lookupModel("echoModel");
         FunctionalStreamingTestComponent ftc =
                 (FunctionalStreamingTestComponent) model.getComponent("testComponent").getInstance();
-//        assertNotNull(ftc);
+        assertNotNull(ftc);
 //        assertEquals(1, ftc.getNumber());
 
         ftc.setEventCallback(callback, size);

@@ -17,12 +17,12 @@ import org.mule.tck.functional.FunctionalStreamingTestComponent;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.model.UMOModel;
 
+import java.util.HashMap;
+
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
-
-import java.util.HashMap;
 
 /**
  * We don't have an integrated ftp server (yet), and synchronous return doesn't work
@@ -78,7 +78,7 @@ public class FtpStreamingTestCase extends BaseServerTestCase
         UMOModel model = managementContext.getRegistry().lookupModel("main");
         FunctionalStreamingTestComponent ftc =
                 (FunctionalStreamingTestComponent) model.getComponent("testComponent").getInstance();
-//        assertNotNull(ftc);
+        assertNotNull(ftc);
 //        assertEquals(1, ftc.getNumber());
 
         ftc.setEventCallback(callback, TEST_MESSAGE.length());
