@@ -15,7 +15,7 @@ public class SmtpMimeFunctionalTestCase extends AbstractEmailFunctionalTestCase
 
     public SmtpMimeFunctionalTestCase()
     {
-        super(MIME_MESSAGE, "smtp", "smtp-mime-functional-test.xml");
+        super(65438, MIME_MESSAGE, "smtp", "smtp-mime-functional-test.xml");
     }
 
     public void testSend() throws Exception

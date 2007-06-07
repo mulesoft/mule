@@ -220,6 +220,7 @@ public abstract class AbstractMuleTestCase extends TestCase
                 // We dispose here just in case
                 disposeManager();
             }
+
             managementContext = createManagementContext();
 
             doSetUp();
@@ -319,7 +320,7 @@ public abstract class AbstractMuleTestCase extends TestCase
         // template method
     }
 
-    protected void doTearDown() throws Exception
+   protected void doTearDown() throws Exception
     {
         // template method
     }

@@ -39,6 +39,7 @@ import org.mule.impl.model.resolvers.CallableEntryPointResolver;
 import org.mule.impl.model.seda.SedaModel;
 import org.mule.impl.model.seda.optimised.OptimisedSedaModel;
 import org.mule.impl.model.streaming.StreamingModel;
+import org.mule.providers.SimpleRetryConnectionStrategy;
 import org.mule.routing.ForwardingCatchAllStrategy;
 import org.mule.routing.inbound.CorrelationAggregator;
 import org.mule.routing.inbound.CorrelationEventResequencer;
@@ -225,6 +226,9 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("wildcard-filter", new FilterDefinitionParser());
         registerBeanDefinitionParser("equals-filter", new FilterDefinitionParser());
         registerBeanDefinitionParser("custom-filter", new FilterDefinitionParser());
+
+        //Retry strategies
+        registerBeanDefinitionParser("retry-connection-strategy", new SimpleChildDefinitionParser("connectionStrategy", SimpleRetryConnectionStrategy.class));
 
         // Utils / Standard Types
         registerBeanDefinitionParser("properties", new PropertiesBeanDefinitionParser("properties"));

@@ -79,7 +79,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertNotNull(ep.getConnectionStrategy());
         assertTrue(ep.getConnectionStrategy() instanceof SimpleRetryConnectionStrategy);
         assertEquals(4, ((SimpleRetryConnectionStrategy)ep.getConnectionStrategy()).getRetryCount());
-        assertEquals(3000, ((SimpleRetryConnectionStrategy)ep.getConnectionStrategy()).getFrequency());
+        assertEquals(3000, ((SimpleRetryConnectionStrategy)ep.getConnectionStrategy()).getRetryFrequency());
     }
 
     public void testEndpointConfig()

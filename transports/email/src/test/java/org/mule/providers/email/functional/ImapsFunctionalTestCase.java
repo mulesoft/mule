@@ -15,7 +15,7 @@ public class ImapsFunctionalTestCase extends AbstractEmailFunctionalTestCase
 
     public ImapsFunctionalTestCase()
     {
-        super(STRING_MESSAGE, "imaps");
+        super(65434, STRING_MESSAGE, "imaps");
     }
 
     public void testReceive() throws Exception

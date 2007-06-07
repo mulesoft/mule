@@ -15,7 +15,7 @@ public class SmtpFunctionalTestCase extends AbstractEmailFunctionalTestCase
 
     public SmtpFunctionalTestCase()
     {
-        super(STRING_MESSAGE, "smtp");
+        super(65437, STRING_MESSAGE, "smtp");
     }
 
     public void testSend() throws Exception

@@ -17,6 +17,8 @@ package org.mule.providers.email;
  */
 public class Pop3Connector extends AbstractRetrieveMailConnector
 {
+
+    public static final String POP3 = "pop3";
     public static final int DEFAULT_POP3_PORT = 110;
 
     public Pop3Connector()
@@ -26,7 +28,7 @@ public class Pop3Connector extends AbstractRetrieveMailConnector
     
     public String getProtocol()
     {
-        return "pop3";
+        return POP3;
     }
 
 }

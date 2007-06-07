@@ -10,9 +10,11 @@
 
 package org.mule.providers.email.functional;
 
-import org.mule.tck.FunctionalTestCase;
 import org.mule.extras.client.MuleClient;
 import org.mule.providers.email.GreenMailUtilities;
+import org.mule.providers.email.ImapConnector;
+import org.mule.providers.email.Pop3Connector;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
 import com.icegreen.greenmail.util.ServerSetup;
@@ -20,9 +22,9 @@ import com.icegreen.greenmail.util.Servers;
 
 import java.io.IOException;
 
-import javax.mail.internet.MimeMessage;
-import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.Message;
+import javax.mail.internet.MimeMessage;
 
 public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase
 {
@@ -32,7 +34,6 @@ public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase
     protected static final boolean MIME_MESSAGE = true;
     protected static final boolean STRING_MESSAGE = false;
 
-    protected static final int DEFAULT_PORT = 65432;
     protected static final String DEFAULT_EMAIL = "bob@example.com";
     protected static final String DEFAULT_USER = "bob";
     protected static final String DEFAULT_MESSAGE = "Test email message";
@@ -48,18 +49,18 @@ public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase
     private String message;
     private String password;
 
-    protected AbstractEmailFunctionalTestCase(boolean isMimeMessage, String protocol)
+    protected AbstractEmailFunctionalTestCase(int port, boolean isMimeMessage, String protocol)
     {
-        this(isMimeMessage, protocol, protocol + CONFIG_BASE);
+        this(port, isMimeMessage, protocol, protocol + CONFIG_BASE);
     }
 
-    protected AbstractEmailFunctionalTestCase(boolean isMimeMessage, String protocol, String configFile)
+    protected AbstractEmailFunctionalTestCase(int port, boolean isMimeMessage, String protocol, String configFile)
     {
-        this(isMimeMessage, protocol, configFile, DEFAULT_PORT, 
+        this(port, isMimeMessage, protocol, configFile,
                 DEFAULT_EMAIL, DEFAULT_USER, DEFAULT_MESSAGE, DEFAULT_PASSWORD);
     }
 
-    protected AbstractEmailFunctionalTestCase(boolean isMimeMessage, String protocol, String configFile, int port,
+    protected AbstractEmailFunctionalTestCase(int port, boolean isMimeMessage, String protocol, String configFile,
                                               String email, String user, String message,
                                               String password)
     {
@@ -79,17 +80,18 @@ public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase
     }
 
     // @Override
-    protected void doSetUp() throws Exception
+    protected void suitePreSetUp() throws Exception
+//    protected void doPreStartupSetUp() throws Exception
     {
-        super.doSetUp();
         startServer();
     }
 
+
     // @Override
-    protected void doTearDown() throws Exception
+    protected void suitePreTearDown() throws Exception
+//    protected void doTearDown() throws Exception
     {
         stopServer();
-        super.doTearDown();
     }
 
     protected void doSend() throws Exception
@@ -119,36 +121,53 @@ public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase
     {
         assertTrue("Did not receive a message with String contents",
             received.getContent() instanceof String);
-        // for some reason, something is adding a newline at the end of messages
-        // so we need to strip that out for comparison
-        String receivedText = ((String) received.getContent()).trim();
-        assertEquals(message, receivedText);
+        verifyMessage((String) received.getContent());
         assertNotNull(received.getRecipients(Message.RecipientType.TO));
         assertEquals(1, received.getRecipients(Message.RecipientType.TO).length);
         assertEquals(received.getRecipients(Message.RecipientType.TO)[0].toString(), email);
     }
 
+    protected void verifyMessage(String receivedText)
+    {
+        // for some reason, something is adding a newline at the end of messages
+        // so we need to strip that out for comparison
+        assertEquals(message, receivedText.trim());
+    }
+
     protected void doReceive() throws Exception
     {
-        GreenMailUtilities.storeEmail(server.getManagers().getUserManager(),
-                email, user, password,
-                GreenMailUtilities.toMessage(message, email));
         assertEquals(1, server.getReceivedMessages().length);
 
         MuleClient client = new MuleClient();
-        UMOMessage message = client.receive("vm://receive", 1000);
+        UMOMessage message = client.receive("vm://receive", 5000);
         
         assertNotNull(message);
         Object payload = message.getPayload();
-        assertTrue(payload instanceof MimeMessage);
-        verifyMessage((MimeMessage) payload);
+        if (isMimeMessage)
+        {
+            assertTrue(payload instanceof MimeMessage);
+            verifyMessage((MimeMessage) payload);
+        }
+        else
+        {
+            assertTrue(payload instanceof String);
+            verifyMessage((String) payload);
+        }
     }
 
-    private void startServer()
+    private void startServer() throws Exception
     {
+        logger.debug("starting server on port " + port);
         ServerSetup setup = new ServerSetup(port, null, protocol);
         server = new Servers(setup);
         server.start();
+        if (protocol.startsWith(Pop3Connector.POP3) || protocol.startsWith(ImapConnector.IMAP))
+        {
+            GreenMailUtilities.storeEmail(server.getManagers().getUserManager(),
+                    email, user, password,
+                    GreenMailUtilities.toMessage(message, email));
+        }
+        logger.debug("server started for protocol " + protocol);
     }
 
     private void stopServer()

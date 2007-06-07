@@ -118,7 +118,7 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             ep.setName("testEPWithCS");
             SimpleRetryConnectionStrategy cs = new SimpleRetryConnectionStrategy();
             cs.setRetryCount(4);
-            cs.setFrequency(3000);
+            cs.setRetryFrequency(3000);
             ep.setConnectionStrategy(cs);
             builder.getManagementContext().getRegistry().registerEndpoint(ep);
 

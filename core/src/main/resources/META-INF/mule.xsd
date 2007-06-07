@@ -489,7 +489,8 @@
     </xsd:group>
 
     <xsd:complexType name="connectionStrategyType">
-        <xsd:attribute name="inbound" type="xsd:boolean" use="required"/>
+        <!-- don't see what this is for - MULE-1771 -->
+        <!-- xsd:attribute name="inbound" type="xsd:boolean" use="required"/ -->
     </xsd:complexType>
 
     <xsd:element name="retry-connection-strategy">

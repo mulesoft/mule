@@ -58,7 +58,7 @@ public class SimpleRetryConnectionStrategy extends AbstractConnectionStrategy
     protected static final ThreadLocal called = new ThreadLocal();
 
     private volatile int retryCount = DEFAULT_RETRY_COUNT;
-    private volatile long frequency = DEFAULT_FREQUENCY;
+    private volatile long retryFrequency = DEFAULT_FREQUENCY;
 
     protected void doConnect(UMOConnectable connectable) throws FatalConnectException
     {
@@ -116,13 +116,13 @@ public class SimpleRetryConnectionStrategy extends AbstractConnectionStrategy
 
                 if (logger.isInfoEnabled())
                 {
-                    logger.info("Waiting for " + frequency + "ms before reconnecting. Failed attempt "
+                    logger.info("Waiting for " + retryFrequency + "ms before reconnecting. Failed attempt "
                                 + retryCounter.current().get() + " of " + retryCount);
                 }
 
                 try
                 {
-                    Thread.sleep(frequency);
+                    Thread.sleep(retryFrequency);
                 }
                 catch (InterruptedException e1)
                 {
@@ -157,13 +157,13 @@ public class SimpleRetryConnectionStrategy extends AbstractConnectionStrategy
         this.retryCount = retryCount;
     }
 
-    public long getFrequency()
+    public long getRetryFrequency()
     {
-        return frequency;
+        return retryFrequency;
     }
 
-    public void setFrequency(long frequency)
+    public void setRetryFrequency(long retryFrequency)
     {
-        this.frequency = frequency;
+        this.retryFrequency = retryFrequency;
     }
 }

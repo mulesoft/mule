@@ -28,7 +28,7 @@
             <mule:outbound-router>
                 <mule:pass-through-router>
                     <!-- connector needed for MULE-1765 -->
-                    <mule:endpoint address="smtps://localhost:65432" connector-ref="smtpsConnector">
+                    <mule:endpoint address="smtps://localhost:65439" connector-ref="smtpsConnector">
                         <mule:properties>
                             <prop key="toAddresses">bob@example.com</prop>
                         </mule:properties>

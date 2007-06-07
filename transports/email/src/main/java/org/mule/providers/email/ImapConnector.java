@@ -15,6 +15,8 @@ package org.mule.providers.email;
  */
 public class ImapConnector extends AbstractRetrieveMailConnector
 {
+
+    public static final String IMAP = "imap";
     public static final int DEFAULT_IMAP_PORT = 143;
 
     public ImapConnector()
@@ -24,7 +26,7 @@ public class ImapConnector extends AbstractRetrieveMailConnector
     
     public String getProtocol()
     {
-        return "imap";
+        return IMAP;
     }
 
 }

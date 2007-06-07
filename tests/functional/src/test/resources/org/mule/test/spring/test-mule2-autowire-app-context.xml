@@ -96,7 +96,7 @@
                 <property name="retryCount">
                     <value>4</value>
                 </property>
-                <property name="frequency">
+                <property name="retryFrequency">
                     <value>3000</value>
                 </property>
             </bean>
