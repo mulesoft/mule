@@ -79,6 +79,13 @@
 
         <!-- re-declaration of dependencies that never ever may end up in the .rar -->
         <dependency>
+            <groupId>org.mule.examples</groupId>
+            <artifactId>mule-examples-all</artifactId>
+            <version>${version}</version>
+            <type>pom</type>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-ejb_2.1_spec</artifactId>
             <scope>provided</scope>

@@ -35,7 +35,11 @@
                     <execution>
                         <phase>package</phase>
                         <goals>
-                            <goal>assembly</goal>
+                            <!--
+                                'attached' ensures there's only a single run bound to m2's lifecycle.
+                                The default 'assembly' goal would run every plugin in this pom twice.
+                            -->
+                            <goal>attached</goal>
                         </goals>
                     </execution>
                 </executions>

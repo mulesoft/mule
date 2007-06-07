@@ -12,353 +12,35 @@ Assembly descriptor for the full Mule distribution.
     <fileSet>
       <directory>../src/main/resources</directory>
       <outputDirectory></outputDirectory>
-      <!-- <lineEnding>???</lineEnding> -->
     </fileSet>
 
     <!-- Make binary directories executable. -->
     <fileSet>
       <directory>../src/main/resources/bin</directory>
       <outputDirectory>bin</outputDirectory>
-      <fileMode>744</fileMode>
+      <fileMode>755</fileMode>
     </fileSet>
     <fileSet>
-      <directory>../src/main/resources/lib/boot/exec</directory>
-      <outputDirectory>lib/boot/exec</outputDirectory>
-      <fileMode>744</fileMode>
+      <directory>../src/main/resources/bin</directory>
+      <outputDirectory>bin</outputDirectory>
+      <fileMode>644</fileMode>
+      <includes>
+          <include>*.txt</include>
+      </includes>
     </fileSet>
-
-      <!--
-        ============================
-            Mule Examples: Echo
-        ============================
-      -->
-      <fileSet>
-          <directory>../../../examples/echo</directory>
-          <outputDirectory>examples/echo</outputDirectory>
-          <excludes>
-              <exclude>target/**</exclude>
-              <exclude>dist/**</exclude>
-              <!-- AxisEchoTestCase does not build.  src directory was excluded in previous version too -->
-              <exclude>src/**</exclude>
-          </excludes>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/echo/dist</directory>
-          <outputDirectory>examples/echo</outputDirectory>
-          <fileMode>744</fileMode>
-      </fileSet>
-
-      <!--
-        ==================================
-            Mule Examples: Error Handler
-        ==================================
-      -->
-      <fileSet>
-          <directory>../../../examples/errorhandler</directory>
-          <outputDirectory>examples/errorhandler</outputDirectory>
-          <excludes>
-              <exclude>target/**</exclude>
-              <exclude>dist/**</exclude>
-          </excludes>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/errorhandler/dist</directory>
-          <outputDirectory>examples/errorhandler</outputDirectory>
-          <fileMode>744</fileMode>
-      </fileSet>
-
-      <fileSet>
-          <directory>../../../examples/errorhandler/src/main/resources</directory>
-          <outputDirectory>examples/errorhandler/conf</outputDirectory>
-      </fileSet>
-
-
-
-
-      <!--
-        ============================
-            Mule Examples: Hello
-        ============================
-      -->
-       <fileSet>
-          <directory>../../../examples/hello</directory>
-          <outputDirectory>examples/hello</outputDirectory>
-          <excludes>
-              <exclude>target/**</exclude>
-              <exclude>dist/**</exclude>
-          </excludes>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/hello/dist</directory>
-          <outputDirectory>examples/hello</outputDirectory>
-          <fileMode>744</fileMode>
-      </fileSet>
-
-      <fileSet>
-          <directory>../../../examples/hello/src/main/resources</directory>
-          <outputDirectory>examples/hello/conf</outputDirectory>
-      </fileSet>
- 
-
- 
-      <!--
-        ===============================
-            Mule Examples: Loan Broker
-        ===============================
-      -->
-      <fileSet>
-          <directory>../../../examples/loanbroker/dist</directory>
-          <outputDirectory>examples/loanbroker</outputDirectory>
-          <includes>
-              <include>README.txt</include>
-              <include>pom.xml</include>
-              <include>build.xml</include>
-          </includes>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/loanbroker/dist</directory>
-          <outputDirectory>examples/loanbroker</outputDirectory>
-          <includes>
-              <include>loanbroker</include>
-              <include>loanbroker.bat</include>
-          </includes>
-          <fileMode>744</fileMode>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/loanbroker/common/dist</directory>
-          <outputDirectory>examples/loanbroker/common</outputDirectory>
-          <includes>
-              <include>pom.xml</include>
-              <include>build.xml</include>
-          </includes>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/loanbroker/common/src</directory>
-          <outputDirectory>examples/loanbroker/common/src</outputDirectory>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/loanbroker/common-tests/dist</directory>
-          <outputDirectory>examples/loanbroker/common-tests</outputDirectory>
-          <includes>
-              <include>pom.xml</include>
-              <include>build.xml</include>
-          </includes>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/loanbroker/common-tests/src</directory>
-          <outputDirectory>examples/loanbroker/common-tests/src</outputDirectory>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/loanbroker/credit-agency/dist</directory>
-          <outputDirectory>examples/loanbroker/credit-agency</outputDirectory>
-          <includes>
-              <include>pom.xml</include>
-              <include>build.xml</include>
-          </includes>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/loanbroker/credit-agency/src</directory>
-          <outputDirectory>examples/loanbroker/credit-agency/src</outputDirectory>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/loanbroker/esb/dist</directory>
-          <outputDirectory>examples/loanbroker/esb</outputDirectory>
-          <includes>
-              <include>pom.xml</include>
-              <include>build.xml</include>
-          </includes>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/loanbroker/esb/conf</directory>
-          <outputDirectory>examples/loanbroker/esb/conf</outputDirectory>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/loanbroker/esb/src</directory>
-          <outputDirectory>examples/loanbroker/esb/src</outputDirectory>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/loanbroker/esn/dist</directory>
-          <outputDirectory>examples/loanbroker/esn</outputDirectory>
-          <includes>
-              <include>pom.xml</include>
-              <include>build.xml</include>
-          </includes>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/loanbroker/esn/conf</directory>
-          <outputDirectory>examples/loanbroker/esn/conf</outputDirectory>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/loanbroker/esn/src</directory>
-          <outputDirectory>examples/loanbroker/esn/src</outputDirectory>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/loanbroker/bpm/dist</directory>
-          <outputDirectory>examples/loanbroker/bpm</outputDirectory>
-          <includes>
-              <include>pom.xml</include>
-              <include>build.xml</include>
-          </includes>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/loanbroker/bpm/conf</directory>
-          <outputDirectory>examples/loanbroker/bpm/conf</outputDirectory>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/loanbroker/bpm/src</directory>
-          <outputDirectory>examples/loanbroker/bpm/src</outputDirectory>
-      </fileSet>
-
-      <!--
-        =============================
-            Mule Examples: Scripting
-        =============================
-      -->
-
-      <fileSet>
-          <directory>../../../examples/scripting</directory>
-          <outputDirectory>examples/scripting</outputDirectory>
-          <excludes>
-              <exclude>target/**</exclude>
-              <exclude>dist/**</exclude>
-          </excludes>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/scripting/dist</directory>
-          <outputDirectory>examples/scripting</outputDirectory>
-          <fileMode>744</fileMode>
-      </fileSet>
-
-
-
-      <!--
-        ===============================
-            Mule Examples: Stock Quote
-        ===============================
-      -->
-
-
-
-      <fileSet>
-          <directory>../../../examples/stockquote</directory>
-          <outputDirectory>examples/stockquote</outputDirectory>
-          <excludes>
-              <exclude>target/**</exclude>
-              <exclude>dist/**</exclude>
-          </excludes>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/stockquote/dist</directory>
-          <outputDirectory>examples/stockquote</outputDirectory>
-          <fileMode>744</fileMode>
-      </fileSet>
-
-      <fileSet>
-          <directory>../../../examples/stockquote/src/main/resources</directory>
-          <outputDirectory>examples/stockquote/resources</outputDirectory>
-      </fileSet>
-
-
-
-      <!--
-        ================================
-            Mule Examples: VoIP Service
-        ================================
-      -->
-      <!-- Maven-style example -->
- 
-      <fileSet>
-          <directory>../../../examples/voipservice</directory>
-          <outputDirectory>examples/voipservice</outputDirectory>
-          <excludes>
-              <exclude>target/**</exclude>
-              <exclude>dist/**</exclude>
-          </excludes>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/voipservice/dist</directory>
-          <outputDirectory>examples/voipservice</outputDirectory>
-          <fileMode>744</fileMode>
-      </fileSet>
-
-      <fileSet>
-          <directory>../../../examples/voipservice/src/main/resources</directory>
-          <outputDirectory>examples/voipservice/conf</outputDirectory>
-      </fileSet>
-
-
-
-      <!--
-        ============================
-            Mule Examples: Webapp
-        ============================
-      -->
-      <!-- now just copy a readme to explain that the example should be built
-           from Ant -->
-      <fileSet>
-          <directory>../../../examples/webapp/dist</directory>
-          <outputDirectory>examples/webapp</outputDirectory>
-          <includes>
-              <include>MAVEN_README.txt</include>
-          </includes>
-      </fileSet>
-      <!-- Maven-style example : TODO
-      <fileSet>
-          <directory>../../../examples/webapp</directory>
-          <outputDirectory>examples/maven/webapp</outputDirectory>
-          <includes>
-              <include>README.txt</include>
-          </includes>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/webapp/dist</directory>
-          <outputDirectory>examples/maven/webapp</outputDirectory>
-          <includes>
-              <include>pom.xml</include>
-          </includes>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/webapp/conf</directory>
-          <outputDirectory>examples/maven/webapp/conf</outputDirectory>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/webapp/src</directory>
-          <outputDirectory>examples/maven/webapp/src</outputDirectory>
-      </fileSet>
-      -->
-
-      <!-- Ant-style example -->
-      <fileSet>
-          <directory>../../../examples/webapp</directory>
-          <outputDirectory>examples/webapp</outputDirectory>
-          <includes>
-              <include>README.txt</include>
-          </includes>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/webapp/dist</directory>
-          <outputDirectory>examples/webapp</outputDirectory>
-          <includes>
-              <include>build.xml</include>
-          </includes>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/webapp/conf</directory>
-          <outputDirectory>examples/webapp/conf</outputDirectory>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/webapp/src/main/java</directory>
-          <outputDirectory>examples/webapp/src</outputDirectory>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/webapp/src/main/resources</directory>
-          <outputDirectory>examples/webapp/resources</outputDirectory>
-      </fileSet>
-      <fileSet>
-          <directory>../../../examples/webapp/src/main/webapp</directory>
-          <outputDirectory>examples/webapp/webapp</outputDirectory>
-      </fileSet>
-
+    <fileSet>
+      <directory>../src/main/resources/sbin</directory>
+      <outputDirectory>sbin</outputDirectory>
+      <fileMode>755</fileMode>
+    </fileSet>
+    <fileSet>
+      <directory>../src/main/resources/sbin</directory>
+      <outputDirectory>sbin</outputDirectory>
+      <fileMode>644</fileMode>
+      <includes>
+          <include>*.txt</include>
+      </includes>
+    </fileSet>
 
     <!-- Copy the USAGE.txt file to the root directory for visibility -->
     <fileSet>
@@ -383,21 +65,248 @@ Assembly descriptor for the full Mule distribution.
           <include>mule-*-src.zip</include>
       </includes>
     </fileSet>
+    
+    <!--
+    ============================
+        Examples
+    ============================
+    -->
 
+    <!--
+    The entire examples directory is copied over first, then for each example, the contents 
+    of the "dist" directory (README.txt, pom.xml, build.xml) are copied over, followed by
+    the executable scripts.
+    -->
+    <fileSet>
+        <directory>../../../examples</directory>
+        <outputDirectory>examples</outputDirectory>
+        <excludes>
+            <exclude>pom.xml</exclude>
+            <exclude>all-examples/**</exclude>
+            <exclude>**/target/**</exclude> 
+            <exclude>**/dist/**</exclude>
+            <exclude>**/.*/**</exclude>
+        </excludes>
+    </fileSet>
+
+    <!--
+    ============================
+        Mule Examples: Echo
+    ============================
+    -->
+    <fileSet>
+        <directory>../../../examples/echo/dist</directory>
+        <outputDirectory>examples/echo</outputDirectory>
+    </fileSet>
+    <fileSet>
+        <directory>../../../examples/echo/dist</directory>
+        <outputDirectory>examples/echo</outputDirectory>
+        <fileMode>755</fileMode>
+        <includes>
+            <include>echo</include>
+            <include>echo.bat</include>
+        </includes>
+    </fileSet>
+
+    <!--
+    ==================================
+        Mule Examples: Error Handler
+    ==================================
+    -->
+    <fileSet>
+        <directory>../../../examples/errorhandler/dist</directory>
+        <outputDirectory>examples/errorhandler</outputDirectory>
+    </fileSet>
+    <fileSet>
+        <directory>../../../examples/errorhandler/dist</directory>
+        <outputDirectory>examples/errorhandler</outputDirectory>
+        <fileMode>755</fileMode>
+        <includes>
+            <include>errorhandler</include>
+            <include>errorhandler.bat</include>
+        </includes>
+    </fileSet>
+
+    <!--
+    ============================
+        Mule Examples: Hello
+    ============================
+    -->
+    <fileSet>
+        <directory>../../../examples/hello/dist</directory>
+        <outputDirectory>examples/hello</outputDirectory>
+    </fileSet>
+    <fileSet>
+        <directory>../../../examples/hello/dist</directory>
+        <outputDirectory>examples/hello</outputDirectory>
+        <fileMode>755</fileMode>
+        <includes>
+            <include>hello</include>
+            <include>hello.bat</include>
+        </includes>
+    </fileSet>
+
+    <!--
+    ===============================
+        Mule Examples: Loan Broker
+    ===============================
+    -->
+    <fileSet>
+        <directory>../../../examples/loanbroker/dist</directory>
+        <outputDirectory>examples/loanbroker</outputDirectory>
+    </fileSet>
+    <fileSet>
+        <directory>../../../examples/loanbroker/dist</directory>
+        <outputDirectory>examples/loanbroker</outputDirectory>
+        <fileMode>755</fileMode>
+        <includes>
+            <include>loanbroker</include>
+            <include>loanbroker.bat</include>
+        </includes>
+    </fileSet>
+    <!-- Common classes -->      
+    <fileSet>
+        <directory>../../../examples/loanbroker/common/dist</directory>
+        <outputDirectory>examples/loanbroker/common</outputDirectory>
+    </fileSet>
+    <fileSet>
+        <directory>../../../examples/loanbroker/common-tests/dist</directory>
+        <outputDirectory>examples/loanbroker/common-tests</outputDirectory>
+    </fileSet>
+    <!-- Credit Agency EJB -->      
+    <fileSet>
+        <directory>../../../examples/loanbroker/credit-agency/dist</directory>
+        <outputDirectory>examples/loanbroker/credit-agency</outputDirectory>
+    </fileSet>
+    <!-- LoanBroker ESB -->      
+    <fileSet>
+        <directory>../../../examples/loanbroker/esb/dist</directory>
+        <outputDirectory>examples/loanbroker/esb</outputDirectory>
+    </fileSet>
     <!-- OpenEJB needs a direct path to the openejb.conf file (i.e., it can't find it from within a jar) -->
     <fileSet>
-      <directory>../../../examples/loanbroker/esb/src/main/resources</directory>
-      <outputDirectory>lib/user</outputDirectory>
-      <includes>
-          <include>openejb.conf</include>
-      </includes>
+        <directory>../../../examples/loanbroker/esb/src/main/resources</directory>
+        <outputDirectory>lib/user</outputDirectory>
+        <includes>
+            <include>openejb.conf</include>
+        </includes>
+    </fileSet>
+    <!-- LoanBroker ESN -->      
+    <fileSet>
+        <directory>../../../examples/loanbroker/esn/dist</directory>
+        <outputDirectory>examples/loanbroker/esn</outputDirectory>
+    </fileSet>
+    <!-- LoanBroker BPM -->      
+    <fileSet>
+        <directory>../../../examples/loanbroker/bpm/dist</directory>
+        <outputDirectory>examples/loanbroker/bpm</outputDirectory>
+    </fileSet>
+
+    <!--
+    =============================
+        Mule Examples: Scripting
+    =============================
+    -->
+    <fileSet>
+        <directory>../../../examples/scripting/dist</directory>
+        <outputDirectory>examples/scripting</outputDirectory>
+    </fileSet>
+    <fileSet>
+        <directory>../../../examples/scripting/dist</directory>
+        <outputDirectory>examples/scripting</outputDirectory>
+        <fileMode>755</fileMode>
+        <includes>
+            <include>scripting</include>
+            <include>scripting.bat</include>
+        </includes>
+    </fileSet>
+
+    <!--
+    ===============================
+        Mule Examples: Stock Quote
+    ===============================
+    -->
+    <fileSet>
+        <directory>../../../examples/stockquote/dist</directory>
+        <outputDirectory>examples/stockquote</outputDirectory>
+    </fileSet>
+    <fileSet>
+        <directory>../../../examples/stockquote/dist</directory>
+        <outputDirectory>examples/stockquote</outputDirectory>
+        <fileMode>755</fileMode>
+        <includes>
+            <include>stockquote</include>
+            <include>stockquote.bat</include>
+        </includes>
+    </fileSet>
+
+    <!--
+    ================================
+        Mule Examples: VoIP Service
+    ================================
+    -->
+    <fileSet>
+        <directory>../../../examples/voipservice/dist</directory>
+        <outputDirectory>examples/voipservice</outputDirectory>
+    </fileSet>
+    <fileSet>
+        <directory>../../../examples/voipservice/dist</directory>
+        <outputDirectory>examples/voipservice</outputDirectory>
+        <fileMode>755</fileMode>
+        <includes>
+            <include>voipservice</include>
+            <include>voipservice.bat</include>
+        </includes>
+    </fileSet>
+
+    <!--
+    ============================
+        Mule Examples: Webapp
+    ============================
+    -->
+    <fileSet>
+        <directory>../../../examples/webapp/dist</directory>
+        <outputDirectory>examples/webapp</outputDirectory>
+    </fileSet>
+    <!-- Copy configs from other examples -->
+    <fileSet>
+        <directory>../../../examples/echo/conf</directory>
+        <outputDirectory>examples/webapp/conf</outputDirectory>
+        <includes>
+            <include>echo-config.xml</include>
+        </includes>
+    </fileSet>
+    <fileSet>
+        <directory>../../../examples/hello/conf</directory>
+        <outputDirectory>examples/webapp/conf</outputDirectory>
+        <includes>
+            <include>hello-http-config.xml</include>
+        </includes>
+    </fileSet>
+    <fileSet>
+        <directory>../../../examples/loanbroker/esn/conf</directory>
+        <outputDirectory>examples/webapp/conf</outputDirectory>
+        <includes>
+            <include>loan-broker-sync-config.xml</include>
+            <include>loan-broker-vm-endpoints-config.xml</include>
+        </includes>
+    </fileSet>
+    <fileSet>
+        <directory>../../../examples/stockquote/conf</directory>
+        <outputDirectory>examples/webapp/conf</outputDirectory>
+        <includes>
+            <include>stockquote-rest-config.xml</include>
+        </includes>
     </fileSet>
   </fileSets>
 
-  <!--
-       TODO: http://jira.codehaus.org/browse/MASSEMBLY-41 is now fixed.
-       Update to use wildcards.
-   -->
+    <!--
+    ============================
+        Libraries
+    ============================
+    -->
+    
+  <!-- TODO: http://jira.codehaus.org/browse/MASSEMBLY-41 is now fixed. Update to use wildcards. -->
   <dependencySets>
 
     <!-- Mule bootstrap -->
