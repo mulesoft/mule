@@ -1,5 +1,52 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:http="http://www.mulesource.org/schema/mule/axis/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-axis.xsd">
 
+    <bean name="tsc" class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+
+    <mule:environment-properties>
+        <entry key="serverUrl" value=""/>
+    </mule:environment-properties>
+    
+    <mule:model-seda name="test">
+        <mule:service name="mycomponent" service-ref="tsc">
+            <mule:inbound-router>
+                <mule:endpoint address="axis:http://localhost:38008/mule"/>
+            </mule:inbound-router>
+        </mule:service>
+        
+        <mule:service name="mycomponent2" service-ref="tsc">
+            <mule:inbound-router>
+                <mule:endpoint address="axis:http://localhost:38009/mule/services">
+                    <!--  TODO DO: how to specify a list here?
+                    <mule:properties>
+                    </mule:properties>
+                    -->
+                </mule:endpoint>
+            </mule:inbound-router>
+        </mule:service>
+        
+        <mule:service name="mycomponent3" service-ref="tsc">
+            <mule:inbound-router>
+                <mule:endpoint address="axis:http://localhost:38009"/>
+            </mule:inbound-router>
+        </mule:service>
+        
+        <mule:service name="mycomponent4" service-ref="tsc">
+            <mule:inbound-router>
+                <mule:endpoint address="axis:http://localhost:38010" synchronous="false"/>
+            </mule:inbound-router>
+        </mule:service>
+    </mule:model-seda>
+</beans>
+
+<!-- 
 <!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
                                 "http://mule.mulesource.org/dtds/mule-configuration.dtd">
 
@@ -36,3 +83,4 @@
         </mule-descriptor>
     </model>
 </mule-configuration>
+-->
