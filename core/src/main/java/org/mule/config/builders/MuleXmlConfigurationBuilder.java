@@ -34,8 +34,7 @@ import java.util.Properties;
  * sure that the DTD definitions for each of the document types are declared in the
  * documents.
  */
-public class
-        MuleXmlConfigurationBuilder implements ConfigurationBuilder
+public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
 {
     private String defaultConfigResource = "default-mule-config.xml";
 
