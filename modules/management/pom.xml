@@ -21,8 +21,6 @@
                      <excludes>
                          <exclude>**/ComponentServiceTestCase.*</exclude>
                          <exclude>**/JmxAgentTestCase.*</exclude>
-                         <exclude>**/ConnectorServiceTestCase.*</exclude>
-                         <exclude>**/Mx4jAgentTestCase.*</exclude>
                      </excludes>
                  </configuration>
              </plugin>
