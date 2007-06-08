@@ -19,7 +19,9 @@
 
         <mule:service name="relay" service-ref="bridge">
             <mule:inbound-router>
-                <mule:endpoint address="pop3://bob:password@localhost:65435"/>
+                <mule:endpoint address="pop3://bob:password@localhost:65435">
+                    <mule:retry-connection-strategy retryCount="3" retryFrequency="1000"/>
+                </mule:endpoint>
             </mule:inbound-router>
             <mule:outbound-router>
                 <mule:pass-through-router>
