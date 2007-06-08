@@ -43,7 +43,7 @@ import org.w3c.dom.NamedNodeMap;
  *
  * For example,
  * 
- *     <code> <bpm:connector bpms-ref="testBpms"/> </code>
+ *     <code> &lt;bpm:connector bpms-ref=&quot;testBpms&quot;/&lt; </code>
  * 
  * will automatically set a property "bpms" on the connector to reference a bean named "testBpms"
  *
@@ -91,11 +91,11 @@ public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBea
     protected boolean singleton = false;
 
     protected AbstractMuleSingleBeanDefinitionParser()
-     {
+    {
          attributeMappings = new Properties();
          valueMappings = new HashMap();
          beanReferences = new ArrayList();
-     }
+    }
 
     public void registerValueMapping(ValueMap mapping)
     {
