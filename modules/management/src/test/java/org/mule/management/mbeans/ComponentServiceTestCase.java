@@ -27,7 +27,7 @@ public class ComponentServiceTestCase extends AbstractMuleJmxTestCase
         descriptor.setService(new Object());
         getDefaultModel(managementContext).registerComponent(descriptor);
 
-       managementContext.start();
+        managementContext.start();
         final ComponentService service = new ComponentService("TEST_SERVICE");
         final ObjectName name = ObjectName.getInstance(domainOriginal + ":type=TEST_SERVICE");
         mBeanServer.registerMBean(service, name);
