@@ -100,7 +100,19 @@ public abstract class AbstractChildBeanDefinitionParser extends AbstractHierarch
             {
                 pv = newParentPropertyValue(element, new ManagedList());
             }
-            ((List) pv.getValue()).add(builder.getBeanDefinition());
+            
+            List list = (List) pv.getValue();
+            Object source = builder.getBeanDefinition().getSource();
+            if (source instanceof ListEntryDefinitionParser.ListEntry)
+            {
+                ListEntryDefinitionParser.ListEntry listEntry = 
+                    (ListEntryDefinitionParser.ListEntry)source;
+                list.add(listEntry.getProxiedObject());
+            }
+            else
+            {
+                list.add(builder.getBeanDefinition());
+            }
         }
         else
         {

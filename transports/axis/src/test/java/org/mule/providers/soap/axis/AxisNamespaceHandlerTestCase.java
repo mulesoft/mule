@@ -32,6 +32,12 @@ public class AxisNamespaceHandlerTestCase extends FunctionalTestCase
         Assert.assertEquals("test-axis-config.wsdd", connector.getServerConfig());
         Assert.assertEquals("test-axis-config.wsdd", connector.getClientConfig());
         Assert.assertFalse(connector.isTreatMapAsNamedParams());
+        Assert.assertFalse(connector.isDoAutoTypes());
+        Assert.assertEquals(2, connector.getBeanTypes().size());
+        Assert.assertTrue(connector.getBeanTypes().contains("org.mule.tck.testmodels.fruit.Apple"));
+        Assert.assertTrue(connector.getBeanTypes().contains("org.mule.tck.testmodels.fruit.Banana"));
+        Assert.assertEquals(1, connector.getSupportedSchemes().size());
+        Assert.assertEquals("http", connector.getSupportedSchemes().get(0));
     }
 
     public void testInjectedObjects()
@@ -42,7 +48,6 @@ public class AxisNamespaceHandlerTestCase extends FunctionalTestCase
         Assert.assertNotNull(connector);
         Assert.assertEquals(MockAxisServer.class, connector.getAxisServer().getClass());
         Assert.assertEquals(MockProvider.class, connector.getClientProvider().getClass());
-        Assert.assertFalse(connector.isDoAutoTypes());
     }
 }
 

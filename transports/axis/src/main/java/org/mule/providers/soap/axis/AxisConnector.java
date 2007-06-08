@@ -36,7 +36,6 @@ import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.ClassUtils;
-import org.mule.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -122,8 +121,6 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
     public AxisConnector()
     {
         super();
-        registerProtocols();
-
     }
 
     protected void registerProtocols()
@@ -158,6 +155,8 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
 
     protected void doInitialise() throws InitialisationException
     {
+        this.registerProtocols();
+        
         if (axisTransportProtocols == null)
         {
             axisTransportProtocols = new HashMap();
@@ -252,12 +251,12 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
     {
         // Register Transport handlers
         // By default these will alll be handled by Mule, however some companies may
-        // have
-        // their own they wish to use
-        for (Iterator iterator = getAxisTransportProtocols().keySet().iterator(); iterator.hasNext();)
+        // have their own they wish to use
+        Map transportProtocols = this.getAxisTransportProtocols();
+        for (Iterator iterator = transportProtocols.keySet().iterator(); iterator.hasNext();)
         {
             String protocol = (String)iterator.next();
-            Object temp = getAxisTransportProtocols().get(protocol);
+            Object temp = transportProtocols.get(protocol);
             Class clazz = null;
             if (temp instanceof String)
             {

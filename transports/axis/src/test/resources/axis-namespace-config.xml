@@ -16,12 +16,18 @@
 
     <axis:connector name="axisConnector"
         clientConfig="test-axis-config.wsdd"
+        doAutoTypes="false"
         serverConfig="test-axis-config.wsdd"
-        treatMapAsNamedParams="false"/>
+        treatMapAsNamedParams="false">
+
+        <axis:beanType>org.mule.tck.testmodels.fruit.Apple</axis:beanType>
+        <axis:beanType>org.mule.tck.testmodels.fruit.Banana</axis:beanType>
+
+        <axis:supportedScheme>http</axis:supportedScheme>
+     </axis:connector>
 
     <axis:connector name="axisConnector2"
         axisServer-ref="axisServer"
         clientProvider-ref="mockProvider"
-        doAutoTypes="false"
         serverProvider-ref="mockProvider"/>
 </beans>
