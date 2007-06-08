@@ -29,14 +29,14 @@ public class JmxAgentTestCase extends AbstractMuleTestCase
 
     private JmxAgent jmxAgent;
 
-    protected void doSetUp () throws Exception
+    protected void doSetUp() throws Exception
     {
         super.doSetUp();
         RmiRegistryAgent rmiRegistryAgent = new RmiRegistryAgent();
         jmxAgent = new JmxAgent();
         jmxAgent.setConnectorServerUrl(JmxAgent.DEFAULT_REMOTING_URI);
-       managementContext.getRegistry().registerAgent(rmiRegistryAgent);
-       managementContext.setId(DOMAIN);
+        managementContext.getRegistry().registerAgent(rmiRegistryAgent);
+        managementContext.setId(DOMAIN);
     }
 
     public void testDefaultProperties() throws Exception
@@ -50,8 +50,8 @@ public class JmxAgentTestCase extends AbstractMuleTestCase
     {
         configureProperties();
         jmxAgent.setCredentials(getValidCredentials());
-       managementContext.getRegistry().registerAgent(jmxAgent);
-       managementContext.start();
+        managementContext.getRegistry().registerAgent(jmxAgent);
+        managementContext.start();
 
         JMXServiceURL serviceUrl = new JMXServiceURL(JmxAgent.DEFAULT_REMOTING_URI);
         Map props = new HashMap(1);
@@ -66,8 +66,8 @@ public class JmxAgentTestCase extends AbstractMuleTestCase
     {
         configureProperties();
         jmxAgent.setCredentials(getValidCredentials());
-       managementContext.getRegistry().registerAgent(jmxAgent);
-       managementContext.start();
+        managementContext.getRegistry().registerAgent(jmxAgent);
+        managementContext.start();
 
         JMXServiceURL serviceUrl = new JMXServiceURL(JmxAgent.DEFAULT_REMOTING_URI);
         try
@@ -84,8 +84,8 @@ public class JmxAgentTestCase extends AbstractMuleTestCase
     {
         configureProperties();
         jmxAgent.setCredentials(null);
-       managementContext.getRegistry().registerAgent(jmxAgent);
-       managementContext.start();
+        managementContext.getRegistry().registerAgent(jmxAgent);
+        managementContext.start();
 
         JMXServiceURL serviceUrl = new JMXServiceURL(JmxAgent.DEFAULT_REMOTING_URI);
         JMXConnector connector = JMXConnectorFactory.connect(serviceUrl);
@@ -94,7 +94,7 @@ public class JmxAgentTestCase extends AbstractMuleTestCase
         assertTrue(Arrays.asList(connection.getDomains()).contains("Mule." + DOMAIN));
     }
 
-    protected Map getValidCredentials ()
+    protected Map getValidCredentials()
     {
         final Map credentials = new HashMap(1);
         credentials.put(VALID_AUTH_TOKEN[0], VALID_AUTH_TOKEN[1]);
@@ -102,7 +102,7 @@ public class JmxAgentTestCase extends AbstractMuleTestCase
         return credentials;
     }
 
-    protected void configureProperties ()
+    protected void configureProperties()
     {
         // make multi-NIC dev box happy by sticking RMI clients to a single
         // local ip address

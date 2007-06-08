@@ -21,7 +21,7 @@ public class Log4jAgentTestCase extends AbstractMuleJmxTestCase
     public void testRedeploy() throws Exception
     {
         mBeanServer.registerMBean(new HierarchyDynamicMBean(),
-            ObjectName.getInstance(Log4jAgent.JMX_OBJECT_NAME));
+                                  ObjectName.getInstance(Log4jAgent.JMX_OBJECT_NAME));
 
         Log4jAgent agent = new Log4jAgent();
         agent.initialise();

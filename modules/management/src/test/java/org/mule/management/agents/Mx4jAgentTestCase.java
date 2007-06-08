@@ -25,7 +25,7 @@ public class Mx4jAgentTestCase extends AbstractMuleJmxTestCase
     public void testRedeploy() throws Exception
     {
         final String name = JmxSupport.DEFAULT_JMX_DOMAIN_PREFIX +
-                                  ".Mx4jAgentTest:" + Mx4jAgent.HTTP_ADAPTER_OBJECT_NAME;
+                            ".Mx4jAgentTest:" + Mx4jAgent.HTTP_ADAPTER_OBJECT_NAME;
         mBeanServer.registerMBean(new HttpAdaptor(), ObjectName.getInstance(name));
 
         Mx4jAgent agent = new Mx4jAgent();
