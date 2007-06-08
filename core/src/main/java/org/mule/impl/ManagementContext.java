@@ -322,7 +322,7 @@ public class ManagementContext implements UMOManagementContext
      */
     public boolean isInitialising()
     {
-        return lifecycleManager.getExecutingPhase().equals(Disposable.PHASE_NAME);
+        return Disposable.PHASE_NAME.equals(lifecycleManager.getExecutingPhase());
     }
 
     protected boolean isStopped()
@@ -332,7 +332,7 @@ public class ManagementContext implements UMOManagementContext
 
     protected boolean isStopping()
     {
-        return lifecycleManager.getExecutingPhase().equals(Stoppable.PHASE_NAME);
+        return Stoppable.PHASE_NAME.equals(lifecycleManager.getExecutingPhase());
     }
 
     /**
@@ -347,7 +347,7 @@ public class ManagementContext implements UMOManagementContext
 
     protected boolean isStarting()
     {
-        return lifecycleManager.getExecutingPhase().equals(Startable.PHASE_NAME);
+        return Startable.PHASE_NAME.equals(lifecycleManager.getExecutingPhase());
     }
 
     public boolean isDisposed()
@@ -357,7 +357,7 @@ public class ManagementContext implements UMOManagementContext
 
     public boolean isDisposing()
     {
-        return lifecycleManager.getExecutingPhase().equals(Disposable.PHASE_NAME);
+        return Disposable.PHASE_NAME.equals(lifecycleManager.getExecutingPhase());
     }
 
     protected void validateEncoding() throws FatalException
