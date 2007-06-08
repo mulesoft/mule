@@ -37,7 +37,11 @@
 
         <mule:service name="testComponent" service-ref="ftc" singleton="true">
             <mule:inbound-router>
-                <mule:endpoint address="ftp://anonymous:email@localhost:60197"/>
+                <mule:endpoint address="ftp://anonymous:email@localhost:60197">
+                    <mule:retry-connection-strategy
+                            retryCount="3"
+                            retryFrequency="2000"/>
+                </mule:endpoint>
             </mule:inbound-router>
         </mule:service>
 
