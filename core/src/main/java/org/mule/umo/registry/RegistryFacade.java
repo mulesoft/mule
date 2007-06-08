@@ -136,6 +136,8 @@ public interface RegistryFacade extends Initialisable, Registry
 
     UMOEndpoint createEndpointFromUri(UMOEndpointURI uri, String type) throws UMOException;
 
+    UMOEndpoint createEndpointFromUri(String uri, String type) throws UMOException;
+
     UMOEndpoint getEndpointFromUri(String uri) throws ObjectNotFoundException;
 
     UMOEndpoint getEndpointFromUri(UMOEndpointURI uri) throws UMOException;

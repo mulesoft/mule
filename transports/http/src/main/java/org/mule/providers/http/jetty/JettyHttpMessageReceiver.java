@@ -13,7 +13,6 @@ package org.mule.providers.http.jetty;
 import org.mule.RegistryContext;
 import org.mule.config.ThreadingProfile;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.http.i18n.HttpMessages;
 import org.mule.providers.http.servlet.MuleRESTReceiverServlet;
@@ -70,7 +69,8 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
                     path = "/";
                 }
 
-                UMOEndpoint ep = new MuleEndpoint("servlet://" + path.substring(1), true);
+                UMOEndpoint ep = connector.getManagementContext().getRegistry().createEndpointFromUri(
+                        "servlet://" + path.substring(1), UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
                 ep.setTransformer(endpoint.getTransformer());
                 scon.registerListener(component, ep);
             }

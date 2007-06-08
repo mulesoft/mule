@@ -627,11 +627,16 @@ public abstract class AbstractRegistry implements RegistryFacade
         this.parent = registry;
     }
 
+    public UMOEndpoint createEndpointFromUri(String uri, String type) throws UMOException
+    {
+        return createEndpointFromUri(new MuleEndpointURI(uri), type);
+    }
+
     public UMOEndpoint createEndpointFromUri(UMOEndpointURI uri, String type) throws UMOException
     {
         uri.initialise();
         UMOEndpoint endpoint = TransportFactory.createEndpoint(uri, type);
-        endpoint.initialise();
+        registerEndpoint(endpoint);
         return endpoint;
     }
 
