@@ -58,7 +58,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="proxyPort" type="xsd:int">
+                <xsd:attribute name="proxyPort" type="mule:substitutablePortNumber">
                     <xsd:annotation>
                         <xsd:documentation>
                             The proxy port number.
@@ -68,11 +68,11 @@
                 <xsd:attribute name="proxyUsername" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The username to use for preoxy access.
+                            The username to use for proxy access.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="enableCookies" type="xsd:boolean">
+                <xsd:attribute name="enableCookies" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
                             Whether or not to support cookies.

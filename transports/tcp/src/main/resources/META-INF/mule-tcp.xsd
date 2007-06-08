@@ -23,28 +23,28 @@
     <xsd:complexType name="noProtocolTcpConnectorType">
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
-                <xsd:attribute name="sendBufferSize" type="xsd:int">
+                <xsd:attribute name="sendBufferSize" type="mule:substitutableInt">
                     <xsd:annotation>
                         <xsd:documentation>
                             The size of the buffer (in bytes) used when sending data, set on the socket itself.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="receiveBufferSize" type="xsd:int">
+                <xsd:attribute name="receiveBufferSize" type="mule:substitutableInt">
                     <xsd:annotation>
                         <xsd:documentation>
                             The size of the buffer (in bytes) used when receiving data, set on the socket itself.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="receiveBacklog" type="xsd:int">
+                <xsd:attribute name="receiveBacklog" type="mule:substitutableInt">
                     <xsd:annotation>
                         <xsd:documentation>
                             The maximum queue length for incoming connections.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="sendTcpNoDelay" type="xsd:boolean">
+                <xsd:attribute name="sendTcpNoDelay" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
                             If set, transmitted data are not collected together for greater efficiency, but sent
@@ -52,7 +52,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="clientSoTimeout" type="xsd:int">
+                <xsd:attribute name="clientSoTimeout" type="mule:substitutableInt">
                     <xsd:annotation>
                         <xsd:documentation>
                             This sets the socket's SO_TIMEOUT value when the socket is used as a client. Reading from
@@ -61,7 +61,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="serverSoTimeout" type="xsd:int">
+                <xsd:attribute name="serverSoTimeout" type="mule:substitutableInt">
                     <xsd:annotation>
                         <xsd:documentation>
                             This sets the socket's SO_TIMEOUT value when the socket is used as a server. Reading from
@@ -70,7 +70,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="socketSoLinger" type="xsd:int">
+                <xsd:attribute name="socketSoLinger" type="mule:substitutableInt">
                     <xsd:annotation>
                         <xsd:documentation>
                             This sets the socket's SO_LINGER value.  This is related to how long (in milliseconds) the
@@ -78,14 +78,14 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="keepSendSocketOpen" type="xsd:boolean">
+                <xsd:attribute name="keepSendSocketOpen" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
                             If set, the socket is not closed after sending a message.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="keepAlive" type="xsd:boolean">
+                <xsd:attribute name="keepAlive" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
                             Enables SO_KEEPALIVE behaviour on open sockets. This automatically checks socket connections
@@ -94,7 +94,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="validateConnections" type="xsd:boolean">
+                <xsd:attribute name="validateConnections" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
                             This "blips" the socket, opening and closing it to validate the connection, when first

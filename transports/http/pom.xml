@@ -28,8 +28,6 @@
                          <exclude>**/JettyRestFunctionalTestCase.*</exclude>
                          <!-- waiting on MULE-1881 -->
                          <exclude>**/RestEndpointMule1881TestCase.*</exclude>
-                         <!-- waiting on MULE-1887 -->
-                         <exclude>**/TypedPlaceholderMule1887TestCase.*</exclude>
                      </excludes>
                  </configuration>
              </plugin>

@@ -30,7 +30,7 @@
                     socketSoLinger="6789"
                     serverSoTimeout="7890"
                     enableCookies="true"
-                    keepAlive="true"
+                    keepAlive="${keepAlive}"
                     keepSendSocketOpen="true"
                     sendTcpNoDelay="true"
                     validateConnections="false"
