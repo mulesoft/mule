@@ -19,7 +19,7 @@
                     <!--<xsd:attribute name="map-class" default="java.util.HashMap"/>-->
                 </xsd:extension>
             </xsd:complexContent>
-           
+
         </xsd:complexType>
     </xsd:element>
 
@@ -1151,7 +1151,7 @@
                 <xsd:attribute name="jndiProviderUrl" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The service provider to use. The value of the property
+                            The service provider to use. The vtablePortNumberalue of the property
                             should contain a URL string (e.g. "ldap://somehost:389").
                         </xsd:documentation>
                     </xsd:annotation>
@@ -1172,21 +1172,100 @@
     </xsd:complexType>
 
     <xsd:complexType name="mapType">
-		<xsd:complexContent>
-			<xsd:extension base="spring:mapType">
+        <xsd:complexContent>
+            <xsd:extension base="spring:mapType">
                 <xsd:attribute name="mapClass" type="xsd:string"/>
-                <xsd:attribute name="name" type="xsd:string"/>
-			</xsd:extension>
-		</xsd:complexContent>
-	</xsd:complexType>
+                <xsd:attribute name="name" type="xsd:int"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
-	<xsd:complexType name="propsType">
-		<xsd:complexContent>
-			<xsd:extension base="spring:propsType">
+    <xsd:complexType name="propsType">
+        <xsd:complexContent>
+            <xsd:extension base="spring:propsType">
                 <xsd:attribute name="location" type="xsd:string"/>
                 <xsd:attribute name="fileEncoding" type="xsd:string"/>
-			</xsd:extension>
-		</xsd:complexContent>
-	</xsd:complexType>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:simpleType name="propertyPlaceholderType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A type that defines an Ant-stale property placeholder
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="(\$\{[^\}]+\})"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="substitutablePortNumber">
+        <xsd:annotation>
+            <xsd:documentation>
+                A custom xsd:int type that also allows for Ant-style property placeholders and restrict the
+                int value to a valid port number
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:union>
+            <xsd:simpleType>
+                <xsd:restriction base="propertyPlaceholderType"/>
+            </xsd:simpleType>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:int">
+                    <xsd:minInclusive value="0"/>
+                    <xsd:maxInclusive value="65536"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:union>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="substitutableInt">
+        <xsd:annotation>
+            <xsd:documentation>
+                A custom xsd:int type that also allows for Ant-style property placeholders
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:union>
+            <xsd:simpleType>
+                <xsd:restriction base="propertyPlaceholderType"/>
+            </xsd:simpleType>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:int"/>
+            </xsd:simpleType>
+        </xsd:union>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="substitutableLong">
+        <xsd:annotation>
+            <xsd:documentation>
+                A custom xsd:long type that also allows for Ant-style property placeholders
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:union>
+            <xsd:simpleType>
+                <xsd:restriction base="propertyPlaceholderType"/>
+            </xsd:simpleType>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:long"/>
+            </xsd:simpleType>
+        </xsd:union>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="substitutableBoolean">
+        <xsd:annotation>
+            <xsd:documentation>
+                A custom xsd:boolean type that also allows for Ant-style property placeholders
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:union>
+            <xsd:simpleType>
+                <xsd:restriction base="propertyPlaceholderType"/>
+            </xsd:simpleType>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:boolean"/>
+            </xsd:simpleType>
+        </xsd:union>
+    </xsd:simpleType>
 
 </xsd:schema>
