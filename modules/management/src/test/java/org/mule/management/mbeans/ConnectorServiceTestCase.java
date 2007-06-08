@@ -24,19 +24,19 @@ public class ConnectorServiceTestCase extends AbstractMuleJmxTestCase
     public void testUndeploy() throws Exception
     {
         final String configId = "ConnectorServiceTest";
-       managementContext.setId(configId);
+        managementContext.setId(configId);
         final UMOConnector connector = getTestConnector();
         connector.setName("TEST_CONNECTOR");
         final JmxAgent jmxAgent = new JmxAgent();
-       managementContext.getRegistry().registerConnector(connector);
-       managementContext.getRegistry().registerAgent(jmxAgent);
-       managementContext.start();
+        managementContext.getRegistry().registerConnector(connector);
+        managementContext.getRegistry().registerAgent(jmxAgent);
+        managementContext.start();
 
         final String query = JmxSupport.DEFAULT_JMX_DOMAIN_PREFIX + "." + configId + ":*";
         Set mbeans = mBeanServer.queryMBeans(ObjectName.getInstance(query), null);
         assertEquals("Unexpected number of components registered in the domain.", 6, mbeans.size());
 
-       managementContext.dispose();
+        managementContext.dispose();
 
         mbeans = mBeanServer.queryMBeans(ObjectName.getInstance(query), null);
         assertEquals("There should be no MBeans left in the domain", 0, mbeans.size());
