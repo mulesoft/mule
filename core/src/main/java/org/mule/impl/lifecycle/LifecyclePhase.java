@@ -56,16 +56,22 @@ public class LifecyclePhase implements UMOLifecyclePhase
 
     public void fireLifecycle(UMOManagementContext managementContext, String currentPhase) throws UMOException
     {
-        if(logger.isDebugEnabled()) logger.debug("Attempting to fire lifecycle phase: " + getName());
-        if(currentPhase.equals(name))
+        if (logger.isDebugEnabled())
         {
-            if(logger.isDebugEnabled()) logger.debug("Not firing, already in lifecycle phase: " + getName());
+            logger.debug("Attempting to fire lifecycle phase: " + getName());
+        }
+        if (currentPhase.equals(name))
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Not firing, already in lifecycle phase: " + getName());
+            }
             return;
         }
-        if(!isPhaseSupported(currentPhase))
+        if (!isPhaseSupported(currentPhase))
         {
             throw new IllegalStateException("Lifecycle phase: " + name + " does not support current phase: "
-                    + currentPhase + ". Phases supported are: " + StringMessageUtils.toString(supportedPhases));
+                                            + currentPhase + ". Phases supported are: " + StringMessageUtils.toString(supportedPhases));
         }
         boolean fireDefault = true;
         Set called = new HashSet();
@@ -88,7 +94,10 @@ public class LifecyclePhase implements UMOLifecyclePhase
                     {
                         continue;
                     }
-                    if(logger.isDebugEnabled()) logger.debug("lifecycle phase: " + getName() + " for object: " + o);                                    
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("lifecycle phase: " + getName() + " for object: " + o);
+                    }
 
                     applyLifecycle(o);
                     called.add(new Integer(o.hashCode()));
@@ -182,35 +191,44 @@ public class LifecyclePhase implements UMOLifecyclePhase
 
     public void registerSupportedPhase(String phase)
     {
-        if(supportedPhases==null) supportedPhases = new HashSet();
+        if (supportedPhases == null)
+        {
+            supportedPhases = new HashSet();
+        }
         supportedPhases.add(phase);
     }
 
     public boolean isPhaseSupported(String phase)
     {
-        if(getSupportedPhases()==null)
-        {
-            return true;
-        }
-        else if(getSupportedPhases().contains(ALL_PHASES))
+        if (getSupportedPhases() == null)
         {
             return true;
         }
         else
         {
-            return getSupportedPhases().contains(phase);
+            if (getSupportedPhases().contains(ALL_PHASES))
+            {
+                return true;
+            }
+            else
+            {
+                return getSupportedPhases().contains(phase);
+            }
         }
     }
 
     public void applyLifecycle(Object o) throws LifecycleException
     {
-        if(o==null) return;
+        if (o == null)
+        {
+            return;
+        }
 
         if (ignoreType(o.getClass()))
         {
             return;
         }
-        if(!getLifecycleClass().isAssignableFrom(o.getClass()))
+        if (!getLifecycleClass().isAssignableFrom(o.getClass()))
         {
             return;
         }
