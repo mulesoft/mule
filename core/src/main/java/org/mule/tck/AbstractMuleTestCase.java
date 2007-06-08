@@ -302,9 +302,12 @@ public abstract class AbstractMuleTestCase extends TestCase
     {
         try
         {
-            if (managementContext != null)
+            if (managementContext != null && !(managementContext.isDisposed() || managementContext.isDisposing()))
             {
-                FileUtils.deleteTree(FileUtils.newFile(RegistryContext.getConfiguration().getWorkingDirectory()));
+                if (RegistryContext.getRegistry() != null)
+                {
+                    FileUtils.deleteTree(FileUtils.newFile(RegistryContext.getConfiguration().getWorkingDirectory()));
+                }
                 managementContext.dispose();
             }
             FileUtils.deleteTree(FileUtils.newFile("./ActiveMQ"));
