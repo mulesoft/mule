@@ -46,7 +46,7 @@ public class JdbcConnectionTestCase extends AbstractJdbcFunctionalTestCase
         connector = (JdbcConnector)super.createConnector();
         SimpleRetryConnectionStrategy strategy = new SimpleRetryConnectionStrategy();
         strategy.setRetryCount(10);
-        strategy.setFrequency(1000);
+        strategy.setRetryFrequency(1000);
         strategy.setDoThreading(true);
         //TODO RM* URGENT : connector.setConnectionStrategy(strategy);
         return connector;
