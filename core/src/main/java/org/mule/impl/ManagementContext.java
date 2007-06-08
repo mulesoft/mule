@@ -547,8 +547,10 @@ public class ManagementContext implements UMOManagementContext
 
     public void setId(String id)
     {
-        //TODO AP: Some of the management tests require the ID to be set after initialisation.
-        //I don't think this is a good idea if we can help it. Can you take a look at the tests.
+        if (StringUtils.isBlank(id))
+        {
+            throw new IllegalArgumentException("Management Context ID can't be null or empty");
+        }
         checkLifecycleForPropertySet("id", Startable.PHASE_NAME);
         this.id = id;
     }

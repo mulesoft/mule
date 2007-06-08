@@ -78,12 +78,10 @@ public class JmxSupportTestCase extends AbstractMuleJmxTestCase
     {
         JmxAgent jmxAgent = new JmxAgent();
         managementContext.getRegistry().registerAgent(jmxAgent);
-        managementContext.setId(null);
         try
         {
-            managementContext.start();
+            managementContext.setId(null);
             fail("Should have failed.");
-            // TODO rework the exception, not the best one here
         }
         catch (IllegalArgumentException e)
         {
