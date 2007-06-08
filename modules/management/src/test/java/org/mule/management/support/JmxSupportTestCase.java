@@ -30,10 +30,10 @@ public class JmxSupportTestCase extends AbstractMuleJmxTestCase
         ObjectName name = ObjectName.getInstance(testDomain + ":name=TestDuplicates");
         mBeanServer.registerMBean(new StatisticsService(), name);
 
-       managementContext.setId(managerId);
+        managementContext.setId(managerId);
         JmxAgent agent = new JmxAgent();
-       managementContext.getRegistry().registerAgent(agent);
-       managementContext.start();
+        managementContext.getRegistry().registerAgent(agent);
+        managementContext.start();
 
         List domains = Arrays.asList(mBeanServer.getDomains());
         assertTrue("Should have contained an original domain.", domains.contains(testDomain));
@@ -59,10 +59,10 @@ public class JmxSupportTestCase extends AbstractMuleJmxTestCase
         assertEquals("Wrong number of domains created.",
                      numOriginalDomains + 2, mBeanServer.getDomains().length);
 
-       managementContext.setId(managerId);
+        managementContext.setId(managerId);
         JmxAgent agent = new JmxAgent();
-       managementContext.getRegistry().registerAgent(agent);
-       managementContext.start();
+        managementContext.getRegistry().registerAgent(agent);
+        managementContext.start();
 
         List domains = Arrays.asList(mBeanServer.getDomains());
         // one extra domain created by Mule's clash resolution
@@ -77,14 +77,15 @@ public class JmxSupportTestCase extends AbstractMuleJmxTestCase
     public void testDomainNoManagerIdAndJmxAgentMustFail() throws Exception
     {
         JmxAgent jmxAgent = new JmxAgent();
-       managementContext.getRegistry().registerAgent(jmxAgent);
-       managementContext.setId(null);
+        managementContext.getRegistry().registerAgent(jmxAgent);
+        managementContext.setId(null);
         try
         {
-           managementContext.start();
+            managementContext.start();
             fail("Should have failed.");
             // TODO rework the exception, not the best one here
-        } catch (IllegalArgumentException e)
+        }
+        catch (IllegalArgumentException e)
         {
             // this form makes code coverage happier
             assertTrue(true);
