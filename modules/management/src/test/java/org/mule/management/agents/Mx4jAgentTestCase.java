@@ -11,9 +11,6 @@
 package org.mule.management.agents;
 
 import org.mule.management.AbstractMuleJmxTestCase;
-import org.mule.management.support.JmxSupport;
-
-import javax.management.ObjectName;
 
 import mx4j.tools.adaptor.http.HttpAdaptor;
 
@@ -24,11 +21,13 @@ public class Mx4jAgentTestCase extends AbstractMuleJmxTestCase
 {
     public void testRedeploy() throws Exception
     {
-        final String name = JmxSupport.DEFAULT_JMX_DOMAIN_PREFIX +
-                            ".Mx4jAgentTest:" + Mx4jAgent.HTTP_ADAPTER_OBJECT_NAME;
-        mBeanServer.registerMBean(new HttpAdaptor(), ObjectName.getInstance(name));
+        managementContext.setId("Mx4jAgentTest");
+        final String name = jmxSupport.getDomainName(managementContext) +
+                            ":" + Mx4jAgent.HTTP_ADAPTER_OBJECT_NAME;
+        mBeanServer.registerMBean(new HttpAdaptor(), jmxSupport.getObjectName(name));
 
         Mx4jAgent agent = new Mx4jAgent();
+        agent.setManagementContext(managementContext);
         agent.initialise();
     }
 }

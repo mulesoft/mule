@@ -10,6 +10,11 @@
 
 package org.mule.management;
 
+import org.mule.management.support.AutoDiscoveryJmxSupportFactory;
+import org.mule.management.support.JmxSupport;
+import org.mule.management.support.JmxSupportFactory;
+import org.mule.tck.AbstractMuleTestCase;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -19,8 +24,6 @@ import javax.management.MBeanServerFactory;
 import javax.management.ObjectInstance;
 import javax.management.ObjectName;
 
-import org.mule.tck.AbstractMuleTestCase;
-
 /**
  * This base test case will create a new <code>MBean Server</code> if necessary,
  * and will clean up any registered MBeans in its <code>tearDown()</code> method.
@@ -28,6 +31,8 @@ import org.mule.tck.AbstractMuleTestCase;
 public class AbstractMuleJmxTestCase extends AbstractMuleTestCase
 {
     protected MBeanServer mBeanServer;
+    protected JmxSupportFactory jmxSupportFactory = AutoDiscoveryJmxSupportFactory.getInstance();
+    protected JmxSupport jmxSupport = jmxSupportFactory.getJmxSupport(); 
 
     protected void doSetUp() throws Exception
     {
