@@ -29,6 +29,7 @@ public class ImapsConnectorTestCase extends AbstractReceivingMailConnectorTestCa
         ImapsConnector connector = new ImapsConnector();
         connector.setName(getConnectorName());
         connector.setCheckFrequency(POLL_PERIOD_MS);
+        connector.setServiceOverrides(newEmailToStringServiceOverrides());
         connector.setTrustStorePassword("password");
         connector.setTrustStore("greenmail-truststore");
         if (init) 

@@ -11,11 +11,14 @@
 package org.mule.providers.email.connectors;
 
 import org.mule.config.builders.QuickConfigurationBuilder;
+import org.mule.config.MuleProperties;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.umo.UMOEventContext;
+import org.mule.providers.email.transformers.EmailMessageToString;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
@@ -76,6 +79,14 @@ public abstract class AbstractReceivingMailConnectorTestCase extends AbstractMai
 
         logger.debug("waiting for count down");
         assertTrue(countDown.await(WAIT_PERIOD_MS, TimeUnit.MILLISECONDS));
+    }
+
+    protected static Map newEmailToStringServiceOverrides()
+    {
+        Map serviceOverrides = new HashMap();
+        serviceOverrides.put(MuleProperties.CONNECTOR_INBOUND_TRANSFORMER,
+                EmailMessageToString.class.getName());
+        return serviceOverrides;
     }
 
 }

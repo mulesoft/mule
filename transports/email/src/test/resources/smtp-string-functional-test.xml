@@ -8,7 +8,9 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/smtp/2.0 http://www.mulesource.org/schema/mule/smtp/2.0/mule-smtp.xsd">
 
-    <smtp:connector name="smtpConnector"/>
+    <smtp:connector name="smtpConnector">
+        <mule:service-overrides inboundTransformer="org.mule.providers.email.transformers.StringToEmailMessage"/>
+    </smtp:connector>
 
     <bean name="bridge" class="org.mule.components.simple.BridgeComponent"/>
 
@@ -20,7 +22,7 @@
             </mule:inbound-router>
             <mule:outbound-router>
                 <mule:pass-through-router>
-                    <mule:endpoint address="smtp://localhost:65437">
+                    <mule:endpoint address="smtp://localhost:65447">
                         <mule:properties>
                             <prop key="toAddresses">bob@example.com</prop>
                         </mule:properties>

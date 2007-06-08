@@ -10,17 +10,17 @@
 
 package org.mule.providers.email.functional;
 
-public class SmtpFunctionalTestCase extends AbstractEmailFunctionalTestCase
+public class Pop3StringFunctionalTestCase extends AbstractEmailFunctionalTestCase
 {
 
-    public SmtpFunctionalTestCase()
+    public Pop3StringFunctionalTestCase()
     {
-        super(65437, MIME_MESSAGE, "smtp");
+        super(65445, STRING_MESSAGE, "pop3", "pop3-string-functional-test.xml");
     }
 
-    public void testSend() throws Exception
+    public void testReceive() throws Exception
     {
-        doSend();
+        doReceive();
     }
 
 }

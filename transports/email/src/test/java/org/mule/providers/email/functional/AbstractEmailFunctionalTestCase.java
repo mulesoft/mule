@@ -81,7 +81,6 @@ public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase
 
     // @Override
     protected void suitePreSetUp() throws Exception
-//    protected void doPreStartupSetUp() throws Exception
     {
         startServer();
     }
@@ -89,7 +88,6 @@ public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase
 
     // @Override
     protected void suitePreTearDown() throws Exception
-//    protected void doTearDown() throws Exception
     {
         stopServer();
     }

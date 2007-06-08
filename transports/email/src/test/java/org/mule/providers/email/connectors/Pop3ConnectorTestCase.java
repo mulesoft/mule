@@ -10,8 +10,8 @@
 
 package org.mule.providers.email.connectors;
 
-import org.mule.umo.provider.UMOConnector;
 import org.mule.providers.email.Pop3Connector;
+import org.mule.umo.provider.UMOConnector;
 
 /**
  * Simple tests for pulling from a POP3 server.
@@ -29,6 +29,7 @@ public class Pop3ConnectorTestCase extends AbstractReceivingMailConnectorTestCas
         Pop3Connector connector = new Pop3Connector();
         connector.setName(getConnectorName());
         connector.setCheckFrequency(POLL_PERIOD_MS);
+        connector.setServiceOverrides(newEmailToStringServiceOverrides());
         if (init)
         {
             connector.initialise();

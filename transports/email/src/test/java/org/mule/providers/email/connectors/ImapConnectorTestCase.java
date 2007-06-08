@@ -29,6 +29,7 @@ public class ImapConnectorTestCase extends AbstractReceivingMailConnectorTestCas
         ImapConnector connector = new ImapConnector();
         connector.setName(getConnectorName());
         connector.setCheckFrequency(POLL_PERIOD_MS);
+        connector.setServiceOverrides(newEmailToStringServiceOverrides());
         if (init)
         {
             connector.initialise();

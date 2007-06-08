@@ -10,12 +10,15 @@
 
 package org.mule.providers.email.functional;
 
-public class SmtpFunctionalTestCase extends AbstractEmailFunctionalTestCase
+/**
+ * No additional transformers
+ */
+public class SmtpStringFunctionalTestCase extends AbstractEmailFunctionalTestCase
 {
 
-    public SmtpFunctionalTestCase()
+    public SmtpStringFunctionalTestCase()
     {
-        super(65437, MIME_MESSAGE, "smtp");
+        super(65447, STRING_MESSAGE, "smtp", "smtp-string-functional-test.xml");
     }
 
     public void testSend() throws Exception

@@ -29,6 +29,7 @@ public class Pop3sConnectorTestCase extends AbstractReceivingMailConnectorTestCa
         Pop3sConnector connector = new Pop3sConnector();
         connector.setName(getConnectorName());
         connector.setCheckFrequency(POLL_PERIOD_MS);
+        connector.setServiceOverrides(newEmailToStringServiceOverrides());
         connector.setTrustStorePassword("password");
         connector.setTrustStore("greenmail-truststore");
         if (init)
