@@ -26,24 +26,15 @@ import java.util.Properties;
 public class DefaultModelServiceDescriptor extends AbstractServiceDescriptor implements ModelServiceDescriptor
 {
     private String modelClass;
+    private Properties properties;
     
-    public DefaultModelServiceDescriptor(String service, Properties props)
+    public DefaultModelServiceDescriptor(String service, Properties properties)
     {
-        super(service, props);
-
-        modelClass = removeProperty(MuleProperties.MODEL_CLASS);
+        super(service);
+        this.properties = properties;
+        modelClass = removeProperty(MuleProperties.MODEL_CLASS, properties);
     }
 
-    public void setOverrides(Properties props)
-    {
-        if (props == null || props.size() == 0)
-        {
-            return;
-        }
-        
-        modelClass = props.getProperty(MuleProperties.MODEL_CLASS, modelClass);
-    }
-    
     public UMOModel createModel() throws ServiceException
     {
         if (modelClass != null)
@@ -72,5 +63,3 @@ public class DefaultModelServiceDescriptor extends AbstractServiceDescriptor imp
         }
     }
 }
-
-

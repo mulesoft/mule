@@ -43,6 +43,7 @@ public class ServiceDescriptorFactory
         if(overrides!=null)
         {
             serviceFinderClass = (String) props.remove(MuleProperties.SERVICE_FINDER);
+            props.putAll(overrides);
         }
         
         ServiceDescriptor sd = null;
@@ -67,9 +68,6 @@ public class ServiceDescriptorFactory
         {
             throw new ServiceException(CoreMessages.unrecognisedServiceType(type));
         }
-        
-        // Set overrides, if any.
-        sd.setOverrides(overrides);
         
         // If there is a finder service, use it to find the "real" service.
         if (StringUtils.isNotBlank(serviceFinderClass))

@@ -18,11 +18,8 @@ import org.mule.providers.NullPayload;
 import org.mule.registry.AbstractServiceDescriptor;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.UMOTransactionFactory;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.lifecycle.Initialisable;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
@@ -38,7 +35,6 @@ import java.io.OutputStream;
 import java.util.Properties;
 
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanFactory;
 import org.springframework.beans.factory.support.RootBeanDefinition;
@@ -48,24 +44,19 @@ import org.springframework.context.support.StaticApplicationContext;
 /**
  * @inheritDocs
  */
-public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor implements TransportServiceDescriptor, Initialisable
+public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor implements TransportServiceDescriptor
 {
-    private String connector;
-    private String connectorFactory;
-    private String dispatcherFactory;
-    private String transactionFactory;
+
     private String messageAdapter;
     private String streamMessageAdapter;
     private String messageReceiver;
-    private String transactedMessageReceiver;
     private Properties exceptionMappings = new Properties();
-    private Properties servicePorperties;
 
     StaticApplicationContext context;
 
     public DefaultTransportServiceDescriptor(String service, Properties props, ApplicationContext appContext) throws ClassNotFoundException
     {
-        super(service, props);
+        super(service);
 
         if(appContext!=null)
         {
@@ -83,74 +74,24 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         messageAdapter = props.getProperty(MuleProperties.CONNECTOR_MESSAGE_ADAPTER);
         streamMessageAdapter = props.getProperty(MuleProperties.CONNECTOR_STREAM_MESSAGE_ADAPTER);
 
-        registerService(MuleProperties.CONNECTOR_CLASS, null, false);
-        registerService(MuleProperties.CONNECTOR_FACTORY, null, false);
-        registerService(MuleProperties.CONNECTOR_DISPATCHER_FACTORY, null, false);
-        registerService(MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS, null, false);
-        registerService(MuleProperties.CONNECTOR_TRANSACTED_MESSAGE_RECEIVER_CLASS, null, false);
-        registerService(MuleProperties.CONNECTOR_MESSAGE_ADAPTER, null, false);
-        registerService(MuleProperties.CONNECTOR_STREAM_MESSAGE_ADAPTER, null, false);
-        registerService(MuleProperties.CONNECTOR_INBOUND_TRANSFORMER, null, false);
-        registerService(MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER, null, false);
-        registerService(MuleProperties.CONNECTOR_RESPONSE_TRANSFORMER, null, false);
-        registerService(MuleProperties.CONNECTOR_ENDPOINT_BUILDER, null, false);
-        registerService(MuleProperties.CONNECTOR_SESSION_HANDLER, MuleSessionHandler.class, false);
+        registerService(MuleProperties.CONNECTOR_CLASS, null, props);
+        registerService(MuleProperties.CONNECTOR_FACTORY, null, props);
+        registerService(MuleProperties.CONNECTOR_DISPATCHER_FACTORY, null, props);
+        registerService(MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS, null, props);
+        registerService(MuleProperties.CONNECTOR_TRANSACTED_MESSAGE_RECEIVER_CLASS, null, props);
+        registerService(MuleProperties.CONNECTOR_MESSAGE_ADAPTER, null, props);
+        registerService(MuleProperties.CONNECTOR_STREAM_MESSAGE_ADAPTER, null, props);
+        registerService(MuleProperties.CONNECTOR_INBOUND_TRANSFORMER, null, props);
+        registerService(MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER, null, props);
+        registerService(MuleProperties.CONNECTOR_RESPONSE_TRANSFORMER, null, props);
+        registerService(MuleProperties.CONNECTOR_ENDPOINT_BUILDER, null, props);
+        registerService(MuleProperties.CONNECTOR_SESSION_HANDLER, MuleSessionHandler.class, props);
     }
 
 
-    public void initialise() throws InitialisationException
+    protected void registerService(String name, Class defaultService, Properties props) throws ClassNotFoundException
     {
-        //To change body of implemented methods use File | Settings | File Templates.
-        System.out.println("");
-    }
-
-    public void setOverrides(Properties props)
-    {
-        if (props == null || props.size() == 0)
-        {
-            return;
-        }
-        this.properties.putAll(props);
-//        connector = props.getProperty(MuleProperties.CONNECTOR_CLASS, connector);
-//        connectorFactory = props.getProperty(MuleProperties.CONNECTOR_FACTORY, connectorFactory);
-//        dispatcherFactory = props.getProperty(MuleProperties.CONNECTOR_DISPATCHER_FACTORY, dispatcherFactory);
-//        messageReceiver = props.getProperty(MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS, messageReceiver);
-//        transactedMessageReceiver = props.getProperty(
-//            MuleProperties.CONNECTOR_TRANSACTED_MESSAGE_RECEIVER_CLASS, transactedMessageReceiver);
-//        messageAdapter = props.getProperty(MuleProperties.CONNECTOR_MESSAGE_ADAPTER, messageAdapter);
-//
-//        String temp = props.getProperty(MuleProperties.CONNECTOR_INBOUND_TRANSFORMER);
-//        if (temp != null)
-//        {
-//            defaultInboundTransformer = temp;
-//            inboundTransformer = null;
-//        }
-//
-//        temp = props.getProperty(MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER);
-//        if (temp != null)
-//        {
-//            defaultOutboundTransformer = temp;
-//            outboundTransformer = null;
-//        }
-//
-//        temp = props.getProperty(MuleProperties.CONNECTOR_RESPONSE_TRANSFORMER);
-//        if (temp != null)
-//        {
-//            defaultResponseTransformer = temp;
-//            responseTransformer = null;
-//        }
-//
-//        temp = props.getProperty(MuleProperties.CONNECTOR_ENDPOINT_BUILDER);
-//        if (temp != null)
-//        {
-//            endpointBuilder = temp;
-//        }
-    }
-
-
-    protected void registerService(String name, Class defaultService, boolean useFactory) throws ClassNotFoundException
-    {
-        Class serviceClass = removeClassProperty(name);
+        Class serviceClass = removeClassProperty(name, props);
         if(serviceClass==null)
         {
             if(defaultService!=null)
@@ -163,12 +104,6 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
                 logger.debug("No connector service registered for key: " + name + ". No default set either");
             }
         }
-//        if(useFactory && serviceClass!=null)
-//        {
-//
-//            context.getBeanFactory().registerScope();
-//            factory.setServiceClass(serviceClass);
-//        }
         if(serviceClass!=null)
         {
             RootBeanDefinition bd = new RootBeanDefinition(serviceClass, false);
@@ -181,6 +116,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         }
 
     }
+
     /* (non-Javadoc)
      * @see org.mule.providers.service.TransportServiceDescriptor#createMessageAdapter(java.lang.Object)
      */
@@ -267,6 +203,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         }
 
     }
+
     /* (non-Javadoc)
      * @see org.mule.providers.service.TransportServiceDescriptor#createSessionHandler()
      */
@@ -295,15 +232,6 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
                                                     Object[] args) throws UMOException
     {
         String receiverClass = messageReceiver;
-
-        if (endpoint.getTransactionConfig() != null
-            && endpoint.getTransactionConfig().getAction() != UMOTransactionConfig.ACTION_NONE)
-        {
-            if (transactedMessageReceiver != null)
-            {
-                receiverClass = transactedMessageReceiver;
-            }
-        }
 
         if (receiverClass != null)
         {
@@ -407,8 +335,8 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         }
         catch (Exception e)
         {
-            throw new TransportServiceException(CoreMessages.failedToCreateObjectWith("Connector",
-                connector), e);
+            throw new TransportServiceException(
+                    CoreMessages.failedToCreateObjectWith("Connector", null), e);
 
         }
 
@@ -510,53 +438,4 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         return this.exceptionMappings;
     }
 
-    private class ServiceFactoryBean implements FactoryBean
-    {
-
-        private Object[] constructorArgs;
-        private Class serviceClass;
-
-
-        public Object getObject() throws Exception
-        {
-            if(getConstructorArgs()==null)
-            {
-                throw new IllegalStateException("Constructir Args not set");
-            }
-            Object o = ClassUtils.instanciateClass(serviceClass, constructorArgs);
-            setConstructorArgs(null);
-            return o;
-        }
-
-        public Class getObjectType()
-        {
-            return UMOMessageAdapter.class;
-        }
-
-        public boolean isSingleton()
-        {
-            return false;
-        }
-
-
-        public Object[] getConstructorArgs()
-        {
-            return constructorArgs;
-        }
-
-        public void setConstructorArgs(Object[] constructorArgs)
-        {
-            this.constructorArgs = constructorArgs;
-        }
-
-        public Class getServiceClass()
-        {
-            return serviceClass;
-        }
-
-        public void setServiceClass(Class serviceClass)
-        {
-            this.serviceClass = serviceClass;
-        }
-    }
 }

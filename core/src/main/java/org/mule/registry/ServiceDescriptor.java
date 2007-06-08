@@ -10,18 +10,14 @@
 
 package org.mule.registry;
 
-import java.util.Properties;
-
-
-
 /**
  * Parent interface for any pluggable service in Mule (transport, model, etc.)
  */
 public interface ServiceDescriptor
 {
+
     public String getService();
-    
-    public void setOverrides(Properties props);
+
 }
 
 

@@ -11,38 +11,35 @@
 package org.mule.registry;
 
 import org.mule.util.ClassUtils;
+import org.mule.util.StringUtils;
 
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public abstract class AbstractServiceDescriptor implements ServiceDescriptor
 {
+
     /**
      * logger used by this class
      */
     protected final Log logger = LogFactory.getLog(getClass());
 
-    protected Properties properties;
     protected String service;
 
-    public AbstractServiceDescriptor(String service, Properties props)
+    public AbstractServiceDescriptor(String service)
     {
         this.service = service;
-        this.properties = props;
     }
-
-    public abstract void setOverrides(Properties props);
 
     public String getService()
     {
         return service;
     }
 
-    protected String removeProperty(String name)
+    protected String removeProperty(String name, Properties properties)
     {
         String temp = (String)properties.remove(name);
         if (StringUtils.isEmpty(StringUtils.trim(temp)))
@@ -55,21 +52,24 @@ public abstract class AbstractServiceDescriptor implements ServiceDescriptor
         }
     }
 
-    protected Class removeClassProperty(String name) throws ClassNotFoundException
+    protected Class removeClassProperty(String name, Properties properties) throws ClassNotFoundException
     {
-        String clazz = removeProperty(name);
+        String clazz = removeProperty(name, properties);
         if(clazz==null) return null;
-        
+
         return ClassUtils.loadClass(clazz, getClass());
     }
 
-    
+
 
     /**
-     * Unique key used to cache the service descriptors.
+     * Unique key used to cache the service descriptors.  This uses the service and the
+     * overrides, but since it is generated externally by the factory that instantiates
+     * the service descriptor we do not need to keep overrides or properties anywhere else.
      */
     public static class Key
     {
+        
         private final Map overrides;
         private final String service;
 
@@ -111,6 +111,7 @@ public abstract class AbstractServiceDescriptor implements ServiceDescriptor
             return 29 * (overrides != null ? overrides.hashCode() : 0) + (service!=null ? service.hashCode(): 0);
         }
     }
+
 }
 
 
