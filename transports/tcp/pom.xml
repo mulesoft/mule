@@ -21,6 +21,7 @@
                      <excludes>
                          <exclude>**/MuleMessageProtocolChunkingTestCase.*</exclude>
                          <exclude>**/SynchStreamingMule1687TestCase.*</exclude>
+                         <exclude>**/AsynchMule1869TestCase.*</exclude>
                      </excludes>
                  </configuration>
              </plugin>
