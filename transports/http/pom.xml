@@ -24,8 +24,6 @@
                          <!-- waiting on MULE-1843 -->
                          <exclude>**/HttpPollingFunctionalTestCase.*</exclude>
                          <exclude>**/PollingReceiversRestartTestCase.*</exclude>
-                         <!-- waiting on MULE-1881 -->
-                         <exclude>**/RestEndpointMule1881TestCase.*</exclude>
                      </excludes>
                  </configuration>
              </plugin>
