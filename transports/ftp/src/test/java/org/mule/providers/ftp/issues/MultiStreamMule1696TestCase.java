@@ -68,7 +68,7 @@ public class MultiStreamMule1696TestCase extends AbstractFtpServerTestCase
         UMOModel model = managementContext.getRegistry().lookupModel("main");
         FunctionalStreamingTestComponent ftc =
                 (FunctionalStreamingTestComponent) model.getComponent("testComponent").getInstance();
-//        assertNotNull(ftc);
+        assertNotNull(ftc);
 //        assertEquals(1, ftc.getNumber());
 
         CountDownLatch latch = new CountDownLatch(1);
