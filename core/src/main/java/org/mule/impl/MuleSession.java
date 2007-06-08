@@ -438,14 +438,14 @@ public final class MuleSession implements UMOSession
         }
 
         // Use default transformer if none is set
-//        if (endpoint.getTransformer() == null && endpoint instanceof UMOEndpoint)
-//        {
-//            if (endpoint.getConnector() instanceof AbstractConnector)
-//            {
-//                ((UMOEndpoint)endpoint).setTransformer(((AbstractConnector) endpoint.getConnector()).getDefaultOutboundTransformer());
-//                logger.debug("Using default connector outbound transformer: " + endpoint.getTransformer());
-//            }
-//        }
+        if (endpoint.getTransformer() == null && endpoint instanceof UMOEndpoint)
+        {
+            if (endpoint.getConnector() instanceof AbstractConnector)
+            {
+                ((UMOEndpoint)endpoint).setTransformer(((AbstractConnector) endpoint.getConnector()).getDefaultOutboundTransformer());
+                logger.debug("Using default connector outbound transformer: " + endpoint.getTransformer());
+            }
+        }
         try
         {
             UMOEvent event;
