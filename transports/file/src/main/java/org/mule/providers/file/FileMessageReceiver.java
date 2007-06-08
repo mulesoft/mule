@@ -60,7 +60,8 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                                String moveToPattern,
                                long frequency) throws InitialisationException
     {
-        super(connector, component, endpoint, frequency);
+        super(connector, component, endpoint);
+        this.setFrequency(frequency);
 
         this.readDir = readDir;
         this.moveDir = moveDir;

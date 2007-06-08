@@ -51,7 +51,7 @@ import org.apache.commons.lang.StringUtils;
  */
 
 public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver
-implements MessageCountListener, Startable, Stoppable
+    implements MessageCountListener, Startable, Stoppable
 {
     private Folder folder = null;
     private String backupFolder = null;
@@ -63,9 +63,9 @@ implements MessageCountListener, Startable, Stoppable
                                    String backupFolder) 
     throws InitialisationException
     {
-        super(connector, component, endpoint, checkFrequency);
+        super(connector, component, endpoint);
         this.backupFolder = backupFolder;
-        this.connector = (AbstractRetrieveMailConnector) connector;
+        this.setFrequency(checkFrequency);
     }
 
     private AbstractRetrieveMailConnector castConnector()

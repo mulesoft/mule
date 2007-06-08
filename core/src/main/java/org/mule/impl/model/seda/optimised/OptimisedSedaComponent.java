@@ -16,9 +16,8 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.ObjectPool;
 
 /**
- * A Seda component runs inside a Seda Model and is responsible for managing a Seda
- * Queue and thread pool for a Mule sevice component. In Seda terms this is
- * equivalent to a stage.
+ * Same as <code>SedaComponent</code> except that it assumes that components implement the Callable 
+ * interface and therefore does away with the reflection and introspection on objects.
  */
 public class OptimisedSedaComponent extends SedaComponent
 {

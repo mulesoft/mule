@@ -26,6 +26,11 @@ public class ManagementMessages extends MessageFactory
     {
         return createMessage(BUNDLE_PATH, 2);
     }
+
+    public static Message noMBeanServerAvailable()
+    {
+        return createMessage(BUNDLE_PATH, 3);
+    }
 }
 
 

@@ -20,6 +20,7 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 import java.util.Iterator;
 import java.util.List;
@@ -34,42 +35,69 @@ import javax.resource.spi.work.Work;
 public abstract class TransactedPollingMessageReceiver extends AbstractPollingMessageReceiver
 {
     /** determines whether messages will be received in a transaction template */
-    protected boolean receiveMessagesInTransaction = true;
+    private boolean receiveMessagesInTransaction = true;
 
     /** determines whether Multiple receivers are created to improve throughput */
-    protected boolean useMultipleReceivers = true;
+    private boolean useMultipleReceivers = true;
 
+    public TransactedPollingMessageReceiver(UMOConnector connector,
+                                            UMOComponent component,
+                                            final UMOEndpoint endpoint) throws InitialisationException
+    {
+        super(connector, component, endpoint);
+        this.setReceiveMessagesInTransaction(endpoint.getTransactionConfig().getFactory() != null);
+    }
+
+    /**
+     * @deprecated please use
+     *             {@link #TransactedPollingMessageReceiver(UMOConnector, UMOComponent, UMOEndpoint, long, TimeUnit)}
+     *             instead
+     */
     public TransactedPollingMessageReceiver(UMOConnector connector,
                                             UMOComponent component,
                                             final UMOEndpoint endpoint,
                                             long frequency) throws InitialisationException
     {
-        super(connector, component, endpoint, frequency);
-
-        if (endpoint.getTransactionConfig().getFactory() != null)
-        {
-            receiveMessagesInTransaction = true;
-        }
-        else
-        {
-            receiveMessagesInTransaction = false;
-        }
+        this(connector, component, endpoint);
+        this.setFrequency(frequency);
     }
 
+    public boolean isReceiveMessagesInTransaction()
+    {
+        return receiveMessagesInTransaction;
+    }
+
+    public void setReceiveMessagesInTransaction(boolean useTx)
+    {
+        receiveMessagesInTransaction = useTx;
+    }
+
+    public boolean isUseMultipleTransactedReceivers()
+    {
+        return useMultipleReceivers;
+    }
+
+    public void setUseMultipleTransactedReceivers(boolean useMultiple)
+    {
+        useMultipleReceivers = useMultiple;
+    }
+
+    // @Override
     public void doStart() throws UMOException
     {
         // Connector property overrides any implied value
-        useMultipleReceivers = connector.isCreateMultipleTransactedReceivers();
-        ThreadingProfile tp = connector.getReceiverThreadingProfile();
+        this.setUseMultipleTransactedReceivers(connector.isCreateMultipleTransactedReceivers());
 
-        if (useMultipleReceivers && receiveMessagesInTransaction && tp.isDoThreading())
+        ThreadingProfile tp = connector.getReceiverThreadingProfile();
+        int numReceiversToStart = 1;
+
+        if (this.isReceiveMessagesInTransaction() && this.isUseMultipleTransactedReceivers()
+                        && tp.isDoThreading())
         {
-            for (int i = 0; i < connector.getNumberOfConcurrentTransactedReceivers(); i++)
-            {
-                super.doStart();
-            }
+            numReceiversToStart = connector.getNumberOfConcurrentTransactedReceivers();
         }
-        else
+
+        for (int i = 0; i < numReceiversToStart; i++)
         {
             super.doStart();
         }
@@ -80,7 +108,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
         TransactionTemplate tt = new TransactionTemplate(endpoint.getTransactionConfig(),
             connector.getExceptionListener(), connector.getManagementContext());
 
-        if (receiveMessagesInTransaction)
+        if (this.isReceiveMessagesInTransaction())
         {
             // Receive messages and process them in a single transaction
             // Do not enable threading here, but several workers
@@ -113,7 +141,8 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
                 {
                     try
                     {
-                        this.getWorkManager().scheduleWork(new MessageProcessorWorker(tt, countdown, it.next()));
+                        this.getWorkManager().scheduleWork(
+                            new MessageProcessorWorker(tt, countdown, it.next()));
                     }
                     catch (Exception e)
                     {

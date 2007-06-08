@@ -16,12 +16,11 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 
 /**
- * A Mule component service model that uses Seda principles to achieve high
- * throughput by queueing events for components and processing them concurrently.
+ * Same as <code>SedaModel</code> except that it assumes that components implement the Callable 
+ * interface and therefore does away with the reflection and introspection on objects.
  */
 public class OptimisedSedaModel extends SedaModel
 {
-
     /**
      * Returns the model type name. This is a friendly identifier that is used to
      * look up the SPI class for the model

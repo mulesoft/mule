@@ -46,22 +46,14 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
                                       UMOComponent component,
                                       final UMOEndpoint endpoint) throws InitialisationException
     {
-        this(connector, component, endpoint, AbstractPollingMessageReceiver.DEFAULT_POLL_FREQUENCY);
+        super(connector, component, endpoint);
 
         long pollingFrequency = MapUtils.getLongValue(endpoint.getProperties(), "pollingFrequency",
             -1);
         if (pollingFrequency > 0)
         {
-            setFrequency(pollingFrequency);
+            this.setFrequency(pollingFrequency);
         }
-    }
-
-    public PollingHttpMessageReceiver(UMOConnector connector,
-                                      UMOComponent component,
-                                      final UMOEndpoint endpoint,
-                                      long frequency) throws InitialisationException
-    {
-        super(connector, component, endpoint, frequency);
 
         try
         {

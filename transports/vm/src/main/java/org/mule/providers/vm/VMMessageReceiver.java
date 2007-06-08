@@ -13,7 +13,6 @@ package org.mule.providers.vm;
 import org.mule.MuleException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleMessage;
-import org.mule.providers.AbstractPollingMessageReceiver;
 import org.mule.providers.TransactedPollingMessageReceiver;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
@@ -25,23 +24,31 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueSession;
 
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 import java.util.List;
 
 /**
- * <code>VMMessageReceiver</code> is a listener of events from a mule component
+ * <code>VMMessageReceiver</code> is a listener for events from a Mule component
  * which then simply passes the events on to the target component.
  */
 public class VMMessageReceiver extends TransactedPollingMessageReceiver
 {
+    public static final long DEFAULT_VM_POLL_FREQUENCY = 1;
+    public static final TimeUnit DEFAULT_VM_POLL_TIMEUNIT = TimeUnit.NANOSECONDS;
+
     private VMConnector connector;
     private final Object lock = new Object();
 
     public VMMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
         throws InitialisationException
     {
-        super(connector, component, endpoint, AbstractPollingMessageReceiver.DEFAULT_POLL_FREQUENCY);
-        this.connector = (VMConnector)connector;
-        super.receiveMessagesInTransaction = endpoint.getTransactionConfig().isTransacted();
+        super(connector, component, endpoint);
+        // compare with superclass' implementation - is this really correct?
+        this.setReceiveMessagesInTransaction(endpoint.getTransactionConfig().isTransacted());
+        this.setFrequency(DEFAULT_VM_POLL_FREQUENCY);
+        this.setTimeUnit(DEFAULT_VM_POLL_TIMEUNIT);
+        this.connector = (VMConnector) connector;
     }
 
     protected void doDispose()
@@ -59,7 +66,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
             if (logger.isDebugEnabled())
             {
                 logger.debug("Current queue depth for queue: " + endpoint.getEndpointURI().getAddress()
-                             + " is: " + q.size());
+                                + " is: " + q.size());
             }
         }
     }
@@ -86,8 +93,8 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
             }
             catch (InterruptedException e)
             {
-                throw new MuleException(
-                    CoreMessages.interruptedQueuingEventFor(this.endpoint.getEndpointURI()), e);
+                throw new MuleException(CoreMessages.interruptedQueuingEventFor(this.endpoint
+                    .getEndpointURI()), e);
             }
         }
         else
@@ -102,15 +109,15 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
 
     public Object onCall(UMOEvent event) throws UMOException
     {
-        return routeMessage(new MuleMessage(event.getTransformedMessage(), event.getMessage()),
-            event.isSynchronous());
+        return routeMessage(new MuleMessage(event.getTransformedMessage(), event.getMessage()), event
+            .isSynchronous());
     }
 
     protected List getMessages() throws Exception
     {
         QueueSession qs = connector.getQueueSession();
         Queue queue = qs.getQueue(endpoint.getEndpointURI().getAddress());
-        UMOEvent event = (UMOEvent)queue.poll(connector.getQueueTimeout());
+        UMOEvent event = (UMOEvent) queue.poll(connector.getQueueTimeout());
         if (event != null)
         {
             routeMessage(new MuleMessage(event.getTransformedMessage(), event.getMessage()));

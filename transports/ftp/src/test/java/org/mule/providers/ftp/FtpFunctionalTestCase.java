@@ -17,7 +17,7 @@ import org.mule.providers.ftp.server.NamedPayload;
 import java.util.HashMap;
 import java.util.Map;
 
-public class FtpFunctionalTestCase extends BaseServerTestCase
+public class FtpFunctionalTestCase extends AbstractFtpServerTestCase
 {
 
     private static int PORT = 60198;

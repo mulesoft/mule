@@ -30,7 +30,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
  * a through a streaming bridge to the test server, then pull it back again (again,
  * through the streaming model).
  */
-public class FtpStreamingTestCase extends BaseServerTestCase
+public class FtpStreamingTestCase extends AbstractFtpServerTestCase
 {
 
     private static int PORT = 60197;

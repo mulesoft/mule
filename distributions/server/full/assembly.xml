@@ -86,6 +86,9 @@ Assembly descriptor for the full Mule distribution.
             <exclude>**/target/**</exclude> 
             <exclude>**/dist/**</exclude>
             <exclude>**/.*/**</exclude>
+            <exclude>**/*.iml</exclude>
+            <exclude>**/*.ipr</exclude>
+            <exclude>**/*.iws</exclude>
         </excludes>
     </fileSet>
 

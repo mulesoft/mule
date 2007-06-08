@@ -15,24 +15,29 @@ import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
 
+import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.text.MessageFormat;
 
 /**
- * A configurable message transformer that allows users to add, overwrite and delete properties on the current message.
- * Users can set a {@link Set} of 'deleteProperties' names to remove from the message and can also set a {@link Map} of
- * 'addProperties' that will be added to the message and possibly overwrite existing properties with the same name.
- * <p/>
- * If {@link #overwrite} is set to {@code false}, and a property exists on the message (even if the value is {@code
- * null}, it will be left intact. The transformer then acts as a more gentle 'enricher'. Default setting is {@code true}.
+ * A configurable message transformer that allows users to add, overwrite and delete
+ * properties on the current message. Users can set a {@link List} of
+ * 'deleteProperties' names to remove from the message and can also set a {@link Map}
+ * of 'addProperties' that will be added to the message and possibly overwrite
+ * existing properties with the same name.
+ * <p>
+ * If {@link #overwrite} is set to <code>false</code>, and a property exists on
+ * the message (even if the value is <code>null</code>, it will be left intact.
+ * The transformer then acts as a more gentle 'enricher'. The default setting is
+ * <code>true</code>.
  */
 public class MessagePropertiesTransformer extends AbstractEventAwareTransformer
 {
-    private Set deleteProperties = null;
+    private List deleteProperties = null;
     private Map addProperties = null;
     private boolean overwrite = true;
 
@@ -49,7 +54,7 @@ public class MessagePropertiesTransformer extends AbstractEventAwareTransformer
 
         if (deleteProperties != null)
         {
-            clone.setDeleteProperties(new HashSet(deleteProperties));
+            clone.setDeleteProperties(new ArrayList(deleteProperties));
         }
 
         if (addProperties != null)
@@ -63,12 +68,12 @@ public class MessagePropertiesTransformer extends AbstractEventAwareTransformer
     public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
     {
         final UMOMessage message = context.getMessage();
+
         if (deleteProperties != null && deleteProperties.size() > 0)
         {
             for (Iterator iterator = deleteProperties.iterator(); iterator.hasNext();)
             {
-                Object o = iterator.next();
-                message.removeProperty(o.toString());
+                message.removeProperty(iterator.next().toString());
             }
         }
 
@@ -117,12 +122,12 @@ public class MessagePropertiesTransformer extends AbstractEventAwareTransformer
         return src;
     }
 
-    public Set getDeleteProperties()
+    public List getDeleteProperties()
     {
         return deleteProperties;
     }
 
-    public void setDeleteProperties(Set deleteProperties)
+    public void setDeleteProperties(List deleteProperties)
     {
         this.deleteProperties = deleteProperties;
     }

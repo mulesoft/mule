@@ -63,8 +63,8 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
     private static final long serialVersionUID = 7711976708670893015L;
 
     /**
-     * A pool of available Mule Proxies. Component pooling has been disabled on the
-     * SEDAModel, this pool will be null anf the 'componentProxy' will be used.
+     * A pool of available Mule proxies. If component pooling has been disabled on the
+     * SEDAModel, this pool will be null and the 'componentProxy' will be used.
      */
     protected ObjectPool proxyPool;
 
@@ -392,22 +392,7 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
         MuleProxy proxy = null;
         try
         {
-            if (proxyPool != null)
-            {
-                proxy = (MuleProxy) proxyPool.borrowObject();
-                ((SedaComponentStatistics) getStatistics()).setComponentPoolSize(proxyPool.getSize());
-            }
-            else if (componentPerRequest)
-            {
-                proxy = createComponentProxy();
-            }
-            else
-            {
-                proxy = componentProxy;
-            }
-
-            proxy.setStatistics(getStatistics());
-
+            proxy = getProxy();
             if (logger.isDebugEnabled())
             {
                 logger.debug(this + " : got proxy for " + event.getId() + " = " + proxy);
@@ -508,21 +493,7 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
                                         + event.getEndpoint().getEndpointURI());
                     }
 
-                    if (proxyPool != null)
-                    {
-                        proxy = (MuleProxy) proxyPool.borrowObject();
-                        ((SedaComponentStatistics) getStatistics()).setComponentPoolSize(proxyPool.getSize());
-                    }
-                    else if (componentPerRequest)
-                    {
-                        proxy = createComponentProxy();
-                    }
-                    else
-                    {
-                        proxy = componentProxy;
-                    }
-
-                    proxy.setStatistics(getStatistics());
+                    proxy = getProxy();
                     proxy.start();
                     proxy.onEvent(queueSession, event);
                     workManager.scheduleWork(proxy, WorkManager.INDEFINITE, null, this);
@@ -587,6 +558,29 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
         }
     }
 
+    /**
+     * The proxy may be one of three types: 1. pooled 2. not pooled 3. per-request
+     */
+    protected MuleProxy getProxy() throws Exception
+    {
+        MuleProxy proxy;
+        if (proxyPool != null)
+        {
+            proxy = (MuleProxy) proxyPool.borrowObject();
+            ((SedaComponentStatistics) getStatistics()).setComponentPoolSize(proxyPool.getSize());
+        }
+        else if (componentPerRequest)
+        {
+            proxy = createComponentProxy();
+        }
+        else
+        {
+            proxy = componentProxy;
+        }
+        proxy.setStatistics(getStatistics());
+        return proxy;
+    }
+    
     public void release()
     {
         stopping.set(false);

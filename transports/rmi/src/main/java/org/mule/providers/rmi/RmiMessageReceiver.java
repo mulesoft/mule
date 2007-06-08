@@ -50,8 +50,8 @@ public class RmiMessageReceiver extends AbstractPollingMessageReceiver
                               UMOEndpoint endpoint,
                               long frequency) throws InitialisationException
     {
-        super(connector, component, endpoint, frequency);
-
+        super(connector, component, endpoint);
+        this.setFrequency(frequency);
         this.connector = (RmiConnector)connector;
     }
 

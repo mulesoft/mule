@@ -14,11 +14,13 @@ import org.mule.impl.MuleMessage;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOEventContext;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 public class MessagePropertiesTransformerTestCase extends AbstractMuleTestCase
 {
+
     public void testOverwriteFlagEnabledByDefault() throws Exception
     {
         MessagePropertiesTransformer t = new MessagePropertiesTransformer();
@@ -58,4 +60,21 @@ public class MessagePropertiesTransformerTestCase extends AbstractMuleTestCase
 
         assertEquals("originalValue", transformed.getProperty("addedProperty"));
     }
+
+    public void testDelete() throws Exception
+    {
+        MessagePropertiesTransformer t = new MessagePropertiesTransformer();
+        t.setDeleteProperties(Collections.singletonList("badProperty"));
+
+        MuleMessage msg = new MuleMessage("message");
+        msg.setProperty("badProperty", "badValue");
+        UMOEventContext ctx = getTestEventContext(msg);
+        MuleMessage transformed = (MuleMessage) t.transform(msg, null, ctx);
+        assertSame(msg, transformed);
+        assertEquals(msg.getUniqueId(), transformed.getUniqueId());
+        assertEquals(msg.getPayload(), transformed.getPayload());
+        assertEquals(msg.getPropertyNames(), transformed.getPropertyNames());
+        assertFalse(transformed.getPropertyNames().contains("badValue"));
+    }
+
 }

@@ -22,8 +22,8 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
-import org.mule.util.MapUtils;
 import org.mule.util.ClassUtils;
+import org.mule.util.MapUtils;
 
 import java.util.List;
 
@@ -32,7 +32,6 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.Session;
-import javax.jms.Topic;
 
 public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiver
 {
@@ -68,12 +67,13 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
         }
     }
 
-    public TransactedJmsMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
+    public TransactedJmsMessageReceiver(UMOConnector umoConnector, UMOComponent component, UMOEndpoint endpoint)
         throws InitialisationException
     {
-        // TODO AP: check how frequency=0 works with the scheduler, see setFrequency(long)
-        super(connector, component, endpoint, 0);
-        this.connector = (JmsConnector)connector;
+        // TODO AP: find appropriate value for polling frequency with the scheduler;
+        // see setFrequency/setTimeUnit & VMMessageReceiver for more
+        super(umoConnector, component, endpoint);
+        this.connector = (JmsConnector) umoConnector;
         this.timeout = endpoint.getTransactionConfig().getTimeout();
 
         // If reconnection is set, default reuse strategy to false
@@ -84,6 +84,7 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
             this.reuseConsumer = true;
             this.reuseSession = true;
         }
+
         // User may override reuse strategy if necessary
         this.reuseConsumer = MapUtils.getBooleanValue(endpoint.getProperties(), "reuseConsumer",
             this.reuseConsumer);
@@ -94,13 +95,11 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
         // if we are in transactional mode.
         // If true, set receiveMessagesInTransaction to true.
         // It will start multiple threads, depending on the threading profile.
-        String resourceInfo = endpoint.getEndpointURI().getResourceInfo();
-        boolean topic = (resourceInfo != null && "topic".equalsIgnoreCase(resourceInfo));
+        final boolean topic = connector.getTopicResolver().isTopic(endpoint);
 
-        // If we're using topics We dont want to use multiple receivers as we'll get
-        // the same message
-        // multiple times
-        useMultipleReceivers = !topic;
+        // If we're using topics we don't want to use multiple receivers as we'll get
+        // the same message multiple times
+        this.setUseMultipleTransactedReceivers(!topic);
 
         try
         {
@@ -180,7 +179,7 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.providers.TransactionEnabledPollingMessageReceiver#getMessages()
      */
     protected List getMessages() throws Exception
@@ -263,7 +262,7 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.providers.TransactionEnabledPollingMessageReceiver#processMessage(java.lang.Object)
      */
     protected void processMessage(Object msg) throws Exception
@@ -312,8 +311,7 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
             }
 
             // Create destination
-            String resourceInfo = endpoint.getEndpointURI().getResourceInfo();
-            boolean topic = (resourceInfo != null && "topic".equalsIgnoreCase(resourceInfo));
+            final boolean topic = connector.getTopicResolver().isTopic(endpoint);
             Destination dest = jmsSupport.createDestination(ctx.session, endpoint.getEndpointURI()
                 .getAddress(), topic);
 
@@ -338,9 +336,7 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
 
             // Get the durable subscriber name if there is one
             String durableName = (String)endpoint.getProperties().get("durableName");
-            // TODO AP: to be replaced with a more intelligent topic detection,
-            // instanceof does not always work as needed
-            if (durableName == null && durable && dest instanceof Topic)
+            if (durableName == null && durable && topic)
             {
                 durableName = "mule." + connector.getName() + "." + endpoint.getEndpointURI().getAddress();
                 logger.debug("Jms Connector for this receiver is durable but no durable name has been specified. Defaulting to: "
