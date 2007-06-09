@@ -14,7 +14,6 @@ import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleSessionHandler;
 import org.mule.impl.endpoint.EndpointBuilder;
-import org.mule.providers.AbstractConnector;
 import org.mule.providers.NullPayload;
 import org.mule.registry.AbstractServiceDescriptor;
 import org.mule.umo.UMOComponent;
@@ -306,20 +305,20 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
      */
     public UMOConnector createConnector() throws TransportServiceException
     {
-        AbstractConnector newConnector;
+        UMOConnector newConnector;
         // if there is a factory, use it
         try
         {
             if (context.containsBean(MuleProperties.CONNECTOR_FACTORY))
             {
                 ObjectFactory factory = (ObjectFactory)context.getBean(MuleProperties.CONNECTOR_FACTORY);
-                newConnector = (AbstractConnector)factory.create();
+                newConnector = (UMOConnector)factory.create();
             }
             else
             {
                 if (context.containsBean(MuleProperties.CONNECTOR_CLASS))
                 {
-                    newConnector = (AbstractConnector)context.getBean(MuleProperties.CONNECTOR_CLASS);
+                    newConnector = (UMOConnector)context.getBean(MuleProperties.CONNECTOR_CLASS);
                 }
                 else
                 {
