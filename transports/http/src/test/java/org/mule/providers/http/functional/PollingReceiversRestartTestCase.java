@@ -39,7 +39,7 @@ public class PollingReceiversRestartTestCase extends AbstractMuleTestCase
         AtomicInteger pollCounter = new AtomicInteger(0);
         ftc.setEventCallback(new CounterCallback(pollCounter));
 
-       managementContext.start();
+        managementContext.start();
         // should be enough to poll for 2 messages
         Thread.sleep(WAIT_TIME);
 
@@ -55,7 +55,6 @@ public class PollingReceiversRestartTestCase extends AbstractMuleTestCase
 
         Thread.sleep(WAIT_TIME);
         managementContext.dispose();
-        //manager.dispose();
         assertTrue("No polls performed", pollCounter.get() > 0);
     }
 
