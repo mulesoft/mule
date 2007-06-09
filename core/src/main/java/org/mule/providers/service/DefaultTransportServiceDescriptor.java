@@ -14,6 +14,7 @@ import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleSessionHandler;
 import org.mule.impl.endpoint.EndpointBuilder;
+import org.mule.providers.AbstractConnector;
 import org.mule.providers.NullPayload;
 import org.mule.registry.AbstractServiceDescriptor;
 import org.mule.umo.UMOComponent;
@@ -68,6 +69,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         else
         {
             context = new StaticApplicationContext();
+
         }
 
         messageReceiver = props.getProperty(MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS);
@@ -107,11 +109,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         if(serviceClass!=null)
         {
             RootBeanDefinition bd = new RootBeanDefinition(serviceClass, false);
-           // bd.setInitMethodName("initialise");
-            bd.setDestroyMethodName("dispose");
             bd.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-            bd.setEnforceDestroyMethod(false);
-            //bd.setEnforceInitMethod(false);
             context.registerBeanDefinition(name, bd);
         }
 
@@ -308,20 +306,20 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
      */
     public UMOConnector createConnector() throws TransportServiceException
     {
-        UMOConnector newConnector;
+        AbstractConnector newConnector;
         // if there is a factory, use it
         try
         {
             if (context.containsBean(MuleProperties.CONNECTOR_FACTORY))
             {
                 ObjectFactory factory = (ObjectFactory)context.getBean(MuleProperties.CONNECTOR_FACTORY);
-                newConnector = (UMOConnector)factory.create();
+                newConnector = (AbstractConnector)factory.create();
             }
             else
             {
                 if (context.containsBean(MuleProperties.CONNECTOR_CLASS))
                 {
-                    newConnector = (UMOConnector)context.getBean(MuleProperties.CONNECTOR_CLASS);
+                    newConnector = (AbstractConnector)context.getBean(MuleProperties.CONNECTOR_CLASS);
                 }
                 else
                 {
