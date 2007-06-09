@@ -43,12 +43,12 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
     protected void doSetUp() throws Exception
     {
         model = managementContext.getRegistry().lookupModel(UMOModel.DEFAULT_MODEL_NAME);
+        managementContext.start();
     }
 
     // @Override
     protected void doTearDown() throws Exception
     {
-        managementContext.stop();
         managerStopped.set(true);
         managerStoppedEvents.set(0);
     }
@@ -111,7 +111,6 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
         model.registerComponent(getTestDescriptor("component2", Apple.class.getName()));
         model.registerComponent(getTestDescriptor("component1", Apple.class.getName()));
 
-        managementContext.start();
         // Wait for the notifcation event to be fired as they are queue
         latch.await(20000, TimeUnit.MILLISECONDS);
         assertEquals(1, componentStartedCount.get());
@@ -192,7 +191,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
        managementContext.fireNotification(new DummyNotification(" quick brown", DummyNotification.EVENT_RECEIVED));
 
         // Wait for the notifcation event to be fired as they are queue
-        latch.await(2000, TimeUnit.MILLISECONDS);
+        latch.await(20000, TimeUnit.MILLISECONDS);
         assertEquals(2, customNotificationCount.get());
     }
 
