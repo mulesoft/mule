@@ -16,8 +16,8 @@ import org.mule.config.i18n.Message;
 import org.mule.impl.MuleShutdownHook;
 import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
-import org.mule.util.SystemUtils;
 import org.mule.util.StringMessageUtils;
+import org.mule.util.SystemUtils;
 
 import java.net.URL;
 import java.util.Collections;
@@ -104,19 +104,19 @@ public class MuleServer implements Runnable
     public static void main(String[] args) throws Exception
     {
         MuleServer server = new MuleServer(args);
-        muleShutdownHook = new MuleShutdownHook(logger);
         server.start(false, true);
 
     }
 
     public MuleServer()
     {
-        this(new String[0]);
+        init(new String[]{});
     }
 
     public MuleServer(String configResources)
     {
-        setConfigurationResources(configResources);
+        //setConfigurationResources(configResources);
+        init(new String[]{"-config", configResources});
     }
 
     /**
@@ -124,10 +124,17 @@ public class MuleServer implements Runnable
      */
     public MuleServer(String[] args) throws IllegalArgumentException
     {
+        init(args);
+    }
+
+    protected void init(String[] args) throws IllegalArgumentException
+    {
         Map options;
 
         try
         {
+            muleShutdownHook = new MuleShutdownHook(logger);
+            registerShutdownHook(muleShutdownHook);
             options = SystemUtils.getCommandLineOptions(args, CLI_OPTIONS);
         }
         catch (MuleException me)
@@ -137,7 +144,7 @@ public class MuleServer implements Runnable
 
         String config = (String) options.get("config");
         // Try default if no config file was given.
-        if (config == null && !options.containsKey("idle"))
+        if (config == null && !options.containsKey("idle") )
         {
             logger.warn("A configuration file was not set, using default: " + DEFAULT_CONFIGURATION);
             // try to load the config as a file as well
