@@ -29,7 +29,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 
 public class ServerNotificationsTestCase extends AbstractMuleTestCase
-    implements ModelNotificationListener, ManagerNotificationListener
+        implements ModelNotificationListener, ManagerNotificationListener
 {
 
     private final AtomicBoolean managerStopped = new AtomicBoolean(false);
@@ -55,8 +55,8 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
 
     public void testStandardNotifications() throws Exception
     {
-       managementContext.registerListener(this);
-       managementContext.stop();
+        managementContext.registerListener(this);
+        managementContext.stop();
         assertTrue(modelStopped.get());
         assertTrue(managerStopped.get());
     }
@@ -72,9 +72,9 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
 
     public void testUnregistering() throws Exception
     {
-       managementContext.registerListener(this);
-       managementContext.unregisterListener(this);
-       managementContext.stop();
+        managementContext.registerListener(this);
+        managementContext.unregisterListener(this);
+        managementContext.stop();
         // these should still be false because we unregistered ourselves
         assertFalse(modelStopped.get());
         assertFalse(managerStopped.get());
@@ -95,7 +95,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
     public void testStandardNotificationsWithSubscription() throws Exception
     {
         final CountDownLatch latch = new CountDownLatch(1);
-       managementContext.registerListener(new ComponentNotificationListener()
+        managementContext.registerListener(new ComponentNotificationListener()
         {
             public void onNotification(UMOServerNotification notification)
             {
@@ -111,7 +111,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
         model.registerComponent(getTestDescriptor("component2", Apple.class.getName()));
         model.registerComponent(getTestDescriptor("component1", Apple.class.getName()));
 
-        // Wait for the notifcation event to be fired as they are queue
+        // Wait for the notifcation event to be fired as they are queued
         latch.await(20000, TimeUnit.MILLISECONDS);
         assertEquals(1, componentStartedCount.get());
     }
@@ -120,7 +120,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
     {
         final CountDownLatch latch = new CountDownLatch(2);
 
-       managementContext.registerListener(new ComponentNotificationListener()
+        managementContext.registerListener(new ComponentNotificationListener()
         {
             public void onNotification(UMOServerNotification notification)
             {
@@ -137,7 +137,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
         model.registerComponent(getTestDescriptor("component1", Apple.class.getName()));
         model.registerComponent(getTestDescriptor("noMatchComponent", Apple.class.getName()));
 
-        // Wait for the notifcation event to be fired as they are queue
+        // Wait for the notifcation event to be fired as they are queued
         latch.await(2000, TimeUnit.MILLISECONDS);
         assertEquals(2, componentStartedCount.get());
     }
@@ -146,7 +146,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
     {
         final CountDownLatch latch = new CountDownLatch(2);
 
-       managementContext.registerListener(new DummyNotificationListener()
+        managementContext.registerListener(new DummyNotificationListener()
         {
             public void onNotification(UMOServerNotification notification)
             {
@@ -159,10 +159,10 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
             }
         });
 
-       managementContext.fireNotification(new DummyNotification("hello", DummyNotification.EVENT_RECEIVED));
-       managementContext.fireNotification(new DummyNotification("hello", DummyNotification.EVENT_RECEIVED));
+        managementContext.fireNotification(new DummyNotification("hello", DummyNotification.EVENT_RECEIVED));
+        managementContext.fireNotification(new DummyNotification("hello", DummyNotification.EVENT_RECEIVED));
 
-        // Wait for the notifcation event to be fired as they are queue
+        // Wait for the notifcation event to be fired as they are queued
         latch.await(2000, TimeUnit.MILLISECONDS);
         assertEquals(2, customNotificationCount.get());
     }
@@ -172,7 +172,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
 
         final CountDownLatch latch = new CountDownLatch(2);
 
-       managementContext.registerListener(new DummyNotificationListener()
+        managementContext.registerListener(new DummyNotificationListener()
         {
             public void onNotification(UMOServerNotification notification)
             {
@@ -185,12 +185,12 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
             }
         }, "* quick brown*");
 
-       managementContext.fireNotification(new DummyNotification("the quick brown fox jumped over the lazy dog",
-            DummyNotification.EVENT_RECEIVED));
-       managementContext.fireNotification(new DummyNotification("e quick bro", DummyNotification.EVENT_RECEIVED));
-       managementContext.fireNotification(new DummyNotification(" quick brown", DummyNotification.EVENT_RECEIVED));
+        managementContext.fireNotification(new DummyNotification("the quick brown fox jumped over the lazy dog",
+                                                                 DummyNotification.EVENT_RECEIVED));
+        managementContext.fireNotification(new DummyNotification("e quick bro", DummyNotification.EVENT_RECEIVED));
+        managementContext.fireNotification(new DummyNotification(" quick brown", DummyNotification.EVENT_RECEIVED));
 
-        // Wait for the notifcation event to be fired as they are queue
+        // Wait for the notifcation event to be fired as they are queued
         latch.await(20000, TimeUnit.MILLISECONDS);
         assertEquals(2, customNotificationCount.get());
     }
@@ -201,10 +201,13 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
         {
             modelStopped.set(true);
         }
-        else if (notification.getAction() == ManagerNotification.MANAGER_STOPPED)
+        else
         {
-            managerStopped.set(true);
-            managerStoppedEvents.incrementAndGet();
+            if (notification.getAction() == ManagerNotification.MANAGER_STOPPED)
+            {
+                managerStopped.set(true);
+                managerStoppedEvents.incrementAndGet();
+            }
         }
     }
 
