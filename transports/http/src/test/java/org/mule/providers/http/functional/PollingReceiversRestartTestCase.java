@@ -11,9 +11,8 @@ package org.mule.providers.http.functional;
 
 import org.mule.MuleServer;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.tck.functional.EventCallback;
+import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.umo.UMOEventContext;
 import org.mule.umo.model.UMOModel;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
@@ -33,27 +32,26 @@ public class PollingReceiversRestartTestCase extends AbstractMuleTestCase
         // possible for MuleManager, so just sleep
         Thread.sleep(2000);
 
-        UMOModel model = (UMOModel) managementContext.getRegistry().getModels().get("PollingHttpRestart");
+        UMOModel model = (UMOModel) managementContext.getRegistry().getModels().get("main");
         FunctionalTestComponent ftc = (FunctionalTestComponent) model.getComponent("Test").getInstance();
         assertNotNull("Functional Test Component not found in the model.", ftc);
 
         AtomicInteger pollCounter = new AtomicInteger(0);
-        ftc.setEventCallback(new PollingEventCallback(pollCounter));
+        ftc.setEventCallback(new CounterCallback(pollCounter));
 
+       managementContext.start();
         // should be enough to poll for 2 messages
         Thread.sleep(WAIT_TIME);
 
         // stop
         managementContext.stop();
-        //manager.stop();
         assertTrue("No polls performed", pollCounter.get() > 0);
 
         // and restart
         managementContext.start();
-        //manager.start();
 
         pollCounter.set(0);
-        ftc.setEventCallback(new PollingEventCallback(pollCounter));
+        ftc.setEventCallback(new CounterCallback(pollCounter));
 
         Thread.sleep(WAIT_TIME);
         managementContext.dispose();
@@ -61,21 +59,6 @@ public class PollingReceiversRestartTestCase extends AbstractMuleTestCase
         assertTrue("No polls performed", pollCounter.get() > 0);
     }
 
-    private static class PollingEventCallback implements EventCallback
-    {
-        private final AtomicInteger pollCounter;
 
-        public PollingEventCallback(final AtomicInteger pollCounter)
-        {
-            this.pollCounter = pollCounter;
-        }
-
-        public void eventReceived(final UMOEventContext context, final Object component) throws Exception
-        {
-            pollCounter.incrementAndGet();
-            String message = context.getMessageAsString();
-            assertEquals("Here's your content.", message);
-        }
-    }
 }
 

@@ -18,7 +18,17 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
  */
 public class CounterCallback implements EventCallback
 {
-    private AtomicInteger callbackCount = new AtomicInteger(0);
+    private AtomicInteger callbackCount;
+
+    public CounterCallback()
+    {
+        callbackCount = new AtomicInteger(0);
+    }
+
+    public CounterCallback(AtomicInteger callbackCount)
+    {
+        this.callbackCount = callbackCount;
+    }
 
     public void eventReceived(UMOEventContext context, Object Component) throws Exception
     {

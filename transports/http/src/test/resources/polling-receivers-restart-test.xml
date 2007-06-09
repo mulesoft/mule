@@ -22,7 +22,7 @@
         <property name="data" value="Here's your content."/>
     </bean>
 
-    <mule:model-seda name="http polling test model">
+    <mule:model-seda name="main">
 
         <!-- singleton for easier testing only -->
         <mule:service name="Test" service-ref="ftc" singleton="true">

@@ -21,9 +21,6 @@
                      <excludes>
                          <!-- waiting on MULE-1870 -->
                          <exclude>**/TwoEndpointsSinglePortTestCase.*</exclude>
-                         <!-- waiting on MULE-1843 -->
-                         <exclude>**/HttpPollingFunctionalTestCase.*</exclude>
-                         <exclude>**/PollingReceiversRestartTestCase.*</exclude>
                      </excludes>
                  </configuration>
              </plugin>
