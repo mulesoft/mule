@@ -10,19 +10,21 @@
 package org.mule.impl.lifecycle;
 
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 
 /**
- * TODO
+ * A container-managed lifecycle phase is called by the container itself. This class acts as a marker to enable
+ * tracking of phases even if Mule does not initiate the phase
  */
 public class ContainerManagedLifecyclePhase extends LifecyclePhase
 {
-    public ContainerManagedLifecyclePhase(String name, Class lifecycleClass)
+    public ContainerManagedLifecyclePhase(String name, Class lifecycleClass, String oppositePhaseName)
     {
-        super(name, lifecycleClass);
+        super(name, lifecycleClass, oppositePhaseName);
     }
 
     //@java.lang.Override
-    public void callLifecycle(String currentPhase) throws UMOException
+    public void fireLifecycle(UMOManagementContext managementContext, String currentPhase) throws UMOException
     {
         //The container manages this lifecycle
         return;

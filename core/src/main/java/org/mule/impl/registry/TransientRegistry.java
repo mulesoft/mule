@@ -508,10 +508,10 @@ public class TransientRegistry extends AbstractRegistry
         //UMOLifecycleManager lifecycleManager = new DefaultLifecycleManager();
         UMOLifecycleManager lifecycleManager = new GenericLifecycleManager();
 
-        lifecycleManager.registerLifecycle(new ContainerManagedLifecyclePhase(Initialisable.PHASE_NAME, Initialisable.class));
+        lifecycleManager.registerLifecycle(new ContainerManagedLifecyclePhase(Initialisable.PHASE_NAME, Initialisable.class, Disposable.PHASE_NAME));
         lifecycleManager.registerLifecycle(new ManagementContextStartPhase());
         lifecycleManager.registerLifecycle(new ManagementContextStopPhase());
-        lifecycleManager.registerLifecycle(new ContainerManagedLifecyclePhase(Disposable.PHASE_NAME, Disposable.class));
+        lifecycleManager.registerLifecycle(new ContainerManagedLifecyclePhase(Disposable.PHASE_NAME, Disposable.class, Initialisable.PHASE_NAME));
 
         //Create the registry
         TransientRegistry registry = new TransientRegistry();

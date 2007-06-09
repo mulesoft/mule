@@ -15,8 +15,8 @@ import org.mule.registry.Registry;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
-import org.mule.umo.lifecycle.UMOLifecyclePhase;
 import org.mule.umo.manager.UMOAgent;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
@@ -26,7 +26,14 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * TODO
+ * The Initialise phase for the TransientRegistry LifecycleManager. Calling {@link org.mule.impl.registry.TransientRegistry#initialise()}
+ * with initiate this phase via the {@link org.mule.umo.lifecycle.UMOLifecycleManager}.
+ * This phase controls the order in which objects should be initialised.
+ *
+ * @see org.mule.umo.UMOManagementContext
+ * @see org.mule.umo.lifecycle.UMOLifecycleManager
+ * @see org.mule.impl.registry.TransientRegistry
+ * @see org.mule.umo.lifecycle.Initialisable
  */
 public class TransientRegistryInitialisePhase extends LifecyclePhase
 {
@@ -37,7 +44,7 @@ public class TransientRegistryInitialisePhase extends LifecyclePhase
 
     public TransientRegistryInitialisePhase(Class[] ignorredObjects)
     {
-        super(Initialisable.PHASE_NAME, Initialisable.class);
+        super(Initialisable.PHASE_NAME, Initialisable.class, Disposable.PHASE_NAME);
 
         setIgnorredObjectTypes(ignorredObjects);
         Set initOrderedObjects = new LinkedHashSet();
@@ -52,6 +59,6 @@ public class TransientRegistryInitialisePhase extends LifecyclePhase
         initOrderedObjects.add(new NotificationLifecycleObject(Initialisable.class));
 
         setOrderedLifecycleObjects(initOrderedObjects);
-        registerSupportedPhase(UMOLifecyclePhase.NOT_IN_LIFECYCLE_PHASE);
+        registerSupportedPhase(NotInLifecyclePhase.PHASE_NAME);
     }
 }

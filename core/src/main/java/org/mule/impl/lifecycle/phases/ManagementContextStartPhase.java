@@ -25,7 +25,13 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * TODO
+ * The Start phase for the Management context LifecycleManager. Calling {@link org.mule.umo.UMOManagementContext#start()}
+ * with initiate this phase via the {@link org.mule.umo.lifecycle.UMOLifecycleManager}.
+ * This phase controls the order in which objects should be started.
+ *
+ * @see org.mule.umo.UMOManagementContext
+ * @see org.mule.umo.lifecycle.UMOLifecycleManager
+ * @see org.mule.umo.lifecycle.Startable
  */
 public class ManagementContextStartPhase extends LifecyclePhase
 {
@@ -36,7 +42,7 @@ public class ManagementContextStartPhase extends LifecyclePhase
 
     public ManagementContextStartPhase(Class[] ignorredObjects)
     {
-        super(Startable.PHASE_NAME, Startable.class);
+        super(Startable.PHASE_NAME, Startable.class, Stoppable.PHASE_NAME);
 
         Set startOrderedObjects = new LinkedHashSet();
         startOrderedObjects.add(new NotificationLifecycleObject(UMOConnector.class));

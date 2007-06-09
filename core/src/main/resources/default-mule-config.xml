@@ -81,6 +81,7 @@
     <bean name="_muleInitLifecycle" class="org.mule.impl.lifecycle.ContainerManagedLifecyclePhase">
         <constructor-arg value="initialise"/>
         <constructor-arg value="org.mule.umo.lifecycle.Initialisable"/>
+        <constructor-arg value="dispose"/>
     </bean>
 
     <bean name="_muleStartLifecycle" class="org.mule.impl.lifecycle.phases.ManagementContextStartPhase"/>
@@ -90,6 +91,7 @@
     <bean name="_muleDisposeLifecycle" class="org.mule.impl.lifecycle.ContainerManagedLifecyclePhase">
         <constructor-arg value="dispose"/>
         <constructor-arg value="org.mule.umo.lifecycle.Disposable"/>
+        <constructor-arg value="initialise"/>
     </bean>
 
     <bean name="_muleQueueManager" class="org.mule.util.queue.TransactionalQueueManager">

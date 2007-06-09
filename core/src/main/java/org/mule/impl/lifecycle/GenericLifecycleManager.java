@@ -9,6 +9,7 @@
  */
 package org.mule.impl.lifecycle;
 
+import org.mule.impl.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.UMOLifecycleManager;
@@ -34,7 +35,8 @@ public class GenericLifecycleManager implements UMOLifecycleManager
      * logger used by this class
      */
     protected transient final Log logger = LogFactory.getLog(GenericLifecycleManager.class);
-    protected String currentPhase = UMOLifecyclePhase.NOT_IN_LIFECYCLE_PHASE;
+    protected static NotInLifecyclePhase notInLifecyclePhase = new NotInLifecyclePhase();
+    protected String currentPhase = notInLifecyclePhase.getName();
     protected String executingPhase = null;
     protected ListOrderedSet lifecycles = new ListOrderedSet();
     protected Map index = new HashMap(6);
@@ -78,7 +80,7 @@ public class GenericLifecycleManager implements UMOLifecycleManager
             setExecutingPhase(phase);
             UMOLifecyclePhase li = (UMOLifecyclePhase) lifecycles.get(phaseIndex.intValue());
             li.fireLifecycle(managementContext, currentPhase);
-            setCurrentPhase(phase);
+            setCurrentPhase(li);
         }
         finally
         {
@@ -101,10 +103,11 @@ public class GenericLifecycleManager implements UMOLifecycleManager
         return executingPhase;
     }
 
-    protected synchronized void setCurrentPhase(String phase)
+    protected synchronized void setCurrentPhase(UMOLifecyclePhase phase)
     {
-        completedPhases.add(phase);
-        this.currentPhase = phase;
+        completedPhases.add(phase.getName());
+        completedPhases.remove(phase.getOppositeLifecyclePhase());
+        this.currentPhase = phase.getName();
     }
 
     protected synchronized void setExecutingPhase(String phase)
@@ -116,7 +119,7 @@ public class GenericLifecycleManager implements UMOLifecycleManager
     {
         setExecutingPhase(null);
         completedPhases.clear();
-        setCurrentPhase(UMOLifecyclePhase.NOT_IN_LIFECYCLE_PHASE);
+        setCurrentPhase(notInLifecyclePhase);
     }
 
     public boolean isPhaseComplete(String phaseName)
@@ -126,7 +129,7 @@ public class GenericLifecycleManager implements UMOLifecycleManager
 
     public void applyLifecycle(UMOManagementContext managementContext, Object object) throws UMOException
     {
-        //String startingPhase = UMOLifecyclePhase.NOT_IN_LIFECYCLE_PHASE;
+        //String startingPhase = UMOLifecyclePhase.PHASE_NAME;
         UMOLifecyclePhase lcp;
         String phase;
         Integer phaseIndex;
@@ -169,7 +172,7 @@ public class GenericLifecycleManager implements UMOLifecycleManager
         {
             throw new IllegalStateException("Phase does not exist: " + name);
         }
-        if (UMOLifecyclePhase.NOT_IN_LIFECYCLE_PHASE.equals(currentPhase))
+        if (NotInLifecyclePhase.PHASE_NAME.equals(currentPhase))
         {
             if (phaseIndex.intValue() > 0)
             {

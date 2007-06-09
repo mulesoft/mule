@@ -25,7 +25,13 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * TODO
+ * The Stop phase for the Management context LifecycleManager. Calling {@link org.mule.umo.UMOManagementContext#stop()}
+ * with initiate this phase via the {@link org.mule.umo.lifecycle.UMOLifecycleManager}.
+ * This phase controls the order in which objects should be stopped.
+ *
+ * @see org.mule.umo.UMOManagementContext
+ * @see org.mule.umo.lifecycle.UMOLifecycleManager
+ * @see org.mule.umo.lifecycle.Stoppable
  */
 public class ManagementContextStopPhase extends LifecyclePhase
 {
@@ -36,7 +42,7 @@ public class ManagementContextStopPhase extends LifecyclePhase
 
     public ManagementContextStopPhase(Class[] ignorredObjects)
     {
-        super(Stoppable.PHASE_NAME, Stoppable.class);
+        super(Stoppable.PHASE_NAME, Stoppable.class, Startable.PHASE_NAME);
 
         Set stopOrderedObjects = new LinkedHashSet();
         stopOrderedObjects.add(new NotificationLifecycleObject(UMOConnector.class));

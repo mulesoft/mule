@@ -26,7 +26,6 @@ import java.util.Set;
 public interface UMOLifecyclePhase
 {
     String ALL_PHASES = "all";
-    String NOT_IN_LIFECYCLE_PHASE = "not in lifecycle";
 
     void fireLifecycle(UMOManagementContext managementContext, String currentPhase) throws UMOException;
 
@@ -61,4 +60,6 @@ public interface UMOLifecyclePhase
     public int getRegistryScope();
 
     public void setRegistryScope(int registryScope);
+
+    public String getOppositeLifecyclePhase();
 }

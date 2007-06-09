@@ -29,7 +29,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * TODO
+ * Represents a configurable lifecycle phase. This is a default implementation of a 'generic phase' in that is
+ * can be configured to represnt any phase. Instances of this phase can then be registered with a
+ * {@link org.mule.umo.lifecycle.UMOLifecycleManager} and by used to enforce a lifecycle phase on an object.
+ * Usually, Lifecycle phases have a fixed configuration in which case a specialisation of this class should be
+ * created that initialises its configuration internally.
+ *
+ * @see org.mule.umo.lifecycle.UMOLifecyclePhase
  */
 public class LifecyclePhase implements UMOLifecyclePhase
 {
@@ -43,15 +49,17 @@ public class LifecyclePhase implements UMOLifecyclePhase
     private Set orderedLifecycleObjects = new LinkedHashSet(6);
     private Class[] ignorredObjectTypes;
     private String name;
+    private String oppositeLifecyclePhase;
     private Set supportedPhases;
     private int registryScope = RegistryFacade.SCOPE_REMOTE;
 
-    public LifecyclePhase(String name, Class lifecycleClass)
+    public LifecyclePhase(String name, Class lifecycleClass, String oppositeLifecyclePhase)
     {
         this.name = name;
         this.lifecycleClass = lifecycleClass;
         //LifecyclePhase interface only has one method
         lifecycleMethod = lifecycleClass.getMethods()[0];
+        this.oppositeLifecyclePhase = oppositeLifecyclePhase;
     }
 
     public void fireLifecycle(UMOManagementContext managementContext, String currentPhase) throws UMOException
@@ -250,6 +258,11 @@ public class LifecyclePhase implements UMOLifecyclePhase
     public void setRegistryScope(int registryScope)
     {
         this.registryScope = registryScope;
+    }
+
+    public String getOppositeLifecyclePhase()
+    {
+        return oppositeLifecyclePhase;
     }
 }
 

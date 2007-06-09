@@ -83,8 +83,8 @@ public class SpringRegistry extends AbstractRegistry implements ApplicationConte
     protected UMOLifecycleManager createLifecycleManager()
     {
         GenericLifecycleManager lcm = new GenericLifecycleManager();
-        lcm.registerLifecycle(new ContainerManagedLifecyclePhase(Initialisable.PHASE_NAME, Initialisable.class));
-        lcm.registerLifecycle(new ContainerManagedLifecyclePhase(Disposable.PHASE_NAME, Disposable.class));
+        lcm.registerLifecycle(new ContainerManagedLifecyclePhase(Initialisable.PHASE_NAME, Initialisable.class, Disposable.PHASE_NAME));
+        lcm.registerLifecycle(new ContainerManagedLifecyclePhase(Disposable.PHASE_NAME, Disposable.class, Initialisable.PHASE_NAME));
         return lcm;
     }
 

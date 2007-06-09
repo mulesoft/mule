@@ -305,7 +305,7 @@ public abstract class AbstractModel implements UMOModel
             logger.info("Component " + component + " has been stopped successfully");
         }
         started.set(false);
-        initialised.set(false);
+
         fireNotification(new ModelNotification(this, ModelNotification.MODEL_STOPPED));
     }
 
