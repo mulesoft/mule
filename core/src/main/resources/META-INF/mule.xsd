@@ -1151,7 +1151,7 @@
                 <xsd:attribute name="jndiProviderUrl" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The service provider to use. The vtablePortNumberalue of the property
+                            The service provider to use. The value of the property
                             should contain a URL string (e.g. "ldap://somehost:389").
                         </xsd:documentation>
                     </xsd:annotation>
@@ -1192,7 +1192,7 @@
     <xsd:simpleType name="propertyPlaceholderType">
         <xsd:annotation>
             <xsd:documentation>
-                A type that defines an Ant-stale property placeholder
+                A type that defines an Ant-style property placeholder
             </xsd:documentation>
         </xsd:annotation>
         <xsd:restriction base="xsd:string">
