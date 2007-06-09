@@ -19,8 +19,6 @@
                  <artifactId>maven-surefire-plugin</artifactId>
                  <configuration>
                      <excludes>
-                         <!-- waiting on MULE-1870 -->
-                         <exclude>**/TwoEndpointsSinglePortTestCase.*</exclude>
                      </excludes>
                  </configuration>
              </plugin>
