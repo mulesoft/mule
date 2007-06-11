@@ -119,17 +119,14 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
 
     protected Client createXFireClient(UMOImmutableEndpoint endpoint, Service service, XFire xfire, String transportClass) throws Exception
     {
-        Class transportClazz;
+        Class transportClazz = MuleUniversalTransport.class;
 
+        // TODO DO: this is suspicious: this method seems to be called by a subclass (couldn't find references to it) and still the config orverrides the transport class to use?
         if (connector.getClientTransport() == null)
         {
             if (!StringUtils.isBlank(transportClass))
             {
                 transportClazz = ClassUtils.loadClass(transportClass, this.getClass());
-            }
-            else
-            {
-                transportClazz = MuleUniversalTransport.class;
             }
         }
         else

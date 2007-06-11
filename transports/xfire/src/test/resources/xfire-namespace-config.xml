@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xfire="http://www.mulesource.org/schema/mule/xfire/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/xfire/2.0 http://www.mulesource.org/schema/mule/xfire/2.0/mule-xfire.xsd">
+       
+    <bean name="mockFactory" class="org.mule.providers.soap.xfire.testmodels.MockServiceFactory"/>
+    <bean name="mockXFire" class="org.mule.providers.soap.xfire.testmodels.MockXFire"/>
+       
+    <xfire:connector name="xfireConnector"
+        bindingProviderClass="org.codehaus.xfire.service.binding.MessageBindingProvider"
+        clientTransportClass="org.codehaus.xfire.transport.dead.DeadLetterTransport"
+        enableJSR181Annotations="false"
+        serviceTransport="org.mule.providers.soap.xfire.testmodels.MockService"
+        typeMappingRegistryClass="org.mule.providers.soap.xfire.testmodels.MockTypeMappingRegistry">
+        
+        <xfire:client-in-handler>org.codehaus.xfire.util.dom.DOMInHandler</xfire:client-in-handler>
+        <xfire:client-in-handler>org.codehaus.xfire.util.LoggingHandler</xfire:client-in-handler>
+        
+        <xfire:client-out-handler>org.codehaus.xfire.util.dom.DOMOutHandler</xfire:client-out-handler>
+
+        <xfire:client-service>org.mule.providers.soap.xfire.testmodels.MockService</xfire:client-service>
+
+        <xfire:server-in-handler>org.codehaus.xfire.util.dom.DOMInHandler</xfire:server-in-handler>
+        <xfire:server-in-handler>org.codehaus.xfire.util.LoggingHandler</xfire:server-in-handler>
+
+        <xfire:server-out-handler>org.codehaus.xfire.util.dom.DOMOutHandler</xfire:server-out-handler>
+    </xfire:connector>
+    
+    <xfire:connector name="xfireConnector2"
+        serviceFactory-ref="mockFactory"
+        xfire-ref="mockXFire"/>
+</beans>

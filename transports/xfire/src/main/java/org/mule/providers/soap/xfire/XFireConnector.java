@@ -224,12 +224,13 @@ public class XFireConnector extends AbstractConnector
                 factory.setStyle(SoapConstants.STYLE_MESSAGE);
             }
 
-            // Special handling for XmlBeansBindingProvider
-            if (bindingProvider.equals("org.codehaus.xfire.service.binding.MessageBindingProvider"))
-            {
-                factory.setStyle(SoapConstants.STYLE_DOCUMENT);
-                wsdlBuilderFactoryClass = "org.codehaus.xfire.xmlbeans.XmlBeansWSDLBuilderFactory";
-            }
+            // See MULE-1871
+//            // Special handling for XmlBeansBindingProvider
+//            if (bindingProvider.equals("org.codehaus.xfire.service.binding.MessageBindingProvider"))
+//            {
+//                factory.setStyle(SoapConstants.STYLE_DOCUMENT);
+//                wsdlBuilderFactoryClass = "org.codehaus.xfire.xmlbeans.XmlBeansWSDLBuilderFactory";
+//            }
 
             // If required, create the WSDL builder factory (only XML beans needs
             // this)

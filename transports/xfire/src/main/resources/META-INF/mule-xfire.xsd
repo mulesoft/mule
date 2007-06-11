@@ -1,0 +1,87 @@
+<xsd:schema xmlns="http://www.mulesource.org/schema/mule/xfire/2.0"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+    xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+    targetNamespace="http://www.mulesource.org/schema/mule/xfire/2.0" 
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:import namespace="http://www.springframework.org/schema/beans"
+                schemaLocation="http://www.springframework.org/schema/beans/spring-beans-2.0.xsd" />
+
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0" 
+                schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
+                
+
+    <xsd:element name="connector" type="xfireConnectorType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Consume and provide web services via XFire.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    
+    <xsd:complexType name="xfireConnectorType">
+        <xsd:complexContent>        
+            <xsd:extension base="mule:connectorType">
+                <xsd:sequence>
+                    <xsd:element name="client-in-handler" type="xsd:NMTOKEN" minOccurs="0" maxOccurs="unbounded" />
+                    <xsd:element name="client-out-handler" type="xsd:NMTOKEN" minOccurs="0" maxOccurs="unbounded" />
+                    <xsd:element name="client-service" type="xsd:NMTOKEN" minOccurs="0" maxOccurs="unbounded" />
+                    <xsd:element name="server-in-handler" type="xsd:NMTOKEN" minOccurs="0" maxOccurs="unbounded" />
+                    <xsd:element name="server-out-handler" type="xsd:NMTOKEN" minOccurs="0" maxOccurs="unbounded" />
+                </xsd:sequence>
+                <xsd:attribute name="bindingProviderClass" type="xsd:NMTOKEN">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Fully qualified class name of the xfire BindingProvider to use.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="clientTransportClass" type="xsd:NMTOKEN">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Fully qualified class name of the xfire Transport class to use.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="enableJSR181Annotations" type="xsd:boolean" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Set to true if annotations should be used. Requires JDK5 and later to work.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="serviceFactory-ref" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Bean reference to the ServiceFactory that should be used.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="serviceTransport" type="xsd:NMTOKEN">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Name of the Transport class that should be used.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="typeMappingRegistryClass" type="xsd:NMTOKEN">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            TypeMappingRegistry class that should be instantiated and used. This 
+                            setting has only effect when using the aegis binding provider.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="xfire-ref" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Bean reference to the XFire instance that should be used.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+</xsd:schema>
