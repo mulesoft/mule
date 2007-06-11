@@ -27,7 +27,6 @@
                         <!-- MULE-1855: too much is failing in 2.0 -->
                         <exclude>**/XFireBadSoapRequestTestCase.java</exclude>
                         <exclude>**/XFireWsdlCallTestCase.java</exclude>
-                        <exclude>**/XFireSoapEndpointTestCase.java</exclude>
                         <exclude>**/XFireAddClientServiceInterfaceTestCase.java</exclude>
                         <exclude>**/XFireMultipleConnectorsTestCase.java</exclude>
                         <exclude>**/XFireConnectorHttpFunctionalTestCase.java</exclude>

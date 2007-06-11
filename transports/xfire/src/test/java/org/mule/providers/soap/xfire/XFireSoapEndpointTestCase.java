@@ -21,6 +21,8 @@ public class XFireSoapEndpointTestCase extends AbstractMuleTestCase
     {
         String url = "xfire:http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2";
         UMOEndpointURI endpointUri = new MuleEndpointURI(url);
+        endpointUri.initialise();
+        
         assertEquals("xfire", endpointUri.getSchemeMetaInfo());
         // it's up to the client to actually strip off the method name if necessary
         assertEquals("http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2",
@@ -30,6 +32,8 @@ public class XFireSoapEndpointTestCase extends AbstractMuleTestCase
 
         url = "xfire:http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2";
         endpointUri = new MuleEndpointURI(url);
+        endpointUri.initialise();
+        
         assertEquals("xfire", endpointUri.getSchemeMetaInfo());
         assertEquals("http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2",
             endpointUri.getAddress());
@@ -41,6 +45,8 @@ public class XFireSoapEndpointTestCase extends AbstractMuleTestCase
     {
         String url = "xfire:http://admin:pwd@www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2";
         UMOEndpointURI endpointUri = new MuleEndpointURI(url);
+        endpointUri.initialise();
+        
         assertEquals("xfire", endpointUri.getSchemeMetaInfo());
         // it's up to the client to actually strip off the method name if necessary
         assertEquals("http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2",
@@ -56,6 +62,8 @@ public class XFireSoapEndpointTestCase extends AbstractMuleTestCase
     {
         String url = "soap:http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2";
         UMOEndpointURI endpointUri = new MuleEndpointURI(url);
+        endpointUri.initialise();
+        
         assertEquals("soap", endpointUri.getSchemeMetaInfo());
         // it's up to the client to actually strip off the method name if necessary
         assertEquals("http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2",
