@@ -32,7 +32,10 @@ public class ResponseWriterCallback extends CounterCallback
         super.eventReceived(context, component);
 
         String result = context.getMessageAsString() + " Received Async";
-        assert (context.getOutputStream() != null);
+        if (context.getOutputStream() == null)
+        {
+            throw new IllegalArgumentException("event context does not have an OutputStream associated");
+        }
 
         context.getOutputStream().write(result.getBytes());
         context.getOutputStream().flush();

@@ -79,7 +79,10 @@ public class FilterDefinitionParser extends AbstractChildBeanDefinitionParser
             {
                 String clazz = element.getAttribute("class");
                 element.removeAttribute("class");
-                assert clazz!=null;
+                if (clazz == null)
+                {
+                    throw new IllegalArgumentException("attribute 'class' may not be empty");
+                }
                 return ClassUtils.loadClass(clazz, getClass());
             }
             catch (ClassNotFoundException e)

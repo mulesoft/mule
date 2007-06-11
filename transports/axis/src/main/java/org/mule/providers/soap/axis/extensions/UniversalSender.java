@@ -87,7 +87,10 @@ public class UniversalSender extends BasicHandler
         UMOImmutableEndpoint requestEndpoint = (UMOImmutableEndpoint)call
             .getProperty(MuleProperties.MULE_ENDPOINT_PROPERTY);
         UMOManagementContext context = requestEndpoint.getManagementContext();
-        assert(context!=null);
+        if (context == null)
+        {
+            throw new IllegalArgumentException("management context is null");
+        }
         
         UMOImmutableEndpoint endpoint;
 
