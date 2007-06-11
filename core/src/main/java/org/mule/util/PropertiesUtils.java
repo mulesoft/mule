@@ -161,7 +161,7 @@ public final class PropertiesUtils
 
     /**
      * Will create a map of properties where the names have a prefix Allows the
-     * callee to supply the target map so a comarator can be set
+     * callee to supply the target map so a comparator can be set
      * 
      * @param props the source set of properties
      * @param prefix the prefix to filter on
