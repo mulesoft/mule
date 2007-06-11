@@ -130,18 +130,17 @@
     </profiles>
     
     <dependencies>
-        <!-- TODO This can't be in the parent pom.xml because it creates a cyclic dependency: 
-                mule-tests-functional -> mule-module-builders -> mule-tests-functional -->
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-functional</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
-
+        <!-- do not include the org.springframework:spring depencency kitchen sink
+             but rather include each spring module individually. This allows for
+             finer grained management of dependencies.
+        -->
         <dependency>
             <groupId>org.springframework</groupId>
-            <artifactId>spring</artifactId>
+            <artifactId>spring-jdbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jms</artifactId>
         </dependency>
 
         <!-- Used by MuleEventMulticaster -->
@@ -178,6 +177,14 @@
         </dependency>
 
         <!-- For test cases only -->
+        <!-- TODO This can't be in the parent pom.xml because it creates a cyclic dependency: 
+             mule-tests-functional -> mule-module-builders -> mule-tests-functional -->
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>
