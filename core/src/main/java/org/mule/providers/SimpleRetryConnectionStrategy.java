@@ -27,6 +27,7 @@ public class SimpleRetryConnectionStrategy extends AbstractConnectionStrategy
 {
     public static final int DEFAULT_FREQUENCY = 2000;
     public static final int DEFAULT_RETRY_COUNT = 2;
+    public static final int RETRY_COUNT_FOREVER = -1;
 
     protected static class RetryCounter extends ThreadLocal
     {
@@ -96,7 +97,7 @@ public class SimpleRetryConnectionStrategy extends AbstractConnectionStrategy
                     // rethrow
                     throw (FatalConnectException) e;
                 }
-                if (retryCounter.current().get() >= retryCount)
+                if (retryCount != RETRY_COUNT_FOREVER && retryCounter.current().get() >= retryCount)
                 {
                     throw new FatalConnectException(
                         // TODO it's not only endpoint that is reconnected, connectors too
@@ -117,7 +118,8 @@ public class SimpleRetryConnectionStrategy extends AbstractConnectionStrategy
                 if (logger.isInfoEnabled())
                 {
                     logger.info("Waiting for " + retryFrequency + "ms before reconnecting. Failed attempt "
-                                + retryCounter.current().get() + " of " + retryCount);
+                                + retryCounter.current().get() + " of " +
+                                (retryCount != RETRY_COUNT_FOREVER ? String.valueOf(retryCount) : "unlimited"));
                 }
 
                 try
@@ -152,6 +154,10 @@ public class SimpleRetryConnectionStrategy extends AbstractConnectionStrategy
         return retryCount;
     }
 
+    /**
+     * How many times to retry. Set to -1 to retry forever.
+     * @param retryCount number of retries
+     */
     public void setRetryCount(int retryCount)
     {
         this.retryCount = retryCount;

@@ -99,7 +99,7 @@ public class FileConnector extends AbstractConnector
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.providers.AbstractConnector#doInitialise()
      */
     public FileConnector()
@@ -112,7 +112,7 @@ public class FileConnector extends AbstractConnector
         if (endpoint.getFilter() != null)
         {
             return endpoint.getEndpointURI().getAddress() + "/"
-                   + ((FilenameWildcardFilter)endpoint.getFilter()).getPattern();
+                   + ((FilenameWildcardFilter) endpoint.getFilter()).getPattern();
         }
         return endpoint.getEndpointURI().getAddress();
     }
@@ -154,7 +154,7 @@ public class FileConnector extends AbstractConnector
             {
                 moveTo = move;
             }
-            String tempMoveToPattern = (String)props.get(PROPERTY_MOVE_TO_PATTERN);
+            String tempMoveToPattern = (String) props.get(PROPERTY_MOVE_TO_PATTERN);
             if (tempMoveToPattern != null)
             {
                 if (logger.isDebugEnabled())
@@ -164,7 +164,7 @@ public class FileConnector extends AbstractConnector
                 moveToPattern = tempMoveToPattern;
             }
 
-            String tempPolling = (String)props.get(PROPERTY_POLLING_FREQUENCY);
+            String tempPolling = (String) props.get(PROPERTY_POLLING_FREQUENCY);
             if (tempPolling != null)
             {
                 polling = Long.parseLong(tempPolling);
@@ -179,7 +179,7 @@ public class FileConnector extends AbstractConnector
             {
                 logger.debug("set polling frequency to: " + polling);
             }
-            String tempFileAge = (String)props.get(PROPERTY_FILE_AGE);
+            String tempFileAge = (String) props.get(PROPERTY_FILE_AGE);
             if (tempFileAge != null)
             {
                 try
@@ -192,9 +192,9 @@ public class FileConnector extends AbstractConnector
                 }
             }
             Map srvOverride = (Map) props.get(PROPERTY_SERVICE_OVERRIDE);
-            if (srvOverride != null) 
+            if (srvOverride != null)
             {
-                if (serviceOverrides == null) 
+                if (serviceOverrides == null)
                 {
                     serviceOverrides = new Properties();
                 }
@@ -214,7 +214,7 @@ public class FileConnector extends AbstractConnector
         catch (Exception e)
         {
             throw new InitialisationException(
-                CoreMessages.failedToCreateObjectWith("Message Receiver", 
+                CoreMessages.failedToCreateObjectWith("Message Receiver",
                     serviceDescriptor), e, this);
         }
     }
@@ -376,7 +376,7 @@ public class FileConnector extends AbstractConnector
     }
 
     /**
-     * @param fileAge The fileAge in seconds to set.
+     * @param fileAge The fileAge in milliseconds to set.
      */
     public void setFileAge(long fileAge)
     {

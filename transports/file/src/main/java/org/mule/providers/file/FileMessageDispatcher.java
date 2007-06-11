@@ -37,7 +37,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
     public FileMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
         super(endpoint);
-        this.connector = (FileConnector)endpoint.getConnector();
+        this.connector = (FileConnector) endpoint.getConnector();
     }
 
     /*
@@ -54,14 +54,14 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
         byte[] buf;
         if (data instanceof byte[])
         {
-            buf = (byte[])data;
+            buf = (byte[]) data;
         }
         else
         {
             buf = data.toString().getBytes(event.getEncoding());
         }
 
-        FileOutputStream fos = (FileOutputStream)connector.getOutputStream(event.getEndpoint(), message);
+        FileOutputStream fos = (FileOutputStream) connector.getOutputStream(event.getEndpoint(), message);
         if (event.getMessage().getStringProperty(FileConnector.PROPERTY_FILENAME, null) == null)
         {
             event.getMessage().setStringProperty(FileConnector.PROPERTY_FILENAME,
@@ -103,7 +103,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
         File file = FileUtils.newFile(endpoint.getEndpointURI().getAddress());
         File result = null;
         FilenameFilter filenameFilter = null;
-        String filter = (String)endpoint.getProperty("filter");
+        String filter = (String) endpoint.getProperty("filter");
         if (filter != null)
         {
             filter = URLDecoder.decode(filter, RegistryContext.getConfiguration().getDefaultEncoding());
@@ -126,9 +126,14 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
                 {
                     long fileAge = connector.getFileAge();
                     long lastMod = result.lastModified();
-                    long now = (new java.util.Date()).getTime();
-                    if ((now - lastMod) < fileAge)
+                    long now = System.currentTimeMillis();
+                    long thisFileAge = now - lastMod;
+                    if (thisFileAge < fileAge)
                     {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("The file has not aged enough yet, will return nothing for: " +
+                                         result.getCanonicalPath());
+                        }
                         return null;
                     }
                 }
@@ -137,18 +142,16 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
                 File destinationFile = null;
                 if (connector.getMoveToDirectory() != null)
                 {
+                    destinationFile = new File(connector.getMoveToDirectory(), result
+                        .getName());
+                    if (!result.renameTo(destinationFile))
                     {
-                        destinationFile = new File(connector.getMoveToDirectory(), result
-                            .getName());
-                        if (!result.renameTo(destinationFile))
-                        {
-                            logger.error("Failed to move file: " + result.getAbsolutePath()
-                                         + " to " + destinationFile.getAbsolutePath());
-                        }
+                        logger.error("Failed to move file: " + result.getAbsolutePath()
+                                     + " to " + destinationFile.getAbsolutePath());
                     }
                 }
                 
-                if (((FileConnector) connector).isAutoDelete())
+                if (connector.isAutoDelete())
                 {
                     // no moveTo directory
                     if (destinationFile == null)
@@ -160,11 +163,9 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
                                 FileMessages.failedToDeleteFile(result.getAbsolutePath()));
                         }
                     }
-                    else
-                    {
-                        // nothing to do here since moveFile() should have deleted
-                        // the source file for us
-                    }
+
+                    // nothing to do here since moveFile() should have deleted
+                    // the source file for us
                 }
                 
                 return message;
