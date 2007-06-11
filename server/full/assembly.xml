@@ -386,6 +386,7 @@ Assembly descriptor for the full Mule distribution.
         <!-- Core -->
         <exclude>org.mule:mule-core</exclude>
         <!-- Transports -->
+        <exclude>org.mule.transports:mule-transports-all</exclude>
         <exclude>org.mule.transports:mule-transport-axis</exclude>
         <exclude>org.mule.transports:mule-transport-bpm</exclude>
         <exclude>org.mule.transports:mule-transport-ejb</exclude>
@@ -410,6 +411,7 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule.transports:mule-transport-xfire</exclude>
         <exclude>org.mule.transports:mule-transport-xmpp</exclude>
         <!-- Modules -->
+        <exclude>org.mule.modules:mule-modules-all</exclude>
         <exclude>org.mule.modules:mule-module-boot</exclude>
         <exclude>org.mule.modules:mule-module-builders</exclude>
         <exclude>org.mule.modules:mule-module-acegi</exclude>
@@ -427,6 +429,7 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule.modules:mule-module-util</exclude>
         <exclude>org.mule.modules:mule-module-xml</exclude>
         <!-- Examples -->
+        <exclude>org.mule.examples:mule-examples-all</exclude>
         <exclude>org.mule.examples:mule-example-echo</exclude>
         <exclude>org.mule.examples:mule-example-errorhandler</exclude>
         <exclude>org.mule.examples:mule-example-hello</exclude>
