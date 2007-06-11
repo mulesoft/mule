@@ -52,6 +52,5 @@ public class XFireBasicTestCase extends FunctionalTestCase
     {
         return "xfire-basic-conf.xml";
     }
-
 }
 

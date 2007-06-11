@@ -19,8 +19,24 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <excludes>
+                        <!-- This class matches surefire's include pattern by accident. 
+                             Don't execute it as it's not a unit test.
+                        -->
+                        <exclude>**/TestXFireComponent.java</exclude>
+
                         <!-- MULE-1855: too much is failing in 2.0 -->
-                        <exclude>**/*</exclude>
+                        <exclude>**/XFireBadSoapRequestTestCase.java</exclude>
+                        <exclude>**/XFireWsdlCallTestCase.java</exclude>
+                        <exclude>**/XFireSoapEndpointTestCase.java</exclude>
+                        <exclude>**/XFireAddClientServiceInterfaceTestCase.java</exclude>
+                        <exclude>**/XFireMultipleConnectorsTestCase.java</exclude>
+                        <exclude>**/XFireConnectorHttpFunctionalTestCase.java</exclude>
+                        <exclude>**/XFireSoapRequestNoMethodParamTestCase.java</exclude>
+                        <exclude>**/XFireCustomHttpHeaderTestCase.java</exclude>
+                        <exclude>**/XFireComponentExceptionStrategyTestCase.java</exclude>
+                        <exclude>**/XFireNamespaceHandlerTestCase.java</exclude>
+                        <exclude>**/XFireConnectorTestCase.java</exclude>
+
                         <!-- MULE-1134 -->
                         <exclude>**/XFireConnectorVMFunctionalTestCase.java</exclude>
                         <!-- Only run tests with external dependencies in the tests-external profile -->
