@@ -18,7 +18,7 @@
                         <xsd:element name="namespace" type="namespaceType" minOccurs="0" maxOccurs="unbounded"/>
                         <xsd:element name="contextProperty" type="spring:propertyType" minOccurs="0" maxOccurs="unbounded"/>
                     </xsd:choice>
-                    <xsd:attribute name="lenient" type="xsd:boolean" default="true"/>
+                    <xsd:attribute name="lenient" type="mule:substitutableBoolean" default="true"/>
                     <xsd:attribute name="expectedValue" type="xsd:string"/>
                 </xsd:extension>
             </xsd:complexContent>

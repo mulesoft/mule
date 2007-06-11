@@ -45,7 +45,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="enableJSR181Annotations" type="xsd:boolean" default="false">
+                <xsd:attribute name="enableJSR181Annotations" type="mule:substitutableBoolean" default="false">
                     <xsd:annotation>
                         <xsd:documentation>
                             Set to true if annotations should be used. Requires JDK5 and later to work.

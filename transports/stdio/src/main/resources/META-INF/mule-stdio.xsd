@@ -17,7 +17,7 @@
     <xsd:complexType name="stdioConnectorType">
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
-                <xsd:attribute name="messageDelayTime" type="xsd:long">
+                <xsd:attribute name="messageDelayTime" type="mule:substitutableLong">
                     <xsd:annotation>
                         <xsd:documentation>
                             Delay (ms) before printing prompt to stdout.

@@ -56,7 +56,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="doAutoTypes" type="xsd:boolean">
+                <xsd:attribute name="doAutoTypes" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
                             Use this property to configure whether AxisServer should automatically map types.
@@ -80,7 +80,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="treatMapAsNamedParams" type="xsd:boolean">
+                <xsd:attribute name="treatMapAsNamedParams" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
                             The AxisConnector treats a Map as container for named parameters, which 

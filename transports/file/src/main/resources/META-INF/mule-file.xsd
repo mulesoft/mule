@@ -30,7 +30,7 @@
                 <xsd:sequence minOccurs="0" maxOccurs="1">
                     <xsd:element name="filename-parser" type="filenameParserType" minOccurs="0" maxOccurs="1"/>
                 </xsd:sequence>
-                <xsd:attribute name="fileAge" type="xsd:long">
+                <xsd:attribute name="fileAge" type="mule:substitutableLong">
                     <xsd:annotation>
                         <xsd:documentation>
                             Miniumum age (ms) for a file to be processed.
@@ -58,7 +58,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="pollingFrequency" type="xsd:int">
+                <xsd:attribute name="pollingFrequency" type="mule:substitutableLong">
                     <xsd:annotation>
                         <xsd:documentation>
                             Period (ms) between poll connections to the server.
@@ -79,21 +79,21 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="autoDelete" type="xsd:boolean">
+                <xsd:attribute name="autoDelete" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
                             Should file be deleted once read?
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="outputAppend" type="xsd:boolean">
+                <xsd:attribute name="outputAppend" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
                             Should output append to existing file?
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="serialiseObjects" type="xsd:boolean">
+                <xsd:attribute name="serialiseObjects" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
                             Forces use of transformers between serializable objects and byte arrays.

@@ -96,12 +96,12 @@
             <xsd:group ref="storageTypes" minOccurs="0" maxOccurs="1"/>
             <xsd:element name="default-connection-strategy" type="connectionStrategyType" minOccurs="0" maxOccurs="1"/>
         </xsd:choice>
-        <xsd:attribute name="defaultSynchronousEndpoints" type="xsd:boolean" default="false"/>
+        <xsd:attribute name="defaultSynchronousEndpoints" type="substitutableBoolean" default="false"/>
         <xsd:attribute name="workingDirectory" type="xsd:string" default="./.mule"/>
         <xsd:attribute name="defaultSynchronousEventTimeout" type="xsd:string"/>
         <xsd:attribute name="defaultEncoding" type="xsd:string"/>
         <xsd:attribute name="defaultTransactionTimeout" type="xsd:string"/>
-        <xsd:attribute name="defaultRemoteSync" type="xsd:boolean" default="false"/>
+        <xsd:attribute name="defaultRemoteSync" type="substitutableBoolean" default="false"/>
         <xsd:attribute name="serverId" type="xsd:string" use="required"/>
         <xsd:attribute name="clusterId" type="xsd:string" use="optional"/>
         <xsd:attribute name="domainId" type="xsd:string" use="optional"/>
@@ -127,8 +127,8 @@
         <xsd:attribute name="name" type="xsd:string"/>
         <xsd:attribute name="transformers" type="xsd:string"/>
         <xsd:attribute name="responseTransformers" type="xsd:string"/>
-        <xsd:attribute name="synchronous" type="xsd:boolean"/>
-        <xsd:attribute name="remoteSync" type="xsd:boolean"/>
+        <xsd:attribute name="synchronous" type="substitutableBoolean"/>
+        <xsd:attribute name="remoteSync" type="substitutableBoolean"/>
         <xsd:attribute name="remoteSyncTimeout" type="xsd:NMTOKEN"/>
         <xsd:attribute name="encoding" type="xsd:string"/>
         <xsd:attribute name="connector-ref" type="xsd:NMTOKEN"/>
@@ -234,7 +234,7 @@
     </xsd:complexType>
 
     <xsd:complexType name="filterType">
-        <xsd:attribute name="not" type="xsd:boolean"/>
+        <xsd:attribute name="not" type="substitutableBoolean"/>
     </xsd:complexType>
 
     <xsd:complexType name="customFilterType">
@@ -242,7 +242,7 @@
             <xsd:element name="property" type="spring:propertyType" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:choice>
         <xsd:attribute name="class" type="xsd:NMTOKEN"/>
-        <xsd:attribute name="not" type="xsd:boolean"/>
+        <xsd:attribute name="not" type="substitutableBoolean"/>
     </xsd:complexType>
 
 
@@ -263,7 +263,7 @@
     <xsd:complexType name="transformerType">
         <xsd:attribute name="name" type="xsd:string"/>
         <xsd:attribute name="returnClass" type="xsd:NMTOKEN"/>
-        <xsd:attribute name="ignoreBadInput" type="xsd:boolean"/>
+        <xsd:attribute name="ignoreBadInput" type="substitutableBoolean"/>
     </xsd:complexType>
 
     <xsd:element name="custom-transformer">
@@ -369,7 +369,7 @@
 
     <xsd:complexType name="queueProfileType">
         <xsd:attribute name="maxOutstandingMessages" type="xsd:string"/>
-        <xsd:attribute name="persistent" type="xsd:boolean" default="false"/>
+        <xsd:attribute name="persistent" type="substitutableBoolean" default="false"/>
     </xsd:complexType>
 
     <xsd:complexType name="securityManagerType">
@@ -401,7 +401,7 @@
             </xsd:simpleType>
         </xsd:attribute>
         <xsd:attribute name="threadWaitTimeout" type="xsd:string"/>
-        <xsd:attribute name="doThreading" type="xsd:boolean" default="true"/>
+        <xsd:attribute name="doThreading" type="substitutableBoolean" default="true"/>
         <xsd:attribute name="maxBufferSize" type="xsd:string"/>
     </xsd:complexType>
 
@@ -449,8 +449,8 @@
         <xsd:group ref="connectorElements"/>
 
         <xsd:attribute name="name" type="xsd:string" use="required"/>
-        <xsd:attribute name="createDispatcherPerRequest" type="xsd:boolean"/>
-        <xsd:attribute name="createMultipleTransactedReceivers" type="xsd:boolean"/>
+        <xsd:attribute name="createDispatcherPerRequest" type="substitutableBoolean"/>
+        <xsd:attribute name="createMultipleTransactedReceivers" type="substitutableBoolean"/>
     </xsd:complexType>
 
     <xsd:group name="connectorElements">
@@ -497,8 +497,8 @@
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="connectionStrategyType">
-                    <xsd:attribute name="retryFrequency" type="xsd:long"/>
-                    <xsd:attribute name="retryCount" type="xsd:int"/>
+                    <xsd:attribute name="retryFrequency" type="substitutableLong"/>
+                    <xsd:attribute name="retryCount" type="substitutableInt"/>
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>
@@ -631,7 +631,7 @@
         <!-- Deprecated, use "service-ref" instead. -->
         <xsd:attribute name="implementation" type="xsd:NMTOKEN"/>
         <xsd:attribute name="version" type="xsd:string"/>
-        <xsd:attribute name="singleton" type="xsd:boolean" default="false"/>
+        <xsd:attribute name="singleton" type="substitutableBoolean" default="false"/>
         <xsd:attribute name="initialState" default="started">
             <xsd:simpleType>
                 <xsd:restriction base="xsd:NMTOKEN">
@@ -654,7 +654,7 @@
             <xsd:group ref="catchAllStrategies" minOccurs="0" maxOccurs="1"/>
             <xsd:group ref="inboundRouters" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:choice>
-        <xsd:attribute name="matchAll" type="xsd:boolean" default="false"/>
+        <xsd:attribute name="matchAll" type="substitutableBoolean" default="false"/>
     </xsd:complexType>
 
 
@@ -689,7 +689,7 @@
             <xsd:group ref="catchAllStrategies" minOccurs="0" maxOccurs="1"/>
             <xsd:group ref="outboundRouters" minOccurs="1" maxOccurs="unbounded"/>
         </xsd:sequence>
-        <xsd:attribute name="matchAll" type="xsd:boolean" default="false"/>
+        <xsd:attribute name="matchAll" type="substitutableBoolean" default="false"/>
     </xsd:complexType>
 
 
@@ -745,7 +745,7 @@
         <xsd:complexContent>
             <xsd:extension base="nestedInboundRouterType">
                 <xsd:attribute name="transformers" type="xsd:string"/>
-                <xsd:attribute name="transformerFirst" type="xsd:boolean"/>
+                <xsd:attribute name="transformerFirst" type="substitutableBoolean"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -848,8 +848,8 @@
     <xsd:complexType name="messageSplitterendpointSelectorRouterType">
         <xsd:complexContent>
             <xsd:extension base="filteringOutboundRouterType">
-                <xsd:attribute name="multimatch" type="xsd:boolean"/>
-                <xsd:attribute name="honourSynchronicity" type="xsd:boolean"/>
+                <xsd:attribute name="multimatch" type="substitutableBoolean"/>
+                <xsd:attribute name="honourSynchronicity" type="substitutableBoolean"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -857,8 +857,8 @@
     <xsd:complexType name="chunkingRouterType">
         <xsd:complexContent>
             <xsd:extension base="filteringOutboundRouterType">
-                <xsd:attribute name="messageSize" type="xsd:int"/>
-                <xsd:attribute name="numberOfMessages" type="xsd:int"/>
+                <xsd:attribute name="messageSize" type="substitutableInt"/>
+                <xsd:attribute name="numberOfMessages" type="substitutableInt"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -943,8 +943,8 @@
             <xsd:any namespace="##other" processContents="strict" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:choice>
         <xsd:attribute name="name" type="xsd:string" default="properties"/>
-        <xsd:attribute name="includeSystemProperties" type="xsd:boolean"/>
-        <xsd:attribute name="enableTemplates" type="xsd:boolean"/>
+        <xsd:attribute name="includeSystemProperties" type="substitutableBoolean"/>
+        <xsd:attribute name="enableTemplates" type="substitutableBoolean"/>
     </xsd:complexType>
 
     <xsd:complexType name="iocContainerContextType">
@@ -1097,8 +1097,8 @@
                 <xsd:attribute name="trustManagerAlgorithm" type="xsd:string"/>
                 <!-- should be of type TrustManagerFactory -->
                 <xsd:attribute name="trustManagerFactory" type="xsd:NMTOKEN"/>
-                <xsd:attribute name="explicitTrustStoreOnly" type="xsd:boolean"/>
-                <xsd:attribute name="requireClientAuthentication" type="xsd:boolean"/>
+                <xsd:attribute name="explicitTrustStoreOnly" type="substitutableBoolean"/>
+                <xsd:attribute name="requireClientAuthentication" type="substitutableBoolean"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -1171,14 +1171,15 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="mapType">
+    <!-- MULE-1909 -->
+    <!-- xsd:complexType name="mapType">
         <xsd:complexContent>
             <xsd:extension base="spring:mapType">
                 <xsd:attribute name="mapClass" type="xsd:string"/>
                 <xsd:attribute name="name" type="xsd:int"/>
             </xsd:extension>
         </xsd:complexContent>
-    </xsd:complexType>
+    </xsd:complexType -->
 
     <xsd:complexType name="propsType">
         <xsd:complexContent>

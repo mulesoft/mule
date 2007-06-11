@@ -20,7 +20,7 @@
 		    	<xsd:sequence>
 		    		<xsd:element name="queueProfile" type="mule:queueProfileType" minOccurs="0"/>
 		    	</xsd:sequence>
-		        <xsd:attribute name="queueEvents" type="xsd:boolean"/>
+		        <xsd:attribute name="queueEvents" type="mule:substitutableBoolean"/>
 		        <xsd:attribute name="queueTimeout" type="xsd:positiveInteger"/>
 		    </xsd:extension>
     	</xsd:complexContent>

@@ -19,8 +19,8 @@
     	<xsd:complexContent>
     		<xsd:extension base="mule:connectorType">
 		        <xsd:attribute name="bpms-ref" type="xsd:IDREF" use="required"/>
-		        <xsd:attribute name="allowGlobalReceiver" type="xsd:boolean"/>
-		        <xsd:attribute name="allowGlobalDispatcher" type="xsd:boolean"/>
+		        <xsd:attribute name="allowGlobalReceiver" type="mule:substitutableBoolean"/>
+		        <xsd:attribute name="allowGlobalDispatcher" type="mule:substitutableBoolean"/>
 		        <xsd:attribute name="processIdField" type="xsd:string"/>
 		    </xsd:extension>
     	</xsd:complexContent>

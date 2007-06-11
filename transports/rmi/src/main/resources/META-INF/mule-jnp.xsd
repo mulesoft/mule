@@ -22,7 +22,7 @@
     <xsd:complexType name="jnpConnectorType">
         <xsd:complexContent>
             <xsd:extension base="mule:jndiConnectorType">
-                <xsd:attribute name="pollingFrequency" type="xsd:long">
+                <xsd:attribute name="pollingFrequency" type="mule:substitutableLong">
                     <xsd:annotation>
                         <xsd:documentation>
                             Period (ms) between polling connections.

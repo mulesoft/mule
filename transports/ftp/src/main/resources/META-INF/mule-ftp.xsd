@@ -30,28 +30,28 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="pollingFrequency" type="xsd:int">
+                <xsd:attribute name="pollingFrequency" type="mule:substitutableLong">
                     <xsd:annotation>
                         <xsd:documentation>
                             Time (ms) between polling reads.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="binary" type="xsd:boolean">
+                <xsd:attribute name="binary" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
                             Select/disable binary file transfer type.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="passive" type="xsd:boolean">
+                <xsd:attribute name="passive" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
                             Select/disable passive protocol (more likely to work through firewalls).
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="validateConnections" type="xsd:boolean">
+                <xsd:attribute name="validateConnections" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
                             Validate connection (via NOOP) before use.

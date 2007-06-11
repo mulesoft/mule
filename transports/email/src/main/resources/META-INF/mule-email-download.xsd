@@ -23,7 +23,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="checkFrequency" type="xsd:int">
+                <xsd:attribute name="checkFrequency" type="mule:substitutableLong">
                     <xsd:annotation>
                         <xsd:documentation>
                             Period (ms) between poll connections to the server.
@@ -37,7 +37,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="deleteReadMessages" type="xsd:boolean">
+                <xsd:attribute name="deleteReadMessages" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
                             Whether or not to delete messages from the server when they have been downloaded.

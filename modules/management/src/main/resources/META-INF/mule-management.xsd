@@ -25,7 +25,7 @@
 
     <xsd:complexType name="connectorServerType">
         <xsd:attribute name="url" type="xsd:string" use="required"/>
-        <xsd:attribute name="rebind" type="xsd:boolean" use="optional" default="true"/>
+        <xsd:attribute name="rebind" type="mule:substitutableBoolean" use="optional" default="true"/>
     </xsd:complexType>
 
     <xsd:element name="jmx-mx4j-adapter">
@@ -45,14 +45,14 @@
 
     <xsd:element name="jmx-default-config">
         <xsd:complexType>
-            <xsd:attribute name="registerMx4jAdapter" type="xsd:boolean"/>
+            <xsd:attribute name="registerMx4jAdapter" type="mule:substitutableBoolean"/>
             <xsd:attribute name="name" type="xsd:string" use="required"/>
         </xsd:complexType>
     </xsd:element>
 
     <xsd:element name="jmx-notifications">
         <xsd:complexType>
-            <xsd:attribute name="registerdefaultListner" type="xsd:boolean"/>
+            <xsd:attribute name="registerdefaultListner" type="mule:substitutableBoolean"/>
             <xsd:attribute name="name" type="xsd:string" use="required"/>
         </xsd:complexType>
     </xsd:element>
@@ -88,7 +88,7 @@
                 </xsd:element>
             </xsd:choice>
             <xsd:attribute name="chainsawHost" type="xsd:string" use="required"/>
-            <xsd:attribute name="chainsawPort" type="xsd:int" use="required"/>
+            <xsd:attribute name="chainsawPort" type="mule:substitutablePortNumber" use="required"/>
             <xsd:attribute name="name" type="xsd:string" use="required"/>
         </xsd:complexType>
     </xsd:element>
@@ -105,7 +105,7 @@
     <xsd:element name="rmi-server">
         <xsd:complexType>
             <xsd:attribute name="serverUri" type="xsd:string"/>
-            <xsd:attribute name="createRegistry" type="xsd:boolean"/>
+            <xsd:attribute name="createRegistry" type="mule:substitutableBoolean"/>
             <xsd:attribute name="name" type="xsd:string" use="required"/>
         </xsd:complexType>
     </xsd:element>
