@@ -15,5 +15,7 @@
                 />
     </vm:connector>
 
+    <vm:connector name="second"/>
+
 </beans>
         
