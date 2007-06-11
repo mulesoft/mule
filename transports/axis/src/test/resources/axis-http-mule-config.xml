@@ -24,7 +24,12 @@
         <mule:service name="mycomponent2" service-ref="tsc">
             <mule:inbound-router>
                 <mule:endpoint address="axis:http://localhost:38009/mule/services">
-                <!-- TODO DO: how to specify endpoint list -->
+                    <property name="serviceInterfaces">
+                        <list>
+                            <value>org.mule.components.simple.EchoService</value>
+                            <value>org.mule.tck.testmodels.services.DateService</value>
+                        </list>
+                    </property>
                 </mule:endpoint>
             </mule:inbound-router>
         </mule:service>
