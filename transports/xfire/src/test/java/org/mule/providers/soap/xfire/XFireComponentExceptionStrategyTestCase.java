@@ -14,6 +14,7 @@ import org.mule.extras.client.MuleClient;
 import org.mule.providers.soap.xfire.testmodels.XFireEnabledFaultMessage;
 import org.mule.providers.soap.xfire.testmodels.CustomFault;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.umo.provider.DispatchException;
 
 import org.codehaus.xfire.fault.XFireFault;
 
@@ -28,7 +29,7 @@ public class XFireComponentExceptionStrategyTestCase extends FunctionalTestCase
         {
             client.send("xfire:http://localhost:10181/services/XFireDefault?method=testXFireException", "TEST", null);
         }
-        catch (org.mule.umo.provider.DispatchException ex)
+        catch (DispatchException ex)
         {
             final Throwable t = ex.getCause();
             assertNotNull("Cause should've been filled in.", t);
@@ -44,7 +45,7 @@ public class XFireComponentExceptionStrategyTestCase extends FunctionalTestCase
         {
             client.send("xfire:http://localhost:10181/services/XFireWithExceptionStrategy?method=testXFireException", "TEST", null);
         }
-        catch (org.mule.umo.provider.DispatchException ex)
+        catch (DispatchException ex)
         {
             final Throwable t = ex.getCause();
             assertNotNull("Cause should've been filled in.", t);
@@ -65,14 +66,13 @@ public class XFireComponentExceptionStrategyTestCase extends FunctionalTestCase
         {
             client.send("xfire:http://localhost:10181/services/XFireWithExceptionStrategy?method=testNonXFireException", "TEST", null);
         }
-        catch (org.mule.umo.provider.DispatchException ex)
+        catch (DispatchException ex)
         {
             final Throwable t = ex.getCause();
             assertNotNull("Cause should've been filled in.", t);
             assertTrue(t instanceof XFireFault);
         }
     }
-
 
     protected String getConfigResources()
     {

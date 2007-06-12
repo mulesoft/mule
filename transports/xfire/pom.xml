@@ -32,7 +32,6 @@
                         <exclude>**/XFireConnectorHttpFunctionalTestCase.java</exclude>
                         <exclude>**/XFireSoapRequestNoMethodParamTestCase.java</exclude>
                         <exclude>**/XFireCustomHttpHeaderTestCase.java</exclude>
-                        <exclude>**/XFireComponentExceptionStrategyTestCase.java</exclude>
                         <exclude>**/XFireNamespaceHandlerTestCase.java</exclude>
 
                         <!-- MULE-1134 -->

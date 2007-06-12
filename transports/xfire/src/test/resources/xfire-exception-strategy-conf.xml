@@ -21,8 +21,9 @@
             <mule:inbound-router>
                 <mule:endpoint address="xfire:http://localhost:10181/services"/>
             </mule:inbound-router>
+            <mule:custom-exception-strategy class="org.mule.providers.soap.xfire.XFireComponentExceptionStrategy"/>
         </mule:service>
-        <mule:service name="XFireDefault" service-ref="ftc">
+        <mule:service name="XFireDefault" service-ref="testService">
             <mule:inbound-router>
                 <mule:endpoint address="xfire:http://localhost:10181/services"/>
 	        </mule:inbound-router>
