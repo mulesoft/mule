@@ -127,9 +127,9 @@ public class MigrationMessages extends MessageFactory
         return createMessage(BUNDLE_PATH, 21);
     }
 
-    public static Message implementationShouldBeServiceRef()
+    public static Message implementationShouldBeServiceRef(String implementation, String descriptorName)
     {
-        return createMessage(BUNDLE_PATH, 22);
+        return createMessage(BUNDLE_PATH, 22, implementation, descriptorName);
     }
 }
 

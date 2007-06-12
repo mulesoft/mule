@@ -54,7 +54,7 @@
     </xsl:template>
 
     <xsl:template match="mule-environment-properties">
-        <bean name="muleConfiguratrion" class="org.mule.config.MuleConfiguration">
+        <bean name="_muleConfiguration" class="org.mule.config.MuleConfiguration">
             <xsl:if test="@model">
 
                 <xsl:variable name="err"
@@ -504,30 +504,34 @@
             </xsl:choose>
         </xsl:variable>
 
-        <xsl:variable name="implName">
+        <xsl:variable name="impl" select="@implementation"/>
+
+        <!-- This variable defines the service name, derived from the @implementation
+            attribute. If @implmentation looks like a class name then a new <bean> entry
+            is added to the context -->
+        <xsl:variable name="serviceName">
             <xsl:choose>
-                <xsl:when test="contains(@implementation, '.') = false">
-                    <xsl:value-of select="@implementation"/>
+                <xsl:when test="contains($impl, '.')">
+                    <!-- In the next step we'll create a bean entry for this implmentation -->
+                    <xsl:value-of select="concat(@name, '-impl')"/>
                 </xsl:when>
                 <xsl:otherwise>
-                    <xsl:value-of select="concat(@name, '-impl')"/>
+                    <xsl:value-of select="$impl"/>
                     <xsl:variable name="err"
-                      select="helper:implementationShouldBeServiceRef()"/>
+                      select="helper:implementationShouldBeServiceRef($impl, $name)"/>
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
 
-        <xsl:variable name="impl" select="@implementation"/>
-
-        <xsl:if test="contains(@implementation, '.')">
+        <xsl:if test="contains($impl, '.')">
             <!-- The backing service bean. -->
             <bean name="{$name}-impl" class="{$impl}" singleton="false"/>
         </xsl:if>
 
-        <bean name="{$name}" class="{$type}" depends-on="{$currentModel},{$implName}">
+        <bean name="{$name}" class="{$type}" depends-on="{$currentModel},{$serviceName}">
             <property name="service">
                 <value>
-                    <xsl:value-of select="$implName"/>
+                    <xsl:value-of select="$serviceName"/>
                 </value>
             </property>
 
