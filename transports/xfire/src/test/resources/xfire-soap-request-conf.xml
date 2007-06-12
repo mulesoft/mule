@@ -1,4 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xfire="http://www.mulesource.org/schema/mule/xfire/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/xfire/2.0 http://www.mulesource.org/schema/mule/xfire/2.0/mule-xfire.xsd">
+
+    <!--
+        Testing Xfire Soap Request
+     -->
+    
+    <bean name="tc" class="org.mule.tck.testmodels.services.TestComponent"/>
+     
+    <mule:model-seda name="XfireSoapRequest">
+        <mule:service name="TestComponent" service-ref="tc">
+            <mule:inbound-router>
+                <mule:endpoint address="xfire:http://localhost:33381/services"/>
+            </mule:inbound-router>
+        </mule:service>
+    </mule:model-seda>
+</beans>
+
+<!-- 
 <!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
                                 "http://mule.mulesource.org/dtds/mule-configuration.dtd">
 
@@ -18,3 +43,4 @@
         </mule-descriptor>
     </model>
 </mule-configuration>
+ -->

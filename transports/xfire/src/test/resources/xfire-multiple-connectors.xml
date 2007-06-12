@@ -1,5 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xfire="http://www.mulesource.org/schema/mule/xfire/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/xfire/2.0 http://www.mulesource.org/schema/mule/xfire/2.0/mule-xfire.xsd">
+    
+    <bean name="tc" class="org.mule.tck.testmodels.services.TestComponent" scope="prototype"/>
+    
+    <xfire:connector name="XFireConnector1"/>
+    <xfire:connector name="XFireConnector2"/>
+    
+    <mule:endpoint name="xfire1" 
+        address="xfire:http://localhost:8081/services/TestComponent1?method=receive" 
+        connector-ref="XFireConnector1"/>
 
+    <mule:endpoint name="xfire2" 
+        address="xfire:http://localhost:8082/services/TestComponent2?method=receive" 
+        connector-ref="XFireConnector2"/>
+
+    <mule:model-seda name="TestXfireConnectors">
+        <!-- Two separate components are created instead of 1 with 2 endpoints so that exceptions are not compomised -->
+        <mule:service name="TestComponent1" service-ref="tc">
+            <mule:inbound-router>
+                <mule:endpoint address="xfire:http://localhost:8081/services" connector-ref="XFireConnector1"/>
+            </mule:inbound-router>
+        </mule:service>
+
+        <mule:service name="TestComponent2" service-ref="tc">
+            <mule:inbound-router>
+                <mule:endpoint address="xfire:http://localhost:8082/services" connector-ref="XFireConnector2"/>
+            </mule:inbound-router>
+        </mule:service>
+    </mule:model-seda>
+</beans>
+<!-- 
 <!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
                                 "http://mule.mulesource.org/dtds/mule-configuration.dtd">
 
@@ -15,7 +52,7 @@
 
     <model name="TestXfireConnectors">
         
-        <!--Two separate components are created instead of 1 with 2 endpoints so that exceptions are not compomised-->
+        <!--Two separate components are created instead of 1 with 2 endpoints so that exceptions are not compomised ->
         <mule-descriptor name="TestComponent1" implementation="org.mule.tck.testmodels.services.TestComponent">
             <inbound-router>
                 <endpoint address="xfire:http://localhost:8081/services" connector="XFireConnector1"/>
@@ -30,3 +67,4 @@
 
     </model>
 </mule-configuration>
+ -->
