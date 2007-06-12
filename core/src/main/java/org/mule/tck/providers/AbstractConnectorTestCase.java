@@ -46,11 +46,6 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
 
     private String connectorName = null;
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see junit.framework.TestCase#setUp()
-     */
     protected void doSetUp() throws Exception
     {
         model = new SedaModel();
@@ -58,14 +53,13 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         managementContext.getRegistry().registerModel(model);
         descriptor = getTestDescriptor("apple", Apple.class.getName());
         connector = getConnector();
-        if(connector.getName()==null)
+        connectorName = connector.getName();
+        if (connectorName == null)
         {
             fail("You need to set the connector name on the connector before returning it");
         }
-        connectorName = connector.getName();
         managementContext.getRegistry().registerConnector(connector);
         managementContext.start();
-
     }
 
     protected void doTearDown() throws Exception
