@@ -23,7 +23,8 @@ public class XFireConnectorTestCase extends AbstractConnectorTestCase
     public UMOConnector getConnector() throws Exception
     {
         XFireConnector c = new XFireConnector();
-        c.initialise();
+        c.setName("xfireConnector");
+        c.setManagementContext(managementContext);
         return c;
     }
 

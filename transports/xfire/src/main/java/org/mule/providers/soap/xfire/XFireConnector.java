@@ -104,7 +104,6 @@ public class XFireConnector extends AbstractConnector
 
     protected void doInitialise() throws InitialisationException
     {
-
         try
         {
             managementContext.registerListener(this);

@@ -17,6 +17,7 @@ import org.codehaus.xfire.service.Binding;
 import org.codehaus.xfire.service.Service;
 import org.codehaus.xfire.soap.Soap11;
 import org.codehaus.xfire.soap.Soap12;
+import org.codehaus.xfire.soap.SoapTransport;
 import org.codehaus.xfire.soap.SoapTransportHelper;
 import org.codehaus.xfire.soap.SoapVersion;
 import org.codehaus.xfire.transport.AbstractTransport;
@@ -26,9 +27,11 @@ import org.codehaus.xfire.wsdl11.WSDL11Transport;
 import org.mule.providers.soap.xfire.MuleInvoker;
 
 /**
- * TODO document
+ * This is a custom xfire transport that implements custom interaction with mule as well
+ * as supports a wider range of transport schemes that xfire's soap transport implementation.
  */
-public class MuleUniversalTransport extends AbstractTransport implements WSDL11Transport
+public class MuleUniversalTransport extends AbstractTransport 
+    implements WSDL11Transport, SoapTransport
 {
     public static final String SOAP11_HTTP_BINDING = "http://schemas.xmlsoap.org/soap/http";
     public static final String SOAP12_HTTP_BINDING = "http://www.w3.org/2003/05/soap/bindings/HTTP/";

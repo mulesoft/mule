@@ -21,7 +21,6 @@ import org.mule.util.ClassUtils;
 import org.mule.util.MapUtils;
 import org.mule.util.StringUtils;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
@@ -101,13 +100,13 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
                 rewriteProperty(props, "schemas");
             }
 
-            serviceInterfaces = (List)component.getDescriptor().getProperties().get(
-                "serviceInterfaces");
+            serviceInterfaces = (List)component.getDescriptor().getProperties().get("serviceInterfaces");
             Class exposedInterface;
 
             if (serviceInterfaces == null)
+            {
                 exposedInterface = component.getDescriptor().getService().getClass();
-
+            }
             else
             {
                 String className = (String)serviceInterfaces.get(0);
@@ -154,16 +153,6 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
                 sync = true;
             }
             service.setInvoker(new MuleInvoker(this, sync));
-        }
-        catch (ClassNotFoundException e)
-        {
-            // will be thrown in the case that the ClassUtils.loadClass() does
-            // not find the class to load
-            throw new InitialisationException(e, this);
-        }
-        catch (MalformedURLException e)
-        {
-            throw new InitialisationException(e, this);
         }
         catch (Exception e)
         {
