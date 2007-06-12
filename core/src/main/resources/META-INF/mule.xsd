@@ -12,14 +12,14 @@
                 schemaLocation="http://www.springframework.org/schema/beans/spring-beans-2.0.xsd"/>
 
     <xsd:element name="environment-properties">
-
+        <xsd:annotation>
+            <xsd:documentation>An simple map of properties to associate with the Mule instance</xsd:documentation>
+        </xsd:annotation>
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="spring:mapType">
-                    <!--<xsd:attribute name="map-class" default="java.util.HashMap"/>-->
                 </xsd:extension>
             </xsd:complexContent>
-
         </xsd:complexType>
     </xsd:element>
 
