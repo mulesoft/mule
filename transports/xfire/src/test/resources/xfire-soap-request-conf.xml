@@ -13,7 +13,9 @@
      -->
     
     <bean name="tc" class="org.mule.tck.testmodels.services.TestComponent"/>
-     
+    
+    <mule:configuration serverId="" defaultSynchronousEndpoints="true"/>
+    
     <mule:model-seda name="XfireSoapRequest">
         <mule:service name="TestComponent" service-ref="tc">
             <mule:inbound-router>
