@@ -129,10 +129,14 @@ public abstract class AbstractMuleTestCase extends TestCase
         }
     }
 
-//    public String getName()
-//    {
-//        return super.getName().substring(4).replaceAll("([A-Z])", " $1").toLowerCase() + " ";
-//    }
+    public String getName()
+    {
+        if (verbose)
+        {
+            return super.getName().substring(4).replaceAll("([A-Z])", " $1").toLowerCase() + " ";
+        }
+        return super.getName();
+    }
 
     public void run(TestResult result)
     {
