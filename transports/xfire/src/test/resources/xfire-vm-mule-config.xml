@@ -10,10 +10,8 @@
 
     <bean name="tsc" class="org.mule.tck.testmodels.services.TestServiceComponent" scope="prototype"/>
     
-    <mule:environment-properties>
-        <entry key="synchronous" value="true"/>
-    </mule:environment-properties>
-    
+    <mule:configuration serverId="" defaultSynchronousEndpoints="true"/>
+        
     <mule:model-seda name="test">
         <mule:service name="mycomponent" service-ref="tsc">
             <mule:inbound-router>

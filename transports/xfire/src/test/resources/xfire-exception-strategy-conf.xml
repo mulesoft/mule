@@ -14,10 +14,7 @@
     <bean name="testService" class="org.mule.providers.soap.xfire.testmodels.TestXFireComponent" 
         scope="prototype"/>
 
-    <mule:environment-properties>
-        <entry key="synchronous" value="true"/>
-        <entry key="enableMessageEvents" value="true"/>
-    </mule:environment-properties>
+    <mule:configuration serverId="" defaultSynchronousEndpoints="true"/>
     
     <mule:model-seda name="TestXFireComponentExceptionStrategy">
         <mule:service name="XFireWithExceptionStrategy" service-ref="testService">
