@@ -301,7 +301,7 @@ public class ManagementContext implements UMOManagementContext
         {
             logger.info(getEndSplash());
         }
-        lifecycleManager.reset();
+        //lifecycleManager.reset();
     }
 
 
