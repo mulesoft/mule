@@ -54,7 +54,7 @@
     </xsl:template>
 
     <xsl:template match="mule-environment-properties">
-        <bean name="_muleConfiguration" class="org.mule.config.MuleConfiguration">
+        <bean name="config" class="org.mule.config.MuleConfiguration">
             <xsl:if test="@model">
 
                 <xsl:variable name="err"
