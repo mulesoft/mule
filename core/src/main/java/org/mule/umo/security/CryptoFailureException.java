@@ -22,6 +22,9 @@ import org.mule.umo.UMOEncryptionStrategy;
  * message. Implementors of UMOEncryptionStrategy should provide a toString method
  * that exposes *only* information that maybe useful for debugging not passwords,
  * secret keys, etc.
+ * 
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
+ * @version $Revision$
  */
 public class CryptoFailureException extends MuleException
 {

@@ -16,6 +16,7 @@ import org.mule.umo.UMOMessage;
 
 /**
  * <code>SecurityException</code> is a generic security exception
+ * 
  */
 public abstract class SecurityException extends MessagingException
 {

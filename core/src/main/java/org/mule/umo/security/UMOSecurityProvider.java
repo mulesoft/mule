@@ -16,6 +16,9 @@ import org.mule.umo.lifecycle.Initialisable;
  * <code>UMOSecurityProvider</code> is a target security provider thsat actually
  * does the work of authenticating credentials and populating the UMOAuthentication
  * object.
+ * 
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
+ * @version $Revision$
  */
 
 public interface UMOSecurityProvider extends Initialisable

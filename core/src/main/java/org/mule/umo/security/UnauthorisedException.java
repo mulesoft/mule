@@ -18,6 +18,9 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 /**
  * <code>UnauthorisedException</code> is thrown if authentication fails
+ * 
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
+ * @version $Revision$
  */
 
 public class UnauthorisedException extends SecurityException

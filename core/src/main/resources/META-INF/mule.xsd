@@ -39,6 +39,9 @@
     <xsd:element name="resin-transaction-manager" type="transactionManagersType"/>
 
 
+    <!--<xsd:element name="security-manager" type="shared:securityManagerType" minOccurs="0"/>-->
+
+
     <!--<xsd:element name="connectors" minOccurs="0">-->
     <!--<xsd:complexType>-->
     <!--<xsd:sequence>-->
@@ -315,6 +318,16 @@
     </xsd:complexType>
 
 
+    <xsd:complexType name="encryptionStrategyType">
+        <xsd:choice>
+            <xsd:any namespace="http://www.springframework.org/schema/beans" processContents="strict" minOccurs="0"
+                     maxOccurs="unbounded"/>
+        </xsd:choice>
+        <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
+        <xsd:attribute name="name" type="xsd:string" use="required"/>
+    </xsd:complexType>
+
+
     <xsd:complexType name="storageType">
         <xsd:choice maxOccurs="unbounded">
             <xsd:any namespace="##other" minOccurs="0" maxOccurs="unbounded"/>
@@ -360,60 +373,18 @@
         <xsd:attribute name="persistent" type="substitutableBoolean" default="false"/>
     </xsd:complexType>
 
-
-    <xsd:element name="security-manager" type="securityManagerType"/>
-
     <xsd:complexType name="securityManagerType">
-        <xsd:annotation>
-            <xsd:documentation>
-                This is an empty holder that can be extended by modules that want to
-                provide security managers.  Typically it will contain elements called
-                module:type-security-provider which extend securityProviderType
-                where "module" might be "acegi" and "type" might de "delegate", for example.
-                Alternatively (or in addition) it may contain encryptin strategies,
-                which should follow a similar scheme and extend encryptionStrategyType.
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:attribute name="name" type="xsd:string"/>
+        <xsd:sequence>
+            <xsd:element name="security-provider" type="securityProviderType" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element name="encryption-strategy" type="encryptionStrategyType" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attribute name="class" type="xsd:NMTOKEN"/>
     </xsd:complexType>
 
     <xsd:complexType name="securityProviderType">
+        <xsd:attribute name="class" type="xsd:NMTOKEN"/>
         <xsd:attribute name="name" type="xsd:string" use="required"/>
     </xsd:complexType>
-
-    <xsd:complexType name="encryptionStrategyType">
-        <xsd:attribute name="name" type="xsd:string" use="required"/>
-    </xsd:complexType>
-
-    <!-- TODO - rest of security to do still -->
-
-    <xsd:complexType name="defaultSecurityManagerType">
-        <xsd:complexContent>
-            <xsd:extension base="securityManagerType">
-                <xsd:sequence>
-                    <xsd:element name="custom-security-provider" type="customSecurityProviderType" minOccurs="0" maxOccurs="unbounded"/>
-                    <xsd:element name="custom-encryption-strategy" type="customEncryptionStrategyType" minOccurs="0" maxOccurs="unbounded"/>
-                </xsd:sequence>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:complexType name="customSecurityProviderType">
-        <xsd:complexContent>
-            <xsd:extension base="securityProviderType">
-                <xsd:attribute name="provider-ref" type="xsd:NMTOKEN" use="required"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:complexType name="customEncryptionStrategyType">
-        <xsd:complexContent>
-            <xsd:extension base="encryptionStrategyType">
-                <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
 
     <xsd:complexType name="threadingProfileType">
         <xsd:attribute name="maxThreadsActive" type="xsd:string"/>

@@ -15,6 +15,8 @@ package org.mule.umo.security;
  * with the UMOSession.
  * 
  * @see org.mule.umo.UMOSession
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
+ * @version $Revision$
  */
 
 public interface UMOSecurityContext
