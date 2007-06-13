@@ -43,6 +43,7 @@ import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
+import org.mule.util.object.SimpleObjectFactory;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArraySet;
 import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
@@ -809,7 +810,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
         }
         // TODO RM: Need to put the actual instance here (not just the name reference), 
         // please review whether the following is correct?
-        descriptor.setService(new MuleEventMulticaster());
+        descriptor.setServiceFactory(new SimpleObjectFactory(MuleEventMulticaster.class));
         return descriptor;
     }
 

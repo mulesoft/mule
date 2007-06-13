@@ -12,6 +12,7 @@ package org.mule.ra;
 
 import org.mule.MuleException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.impl.ManagementContextAware;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.RequestContext;
@@ -138,6 +139,8 @@ public class JcaComponent implements UMOComponent, ManagementContextAware
 
     public synchronized void initialise() throws InitialisationException
     {
+        throw new InitialisationException(MessageFactory.createStaticMessage("This component needs to be reviewed for Mule 2.0 (see MULE-1910)"), this);
+        /*
         if (initialised.get())
         {
             throw new InitialisationException(
@@ -167,10 +170,13 @@ public class JcaComponent implements UMOComponent, ManagementContextAware
         initialised.set(true);
         managementContext.fireNotification(
             new ComponentNotification(descriptor, ComponentNotification.COMPONENT_INITIALISED));
+        */
     }
 
     protected Object getDelegateComponent() throws InitialisationException
     {
+        throw new InitialisationException(MessageFactory.createStaticMessage("This component needs to be reviewed for Mule 2.0 (see MULE-1910)"), this);
+        /*
         Object impl = descriptor.getService();
         Object component = null;
 
@@ -192,6 +198,7 @@ public class JcaComponent implements UMOComponent, ManagementContextAware
         // Call any custom initialisers
         descriptor.fireInitialisationCallbacks(component);
         return component;
+        */
     }
 
     public boolean isStarted()

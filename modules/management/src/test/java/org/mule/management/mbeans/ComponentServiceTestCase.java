@@ -12,6 +12,7 @@ package org.mule.management.mbeans;
 
 import org.mule.impl.MuleDescriptor;
 import org.mule.management.AbstractMuleJmxTestCase;
+import org.mule.util.object.SingletonObjectFactory;
 
 import java.util.Set;
 
@@ -24,7 +25,7 @@ public class ComponentServiceTestCase extends AbstractMuleJmxTestCase
         final String domainOriginal = "TEST_DOMAIN_1";
 
         final MuleDescriptor descriptor = new MuleDescriptor("TEST_SERVICE");
-        descriptor.setService(new Object());
+        descriptor.setServiceFactory(new SingletonObjectFactory(new Object()));
         getDefaultModel(managementContext).registerComponent(descriptor);
 
         managementContext.start();

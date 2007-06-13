@@ -25,6 +25,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.manager.UMOWorkManager;
 import org.mule.util.ClassUtils;
+import org.mule.util.object.SingletonObjectFactory;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -167,7 +168,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
                 String name = "JcaComponent#" + messageEndpoint.hashCode();
                 MuleDescriptor descriptor = new MuleDescriptor(name);
                 descriptor.getInboundRouter().addEndpoint(endpoint);
-                descriptor.setService(messageEndpoint);
+                descriptor.setServiceFactory(new SingletonObjectFactory(messageEndpoint));
                 managementContext.getRegistry().lookupModel(JcaModel.JCA_MODEL_TYPE).registerComponent(descriptor);
 
                 MuleEndpointKey key = new MuleEndpointKey(endpointFactory, (MuleActivationSpec)activationSpec);
