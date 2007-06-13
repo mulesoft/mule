@@ -8,10 +8,9 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/axis/2.0/mule-axis.xsd">
 
-    <bean name="echo" class="org.mule.components.simple.EchoComponent"/>
-    
     <mule:model-seda name="Axis_Headers_TestCase">
-        <mule:service name="component" service-ref="echo">
+        <mule:service name="component">
+        	<mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="axis:http://localhost:12181/services"/>
             </mule:inbound-router>

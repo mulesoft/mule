@@ -8,11 +8,9 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/axis/2.0/mule-axis.xsd">
 
-    <bean name="tsc" class="org.mule.tck.testmodels.services.TestServiceComponent"/>
-    <bean name="echo" class="org.mule.components.simple.EchoComponent"/>
-
     <mule:model-seda name="test">
-        <mule:service name="mycomponent1" service-ref="echo">
+        <mule:service name="mycomponent1">
+        	<mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="vm://mycomponent1"/>
             </mule:inbound-router>
@@ -26,7 +24,8 @@
             </mule:outbound-router>
         </mule:service>
 
-        <mule:service name="mycomponent2" service-ref="tsc">
+        <mule:service name="mycomponent2">
+        	<mule:component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="axis:http://localhost:38011/mule" synchronous="true"/>
             </mule:inbound-router>

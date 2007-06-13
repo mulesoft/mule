@@ -8,10 +8,9 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/axis/2.0/mule-axis.xsd">
 
-    <bean name="echo" class="org.mule.components.simple.EchoComponent" scope="prototype"/>
-
     <mule:model-seda name="test">
-        <mule:service name="EchoService1" service-ref="echo">
+        <mule:service name="EchoService1">
+        	<mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="axis:http://localhost:8081/services">
                     <property name="serviceNamespace" value="http://foo"/>
@@ -19,7 +18,8 @@
             </mule:inbound-router>
         </mule:service>
 
-        <mule:service name="EchoService2" service-ref="echo">
+        <mule:service name="EchoService2">
+        	<mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="axis:http://localhost:8082/services">
                     <property name="wsdlPortType" value="mulePortType"/>
@@ -29,7 +29,8 @@
             </mule:inbound-router>
         </mule:service>    
 
-        <mule:service name="EchoService3" service-ref="echo">
+        <mule:service name="EchoService3">
+        	<mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="axis:http://localhost:8083/services">
                     <property name="wsdlFile" value="test-service.wsdl"/>
