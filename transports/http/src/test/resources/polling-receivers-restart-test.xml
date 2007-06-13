@@ -16,16 +16,11 @@
 
     <http:connector name="HttpConnector"/>
 
-    <bean name="ftc" class="org.mule.tck.functional.FunctionalTestComponent"/>
-
-    <bean name="static" class="org.mule.components.simple.StaticComponent">
-        <property name="data" value="Here's your content."/>
-    </bean>
-
-    <mule:model-seda name="main">
+    <mule:model-seda name="main" class="org.mule.tck.testmodels.mule.TestSedaModel">
 
         <!-- singleton for easier testing only -->
-        <mule:service name="Test" service-ref="ftc" singleton="true">
+        <mule:service name="Test">
+            <mule:component class="org.mule.tck.functional.FunctionalTestComponent" scope="singleton" />
             <mule:inbound-router>
                 <mule:endpoint name="httpEndpoint" connector-ref="PollingHttpConnector"
                                address="http://localhost:12345/TestServer"/>
@@ -37,7 +32,12 @@
             </mule:outbound-router>
         </mule:service>
 
-        <mule:service name="TestServer" service-ref="static">
+        <mule:service name="TestServer">
+            <mule:component class="org.mule.components.simple.StaticComponent">
+        		<mule:properties>
+			    	<prop key="data">Here's your content.</prop>
+        		</mule:properties>
+        	</mule:component>
             <mule:inbound-router>
                 <mule:endpoint address="http://localhost:12345" connector-ref="HttpConnector"/>
             </mule:inbound-router>

@@ -16,22 +16,20 @@
     <mule:endpoint name="inbound" address="http://localhost:60201" synchronous="true"/>
 
     <mule:custom-transformer name="appendString"
-                             class="org.mule.tck.functional.StringAppendTestTranformer"/>
+                             class="org.mule.tck.functional.StringAppendTestTransformer"/>
 
     <mule:custom-transformer name="appendString2"
-                             class="org.mule.tck.functional.StringAppendTestTranformer">
+                             class="org.mule.tck.functional.StringAppendTestTransformer">
         <mule:property name="message" value=" transformed 2"/>
     </mule:custom-transformer>
 
     <!-- first, the simple two service model we use in all cases, with no additional
          transformers -->
 
-    <bean name="ftc1" class="org.mule.tck.functional.FunctionalTestComponent"/>
-    <bean name="through1" class="org.mule.components.simple.BridgeComponent"/>
-
     <mule:model-seda name="baseModel">
 
-        <mule:service name="baseService1" service-ref="through1">
+        <mule:service name="baseService1">
+        	<mule:component class="org.mule.components.simple.BridgeComponent"/>
             <mule:inbound-router>
                 <mule:endpoint-ref nameref="base"/>
             </mule:inbound-router>
@@ -42,7 +40,8 @@
             </mule:outbound-router>
         </mule:service>
 
-        <mule:service name="baseService2" service-ref="ftc1">
+        <mule:service name="baseService2">
+        	<mule:component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="vm://echo1" synchronous="true"/>
             </mule:inbound-router>
@@ -54,12 +53,10 @@
     <!-- next, the same model but with adapted components that call
          getMessage() rather than getTransformedMessage() -->
 
-    <bean name="ftc2" class="org.mule.providers.http.issues.NoTransformFunctionalTestComponent"/>
-    <bean name="through2" class="org.mule.providers.http.issues.NoTransformPassThroughComponent"/>
-
     <mule:model-seda name="adaptedModel">
 
-        <mule:service name="adaptedService1" service-ref="through2">
+        <mule:service name="adaptedService1">
+        	<mule:component class="org.mule.providers.http.issues.NoTransformPassThroughComponent"/>
             <mule:inbound-router>
                 <mule:endpoint-ref nameref="adapted"/>
             </mule:inbound-router>
@@ -70,7 +67,8 @@
             </mule:outbound-router>
         </mule:service>
 
-        <mule:service name="adaptedService2" service-ref="ftc2">
+        <mule:service name="adaptedService2">
+        	<mule:component class="org.mule.providers.http.issues.NoTransformFunctionalTestComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="vm://echo2" synchronous="true"/>
             </mule:inbound-router>
@@ -81,12 +79,10 @@
 
     <!-- now we add transformers to the adapted model - they should have no effect -->
 
-    <bean name="ftc3" class="org.mule.providers.http.issues.NoTransformFunctionalTestComponent"/>
-    <bean name="through3" class="org.mule.providers.http.issues.NoTransformPassThroughComponent"/>
-
     <mule:model-seda name="ignoredModel">
 
-        <mule:service name="ignoredService1" service-ref="through3">
+        <mule:service name="ignoredService1">
+        	<mule:component class="org.mule.providers.http.issues.NoTransformPassThroughComponent"/>
             <mule:inbound-router>
                 <mule:endpoint-ref nameref="ignored" transformers="appendString"/>
             </mule:inbound-router>
@@ -97,7 +93,8 @@
             </mule:outbound-router>
         </mule:service>
 
-        <mule:service name="ignoredService2" service-ref="ftc3">
+        <mule:service name="ignoredService2">
+        	<mule:component class="org.mule.providers.http.issues.NoTransformFunctionalTestComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="vm://echo3" synchronous="true" transformers="appendString2"/>
             </mule:inbound-router>
@@ -107,12 +104,10 @@
 
     <!-- adding transformers to the base model will have an effect -->
 
-    <bean name="ftc4" class="org.mule.tck.functional.FunctionalTestComponent"/>
-    <bean name="through4" class="org.mule.components.simple.BridgeComponent"/>
-
     <mule:model-seda name="inboundModel">
 
-        <mule:service name="inboundService1" service-ref="through4">
+        <mule:service name="inboundService1">
+        	<mule:component class="org.mule.components.simple.BridgeComponent"/>
             <mule:inbound-router>
                 <mule:endpoint-ref nameref="inbound" transformers="appendString"/>
             </mule:inbound-router>
@@ -123,7 +118,8 @@
             </mule:outbound-router>
         </mule:service>
 
-        <mule:service name="inboundService2" service-ref="ftc4">
+        <mule:service name="inboundService2">
+        	<mule:component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="vm://echo4" synchronous="true" transformers="appendString2"/>
             </mule:inbound-router>

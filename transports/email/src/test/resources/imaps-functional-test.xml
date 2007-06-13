@@ -22,11 +22,10 @@
     </imaps:connector>
     <vm:connector name="vmConnector" queueEvents="true"/>
 
-    <bean name="bridge" class="org.mule.components.simple.BridgeComponent"/>
-
     <mule:model-seda name="test">
 
-        <mule:service name="relay" service-ref="bridge">
+        <mule:service name="relay">
+        	<mule:component class="org.mule.components.simple.BridgeComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="imaps://bob:password@localhost:65444" connector-ref="imapsConnector">
                     <mule:retry-connection-strategy retryCount="3" retryFrequency="1000"/>

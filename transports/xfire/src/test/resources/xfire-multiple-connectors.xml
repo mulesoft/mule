@@ -8,8 +8,6 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/xfire/2.0 http://www.mulesource.org/schema/mule/xfire/2.0/mule-xfire.xsd">
     
-    <bean name="tc" class="org.mule.tck.testmodels.services.TestComponent" scope="prototype"/>
-    
     <xfire:connector name="XFireConnector1"/>
     <xfire:connector name="XFireConnector2"/>
     
@@ -23,13 +21,15 @@
 
     <mule:model-seda name="TestXfireConnectors">
         <!-- Two separate components are created instead of 1 with 2 endpoints so that exceptions are not compomised -->
-        <mule:service name="TestComponent1" service-ref="tc">
+        <mule:service name="TestComponent1">
+            <mule:component class="org.mule.tck.testmodels.services.TestComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="xfire:http://localhost:8081/services" connector-ref="XFireConnector1"/>
             </mule:inbound-router>
         </mule:service>
 
-        <mule:service name="TestComponent2" service-ref="tc">
+        <mule:service name="TestComponent2">
+            <mule:component class="org.mule.tck.testmodels.services.TestComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="xfire:http://localhost:8082/services" connector-ref="XFireConnector2"/>
             </mule:inbound-router>

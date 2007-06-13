@@ -33,11 +33,10 @@
         </mule:properties>
     </mule:endpoint>
 
-    <bean name="bridge" class="org.mule.components.simple.BridgeComponent"/>
-
     <mule:model-seda name="sample">
 
-        <mule:service name="TestUMO" service-ref="bridge">
+        <mule:service name="TestUMO">
+            <mule:component class="org.mule.components.simple.BridgeComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="vm://testin"/>
             </mule:inbound-router>

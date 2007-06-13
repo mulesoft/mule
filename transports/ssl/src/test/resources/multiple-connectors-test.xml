@@ -23,11 +23,10 @@
 
     <mule:endpoint name="clientEndpoint" address="ssl://localhost:60198" synchronous="true"/>
 
-    <bean id="reply" class="org.mule.tck.functional.FunctionalTestComponent"/>
-
     <mule:model-seda name="main">
 
-        <mule:service name="testComponent1" service-ref="reply">
+        <mule:service name="testComponent1">
+        	<mule:component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <mule:inbound-router>
                 <mule:endpoint-ref nameref="clientEndpoint"/>
             </mule:inbound-router>

@@ -11,13 +11,11 @@
     <!--
         Testing Xfire Soap Request
      -->
-    
-    <bean name="tc" class="org.mule.tck.testmodels.services.TestComponent"/>
-    
     <mule:configuration serverId="" defaultSynchronousEndpoints="true"/>
     
     <mule:model-seda name="XfireSoapRequest">
-        <mule:service name="TestComponent" service-ref="tc">
+        <mule:service name="TestComponent">
+            <mule:component class="org.mule.tck.testmodels.services.TestComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="xfire:http://localhost:33381/services"/>
             </mule:inbound-router>

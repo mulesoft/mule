@@ -8,10 +8,9 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd">
 
-    <bean name="echo" class="org.mule.components.simple.EchoComponent"/>
-
     <mule:model-seda name="main">
-        <mule:service name="httpIn" service-ref="echo">
+        <mule:service name="httpIn">
+            <mule:component class="org.mule.components.simple.EchoComponent" />
             <mule:inbound-router>
                 <mule:endpoint address="http://localhost:60198" synchronous="true"/>
             </mule:inbound-router>

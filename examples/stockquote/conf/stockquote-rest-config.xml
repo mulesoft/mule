@@ -39,15 +39,16 @@
         <mule:property name="xslFile" value="xsl/rest-stock.xsl"/>
     </mule:custom-transformer>
 
-    <bean name="RestServiceWrapper" class="org.mule.components.rest.RestServiceWrapper">
-        <property name="serviceUrl" value="http://www.webservicex.net/stockquote.asmx/GetQuote"/>
-        <property name="payloadParameterName" value="symbol"/>
-        <property name="httpMethod" value="POST"/>
-    </bean>
-
     <mule:model-seda name="Sample">
-        <mule:service name="HTTPPostSample"
-                      service-ref="RestServiceWrapper">
+        <mule:service name="HTTPPostSample">
+        	<mule:component class="org.mule.components.rest.RestServiceWrapper">
+        		<mule:properties>
+			    	<prop key="serviceUrl">http://www.webservicex.net/stockquote.asmx/GetQuote</prop>
+			    	<prop key="payloadParameterName">symbol</prop>
+			    	<prop key="httpMethod">POST</prop>
+        		</mule:properties>
+        	</mule:component>
+
             <mule:inbound-router>
                 <mule:endpoint address="vm://stockquote"
                                responseTransformers="XmlDecoder Xslt XmlToObject"/>

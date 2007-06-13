@@ -11,10 +11,9 @@
     <tcp:connector name="tcpConnector1"/>
     <tcp:connector name="tcpConnector2"/>
 
-    <bean name="bridge" class="org.mule.components.simple.BridgeComponent"/>
-
     <mule:model-seda name="MultilpleConnectorsTestModel">
-        <mule:service name="testDescriptor" service-ref="bridge">
+        <mule:service name="testDescriptor">
+        	<mule:component class="org.mule.components.simple.BridgeComponent"/>
             <mule:inbound-router>
                 <!-- if the connector-ref was removed this would give an error
                      since we have multiple connectors -->

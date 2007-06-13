@@ -17,7 +17,12 @@
 
     <mule:model-seda name="main">
 
-        <mule:service name="Component1" service-ref="testComponent1">
+        <mule:service name="Component1">
+        	<mule:component class="org.mule.tck.functional.FunctionalTestComponent">
+        		<mule:properties>
+			    	<prop key="appendComponentName">true</prop>
+        		</mule:properties>
+        	</mule:component>
             <mule:inbound-router>
                 <mule:endpoint-ref nameref="serverEndpoint"/>
             </mule:inbound-router>
@@ -28,7 +33,12 @@
             </mule:outbound-router>
         </mule:service>
 
-        <mule:service name="Component2" service-ref="testComponent2">
+        <mule:service name="Component2">
+        	<mule:component class="org.mule.tck.functional.FunctionalTestComponent">
+        		<mule:properties>
+			    	<prop key="appendComponentName">true</prop>
+        		</mule:properties>
+        	</mule:component>
             <mule:inbound-router>
                 <mule:endpoint-ref nameref="serverEndpoint"/>
             </mule:inbound-router>
@@ -39,7 +49,12 @@
             </mule:outbound-router>
         </mule:service>
 
-        <mule:service name="Component3" service-ref="testComponent3">
+        <mule:service name="Component3">
+        	<mule:component class="org.mule.tck.functional.FunctionalTestComponent">
+        		<mule:properties>
+			    	<prop key="appendComponentName">true</prop>
+        		</mule:properties>
+        	</mule:component>
             <mule:inbound-router>
                 <mule:endpoint-ref nameref="serverEndpoint"/>
             </mule:inbound-router>
@@ -51,17 +66,5 @@
         </mule:service>
 
     </mule:model-seda>
-
-    <bean name="testComponent1" class="org.mule.tck.functional.FunctionalTestComponent">
-        <property name="appendComponentName" value="true"/>
-    </bean>
-
-    <bean name="testComponent2" class="org.mule.tck.functional.FunctionalTestComponent">
-        <property name="appendComponentName" value="true"/>
-    </bean>
-
-    <bean name="testComponent3" class="org.mule.tck.functional.FunctionalTestComponent">
-        <property name="appendComponentName" value="true"/>
-    </bean>
 
 </beans>

@@ -24,7 +24,8 @@
 
     <mule:model-seda name="main">
 
-        <mule:service name="PassingThrough" service-ref="Just">
+        <mule:service name="PassingThrough">
+        	<mule:component class="org.mule.components.simple.PassThroughComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="udp://${hostname}:9001"/>
             </mule:inbound-router>
@@ -36,8 +37,5 @@
         </mule:service>
 
     </mule:model-seda>
-
-    <bean name="Just" class="org.mule.components.simple.PassThroughComponent"/>
-
 </beans>
         

@@ -11,10 +11,9 @@
     <mule:endpoint address="http://localhost:60198" name="clientEndpoint" synchronous="true"/>
     <mule:endpoint address="jetty:http://localhost:60198" name="serverEndpoint" synchronous="true"/>
 
-    <bean name="ftc" class="org.mule.tck.functional.FunctionalTestComponent"/>
-
     <mule:model-seda name="main">
-        <mule:service name="testComponent" service-ref="ftc">
+        <mule:service name="testComponent">
+        	<mule:component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <mule:inbound-router>
                 <mule:endpoint-ref nameref="serverEndpoint"/>
             </mule:inbound-router>

@@ -13,11 +13,10 @@
     <pop3:connector name="pop3Connector"/>
     <vm:connector name="vmConnector" queueEvents="true"/>
 
-    <bean name="bridge" class="org.mule.components.simple.BridgeComponent"/>
-
     <mule:model-seda name="test">
 
-        <mule:service name="relay" service-ref="bridge">
+        <mule:service name="relay">
+        	<mule:component class="org.mule.components.simple.BridgeComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="pop3://bob:password@localhost:65435">
                     <mule:retry-connection-strategy retryCount="3" retryFrequency="1000"/>

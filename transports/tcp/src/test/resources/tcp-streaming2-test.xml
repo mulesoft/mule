@@ -17,7 +17,8 @@
 
     <mule:model-streaming name="echoModel">
 
-        <mule:service name="echo" implementation="org.mule.components.simple.StreamingBridgeComponent">
+        <mule:service name="echo">
+            <mule:component class="org.mule.components.simple.StreamingBridgeComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="tcp://localhost:65432" synchronous="false"/>
             </mule:inbound-router>
@@ -28,8 +29,8 @@
             </mule:outbound-router>
         </mule:service>
 
-        <mule:service name="testComponent" singleton="true"
-                      implementation="org.mule.tck.functional.FunctionalStreamingTestComponent">
+        <mule:service name="testComponent">
+            <mule:component scope="singleton" class="org.mule.tck.functional.FunctionalStreamingTestComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="tcp://localhost:65433" synchronous="false"/>
             </mule:inbound-router>

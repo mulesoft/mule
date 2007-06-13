@@ -11,19 +11,18 @@
     <!-- 
         Testing XFire Exception Strategy
      -->
-    <bean name="testService" class="org.mule.providers.soap.xfire.testmodels.TestXFireComponent" 
-        scope="prototype"/>
-
     <mule:configuration serverId="" defaultSynchronousEndpoints="true"/>
     
     <mule:model-seda name="TestXFireComponentExceptionStrategy">
-        <mule:service name="XFireWithExceptionStrategy" service-ref="testService">
+        <mule:service name="XFireWithExceptionStrategy">
+            <mule:component class="org.mule.providers.soap.xfire.testmodels.TestXFireComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="xfire:http://localhost:10181/services"/>
             </mule:inbound-router>
             <mule:custom-exception-strategy class="org.mule.providers.soap.xfire.XFireComponentExceptionStrategy"/>
         </mule:service>
-        <mule:service name="XFireDefault" service-ref="testService">
+        <mule:service name="XFireDefault">
+            <mule:component class="org.mule.providers.soap.xfire.testmodels.TestXFireComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="xfire:http://localhost:10181/services"/>
 	        </mule:inbound-router>

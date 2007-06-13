@@ -11,13 +11,15 @@
     <bpm:connector name="bpmConnector" bpms-ref="jbpm"/>
 
     <mule:model-seda name="processModel">
-        <mule:service name="fromSimpleProcess" service-ref="logger">
+        <mule:service name="fromSimpleProcess">
+        	<mule:component class="org.mule.components.simple.LogComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="bpm://simple" />
             </mule:inbound-router>
         </mule:service>
 
-        <mule:service name="fromMessageProcess" service-ref="logger">
+        <mule:service name="fromMessageProcess">
+        	<mule:component class="org.mule.components.simple.LogComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="bpm://message" />
             </mule:inbound-router>
@@ -28,17 +30,14 @@
             </mule:outbound-router>
         </mule:service>
 
-        <mule:service name="echoService" service-ref="echo">
+        <mule:service name="echoService">
+        	<mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="vm://echo" />
             </mule:inbound-router>
         </mule:service>
     </mule:model-seda>
     
-    <bean id="logger" class="org.mule.components.simple.LogComponent" scope="prototype"/>
-
-    <bean id="echo" class="org.mule.components.simple.EchoComponent" scope="prototype"/>
-
     <!-- ***************************************************
          BPMS Configuration
          *************************************************** -->

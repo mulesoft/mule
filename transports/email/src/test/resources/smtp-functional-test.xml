@@ -10,11 +10,10 @@
 
     <smtp:connector name="smtpConnector"/>
 
-    <bean name="bridge" class="org.mule.components.simple.BridgeComponent"/>
-
     <mule:model-seda name="test">
 
-        <mule:service name="relay" service-ref="bridge">
+        <mule:service name="relay">
+        	<mule:component class="org.mule.components.simple.BridgeComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="vm://send"/>
             </mule:inbound-router>

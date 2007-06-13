@@ -8,18 +8,18 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/xfire/2.0 http://www.mulesource.org/schema/mule/xfire/2.0/mule-xfire.xsd">
 
-    <bean name="tsc" class="org.mule.tck.testmodels.services.TestServiceComponent" scope="prototype"/>
-    
     <mule:configuration serverId="" defaultSynchronousEndpoints="true"/>
         
     <mule:model-seda name="test">
-        <mule:service name="mycomponent" service-ref="tsc">
+        <mule:service name="mycomponent">
+            <mule:component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="xfire:vm://mycomponent"/>
             </mule:inbound-router>
         </mule:service>
 
-        <mule:service name="mycomponent2" service-ref="tsc">
+        <mule:service name="mycomponent2">
+            <mule:component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="xfire:vm://mycomponent2">
                     <property name="serviceInterfaces">
@@ -32,13 +32,15 @@
             </mule:inbound-router>
         </mule:service>
 
-        <mule:service name="mycomponent3" service-ref="tsc">
+        <mule:service name="mycomponent3">
+            <mule:component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="xfire:vm://mycomponent3"/>
             </mule:inbound-router>
         </mule:service>
 
-        <mule:service name="mycomponent4" service-ref="tsc">
+        <mule:service name="mycomponent4">
+            <mule:component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="xfire:vm://mycomponent4" synchronous="false"/>
             </mule:inbound-router>

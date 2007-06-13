@@ -11,13 +11,11 @@
     <!-- 
         Testing XFire http headers
      -->
-     
-    <bean name="ftc" class="org.mule.tck.functional.FunctionalTestComponent"/>
-    
     <mule:configuration serverId="" defaultSynchronousEndpoints="true"/>
         
     <mule:model-seda name="TestXfireHeaders">
-        <mule:service name="TestComponent" service-ref="ftc">
+        <mule:service name="TestComponent">
+            <mule:component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="xfire:http://localhost:10181/services"/>
             </mule:inbound-router>

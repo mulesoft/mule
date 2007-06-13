@@ -46,21 +46,30 @@
         </property>
     </bean>
 
-    <mule:model-seda name="main">
+    <mule:model-seda name="main" class="org.mule.tck.testmodels.mule.TestSedaModel">
 
-        <mule:service name="testComponent1" service-ref="reply">
+        <mule:service name="testComponent1">
+        	<!-- Note: this doesn't need to be a singleton, it's a workaround because I couldn't 
+        		figure out how to set the eventCallback bean as a property within mule:properties -->
+            <mule:component scope="singleton" instance-ref="reply"/>
             <mule:inbound-router>
                 <mule:endpoint-ref nameref="sendEndpoint"/>
             </mule:inbound-router>
         </mule:service>
 
-        <mule:service name="testComponent2" service-ref="countAndReply" singleton="true">
+        <mule:service name="testComponent2">
+        	<!-- Note: this doesn't need to be a singleton, it's a workaround because I couldn't 
+        		figure out how to set the eventCallback bean as a property within mule:properties -->
+            <mule:component scope="singleton" instance-ref="countAndReply"/>
             <mule:inbound-router>
                 <mule:endpoint-ref nameref="sendManyEndpoint"/>
             </mule:inbound-router>
         </mule:service>
 
-        <mule:service name="testComponent3" service-ref="asynchronous">
+        <mule:service name="testComponent3">
+        	<!-- Note: this doesn't need to be a singleton, it's a workaround because I couldn't 
+        		figure out how to set the eventCallback bean as a property within mule:properties -->
+            <mule:component scope="singleton" instance-ref="asynchronous"/>
             <mule:inbound-router>
                 <mule:endpoint-ref nameref="asyncEndpoint"/>
             </mule:inbound-router>

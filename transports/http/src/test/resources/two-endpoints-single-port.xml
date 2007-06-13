@@ -11,23 +11,27 @@
 
     <http:connector name="httpConnector" keepAlive="false"/>
 
-    <bean name="ftc1" class="org.mule.tck.functional.FunctionalTestComponent">
-        <property name="returnMessage" value="mycomponent1"/>
-    </bean>
-
-    <bean name="ftc2" class="org.mule.tck.functional.FunctionalTestComponent">
-        <property name="returnMessage" value="mycomponent2"/>
-    </bean>
-
     <mule:model-seda name="test">
 
-        <mule:service name="mycomponent1" service-ref="ftc1">
+        <mule:service name="mycomponent1">
+        	<mule:component class="org.mule.tck.functional.FunctionalTestComponent">
+        		<mule:properties>
+			    	<prop key="returnMessage">mycomponent1</prop>
+        		</mule:properties>
+        	</mule:component>
+        	
             <mule:inbound-router>
                 <mule:endpoint address="http://localhost:8081/mycomponent1" synchronous="true"/>
             </mule:inbound-router>
         </mule:service>
 
-        <mule:service name="mycomponent2" service-ref="ftc2">
+        <mule:service name="mycomponent2">
+        	<mule:component class="org.mule.tck.functional.FunctionalTestComponent">
+        		<mule:properties>
+			    	<prop key="returnMessage">mycomponent2</prop>
+        		</mule:properties>
+        	</mule:component>
+        	
             <mule:inbound-router>
                 <mule:endpoint address="http://localhost:8081/mycomponent2" synchronous="true"/>
             </mule:inbound-router>

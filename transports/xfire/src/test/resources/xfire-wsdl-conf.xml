@@ -11,18 +11,18 @@
        http://www.mulesource.org/schema/mule/servlet/2.0 http://www.mulesource.org/schema/mule/servlet/2.0/mule-servlet.xsd
        http://www.mulesource.org/schema/mule/xfire/2.0 http://www.mulesource.org/schema/mule/xfire/2.0/mule-xfire.xsd">
     
-    <bean name="tsc" class="org.mule.tck.testmodels.services.TestServiceComponent" scope="prototype"/>
-    
     <servlet:connector name="servlet" servletUrl="http://localhost:18088/services"/>
 
     <mule:model-seda name="test">
-        <mule:service name="mycomponent" service-ref="tsc">
+        <mule:service name="mycomponent">
+            <mule:component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="xfire:servlet://mycomponent"/>
             </mule:inbound-router>
         </mule:service>    
 
-        <mule:service name="xfireService" service-ref="tsc">
+        <mule:service name="xfireService">
+            <mule:component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="xfire:http://localhost:18082"/>
             </mule:inbound-router>

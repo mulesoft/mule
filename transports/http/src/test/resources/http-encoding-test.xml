@@ -8,8 +8,6 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd">
 
-    <bean name="ftc" class="org.mule.tck.functional.FunctionalTestComponent"/>
-
     <mule:custom-transformer name="setResponseType"
             class="org.mule.transformers.simple.MessagePropertiesTransformer">
         <mule:property name="addProperties">
@@ -22,7 +20,8 @@
     <mule:endpoint name="clientEndpoint" address="http://localhost:60198" synchronous="true"/>
 
     <mule:model-seda name="main">
-        <mule:service name="testComponent" service-ref="ftc">
+        <mule:service name="testComponent">
+            <mule:component class="org.mule.tck.functional.FunctionalTestComponent" />
             <mule:inbound-router>
                 <mule:endpoint-ref nameref="clientEndpoint" responseTransformers="setResponseType"/>
             </mule:inbound-router>

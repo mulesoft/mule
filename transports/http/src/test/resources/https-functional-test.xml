@@ -21,8 +21,6 @@
                 trustStorePassword="mulepassword"/>
     </https:connector>
 
-    <bean name="ftc" class="org.mule.tck.functional.FunctionalTestComponent"/>
-
     <mule:endpoint
             name="clientEndpoint"
             address="https://localhost:60198"
@@ -30,7 +28,8 @@
             connector-ref="httpConnector"/>
 
     <mule:model-seda name="main">
-        <mule:service name="testComponent" service-ref="ftc">
+        <mule:service name="testComponent">
+            <mule:component class="org.mule.tck.functional.FunctionalTestComponent" />
             <mule:inbound-router>
                 <mule:endpoint-ref nameref="clientEndpoint"/>
             </mule:inbound-router>

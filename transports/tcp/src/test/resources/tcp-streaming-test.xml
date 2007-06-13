@@ -25,8 +25,8 @@
             </mule:outbound-router>
         </mule:service>
 
-        <mule:service name="testComponent" singleton="true"
-                      implementation="org.mule.tck.functional.FunctionalStreamingTestComponent">
+        <mule:service name="testComponent">
+            <mule:component scope="singleton" class="org.mule.tck.functional.FunctionalStreamingTestComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="tcp://localhost:65433" synchronous="false"/>
             </mule:inbound-router>

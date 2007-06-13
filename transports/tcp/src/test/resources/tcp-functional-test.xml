@@ -17,8 +17,6 @@
 
     <mule:endpoint name="asyncClientEndpoint" address="tcp://localhost:60199" synchronous="false"/>
 
-    <bean id="test1" class="org.mule.tck.functional.FunctionalTestComponent"/>
-
     <bean id="test2" class="org.mule.tck.functional.FunctionalTestComponent">
         <property name="eventCallback">
             <bean class="org.mule.tck.functional.ResponseWriterCallback"/>
@@ -26,13 +24,17 @@
     </bean>
 
     <mule:model-seda name="main">
-        <mule:service name="testComponent1" service-ref="test1">
+        <mule:service name="testComponent1">
+            <mule:component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <mule:inbound-router>
                 <mule:endpoint-ref nameref="clientEndpoint"/>
             </mule:inbound-router>
         </mule:service>
 
-        <mule:service name="testComponent2" service-ref="test2">
+        <mule:service name="testComponent2">
+        	<!-- Note: this doesn't need to be a singleton, it's a workaround because I couldn't 
+        		figure out how to set the eventCallback bean as a property within mule:properties -->
+            <mule:component scope="singleton" instance-ref="test2"/>
             <mule:inbound-router>
                 <mule:endpoint-ref nameref="asyncClientEndpoint"/>
             </mule:inbound-router>

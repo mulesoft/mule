@@ -25,11 +25,10 @@
 
     <mule:endpoint address="file://test" name="send" connector-ref="sendConnector"/>
 
-    <bean name="bridge" class="org.mule.components.simple.BridgeComponent"/>
-
     <mule:model-seda name="receiveModel">
 
-        <mule:service name="relay" service-ref="bridge" singleton="true">
+        <mule:service name="relay">
+            <mule:component class="org.mule.components.simple.BridgeComponent" scope="singleton"/>
             <mule:inbound-router>
                 <!-- will be set at runtime, once connector has readFromDirectory -->
                 <!-- mule:endpoint address="file:///tmp/foo"/ -->

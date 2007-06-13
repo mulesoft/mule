@@ -13,18 +13,17 @@
     </mule:configuration>
 
    <mule:model-seda name="synchTestModel">
-    
-        <mule:service name="mySynchService" service-ref="marcoPolo">
+        <mule:service name="mySynchService">
+        	<mule:component class="org.mule.tck.functional.FunctionalTestComponent">
+        		<mule:properties>
+			    	<prop key="returnMessage">Polo</prop>
+        		</mule:properties>
+        	</mule:component>
+
             <mule:inbound-router>
                 <mule:endpoint address="vm://s-in" synchronous="true"/>
             </mule:inbound-router>
         </mule:service>
-
      </mule:model-seda>
-
-    <bean id="marcoPolo" class="org.mule.tck.functional.FunctionalTestComponent">
-    	<property name="returnMessage" value="Polo"/>
-    </bean>
-
 </beans>
         

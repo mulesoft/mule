@@ -13,12 +13,12 @@
     <imap:connector name="imapConnector"/>
     <vm:connector name="vmConnector" queueEvents="true"/>
 
-    <bean name="bridge" class="org.mule.components.simple.BridgeComponent"/>
     <bean name="mailToString" class="org.mule.providers.email.transformers.EmailMessageToString"/>
 
     <mule:model-seda name="test">
 
-        <mule:service name="relay" service-ref="bridge">
+        <mule:service name="relay">
+        	<mule:component class="org.mule.components.simple.BridgeComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="imap://bob:password@localhost:65443"
                                transformers="mailToString">
