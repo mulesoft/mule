@@ -13,7 +13,6 @@ import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.util.ClassUtils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +25,6 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.core.Conventions;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Attr;
@@ -42,9 +40,9 @@ import org.w3c.dom.NamedNodeMap;
  * Alternatively, a property can be explicitly registered as a bean reference via registerBeanReference()
  *
  * For example,
- * 
+ *
  *     <code> &lt;bpm:connector bpms-ref=&quot;testBpms&quot;/&lt; </code>
- * 
+ *
  * will automatically set a property "bpms" on the connector to reference a bean named "testBpms"
  *
  * 2. Attribute mappings can be registered to control how an attribute name in Mule Xml maps to the bean name in the
@@ -80,61 +78,47 @@ public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBea
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    //public static final String ID_ATTRIBUTE = "id";
-    //public static final String LOCAL_NAMESPACE = "http://mule.mulesource.org/schema/";
-
+    protected PropertyToolkit propertyToolkit = new PropertyToolkit();
     protected Properties attributeMappings;
     protected Map valueMappings;
     protected List beanReferences;
     protected ParserContext parserContext;
     //By default Mule objects are not singletons
     protected boolean singleton = false;
-
     /** Allow the bean class to be set explicitly via the "class" attribute. */
     protected boolean allowClassAttribute = true;
-    
-    protected AbstractMuleSingleBeanDefinitionParser()
+
+
+    public void registerBeanReference(String propertyName)
     {
-         attributeMappings = new Properties();
-         valueMappings = new HashMap();
-         beanReferences = new ArrayList();
+        propertyToolkit.registerBeanReference(propertyName);
     }
 
-    public void registerValueMapping(ValueMap mapping)
+    public void registerValueMapping(PropertyToolkit.ValueMap mapping)
     {
-        valueMappings.put(mapping.getPropertyName(), mapping);
+        propertyToolkit.registerValueMapping(mapping);
     }
 
     public void registerValueMapping(String propertyName, Map mappings)
     {
-        valueMappings.put(propertyName, new ValueMap(propertyName, mappings));
+        propertyToolkit.registerValueMapping(propertyName, mappings);
     }
 
     public void registerValueMapping(String propertyName, String mappings)
     {
-        valueMappings.put(propertyName, new ValueMap(propertyName, mappings));
+        propertyToolkit.registerValueMapping(propertyName, mappings);
     }
 
-    protected void registerAttributeMapping(String alias, String propertyName)
+    public void registerAttributeMapping(String alias, String propertyName)
     {
-        attributeMappings.put(alias, propertyName);
-    }
-
-    public void registerBeanReference(String propertyName)
-    {
-        beanReferences.add(propertyName);
-    }
-
-    protected String getAttributeMapping(String alias)
-    {
-        return attributeMappings.getProperty(alias, alias);
+        propertyToolkit.registerAttributeMapping(alias, propertyName);
     }
 
     protected void processProperty(Attr attribute, BeanDefinitionBuilder builder)
     {
-        boolean isBeanReference = isBeanReference(attribute.getNodeName());
-        String propertyName = extractPropertyName(attribute.getNodeName());
-        String propertyValue = extractPropertyValue(propertyName, attribute.getValue());
+        boolean isBeanReference = propertyToolkit.isBeanReference(attribute.getNodeName());
+        String propertyName = propertyToolkit.extractPropertyName(attribute.getNodeName());
+        String propertyValue = propertyToolkit.extractPropertyValue(propertyName, attribute.getValue());
         Assert.state(StringUtils.hasText(propertyName),
                 "Illegal property name returned from 'extractPropertyName(String)': cannot be null or empty.");
 
@@ -146,49 +130,6 @@ public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBea
         else
         {
             builder.addPropertyValue(propertyName, propertyValue);
-        }
-    }
-
-    /**
-     * A property can be explicitly registered as a bean reference via registerBeanReference()
-     * or it can simply use the "-ref" suffix.
-     */
-    protected boolean isBeanReference(String attributeName)
-    {
-        return (beanReferences.contains(attributeName) || attributeName.endsWith(ATTRIBUTE_REF_SUFFIX));
-    }
-    
-    /**
-     * Extract a JavaBean property name from the supplied attribute name.
-     * <p>The default implementation uses the {@link org.springframework.core.Conventions#attributeNameToPropertyName(String)}
-     * method to perform the extraction.
-     * <p>The name returned must obey the standard JavaBean property name
-     * conventions. For example for a class with a setter method
-     * '<code>setBingoHallFavourite(String)</code>', the name returned had
-     * better be '<code>bingoHallFavourite</code>' (with that exact casing).
-     *
-     * @param attributeName the attribute name taken straight from the XML element being parsed; will never be <code>null</code>
-     * @return the extracted JavaBean property name; must never be <code>null</code>
-     */
-    protected String extractPropertyName(String attributeName)
-    {
-        // Remove the bean reference suffix if any.
-        attributeName = org.mule.util.StringUtils.chomp(attributeName, ATTRIBUTE_REF_SUFFIX);
-        // Map to the real property name if necessary.
-        attributeName = getAttributeMapping(attributeName);
-        // JavaBeans property convention.
-        return Conventions.attributeNameToPropertyName(attributeName);
-    }
-
-    protected String extractPropertyValue(String attributeName, String attributeValue)
-    {
-        ValueMap vm = (ValueMap)valueMappings.get(attributeName);
-        if(vm!=null)
-        {
-            return vm.getValue(attributeValue).toString();
-        }
-        else {
-            return attributeValue;
         }
     }
 
@@ -232,15 +173,7 @@ public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBea
     {
         this.parserContext = parserContext;
         preProcess();
-        Class beanClass = null;
-        if (allowClassAttribute)
-        {
-            beanClass = getBeanClassFromAttribute(element);
-        }
-        if (beanClass == null)
-        {
-            beanClass = getBeanClass(element);
-        }
+        Class beanClass = getBeanClass(element);
         Assert.state(beanClass != null, "Class returned from getBeanClass(Element) must not be null, element is: " + element.getNodeName());
         BeanDefinitionBuilder builder = createBeanDefinitionBuilder(element, beanClass);
         builder.setSource(parserContext.extractSource(element));
@@ -273,35 +206,6 @@ public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBea
     protected BeanDefinitionBuilder createBeanDefinitionBuilder(Element element, Class beanClass)
     {
         return BeanDefinitionBuilder.rootBeanDefinition(beanClass);
-    }
-
-    /**
-     * Determine the bean class corresponding to the supplied {@link Element} based on an 
-     * explicit "class" attribute.
-     *
-     * @param element the <code>Element</code> that is being parsed
-     * @return the {@link Class} of the bean that is being defined via parsing the supplied <code>Element</code>
-     *         (must <b>not</b> be <code>null</code>)
-     * @see #parseInternal(org.w3c.dom.Element,ParserContext)
-     */
-    protected Class getBeanClassFromAttribute(Element element)
-    {
-        String className = element.getAttribute(ATTRIBUTE_CLASS);
-        Class clazz = null;
-        if (org.mule.util.StringUtils.isNotBlank(className))
-        {
-            try
-            {
-                element.removeAttribute(ATTRIBUTE_CLASS);
-                //RM* Todo probably need to use OSGi Loader here
-                clazz = ClassUtils.loadClass(className, getClass());
-            }
-            catch (ClassNotFoundException e)
-            {
-                logger.error("could not load class: " + className, e);
-            }
-        }
-        return clazz;         
     }
 
     /**

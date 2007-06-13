@@ -23,8 +23,6 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Automatically discovers the JDK we are running on and returns a corresponding
  * {@link SecurityProviderInfo}. <p/> Implementations of this class are thread-safe.
- * 
- * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
  */
 public class AutoDiscoverySecurityProviderFactory implements SecurityProviderFactory
 {

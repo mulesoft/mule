@@ -20,14 +20,13 @@ import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.security.UMOSecurityProvider;
 import org.mule.umo.security.UnknownAuthenticationTypeException;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -114,12 +113,12 @@ public class MuleSecurityManager implements UMOSecurityManager
         return (UMOSecurityProvider) providers.remove(name);
     }
 
-    public List getProviders()
+    public Collection getProviders()
     {
-        return Collections.unmodifiableList(new ArrayList(providers.values()));
+        return Collections.unmodifiableCollection(new ArrayList(providers.values()));
     }
 
-    public void setProviders(List providers)
+    public void setProviders(Collection providers)
     {
         for (Iterator iterator = providers.iterator(); iterator.hasNext();)
         {

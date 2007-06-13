@@ -17,9 +17,6 @@ import org.mule.umo.UMOException;
  * <code>EncryptionStrategyNotFoundException</code> is thrown by the
  * UMOSecurityManager when an encryption scheme is set in a property or header that
  * has not been registered witrh the manager
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class EncryptionStrategyNotFoundException extends UMOException
 {

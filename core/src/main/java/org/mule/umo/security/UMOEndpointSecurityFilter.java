@@ -17,9 +17,6 @@ import org.mule.umo.lifecycle.Initialisable;
 /**
  * <code>UMOEndpointSecurityFilter</code> is a base filter for secure filtering of
  * inbound and outbout event flow
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public interface UMOEndpointSecurityFilter extends Initialisable
 {
