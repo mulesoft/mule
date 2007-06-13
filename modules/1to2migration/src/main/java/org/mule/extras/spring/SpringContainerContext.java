@@ -35,6 +35,7 @@ import org.springframework.core.io.InputStreamResource;
 /**
  * Provides an acess facade to the Spring bean factory
  * @deprecated No longer required in Mule 2.0 since Mule's Xml configuration is based on Spring
+ * TODO MULE-1908
  */
 public class SpringContainerContext extends AbstractContainerContext
 {
