@@ -11,8 +11,8 @@ package org.mule.config.spring.parsers;
 
 import org.mule.impl.MuleDescriptor;
 import org.mule.util.StringUtils;
+import org.mule.util.object.SimpleObjectFactory;
 
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -41,13 +41,13 @@ public class ServiceDescriptorDefinitionParser extends AbstractMuleSingleBeanDef
         String implClass = element.getAttribute("implementation");
         if (StringUtils.isNotBlank(implClass))
         {
-            BeanDefinitionBuilder serviceBean = BeanDefinitionBuilder.rootBeanDefinition(implClass);
-            String serviceName = element.getAttribute("name") + "-impl";
-            serviceBean.setScope(BeanDefinition.SCOPE_PROTOTYPE);
+            BeanDefinitionBuilder serviceFactory = BeanDefinitionBuilder.rootBeanDefinition(SimpleObjectFactory.class);
+            serviceFactory.addPropertyValue("objectClassName", implClass);
+            String serviceName = element.getAttribute("name") + "-factory";
             // Reference this bean from the service descriptor.
-            builder.addPropertyReference("service", serviceName);
+            builder.addPropertyReference("serviceFactory", serviceName);
             // Register the new bean.
-            BeanDefinitionHolder holder = new BeanDefinitionHolder(serviceBean.getBeanDefinition(), serviceName);
+            BeanDefinitionHolder holder = new BeanDefinitionHolder(serviceFactory.getBeanDefinition(), serviceName);
             registerBeanDefinition(holder, parserContext.getRegistry());
             element.removeAttribute("implementation");
         }
