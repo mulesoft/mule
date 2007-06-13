@@ -8,7 +8,8 @@
  * LICENSE.txt file.
  */
 
-package org.mule.util;
+package org.mule.util.object;
+
 
 /**
  * <code>ObjectPool</code> is a simple pooling interface for objects

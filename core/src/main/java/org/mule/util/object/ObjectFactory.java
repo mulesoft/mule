@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.util;
+package org.mule.util.object;
 
 /**
  * <code>ObjectFactory</code> is a generic Factory interface.
