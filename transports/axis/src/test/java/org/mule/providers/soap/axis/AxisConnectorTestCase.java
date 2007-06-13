@@ -14,8 +14,7 @@ import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.umo.provider.UMOConnector;
 
 /**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * Test case for AxisConnector's basic behaviour
  */
 public class AxisConnectorTestCase extends AbstractConnectorTestCase
 {
@@ -27,7 +26,8 @@ public class AxisConnectorTestCase extends AbstractConnectorTestCase
     public UMOConnector getConnector() throws Exception
     {
         AxisConnector c = new AxisConnector();
-        c.initialise();
+        c.setName("axisConnector");
+        c.setManagementContext(managementContext);
         return c;
     }
 

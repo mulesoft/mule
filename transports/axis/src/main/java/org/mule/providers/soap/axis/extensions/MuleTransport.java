@@ -21,9 +21,6 @@ import org.apache.axis.client.Transport;
 
 /**
  * A container for all Mule supported transports for Axis.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class MuleTransport extends Transport
 {

@@ -18,8 +18,7 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 /**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * TODO document me
  */
 public class SoapActionTemplateTestCase extends AbstractMuleTestCase
 {
@@ -27,6 +26,7 @@ public class SoapActionTemplateTestCase extends AbstractMuleTestCase
     {
         UMOImmutableEndpoint ep = new ImmutableMuleEndpoint(
             "axis:http://mycompany.com:8080/services/myService?method=foo", false);
+        
         AxisMessageDispatcher dispatcher = new AxisMessageDispatcher(ep);
         UMOEvent event = getTestEvent("test,", ep);
         String result = dispatcher.parseSoapAction("${hostInfo}/${method}", new QName("foo"), event);

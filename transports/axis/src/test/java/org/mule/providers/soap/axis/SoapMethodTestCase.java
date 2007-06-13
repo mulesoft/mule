@@ -21,8 +21,7 @@ import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
 /**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * 
  */
 public class SoapMethodTestCase extends AbstractMuleTestCase
 {

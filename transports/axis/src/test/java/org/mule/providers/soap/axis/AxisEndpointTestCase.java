@@ -23,6 +23,8 @@ public class AxisEndpointTestCase extends AbstractMuleTestCase
     {
         String url = "axis:http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2";
         UMOEndpointURI endpointUri = new MuleEndpointURI(url);
+        endpointUri.initialise();
+        
         assertEquals("axis", endpointUri.getSchemeMetaInfo());
         // it's up to the client to actually strip off the method name if
         // necessary
@@ -33,6 +35,8 @@ public class AxisEndpointTestCase extends AbstractMuleTestCase
 
         url = "axis:http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2";
         endpointUri = new MuleEndpointURI(url);
+        endpointUri.initialise();
+        
         assertEquals("axis", endpointUri.getSchemeMetaInfo());
         assertEquals("http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2",
             endpointUri.getAddress());
@@ -44,6 +48,8 @@ public class AxisEndpointTestCase extends AbstractMuleTestCase
     {
         String url = "axis:http://admin:pwd@www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2";
         UMOEndpointURI endpointUri = new MuleEndpointURI(url);
+        endpointUri.initialise();
+        
         assertEquals("axis", endpointUri.getSchemeMetaInfo());
         // it's up to the client to actually strip off the method name if
         // necessary
@@ -60,6 +66,8 @@ public class AxisEndpointTestCase extends AbstractMuleTestCase
     {
         String url = "soap:http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2";
         UMOEndpointURI endpointUri = new MuleEndpointURI(url);
+        endpointUri.initialise();
+        
         assertEquals("soap", endpointUri.getSchemeMetaInfo());
         // it's up to the client to actually strip off the method name if
         // necessary
@@ -76,6 +84,5 @@ public class AxisEndpointTestCase extends AbstractMuleTestCase
             //assertEquals("axis", sd.getProtocol());
             //assertEquals("org.mule.providers.soap.axis.AxisConnector", sd.getConnector());
         }
-
     }
 }

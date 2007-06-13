@@ -33,7 +33,15 @@
                     <excludes>
 
                         <!-- MULE-1839 -->
-                        <exclude>**/*</exclude>
+                        <exclude>**/SoapActionTemplateTestCase.java</exclude>
+                        <exclude>**/AxisMessageStyleServiceWithoutNamespaceTestCase.java</exclude>
+                        <exclude>**/AxisMessageStyleServiceTestCase.java</exclude>
+                        <exclude>**/AxisMessageDispatcherTestCase.java</exclude>
+                        <exclude>**/AxisServletWithSecurityTestCase.java</exclude>
+                        <exclude>**/WsdlGenerationTestCase.java</exclude>
+                        <exclude>**/SoapAttachmentsFunctionalTestCase.java</exclude>
+                        
+                        <exclude>**/AxisConnectorJmsTopicsFunctionalTestCase.java</exclude>
 
                         <!-- Only run tests with external dependencies in the tests-external profile -->
                         <exclude>**/AxisExternalServerTest.java</exclude>

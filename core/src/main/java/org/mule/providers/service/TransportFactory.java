@@ -194,6 +194,11 @@ public class TransportFactory
                     {
                         trans = sd.createResponseTransformer();
                     }
+                    
+                    if (trans != null)
+                    {
+                        trans.initialise();
+                    }
                 }
                 else
                 {

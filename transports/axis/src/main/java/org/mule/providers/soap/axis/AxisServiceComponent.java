@@ -154,6 +154,7 @@ public class AxisServiceComponent implements Initialisable, Callable
                                 + context.getEndpointURI().getPort();
                 uri += context.getMessageAsString();
                 endpointUri = new MuleEndpointURI(uri);
+                endpointUri.initialise();
             }
 
             AxisEngine engine = getAxisServer();

@@ -18,7 +18,6 @@ import org.mule.umo.lifecycle.InitialisationException;
 
 public class AxisConnectorHttpFunctionalTestCase extends AbstractSoapUrlEndpointFunctionalTestCase
 {
-
     public static class ComponentWithoutInterfaces
     {
         public String echo(String msg)
@@ -64,5 +63,4 @@ public class AxisConnectorHttpFunctionalTestCase extends AbstractSoapUrlEndpoint
             assertTrue(e instanceof InitialisationException);
         }
     }
-
 }

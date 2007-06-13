@@ -1,5 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:axis="http://www.mulesource.org/schema/mule/axis/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/axis/2.0/mule-axis.xsd">
 
+    <bean name="echo" class="org.mule.components.simple.EchoComponent"/>
+    
+    <mule:model-seda name="Axis_Headers_TestCase">
+        <mule:service name="component" service-ref="echo">
+            <mule:inbound-router>
+                <mule:endpoint address="axis:http://localhost:12181/services"/>
+            </mule:inbound-router>
+            <mule:response-router>
+                <mule:endpoint address="http://localhost:12182/reply"/>
+            </mule:response-router>
+        </mule:service>    
+    </mule:model-seda>
+</beans>
+
+<!-- 
 <!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
                                 "http://mule.mulesource.org/dtds/mule-configuration.dtd">
 
@@ -18,3 +41,4 @@
     </model>
 
 </mule-configuration>
+ -->

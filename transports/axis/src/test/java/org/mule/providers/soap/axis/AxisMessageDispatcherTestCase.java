@@ -26,7 +26,6 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
  */
 public class AxisMessageDispatcherTestCase extends AbstractMuleTestCase
 {
-
     public void testNullParametersInCallAllowed() throws Exception
     {
         UMOImmutableEndpoint ep = new ImmutableMuleEndpoint(
@@ -48,5 +47,4 @@ public class AxisMessageDispatcherTestCase extends AbstractMuleTestCase
         assertEquals(1, values.size());
         assertEquals("value0;qname{:anyType:http://www.w3.org/2001/XMLSchema};in", values.get(0));
     }
-
 }

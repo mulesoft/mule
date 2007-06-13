@@ -75,5 +75,4 @@ public class AxisExceptionTestCase extends FunctionalTestCase
         assertTrue(reply.getPayload() instanceof String);
         assertEquals("Received: test", reply.getPayloadAsString());
     }
-
 }

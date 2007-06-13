@@ -1,5 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:axis="http://www.mulesource.org/schema/mule/axis/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/axis/2.0/mule-axis.xsd">
+    
+    <bean name="tc" class="org.mule.tck.testmodels.services.TestComponent"/>
+    <bean name="bridge" class="org.mule.components.simple.BridgeComponent" scope="prototype"/>
 
+    <!-- TODO how to set the serverUrl in spring config files? -->
+    
+    <mule:model-seda name="Testing_an_axis_service_using_xfire_dynamic_client">
+        <!-- hosting the Axis Service -->
+        <mule:service name="AxisService" service-ref="tc">
+            <mule:inbound-router>
+                <mule:endpoint address="axis:http://localhost:33381/services">
+                    <property name="style" value="Wrapped"/>
+                    <property name="use" value="Literal"/>
+                </mule:endpoint>
+            </mule:inbound-router>
+        </mule:service>
+        
+        <!-- Bridge Component used to test the ExceptionBasedRouting on Axis -->
+        <mule:service name="test" service-ref="bridge">
+            <mule:inbound-router>
+                <mule:endpoint address="vm://localhost.test"/>
+            </mule:inbound-router>
+            <mule:outbound-router>
+                <mule:exception-based-router>
+                    <mule:endpoint address="axis:http://localhost:33380/services/AxisService?method=receive"/>
+                    <mule:endpoint address="axis:http://localhost:33381/services/AxisService?method=receive"/>
+                </mule:exception-based-router>
+            </mule:outbound-router>
+        </mule:service>
+        
+        <!-- Accessing an Axis hosted web-service using XFire dynamic client -->
+        <mule:service name="BridgeToAxisService" service-ref="bridge">
+            <mule:inbound-router>
+                <mule:endpoint address="vm://axis.in"/>
+            </mule:inbound-router>
+            <mule:outbound-router>
+                <mule:pass-through-router>
+                    <mule:endpoint address="wsdl-xfire:http://localhost:33381/services/AxisService?WSDL&amp;method=receive"/>
+                </mule:pass-through-router>
+            </mule:outbound-router>
+        </mule:service>    
+    </mule:model-seda>
+</beans>
+<!-- 
 <!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
                                 "http://mule.mulesource.org/dtds/mule-configuration.dtd">
 
@@ -12,7 +63,7 @@
 
     <model name="Testing_an_axis_service_using_xfire_dynamic_client">
 
-        <!--hosting the Axis Service-->
+        <!- hosting the Axis Service ->
         <mule-descriptor name="AxisService" implementation="org.mule.tck.testmodels.services.TestComponent">
             <inbound-router>
                 <endpoint address="axis:http://localhost:33381/services"/>
@@ -23,7 +74,7 @@
             </properties>
         </mule-descriptor>
 
-        <!--Bridge Component used to test the ExceptionBasedRouting on Axis-->
+        <!- Bridge Component used to test the ExceptionBasedRouting on Axis ->
         <mule-descriptor name="test" implementation="org.mule.components.simple.BridgeComponent">
             <inbound-router>
                 <endpoint address="vm://localhost.test"/>
@@ -36,7 +87,7 @@
             </outbound-router>
         </mule-descriptor>
 
-        <!--Accessing an Axis hosted web-service using XFire dynamic client-->
+        <!- Accessing an Axis hosted web-service using XFire dynamic client ->
         <mule-descriptor name="BridgeToAxisService" implementation="org.mule.components.simple.BridgeComponent">
             <inbound-router>
                 <endpoint address="vm://axis.in"/>
@@ -51,3 +102,4 @@
     </model>
     
 </mule-configuration>
+ -->

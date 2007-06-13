@@ -1,5 +1,40 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:axis="http://www.mulesource.org/schema/mule/axis/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/axis/2.0/mule-axis.xsd">
 
+    <bean name="tsc" class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+    <bean name="echo" class="org.mule.components.simple.EchoComponent"/>
+
+    <mule:model-seda name="test">
+        <mule:service name="mycomponent1" service-ref="echo">
+            <mule:inbound-router>
+                <mule:endpoint address="vm://mycomponent1"/>
+            </mule:inbound-router>
+            <mule:outbound-router>
+                <mule:pass-through-router>
+                    <mule:endpoint address="axis:http://localhost:38011/mule/mycomponent2?method=echo"
+                        synchronous="true">
+                        <property name="soapMethods" value="value:string:in,return:string"/>
+                    </mule:endpoint>
+                </mule:pass-through-router>
+            </mule:outbound-router>
+        </mule:service>
+
+        <mule:service name="mycomponent2" service-ref="tsc">
+            <mule:inbound-router>
+                <mule:endpoint address="axis:http://localhost:38011/mule" synchronous="true"/>
+            </mule:inbound-router>
+        </mule:service>
+    </mule:model-seda>
+</beans>
+
+<!-- 
 <!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
                                 "http://mule.mulesource.org/dtds/mule-configuration.dtd">
 
@@ -32,3 +67,4 @@
         </mule-descriptor>
     </model>
 </mule-configuration>
+ -->

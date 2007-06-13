@@ -121,6 +121,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
     public AxisConnector()
     {
         super();
+        this.registerProtocols();
     }
 
     protected void registerProtocols()
@@ -155,7 +156,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
 
     protected void doInitialise() throws InitialisationException
     {
-        this.registerProtocols();
+        // TODO DO: see if registered protocols were changed via external setter
         
         if (axisTransportProtocols == null)
         {
