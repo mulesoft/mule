@@ -503,37 +503,27 @@
                 <xsl:otherwise>org.mule.impl.MuleDescriptor</xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
-
-        <xsl:variable name="impl" select="@implementation"/>
-
-        <!-- This variable defines the service name, derived from the @implementation
-            attribute. If @implmentation looks like a class name then a new <bean> entry
-            is added to the context -->
-        <xsl:variable name="serviceName">
-            <xsl:choose>
-                <xsl:when test="contains($impl, '.')">
-                    <!-- In the next step we'll create a bean entry for this implmentation -->
-                    <xsl:value-of select="concat(@name, '-impl')"/>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:value-of select="$impl"/>
-                    <xsl:variable name="err"
-                      select="helper:implementationShouldBeServiceRef($impl, $name)"/>
-                </xsl:otherwise>
-            </xsl:choose>
+        <xsl:variable name="impl">
+            <xsl:value-of select="@implementation"/>
         </xsl:variable>
 
-        <xsl:if test="contains($impl, '.')">
-            <!-- The backing service bean. -->
-            <bean name="{$name}-impl" class="{$impl}" singleton="false"/>
-        </xsl:if>
-
-        <bean name="{$name}" class="{$type}" depends-on="{$currentModel},{$serviceName}">
-            <property name="service">
-                <value>
-                    <xsl:value-of select="$serviceName"/>
-                </value>
-            </property>
+        <bean name="{$name}" class="{$type}" depends-on="{$currentModel}">
+			<property name="serviceFactory">
+         		<xsl:choose>
+         			<!-- implementation is a container reference -->
+	                <xsl:when test="contains($impl, '.') = false">
+						<bean class="org.mule.util.object.SingletonObjectFactory">
+							<property name="instance" ref="{$impl}" />
+						</bean>
+	                </xsl:when>
+         			<!-- implementation is a class name -->
+	                <xsl:otherwise>
+						<bean class="org.mule.util.object.SimpleObjectFactory">
+							<property name="objectClassName" value="{$impl}" />
+						</bean>
+	                </xsl:otherwise>
+            	</xsl:choose>
+			</property>
 
             <property name="modelName" value="{$currentModel}"/>
             <xsl:if test="@containerManaged">
