@@ -206,7 +206,7 @@ public abstract class AbstractChildBeanDefinitionParser extends AbstractHierarch
 
     protected boolean isMap(Element element)
     {
-        return getBeanClass(element).equals(MapEntryDefinitionParser.KeyValuePair.class);
+        return MapEntryDefinitionParser.KeyValuePair.class.equals(getBeanClass(element));
     }
 
 }
