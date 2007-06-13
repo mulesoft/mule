@@ -13,12 +13,12 @@ import org.mule.config.MuleProperties;
 import org.mule.config.QueueProfile;
 import org.mule.config.spring.parsers.ConfigurationDefinitionParser;
 import org.mule.config.spring.parsers.ConnectionStrategyDefinitionParser;
-import org.mule.config.spring.parsers.CustomElementDefinitionParser;
 import org.mule.config.spring.parsers.EndpointDefinitionParser;
 import org.mule.config.spring.parsers.EndpointRefDefinitionParser;
 import org.mule.config.spring.parsers.FilterDefinitionParser;
 import org.mule.config.spring.parsers.InheritedModelDefinitionParser;
 import org.mule.config.spring.parsers.MapBeanDefinitionParser;
+import org.mule.config.spring.parsers.ObjectFactoryDefinitionParser;
 import org.mule.config.spring.parsers.PoolingProfileDefinitionParser;
 import org.mule.config.spring.parsers.PropertiesBeanDefinitionParser;
 import org.mule.config.spring.parsers.RouterDefinitionParser;
@@ -118,10 +118,10 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("dispatcher-connection-straqtegy", new ConnectionStrategyDefinitionParser());
         registerBeanDefinitionParser("receiver-connection-straqtegy", new ConnectionStrategyDefinitionParser());
         registerBeanDefinitionParser("service-overrides", new ServiceOverridesDefinitionParser());
-        registerBeanDefinitionParser("custom-connector", new CustomElementDefinitionParser(true));
+        registerBeanDefinitionParser("custom-connector", new SingleElementDefinitionParser(true));
 
         //Transformer elements
-        registerBeanDefinitionParser("custom-transformer", new CustomElementDefinitionParser(false));
+        registerBeanDefinitionParser("custom-transformer", new SingleElementDefinitionParser(false));
         registerBeanDefinitionParser("transformer-no-action", new SingleElementDefinitionParser(NoActionTransformer.class, false));
 
         registerBeanDefinitionParser("transformer-base64-encoder", new SingleElementDefinitionParser(Base64Encoder.class, false));
@@ -156,7 +156,7 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("transaction", new TransactionConfigDefinitionParser());
 
         //Container contexts
-        registerBeanDefinitionParser("custom-container", new CustomElementDefinitionParser(true));
+        registerBeanDefinitionParser("custom-container", new SingleElementDefinitionParser(true));
         registerBeanDefinitionParser("rmi-container", new SingleElementDefinitionParser(RmiContainerContext.class, true));
         registerBeanDefinitionParser("jndi-container", new SingleElementDefinitionParser(JndiContainerContext.class, true));
         registerBeanDefinitionParser("properties-container", new SingleElementDefinitionParser(PropertiesContainerContext.class, true));
@@ -168,7 +168,7 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("model-simple", new SingleElementDefinitionParser(DirectModel.class, true));
         registerBeanDefinitionParser("model-pipeline", new SingleElementDefinitionParser(PipelineModel.class, true));
         registerBeanDefinitionParser("model-streaming", new SingleElementDefinitionParser(StreamingModel.class, true));
-        registerBeanDefinitionParser("model-custom", new CustomElementDefinitionParser(true));
+        registerBeanDefinitionParser("model-custom", new SingleElementDefinitionParser(true));
 
         registerBeanDefinitionParser("component-lifecycle-adapter-factory", new SimpleChildDefinitionParser("lifecycleAdapterFactory", null));
         registerBeanDefinitionParser("callable-entrypoint-resolver", new SimpleChildDefinitionParser("entryPointResolver", CallableEntryPointResolver.class));
@@ -179,6 +179,7 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
 
         //Service Elements
         registerBeanDefinitionParser("service", new ServiceDescriptorDefinitionParser());
+        registerBeanDefinitionParser("component", new ObjectFactoryDefinitionParser("serviceFactory"));
         registerBeanDefinitionParser("inbound-router", new SimpleChildDefinitionParser("inboundRouter", InboundRouterCollection.class));
         registerBeanDefinitionParser("outbound-router", new SimpleChildDefinitionParser("outboundRouter", OutboundRouterCollection.class));
         registerBeanDefinitionParser("nested-router", new SimpleChildDefinitionParser("nestedRouter", NestedRouterCollection.class));

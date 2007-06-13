@@ -9,8 +9,6 @@
  */
 package org.mule.config.spring.parsers;
 
-import org.mule.util.ClassUtils;
-
 import org.w3c.dom.Element;
 
 /**
@@ -26,11 +24,10 @@ import org.w3c.dom.Element;
  */
 public class SimpleChildDefinitionParser extends AbstractChildBeanDefinitionParser
 {
-
-    private Class constraint;
-    private Class clazz;
-    private String setterMethod;
-    private boolean isDynamic;
+    protected Class constraint;
+    protected Class clazz;
+    protected String setterMethod;
+    protected boolean isDynamic;
 
     public SimpleChildDefinitionParser(String setterMethod, Class clazz)
     {
@@ -47,6 +44,7 @@ public class SimpleChildDefinitionParser extends AbstractChildBeanDefinitionPars
 
     protected void preProcess()
     {
+        // AC: Is this a workaround for MULE-1735?
         if (isDynamic)
         {
            clazz = null; // reset for this element
@@ -55,20 +53,21 @@ public class SimpleChildDefinitionParser extends AbstractChildBeanDefinitionPars
 
     protected Class getBeanClass(Element element)
     {
-        if (clazz == null)
-        {
-            String cls = element.getAttribute(ATTRIBUTE_CLASS);
-            try
-            {
-                //TODO TC: probably need to use OSGi Loader here
-                clazz = ClassUtils.loadClass(cls, getClass());
-            }
-            catch (ClassNotFoundException e)
-            {
-                logger.error("could not load class: " + cls, e);
-            }
-        }
-        element.removeAttribute(ATTRIBUTE_CLASS);
+        // This is now handled by AbstractMuleSingleBeanDefinitionParser.getBeanClassFromAttribute()
+//        if (clazz == null)
+//        {
+//            String cls = element.getAttribute(ATTRIBUTE_CLASS);
+//            try
+//            {
+//                //TODO TC: probably need to use OSGi Loader here
+//                clazz = ClassUtils.loadClass(cls, getClass());
+//            }
+//            catch (ClassNotFoundException e)
+//            {
+//                logger.error("could not load class: " + cls, e);
+//            }
+//        }
+//        element.removeAttribute(ATTRIBUTE_CLASS);
         if (null != clazz && null != constraint && !constraint.isAssignableFrom(clazz))
         {
             logger.error(clazz + " not a subclass of " + constraint);

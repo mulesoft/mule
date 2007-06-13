@@ -90,6 +90,9 @@ public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBea
     //By default Mule objects are not singletons
     protected boolean singleton = false;
 
+    /** Allow the bean class to be set explicitly via the "class" attribute. */
+    protected boolean allowClassAttribute = true;
+    
     protected AbstractMuleSingleBeanDefinitionParser()
     {
          attributeMappings = new Properties();
@@ -229,7 +232,15 @@ public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBea
     {
         this.parserContext = parserContext;
         preProcess();
-        Class beanClass = getBeanClass(element);
+        Class beanClass = null;
+        if (allowClassAttribute)
+        {
+            beanClass = getBeanClassFromAttribute(element);
+        }
+        if (beanClass == null)
+        {
+            beanClass = getBeanClass(element);
+        }
         Assert.state(beanClass != null, "Class returned from getBeanClass(Element) must not be null, element is: " + element.getNodeName());
         BeanDefinitionBuilder builder = createBeanDefinitionBuilder(element, beanClass);
         builder.setSource(parserContext.extractSource(element));
@@ -262,6 +273,35 @@ public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBea
     protected BeanDefinitionBuilder createBeanDefinitionBuilder(Element element, Class beanClass)
     {
         return BeanDefinitionBuilder.rootBeanDefinition(beanClass);
+    }
+
+    /**
+     * Determine the bean class corresponding to the supplied {@link Element} based on an 
+     * explicit "class" attribute.
+     *
+     * @param element the <code>Element</code> that is being parsed
+     * @return the {@link Class} of the bean that is being defined via parsing the supplied <code>Element</code>
+     *         (must <b>not</b> be <code>null</code>)
+     * @see #parseInternal(org.w3c.dom.Element,ParserContext)
+     */
+    protected Class getBeanClassFromAttribute(Element element)
+    {
+        String className = element.getAttribute(ATTRIBUTE_CLASS);
+        Class clazz = null;
+        if (org.mule.util.StringUtils.isNotBlank(className))
+        {
+            try
+            {
+                element.removeAttribute(ATTRIBUTE_CLASS);
+                //RM* Todo probably need to use OSGi Loader here
+                clazz = ClassUtils.loadClass(className, getClass());
+            }
+            catch (ClassNotFoundException e)
+            {
+                logger.error("could not load class: " + className, e);
+            }
+        }
+        return clazz;         
     }
 
     /**

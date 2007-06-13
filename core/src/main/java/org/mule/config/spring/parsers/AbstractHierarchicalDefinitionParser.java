@@ -17,7 +17,7 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.w3c.dom.Element;
 
 /**
- * This definition parser introduces the notion of Heirarchical processing to nested Xml elements. Definition
+ * This definition parser introduces the notion of Hierarchical processing to nested XML elements. Definition
  * parsers that extend this can refer to parent beans.  It does not assume that the parser is restricted
  * to a single property.
  *
