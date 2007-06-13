@@ -25,10 +25,11 @@
 
     <xsd:element name="endpoint" type="endpointType"/>
 
-    <xsd:element name="model-seda" type="sedaModelType"/>
     <xsd:element name="model-inherited" type="modelType"/>
-    <xsd:element name="model-custom" type="customModelType"/>
+    <xsd:element name="model-seda" type="sedaModelType"/>
     <xsd:element name="model-streaming" type="streamingModelType"/>
+    <xsd:element name="model-simple" type="directModelType"/>
+    <xsd:element name="model-custom" type="customModelType"/>
 
     <xsd:element name="jndi-transaction-manager" type="transactionManagersType"/>
     <xsd:element name="weblogic-transaction-manager" type="transactionManagersType"/>
@@ -538,28 +539,33 @@
     <!--   Model Types                                                -->
     <!--==============================================================-->
 
-    <xsd:complexType name="sedaModelType">
-        <xsd:choice minOccurs="1" maxOccurs="unbounded">
-            <xsd:element name="pooling-profile" type="poolingProfileType" minOccurs="0" maxOccurs="1"/>
-            <xsd:element name="queue-profile" type="queueProfileType" minOccurs="0" maxOccurs="1"/>
-            <xsd:element name="custom-entrypoint-resolver" type="customEntrypointResolverType" minOccurs="0"
-                         maxOccurs="1"/>
-            <xsd:element name="callable-entrypoint-resolver" type="entrypointResolverType" minOccurs="0" maxOccurs="1"/>
-            <xsd:element name="component-factory" type="componentFactoryType" minOccurs="0" maxOccurs="1"/>
-            <xsd:element name="component-lifecycle-adapter-factory" type="componentLifecycleAdapterFactoryType"
-                         minOccurs="0" maxOccurs="1"/>
-            <xsd:element name="component-pool-factory" type="componentPoolFactoryType" minOccurs="0"
-                         maxOccurs="1"/>
+    <xsd:complexType name="modelType">
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
             <xsd:group ref="exceptionStrategies" maxOccurs="1" minOccurs="0"/>
+            <!-- This may be different for each model type 
             <xsd:element name="service" type="muleServiceType" minOccurs="0" maxOccurs="unbounded"/>
+            -->
         </xsd:choice>
         <xsd:attribute name="name" type="xsd:string" use="required"/>
+        <xsd:attribute name="class" type="xsd:NMTOKEN" use="optional"/>
     </xsd:complexType>
 
-    <xsd:complexType name="customModelType">
+    <xsd:complexType name="sedaModelType">
         <xsd:complexContent>
             <xsd:extension base="modelType">
-                <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
+		        <xsd:choice minOccurs="1" maxOccurs="unbounded">
+		            <xsd:element name="pooling-profile" type="poolingProfileType" minOccurs="0" maxOccurs="1"/>
+		            <xsd:element name="queue-profile" type="queueProfileType" minOccurs="0" maxOccurs="1"/>
+		            <xsd:element name="custom-entrypoint-resolver" type="customEntrypointResolverType" minOccurs="0"
+		                         maxOccurs="1"/>
+		            <xsd:element name="callable-entrypoint-resolver" type="entrypointResolverType" minOccurs="0" maxOccurs="1"/>
+		            <xsd:element name="component-factory" type="componentFactoryType" minOccurs="0" maxOccurs="1"/>
+		            <xsd:element name="component-lifecycle-adapter-factory" type="componentLifecycleAdapterFactoryType"
+		                         minOccurs="0" maxOccurs="1"/>
+		            <xsd:element name="component-pool-factory" type="componentPoolFactoryType" minOccurs="0"
+		                         maxOccurs="1"/>
+		            <xsd:element name="service" type="sedaServiceType" minOccurs="0" maxOccurs="unbounded"/>
+		        </xsd:choice>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -567,16 +573,31 @@
     <xsd:complexType name="streamingModelType">
         <xsd:complexContent>
             <xsd:extension base="modelType">
+		        <xsd:choice minOccurs="1" maxOccurs="unbounded">
+		            <xsd:element name="service" type="streamingServiceType" minOccurs="0" maxOccurs="unbounded"/>
+		        </xsd:choice>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="modelType">
-        <xsd:choice minOccurs="0" maxOccurs="unbounded">
-            <xsd:group ref="exceptionStrategies" maxOccurs="1" minOccurs="0"/>
-            <xsd:element name="service" type="muleServiceType" minOccurs="0" maxOccurs="unbounded"/>
-        </xsd:choice>
-        <xsd:attribute name="name" type="xsd:string" use="required"/>
+    <xsd:complexType name="directModelType">
+        <xsd:complexContent>
+            <xsd:extension base="modelType">
+		        <xsd:choice minOccurs="1" maxOccurs="unbounded">
+		            <xsd:element name="service" type="directServiceType" minOccurs="0" maxOccurs="unbounded"/>
+		        </xsd:choice>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="customModelType">
+        <xsd:complexContent>
+            <xsd:extension base="modelType">
+		        <xsd:choice minOccurs="1" maxOccurs="unbounded">
+		            <xsd:element name="service" type="muleServiceType" minOccurs="0" maxOccurs="unbounded"/>
+		        </xsd:choice>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
 
     <!--==============================================================-->
@@ -616,6 +637,11 @@
 
     <xsd:complexType name="muleServiceType">
         <xsd:choice maxOccurs="unbounded">
+            <xsd:element name="component" type="objectFactoryType" minOccurs="1" maxOccurs="1">
+		        <xsd:annotation>
+		            <xsd:documentation>The underlying service component (your business logic)</xsd:documentation>
+		        </xsd:annotation>
+		    </xsd:element>
             <xsd:element name="inbound-router" type="inboundRouterCollectionType" minOccurs="0" maxOccurs="1"/>
             <xsd:element name="nested-router" type="nestedRouterCollectionType" minOccurs="0" maxOccurs="1"/>
             <xsd:element name="outbound-router" type="outboundRouterCollectionType" minOccurs="0" maxOccurs="1"/>
@@ -627,11 +653,17 @@
             <xsd:any namespace="##other" processContents="strict" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:choice>
         <xsd:attribute name="name" type="xsd:string" use="required"/>
-        <xsd:attribute name="service-ref" type="xsd:NMTOKEN"/>
-        <!-- Deprecated, use "service-ref" instead. -->
-        <xsd:attribute name="implementation" type="xsd:NMTOKEN"/>
+        <xsd:attribute name="implementation" type="xsd:NMTOKEN">
+	        <xsd:annotation>
+	            <xsd:documentation>Deprecated, use "component" instead</xsd:documentation>
+	        </xsd:annotation>
+	    </xsd:attribute>
+        <!-- Disabled until it actually does something! 
         <xsd:attribute name="version" type="xsd:string"/>
+        -->
+        <!-- Deprecated, configure this on the service factory instead (e.g., use SingletonServiceFactory) 
         <xsd:attribute name="singleton" type="substitutableBoolean" default="false"/>
+        -->
         <xsd:attribute name="initialState" default="started">
             <xsd:simpleType>
                 <xsd:restriction base="xsd:NMTOKEN">
@@ -640,6 +672,30 @@
                 </xsd:restriction>
             </xsd:simpleType>
         </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:complexType name="sedaServiceType">
+        <xsd:complexContent>
+            <xsd:extension base="muleServiceType">
+                <xsd:attribute name="queueTimeout" type="xsd:integer"/>
+                <xsd:attribute name="enablePooling" type="xsd:boolean"/>
+                <xsd:attribute name="componentPerRequest" type="xsd:boolean"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="streamingServiceType">
+        <xsd:complexContent>
+            <xsd:extension base="muleServiceType">
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="directServiceType">
+        <xsd:complexContent>
+            <xsd:extension base="muleServiceType">
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
 
     <!--==============================================================-->
@@ -975,6 +1031,54 @@
     <!--  Utils / Standard Types                                      -->
     <!--==============================================================-->
 
+    <xsd:complexType name="objectFactoryType">
+		<xsd:annotation>
+		    <xsd:documentation>
+		    	A factory which will be used by Mule to create new instances of this object
+		    </xsd:documentation>
+		</xsd:annotation>
+        <xsd:choice maxOccurs="unbounded" minOccurs="0">
+            <xsd:element name="properties" type="propsType">
+				<xsd:annotation>
+				    <xsd:documentation>Properties to be set on the created object</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+            <xsd:element name="pooling-profile" type="poolingProfileType">
+				<xsd:annotation>
+				    <xsd:documentation>Pooling profile to use if scope="pooled"</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+        </xsd:choice>
+        <xsd:attribute name="scope" default="prototype">
+			<xsd:annotation>
+			    <xsd:documentation>Creation strategy</xsd:documentation>
+			</xsd:annotation>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="singleton"/>
+                    <xsd:enumeration value="prototype"/>
+                    <xsd:enumeration value="pooled"/>
+                    <xsd:enumeration value="custom"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+        <xsd:attribute name="class" type="xsd:NMTOKEN">
+			<xsd:annotation>
+			    <xsd:documentation>Class name</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+        <xsd:attribute name="instance-ref" type="xsd:NMTOKEN">
+			<xsd:annotation>
+			    <xsd:documentation>Singleton instance to use if scope="singleton"</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+        <xsd:attribute name="factory-ref" type="xsd:NMTOKEN">
+			<xsd:annotation>
+			    <xsd:documentation>Custom factory bean</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+    </xsd:complexType>
+
     <!-- corresponds to TlsIndirectKeyStore, named as tls-client in transport namespace -->
     <xsd:complexType name="tlsClientKeyStoreType">
         <xsd:annotation>
@@ -1176,7 +1280,7 @@
         <xsd:complexContent>
             <xsd:extension base="spring:mapType">
                 <xsd:attribute name="mapClass" type="xsd:string"/>
-                <xsd:attribute name="name" type="xsd:int"/>
+                <xsd:attribute name="name" type="xsd:string"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType -->
