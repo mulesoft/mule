@@ -16,6 +16,7 @@ import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.routing.UMONestedRouterCollection;
 import org.mule.umo.routing.UMOOutboundRouterCollection;
 import org.mule.umo.routing.UMOResponseRouterCollection;
+import org.mule.util.object.ObjectFactory;
 
 import java.beans.ExceptionListener;
 import java.util.List;
@@ -46,6 +47,8 @@ public interface UMOImmutableDescriptor extends Initialisable, Registerable
      * Returns any properties configured on this descriptor.
      *
      * @return properties defined for the descriptor.
+     * 
+     * @deprecated Properties for the underlying service should be set on the ServiceFactory instead.
      */
     Map getProperties();
 
@@ -67,9 +70,9 @@ public interface UMOImmutableDescriptor extends Initialisable, Registerable
     String getVersion();
 
     /**
-     * @return the actual bean backing the UMO.
+     * @return Factory which creates an instance of the actual service object.
      */
-    Object getService();
+    ObjectFactory getServiceFactory();
 
     /**
      * Inbound Routers control how events are received by a component. If no router
