@@ -32,6 +32,7 @@ import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.SystemUtils;
+import org.mule.util.object.SingletonObjectFactory;
 
 import java.util.List;
 
@@ -380,7 +381,7 @@ public class XFireConnector extends AbstractConnector
         if (xfireDescriptor == null)
         {
             xfireDescriptor = new MuleDescriptor(XFIRE_SERVICE_COMPONENT_NAME + getName());
-            xfireDescriptor.setService(new XFireServiceComponent());
+            xfireDescriptor.setServiceFactory(new SingletonObjectFactory(new XFireServiceComponent()));
         }
         return xfireDescriptor;
     }

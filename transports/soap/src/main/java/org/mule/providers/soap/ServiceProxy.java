@@ -38,7 +38,15 @@ public class ServiceProxy
         List ifaces = (List)component.getDescriptor().getProperties().get("serviceInterfaces");
         if (ifaces == null || ifaces.size() == 0)
         {
-            final Class implementationClass = component.getDescriptor().getService().getClass();
+            final Class implementationClass;
+            try
+            {
+                implementationClass = component.getDescriptor().getServiceFactory().create().getClass();
+            }
+            catch (Exception e)
+            {
+                throw new ClassNotFoundException("Unable to retrieve class from service factory", e);
+            }
             // get all implemented interfaces from superclasses as well
             final List intfList = ClassUtils.getAllInterfaces(implementationClass);
             interfaces = (Class[])intfList.toArray(new Class[intfList.size()]);

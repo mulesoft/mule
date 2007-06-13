@@ -13,7 +13,7 @@ package org.mule.providers.http.issues;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.tck.functional.StringAppendTestTranformer;
+import org.mule.tck.functional.StringAppendTestTransformer;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 
@@ -55,8 +55,8 @@ public class HttpTransformersMule1822TestCase extends FunctionalTestCase
     public void testResponse() throws Exception
     {
         assertEquals(
-                StringAppendTestTranformer.append(" response",
-                        StringAppendTestTranformer.append(" response 2",
+                StringAppendTestTransformer.append(" response",
+                        StringAppendTestTransformer.append(" response 2",
                                 FunctionalTestComponent.received(
                                         OUTBOUND_MESSAGE))),
                 sendTo("response").getPayloadAsString());
@@ -70,11 +70,11 @@ public class HttpTransformersMule1822TestCase extends FunctionalTestCase
     public void testBoth() throws Exception
     {
         assertEquals(
-                StringAppendTestTranformer.append(" response",
-                        StringAppendTestTranformer.append(" response 2",
+                StringAppendTestTransformer.append(" response",
+                        StringAppendTestTransformer.append(" response 2",
                                 FunctionalTestComponent.received(
-                                        StringAppendTestTranformer.append(" transformed 2",
-                                                StringAppendTestTranformer.appendDefault(
+                                        StringAppendTestTransformer.append(" transformed 2",
+                                                StringAppendTestTransformer.appendDefault(
                                         OUTBOUND_MESSAGE))))),
                 sendTo("both").getPayloadAsString());
     }

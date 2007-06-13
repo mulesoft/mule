@@ -36,6 +36,7 @@ import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.ClassUtils;
+import org.mule.util.object.SingletonObjectFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -482,7 +483,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
         if (axisDescriptor == null)
         {
             axisDescriptor = new MuleDescriptor(AXIS_SERVICE_COMPONENT_NAME);
-            axisDescriptor.setService(new AxisServiceComponent());
+            axisDescriptor.setServiceFactory(new SingletonObjectFactory(new AxisServiceComponent()));
         }
         return axisDescriptor;
     }

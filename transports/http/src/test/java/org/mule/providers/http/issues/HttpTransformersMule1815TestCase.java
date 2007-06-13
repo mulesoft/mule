@@ -13,7 +13,7 @@ package org.mule.providers.http.issues;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.tck.functional.StringAppendTestTranformer;
+import org.mule.tck.functional.StringAppendTestTransformer;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 
@@ -81,8 +81,8 @@ public class HttpTransformersMule1815TestCase extends FunctionalTestCase
         assertEquals(
                 // this reads backwards - innermost is first in chain
                 FunctionalTestComponent.received(
-                        StringAppendTestTranformer.append(" transformed 2",
-                                StringAppendTestTranformer.appendDefault(
+                        StringAppendTestTransformer.append(" transformed 2",
+                                StringAppendTestTransformer.appendDefault(
                                         OUTBOUND_MESSAGE))),
                 sendTo("inbound").getPayloadAsString());
     }

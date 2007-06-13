@@ -10,9 +10,13 @@
 package org.mule.providers.http.functional;
 
 import org.mule.MuleServer;
+import org.mule.impl.model.MuleProxy;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.testmodels.mule.TestMuleProxy;
+import org.mule.tck.testmodels.mule.TestSedaComponent;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.model.UMOModel;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
@@ -33,11 +37,16 @@ public class PollingReceiversRestartTestCase extends AbstractMuleTestCase
         Thread.sleep(WAIT_TIME);
 
         UMOModel model = (UMOModel) managementContext.getRegistry().getModels().get("main");
-        FunctionalTestComponent ftc = (FunctionalTestComponent) model.getComponent("Test").getInstance();
+
+        UMOComponent c = model.getComponent("Test");
+        assertTrue("Component should be a TestSedaComponent", c instanceof TestSedaComponent);
+        MuleProxy proxy = ((TestSedaComponent) c).getProxy();
+        Object ftc = ((TestMuleProxy) proxy).getComponent();
         assertNotNull("Functional Test Component not found in the model.", ftc);
+        assertTrue("Service should be a FunctionalTestComponent", ftc instanceof FunctionalTestComponent);
 
         AtomicInteger pollCounter = new AtomicInteger(0);
-        ftc.setEventCallback(new CounterCallback(pollCounter));
+        ((FunctionalTestComponent) ftc).setEventCallback(new CounterCallback(pollCounter));
 
         managementContext.start();
         // should be enough to poll for 2 messages
@@ -51,7 +60,7 @@ public class PollingReceiversRestartTestCase extends AbstractMuleTestCase
         managementContext.start();
 
         pollCounter.set(0);
-        ftc.setEventCallback(new CounterCallback(pollCounter));
+        ((FunctionalTestComponent) ftc).setEventCallback(new CounterCallback(pollCounter));
 
         Thread.sleep(WAIT_TIME);
         managementContext.dispose();

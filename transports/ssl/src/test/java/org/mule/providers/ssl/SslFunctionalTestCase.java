@@ -1,10 +1,14 @@
 package org.mule.providers.ssl;
 
 import org.mule.extras.client.MuleClient;
-import org.mule.impl.model.seda.SedaComponent;
+import org.mule.impl.model.MuleProxy;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.CounterCallback;
+import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.testmodels.mule.TestMuleProxy;
+import org.mule.tck.testmodels.mule.TestSedaComponent;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.model.UMOModel;
 
@@ -45,13 +49,17 @@ public class SslFunctionalTestCase extends FunctionalTestCase {
         }
 
         UMOModel model = managementContext.getRegistry().lookupModel("main");
-        SedaComponent seda = (SedaComponent) model.getComponent("testComponent2");
-        assertNotNull("Null service", seda);
-        FunctionalTestComponent ftc = (FunctionalTestComponent) seda.getInstance();
-        assertNotNull("Null FTC", ftc);
-        CounterCallback cc = (CounterCallback) ftc.getEventCallback();
-        assertNotNull("Null CounterCallback", cc);
-        assertEquals(NUM_MESSAGES, cc.getCallbackCount());
+        UMOComponent c = model.getComponent("testComponent2");
+        assertTrue("Component should be a TestSedaComponent", c instanceof TestSedaComponent);
+        MuleProxy proxy = ((TestSedaComponent) c).getProxy();
+        Object ftc = ((TestMuleProxy) proxy).getComponent();
+        assertNotNull("Functional Test Component not found in the model.", ftc);
+        assertTrue("Service should be a FunctionalTestComponent", ftc instanceof FunctionalTestComponent);
+
+        EventCallback cc = ((FunctionalTestComponent) ftc).getEventCallback();
+        assertNotNull("EventCallback is null", cc);
+        assertTrue("EventCallback should be a CounterCallback", cc instanceof CounterCallback);
+        assertEquals(NUM_MESSAGES, ((CounterCallback) cc).getCallbackCount());
     }
 
     // see AsynchronousSslMule1854TestCase

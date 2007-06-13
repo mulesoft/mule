@@ -105,7 +105,7 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
 
             if (serviceInterfaces == null)
             {
-                exposedInterface = component.getDescriptor().getService().getClass();
+                exposedInterface = component.getDescriptor().getServiceFactory().create().getClass();
             }
             else
             {
