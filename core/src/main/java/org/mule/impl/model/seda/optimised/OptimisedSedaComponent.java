@@ -13,7 +13,7 @@ package org.mule.impl.model.seda.optimised;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.model.seda.SedaComponent;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.util.ObjectPool;
+import org.mule.util.object.ObjectPool;
 
 /**
  * Same as <code>SedaComponent</code> except that it assumes that components implement the Callable 

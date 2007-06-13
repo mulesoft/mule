@@ -15,6 +15,7 @@ import org.mule.impl.MuleDescriptor;
 import org.mule.impl.RequestContext;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.model.AbstractComponent;
+import org.mule.impl.model.ComponentFactory;
 import org.mule.umo.ComponentException;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
@@ -49,7 +50,7 @@ public class StreamingComponent extends AbstractComponent
     {
         try
         {
-            component = lookupComponent();
+            component = ComponentFactory.createService(getDescriptor());
         }
         catch (UMOException e)
         {

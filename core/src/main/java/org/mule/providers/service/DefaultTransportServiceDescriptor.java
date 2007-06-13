@@ -28,7 +28,7 @@ import org.mule.umo.provider.UMOSessionHandler;
 import org.mule.umo.provider.UMOStreamMessageAdapter;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
-import org.mule.util.ObjectFactory;
+import org.mule.util.object.ObjectFactory;
 
 import java.io.InputStream;
 import java.io.OutputStream;

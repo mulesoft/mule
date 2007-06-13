@@ -31,15 +31,17 @@ public class MuleDescriptorTestCase extends AbstractMuleTestCase
         assertEquals(0, descriptor.getInterceptors().size());
 
         //TODO RM*
-//        assertEquals(config.getQueueProfile().getMaxOutstandingMessages(), descriptor.getQueueProfile()
-//            .getMaxOutstandingMessages());
+//        assertEquals(config.getQueueProfile().getMaxOutstandingMessages(), 
+//                     descriptor.getQueueProfile().getMaxOutstandingMessages());
+//        assertEquals(config.getThreadingProfile().getMaxBufferSize(), 
+//                     descriptor.getThreadingProfile().getMaxBufferSize());
 //        assertEquals(config.getPoolingProfile().getMaxIdle(), descriptor.getPoolingProfile().getMaxIdle());
 //        assertEquals(config.getPoolingProfile().getMaxWait(), descriptor.getPoolingProfile().getMaxWait());
 //        assertEquals(config.getPoolingProfile().getMaxActive(), descriptor.getPoolingProfile().getMaxActive());
 //        assertEquals("1.0", descriptor.getVersion());
         // assertEquals(2, descriptor.getInitialisationPolicy());
 
-        assertNull(descriptor.getService());
+        assertNull(descriptor.getServiceFactory());
         assertNull(descriptor.getName());
         assertEquals(0, descriptor.getProperties().size());
     }
@@ -70,8 +72,8 @@ public class MuleDescriptorTestCase extends AbstractMuleTestCase
 
         try
         {
-            descriptor.setService(null);
-            fail("setting implementation to null should fail");
+            descriptor.setServiceFactory(null);
+            fail("setting serviceFactory to null should fail");
         }
         catch (RuntimeException e)
         {
@@ -86,8 +88,8 @@ public class MuleDescriptorTestCase extends AbstractMuleTestCase
 
         try
         {
-            descriptor.setService(null);
-            fail("setting implementation to null should fail");
+            descriptor.setServiceFactory(null);
+            fail("setting serviceFactory to null should fail");
         }
         catch (RuntimeException e)
         {

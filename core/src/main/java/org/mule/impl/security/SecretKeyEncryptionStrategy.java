@@ -12,8 +12,8 @@ package org.mule.impl.security;
 
 import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.util.ObjectFactory;
 import org.mule.util.StringMessageUtils;
+import org.mule.util.object.ObjectFactory;
 
 import java.security.GeneralSecurityException;
 import java.security.spec.AlgorithmParameterSpec;

@@ -537,17 +537,6 @@ public abstract class AbstractComponent implements UMOComponent
         exceptionListener.exceptionThrown(e);
     }
 
-    /**
-     * Provides a consistent mechanism for custom models to create components.
-     * 
-     * @return
-     * @throws UMOException
-     */
-    protected Object lookupComponent() throws UMOException
-    {
-        return ComponentFactory.createComponent(getDescriptor());
-    }
-
     protected void doForceStop() throws UMOException
     {
         // template method
@@ -582,9 +571,13 @@ public abstract class AbstractComponent implements UMOComponent
 
     protected abstract void doDispatch(UMOEvent event) throws UMOException;
 
+    /**
+     * Returns an instance of the underlying service object based on the UMODescriptor.
+     * By default, this will be a new instance unless a Singleton service factory is used.
+     */
     public Object getInstance() throws UMOException
     {
-        return lookupComponent();
+        return ComponentFactory.createService(getDescriptor());
     }
 
     protected void registerListeners() throws UMOException

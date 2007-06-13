@@ -45,6 +45,7 @@ import org.mule.umo.provider.UMOMessageDispatcherFactory;
 import org.mule.umo.routing.UMOOutboundRouter;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
+import org.mule.util.object.SimpleObjectFactory;
 
 import com.mockobjects.dynamic.Mock;
 
@@ -175,7 +176,7 @@ public final class MuleTestUtils
         MuleDescriptor descriptor = new MuleDescriptor();
         descriptor.setExceptionListener(new DefaultExceptionStrategy());
         descriptor.setName(name);
-        descriptor.setService(ClassUtils.instanciateClass(implementation, ClassUtils.NO_ARGS));
+        descriptor.setServiceFactory(new SimpleObjectFactory(implementation));
         UMOOutboundRouter router = new OutboundPassThroughRouter();
         router.addEndpoint(getTestEndpoint("test1", UMOEndpoint.ENDPOINT_TYPE_SENDER, context));
         descriptor.getOutboundRouter().addRouter(router);

@@ -14,6 +14,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
+import org.mule.impl.model.ComponentFactory;
 import org.mule.impl.model.direct.DirectComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
@@ -46,7 +47,7 @@ public class PipelineComponent extends DirectComponent
         Object component = null;
         try
         {
-            component = lookupComponent();
+            component = ComponentFactory.createService(getDescriptor());
         }
         catch (UMOException e)
         {

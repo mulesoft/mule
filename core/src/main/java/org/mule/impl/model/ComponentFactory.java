@@ -10,12 +10,11 @@
 
 package org.mule.impl.model;
 
-import org.mule.config.i18n.CoreMessages;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.impl.MuleDescriptor;
-import org.mule.impl.container.ContainerKeyPair;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
-import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.util.BeanUtils;
 
 /**
@@ -37,38 +36,19 @@ public final class ComponentFactory
      * @return The newly created component
      * @throws UMOException
      */
-    public static Object createComponent(UMODescriptor descriptor) throws UMOException
+    public static Object createService(UMODescriptor descriptor) throws UMOException
     {
-        Object impl = descriptor.getService();
         Object component;
-
-        if (impl instanceof String)
-        {
-            impl = new ContainerKeyPair(null, impl);
-        }
-        if (impl instanceof ContainerKeyPair)
-        {
-            component = descriptor.getManagementContext().getRegistry().lookupObject(((ContainerKeyPair)impl).getKey(), Object.class);
-
-            if (descriptor.isSingleton())
-            {
-                descriptor.setService(component);
-            }
-        }
-        else
-        {
-            component = impl;
-        }
-
         try
         {
+            component = descriptor.getServiceFactory().create();
+            
+            // TODO Would be nice to remove this eventually.
             BeanUtils.populate(component, descriptor.getProperties());
         }
         catch (Exception e)
         {
-            throw new InitialisationException(
-                CoreMessages.failedToSetPropertiesOn("Component '" + descriptor.getName() + "'"), 
-                e, descriptor);
+            throw new LifecycleException(MessageFactory.createStaticMessage("Unable to create component"), e);
         }
 
         // Call any custom initialisers

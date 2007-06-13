@@ -32,8 +32,9 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.model.UMOModel;
-import org.mule.util.ClassUtils;
 import org.mule.util.MuleObjectHelper;
+import org.mule.util.object.SimpleObjectFactory;
+import org.mule.util.object.SingletonObjectFactory;
 
 import java.util.Map;
 import java.util.Properties;
@@ -212,8 +213,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     {
         MuleDescriptor descriptor = new MuleDescriptor();
         descriptor.setName(name);
-        descriptor.setService(component);
-
+        descriptor.setServiceFactory(new SingletonObjectFactory(component));
 
         descriptor.setOutboundRouter(new OutboundRouterCollection());
         OutboundPassThroughRouter router = new OutboundPassThroughRouter();
@@ -466,7 +466,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         try
         {
             MuleDescriptor descriptor = new MuleDescriptor();
-            descriptor.setService(ClassUtils.instanciateClass(implementation, null));
+            descriptor.setServiceFactory(new SimpleObjectFactory(implementation, properties));
             descriptor.setName(name);
             descriptor.setModelName(getModel().getName());
             if (properties != null)

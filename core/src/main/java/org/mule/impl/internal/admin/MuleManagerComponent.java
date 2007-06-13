@@ -39,8 +39,8 @@ import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.util.ClassUtils;
 import org.mule.util.MapUtils;
+import org.mule.util.object.SimpleObjectFactory;
 
 import java.io.ByteArrayInputStream;
 import java.util.HashMap;
@@ -250,11 +250,12 @@ public class MuleManagerComponent implements Callable, Initialisable
             descriptor.setName(MANAGER_COMPONENT_NAME);
     
             descriptor.getInboundRouter().addEndpoint(endpoint);
-            descriptor.setService(ClassUtils.instanciateClass(MuleManagerComponent.class, null));
+
             Map props = new HashMap();
             props.put("wireFormat", wireFormat);
             props.put("encoding", encoding);
             props.put("synchronousEventTimeout", new Integer(eventTimeout));
+            descriptor.setServiceFactory(new SimpleObjectFactory(MuleManagerComponent.class, props));
             descriptor.setProperties(props);
             return descriptor;
         }

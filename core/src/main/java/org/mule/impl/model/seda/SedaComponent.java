@@ -15,10 +15,12 @@ import org.mule.config.PoolingProfile;
 import org.mule.config.QueueProfile;
 import org.mule.config.ThreadingProfile;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.impl.FailedToQueueEventException;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.model.AbstractComponent;
+import org.mule.impl.model.ComponentFactory;
 import org.mule.impl.model.DefaultMuleProxy;
 import org.mule.impl.model.MuleProxy;
 import org.mule.management.stats.ComponentStatistics;
@@ -31,7 +33,8 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.manager.UMOWorkManager;
-import org.mule.util.ObjectPool;
+import org.mule.umo.model.UMOModel;
+import org.mule.util.object.ObjectPool;
 import org.mule.util.queue.QueueManager;
 import org.mule.util.queue.QueueSession;
 
@@ -54,8 +57,9 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
 {
     public static ObjectMetadata objectMetadata = new ObjectMetadata(SedaComponent.class);
 
-    public static final String QUEUE_PROFILE_PROPERTY = "queueProfile";
-    public static final String POOLING_PROFILE_PROPERTY = "poolingProfile";
+    // Use setPoolingProfile(), setQueueProfile() instead.
+//    public static final String QUEUE_PROFILE_PROPERTY = "queueProfile";
+//    public static final String POOLING_PROFILE_PROPERTY = "poolingProfile";
 
     /**
      * Serial version/
@@ -140,13 +144,13 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
         ThreadingProfile tp = descriptor.getThreadingProfile();
         workManager = tp.createWorkManager(descriptor.getName());
 
-        queueProfile = (QueueProfile) descriptor.getProperties().get(QUEUE_PROFILE_PROPERTY);
+        queueProfile = descriptor.getQueueProfile();
         if (queueProfile == null)
         {
             queueProfile = ((SedaModel) model).getQueueProfile();
         }
 
-        poolingProfile = (PoolingProfile) descriptor.getProperties().get(POOLING_PROFILE_PROPERTY);
+        poolingProfile = descriptor.getPoolingProfile();
         if (poolingProfile == null)
         {
             poolingProfile = ((SedaModel) model).getPoolingProfile();
@@ -247,8 +251,8 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
     {
         try
         {
-            Object component = lookupComponent();
-            MuleProxy componentProxy = new DefaultMuleProxy(component, descriptor, model, null);
+            Object component = ComponentFactory.createService(getDescriptor());
+            MuleProxy componentProxy = createComponentProxy(component, descriptor, model, null);
             ((SedaComponentStatistics) getStatistics()).setComponentPoolSize(-1);
             componentProxy.setStatistics(getStatistics());
             componentProxy.start();
@@ -258,6 +262,12 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
         {
             throw new InitialisationException(e, this);
         }
+    }
+
+    protected MuleProxy createComponentProxy(Object component, MuleDescriptor descriptor, UMOModel model, ObjectPool proxyPool) 
+        throws UMOException
+    {
+        return new DefaultMuleProxy(component, descriptor, model, null);
     }
 
     public void doForceStop() throws UMOException
@@ -559,14 +569,24 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
     }
 
     /**
-     * The proxy may be one of three types: 1. pooled 2. not pooled 3. per-request
+     * The proxy to the component may be one of three types: 
+     *  1. pooled 
+     *  2. not pooled, created only once 
+     *  3. created/disposed per request
      */
-    protected MuleProxy getProxy() throws Exception
+    protected MuleProxy getProxy() throws UMOException
     {
         MuleProxy proxy;
         if (proxyPool != null)
         {
-            proxy = (MuleProxy) proxyPool.borrowObject();
+            try
+            {
+                proxy = (MuleProxy) proxyPool.borrowObject();
+            }
+            catch (Exception e)
+            {
+                throw new ComponentException(MessageFactory.createStaticMessage("Unable to retrieve component proxy from pool"), null, null, e);
+            }
             ((SedaComponentStatistics) getStatistics()).setComponentPoolSize(proxyPool.getSize());
         }
         else if (componentPerRequest)
@@ -648,6 +668,11 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
             throw new MuleRuntimeException(
                 CoreMessages.componentCausedErrorIs(this.getName()), e);
         }
+    }
+
+    public Object getInstance() throws UMOException
+    {
+        throw new ComponentException(MessageFactory.createStaticMessage("Direct access to underlying service object is not allowed in the SedaModel.  If this is for a unit test, make sure you are using the TestSedaModel ('seda-test')"), null, this);
     }
 
     public PoolingProfile getPoolingProfile()

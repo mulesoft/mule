@@ -12,6 +12,8 @@ package org.mule.impl;
 
 import org.mule.RegistryContext;
 import org.mule.config.MuleConfiguration;
+import org.mule.config.PoolingProfile;
+import org.mule.config.QueueProfile;
 import org.mule.config.ThreadingProfile;
 import org.mule.registry.DeregistrationException;
 import org.mule.registry.RegistrationException;
@@ -28,6 +30,7 @@ import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.routing.UMONestedRouterCollection;
 import org.mule.umo.routing.UMOOutboundRouterCollection;
 import org.mule.umo.routing.UMOResponseRouterCollection;
+import org.mule.util.object.ObjectFactory;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
@@ -53,20 +56,14 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     public static final String INITIAL_STATE_PAUSED = "paused";
 
     /**
-     * Property that allows for a property file to be used to load properties instead
-     * of listing them directly in the mule-configuration file
-     */
-    protected static final String MULE_PROPERTY_DOT_PROPERTIES = "org.mule.dotProperties";
-
-    /**
      * holds the exception stategy for this UMO
      */
     protected ExceptionListener exceptionListener;
 
     /**
-     * The actual bean backing the UMO instance. 
+     * Factory which creates an instance of the actual service object.
      */
-    protected Object service;
+    protected ObjectFactory serviceFactory;
 
     /**
      * The descriptor name
@@ -75,6 +72,8 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 
     /**
      * The properties for the Mule UMO.
+     * 
+     * @deprecated Properties for the underlying service should be set on the ServiceFactory instead.
      */
     protected Map properties = new HashMap();
 
@@ -101,6 +100,18 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
      * will be provided by the server
      */
     protected ThreadingProfile threadingProfile;
+
+    /**
+     * The pooling profile to use for this component. If this is not set a default
+     * will be provided by the server
+     */
+    protected PoolingProfile poolingProfile;
+
+    /**
+     * The queue profile to use for this component. If this is not set a default
+     * will be provided by the server
+     */
+    protected QueueProfile queueProfile;
 
     /**
      * Determines the initial state of this component when the model starts. Can be
@@ -136,7 +147,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         outboundRouter = descriptor.getOutboundRouter();
         responseRouter = descriptor.getResponseRouter();
         nestedRouter = descriptor.getNestedRouter();
-        service = descriptor.getService();
+        serviceFactory = descriptor.getServiceFactory();
         version = descriptor.getVersion();
         intecerptorList = descriptor.getInterceptors();
         properties = descriptor.getProperties();
@@ -251,11 +262,11 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     }
 
     /*
-     * (non-Javadoc)
-     *
      * @see org.mule.umo.UMODescriptor#getParams() Not HashMap is used instead of Map
      *      due to a Spring quirk where the property is not found if specified as a
      *      map
+     *      
+     * @deprecated Properties for the underlying service should be set on the ServiceFactory instead.
      */
     public Map getProperties()
     {
@@ -282,14 +293,12 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         return intecerptorList;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.UMODescriptor#getImplementation()
+    /**
+     * Factory which creates an instance of the actual service object.
      */
-    public Object getService()
+    public ObjectFactory getServiceFactory()
     {
-        return service;
+        return serviceFactory;
     }
 
     public UMOInboundRouterCollection getInboundRouter()
@@ -314,6 +323,16 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     public ThreadingProfile getThreadingProfile()
     {
         return threadingProfile;
+    }
+
+    public PoolingProfile getPoolingProfile()
+    {
+        return poolingProfile;
+    }
+
+    public QueueProfile getQueueProfile()
+    {
+        return queueProfile;
     }
 
     public void fireInitialisationCallbacks(Object component) throws InitialisationException
@@ -356,7 +375,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         final StringBuffer sb = new StringBuffer();
         sb.append("ImmutableMuleDescriptor");
         sb.append("{exceptionListener=").append(exceptionListener);
-        sb.append(", service=").append(service);
+        sb.append(", serviceFactory=").append(serviceFactory);
         sb.append(", name='").append(name).append('\'');
         sb.append(", properties=").append(properties);
         sb.append(", version='").append(version).append('\'');

@@ -10,6 +10,8 @@
 
 package org.mule.impl;
 
+import org.mule.config.PoolingProfile;
+import org.mule.config.QueueProfile;
 import org.mule.config.ThreadingProfile;
 import org.mule.registry.RegistrationException;
 import org.mule.umo.UMODescriptor;
@@ -19,13 +21,11 @@ import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.routing.UMONestedRouterCollection;
 import org.mule.umo.routing.UMOOutboundRouterCollection;
 import org.mule.umo.routing.UMOResponseRouterCollection;
-import org.mule.util.FileUtils;
+import org.mule.util.object.ObjectFactory;
 
 import java.beans.ExceptionListener;
-import java.io.FileInputStream;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -68,6 +68,16 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
         this.threadingProfile = threadingProfile;
     }
 
+    public void setPoolingProfile(PoolingProfile poolingProfile)
+    {
+        this.poolingProfile = poolingProfile;
+    }
+
+    public void setQueueProfile(QueueProfile queueProfile)
+    {
+        this.queueProfile = queueProfile;
+    }
+
     /*
      * (non-Javadoc)
      *
@@ -98,30 +108,11 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
     }
 
     /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.UMODescriptor#getPropertiesForURI(java.util.Properties)
+     * @deprecated Properties for the underlying service should be set on the ServiceFactory instead.
      */
     public void setProperties(Map props)
     {
         properties = props;
-        String delegate = (String) properties.get(MULE_PROPERTY_DOT_PROPERTIES);
-        if (delegate != null)
-        {
-            try
-            {
-                FileInputStream is = new FileInputStream(FileUtils.newFile(delegate));
-                Properties dProps = new Properties();
-                dProps.load(is);
-                properties.putAll(dProps);
-            }
-            catch (Exception e)
-            {
-                // TODO MULE-863: Sufficient?  Correct level?
-                logger.warn(MULE_PROPERTY_DOT_PROPERTIES + " was set  to " + delegate
-                            + " but the file could not be read, exception is: " + e.getMessage());
-            }
-        }
     }
 
     /*
@@ -152,17 +143,16 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
         this.intecerptorList = inteceptorList;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.mule.umo.UMODescriptor#setImplementation(java.lang.String)
+    /**
+     * Factory which creates an instance of the actual service object.
      */
-    public void setService(Object service)
+    public void setServiceFactory(ObjectFactory serviceFactory)
     {
-        if (service == null)
+        if (serviceFactory == null)
         {
-            throw new IllegalArgumentException("Service cannot be null");
+            throw new IllegalArgumentException("ServiceFactory cannot be null");
         }
-        this.service = service;
+        this.serviceFactory = serviceFactory;
     }
 
     public void setInboundRouter(UMOInboundRouterCollection router)

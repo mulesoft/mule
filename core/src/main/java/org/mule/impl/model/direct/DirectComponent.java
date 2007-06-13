@@ -13,6 +13,7 @@ package org.mule.impl.model.direct;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.model.AbstractComponent;
+import org.mule.impl.model.ComponentFactory;
 import org.mule.impl.model.DefaultMuleProxy;
 import org.mule.impl.model.MuleProxy;
 import org.mule.umo.UMOEvent;
@@ -47,7 +48,7 @@ public class DirectComponent extends AbstractComponent
 
         try
         {
-            Object component = lookupComponent();
+            Object component = ComponentFactory.createService(getDescriptor());
             proxy = new DefaultMuleProxy(component, descriptor, model, null);
             proxy.setStatistics(getStatistics());
         }

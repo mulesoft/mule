@@ -29,7 +29,7 @@ import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Startable;
 import org.mule.umo.lifecycle.Stoppable;
 import org.mule.umo.model.ModelException;
-import org.mule.util.ObjectPool;
+import org.mule.util.object.ObjectPool;
 import org.mule.util.queue.QueueSession;
 
 import org.apache.commons.logging.Log;
