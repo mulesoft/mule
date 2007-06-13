@@ -10,7 +10,7 @@
 
 package org.mule.tck.testmodels.fruit;
 
-import org.mule.util.ObjectFactory;
+import org.mule.util.object.ObjectFactory;
 
 /**
  * <code>BananaFactory</code> is a test factory that creates Bananas
