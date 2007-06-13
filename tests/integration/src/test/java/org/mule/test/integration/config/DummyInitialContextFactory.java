@@ -16,13 +16,10 @@ import org.mule.impl.jndi.SimpleContext;
 import org.mule.management.agents.Log4jAgent;
 import org.mule.providers.vm.VMConnector;
 import org.mule.transformers.xml.XmlToObject;
-import org.mule.util.ObjectFactory;
+import org.mule.util.object.ObjectFactory;
 
 /**
  * A dummy property factory for creating a Jndi context
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class DummyInitialContextFactory implements ObjectFactory
 {

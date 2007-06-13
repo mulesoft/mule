@@ -26,6 +26,7 @@ import org.mule.umo.UMOTransaction;
 import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.UMOTransactionFactory;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.util.object.SimpleObjectFactory;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
@@ -102,7 +103,7 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
         UMODescriptor descriptor = new MuleDescriptor();
         descriptor.setExceptionListener(new DefaultExceptionStrategy());
         descriptor.setName("testComponent");
-        descriptor.setService(JdbcFunctionalTestComponent.class.getName());
+        descriptor.setServiceFactory(new SimpleObjectFactory(JdbcFunctionalTestComponent.class));
 
         UMOEndpoint endpoint = new MuleEndpoint("testIn", getInDest(), connector, null,
             UMOEndpoint.ENDPOINT_TYPE_RECEIVER, 0, null, null);

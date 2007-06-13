@@ -22,6 +22,7 @@ import org.mule.test.integration.service.TestReceiver;
 import org.mule.transformers.simple.ByteArrayToString;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.NoReceiverForEndpointException;
+import org.mule.util.object.SingletonObjectFactory;
 
 
 public class MuleClientListenerTestCase extends FunctionalTestCase
@@ -63,7 +64,7 @@ public class MuleClientListenerTestCase extends FunctionalTestCase
         String name = "myComponent";
         MuleDescriptor descriptor = new MuleDescriptor();
         descriptor.setName(name);
-        descriptor.setService(receiver);
+        descriptor.setServiceFactory(new SingletonObjectFactory(receiver));
 
         MuleEndpoint endpoint = new MuleEndpoint(urlString, true);
         // We get a byte[] from a tcp endpoint so we need to convert it
