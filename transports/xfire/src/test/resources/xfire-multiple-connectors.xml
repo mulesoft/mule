@@ -52,7 +52,7 @@
 
     <model name="TestXfireConnectors">
         
-        <!--Two separate components are created instead of 1 with 2 endpoints so that exceptions are not compomised ->
+        <!- Two separate components are created instead of 1 with 2 endpoints so that exceptions are not compomised ->
         <mule-descriptor name="TestComponent1" implementation="org.mule.tck.testmodels.services.TestComponent">
             <inbound-router>
                 <endpoint address="xfire:http://localhost:8081/services" connector="XFireConnector1"/>

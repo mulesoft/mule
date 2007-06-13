@@ -20,6 +20,8 @@ import org.mule.umo.manager.UMOServerNotification;
 
 import java.util.HashMap;
 
+import junit.framework.Assert;
+
 public class XFireCustomHttpHeaderTestCase extends FunctionalTestCase implements MessageNotificationListener
 {
     protected static final String endpointAddress = "http://localhost:10181/services/TestComponent?method=onReceive";
@@ -58,7 +60,7 @@ public class XFireCustomHttpHeaderTestCase extends FunctionalTestCase implements
         assertEquals("Test String Received", reply.getPayloadAsString());
 
         // make sure all notifications have trickled in
-        Thread.sleep(3000);
+        Thread.sleep(10000);
 
         // make sure we received a notification on xfire
         assertNotNull(notificationMsg);
@@ -83,11 +85,14 @@ public class XFireCustomHttpHeaderTestCase extends FunctionalTestCase implements
                 notificationMsg = (UMOMessage)notification.getSource();
             }
         }
+        else
+        {
+            Assert.fail("invalid notification: " + notification);
+        }
     }
 
     protected String getConfigResources()
     {
         return "xfire-headers-conf.xml";
     }
-
 }

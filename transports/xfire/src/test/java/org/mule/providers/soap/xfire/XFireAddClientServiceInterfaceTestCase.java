@@ -10,7 +10,6 @@
 
 package org.mule.providers.soap.xfire;
 
-import org.mule.impl.MuleDescriptor;
 import org.mule.tck.AbstractMuleTestCase;
 
 import java.util.ArrayList;
@@ -18,13 +17,12 @@ import java.util.List;
 
 public class XFireAddClientServiceInterfaceTestCase extends AbstractMuleTestCase
 {
-    protected MuleDescriptor descriptor;
-
     protected XFireConnector connector;
 
     protected void doSetUp() throws Exception
     {
         connector = new XFireConnector();
+        connector.setManagementContext(managementContext);
         List clientServices = new ArrayList();
         clientServices.add("org.mule.components.simple.EchoService");
         connector.setClientServices(clientServices);
