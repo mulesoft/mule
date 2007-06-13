@@ -15,10 +15,6 @@ import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.manager.UMOContainerContext;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class MuleContainerContextTestCase extends AbstractContainerContextTestCase
 {
 
@@ -109,9 +105,11 @@ public class MuleContainerContextTestCase extends AbstractContainerContextTestCa
         assertNotNull(ctx);
 
         UMODescriptor descriptor = getTestDescriptor("fruit Bowl", "org.mule.tck.testmodels.fruit.FruitBowl");
-        FruitBowl fruitBowl = (FruitBowl)ctx.getComponent(descriptor.getService());
-
-        assertNotNull(fruitBowl);
+        
+        fail("Need to figure out whether this test is relevant for Mule 2.0");
+        // TODO MULE-1908
+        //FruitBowl fruitBowl = (FruitBowl)ctx.getComponent(descriptor.getService());
+        //assertNotNull(fruitBowl);
     }
 
 }

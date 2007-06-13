@@ -87,7 +87,10 @@ public abstract class AbstractContainerContextTestCase extends AbstractMuleTestC
         assertNotNull(container);
         container.initialise();
         descriptor.initialise();
-        return container.getComponent(descriptor.getService());
+        fail("Need to figure out whether this test is relevant for Mule 2.0");
+        // TODO MULE-1908
+        return null;
+        //return container.getComponent(descriptor.getService());
     }
 
     protected void verifyExternalReference(Object object)
