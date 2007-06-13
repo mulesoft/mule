@@ -621,6 +621,7 @@
                 </configuration>
             </plugin>
 
+            <!--
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
@@ -630,7 +631,7 @@
                     <instructions>
                         <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
                         <Bundle-DocURL>${pom.url}</Bundle-DocURL>
-                        <!-- These packages are part of the JDK and should not appear in the imports list -->
+                        <!- These packages are part of the JDK and should not appear in the imports list ->
                         <Import-Package>
                             !com.ccg.net.ethernet,
                             !com.sun.activation.registries,
@@ -656,7 +657,7 @@
                     </instructions>
                 </configuration>
             </plugin>
-
+            -->
         </plugins>
     </build>
 
