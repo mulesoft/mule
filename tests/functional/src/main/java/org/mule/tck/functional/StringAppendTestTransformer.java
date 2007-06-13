@@ -13,7 +13,7 @@ package org.mule.tck.functional;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 
-public class StringAppendTestTranformer extends AbstractTransformer
+public class StringAppendTestTransformer extends AbstractTransformer
 {
 
     public static final String DEFAULT_TEXT = " transformed";
