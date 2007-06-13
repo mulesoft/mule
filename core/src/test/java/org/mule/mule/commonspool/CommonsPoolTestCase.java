@@ -13,23 +13,16 @@ package org.mule.mule.commonspool;
 import org.mule.config.pool.CommonsPoolFactory;
 import org.mule.config.pool.CommonsPoolProxyPool;
 import org.mule.impl.MuleDescriptor;
-import org.mule.impl.model.seda.SedaModel;
 import org.mule.tck.model.AbstractPoolTestCase;
+import org.mule.tck.testmodels.mule.TestSedaModel;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.model.UMOPoolFactory;
-import org.mule.util.ObjectPool;
+import org.mule.util.object.ObjectPool;
 
 import org.apache.commons.pool.impl.GenericObjectPool;
 
 public class CommonsPoolTestCase extends AbstractPoolTestCase
 {
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.test.mule.AbstractPoolTestCase#createPool(org.mule.umo.UMODescriptor,
-     *      byte)
-     */
     public ObjectPool createPool(MuleDescriptor descriptor, byte action) throws InitialisationException
     {
         GenericObjectPool.Config config = new GenericObjectPool.Config();
@@ -52,12 +45,11 @@ public class CommonsPoolTestCase extends AbstractPoolTestCase
         {
             fail("Action type for pool not recognised. Type is: " + action);
         }
-        return new CommonsPoolProxyPool(descriptor, new SedaModel(), config);
+        return new CommonsPoolProxyPool(descriptor, new TestSedaModel(), config);
     }
 
     public UMOPoolFactory getPoolFactory()
     {
         return new CommonsPoolFactory();
     }
-
 }

@@ -15,8 +15,8 @@ import org.mule.impl.MuleDescriptor;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.model.UMOPoolFactory;
-import org.mule.util.ObjectFactory;
-import org.mule.util.ObjectPool;
+import org.mule.util.object.ObjectFactory;
+import org.mule.util.object.ObjectPool;
 
 /**
  * <code>CommonsPoolFactory</code> is a commons-pool pool implementation for mule.

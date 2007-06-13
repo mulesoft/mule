@@ -13,11 +13,13 @@ package org.mule.config.pool;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.model.ComponentFactory;
 import org.mule.impl.model.DefaultMuleProxy;
+import org.mule.tck.testmodels.mule.TestMuleProxy;
+import org.mule.tck.testmodels.mule.TestSedaModel;
 import org.mule.umo.UMOException;
-import org.mule.umo.model.UMOModel;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.util.ObjectFactory;
-import org.mule.util.ObjectPool;
+import org.mule.umo.model.UMOModel;
+import org.mule.util.object.ObjectFactory;
+import org.mule.util.object.ObjectPool;
 
 /**
  * <code>AbstractProxyFactory</code> provides common behaviour for creating proxy
@@ -48,14 +50,21 @@ public abstract class AbstractProxyFactory implements ObjectFactory
 
     public Object create() throws UMOException
     {
-        Object component = ComponentFactory.createComponent(descriptor);
+        Object component = ComponentFactory.createService(descriptor);
         afterComponentCreate(component);
         return createProxy(component);
     }
 
     protected Object createProxy(Object component) throws UMOException
     {
-        return new DefaultMuleProxy(component, descriptor, model, pool);
+        if (model instanceof TestSedaModel)
+        {
+            return new TestMuleProxy(component, descriptor, model, pool);
+        }
+        else 
+        {
+            return new DefaultMuleProxy(component, descriptor, model, pool);
+        }
     }
 
     protected void afterComponentCreate(Object component) throws InitialisationException

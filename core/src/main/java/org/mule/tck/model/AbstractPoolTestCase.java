@@ -14,11 +14,13 @@ import org.mule.config.PoolingProfile;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.model.seda.SedaModel;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.services.UniqueComponent;
 import org.mule.tck.testmodels.fruit.Orange;
+import org.mule.tck.testmodels.mule.TestMuleProxy;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.model.UMOPoolFactory;
-import org.mule.util.ObjectPool;
+import org.mule.util.object.ObjectPool;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 
@@ -39,7 +41,6 @@ public abstract class AbstractPoolTestCase extends AbstractMuleTestCase
 
     public void testCreatePool() throws Exception
     {
-
         MuleDescriptor d = getTestDescriptor("orange", Orange.class.getName());
         ObjectPool pool = createPool(d, FAIL_WHEN_EXHAUSTED);
 
@@ -205,6 +206,50 @@ public abstract class AbstractPoolTestCase extends AbstractMuleTestCase
 
     }
 
+    public void testObjectUniqueness() throws Exception
+    {
+        MuleDescriptor desc = getTestDescriptor("unique", UniqueComponent.class.getName());
+        ObjectPool pool = createPool(desc, FAIL_WHEN_EXHAUSTED);
+        assertNotNull(pool);
+        assertEquals(0, pool.getSize());
+
+        Object proxy;
+        Object component;
+
+        proxy = pool.borrowObject();
+        assertNotNull(proxy);
+        assertTrue("Proxy should be of type TestMuleProxy, are you sure you're using the TestSedaModel?", 
+                   proxy instanceof TestMuleProxy);
+        component = ((TestMuleProxy) proxy).getComponent();
+        assertNotNull(component);
+        assertTrue("Component should be of type UniqueComponent", component instanceof UniqueComponent);
+        String id1 = ((UniqueComponent) component).getId();
+        assertNotNull(id1);
+        
+        proxy = pool.borrowObject();
+        assertNotNull(proxy);
+        assertTrue("Proxy should be of type TestMuleProxy, are you sure you're using the TestSedaModel?", 
+                   proxy instanceof TestMuleProxy);
+        component = ((TestMuleProxy) proxy).getComponent();
+        assertNotNull(component);
+        assertTrue("Component should be of type UniqueComponent", component instanceof UniqueComponent);
+        String id2 = ((UniqueComponent) component).getId();
+        assertNotNull(id2);
+        
+        proxy = pool.borrowObject();
+        assertNotNull(proxy);
+        assertTrue("Proxy should be of type TestMuleProxy, are you sure you're using the TestSedaModel?", 
+                   proxy instanceof TestMuleProxy);
+        component = ((TestMuleProxy) proxy).getComponent();
+        assertNotNull(component);
+        assertTrue("Component should be of type UniqueComponent", component instanceof UniqueComponent);
+        String id3 = ((UniqueComponent) component).getId();
+        assertNotNull(id3);        
+
+        assertFalse("Component IDs " + id1 + " and " + id2 + " should be different", id1.equals(id2));
+        assertFalse("Component IDs " + id2 + " and " + id3 + " should be different", id2.equals(id3));
+    }
+    
     private class Borrower extends Thread
     {
         private ObjectPool pool;

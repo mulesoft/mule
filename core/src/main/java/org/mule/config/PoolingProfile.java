@@ -13,7 +13,7 @@ package org.mule.config;
 import org.mule.config.pool.CommonsPoolFactory;
 import org.mule.umo.model.UMOPoolFactory;
 import org.mule.util.MapUtils;
-import org.mule.util.ObjectPool;
+import org.mule.util.object.ObjectPool;
 
 import java.util.Map;
 

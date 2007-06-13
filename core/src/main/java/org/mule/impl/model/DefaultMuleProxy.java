@@ -41,7 +41,7 @@ import org.mule.umo.lifecycle.UMOLifecycleAdapter;
 import org.mule.umo.model.ModelException;
 import org.mule.umo.model.UMOEntryPointResolver;
 import org.mule.umo.model.UMOModel;
-import org.mule.util.ObjectPool;
+import org.mule.util.object.ObjectPool;
 import org.mule.util.queue.QueueSession;
 
 import java.util.ArrayList;

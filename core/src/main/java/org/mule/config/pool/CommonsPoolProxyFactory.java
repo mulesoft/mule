@@ -14,8 +14,8 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleDescriptor;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.model.UMOModel;
+import org.mule.util.BeanUtils;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.pool.PoolableObjectFactory;
 
 /**

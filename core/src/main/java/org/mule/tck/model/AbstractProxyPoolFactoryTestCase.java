@@ -14,8 +14,8 @@ import org.mule.impl.MuleDescriptor;
 import org.mule.impl.model.MuleProxy;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.util.ObjectFactory;
-import org.mule.util.ObjectPool;
+import org.mule.util.object.ObjectFactory;
+import org.mule.util.object.ObjectPool;
 
 import com.mockobjects.dynamic.Mock;
 

@@ -17,8 +17,8 @@ import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Startable;
 import org.mule.umo.lifecycle.Stoppable;
 import org.mule.umo.model.UMOModel;
-import org.mule.util.ObjectFactory;
-import org.mule.util.ObjectPool;
+import org.mule.util.object.ObjectFactory;
+import org.mule.util.object.ObjectPool;
 
 import java.util.ArrayList;
 import java.util.Iterator;
