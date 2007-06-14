@@ -13,7 +13,7 @@
 
     <mule:model-seda name="testSimple">
         <mule:service name="testServiceSimple">
-        	<mule:component class="org.mule.tck.functional.FunctionalTestComponent" />
+            <mule:component class="org.mule.tck.functional.FunctionalTestComponent" />
             <mule:inbound-router>
                 <mule:endpoint address="vm://simple" transformers="appendString"/>
             </mule:inbound-router>
@@ -22,7 +22,7 @@
 
     <mule:model-seda name="testChained">
         <mule:service name="testServiceChained">
-        	<mule:component class="org.mule.components.simple.BridgeComponent" />
+            <mule:component class="org.mule.components.simple.BridgeComponent" />
             <mule:inbound-router>
                 <mule:endpoint address="vm://chained"/>
             </mule:inbound-router>
@@ -33,7 +33,7 @@
             </mule:outbound-router>
         </mule:service>
         <mule:service name="testServiceChainedB">
-        	<mule:component class="org.mule.tck.functional.FunctionalTestComponent" />
+            <mule:component class="org.mule.tck.functional.FunctionalTestComponent" />
             <mule:inbound-router>
                 <mule:endpoint address="vm://out" transformers="appendString"/>
             </mule:inbound-router>

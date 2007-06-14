@@ -8,19 +8,19 @@
 
     <mule:model-seda name="main" class="org.mule.tck.testmodels.mule.TestSedaModel">
         <mule:service name="unique1">
-        	<mule:component class="org.mule.tck.services.UniqueComponent" />
+            <mule:component class="org.mule.tck.services.UniqueComponent" />
         </mule:service>
         <mule:service name="unique2">
-        	<mule:component scope="singleton" class="org.mule.tck.services.UniqueComponent" />
+            <mule:component scope="singleton" class="org.mule.tck.services.UniqueComponent" />
         </mule:service>
         <mule:service name="unique3">
-        	<mule:component scope="singleton" instance-ref="myUniqueBean" />
+            <mule:component scope="singleton" instance-ref="myUniqueBean" />
         </mule:service>
         <!-- SEDA-specific attributes 
         <mule:service name="unique4" serviceFactory-ref="genericFactory" enablePooling="false"/>
         -->
     </mule:model-seda>
 
-	<!-- Singleton bean -->    
+    <!-- Singleton bean -->    
     <bean name="myUniqueBean" class="org.mule.tck.services.UniqueComponent" />
 </beans>

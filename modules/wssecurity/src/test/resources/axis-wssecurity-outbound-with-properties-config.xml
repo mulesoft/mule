@@ -12,14 +12,14 @@
             <property name="configFile" value="spring-security.xml"/>
         </properties>
     </container-context>
-	
-	<connector name="WsSecurity" className="org.mule.providers.soap.axis.AxisConnector">
+    
+    <connector name="WsSecurity" className="org.mule.providers.soap.axis.AxisConnector">
         <properties>
             <property name="clientConfig" value="mule-axis-secure-client-config.wsdd"/>
             <property name="serverConfig" value="mule-axis-secure-server-config.wsdd"/>
         </properties>
     </connector>
-		
+        
     <model name="OutboundSecurity">
         <mule-descriptor name="BridgeUMO" implementation="org.mule.components.simple.BridgeComponent">
             <inbound-router>
@@ -29,19 +29,19 @@
                 <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
                     <endpoint address="axis:http://localhost:8484/MySecuredUMO?method=echo" type="sender">
                         <security-filter className="org.mule.extras.wssecurity.filters.WsSecurityFilter">
-							<properties>
-								<map name="addOutboundProperties">
-									<property value="Encrypt" name="action"/>
-									<property value="out-encrypted-security.properties" name="encryptionPropFile"/>
-									<property value="mulealias" name="user"/>
-									<property value="org.mule.extras.wssecurity.callbackhandlers.MuleWsSecurityCallbackHandler" name="passwordCallbackClass"/>
-								</map>	
-							</properties>
-						</security-filter>	
+                            <properties>
+                                <map name="addOutboundProperties">
+                                    <property value="Encrypt" name="action"/>
+                                    <property value="out-encrypted-security.properties" name="encryptionPropFile"/>
+                                    <property value="mulealias" name="user"/>
+                                    <property value="org.mule.extras.wssecurity.callbackhandlers.MuleWsSecurityCallbackHandler" name="passwordCallbackClass"/>
+                                </map>    
+                            </properties>
+                        </security-filter>    
                     </endpoint>
                 </router>
             </outbound-router>
-		</mule-descriptor>
+        </mule-descriptor>
 
         <mule-descriptor name="MySecuredUMO" implementation="org.mule.components.simple.EchoComponent">
             <inbound-router>

@@ -16,21 +16,21 @@
     <xsd:element name="connector" type="bpmConnectorType"/>
 
     <xsd:complexType name="bpmConnectorType">
-    	<xsd:complexContent>
-    		<xsd:extension base="mule:connectorType">
-		        <xsd:attribute name="bpms-ref" type="xsd:IDREF" use="required"/>
-		        <xsd:attribute name="allowGlobalReceiver" type="mule:substitutableBoolean"/>
-		        <xsd:attribute name="allowGlobalDispatcher" type="mule:substitutableBoolean"/>
-		        <xsd:attribute name="processIdField" type="xsd:string"/>
-		    </xsd:extension>
-    	</xsd:complexContent>
+        <xsd:complexContent>
+            <xsd:extension base="mule:connectorType">
+                <xsd:attribute name="bpms-ref" type="xsd:IDREF" use="required"/>
+                <xsd:attribute name="allowGlobalReceiver" type="mule:substitutableBoolean"/>
+                <xsd:attribute name="allowGlobalDispatcher" type="mule:substitutableBoolean"/>
+                <xsd:attribute name="processIdField" type="xsd:string"/>
+            </xsd:extension>
+        </xsd:complexContent>
    </xsd:complexType>
  
     <xsd:complexType name="customElement">
-	    <xsd:choice>
-	        <xsd:any namespace="##any" minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
-	    </xsd:choice>
-	    <xsd:anyAttribute namespace="##any" processContents="lax"/>
+        <xsd:choice>
+            <xsd:any namespace="##any" minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
+        </xsd:choice>
+        <xsd:anyAttribute namespace="##any" processContents="lax"/>
     </xsd:complexType>
 
 </xsd:schema>

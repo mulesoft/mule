@@ -25,7 +25,7 @@
     <mule:model-seda name="main">
 
         <mule:service name="PassingThrough">
-        	<mule:component class="org.mule.components.simple.PassThroughComponent"/>
+            <mule:component class="org.mule.components.simple.PassThroughComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="udp://${hostname}:9001"/>
             </mule:inbound-router>

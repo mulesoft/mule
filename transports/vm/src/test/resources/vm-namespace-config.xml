@@ -13,7 +13,7 @@
     <vm:connector name="vmConnector1" queueEvents="true"/>
 
     <vm:connector name="vmConnector2" queueEvents="true" queueTimeout="5000">
-	    <vm:queueProfile maxOutstandingMessages="10" persistent="true"/>
-   	</vm:connector>
+        <vm:queueProfile maxOutstandingMessages="10" persistent="true"/>
+       </vm:connector>
 
 </beans>

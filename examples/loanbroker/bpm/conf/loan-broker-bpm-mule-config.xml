@@ -26,12 +26,12 @@
     
     <connector name="asyncVm" className="org.mule.providers.vm.VMConnector">
         <properties>
-        	<!-- Queue up events for asynchronous communication. -->
+            <!-- Queue up events for asynchronous communication. -->
             <property name="queueEvents" value="true"/>
         </properties>
     </connector>
     
-	<!-- We could use JMS instead of VM to make the example more realistic.
+    <!-- We could use JMS instead of VM to make the example more realistic.
     <connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">
         <properties>
             <property name="connectionFactoryJndiName" value="ConnectionFactory"/>
@@ -57,7 +57,7 @@
         <!-- Final loan quote to the customer -->
         <endpoint name="CustomerResponses" address="vm://customer.responses" connector="asyncVm"/>
 
-		<!-- Bigger banks handle bigger loans.  -->
+        <!-- Bigger banks handle bigger loans.  -->
         <endpoint name="BigBank" address="vm://big.bank" connector="syncVm"/>
         <endpoint name="MediumBank" address="vm://medium.bank" connector="syncVm"/>
         <endpoint name="SmallBank" address="vm://small.bank" connector="syncVm"/>

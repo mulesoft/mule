@@ -55,7 +55,7 @@ public class ${TransportName}Connector extends AbstractConnector
 
     public void doStart() throws org.mule.umo.UMOException
     {
-    	// Optional; does not need to be implemented. Delete if not required
+        // Optional; does not need to be implemented. Delete if not required
 
         /* IMPLEMENTATION NOTE: If there is a single server instance or
            connection associated with the connector i.e.  AxisServer or a Jms
@@ -65,7 +65,7 @@ public class ${TransportName}Connector extends AbstractConnector
 
     public void doStop() throws org.mule.umo.UMOException
     {
-    	// Optional; does not need to be implemented. Delete if not required
+        // Optional; does not need to be implemented. Delete if not required
 
         /* IMPLEMENTATION NOTE: Should put any associated resources into a
            stopped state. Mule will automatically call the stop() method. */
@@ -73,7 +73,7 @@ public class ${TransportName}Connector extends AbstractConnector
 
     public void doDispose()
     {
-    	// Optional; does not need to be implemented. Delete if not required
+        // Optional; does not need to be implemented. Delete if not required
 
         /* IMPLEMENTATION NOTE: Should clean up any open resources associated
            with the connector. */

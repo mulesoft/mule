@@ -29,7 +29,7 @@
     <mule:model-seda name="baseModel">
 
         <mule:service name="baseService1">
-        	<mule:component class="org.mule.components.simple.BridgeComponent"/>
+            <mule:component class="org.mule.components.simple.BridgeComponent"/>
             <mule:inbound-router>
                 <mule:endpoint-ref nameref="base"/>
             </mule:inbound-router>
@@ -41,7 +41,7 @@
         </mule:service>
 
         <mule:service name="baseService2">
-        	<mule:component class="org.mule.tck.functional.FunctionalTestComponent"/>
+            <mule:component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="vm://echo1" synchronous="true"/>
             </mule:inbound-router>
@@ -56,7 +56,7 @@
     <mule:model-seda name="adaptedModel">
 
         <mule:service name="adaptedService1">
-        	<mule:component class="org.mule.providers.http.issues.NoTransformPassThroughComponent"/>
+            <mule:component class="org.mule.providers.http.issues.NoTransformPassThroughComponent"/>
             <mule:inbound-router>
                 <mule:endpoint-ref nameref="adapted"/>
             </mule:inbound-router>
@@ -68,7 +68,7 @@
         </mule:service>
 
         <mule:service name="adaptedService2">
-        	<mule:component class="org.mule.providers.http.issues.NoTransformFunctionalTestComponent"/>
+            <mule:component class="org.mule.providers.http.issues.NoTransformFunctionalTestComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="vm://echo2" synchronous="true"/>
             </mule:inbound-router>
@@ -82,7 +82,7 @@
     <mule:model-seda name="ignoredModel">
 
         <mule:service name="ignoredService1">
-        	<mule:component class="org.mule.providers.http.issues.NoTransformPassThroughComponent"/>
+            <mule:component class="org.mule.providers.http.issues.NoTransformPassThroughComponent"/>
             <mule:inbound-router>
                 <mule:endpoint-ref nameref="ignored" transformers="appendString"/>
             </mule:inbound-router>
@@ -94,7 +94,7 @@
         </mule:service>
 
         <mule:service name="ignoredService2">
-        	<mule:component class="org.mule.providers.http.issues.NoTransformFunctionalTestComponent"/>
+            <mule:component class="org.mule.providers.http.issues.NoTransformFunctionalTestComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="vm://echo3" synchronous="true" transformers="appendString2"/>
             </mule:inbound-router>
@@ -107,7 +107,7 @@
     <mule:model-seda name="inboundModel">
 
         <mule:service name="inboundService1">
-        	<mule:component class="org.mule.components.simple.BridgeComponent"/>
+            <mule:component class="org.mule.components.simple.BridgeComponent"/>
             <mule:inbound-router>
                 <mule:endpoint-ref nameref="inbound" transformers="appendString"/>
             </mule:inbound-router>
@@ -119,7 +119,7 @@
         </mule:service>
 
         <mule:service name="inboundService2">
-        	<mule:component class="org.mule.tck.functional.FunctionalTestComponent"/>
+            <mule:component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="vm://echo4" synchronous="true" transformers="appendString2"/>
             </mule:inbound-router>

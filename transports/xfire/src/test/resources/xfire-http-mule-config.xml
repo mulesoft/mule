@@ -14,28 +14,28 @@
     
     <mule:model-seda name="test">
         <mule:service name="mycomponent">
-        	<mule:component class="org.mule.tck.testmodels.services.TestServiceComponent" />
+            <mule:component class="org.mule.tck.testmodels.services.TestServiceComponent" />
             <mule:inbound-router>
                 <mule:endpoint address="xfire:http://localhost:38008/mule"/>
             </mule:inbound-router>
         </mule:service>
 
         <mule:service name="mycomponent2">
-        	<mule:component class="org.mule.tck.testmodels.services.TestServiceComponent" />
+            <mule:component class="org.mule.tck.testmodels.services.TestServiceComponent" />
             <mule:inbound-router>
                 <mule:endpoint address="xfire:http://localhost:38009/mule/services"/>
             </mule:inbound-router>
         </mule:service>
 
         <mule:service name="mycomponent3">
-        	<mule:component class="org.mule.tck.testmodels.services.TestServiceComponent" />
+            <mule:component class="org.mule.tck.testmodels.services.TestServiceComponent" />
             <mule:inbound-router>
                 <mule:endpoint address="xfire:http://localhost:38009"/>
             </mule:inbound-router>
         </mule:service>
 
         <mule:service name="mycomponent4">
-        	<mule:component class="org.mule.tck.testmodels.services.TestServiceComponent" />
+            <mule:component class="org.mule.tck.testmodels.services.TestServiceComponent" />
             <mule:inbound-router>
                 <mule:endpoint address="xfire:http://localhost:38010" synchronous="false"/>
             </mule:inbound-router>

@@ -10,12 +10,12 @@
     
     <mule:configuration serverId="" defaultSynchronousEndpoints="true"/>
     
-	<mule:model-seda name="WebService_Test">
-    	<mule:service name="ServiceEntryPoint">
+    <mule:model-seda name="WebService_Test">
+        <mule:service name="ServiceEntryPoint">
             <mule:component class="org.mule.providers.soap.axis.style.DefaultMessageService"/>
-        	<mule:inbound-router>
-            	<mule:endpoint address="axis:http://localhost:8088">
-	            	<property name="style" value="Message"/>
+            <mule:inbound-router>
+                <mule:endpoint address="axis:http://localhost:8088">
+                    <property name="style" value="Message"/>
                     <property name="serviceNamespace" value=""/>
                     <property name="axisOptions">
                         <map>

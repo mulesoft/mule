@@ -32,8 +32,8 @@
         </mule:service>
 
         <mule:service name="testComponent2">
-        	<!-- Note: this doesn't need to be a singleton, it's a workaround because I couldn't 
-        		figure out how to set the eventCallback bean as a property within mule:properties -->
+            <!-- Note: this doesn't need to be a singleton, it's a workaround because I couldn't 
+                figure out how to set the eventCallback bean as a property within mule:properties -->
             <mule:component scope="singleton" instance-ref="test2"/>
             <mule:inbound-router>
                 <mule:endpoint-ref nameref="asyncClientEndpoint"/>

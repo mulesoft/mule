@@ -39,8 +39,8 @@
             For this example we use Vm.
         -->
         <mule-descriptor name="serviceProxy" 
-        				 implementation="org.mule.components.simple.BridgeComponent"
-        				 responseTransformer="XmlDecoder Xslt XmlToObject">
+                         implementation="org.mule.components.simple.BridgeComponent"
+                         responseTransformer="XmlDecoder Xslt XmlToObject">
             <inbound-router>
                 <endpoint address="vm://stockquote"/>
             </inbound-router>

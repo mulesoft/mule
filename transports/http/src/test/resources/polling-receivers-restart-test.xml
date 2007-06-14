@@ -34,10 +34,10 @@
 
         <mule:service name="TestServer">
             <mule:component class="org.mule.components.simple.StaticComponent">
-        		<mule:properties>
-			    	<prop key="data">Here's your content.</prop>
-        		</mule:properties>
-        	</mule:component>
+                <mule:properties>
+                    <prop key="data">Here's your content.</prop>
+                </mule:properties>
+            </mule:component>
             <mule:inbound-router>
                 <mule:endpoint address="http://localhost:12345" connector-ref="HttpConnector"/>
             </mule:inbound-router>

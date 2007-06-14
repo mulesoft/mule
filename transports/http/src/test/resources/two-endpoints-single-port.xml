@@ -14,24 +14,24 @@
     <mule:model-seda name="test">
 
         <mule:service name="mycomponent1">
-        	<mule:component class="org.mule.tck.functional.FunctionalTestComponent">
-        		<mule:properties>
-			    	<prop key="returnMessage">mycomponent1</prop>
-        		</mule:properties>
-        	</mule:component>
-        	
+            <mule:component class="org.mule.tck.functional.FunctionalTestComponent">
+                <mule:properties>
+                    <prop key="returnMessage">mycomponent1</prop>
+                </mule:properties>
+            </mule:component>
+            
             <mule:inbound-router>
                 <mule:endpoint address="http://localhost:8081/mycomponent1" synchronous="true"/>
             </mule:inbound-router>
         </mule:service>
 
         <mule:service name="mycomponent2">
-        	<mule:component class="org.mule.tck.functional.FunctionalTestComponent">
-        		<mule:properties>
-			    	<prop key="returnMessage">mycomponent2</prop>
-        		</mule:properties>
-        	</mule:component>
-        	
+            <mule:component class="org.mule.tck.functional.FunctionalTestComponent">
+                <mule:properties>
+                    <prop key="returnMessage">mycomponent2</prop>
+                </mule:properties>
+            </mule:component>
+            
             <mule:inbound-router>
                 <mule:endpoint address="http://localhost:8081/mycomponent2" synchronous="true"/>
             </mule:inbound-router>

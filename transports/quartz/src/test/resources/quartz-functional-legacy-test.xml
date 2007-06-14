@@ -28,22 +28,22 @@
             <inbound-router>
                 <global-endpoint name="quartz.in.1"/>
             </inbound-router>
-		    <!--
-		        we want exactly one TestComponent for this test, otherwise counter 
-		        bookkeeping would be more difficult than necessary.
-		    <pooling-profile maxActive="1" exhaustedAction="WAIT" />
-		    -->
+            <!--
+                we want exactly one TestComponent for this test, otherwise counter 
+                bookkeeping would be more difficult than necessary.
+            <pooling-profile maxActive="1" exhaustedAction="WAIT" />
+            -->
         </mule-descriptor>
 
         <mule-descriptor name="quartzService2" implementation="org.mule.providers.quartz.TestComponent">
             <inbound-router>
                 <global-endpoint name="quartz.in.2"/>
             </inbound-router>
-		    <!--
-		        we want exactly one TestComponent for this test, otherwise counter 
-		        bookkeeping would be more difficult than necessary.
-		    <pooling-profile maxActive="1" exhaustedAction="WAIT" />
-		    -->
+            <!--
+                we want exactly one TestComponent for this test, otherwise counter 
+                bookkeeping would be more difficult than necessary.
+            <pooling-profile maxActive="1" exhaustedAction="WAIT" />
+            -->
         </mule-descriptor>
     </model>
     

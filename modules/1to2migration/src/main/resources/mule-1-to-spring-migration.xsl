@@ -508,22 +508,22 @@
         </xsl:variable>
 
         <bean name="{$name}" class="{$type}" depends-on="{$currentModel}">
-			<property name="serviceFactory">
-         		<xsl:choose>
-         			<!-- implementation is a container reference -->
-	                <xsl:when test="contains($impl, '.') = false">
-						<bean class="org.mule.util.object.SingletonObjectFactory">
-							<property name="instance" ref="{$impl}" />
-						</bean>
-	                </xsl:when>
-         			<!-- implementation is a class name -->
-	                <xsl:otherwise>
-						<bean class="org.mule.util.object.SimpleObjectFactory">
-							<property name="objectClassName" value="{$impl}" />
-						</bean>
-	                </xsl:otherwise>
-            	</xsl:choose>
-			</property>
+            <property name="serviceFactory">
+                 <xsl:choose>
+                     <!-- implementation is a container reference -->
+                    <xsl:when test="contains($impl, '.') = false">
+                        <bean class="org.mule.util.object.SingletonObjectFactory">
+                            <property name="instance" ref="{$impl}" />
+                        </bean>
+                    </xsl:when>
+                     <!-- implementation is a class name -->
+                    <xsl:otherwise>
+                        <bean class="org.mule.util.object.SimpleObjectFactory">
+                            <property name="objectClassName" value="{$impl}" />
+                        </bean>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </property>
 
             <property name="modelName" value="{$currentModel}"/>
             <xsl:if test="@containerManaged">

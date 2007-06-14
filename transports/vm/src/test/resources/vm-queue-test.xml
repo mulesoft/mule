@@ -16,7 +16,7 @@
 
     <mule:model-seda name="main">
         <mule:service name="testService">
-        	<mule:component class="org.mule.tck.functional.FunctionalTestComponent" />
+            <mule:component class="org.mule.tck.functional.FunctionalTestComponent" />
             <mule:inbound-router>
                 <mule:endpoint address="vm://entry" connector-ref="vm-normal"/>
             </mule:inbound-router>

@@ -43,7 +43,7 @@
     -->
     <model name="Sample">
         <mule-descriptor name="Console I/O"
-            			 implementation="org.mule.components.simple.BridgeComponent">
+                         implementation="org.mule.components.simple.BridgeComponent">
             <inbound-router>
                 <endpoint address="stream://System.in"/>
             </inbound-router>
@@ -51,7 +51,7 @@
                 <!-- we use a chaining router to send the results of one endpoint execution as the input
                 for the next endpoint.  In this case it writes it out to System.out -->
                 <router className="org.mule.routing.outbound.ChainingRouter">
-	                <endpoint address="vm://stockquote"/>
+                    <endpoint address="vm://stockquote"/>
                     <endpoint address="stream://System.out"/>
                 </router>
             </outbound-router>
@@ -62,8 +62,8 @@
             For this example we use Vm.
         -->
         <mule-descriptor name="serviceProxy" 
-        				 implementation="org.mule.components.simple.BridgeComponent"
-        				 responseTransformer="XmlDecoder Xslt XmlToObject">
+                         implementation="org.mule.components.simple.BridgeComponent"
+                         responseTransformer="XmlDecoder Xslt XmlToObject">
             <inbound-router>
                 <endpoint address="vm://stockquote"/>
             </inbound-router>

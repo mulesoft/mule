@@ -14,12 +14,12 @@
     <xsd:element name="connector" type="jdbcConnectorType"/>
 
     <xsd:complexType name="jdbcConnectorType">
-    	<xsd:complexContent>
-    		<xsd:extension base="mule:connectorType">
-				<xsd:attribute name="dataSource-ref" type="xsd:NMTOKEN"/>
-		        <xsd:attribute name="pollingFrequency" type="mule:substitutableLong"/>
-		    </xsd:extension>
-    	</xsd:complexContent>
+        <xsd:complexContent>
+            <xsd:extension base="mule:connectorType">
+                <xsd:attribute name="dataSource-ref" type="xsd:NMTOKEN"/>
+                <xsd:attribute name="pollingFrequency" type="mule:substitutableLong"/>
+            </xsd:extension>
+        </xsd:complexContent>
    </xsd:complexType>
 </xsd:schema>
 

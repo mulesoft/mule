@@ -20,7 +20,7 @@ find below the generated graph for the given mule configuration files :
     <tr>
       <td>
        <a href="$file.Name"><img width="250" src="$file.Name" border="0"/></a>
-      </td>	
+      </td>    
       <td>
       <a href="${file.Name.substring(0,$file.Name.lastIndexOf("."))}.html">${file.Name.substring(0,$file.Name.lastIndexOf("."))}.html</a>
       </td>

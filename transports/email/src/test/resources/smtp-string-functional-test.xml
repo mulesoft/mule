@@ -15,7 +15,7 @@
     <mule:model-seda name="test">
 
         <mule:service name="relay">
-        	<mule:component class="org.mule.components.simple.BridgeComponent"/>
+            <mule:component class="org.mule.components.simple.BridgeComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="vm://send"/>
             </mule:inbound-router>

@@ -12,26 +12,26 @@
 
     <mule:model-seda name="processModel">
         <mule:service name="fromSimpleProcess">
-        	<mule:component class="org.mule.components.simple.LogComponent"/>
+            <mule:component class="org.mule.components.simple.LogComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="bpm://simple" />
             </mule:inbound-router>
         </mule:service>
 
         <mule:service name="fromMessageProcess">
-        	<mule:component class="org.mule.components.simple.LogComponent"/>
+            <mule:component class="org.mule.components.simple.LogComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="bpm://message" />
             </mule:inbound-router>
             <mule:outbound-router>
                 <mule:pass-through-router>
-                	<mule:endpoint address="vm://echo"/>
+                    <mule:endpoint address="vm://echo"/>
                 </mule:pass-through-router>
             </mule:outbound-router>
         </mule:service>
 
         <mule:service name="echoService">
-        	<mule:component class="org.mule.components.simple.EchoComponent"/>
+            <mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="vm://echo" />
             </mule:inbound-router>

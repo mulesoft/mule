@@ -11,10 +11,10 @@
     <bpm:connector name="bpmConnectorDefaults" bpms-ref="testBpms"/>
 
     <bpm:connector name="bpmConnector1" bpms-ref="testBpms"
-    	allowGlobalReceiver="true" allowGlobalDispatcher="true" processIdField="myId"/>
+        allowGlobalReceiver="true" allowGlobalDispatcher="true" processIdField="myId"/>
 
-	<bean id="testBpms" class="org.mule.providers.bpm.test.TestBpms">
-		<property name="foo" value="bar"/>
-	</bean>
+    <bean id="testBpms" class="org.mule.providers.bpm.test.TestBpms">
+        <property name="foo" value="bar"/>
+    </bean>
 
 </beans>

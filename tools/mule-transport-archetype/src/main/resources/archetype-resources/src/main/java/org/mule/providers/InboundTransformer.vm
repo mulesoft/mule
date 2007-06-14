@@ -42,9 +42,9 @@ public class ${InboundTransformer} extends AbstractEventAwareTransformer
 
     }
 
-	public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
+    public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
     {
-		/* IMPLEMENTATION NOTE: If you only have a single source type
+        /* IMPLEMENTATION NOTE: If you only have a single source type
            registered you can cast the 'src' object directly to that type,
            otherwise you need to check the instance type of 'src' for each
            registered source type */

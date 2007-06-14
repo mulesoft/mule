@@ -15,15 +15,15 @@
     <xsd:element name="connector" type="vmConnectorType"/>
 
     <xsd:complexType name="vmConnectorType">
-    	<xsd:complexContent>
-    		<xsd:extension base="mule:connectorType">
-		    	<xsd:sequence>
-		    		<xsd:element name="queueProfile" type="mule:queueProfileType" minOccurs="0"/>
-		    	</xsd:sequence>
-		        <xsd:attribute name="queueEvents" type="mule:substitutableBoolean"/>
-		        <xsd:attribute name="queueTimeout" type="xsd:positiveInteger"/>
-		    </xsd:extension>
-    	</xsd:complexContent>
+        <xsd:complexContent>
+            <xsd:extension base="mule:connectorType">
+                <xsd:sequence>
+                    <xsd:element name="queueProfile" type="mule:queueProfileType" minOccurs="0"/>
+                </xsd:sequence>
+                <xsd:attribute name="queueEvents" type="mule:substitutableBoolean"/>
+                <xsd:attribute name="queueTimeout" type="xsd:positiveInteger"/>
+            </xsd:extension>
+        </xsd:complexContent>
    </xsd:complexType>
  
 </xsd:schema>

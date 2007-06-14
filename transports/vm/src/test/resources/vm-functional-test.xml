@@ -13,19 +13,19 @@
    <mule:model-seda name="asynchTestModel">
     
         <mule:service name="myAsynchService">
-        	<mule:component class="org.mule.tck.functional.FunctionalTestComponent">
-        		<mule:properties>
-			    	<prop key="returnMessage">Polo</prop>
-        		</mule:properties>
-        	</mule:component>
-        	
+            <mule:component class="org.mule.tck.functional.FunctionalTestComponent">
+                <mule:properties>
+                    <prop key="returnMessage">Polo</prop>
+                </mule:properties>
+            </mule:component>
+            
             <mule:inbound-router>
                 <mule:endpoint address="vm://in" connector-ref="asynchVm" />
             </mule:inbound-router>
             
             <mule:outbound-router>
                 <mule:pass-through-router>
-	                <mule:endpoint address="vm://out" connector-ref="asynchVm" />
+                    <mule:endpoint address="vm://out" connector-ref="asynchVm" />
                 </mule:pass-through-router>
             </mule:outbound-router>
         </mule:service>

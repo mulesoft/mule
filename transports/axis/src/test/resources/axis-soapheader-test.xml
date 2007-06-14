@@ -10,7 +10,7 @@
 
     <mule:model-seda name="Axis_Headers_TestCase">
         <mule:service name="component">
-        	<mule:component class="org.mule.components.simple.EchoComponent"/>
+            <mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="axis:http://localhost:12181/services"/>
             </mule:inbound-router>

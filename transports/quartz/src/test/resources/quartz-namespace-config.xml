@@ -8,36 +8,36 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/quartz/2.0 http://www.mulesource.org/schema/mule/quartz/2.0/mule-quartz.xsd">
 
-	<!-- Default config -->
+    <!-- Default config -->
     <quartz:connector name="quartzConnectorDefaults"/>
 
-	<!-- Inject the scheduler as a bean. -->
+    <!-- Inject the scheduler as a bean. -->
     <quartz:connector name="quartzConnector1" scheduler-ref="myScheduler"/>
     
     <bean id="myScheduler" factory-bean="mySchedulerFactory" factory-method="getScheduler"/>
 
     <bean id="mySchedulerFactory" class="org.quartz.impl.StdSchedulerFactory">
-    	<constructor-arg>
-    		<props>
-    			<prop key="org.quartz.scheduler.instanceName">MuleScheduler1</prop>
-    			<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
-    			<prop key="org.quartz.threadPool.threadCount">3</prop>
-    			<prop key="org.quartz.scheduler.rmi.export">false</prop>
-    			<prop key="org.quartz.scheduler.rmi.proxy">false</prop>
-    			<prop key="org.quartz.jobStore.class">org.quartz.simpl.RAMJobStore</prop>
-			</props>
-    	</constructor-arg>
+        <constructor-arg>
+            <props>
+                <prop key="org.quartz.scheduler.instanceName">MuleScheduler1</prop>
+                <prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+                <prop key="org.quartz.threadPool.threadCount">3</prop>
+                <prop key="org.quartz.scheduler.rmi.export">false</prop>
+                <prop key="org.quartz.scheduler.rmi.proxy">false</prop>
+                <prop key="org.quartz.jobStore.class">org.quartz.simpl.RAMJobStore</prop>
+            </props>
+        </constructor-arg>
     </bean>
 
-	<!-- Default config but provide some factory properties. -->
+    <!-- Default config but provide some factory properties. -->
     <quartz:connector name="quartzConnector2">
-    	<quartz:factory-properties>
-  			<prop key="org.quartz.scheduler.instanceName">MuleScheduler2</prop>
-   			<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
-   			<prop key="org.quartz.threadPool.threadCount">3</prop>
-   			<prop key="org.quartz.scheduler.rmi.export">false</prop>
-   			<prop key="org.quartz.scheduler.rmi.proxy">false</prop>
-   			<prop key="org.quartz.jobStore.class">org.quartz.simpl.RAMJobStore</prop>
-    	</quartz:factory-properties>
+        <quartz:factory-properties>
+              <prop key="org.quartz.scheduler.instanceName">MuleScheduler2</prop>
+               <prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+               <prop key="org.quartz.threadPool.threadCount">3</prop>
+               <prop key="org.quartz.scheduler.rmi.export">false</prop>
+               <prop key="org.quartz.scheduler.rmi.proxy">false</prop>
+               <prop key="org.quartz.jobStore.class">org.quartz.simpl.RAMJobStore</prop>
+        </quartz:factory-properties>
     </quartz:connector>
 </beans>

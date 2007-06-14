@@ -23,8 +23,8 @@ public class ${TransportName}MessageAdapterTestCase extends AbstractMessageAdapt
 
     public Object getValidMessage() throws Exception
     {
-    	// TODO Create a valid message for your transport
-    	throw new UnsupportedOperationException("getValidMessage");
+        // TODO Create a valid message for your transport
+        throw new UnsupportedOperationException("getValidMessage");
     }
 
     public UMOMessageAdapter createAdapter(Object payload) throws MessagingException

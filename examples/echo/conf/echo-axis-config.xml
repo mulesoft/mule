@@ -9,11 +9,11 @@
     This config is identical to echo-config.xml but exposes the EchoUMO as a SOAP web service.
 
     To invoke the EchoUMO hit the following URL -
-    	http://localhost:8081/services/EchoUMO?method=echo&amp;param=Is there an echo?
+        http://localhost:8081/services/EchoUMO?method=echo&amp;param=Is there an echo?
     (remember to replace the '&amp;' with an ampersand)
 
     To view the WSDL for the EchoUMO service go to -
-    	http://localhost:8081/services/EchoUMO?wsdl
+        http://localhost:8081/services/EchoUMO?wsdl
     </description>
     
     <transformers>

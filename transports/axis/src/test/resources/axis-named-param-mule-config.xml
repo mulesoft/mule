@@ -10,7 +10,7 @@
 
     <mule:model-seda name="test">
         <mule:service name="mycomponent1">
-        	<mule:component class="org.mule.components.simple.EchoComponent"/>
+            <mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="vm://mycomponent1"/>
             </mule:inbound-router>
@@ -25,7 +25,7 @@
         </mule:service>
 
         <mule:service name="mycomponent2">
-        	<mule:component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            <mule:component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="axis:http://localhost:38011/mule" synchronous="true"/>
             </mule:inbound-router>

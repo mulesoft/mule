@@ -14,13 +14,13 @@
 
     <jdbc:connector name="jdbcConnector1" dataSource-ref="testDS1"/>
 
-	<bean id="testDS1" class="org.mule.providers.jdbc.test.TestDataSource" />
+    <bean id="testDS1" class="org.mule.providers.jdbc.test.TestDataSource" />
 
     <jdbc:connector name="jdbcConnector2" dataSource-ref="testDS2"/>
 
-	<jee:jndi-lookup id="testDS2" jndi-name="jdbc/testDS" environment-ref="jndiEnv"/>
+    <jee:jndi-lookup id="testDS2" jndi-name="jdbc/testDS" environment-ref="jndiEnv"/>
 
     <util:properties id="jndiEnv">
-    	<prop key="java.naming.factory.initial">org.mule.providers.jdbc.test.JdbcTestContextFactory</prop>
+        <prop key="java.naming.factory.initial">org.mule.providers.jdbc.test.JdbcTestContextFactory</prop>
     </util:properties>
 </beans>

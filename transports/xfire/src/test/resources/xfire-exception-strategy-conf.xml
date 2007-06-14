@@ -25,7 +25,7 @@
             <mule:component class="org.mule.providers.soap.xfire.testmodels.TestXFireComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="xfire:http://localhost:10181/services"/>
-	        </mule:inbound-router>
+            </mule:inbound-router>
         </mule:service>
     </mule:model-seda>
 </beans>

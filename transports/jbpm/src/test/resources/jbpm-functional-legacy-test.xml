@@ -25,7 +25,7 @@
             </inbound-router>
             <outbound-router>
                 <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                	<endpoint address="vm://echo" />
+                    <endpoint address="vm://echo" />
                 </router>
             </outbound-router>
         </mule-descriptor>

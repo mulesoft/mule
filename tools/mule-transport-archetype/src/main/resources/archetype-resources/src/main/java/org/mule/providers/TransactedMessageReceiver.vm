@@ -67,7 +67,7 @@ public class ${TransportName}TransactedMessageReceiver extends TransactedPolling
 
     public void doConnect() throws ConnectException
     {
-    	/* IMPLEMENTATION NOTE: Should make a connection to the underlying
+        /* IMPLEMENTATION NOTE: Should make a connection to the underlying
            transport i.e. connect to a socket or register a soap service. When
            there is no connection to be made this method should be used to
            chack that resources are available. For example the
@@ -93,7 +93,7 @@ public class ${TransportName}TransactedMessageReceiver extends TransactedPolling
              throw new ConnectException(new Message(Messages.FAILED_TO_SCHEDULE_WORK), e, this);
         */
 
-    	// TODO the code necessay to Connect to the underlying resource
+        // TODO the code necessay to Connect to the underlying resource
     }
 
     public void doDisconnect() throws ConnectException
@@ -108,7 +108,7 @@ public class ${TransportName}TransactedMessageReceiver extends TransactedPolling
 
     public void doStart()
     {
-    	// Optional; does not need to be implemented. Delete if not required
+        // Optional; does not need to be implemented. Delete if not required
 
         /* IMPLEMENTATION NOTE: Should perform any actions necessary to enable
            the reciever to start reciving events. This is different to the
@@ -123,7 +123,7 @@ public class ${TransportName}TransactedMessageReceiver extends TransactedPolling
 
     public void doStop()
     {
-    	// Optional; does not need to be implemented. Delete if not required
+        // Optional; does not need to be implemented. Delete if not required
 
         /* IMPLEMENTATION NOTE: Should perform any actions necessary to stop
            the reciever from receiving events. */
@@ -131,7 +131,7 @@ public class ${TransportName}TransactedMessageReceiver extends TransactedPolling
 
     public void doDispose()
     {
-    	// Optional; does not need to be implemented. Delete if not required
+        // Optional; does not need to be implemented. Delete if not required
 
         /* IMPLEMENTATION NOTE: Is called when the Conector is being dispoed
            and should clean up any resources. The doStop() and doDisconnect()

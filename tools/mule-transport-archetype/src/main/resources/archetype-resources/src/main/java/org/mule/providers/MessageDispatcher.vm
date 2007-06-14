@@ -65,24 +65,24 @@ public class ${TransportName}MessageDispatcher extends AbstractMessageDispatcher
            that should be invoked.  This method is executed in a different
            thread to the request thread. */
 
-    	// TODO Write the client code here to dispatch the event over this
-    	// transport
+        // TODO Write the client code here to dispatch the event over this
+        // transport
 
         throw new UnsupportedOperationException("doDispatch");
     }
 
     public UMOMessage doSend(UMOEvent event) throws Exception
     {
-    	/* IMPLEMENTATION NOTE: Should send the event payload over the
+        /* IMPLEMENTATION NOTE: Should send the event payload over the
            transport. If there is a response from the transport it shuold be
            returned from this method. The sendEvent method is called when the
            endpoint is running synchronously and any response returned will
            ultimately be passed back to the callee. This method is executed in
            the same thread as the request thread. */
         
-    	// TODO Write the client code here to send the event over this
-    	// transport (or to dispatch the event to a store or repository)
-    	
+        // TODO Write the client code here to send the event over this
+        // transport (or to dispatch the event to a store or repository)
+        
         // TODO Once the event has been sent, return the result (if any)
         // wrapped in a MuleMessage object
 
@@ -91,20 +91,20 @@ public class ${TransportName}MessageDispatcher extends AbstractMessageDispatcher
 
     public UMOMessage doReceive(long timeout) throws Exception
     {
-    	/* IMPLEMENTATION NOTE: Can be used to make arbitary requests to a
+        /* IMPLEMENTATION NOTE: Can be used to make arbitary requests to a
            transport resource. if the timeout is 0 the method should block
            until an event on the endpoint is received. */
         
         // TODO Write the client code here to perform a request over the
         // transport
 
-    	throw new UnsupportedOperationException("receive");
+        throw new UnsupportedOperationException("receive");
     }
 
     public void doDispose()
     {
-    	// Optional; does not need to be implemented. Delete if not required
-    	
+        // Optional; does not need to be implemented. Delete if not required
+        
         /* IMPLEMENTATION NOTE: Is called when the Dispatcher is being
            disposed and should clean up any open resources. */
     }

@@ -39,7 +39,7 @@
     <mule:model-seda name="baseModel">
 
         <mule:service name="baseService1">
-        	<mule:component class="org.mule.components.simple.BridgeComponent"/>
+            <mule:component class="org.mule.components.simple.BridgeComponent"/>
             <mule:inbound-router>
                 <mule:endpoint-ref nameref="base"/>
             </mule:inbound-router>
@@ -51,7 +51,7 @@
         </mule:service>
 
         <mule:service name="baseService2">
-        	<mule:component class="org.mule.tck.functional.FunctionalTestComponent"/>
+            <mule:component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="vm://echo1" synchronous="true"/>
             </mule:inbound-router>
@@ -65,7 +65,7 @@
     <mule:model-seda name="responseModel">
 
         <mule:service name="responseService1">
-        	<mule:component class="org.mule.components.simple.BridgeComponent"/>
+            <mule:component class="org.mule.components.simple.BridgeComponent"/>
             <mule:inbound-router>
                 <mule:endpoint-ref nameref="response" responseTransformers="appendResponse"/>
             </mule:inbound-router>
@@ -77,7 +77,7 @@
         </mule:service>
 
         <mule:service name="responseService2">
-        	<mule:component class="org.mule.tck.functional.FunctionalTestComponent"/>
+            <mule:component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="vm://echo2" synchronous="true" responseTransformers="appendResponse2"/>
             </mule:inbound-router>
@@ -91,7 +91,7 @@
     <mule:model-seda name="bothModel">
 
         <mule:service name="bothService1">
-        	<mule:component class="org.mule.components.simple.BridgeComponent"/>
+            <mule:component class="org.mule.components.simple.BridgeComponent"/>
             <mule:inbound-router>
                 <mule:endpoint-ref nameref="both"
                                    transformers="appendString"
@@ -105,7 +105,7 @@
         </mule:service>
 
         <mule:service name="bothService2">
-        	<mule:component class="org.mule.tck.functional.FunctionalTestComponent"/>
+            <mule:component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="vm://echo3" synchronous="true"
                                transformers="appendString2"

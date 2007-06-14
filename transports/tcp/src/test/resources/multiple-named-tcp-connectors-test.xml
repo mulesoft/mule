@@ -13,7 +13,7 @@
 
     <mule:model-seda name="MultilpleConnectorsTestModel">
         <mule:service name="testDescriptor">
-        	<mule:component class="org.mule.components.simple.BridgeComponent"/>
+            <mule:component class="org.mule.components.simple.BridgeComponent"/>
             <mule:inbound-router>
                 <!-- if the connector-ref was removed this would give an error
                      since we have multiple connectors -->

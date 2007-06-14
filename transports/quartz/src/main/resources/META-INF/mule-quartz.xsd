@@ -14,13 +14,13 @@
     <xsd:element name="connector" type="quartzConnectorType"/>
 
     <xsd:complexType name="quartzConnectorType">
-    	<xsd:complexContent>
-    		<xsd:extension base="mule:connectorType">
-		    	<xsd:sequence>
-		    		<xsd:element name="factory-properties" type="mule:propsType" minOccurs="0"/>
-		    	</xsd:sequence>
-		        <xsd:attribute name="scheduler-ref" type="xsd:NMTOKEN"/>
-		    </xsd:extension>
-    	</xsd:complexContent>
+        <xsd:complexContent>
+            <xsd:extension base="mule:connectorType">
+                <xsd:sequence>
+                    <xsd:element name="factory-properties" type="mule:propsType" minOccurs="0"/>
+                </xsd:sequence>
+                <xsd:attribute name="scheduler-ref" type="xsd:NMTOKEN"/>
+            </xsd:extension>
+        </xsd:complexContent>
    </xsd:complexType>
 </xsd:schema>

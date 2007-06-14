@@ -11,23 +11,23 @@
     <quartz:connector name="quartzConnectorDefaults"/>
 
     <mule:endpoint name="quartz.in.1" address="quartz:/myService1">
-    	<mule:properties>
-	        <prop key="repeatInterval">1000</prop>
-	        <prop key="repeatCount">3</prop>
-	        <prop key="payload">quartz test</prop>
-    	</mule:properties>
-	</mule:endpoint>    	
+        <mule:properties>
+            <prop key="repeatInterval">1000</prop>
+            <prop key="repeatCount">3</prop>
+            <prop key="payload">quartz test</prop>
+        </mule:properties>
+    </mule:endpoint>        
 
     <mule:endpoint name="quartz.in.2" address="quartz:/myService2">
-    	<mule:properties>
-	        <prop key="repeatInterval">1000</prop>
-	        <prop key="repeatCount">1</prop>
-    	</mule:properties>
-	</mule:endpoint>    	
+        <mule:properties>
+            <prop key="repeatInterval">1000</prop>
+            <prop key="repeatCount">1</prop>
+        </mule:properties>
+    </mule:endpoint>        
 
     <mule:model-seda name="quartz" >
-    	<mule:pooling-profile maxActive="1" exhaustedAction="WAIT"/>
-    	
+        <mule:pooling-profile maxActive="1" exhaustedAction="WAIT"/>
+        
         <mule:service name="quartzService1" implementation="org.mule.providers.quartz.TestComponent">
             <mule:inbound-router>
                 <mule:endpoint-ref nameref="quartz.in.1"/>

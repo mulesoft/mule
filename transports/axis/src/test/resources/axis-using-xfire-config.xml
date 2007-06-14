@@ -13,7 +13,7 @@
     <mule:model-seda name="Testing_an_axis_service_using_xfire_dynamic_client">
         <!-- hosting the Axis Service -->
         <mule:service name="AxisService">
-        	<mule:component class="org.mule.tck.testmodels.services.TestComponent"/>
+            <mule:component class="org.mule.tck.testmodels.services.TestComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="axis:http://localhost:33381/services">
                     <property name="style" value="Wrapped"/>
@@ -24,7 +24,7 @@
         
         <!-- Bridge Component used to test the ExceptionBasedRouting on Axis -->
         <mule:service name="test">
-        	<mule:component class="org.mule.components.simple.BridgeComponent"/>
+            <mule:component class="org.mule.components.simple.BridgeComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="vm://localhost.test"/>
             </mule:inbound-router>
@@ -38,7 +38,7 @@
         
         <!-- Accessing an Axis hosted web-service using XFire dynamic client -->
         <mule:service name="BridgeToAxisService">
-        	<mule:component class="org.mule.components.simple.BridgeComponent"/>
+            <mule:component class="org.mule.components.simple.BridgeComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="vm://axis.in"/>
             </mule:inbound-router>
