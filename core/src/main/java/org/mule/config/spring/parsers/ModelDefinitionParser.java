@@ -23,8 +23,7 @@ import org.w3c.dom.Element;
  */
 public class ModelDefinitionParser extends AbstractMuleSingleBeanDefinitionParser
 {
-    private static String type;
-    private String name;
+    private String type;
 
     public ModelDefinitionParser(String type)
     {
@@ -34,13 +33,12 @@ public class ModelDefinitionParser extends AbstractMuleSingleBeanDefinitionParse
 
     protected Class getBeanClass(Element element)
     {
-        name = element.getAttribute(ATTRIBUTE_NAME);
         return ModelFactoryBean.class;
     }
 
     
 
-    public static class ModelFactoryBean extends AbstractFactoryBean
+    public class ModelFactoryBean extends AbstractFactoryBean
     {
 
         private UMOModel model;

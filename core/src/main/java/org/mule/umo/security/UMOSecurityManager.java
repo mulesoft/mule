@@ -44,4 +44,6 @@ public interface UMOSecurityManager extends Initialisable
     void addEncryptionStrategy(String name, UMOEncryptionStrategy strategy);
 
     UMOEncryptionStrategy removeEncryptionStrategy(String name);
+
+    void setName(String name);
 }

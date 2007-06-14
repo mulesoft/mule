@@ -9,6 +9,11 @@
  */
 package org.mule.config.spring.parsers;
 
+import java.util.Collection;
+import java.util.HashSet;
+
+import org.springframework.beans.MutablePropertyValues;
+import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -48,12 +53,29 @@ public class CompoundElementDefinitionParser  extends AbstractHierarchicalDefini
         }
         doParse(element, parserContext, builder);
 
+        MutablePropertyValues parentProperties = getParentBeanDefinition(element).getPropertyValues();
         for (int i=0;i < builder.getBeanDefinition().getPropertyValues().getPropertyValues().length; i++)
         {
-            addParentPropertyValue(element,
-                    builder.getBeanDefinition().getPropertyValues().getPropertyValues()[i]);
-
+            PropertyValue newPropertyValue = builder.getBeanDefinition().getPropertyValues().getPropertyValues()[i];
+            String name = newPropertyValue.getName();
+            Object value = newPropertyValue.getValue();
+            if (propertyToolkit.isCollection(name))
+            {
+                Collection values = new HashSet();
+                if (parentProperties.contains(name))
+                {
+                    values = (Collection) parentProperties.getPropertyValue(name).getValue();
+                    parentProperties.removePropertyValue(name);
+                }
+                values.add(value);
+                parentProperties.addPropertyValue(name, values);
+            }
+            else
+            {
+                parentProperties.addPropertyValue(name, value);
+            }
         }
+        
         AbstractBeanDefinition bd = (AbstractBeanDefinition)parserContext.getContainingBeanDefinition();
         bd.setAttribute(COMPOUND_ELEMENT, Boolean.TRUE);
         return bd;

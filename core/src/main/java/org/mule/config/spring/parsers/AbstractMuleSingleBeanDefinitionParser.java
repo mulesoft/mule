@@ -13,7 +13,6 @@ import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.util.ClassUtils;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -114,6 +113,11 @@ public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBea
         propertyToolkit.registerAttributeMapping(alias, propertyName);
     }
 
+    public void registerCollection(String propertyName)
+    {
+        propertyToolkit.registerCollection(propertyName);
+    }
+
     protected void processProperty(Attr attribute, BeanDefinitionBuilder builder)
     {
         boolean isBeanReference = propertyToolkit.isBeanReference(attribute.getNodeName());
@@ -121,15 +125,19 @@ public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBea
         String propertyValue = propertyToolkit.extractPropertyValue(propertyName, attribute.getValue());
         Assert.state(StringUtils.hasText(propertyName),
                 "Illegal property name returned from 'extractPropertyName(String)': cannot be null or empty.");
+        addProperty(builder, propertyName, propertyValue, isBeanReference);
+    }
 
+    protected void addProperty(BeanDefinitionBuilder builder, String name, String value, boolean reference)
+    {
         // The property may be a reference to another bean.
-        if (isBeanReference)
+        if (reference)
         {
-            builder.addPropertyReference(propertyName, propertyValue);
+            builder.addPropertyReference(name, value);
         }
         else
         {
-            builder.addPropertyValue(propertyName, propertyValue);
+            builder.addPropertyValue(name, value);
         }
     }
 
@@ -305,46 +313,4 @@ public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBea
         return singleton;
     }
 
-    public static class ValueMap
-    {
-        private String propertyName;
-        private Map mappings;
-
-
-        public ValueMap(String propertyName, String mappingsString)
-        {
-            this.propertyName = propertyName;
-            mappings = new HashMap();
-
-            String[] values = StringUtils.tokenizeToStringArray(mappingsString, ",");
-            for (int i = 0; i < values.length; i++)
-            {
-                String value = values[i];
-                int x = value.indexOf("=");
-                if(x==-1)
-                {
-                    throw new IllegalArgumentException("Mappings string not properly defined: " + mappingsString);
-                }
-                mappings.put(value.substring(0, x), value.substring(x+1));
-            }
-
-        }
-
-
-        public ValueMap(String propertyName, Map mappings)
-        {
-            this.propertyName = propertyName;
-            this.mappings = mappings;
-        }
-
-        public String getPropertyName()
-        {
-            return propertyName;
-        }
-
-        public Object getValue(Object key)
-        {
-            return mappings.get(key);
-        }
-    }
 }
