@@ -299,6 +299,8 @@
     <xsd:element name="transformer-object-to-byte-array" type="transformerType"/>
     <xsd:element name="transformer-byte-array-to-serializable" type="transformerType"/>
     <xsd:element name="transformer-serializable-to-byte-array" type="transformerType"/>
+    <xsd:element name="transformer-byte-array-to-string" type="transformerType"/>
+    <xsd:element name="transformer-string-to-byte-array" type="transformerType"/>
 
     <!-- TODO RM* Wire formats -->
 

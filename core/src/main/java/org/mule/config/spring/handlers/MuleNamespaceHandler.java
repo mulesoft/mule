@@ -84,9 +84,11 @@ import org.mule.transformers.encryption.EncryptionTransformer;
 import org.mule.transformers.simple.ByteArrayToHexString;
 import org.mule.transformers.simple.ByteArrayToObject;
 import org.mule.transformers.simple.ByteArrayToSerializable;
+import org.mule.transformers.simple.ByteArrayToString;
 import org.mule.transformers.simple.HexStringToByteArray;
 import org.mule.transformers.simple.ObjectToByteArray;
 import org.mule.transformers.simple.SerializableToByteArray;
+import org.mule.transformers.simple.StringToByteArray;
 
 import java.util.HashMap;
 
@@ -142,6 +144,8 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("transformer-object-to-byte-array", new SingleElementDefinitionParser(ObjectToByteArray.class, false));
         registerBeanDefinitionParser("transformer-byte-array-to-serializable", new SingleElementDefinitionParser(ByteArrayToSerializable.class, false));
         registerBeanDefinitionParser("transformer-serializable-to-byte-array", new SingleElementDefinitionParser(SerializableToByteArray.class, false));
+        registerBeanDefinitionParser("transformer-byte-array-to-string", new SingleElementDefinitionParser(ByteArrayToString.class, false));
+        registerBeanDefinitionParser("transformer-string-to-byte-array", new SingleElementDefinitionParser(StringToByteArray.class, false));
 
         //Transaction Managers
         //TODO RM*: Need to review these, since Spring have some facilities for configuring the transactionMaanger
