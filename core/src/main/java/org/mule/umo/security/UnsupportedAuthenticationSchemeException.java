@@ -17,9 +17,6 @@ import org.mule.umo.UMOMessage;
  * <code>UnsupportedAuthenticationSchemeException</code> is thrown when a
  * authentication scheme is being used on the message that the Security filter does
  * not understand
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class UnsupportedAuthenticationSchemeException extends SecurityException
 {

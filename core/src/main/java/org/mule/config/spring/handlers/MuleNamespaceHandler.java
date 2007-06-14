@@ -13,6 +13,7 @@ import org.mule.config.MuleProperties;
 import org.mule.config.QueueProfile;
 import org.mule.config.spring.parsers.ConfigurationDefinitionParser;
 import org.mule.config.spring.parsers.ConnectionStrategyDefinitionParser;
+import org.mule.config.spring.parsers.CustomSecurityProviderDefinitionParser;
 import org.mule.config.spring.parsers.EndpointDefinitionParser;
 import org.mule.config.spring.parsers.EndpointRefDefinitionParser;
 import org.mule.config.spring.parsers.FilterDefinitionParser;
@@ -22,6 +23,7 @@ import org.mule.config.spring.parsers.ObjectFactoryDefinitionParser;
 import org.mule.config.spring.parsers.PoolingProfileDefinitionParser;
 import org.mule.config.spring.parsers.PropertiesBeanDefinitionParser;
 import org.mule.config.spring.parsers.RouterDefinitionParser;
+import org.mule.config.spring.parsers.SecurityManagerDefinitionParser;
 import org.mule.config.spring.parsers.ServiceDescriptorDefinitionParser;
 import org.mule.config.spring.parsers.ServiceOverridesDefinitionParser;
 import org.mule.config.spring.parsers.SimpleChildDefinitionParser;
@@ -234,5 +236,9 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         // Utils / Standard Types
         registerBeanDefinitionParser("properties", new PropertiesBeanDefinitionParser("properties"));
         registerBeanDefinitionParser("jndi-provider-properties", new PropertiesBeanDefinitionParser("jndiProviderProperties"));
+
+        // Security
+        registerBeanDefinitionParser("security-manager", new SecurityManagerDefinitionParser());
+        registerBeanDefinitionParser("custom-security-provider", new CustomSecurityProviderDefinitionParser());
     }
 }

@@ -13,18 +13,16 @@ package org.mule.umo.security;
 import org.mule.umo.UMOEncryptionStrategy;
 import org.mule.umo.lifecycle.Initialisable;
 
-import java.util.List;
+import java.util.Collection;
 
 /**
- * <code>UMOSecurityManager</code> is responsible for managing a one or more
+ * <code>UMOSecurityManager</code> is responsible for managing one or more
  * security providers.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public interface UMOSecurityManager extends Initialisable
 {
+    
     UMOAuthentication authenticate(UMOAuthentication authentication)
         throws SecurityException, SecurityProviderNotFoundException;
 
@@ -34,9 +32,9 @@ public interface UMOSecurityManager extends Initialisable
 
     UMOSecurityProvider removeProvider(String name);
 
-    List getProviders();
+    Collection getProviders();
 
-    void setProviders(List providers);
+    void setProviders(Collection providers);
 
     UMOSecurityContext createSecurityContext(UMOAuthentication authentication)
         throws UnknownAuthenticationTypeException;

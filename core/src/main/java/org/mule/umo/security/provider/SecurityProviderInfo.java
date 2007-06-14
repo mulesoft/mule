@@ -12,8 +12,6 @@ package org.mule.umo.security.provider;
 
 /**
  * A holder for some JDK-level SSL/TLS properties.
- * 
- * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
  */
 public interface SecurityProviderInfo
 {
