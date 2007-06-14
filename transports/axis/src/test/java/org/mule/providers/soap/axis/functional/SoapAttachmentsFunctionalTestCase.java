@@ -43,11 +43,10 @@ public class SoapAttachmentsFunctionalTestCase extends AbstractProviderFunctiona
         RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(true);
 
         SedaModel model = new SedaModel();
-        model.getPoolingProfile().setInitialisationPolicy(
-            PoolingProfile.INITIALISE_ONE);
+        model.getPoolingProfile().setInitialisationPolicy(PoolingProfile.INITIALISE_ONE);
 
         model.setName("main");
-       managementContext.getRegistry().registerModel(model);
+        managementContext.getRegistry().registerModel(model);
         callbackCalled = false;
         callbackCount = 0;
         connector = createConnector();

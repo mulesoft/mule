@@ -13,7 +13,9 @@
             <mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="axis:http://localhost:8081/services">
-                    <property name="serviceNamespace" value="http://foo"/>
+                    <mule:properties>
+                        <prop key="serviceNamespace">http://foo</prop>
+                    </mule:properties>
                 </mule:endpoint>
             </mule:inbound-router>
         </mule:service>
@@ -22,9 +24,29 @@
             <mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="axis:http://localhost:8082/services">
-                    <property name="wsdlPortType" value="mulePortType"/>
-                    <property name="wsdlServiceElement" value="muleService"/>
-                    <property name="wsdlServicePort" value="muleServicePort"/>
+                    <mule:properties>
+                        <prop key="hansi"></prop>
+                    </mule:properties>
+<!--                    <property name="properties">-->
+<!--                        <map>-->
+<!--                            <entry key="axisOptions">-->
+<!--                                <map>-->
+<!--                                    <entry key="wsdlPortType" value="mulePortType"/>-->
+<!--                                    <entry key="wsdlServiceElement" value="muleService"/>-->
+<!--                                    <entry key="wsdlServicePort" value="muleServicePort"/>-->
+<!--                                </map>-->
+<!--                            </entry>-->
+<!--                        </map>-->
+<!--                    </property>-->
+<!--                    <mule:properties>-->
+<!--                        <prop key="hansi">-->
+<!--                            <map>-->
+<!--                                <prop key="wsdlPortType">mulePortType</prop>-->
+<!--                                <prop key="wsdlServiceElement">muleService</prop>-->
+<!--                                <prop key="wsdlServicePort">muleServicePort</prop>-->
+<!--                            </map>-->
+<!--                        </prop>-->
+<!--                    </mule:properties>-->
                 </mule:endpoint>
             </mule:inbound-router>
         </mule:service>    
@@ -33,7 +55,9 @@
             <mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="axis:http://localhost:8083/services">
-                    <property name="wsdlFile" value="test-service.wsdl"/>
+                    <mule:properties>
+                        <prop key="wsdlFile">test-service.wsdl</prop>
+                    </mule:properties>
                 </mule:endpoint>
             </mule:inbound-router>
         </mule:service>    

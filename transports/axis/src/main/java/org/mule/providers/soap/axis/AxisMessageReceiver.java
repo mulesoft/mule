@@ -72,9 +72,13 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
     {
         AxisProperties.setProperty("axis.doAutoTypes", String.valueOf(connector.isDoAutoTypes()));
         MuleDescriptor descriptor = (MuleDescriptor)component.getDescriptor();
-        String style = (String)descriptor.getProperties().get("style");
-        String use = (String)descriptor.getProperties().get("use");
-        String doc = (String)descriptor.getProperties().get("documentation");
+        // TODO RM: these are endpoint properties now
+//        String style = (String)descriptor.getProperties().get("style");
+//        String use = (String)descriptor.getProperties().get("use");
+//        String doc = (String)descriptor.getProperties().get("documentation");
+        String style = (String)endpoint.getProperties().get("style");
+        String use = (String)endpoint.getProperties().get("use");
+        String doc = (String)endpoint.getProperties().get("documentation");
 
         UMOEndpointURI uri = endpoint.getEndpointURI();
         String serviceName = component.getDescriptor().getName();
@@ -208,14 +212,18 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         String className = interfaces[0].getName();
         // The namespace of the service.
         // Todo use the service qname in Mule 2.0
-        String namespace = (String)descriptor.getProperties().get("serviceNamespace");
+        // TODO RM: this is an endpoint property now
+        // String namespace = (String)descriptor.getProperties().get("serviceNamespace");
+        String namespace = (String)endpoint.getProperties().get("serviceNamespace");
         if (namespace == null)
         {
             namespace = Namespaces.makeNamespace(className);
         }
 
         // WSDL override
-        String wsdlFile = (String)descriptor.getProperties().get("wsdlFile");
+        // TODO RM: this is an endpoint property now?
+        // String wsdlFile = (String)descriptor.getProperties().get("wsdlFile");
+        String wsdlFile = (String)endpoint.getProperties().get("wsdlFile");
         if (wsdlFile != null)
         {
             service.getServiceDescription().setWSDLFile(wsdlFile);
