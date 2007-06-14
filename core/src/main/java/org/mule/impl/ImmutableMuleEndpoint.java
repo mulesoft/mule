@@ -300,13 +300,6 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
             this.properties.putAll(endpointUri.getParams());
         }
 
-        // seal the properties if we are immutable to avoid
-        // write-through aliasing problems with the exposed Map
-        if (!(this instanceof MuleEndpoint))
-        {
-            this.properties = Collections.unmodifiableMap(this.properties);
-        }
-
         this.type = source.getType();
         this.transactionConfig = source.getTransactionConfig();
         this.deleteUnacceptedMessages = source.isDeleteUnacceptedMessages();
@@ -329,11 +322,6 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         }
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.endpoint.UMOEndpoint#getEndpointURI()
-     */
     public UMOEndpointURI getEndpointURI()
     {
         return endpointUri;
@@ -344,61 +332,31 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         return endpointEncoding;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.endpoint.UMOImmutableEndpoint#getType()
-     */
     public String getType()
     {
         return type;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.endpoint.UMOImmutableEndpoint#getConnectorName()
-     */
     public UMOConnector getConnector()
     {
         return connector;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.endpoint.UMOImmutableEndpoint#getName()
-     */
     public String getName()
     {
         return name;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.endpoint.UMOEndpoint#getTransformer()
-     */
     public UMOTransformer getTransformer()
     {
         return transformer;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.endpoint.UMOImmutableEndpoint#getParams()
-     */
     public Map getProperties()
     {
         return properties;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.endpoint.UMOImmutableEndpoint#isReadOnly()
-     */
     public boolean isReadOnly()
     {
         return true;
@@ -444,44 +402,22 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
                + ", remoteSyncTimeout=" + remoteSyncTimeout + ", endpointEncoding=" + endpointEncoding + "}";
     }
 
-
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.endpoint.UMOImmutableEndpoint#getProtocol()
-     */
     public String getProtocol()
     {
         return connector.getProtocol();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.endpoint.UMOImmutableEndpoint#canReceive()
-     */
     public boolean canReceive()
     {
         return (getType().equals(ENDPOINT_TYPE_RECEIVER) || getType().equals(
             ENDPOINT_TYPE_SENDER_AND_RECEIVER));
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.endpoint.UMOImmutableEndpoint#canSend()
-     */
     public boolean canSend()
     {
         return (getType().equals(ENDPOINT_TYPE_SENDER) || getType().equals(ENDPOINT_TYPE_SENDER_AND_RECEIVER));
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.endpoint.UMOEndpoint#getTransactionConfig()
-     */
     public UMOTransactionConfig getTransactionConfig()
     {
         return transactionConfig;
@@ -621,6 +557,13 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         {
             properties.putAll(endpointUri.getParams());
         }
+        
+        // seal the properties if we are immutable to avoid
+        // write-through aliasing problems with the exposed Map
+        if (!(this instanceof MuleEndpoint))
+        {
+            this.properties = Collections.unmodifiableMap(this.properties);
+        }
 
         if (endpointUri.getTransformers() != null)
         {
@@ -720,11 +663,6 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         }
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.lifecycle.Registerable#register()
-     */
     public void register() throws RegistrationException
     {
         if (connector == null || connector.getRegistryId() == null)
@@ -734,22 +672,12 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
             managementContext.getRegistry().registerMuleObject(connector, this).getId();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.lifecycle.Registerable#deregister()
-     */
     public void deregister() throws DeregistrationException
     {
         managementContext.getRegistry().deregisterComponent(registryId);
         registryId = null;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.lifecycle.Registerable#getRegistryId()
-     */
     public String getRegistryId()
     {
         return registryId;
