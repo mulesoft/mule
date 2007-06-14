@@ -22,6 +22,12 @@
             <mule:outbound-router>
                 <mule:pass-through-router>
                     <mule:endpoint address="smtp://localhost:65447">
+                        <!-- this doesn't work -->
+                        <!-- property name="properties">
+                            <map>
+                                <entry key="toAddresses" value="bob@example.com"/>
+                            </map>
+                        </property -->
                         <mule:properties>
                             <prop key="toAddresses">bob@example.com</prop>
                         </mule:properties>
