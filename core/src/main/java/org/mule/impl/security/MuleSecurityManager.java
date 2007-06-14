@@ -168,9 +168,4 @@ public class MuleSecurityManager implements UMOSecurityManager
         cryptoStrategies.putAll(strategies);
     }
 
-    public void setName(String name)
-    {
-        // discarded - only used to keep Spring happy
-    }
-
 }
