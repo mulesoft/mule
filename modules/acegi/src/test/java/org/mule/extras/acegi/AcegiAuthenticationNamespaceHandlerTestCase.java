@@ -16,12 +16,12 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import java.util.Iterator;
 import java.util.Map;
 
-public class AuthenticationConfigurationTestCase extends FunctionalTestCase
+public class AcegiAuthenticationNamespaceHandlerTestCase extends FunctionalTestCase
 {
 
     protected String getConfigResources()
     {
-        return "authentication-config.xml";
+        return "acegi-authentication-config.xml";
     }
 
     public void testAcegi()

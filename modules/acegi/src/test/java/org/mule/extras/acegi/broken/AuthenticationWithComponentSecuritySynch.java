@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.extras.acegi;
+package org.mule.extras.acegi.broken;
 
 import org.mule.config.MuleProperties;
 import org.mule.extras.client.MuleClient;
@@ -77,6 +77,6 @@ public class AuthenticationWithComponentSecuritySynch extends FunctionalTestCase
 
     protected String getConfigResources()
     {
-        return "test-mule-component-security-synchronous-config.xml";
+        return "../../../../../../resources/broken/test-mule-component-security-synchronous-config.xml";
     }
 }

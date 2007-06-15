@@ -8,12 +8,13 @@
  * LICENSE.txt file.
  */
 
-package org.mule.extras.acegi;
+package org.mule.extras.acegi.broken;
 
 import org.mule.components.simple.EchoComponent;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.extras.acegi.filters.http.HttpBasicAuthenticationFilter;
+import org.mule.extras.acegi.AcegiProviderAdapter;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.security.MuleSecurityManager;
 import org.mule.providers.http.HttpConstants;
@@ -50,7 +51,7 @@ public class HttpBasicEndpointFilterTestCase extends FunctionalTestCase
         QuickConfigurationBuilder builder;
         builder = new QuickConfigurationBuilder();
         managementContext = builder.getManagementContext();
-       managementContext.setSecurityManager(sm);
+        managementContext.setSecurityManager(sm);
         UMOEndpoint ep = new MuleEndpoint("http://localhost:4567", true);
         ep.setSecurityFilter(new HttpBasicAuthenticationFilter("mule-realm"));
 

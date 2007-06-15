@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.extras.acegi;
+package org.mule.extras.acegi.broken;
 
 import org.mule.config.ExceptionHelper;
 import org.mule.config.MuleProperties;
@@ -30,7 +30,7 @@ public class MuleEndpointEncryptionFilterTestCase extends FunctionalTestCase
 
     protected String getConfigResources()
     {
-        return "test-acegi-encrypt-config.xml";
+        return "../../../../../../resources/broken/test-acegi-encrypt-config.xml";
     }
 
     public void testAuthenticationFailureNoContext() throws Exception

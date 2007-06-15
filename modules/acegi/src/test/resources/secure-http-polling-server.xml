@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
+       xmlns:acegi="http://www.mulesource.org/schema/mule/acegi/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd
+       http://www.mulesource.org/schema/mule/acegi/2.0 http://www.mulesource.org/schema/mule/acegi/2.0/mule-acegi.xsd">
+
+    <bean id="daoAuthenticationProvider" class="org.acegisecurity.providers.dao.DaoAuthenticationProvider">
+        <property name="userDetailsService">
+            <ref bean="inMemoryDaoImpl"/>
+        </property>
+    </bean>
+
+    <bean id="inMemoryDaoImpl" class="org.acegisecurity.userdetails.memory.InMemoryDaoImpl">
+        <property name="userMap">
+            <value>
+                marie=marie,ROLE_ADMIN
+            </value>
+        </property>
+    </bean>
+
+    <mule:security-manager name="acegiSM" xsi:type="acegi:securityManagerType">
+        <acegi:delegate-security-provider name="memory-dao"
+                                          delegate-ref="daoAuthenticationProvider"/>
+    </mule:security-manager>
+
+    <http:connector name="HttpConnector"/>
+
+    <mule:model-seda name="http secured test model">
+        <mule:service name="SecureUMO">
+            <mule:component class="org.mule.tck.functional.FunctionalTestComponent"/>
+            <mule:inbound-router>
+                <mule:endpoint address="http://localhost:4567" connector-ref="HttpConnector">
+                    <mule:security-filter xsi:type="acegi:securityFilterType">
+                        <acegi:http-security-filter realm="mule-realm"/>
+                    </mule:security-filter>
+                </mule:endpoint>
+            </mule:inbound-router>
+        </mule:service>
+    </mule:model-seda>
+
+</beans>
