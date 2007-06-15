@@ -32,6 +32,6 @@ class QuartzConnectorDefinitionParser extends SingleElementDefinitionParser
     public QuartzConnectorDefinitionParser()
     {
         super(QuartzConnector.class, true);
-        registerAttributeMapping("scheduler", "quartzScheduler");
+        withAlias("scheduler", "quartzScheduler");
     }
 }
