@@ -20,7 +20,7 @@
                  <configuration>
                      <excludes>
                          <exclude>**/AuthenticationWithComponentSecurityAsynch.*</exclude>
-                         <exclude>**/AuthenticationWithComponentSecuritySynch.*</exclude>
+                         <exclude>**/AuthComponentSynchFunctionalTestCase.*</exclude>
                          <exclude>**/MuleEndpointEncryptionFilterTestCase.*</exclude>
                          <exclude>**/MuleEndpointPlainTextFilterTestCase.*</exclude>
                      </excludes>

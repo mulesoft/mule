@@ -22,8 +22,8 @@ public class PoolingProfileDefinitionParser extends AbstractChildBeanDefinitionP
 
     public PoolingProfileDefinitionParser()
     {
-        registerAttributeMapping("initialisationPolicy", "initialisationPolicyString");
-        registerAttributeMapping("exhaustedAction", "exhaustedActionString");
+        withAlias("initialisationPolicy", "initialisationPolicyString");
+        withAlias("exhaustedAction", "exhaustedActionString");
     }
 
     protected Class getBeanClass(Element element)

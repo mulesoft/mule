@@ -30,8 +30,8 @@ public class CustomSecurityProviderDefinitionParser extends CompoundElementDefin
 
     public CustomSecurityProviderDefinitionParser()
     {
-        registerAttributeMapping(PROVIDER, PROVIDERS);
-        registerCollection(PROVIDERS);
+        withAlias(PROVIDER, PROVIDERS);
+        withCollection(PROVIDERS);
     }
 
     // this is a bit of a hack - we transfer the name to the provider

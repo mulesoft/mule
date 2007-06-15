@@ -11,7 +11,6 @@
 package org.mule.impl.security;
 
 import org.mule.config.i18n.CoreMessages;
-import org.mule.umo.UMOEncryptionStrategy;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.CryptoFailureException;
 import org.mule.util.Base64;
@@ -30,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
  * A JCE based encryption strategy. It also provides base64 encoding of
  * encrypted/decrypted data by setting the base64encoding attribute.
  */
-public abstract class AbstractJCEEncryptionStrategy implements UMOEncryptionStrategy
+public abstract class AbstractJCEEncryptionStrategy extends AbstractNamedEncryptionStrategy
 {
     /**
      * logger used by this class

@@ -11,9 +11,12 @@
 package org.mule.extras.pgp;
 
 import org.mule.config.i18n.CoreMessages;
-import org.mule.umo.UMOEncryptionStrategy;
+import org.mule.impl.security.AbstractNamedEncryptionStrategy;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.CryptoFailureException;
+
+import java.io.ByteArrayInputStream;
+import java.util.Collection;
 
 import cryptix.message.EncryptedMessage;
 import cryptix.message.EncryptedMessageBuilder;
@@ -23,14 +26,10 @@ import cryptix.message.MessageFactory;
 import cryptix.message.SignedMessageBuilder;
 import cryptix.openpgp.PGPArmouredMessage;
 import cryptix.pki.KeyBundle;
-
-import java.io.ByteArrayInputStream;
-import java.util.Collection;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class KeyBasedEncryptionStrategy implements UMOEncryptionStrategy
+public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
 {
     /**
      * logger used by this class

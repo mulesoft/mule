@@ -26,7 +26,7 @@ public class ObjectFactoryDefinitionParser extends SimpleChildDefinitionParser
     {
         super(setterMethod, null);
         allowClassAttribute = false;
-        registerAttributeMapping("class", "objectClassName");
+        withAlias("class", "objectClassName");
     }
     
     protected Class getBeanClass(Element element)

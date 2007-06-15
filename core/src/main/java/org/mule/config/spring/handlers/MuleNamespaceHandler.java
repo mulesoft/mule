@@ -17,6 +17,7 @@ import org.mule.config.spring.parsers.CustomSecurityProviderDefinitionParser;
 import org.mule.config.spring.parsers.EndpointDefinitionParser;
 import org.mule.config.spring.parsers.EndpointRefDefinitionParser;
 import org.mule.config.spring.parsers.FilterDefinitionParser;
+import org.mule.config.spring.parsers.GrandchildDefinitionParser;
 import org.mule.config.spring.parsers.InheritedModelDefinitionParser;
 import org.mule.config.spring.parsers.MapBeanDefinitionParser;
 import org.mule.config.spring.parsers.ObjectFactoryDefinitionParser;
@@ -42,6 +43,8 @@ import org.mule.impl.model.resolvers.CallableEntryPointResolver;
 import org.mule.impl.model.seda.SedaModel;
 import org.mule.impl.model.seda.optimised.OptimisedSedaModel;
 import org.mule.impl.model.streaming.StreamingModel;
+import org.mule.impl.security.PasswordBasedEncryptionStrategy;
+import org.mule.impl.security.filters.MuleEncryptionEndpointSecurityFilter;
 import org.mule.providers.SimpleRetryConnectionStrategy;
 import org.mule.routing.ForwardingCatchAllStrategy;
 import org.mule.routing.inbound.CorrelationAggregator;
@@ -238,13 +241,16 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         //Retry strategies
         registerBeanDefinitionParser("retry-connection-strategy", new SimpleChildDefinitionParser("connectionStrategy", SimpleRetryConnectionStrategy.class));
 
-        // Utils / Standard Types
+        //Utils / Standard Types
         registerBeanDefinitionParser("properties", new PropertiesBeanDefinitionParser("properties"));
         registerBeanDefinitionParser("jndi-provider-properties", new PropertiesBeanDefinitionParser("jndiProviderProperties"));
 
-        // Security
+        //Security
         registerBeanDefinitionParser("security-manager", new SecurityManagerDefinitionParser());
         registerBeanDefinitionParser("custom-security-provider", new CustomSecurityProviderDefinitionParser());
+        //registerBeanDefinitionParser("custom-encryption-strategy", new CustomSecurityProviderDefinitionParser());
+        registerBeanDefinitionParser("password-encryption-strategy", new SimpleChildDefinitionParser("encryptionStrategies", PasswordBasedEncryptionStrategy.class));
         registerBeanDefinitionParser("security-filter", new SecurityFilterDefinitionParser());
+        registerBeanDefinitionParser("encryption-security-filter", new GrandchildDefinitionParser("securityFilter", MuleEncryptionEndpointSecurityFilter.class));
     }
 }

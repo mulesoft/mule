@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-
 <xsd:schema xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:spring="http://www.springframework.org/schema/beans"
             targetNamespace="http://www.mulesource.org/schema/mule/core/2.0"
@@ -246,12 +246,10 @@
     <xsd:group name="securityFilters">
         <xsd:sequence>
             <xsd:choice minOccurs="0" maxOccurs="1">
-                <xsd:element ref="security-filter"/>
+                <xsd:element name="security-filter" type="securityFilterType"/>
             </xsd:choice>
         </xsd:sequence>
     </xsd:group>
-
-    <xsd:element name="security-filter" type="securityFilterType"/>
 
     <xsd:complexType name="securityFilterType">
         <xsd:annotation>
@@ -260,6 +258,8 @@
                 provide security filters.  Typically it will contain elements called
                 module:type-security-filter which extend securitySpecificFilterType
                 where "module" might be "acegi" and "type" might be "http", for example.
+                The type of the filter should be given using the xsi:type
+                attribute - as an example, for module foo the type would be foo:securityFilterType.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:attribute name="name" type="xsd:string"/>
@@ -268,6 +268,30 @@
     <xsd:complexType name="securitySpecificFilterType">
         <xsd:attribute name="name" type="xsd:string"/>
     </xsd:complexType>
+
+    <xsd:complexType name="defaultSecurityFilterType">
+        <xsd:complexContent>
+            <xsd:extension base="securityFilterType">
+                <xsd:sequence>
+                    <xsd:element name="encryption-security-filter" type="encryptionSecurityFilterType" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="encryptionSecurityFilterType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Password based encyption.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:extension base="securitySpecificFilterType">
+                <xsd:attribute name="strategy-ref" type="xsd:NMTOKEN"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
 
     <!--==============================================================-->
     <!--   Transformer elements                                          -->
@@ -378,7 +402,16 @@
     </xsd:complexType>
 
 
-    <xsd:element name="security-manager" type="securityManagerType"/>
+    <xsd:element name="security-manager" type="securityManagerType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A security manager is a container for security providers.  More than one
+                security manager may be configured; each contains providers from a particular
+                module and has that module's type.  The type is specified using the xsi:type
+                attribute - as an example, for module foo the type would be foo:securityManagerType.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
 
     <xsd:complexType name="securityManagerType">
         <xsd:annotation>
@@ -387,11 +420,12 @@
                 provide security managers.  Typically it will contain elements called
                 module:type-security-provider which extend securityProviderType
                 where "module" might be "acegi" and "type" might de "delegate", for example.
-                Alternatively (or in addition) it may contain encryptin strategies,
+                Alternatively (or in addition) it may contain encryption strategies,
                 which should follow a similar scheme and extend encryptionStrategyType.
             </xsd:documentation>
         </xsd:annotation>
-        <xsd:attribute name="name" type="xsd:string"/>
+        <xsd:attribute name="id" fixed="_muleSecurityManager"/>
+        <xsd:attribute name="name" fixed="_muleSecurityManager"/>
     </xsd:complexType>
 
     <xsd:complexType name="securityProviderType">
@@ -408,12 +442,18 @@
                 <xsd:sequence>
                     <xsd:element name="custom-security-provider" type="customSecurityProviderType" minOccurs="0" maxOccurs="unbounded"/>
                     <xsd:element name="custom-encryption-strategy" type="customEncryptionStrategyType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element name="password-encryption-strategy" type="passwordEncryptionStrategyType" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
     <xsd:complexType name="customSecurityProviderType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Allow any implementation of UMOSecurityProvider to be used.
+            </xsd:documentation>
+        </xsd:annotation>
         <xsd:complexContent>
             <xsd:extension base="securityProviderType">
                 <xsd:attribute name="provider-ref" type="xsd:NMTOKEN" use="required"/>
@@ -422,9 +462,31 @@
     </xsd:complexType>
 
     <xsd:complexType name="customEncryptionStrategyType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Allow any implementation of UMOEncryptionStrategy to be used.
+            </xsd:documentation>
+        </xsd:annotation>
         <xsd:complexContent>
             <xsd:extension base="encryptionStrategyType">
-                <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
+                <xsd:attribute name="strategy-ref" type="xsd:NMTOKEN" use="required"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="passwordEncryptionStrategyType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Provides password-based encryption using JCE. Users must specify a password and
+                optionally a salt and iteration count as well. The default algorithm is
+                PBEWithMD5AndDES, but users can specify any valid algorithm supported by JCE.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:extension base="encryptionStrategyType">
+                <xsd:attribute name="password" type="xsd:string" use="required"/>
+                <xsd:attribute name="salt" type="xsd:string"/>
+                <xsd:attribute name="iterationCount" type="substitutableInt"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

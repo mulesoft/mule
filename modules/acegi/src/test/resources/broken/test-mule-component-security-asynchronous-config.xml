@@ -9,7 +9,7 @@
 
     <container-context className="org.mule.extras.spring.SpringContainerContext">
         <properties>
-            <property name="configFile" value="componentSecurityContext.xml"/>
+            <property name="configFile" value="auth-component-security.xml"/>
         </properties>
     </container-context>
 

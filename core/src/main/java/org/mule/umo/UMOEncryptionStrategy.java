@@ -22,6 +22,8 @@ import org.mule.umo.security.CryptoFailureException;
  */
 public interface UMOEncryptionStrategy extends Initialisable
 {
+    public String getName();
+
     byte[] encrypt(byte[] data, Object info) throws CryptoFailureException;
 
     byte[] decrypt(byte[] data, Object info) throws CryptoFailureException;

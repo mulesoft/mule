@@ -21,7 +21,7 @@ public class RouterDefinitionParser extends SimpleChildDefinitionParser
     {
         super(setterMethod, clazz);
         registerValueMapping("enableCorrelation", "IF_NOT_SET=0,ALWAYS=1,NEVER=2");
-        registerAttributeMapping("transformers", "transformer");
+        withAlias("transformers", "transformer");
     }
 
 

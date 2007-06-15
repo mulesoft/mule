@@ -1,7 +1,8 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
-
-<beans>
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
 
     <bean id="inMemoryDaoImpl" class='org.acegisecurity.userdetails.memory.InMemoryDaoImpl'>
         <property name="userMap">
@@ -37,13 +38,9 @@
     <bean id="EchoComponent" class="org.mule.components.simple.EchoComponent"/>
 
     <bean id="EchoComponentSecurity" class="org.acegisecurity.intercept.method.aopalliance.MethodSecurityInterceptor">
-        <property name="authenticationManager"><ref bean="authenticationManager"/></property>
-        <property name="accessDecisionManager"><ref bean="accessDecisionManager"/></property>
-        <property name="objectDefinitionSource">
-            <value>
-                org.mule.umo.lifecycle.Callable.onCall=ROLE_ADMIN
-            </value>
-        </property>
+        <property name="authenticationManager" ref="authenticationManager"/>
+        <property name="accessDecisionManager" ref="accessDecisionManager"/>
+        <property name="objectDefinitionSource" value="org.mule.umo.lifecycle.Callable.onCall=ROLE_ADMIN"/>
     </bean>
 
     <bean id="autoProxyCreator" class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">

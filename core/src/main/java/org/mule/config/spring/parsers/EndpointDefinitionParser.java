@@ -30,9 +30,9 @@ public class EndpointDefinitionParser extends AbstractChildBeanDefinitionParser
 
     public EndpointDefinitionParser()
     {
-        registerAttributeMapping("address", "endpointURI");
-        registerAttributeMapping("transformers", "transformer");
-        registerAttributeMapping("responseTransformers", "responseTransformer");
+        withAlias("address", "endpointURI");
+        withAlias("transformers", "transformer");
+        withAlias("responseTransformers", "responseTransformer");
         registerValueMapping("createConnector", "GET_OR_CREATE=0,ALWAYS_CREATE=1,NEVER_CREATE=2");
     }
 

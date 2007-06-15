@@ -93,11 +93,6 @@ public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBea
         propertyToolkit.registerBeanReference(propertyName);
     }
 
-    public void registerValueMapping(PropertyToolkit.ValueMap mapping)
-    {
-        propertyToolkit.registerValueMapping(mapping);
-    }
-
     public void registerValueMapping(String propertyName, Map mappings)
     {
         propertyToolkit.registerValueMapping(propertyName, mappings);
@@ -108,19 +103,35 @@ public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBea
         propertyToolkit.registerValueMapping(propertyName, mappings);
     }
 
-    public void registerAttributeMapping(String alias, String propertyName)
+    /**
+     * @param alias The attribute name
+     * @param propertyName The bean property name
+     * @return This instance, allowing chaining during use, avoiding subclasses
+     */
+    public AbstractMuleSingleBeanDefinitionParser withAlias(String alias, String propertyName)
     {
         propertyToolkit.registerAttributeMapping(alias, propertyName);
+        return this;
     }
 
-    public void registerCollection(String propertyName)
+    /**
+     * @param propertyName Property that is a collection
+     * @return This instance, allowing chaining during use, avoiding subclasses
+     */
+    public AbstractMuleSingleBeanDefinitionParser withCollection(String propertyName)
     {
         propertyToolkit.registerCollection(propertyName);
+        return this;
     }
 
-    public void registerIgnored(String propertyName)
+    /**
+     * @param propertyName Property that is to be ignored
+     * @return This instance, allowing chaining during use, avoiding subclasses
+     */
+    public AbstractMuleSingleBeanDefinitionParser withIgnored(String propertyName)
     {
         propertyToolkit.registerIgnored(propertyName);
+        return this;
     }
 
     protected void processProperty(Attr attribute, BeanDefinitionBuilder builder)

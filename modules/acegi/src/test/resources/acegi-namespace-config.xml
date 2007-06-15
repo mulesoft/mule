@@ -26,7 +26,7 @@
 
     <bean name="echoComponent" class="org.mule.components.simple.EchoComponent"/>
 
-    <mule:security-manager name="securityManager1" xsi:type="acegi:securityManagerType">
+    <mule:security-manager xsi:type="acegi:securityManagerType">
         <acegi:delegate-security-provider name="memory-dao"
                                           delegate-ref="daoAuthenticationProvider"/>
     </mule:security-manager>
@@ -41,7 +41,7 @@
         <property name="name" value="customProvider"/>
     </bean>
 
-    <mule:security-manager name="securityManager2" xsi:type="mule:defaultSecurityManagerType">
+    <mule:security-manager xsi:type="mule:defaultSecurityManagerType">
         <mule:custom-security-provider name="willNotOverwriteName"
                                        provider-ref="explicitCreation1"/>
     </mule:security-manager>
@@ -50,7 +50,7 @@
         <property name="delegate" ref="daoAuthenticationProvider"/>
     </bean>
 
-    <mule:security-manager name="securityManager3" xsi:type="mule:defaultSecurityManagerType">
+    <mule:security-manager xsi:type="mule:defaultSecurityManagerType">
         <mule:custom-security-provider name="willOverwriteName"
                                        provider-ref="explicitCreation2"/>
     </mule:security-manager>

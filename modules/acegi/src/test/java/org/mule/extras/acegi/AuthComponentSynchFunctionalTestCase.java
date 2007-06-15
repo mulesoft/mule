@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.extras.acegi.broken;
+package org.mule.extras.acegi;
 
 import org.mule.config.MuleProperties;
 import org.mule.extras.client.MuleClient;
@@ -23,8 +23,13 @@ import java.util.Map;
 import org.acegisecurity.context.SecurityContextHolder;
 import org.acegisecurity.context.SecurityContextImpl;
 
-public class AuthenticationWithComponentSecuritySynch extends FunctionalTestCase
+public class AuthComponentSynchFunctionalTestCase extends FunctionalTestCase
 {
+
+    protected String getConfigResources()
+    {
+        return "auth-component-synch-test.xml";
+    }
 
     // Clear the security context after each test.
     public void doFunctionalTearDown()
@@ -75,8 +80,4 @@ public class AuthenticationWithComponentSecuritySynch extends FunctionalTestCase
         assertNotNull(m.getPayload());
     }
 
-    protected String getConfigResources()
-    {
-        return "../../../../../../resources/broken/test-mule-component-security-synchronous-config.xml";
-    }
 }

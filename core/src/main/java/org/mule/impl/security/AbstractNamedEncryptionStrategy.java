@@ -8,14 +8,23 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config.spring.parsers;
+package org.mule.impl.security;
 
-public class SecurityFilterDefinitionParser extends CompoundElementDefinitionParser
+import org.mule.umo.UMOEncryptionStrategy;
+
+public abstract class AbstractNamedEncryptionStrategy implements UMOEncryptionStrategy
 {
 
-    public SecurityFilterDefinitionParser()
+    private String name;
+
+    public String getName()
     {
-        withIgnored("xsi:type");
+        return name;
     }
 
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+    
 }

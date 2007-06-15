@@ -18,8 +18,8 @@ public class XfireElementDefinitionParser extends SingleElementDefinitionParser
     public XfireElementDefinitionParser()
     {
         super(XFireConnector.class, true);
-        this.registerAttributeMapping("bindingProviderClass", "bindingProvider");
-        this.registerAttributeMapping("clientTransportClass", "clientTransport");
-        this.registerAttributeMapping("typeMappingRegistryClass", "typeMappingRegistry");
+        this.withAlias("bindingProviderClass", "bindingProvider");
+        this.withAlias("clientTransportClass", "clientTransport");
+        this.withAlias("typeMappingRegistryClass", "typeMappingRegistry");
     }
 }

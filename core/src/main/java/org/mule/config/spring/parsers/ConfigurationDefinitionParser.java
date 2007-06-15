@@ -30,7 +30,7 @@ public class ConfigurationDefinitionParser extends AbstractMuleSingleBeanDefinit
 
     public ConfigurationDefinitionParser()
     {
-        registerAttributeMapping(ATTRIBUTE_SERVER_ID, ATTRIBUTE_ID);
+        withAlias(ATTRIBUTE_SERVER_ID, ATTRIBUTE_ID);
         singleton=true;
     }
 

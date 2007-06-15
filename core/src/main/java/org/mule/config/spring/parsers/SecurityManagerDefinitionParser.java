@@ -13,25 +13,23 @@ package org.mule.config.spring.parsers;
 import org.mule.config.MuleProperties;
 
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
-import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-public class SecurityManagerDefinitionParser extends AbstractBeanDefinitionParser
+public class SecurityManagerDefinitionParser extends NamedCompoundElementDefinitionParser
 {
+
+    public SecurityManagerDefinitionParser()
+    {
+        super(MuleProperties.OBJECT_SECURITY_MANAGER);
+        withIgnored("id");
+        withIgnored("name");
+        withIgnored("xsi:type");
+    }
 
     protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext)
     {
-        return getSecuritymanager(element, parserContext);
-    }
-
-    public static AbstractBeanDefinition getSecuritymanager(Element element, ParserContext parserContext)
-    {
-        // this is a hack copied from other BDPs that stops Spring from complaining that "id"
-        // is not defined
-        element.setAttribute("id", element.getAttribute("name"));
-        // we pull the "real" bean from spring - it is created in default-mule-config.xml
-        return (AbstractBeanDefinition)parserContext.getRegistry().getBeanDefinition(MuleProperties.OBJECT_SECURITY_MANAGER);
+        return super.parseInternal(element, parserContext);
     }
 
 }

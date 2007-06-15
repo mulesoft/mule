@@ -31,12 +31,12 @@ import org.mule.umo.security.UnknownAuthenticationTypeException;
 
 /**
  * <code>MuleEncryptionEndpointSecurityFilter</code> provides password-based
- * encription
+ * encryption
  */
 public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecurityFilter
 {
     private UMOEncryptionStrategy strategy;
-    private String strategyName;
+//    private String strategyName;
 
     public MuleEncryptionEndpointSecurityFilter()
     {
@@ -118,10 +118,10 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecuri
 
     protected void doInitialise() throws InitialisationException
     {
-        if (strategyName != null)
-        {
-            strategy = endpoint.getManagementContext().getSecurityManager().getEncryptionStrategy(strategyName);
-        }
+//        if (strategyName != null)
+//        {
+//            strategy = endpoint.getManagementContext().getSecurityManager().getEncryptionStrategy(strategyName);
+//        }
 
         if (strategy == null)
         {
@@ -139,8 +139,8 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecuri
         this.strategy = strategy;
     }
 
-    public void setStrategyName(String name)
-    {
-        strategyName = name;
-    }
+//    public void setStrategyName(String name)
+//    {
+//        strategyName = name;
+//    }
 }

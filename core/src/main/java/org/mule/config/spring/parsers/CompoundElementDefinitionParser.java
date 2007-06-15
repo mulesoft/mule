@@ -14,6 +14,7 @@ import java.util.HashSet;
 
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValue;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -53,7 +54,8 @@ public class CompoundElementDefinitionParser  extends AbstractHierarchicalDefini
         }
         doParse(element, parserContext, builder);
 
-        MutablePropertyValues parentProperties = getParentBeanDefinition(element).getPropertyValues();
+        BeanDefinition bd = getParentBeanDefinition(element);
+        MutablePropertyValues parentProperties = bd.getPropertyValues();
         for (int i=0;i < builder.getBeanDefinition().getPropertyValues().getPropertyValues().length; i++)
         {
             PropertyValue newPropertyValue = builder.getBeanDefinition().getPropertyValues().getPropertyValues()[i];
@@ -79,9 +81,9 @@ public class CompoundElementDefinitionParser  extends AbstractHierarchicalDefini
             }
         }
         
-        AbstractBeanDefinition bd = (AbstractBeanDefinition)parserContext.getContainingBeanDefinition();
+//        AbstractBeanDefinition bd = (AbstractBeanDefinition)parserContext.getContainingBeanDefinition();
         bd.setAttribute(COMPOUND_ELEMENT, Boolean.TRUE);
-        return bd;
+        return (AbstractBeanDefinition) bd;
     }
 
 }

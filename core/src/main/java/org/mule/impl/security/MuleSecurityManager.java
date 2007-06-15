@@ -46,6 +46,11 @@ public class MuleSecurityManager implements UMOSecurityManager
     private Map providers = new ConcurrentHashMap();
     private Map cryptoStrategies = new ConcurrentHashMap();
 
+    public MuleSecurityManager()
+    {
+        // for debug
+    }
+
     public void initialise() throws InitialisationException
     {
         for (Iterator iterator = providers.values().iterator(); iterator.hasNext();)
@@ -152,9 +157,9 @@ public class MuleSecurityManager implements UMOSecurityManager
         return (UMOEncryptionStrategy) cryptoStrategies.get(name);
     }
 
-    public void addEncryptionStrategy(String name, UMOEncryptionStrategy strategy)
+    public void addEncryptionStrategy(UMOEncryptionStrategy strategy)
     {
-        cryptoStrategies.put(name, strategy);
+        cryptoStrategies.put(strategy.getName(), strategy);
     }
 
     public UMOEncryptionStrategy removeEncryptionStrategy(String name)
@@ -163,9 +168,18 @@ public class MuleSecurityManager implements UMOSecurityManager
 
     }
 
-    public void setEncryptionStrategies(Map strategies)
+    public Collection getEncryptionStrategies()
     {
-        cryptoStrategies.putAll(strategies);
+        return Collections.unmodifiableCollection(new ArrayList(cryptoStrategies.values()));
+    }
+
+    public void setEncryptionStrategies(Collection strategies)
+    {
+        for (Iterator iterator = strategies.iterator(); iterator.hasNext();)
+        {
+            UMOEncryptionStrategy strategy = (UMOEncryptionStrategy) iterator.next();
+            addEncryptionStrategy(strategy);
+        }
     }
 
 }

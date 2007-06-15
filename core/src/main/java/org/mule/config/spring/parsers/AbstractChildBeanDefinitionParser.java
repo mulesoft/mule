@@ -202,7 +202,7 @@ public abstract class AbstractChildBeanDefinitionParser extends AbstractHierarch
 
     public boolean isCollection(Element element)
     {
-        return false;
+        return propertyToolkit.isCollection(element.getNodeName());
     }
 
     protected boolean isMap(Element element)
