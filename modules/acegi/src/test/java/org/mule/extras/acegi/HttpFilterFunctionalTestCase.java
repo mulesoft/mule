@@ -8,72 +8,22 @@
  * LICENSE.txt file.
  */
 
-package org.mule.extras.acegi.broken;
+package org.mule.extras.acegi;
 
-import org.mule.components.simple.EchoComponent;
-import org.mule.config.ConfigurationBuilder;
-import org.mule.config.builders.QuickConfigurationBuilder;
-import org.mule.extras.acegi.filters.http.HttpBasicAuthenticationFilter;
-import org.mule.extras.acegi.AcegiProviderAdapter;
-import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.impl.security.MuleSecurityManager;
 import org.mule.providers.http.HttpConstants;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMODescriptor;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.security.UMOSecurityProvider;
 
-import org.acegisecurity.GrantedAuthority;
-import org.acegisecurity.GrantedAuthorityImpl;
-import org.acegisecurity.providers.AuthenticationProvider;
-import org.acegisecurity.providers.dao.DaoAuthenticationProvider;
-import org.acegisecurity.userdetails.User;
-import org.acegisecurity.userdetails.memory.InMemoryDaoImpl;
-import org.acegisecurity.userdetails.memory.UserMap;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
 
-public class HttpBasicEndpointFilterTestCase extends FunctionalTestCase
+public class HttpFilterFunctionalTestCase extends FunctionalTestCase
 {
 
     protected String getConfigResources()
     {
-        return "";
-    }
-
-    protected ConfigurationBuilder getBuilder() throws Exception
-    {
-        MuleSecurityManager sm = new MuleSecurityManager();
-        UMOSecurityProvider provider = new AcegiProviderAdapter(getTestProvider(), "testProvider");
-        sm.addProvider(provider);
-        QuickConfigurationBuilder builder;
-        builder = new QuickConfigurationBuilder();
-        managementContext = builder.getManagementContext();
-        managementContext.setSecurityManager(sm);
-        UMOEndpoint ep = new MuleEndpoint("http://localhost:4567", true);
-        ep.setSecurityFilter(new HttpBasicAuthenticationFilter("mule-realm"));
-
-        UMODescriptor d = builder.createDescriptor(EchoComponent.class.getName(), "echo", ep, null, null);
-        builder.registerComponent(d);
-
-        return builder;
-    }
-
-    public AuthenticationProvider getTestProvider() throws Exception
-    {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        InMemoryDaoImpl dao = new InMemoryDaoImpl();
-        UserMap map = new UserMap();
-        map.addUser(new User("ross", "ross", true, true, true, true,
-            new GrantedAuthority[]{new GrantedAuthorityImpl("ROLE_ADMIN")}));
-        map.addUser(new User("anon", "anon", true, true, true, true,
-            new GrantedAuthority[]{new GrantedAuthorityImpl("ROLE_ANONYOMUS")}));
-        dao.setUserMap(map);
-        dao.afterPropertiesSet();
-        provider.setUserDetailsService(dao); // .setAuthenticationDao(dao);
-        return provider;
+        return "http-filter-test.xml";
     }
 
     public void testAuthenticationFailureNoContext() throws Exception
