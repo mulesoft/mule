@@ -17,8 +17,7 @@ import org.mule.providers.soap.axis.AxisConnector;
 import org.springframework.beans.factory.xml.UtilNamespaceHandler;
 
 /**
- * Reigsters a Bean Definition Parser for handling <code>&lt;axis:connector&gt;</code> elements.
- *
+ * Registers a Bean Definition Parser for handling <code>&lt;axis:connector&gt;</code> elements.
  */
 public class AxisNamespaceHandler extends UtilNamespaceHandler // NamespaceHandlerSupport
 {
