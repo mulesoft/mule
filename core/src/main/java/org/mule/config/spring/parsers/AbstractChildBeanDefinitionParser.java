@@ -70,6 +70,7 @@ public abstract class AbstractChildBeanDefinitionParser extends AbstractHierarch
         {
             return;
         }
+
         PropertyValue pv;
         try
         {

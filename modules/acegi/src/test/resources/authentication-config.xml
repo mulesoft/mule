@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
@@ -24,33 +23,20 @@
         <property name="userDetailsService" ref="inMemoryDaoImpl"/>
     </bean>
 
-    <bean name="echoComponent" class="org.mule.components.simple.EchoComponent"/>
-
-    <mule:foo-security-manager>
-        <mule:foo-security-provider name="memory-dao"
-                                xsi:type="acegi:fooSecurityProviderType"
-                                delegate-ref="daoAuthenticationProvider">
-            <acegi:foo/>
-        </mule:foo-security-provider>
-    </mule:foo-security-manager>
-
-    <mule:burp>
-        <mule:security-manager xsi:type="acegi:securityManagerType">
-            <acegi:bar/>
-            <acegi:delegate-security-provider name="memory-dao"
-                                              delegate-ref="daoAuthenticationProvider"/>
-        </mule:security-manager>
-    </mule:burp>
-
-    <!-- mule:security-manager xsi:type="mule:defaultSecurityManagerType">
-        <mule:custom-security-provider/>
-    </mule:security-manager -->
+    <mule:security-manager name="acegiSM" xsi:type="acegi:securityManagerType">
+        <acegi:delegate-security-provider name="memory-dao"
+                                          delegate-ref="daoAuthenticationProvider"/>
+    </mule:security-manager>
 
     <mule:model-seda name="test">
-        <mule:service name="echo" service-ref="echoComponent">
+        <mule:service name="echo">
+            <mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
-                <mule:endpoint address="http://localhost:4567"/>
-                <!-- acegi:http-security-filter realm="mule-realm"/ -->
+                <mule:endpoint address="http://localhost:4567">
+                    <mule:security-filter xsi:type="acegi:securityFilterType">
+                        <acegi:http-security-filter realm="mule-realm"/>
+                    </mule:security-filter>
+                </mule:endpoint>
             </mule:inbound-router>
         </mule:service>
     </mule:model-seda>

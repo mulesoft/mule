@@ -23,6 +23,7 @@ import org.mule.config.spring.parsers.ObjectFactoryDefinitionParser;
 import org.mule.config.spring.parsers.PoolingProfileDefinitionParser;
 import org.mule.config.spring.parsers.PropertiesBeanDefinitionParser;
 import org.mule.config.spring.parsers.RouterDefinitionParser;
+import org.mule.config.spring.parsers.SecurityFilterDefinitionParser;
 import org.mule.config.spring.parsers.SecurityManagerDefinitionParser;
 import org.mule.config.spring.parsers.ServiceDescriptorDefinitionParser;
 import org.mule.config.spring.parsers.ServiceOverridesDefinitionParser;
@@ -244,5 +245,6 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         // Security
         registerBeanDefinitionParser("security-manager", new SecurityManagerDefinitionParser());
         registerBeanDefinitionParser("custom-security-provider", new CustomSecurityProviderDefinitionParser());
+        registerBeanDefinitionParser("security-filter", new SecurityFilterDefinitionParser());
     }
 }

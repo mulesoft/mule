@@ -49,6 +49,7 @@ public abstract class AbstractEndpointSecurityFilter implements UMOEndpointSecur
     private boolean inbound = false;
     private boolean authenticate;
     private UMOCredentialsAccessor credentialsAccessor;
+    private boolean isInitialised = false;
 
     protected UMOManagementContext managementContext;
 
@@ -68,10 +69,6 @@ public abstract class AbstractEndpointSecurityFilter implements UMOEndpointSecur
             throw new InitialisationException(CoreMessages.authSecurityManagerNotSet(), this);
         }
 
-        if (endpoint == null)
-        {
-            throw new InitialisationException(CoreMessages.objectIsNull("Endpoint"), this);
-        }
         // This filter may only allow authentication on a subset of registered
         // security providers
         if (securityProviders != null)
@@ -94,6 +91,26 @@ public abstract class AbstractEndpointSecurityFilter implements UMOEndpointSecur
             }
             securityManager = localManager;
         }
+
+        // further functionality moved to lazy initialisation
+    }
+
+    protected final synchronized void lazyInit() throws InitialisationException
+    {
+        if (! isInitialised)
+        {
+            initialiseEndpoint();
+            isInitialised = true;
+        }
+    }
+
+    protected final void initialiseEndpoint() throws InitialisationException
+    {
+        if (endpoint == null)
+        {
+            throw new InitialisationException(CoreMessages.objectIsNull("Endpoint"), this);
+        }
+
         if (endpoint.getType().equals(UMOEndpoint.ENDPOINT_TYPE_RECEIVER))
         {
             inbound = true;
@@ -150,15 +167,18 @@ public abstract class AbstractEndpointSecurityFilter implements UMOEndpointSecur
         return endpoint;
     }
 
-    public void setEndpoint(UMOImmutableEndpoint endpoint)
+    public synchronized void setEndpoint(UMOImmutableEndpoint endpoint)
     {
         this.endpoint = endpoint;
+        isInitialised = false;
     }
 
     public void authenticate(UMOEvent event)
-        throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
-        SecurityProviderNotFoundException, EncryptionStrategyNotFoundException
+            throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
+            SecurityProviderNotFoundException, EncryptionStrategyNotFoundException,
+            InitialisationException
     {
+        lazyInit();
         if (inbound)
         {
             authenticateInbound(event);

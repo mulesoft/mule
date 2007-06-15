@@ -34,6 +34,7 @@ public class PropertyToolkit
     protected Properties attributeMappings = new Properties();
     protected Map valueMappings = new HashMap();
     protected Set collections = new HashSet();
+    protected Set ignored = new HashSet();
 
     public void registerBeanReference(String propertyName)
     {
@@ -65,6 +66,11 @@ public class PropertyToolkit
         collections.add(propertyName);
     }
 
+    protected void registerIgnored(String propertyName)
+    {
+        ignored.add(propertyName);
+    }
+
     protected String getAttributeMapping(String alias)
     {
         return attributeMappings.getProperty(alias, alias);
@@ -73,6 +79,11 @@ public class PropertyToolkit
     protected boolean isCollection(String propertyName)
     {
         return collections.contains(propertyName);
+    }
+
+    protected boolean isIgnored(String propertyName)
+    {
+        return ignored.contains(propertyName);
     }
 
     /**

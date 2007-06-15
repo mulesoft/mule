@@ -10,12 +10,30 @@
 
 package org.mule.extras.acegi;
 
-public class AuthenticationConfigurationTestCase extends HttpBasicEndpointFilterTestCase
+import org.mule.tck.FunctionalTestCase;
+import org.mule.umo.endpoint.UMOEndpoint;
+
+import java.util.Iterator;
+import java.util.Map;
+
+public class AuthenticationConfigurationTestCase extends FunctionalTestCase
 {
 
     protected String getConfigResources()
     {
-        return "test-acegi-http-config.xml";
+        return "authentication-config.xml";
+    }
+
+    public void testAcegi()
+    {
+        Map endpoints = managementContext.getRegistry().getEndpoints();
+        Iterator names = endpoints.keySet().iterator();
+        while (names.hasNext())
+        {
+            String name = (String) names.next();
+            UMOEndpoint endpoint = (UMOEndpoint) endpoints.get(name);
+            logger.debug(name + " : " + endpoint);
+        }
     }
 
 }

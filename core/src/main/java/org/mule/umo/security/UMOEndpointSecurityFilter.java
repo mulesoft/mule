@@ -13,6 +13,7 @@ package org.mule.umo.security;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Initialisable;
+import org.mule.umo.lifecycle.InitialisationException;
 
 /**
  * <code>UMOEndpointSecurityFilter</code> is a base filter for secure filtering of
@@ -40,6 +41,6 @@ public interface UMOEndpointSecurityFilter extends Initialisable
     UMOCredentialsAccessor getCredentialsAccessor();
 
     void authenticate(UMOEvent event)
-        throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
-        SecurityProviderNotFoundException, EncryptionStrategyNotFoundException;
+            throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
+            SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException;
 }

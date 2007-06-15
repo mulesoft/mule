@@ -115,7 +115,7 @@
         <xsd:choice minOccurs="0" maxOccurs="unbounded">
             <xsd:element name="transaction" type="transactionType" minOccurs="0" maxOccurs="1"/>
             <xsd:group ref="filter" minOccurs="0" maxOccurs="unbounded"/>
-            <!--<xsd:group ref="securityFilters" minOccurs="0" maxOccurs="1"/>-->
+            <xsd:group ref="securityFilters" minOccurs="0" maxOccurs="1"/>
             <xsd:group ref="connectionStrategies" minOccurs="0" maxOccurs="1"/>
             <xsd:element name="properties" type="propsType" minOccurs="0" maxOccurs="1"/>
             <xsd:choice minOccurs="0" maxOccurs="unbounded">
@@ -243,15 +243,30 @@
         <xsd:attribute name="not" type="substitutableBoolean"/>
     </xsd:complexType>
 
-
-    <!-- Todo schemas for each security filter type -->
-    <xsd:complexType name="securityFilterType">
+    <xsd:group name="securityFilters">
         <xsd:sequence>
-            <xsd:any namespace="http://www.springframework.org/schema/beans" processContents="strict" minOccurs="0"
-                     maxOccurs="unbounded"/>
+            <xsd:choice minOccurs="0" maxOccurs="1">
+                <xsd:element ref="security-filter"/>
+            </xsd:choice>
         </xsd:sequence>
-        <xsd:attribute name="useProviders" type="xsd:string"/>
-        <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
+    </xsd:group>
+
+    <xsd:element name="security-filter" type="securityFilterType"/>
+
+    <xsd:complexType name="securityFilterType">
+        <xsd:annotation>
+            <xsd:documentation>
+                This is an empty holder that can be extended by modules that want to
+                provide security filters.  Typically it will contain elements called
+                module:type-security-filter which extend securitySpecificFilterType
+                where "module" might be "acegi" and "type" might be "http", for example.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:attribute name="name" type="xsd:string"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="securitySpecificFilterType">
+        <xsd:attribute name="name" type="xsd:string"/>
     </xsd:complexType>
 
     <!--==============================================================-->
@@ -386,8 +401,6 @@
     <xsd:complexType name="encryptionStrategyType">
         <xsd:attribute name="name" type="xsd:string" use="required"/>
     </xsd:complexType>
-
-    <!-- TODO - rest of security to do still -->
 
     <xsd:complexType name="defaultSecurityManagerType">
         <xsd:complexContent>

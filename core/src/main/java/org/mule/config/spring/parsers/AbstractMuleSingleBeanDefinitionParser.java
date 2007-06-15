@@ -118,6 +118,11 @@ public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBea
         propertyToolkit.registerCollection(propertyName);
     }
 
+    public void registerIgnored(String propertyName)
+    {
+        propertyToolkit.registerIgnored(propertyName);
+    }
+
     protected void processProperty(Attr attribute, BeanDefinitionBuilder builder)
     {
         boolean isBeanReference = propertyToolkit.isBeanReference(attribute.getNodeName());
@@ -130,14 +135,17 @@ public abstract class AbstractMuleSingleBeanDefinitionParser extends AbstractBea
 
     protected void addProperty(BeanDefinitionBuilder builder, String name, String value, boolean reference)
     {
-        // The property may be a reference to another bean.
-        if (reference)
+        if (!propertyToolkit.isIgnored(name))
         {
-            builder.addPropertyReference(name, value);
-        }
-        else
-        {
-            builder.addPropertyValue(name, value);
+            // The property may be a reference to another bean.
+            if (reference)
+            {
+                builder.addPropertyReference(name, value);
+            }
+            else
+            {
+                builder.addPropertyValue(name, value);
+            }
         }
     }
 

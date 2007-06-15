@@ -10,12 +10,12 @@
 
 package org.mule.umo.endpoint;
 
+import org.mule.providers.ConnectionStrategy;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOEndpointSecurityFilter;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.providers.ConnectionStrategy;
 
 import java.util.Map;
 

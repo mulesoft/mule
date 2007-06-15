@@ -27,7 +27,7 @@ public class SimpleChildDefinitionParser extends AbstractChildBeanDefinitionPars
     protected Class constraint;
     protected Class clazz;
     protected String setterMethod;
-    protected boolean isDynamic;
+    protected boolean resetEachUseMule1735;
 
     public SimpleChildDefinitionParser(String setterMethod, Class clazz)
     {
@@ -39,13 +39,12 @@ public class SimpleChildDefinitionParser extends AbstractChildBeanDefinitionPars
         this.constraint = constraint;
         this.clazz = clazz;
         this.setterMethod = setterMethod;
-        isDynamic = null == clazz;
+        resetEachUseMule1735 = null == clazz;
     }
 
     protected void preProcess()
     {
-        // AC: Is this a workaround for MULE-1735?
-        if (isDynamic)
+        if (resetEachUseMule1735)
         {
            clazz = null; // reset for this element
         }
@@ -53,21 +52,6 @@ public class SimpleChildDefinitionParser extends AbstractChildBeanDefinitionPars
 
     protected Class getBeanClass(Element element)
     {
-        // This is now handled by AbstractMuleSingleBeanDefinitionParser.getBeanClassFromAttribute()
-//        if (clazz == null)
-//        {
-//            String cls = element.getAttribute(ATTRIBUTE_CLASS);
-//            try
-//            {
-//                //TODO TC: probably need to use OSGi Loader here
-//                clazz = ClassUtils.loadClass(cls, getClass());
-//            }
-//            catch (ClassNotFoundException e)
-//            {
-//                logger.error("could not load class: " + cls, e);
-//            }
-//        }
-//        element.removeAttribute(ATTRIBUTE_CLASS);
         if (null != clazz && null != constraint && !constraint.isAssignableFrom(clazz))
         {
             logger.error(clazz + " not a subclass of " + constraint);

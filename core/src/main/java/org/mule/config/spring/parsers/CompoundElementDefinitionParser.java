@@ -59,20 +59,23 @@ public class CompoundElementDefinitionParser  extends AbstractHierarchicalDefini
             PropertyValue newPropertyValue = builder.getBeanDefinition().getPropertyValues().getPropertyValues()[i];
             String name = newPropertyValue.getName();
             Object value = newPropertyValue.getValue();
-            if (propertyToolkit.isCollection(name))
+            if (!propertyToolkit.isIgnored(name))
             {
-                Collection values = new HashSet();
-                if (parentProperties.contains(name))
+                if (propertyToolkit.isCollection(name))
                 {
-                    values = (Collection) parentProperties.getPropertyValue(name).getValue();
-                    parentProperties.removePropertyValue(name);
+                    Collection values = new HashSet();
+                    if (parentProperties.contains(name))
+                    {
+                        values = (Collection) parentProperties.getPropertyValue(name).getValue();
+                        parentProperties.removePropertyValue(name);
+                    }
+                    values.add(value);
+                    parentProperties.addPropertyValue(name, values);
                 }
-                values.add(value);
-                parentProperties.addPropertyValue(name, values);
-            }
-            else
-            {
-                parentProperties.addPropertyValue(name, value);
+                else
+                {
+                    parentProperties.addPropertyValue(name, value);
+                }
             }
         }
         
