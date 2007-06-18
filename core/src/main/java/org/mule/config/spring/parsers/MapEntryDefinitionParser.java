@@ -61,10 +61,10 @@ public class MapEntryDefinitionParser extends AbstractChildBeanDefinitionParser
 
     protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
-        final String prefix = element.getAttribute(keyName);
-        final String uri = element.getAttribute(valueName);
+        String key = element.getAttribute(keyName);
+        String value = element.getAttribute(valueName);
 
-        builder.setSource(new MapEntryDefinitionParser.KeyValuePair(prefix, uri));
+        builder.setSource(new MapEntryDefinitionParser.KeyValuePair(key, value));
         postProcess(builder, element);
     }
 
@@ -83,7 +83,6 @@ public class MapEntryDefinitionParser extends AbstractChildBeanDefinitionParser
             this.key = key;
             this.value = value;
         }
-
 
         public String getKey()
         {
@@ -105,5 +104,7 @@ public class MapEntryDefinitionParser extends AbstractChildBeanDefinitionParser
         {
             this.value = value;
         }
+
     }
+
 }
