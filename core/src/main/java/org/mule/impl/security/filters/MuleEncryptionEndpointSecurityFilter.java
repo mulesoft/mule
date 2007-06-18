@@ -54,7 +54,7 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecuri
                 event.getEndpoint(), this);
         }
 
-        UMOCredentials user = new MuleCredentials(userHeader);
+        UMOCredentials user = new MuleCredentials(userHeader, getSecurityManager());
 
         UMOAuthentication authResult;
         UMOAuthentication umoAuthentication = new MuleAuthentication(user);

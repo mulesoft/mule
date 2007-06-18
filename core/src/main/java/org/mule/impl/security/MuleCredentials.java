@@ -16,6 +16,7 @@ import org.mule.umo.UMOEncryptionStrategy;
 import org.mule.umo.security.CryptoFailureException;
 import org.mule.umo.security.EncryptionStrategyNotFoundException;
 import org.mule.umo.security.UMOCredentials;
+import org.mule.umo.security.UMOSecurityManager;
 import org.mule.util.ArrayUtils;
 
 import java.util.StringTokenizer;
@@ -46,9 +47,8 @@ public class MuleCredentials implements UMOCredentials
         this.roles = roles;
     }
 
-    public MuleCredentials(String header) throws EncryptionStrategyNotFoundException, CryptoFailureException
+    public MuleCredentials(String header, UMOSecurityManager sm) throws EncryptionStrategyNotFoundException, CryptoFailureException
     {
-        String scheme = null;
 
         int i = header.indexOf(' ');
         if (i == -1)
@@ -56,18 +56,13 @@ public class MuleCredentials implements UMOCredentials
             throw new IllegalArgumentException(
                 CoreMessages.headerMalformedValueIs(MuleProperties.MULE_USER_PROPERTY, header).toString());
         }
-        else
-        {
-            scheme = header.substring(0, i);
-        }
 
+        String scheme = header.substring(0, i);
         String creds = header.substring(i + 1);
 
         if (!scheme.equalsIgnoreCase("plain"))
         {
-            //TODO RM*: Not sure how to deal with this UMOSecurityManager sm = managementContext.getSecurityManager();
-
-            UMOEncryptionStrategy es = null; // sm.getEncryptionStrategy(scheme);
+            UMOEncryptionStrategy es = sm.getEncryptionStrategy(scheme);
             if (es == null)
             {
                 throw new EncryptionStrategyNotFoundException(scheme);
