@@ -19,9 +19,6 @@
                  <artifactId>maven-surefire-plugin</artifactId>
                  <configuration>
                      <excludes>
-                         <exclude>**/AuthenticationWithComponentSecurityAsynch.*</exclude>
-                         <exclude>**/MuleEndpointEncryptionFilterTestCase.*</exclude>
-                         <exclude>**/MuleEndpointPlainTextFilterTestCase.*</exclude>
                      </excludes>
                  </configuration>
              </plugin>

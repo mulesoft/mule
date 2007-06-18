@@ -40,7 +40,7 @@
         <xsd:complexContent>
             <xsd:extension base="mule:securityProviderType">
                 <xsd:sequence>
-                    <xsd:element name="security-property" type="securityProperty"/>
+                    <xsd:element name="security-property" type="securityProperty" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
                 <xsd:attribute name="delegate-ref" type="xsd:NMTOKEN" use="required"/>
             </xsd:extension>
