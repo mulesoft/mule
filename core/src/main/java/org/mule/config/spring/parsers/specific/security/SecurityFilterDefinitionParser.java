@@ -8,7 +8,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config.spring.parsers;
+package org.mule.config.spring.parsers.specific.security;
+
+import org.mule.config.spring.parsers.general.CompoundElementDefinitionParser;
+
 
 public class SecurityFilterDefinitionParser extends CompoundElementDefinitionParser
 {

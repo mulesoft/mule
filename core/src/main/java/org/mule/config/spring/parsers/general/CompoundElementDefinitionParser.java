@@ -7,7 +7,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers;
+package org.mule.config.spring.parsers.general;
+
+import org.mule.config.spring.parsers.AbstractHierarchicalDefinitionParser;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -26,7 +28,7 @@ import org.w3c.dom.Element;
  * useful when an object has lots of properties and its more readable to break those properties into
  * groups that can be represented as a sub-element in Xml.
  */
-public class CompoundElementDefinitionParser  extends AbstractHierarchicalDefinitionParser
+public class CompoundElementDefinitionParser extends AbstractHierarchicalDefinitionParser
 {
 
     public static final String COMPOUND_ELEMENT = "compound";

@@ -10,6 +10,7 @@
 package org.mule.config.spring.parsers;
 
 import org.mule.impl.ManagementContext;
+import org.mule.config.spring.parsers.AbstractMuleSingleBeanDefinitionParser;
 
 import org.w3c.dom.Element;
 

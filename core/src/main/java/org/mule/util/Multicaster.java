@@ -20,7 +20,7 @@ import java.util.List;
 
 /**
  * <code>Multicaster</code> is a utility that can call a given method on a
- * collection of objects that implement one or more common interfaces. The create
+ * collection of objects that implement one or more collection interfaces. The create
  * method returns a proxy that can be cast to any of the the interfaces passed and be
  * used like a single object.
  */

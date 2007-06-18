@@ -23,7 +23,7 @@ import java.util.List;
 import org.apache.commons.collections.IteratorUtils;
 
 /**
- * <code>EventGroup</code> is a holder over events grouped by a common group Id.
+ * <code>EventGroup</code> is a holder over events grouped by a collection group Id.
  * This can be used by components such as routers to managed related events.
  */
 // @ThreadSafe

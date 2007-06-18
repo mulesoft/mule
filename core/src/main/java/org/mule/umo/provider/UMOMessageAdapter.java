@@ -19,7 +19,7 @@ import java.util.Set;
 import javax.activation.DataHandler;
 
 /**
- * <code>UMOMessageAdapter</code> provides a common abstraction of different
+ * <code>UMOMessageAdapter</code> provides a collection abstraction of different
  * message implementations provided by different underlying technologies.
  */
 public interface UMOMessageAdapter extends Serializable

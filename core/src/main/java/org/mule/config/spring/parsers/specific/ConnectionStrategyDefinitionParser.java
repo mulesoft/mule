@@ -7,9 +7,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers;
+package org.mule.config.spring.parsers.specific;
 
 import org.mule.config.i18n.CoreMessages;
+import org.mule.config.spring.parsers.AbstractChildBeanDefinitionParser;
 import org.mule.providers.SimpleRetryConnectionStrategy;
 import org.mule.util.ClassUtils;
 

@@ -9,8 +9,8 @@
  */
 package org.mule.providers.quartz.config;
 
-import org.mule.config.spring.parsers.PropertiesBeanDefinitionParser;
-import org.mule.config.spring.parsers.SingleElementDefinitionParser;
+import org.mule.config.spring.parsers.specific.PropertiesBeanDefinitionParser;
+import org.mule.config.spring.parsers.general.SingleElementDefinitionParser;
 import org.mule.providers.quartz.QuartzConnector;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;

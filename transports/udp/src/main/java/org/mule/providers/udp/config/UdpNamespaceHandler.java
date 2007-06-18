@@ -9,7 +9,7 @@
  */
 package org.mule.providers.udp.config;
 
-import org.mule.config.spring.parsers.SingleElementDefinitionParser;
+import org.mule.config.spring.parsers.general.SingleElementDefinitionParser;
 import org.mule.providers.udp.UdpConnector;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;

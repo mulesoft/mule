@@ -7,8 +7,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers;
+package org.mule.config.spring.parsers.specific;
 
+import org.mule.config.spring.parsers.AbstractChildBeanDefinitionParser;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.util.StringUtils;
@@ -29,7 +30,7 @@ public class EndpointDefinitionParser extends AbstractChildBeanDefinitionParser
 
     public EndpointDefinitionParser()
     {
-        withAlias("address", "endpointURI");
+        withAlias(ADDRESS_ATTRIBUTE, "endpointURI");
         withAlias("transformers", "transformer");
         withAlias("responseTransformers", "responseTransformer");
         registerValueMapping("createConnector", "GET_OR_CREATE=0,ALWAYS_CREATE=1,NEVER_CREATE=2");

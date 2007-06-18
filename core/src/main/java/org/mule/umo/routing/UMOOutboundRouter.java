@@ -66,7 +66,7 @@ public interface UMOOutboundRouter extends UMORouter
      * list of assoaciated endpoints sending the message. Another type of router such
      * as the ExceptionBasedRouter will hit the first endpoint, if it fails try the
      * second, and so on. Most router implementations will extends the
-     * FilteringOutboundRouter which implements all the common logic need for a
+     * FilteringOutboundRouter which implements all the collection logic need for a
      * router.
      * 
      * @param message the message to send via one or more endpoints on this router

@@ -10,7 +10,7 @@
 
 package org.mule.providers.soap.xfire.config;
 
-import org.mule.config.spring.parsers.SingleElementDefinitionParser;
+import org.mule.config.spring.parsers.general.SingleElementDefinitionParser;
 import org.mule.providers.soap.xfire.XFireConnector;
 
 public class XfireElementDefinitionParser extends SingleElementDefinitionParser

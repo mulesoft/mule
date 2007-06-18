@@ -52,7 +52,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * <code>AbstractMessageReceiver</code> provides common methods for all Message
+ * <code>AbstractMessageReceiver</code> provides collection methods for all Message
  * Receivers provided with Mule. A message receiver enables an endpoint to receive a
  * message from an external system.
  */

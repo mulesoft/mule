@@ -130,7 +130,7 @@ public class GZipCompression implements CompressionStrategy
         {
             /*
              * if (strict) { // throw a specific exception here to allow users of
-             * this method to // diffientiate between general IOExceptions and an
+             * this method to // diffientiate between base IOExceptions and an
              * invalid format logger.warn("Data is not of type GZIP compressed." + "
              * The data may not have been compressed in the first place."); throw new
              * CompressionException("Not in GZIP format"); }

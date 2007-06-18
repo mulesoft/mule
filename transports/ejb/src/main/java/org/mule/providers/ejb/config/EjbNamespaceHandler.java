@@ -9,7 +9,7 @@
  */
 package org.mule.providers.ejb.config;
 
-import org.mule.config.spring.parsers.SingleElementDefinitionParser;
+import org.mule.config.spring.parsers.general.SingleElementDefinitionParser;
 import org.mule.providers.ejb.EjbConnector;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;

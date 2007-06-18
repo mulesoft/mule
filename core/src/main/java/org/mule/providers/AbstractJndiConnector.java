@@ -21,7 +21,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 /**
- * This class acts as common baseclass for both Rmi & EjbConnector Resolves Jndi root for connector usage
+ * This class acts as collection baseclass for both Rmi & EjbConnector Resolves Jndi root for connector usage
  * 
  */
 public abstract class AbstractJndiConnector extends AbstractConnector

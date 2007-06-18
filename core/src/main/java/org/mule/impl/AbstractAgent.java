@@ -14,7 +14,7 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOAgent;
 
 /**
- * Impleents common methods for all Agents. Improtantly, the Management context is made available to Agents that
+ * Impleents collection methods for all Agents. Improtantly, the Management context is made available to Agents that
  * extend this.
  */
 public abstract class AbstractAgent implements UMOAgent, ManagementContextAware

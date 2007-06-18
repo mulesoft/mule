@@ -8,9 +8,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config.spring.parsers;
+package org.mule.config.spring.parsers.specific.security;
 
 import org.mule.config.MuleProperties;
+import org.mule.config.spring.parsers.general.NamedCompoundElementDefinitionParser;
 
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;

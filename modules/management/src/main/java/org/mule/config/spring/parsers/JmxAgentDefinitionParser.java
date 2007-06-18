@@ -11,6 +11,7 @@ package org.mule.config.spring.parsers;
 
 import org.mule.management.agents.JmxAgent;
 import org.mule.util.StringUtils;
+import org.mule.config.spring.parsers.AbstractMuleSingleBeanDefinitionParser;
 
 import java.util.HashMap;
 import java.util.Map;

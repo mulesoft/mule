@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config.spring.parsers;
+package org.mule.config.spring.parsers.general;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.w3c.dom.Element;

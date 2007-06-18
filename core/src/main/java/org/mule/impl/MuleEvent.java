@@ -578,7 +578,7 @@ public class MuleEvent extends EventObject implements UMOEvent
     /**
      * Setting this parameter will stop the Mule framework from processing this event
      * in the standard way. This allow for client code to override default behaviour.
-     * The common reasons for doing this are - 1. The UMO has more than one send
+     * The collection reasons for doing this are - 1. The UMO has more than one send
      * endpoint configured; the component must dispatch to other prviders
      * programatically by using the component on the current event 2. The UMO doesn't
      * send the current event out through a endpoint. i.e. the processing of the

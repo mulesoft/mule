@@ -53,7 +53,7 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
     }
 
     /**
-     * Default constructor. Initalises common properties for the MuleConfiguration
+     * Default constructor. Initalises collection properties for the MuleConfiguration
      * object
      *
      * @see org.mule.config.MuleConfiguration

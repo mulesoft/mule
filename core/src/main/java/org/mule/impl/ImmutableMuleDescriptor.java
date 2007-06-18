@@ -136,7 +136,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     protected UMOManagementContext managementContext;
 
     /**
-     * Default constructor. Initalises common properties for the MuleConfiguration
+     * Default constructor. Initalises collection properties for the MuleConfiguration
      * object
      *
      * @see org.mule.config.MuleConfiguration

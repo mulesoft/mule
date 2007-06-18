@@ -7,10 +7,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers;
+package org.mule.config.spring.parsers.specific;
 
 import org.mule.config.MuleConfiguration;
 import org.mule.config.MuleProperties;
+import org.mule.config.spring.parsers.AbstractMuleSingleBeanDefinitionParser;
 
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;

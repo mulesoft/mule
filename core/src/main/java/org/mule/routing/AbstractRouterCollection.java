@@ -26,7 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * <code>AbstractRouterCollection</code> provides common method implementations of
+ * <code>AbstractRouterCollection</code> provides collection method implementations of
  * router collections for in and outbound routers.
  */
 

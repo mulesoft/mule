@@ -8,30 +8,30 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config.spring.parsers;
+package org.mule.config.spring.parsers.specific.security;
+
+import org.mule.config.spring.parsers.general.CompoundElementDefinitionParser;
 
 import org.springframework.beans.MutablePropertyValues;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.w3c.dom.Element;
 
-public class CustomSecurityProviderDefinitionParser extends CompoundElementDefinitionParser
+public class CustomSecurityDefinitionParser extends CompoundElementDefinitionParser
 {
 
     public static final String NAME = "name";
-    public static final String PROVIDER = "provider";
-    public static final String PROVIDERS = "providers";
 
     private String name;
-    private String provider;
+    private String componentAttributeValue;
+    private String componentAttributeName;
     private ParserContext parserContext;
 
-    public CustomSecurityProviderDefinitionParser()
+    public CustomSecurityDefinitionParser(String componentAttributeName)
     {
-        withAlias(PROVIDER, PROVIDERS);
-        withCollection(PROVIDERS);
+        this.componentAttributeName = componentAttributeName;
     }
 
     // this is a bit of a hack - we transfer the name to the provider
@@ -40,7 +40,7 @@ public class CustomSecurityProviderDefinitionParser extends CompoundElementDefin
     protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext)
     {
         name = null;
-        provider = null;
+        componentAttributeValue = null;
         this.parserContext = parserContext;
         return super.parseInternal(element, parserContext);
     }
@@ -52,16 +52,16 @@ public class CustomSecurityProviderDefinitionParser extends CompoundElementDefin
         if (NAME.equals(name))
         {
             this.name = value;
-            if (null != provider)
+            if (null != componentAttributeValue)
             {
                 setName();
             }
         }
         else {
             super.addProperty(builder, name, value, reference);
-            if (PROVIDERS.equals(name))
+            if (componentAttributeName.equals(name))
             {
-                provider = value;
+                componentAttributeValue = value;
                 if (null != this.name)
                 {
                     setName();
@@ -73,7 +73,7 @@ public class CustomSecurityProviderDefinitionParser extends CompoundElementDefin
     //  only set name if not already given
     private void setName()
     {
-        BeanDefinition beanDef = parserContext.getRegistry().getBeanDefinition(provider);
+        BeanDefinition beanDef = parserContext.getRegistry().getBeanDefinition(componentAttributeValue);
         MutablePropertyValues propertyValues = beanDef.getPropertyValues();
         if (!propertyValues.contains(NAME))
         {

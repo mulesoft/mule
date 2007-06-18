@@ -20,7 +20,7 @@ import org.mule.providers.NullPayload;
 import java.util.Map;
 
 /**
- * <code>MessagingException</code> is a general message exception thrown when
+ * <code>MessagingException</code> is a base message exception thrown when
  * errors specific to Message processing occur..
  */
 

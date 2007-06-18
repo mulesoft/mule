@@ -22,7 +22,7 @@ import org.mule.util.object.ObjectFactory;
 import org.mule.util.object.ObjectPool;
 
 /**
- * <code>AbstractProxyFactory</code> provides common behaviour for creating proxy
+ * <code>AbstractProxyFactory</code> provides collection behaviour for creating proxy
  * objects.
  */
 

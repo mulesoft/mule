@@ -7,7 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers;
+package org.mule.config.spring.parsers.specific;
 
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.util.StringUtils;
@@ -16,10 +16,10 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.w3c.dom.Element;
 
 /**
- * The EndpointRef definition parser extends the {@link org.mule.config.spring.parsers.EndpointDefinitionParser} to
+ * The EndpointRef definition parser extends the {@link org.mule.config.spring.parsers.specific.EndpointDefinitionParser} to
  * process refernces to global endpoints.
  *
- * @see org.mule.config.spring.parsers.EndpointDefinitionParser
+ * @see org.mule.config.spring.parsers.specific.EndpointDefinitionParser
  */
 public class EndpointRefDefinitionParser extends EndpointDefinitionParser
 {

@@ -10,8 +10,8 @@
 package org.mule.config.spring.handlers;
 
 import org.mule.config.spring.parsers.JmxAgentDefinitionParser;
-import org.mule.config.spring.parsers.MapEntryDefinitionParser;
-import org.mule.config.spring.parsers.SingleElementDefinitionParser;
+import org.mule.config.spring.parsers.general.SingleElementDefinitionParser;
+import org.mule.config.spring.parsers.collection.MapEntryDefinitionParser;
 import org.mule.impl.internal.admin.EndpointNotificationLoggerAgent;
 import org.mule.impl.internal.admin.Log4jNotificationLoggerAgent;
 import org.mule.management.agents.DefaultJmxSupportAgent;
