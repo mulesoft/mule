@@ -18,11 +18,10 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
- * The pasr used for processing <code><endpoint></code> elements in Mule Xml configuration.
- * This parser is a child bean definition parser which means the endpoint created is always set on the parent object,
- * unless the parent elemet is the root element <code><beans></code> in which case the Endpoint becomes a
- * <i>global Endpoint</i> and is available via the registry.
- * 
+ * The parser used for processing <code>&lt;endpoint&gt;</code> elements in Mule Xml configuration.
+ * This parser is a child bean definition parser which means the endpoint created is always set on the 
+ * parent object, unless the parent elemet is the root element <code>&lt;beans&gt;</code> in which 
+ * case the Endpoint becomes a <em>global Endpoint</em> and is available via the registry.
  */
 public class EndpointDefinitionParser extends AbstractChildBeanDefinitionParser
 {
