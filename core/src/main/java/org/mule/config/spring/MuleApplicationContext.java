@@ -24,7 +24,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractXmlApplicationContext;
 
 /**
- * <code>MuleApplicationContext</code> is A Simple extension Application context
+ * <code>MuleApplicationContext</code> is a simple extension Application context
  * that allows rosurces to be loaded from the Classpath of file system using the
  * MuleBeanDefinitionReader.
  *
@@ -83,15 +83,14 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
             }
             catch (Exception e)
             {
-                //TODO
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                throw new RuntimeException(e);
             }
         }
         else
         {
             beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
         }
-        //hook in our customheirarchical reader
+        //hook in our custom hierarchical reader
         beanDefinitionReader.setDocumentReaderClass(MuleBeanDefinitionDocumentReader.class);
 
         beanDefinitionReader.loadBeanDefinitions(configLocations);
