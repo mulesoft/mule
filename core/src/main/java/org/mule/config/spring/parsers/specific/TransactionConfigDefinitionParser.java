@@ -10,7 +10,7 @@
 package org.mule.config.spring.parsers.specific;
 
 import org.mule.config.i18n.CoreMessages;
-import org.mule.config.spring.parsers.generic.SimpleChildDefinitionParser;
+import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.impl.MuleTransactionConfig;
 import org.mule.util.ClassUtils;
 
@@ -23,7 +23,7 @@ import org.w3c.dom.Element;
 /**
  * This parser is responsible for processing the <code><transaction-config><code> configuration elements.
  */
-public class TransactionConfigDefinitionParser extends SimpleChildDefinitionParser
+public class TransactionConfigDefinitionParser extends ChildDefinitionParser
 {
 
     public TransactionConfigDefinitionParser()

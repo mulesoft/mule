@@ -10,8 +10,8 @@
 package org.mule.providers.vm.config;
 
 import org.mule.config.QueueProfile;
-import org.mule.config.spring.parsers.generic.SimpleChildDefinitionParser;
-import org.mule.config.spring.parsers.generic.SingleElementDefinitionParser;
+import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.providers.vm.VMConnector;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
@@ -24,7 +24,7 @@ public class VmNamespaceHandler extends NamespaceHandlerSupport
 {
     public void init()
     {
-        registerBeanDefinitionParser("connector", new SingleElementDefinitionParser(VMConnector.class, true));
-        registerBeanDefinitionParser("queueProfile", new SimpleChildDefinitionParser("queueProfile", QueueProfile.class));
+        registerBeanDefinitionParser("connector", new OrphanDefinitionParser(VMConnector.class, true));
+        registerBeanDefinitionParser("queueProfile", new ChildDefinitionParser("queueProfile", QueueProfile.class));
     }
 }

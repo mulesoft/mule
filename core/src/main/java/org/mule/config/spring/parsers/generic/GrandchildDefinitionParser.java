@@ -15,10 +15,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 /**
- * An extension to {@line SimpleChildDefinitionParser} which recurses up the DOM
+ * An extension to {@line ChildDefinitionParser} which recurses up the DOM
  * tree until it finds a named parent.
  */
-public class GrandchildDefinitionParser extends SimpleChildDefinitionParser
+public class GrandchildDefinitionParser extends ChildDefinitionParser
 {
     public GrandchildDefinitionParser(String setterMethod, Class clazz)
     {

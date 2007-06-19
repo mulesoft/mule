@@ -9,7 +9,7 @@
  */
 package org.mule.providers.ejb.config;
 
-import org.mule.config.spring.parsers.generic.SingleElementDefinitionParser;
+import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.providers.ejb.EjbConnector;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
@@ -22,6 +22,6 @@ public class EjbNamespaceHandler extends NamespaceHandlerSupport
 {
     public void init()
     {
-        registerBeanDefinitionParser("connector", new SingleElementDefinitionParser(EjbConnector.class, true));
+        registerBeanDefinitionParser("connector", new OrphanDefinitionParser(EjbConnector.class, true));
     }
 }

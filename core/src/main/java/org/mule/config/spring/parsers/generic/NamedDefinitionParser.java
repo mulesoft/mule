@@ -13,12 +13,16 @@ package org.mule.config.spring.parsers.generic;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.w3c.dom.Element;
 
-public class NamedCompoundElementDefinitionParser extends CompoundElementDefinitionParser
+/**
+ * Behaves as {@link org.mule.config.spring.parsers.generic.ParentDefinitionParser},
+ * but allows any named bean to be the parent, rather than using the enclosing element in the DOM tree.
+ */
+public class NamedDefinitionParser extends ParentDefinitionParser
 {
 
     private String name;
 
-    public NamedCompoundElementDefinitionParser(String name)
+    public NamedDefinitionParser(String name)
     {
         this.name = name;
     }

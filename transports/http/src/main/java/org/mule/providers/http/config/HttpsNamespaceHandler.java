@@ -9,8 +9,8 @@
  */
 package org.mule.providers.http.config;
 
-import org.mule.config.spring.parsers.generic.CompoundElementDefinitionParser;
-import org.mule.config.spring.parsers.generic.SingleElementDefinitionParser;
+import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
+import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.providers.http.HttpsConnector;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
@@ -22,11 +22,11 @@ public class HttpsNamespaceHandler extends NamespaceHandlerSupport
 {
     public void init()
     {
-        registerBeanDefinitionParser("connector", new SingleElementDefinitionParser(HttpsConnector.class, true));
-        registerBeanDefinitionParser("tls-key-store", new CompoundElementDefinitionParser());
-        registerBeanDefinitionParser("tls-client", new CompoundElementDefinitionParser());
-        registerBeanDefinitionParser("tls-server", new CompoundElementDefinitionParser());
-        registerBeanDefinitionParser("tls-protocol-handler", new CompoundElementDefinitionParser());
+        registerBeanDefinitionParser("connector", new OrphanDefinitionParser(HttpsConnector.class, true));
+        registerBeanDefinitionParser("tls-key-store", new ParentDefinitionParser());
+        registerBeanDefinitionParser("tls-client", new ParentDefinitionParser());
+        registerBeanDefinitionParser("tls-server", new ParentDefinitionParser());
+        registerBeanDefinitionParser("tls-protocol-handler", new ParentDefinitionParser());
     }
 
 }

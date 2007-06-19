@@ -9,7 +9,7 @@
  */
 package org.mule.config.spring.parsers.collection;
 
-import org.mule.config.spring.parsers.generic.SimpleChildDefinitionParser;
+import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 
 import java.util.Properties;
 
@@ -21,7 +21,7 @@ import org.w3c.dom.Element;
 /**
  * Creates a single Properties object and processes standard Spring Properties sub elements
  */
-public class PropertiesBeanDefinitionParser extends SimpleChildDefinitionParser
+public class PropertiesBeanDefinitionParser extends ChildDefinitionParser
 {
 
     public PropertiesBeanDefinitionParser(String setterMethod)

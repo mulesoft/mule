@@ -9,14 +9,14 @@
  */
 package org.mule.config.spring.parsers.specific;
 
-import org.mule.config.spring.parsers.generic.SimpleChildDefinitionParser;
+import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 
 import org.w3c.dom.Element;
 
 /**
  * Generic router definition parser for parsing all Router elements.
  */
-public class RouterDefinitionParser extends SimpleChildDefinitionParser
+public class RouterDefinitionParser extends ChildDefinitionParser
 {
 
     public RouterDefinitionParser(String setterMethod, Class clazz)

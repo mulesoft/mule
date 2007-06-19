@@ -10,9 +10,9 @@
 
 package org.mule.config.spring.parsers.specific.security;
 
-import org.mule.config.spring.parsers.generic.CompoundElementDefinitionParser;
+import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
 
-public class SecurityFilterDefinitionParser extends CompoundElementDefinitionParser
+public class SecurityFilterDefinitionParser extends ParentDefinitionParser
 {
 
     public SecurityFilterDefinitionParser()

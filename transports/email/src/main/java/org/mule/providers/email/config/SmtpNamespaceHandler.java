@@ -9,7 +9,7 @@
  */
 package org.mule.providers.email.config;
 
-import org.mule.config.spring.parsers.generic.SingleElementDefinitionParser;
+import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.collection.MapEntryDefinitionParser;
 import org.mule.providers.email.SmtpConnector;
 
@@ -23,7 +23,7 @@ public class SmtpNamespaceHandler extends NamespaceHandlerSupport
 {
     public void init()
     {
-        registerBeanDefinitionParser("connector", new SingleElementDefinitionParser(SmtpConnector.class, true));
+        registerBeanDefinitionParser("connector", new OrphanDefinitionParser(SmtpConnector.class, true));
         registerBeanDefinitionParser("header", new MapEntryDefinitionParser("customHeaders", "name", "value"));
     }
 }

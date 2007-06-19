@@ -42,7 +42,7 @@ import org.w3c.dom.Element;
  * set on the parent bean with this bean. Note that the property name can be dynamically resolved depending on the parent
  * element.
  *
- * @see org.mule.config.spring.parsers.generic.SimpleChildDefinitionParser
+ * @see org.mule.config.spring.parsers.generic.ChildDefinitionParser
  * @see org.mule.config.spring.parsers.collection.MapEntryDefinitionParser.KeyValuePair
  * @see AbstractMuleSingleBeanDefinitionParser
  */

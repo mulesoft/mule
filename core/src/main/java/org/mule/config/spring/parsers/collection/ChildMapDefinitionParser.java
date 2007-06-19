@@ -9,7 +9,7 @@
  */
 package org.mule.config.spring.parsers.collection;
 
-import org.mule.config.spring.parsers.generic.SimpleChildDefinitionParser;
+import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +20,7 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /** Creates a single Properties object and processes standard Spring Properties sub elements */
-public class ChildMapDefinitionParser extends SimpleChildDefinitionParser
+public class ChildMapDefinitionParser extends ChildDefinitionParser
 {
 
     public ChildMapDefinitionParser(String setterMethod)

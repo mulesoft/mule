@@ -10,7 +10,7 @@
 package org.mule.config.spring;
 
 import org.mule.util.StringUtils;
-import org.mule.config.spring.parsers.generic.CompoundElementDefinitionParser;
+import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,8 +32,8 @@ import org.w3c.dom.NodeList;
  * There are 4 base DefinitionParsers supplied in Mule that Most Parsers will extend from, these are
  * {@link org.mule.config.spring.parsers.AbstractChildBeanDefinitionParser}
  * {@link org.mule.config.spring.parsers.AbstractMuleSingleBeanDefinitionParser}
- * {@link org.mule.config.spring.parsers.generic.SimpleChildDefinitionParser}
- * {@link org.mule.config.spring.parsers.generic.SingleElementDefinitionParser}
+ * {@link org.mule.config.spring.parsers.generic.ChildDefinitionParser}
+ * {@link org.mule.config.spring.parsers.generic.OrphanDefinitionParser}
  */
 public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinitionParserDelegate
 {
@@ -160,7 +160,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
         //Check to see if the Bean Definition represents a compound element - one represents a subset of
         //configuration for the parent bean. Compound bean definitions should not be registered since the properties
         //set on them are really set on the parent bean.
-        Boolean compoundElement = (Boolean)bd.getAttribute(CompoundElementDefinitionParser.COMPOUND_ELEMENT);
+        Boolean compoundElement = (Boolean)bd.getAttribute(ParentDefinitionParser.COMPOUND_ELEMENT);
         if(Boolean.TRUE.equals(compoundElement))
         {
             return;

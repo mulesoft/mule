@@ -25,10 +25,10 @@ import org.w3c.dom.Element;
 
 /**
  * Processes child property elements in Xml but sets the properties on the parent object.  This is
- * useful when an object has lots of properties and its more readable to break those properties into
+ * useful when an object has lots of properties and it's more readable to break those properties into
  * groups that can be represented as a sub-element in Xml.
  */
-public class CompoundElementDefinitionParser  extends AbstractHierarchicalDefinitionParser
+public class ParentDefinitionParser extends AbstractHierarchicalDefinitionParser
 {
 
     public static final String COMPOUND_ELEMENT = "compound";

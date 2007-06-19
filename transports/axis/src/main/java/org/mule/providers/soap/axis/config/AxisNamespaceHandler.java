@@ -11,7 +11,7 @@
 package org.mule.providers.soap.axis.config;
 
 import org.mule.config.spring.parsers.collection.ListEntryDefinitionParser;
-import org.mule.config.spring.parsers.generic.SingleElementDefinitionParser;
+import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.providers.soap.axis.AxisConnector;
 
 import org.springframework.beans.factory.xml.UtilNamespaceHandler;
@@ -24,7 +24,7 @@ public class AxisNamespaceHandler extends UtilNamespaceHandler // NamespaceHandl
     public void init()
     {
         this.registerBeanDefinitionParser("connector", 
-            new SingleElementDefinitionParser(AxisConnector.class, true));
+            new OrphanDefinitionParser(AxisConnector.class, true));
         this.registerBeanDefinitionParser("beanType", new ListEntryDefinitionParser("beanTypes"));
         this.registerBeanDefinitionParser("supportedScheme", new ListEntryDefinitionParser("supportedSchemes"));
     }

@@ -9,8 +9,8 @@
  */
 package org.mule.providers.ftp.config;
 
-import org.mule.config.spring.parsers.generic.SimpleChildDefinitionParser;
-import org.mule.config.spring.parsers.generic.SingleElementDefinitionParser;
+import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.providers.file.FilenameParser;
 import org.mule.providers.ftp.FtpConnector;
 
@@ -24,8 +24,8 @@ public class FtpNamespaceHandler extends NamespaceHandlerSupport
 {
     public void init()
     {
-        registerBeanDefinitionParser("connector", new SingleElementDefinitionParser(FtpConnector.class, true));
+        registerBeanDefinitionParser("connector", new OrphanDefinitionParser(FtpConnector.class, true));
         registerBeanDefinitionParser("filename-parser",
-                new SimpleChildDefinitionParser("filenameParser", null, FilenameParser.class));
+                new ChildDefinitionParser("filenameParser", null, FilenameParser.class));
     }
 }

@@ -9,8 +9,8 @@
  */
 package org.mule.providers.file.config;
 
-import org.mule.config.spring.parsers.generic.SimpleChildDefinitionParser;
-import org.mule.config.spring.parsers.generic.SingleElementDefinitionParser;
+import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.providers.file.FileConnector;
 import org.mule.providers.file.FilenameParser;
 
@@ -24,8 +24,8 @@ public class FileNamespaceHandler extends NamespaceHandlerSupport
 {
     public void init()
     {
-        registerBeanDefinitionParser("connector", new SingleElementDefinitionParser(FileConnector.class, true));
+        registerBeanDefinitionParser("connector", new OrphanDefinitionParser(FileConnector.class, true));
         registerBeanDefinitionParser("filename-parser",
-                    new SimpleChildDefinitionParser("filenameParser", null, FilenameParser.class));
+                    new ChildDefinitionParser("filenameParser", null, FilenameParser.class));
     }
 }

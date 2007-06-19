@@ -9,7 +9,7 @@
  */
 package org.mule.providers.jdbc.config;
 
-import org.mule.config.spring.parsers.generic.SingleElementDefinitionParser;
+import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.providers.jdbc.JdbcConnector;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
@@ -19,12 +19,12 @@ public class JdbcNamespaceHandler extends NamespaceHandlerSupport
 {
     public void init()
     {
-        registerBeanDefinitionParser("connector", new SingleElementDefinitionParser(JdbcConnector.class, true));
-//        registerBeanDefinitionParser("jndi-resource", new SimpleChildDefinitionParser("jndiResource", JndiResource.class));
+        registerBeanDefinitionParser("connector", new OrphanDefinitionParser(JdbcConnector.class, true));
+//        registerBeanDefinitionParser("jndi-resource", new ChildDefinitionParser("jndiResource", JndiResource.class));
 //        registerBeanDefinitionParser("provider-properties", new ChildMapDefinitionParser("providerProperties"));
     }
 
-//    class JndiResourceDefinitionParser extends SimpleChildDefinitionParser
+//    class JndiResourceDefinitionParser extends ChildDefinitionParser
 //    {
 //        public JndiResourceDefinitionParser(String setterMethod)
 //        {

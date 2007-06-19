@@ -9,8 +9,8 @@
  */
 package org.mule.providers.ssl.config;
 
-import org.mule.config.spring.parsers.generic.CompoundElementDefinitionParser;
-import org.mule.config.spring.parsers.generic.SingleElementDefinitionParser;
+import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
+import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.providers.ssl.SslConnector;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
@@ -22,11 +22,11 @@ public class SslNamespaceHandler extends NamespaceHandlerSupport
 {
     public void init()
     {
-        registerBeanDefinitionParser("connector", new SingleElementDefinitionParser(SslConnector.class, true));
-        registerBeanDefinitionParser("ssl-key-store", new CompoundElementDefinitionParser());
-        registerBeanDefinitionParser("ssl-client", new CompoundElementDefinitionParser());
-        registerBeanDefinitionParser("ssl-server", new CompoundElementDefinitionParser());
-        registerBeanDefinitionParser("ssl-protocol-handler", new CompoundElementDefinitionParser());
+        registerBeanDefinitionParser("connector", new OrphanDefinitionParser(SslConnector.class, true));
+        registerBeanDefinitionParser("ssl-key-store", new ParentDefinitionParser());
+        registerBeanDefinitionParser("ssl-client", new ParentDefinitionParser());
+        registerBeanDefinitionParser("ssl-server", new ParentDefinitionParser());
+        registerBeanDefinitionParser("ssl-protocol-handler", new ParentDefinitionParser());
     }
     
 }

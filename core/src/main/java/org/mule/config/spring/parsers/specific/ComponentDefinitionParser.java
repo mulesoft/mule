@@ -8,11 +8,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config.spring.parsers.generic;
+package org.mule.config.spring.parsers.specific;
 
 import org.mule.util.StringUtils;
 import org.mule.util.object.SimpleObjectFactory;
 import org.mule.util.object.SingletonObjectFactory;
+import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -20,9 +21,9 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-public class ObjectFactoryDefinitionParser extends SimpleChildDefinitionParser
+public class ComponentDefinitionParser extends ChildDefinitionParser
 {
-    public ObjectFactoryDefinitionParser(String setterMethod)
+    public ComponentDefinitionParser(String setterMethod)
     {
         super(setterMethod, null);
         allowClassAttribute = false;

@@ -10,7 +10,7 @@
 package org.mule.config.spring.handlers;
 
 import org.mule.config.spring.parsers.collection.MapEntryDefinitionParser;
-import org.mule.config.spring.parsers.generic.SimpleChildDefinitionParser;
+import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.routing.filters.xml.JXPathFilter;
 
 /**
@@ -21,7 +21,7 @@ public class XmlNamespaceHandler extends AbstractIgnorableNamespaceHandler
 
     public void init()
     {
-        registerBeanDefinitionParser("jxpath-filter", new SimpleChildDefinitionParser("filter", JXPathFilter.class));
+        registerBeanDefinitionParser("jxpath-filter", new ChildDefinitionParser("filter", JXPathFilter.class));
         registerBeanDefinitionParser("namespace", new MapEntryDefinitionParser("namespaces", "prefix", "uri"));
 
     }

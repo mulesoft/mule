@@ -11,13 +11,13 @@
 package org.mule.config.spring.parsers.specific.security;
 
 import org.mule.config.MuleProperties;
-import org.mule.config.spring.parsers.generic.NamedCompoundElementDefinitionParser;
+import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
 
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-public class SecurityManagerDefinitionParser extends NamedCompoundElementDefinitionParser
+public class SecurityManagerDefinitionParser extends NamedDefinitionParser
 {
 
     public SecurityManagerDefinitionParser()

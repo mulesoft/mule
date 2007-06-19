@@ -7,7 +7,7 @@
   * license, a copy of which has been included with this distribution in the
   * LICENSE.txt file.
   */
-package org.mule.config.spring.parsers.generic;
+package org.mule.config.spring.parsers.specific;
 
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;

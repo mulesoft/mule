@@ -9,8 +9,8 @@
  */
 package org.mule.providers.email.config;
 
-import org.mule.config.spring.parsers.generic.CompoundElementDefinitionParser;
-import org.mule.config.spring.parsers.generic.SingleElementDefinitionParser;
+import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
+import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.providers.email.Pop3sConnector;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
@@ -23,8 +23,8 @@ public class Pop3sNamespaceHandler extends NamespaceHandlerSupport
 {
     public void init()
     {
-        registerBeanDefinitionParser("connector", new SingleElementDefinitionParser(Pop3sConnector.class, true));
-        registerBeanDefinitionParser("tls-trust-store", new CompoundElementDefinitionParser());
-        registerBeanDefinitionParser("tls-client", new CompoundElementDefinitionParser());
+        registerBeanDefinitionParser("connector", new OrphanDefinitionParser(Pop3sConnector.class, true));
+        registerBeanDefinitionParser("tls-trust-store", new ParentDefinitionParser());
+        registerBeanDefinitionParser("tls-client", new ParentDefinitionParser());
     }
 }

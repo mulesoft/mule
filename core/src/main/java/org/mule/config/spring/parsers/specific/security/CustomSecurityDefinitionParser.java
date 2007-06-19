@@ -10,7 +10,7 @@
 
 package org.mule.config.spring.parsers.specific.security;
 
-import org.mule.config.spring.parsers.generic.CompoundElementDefinitionParser;
+import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
 
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -19,7 +19,7 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-public class CustomSecurityDefinitionParser extends CompoundElementDefinitionParser
+public class CustomSecurityDefinitionParser extends ParentDefinitionParser
 {
 
     public static final String NAME = "name";
