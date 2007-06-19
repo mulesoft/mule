@@ -15,7 +15,7 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 
 /**
- * <code>VMMessageAdapter</code> provides a collection abstraction of Mule Event
+ * <code>VMMessageAdapter</code> provides a common abstraction of Mule Event
  * message. The message adapter allows a Mule event to be read and manipulated like
  * any other object data type from any external system that has a Mule endpoint
  * implementation.

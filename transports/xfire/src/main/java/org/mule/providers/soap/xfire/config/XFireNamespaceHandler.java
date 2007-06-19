@@ -10,7 +10,7 @@
 
 package org.mule.providers.soap.xfire.config;
 
-import org.mule.config.spring.parsers.collection.ListEntryDefinitionParser;
+import org.mule.config.spring.parsers.ListEntryDefinitionParser;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 

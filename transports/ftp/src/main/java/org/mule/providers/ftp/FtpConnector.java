@@ -332,7 +332,7 @@ public class FtpConnector extends AbstractConnector
      */
     public void enterActiveOrPassiveMode(FTPClient client, UMOImmutableEndpoint endpoint)
     {
-        // well, no endpoint URI here, as we have to use the most collection denominator
+        // well, no endpoint URI here, as we have to use the most common denominator
         // in API :(
         final String passiveString = (String)endpoint.getProperty(FtpConnector.PROPERTY_PASSIVE_MODE);
         if (passiveString == null)
@@ -429,7 +429,7 @@ public class FtpConnector extends AbstractConnector
     {
         int type;
 
-        // well, no endpoint URI here, as we have to use the most collection denominator
+        // well, no endpoint URI here, as we have to use the most common denominator
         // in API :(
         final String binaryTransferString = (String)endpoint.getProperty(FtpConnector.PROPERTY_BINARY_TRANSFER);
         if (binaryTransferString == null)

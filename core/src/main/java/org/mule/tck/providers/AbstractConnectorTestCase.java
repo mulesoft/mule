@@ -31,7 +31,7 @@ import com.mockobjects.dynamic.Mock;
 import java.beans.ExceptionListener;
 
 /**
- * <code>AbstractConnectorTestCase</code> tests collection behaviour of all endpoints
+ * <code>AbstractConnectorTestCase</code> tests common behaviour of all endpoints
  * and provides 'reminder' methods for implementation specific interface methods
  */
 public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase

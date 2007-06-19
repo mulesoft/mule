@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="Test_Mule_Properties" version="1.0">
+
+    <mule-environment-properties serverUrl=""/>
+
+    <container-context className="org.mule.extras.spring.SpringContainerContext">
+        <properties>
+            <property name="configFile" value="securityContext.xml"/>
+        </properties>
+    </container-context>
+
+    <security-manager>
+        <security-provider name="memory-dao" className="org.mule.extras.acegi.AcegiProviderAdapter">
+            <properties>
+                <container-property name="delegate" reference="daoAuthenticationProvider"/>
+            </properties>
+        </security-provider>
+        <encryption-strategy name="PBE" className="org.mule.impl.security.PasswordBasedEncryptionStrategy">
+            <properties>
+                <property name="password" value="mule"/>
+            </properties>
+        </encryption-strategy>
+    </security-manager>
+    
+    <model name="test">
+        <mule-descriptor name="echo" 
+            implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <endpoint address="vm://my.queue">
+                    <security-filter className="org.mule.impl.security.filters.MuleEncryptionEndpointSecurityFilter">
+                        <properties>
+                            <property name="strategyName" value="PBE"/>
+                        </properties>
+                    </security-filter>
+                </endpoint>
+                <endpoint address="http://localhost:4567">
+                    <security-filter className="org.mule.impl.security.filters.MuleEncryptionEndpointSecurityFilter">
+                        <properties>
+                            <property name="strategyName" value="PBE"/>
+                        </properties>
+                    </security-filter>
+                </endpoint>
+            </inbound-router>
+        </mule-descriptor> 
+    </model>
+
+</mule-configuration>

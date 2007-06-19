@@ -10,7 +10,7 @@
 
 package org.mule.extras.acegi.config;
 
-import org.mule.config.spring.parsers.general.SimpleChildDefinitionParser;
+import org.mule.config.spring.parsers.SimpleChildDefinitionParser;
 import org.mule.extras.acegi.AcegiProviderAdapter;
 
 import org.w3c.dom.Element;

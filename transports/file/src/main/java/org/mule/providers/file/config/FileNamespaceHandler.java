@@ -9,8 +9,8 @@
  */
 package org.mule.providers.file.config;
 
-import org.mule.config.spring.parsers.general.SimpleChildDefinitionParser;
-import org.mule.config.spring.parsers.general.SingleElementDefinitionParser;
+import org.mule.config.spring.parsers.SimpleChildDefinitionParser;
+import org.mule.config.spring.parsers.SingleElementDefinitionParser;
 import org.mule.providers.file.FileConnector;
 import org.mule.providers.file.FilenameParser;
 

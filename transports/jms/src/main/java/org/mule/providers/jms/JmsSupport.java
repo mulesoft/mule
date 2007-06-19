@@ -22,7 +22,7 @@ import javax.jms.Session;
 /**
  * <code>JmsSupport</code> is an interface that provides a polymorphic facade to
  * the JMS 1.0.2b and 1.1 API specifications. this interface is not intended for
- * base purpose use and should only be used with the Mule JMS connector.
+ * general purpose use and should only be used with the Mule JMS connector.
  */
 
 public interface JmsSupport

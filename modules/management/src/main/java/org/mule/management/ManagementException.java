@@ -14,7 +14,7 @@ import org.mule.config.i18n.Message;
 import org.mule.umo.UMOException;
 
 /**
- * <code>ManagementException</code> is a base exception thrown by management
+ * <code>ManagementException</code> is a general exception thrown by management
  * extensions
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>

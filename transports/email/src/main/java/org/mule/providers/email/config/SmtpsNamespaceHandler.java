@@ -9,9 +9,9 @@
  */
 package org.mule.providers.email.config;
 
-import org.mule.config.spring.parsers.general.CompoundElementDefinitionParser;
-import org.mule.config.spring.parsers.collection.MapEntryDefinitionParser;
-import org.mule.config.spring.parsers.general.SingleElementDefinitionParser;
+import org.mule.config.spring.parsers.CompoundElementDefinitionParser;
+import org.mule.config.spring.parsers.MapEntryDefinitionParser;
+import org.mule.config.spring.parsers.SingleElementDefinitionParser;
 import org.mule.providers.email.SmtpsConnector;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;

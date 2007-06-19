@@ -36,6 +36,7 @@ import org.mule.umo.security.UnknownAuthenticationTypeException;
 public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecurityFilter
 {
     private UMOEncryptionStrategy strategy;
+//    private String strategyName;
 
     public MuleEncryptionEndpointSecurityFilter()
     {
@@ -117,6 +118,11 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecuri
 
     protected void doInitialise() throws InitialisationException
     {
+//        if (strategyName != null)
+//        {
+//            strategy = endpoint.getManagementContext().getSecurityManager().getEncryptionStrategy(strategyName);
+//        }
+
         if (strategy == null)
         {
             throw new InitialisationException(CoreMessages.encryptionStrategyNotSet(), this);
@@ -133,4 +139,8 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecuri
         this.strategy = strategy;
     }
 
+//    public void setStrategyName(String name)
+//    {
+//        strategyName = name;
+//    }
 }

@@ -9,7 +9,7 @@
  */
 package org.mule.providers.stdio.config;
 
-import org.mule.config.spring.parsers.general.SingleElementDefinitionParser;
+import org.mule.config.spring.parsers.SingleElementDefinitionParser;
 import org.mule.providers.stdio.PromptStdioConnector;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;

@@ -15,7 +15,7 @@ import org.mule.config.i18n.Message;
 /**
  * <code>RecoverableException</code> can be thrown during initialisation to
  * indicate that the error occurred is not fatal and a reactive action can be
- * performed to try and remedy the error. The most collection example would be a
+ * performed to try and remedy the error. The most common example would be a
  * Connector failing to connect due to a JVM_BIND exception.
  */
 public class RecoverableException extends InitialisationException

@@ -14,7 +14,7 @@ import org.mule.util.xa.ResourceManagerSystemException;
 
 /**
  * A Queue manager is responsible for manageing one or more Queue resources and
- * providing collection support fot transactions and persistence
+ * providing common support fot transactions and persistence
  * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>

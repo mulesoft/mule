@@ -9,7 +9,7 @@
  */
 package org.mule.providers.email.config;
 
-import org.mule.config.spring.parsers.general.SingleElementDefinitionParser;
+import org.mule.config.spring.parsers.SingleElementDefinitionParser;
 import org.mule.providers.email.Pop3Connector;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;

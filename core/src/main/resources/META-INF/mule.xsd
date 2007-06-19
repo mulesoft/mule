@@ -429,38 +429,20 @@
     </xsd:complexType>
 
     <xsd:complexType name="securityProviderType">
-        <xsd:annotation>
-            <xsd:documentation>
-                A security provider is a source of a particular security-related functionality.
-            </xsd:documentation>
-        </xsd:annotation>
         <xsd:attribute name="name" type="xsd:string" use="required"/>
     </xsd:complexType>
 
     <xsd:complexType name="encryptionStrategyType">
-        <xsd:annotation>
-            <xsd:documentation>
-                An encryption strategy provides support for a particular encryption algorithm.
-            </xsd:documentation>
-        </xsd:annotation>
         <xsd:attribute name="name" type="xsd:string" use="required"/>
     </xsd:complexType>
 
     <xsd:complexType name="defaultSecurityManagerType">
-        <xsd:annotation>
-            <xsd:documentation>
-                The default security manager (type mule:defaultSecurityManagerType) provides
-                basic support for security functions.  Other modules (eg Acegi, JAAS, PGP)
-                provide more advanced functionality.
-            </xsd:documentation>
-        </xsd:annotation>
         <xsd:complexContent>
             <xsd:extension base="securityManagerType">
                 <xsd:sequence>
                     <xsd:element name="custom-security-provider" type="customSecurityProviderType" minOccurs="0" maxOccurs="unbounded"/>
                     <xsd:element name="custom-encryption-strategy" type="customEncryptionStrategyType" minOccurs="0" maxOccurs="unbounded"/>
                     <xsd:element name="password-encryption-strategy" type="passwordEncryptionStrategyType" minOccurs="0" maxOccurs="unbounded"/>
-                    <xsd:element name="secret-key-encryption-strategy" type="secretKeyEncryptionStrategyType" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
@@ -505,20 +487,6 @@
                 <xsd:attribute name="password" type="xsd:string" use="required"/>
                 <xsd:attribute name="salt" type="xsd:string"/>
                 <xsd:attribute name="iterationCount" type="substitutableInt"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:complexType name="secretKeyEncryptionStrategyType">
-        <xsd:annotation>
-            <xsd:documentation>
-                Provides secret key-based encryption using JCE.
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:complexContent>
-            <xsd:extension base="encryptionStrategyType">
-                <xsd:attribute name="key" type="xsd:string"/>
-                <xsd:attribute name="factory-ref" type="xsd:NMTOKEN"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

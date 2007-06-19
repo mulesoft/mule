@@ -9,8 +9,8 @@
  */
 package org.mule.extras.acegi.config;
 
-import org.mule.config.spring.parsers.general.GrandchildDefinitionParser;
-import org.mule.config.spring.parsers.collection.MapEntryDefinitionParser;
+import org.mule.config.spring.parsers.GrandchildDefinitionParser;
+import org.mule.config.spring.parsers.MapEntryDefinitionParser;
 import org.mule.extras.acegi.filters.http.HttpBasicAuthenticationFilter;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
