@@ -9,7 +9,7 @@
  */
 package org.mule.providers.tcp.config;
 
-import org.mule.config.spring.parsers.SingleElementDefinitionParser;
+import org.mule.config.spring.parsers.generic.SingleElementDefinitionParser;
 import org.mule.providers.tcp.TcpConnector;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;

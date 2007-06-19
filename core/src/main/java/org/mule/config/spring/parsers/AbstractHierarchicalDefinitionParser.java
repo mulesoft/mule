@@ -23,8 +23,8 @@ import org.w3c.dom.Element;
  *
  * Calling classes must set the registry at the start of processing.
  *
- * @see org.mule.config.spring.parsers.SimpleChildDefinitionParser
- * @see org.mule.config.spring.parsers.MapEntryDefinitionParser.KeyValuePair
+ * @see org.mule.config.spring.parsers.generic.SimpleChildDefinitionParser
+ * @see org.mule.config.spring.parsers.collection.MapEntryDefinitionParser.KeyValuePair
  * @see org.mule.config.spring.parsers.AbstractMuleSingleBeanDefinitionParser
  */
 public abstract class AbstractHierarchicalDefinitionParser extends AbstractMuleSingleBeanDefinitionParser

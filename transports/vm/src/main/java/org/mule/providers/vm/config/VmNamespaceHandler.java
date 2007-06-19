@@ -10,8 +10,8 @@
 package org.mule.providers.vm.config;
 
 import org.mule.config.QueueProfile;
-import org.mule.config.spring.parsers.SimpleChildDefinitionParser;
-import org.mule.config.spring.parsers.SingleElementDefinitionParser;
+import org.mule.config.spring.parsers.generic.SimpleChildDefinitionParser;
+import org.mule.config.spring.parsers.generic.SingleElementDefinitionParser;
 import org.mule.providers.vm.VMConnector;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;

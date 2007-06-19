@@ -9,7 +9,7 @@
  */
 package org.mule.providers.rmi.config;
 
-import org.mule.config.spring.parsers.SingleElementDefinitionParser;
+import org.mule.config.spring.parsers.generic.SingleElementDefinitionParser;
 import org.mule.providers.rmi.RmiConnector;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;

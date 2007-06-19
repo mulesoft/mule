@@ -9,8 +9,8 @@
  */
 package org.mule.config.spring;
 
-import org.mule.config.spring.parsers.CompoundElementDefinitionParser;
 import org.mule.util.StringUtils;
+import org.mule.config.spring.parsers.generic.CompoundElementDefinitionParser;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,8 +32,8 @@ import org.w3c.dom.NodeList;
  * There are 4 base DefinitionParsers supplied in Mule that Most Parsers will extend from, these are
  * {@link org.mule.config.spring.parsers.AbstractChildBeanDefinitionParser}
  * {@link org.mule.config.spring.parsers.AbstractMuleSingleBeanDefinitionParser}
- * {@link org.mule.config.spring.parsers.SimpleChildDefinitionParser}
- * {@link org.mule.config.spring.parsers.SingleElementDefinitionParser}
+ * {@link org.mule.config.spring.parsers.generic.SimpleChildDefinitionParser}
+ * {@link org.mule.config.spring.parsers.generic.SingleElementDefinitionParser}
  */
 public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinitionParserDelegate
 {

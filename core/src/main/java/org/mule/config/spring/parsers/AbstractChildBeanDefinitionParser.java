@@ -11,6 +11,8 @@ package org.mule.config.spring.parsers;
 
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
+import org.mule.config.spring.parsers.collection.ListEntryDefinitionParser;
+import org.mule.config.spring.parsers.collection.MapEntryDefinitionParser;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -32,15 +34,16 @@ import org.w3c.dom.Element;
  * This supports collections and Maps. For collections if a child element is repeated it will be assumed
  * that it is a collection.
  *
- * If the Bean Class for this element is set to {@link MapEntryDefinitionParser.KeyValuePair} it is assumed that a Map
+ * If the Bean Class for this element is set to
+ * {@link org.mule.config.spring.parsers.collection.MapEntryDefinitionParser.KeyValuePair} it is assumed that a Map
  * is being processed and any child elements will be added to the parent Map.
  *
  * A single method needs to be overriden called {@link #getPropertyName} that determines the name of the property to
  * set on the parent bean with this bean. Note that the property name can be dynamically resolved depending on the parent
  * element.
  *
- * @see SimpleChildDefinitionParser
- * @see MapEntryDefinitionParser.KeyValuePair
+ * @see org.mule.config.spring.parsers.generic.SimpleChildDefinitionParser
+ * @see org.mule.config.spring.parsers.collection.MapEntryDefinitionParser.KeyValuePair
  * @see AbstractMuleSingleBeanDefinitionParser
  */
 public abstract class AbstractChildBeanDefinitionParser extends AbstractHierarchicalDefinitionParser

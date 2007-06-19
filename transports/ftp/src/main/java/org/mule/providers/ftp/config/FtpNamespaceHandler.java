@@ -9,8 +9,8 @@
  */
 package org.mule.providers.ftp.config;
 
-import org.mule.config.spring.parsers.SimpleChildDefinitionParser;
-import org.mule.config.spring.parsers.SingleElementDefinitionParser;
+import org.mule.config.spring.parsers.generic.SimpleChildDefinitionParser;
+import org.mule.config.spring.parsers.generic.SingleElementDefinitionParser;
 import org.mule.providers.file.FilenameParser;
 import org.mule.providers.ftp.FtpConnector;
 

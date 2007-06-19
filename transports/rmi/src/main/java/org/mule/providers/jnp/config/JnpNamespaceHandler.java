@@ -9,7 +9,7 @@
  */
 package org.mule.providers.jnp.config;
 
-import org.mule.config.spring.parsers.SingleElementDefinitionParser;
+import org.mule.config.spring.parsers.generic.SingleElementDefinitionParser;
 import org.mule.providers.jnp.JnpConnector;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;

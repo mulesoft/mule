@@ -9,8 +9,8 @@
  */
 package org.mule.config.spring.handlers;
 
-import org.mule.config.spring.parsers.MapEntryDefinitionParser;
-import org.mule.config.spring.parsers.SimpleChildDefinitionParser;
+import org.mule.config.spring.parsers.collection.MapEntryDefinitionParser;
+import org.mule.config.spring.parsers.generic.SimpleChildDefinitionParser;
 import org.mule.routing.filters.xml.JXPathFilter;
 
 /**

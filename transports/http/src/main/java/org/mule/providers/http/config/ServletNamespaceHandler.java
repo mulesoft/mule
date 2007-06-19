@@ -9,7 +9,7 @@
  */
 package org.mule.providers.http.config;
 
-import org.mule.config.spring.parsers.SingleElementDefinitionParser;
+import org.mule.config.spring.parsers.generic.SingleElementDefinitionParser;
 import org.mule.providers.http.servlet.ServletConnector;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;

@@ -10,8 +10,8 @@
 
 package org.mule.providers.soap.axis.config;
 
-import org.mule.config.spring.parsers.ListEntryDefinitionParser;
-import org.mule.config.spring.parsers.SingleElementDefinitionParser;
+import org.mule.config.spring.parsers.collection.ListEntryDefinitionParser;
+import org.mule.config.spring.parsers.generic.SingleElementDefinitionParser;
 import org.mule.providers.soap.axis.AxisConnector;
 
 import org.springframework.beans.factory.xml.UtilNamespaceHandler;

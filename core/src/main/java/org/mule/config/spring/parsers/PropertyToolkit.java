@@ -56,32 +56,32 @@ public class PropertyToolkit
         valueMappings.put(propertyName, new ValueMap(propertyName, mappings));
     }
 
-    protected void registerAttributeMapping(String alias, String propertyName)
+    public void registerAttributeMapping(String alias, String propertyName)
     {
         attributeMappings.put(alias, propertyName);
     }
 
-    protected void registerCollection(String propertyName)
+    public void registerCollection(String propertyName)
     {
         collections.add(propertyName);
     }
 
-    protected void registerIgnored(String propertyName)
+    public void registerIgnored(String propertyName)
     {
         ignored.add(propertyName);
     }
 
-    protected String getAttributeMapping(String alias)
+    public String getAttributeMapping(String alias)
     {
         return attributeMappings.getProperty(alias, alias);
     }
 
-    protected boolean isCollection(String propertyName)
+    public boolean isCollection(String propertyName)
     {
         return collections.contains(propertyName);
     }
 
-    protected boolean isIgnored(String propertyName)
+    public boolean isIgnored(String propertyName)
     {
         return ignored.contains(propertyName);
     }
@@ -90,7 +90,7 @@ public class PropertyToolkit
      * A property can be explicitly registered as a bean reference via registerBeanReference()
      * or it can simply use the "-ref" suffix.
      */
-    protected boolean isBeanReference(String attributeName)
+    public boolean isBeanReference(String attributeName)
     {
         return (beanReferences.contains(attributeName) || attributeName.endsWith(ATTRIBUTE_REF_SUFFIX));
     }
@@ -107,7 +107,7 @@ public class PropertyToolkit
      * @param attributeName the attribute name taken straight from the XML element being parsed; will never be <code>null</code>
      * @return the extracted JavaBean property name; must never be <code>null</code>
      */
-    protected String extractPropertyName(String attributeName)
+    public String extractPropertyName(String attributeName)
     {
         // Remove the bean reference suffix if any.
         attributeName = org.mule.util.StringUtils.chomp(attributeName, ATTRIBUTE_REF_SUFFIX);
@@ -117,7 +117,7 @@ public class PropertyToolkit
         return Conventions.attributeNameToPropertyName(attributeName);
     }
 
-    protected String extractPropertyValue(String attributeName, String attributeValue)
+    public String extractPropertyValue(String attributeName, String attributeValue)
     {
         ValueMap vm = (ValueMap) valueMappings.get(attributeName);
         if(vm!=null)

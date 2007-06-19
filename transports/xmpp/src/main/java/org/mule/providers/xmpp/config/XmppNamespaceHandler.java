@@ -10,7 +10,7 @@
 
 package org.mule.providers.xmpp.config;
 
-import org.mule.config.spring.parsers.SingleElementDefinitionParser;
+import org.mule.config.spring.parsers.generic.SingleElementDefinitionParser;
 import org.mule.providers.xmpp.XmppConnector;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
