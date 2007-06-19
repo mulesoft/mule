@@ -12,20 +12,6 @@
     <name>Mule 1 to Mule 2 Migration Support</name>
     <description>A module to help briding users from Mule 1.x to Mule 2.0</description>
 
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <!-- Autowire configuration is not supported at the moment. See MULE-1852 -->
-                        <exclude>**/SpringAutowireConfigBuilderTestCase.*</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>
