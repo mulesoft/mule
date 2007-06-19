@@ -73,7 +73,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     /**
      * The properties for the Mule UMO.
      * 
-     * @deprecated Properties for the underlying service should be set on the ServiceFactory instead.
+     * @deprecated MULE-1933 Properties for the underlying service should be set on the ServiceFactory instead.
      */
     protected Map properties = new HashMap();
 
@@ -266,7 +266,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
      *      due to a Spring quirk where the property is not found if specified as a
      *      map
      *      
-     * @deprecated Properties for the underlying service should be set on the ServiceFactory instead.
+     * @deprecated MULE-1933 Properties for the underlying service should be set on the ServiceFactory instead.
      */
     public Map getProperties()
     {

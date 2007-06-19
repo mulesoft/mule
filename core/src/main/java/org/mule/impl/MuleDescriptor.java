@@ -108,7 +108,7 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
     }
 
     /*
-     * @deprecated Properties for the underlying service should be set on the ServiceFactory instead.
+     * @deprecated MULE-1933 Properties for the underlying service should be set on the ServiceFactory instead.
      */
     public void setProperties(Map props)
     {

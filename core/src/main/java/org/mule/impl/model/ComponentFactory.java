@@ -43,7 +43,7 @@ public final class ComponentFactory
         {
             component = descriptor.getServiceFactory().create();
             
-            // TODO Would be nice to remove this eventually.
+            // TODO MULE-1933 Would be nice to remove this eventually.
             BeanUtils.populate(component, descriptor.getProperties());
         }
         catch (Exception e)
