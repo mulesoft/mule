@@ -10,13 +10,13 @@
 package org.mule.config.spring.parsers;
 
 import java.util.Collection;
-import java.util.HashSet;
 
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.Assert;
 import org.w3c.dom.Element;
@@ -65,7 +65,7 @@ public class CompoundElementDefinitionParser  extends AbstractHierarchicalDefini
             {
                 if (propertyToolkit.isCollection(name))
                 {
-                    Collection values = new HashSet();
+                    Collection values = new ManagedList();
                     if (parentProperties.contains(name))
                     {
                         values = (Collection) parentProperties.getPropertyValue(name).getValue();

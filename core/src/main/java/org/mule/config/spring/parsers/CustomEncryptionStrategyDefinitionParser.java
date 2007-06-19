@@ -10,17 +10,17 @@
 
 package org.mule.config.spring.parsers;
 
-public class CustomSecurityProviderDefinitionParser extends CustomSecurityDefinitionParser
+public class CustomEncryptionStrategyDefinitionParser extends CustomSecurityDefinitionParser
 {
 
-    public static final String PROVIDER = "provider";
-    public static final String PROVIDERS = "providers";
+    public static final String STRATEGY = "strategy";
+    public static final String STRATEGIES = "encryptionStrategies";
 
-    public CustomSecurityProviderDefinitionParser()
+    public CustomEncryptionStrategyDefinitionParser()
     {
-        super(PROVIDERS);
-        withAlias(PROVIDER, PROVIDERS);
-        withCollection(PROVIDERS);
+        super(STRATEGIES);
+        withAlias(STRATEGY, STRATEGIES);
+        withCollection(STRATEGIES);
     }
 
 }

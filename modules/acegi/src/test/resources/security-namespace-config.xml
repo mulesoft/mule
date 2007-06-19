@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
+
+    <bean name="dummySecurityProvider" class="org.mule.impl.security.MockSecurityProvider"/>
+    <bean name="dummyEncryptionStrategy" class="org.mule.impl.security.MockEncryptionStrategy"/>
+    <bean name="dummyKeyFactory" class="org.mule.impl.security.MockKeyFactory"/>
+
+    <mule:security-manager xsi:type="mule:defaultSecurityManagerType">
+        <mule:custom-security-provider name="dummySecurityProvider"
+                                       provider-ref="dummySecurityProvider"/>
+        <mule:custom-encryption-strategy name="dummyEncryptionStrategy"
+                                         strategy-ref="dummyEncryptionStrategy"/>
+        <mule:secret-key-encryption-strategy name="secretKeyEncryptionStrategy"
+                                             key="key" keyFactory-ref="dummyKeyFactory"/>
+        <mule:password-encryption-strategy  name="passwordEncryptionStrategy"
+                                            password="password" salt="saltsalt" iterationCount="2"/>
+    </mule:security-manager>
+
+</beans>

@@ -13,6 +13,7 @@ import org.mule.config.MuleProperties;
 import org.mule.config.QueueProfile;
 import org.mule.config.spring.parsers.ConfigurationDefinitionParser;
 import org.mule.config.spring.parsers.ConnectionStrategyDefinitionParser;
+import org.mule.config.spring.parsers.CustomEncryptionStrategyDefinitionParser;
 import org.mule.config.spring.parsers.CustomSecurityProviderDefinitionParser;
 import org.mule.config.spring.parsers.EndpointDefinitionParser;
 import org.mule.config.spring.parsers.EndpointRefDefinitionParser;
@@ -44,6 +45,7 @@ import org.mule.impl.model.seda.SedaModel;
 import org.mule.impl.model.seda.optimised.OptimisedSedaModel;
 import org.mule.impl.model.streaming.StreamingModel;
 import org.mule.impl.security.PasswordBasedEncryptionStrategy;
+import org.mule.impl.security.SecretKeyEncryptionStrategy;
 import org.mule.impl.security.filters.MuleEncryptionEndpointSecurityFilter;
 import org.mule.providers.SimpleRetryConnectionStrategy;
 import org.mule.routing.ForwardingCatchAllStrategy;
@@ -248,8 +250,9 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         //Security
         registerBeanDefinitionParser("security-manager", new SecurityManagerDefinitionParser());
         registerBeanDefinitionParser("custom-security-provider", new CustomSecurityProviderDefinitionParser());
-        //registerBeanDefinitionParser("custom-encryption-strategy", new CustomSecurityProviderDefinitionParser());
-        registerBeanDefinitionParser("password-encryption-strategy", new SimpleChildDefinitionParser("encryptionStrategies", PasswordBasedEncryptionStrategy.class));
+        registerBeanDefinitionParser("custom-encryption-strategy", new CustomEncryptionStrategyDefinitionParser());
+        registerBeanDefinitionParser("password-encryption-strategy", new SimpleChildDefinitionParser("encryptionStrategies", PasswordBasedEncryptionStrategy.class).withCollection("mule:password-encryption-strategy"));
+        registerBeanDefinitionParser("secret-key-encryption-strategy", new SimpleChildDefinitionParser("encryptionStrategies", SecretKeyEncryptionStrategy.class).withCollection("mule:secret-key-encryption-strategy"));
         registerBeanDefinitionParser("security-filter", new SecurityFilterDefinitionParser());
         registerBeanDefinitionParser("encryption-security-filter", new GrandchildDefinitionParser("securityFilter", MuleEncryptionEndpointSecurityFilter.class));
     }
