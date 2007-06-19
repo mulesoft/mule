@@ -15,19 +15,19 @@ import org.mule.tck.AbstractMuleTestCase;
 public class RegExFilterTestCase extends AbstractMuleTestCase
 {
 
-   public void testRegexFilterNoPattern()
+    public void testRegexFilterNoPattern()
     {
         // start with default
         RegExFilter filter = new RegExFilter();
-        assertNull(filter.getExpression());
+        assertNull(filter.getPattern());
         assertFalse(filter.accept("No tengo dinero"));
 
         // activate a pattern
-        filter.setExpression("(.*) brown fox");
+        filter.setPattern("(.*) brown fox");
         assertTrue(filter.accept("The quick brown fox"));
 
         // remove pattern again, i.e. block all
-        filter.setExpression(null);
+        filter.setPattern(null);
         assertFalse(filter.accept("oh-oh"));
     }
 
@@ -35,7 +35,7 @@ public class RegExFilterTestCase extends AbstractMuleTestCase
     {
 
         RegExFilter filter = new RegExFilter("The quick (.*)");
-        assertNotNull(filter.getExpression());
+        assertNotNull(filter.getPattern());
 
         assertTrue(filter.accept("The quick brown fox"));
         assertTrue(filter.accept("The quick "));
@@ -43,21 +43,21 @@ public class RegExFilterTestCase extends AbstractMuleTestCase
         assertTrue(!filter.accept("The quickbrown fox"));
         assertTrue(!filter.accept("he quick brown fox"));
 
-        filter.setExpression("(.*) brown fox");
+        filter.setPattern("(.*) brown fox");
         assertTrue(filter.accept("The quick brown fox"));
         assertTrue(filter.accept(" brown fox"));
 
         assertTrue(!filter.accept("The quickbrown fox"));
         assertTrue(!filter.accept("The quick brown fo"));
 
-        filter.setExpression("(.*) brown (.*)");
+        filter.setPattern("(.*) brown (.*)");
         assertTrue(filter.accept("The quick brown fox"));
         assertTrue(filter.accept("(.*) brown fox"));
 
         assertTrue(!filter.accept("The quickbrown fox"));
         assertTrue(filter.accept("The quick brown fo"));
 
-        filter.setExpression("(.*)");
+        filter.setPattern("(.*)");
         assertTrue(filter.accept("The quick brown fox"));
     }
 }

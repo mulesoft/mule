@@ -17,12 +17,12 @@ import java.util.regex.Pattern;
 
 /**
  * <code>RegExFilter</code> is used to match a String argument against a regular
- * expression.
+ * pattern.
  */
 
 public class RegExFilter implements UMOFilter, ObjectFilter
 {
-    private Pattern expression;
+    private Pattern pattern;
 
     public RegExFilter()
     {
@@ -31,7 +31,7 @@ public class RegExFilter implements UMOFilter, ObjectFilter
 
     public RegExFilter(String pattern)
     {
-        this.expression = Pattern.compile(pattern);
+        this.pattern = Pattern.compile(pattern);
     }
 
     public boolean accept(UMOMessage message)
@@ -46,17 +46,35 @@ public class RegExFilter implements UMOFilter, ObjectFilter
             return false;
         }
 
-        return (expression != null && expression.matcher(object.toString()).find());
+        return (pattern != null && pattern.matcher(object.toString()).find());
     }
 
+    public String getPattern()
+    {
+        return (pattern == null ? null : pattern.pattern());
+    }
+
+    public void setPattern(String pattern)
+    {
+        this.pattern = (pattern != null ? Pattern.compile(pattern) : null);
+    }
+
+    /**
+     * @return
+     * @deprecated Use {@link #getPattern()} This method name was changed to be consistent with other filters
+     */
     public String getExpression()
     {
-        return (expression == null ? null : expression.pattern());
+        return getPattern();
     }
 
+    /**
+     * @param
+     * @deprecated Use {@link #getPattern()} This method name was changed to be consistent with other filters
+     */
     public void setExpression(String expression)
     {
-        this.expression = (expression != null ? Pattern.compile(expression) : null);
+        setPattern(expression);
     }
 
 }

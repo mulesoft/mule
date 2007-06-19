@@ -38,11 +38,11 @@ public class MailSubjectRegExFilter extends AbstractMailFilter
 
     public void setExpression(String pattern)
     {
-        filter.setExpression(pattern);
+        filter.setPattern(pattern);
     }
 
     public String getExpression()
     {
-        return filter.getExpression();
+        return filter.getPattern();
     }
 }
