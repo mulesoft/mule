@@ -20,35 +20,33 @@ import org.mule.config.i18n.Message;
  */
 public class InitialisationException extends LifecycleException
 {
-    /**
-     * Serial version
-     */
+    /** Serial version */
     private static final long serialVersionUID = -8402348927606781931L;
 
     /**
-     * @param message the exception message
+     * @param message   the exception message
      * @param component the object that failed during a lifecycle method call
      */
-    public InitialisationException(Message message, Object component)
+    public InitialisationException(Message message, Initialisable component)
     {
         super(message, component);
     }
 
     /**
-     * @param message the exception message
-     * @param cause the exception that cause this exception to be thrown
+     * @param message   the exception message
+     * @param cause     the exception that cause this exception to be thrown
      * @param component the object that failed during a lifecycle method call
      */
-    public InitialisationException(Message message, Throwable cause, Object component)
+    public InitialisationException(Message message, Throwable cause, Initialisable component)
     {
         super(message, cause, component);
     }
 
     /**
-     * @param cause the exception that cause this exception to be thrown
+     * @param cause     the exception that cause this exception to be thrown
      * @param component the object that failed during a lifecycle method call
      */
-    public InitialisationException(Throwable cause, Object component)
+    public InitialisationException(Throwable cause, Initialisable component)
     {
         super(cause, component);
     }

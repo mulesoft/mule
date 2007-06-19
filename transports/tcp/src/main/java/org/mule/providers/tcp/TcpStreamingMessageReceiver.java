@@ -17,7 +17,7 @@ import org.mule.providers.tcp.i18n.TcpMessages;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.util.StringUtils;
@@ -44,11 +44,11 @@ public class TcpStreamingMessageReceiver extends AbstractPollingMessageReceiver
     protected TcpProtocol protocol = null;
 
     public TcpStreamingMessageReceiver(UMOConnector connector,
-                                        UMOComponent component,
-                                        UMOEndpoint endpoint) throws InitialisationException
+                                       UMOComponent component,
+                                       UMOEndpoint endpoint) throws CreateException
     {
         super(connector, component, endpoint);
-        protocol = ((TcpConnector)connector).getTcpProtocol();
+        protocol = ((TcpConnector) connector).getTcpProtocol();
     }
 
     protected void doDispose()
@@ -66,7 +66,7 @@ public class TcpStreamingMessageReceiver extends AbstractPollingMessageReceiver
             logger.debug("Attempting to connect to server socket");
             InetAddress inetAddress = InetAddress.getByName(host);
             clientSocket = new Socket(inetAddress, uri.getPort());
-            TcpConnector connector = (TcpConnector)this.connector;
+            TcpConnector connector = (TcpConnector) this.connector;
             clientSocket.setReceiveBufferSize(connector.getReceiveBufferSize());
             clientSocket.setSendBufferSize(connector.getSendBufferSize());
             clientSocket.setSoTimeout(connector.getServerSoTimeout());
@@ -104,7 +104,7 @@ public class TcpStreamingMessageReceiver extends AbstractPollingMessageReceiver
         // TODO AC: this seems wrong since 0 is ignored as value
         setFrequency(0); // make sure this is zero and not overridden via config
         // TODO AC: check if this cast is ok
-        byte[] data = (byte[])protocol.read(dataIn);
+        byte[] data = (byte[]) protocol.read(dataIn);
         if (data != null)
         {
             UMOMessageAdapter adapter = connector.getMessageAdapter(data);

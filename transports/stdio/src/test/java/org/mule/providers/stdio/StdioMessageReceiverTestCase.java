@@ -17,7 +17,7 @@ import org.mule.tck.providers.AbstractMessageReceiverTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
 
@@ -35,7 +35,7 @@ public class StdioMessageReceiverTestCase extends AbstractMessageReceiverTestCas
 
     public void testOtherProperties() throws Exception
     {
-        StdioMessageReceiver receiver = (StdioMessageReceiver)getMessageReceiver();
+        StdioMessageReceiver receiver = (StdioMessageReceiver) getMessageReceiver();
 
         MuleDescriptor descriptor = getTestDescriptor("orange", Orange.class.getName());
         assertNotNull(descriptor);
@@ -60,7 +60,7 @@ public class StdioMessageReceiverTestCase extends AbstractMessageReceiverTestCas
      * 
      * @see org.mule.tck.providers.AbstractMessageReceiverTestCase#getMessageReceiver()
      */
-    public UMOMessageReceiver getMessageReceiver() throws InitialisationException
+    public UMOMessageReceiver getMessageReceiver() throws CreateException
     {
         return new StdioMessageReceiver(endpoint.getConnector(), component, endpoint, 1000);
     }

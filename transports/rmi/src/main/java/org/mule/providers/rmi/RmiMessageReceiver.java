@@ -17,7 +17,7 @@ import org.mule.providers.ConnectException;
 import org.mule.providers.rmi.i18n.RmiMessages;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.util.ClassUtils;
 
@@ -48,11 +48,11 @@ public class RmiMessageReceiver extends AbstractPollingMessageReceiver
     public RmiMessageReceiver(UMOConnector connector,
                               UMOComponent component,
                               UMOEndpoint endpoint,
-                              long frequency) throws InitialisationException
+                              long frequency) throws CreateException
     {
         super(connector, component, endpoint);
         this.setFrequency(frequency);
-        this.connector = (RmiConnector)connector;
+        this.connector = (RmiConnector) connector;
     }
 
     protected void doDispose()
@@ -71,11 +71,11 @@ public class RmiMessageReceiver extends AbstractPollingMessageReceiver
         }
 
         String methodName = MapUtils.getString(endpoint.getEndpointURI().getParams(),
-            MuleProperties.MULE_METHOD_PROPERTY, null);
+                MuleProperties.MULE_METHOD_PROPERTY, null);
 
         if (null == methodName)
         {
-            methodName = (String)endpoint.getProperty(MuleProperties.MULE_METHOD_PROPERTY);
+            methodName = (String) endpoint.getProperty(MuleProperties.MULE_METHOD_PROPERTY);
 
             if (null == methodName)
             {
@@ -85,14 +85,14 @@ public class RmiMessageReceiver extends AbstractPollingMessageReceiver
 
         remoteObject = connector.getRemoteObject(getEndpoint());
 
-        List args = (List)endpoint.getProperty(RmiConnector.PROPERTY_SERVICE_METHOD_PARAMS_LIST);
+        List args = (List) endpoint.getProperty(RmiConnector.PROPERTY_SERVICE_METHOD_PARAMS_LIST);
 
         Class[] argTypes = new Class[]{};
 
         if (args == null)
         {
             logger.info(RmiConnector.PROPERTY_SERVICE_METHOD_PARAMS_LIST
-                        + " not set on endpoint, assuming method call has no arguments");
+                    + " not set on endpoint, assuming method call has no arguments");
             methodArguments = ClassUtils.NO_ARGS;
         }
         else
@@ -131,7 +131,7 @@ public class RmiMessageReceiver extends AbstractPollingMessageReceiver
     /**
      * Returns the method arguments to use when invoking the method on the Remote
      * object. This method can be overloaded to enable dynamic method arguments
-     * 
+     *
      * @return
      */
     protected Object[] getMethodArguments()

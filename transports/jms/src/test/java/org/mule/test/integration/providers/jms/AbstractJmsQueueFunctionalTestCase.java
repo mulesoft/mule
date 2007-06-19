@@ -16,7 +16,7 @@ import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
@@ -57,11 +57,11 @@ public abstract class AbstractJmsQueueFunctionalTestCase extends AbstractJmsFunc
         // check replyTo
         if (useTopics())
         {
-            mc = JmsTestUtils.getTopicSubscriber((TopicConnection)cnn, getOutDest().getAddress());
+            mc = JmsTestUtils.getTopicSubscriber((TopicConnection) cnn, getOutDest().getAddress());
         }
         else
         {
-            mc = JmsTestUtils.getQueueReceiver((QueueConnection)cnn, getOutDest().getAddress());
+            mc = JmsTestUtils.getQueueReceiver((QueueConnection) cnn, getOutDest().getAddress());
         }
         mc.setMessageListener(new MessageListener()
         {
@@ -81,7 +81,7 @@ public abstract class AbstractJmsQueueFunctionalTestCase extends AbstractJmsFunc
 
         assertNotNull(currentMsg);
         assertTrue(currentMsg instanceof TextMessage);
-        assertEquals(DEFAULT_MESSAGE + " Received", ((TextMessage)currentMsg).getText());
+        assertEquals(DEFAULT_MESSAGE + " Received", ((TextMessage) currentMsg).getText());
 
         assertTrue(callbackCalled);
     }
@@ -109,11 +109,11 @@ public abstract class AbstractJmsQueueFunctionalTestCase extends AbstractJmsFunc
         // check replyTo
         if (useTopics())
         {
-            mc = JmsTestUtils.getTopicSubscriber((TopicConnection)cnn, "replyto");
+            mc = JmsTestUtils.getTopicSubscriber((TopicConnection) cnn, "replyto");
         }
         else
         {
-            mc = JmsTestUtils.getQueueReceiver((QueueConnection)cnn, "replyto");
+            mc = JmsTestUtils.getQueueReceiver((QueueConnection) cnn, "replyto");
         }
         mc.setMessageListener(new MessageListener()
         {
@@ -134,7 +134,7 @@ public abstract class AbstractJmsQueueFunctionalTestCase extends AbstractJmsFunc
 
         assertNotNull(currentMsg);
         assertTrue(currentMsg instanceof TextMessage);
-        assertEquals(DEFAULT_MESSAGE + " Received", ((TextMessage)currentMsg).getText());
+        assertEquals(DEFAULT_MESSAGE + " Received", ((TextMessage) currentMsg).getText());
         assertTrue(callbackCalled);
     }
 
@@ -147,7 +147,7 @@ public abstract class AbstractJmsQueueFunctionalTestCase extends AbstractJmsFunc
     {
         public JmsMessageReceiverSynchronous(UMOConnector connector,
                                              UMOComponent component,
-                                             UMOEndpoint endpoint) throws InitialisationException
+                                             UMOEndpoint endpoint) throws CreateException
         {
             super(connector, component, endpoint);
         }

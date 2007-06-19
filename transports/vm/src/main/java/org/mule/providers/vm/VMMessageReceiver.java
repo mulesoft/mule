@@ -19,7 +19,7 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueSession;
@@ -41,7 +41,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
     private final Object lock = new Object();
 
     public VMMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
-        throws InitialisationException
+            throws CreateException
     {
         super(connector, component, endpoint);
         // compare with superclass' implementation - is this really correct?
@@ -66,7 +66,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
             if (logger.isDebugEnabled())
             {
                 logger.debug("Current queue depth for queue: " + endpoint.getEndpointURI().getAddress()
-                                + " is: " + q.size());
+                        + " is: " + q.size());
             }
         }
     }
@@ -94,7 +94,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
             catch (InterruptedException e)
             {
                 throw new MuleException(CoreMessages.interruptedQueuingEventFor(this.endpoint
-                    .getEndpointURI()), e);
+                        .getEndpointURI()), e);
             }
         }
         else
@@ -110,7 +110,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
     public Object onCall(UMOEvent event) throws UMOException
     {
         return routeMessage(new MuleMessage(event.getTransformedMessage(), event.getMessage()), event
-            .isSynchronous());
+                .isSynchronous());
     }
 
     protected List getMessages() throws Exception

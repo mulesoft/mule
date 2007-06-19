@@ -17,7 +17,7 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.provider.UMOConnector;
 
@@ -48,11 +48,11 @@ public class JbiMessageReceiver extends AbstractMessageReceiver implements Work
     private DeliveryChannel deliveryChannel;
 
     public JbiMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
-        throws InitialisationException
+            throws CreateException
     {
         super(connector, component, endpoint);
         name = component.getDescriptor().getName() + ".jbiReceiver";
-        this.connector = (JbiConnector)connector;
+        this.connector = (JbiConnector) connector;
         context = this.connector.getComponentContext();
         deliveryChannel = this.connector.getDeliveryChannel();
     }
@@ -170,7 +170,7 @@ public class JbiMessageReceiver extends AbstractMessageReceiver implements Work
     {
         if (e instanceof Fault)
         {
-            me.setFault((Fault)e);
+            me.setFault((Fault) e);
         }
         else
         {

@@ -20,7 +20,7 @@ import org.mule.providers.http.servlet.ServletConnector;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.util.StringUtils;
@@ -34,7 +34,6 @@ import org.mortbay.util.InetAddrPort;
 /**
  * <code>HttpMessageReceiver</code> is a simple http server that can be used to
  * listen for http requests on a particular port
- * 
  */
 public class JettyHttpMessageReceiver extends AbstractMessageReceiver
 {
@@ -43,8 +42,9 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
     private Server httpServer;
 
     public JettyHttpMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
-        throws InitialisationException
+            throws CreateException
     {
+
         super(connector, component, endpoint);
 
         if ("rest".equals(endpoint.getEndpointURI().getScheme()))
@@ -52,9 +52,10 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
             // We need tohave  a Servlet Connector pointing to our servlet so the Servlets can
             // find the listeners for incoming requests
             ServletConnector scon = (ServletConnector) RegistryContext.getRegistry().lookupConnector(JETTY_SERVLET_CONNECTOR_NAME);
-            if(scon!=null) {
-                throw new InitialisationException(
-                    HttpMessages.noServletConnectorFound(JETTY_SERVLET_CONNECTOR_NAME), this);
+            if (scon != null)
+            {
+                throw new CreateException(
+                        HttpMessages.noServletConnectorFound(JETTY_SERVLET_CONNECTOR_NAME), this);
             }
 
             scon = new ServletConnector();
@@ -76,7 +77,7 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
             }
             catch (Exception e)
             {
-                throw new InitialisationException(e, this);
+                throw new CreateException(e, this);
             }
         }
 
@@ -86,11 +87,11 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
     {
         httpServer = new Server();
         SocketListener socketListener = new SocketListener(new InetAddrPort(endpoint.getEndpointURI()
-            .getPort()));
+                .getPort()));
 
         // apply Threading settings
         ThreadingProfile tp = connector.getReceiverThreadingProfile();
-        socketListener.setMaxIdleTimeMs((int)tp.getThreadTTL());
+        socketListener.setMaxIdleTimeMs((int) tp.getThreadTTL());
         int threadsActive = tp.getMaxThreadsActive();
         int threadsMin = socketListener.getMinThreads();
         if (threadsMin >= threadsActive)
@@ -138,7 +139,6 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
     {
         // stop is automativcally called by Mule
     }
-
 
 
     /**

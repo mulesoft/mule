@@ -23,9 +23,7 @@ import java.util.Map;
 
 import javax.management.remote.rmi.RMIConnectorServer;
 
-/**
- * TODO document.
- */
+/** TODO document. */
 public class DefaultJmxSupportAgent extends AbstractAgent
 {
 
@@ -102,12 +100,12 @@ public class DefaultJmxSupportAgent extends AbstractAgent
      * There is no guarantee that by throwing a Recoverable exception that the Mule
      * instance will not shut down.
      *
-     * @throws org.mule.umo.lifecycle.InitialisationException if a fatal error occurs
-     *             causing the Mule instance to shutdown
-     * @throws org.mule.umo.lifecycle.RecoverableException if an error occurs that
-     *             can be recovered from
+     * @throws org.mule.umo.lifecycle.InitialisationException
+     *          if a fatal error occurs
+     *          causing the Mule instance to shutdown
      */
-    public void initialise() throws InitialisationException {
+    public void initialise() throws InitialisationException
+    {
 
         try
         {
@@ -176,7 +174,7 @@ public class DefaultJmxSupportAgent extends AbstractAgent
             mergedProps.putAll(props);
             RMIClientSocketFactory factory = new FixedHostRmiClientSocketFactory(host);
             mergedProps.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE,
-                            factory);
+                    factory);
             agent.setConnectorServerProperties(mergedProps);
         }
 
@@ -185,8 +183,8 @@ public class DefaultJmxSupportAgent extends AbstractAgent
         {
             remotingUri =
                     MessageFormat.format("service:jmx:rmi:///jndi/rmi://{0}:{1}/server",
-                                         new Object[] {StringUtils.defaultString(host, DEFAULT_HOST),
-                                                       StringUtils.defaultString(port, DEFAULT_PORT)});
+                            new Object[]{StringUtils.defaultString(host, DEFAULT_HOST),
+                                    StringUtils.defaultString(port, DEFAULT_PORT)});
         }
 
         if (credentials != null && !credentials.isEmpty())

@@ -61,9 +61,9 @@ public class PGPSecurityProvider implements UMOSecurityProvider
      */
     public UMOAuthentication authenticate(UMOAuthentication authentication) throws SecurityException
     {
-        PGPAuthentication auth = (PGPAuthentication)authentication;
+        PGPAuthentication auth = (PGPAuthentication) authentication;
 
-        String userId = (String)auth.getPrincipal();
+        String userId = (String) auth.getPrincipal();
 
         if (userId == null)
         {
@@ -77,7 +77,7 @@ public class PGPSecurityProvider implements UMOSecurityProvider
             throw new UnauthorisedException(PGPMessages.noPublicKeyForUser(userId));
         }
 
-        Message msg = (Message)auth.getCredentials();
+        Message msg = (Message) auth.getCredentials();
 
         if (!((msg != null) && msg instanceof SignedMessage))
         {
@@ -86,7 +86,7 @@ public class PGPSecurityProvider implements UMOSecurityProvider
 
         try
         {
-            if (!((SignedMessage)msg).verify(userKeyBundle))
+            if (!((SignedMessage) msg).verify(userKeyBundle))
             {
                 throw new UnauthorisedException(PGPMessages.invalidSignature());
             }
@@ -118,7 +118,7 @@ public class PGPSecurityProvider implements UMOSecurityProvider
      * @see org.mule.umo.security.UMOSecurityProvider#createSecurityContext(org.mule.umo.security.UMOAuthentication)
      */
     public UMOSecurityContext createSecurityContext(UMOAuthentication auth)
-        throws UnknownAuthenticationTypeException
+            throws UnknownAuthenticationTypeException
     {
         return factory.create(auth);
     }
@@ -139,7 +139,7 @@ public class PGPSecurityProvider implements UMOSecurityProvider
         }
         catch (Exception e)
         {
-            throw new InitialisationException(CoreMessages.failedToCreate("PGPProvider"), e);
+            throw new InitialisationException(CoreMessages.failedToCreate("PGPProvider"), e, this);
         }
     }
 

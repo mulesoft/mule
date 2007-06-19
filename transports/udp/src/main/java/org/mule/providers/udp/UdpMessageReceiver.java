@@ -13,13 +13,14 @@ package org.mule.providers.udp;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageReceiver;
+import org.mule.providers.ConnectException;
 import org.mule.providers.udp.i18n.UdpMessages;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.lifecycle.Disposable;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.transformer.UMOTransformer;
@@ -36,9 +37,7 @@ import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkManager;
 
-/**
- * <code>UdpMessageReceiver</code> receives UDP message packets.
- */
+/** <code>UdpMessageReceiver</code> receives UDP message packets. */
 public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
 {
     protected DatagramSocket socket = null;
@@ -48,23 +47,25 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
     protected UMOTransformer responseTransformer = null;
 
     public UdpMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
-        throws InitialisationException
+            throws CreateException
     {
+
         super(connector, component, endpoint);
-        bufferSize = ((UdpConnector)connector).getReceiveBufferSize();
+
+        bufferSize = ((UdpConnector) connector).getReceiveBufferSize();
 
         uri = endpoint.getEndpointURI().getUri();
 
         try
         {
-            if(!"null".equalsIgnoreCase(uri.getHost()))
+            if (!"null".equalsIgnoreCase(uri.getHost()))
             {
                 inetAddress = InetAddress.getByName(uri.getHost());
             }
         }
         catch (UnknownHostException e)
         {
-            throw new InitialisationException(UdpMessages.failedToLocateHost(uri), e, this);
+            throw new CreateException(UdpMessages.failedToLocateHost(uri), e, this);
         }
 
         responseTransformer = getResponseTransformer();
@@ -74,11 +75,11 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
     {
         try
         {
-            socket = ((UdpConnector)connector).getSocket(endpoint);
+            socket = ((UdpConnector) connector).getSocket(endpoint);
         }
         catch (Exception e)
         {
-            throw new InitialisationException(UdpMessages.failedToBind(uri), e, this);
+            throw new ConnectException(UdpMessages.failedToBind(uri), e, this);
         }
 
         try
@@ -87,7 +88,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
         }
         catch (WorkException e)
         {
-            throw new InitialisationException(CoreMessages.failedToScheduleWork(), e, this);
+            throw new ConnectException(CoreMessages.failedToScheduleWork(), e, this);
         }
     }
 
@@ -112,7 +113,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
         // nothing to do
     }
 
-    protected UMOTransformer getResponseTransformer() throws InitialisationException
+    protected UMOTransformer getResponseTransformer()
     {
         UMOTransformer transformer = endpoint.getResponseTransformer();
         if (transformer == null)
@@ -127,9 +128,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
         return new DatagramSocket(uri.getPort(), inetAddress);
     }
 
-    /**
-     * Obtain the serverSocket
-     */
+    /** Obtain the serverSocket */
     public DatagramSocket getSocket()
     {
         return socket;
@@ -249,9 +248,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
             socket = null;
         }
 
-        /**
-         * Accept requests from a given Udp address
-         */
+        /** Accept requests from a given Udp address */
         public void run()
         {
             UMOMessage returnMessage = null;
@@ -268,7 +265,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
                         Object response = responseTransformer.transform(returnMessage.getPayload());
                         if (response instanceof byte[])
                         {
-                            data = (byte[])response;
+                            data = (byte[]) response;
                         }
                         else
                         {
@@ -280,7 +277,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
                         data = returnMessage.getPayloadAsBytes();
                     }
                     DatagramPacket result = new DatagramPacket(data, data.length, packet.getAddress(),
-                        packet.getPort());
+                            packet.getPort());
                     socket.send(result);
                 }
             }

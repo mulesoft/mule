@@ -15,7 +15,7 @@ import org.mule.providers.AbstractPollingMessageReceiver;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
 
 import java.io.InputStream;
@@ -37,14 +37,14 @@ public class StdioMessageReceiver extends AbstractPollingMessageReceiver
     private StdioConnector connector;
 
     public StdioMessageReceiver(UMOConnector connector,
-                                 UMOComponent component,
-                                 UMOEndpoint endpoint,
-                                 long checkFrequency) throws InitialisationException
+                                UMOComponent component,
+                                UMOEndpoint endpoint,
+                                long checkFrequency) throws CreateException
     {
         super(connector, component, endpoint);
         this.setFrequency(checkFrequency);
 
-        this.connector = (StdioConnector)connector;
+        this.connector = (StdioConnector) connector;
         String streamName = endpoint.getEndpointURI().getAddress();
         if (StdioConnector.STREAM_SYSTEM_IN.equalsIgnoreCase(streamName))
         {
@@ -58,9 +58,9 @@ public class StdioMessageReceiver extends AbstractPollingMessageReceiver
         // apply connector-specific properties
         if (connector instanceof PromptStdioConnector)
         {
-            PromptStdioConnector ssc = (PromptStdioConnector)connector;
+            PromptStdioConnector ssc = (PromptStdioConnector) connector;
 
-            String promptMessage = (String)endpoint.getProperties().get("promptMessage");
+            String promptMessage = (String) endpoint.getProperties().get("promptMessage");
             if (promptMessage != null)
             {
                 ssc.setPromptMessage(promptMessage);
@@ -77,7 +77,7 @@ public class StdioMessageReceiver extends AbstractPollingMessageReceiver
     {
         if (connector instanceof PromptStdioConnector)
         {
-            PromptStdioConnector ssc = (PromptStdioConnector)connector;
+            PromptStdioConnector ssc = (PromptStdioConnector) connector;
             DelayedMessageWriter writer = new DelayedMessageWriter(ssc);
             writer.start();
         }
@@ -97,7 +97,7 @@ public class StdioMessageReceiver extends AbstractPollingMessageReceiver
     {
         try
         {
-            if(endpoint.isStreaming())
+            if (endpoint.isStreaming())
             {
                 PushbackInputStream in = new PushbackInputStream(inputStream);
 
@@ -198,8 +198,8 @@ public class StdioMessageReceiver extends AbstractPollingMessageReceiver
                     // ignore
                 }
             }
-            ((PrintStream)ssc.getOutputStream()).println();
-            ((PrintStream)ssc.getOutputStream()).print(ssc.getPromptMessage());
+            ((PrintStream) ssc.getOutputStream()).println();
+            ((PrintStream) ssc.getOutputStream()).print(ssc.getPromptMessage());
         }
     }
 }

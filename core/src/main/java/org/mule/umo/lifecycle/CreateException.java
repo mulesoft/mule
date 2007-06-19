@@ -10,29 +10,26 @@
 
 package org.mule.umo.lifecycle;
 
-import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
-import org.mule.umo.UMOException;
 
-import org.apache.commons.lang.ObjectUtils;
-
-/** <code>LifecycleException</code> TODO */
-
-public class LifecycleException extends UMOException
+/**
+ * <code>InitialisationException</code> is thrown by the initialise method defined
+ * in the <code>org.mule.umo.lifecycle.Initialisable</code> interface.
+ * IinitialisationExceptions are fatal and will cause the current Mule instance to
+ * shutdown.
+ */
+public class CreateException extends LifecycleException
 {
     /** Serial version */
-    private static final long serialVersionUID = 2909614055858287394L;
-
-    private transient Object component;
+    private static final long serialVersionUID = -8402348927606781921L;
 
     /**
      * @param message   the exception message
      * @param component the object that failed during a lifecycle method call
      */
-    protected LifecycleException(Message message, Object component)
+    public CreateException(Message message, Object component)
     {
-        super(message);
-        this.component = component;
+        super(message, component);
     }
 
     /**
@@ -40,25 +37,17 @@ public class LifecycleException extends UMOException
      * @param cause     the exception that cause this exception to be thrown
      * @param component the object that failed during a lifecycle method call
      */
-    public LifecycleException(Message message, Throwable cause, Object component)
+    public CreateException(Message message, Throwable cause, Object component)
     {
-        super(message, cause);
-        this.component = component;
+        super(message, cause, component);
     }
 
     /**
      * @param cause     the exception that cause this exception to be thrown
      * @param component the object that failed during a lifecycle method call
      */
-    public LifecycleException(Throwable cause, Object component)
+    public CreateException(Throwable cause, Object component)
     {
-        super(CoreMessages.initialisationFailure(cause.getMessage()), cause);
-        this.component = component;
-        addInfo("Object", ObjectUtils.toString(component, "null"));
-    }
-
-    public Object getComponent()
-    {
-        return component;
+        super(cause, component);
     }
 }

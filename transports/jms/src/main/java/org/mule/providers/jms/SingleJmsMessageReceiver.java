@@ -17,8 +17,9 @@ import org.mule.providers.jms.filters.JmsSelectorFilter;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.lifecycle.LifecycleException;
+import org.mule.umo.lifecycle.CreateException;
+import org.mule.umo.lifecycle.StartException;
+import org.mule.umo.lifecycle.StopException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.util.ClassUtils;
@@ -31,9 +32,7 @@ import javax.jms.MessageListener;
 import javax.jms.Session;
 import javax.jms.Topic;
 
-/**
- * Registers a single Jms MessageListener for an endpoint
- */
+/** Registers a single Jms MessageListener for an endpoint */
 public class SingleJmsMessageReceiver extends AbstractMessageReceiver implements MessageListener
 {
 
@@ -44,10 +43,10 @@ public class SingleJmsMessageReceiver extends AbstractMessageReceiver implements
     protected boolean startOnConnect = false;
 
     public SingleJmsMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
-        throws InitialisationException
+            throws CreateException
     {
         super(connector, component, endpoint);
-        this.connector = (JmsConnector)connector;
+        this.connector = (JmsConnector) connector;
 
         try
         {
@@ -56,7 +55,7 @@ public class SingleJmsMessageReceiver extends AbstractMessageReceiver implements
         }
         catch (Exception e)
         {
-            throw new InitialisationException(e, this);
+            throw new CreateException(e, this);
         }
     }
 
@@ -85,7 +84,7 @@ public class SingleJmsMessageReceiver extends AbstractMessageReceiver implements
                 if (message.getJMSDestination() != null)
                 {
                     logger.debug("Message received on " + message.getJMSDestination() + " ("
-                                 + message.getJMSDestination().getClass().getName() + ")");
+                            + message.getJMSDestination().getClass().getName() + ")");
                 }
                 else
                 {
@@ -100,7 +99,7 @@ public class SingleJmsMessageReceiver extends AbstractMessageReceiver implements
                 if (logger.isDebugEnabled())
                 {
                     logger.debug("Message with correlationId: " + message.getJMSCorrelationID()
-                                 + " is redelivered. handing off to Exception Handler");
+                            + " is redelivered. handing off to Exception Handler");
                 }
                 redeliveryHandler.handleRedelivery(message);
             }
@@ -136,7 +135,7 @@ public class SingleJmsMessageReceiver extends AbstractMessageReceiver implements
         }
         catch (JMSException e)
         {
-            throw new LifecycleException(e, this);
+            throw new StartException(e, this);
         }
     }
 
@@ -151,7 +150,7 @@ public class SingleJmsMessageReceiver extends AbstractMessageReceiver implements
         }
         catch (JMSException e)
         {
-            throw new LifecycleException(e, this);
+            throw new StopException(e, this);
         }
     }
 
@@ -170,7 +169,7 @@ public class SingleJmsMessageReceiver extends AbstractMessageReceiver implements
 
     /**
      * Create a consumer for the jms destination
-     * 
+     *
      * @throws Exception
      */
     protected void createConsumer() throws Exception
@@ -188,21 +187,21 @@ public class SingleJmsMessageReceiver extends AbstractMessageReceiver implements
 
             // Create destination
             Destination dest = jmsSupport.createDestination(session, endpoint.getEndpointURI().getAddress(),
-                topic);
+                    topic);
 
             // Extract jms selector
             String selector = null;
             if (endpoint.getFilter() != null && endpoint.getFilter() instanceof JmsSelectorFilter)
             {
-                selector = ((JmsSelectorFilter)endpoint.getFilter()).getExpression();
+                selector = ((JmsSelectorFilter) endpoint.getFilter()).getExpression();
             }
             else if (endpoint.getProperties() != null)
             {
                 // still allow the selector to be set as a property on the endpoint
                 // to be backward compatable
-                selector = (String)endpoint.getProperties().get(JmsConstants.JMS_SELECTOR_PROPERTY);
+                selector = (String) endpoint.getProperties().get(JmsConstants.JMS_SELECTOR_PROPERTY);
             }
-            String tempDurable = (String)endpoint.getProperties().get(JmsConstants.DURABLE_PROPERTY);
+            String tempDurable = (String) endpoint.getProperties().get(JmsConstants.DURABLE_PROPERTY);
             boolean durable = connector.isDurable();
             if (tempDurable != null)
             {
@@ -210,17 +209,17 @@ public class SingleJmsMessageReceiver extends AbstractMessageReceiver implements
             }
 
             // Get the durable subscriber name if there is one
-            String durableName = (String)endpoint.getProperties().get(JmsConstants.DURABLE_NAME_PROPERTY);
+            String durableName = (String) endpoint.getProperties().get(JmsConstants.DURABLE_NAME_PROPERTY);
             if (durableName == null && durable && dest instanceof Topic)
             {
                 durableName = "mule." + connector.getName() + "." + endpoint.getEndpointURI().getAddress();
                 logger.debug("Jms Connector for this receiver is durable but no durable name has been specified. Defaulting to: "
-                             + durableName);
+                        + durableName);
             }
 
             // Create consumer
             consumer = jmsSupport.createConsumer(session, dest, selector, connector.isNoLocal(), durableName,
-                topic);
+                    topic);
         }
         catch (JMSException e)
         {

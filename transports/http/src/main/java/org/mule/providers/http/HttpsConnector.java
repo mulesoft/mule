@@ -12,6 +12,7 @@ package org.mule.providers.http;
 
 import org.mule.providers.ssl.SslServerSocketFactory;
 import org.mule.providers.ssl.SslSocketFactory;
+import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.TlsDirectKeyStore;
 import org.mule.umo.security.TlsDirectTrustStore;
@@ -29,11 +30,9 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.TrustManagerFactory;
 
-/**
- * <code>HttpsConnector</code> provides Https connectivity
- */
-public class HttpsConnector extends HttpConnector 
-implements TlsDirectKeyStore, TlsIndirectKeyStore, TlsDirectTrustStore, TlsProtocolHandler
+/** <code>HttpsConnector</code> provides Https connectivity */
+public class HttpsConnector extends HttpConnector
+        implements TlsDirectKeyStore, TlsIndirectKeyStore, TlsDirectTrustStore, TlsProtocolHandler
 {
     private TlsConfiguration tls = new TlsConfiguration(TlsConfiguration.DEFAULT_KEYSTORE);
 
@@ -55,7 +54,14 @@ implements TlsDirectKeyStore, TlsIndirectKeyStore, TlsDirectTrustStore, TlsProto
 
     protected void doInitialise() throws InitialisationException
     {
-        tls.initialise(false, TlsConfiguration.JSSE_NAMESPACE);
+        try
+        {
+            tls.initialise(false, TlsConfiguration.JSSE_NAMESPACE);
+        }
+        catch (CreateException e)
+        {
+            throw new InitialisationException(e, this);
+        }
         super.doInitialise();
     }
 

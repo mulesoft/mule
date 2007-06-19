@@ -15,7 +15,7 @@ import org.mule.transaction.TransactionCallback;
 import org.mule.transaction.TransactionTemplate;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.util.ClassUtils;
@@ -31,7 +31,7 @@ public class JmsMessageReceiver extends SingleJmsMessageReceiver
 {
 
     public JmsMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
-        throws InitialisationException
+            throws CreateException
     {
         super(connector, component, endpoint);
     }
@@ -46,7 +46,7 @@ public class JmsMessageReceiver extends SingleJmsMessageReceiver
                 if (message.getJMSDestination() != null)
                 {
                     logger.debug("Message received on " + message.getJMSDestination() + " ("
-                                 + message.getJMSDestination().getClass().getName() + ")");
+                            + message.getJMSDestination().getClass().getName() + ")");
                 }
                 else
                 {
@@ -61,7 +61,7 @@ public class JmsMessageReceiver extends SingleJmsMessageReceiver
                 if (logger.isDebugEnabled())
                 {
                     logger.debug("Message with correlationId: " + message.getJMSCorrelationID()
-                                 + " has redelivered flag set, handing off to Exception Handler");
+                            + " has redelivered flag set, handing off to Exception Handler");
                 }
                 redeliveryHandler.handleRedelivery(message);
             }
@@ -96,7 +96,7 @@ public class JmsMessageReceiver extends SingleJmsMessageReceiver
                     if (logger.isDebugEnabled())
                     {
                         logger.debug("Message with correlationId: " + message.getJMSCorrelationID()
-                                     + " has redelivered flag set, handing off to Exception Handler");
+                                + " has redelivered flag set, handing off to Exception Handler");
                     }
                     redeliveryHandler.handleRedelivery(message);
                 }
@@ -108,7 +108,7 @@ public class JmsMessageReceiver extends SingleJmsMessageReceiver
 
 
             TransactionTemplate tt = new TransactionTemplate(endpoint.getTransactionConfig(),
-            connector.getExceptionListener(), connector.getManagementContext());
+                    connector.getExceptionListener(), connector.getManagementContext());
 
             // Receive messages and process them in a single transaction
             // Do not enable threading here, but serveral workers

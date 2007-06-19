@@ -51,14 +51,14 @@ public class QuartzConnector extends AbstractConnector
     public static final String DEFAULT_GROUP_NAME = "mule";
 
     /**
-     * Properties to be used for creating the scheduler.  If no properties are given, the 
+     * Properties to be used for creating the scheduler.  If no properties are given, the
      * scheduler will be created by StdSchedulerFactory.getDefaultScheduler()
      */
     private Properties factoryProperties = null;
 
     /**
      * The scheduler instance.  This can be configured by the user and injected as a bean
-     * or if not, it will be created by Mule upon initialization.  
+     * or if not, it will be created by Mule upon initialization.
      */
     private Scheduler quartzScheduler = null;
 
@@ -73,7 +73,7 @@ public class QuartzConnector extends AbstractConnector
                     SchedulerFactory factory = new StdSchedulerFactory(factoryProperties);
                     quartzScheduler = factory.getScheduler();
                 }
-                else 
+                else
                 {
                     quartzScheduler = StdSchedulerFactory.getDefaultScheduler();
                 }
@@ -81,7 +81,7 @@ public class QuartzConnector extends AbstractConnector
         }
         catch (Exception e)
         {
-            throw new InitialisationException(CoreMessages.initialisationFailure("Quartz provider"), e);
+            throw new InitialisationException(CoreMessages.initialisationFailure("Quartz provider"), e, this);
         }
     }
 

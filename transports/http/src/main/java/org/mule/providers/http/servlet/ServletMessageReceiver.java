@@ -14,7 +14,7 @@ import org.mule.providers.AbstractMessageReceiver;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
 
 /**
@@ -26,9 +26,11 @@ import org.mule.umo.provider.UMOConnector;
 public class ServletMessageReceiver extends AbstractMessageReceiver
 {
     public ServletMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
-        throws InitialisationException
+            throws CreateException
     {
+
         super(connector, component, endpoint);
+
     }
 
     protected void doDispose()

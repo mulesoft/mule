@@ -17,21 +17,19 @@ import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.util.BeanUtils;
 
-/**
- * Reusable methods for working with UMOComponents.
- */
+/** Reusable methods for working with UMOComponents. */
 public final class ComponentFactory
 {
 
     /** Do not instanciate. */
-    private ComponentFactory ()
+    private ComponentFactory()
     {
         // no-op
     }
 
     /**
      * Creates a component based on its descriptor.
-     * 
+     *
      * @param descriptor the descriptor to create the component from
      * @return The newly created component
      * @throws UMOException
@@ -42,13 +40,13 @@ public final class ComponentFactory
         try
         {
             component = descriptor.getServiceFactory().create();
-            
+
             // TODO MULE-1933 Would be nice to remove this eventually.
             BeanUtils.populate(component, descriptor.getProperties());
         }
         catch (Exception e)
         {
-            throw new LifecycleException(MessageFactory.createStaticMessage("Unable to create component"), e);
+            throw new LifecycleException(MessageFactory.createStaticMessage("Unable to create component"), e, descriptor);
         }
 
         // Call any custom initialisers

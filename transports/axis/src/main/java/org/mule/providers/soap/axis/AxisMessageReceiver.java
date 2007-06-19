@@ -23,6 +23,7 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 
@@ -54,31 +55,33 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
     protected SOAPService service;
 
     public AxisMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
-        throws InitialisationException
+            throws CreateException
     {
+
         super(connector, component, endpoint);
-        this.connector = (AxisConnector)connector;
+
+        this.connector = (AxisConnector) connector;
         try
         {
-            init();
+            create();
         }
         catch (Exception e)
         {
-            throw new InitialisationException(e, this);
+            throw new CreateException(e, this);
         }
     }
 
-    protected void init() throws Exception
+    protected void create() throws Exception
     {
         AxisProperties.setProperty("axis.doAutoTypes", String.valueOf(connector.isDoAutoTypes()));
-        MuleDescriptor descriptor = (MuleDescriptor)component.getDescriptor();
+        MuleDescriptor descriptor = (MuleDescriptor) component.getDescriptor();
         // TODO RM: these are endpoint properties now
 //        String style = (String)descriptor.getProperties().get("style");
 //        String use = (String)descriptor.getProperties().get("use");
 //        String doc = (String)descriptor.getProperties().get("documentation");
-        String style = (String)endpoint.getProperties().get("style");
-        String use = (String)endpoint.getProperties().get("use");
-        String doc = (String)endpoint.getProperties().get("documentation");
+        String style = (String) endpoint.getProperties().get("style");
+        String use = (String) endpoint.getProperties().get("use");
+        String doc = (String) endpoint.getProperties().get("documentation");
 
         UMOEndpointURI uri = endpoint.getEndpointURI();
         String serviceName = component.getDescriptor().getName();
@@ -118,7 +121,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         service.setName(serviceName);
 
         // Add any custom options from the Descriptor config
-        Map options = (Map)descriptor.getProperties().get("axisOptions");
+        Map options = (Map) descriptor.getProperties().get("axisOptions");
 
         // IF wsdl service name is not set, default to service name
         if (options == null)
@@ -133,7 +136,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         Map.Entry entry;
         for (Iterator iterator = options.entrySet().iterator(); iterator.hasNext();)
         {
-            entry = (Map.Entry)iterator.next();
+            entry = (Map.Entry) iterator.next();
             service.setOption(entry.getKey().toString(), entry.getValue());
             logger.debug("Adding Axis option: " + entry);
         }
@@ -143,16 +146,16 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         if (interfaces.length == 0)
         {
             throw new InitialisationException(
-                AxisMessages.objectMustImplementAnInterface(serviceName), component);
+                    AxisMessages.objectMustImplementAnInterface(serviceName), component);
         }
         // You must supply a class name if you want to restrict methods
         // or specify the 'allowedMethods' property in the axisOptions property
         String methodNames = "*";
 
-        Map methods = (Map)endpoint.getProperties().get("soapMethods");
+        Map methods = (Map) endpoint.getProperties().get("soapMethods");
         if (methods == null)
         {
-            methods = (Map)descriptor.getProperties().get("soapMethods");
+            methods = (Map) descriptor.getProperties().get("soapMethods");
         }
         if (methods != null)
         {
@@ -160,23 +163,23 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
             StringBuffer buf = new StringBuffer(64);
             while (i.hasNext())
             {
-                String name = (String)i.next();
+                String name = (String) i.next();
                 Object m = methods.get(name);
                 SoapMethod method = null;
                 if (m instanceof List)
                 {
-                    method = new SoapMethod(name, (List)m);
+                    method = new SoapMethod(name, (List) m);
                 }
                 else
                 {
-                    method = new SoapMethod(name, (String)m);
+                    method = new SoapMethod(name, (String) m);
                 }
 
                 List namedParameters = method.getNamedParameters();
                 ParameterDesc[] parameters = new ParameterDesc[namedParameters.size()];
                 for (int j = 0; j < namedParameters.size(); j++)
                 {
-                    NamedParameter parameter = (NamedParameter)namedParameters.get(j);
+                    NamedParameter parameter = (NamedParameter) namedParameters.get(j);
                     byte mode = ParameterDesc.INOUT;
                     if (parameter.getMode().equals(ParameterMode.IN))
                     {
@@ -191,7 +194,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
                 }
 
                 service.getServiceDescription().addOperationDesc(
-                    new OperationDesc(method.getName().getLocalPart(), parameters, method.getReturnType()));
+                        new OperationDesc(method.getName().getLocalPart(), parameters, method.getReturnType()));
                 buf.append(method.getName().getLocalPart() + ",");
             }
             methodNames = buf.toString();
@@ -214,7 +217,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         // Todo use the service qname in Mule 2.0
         // TODO RM: this is an endpoint property now
         // String namespace = (String)descriptor.getProperties().get("serviceNamespace");
-        String namespace = (String)endpoint.getProperties().get("serviceNamespace");
+        String namespace = (String) endpoint.getProperties().get("serviceNamespace");
         if (namespace == null)
         {
             namespace = Namespaces.makeNamespace(className);
@@ -223,7 +226,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         // WSDL override
         // TODO RM: this is an endpoint property now?
         // String wsdlFile = (String)descriptor.getProperties().get("wsdlFile");
-        String wsdlFile = (String)endpoint.getProperties().get("wsdlFile");
+        String wsdlFile = (String) endpoint.getProperties().get("wsdlFile");
         if (wsdlFile != null)
         {
             service.getServiceDescription().setWSDLFile(wsdlFile);
@@ -268,8 +271,8 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
             Style s = Style.getStyle(style);
             if (s == null)
             {
-                throw new InitialisationException(
-                    CoreMessages.valueIsInvalidFor(style, "style"), this);
+                throw new CreateException(
+                        CoreMessages.valueIsInvalidFor(style, "style"), this);
             }
             else
             {
@@ -282,8 +285,8 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
             Use u = Use.getUse(use);
             if (u == null)
             {
-                throw new InitialisationException(CoreMessages.valueIsInvalidFor(use, "use"),
-                    this);
+                throw new CreateException(CoreMessages.valueIsInvalidFor(use, "use"),
+                        this);
             }
             else
             {

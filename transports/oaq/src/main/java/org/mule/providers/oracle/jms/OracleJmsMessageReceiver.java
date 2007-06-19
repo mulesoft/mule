@@ -14,7 +14,7 @@ import org.mule.providers.jms.JmsConnector;
 import org.mule.providers.jms.TransactedJmsMessageReceiver;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
 
 import org.apache.commons.logging.Log;
@@ -24,19 +24,19 @@ public class OracleJmsMessageReceiver extends TransactedJmsMessageReceiver
 {
 
     public OracleJmsMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
-        throws InitialisationException
+            throws CreateException
     {
         super(connector, component, endpoint);
     }
 
     /**
      * Save a copy of the endpoint's properties within the OracleJmsSupport object.
-     * 
+     *
      * @see OracleJmsSupport#endpointProperties
      */
     protected void createConsumer() throws Exception
     {
-        ((OracleJmsSupport)((JmsConnector)getConnector()).getJmsSupport()).setEndpointProperties(endpoint.getProperties());
+        ((OracleJmsSupport) ((JmsConnector) getConnector()).getJmsSupport()).setEndpointProperties(endpoint.getProperties());
         super.createConsumer();
     }
 

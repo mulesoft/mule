@@ -18,7 +18,7 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 
@@ -27,9 +27,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * TODO
- */
+/** TODO */
 public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
 {
 
@@ -43,13 +41,13 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
                                UMOComponent component,
                                UMOEndpoint endpoint,
                                String readStmt,
-                               String ackStmt) throws InitialisationException
+                               String ackStmt) throws CreateException
     {
         super(connector, component, endpoint);
-        this.setFrequency(((JdbcConnector)connector).getPollingFrequency());
+        this.setFrequency(((JdbcConnector) connector).getPollingFrequency());
         this.setReceiveMessagesInTransaction(false);
 
-        this.connector = (JdbcConnector)connector;
+        this.connector = (JdbcConnector) connector;
         this.readParams = new ArrayList();
         this.readStmt = this.connector.parseStatement(readStmt, this.readParams);
         this.ackParams = new ArrayList();
@@ -151,8 +149,8 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
 
             Object[] readParams = connector.getParams(endpoint, this.readParams, null);
             Object results = connector.createQueryRunner().query(con, this.readStmt, readParams,
-                connector.createResultSetHandler());
-            return (List)results;
+                    connector.createResultSetHandler());
+            return (List) results;
         }
         finally
         {

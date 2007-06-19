@@ -21,8 +21,10 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.lifecycle.LifecycleException;
+import org.mule.umo.lifecycle.StartException;
+import org.mule.umo.lifecycle.StopException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.util.ClassUtils;
@@ -37,7 +39,7 @@ import javax.jms.Topic;
 import javax.resource.spi.work.Work;
 
 public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageReceiver
-    implements MessageListener
+        implements MessageListener
 {
     protected JmsConnector connector;
     protected RedeliveryHandler redeliveryHandler;
@@ -59,10 +61,12 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
      */
     public TransactedSingleResourceJmsMessageReceiver(UMOConnector connector,
                                                       UMOComponent component,
-                                                      UMOEndpoint endpoint) throws InitialisationException
+                                                      UMOEndpoint endpoint) throws CreateException
     {
+
         super(connector, component, endpoint);
-        this.connector = (JmsConnector)connector;
+
+        this.connector = (JmsConnector) connector;
 
         // TODO check which properties being set in the TransecteJmsMessage receiver
         // are needed...
@@ -74,7 +78,7 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
         }
         catch (Exception e)
         {
-            throw new InitialisationException(e, this);
+            throw new CreateException(e, this);
         }
     }
 
@@ -98,21 +102,21 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
             boolean topic = connector.getTopicResolver().isTopic(endpoint, true);
 
             Destination dest = jmsSupport.createDestination(session, endpoint.getEndpointURI().getAddress(),
-                topic);
+                    topic);
 
             // Extract jms selector
             String selector = null;
             if (endpoint.getFilter() != null && endpoint.getFilter() instanceof JmsSelectorFilter)
             {
-                selector = ((JmsSelectorFilter)endpoint.getFilter()).getExpression();
+                selector = ((JmsSelectorFilter) endpoint.getFilter()).getExpression();
             }
             else if (endpoint.getProperties() != null)
             {
                 // still allow the selector to be set as a property on the endpoint
                 // to be backward compatable
-                selector = (String)endpoint.getProperties().get(JmsConstants.JMS_SELECTOR_PROPERTY);
+                selector = (String) endpoint.getProperties().get(JmsConstants.JMS_SELECTOR_PROPERTY);
             }
-            String tempDurable = (String)endpoint.getProperties().get(JmsConstants.DURABLE_PROPERTY);
+            String tempDurable = (String) endpoint.getProperties().get(JmsConstants.DURABLE_PROPERTY);
             boolean durable = connector.isDurable();
             if (tempDurable != null)
             {
@@ -120,17 +124,17 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
             }
 
             // Get the durable subscriber name if there is one
-            String durableName = (String)endpoint.getProperties().get(JmsConstants.DURABLE_NAME_PROPERTY);
+            String durableName = (String) endpoint.getProperties().get(JmsConstants.DURABLE_NAME_PROPERTY);
             if (durableName == null && durable && dest instanceof Topic)
             {
                 durableName = "mule." + connector.getName() + "." + endpoint.getEndpointURI().getAddress();
                 logger.debug("Jms Connector for this receiver is durable but no durable name has been specified. Defaulting to: "
-                             + durableName);
+                        + durableName);
             }
 
             // Create consumer
             consumer = jmsSupport.createConsumer(session, dest, selector, connector.isNoLocal(), durableName,
-                topic);
+                    topic);
         }
         catch (JMSException e)
         {
@@ -158,7 +162,7 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
         }
         catch (JMSException e)
         {
-            throw new LifecycleException(e, this);
+            throw new StartException(e, this);
         }
     }
 
@@ -173,7 +177,7 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
         }
         catch (JMSException e)
         {
-            throw new LifecycleException(e, this);
+            throw new StopException(e, this);
         }
     }
 
@@ -216,7 +220,7 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
             try
             {
                 TransactionTemplate tt = new TransactionTemplate(endpoint.getTransactionConfig(),
-                    connector.getExceptionListener(), connector.getManagementContext());
+                        connector.getExceptionListener(), connector.getManagementContext());
 
                 if (receiveMessagesInTransaction)
                 {
@@ -243,7 +247,7 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
                                 if (message.getJMSDestination() != null)
                                 {
                                     logger.debug("Message received on " + message.getJMSDestination() + " ("
-                                                 + message.getJMSDestination().getClass().getName() + ")");
+                                            + message.getJMSDestination().getClass().getName() + ")");
                                 }
                                 else
                                 {
@@ -258,8 +262,8 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
                                 if (logger.isDebugEnabled())
                                 {
                                     logger.debug("Message with correlationId: "
-                                                 + message.getJMSCorrelationID()
-                                                 + " is redelivered. handing off to Exception Handler");
+                                            + message.getJMSCorrelationID()
+                                            + " is redelivered. handing off to Exception Handler");
                                 }
                                 redeliveryHandler.handleRedelivery(message);
                             }

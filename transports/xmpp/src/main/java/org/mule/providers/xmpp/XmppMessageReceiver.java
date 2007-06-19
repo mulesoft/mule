@@ -20,7 +20,7 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOMessageAdapter;
 
 import javax.resource.spi.work.Work;
@@ -35,16 +35,15 @@ import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 
-/**
- * <code>XmppMessageReceiver</code> is responsible for receiving Mule events over XMPP.
- */
+/** <code>XmppMessageReceiver</code> is responsible for receiving Mule events over XMPP. */
 public class XmppMessageReceiver extends AbstractMessageReceiver implements PacketListener
 {
     private XMPPConnection xmppConnection = null;
 
     public XmppMessageReceiver(AbstractConnector connector, UMOComponent component, UMOEndpoint endpoint)
-        throws InitialisationException
+            throws CreateException
     {
+
         super(connector, component, endpoint);
     }
 
@@ -52,11 +51,11 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements Pack
     {
         try
         {
-            XmppConnector cnn = (XmppConnector)connector;
+            XmppConnector cnn = (XmppConnector) connector;
             xmppConnection = cnn.createXmppConnection(endpoint.getEndpointURI());
             if (endpoint.getFilter() instanceof PacketFilter)
             {
-                xmppConnection.addPacketListener(this, (PacketFilter)endpoint.getFilter());
+                xmppConnection.addPacketListener(this, (PacketFilter) endpoint.getFilter());
             }
             else
             {
@@ -99,9 +98,7 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements Pack
         return new XMPPWorker(message);
     }
 
-    /**
-     * @see org.jivesoftware.smack.PacketListener#processPacket(org.jivesoftware.smack.packet.Packet)
-     */
+    /** @see org.jivesoftware.smack.PacketListener#processPacket(org.jivesoftware.smack.packet.Packet) */
     public void processPacket(Packet packet)
     {
         if (logger.isDebugEnabled())
@@ -129,9 +126,7 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements Pack
             this.packet = message;
         }
 
-        /**
-         * Accept requests from a given TCP port
-         */
+        /** Accept requests from a given TCP port */
         public void run()
         {
             try
@@ -149,8 +144,8 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements Pack
                 if (returnMessage != null && packet instanceof Message)
                 {
                     RequestContext.rewriteEvent(returnMessage);
-                    Packet result = (Packet)connector.getDefaultResponseTransformer().transform(
-                        returnMessage.getPayload());
+                    Packet result = (Packet) connector.getDefaultResponseTransformer().transform(
+                            returnMessage.getPayload());
                     xmppConnection.sendPacket(result);
                 }
             }

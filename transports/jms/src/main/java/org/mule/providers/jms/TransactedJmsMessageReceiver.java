@@ -19,7 +19,7 @@ import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.util.ClassUtils;
@@ -42,23 +42,19 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
     protected final long timeout;
     protected final RedeliveryHandler redeliveryHandler;
 
-    /**
-     * Holder receiving the session and consumer for this thread.
-     */
+    /** Holder receiving the session and consumer for this thread. */
     protected static class JmsThreadContext
     {
         public Session session;
         public MessageConsumer consumer;
     }
 
-    /**
-     * Strongly typed ThreadLocal for ThreadContext.
-     */
+    /** Strongly typed ThreadLocal for ThreadContext. */
     protected static class ThreadContextLocal extends ThreadLocal
     {
         public JmsThreadContext getContext()
         {
-            return (JmsThreadContext)get();
+            return (JmsThreadContext) get();
         }
 
         protected Object initialValue()
@@ -68,7 +64,7 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
     }
 
     public TransactedJmsMessageReceiver(UMOConnector umoConnector, UMOComponent component, UMOEndpoint endpoint)
-        throws InitialisationException
+            throws CreateException
     {
         // TODO AP: find appropriate value for polling frequency with the scheduler;
         // see setFrequency/setTimeUnit & VMMessageReceiver for more
@@ -87,9 +83,9 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
 
         // User may override reuse strategy if necessary
         this.reuseConsumer = MapUtils.getBooleanValue(endpoint.getProperties(), "reuseConsumer",
-            this.reuseConsumer);
+                this.reuseConsumer);
         this.reuseSession = MapUtils.getBooleanValue(endpoint.getProperties(), "reuseSession",
-            this.reuseSession);
+                this.reuseSession);
 
         // Check if the destination is a queue and
         // if we are in transactional mode.
@@ -108,7 +104,7 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
         }
         catch (Exception e)
         {
-            throw new InitialisationException(e, this);
+            throw new CreateException(e, this);
         }
 
     }
@@ -148,9 +144,7 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
         }
     }
 
-    /**
-     * The poll method is overriden from the {@link TransactedPollingMessageReceiver}
-     */
+    /** The poll method is overriden from the {@link TransactedPollingMessageReceiver} */
     public void poll() throws Exception
     {
         try
@@ -230,7 +224,7 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
             if (message.getJMSDestination() != null)
             {
                 logger.debug("Message received on " + message.getJMSDestination() + " ("
-                             + message.getJMSDestination().getClass().getName() + ")");
+                        + message.getJMSDestination().getClass().getName() + ")");
             }
             else
             {
@@ -245,7 +239,7 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
             if (logger.isDebugEnabled())
             {
                 logger.debug("Message with correlationId: " + message.getJMSCorrelationID()
-                             + " is redelivered. handing off to Exception Handler");
+                        + " is redelivered. handing off to Exception Handler");
             }
             redeliveryHandler.handleRedelivery(message);
         }
@@ -295,7 +289,7 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
 
     /**
      * Create a consumer for the jms destination
-     * 
+     *
      * @throws Exception
      */
     protected void createConsumer() throws Exception
@@ -313,21 +307,21 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
             // Create destination
             final boolean topic = connector.getTopicResolver().isTopic(endpoint);
             Destination dest = jmsSupport.createDestination(ctx.session, endpoint.getEndpointURI()
-                .getAddress(), topic);
+                    .getAddress(), topic);
 
             // Extract jms selector
             String selector = null;
             if (endpoint.getFilter() != null && endpoint.getFilter() instanceof JmsSelectorFilter)
             {
-                selector = ((JmsSelectorFilter)endpoint.getFilter()).getExpression();
+                selector = ((JmsSelectorFilter) endpoint.getFilter()).getExpression();
             }
             else if (endpoint.getProperties() != null)
             {
                 // still allow the selector to be set as a property on the endpoint
                 // to be backward compatible
-                selector = (String)endpoint.getProperties().get(JmsConstants.JMS_SELECTOR_PROPERTY);
+                selector = (String) endpoint.getProperties().get(JmsConstants.JMS_SELECTOR_PROPERTY);
             }
-            String tempDurable = (String)endpoint.getProperties().get("durable");
+            String tempDurable = (String) endpoint.getProperties().get("durable");
             boolean durable = connector.isDurable();
             if (tempDurable != null)
             {
@@ -335,17 +329,17 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
             }
 
             // Get the durable subscriber name if there is one
-            String durableName = (String)endpoint.getProperties().get("durableName");
+            String durableName = (String) endpoint.getProperties().get("durableName");
             if (durableName == null && durable && topic)
             {
                 durableName = "mule." + connector.getName() + "." + endpoint.getEndpointURI().getAddress();
                 logger.debug("Jms Connector for this receiver is durable but no durable name has been specified. Defaulting to: "
-                             + durableName);
+                        + durableName);
             }
 
             // Create consumer
             ctx.consumer = jmsSupport.createConsumer(ctx.session, dest, selector, connector.isNoLocal(),
-                durableName, topic);
+                    durableName, topic);
         }
         catch (JMSException e)
         {

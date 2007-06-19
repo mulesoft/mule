@@ -18,7 +18,7 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
 
 import java.util.Date;
@@ -44,10 +44,10 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
     private final QuartzConnector connector;
 
     public QuartzMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
-        throws InitialisationException
+            throws CreateException
     {
         super(connector, component, endpoint);
-        this.connector = (QuartzConnector)connector;
+        this.connector = (QuartzConnector) connector;
     }
 
     protected void doDispose()
@@ -112,7 +112,7 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
             else
             {
                 throw new IllegalArgumentException(
-                    QuartzMessages.cronExpressionOrIntervalMustBeSet().getMessage());
+                        QuartzMessages.cronExpressionOrIntervalMustBeSet().getMessage());
             }
             long start = System.currentTimeMillis();
             if (startDelay != null)

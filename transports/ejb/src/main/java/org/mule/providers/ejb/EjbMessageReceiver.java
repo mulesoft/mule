@@ -13,7 +13,7 @@ package org.mule.providers.ejb;
 import org.mule.providers.rmi.RmiMessageReceiver;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
 
 /**
@@ -29,11 +29,11 @@ public class EjbMessageReceiver extends RmiMessageReceiver
     public EjbMessageReceiver(UMOConnector connector,
                               UMOComponent component,
                               UMOEndpoint endpoint,
-                              long frequency) throws InitialisationException
+                              long frequency) throws CreateException
     {
         super(connector, component, endpoint, frequency);
 
-        this.connector = (EjbConnector)connector;
+        this.connector = (EjbConnector) connector;
     }
 
 }

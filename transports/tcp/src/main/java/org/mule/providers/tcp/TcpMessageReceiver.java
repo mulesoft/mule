@@ -21,11 +21,14 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.DisposeException;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
+
+import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -45,9 +48,6 @@ import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkManager;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 
 /**
  * <code>TcpMessageReceiver</code> acts like a TCP server to receive socket
@@ -58,7 +58,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
     private ServerSocket serverSocket = null;
 
     public TcpMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
-        throws InitialisationException
+            throws CreateException
     {
         super(connector, component, endpoint);
     }
@@ -122,6 +122,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
 
     /**
      * Obtain the serverSocket
+     *
      * @return the server socket for this server
      */
     public ServerSocket getServerSocket()
@@ -213,7 +214,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
         }
         catch (Exception e)
         {
-            logger.error(new DisposeException(TcpMessages.failedToCloseSocket(), e));
+            logger.error(new DisposeException(TcpMessages.failedToCloseSocket(), e, this));
         }
         logger.info("Closed Tcp port");
     }
@@ -282,9 +283,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
             }
         }
 
-        /**
-         * Accept requests from a given TCP port
-         */
+        /** Accept requests from a given TCP port */
         public void run()
         {
             try

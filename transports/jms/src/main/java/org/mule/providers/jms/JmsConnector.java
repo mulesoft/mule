@@ -30,7 +30,7 @@ import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.lifecycle.LifecycleException;
+import org.mule.umo.lifecycle.StartException;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.util.BeanUtils;
@@ -121,9 +121,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
     private JmsTopicResolver topicResolver;
 
-    /**
-     * Whether to create a consumer on connect.
-     */
+    /** Whether to create a consumer on connect. */
     private boolean eagerConsumer = true;
 
     public JmsConnector()
@@ -186,7 +184,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
                 props.put(Context.INITIAL_CONTEXT_FACTORY, jndiInitialFactory);
             }
             else if (jndiProviderProperties == null
-                     || !jndiProviderProperties.containsKey(Context.INITIAL_CONTEXT_FACTORY))
+                    || !jndiProviderProperties.containsKey(Context.INITIAL_CONTEXT_FACTORY))
             {
                 throw new InitialisationException(CoreMessages.objectIsNull("jndiInitialFactory"), this);
             }
@@ -216,13 +214,13 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
         if (temp instanceof ConnectionFactory)
         {
-            return (ConnectionFactory)temp;
+            return (ConnectionFactory) temp;
         }
         else
         {
             throw new InitialisationException(
-                JmsMessages.invalidResourceType(ConnectionFactory.class, 
-                    (temp == null ? null : temp.getClass())), this);
+                    JmsMessages.invalidResourceType(ConnectionFactory.class,
+                            (temp == null ? null : temp.getClass())), this);
         }
     }
 
@@ -240,7 +238,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
             if (managementContext.getTransactionManager() != null)
             {
                 connectionFactory = new ConnectionFactoryWrapper(connectionFactory, managementContext
-                    .getTransactionManager());
+                        .getTransactionManager());
             }
         }
 
@@ -311,8 +309,8 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
             // want if the descriptor's initial state is paused.
             if (connectionFactoryClass != null)
             {
-                connectionFactory = (ConnectionFactory)ClassUtils.instanciateClass(connectionFactoryClass,
-                    ClassUtils.NO_ARGS);
+                connectionFactory = (ConnectionFactory) ClassUtils.instanciateClass(connectionFactoryClass,
+                        ClassUtils.NO_ARGS);
             }
 
             // If we have a connection factory, there is no need to initialise
@@ -334,7 +332,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
                 if (JmsConstants.JMS_SPECIFICATION_102B.equals(specification))
                 {
                     jmsSupport = new Jms102bSupport(this, jndiContext, jndiDestinations,
-                        forceJndiDestinations);
+                            forceJndiDestinations);
                 }
                 else
                 {
@@ -392,7 +390,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
     public UMOMessageAdapter getMessageAdapter(Object message) throws MessagingException
     {
-        JmsMessageAdapter adapter = (JmsMessageAdapter)super.getMessageAdapter(message);
+        JmsMessageAdapter adapter = (JmsMessageAdapter) super.getMessageAdapter(message);
         adapter.setSpecification(this.getSpecification());
         return adapter;
     }
@@ -414,7 +412,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
                     logger.debug("Retrieving jms session from current transaction " + tx);
                 }
 
-                return (Session)tx.getResource(connection);
+                return (Session) tx.getResource(connection);
             }
         }
         return null;
@@ -444,15 +442,15 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         {
             logger.debug(MessageFormat.format(
                     "Retrieving new jms session from connection: " +
-                    "topic={0}, transacted={1}, ack mode={2}, nolocal={3}",
+                            "topic={0}, transacted={1}, ack mode={2}, nolocal={3}",
                     new Object[]{Boolean.valueOf(topic),
-                                 Boolean.valueOf(transacted || tx != null),
-                                 new Integer(acknowledgementMode),
-                                 Boolean.valueOf(noLocal)}));
+                            Boolean.valueOf(transacted || tx != null),
+                            new Integer(acknowledgementMode),
+                            Boolean.valueOf(noLocal)}));
         }
 
         session = jmsSupport.createSession(connection, topic, transacted || tx != null, acknowledgementMode,
-            noLocal);
+                noLocal);
         if (tx != null)
         {
             logger.debug("Binding session to current transaction");
@@ -478,7 +476,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
             }
             catch (JMSException e)
             {
-                throw new LifecycleException(CoreMessages.failedToStart("Jms Connection"), e);
+                throw new StartException(CoreMessages.failedToStart("Jms Connection"), e, this);
             }
         }
     }
@@ -493,81 +491,61 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         return "jms";
     }
 
-    /**
-     * @return Returns the acknowledgeMode.
-     */
+    /** @return Returns the acknowledgeMode. */
     public int getAcknowledgementMode()
     {
         return acknowledgementMode;
     }
 
-    /**
-     * @param acknowledgementMode The acknowledgementMode to set.
-     */
+    /** @param acknowledgementMode The acknowledgementMode to set. */
     public void setAcknowledgementMode(int acknowledgementMode)
     {
         this.acknowledgementMode = acknowledgementMode;
     }
 
-    /**
-     * @return Returns the connectionFactoryJndiName.
-     */
+    /** @return Returns the connectionFactoryJndiName. */
     public String getConnectionFactoryJndiName()
     {
         return connectionFactoryJndiName;
     }
 
-    /**
-     * @param connectionFactoryJndiName The connectionFactoryJndiName to set.
-     */
+    /** @param connectionFactoryJndiName The connectionFactoryJndiName to set. */
     public void setConnectionFactoryJndiName(String connectionFactoryJndiName)
     {
         this.connectionFactoryJndiName = connectionFactoryJndiName;
     }
 
-    /**
-     * @return Returns the durable.
-     */
+    /** @return Returns the durable. */
     public boolean isDurable()
     {
         return durable;
     }
 
-    /**
-     * @param durable The durable to set.
-     */
+    /** @param durable The durable to set. */
     public void setDurable(boolean durable)
     {
         this.durable = durable;
     }
 
-    /**
-     * @return Returns the noLocal.
-     */
+    /** @return Returns the noLocal. */
     public boolean isNoLocal()
     {
         return noLocal;
     }
 
-    /**
-     * @param noLocal The noLocal to set.
-     */
+    /** @param noLocal The noLocal to set. */
     public void setNoLocal(boolean noLocal)
     {
         this.noLocal = noLocal;
     }
 
-    /**
-     * @return Returns the persistentDelivery.
-     */
+    /** @return Returns the persistentDelivery. */
     public boolean isPersistentDelivery()
     {
         return persistentDelivery;
     }
 
-    /**
-     * @param persistentDelivery The persistentDelivery to set.
-     */
+    /** @param persistentDelivery The persistentDelivery to set. */
     public void setPersistentDelivery(boolean persistentDelivery)
     {
         this.persistentDelivery = persistentDelivery;
@@ -591,9 +569,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         this.jndiProviderProperties = jndiProviderProperties;
     }
 
-    /**
-     * @return Returns underlying connection factory properties.
-     */
+    /** @return Returns underlying connection factory properties. */
     public Map getConnectionFactoryProperties()
     {
         return connectionFactoryProperties;
@@ -601,7 +577,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
     /**
      * @param connectionFactoryProperties properties to be set on the underlying
-     *            ConnectionFactory.
+     *                                    ConnectionFactory.
      */
     public void setConnectionFactoryProperties(final Map connectionFactoryProperties)
     {
@@ -709,12 +685,12 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     }
 
     protected RedeliveryHandler createRedeliveryHandler()
-        throws IllegalAccessException, NoSuchMethodException, InvocationTargetException,
-        InstantiationException, ClassNotFoundException
+            throws IllegalAccessException, NoSuchMethodException, InvocationTargetException,
+            InstantiationException, ClassNotFoundException
     {
         if (redeliveryHandler != null)
         {
-            return (RedeliveryHandler)ClassUtils.instanciateClass(redeliveryHandler, ClassUtils.NO_ARGS);
+            return (RedeliveryHandler) ClassUtils.instanciateClass(redeliveryHandler, ClassUtils.NO_ARGS);
         }
         else
         {
@@ -747,9 +723,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         this.password = password;
     }
 
-    /**
-     * @return Returns the connection.
-     */
+    /** @return Returns the connection. */
     public Connection getConnection()
     {
         return connection;
@@ -796,7 +770,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
      *
      * @return Value for property 'topicResolver'.
      */
-    public JmsTopicResolver getTopicResolver ()
+    public JmsTopicResolver getTopicResolver()
     {
         return topicResolver;
     }
@@ -806,7 +780,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
      *
      * @param topicResolver Value to set for property 'topicResolver'.
      */
-    public void setTopicResolver (final JmsTopicResolver topicResolver)
+    public void setTopicResolver(final JmsTopicResolver topicResolver)
     {
         this.topicResolver = topicResolver;
     }
@@ -818,7 +792,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
      * @return Value for property 'eagerConsumer'.
      * @see #eagerConsumer
      */
-    public boolean isEagerConsumer ()
+    public boolean isEagerConsumer()
     {
         return eagerConsumer;
     }
@@ -840,7 +814,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
      * @see #eagerConsumer
      * @see org.mule.providers.jms.TransactedJmsMessageReceiver
      */
-    public void setEagerConsumer (final boolean eagerConsumer)
+    public void setEagerConsumer(final boolean eagerConsumer)
     {
         this.eagerConsumer = eagerConsumer;
     }
@@ -848,7 +822,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     public void onNotification(UMOServerNotification notification)
     {
         if (notification.getAction() == ConnectionNotification.CONNECTION_DISCONNECTED
-            || notification.getAction() == ConnectionNotification.CONNECTION_FAILED)
+                || notification.getAction() == ConnectionNotification.CONNECTION_FAILED)
         {
             // Remove all dispatchers as any cached session will be invalidated
             disposeDispatchers();
@@ -882,7 +856,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     /**
      * This method may be overridden in order to apply pre-processing to the message
      * as soon as it arrives.
-     * 
+     *
      * @param message - the incoming message
      * @param session - the JMS session
      * @return the preprocessed message
@@ -894,7 +868,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
     /**
      * Closes the MessageProducer
-     * 
+     *
      * @param producer
      * @throws JMSException
      */
@@ -909,7 +883,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     /**
      * Closes the MessageProducer without throwing an exception (an error message is
      * logged instead).
-     * 
+     *
      * @param producer
      */
     public void closeQuietly(MessageProducer producer)
@@ -926,7 +900,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
     /**
      * Closes the MessageConsumer
-     * 
+     *
      * @param consumer
      * @throws JMSException
      */
@@ -941,7 +915,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     /**
      * Closes the MessageConsumer without throwing an exception (an error message is
      * logged instead).
-     * 
+     *
      * @param consumer
      */
     public void closeQuietly(MessageConsumer consumer)
@@ -958,7 +932,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
     /**
      * Closes the Session
-     * 
+     *
      * @param session
      * @throws JMSException
      */
@@ -973,7 +947,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     /**
      * Closes the Session without throwing an exception (an error message is logged
      * instead).
-     * 
+     *
      * @param session
      */
     public void closeQuietly(Session session)
@@ -990,7 +964,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
     /**
      * Closes the TemporaryQueue
-     * 
+     *
      * @param tempQueue
      * @throws JMSException
      */
@@ -1005,7 +979,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     /**
      * Closes the TemporaryQueue without throwing an exception (an error message is
      * logged instead).
-     * 
+     *
      * @param tempQueue
      */
     public void closeQuietly(TemporaryQueue tempQueue)
@@ -1029,14 +1003,14 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
                 }
                 logger.info(MessageFormat.format(
                         "Faled to delete a temporary queue '{0}' Reason: {1}",
-                        new Object[] {queueName, e.getMessage()}));
+                        new Object[]{queueName, e.getMessage()}));
             }
         }
     }
 
     /**
      * Closes the TemporaryTopic
-     * 
+     *
      * @param tempTopic
      * @throws JMSException
      */
@@ -1051,7 +1025,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     /**
      * Closes the TemporaryTopic without throwing an exception (an error message is
      * logged instead).
-     * 
+     *
      * @param tempTopic
      */
     public void closeQuietly(TemporaryTopic tempTopic)

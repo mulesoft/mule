@@ -18,7 +18,7 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.lifecycle.Startable;
 import org.mule.umo.lifecycle.Stoppable;
 import org.mule.umo.provider.ReceiveException;
@@ -46,12 +46,12 @@ import org.apache.commons.lang.StringUtils;
 
 /**
  * Poll a mailbox for messages, remove the messages and route them as events into Mule.
- *
+ * <p/>
  * This contains a reference to a mail folder (and also the endpoint and connector, via superclasses)
  */
 
 public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver
-    implements MessageCountListener, Startable, Stoppable
+        implements MessageCountListener, Startable, Stoppable
 {
     private Folder folder = null;
     private String backupFolder = null;
@@ -60,8 +60,8 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver
                                    UMOComponent component,
                                    UMOEndpoint endpoint,
                                    long checkFrequency,
-                                   String backupFolder) 
-    throws InitialisationException
+                                   String backupFolder)
+            throws CreateException
     {
         super(connector, component, endpoint);
         this.backupFolder = backupFolder;
@@ -84,8 +84,8 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver
         // If user explicitly sets backup folder to "" it will disable email back up
         if (backupFolder == null)
         {
-            this.backupFolder = 
-                RegistryContext.getConfiguration().getWorkingDirectory() + "/mail/" + folder.getName();
+            this.backupFolder =
+                    RegistryContext.getConfiguration().getWorkingDirectory() + "/mail/" + folder.getName();
         }
         else if (StringUtils.EMPTY.equals(backupFolder))
         {
@@ -205,17 +205,13 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver
         }
     }
 
-    /**
-     * @return the current Mail folder
-     */
+    /** @return the current Mail folder */
     public Folder getFolder()
     {
         return folder;
     }
 
-    /**
-     * @param folder
-     */
+    /** @param folder  */
     public synchronized void setFolder(Folder folder)
     {
         if (folder == null)
@@ -242,9 +238,9 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver
     /**
      * Helper method for testing which stores a copy of the message locally as the
      * POP3 <p/> message will be deleted from the server
-     * 
+     *
      * @param msg the message to store
-     * @throws IOException If a failure happens writing the message
+     * @throws IOException        If a failure happens writing the message
      * @throws MessagingException If a failure happens reading the message
      */
     protected void storeMessage(Message msg) throws IOException, MessagingException
@@ -258,8 +254,8 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver
                 if (from != null && from.length > 0)
                 {
                     filename = from[0] instanceof InternetAddress
-                    ? ((InternetAddress) from[0]).getAddress()
-                    : from[0].toString();
+                            ? ((InternetAddress) from[0]).getAddress()
+                            : from[0].toString();
                 }
                 else
                 {
@@ -303,13 +299,13 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver
             {
                 Message[] messages = folder.getMessages();
                 MessageCountEvent event = new MessageCountEvent(folder, MessageCountEvent.ADDED, true,
-                    messages);
+                        messages);
                 messagesAdded(event);
             }
             else if (count == -1)
             {
                 throw new MessagingException("Cannot monitor folder: " + folder.getFullName()
-                    + " as folder is closed");
+                        + " as folder is closed");
             }
         }
         catch (MessagingException e)

@@ -10,6 +10,7 @@
 
 package org.mule.providers.email;
 
+import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.TlsIndirectKeyStore;
 import org.mule.umo.security.TlsIndirectTrustStore;
@@ -25,8 +26,8 @@ import javax.mail.URLName;
  * Support for connecting to and receiving email from a secure mailbox (the exact protocol depends on
  * the subclass).
  */
-public abstract class AbstractTlsRetrieveMailConnector 
-extends AbstractRetrieveMailConnector implements TlsIndirectTrustStore, TlsIndirectKeyStore
+public abstract class AbstractTlsRetrieveMailConnector
+        extends AbstractRetrieveMailConnector implements TlsIndirectTrustStore, TlsIndirectKeyStore
 {
 
     private String namespace;
@@ -39,15 +40,22 @@ extends AbstractRetrieveMailConnector implements TlsIndirectTrustStore, TlsIndir
         super(defaultPort);
         this.namespace = namespace;
         socketFactory = defaultSocketFactory.getName();
-        
+
         // see comment below
 //        this.namespace = TlsConfiguration.JSSE_NAMESPACE;
 //        socketFactory = SSLServerSocketFactory.class.getName();
     }
-    
+
     protected void doInitialise() throws InitialisationException
     {
-        tls.initialise(true, null);
+        try
+        {
+            tls.initialise(true, null);
+        }
+        catch (CreateException e)
+        {
+            throw new InitialisationException(e, this);
+        }
         super.doInitialise();
     }
 
@@ -59,7 +67,7 @@ extends AbstractRetrieveMailConnector implements TlsIndirectTrustStore, TlsIndir
         local.setProperty("mail." + getProtocol() + ".ssl", "true");
         local.setProperty("mail." + getProtocol() + ".socketFactory.class", getSocketFactory());
         local.setProperty("mail." + getProtocol() + ".socketFactory.fallback", getSocketFactoryFallback());
-        
+
         new TlsPropertiesMapper(namespace).writeToProperties(global, tls);
 
         // this, instead of the line above, and with the constructor changes,
@@ -67,7 +75,7 @@ extends AbstractRetrieveMailConnector implements TlsIndirectTrustStore, TlsIndir
         // (it didn't work)
 //        new TlsPropertiesMapper(namespace).writeToProperties(local, tls);
     }
-    
+
     public String getSocketFactory()
     {
         return socketFactory;

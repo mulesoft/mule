@@ -12,6 +12,7 @@ package org.mule.transaction.lookup;
 
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.container.JndiContextHelper;
+import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOTransactionManagerFactory;
 
@@ -32,9 +33,8 @@ import org.apache.commons.logging.LogFactory;
  * For some servers the TransactionManager is not even available in the global JNDI
  * namespace, so your only bet is to run Mule in the same JVM as the application
  * server.
- * 
  */
-public class GenericTransactionManagerLookupFactory implements UMOTransactionManagerFactory
+public class GenericTransactionManagerLookupFactory implements UMOTransactionManagerFactory, Initialisable
 {
     protected final Log logger = LogFactory.getLog(getClass());
 
@@ -86,9 +86,7 @@ public class GenericTransactionManagerLookupFactory implements UMOTransactionMan
         this.context = context;
     }
 
-    /**
-     * @see org.mule.umo.manager.UMOTransactionManagerFactory#create()
-     */
+    /** @see org.mule.umo.manager.UMOTransactionManagerFactory#create() */
     public TransactionManager create() throws Exception
     {
         // implementing the Initilisable interface does not call it??
@@ -108,11 +106,10 @@ public class GenericTransactionManagerLookupFactory implements UMOTransactionMan
      * retrying to connect, a <code>RecoverableException</code> should be thrown.
      * There is no guarantee that by throwing a Recoverable exception that the Mule
      * instance will not shut down.
-     * 
-     * @throws org.mule.umo.lifecycle.InitialisationException if a fatal error occurs
-     *             causing the Mule instance to shutdown
-     * @throws org.mule.umo.lifecycle.RecoverableException if an error occurs that
-     *             can be recovered from
+     *
+     * @throws org.mule.umo.lifecycle.InitialisationException
+     *          if a fatal error occurs
+     *          causing the Mule instance to shutdown
      */
     public void initialise() throws InitialisationException
     {
@@ -130,8 +127,8 @@ public class GenericTransactionManagerLookupFactory implements UMOTransactionMan
         }
         catch (NamingException e)
         {
-            throw new InitialisationException(CoreMessages.failedToCreate("Jndi context"), 
-                e, this);
+            throw new InitialisationException(CoreMessages.failedToCreate("Jndi context"),
+                    e, this);
         }
     }
 }

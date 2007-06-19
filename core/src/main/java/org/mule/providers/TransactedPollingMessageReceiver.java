@@ -16,7 +16,7 @@ import org.mule.transaction.TransactionTemplate;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
@@ -42,7 +42,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
 
     public TransactedPollingMessageReceiver(UMOConnector connector,
                                             UMOComponent component,
-                                            final UMOEndpoint endpoint) throws InitialisationException
+                                            final UMOEndpoint endpoint) throws CreateException
     {
         super(connector, component, endpoint);
         this.setReceiveMessagesInTransaction(endpoint.getTransactionConfig().getFactory() != null);
@@ -50,13 +50,13 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
 
     /**
      * @deprecated please use
-     *             {@link #TransactedPollingMessageReceiver(UMOConnector, UMOComponent, UMOEndpoint, long, TimeUnit)}
+     *             {@link #TransactedPollingMessageReceiver(UMOConnector,UMOComponent,UMOEndpoint,long,TimeUnit)}
      *             instead
      */
     public TransactedPollingMessageReceiver(UMOConnector connector,
                                             UMOComponent component,
                                             final UMOEndpoint endpoint,
-                                            long frequency) throws InitialisationException
+                                            long frequency) throws CreateException
     {
         this(connector, component, endpoint);
         this.setFrequency(frequency);
@@ -92,7 +92,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
         int numReceiversToStart = 1;
 
         if (this.isReceiveMessagesInTransaction() && this.isUseMultipleTransactedReceivers()
-                        && tp.isDoThreading())
+                && tp.isDoThreading())
         {
             numReceiversToStart = connector.getNumberOfConcurrentTransactedReceivers();
         }
@@ -106,7 +106,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
     public void poll() throws Exception
     {
         TransactionTemplate tt = new TransactionTemplate(endpoint.getTransactionConfig(),
-            connector.getExceptionListener(), connector.getManagementContext());
+                connector.getExceptionListener(), connector.getManagementContext());
 
         if (this.isReceiveMessagesInTransaction())
         {
@@ -142,7 +142,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
                     try
                     {
                         this.getWorkManager().scheduleWork(
-                            new MessageProcessorWorker(tt, countdown, it.next()));
+                                new MessageProcessorWorker(tt, countdown, it.next()));
                     }
                     catch (Exception e)
                     {

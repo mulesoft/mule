@@ -10,6 +10,7 @@
 
 package org.mule.providers.email;
 
+import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.TlsIndirectKeyStore;
 import org.mule.umo.security.TlsIndirectTrustStore;
@@ -21,9 +22,7 @@ import java.util.Properties;
 
 import javax.mail.URLName;
 
-/**
- * Creates a secure SMTP connection
- */
+/** Creates a secure SMTP connection */
 public class SmtpsConnector extends SmtpConnector implements TlsIndirectTrustStore, TlsIndirectKeyStore
 {
 
@@ -40,12 +39,12 @@ public class SmtpsConnector extends SmtpConnector implements TlsIndirectTrustSto
     {
         super(DEFAULT_SMTPS_PORT);
     }
-    
+
     public String getProtocol()
     {
         return "smtps";
     }
-    
+
     public String getBaseProtocol()
     {
         return "smtp";
@@ -53,7 +52,14 @@ public class SmtpsConnector extends SmtpConnector implements TlsIndirectTrustSto
 
     protected void doInitialise() throws InitialisationException
     {
-        tls.initialise(true, null);
+        try
+        {
+            tls.initialise(true, null);
+        }
+        catch (CreateException e)
+        {
+            throw new InitialisationException(e, this);
+        }
     }
 
     // @Override
@@ -64,10 +70,10 @@ public class SmtpsConnector extends SmtpConnector implements TlsIndirectTrustSto
         local.setProperty("mail." + getProtocol() + ".ssl", "true");
         local.setProperty("mail." + getProtocol() + ".socketFactory.class", getSocketFactory());
         local.setProperty("mail." + getProtocol() + ".socketFactory.fallback", getSocketFactoryFallback());
-        
+
         new TlsPropertiesMapper(SmtpsSocketFactory.MULE_SMTPS_NAMESPACE).writeToProperties(global, tls);
     }
-    
+
     public String getSocketFactory()
     {
         return socketFactory;
@@ -107,7 +113,7 @@ public class SmtpsConnector extends SmtpConnector implements TlsIndirectTrustSto
     {
         tls.setTrustStorePassword(trustStorePassword);
     }
-    
+
     // these were not present before, but could be set implicitly via global proeprties
     // that is no longer true, so i have added them in here
 

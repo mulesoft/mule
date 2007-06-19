@@ -18,9 +18,9 @@ import org.mule.providers.tcp.protocols.DefaultProtocol;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.provider.UMOConnector;
 import org.mule.util.ClassUtils;
 
 import java.io.BufferedOutputStream;
@@ -29,8 +29,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.URI;
 import java.net.SocketException;
+import java.net.URI;
 
 import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 
@@ -42,9 +42,7 @@ import org.apache.commons.pool.impl.GenericKeyedObjectPool;
  */
 public class TcpConnector extends AbstractConnector
 {
-    /**
-     * Property can be set on the endpoint to configure how the socket is managed
-     */
+    /** Property can be set on the endpoint to configure how the socket is managed */
     public static final String KEEP_SEND_SOCKET_OPEN_PROPERTY = "keepSendSocketOpen";
     public static final int DEFAULT_SOCKET_TIMEOUT = INT_VALUE_NOT_SET;
     public static final int DEFAULT_BUFFER_SIZE = INT_VALUE_NOT_SET;
@@ -72,7 +70,7 @@ public class TcpConnector extends AbstractConnector
 
     public TcpConnector()
     {
-        setSocketFactory (new TcpSocketFactory());
+        setSocketFactory(new TcpSocketFactory());
         setServerSocketFactory(new TcpServerSocketFactory());
         setTcpProtocolClassName(DefaultProtocol.class.getName());
     }
@@ -127,7 +125,7 @@ public class TcpConnector extends AbstractConnector
             }
             catch (Exception e)
             {
-                throw new InitialisationException(TcpMessages.failedToInitMessageReader(), e);
+                throw new InitialisationException(TcpMessages.failedToInitMessageReader(), e, this);
             }
         }
 
@@ -190,7 +188,7 @@ public class TcpConnector extends AbstractConnector
         {
             // This shouldn't happen
             throw new IllegalStateException("could not get socket for endpoint: "
-                                            + endpoint.getEndpointURI().getAddress());
+                    + endpoint.getEndpointURI().getAddress());
         }
         try
         {
@@ -236,7 +234,7 @@ public class TcpConnector extends AbstractConnector
     }
 
     // getters and setters ---------------------------------------------------------
-    
+
     public boolean isKeepSendSocketOpen()
     {
         return keepSendSocketOpen;
@@ -249,6 +247,7 @@ public class TcpConnector extends AbstractConnector
 
     /**
      * A shorthand property setting timeout for both SEND and RECEIVE sockets.
+     *
      * @deprecated The time out should be set explicitly for each
      */
     public void setTimeout(int timeout)
@@ -277,17 +276,13 @@ public class TcpConnector extends AbstractConnector
         this.serverSoTimeout = valueOrDefault(timeout, 0, DEFAULT_SOCKET_TIMEOUT);
     }
 
-    /**
-     * @deprecated Should use {@link #getSendBufferSize()} or {@link #getReceiveBufferSize()}
-     */
+    /** @deprecated Should use {@link #getSendBufferSize()} or {@link #getReceiveBufferSize()} */
     public int getBufferSize()
     {
         return sendBufferSize;
     }
 
-    /**
-     * @deprecated Should use {@link #setSendBufferSize(int)} or {@link #setReceiveBufferSize(int)}
-     */
+    /** @deprecated Should use {@link #setSendBufferSize(int)} or {@link #setReceiveBufferSize(int)} */
     public void setBufferSize(int bufferSize)
     {
         sendBufferSize = valueOrDefault(bufferSize, 1, DEFAULT_BUFFER_SIZE);
@@ -334,7 +329,6 @@ public class TcpConnector extends AbstractConnector
     }
 
     /**
-     *
      * @return
      * @deprecated should use {@link #getReceiveBacklog()}
      */
@@ -344,7 +338,6 @@ public class TcpConnector extends AbstractConnector
     }
 
     /**
-     *
      * @param backlog
      * @deprecated should use {@link #setReceiveBacklog(int)}
      */
@@ -397,7 +390,7 @@ public class TcpConnector extends AbstractConnector
     {
         this.sendTcpNoDelay = sendTcpNoDelay;
     }
-    
+
     protected void setSocketFactory(PooledSocketFactory socketFactory)
     {
         this.socketFactory = socketFactory;
@@ -422,16 +415,16 @@ public class TcpConnector extends AbstractConnector
     {
         return getServerSocketFactory().createServerSocket(uri, getReceiveBacklog());
     }
-    
+
     private static int valueOrDefault(int value, int threshhold, int deflt)
     {
         if (value < threshhold)
         {
             return deflt;
         }
-        else 
+        else
         {
-            return value;    
+            return value;
         }
     }
 
@@ -440,15 +433,17 @@ public class TcpConnector extends AbstractConnector
      *
      * @return If true, the message adapter opens and closes the socket on intialisation.
      */
-    public boolean isValidateConnections() {
+    public boolean isValidateConnections()
+    {
         return validateConnections;
     }
 
     /**
-     * @see #isValidateConnections()
      * @param validateConnections If true, the message adapter opens and closes the socket on intialisation.
+     * @see #isValidateConnections()
      */
-    public void setValidateConnections(boolean validateConnections) {
+    public void setValidateConnections(boolean validateConnections)
+    {
         this.validateConnections = validateConnections;
     }
 }

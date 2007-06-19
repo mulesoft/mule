@@ -30,9 +30,7 @@ import javax.security.auth.login.Configuration;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
-/**
- * @author Marie.Rizzo This is the Provider for Mule's Jaas Security
- */
+/** @author Marie.Rizzo This is the Provider for Mule's Jaas Security */
 public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider
 {
 
@@ -49,7 +47,7 @@ public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider
 
     /**
      * Sets the login Configuration
-     * 
+     *
      * @param loginConfig
      */
     public final void setLoginConfig(String loginConfig)
@@ -59,7 +57,7 @@ public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider
 
     /**
      * Gets the Login Configuration
-     * 
+     *
      * @return loginConfig
      */
     public final String getLoginConfig()
@@ -69,7 +67,7 @@ public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider
 
     /**
      * Sets the Login Context name
-     * 
+     *
      * @param loginContextName
      */
     public final void setLoginContextName(String loginContextName)
@@ -79,7 +77,7 @@ public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider
 
     /**
      * Gets the Login Context Name
-     * 
+     *
      * @return loginContextName
      */
     public final String getLoginContextName()
@@ -89,7 +87,7 @@ public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider
 
     /**
      * Gets the user's credentials, i.e. the username and password
-     * 
+     *
      * @return credentials
      */
     public final String getCredentials()
@@ -99,7 +97,7 @@ public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider
 
     /**
      * Sets the user's credentials.
-     * 
+     *
      * @param credentials
      */
     public final void setCredentials(String credentials)
@@ -109,7 +107,7 @@ public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider
 
     /**
      * Gets the login module name
-     * 
+     *
      * @return loginModule
      */
     public final String getLoginModule()
@@ -119,7 +117,7 @@ public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider
 
     /**
      * sets the login module name
-     * 
+     *
      * @param loginModule
      */
     public final void setLoginModule(String loginModule)
@@ -127,17 +125,13 @@ public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider
         this.loginModule = loginModule;
     }
 
-    /**
-     * @return name
-     */
+    /** @return name */
     public final String getName()
     {
         return name;
     }
 
-    /**
-     * @param name
-     */
+    /** @param name  */
     public final void setName(String name)
     {
         this.name = name;
@@ -147,15 +141,15 @@ public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider
 
     /**
      * @throws IOException The configureJaas method gets the resource path of the
-     *             jaas configuration file and constructs the URL for the login
-     *             configuration.
+     *                     jaas configuration file and constructs the URL for the login
+     *                     configuration.
      */
     private void configureJaas() throws IOException
     {
 
         String loginConfigUrl = "file://"
-                                + org.mule.util.FileUtils.getResourcePath(loginConfig,
-                                    JaasSimpleAuthenticationProvider.class);
+                + org.mule.util.FileUtils.getResourcePath(loginConfig,
+                JaasSimpleAuthenticationProvider.class);
 
         boolean alreadySet = false;
 
@@ -185,17 +179,18 @@ public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider
      * The authenticate method first creates the jaas Login Context using the
      * callback handler and the name of the class or directory to prtect. If the
      * Login Context is successfully created, it will then attempt to login.
-     * 
+     *
      * @param UMOAuthentication
      * @return UMOAuthentication
      * @throws org.mule.umo.security.SecurityException
+     *
      */
     public final UMOAuthentication authenticate(UMOAuthentication authentication)
-        throws org.mule.umo.security.SecurityException
+            throws org.mule.umo.security.SecurityException
     {
 
         LoginContext loginContext;
-        MuleAuthentication auth = (MuleAuthentication)authentication;
+        MuleAuthentication auth = (MuleAuthentication) authentication;
 
         // Create the Mule Callback Handler
         MuleCallbackHandler cbh = new MuleCallbackHandler(auth);
@@ -208,7 +203,7 @@ public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider
         catch (LoginException e)
         {
             throw new org.mule.umo.security.UnauthorisedException(
-                CoreMessages.cannotLoadFromClasspath(loginContextName));
+                    CoreMessages.cannotLoadFromClasspath(loginContextName));
         }
 
         // Attempt to login the user
@@ -228,9 +223,9 @@ public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider
 
     /**
      * checks whether the class is supported.
-     * 
-     * @return
+     *
      * @param aClass
+     * @return
      */
     public final boolean supports(Class aClass)
     {
@@ -238,12 +233,13 @@ public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider
     }
 
     /**
-     * @throws UnknownAuthenticationTypeException This occurs when the Security
-     *             Factory cannot be created
      * @return
+     * @throws UnknownAuthenticationTypeException
+     *          This occurs when the Security
+     *          Factory cannot be created
      */
     public final UMOSecurityContext createSecurityContext(UMOAuthentication auth)
-        throws UnknownAuthenticationTypeException
+            throws UnknownAuthenticationTypeException
     {
         return factory.create(auth);
     }
@@ -254,7 +250,7 @@ public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider
      * that file. If such a configuration file is not present, it will then try to
      * configure jaas programmatically. It also attempts to create the
      * JaasSecurityContextFactory.
-     * 
+     *
      * @throws InitialisationException
      */
     public final void initialise() throws InitialisationException
@@ -276,12 +272,12 @@ public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider
                 if (loginModule != null)
                 {
                     entry = new AppConfigurationEntry(loginModule,
-                        AppConfigurationEntry.LoginModuleControlFlag.REQUIRED, options);
+                            AppConfigurationEntry.LoginModuleControlFlag.REQUIRED, options);
                 }
                 else
                 {
                     entry = new AppConfigurationEntry(defaultModule,
-                        AppConfigurationEntry.LoginModuleControlFlag.REQUIRED, options);
+                            AppConfigurationEntry.LoginModuleControlFlag.REQUIRED, options);
                 }
 
                 JaasConfig.addApplicationConfigEntry(loginContextName, entry);
@@ -311,7 +307,7 @@ public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider
         }
         catch (Exception e)
         {
-            throw new InitialisationException(CoreMessages.failedToCreate("JaasProvider"), e);
+            throw new InitialisationException(CoreMessages.failedToCreate("JaasProvider"), e, this);
         }
     }
 
@@ -325,9 +321,7 @@ public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider
         private static Map appConfigEntries = new HashMap();
         private static JaasConfig jaasConfig;
 
-        /**
-         * Initializes and sets the Jaas Configuration
-         */
+        /** Initializes and sets the Jaas Configuration */
         public static void init()
         {
             jaasConfig = new JaasConfig();
@@ -336,7 +330,7 @@ public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider
 
         /**
          * Returns the Jas Configuration
-         * 
+         *
          * @return jaasConfig
          */
         public static JaasConfig getJaasConfig()
@@ -346,7 +340,7 @@ public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider
 
         /**
          * Adds the Configuration Entries
-         * 
+         *
          * @param name
          * @param entry
          */
@@ -357,7 +351,7 @@ public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider
 
         /**
          * Gets the configuration entries using the application Name
-         * 
+         *
          * @param applicationName
          * @return
          */
@@ -369,7 +363,7 @@ public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider
                 throw new IllegalArgumentException("applicationName passed in was null.");
             }
 
-            AppConfigurationEntry entry = (AppConfigurationEntry)appConfigEntries.get(applicationName);
+            AppConfigurationEntry entry = (AppConfigurationEntry) appConfigEntries.get(applicationName);
             if (entry == null)
             {
                 return new AppConfigurationEntry[]{};

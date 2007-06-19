@@ -12,41 +12,37 @@ package org.mule.umo.lifecycle;
 
 import org.mule.config.i18n.Message;
 
-/**
- * <code>DisposeException</code> TODO (document class)
- */
+/** <code>DisposeException</code> TODO (document class) */
 
 public class DisposeException extends LifecycleException
 {
-    /**
-     * Serial version
-     */
+    /** Serial version */
     private static final long serialVersionUID = 1714192290605243678L;
 
     /**
-     * @param message the exception message
+     * @param message   the exception message
      * @param component the object that failed during a lifecycle method call
      */
-    public DisposeException(Message message, Object component)
+    public DisposeException(Message message, Disposable component)
     {
         super(message, component);
     }
 
     /**
-     * @param message the exception message
-     * @param cause the exception that cause this exception to be thrown
+     * @param message   the exception message
+     * @param cause     the exception that cause this exception to be thrown
      * @param component the object that failed during a lifecycle method call
      */
-    public DisposeException(Message message, Throwable cause, Object component)
+    public DisposeException(Message message, Throwable cause, Disposable component)
     {
         super(message, cause, component);
     }
 
     /**
-     * @param cause the exception that cause this exception to be thrown
+     * @param cause     the exception that cause this exception to be thrown
      * @param component the object that failed during a lifecycle method call
      */
-    public DisposeException(Throwable cause, Object component)
+    public DisposeException(Throwable cause, Disposable component)
     {
         super(cause, component);
     }

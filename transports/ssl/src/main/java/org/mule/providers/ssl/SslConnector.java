@@ -11,6 +11,7 @@
 package org.mule.providers.ssl;
 
 import org.mule.providers.tcp.TcpConnector;
+import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.TlsDirectKeyStore;
 import org.mule.umo.security.TlsDirectTrustStore;
@@ -34,7 +35,7 @@ import javax.net.ssl.TrustManagerFactory;
  * provide SSL enabled sockets.  All other logic is identical to TCP.
  */
 public class SslConnector extends TcpConnector
-implements TlsDirectKeyStore, TlsIndirectKeyStore, TlsDirectTrustStore, TlsProtocolHandler
+        implements TlsDirectKeyStore, TlsIndirectKeyStore, TlsDirectTrustStore, TlsProtocolHandler
 {
 
     // null initial keystore - see below
@@ -55,7 +56,14 @@ implements TlsDirectKeyStore, TlsIndirectKeyStore, TlsDirectTrustStore, TlsProto
         // the original logic here was slightly different to other uses of the TlsSupport code -
         // it appeared to be equivalent to switching anon by whether or not a keyStore was defined
         // (which seems to make sense), so that is used here.
-        tls.initialise(null == getKeyStore(), TlsConfiguration.JSSE_NAMESPACE);
+        try
+        {
+            tls.initialise(null == getKeyStore(), TlsConfiguration.JSSE_NAMESPACE);
+        }
+        catch (CreateException e)
+        {
+            throw new InitialisationException(e, this);
+        }
     }
 
     // @Override

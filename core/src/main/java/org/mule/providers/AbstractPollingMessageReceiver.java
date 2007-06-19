@@ -14,7 +14,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.util.ObjectUtils;
 
@@ -48,20 +48,20 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
 
     public AbstractPollingMessageReceiver(UMOConnector connector,
                                           UMOComponent component,
-                                          final UMOEndpoint endpoint) throws InitialisationException
+                                          final UMOEndpoint endpoint) throws CreateException
     {
         super(connector, component, endpoint);
     }
 
     /**
      * @deprecated please use
-     *             {@link #AbstractPollingMessageReceiver(UMOConnector, UMOComponent, UMOEndpoint)
+     *             {@link #AbstractPollingMessageReceiver(UMOConnector,UMOComponent,UMOEndpoint)
      *             instead and configure any other properties manually as required.
      */
     public AbstractPollingMessageReceiver(UMOConnector connector,
                                           UMOComponent component,
                                           final UMOEndpoint endpoint,
-                                          long frequency) throws InitialisationException
+                                          long frequency) throws CreateException
     {
         this(connector, component, endpoint);
         this.setFrequency(frequency);
@@ -78,21 +78,21 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
                 // polled database or network is slow or returns large amounts of
                 // data.
                 ScheduledFuture schedule = connector.getScheduler().scheduleWithFixedDelay(this,
-                    DEFAULT_STARTUP_DELAY, this.getFrequency(), this.getTimeUnit());
+                        DEFAULT_STARTUP_DELAY, this.getFrequency(), this.getTimeUnit());
                 schedules.add(schedule);
 
                 if (logger.isDebugEnabled())
                 {
                     logger.debug(ObjectUtils.identityToShortString(this) + " scheduled "
-                                    + ObjectUtils.identityToShortString(schedule) + " with " + frequency
-                                    + "ms polling frequency");
+                            + ObjectUtils.identityToShortString(schedule) + " with " + frequency
+                            + "ms polling frequency");
                 }
             }
         }
         catch (Exception ex)
         {
             this.stop();
-            throw new InitialisationException(CoreMessages.failedToScheduleWork(), ex, this);
+            throw new CreateException(CoreMessages.failedToScheduleWork(), ex, this);
         }
     }
 
@@ -111,7 +111,7 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
                 if (logger.isDebugEnabled())
                 {
                     logger.debug(ObjectUtils.identityToShortString(this) + " cancelled polling schedule: "
-                                    + ObjectUtils.identityToShortString(schedule));
+                            + ObjectUtils.identityToShortString(schedule));
                 }
             }
         }

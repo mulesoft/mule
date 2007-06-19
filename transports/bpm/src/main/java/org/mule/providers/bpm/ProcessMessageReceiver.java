@@ -16,89 +16,110 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
 
 import java.util.Map;
 
 import javax.resource.spi.work.Work;
 
-/**
- * Generates an incoming Mule event from an executing workflow process.
- */
-public class ProcessMessageReceiver extends AbstractMessageReceiver {
+/** Generates an incoming Mule event from an executing workflow process. */
+public class ProcessMessageReceiver extends AbstractMessageReceiver
+{
 
     private ProcessConnector connector = null;
 
     public ProcessMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
-            throws InitialisationException {
+            throws CreateException
+    {
         super(connector, component, endpoint);
         this.connector = (ProcessConnector) connector;
     }
 
-    public UMOMessage generateSynchronousEvent(String endpoint, Object payload, Map messageProperties) throws UMOException {
+    public UMOMessage generateSynchronousEvent(String endpoint, Object payload, Map messageProperties) throws UMOException
+    {
         logger.debug("Executing process is sending an event (synchronously) to Mule endpoint = " + endpoint);
         UMOMessage response = generateEvent(endpoint, payload, messageProperties, true);
         if (logger.isDebugEnabled())
         {
-            logger.debug("Synchronous response is " + (response != null ? response.getPayload() : null ));
+            logger.debug("Synchronous response is " + (response != null ? response.getPayload() : null));
         }
         return response;
     }
 
-    public void generateAsynchronousEvent(String endpoint, Object payload, Map messageProperties) throws UMOException {
+    public void generateAsynchronousEvent(String endpoint, Object payload, Map messageProperties) throws UMOException
+    {
         logger.debug("Executing process is dispatching an event (asynchronously) to Mule endpoint = " + endpoint);
-        try {
+        try
+        {
             getWorkManager().scheduleWork(new Worker(endpoint, payload, messageProperties));
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             handleException(e);
         }
     }
 
-    protected UMOMessage generateEvent(String endpoint, Object payload, Map messageProperties, boolean synchronous) throws UMOException {
+    protected UMOMessage generateEvent(String endpoint, Object payload, Map messageProperties, boolean synchronous) throws UMOException
+    {
         UMOMessage message;
-        if (payload instanceof UMOMessage) {
+        if (payload instanceof UMOMessage)
+        {
             message = (UMOMessage) payload;
-        } else {
+        }
+        else
+        {
             message = new MuleMessage(connector.getMessageAdapter(payload));
         }
         message.addProperties(messageProperties);
 
-        if (connector.isAllowGlobalDispatcher()) {
+        if (connector.isAllowGlobalDispatcher())
+        {
             // TODO MULE-1221 This should use the "dynamic://" endpoint and not depend on the MuleClient.
-            if (synchronous) {
+            if (synchronous)
+            {
                 return connector.getMuleClient().send(endpoint, message);
-            } else {
+            }
+            else
+            {
                 connector.getMuleClient().dispatch(endpoint, message);
                 return null;
             }
         }
-        else {
+        else
+        {
             message.setStringProperty(ProcessConnector.PROPERTY_ENDPOINT, endpoint);
             return routeMessage(message, synchronous);
         }
     }
 
-    private class Worker implements Work {
+    private class Worker implements Work
+    {
         private String endpoint;
         private Object payload;
         private Map messageProperties;
 
-        public Worker(String endpoint, Object payload, Map messageProperties) {
+        public Worker(String endpoint, Object payload, Map messageProperties)
+        {
             this.endpoint = endpoint;
             this.payload = payload;
             this.messageProperties = messageProperties;
         }
 
-        public void run() {
-            try {
+        public void run()
+        {
+            try
+            {
                 generateEvent(endpoint, payload, messageProperties, false);
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 getConnector().handleException(e);
             }
         }
 
-        public void release() { /*nop*/ }
+        public void release()
+        { /*nop*/ }
     }
 
     protected void doConnect() throws Exception

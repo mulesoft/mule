@@ -17,7 +17,7 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
 
 import java.io.FilenameFilter;
@@ -50,16 +50,17 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
     public FtpMessageReceiver(UMOConnector connector,
                               UMOComponent component,
                               UMOEndpoint endpoint,
-                              long frequency) throws InitialisationException
+                              long frequency) throws CreateException
     {
         super(connector, component, endpoint);
+
         this.setFrequency(frequency);
 
-        this.connector = (FtpConnector)connector;
+        this.connector = (FtpConnector) connector;
 
         if (endpoint.getFilter() instanceof FilenameFilter)
         {
-            this.filenameFilter = (FilenameFilter)endpoint.getFilter();
+            this.filenameFilter = (FilenameFilter) endpoint.getFilter();
         }
         else
         {
@@ -101,7 +102,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
             if (!client.changeWorkingDirectory(path))
             {
                 throw new IOException(MessageFormat.format("Failed to change working directory to {0}. Ftp error: {1}",
-                                                           new Object[] {path, new Integer(client.getReplyCode())}));
+                        new Object[]{path, new Integer(client.getReplyCode())}));
             }
 
             FTPFile[] files = client.listFiles();
@@ -150,11 +151,12 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
 
             final String fileName = file.getName();
             final String path = uri.getPath();
-            
+
             if (!client.changeWorkingDirectory(path))
             {
                 throw new IOException(MessageFormat.format("Failed to change working directory to {0}. Ftp error: {1}",
-                                                           new Object[] {path, new Integer(client.getReplyCode())}));            }
+                        new Object[]{path, new Integer(client.getReplyCode())}));
+            }
 
             UMOMessage message;
             if (endpoint.isStreaming())
@@ -168,7 +170,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
                 if (!client.retrieveFile(fileName, baos))
                 {
                     throw new IOException(MessageFormat.format("Failed to retrieve file {0}. Ftp error: {1}",
-                                                               new Object[] {fileName, new Integer(client.getReplyCode())}));
+                            new Object[]{fileName, new Integer(client.getReplyCode())}));
                 }
                 message = new MuleMessage(connector.getMessageAdapter(baos.toByteArray()));
             }
@@ -179,7 +181,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
             if (!client.deleteFile(fileName))
             {
                 throw new IOException(MessageFormat.format("Failed to delete file {0}. Ftp error: {1}",
-                                                           new Object[] {fileName, new Integer(client.getReplyCode())}));
+                        new Object[]{fileName, new Integer(client.getReplyCode())}));
             }
         }
         finally

@@ -16,7 +16,7 @@ import org.mule.providers.AbstractPollingMessageReceiver;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.util.Base64;
@@ -33,9 +33,7 @@ import java.util.Map;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 
-/**
- * Will poll an http URL and use the response as the input for a service request.
- */
+/** Will poll an http URL and use the response as the input for a service request. */
 public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
 {
     private URL pollUrl;
@@ -44,12 +42,14 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
 
     public PollingHttpMessageReceiver(UMOConnector connector,
                                       UMOComponent component,
-                                      final UMOEndpoint endpoint) throws InitialisationException
+                                      final UMOEndpoint endpoint) throws CreateException
     {
+
         super(connector, component, endpoint);
 
+
         long pollingFrequency = MapUtils.getLongValue(endpoint.getProperties(), "pollingFrequency",
-            -1);
+                -1);
         if (pollingFrequency > 0)
         {
             this.setFrequency(pollingFrequency);
@@ -61,9 +61,9 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
         }
         catch (MalformedURLException e)
         {
-            throw new InitialisationException(
-                CoreMessages.valueIsInvalidFor(endpoint.getEndpointURI().getAddress(), "uri"), 
-                e, this);
+            throw new CreateException(
+                    CoreMessages.valueIsInvalidFor(endpoint.getEndpointURI().getAddress(), "uri"),
+                    e, this);
         }
     }
 
@@ -75,7 +75,7 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
     protected void doConnect() throws Exception
     {
         URL url;
-        String connectUrl = (String)endpoint.getProperties().get("connectUrl");
+        String connectUrl = (String) endpoint.getProperties().get("connectUrl");
         if (connectUrl == null)
         {
             url = pollUrl;
@@ -85,7 +85,7 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
             url = new URL(connectUrl);
         }
         logger.debug("Using url to connect: " + pollUrl.toString());
-        HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.disconnect();
     }
 
@@ -96,13 +96,13 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
 
     public void poll() throws Exception
     {
-        HttpURLConnection connection = (HttpURLConnection)pollUrl.openConnection();
+        HttpURLConnection connection = (HttpURLConnection) pollUrl.openConnection();
         String authentication = endpoint.getEndpointURI().getUserInfo();
         if (authentication != null)
         {
             connection.setRequestProperty("Authorization", "Basic "
-                                                           + Base64.encodeBytes(authentication
-                                                               .getBytes()));
+                    + Base64.encodeBytes(authentication
+                    .getBytes()));
         }
 
         int len;
@@ -148,12 +148,12 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
         Iterator it = connection.getHeaderFields().entrySet().iterator();
         while (it.hasNext())
         {
-            Map.Entry msgHeader = (Map.Entry)it.next();
+            Map.Entry msgHeader = (Map.Entry) it.next();
             Object key = msgHeader.getKey();
             Object value = msgHeader.getValue();
             if (key != null && value != null)
             {
-                respHeaders.put(key, ((List)value).get(0));
+                respHeaders.put(key, ((List) value).get(0));
             }
         }
 
