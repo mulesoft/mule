@@ -11,8 +11,8 @@ package org.mule.config.spring.parsers;
 
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
-import org.mule.config.spring.parsers.collection.ListEntryDefinitionParser;
-import org.mule.config.spring.parsers.collection.MapEntryDefinitionParser;
+import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
+import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -35,7 +35,7 @@ import org.w3c.dom.Element;
  * that it is a collection.
  *
  * If the Bean Class for this element is set to
- * {@link org.mule.config.spring.parsers.collection.MapEntryDefinitionParser.KeyValuePair} it is assumed that a Map
+ * {@link org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser.KeyValuePair} it is assumed that a Map
  * is being processed and any child elements will be added to the parent Map.
  *
  * A single method needs to be overriden called {@link #getPropertyName} that determines the name of the property to
@@ -43,7 +43,7 @@ import org.w3c.dom.Element;
  * element.
  *
  * @see org.mule.config.spring.parsers.generic.ChildDefinitionParser
- * @see org.mule.config.spring.parsers.collection.MapEntryDefinitionParser.KeyValuePair
+ * @see org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser.KeyValuePair
  * @see AbstractMuleSingleBeanDefinitionParser
  */
 public abstract class AbstractChildBeanDefinitionParser extends AbstractHierarchicalDefinitionParser
@@ -93,8 +93,8 @@ public abstract class AbstractChildBeanDefinitionParser extends AbstractHierarch
             {
                 pv = newParentPropertyValue(element, new ManagedMap());
             }
-            MapEntryDefinitionParser.KeyValuePair pair =
-                    (MapEntryDefinitionParser.KeyValuePair) builder.getBeanDefinition().getSource();
+            ChildMapEntryDefinitionParser.KeyValuePair pair =
+                    (ChildMapEntryDefinitionParser.KeyValuePair) builder.getBeanDefinition().getSource();
             ((Map) pv.getValue()).put(pair.getKey(), pair.getValue());
 
         }
@@ -107,10 +107,10 @@ public abstract class AbstractChildBeanDefinitionParser extends AbstractHierarch
             
             List list = (List) pv.getValue();
             Object source = builder.getBeanDefinition().getSource();
-            if (source instanceof ListEntryDefinitionParser.ListEntry)
+            if (source instanceof ChildListEntryDefinitionParser.ListEntry)
             {
-                ListEntryDefinitionParser.ListEntry listEntry = 
-                    (ListEntryDefinitionParser.ListEntry)source;
+                ChildListEntryDefinitionParser.ListEntry listEntry =
+                    (ChildListEntryDefinitionParser.ListEntry)source;
                 list.add(listEntry.getProxiedObject());
             }
             else
@@ -210,7 +210,7 @@ public abstract class AbstractChildBeanDefinitionParser extends AbstractHierarch
 
     protected boolean isMap(Element element)
     {
-        return MapEntryDefinitionParser.KeyValuePair.class.equals(getBeanClass(element));
+        return ChildMapEntryDefinitionParser.KeyValuePair.class.equals(getBeanClass(element));
     }
 
 }

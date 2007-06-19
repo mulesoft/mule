@@ -10,7 +10,7 @@
 package org.mule.config.spring.handlers;
 
 import org.mule.config.spring.parsers.JmxAgentDefinitionParser;
-import org.mule.config.spring.parsers.collection.MapEntryDefinitionParser;
+import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.impl.internal.admin.EndpointNotificationLoggerAgent;
 import org.mule.impl.internal.admin.Log4jNotificationLoggerAgent;
@@ -35,7 +35,7 @@ public class ManagementNamespaceHandler extends AbstractIgnorableNamespaceHandle
         registerBeanDefinitionParser("jmx-notifications", new OrphanDefinitionParser(JmxServerNotificationAgent.class, true));
         registerBeanDefinitionParser("jmx-default-configuration", new OrphanDefinitionParser(DefaultJmxSupportAgent.class, true));
         registerBeanDefinitionParser("chainsaw-notifications", new OrphanDefinitionParser(Log4jNotificationLoggerAgent.class, true));
-        registerBeanDefinitionParser("level-mapping", new MapEntryDefinitionParser("levelMappings", "severity", "eventId"));
+        registerBeanDefinitionParser("level-mapping", new ChildMapEntryDefinitionParser("levelMappings", "severity", "eventId"));
         registerBeanDefinitionParser("log4j-notifications", new OrphanDefinitionParser(Log4jNotificationLoggerAgent.class, true));
         registerBeanDefinitionParser("publish-notifications", new OrphanDefinitionParser(EndpointNotificationLoggerAgent.class, true));
         registerBeanDefinitionParser("rmi-server", new OrphanDefinitionParser(RmiRegistryAgent.class, true));

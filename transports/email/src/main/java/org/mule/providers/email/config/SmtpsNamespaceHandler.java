@@ -10,7 +10,7 @@
 package org.mule.providers.email.config;
 
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
-import org.mule.config.spring.parsers.collection.MapEntryDefinitionParser;
+import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.providers.email.SmtpsConnector;
 
@@ -25,7 +25,7 @@ public class SmtpsNamespaceHandler extends NamespaceHandlerSupport
     public void init()
     {
         registerBeanDefinitionParser("connector", new OrphanDefinitionParser(SmtpsConnector.class, true));
-        registerBeanDefinitionParser("header", new MapEntryDefinitionParser("customHeaders", "name", "value"));
+        registerBeanDefinitionParser("header", new ChildMapEntryDefinitionParser("customHeaders", "name", "value"));
         registerBeanDefinitionParser("tls-trust-store", new ParentDefinitionParser());
         registerBeanDefinitionParser("tls-client", new ParentDefinitionParser());
     }

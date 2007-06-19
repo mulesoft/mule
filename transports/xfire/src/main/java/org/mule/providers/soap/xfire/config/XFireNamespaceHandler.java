@@ -10,25 +10,21 @@
 
 package org.mule.providers.soap.xfire.config;
 
-import org.mule.config.spring.parsers.collection.ListEntryDefinitionParser;
+import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 public class XFireNamespaceHandler extends NamespaceHandlerSupport
 {
+
     public void init()
     {
-        this.registerBeanDefinitionParser("connector", new XfireElementDefinitionParser());
-        this.registerBeanDefinitionParser("client-in-handler", 
-            new ListEntryDefinitionParser("clientInHandlers"));
-        this.registerBeanDefinitionParser("client-out-handler", 
-            new ListEntryDefinitionParser("clientOutHandlers"));
-        this.registerBeanDefinitionParser("client-service", 
-            new ListEntryDefinitionParser("clientServices"));
-        this.registerBeanDefinitionParser("server-in-handler", 
-            new ListEntryDefinitionParser("serverInHandlers"));
-        this.registerBeanDefinitionParser("server-out-handler", 
-            new ListEntryDefinitionParser("serverOutHandlers"));
+        registerBeanDefinitionParser("connector", new XfireElementDefinitionParser());
+        registerBeanDefinitionParser("client-in-handler", new ChildListEntryDefinitionParser("clientInHandlers"));
+        registerBeanDefinitionParser("client-out-handler", new ChildListEntryDefinitionParser("clientOutHandlers"));
+        registerBeanDefinitionParser("client-service", new ChildListEntryDefinitionParser("clientServices"));
+        registerBeanDefinitionParser("server-in-handler", new ChildListEntryDefinitionParser("serverInHandlers"));
+        registerBeanDefinitionParser("server-out-handler", new ChildListEntryDefinitionParser("serverOutHandlers"));
     }
 }
 
