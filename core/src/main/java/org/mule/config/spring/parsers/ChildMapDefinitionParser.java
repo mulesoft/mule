@@ -9,34 +9,38 @@
  */
 package org.mule.config.spring.parsers;
 
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.springframework.beans.factory.config.PropertiesFactoryBean;
+import org.springframework.beans.factory.config.MapFactoryBean;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-/**
- * Creates a single Properties object and processes standard Spring Properties sub elements
- */
-public class PropertiesBeanDefinitionParser extends SimpleChildDefinitionParser
+/** Creates a single Properties object and processes standard Spring Properties sub elements */
+public class ChildMapDefinitionParser extends SimpleChildDefinitionParser
 {
 
-    public PropertiesBeanDefinitionParser(String setterMethod)
+    public ChildMapDefinitionParser(String setterMethod)
     {
-        super(setterMethod, /*clazz*/null);
+        super(setterMethod, HashMap.class);
     }
-    
+
+    public ChildMapDefinitionParser(String setterMethod, Class mapType)
+    {
+        super(setterMethod, mapType, Map.class);
+    }
+
     protected Class getBeanClass(Element element)
     {
-        return PropertiesFactoryBean.class;
+        return MapFactoryBean.class;
     }
 
     protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
         super.parseChild(element, parserContext, builder);
-        
-        Properties parsedProps = parserContext.getDelegate().parsePropsElement(element);
-        builder.addPropertyValue("properties", parsedProps);
+        Map parsedMap = parserContext.getDelegate().parseMapElement(element, builder.getRawBeanDefinition());
+        builder.addPropertyValue("sourceMap", parsedMap);
+        builder.addPropertyValue("targetMapClass", super.getBeanClass(element));
     }
 }

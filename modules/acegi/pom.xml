@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.mule.modules</groupId>
@@ -11,18 +11,21 @@
     <artifactId>mule-module-acegi</artifactId>
     <!--<packaging>bundle</packaging>-->
     <name>Acegi Security</name>
-    <description>Mule Acegi Support exposes Acegi Authentication providers and Method interceptors to authentication event traffic via endpoints and method level authorisation on components.</description>   
+    <description>Mule Acegi Support exposes Acegi Authentication providers and Method interceptors to authentication
+        event traffic via endpoints and method level authorisation on components.
+    </description>
 
     <build>
-         <plugins>
-             <plugin>
-                 <artifactId>maven-surefire-plugin</artifactId>
-                 <configuration>
-                     <excludes>
-                     </excludes>
-                 </configuration>
-             </plugin>
-              <plugin>
+        <plugins>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>**</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
@@ -33,7 +36,7 @@
                     </instructions>
                 </configuration>
             </plugin>
-         </plugins>
+        </plugins>
     </build>
 
     <dependencies>
@@ -120,7 +123,7 @@
                     <groupId>log4j</groupId>
                     <artifactId>log4j</artifactId>
                 </exclusion>
-            </exclusions>  
+            </exclusions>
         </dependency>
 
         <!-- For unit tests only -->

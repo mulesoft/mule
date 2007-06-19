@@ -4,7 +4,7 @@
        xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
        xmlns:stdio="http://www.mulesource.org/schema/mule/stdio/2.0"
-    xsi:schemaLocation="
+       xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/stdio/2.0 http://www.mulesource.org/schema/mule/stdio/2.0/mule-stdio.xsd
@@ -20,7 +20,7 @@
 
         <!-- singleton for easier testing only -->
         <mule:service name="Test">
-            <mule:component class="org.mule.tck.functional.FunctionalTestComponent" scope="singleton" />
+            <mule:component class="org.mule.tck.functional.FunctionalTestComponent" scope="singleton"/>
             <mule:inbound-router>
                 <mule:endpoint name="httpEndpoint" connector-ref="PollingHttpConnector"
                                address="http://localhost:12345/TestServer"/>
@@ -35,7 +35,7 @@
         <mule:service name="TestServer">
             <mule:component class="org.mule.components.simple.StaticComponent">
                 <mule:properties>
-                    <prop key="data">Here's your content.</prop>
+                    <entry key="data" value="Here's your content."/>
                 </mule:properties>
             </mule:component>
             <mule:inbound-router>

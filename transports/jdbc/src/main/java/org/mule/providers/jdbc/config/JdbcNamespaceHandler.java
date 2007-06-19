@@ -14,18 +14,15 @@ import org.mule.providers.jdbc.JdbcConnector;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
-/**
- * Registers Bean Definition Parsers for the "jdbc" namespace.
- */
+/** Registers Bean Definition Parsers for the "jdbc" namespace. */
 public class JdbcNamespaceHandler extends NamespaceHandlerSupport
 {
     public void init()
     {
         registerBeanDefinitionParser("connector", new SingleElementDefinitionParser(JdbcConnector.class, true));
 //        registerBeanDefinitionParser("jndi-resource", new SimpleChildDefinitionParser("jndiResource", JndiResource.class));
-//        registerBeanDefinitionParser("provider-properties", new PropertiesBeanDefinitionParser("providerProperties"));
+//        registerBeanDefinitionParser("provider-properties", new ChildMapDefinitionParser("providerProperties"));
     }
-
 
 //    class JndiResourceDefinitionParser extends SimpleChildDefinitionParser
 //    {

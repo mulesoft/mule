@@ -14,19 +14,19 @@
 
 
     <mule:model-inherited name="main">
-        <mule:service name="appleComponent2"
-            implementation="org.mule.tck.testmodels.fruit.Apple">
+        <mule:service name="appleComponent2">
 
+            <mule:component class="org.mule.tck.testmodels.fruit.Apple"/>
 
             <mule:inbound-router>
                 <mule:endpoint name="nonTransactedInboundEndpoint" address="test://endpoint.in3"/>
-                <mule:endpoint name="transactedInboundEndpoint" createConnector="NEVER_CREATE" address="test://endpoint.in2">
-                    <mule:transaction factory="org.mule.tck.testmodels.mule.TestTransactionFactory" action="ALWAYS_BEGIN"/>
-                    <property name="properties">
-                        <map>
-                            <entry key="testEndpointProperty" value="Prop1"/>
-                        </map>
-                    </property>
+                <mule:endpoint name="transactedInboundEndpoint" createConnector="NEVER_CREATE"
+                               address="test://endpoint.in2">
+                    <mule:transaction factory="org.mule.tck.testmodels.mule.TestTransactionFactory"
+                                      action="ALWAYS_BEGIN"/>
+                    <mule:properties>
+                        <entry key="testEndpointProperty" value="Prop1"/>
+                    </mule:properties>
                 </mule:endpoint>
             </mule:inbound-router>
 

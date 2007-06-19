@@ -9,21 +9,19 @@
  */
 package org.mule.providers.quartz.config;
 
-import org.mule.config.spring.parsers.PropertiesBeanDefinitionParser;
+import org.mule.config.spring.parsers.ChildMapDefinitionParser;
 import org.mule.config.spring.parsers.SingleElementDefinitionParser;
 import org.mule.providers.quartz.QuartzConnector;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
-/**
- * Registers Bean Definition Parsers for the "quartz" namespace.
- */
+/** Registers Bean Definition Parsers for the "quartz" namespace. */
 public class QuartzNamespaceHandler extends NamespaceHandlerSupport
 {
     public void init()
     {
         registerBeanDefinitionParser("connector", new QuartzConnectorDefinitionParser());
-        registerBeanDefinitionParser("factory-properties", new PropertiesBeanDefinitionParser("factoryProperties"));
+        registerBeanDefinitionParser("factory-properties", new ChildMapDefinitionParser("factoryProperties"));
     }
 }
 

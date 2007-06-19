@@ -20,7 +20,7 @@
         <mule:service name="Component1">
             <mule:component class="org.mule.tck.functional.FunctionalTestComponent">
                 <mule:properties>
-                    <prop key="appendComponentName">true</prop>
+                    <entry key="appendComponentName" value="true"/>
                 </mule:properties>
             </mule:component>
             <mule:inbound-router>
@@ -36,7 +36,7 @@
         <mule:service name="Component2">
             <mule:component class="org.mule.tck.functional.FunctionalTestComponent">
                 <mule:properties>
-                    <prop key="appendComponentName">true</prop>
+                    <entry key="appendComponentName" value="true"/>
                 </mule:properties>
             </mule:component>
             <mule:inbound-router>
@@ -52,7 +52,7 @@
         <mule:service name="Component3">
             <mule:component class="org.mule.tck.functional.FunctionalTestComponent">
                 <mule:properties>
-                    <prop key="appendComponentName">true</prop>
+                    <entry key="appendComponentName" value="true"/>
                 </mule:properties>
             </mule:component>
             <mule:inbound-router>

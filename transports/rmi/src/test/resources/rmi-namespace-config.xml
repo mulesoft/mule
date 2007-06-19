@@ -3,16 +3,16 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:rmi="http://www.mulesource.org/schema/mule/rmi/2.0"
-    xsi:schemaLocation="
+       xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/rmi/2.0 http://www.mulesource.org/schema/mule/rmi/2.0/mule-rmi.xsd">
 
     <bean name="securityManager"
-        class="org.mule.providers.rmi.DummySecurityManager"/>
+          class="org.mule.providers.rmi.DummySecurityManager"/>
 
     <bean name="jndiContext"
-        class="org.mule.tck.jndi.InMemoryContext"/>
+          class="org.mule.tck.jndi.InMemoryContext"/>
 
     <rmi:connector name="rmiConnector"
                    pollingFrequency="1234"
@@ -23,12 +23,14 @@
                    jndiInitialFactory="org.mule.tck.jndi.InMemoryContextFactory"
                    jndiProviderUrl="efg"
                    jndiUrlPkgPrefixes="fgh">
+
+        <!-- obviously here we are nt restricted to string pairs, so it could be done a little better -->
         <mule:jndi-provider-properties>
-            <prop key="ghi">hij</prop>
+            <entry key="ghi" value="hij"/>
         </mule:jndi-provider-properties>
     </rmi:connector>
 
-     <rmi:connector name="rmiConnector2"
+    <rmi:connector name="rmiConnector2"
                    pollingFrequency="1234"
                    securityManager-ref="securityManager"
                    securityPolicy="rmi.policy"

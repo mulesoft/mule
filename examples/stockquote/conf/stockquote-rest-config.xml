@@ -3,17 +3,17 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
-    xsi:schemaLocation="
+       xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd">
 
     <description>
-    The StockQuote REST example uses the Mule RestServiceWrapper to invoke a remote .Net service
-    Using REST style invocation and displays the result.
-    The example invokes a StockQuote Web Service on www.webservicesx.com, the result is an Xml string that
-    Mule converts to a StockQuote object by first running the result through an Xslt transformer and then
-    using the XmlToObject transformer.
+        The StockQuote REST example uses the Mule RestServiceWrapper to invoke a remote .Net service
+        Using REST style invocation and displays the result.
+        The example invokes a StockQuote Web Service on www.webservicesx.com, the result is an Xml string that
+        Mule converts to a StockQuote object by first running the result through an Xslt transformer and then
+        using the XmlToObject transformer.
     </description>
 
     <bean id="propertyPlaceholderConfigurer"
@@ -43,9 +43,9 @@
         <mule:service name="HTTPPostSample">
             <mule:component class="org.mule.components.rest.RestServiceWrapper">
                 <mule:properties>
-                    <prop key="serviceUrl">http://www.webservicex.net/stockquote.asmx/GetQuote</prop>
-                    <prop key="payloadParameterName">symbol</prop>
-                    <prop key="httpMethod">POST</prop>
+                    <entry key="serviceUrl" value="http://www.webservicex.net/stockquote.asmx/GetQuote"/>
+                    <entry key="payloadParameterName" value="symbol"/>
+                    <entry key="httpMethod" value="POST"/>
                 </mule:properties>
             </mule:component>
 

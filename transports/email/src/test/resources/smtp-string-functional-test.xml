@@ -29,7 +29,7 @@
                             </map>
                         </property -->
                         <mule:properties>
-                            <prop key="toAddresses">bob@example.com</prop>
+                            <entry key="toAddresses" value="bob@example.com"/>
                         </mule:properties>
                     </mule:endpoint>
                 </mule:pass-through-router>

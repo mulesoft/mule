@@ -19,7 +19,6 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <exclude>**/QuickConfigurationBuilderTestCase.*</exclude>
                         <exclude>**/AlwaysCreateConnectorTestCase.*</exclude>
                         <exclude>**/PlaceholderProcessorTestCase.*</exclude>
                         <exclude>**/MuleConfigurationTestCase.*</exclude>
@@ -27,7 +26,6 @@
                         <exclude>**/MuleXmlConfigBuilderTestCase.*</exclude>
                         <exclude>**/MuleXmlConfigBuilderSplitComponentsTestCase.*</exclude>
                         <exclude>**/ConnectorConverterTestCase.*</exclude>
-                        <exclude>**/MuleClasspathConfigBuilderTestCase.*</exclude>
                         <exclude>**/SpringNamespaceConfigBuilderTestCase.*</exclude>
                     </excludes>
                 </configuration>

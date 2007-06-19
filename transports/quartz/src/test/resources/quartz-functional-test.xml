@@ -12,29 +12,31 @@
 
     <mule:endpoint name="quartz.in.1" address="quartz:/myService1">
         <mule:properties>
-            <prop key="repeatInterval">1000</prop>
-            <prop key="repeatCount">3</prop>
-            <prop key="payload">quartz test</prop>
+            <entry key="repeatInterval" value="1000"/>
+            <entry key="repeatCount" value="3"/>
+            <entry key="payload" value="quartz test"/>
         </mule:properties>
-    </mule:endpoint>        
+    </mule:endpoint>
 
     <mule:endpoint name="quartz.in.2" address="quartz:/myService2">
         <mule:properties>
-            <prop key="repeatInterval">1000</prop>
-            <prop key="repeatCount">1</prop>
+            <entry key="repeatInterval" value="1000"/>
+            <entry key="repeatCount" value="1"/>
         </mule:properties>
-    </mule:endpoint>        
+    </mule:endpoint>
 
-    <mule:model-seda name="quartz" >
+    <mule:model-seda name="quartz">
         <mule:pooling-profile maxActive="1" exhaustedAction="WAIT"/>
-        
-        <mule:service name="quartzService1" implementation="org.mule.providers.quartz.TestComponent">
+
+        <mule:service name="quartzService1">
+            <mule:component class="org.mule.providers.quartz.TestComponent"/>
             <mule:inbound-router>
                 <mule:endpoint-ref nameref="quartz.in.1"/>
             </mule:inbound-router>
         </mule:service>
 
-        <mule:service name="quartzService2" implementation="org.mule.providers.quartz.TestComponent">
+        <mule:service name="quartzService2">
+            <mule:component class="org.mule.providers.quartz.TestComponent"/>
             <mule:inbound-router>
                 <mule:endpoint-ref nameref="quartz.in.2"/>
             </mule:inbound-router>

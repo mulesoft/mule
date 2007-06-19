@@ -3,7 +3,7 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
-    xsi:schemaLocation="
+       xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd">
@@ -16,10 +16,10 @@
         <mule:service name="mycomponent1">
             <mule:component class="org.mule.tck.functional.FunctionalTestComponent">
                 <mule:properties>
-                    <prop key="returnMessage">mycomponent1</prop>
+                    <entry key="returnMessage" value="mycomponent1"/>
                 </mule:properties>
             </mule:component>
-            
+
             <mule:inbound-router>
                 <mule:endpoint address="http://localhost:8081/mycomponent1" synchronous="true"/>
             </mule:inbound-router>
@@ -28,10 +28,10 @@
         <mule:service name="mycomponent2">
             <mule:component class="org.mule.tck.functional.FunctionalTestComponent">
                 <mule:properties>
-                    <prop key="returnMessage">mycomponent2</prop>
+                    <entry key="returnMessage" value="mycomponent2"/>
                 </mule:properties>
             </mule:component>
-            
+
             <mule:inbound-router>
                 <mule:endpoint address="http://localhost:8081/mycomponent2" synchronous="true"/>
             </mule:inbound-router>

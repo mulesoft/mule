@@ -4,7 +4,7 @@
        xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
        xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
-    xsi:schemaLocation="
+       xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd
@@ -12,7 +12,7 @@
 
     <http:connector name="PollingHttpConnector">
         <mule:service-overrides
-            messageReceiver="org.mule.providers.http.PollingHttpMessageReceiver"/>
+                messageReceiver="org.mule.providers.http.PollingHttpMessageReceiver"/>
     </http:connector>
 
     <vm:connector name="vmQueue" queueEvents="true"/>
@@ -27,7 +27,7 @@
                 <mule:endpoint address="http://marie:marie@localhost:4567"
                                connector-ref="PollingHttpConnector">
                     <mule:properties>
-                        <prop key="pollingFrequency">30000</prop>
+                        <entry key="pollingFrequency" value="30000"/>
                     </mule:properties>
                 </mule:endpoint>
             </mule:inbound-router>

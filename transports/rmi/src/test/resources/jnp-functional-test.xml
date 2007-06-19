@@ -23,13 +23,13 @@
 
     <mule:endpoint name="GoodType" address="jnp://localhost:1099/MatchingUMO?method=reverseString">
         <mule:properties>
-            <prop key="methodArgumentTypes">java.lang.String</prop>
+            <entry key="methodArgumentTypes" value="java.lang.String"/>
         </mule:properties>
     </mule:endpoint>
 
     <mule:endpoint name="BadType" address="jnp://localhost:1099/MatchingUMO?method=reverseString">
         <mule:properties>
-            <prop key="methodArgumentTypes">java.lang.StringBuffer</prop>
+            <entry key="methodArgumentTypes" value="java.lang.StringBuffer"/>
         </mule:properties>
     </mule:endpoint>
 

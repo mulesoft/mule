@@ -11,6 +11,7 @@ package org.mule.config.spring.handlers;
 
 import org.mule.config.MuleProperties;
 import org.mule.config.QueueProfile;
+import org.mule.config.spring.parsers.ChildMapDefinitionParser;
 import org.mule.config.spring.parsers.ConfigurationDefinitionParser;
 import org.mule.config.spring.parsers.ConnectionStrategyDefinitionParser;
 import org.mule.config.spring.parsers.CustomEncryptionStrategyDefinitionParser;
@@ -23,7 +24,6 @@ import org.mule.config.spring.parsers.InheritedModelDefinitionParser;
 import org.mule.config.spring.parsers.MapBeanDefinitionParser;
 import org.mule.config.spring.parsers.ObjectFactoryDefinitionParser;
 import org.mule.config.spring.parsers.PoolingProfileDefinitionParser;
-import org.mule.config.spring.parsers.PropertiesBeanDefinitionParser;
 import org.mule.config.spring.parsers.RouterDefinitionParser;
 import org.mule.config.spring.parsers.SecurityFilterDefinitionParser;
 import org.mule.config.spring.parsers.SecurityManagerDefinitionParser;
@@ -244,8 +244,9 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("retry-connection-strategy", new SimpleChildDefinitionParser("connectionStrategy", SimpleRetryConnectionStrategy.class));
 
         //Utils / Standard Types
-        registerBeanDefinitionParser("properties", new PropertiesBeanDefinitionParser("properties"));
-        registerBeanDefinitionParser("jndi-provider-properties", new PropertiesBeanDefinitionParser("jndiProviderProperties"));
+        registerBeanDefinitionParser("properties", new ChildMapDefinitionParser("properties"));
+        registerBeanDefinitionParser("meta-info", new ChildMapDefinitionParser("properties"));
+        registerBeanDefinitionParser("jndi-provider-properties", new ChildMapDefinitionParser("jndiProviderProperties"));
 
         //Security
         registerBeanDefinitionParser("security-manager", new SecurityManagerDefinitionParser());

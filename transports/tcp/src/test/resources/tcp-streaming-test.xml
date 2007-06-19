@@ -14,7 +14,8 @@
 
     <mule:model-streaming name="echoModel">
 
-        <mule:service name="echo" implementation="org.mule.components.simple.StreamingBridgeComponent">
+        <mule:service name="echo">
+            <mule:component class="org.mule.components.simple.StreamingBridgeComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="tcp://localhost:65432" synchronous="false"/>
             </mule:inbound-router>
