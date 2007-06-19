@@ -9,7 +9,7 @@
  */
 package org.mule.config.spring.parsers.collection;
 
-import org.mule.config.spring.parsers.AbstractChildBeanDefinitionParser;
+import org.mule.config.spring.parsers.AbstractChildDefinitionParser;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
  *
  * Here <xm:namespace> refers to a Map of prefix/uri values.
  */
-public class ChildMapEntryDefinitionParser extends AbstractChildBeanDefinitionParser
+public class ChildMapEntryDefinitionParser extends AbstractChildDefinitionParser
 {
     private String propertyName;
     private String keyName;

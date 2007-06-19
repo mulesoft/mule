@@ -11,14 +11,14 @@ package org.mule.config.spring.parsers.specific;
 
 import org.mule.config.MuleProperties;
 import org.mule.config.PoolingProfile;
-import org.mule.config.spring.parsers.AbstractChildBeanDefinitionParser;
+import org.mule.config.spring.parsers.AbstractChildDefinitionParser;
 
 import org.w3c.dom.Element;
 
 /**
  * This parser is responsible for processing the <code><pooling-profile><code> configuration elements.
  */
-public class PoolingProfileDefinitionParser extends AbstractChildBeanDefinitionParser
+public class PoolingProfileDefinitionParser extends AbstractChildDefinitionParser
 {
 
     public PoolingProfileDefinitionParser()

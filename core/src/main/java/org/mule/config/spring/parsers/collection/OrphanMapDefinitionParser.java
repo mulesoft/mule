@@ -9,7 +9,7 @@
  */
 package org.mule.config.spring.parsers.collection;
 
-import org.mule.config.spring.parsers.AbstractMuleSingleBeanDefinitionParser;
+import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 
 import java.util.Map;
 
@@ -23,7 +23,7 @@ import org.w3c.dom.Element;
 /**
  * Creates a single, stand-alone map object and processes standard Spring sub elements
  */
-public class OrphanMapDefinitionParser extends AbstractMuleSingleBeanDefinitionParser
+public class OrphanMapDefinitionParser extends AbstractMuleBeanDefinitionParser
 {
     private Class mapClass;
     private String name;

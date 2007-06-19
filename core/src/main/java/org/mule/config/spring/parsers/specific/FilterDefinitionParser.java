@@ -9,7 +9,7 @@
  */
 package org.mule.config.spring.parsers.specific;
 
-import org.mule.config.spring.parsers.AbstractChildBeanDefinitionParser;
+import org.mule.config.spring.parsers.AbstractChildDefinitionParser;
 import org.mule.routing.filters.EqualsFilter;
 import org.mule.routing.filters.ExceptionTypeFilter;
 import org.mule.routing.filters.MessagePropertyFilter;
@@ -29,7 +29,7 @@ import org.w3c.dom.Element;
  * <i>RegEX</i> and <i>Message Property</i>
  * 
  */
-public class FilterDefinitionParser extends AbstractChildBeanDefinitionParser
+public class FilterDefinitionParser extends AbstractChildDefinitionParser
 {
 
     protected Class getBeanClass(Element element)

@@ -16,7 +16,7 @@ import org.w3c.dom.Element;
 /**
  * TODO
  */
-public class ManagementContextDefinitionParser extends AbstractMuleSingleBeanDefinitionParser
+public class ManagementContextDefinitionParser extends AbstractMuleBeanDefinitionParser
 {
     protected Class getBeanClass(Element element)
     {

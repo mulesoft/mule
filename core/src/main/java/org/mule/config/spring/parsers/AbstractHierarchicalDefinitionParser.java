@@ -25,9 +25,9 @@ import org.w3c.dom.Element;
  *
  * @see org.mule.config.spring.parsers.generic.ChildDefinitionParser
  * @see org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser.KeyValuePair
- * @see org.mule.config.spring.parsers.AbstractMuleSingleBeanDefinitionParser
+ * @see org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser
  */
-public abstract class AbstractHierarchicalDefinitionParser extends AbstractMuleSingleBeanDefinitionParser
+public abstract class AbstractHierarchicalDefinitionParser extends AbstractMuleBeanDefinitionParser
 {
     private BeanDefinitionRegistry registry;
 

@@ -23,7 +23,7 @@ import org.springframework.util.StringUtils;
 
 /**
  * This collects together various constraints/rewrites that can be applied to attributes.  It
- * was extracted from AbstractMuleSingleBeanDefinitionParser and should be used as a delegate
+ * was extracted from AbstractMuleBeanDefinitionParser and should be used as a delegate
  * (see that class for an example).
  */
 public class PropertyToolkit

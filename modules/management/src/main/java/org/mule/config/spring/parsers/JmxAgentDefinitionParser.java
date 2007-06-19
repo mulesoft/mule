@@ -23,7 +23,7 @@ import org.w3c.dom.NodeList;
 /**
  * TODO
  */
-public class JmxAgentDefinitionParser extends AbstractMuleSingleBeanDefinitionParser
+public class JmxAgentDefinitionParser extends AbstractMuleBeanDefinitionParser
 {
 
     public static final String CONNECTOR_SERVER = "connector-server";

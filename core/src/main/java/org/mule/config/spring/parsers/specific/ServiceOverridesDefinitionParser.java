@@ -10,7 +10,7 @@
 package org.mule.config.spring.parsers.specific;
 
 import org.mule.config.MuleProperties;
-import org.mule.config.spring.parsers.AbstractChildBeanDefinitionParser;
+import org.mule.config.spring.parsers.AbstractChildDefinitionParser;
 import org.mule.util.StringUtils;
 
 import java.util.HashMap;
@@ -24,7 +24,7 @@ import org.w3c.dom.Element;
 /**
  * Sets a Map of service overrides on the parent connector
  */
-public class ServiceOverridesDefinitionParser extends AbstractChildBeanDefinitionParser
+public class ServiceOverridesDefinitionParser extends AbstractChildDefinitionParser
 {
 
     protected Class getBeanClass(Element element)

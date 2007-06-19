@@ -30,8 +30,8 @@ import org.w3c.dom.NodeList;
 /**
  * This parser enables Mule to parse heirarchical bean structures using spring Namespace handling
  * There are 4 base DefinitionParsers supplied in Mule that Most Parsers will extend from, these are
- * {@link org.mule.config.spring.parsers.AbstractChildBeanDefinitionParser}
- * {@link org.mule.config.spring.parsers.AbstractMuleSingleBeanDefinitionParser}
+ * {@link org.mule.config.spring.parsers.AbstractChildDefinitionParser}
+ * {@link org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser}
  * {@link org.mule.config.spring.parsers.generic.ChildDefinitionParser}
  * {@link org.mule.config.spring.parsers.generic.OrphanDefinitionParser}
  */

@@ -10,7 +10,7 @@
 package org.mule.config.spring.parsers.specific;
 
 import org.mule.config.i18n.CoreMessages;
-import org.mule.config.spring.parsers.AbstractChildBeanDefinitionParser;
+import org.mule.config.spring.parsers.AbstractChildDefinitionParser;
 import org.mule.providers.SimpleRetryConnectionStrategy;
 import org.mule.util.ClassUtils;
 
@@ -21,7 +21,7 @@ import org.w3c.dom.Element;
  * Handles the parsing of <code><mule:connection-strategy>, <mule:dispatcher-connection-strategy>,
  * <mule:receiver-connection-strategy></code> elements in Mule Xml configuration.
  */
-public class ConnectionStrategyDefinitionParser extends AbstractChildBeanDefinitionParser
+public class ConnectionStrategyDefinitionParser extends AbstractChildDefinitionParser
 {
 
     public static final Class DEFAULT_CONNECTION_STRATEGY = SimpleRetryConnectionStrategy.class;

@@ -11,14 +11,14 @@ package org.mule.config.spring.parsers.specific;
 
 import org.mule.config.MuleProperties;
 import org.mule.config.ThreadingProfile;
-import org.mule.config.spring.parsers.AbstractChildBeanDefinitionParser;
+import org.mule.config.spring.parsers.AbstractChildDefinitionParser;
 
 import org.w3c.dom.Element;
 
 /**
  * This parser is responsible for processing the <code><threading-profile><code> configuration elements.
  */
-public class ThreadingProfileDefinitionParser extends AbstractChildBeanDefinitionParser
+public class ThreadingProfileDefinitionParser extends AbstractChildDefinitionParser
 {
 
     public ThreadingProfileDefinitionParser()

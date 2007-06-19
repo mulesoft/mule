@@ -9,7 +9,7 @@
  */
 package org.mule.config.spring.parsers.generic;
 
-import org.mule.config.spring.parsers.AbstractMuleSingleBeanDefinitionParser;
+import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 
 import org.w3c.dom.Element;
 
@@ -18,7 +18,7 @@ import org.w3c.dom.Element;
  * This parser can be configured to automatically set the class of the object, the init and destroy methods
  * and whether this object is a singleton.
  */
-public class OrphanDefinitionParser extends AbstractMuleSingleBeanDefinitionParser
+public class OrphanDefinitionParser extends AbstractMuleBeanDefinitionParser
 {
     private Class beanClass = null;
 

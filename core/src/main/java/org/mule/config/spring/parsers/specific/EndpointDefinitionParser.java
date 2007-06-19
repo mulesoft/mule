@@ -9,7 +9,7 @@
  */
 package org.mule.config.spring.parsers.specific;
 
-import org.mule.config.spring.parsers.AbstractChildBeanDefinitionParser;
+import org.mule.config.spring.parsers.AbstractChildDefinitionParser;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.util.StringUtils;
@@ -24,7 +24,7 @@ import org.w3c.dom.Element;
  * parent object, unless the parent elemet is the root element <code>&lt;beans&gt;</code> in which 
  * case the Endpoint becomes a <em>global Endpoint</em> and is available via the registry.
  */
-public class EndpointDefinitionParser extends AbstractChildBeanDefinitionParser
+public class EndpointDefinitionParser extends AbstractChildDefinitionParser
 {
     public static final String ADDRESS_ATTRIBUTE = "address";
 

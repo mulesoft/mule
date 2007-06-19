@@ -9,7 +9,7 @@
  */
 package org.mule.config.spring.parsers.specific;
 
-import org.mule.config.spring.parsers.AbstractMuleSingleBeanDefinitionParser;
+import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.impl.model.ModelFactory;
 import org.mule.registry.ServiceException;
 import org.mule.umo.model.UMOModel;
@@ -22,7 +22,7 @@ import org.w3c.dom.Element;
 /**
  * Creates a FactoryBean that will discover the Model class to instantiate from the class path.
  */
-public class ModelDefinitionParser extends AbstractMuleSingleBeanDefinitionParser
+public class ModelDefinitionParser extends AbstractMuleBeanDefinitionParser
 {
     private String type;
 

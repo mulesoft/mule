@@ -9,7 +9,7 @@
  */
 package org.mule.config.spring.parsers.specific;
 
-import org.mule.config.spring.parsers.AbstractMuleSingleBeanDefinitionParser;
+import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.impl.MuleDescriptor;
 import org.mule.util.StringUtils;
 import org.mule.util.object.SimpleObjectFactory;
@@ -22,7 +22,7 @@ import org.w3c.dom.Element;
 /**
  * Parser used for processing <code><mule:service></code> elements.
  */
-public class ServiceDescriptorDefinitionParser extends AbstractMuleSingleBeanDefinitionParser
+public class ServiceDescriptorDefinitionParser extends AbstractMuleBeanDefinitionParser
 {
     protected Class getBeanClass(Element element)
     {

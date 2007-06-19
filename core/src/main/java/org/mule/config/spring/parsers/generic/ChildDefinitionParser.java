@@ -9,7 +9,7 @@
  */
 package org.mule.config.spring.parsers.generic;
 
-import org.mule.config.spring.parsers.AbstractChildBeanDefinitionParser;
+import org.mule.config.spring.parsers.AbstractChildDefinitionParser;
 
 import org.w3c.dom.Element;
 
@@ -24,7 +24,7 @@ import org.w3c.dom.Element;
  * If the class is read from an attribute (when class is null) then it is checked against
  * the constraint - it must be a subclass of the constraint.
  */
-public class ChildDefinitionParser extends AbstractChildBeanDefinitionParser
+public class ChildDefinitionParser extends AbstractChildDefinitionParser
 {
     protected Class constraint;
     protected Class clazz;
