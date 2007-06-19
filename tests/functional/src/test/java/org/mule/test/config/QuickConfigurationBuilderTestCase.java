@@ -59,7 +59,7 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
 
     public ConfigurationBuilder getBuilder()
     {
-        QuickConfigurationBuilder builder=null;
+        QuickConfigurationBuilder builder = null;
         try
         {
 
@@ -138,7 +138,7 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             // register components
             UMOEndpoint ep1 = registry.lookupEndpoint("appleInEndpoint");
             ep1.setTransformer(registry.lookupTransformer("TestCompressionTransformer"));
-            UMODescriptor d = builder.createDescriptor("orange", "orangeComponent", null, ep1, props);
+            UMODescriptor d = builder.createDescriptor(Orange.class.getName(), "orangeComponent", null, ep1, props);
             //d.setContainer("descriptor");
             DefaultComponentExceptionStrategy dces = new DefaultComponentExceptionStrategy();
             dces.addEndpoint(builder.getManagementContext().getRegistry().getOrCreateEndpointForUri("test://orange.exceptions", UMOEndpoint.ENDPOINT_TYPE_SENDER));
@@ -148,7 +148,7 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             inRouter.setCatchAllStrategy(new ForwardingCatchAllStrategy());
             inRouter.getCatchAllStrategy().setEndpoint(builder.getManagementContext().getRegistry().getOrCreateEndpointForUri("test2://catch.all", UMOEndpoint.ENDPOINT_TYPE_SENDER));
             UMOEndpoint ep2 = builder.createEndpoint("test://orange/", "Orange", true,
-                "TestCompressionTransformer");
+                    "TestCompressionTransformer");
             ep2.setResponseTransformer(registry.lookupTransformer("TestCompressionTransformer"));
             inRouter.addEndpoint(ep2);
             UMOEndpoint ep3 = registry.lookupEndpoint("orangeEndpoint");
@@ -174,7 +174,7 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             nestedRouter.addRouter(nr2);
 
             d.setNestedRouter(nestedRouter);
-            
+
             // Response Router
             UMOResponseRouterCollection responseRouter = new ResponseRouterCollection();
             responseRouter.addEndpoint(builder.getManagementContext().getRegistry().getOrCreateEndpointForUri("test://response1", UMOEndpoint.ENDPOINT_TYPE_RECEIVER));

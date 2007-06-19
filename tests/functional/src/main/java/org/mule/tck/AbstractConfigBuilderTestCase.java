@@ -57,7 +57,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     // @Override
     public void testConnectorConfig() throws Exception
     {
-        TestConnector c = (TestConnector)managementContext.getRegistry().lookupConnector("dummyConnector");
+        TestConnector c = (TestConnector) managementContext.getRegistry().lookupConnector("dummyConnector");
         assertNotNull(c);
         assertNotNull(c.getExceptionListener());
         assertTrue(c.getExceptionListener() instanceof TestExceptionStrategy);
@@ -75,7 +75,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertNotNull(endpoint);
         assertEquals(endpoint.getEndpointURI().getAddress(), "fruitBowlPublishQ");
         assertNotNull(endpoint.getFilter());
-        JXPathFilter filter = (JXPathFilter)endpoint.getFilter();
+        JXPathFilter filter = (JXPathFilter) endpoint.getFilter();
         assertEquals("name", filter.getPattern());
         assertEquals("bar", filter.getExpectedValue());
         assertNotNull(filter.getNamespaces());
@@ -108,7 +108,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertNotNull(t);
         assertTrue(t instanceof TestCompressionTransformer);
         assertEquals(t.getReturnClass(), java.lang.String.class);
-        assertNotNull(((TestCompressionTransformer)t).getContainerProperty());
+        assertNotNull(((TestCompressionTransformer) t).getContainerProperty());
     }
 
     // @Override
@@ -129,31 +129,31 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertNotNull(router.getCatchAllStrategy());
         assertEquals(2, router.getRouters().size());
         // check first Router
-        UMOOutboundRouter route1 = (UMOOutboundRouter)router.getRouters().get(0);
+        UMOOutboundRouter route1 = (UMOOutboundRouter) router.getRouters().get(0);
         assertTrue(route1 instanceof FilteringOutboundRouter);
         assertNotNull(((FilteringOutboundRouter) route1).getTransformer());
         assertTrue(((FilteringOutboundRouter) route1).getTransformer() instanceof TestCompressionTransformer);
 
-        UMOFilter filter = ((FilteringOutboundRouter)route1).getFilter();
+        UMOFilter filter = ((FilteringOutboundRouter) route1).getFilter();
         assertNotNull(filter);
         assertTrue(filter instanceof PayloadTypeFilter);
-        assertEquals(String.class, ((PayloadTypeFilter)filter).getExpectedType());
+        assertEquals(String.class, ((PayloadTypeFilter) filter).getExpectedType());
 
         // check second Router
-        UMOOutboundRouter route2 = (UMOOutboundRouter)router.getRouters().get(1);
+        UMOOutboundRouter route2 = (UMOOutboundRouter) router.getRouters().get(1);
         assertTrue(route2 instanceof FilteringOutboundRouter);
 
-        UMOFilter filter2 = ((FilteringOutboundRouter)route2).getFilter();
+        UMOFilter filter2 = ((FilteringOutboundRouter) route2).getFilter();
         assertNotNull(filter2);
         assertTrue(filter2 instanceof AndFilter);
-        UMOFilter left = ((AndFilter)filter2).getLeftFilter();
-        UMOFilter right = ((AndFilter)filter2).getRightFilter();
+        UMOFilter left = ((AndFilter) filter2).getLeftFilter();
+        UMOFilter right = ((AndFilter) filter2).getRightFilter();
         assertNotNull(left);
         assertTrue(left instanceof RegExFilter);
-        assertEquals("the quick brown (.*)", ((RegExFilter)left).getExpression());
+        assertEquals("the quick brown (.*)", ((RegExFilter) left).getPattern());
         assertNotNull(right);
         assertTrue(right instanceof RegExFilter);
-        assertEquals("(.*) brown (.*)", ((RegExFilter)right).getExpression());
+        assertEquals("(.*) brown (.*)", ((RegExFilter) right).getPattern());
 
         assertTrue(router.getCatchAllStrategy() instanceof TestCatchAllStrategy);
     }
@@ -166,17 +166,17 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         UMOInboundRouterCollection messageRouter = descriptor.getInboundRouter();
         assertNotNull(messageRouter.getCatchAllStrategy());
         assertEquals(2, messageRouter.getRouters().size());
-        UMOInboundRouter router = (UMOInboundRouter)messageRouter.getRouters().get(0);
+        UMOInboundRouter router = (UMOInboundRouter) messageRouter.getRouters().get(0);
         assertTrue(router instanceof SelectiveConsumer);
-        SelectiveConsumer sc = (SelectiveConsumer)router;
+        SelectiveConsumer sc = (SelectiveConsumer) router;
 
         assertNotNull(sc.getFilter());
         UMOFilter filter = sc.getFilter();
         // check first Router
         assertTrue(filter instanceof PayloadTypeFilter);
-        assertEquals(String.class, ((PayloadTypeFilter)filter).getExpectedType());
+        assertEquals(String.class, ((PayloadTypeFilter) filter).getExpectedType());
 
-        UMOInboundRouter router2 = (UMOInboundRouter)messageRouter.getRouters().get(1);
+        UMOInboundRouter router2 = (UMOInboundRouter) messageRouter.getRouters().get(1);
         assertTrue(router2 instanceof IdempotentReceiver);
     }
 
@@ -199,7 +199,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertEquals(60001, tp.getThreadTTL());
 
         // test that values not set retain a default value
-        AbstractConnector c = (AbstractConnector)managementContext.getRegistry().lookupConnector("dummyConnector");
+        AbstractConnector c = (AbstractConnector) managementContext.getRegistry().lookupConnector("dummyConnector");
         tp = c.getDispatcherThreadingProfile();
         assertEquals(2, tp.getMaxBufferSize());
         assertEquals(ThreadingProfile.DEFAULT_MAX_THREADS_ACTIVE, tp.getMaxThreadsActive());
@@ -207,8 +207,8 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertEquals(ThreadingProfile.DEFAULT_POOL_EXHAUST_ACTION, tp.getPoolExhaustedAction());
         assertEquals(ThreadingProfile.DEFAULT_MAX_THREAD_TTL, tp.getThreadTTL());
 
-        MuleDescriptor descriptor = (MuleDescriptor)managementContext.getRegistry().lookupService(
-            "appleComponent2");
+        MuleDescriptor descriptor = (MuleDescriptor) managementContext.getRegistry().lookupService(
+                "appleComponent2");
         tp = descriptor.getThreadingProfile();
         assertEquals(6, tp.getMaxBufferSize());
         assertEquals(12, tp.getMaxThreadsActive());
@@ -229,8 +229,8 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
 //        assertTrue(pp.getPoolFactory() instanceof CommonsPoolFactory);
 
         // test override
-        MuleDescriptor descriptor = (MuleDescriptor)managementContext.getRegistry().lookupService(
-            "appleComponent2");
+        MuleDescriptor descriptor = (MuleDescriptor) managementContext.getRegistry().lookupService(
+                "appleComponent2");
 //        PoolingProfile pp = descriptor.getPoolingProfile();
 //
 //        assertEquals(5, pp.getMaxActive());
@@ -249,8 +249,8 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
 //        assertTrue(qp.isPersistent());
 
         // test inherit
-        MuleDescriptor descriptor = (MuleDescriptor)managementContext.getRegistry().lookupService(
-            "orangeComponent");
+        MuleDescriptor descriptor = (MuleDescriptor) managementContext.getRegistry().lookupService(
+                "orangeComponent");
 //        QueueProfile qp = descriptor.getQueueProfile();
 //        assertEquals(100, qp.getMaxOutstandingMessages());
 //        assertTrue(qp.isPersistent());
@@ -266,8 +266,8 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     {
         // test transaction config
         UMODescriptor descriptor = managementContext.getRegistry().lookupService("appleComponent2");
-        MuleEndpoint inEndpoint = (MuleEndpoint)descriptor.getInboundRouter().getEndpoint(
-            "transactedInboundEndpoint");
+        MuleEndpoint inEndpoint = (MuleEndpoint) descriptor.getInboundRouter().getEndpoint(
+                "transactedInboundEndpoint");
         assertNotNull(inEndpoint);
         assertEquals(TransportFactory.NEVER_CREATE_CONNECTOR, inEndpoint.getCreateConnector());
         assertNotNull(inEndpoint.getProperties());
@@ -282,9 +282,9 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertNotNull(inEndpoint);
         assertEquals(1, descriptor.getOutboundRouter().getRouters().size());
 
-        UMOEndpoint outEndpoint = (UMOEndpoint)((UMOOutboundRouter)descriptor.getOutboundRouter()
-            .getRouters()
-            .get(0)).getEndpoints().get(0);
+        UMOEndpoint outEndpoint = (UMOEndpoint) ((UMOOutboundRouter) descriptor.getOutboundRouter()
+                .getRouters()
+                .get(0)).getEndpoints().get(0);
 
         assertNotNull(outEndpoint);
         assertNotNull(inEndpoint.getTransactionConfig());
@@ -314,7 +314,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     public void testNestedRouterProxyCreation() throws ObjectNotFoundException
     {
         //Test that the proxy object was created and set on the service object
-        Orange orange = (Orange)managementContext.getRegistry().lookupObject("orange", Orange.class);
+        Orange orange = (Orange) managementContext.getRegistry().lookupObject("orange", Orange.class);
         assertNotNull(orange);
         assertNotNull(orange.getCleaner());
     }
