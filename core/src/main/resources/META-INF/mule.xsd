@@ -462,6 +462,8 @@
                                  maxOccurs="unbounded"/>
                     <xsd:element name="custom-encryption-strategy" type="customEncryptionStrategyType" minOccurs="0"
                                  maxOccurs="unbounded"/>
+                    <xsd:element name="secret-key-encryption-strategy" type="secretKeyEncryptionStrategyType" minOccurs="0" 
+                                 maxOccurs="unbounded"/>
                     <xsd:element name="password-encryption-strategy" type="passwordEncryptionStrategyType" minOccurs="0"
                                  maxOccurs="unbounded"/>
                 </xsd:sequence>

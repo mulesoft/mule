@@ -21,7 +21,6 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <exclude>**</exclude>
                     </excludes>
                 </configuration>
             </plugin>
