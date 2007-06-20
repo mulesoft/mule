@@ -26,6 +26,7 @@
                         <exclude>**/MuleXmlConfigBuilderTestCase.*</exclude>
                         <exclude>**/MuleXmlConfigBuilderSplitComponentsTestCase.*</exclude>
                         <exclude>**/ConnectorConverterTestCase.*</exclude>
+                        <exclude>**/NamedSimpleTestCase.*</exclude>
                     </excludes>
                 </configuration>
             </plugin>
