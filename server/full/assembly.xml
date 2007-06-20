@@ -308,10 +308,15 @@ Assembly descriptor for the full Mule distribution.
         Libraries
     ============================
     -->
-    
-  <!-- TODO: http://jira.codehaus.org/browse/MASSEMBLY-41 is now fixed. Update to use wildcards. -->
-  <dependencySets>
 
+  <!--
+       TODO: http://jira.codehaus.org/browse/MASSEMBLY-41 is now fixed.
+       Update to use wildcards.
+
+       Unfortunately we still cannot use wildcards, see
+       http://jira.codehaus.org/browse/MASSEMBLY-220
+  -->
+  <dependencySets>
     <!-- Mule bootstrap -->
     <dependencySet>
       <outputDirectory>lib/boot</outputDirectory>
@@ -374,6 +379,7 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.modules:mule-module-scripting</include>
         <include>org.mule.modules:mule-module-spring</include>
         <include>org.mule.modules:mule-module-util</include>
+        <include>org.mule.modules:mule-module-wssecurity</include>
         <include>org.mule.modules:mule-module-xml</include>
       </includes>
     </dependencySet>
@@ -427,6 +433,7 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule.modules:mule-module-scripting</exclude>
         <exclude>org.mule.modules:mule-module-spring</exclude>
         <exclude>org.mule.modules:mule-module-util</exclude>
+        <include>org.mule.modules:mule-module-wssecurity</include>
         <exclude>org.mule.modules:mule-module-xml</exclude>
         <!-- Examples -->
         <exclude>org.mule.examples:mule-examples-all</exclude>
