@@ -15,7 +15,7 @@ import java.io.Writer;
 import java.util.Collection;
 import java.util.StringTokenizer;
 
-import org.apache.commons.lang.StringUtils;
+import org.mule.util.StringUtils;
 
 /**
  * <code>HtmlTablePrinter</code> prints event processing stats as a HTML table

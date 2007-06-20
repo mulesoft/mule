@@ -23,7 +23,7 @@ import javax.naming.InitialContext;
 import javax.naming.Name;
 import javax.naming.NamingException;
 
-import org.apache.commons.lang.ObjectUtils;
+import org.mule.util.ObjectUtils;
 
 /**
  * <code>JndiContainerContext</code> is a container implementaiton that exposes a

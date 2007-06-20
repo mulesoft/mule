@@ -15,7 +15,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.URI;
 
-import org.apache.commons.lang.StringUtils;
+import org.mule.util.StringUtils;
 
 public class TcpServerSocketFactory implements SimpleServerSocketFactory
 {

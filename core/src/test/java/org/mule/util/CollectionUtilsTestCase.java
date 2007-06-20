@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.apache.commons.lang.SystemUtils;
+import org.mule.util.SystemUtils;
 
 public class CollectionUtilsTestCase extends AbstractMuleTestCase
 {

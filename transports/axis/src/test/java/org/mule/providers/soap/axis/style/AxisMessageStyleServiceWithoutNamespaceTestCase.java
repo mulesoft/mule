@@ -25,7 +25,7 @@ import javax.xml.rpc.ParameterMode;
 
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
-import org.apache.commons.lang.StringUtils;
+import org.mule.util.StringUtils;
 
 public class AxisMessageStyleServiceWithoutNamespaceTestCase extends FunctionalTestCase
 {

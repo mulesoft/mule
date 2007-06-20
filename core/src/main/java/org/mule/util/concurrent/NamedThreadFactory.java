@@ -13,7 +13,7 @@ package org.mule.util.concurrent;
 import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicLong;
 
-import org.apache.commons.lang.StringUtils;
+import org.mule.util.StringUtils;
 
 public class NamedThreadFactory implements ThreadFactory
 {

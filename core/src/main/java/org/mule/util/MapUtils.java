@@ -16,8 +16,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.commons.lang.SystemUtils;
-
 // @ThreadSafe
 public class MapUtils extends org.apache.commons.collections.MapUtils
 {

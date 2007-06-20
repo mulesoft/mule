@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.map.CaseInsensitiveMap;
-import org.apache.commons.lang.SystemUtils;
+import org.mule.util.SystemUtils;
 
 public class MapUtilsTestCase extends AbstractMuleTestCase
 {

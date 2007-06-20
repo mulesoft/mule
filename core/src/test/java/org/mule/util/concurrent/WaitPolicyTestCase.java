@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.keyvalue.DefaultMapEntry;
-import org.apache.commons.lang.StringUtils;
+import org.mule.util.StringUtils;
 
 public class WaitPolicyTestCase extends AbstractMuleTestCase
 {

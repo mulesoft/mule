@@ -42,7 +42,7 @@ import org.apache.axis.description.ParameterDesc;
 import org.apache.axis.handlers.soap.SOAPService;
 import org.apache.axis.providers.java.JavaProvider;
 import org.apache.axis.wsdl.fromJava.Namespaces;
-import org.apache.commons.lang.StringUtils;
+import org.mule.util.StringUtils;
 
 /**
  * <code>AxisMessageReceiver</code> is used to register a component as a service

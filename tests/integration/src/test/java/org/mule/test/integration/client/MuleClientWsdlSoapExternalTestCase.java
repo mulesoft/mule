@@ -14,9 +14,8 @@ import org.mule.extras.client.MuleClient;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.mule.util.ExceptionUtils;
+import org.mule.util.StringUtils;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -86,7 +85,7 @@ public class MuleClientWsdlSoapExternalTestCase extends AbstractMuleTestCase
         }
 
         String url = "wsdl:" + WSDL_URL + "&method=" + METHOD;
-        MuleClient client = null;
+        MuleClient client;
         client = new MuleClient();
         UMOMessage result = client.send(url, INPUT, null);
         assertNotNull(result);

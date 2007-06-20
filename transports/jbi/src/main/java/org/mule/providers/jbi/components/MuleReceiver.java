@@ -40,7 +40,7 @@ import javax.jbi.messaging.NormalizedMessage;
 import javax.jbi.servicedesc.ServiceEndpoint;
 import javax.xml.namespace.QName;
 
-import org.apache.commons.lang.SystemUtils;
+import org.mule.util.SystemUtils;
 
 /**
  * Can receive events over Mule transports. Given an muleEndpoint (or endpoint string

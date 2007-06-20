@@ -16,7 +16,7 @@ import org.mule.providers.jms.JmsMessageAdapter;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringMessageUtils;
 
-import org.apache.commons.lang.ObjectUtils;
+import org.mule.util.ObjectUtils;
 
 public class JmsMessages extends MessageFactory
 {

@@ -20,7 +20,7 @@ import com.oy.shared.lm.graph.GraphNode;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.mule.util.StringUtils;
 import org.jdom.Attribute;
 import org.jdom.Element;
 

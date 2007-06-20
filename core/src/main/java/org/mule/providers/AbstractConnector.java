@@ -83,7 +83,7 @@ import java.util.Properties;
 import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.WorkListener;
 
-import org.apache.commons.lang.StringUtils;
+import org.mule.util.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
@@ -121,7 +121,7 @@ public abstract class AbstractConnector
      * Default number of concurrent transactional receivers.
      */
     public static final int DEFAULT_NUM_CONCURRENT_TX_RECEIVERS = 4;
-    
+
     /**
      * logger used by this class
      */
@@ -738,7 +738,7 @@ public abstract class AbstractConnector
         if (!supportsProtocol(endpoint.getConnector().getProtocol()))
         {
             throw new IllegalArgumentException(
-                CoreMessages.connectorSchemeIncompatibleWithEndpointScheme(this.getProtocol(), 
+                CoreMessages.connectorSchemeIncompatibleWithEndpointScheme(this.getProtocol(),
                     endpoint.getEndpointURI().toString()).getMessage());
         }
 
@@ -1666,7 +1666,7 @@ public abstract class AbstractConnector
         if (!supportsProtocol(endpointUri.getFullScheme()))
         {
             throw new InitialisationException(
-                CoreMessages.schemeNotCompatibleWithConnector(endpointUri.getFullScheme(), 
+                CoreMessages.schemeNotCompatibleWithConnector(endpointUri.getFullScheme(),
                     this.getClass()), this);
         }
         Properties props = new Properties();

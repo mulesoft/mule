@@ -21,7 +21,7 @@ import org.mule.util.ChainedReader;
 import java.io.Reader;
 import java.io.StringReader;
 
-import org.apache.commons.lang.SystemUtils;
+import org.mule.util.SystemUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

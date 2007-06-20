@@ -14,7 +14,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.mule.util.StringUtils;
 import org.mule.config.ExceptionReader;
 
 /**

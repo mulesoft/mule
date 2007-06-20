@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.mule.util.StringUtils;
 
 /**
  * Initiates or advances a workflow process from an outgoing Mule event.

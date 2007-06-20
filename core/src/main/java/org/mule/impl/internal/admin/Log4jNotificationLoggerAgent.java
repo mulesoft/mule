@@ -33,7 +33,7 @@ import org.apache.log4j.xml.DOMConfigurator;
 /**
  * <code>AbstractNotificationLoggerAgent</code> Receives Mule server notifications
  * and logs them and can optionally route them to an endpoint
- * 
+ *
  */
 public class Log4jNotificationLoggerAgent extends AbstractNotificationLoggerAgent
 {
@@ -56,7 +56,7 @@ public class Log4jNotificationLoggerAgent extends AbstractNotificationLoggerAgen
 
     /**
      * Should be a 1 line description of the agent
-     * 
+     *
      * @return the description of this Agent
      */
     public String getDescription()

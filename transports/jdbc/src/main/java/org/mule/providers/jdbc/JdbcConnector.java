@@ -24,6 +24,7 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.ClassUtils;
+import org.mule.util.ExceptionUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.properties.BeanPropertyExtractor;
 import org.mule.util.properties.MapPropertyExtractor;
@@ -48,7 +49,6 @@ import javax.sql.DataSource;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
-import org.apache.commons.lang.exception.ExceptionUtils;
 
 public class JdbcConnector extends AbstractConnector
 {

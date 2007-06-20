@@ -14,7 +14,6 @@ import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.apache.commons.lang.SystemUtils;
 
 // @ThreadSafe
 public class CollectionUtils extends org.apache.commons.collections.CollectionUtils

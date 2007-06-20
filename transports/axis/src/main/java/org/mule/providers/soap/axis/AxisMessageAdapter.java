@@ -25,7 +25,7 @@ import javax.xml.soap.SOAPMessage;
 
 import org.apache.axis.MessageContext;
 import org.apache.axis.attachments.AttachmentPart;
-import org.apache.commons.lang.StringUtils;
+import org.mule.util.StringUtils;
 
 /**
  * <code>AxisMessageAdapter</code> wraps a soap message. The payload of the adapter

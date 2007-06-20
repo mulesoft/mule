@@ -20,7 +20,7 @@ public class StringUtils extends org.apache.commons.lang.StringUtils
 {
 
     /**
-     * Like {@link org.apache.commons.lang.StringUtils#split(String, String)}, but
+     * Like {@link org.mule.util.StringUtils#split(String, String)}, but
      * additionally trims whitespace from the result tokens.
      */
     public static String[] splitAndTrim(String string, String delim)

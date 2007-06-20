@@ -15,7 +15,7 @@ import org.mule.config.i18n.Message;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
-import org.apache.commons.lang.ObjectUtils;
+import org.mule.util.ObjectUtils;
 
 /**
  * <code>ReceiveException</code> is specifically thrown by the Provider receive

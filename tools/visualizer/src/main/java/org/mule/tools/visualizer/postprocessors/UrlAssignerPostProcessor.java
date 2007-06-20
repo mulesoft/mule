@@ -13,6 +13,7 @@ package org.mule.tools.visualizer.postprocessors;
 import org.mule.tools.visualizer.components.PostProcessor;
 import org.mule.tools.visualizer.config.GraphConfig;
 import org.mule.tools.visualizer.config.GraphEnvironment;
+import org.mule.util.StringUtils;
 
 import com.oy.shared.lm.graph.Graph;
 import com.oy.shared.lm.graph.GraphNode;
@@ -22,7 +23,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;

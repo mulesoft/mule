@@ -23,7 +23,7 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.mule.util.StringUtils;
 
 /**
  * The Jdbc Message dispatcher is responsible for executing SQL queries against a

@@ -15,12 +15,11 @@ import org.mule.providers.soap.SoapConstants;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
+import org.mule.util.ExceptionUtils;
+import org.mule.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
 
 public class MuleClientWSDLExternalTestCase extends AbstractMuleTestCase
 {

@@ -22,6 +22,10 @@ import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.util.ObjectUtils;
 
+import java.io.File;
+
+import org.mule.util.ObjectUtils;
+
 /**
  * <code>FileMessageAdapter</code> provides a wrapper for a file reference. Users
  * can obtain the contents of the message through the payload property and can get

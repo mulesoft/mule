@@ -14,7 +14,7 @@ import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.StringUtils;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.mule.util.ArrayUtils;
 
 /**
  * Converts a Hex String to a Byte array

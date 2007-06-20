@@ -39,7 +39,7 @@ import java.util.Set;
 import javax.activation.DataHandler;
 import javax.xml.namespace.QName;
 
-import org.apache.commons.lang.StringUtils;
+import org.mule.util.StringUtils;
 import org.codehaus.xfire.XFire;
 import org.codehaus.xfire.client.Client;
 import org.codehaus.xfire.handler.Handler;

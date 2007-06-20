@@ -42,7 +42,7 @@ import javax.mail.event.MessageCountListener;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import org.apache.commons.lang.StringUtils;
+import org.mule.util.StringUtils;
 
 /**
  * Poll a mailbox for messages, remove the messages and route them as events into Mule.

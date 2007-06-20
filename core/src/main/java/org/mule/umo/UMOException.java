@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.commons.lang.SystemUtils;
+import org.mule.util.SystemUtils;
 
 /**
  * <code>UMOException</code> is the base exception type for the Mule server any

@@ -48,8 +48,8 @@ import org.apache.axis.transport.http.SocketInputStream;
 import org.apache.axis.utils.Messages;
 import org.apache.axis.utils.TeeOutputStream;
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.SystemUtils;
+import org.mule.util.StringUtils;
+import org.mule.util.SystemUtils;
 import org.apache.commons.logging.Log;
 
 /**

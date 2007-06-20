@@ -15,7 +15,7 @@ import org.mule.providers.NullPayload;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
-import org.apache.commons.lang.ObjectUtils;
+import org.mule.util.ObjectUtils;
 
 /**
  * <code>DefaultExceptionStrategy</code> provides a default exception handling
