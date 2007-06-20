@@ -18,7 +18,7 @@ public class IgnoredTestCase extends AbstractNamespaceTestCase
         super("org/mule/config/spring/parsers/ignored-test.xml");
     }
 
-    protected void testignored(int index)
+    protected void internalAssert(int index)
     {
         OrphanBean orphan = (OrphanBean) beanExists("orphan" + index, OrphanBean.class);
         assertTrue("orphan" + index, orphan.isIgnored());
@@ -28,17 +28,17 @@ public class IgnoredTestCase extends AbstractNamespaceTestCase
 
     public void testNamed()
     {
-        testignored(1);
+        internalAssert(1);
     }
 
     public void testOrphan()
     {
-        testignored(2);
+        internalAssert(2);
     }
 
     public void testParent()
     {
-        testignored(3);
+        internalAssert(3);
     }
 
 }
