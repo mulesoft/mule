@@ -26,6 +26,7 @@
                         <descriptor>assembly.xml</descriptor>
                     </descriptors>
                     <appendAssemblyId>false</appendAssemblyId>
+                    <tarLongFileMode>gnu</tarLongFileMode>
                 </configuration>
                 <executions>
                     <execution>

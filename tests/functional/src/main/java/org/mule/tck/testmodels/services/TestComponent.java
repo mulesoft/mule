@@ -29,6 +29,11 @@ public class TestComponent implements ITestComponent
                     + Thread.currentThread().getName());
         return "Received: " + message;
     }
+    
+    public String receive(byte[] src) throws Exception
+    {
+        return receive(new String(src));
+    }
 
     public String throwsException(String message) throws Exception
     {

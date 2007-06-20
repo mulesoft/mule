@@ -25,15 +25,22 @@ import org.mule.umo.transformer.TransformerException;
  */
 public class ObjectToXmppPacket extends AbstractEventAwareTransformer
 {
-
     public ObjectToXmppPacket()
     {
-        registerSourceType(String.class);
+        this.registerSourceType(String.class);
+        this.registerSourceType(Message.class);
         setReturnClass(Message.class);
     }
 
     public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
     {
+        // Make the transformer match its wiki documentation: we accept Messages and Strings. 
+        // No special treatment for Messages is needed
+        if (src instanceof Message)
+        {
+            return src;
+        }
+        
         Message result = new Message();
 
         UMOMessage msg = context.getMessage();
@@ -67,9 +74,10 @@ public class ObjectToXmppPacket extends AbstractEventAwareTransformer
             }
         }
 
+        // copy the payload. Since it can only be a String (other objects wouldn't be passed in through
+        // AbstractTransformer) the following is safe.
         result.setBody((String) src);
         
         return result;
     }
-
 }

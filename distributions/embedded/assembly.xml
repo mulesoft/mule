@@ -8,7 +8,11 @@ Assembly descriptor for the composite Mule library (jar).
   </formats>
   <includeBaseDirectory>false</includeBaseDirectory>
   <!-- Once http://jira.codehaus.org/browse/MASSEMBLY-41 is fixed, we should be able to
-       replace the following lists with some clever wildcards. -->
+       replace the following lists with some clever wildcards.
+
+       DO: see http://jira.codehaus.org/browse/MASSEMBLY-220 for the next problems
+       with the assembly plugin.
+  -->
   <dependencySets>
     <dependencySet>
       <outputDirectory>/</outputDirectory>
@@ -25,10 +29,11 @@ Assembly descriptor for the composite Mule library (jar).
         <include>org.mule.transports:mule-transport-ftp</include>
         <include>org.mule.transports:mule-transport-http</include>
         <include>org.mule.transports:mule-transport-jbi</include>
+        <include>org.mule.transports:mule-transport-jbpm</include>
         <include>org.mule.transports:mule-transport-jdbc</include>
         <include>org.mule.transports:mule-transport-jms</include>
         <include>org.mule.transports:mule-transport-multicast</include>
-        <include>org.mule.transports:mule-transport-oracle-jms</include>
+        <include>org.mule.transports:mule-transport-oracleaq</include>
         <include>org.mule.transports:mule-transport-quartz</include>
         <include>org.mule.transports:mule-transport-rmi</include>
         <include>org.mule.transports:mule-transport-soap</include>
@@ -41,6 +46,7 @@ Assembly descriptor for the composite Mule library (jar).
         <include>org.mule.transports:mule-transport-xmpp</include>
         <!-- Modules -->
         <include>org.mule.modules:mule-module-acegi</include>
+        <include>org.mule.modules:mule-module-boot</include>
         <include>org.mule.modules:mule-module-builders</include>
         <include>org.mule.modules:mule-module-client</include>
         <include>org.mule.modules:mule-module-hivemind</include>
@@ -53,6 +59,7 @@ Assembly descriptor for the composite Mule library (jar).
         <include>org.mule.modules:mule-module-picocontainer</include>
         <include>org.mule.modules:mule-module-scripting</include>
         <include>org.mule.modules:mule-module-spring</include>
+        <include>org.mule.modules:mule-module-wssecurity</include>
         <include>org.mule.modules:mule-module-xml</include>
       </includes>
       <!-- Workaround, see comment for "<packaging>jar</packaging>" in the pom.xml -->

@@ -218,6 +218,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
 
             long ttl = Message.DEFAULT_TIME_TO_LIVE;
             int priority = Message.DEFAULT_PRIORITY;
+            // TODO this first assignment is ignored anyway, review and remove if need to
             boolean persistent = Message.DEFAULT_DELIVERY_MODE == DeliveryMode.PERSISTENT;
 
             if (ttlString != null)
@@ -228,10 +229,11 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             {
                 priority = Integer.parseInt(priorityString);
             }
-            if (persistentDeliveryString != null)
-            {
-                persistent = Boolean.valueOf(persistentDeliveryString).booleanValue();
-            }
+
+            // TODO StringUtils.notBlank() would be more robust here
+            persistent = persistentDeliveryString != null
+                                ? Boolean.valueOf(persistentDeliveryString).booleanValue()
+                                : connector.isPersistentDelivery();
 
             if (logger.isDebugEnabled())
             {

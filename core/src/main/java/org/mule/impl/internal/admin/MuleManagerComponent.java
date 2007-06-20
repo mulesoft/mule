@@ -94,11 +94,8 @@ public class MuleManagerComponent implements Callable, Initialisable
         {
             result = invokeAction(action, context);
         }
-        else if (AdminNotification.ACTION_SEND == action.getAction())
-        {
-            result = sendAction(action, context);
-        }
-        else if (AdminNotification.ACTION_DISPATCH == action.getAction())
+        else if (AdminNotification.ACTION_SEND == action.getAction() ||
+                 AdminNotification.ACTION_DISPATCH == action.getAction())
         {
             result = sendAction(action, context);
         }

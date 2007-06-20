@@ -61,7 +61,7 @@ public abstract class FunctionalTestCase extends AbstractMuleTestCase
                 "The builder "
                                 + DEFAULT_BUILDER_CLASS
                                 + " is not on your classpath and "
-                                + "the getBuilder() method of this class has not been overloaded to return adifferent builder. Please "
+                                + "the getBuilder() method of this class has not been overloaded to return a different builder. Please "
                                 + "check your functional test.", e);
         }
 

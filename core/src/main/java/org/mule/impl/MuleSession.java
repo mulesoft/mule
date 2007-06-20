@@ -341,7 +341,7 @@ public final class MuleSession implements UMOSession
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug("dispatching event to component: " + component.getDescriptor().getName()
+                logger.debug("sending event to component: " + component.getDescriptor().getName()
                              + " event is: " + event);
             }
             return component.sendEvent(event);

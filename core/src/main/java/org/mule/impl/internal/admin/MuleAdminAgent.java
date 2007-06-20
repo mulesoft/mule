@@ -57,7 +57,7 @@ public class MuleAdminAgent extends AbstractAgent
 
     /**
      * Should be a 1 line description of the agent
-     * 
+     *
      * @return
      */
     public String getDescription()
@@ -132,7 +132,7 @@ public class MuleAdminAgent extends AbstractAgent
                     UMOEndpointURI endpointUri = new MuleEndpointURI(serverUri);
                     UMOConnector connector = TransportFactory.getOrCreateConnectorByProtocol(endpointUri);
                     // If this connector has already been initialised i.e. it's a
-                    // pre-existing connector not not reinit
+                    // pre-existing connector don't reinit
                     if (managementContext.getRegistry().lookupConnector(connector.getName()) == null)
                     {
                         connector.setName(DEFAULT_MANAGER_ENDPOINT);

@@ -110,6 +110,8 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
             {
                 long ttl = Message.DEFAULT_TIME_TO_LIVE;
                 int priority = Message.DEFAULT_PRIORITY;
+
+                // TODO this first assignment is ignored anyway, review and remove if need to
                 boolean persistent = Message.DEFAULT_DELIVERY_MODE == DeliveryMode.PERSISTENT;
 
                 if (ttlString != null)
@@ -120,10 +122,10 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
                 {
                     priority = Integer.parseInt(priorityString);
                 }
-                if (persistentDeliveryString != null)
-                {
-                    persistent = Boolean.valueOf(persistentDeliveryString).booleanValue();
-                }
+                // TODO StringUtils.notBlank() would be more robust here
+                persistent = persistentDeliveryString != null
+                                ? Boolean.valueOf(persistentDeliveryString).booleanValue()
+                                : connector.isPersistentDelivery();
 
                 connector.getJmsSupport().send(replyToProducer, replyToMessage, persistent, priority, ttl,
                     topic);
