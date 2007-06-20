@@ -10,35 +10,34 @@
 
 package org.mule.config.spring.parsers;
 
-public class IgnoredTest extends AbstractNamespaceTestCase
+public class ReferenceTestCase extends AbstractNamespaceTestCase
 {
 
-    public IgnoredTest()
+    public ReferenceTestCase()
     {
-        super("org/mule/config/spring/parsers/ignored-test.xml");
+        super("org/mule/config/spring/parsers/reference-test.xml");
     }
 
-    protected void testignored(int index)
+    protected void testChildRef(int index)
     {
         OrphanBean orphan = (OrphanBean) beanExists("orphan" + index, OrphanBean.class);
-        assertTrue("orphan" + index, orphan.isIgnored());
         ChildBean child = (ChildBean) contentExists(orphan.getChild(), ChildBean.class);
-        assertTrue("child" + index, child.isIgnored());
+        assertEquals("child" + index, child.getName());
     }
 
     public void testNamed()
     {
-        testignored(1);
+        testChildRef(1);
     }
 
     public void testOrphan()
     {
-        testignored(2);
+        testChildRef(2);
     }
 
     public void testParent()
     {
-        testignored(3);
+        testChildRef(3);
     }
 
 }
