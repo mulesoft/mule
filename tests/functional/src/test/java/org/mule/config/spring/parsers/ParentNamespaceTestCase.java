@@ -13,11 +13,11 @@ package org.mule.config.spring.parsers;
 public class ParentNamespaceTestCase extends AbstractNamespaceTestCase
 {
 
-    public ParentNamespaceTestCase()
+    protected String getConfigResources()
     {
-        super("org/mule/config/spring/parsers/parsers-test-namespace-config.xml");
+        return "org/mule/config/spring/parsers/parsers-test-namespace-config.xml";
     }
-    
+
     public void testParent()
     {
         OrphanBean orphan3 = (OrphanBean) beanExists("orphan3", OrphanBean.class);

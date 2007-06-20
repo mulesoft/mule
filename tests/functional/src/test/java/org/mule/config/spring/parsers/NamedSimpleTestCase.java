@@ -13,9 +13,9 @@ package org.mule.config.spring.parsers;
 public class NamedSimpleTestCase extends AbstractNamespaceTestCase
 {
 
-    public NamedSimpleTestCase()
+    protected String getConfigResources()
     {
-        super("org/mule/config/spring/parsers/named-simple-test.xml");
+        return "org/mule/config/spring/parsers/named-simple-test.xml";
     }
 
     public void testNamed1()

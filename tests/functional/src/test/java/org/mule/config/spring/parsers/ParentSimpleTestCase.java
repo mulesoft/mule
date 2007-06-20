@@ -13,9 +13,9 @@ package org.mule.config.spring.parsers;
 public class ParentSimpleTestCase extends AbstractNamespaceTestCase
 {
 
-    public ParentSimpleTestCase()
+    protected String getConfigResources()
     {
-        super("org/mule/config/spring/parsers/parent-simple-test.xml");
+        return "org/mule/config/spring/parsers/parent-simple-test.xml";
     }
 
     public void testParent3()

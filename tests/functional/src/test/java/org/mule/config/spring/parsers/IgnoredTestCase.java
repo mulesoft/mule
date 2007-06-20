@@ -13,9 +13,9 @@ package org.mule.config.spring.parsers;
 public class IgnoredTestCase extends AbstractNamespaceTestCase
 {
 
-    public IgnoredTestCase()
+    protected String getConfigResources()
     {
-        super("org/mule/config/spring/parsers/ignored-test.xml");
+        return "org/mule/config/spring/parsers/ignored-test.xml";
     }
 
     protected void internalAssert(int index)

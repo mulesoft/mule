@@ -13,9 +13,10 @@ package org.mule.config.spring.parsers;
 public class NamedNamespaceTestCase extends AbstractNamespaceTestCase
 {
 
-    public NamedNamespaceTestCase()
+
+    protected String getConfigResources()
     {
-        super("org/mule/config/spring/parsers/parsers-test-namespace-config.xml");
+        return "org/mule/config/spring/parsers/parsers-test-namespace-config.xml";
     }
 
     public void testNamed()
@@ -23,5 +24,4 @@ public class NamedNamespaceTestCase extends AbstractNamespaceTestCase
         OrphanBean orphan1 = (OrphanBean) beanExists("orphan1", OrphanBean.class);
         contentExists(orphan1.getChild(), ChildBean.class);
     }
-
 }

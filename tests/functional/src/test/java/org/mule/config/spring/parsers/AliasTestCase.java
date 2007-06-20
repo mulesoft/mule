@@ -13,9 +13,9 @@ package org.mule.config.spring.parsers;
 public class AliasTestCase extends AbstractNamespaceTestCase
 {
 
-    public AliasTestCase()
+    protected String getConfigResources()
     {
-        super("org/mule/config/spring/parsers/alias-test.xml");
+        return "org/mule/config/spring/parsers/alias-test.xml";
     }
 
     protected void testFoo(int index)

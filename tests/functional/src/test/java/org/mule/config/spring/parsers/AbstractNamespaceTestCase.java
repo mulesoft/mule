@@ -19,18 +19,6 @@ import java.util.Map;
 public abstract class AbstractNamespaceTestCase extends FunctionalTestCase
 {
 
-    private String config;
-
-    public AbstractNamespaceTestCase(String config)
-    {
-        this.config = config;
-    }
-
-    protected String getConfigResources()
-    {
-        return config;
-    }
-
     public void testParse()
     {
         // just parse the config

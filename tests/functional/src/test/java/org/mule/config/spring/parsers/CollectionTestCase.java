@@ -15,9 +15,9 @@ import java.util.Collection;
 public class CollectionTestCase extends AbstractNamespaceTestCase
 {
 
-    public CollectionTestCase()
+    protected String getConfigResources()
     {
-        super("org/mule/config/spring/parsers/collection-test.xml");
+        return "org/mule/config/spring/parsers/collection-test.xml";
     }
 
     protected void testKids(int index)

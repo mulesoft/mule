@@ -13,9 +13,9 @@ package org.mule.config.spring.parsers;
 public class OrphanSimpleTestCase extends AbstractNamespaceTestCase
 {
 
-    public OrphanSimpleTestCase()
+    protected String getConfigResources()
     {
-        super("org/mule/config/spring/parsers/orphan-simple-test.xml");
+        return "org/mule/config/spring/parsers/orphan-simple-test.xml";
     }
 
     public void testOrphan2()
