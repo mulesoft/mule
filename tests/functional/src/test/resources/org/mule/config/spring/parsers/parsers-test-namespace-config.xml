@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:parsers-test="http://www.mulesource.org/schema/mule/parsers-test/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/parsers-test/2.0 http://www.mulesource.org/schema/mule/parsers-test/2.0/mule-parsers-test.xsd">
+
+    <parsers-test:orphan name="orphan1"/>
+
+    <!-- TODO - don't want to need name and id here -->
+    <parsers-test:orphan1 name="orphan1" id="foo">
+        <parsers-test:child name="child1"/>
+    </parsers-test:orphan1>
+
+    <parsers-test:orphan name="orphan2">
+        <parsers-test:child name="child2"/>
+    </parsers-test:orphan>
+
+    <parsers-test:orphan name="orphan3">
+        <!-- TODO ditto -->
+        <parsers-test:parent name="orphan3">
+            <parsers-test:child name="child3"/>
+        </parsers-test:parent>
+    </parsers-test:orphan>
+
+</beans>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:parsers-test="http://www.mulesource.org/schema/mule/parsers-test/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/parsers-test/2.0 http://www.mulesource.org/schema/mule/parsers-test/2.0/mule-parsers-test.xsd">
+
+    <parsers-test:orphan name="orphan1"/>
+
+    <parsers-test:orphan1 name="orphan1" id="foo" string="orphan1String">
+        <parsers-test:map-entry key="key1" value="orphan1Map1"/>
+        <parsers-test:map-entry key="key2" value="orphan1Map2"/>
+        <parsers-test:list-entry>orphan1List1</parsers-test:list-entry>
+        <parsers-test:list-entry>orphan1List2</parsers-test:list-entry>
+        <parsers-test:child name="child1" string="child1String">
+            <parsers-test:map-entry key="key1" value="child1Map1"/>
+            <parsers-test:map-entry key="key2" value="child1Map2"/>
+            <parsers-test:list-entry>child1List1</parsers-test:list-entry>
+            <parsers-test:list-entry>child1List2</parsers-test:list-entry>
+        </parsers-test:child>
+    </parsers-test:orphan1>
+
+    <parsers-test:orphan name="orphan2">
+        <parsers-test:map-entry key="key1" value="orphan2Map1"/>
+        <parsers-test:map-entry key="key2" value="orphan2Map2"/>
+        <parsers-test:list-entry>orphan2List1</parsers-test:list-entry>
+        <parsers-test:list-entry>orphan2List2</parsers-test:list-entry>
+    </parsers-test:orphan>
+
+    <parsers-test:orphan2 name="orphan2" id="foo" string="orphan2String">
+        <parsers-test:child name="child2" string="child2String">
+        </parsers-test:child>
+    </parsers-test:orphan2>
+
+</beans>

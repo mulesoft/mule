@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.mulesource.org/schema/mule/parsers-test/2.0"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+            targetNamespace="http://www.mulesource.org/schema/mule/parsers-test/2.0"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.springframework.org/schema/beans"
+                schemaLocation="http://www.springframework.org/schema/beans"/>
+
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"/>
+
+    <xsd:element name="orphan" type="orphanType"/>
+    <xsd:element name="orphan1" type="namedType"/>
+    <xsd:element name="orphan2" type="namedType"/>
+
+    <xsd:complexType name="orphanType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractBeanType">
+                <xsd:sequence>
+                    <xsd:element name="parent" type="parentType" minOccurs="0"/>
+                    <xsd:element name="child" type="childType" minOccurs="0"/>
+                    <xsd:element name="kid" type="childType" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attribute name="name" type="xsd:NMTOKEN"/>
+                <xsd:attribute name="child-ref" type="xsd:NMTOKEN"/>
+             </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="parentType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractBeanType">
+                <xsd:sequence>
+                    <xsd:element name="child" type="childType" minOccurs="0"/>
+                    <xsd:element name="kid" type="childType" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attribute name="name" type="xsd:NMTOKEN"/>
+                <xsd:attribute name="child-ref" type="xsd:NMTOKEN"/>
+             </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="namedType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractBeanType">
+                <xsd:sequence>
+                    <xsd:element name="child" type="childType" minOccurs="0"/>
+                    <xsd:element name="kid" type="childType" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attribute name="name" type="xsd:NMTOKEN"/>
+                <xsd:attribute name="id" type="xsd:NMTOKEN"/>
+                <xsd:attribute name="child-ref" type="xsd:NMTOKEN"/>
+             </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="childType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractBeanType">
+                <xsd:attribute name="name" type="xsd:NMTOKEN"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="abstractBeanType">
+        <xsd:sequence>
+            <xsd:element name="map-entry" type="mapEntry" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element name="list-entry" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attribute name="string" type="xsd:string"/>
+        <xsd:attribute name="bar" type="xsd:int"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="mapEntry">
+        <xsd:attribute name="key" type="xsd:NMTOKEN"/>
+        <xsd:attribute name="value" type="xsd:NMTOKEN"/>
+    </xsd:complexType>
+
+</xsd:schema>
