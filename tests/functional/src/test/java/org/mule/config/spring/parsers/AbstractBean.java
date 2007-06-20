@@ -26,6 +26,8 @@ public class AbstractBean
     private String string;
     // test aliased attribute (alias as bar)
     private int foo;
+    // test ignore
+    private boolean ignored = true;
 
     public List getList()
     {
@@ -77,4 +79,14 @@ public class AbstractBean
         this.foo = foo;
     }
 
+    public boolean isIgnored()
+    {
+        return ignored;
+    }
+
+    public void setIgnored(boolean ignored)
+    {
+        this.ignored = ignored;
+    }
+    
 }

@@ -72,6 +72,7 @@
         </xsd:sequence>
         <xsd:attribute name="string" type="xsd:string"/>
         <xsd:attribute name="bar" type="xsd:int"/>
+        <xsd:attribute name="ignored" fixed="false"/>
     </xsd:complexType>
 
     <xsd:complexType name="mapEntry">
