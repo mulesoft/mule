@@ -24,9 +24,6 @@
                         -->
                         <exclude>**/TestXFireComponent.java</exclude>
 
-                        <!-- MULE-1855: too much is failing in 2.0 -->
-                        <exclude>**/XFireCustomHttpHeaderTestCase.java</exclude>
-
                         <!-- MULE-1134 -->
                         <exclude>**/XFireConnectorVMFunctionalTestCase.java</exclude>
                         <!-- Only run tests with external dependencies in the tests-external profile -->

@@ -18,6 +18,9 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.manager.UMOServerNotification;
 
+import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 import java.util.HashMap;
 
 import junit.framework.Assert;
@@ -27,10 +30,12 @@ public class XFireCustomHttpHeaderTestCase extends FunctionalTestCase implements
     protected static final String endpointAddress = "http://localhost:10181/services/TestComponent?method=onReceive";
 
     private UMOMessage notificationMsg = null;
+    private CountDownLatch latch = null;
 
     // @Override
     protected void doSetUp() throws Exception
     {
+        latch = new CountDownLatch(1);
         managementContext.registerListener(this);
     }
 
@@ -60,7 +65,7 @@ public class XFireCustomHttpHeaderTestCase extends FunctionalTestCase implements
         assertEquals("Test String Received", reply.getPayloadAsString());
 
         // make sure all notifications have trickled in
-        Thread.sleep(3000);
+        latch.await(20000, TimeUnit.MILLISECONDS);
 
         // make sure we received a notification on xfire
         assertNotNull(notificationMsg);
@@ -84,6 +89,8 @@ public class XFireCustomHttpHeaderTestCase extends FunctionalTestCase implements
             {
                 notificationMsg = (UMOMessage)notification.getSource();
             }
+            
+            latch.countDown();
         }
         else
         {

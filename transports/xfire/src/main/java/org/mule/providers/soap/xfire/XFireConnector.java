@@ -86,7 +86,9 @@ public class XFireConnector extends AbstractConnector
     public XFireConnector()
     {
         super();
-        registerProtocols();
+        this.registerProtocols();
+        // TODO RM: we should ditch the whole connector-knows-if-to-send-notifications thing
+        this.setEnableMessageEvents(true);
     }
 
     protected void registerProtocols()
