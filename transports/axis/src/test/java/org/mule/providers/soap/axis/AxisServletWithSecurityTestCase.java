@@ -20,8 +20,6 @@ import java.beans.ExceptionListener;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.Assert;
-
 import org.mortbay.http.HttpContext;
 import org.mortbay.http.SocketListener;
 import org.mortbay.jetty.Server;
@@ -68,13 +66,13 @@ public class AxisServletWithSecurityTestCase extends FunctionalTestCase
         
         ExceptionListener exceptionListener = 
             managementContext.getRegistry().lookupConnector("servletConnector").getExceptionListener();
-        Assert.assertTrue(exceptionListener instanceof UnitTestExceptionStrategy);
+        assertTrue(exceptionListener instanceof UnitTestExceptionStrategy);
         
         UnitTestExceptionStrategy utExStrat = (UnitTestExceptionStrategy)exceptionListener;
-        Assert.assertEquals(1, utExStrat.getMessagingExceptions().size());
+        assertEquals(1, utExStrat.getMessagingExceptions().size());
         
-        Assert.assertNotNull(result);
-        Assert.assertTrue(result.getPayload() instanceof byte[]);
+        assertNotNull(result);
+        assertTrue(result.getPayload() instanceof byte[]);
     }
    
     protected String getConfigResources()

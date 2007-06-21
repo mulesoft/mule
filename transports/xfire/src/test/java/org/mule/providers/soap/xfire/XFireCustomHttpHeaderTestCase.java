@@ -18,12 +18,10 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.manager.UMOServerNotification;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import java.util.HashMap;
 
-import junit.framework.Assert;
+import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public class XFireCustomHttpHeaderTestCase extends FunctionalTestCase implements MessageNotificationListener
 {
@@ -94,7 +92,7 @@ public class XFireCustomHttpHeaderTestCase extends FunctionalTestCase implements
         }
         else
         {
-            Assert.fail("invalid notification: " + notification);
+            fail("invalid notification: " + notification);
         }
     }
 
