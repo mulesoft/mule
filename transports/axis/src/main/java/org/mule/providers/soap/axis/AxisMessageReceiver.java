@@ -121,7 +121,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         service.setName(serviceName);
 
         // Add any custom options from the Descriptor config
-        Map options = (Map) descriptor.getProperties().get("axisOptions");
+        Map options = (Map) endpoint.getProperties().get("axisOptions");
 
         // IF wsdl service name is not set, default to service name
         if (options == null)

@@ -35,7 +35,6 @@
                         <exclude>**/AxisMessageStyleServiceWithoutNamespaceTestCase.java</exclude>
                         <exclude>**/AxisMessageStyleServiceTestCase.java</exclude>
                         <exclude>**/AxisServletWithSecurityTestCase.java</exclude>
-                        <exclude>**/WsdlGenerationTestCase.java</exclude>
                         <exclude>**/SoapAttachmentsFunctionalTestCase.java</exclude>
                         <exclude>**/AxisConnectorJmsTopicsFunctionalTestCase.java</exclude>
 

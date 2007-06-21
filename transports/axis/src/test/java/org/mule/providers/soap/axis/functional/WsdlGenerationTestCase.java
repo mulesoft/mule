@@ -40,34 +40,34 @@ public class WsdlGenerationTestCase extends FunctionalTestCase
         return "axis-wsdl-test.xml";
     }
 
-//    public void testWsdl1() throws Exception
-//    {
-//        Map props = new HashMap();
-//        props.put(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
-//        MuleClient client = new MuleClient();
-//
-//        UMOMessage result = client.send("http://localhost:8081/services/EchoService1?wsdl", null, props);
-//        assertNotNull(result);
-//        String wsdl = result.getPayloadAsString();
-//        Document doc = DocumentHelper.parseText(wsdl);
-//        assertEquals("http://foo", doc.valueOf("/wsdl:definitions/@targetNamespace"));
-//
-//        // standalone m2 test run can produce $Proxy0, $Proxy1, $Proxy3, etc.
-//        assertTrue(doc.valueOf("/wsdl:definitions/wsdl:portType/@name").matches(PROXY_REGEX));
-//
-//        assertEquals(
-//            "http://foo",
-//            doc.valueOf("/wsdl:definitions/wsdl:binding/wsdl:operation[@name='echo']/wsdl:input[@name='echoRequest']/wsdlsoap:body/@namespace"));
-//        assertEquals(
-//            "http://foo",
-//            doc.valueOf("/wsdl:definitions/wsdl:binding/wsdl:operation[@name='echo']/wsdl:output[@name='echoResponse']/wsdlsoap:body/@namespace"));
-//
-//        assertEquals("EchoService1", doc.valueOf("/wsdl:definitions/wsdl:service/@name"));
-//
-//        assertEquals("EchoService1", doc.valueOf("/wsdl:definitions/wsdl:service/wsdl:port/@name"));
-//        assertEquals("http://localhost:8081/services/EchoService1",
-//            doc.valueOf("/wsdl:definitions/wsdl:service/wsdl:port/wsdlsoap:address/@location"));
-//    }
+    public void testWsdl1() throws Exception
+    {
+        Map props = new HashMap();
+        props.put(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
+        MuleClient client = new MuleClient();
+
+        UMOMessage result = client.send("http://localhost:8081/services/EchoService1?wsdl", null, props);
+        assertNotNull(result);
+        String wsdl = result.getPayloadAsString();
+        Document doc = DocumentHelper.parseText(wsdl);
+        assertEquals("http://foo", doc.valueOf("/wsdl:definitions/@targetNamespace"));
+
+        // standalone m2 test run can produce $Proxy0, $Proxy1, $Proxy3, etc.
+        assertTrue(doc.valueOf("/wsdl:definitions/wsdl:portType/@name").matches(PROXY_REGEX));
+
+        assertEquals(
+            "http://foo",
+            doc.valueOf("/wsdl:definitions/wsdl:binding/wsdl:operation[@name='echo']/wsdl:input[@name='echoRequest']/wsdlsoap:body/@namespace"));
+        assertEquals(
+            "http://foo",
+            doc.valueOf("/wsdl:definitions/wsdl:binding/wsdl:operation[@name='echo']/wsdl:output[@name='echoResponse']/wsdlsoap:body/@namespace"));
+
+        assertEquals("EchoService1", doc.valueOf("/wsdl:definitions/wsdl:service/@name"));
+
+        assertEquals("EchoService1", doc.valueOf("/wsdl:definitions/wsdl:service/wsdl:port/@name"));
+        assertEquals("http://localhost:8081/services/EchoService1",
+            doc.valueOf("/wsdl:definitions/wsdl:service/wsdl:port/wsdlsoap:address/@location"));
+    }
 
     public void testWsdl2() throws Exception
     {
@@ -93,27 +93,27 @@ public class WsdlGenerationTestCase extends FunctionalTestCase
             doc.valueOf("/wsdl:definitions/wsdl:service/wsdl:port/wsdlsoap:address/@location"));
     }
 
-//    public void testWsdl3() throws Exception
-//    {
-//        Map props = new HashMap();
-//        props.put(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
-//        MuleClient client = new MuleClient();
-//
-//        UMOMessage result = client.send("http://localhost:8083/services/EchoService3?wsdl", null, props);
-//        assertNotNull(result);
-//        String wsdl = result.getPayloadAsString();
-//        Document doc = DocumentHelper.parseText(wsdl);
-//        assertEquals("http://foo.com", doc.valueOf("/wsdl:definitions/@targetNamespace"));
-//        assertEquals("mulePortType1", doc.valueOf("/wsdl:definitions/wsdl:portType/@name"));
-//        assertEquals(
-//            "http://foo.com",
-//            doc.valueOf("/wsdl:definitions/wsdl:binding/wsdl:operation[@name='echo']/wsdl:input[@name='echoRequest']/wsdlsoap:body/@namespace"));
-//        assertEquals(
-//            "http://foo.com",
-//            doc.valueOf("/wsdl:definitions/wsdl:binding/wsdl:operation[@name='echo']/wsdl:output[@name='echoResponse']/wsdlsoap:body/@namespace"));
-//        assertEquals("muleService1", doc.valueOf("/wsdl:definitions/wsdl:service/@name"));
-//        assertEquals("muleServicePort1", doc.valueOf("/wsdl:definitions/wsdl:service/wsdl:port/@name"));
-//        assertEquals("http://localhost:8083/services/EchoService3",
-//            doc.valueOf("/wsdl:definitions/wsdl:service/wsdl:port/wsdlsoap:address/@location"));
-//    }
+    public void testWsdl3() throws Exception
+    {
+        Map props = new HashMap();
+        props.put(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
+        MuleClient client = new MuleClient();
+
+        UMOMessage result = client.send("http://localhost:8083/services/EchoService3?wsdl", null, props);
+        assertNotNull(result);
+        String wsdl = result.getPayloadAsString();
+        Document doc = DocumentHelper.parseText(wsdl);
+        assertEquals("http://foo.com", doc.valueOf("/wsdl:definitions/@targetNamespace"));
+        assertEquals("mulePortType1", doc.valueOf("/wsdl:definitions/wsdl:portType/@name"));
+        assertEquals(
+            "http://foo.com",
+            doc.valueOf("/wsdl:definitions/wsdl:binding/wsdl:operation[@name='echo']/wsdl:input[@name='echoRequest']/wsdlsoap:body/@namespace"));
+        assertEquals(
+            "http://foo.com",
+            doc.valueOf("/wsdl:definitions/wsdl:binding/wsdl:operation[@name='echo']/wsdl:output[@name='echoResponse']/wsdlsoap:body/@namespace"));
+        assertEquals("muleService1", doc.valueOf("/wsdl:definitions/wsdl:service/@name"));
+        assertEquals("muleServicePort1", doc.valueOf("/wsdl:definitions/wsdl:service/wsdl:port/@name"));
+        assertEquals("http://localhost:8083/services/EchoService3",
+            doc.valueOf("/wsdl:definitions/wsdl:service/wsdl:port/wsdlsoap:address/@location"));
+    }
 }
