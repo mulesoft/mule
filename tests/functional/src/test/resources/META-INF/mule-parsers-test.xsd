@@ -20,12 +20,14 @@
         <xsd:complexContent>
             <xsd:extension base="abstractBeanType">
                 <xsd:sequence>
-                    <xsd:element name="parent" type="parentType" minOccurs="0"/>
+                    <xsd:element name="parent" type="parentType" minOccurs="0" maxOccurs="unbounded"/>
                     <xsd:element name="child" type="childType" minOccurs="0"/>
                     <xsd:element name="kid" type="childType" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
                 <xsd:attribute name="name" type="xsd:NMTOKEN"/>
                 <xsd:attribute name="child-ref" type="xsd:NMTOKEN"/>
+                <xsd:attribute name="kid-ref" type="xsd:NMTOKEN"/>
+                <xsd:attribute name="kids-ref" type="xsd:NMTOKEN"/>
              </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -39,6 +41,8 @@
                 </xsd:sequence>
                 <xsd:attribute name="name" type="xsd:NMTOKEN"/>
                 <xsd:attribute name="child-ref" type="xsd:NMTOKEN"/>
+                <xsd:attribute name="kid-ref" type="xsd:NMTOKEN"/>
+                <xsd:attribute name="kids-ref" type="xsd:NMTOKEN"/>
              </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -53,6 +57,8 @@
                 <xsd:attribute name="name" type="xsd:NMTOKEN"/>
                 <xsd:attribute name="id" type="xsd:NMTOKEN"/>
                 <xsd:attribute name="child-ref" type="xsd:NMTOKEN"/>
+                <xsd:attribute name="kid-ref" type="xsd:NMTOKEN"/>
+                <xsd:attribute name="kids-ref" type="xsd:NMTOKEN"/>
              </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

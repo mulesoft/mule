@@ -10,41 +10,39 @@
 
 package org.mule.config.spring.parsers;
 
-public class AliasTestCase extends AbstractNamespaceTestCase
+import java.util.Collection;
+
+/**
+ * Automatic plurals currently do not work for attributes
+ */
+public class ReferenceCollectionAutoTestCase extends AbstractNamespaceTestCase
 {
 
     protected String getConfigResources()
     {
-        return "org/mule/config/spring/parsers/alias-test.xml";
+        return "org/mule/config/spring/parsers/reference-collection-auto-test.xml";
     }
 
-    protected void assertFooExists(int index)
+    protected void testChildRef(int index, int size)
     {
         OrphanBean orphan = (OrphanBean) assertBeanExists("orphan" + index, OrphanBean.class);
-        assertFooExists(orphan, 10 * index + 1);
-        ChildBean child = (ChildBean) assertContentExists(orphan.getChild(), ChildBean.class);
-        assertFooExists(child, 10 * index + 2);
-    }
-
-    protected void assertFooExists(AbstractBean bean, int value)
-    {
-        assertNotNull(bean);
-        assertEquals(value, bean.getFoo());
+        Collection kids = (Collection) assertContentExists(orphan.getKids(), Collection.class);
+        assertEquals(size, kids.size());
     }
 
     public void testNamed()
     {
-        assertFooExists(1);
+        testChildRef(1, 3);
     }
 
     public void testOrphan()
     {
-        assertFooExists(2);
+        testChildRef(2, 1);
     }
 
     public void testParent()
     {
-        assertFooExists(3);
+        testChildRef(3, 3);
     }
 
 }

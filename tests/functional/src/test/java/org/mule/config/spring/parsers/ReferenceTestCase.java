@@ -12,6 +12,7 @@ package org.mule.config.spring.parsers;
 
 public class ReferenceTestCase extends AbstractNamespaceTestCase
 {
+
     protected String getConfigResources()
     {
         return "org/mule/config/spring/parsers/reference-test.xml";
