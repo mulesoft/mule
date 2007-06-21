@@ -8,12 +8,11 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/axis/2.0/mule-axis.xsd">
 
-    <bean name="dms" class="org.mule.providers.soap.axis.style.DefaultMessageService"/>
-
     <mule:configuration serverId="" defaultSynchronousEndpoints="true"/>
     
     <mule:model-seda name="WebService_Test">
-        <mule:service name="ServiceEntryPoint" service-ref="dms">
+        <mule:service name="ServiceEntryPoint">
+            <mule:component class="org.mule.providers.soap.axis.style.DefaultMessageService"/>
             <mule:inbound-router>
                 <mule:endpoint address="axis:http://localhost:8088">
                     <property name="style" value="Message"/>

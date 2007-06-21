@@ -2,11 +2,13 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:acegi="http://www.mulesource.org/schema/mule/acegi/2.0"
        xmlns:axis="http://www.mulesource.org/schema/mule/axis/2.0"
        xmlns:servlet="http://www.mulesource.org/schema/mule/servlet/2.0"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/acegi/2.0 http://www.mulesource.org/schema/mule/acegi/2.0/mule-acegi.xsd
        http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/axis/2.0/mule-axis.xsd
        http://www.mulesource.org/schema/mule/servlet/2.0 http://www.mulesource.org/schema/mule/servlet/2.0/mule-servlet.xsd">
 
@@ -19,24 +21,30 @@
     <bean id="inMemoryDaoImpl" class="org.acegisecurity.userdetails.memory.InMemoryDaoImpl">
         <property name="userMap">
             <value>
-              ross=ross,ROLE_ADMIN
-              anon=anon,ROLE_ANONYMOUS
+              ross=ross_may_not_invoke_web_service,ROLE_ADMIN
             </value>
         </property>
     </bean>
     
     <mule:transformer-byte-array-to-string name="ByteArrayToString"/>
     
-    <servlet:connector name="servletConnector" servletUrl="http://localhost:18088/services"/>
+    <servlet:connector name="servletConnector" servletUrl="http://localhost:18088/services">
+        <!--  TODO DO: this should not be necessary, see MULE-1508 -->
+        <mule:custom-exception-strategy class="org.mule.providers.soap.axis.UnitTestExceptionStrategy"/>
+    </servlet:connector>
     
-    <!-- TODO DO: how to configure security manager? -->
+    <mule:security-manager xsi:type="acegi:securityManagerType">
+        <acegi:delegate-security-provider name="memory-dao" delegate-ref="daoAuthenticationProvider"/>
+    </mule:security-manager>
     
     <mule:model-seda name="test">
         <mule:service name="mycomponent">
             <mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="axis:servlet://mycomponent" responseTransformers="ByteArrayToString">
-                    <!-- TODO DO: how to specify the security filter here? -->
+                    <mule:security-filter xsi:type="acegi:securityFilterType">
+                        <acegi:http-security-filter realm="mule-realm"/>
+                    </mule:security-filter>
                 </mule:endpoint>
             </mule:inbound-router>
         </mule:service>

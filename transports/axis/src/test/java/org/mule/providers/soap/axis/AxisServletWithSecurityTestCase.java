@@ -16,8 +16,11 @@ import org.mule.providers.http.servlet.MuleReceiverServlet;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
+import java.beans.ExceptionListener;
 import java.util.HashMap;
 import java.util.Map;
+
+import junit.framework.Assert;
 
 import org.mortbay.http.HttpContext;
 import org.mortbay.http.SocketListener;
@@ -42,8 +45,8 @@ public class AxisServletWithSecurityTestCase extends FunctionalTestCase
         context.setRequestLog(null);
 
         ServletHandler handler = new ServletHandler();
-        handler.addServlet("MuleReceiverServlet", "/services/*", MuleReceiverServlet.class
-            .getName());
+        handler.addServlet("MuleReceiverServlet", "/services/*", 
+            MuleReceiverServlet.class.getName());
 
         context.addHandler(handler);
         httpServer.start();
@@ -62,9 +65,16 @@ public class AxisServletWithSecurityTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
         UMOMessage result = client.send("http://ross:ross@localhost:" + HTTP_PORT
                                         + "/services/mycomponent?method=echo", "test", props);
-
-        assertNotNull(result);
-        assertTrue(result.getPayload() instanceof byte[]);
+        
+        ExceptionListener exceptionListener = 
+            managementContext.getRegistry().lookupConnector("servletConnector").getExceptionListener();
+        Assert.assertTrue(exceptionListener instanceof UnitTestExceptionStrategy);
+        
+        UnitTestExceptionStrategy utExStrat = (UnitTestExceptionStrategy)exceptionListener;
+        Assert.assertEquals(1, utExStrat.getMessagingExceptions().size());
+        
+        Assert.assertNotNull(result);
+        Assert.assertTrue(result.getPayload() instanceof byte[]);
     }
    
     protected String getConfigResources()
