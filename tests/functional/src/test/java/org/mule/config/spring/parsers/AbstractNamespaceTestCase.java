@@ -24,7 +24,7 @@ public abstract class AbstractNamespaceTestCase extends FunctionalTestCase
         // just parse the config
     }
 
-    protected Object beanExists(String name, Class clazz)
+    protected Object assertBeanExists(String name, Class clazz)
     {
         Object bean = managementContext.getRegistry().lookupObject(name, clazz);
         assertNotNull(name + " bean missing", bean);
@@ -33,7 +33,7 @@ public abstract class AbstractNamespaceTestCase extends FunctionalTestCase
         return bean;
     }
 
-    protected Object contentExists(Object object, Class clazz)
+    protected Object assertContentExists(Object object, Class clazz)
     {
         assertNotNull(ClassUtils.getSimpleName(clazz) + " content missing", object);
         assertTrue(clazz.isAssignableFrom(object.getClass()));
@@ -41,23 +41,23 @@ public abstract class AbstractNamespaceTestCase extends FunctionalTestCase
         return object;
     }
 
-    protected void populated(AbstractBean bean, String name)
+    protected void assertBeanPopulated(AbstractBean bean, String name)
     {
-        mapExists(bean.getMap(), name);
-        listExists(bean.getList(), name);
+        assertMapExists(bean.getMap(), name);
+        assertListExists(bean.getList(), name);
         String string = bean.getString();
         assertNotNull("string for " + name, string);
         assertEquals(name + "String", string);
     }
 
-    protected void mapExists(Map map, String name)
+    protected void assertMapExists(Map map, String name)
     {
         assertNotNull("map for " + name, map);
-        mapEntryExists(map, name, 1);
-        mapEntryExists(map, name, 2);
+        assertMapEntryExists(map, name, 1);
+        assertMapEntryExists(map, name, 2);
     }
 
-    protected void mapEntryExists(Map map, String name, int index)
+    protected void assertMapEntryExists(Map map, String name, int index)
     {
         String key = "key" + index;
         Object value = map.get(key);
@@ -66,14 +66,14 @@ public abstract class AbstractNamespaceTestCase extends FunctionalTestCase
         assertEquals(name + "Map" + index, value);
     }
 
-    protected void listExists(List list, String name)
+    protected void assertListExists(List list, String name)
     {
         assertNotNull("list for " + name, list);
-        listEntryExists(list, name, 1);
-        listEntryExists(list, name, 2);
+        assertListEntryExists(list, name, 1);
+        assertListEntryExists(list, name, 2);
     }
 
-    protected void listEntryExists(List list, String name, int index)
+    protected void assertListEntryExists(List list, String name, int index)
     {
         String value = name + "List" + index;
         assertTrue(value, list.contains(value));

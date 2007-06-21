@@ -19,8 +19,8 @@ public class ReferenceTestCase extends AbstractNamespaceTestCase
 
     protected void testChildRef(int index)
     {
-        OrphanBean orphan = (OrphanBean) beanExists("orphan" + index, OrphanBean.class);
-        ChildBean child = (ChildBean) contentExists(orphan.getChild(), ChildBean.class);
+        OrphanBean orphan = (OrphanBean) assertBeanExists("orphan" + index, OrphanBean.class);
+        ChildBean child = (ChildBean) assertContentExists(orphan.getChild(), ChildBean.class);
         assertEquals("child" + index, child.getName());
     }
 

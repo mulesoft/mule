@@ -20,18 +20,18 @@ public class NamedSimpleTestCase extends AbstractNamespaceTestCase
 
     public void testNamed1()
     {
-        OrphanBean orphan1 = (OrphanBean) beanExists("orphan1", OrphanBean.class);
-        populated(orphan1, "orphan1");
-        ChildBean child1 = (ChildBean) contentExists(orphan1.getChild(), ChildBean.class);
-        populated(child1, "child1");
+        OrphanBean orphan1 = (OrphanBean) assertBeanExists("orphan1", OrphanBean.class);
+        assertBeanPopulated(orphan1, "orphan1");
+        ChildBean child1 = (ChildBean) assertContentExists(orphan1.getChild(), ChildBean.class);
+        assertBeanPopulated(child1, "child1");
     }
 
     public void testNamed2()
     {
-        OrphanBean orphan2 = (OrphanBean) beanExists("orphan2", OrphanBean.class);
-        populated(orphan2, "orphan2");
-        ChildBean child2 = (ChildBean) contentExists(orphan2.getChild(), ChildBean.class);
-        populated(child2, "child2");
+        OrphanBean orphan2 = (OrphanBean) assertBeanExists("orphan2", OrphanBean.class);
+        assertBeanPopulated(orphan2, "orphan2");
+        ChildBean child2 = (ChildBean) assertContentExists(orphan2.getChild(), ChildBean.class);
+        assertBeanPopulated(child2, "child2");
     }
 
 }

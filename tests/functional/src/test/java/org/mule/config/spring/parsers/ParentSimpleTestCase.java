@@ -20,10 +20,10 @@ public class ParentSimpleTestCase extends AbstractNamespaceTestCase
 
     public void testParent3()
     {
-        OrphanBean orphan3 = (OrphanBean) beanExists("orphan3", OrphanBean.class);
-        populated(orphan3, "orphan3");
-        ChildBean child3 = (ChildBean) contentExists(orphan3.getChild(), ChildBean.class);
-        populated(child3, "child3");
+        OrphanBean orphan3 = (OrphanBean) assertBeanExists("orphan3", OrphanBean.class);
+        assertBeanPopulated(orphan3, "orphan3");
+        ChildBean child3 = (ChildBean) assertContentExists(orphan3.getChild(), ChildBean.class);
+        assertBeanPopulated(child3, "child3");
     }
 
 }

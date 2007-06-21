@@ -18,11 +18,11 @@ public class AliasTestCase extends AbstractNamespaceTestCase
         return "org/mule/config/spring/parsers/alias-test.xml";
     }
 
-    protected void testFoo(int index)
+    protected void assertFooExists(int index)
     {
-        OrphanBean orphan = (OrphanBean) beanExists("orphan" + index, OrphanBean.class);
+        OrphanBean orphan = (OrphanBean) assertBeanExists("orphan" + index, OrphanBean.class);
         fooExists(orphan, 10 * index + 1);
-        ChildBean child = (ChildBean) contentExists(orphan.getChild(), ChildBean.class);
+        ChildBean child = (ChildBean) assertContentExists(orphan.getChild(), ChildBean.class);
         fooExists(child, 10 * index + 2);
     }
 
@@ -34,17 +34,17 @@ public class AliasTestCase extends AbstractNamespaceTestCase
 
     public void testNamed()
     {
-        testFoo(1);
+        assertFooExists(1);
     }
 
     public void testOrphan()
     {
-        testFoo(2);
+        assertFooExists(2);
     }
 
     public void testParent()
     {
-        testFoo(3);
+        assertFooExists(3);
     }
 
 }

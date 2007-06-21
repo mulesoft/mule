@@ -21,7 +21,7 @@ public class NamedNamespaceTestCase extends AbstractNamespaceTestCase
 
     public void testNamed()
     {
-        OrphanBean orphan1 = (OrphanBean) beanExists("orphan1", OrphanBean.class);
-        contentExists(orphan1.getChild(), ChildBean.class);
+        OrphanBean orphan1 = (OrphanBean) assertBeanExists("orphan1", OrphanBean.class);
+        assertContentExists(orphan1.getChild(), ChildBean.class);
     }
 }

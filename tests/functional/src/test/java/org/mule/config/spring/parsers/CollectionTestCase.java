@@ -20,26 +20,26 @@ public class CollectionTestCase extends AbstractNamespaceTestCase
         return "org/mule/config/spring/parsers/collection-test.xml";
     }
 
-    protected void testKids(int index)
+    protected void assertKidsExist(int index)
     {
-        OrphanBean orphan = (OrphanBean) beanExists("orphan" + index, OrphanBean.class);
-        Collection kids = (Collection) contentExists(orphan.getKids(), Collection.class);
+        OrphanBean orphan = (OrphanBean) assertBeanExists("orphan" + index, OrphanBean.class);
+        Collection kids = (Collection) assertContentExists(orphan.getKids(), Collection.class);
         assertEquals(index + 1, kids.size());
     }
 
     public void testNamed()
     {
-        testKids(1);
+        assertKidsExist(1);
     }
 
     public void testOrphan()
     {
-        testKids(2);
+        assertKidsExist(2);
     }
 
     public void testParent()
     {
-        testKids(3);
+        assertKidsExist(3);
     }
 
 }
