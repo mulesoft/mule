@@ -155,12 +155,12 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
 
         //Transaction Managers
         //TODO RM*: Need to review these, since Spring have some facilities for configuring the transactionMaanger
-        registerBeanDefinitionParser("jndi-transaction-manager", new OrphanDefinitionParser(GenericTransactionManagerLookupFactory.class, true));
-        registerBeanDefinitionParser("weblogic-transaction-manager", new OrphanDefinitionParser(WeblogicTransactionManagerLookupFactory.class, true));
-        registerBeanDefinitionParser("jboss-transaction-manager", new OrphanDefinitionParser(JBossTransactionManagerLookupFactory.class, true));
-        registerBeanDefinitionParser("jrun-transaction-manager", new OrphanDefinitionParser(JRunTransactionManagerLookupFactory.class, true));
-        registerBeanDefinitionParser("resin3-transaction-manager", new OrphanDefinitionParser(Resin3TransactionManagerLookupFactory.class, true));
-        registerBeanDefinitionParser("websphere-transaction-manager", new OrphanDefinitionParser(WebsphereTransactionManagerLookupFactory.class, true));
+        registerBeanDefinitionParser("transaction-manager-jndi", new OrphanDefinitionParser(GenericTransactionManagerLookupFactory.class, true));
+        registerBeanDefinitionParser("transaction-manager-weblogic", new OrphanDefinitionParser(WeblogicTransactionManagerLookupFactory.class, true));
+        registerBeanDefinitionParser("transaction-manager-jboss", new OrphanDefinitionParser(JBossTransactionManagerLookupFactory.class, true));
+        registerBeanDefinitionParser("transaction-manager-jrun", new OrphanDefinitionParser(JRunTransactionManagerLookupFactory.class, true));
+        registerBeanDefinitionParser("transaction-manager-resin", new OrphanDefinitionParser(Resin3TransactionManagerLookupFactory.class, true));
+        registerBeanDefinitionParser("transaction-manager-websphere", new OrphanDefinitionParser(WebsphereTransactionManagerLookupFactory.class, true));
 
         //Endpoint elements
         registerBeanDefinitionParser("endpoint", new EndpointDefinitionParser());

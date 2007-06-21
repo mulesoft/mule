@@ -31,12 +31,12 @@
     <xsd:element name="model-simple" type="directModelType"/>
     <xsd:element name="model-custom" type="customModelType"/>
 
-    <xsd:element name="jndi-transaction-manager" type="transactionManagersType"/>
-    <xsd:element name="weblogic-transaction-manager" type="transactionManagersType"/>
-    <xsd:element name="websphere-transaction-manager" type="transactionManagersType"/>
-    <xsd:element name="jrun-transaction-manager" type="transactionManagersType"/>
-    <xsd:element name="jboss-transaction-manager" type="transactionManagersType"/>
-    <xsd:element name="resin-transaction-manager" type="transactionManagersType"/>
+    <xsd:element name="transaction-manager-jndi" type="transactionManagersType"/>
+    <xsd:element name="transaction-manager-weblogic" type="transactionManagersType"/>
+    <xsd:element name="transaction-manager-websphere" type="transactionManagersType"/>
+    <xsd:element name="transaction-manager-jrun" type="transactionManagersType"/>
+    <xsd:element name="transaction-manager-jboss" type="transactionManagersType"/>
+    <xsd:element name="transaction-manager-resin" type="transactionManagersType"/>
 
 
     <!--<xsd:element name="connectors" minOccurs="0">-->
