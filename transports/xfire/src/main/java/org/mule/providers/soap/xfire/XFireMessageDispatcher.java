@@ -25,6 +25,7 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.ClassUtils;
+import org.mule.util.StringUtils;
 import org.mule.util.TemplateParser;
 
 import java.util.ArrayList;
@@ -39,7 +40,6 @@ import java.util.Set;
 import javax.activation.DataHandler;
 import javax.xml.namespace.QName;
 
-import org.mule.util.StringUtils;
 import org.codehaus.xfire.XFire;
 import org.codehaus.xfire.client.Client;
 import org.codehaus.xfire.handler.Handler;

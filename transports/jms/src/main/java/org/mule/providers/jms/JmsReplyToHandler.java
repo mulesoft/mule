@@ -24,9 +24,9 @@ import javax.jms.DeliveryMode;
 import javax.jms.Destination;
 import javax.jms.Message;
 import javax.jms.MessageProducer;
+import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.Topic;
-import javax.jms.Queue;
 
 /**
  * <code>JmsReplyToHandler</code> will process a JMS replyTo or hand off to the

@@ -10,12 +10,13 @@
 
 package org.mule.extras.acegi;
 
-import org.acegisecurity.context.SecurityContext;
-import org.acegisecurity.context.SecurityContextHolder;
-import org.acegisecurity.context.SecurityContextImpl;
 import org.mule.umo.security.UMOAuthentication;
 import org.mule.umo.security.UMOSecurityContext;
 import org.mule.umo.security.UMOSecurityContextFactory;
+
+import org.acegisecurity.context.SecurityContext;
+import org.acegisecurity.context.SecurityContextHolder;
+import org.acegisecurity.context.SecurityContextImpl;
 
 /**
  * <code>AcegiSecurityContextFactory</code> creates an AcegiSecurityContext for an

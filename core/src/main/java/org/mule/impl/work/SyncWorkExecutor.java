@@ -29,9 +29,9 @@ package org.mule.impl.work;
 
 import org.mule.util.concurrent.Latch;
 
-import edu.emory.mathcs.backport.java.util.concurrent.Executor;
-
 import javax.resource.spi.work.WorkException;
+
+import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 
 public class SyncWorkExecutor implements WorkExecutor
 {

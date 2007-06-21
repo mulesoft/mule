@@ -10,13 +10,13 @@
 
 package org.mule.providers.ftp.server;
 
-import java.io.OutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
-import org.apache.ftpserver.ftplet.FileObject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ftpserver.ftplet.FileObject;
 
 public abstract class Named implements FileObject 
 {

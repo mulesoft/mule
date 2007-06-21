@@ -10,7 +10,6 @@
 
 package org.mule.examples.webapp;
 
-import org.mortbay.http.HttpContext;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.WebApplicationContext;
 

@@ -14,9 +14,9 @@ import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.provider.UMOStreamMessageAdapter;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.provider.UMOStreamMessageAdapter;
 
 import java.io.FilenameFilter;
 import java.io.IOException;

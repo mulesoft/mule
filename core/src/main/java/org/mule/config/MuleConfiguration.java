@@ -16,6 +16,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.providers.ConnectionStrategy;
 import org.mule.providers.SingleAttemptConnectionStrategy;
 import org.mule.umo.manager.DefaultWorkListener;
+import org.mule.util.StringUtils;
 import org.mule.util.UUID;
 
 import java.io.File;
@@ -23,7 +24,6 @@ import java.io.File;
 import javax.resource.spi.work.WorkListener;
 
 import org.apache.commons.beanutils.BeanUtils;
-import org.mule.util.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

@@ -24,9 +24,9 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueSession;
 
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import java.util.List;
+
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 /**
  * <code>VMMessageReceiver</code> is a listener for events from a Mule component

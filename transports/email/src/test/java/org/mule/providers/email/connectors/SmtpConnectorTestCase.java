@@ -17,6 +17,8 @@ import org.mule.impl.MuleMessage;
 import org.mule.impl.ResponseOutputStream;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.providers.email.MailProperties;
+import org.mule.providers.email.SmtpConnector;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.umo.UMOComponent;
@@ -24,8 +26,6 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.providers.email.SmtpConnector;
-import org.mule.providers.email.MailProperties;
 
 import java.util.HashMap;
 

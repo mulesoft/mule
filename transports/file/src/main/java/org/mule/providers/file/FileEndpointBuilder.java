@@ -10,11 +10,11 @@
 
 package org.mule.providers.file;
 
-import java.net.URI;
-import java.util.Properties;
-
 import org.mule.impl.endpoint.AbstractEndpointBuilder;
 import org.mule.umo.endpoint.MalformedEndpointException;
+
+import java.net.URI;
+import java.util.Properties;
 
 /**
  * <code>FileEndpointBuilder</code> File uris need some special processing because

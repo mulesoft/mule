@@ -12,15 +12,15 @@ package org.mule.tck.functional;
 
 import org.mule.impl.model.streaming.StreamingService;
 import org.mule.umo.UMOEventContext;
-import org.mule.util.StringMessageUtils;
 import org.mule.util.ClassUtils;
+import org.mule.util.StringMessageUtils;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A component that can be used by streaming functional tests. This component accepts an

@@ -12,9 +12,9 @@ package org.mule.management.support;
 import java.util.Arrays;
 import java.util.Collection;
 
+import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
-import javax.management.MBeanServer;
 
 /**
  * Support class using JMX 1.2 and newer calls.

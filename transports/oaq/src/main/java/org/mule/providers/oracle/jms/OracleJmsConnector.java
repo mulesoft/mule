@@ -10,9 +10,6 @@
 
 package org.mule.providers.oracle.jms;
 
-import oracle.jdbc.driver.OracleDriver;
-import oracle.jdbc.pool.OracleDataSource;
-
 import org.mule.umo.lifecycle.InitialisationException;
 
 import java.sql.Driver;
@@ -20,6 +17,9 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import javax.jms.JMSException;
+
+import oracle.jdbc.driver.OracleDriver;
+import oracle.jdbc.pool.OracleDataSource;
 
 /**
  * Extends the standard Mule JMS Provider with functionality specific to Oracle's JMS

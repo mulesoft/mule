@@ -11,7 +11,6 @@
 package org.mule.impl.container;
 
 import org.mule.tck.model.AbstractContainerContextTestCase;
-import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.manager.UMOContainerContext;
 

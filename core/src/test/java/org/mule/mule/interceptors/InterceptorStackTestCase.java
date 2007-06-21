@@ -20,10 +20,10 @@ import org.mule.umo.UMOMessage;
 
 import com.mockobjects.dynamic.Mock;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * TODO: document this class

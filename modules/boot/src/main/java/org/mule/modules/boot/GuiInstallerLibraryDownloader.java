@@ -10,6 +10,8 @@
 
 package org.mule.modules.boot;
 
+import org.mule.util.ClassUtils;
+
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -17,8 +19,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Iterator;
 import java.util.List;
-
-import org.mule.util.ClassUtils;
 
 public class GuiInstallerLibraryDownloader
 {

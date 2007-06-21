@@ -10,11 +10,11 @@
 
 package org.mule.providers.soap.axis.wsdl;
 
+import org.mule.providers.soap.axis.AxisConnector;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import org.mule.providers.soap.axis.AxisConnector;
 
 /**
  * TODO document

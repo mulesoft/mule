@@ -10,11 +10,12 @@
 
 package org.mule.extras.acegi;
 
+import org.mule.umo.security.UMOAuthentication;
+
 import java.util.Map;
 
 import org.acegisecurity.Authentication;
 import org.acegisecurity.GrantedAuthority;
-import org.mule.umo.security.UMOAuthentication;
 
 /**
  * <code>AcegiAuthenticationAdapter</code> TODO

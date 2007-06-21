@@ -10,6 +10,8 @@
 
 package org.mule.impl.container;
 
+import org.mule.util.StringUtils;
+
 import java.rmi.RemoteException;
 
 import javax.ejb.EJBException;
@@ -19,8 +21,6 @@ import javax.ejb.Handle;
 import javax.ejb.RemoveException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
-
-import org.mule.util.StringUtils;
 
 /**
  * A fake (and invalid) EJB used for testing MUle ejb lookup

@@ -10,9 +10,9 @@
 
 package org.mule.providers.soap.axis.functional;
 
-import javax.activation.DataHandler;
-
 import org.mule.tck.functional.FunctionalTestComponent;
+
+import javax.activation.DataHandler;
 
 public class SoapAttachmentsFunctionalTestComponent extends FunctionalTestComponent
     implements SoapAttachmentsFunctionalTest

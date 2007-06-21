@@ -15,8 +15,8 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.util.IOUtils;
 
 import java.io.File;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.servlet.ServletContext;
 

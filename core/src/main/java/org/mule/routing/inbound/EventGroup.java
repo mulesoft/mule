@@ -13,13 +13,12 @@ package org.mule.routing.inbound;
 import org.mule.umo.UMOEvent;
 import org.mule.util.ClassUtils;
 
-import edu.emory.mathcs.backport.java.util.concurrent.helpers.Utils;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import edu.emory.mathcs.backport.java.util.concurrent.helpers.Utils;
 import org.apache.commons.collections.IteratorUtils;
 
 /**

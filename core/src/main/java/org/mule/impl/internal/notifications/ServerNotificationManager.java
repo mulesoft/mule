@@ -23,11 +23,6 @@ import org.mule.umo.manager.UMOWorkManager;
 import org.mule.util.ClassUtils;
 import org.mule.util.concurrent.ConcurrentHashSet;
 
-import edu.emory.mathcs.backport.java.util.concurrent.BlockingDeque;
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
-import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingDeque;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -40,6 +35,10 @@ import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkListener;
 import javax.resource.spi.work.WorkManager;
 
+import edu.emory.mathcs.backport.java.util.concurrent.BlockingDeque;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
+import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingDeque;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

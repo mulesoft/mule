@@ -10,9 +10,7 @@
 
 package org.mule.providers.http;
 
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.providers.http.jetty.JettyConnector;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.UMOEndpointURI;
 

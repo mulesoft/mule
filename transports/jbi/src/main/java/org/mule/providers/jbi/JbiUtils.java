@@ -10,6 +10,10 @@
 
 package org.mule.providers.jbi;
 
+import org.mule.config.MuleProperties;
+import org.mule.impl.MuleMessage;
+import org.mule.umo.UMOMessage;
+
 import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -23,9 +27,6 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.mule.config.MuleProperties;
-import org.mule.impl.MuleMessage;
-import org.mule.umo.UMOMessage;
 
 /**
  * Useful helpers for converting message types

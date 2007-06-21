@@ -10,6 +10,9 @@
 
 package org.mule.providers.soap.xfire.transport;
 
+import org.mule.providers.soap.xfire.MuleInvoker;
+import org.mule.umo.manager.UMOWorkManager;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.xfire.service.Service;
@@ -21,8 +24,6 @@ import org.codehaus.xfire.transport.DefaultEndpoint;
 import org.codehaus.xfire.transport.MapSession;
 import org.codehaus.xfire.transport.Session;
 import org.codehaus.xfire.wsdl11.WSDL11Transport;
-import org.mule.providers.soap.xfire.MuleInvoker;
-import org.mule.umo.manager.UMOWorkManager;
 
 /**
  * TODO document

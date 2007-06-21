@@ -9,9 +9,9 @@
  */
 package org.mule.providers.email.config;
 
-import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
+import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
 import org.mule.providers.email.SmtpsConnector;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;

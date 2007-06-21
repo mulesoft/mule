@@ -10,9 +10,9 @@
 
 package org.mule.extras.spring.transaction;
 
-import javax.transaction.TransactionManager;
-
 import org.mule.umo.manager.UMOTransactionManagerFactory;
+
+import javax.transaction.TransactionManager;
 
 /**
  * A holder to a transaction manager set via a Spring Application context

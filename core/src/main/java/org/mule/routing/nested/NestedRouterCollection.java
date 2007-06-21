@@ -9,9 +9,9 @@
  */
 package org.mule.routing.nested;
 
+import org.mule.management.stats.RouterStatistics;
 import org.mule.routing.AbstractRouterCollection;
 import org.mule.umo.routing.UMONestedRouterCollection;
-import org.mule.management.stats.RouterStatistics;
 
 /**
  * TODO

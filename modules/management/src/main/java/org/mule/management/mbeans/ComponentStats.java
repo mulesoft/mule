@@ -10,14 +10,15 @@
 
 package org.mule.management.mbeans;
 
+import org.mule.management.stats.ComponentStatistics;
+import org.mule.management.stats.RouterStatistics;
+
 import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.management.stats.ComponentStatistics;
-import org.mule.management.stats.RouterStatistics;
 
 /**
  * <code>ComponentStats</code> TODO

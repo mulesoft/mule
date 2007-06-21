@@ -10,12 +10,12 @@
 
 package org.mule.providers.tcp;
 
+import org.mule.util.StringUtils;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.URI;
-
-import org.mule.util.StringUtils;
 
 public class TcpServerSocketFactory implements SimpleServerSocketFactory
 {

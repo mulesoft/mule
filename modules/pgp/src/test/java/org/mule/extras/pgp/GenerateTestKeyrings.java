@@ -10,14 +10,6 @@
 
 package org.mule.extras.pgp;
 
-import cryptix.openpgp.PGPKeyBundle;
-import cryptix.pki.CertificateBuilder;
-import cryptix.pki.ExtendedKeyStore;
-import cryptix.pki.KeyBundleException;
-import cryptix.pki.KeyBundleFactory;
-import cryptix.pki.PrincipalBuilder;
-import cryptix.pki.PrincipalException;
-
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.KeyPair;
@@ -30,6 +22,14 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+
+import cryptix.openpgp.PGPKeyBundle;
+import cryptix.pki.CertificateBuilder;
+import cryptix.pki.ExtendedKeyStore;
+import cryptix.pki.KeyBundleException;
+import cryptix.pki.KeyBundleFactory;
+import cryptix.pki.PrincipalBuilder;
+import cryptix.pki.PrincipalException;
 
 public class GenerateTestKeyrings
 {

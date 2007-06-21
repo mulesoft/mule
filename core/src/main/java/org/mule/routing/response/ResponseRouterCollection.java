@@ -22,10 +22,10 @@ import org.mule.umo.routing.UMOResponseRouter;
 import org.mule.umo.routing.UMOResponseRouterCollection;
 import org.mule.umo.routing.UMORouter;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-
 import java.util.Iterator;
 import java.util.List;
+
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * <code>ResponseRouterCollection</code> is a router that can be used to control how

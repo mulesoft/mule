@@ -12,11 +12,11 @@ package org.mule.providers.ftp.server;
 
 import java.util.Properties;
 
-import org.apache.ftpserver.ftplet.Configuration;
-import org.apache.ftpserver.config.PropertiesConfiguration;
-import org.apache.ftpserver.interfaces.FtpServerContext;
 import org.apache.ftpserver.ConfigurableFtpServerContext;
 import org.apache.ftpserver.FtpServer;
+import org.apache.ftpserver.config.PropertiesConfiguration;
+import org.apache.ftpserver.ftplet.Configuration;
+import org.apache.ftpserver.interfaces.FtpServerContext;
 
 /**
  * An initial wrapper for the Apache ftpServer.  This will progress into a provider of its own,

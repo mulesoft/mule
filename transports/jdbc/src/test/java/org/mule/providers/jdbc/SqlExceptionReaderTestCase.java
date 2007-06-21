@@ -10,14 +10,14 @@
 
 package org.mule.providers.jdbc;
 
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
-
 import org.mule.MuleException;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.tck.AbstractMuleTestCase;
+
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
 
 public class SqlExceptionReaderTestCase extends AbstractMuleTestCase
 {

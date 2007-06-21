@@ -19,13 +19,13 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import java.util.Iterator;
 import java.util.List;
 
 import javax.resource.spi.work.Work;
+
+import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 /**
  * The TransactedPollingMessageReceiver is an abstract receiver that handles polling

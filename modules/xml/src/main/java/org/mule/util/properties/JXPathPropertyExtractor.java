@@ -10,13 +10,14 @@
 
 package org.mule.util.properties;
 
+import org.mule.umo.UMOMessage;
+
 import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
-import org.mule.umo.UMOMessage;
 
 /**
  * Will extract properties based on Xpath expressions. Will work on Xml/Dom and beans

@@ -10,6 +10,12 @@
 
 package org.mule.providers.soap.xfire;
 
+import org.mule.config.MuleProperties;
+import org.mule.providers.AbstractMessageAdapter;
+import org.mule.providers.soap.MuleSoapHeaders;
+import org.mule.transformers.simple.SerializableToByteArray;
+import org.mule.umo.transformer.UMOTransformer;
+
 import java.util.Iterator;
 
 import javax.activation.DataHandler;
@@ -20,11 +26,6 @@ import org.codehaus.xfire.attachments.Attachments;
 import org.codehaus.xfire.attachments.SimpleAttachment;
 import org.jdom.Element;
 import org.jdom.Namespace;
-import org.mule.config.MuleProperties;
-import org.mule.providers.AbstractMessageAdapter;
-import org.mule.providers.soap.MuleSoapHeaders;
-import org.mule.transformers.simple.SerializableToByteArray;
-import org.mule.umo.transformer.UMOTransformer;
 
 /**
  * <code>XFireMessageAdapter</code> wraps an XFire MessageContext, reading

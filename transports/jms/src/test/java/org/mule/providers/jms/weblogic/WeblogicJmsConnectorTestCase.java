@@ -10,10 +10,8 @@
 
 package org.mule.providers.jms.weblogic;
 
-import org.mule.tck.AbstractMuleTestCase;
-import org.mule.providers.jms.weblogic.WeblogicJmsConnector;
-import org.mule.providers.jms.weblogic.WeblogicJmsTopicResolver;
 import org.mule.providers.jms.JmsTopicResolver;
+import org.mule.tck.AbstractMuleTestCase;
 
 public class WeblogicJmsConnectorTestCase extends AbstractMuleTestCase
 {

@@ -12,7 +12,6 @@ package org.mule.examples.webapp;
 
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.WebappMuleXmlConfigurationBuilder;
-import org.mule.tck.TestingWorkListener;
 
 import com.mockobjects.constraint.IsInstanceOf;
 import com.mockobjects.dynamic.FullConstraintMatcher;

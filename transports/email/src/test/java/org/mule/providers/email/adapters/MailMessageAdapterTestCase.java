@@ -10,10 +10,10 @@
 
 package org.mule.providers.email.adapters;
 
+import org.mule.providers.email.MailMessageAdapter;
 import org.mule.tck.providers.AbstractMessageAdapterTestCase;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.UMOMessageAdapter;
-import org.mule.providers.email.MailMessageAdapter;
 
 import java.util.Properties;
 

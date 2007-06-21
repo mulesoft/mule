@@ -18,7 +18,6 @@ import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
-
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**

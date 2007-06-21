@@ -29,10 +29,9 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.transformer.TransformerException;
 
-import edu.emory.mathcs.backport.java.util.concurrent.Callable;
-
 import java.io.OutputStream;
 
+import edu.emory.mathcs.backport.java.util.concurrent.Callable;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

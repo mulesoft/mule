@@ -10,10 +10,10 @@
 
 package org.mule.config.spring.parsers.specific;
 
+import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.util.StringUtils;
 import org.mule.util.object.SimpleObjectFactory;
 import org.mule.util.object.SingletonObjectFactory;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.RuntimeBeanReference;

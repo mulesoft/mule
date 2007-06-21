@@ -9,9 +9,9 @@
  */
 package org.mule.providers.email.config;
 
-import org.mule.tck.FunctionalTestCase;
 import org.mule.providers.email.SmtpConnector;
 import org.mule.providers.email.SmtpsConnector;
+import org.mule.tck.FunctionalTestCase;
 
 import java.util.Properties;
 

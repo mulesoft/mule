@@ -10,6 +10,10 @@
 
 package org.mule.providers.http.servlet;
 
+import org.mule.providers.http.HttpConstants;
+import org.mule.providers.http.HttpResponse;
+import org.mule.umo.UMOMessage;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
@@ -21,9 +25,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.providers.http.HttpConstants;
-import org.mule.providers.http.HttpResponse;
-import org.mule.umo.UMOMessage;
 
 /**
  * A base servlet used to receive requests from a servlet container and route

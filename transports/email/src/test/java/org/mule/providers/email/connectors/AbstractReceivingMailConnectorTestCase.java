@@ -10,12 +10,12 @@
 
 package org.mule.providers.email.connectors;
 
-import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.config.MuleProperties;
+import org.mule.config.builders.QuickConfigurationBuilder;
+import org.mule.providers.email.transformers.EmailMessageToString;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.umo.UMOEventContext;
-import org.mule.providers.email.transformers.EmailMessageToString;
 
 import java.util.HashMap;
 import java.util.Map;

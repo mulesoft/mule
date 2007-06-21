@@ -10,12 +10,12 @@
 
 package org.mule.providers.tcp.protocols;
 
+import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
-import org.mule.extras.client.MuleClient;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 public class MuleMessageLengthTestCase extends FunctionalTestCase 
 {

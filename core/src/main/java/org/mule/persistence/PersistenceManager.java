@@ -10,10 +10,10 @@
 
 package org.mule.persistence;
 
-import org.mule.umo.lifecycle.Startable;
-import org.mule.umo.lifecycle.Stoppable;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
+import org.mule.umo.lifecycle.Startable;
+import org.mule.umo.lifecycle.Stoppable;
 
 /**
  * <code>PersistenceManager</code> is the interface for any object that

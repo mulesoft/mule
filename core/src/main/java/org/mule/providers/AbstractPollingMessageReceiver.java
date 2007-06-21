@@ -18,14 +18,14 @@ import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.util.ObjectUtils;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ScheduledFuture;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.resource.spi.work.Work;
+
+import edu.emory.mathcs.backport.java.util.concurrent.ScheduledFuture;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 /**
  * <code>AbstractPollingMessageReceiver</code> implements a base class for polling

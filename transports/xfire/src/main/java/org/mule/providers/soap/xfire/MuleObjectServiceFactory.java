@@ -10,6 +10,11 @@
 
 package org.mule.providers.soap.xfire;
 
+import org.mule.umo.lifecycle.Callable;
+import org.mule.umo.lifecycle.Disposable;
+import org.mule.umo.lifecycle.Initialisable;
+import org.mule.util.ClassUtils;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.HashSet;
@@ -17,10 +22,6 @@ import java.util.Set;
 
 import org.codehaus.xfire.service.binding.ObjectServiceFactory;
 import org.codehaus.xfire.transport.TransportManager;
-import org.mule.umo.lifecycle.Callable;
-import org.mule.umo.lifecycle.Disposable;
-import org.mule.umo.lifecycle.Initialisable;
-import org.mule.util.ClassUtils;
 
 /**
  * TODO document

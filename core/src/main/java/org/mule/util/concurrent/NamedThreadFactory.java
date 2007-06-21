@@ -10,10 +10,10 @@
 
 package org.mule.util.concurrent;
 
+import org.mule.util.StringUtils;
+
 import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicLong;
-
-import org.mule.util.StringUtils;
 
 public class NamedThreadFactory implements ThreadFactory
 {

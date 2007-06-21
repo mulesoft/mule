@@ -13,11 +13,11 @@ package org.mule.routing.inbound;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOEvent;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
-
 import java.util.Arrays;
 import java.util.Comparator;
+
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
 
 /**
  * <code>AbstractEventResequencer</code> is used to receive a set of events,

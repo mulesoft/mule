@@ -10,20 +10,21 @@
 
 package org.mule.providers.soap.axis;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.soap.ServiceProxy;
+import org.mule.providers.soap.axis.extras.AxisCleanAndAddProperties;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.UMOMessageAdapter;
-import org.mule.providers.soap.axis.extras.AxisCleanAndAddProperties;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
 /**
  * <code>ServiceProxy</code> is a proxy that wraps a soap endpointUri to look like

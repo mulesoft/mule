@@ -10,11 +10,11 @@
 
 package org.mule.extras.pgp;
 
-import cryptix.pki.KeyBundle;
-
 import org.mule.tck.AbstractMuleTestCase;
 
 import java.net.URL;
+
+import cryptix.pki.KeyBundle;
 
 public class PGPKeyRingTestCase extends AbstractMuleTestCase
 {

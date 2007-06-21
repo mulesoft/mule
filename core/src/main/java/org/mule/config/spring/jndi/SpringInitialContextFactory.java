@@ -11,8 +11,6 @@ package org.mule.config.spring.jndi;
 
 import org.mule.config.spring.MuleApplicationContext;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
@@ -21,6 +19,7 @@ import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.naming.spi.InitialContextFactory;
 
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.BeanFactory;

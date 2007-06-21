@@ -19,12 +19,11 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
+import org.mule.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
-import org.mule.util.StringUtils;
 
 /**
  * Initiates or advances a workflow process from an outgoing Mule event.

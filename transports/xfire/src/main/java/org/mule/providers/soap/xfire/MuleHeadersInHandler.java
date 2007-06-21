@@ -10,12 +10,13 @@
 
 package org.mule.providers.soap.xfire;
 
+import org.mule.config.MuleProperties;
+import org.mule.providers.soap.MuleSoapHeaders;
+
 import org.codehaus.xfire.MessageContext;
 import org.codehaus.xfire.handler.AbstractHandler;
 import org.jdom.Element;
 import org.jdom.Namespace;
-import org.mule.config.MuleProperties;
-import org.mule.providers.soap.MuleSoapHeaders;
 
 /**
  * Reads the Mule Soap Header and sets the various header properties on the context.

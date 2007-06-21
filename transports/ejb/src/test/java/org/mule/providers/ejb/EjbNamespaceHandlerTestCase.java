@@ -9,10 +9,10 @@
  */
 package org.mule.providers.ejb;
 
+import org.mule.providers.rmi.DummySecurityManager;
+import org.mule.providers.rmi.RmiConnector;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.jndi.InMemoryContext;
-import org.mule.providers.rmi.RmiConnector;
-import org.mule.providers.rmi.DummySecurityManager;
 
 public class EjbNamespaceHandlerTestCase extends FunctionalTestCase
 {

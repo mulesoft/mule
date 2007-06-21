@@ -10,9 +10,9 @@
 
 package org.mule.util;
 
-import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.CharArrayReader;
+import java.io.IOException;
 import java.io.Reader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

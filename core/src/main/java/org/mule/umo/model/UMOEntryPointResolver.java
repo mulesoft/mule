@@ -10,9 +10,9 @@
 
 package org.mule.umo.model;
 
-import org.mule.umo.UMODescriptor;
-import org.mule.impl.TooManySatisfiableMethodsException;
 import org.mule.impl.NoSatisfiableMethodsException;
+import org.mule.impl.TooManySatisfiableMethodsException;
+import org.mule.umo.UMODescriptor;
 
 /**
  * <code>UMOEntryPointResolver</code> resolves a method to call on the given

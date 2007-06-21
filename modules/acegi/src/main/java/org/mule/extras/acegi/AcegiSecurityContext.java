@@ -10,10 +10,11 @@
 
 package org.mule.extras.acegi;
 
-import org.acegisecurity.context.SecurityContext;
-import org.acegisecurity.context.SecurityContextHolder;
 import org.mule.umo.security.UMOAuthentication;
 import org.mule.umo.security.UMOSecurityContext;
+
+import org.acegisecurity.context.SecurityContext;
+import org.acegisecurity.context.SecurityContextHolder;
 
 /**
  * <code>AcegiSecurityContext</code> is a UMOSecurityContext wrapper used to

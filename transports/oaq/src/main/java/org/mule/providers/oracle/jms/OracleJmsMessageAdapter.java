@@ -10,11 +10,11 @@
 
 package org.mule.providers.oracle.jms;
 
-import oracle.jms.AdtMessage;
-import oracle.xdb.XMLType;
-
 import org.mule.providers.jms.JmsMessageAdapter;
 import org.mule.umo.MessagingException;
+
+import oracle.jms.AdtMessage;
+import oracle.xdb.XMLType;
 
 /**
  * If the message payload is XML, returns the XML as a string. If the message payload

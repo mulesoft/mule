@@ -10,10 +10,10 @@
 
 package org.mule.util.properties;
 
-import org.mule.util.properties.PropertyExtractor;
 import org.mule.umo.UMOMessage;
-import org.dom4j.io.DOMReader;
+
 import org.dom4j.Node;
+import org.dom4j.io.DOMReader;
 
 /**
  * Will select the text of a single node based on the property name

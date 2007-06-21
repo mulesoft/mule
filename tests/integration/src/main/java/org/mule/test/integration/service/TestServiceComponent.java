@@ -13,13 +13,12 @@ package org.mule.test.integration.service;
 import org.mule.components.simple.EchoService;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.umo.lifecycle.Disposable;
+import org.mule.util.StringUtils;
 
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.mule.util.StringUtils;
 
 /**
  * <code>TestServiceComponent</code> is a test WebServices component.

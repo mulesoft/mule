@@ -10,9 +10,10 @@
 
 package org.mule.config.converters;
 
+import org.mule.umo.transformer.UMOTransformer;
+
 import org.apache.commons.beanutils.ConversionException;
 import org.apache.commons.beanutils.Converter;
-import org.mule.umo.transformer.UMOTransformer;
 
 /**
  * <code>TransformerConverter</code> will obtain a transformer name and convert it

@@ -10,6 +10,11 @@
 
 package org.mule.extras.jaas.loginmodule;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
+
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -19,11 +24,6 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.FailedLoginException;
 import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
 
 /**
  * @author Marie.Rizzo This is the Default Login Module for the Mule Jaas

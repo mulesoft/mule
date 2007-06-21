@@ -10,17 +10,17 @@
 
 package org.mule.providers.soap.axis.extras;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
-import org.mule.util.StringUtils;
 import org.mule.config.MuleProperties;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
 import org.mule.providers.soap.SoapConstants;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
+import org.mule.util.StringUtils;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class AxisCleanAndAddProperties
 {

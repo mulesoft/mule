@@ -30,14 +30,13 @@ import org.mule.umo.security.UnknownAuthenticationTypeException;
 import java.io.ByteArrayInputStream;
 import java.util.Collection;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import cryptix.message.LiteralMessage;
 import cryptix.message.Message;
 import cryptix.message.MessageFactory;
 import cryptix.message.SignedMessage;
 import cryptix.pki.KeyBundle;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
 {

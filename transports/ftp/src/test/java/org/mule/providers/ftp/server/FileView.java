@@ -11,11 +11,11 @@
 package org.mule.providers.ftp.server;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.ftpserver.ftplet.FileObject;
 import org.apache.ftpserver.ftplet.FileSystemView;
 import org.apache.ftpserver.ftplet.FtpException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class FileView implements FileSystemView
 {

@@ -12,10 +12,10 @@ package org.mule.extras.pgp;
 
 import org.mule.umo.security.UMOAuthentication;
 
+import java.util.Map;
+
 import cryptix.message.Message;
 import cryptix.pki.KeyBundle;
-
-import java.util.Map;
 
 public class PGPAuthentication implements UMOAuthentication
 {

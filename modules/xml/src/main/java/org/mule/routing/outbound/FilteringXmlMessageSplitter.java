@@ -13,6 +13,7 @@ package org.mule.routing.outbound;
 import org.mule.impl.MuleMessage;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.util.ExceptionUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 
@@ -24,7 +25,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.mule.util.ExceptionUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;

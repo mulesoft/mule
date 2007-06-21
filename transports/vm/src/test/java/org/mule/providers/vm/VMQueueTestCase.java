@@ -14,10 +14,10 @@ import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
-import java.util.Set;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 public class VMQueueTestCase extends FunctionalTestCase

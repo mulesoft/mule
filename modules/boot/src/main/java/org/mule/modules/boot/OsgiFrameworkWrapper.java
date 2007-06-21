@@ -10,13 +10,13 @@
 
 package org.mule.modules.boot;
 
-import org.knopflerfish.framework.Main;
-import org.tanukisoftware.wrapper.WrapperListener;
-import org.tanukisoftware.wrapper.WrapperManager;
-
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
+
+import org.knopflerfish.framework.Main;
+import org.tanukisoftware.wrapper.WrapperListener;
+import org.tanukisoftware.wrapper.WrapperManager;
 
 public class OsgiFrameworkWrapper implements WrapperListener
 {

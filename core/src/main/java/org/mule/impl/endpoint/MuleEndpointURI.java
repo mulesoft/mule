@@ -21,12 +21,12 @@ import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.PropertiesUtils;
+import org.mule.util.StringUtils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Properties;
 
-import org.mule.util.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

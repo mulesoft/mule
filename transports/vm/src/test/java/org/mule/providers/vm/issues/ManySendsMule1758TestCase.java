@@ -10,8 +10,8 @@
 
 package org.mule.providers.vm.issues;
 
-import org.mule.tck.FunctionalTestCase;
 import org.mule.extras.client.MuleClient;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
 public class ManySendsMule1758TestCase extends FunctionalTestCase

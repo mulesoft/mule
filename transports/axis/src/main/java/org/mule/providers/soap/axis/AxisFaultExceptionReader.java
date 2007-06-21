@@ -10,12 +10,13 @@
 
 package org.mule.providers.soap.axis;
 
+import org.mule.config.ExceptionReader;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.axis.AxisFault;
-import org.mule.config.ExceptionReader;
 
 /**
  * Will format and display additional information stored with an Axis fault that is

@@ -10,15 +10,15 @@
 
 package org.mule.providers.jbi;
 
+import org.mule.providers.AbstractMessageAdapter;
+import org.mule.umo.MessagingException;
+import org.mule.umo.provider.MessageTypeNotSupportedException;
+
 import java.util.Iterator;
 import java.util.Set;
 
 import javax.activation.DataHandler;
 import javax.jbi.messaging.NormalizedMessage;
-
-import org.mule.providers.AbstractMessageAdapter;
-import org.mule.umo.MessagingException;
-import org.mule.umo.provider.MessageTypeNotSupportedException;
 
 /**
  * <code>JbiMessageAdapter</code> translates a JBI NormalizedMessage to a

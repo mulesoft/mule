@@ -18,12 +18,11 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOMessageAdapter;
+import org.mule.util.StringUtils;
 
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.mule.util.StringUtils;
 
 /**
  * The Jdbc Message dispatcher is responsible for executing SQL queries against a

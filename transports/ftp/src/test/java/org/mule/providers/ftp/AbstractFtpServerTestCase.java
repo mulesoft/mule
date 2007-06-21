@@ -10,8 +10,8 @@
 
 package org.mule.providers.ftp;
 
-import org.mule.providers.ftp.server.Server;
 import org.mule.providers.ftp.server.NamedPayload;
+import org.mule.providers.ftp.server.Server;
 import org.mule.tck.FunctionalTestCase;
 
 

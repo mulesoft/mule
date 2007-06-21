@@ -9,8 +9,8 @@
  */
 package org.mule.providers.ftp;
 
-import org.mule.providers.file.FilenameParser;
 import org.mule.providers.file.DummyFilenameParser;
+import org.mule.providers.file.FilenameParser;
 import org.mule.tck.FunctionalTestCase;
 
 public class FtpNamespaceHandlerTestCase extends FunctionalTestCase

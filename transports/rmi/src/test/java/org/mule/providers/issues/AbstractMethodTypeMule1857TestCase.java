@@ -10,8 +10,8 @@
 
 package org.mule.providers.issues;
 
-import org.mule.providers.AbstractFunctionalTestCase;
 import org.mule.extras.client.MuleClient;
+import org.mule.providers.AbstractFunctionalTestCase;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 

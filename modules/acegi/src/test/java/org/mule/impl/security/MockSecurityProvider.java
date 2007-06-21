@@ -10,8 +10,11 @@
 
 package org.mule.impl.security;
 
-import org.mule.umo.security.*;
 import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.security.UMOAuthentication;
+import org.mule.umo.security.UMOSecurityContext;
+import org.mule.umo.security.UMOSecurityProvider;
+import org.mule.umo.security.UnknownAuthenticationTypeException;
 
 /**
  * Empty mock for test

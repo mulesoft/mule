@@ -11,8 +11,6 @@
 package org.mule.providers.file;
 
 import org.mule.providers.DefaultMessageAdapter;
-import org.mule.providers.file.FileConnector;
-import org.mule.providers.file.SimpleFilenameParser;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.provider.UMOMessageAdapter;
 

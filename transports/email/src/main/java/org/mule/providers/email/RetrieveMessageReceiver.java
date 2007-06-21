@@ -25,6 +25,7 @@ import org.mule.umo.provider.ReceiveException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.routing.RoutingException;
 import org.mule.util.FileUtils;
+import org.mule.util.StringUtils;
 import org.mule.util.UUID;
 
 import java.io.File;
@@ -41,8 +42,6 @@ import javax.mail.event.MessageCountEvent;
 import javax.mail.event.MessageCountListener;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-
-import org.mule.util.StringUtils;
 
 /**
  * Poll a mailbox for messages, remove the messages and route them as events into Mule.

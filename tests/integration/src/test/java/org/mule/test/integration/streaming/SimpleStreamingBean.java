@@ -11,9 +11,9 @@ package org.mule.test.integration.streaming;
 
 import org.mule.util.IOUtils;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.IOException;
 
 /**
  * A simple bridge component for testing entry point resolution

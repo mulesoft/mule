@@ -11,8 +11,8 @@
 package org.mule.transformers.xml.wire;
 
 import org.mule.transformers.wire.TransformerPairWireFormat;
-import org.mule.transformers.xml.XStreamFactory;
 import org.mule.transformers.xml.ObjectToXml;
+import org.mule.transformers.xml.XStreamFactory;
 import org.mule.transformers.xml.XmlToObject;
 
 import java.util.List;

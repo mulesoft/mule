@@ -10,15 +10,15 @@
 
 package org.mule.providers.soap.axis;
 
-import java.util.Iterator;
-
-import javax.xml.namespace.QName;
-import javax.xml.rpc.ParameterMode;
-
 import org.mule.providers.soap.NamedParameter;
 import org.mule.providers.soap.SoapMethod;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
+
+import java.util.Iterator;
+
+import javax.xml.namespace.QName;
+import javax.xml.rpc.ParameterMode;
 
 /**
  * 

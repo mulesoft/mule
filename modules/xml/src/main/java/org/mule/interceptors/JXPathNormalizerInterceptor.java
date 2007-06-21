@@ -10,7 +10,6 @@
 
 package org.mule.interceptors;
 
-import org.apache.commons.jxpath.JXPathContext;
 import org.mule.impl.MuleMessage;
 import org.mule.umo.Invocation;
 import org.mule.umo.UMOException;
@@ -19,6 +18,8 @@ import org.mule.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.jxpath.JXPathContext;
 
 /**
  * <code>JXPathNormalizerInterceptor</code> can be used as a simple pre/post

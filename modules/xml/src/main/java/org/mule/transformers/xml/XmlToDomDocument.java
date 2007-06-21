@@ -11,12 +11,13 @@
 package org.mule.transformers.xml;
 
 import org.mule.umo.transformer.TransformerException;
-import org.w3c.dom.Document;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
+
+import org.w3c.dom.Document;
 
 /**
  * <code>XmlToDomDocument</code> transforms a XML String to org.w3c.dom.Document.

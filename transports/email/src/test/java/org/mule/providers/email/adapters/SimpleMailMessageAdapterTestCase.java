@@ -10,8 +10,8 @@
 
 package org.mule.providers.email.adapters;
 
-import org.mule.tck.AbstractMuleTestCase;
 import org.mule.providers.email.SimpleMailMessageAdapter;
+import org.mule.tck.AbstractMuleTestCase;
 
 import java.util.List;
 import java.util.Properties;

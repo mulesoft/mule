@@ -10,11 +10,12 @@
 
 package org.mule.providers.soap.axis.extensions;
 
+import org.mule.providers.soap.axis.AxisConnector;
+
 import org.apache.axis.EngineConfiguration;
 import org.apache.axis.deployment.wsdd.WSDDConstants;
 import org.apache.axis.deployment.wsdd.WSDDProvider;
 import org.apache.axis.deployment.wsdd.WSDDService;
-import org.mule.providers.soap.axis.AxisConnector;
 
 /**
  * <code>WSDDJavaMuleProvider</code> is a factory class for creating the

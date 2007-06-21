@@ -18,9 +18,9 @@ import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.InternalMessageListener;
 import org.mule.providers.jbi.JbiMessageAdapter;
 import org.mule.providers.jbi.JbiUtils;
+import org.mule.providers.jbi.i18n.JbiMessages;
 import org.mule.registry.DeregistrationException;
 import org.mule.registry.RegistrationException;
-import org.mule.providers.jbi.i18n.JbiMessages;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
@@ -29,6 +29,7 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOMessageReceiver;
+import org.mule.util.SystemUtils;
 
 import java.io.OutputStream;
 import java.util.Arrays;
@@ -39,8 +40,6 @@ import javax.jbi.messaging.MessagingException;
 import javax.jbi.messaging.NormalizedMessage;
 import javax.jbi.servicedesc.ServiceEndpoint;
 import javax.xml.namespace.QName;
-
-import org.mule.util.SystemUtils;
 
 /**
  * Can receive events over Mule transports. Given an muleEndpoint (or endpoint string

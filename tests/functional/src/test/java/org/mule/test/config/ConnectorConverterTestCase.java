@@ -10,9 +10,10 @@
 
 package org.mule.test.config;
 
-import org.apache.commons.beanutils.Converter;
 import org.mule.config.converters.ConnectorConverter;
 import org.mule.tck.testmodels.mule.TestConnector;
+
+import org.apache.commons.beanutils.Converter;
 
 public class ConnectorConverterTestCase extends AbstractConverterTestCase
 {

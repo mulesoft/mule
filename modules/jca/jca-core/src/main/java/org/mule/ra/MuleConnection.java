@@ -10,12 +10,12 @@
 
 package org.mule.ra;
 
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
+
 import java.util.Map;
 
 import javax.resource.ResourceException;
-
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
 
 /**
  * <code>MuleConnection</code> defines the client connection methods for the JCA

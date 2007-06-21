@@ -9,9 +9,9 @@
  */
 package org.mule.providers.email.config;
 
-import org.mule.tck.FunctionalTestCase;
 import org.mule.providers.email.ImapConnector;
 import org.mule.providers.email.ImapsConnector;
+import org.mule.tck.FunctionalTestCase;
 
 /**
  * TODO

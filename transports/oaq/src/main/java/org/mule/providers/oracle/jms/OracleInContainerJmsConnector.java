@@ -10,10 +10,11 @@
 
 package org.mule.providers.oracle.jms;
 
-import javax.jms.JMSException;
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+
+import javax.jms.JMSException;
+import javax.sql.DataSource;
 
 /**
  * JMS Connector for Oracle AQ that uses a user provided data source for database connectivity

@@ -10,12 +10,13 @@
 
 package org.mule.extras.spring.events;
 
+import org.mule.umo.UMOEventContext;
+import org.mule.umo.endpoint.MalformedEndpointException;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.endpoint.MalformedEndpointException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEvent;
 

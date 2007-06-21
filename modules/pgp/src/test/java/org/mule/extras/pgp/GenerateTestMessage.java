@@ -10,15 +10,6 @@
 
 package org.mule.extras.pgp;
 
-import cryptix.message.EncryptedMessageBuilder;
-import cryptix.message.LiteralMessageBuilder;
-import cryptix.message.Message;
-import cryptix.message.MessageException;
-import cryptix.message.SignedMessageBuilder;
-import cryptix.openpgp.PGPArmouredMessage;
-import cryptix.pki.ExtendedKeyStore;
-import cryptix.pki.KeyBundle;
-
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -29,6 +20,15 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.Enumeration;
 import java.util.Iterator;
+
+import cryptix.message.EncryptedMessageBuilder;
+import cryptix.message.LiteralMessageBuilder;
+import cryptix.message.Message;
+import cryptix.message.MessageException;
+import cryptix.message.SignedMessageBuilder;
+import cryptix.openpgp.PGPArmouredMessage;
+import cryptix.pki.ExtendedKeyStore;
+import cryptix.pki.KeyBundle;
 
 public class GenerateTestMessage
 {

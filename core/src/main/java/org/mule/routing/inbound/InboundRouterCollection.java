@@ -25,10 +25,10 @@ import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.StringUtils;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-
 import java.util.Iterator;
 import java.util.List;
+
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * <code>InboundRouterCollection</code> is a collection of routers that will be

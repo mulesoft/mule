@@ -14,8 +14,8 @@ import org.mule.extras.client.MuleClient;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.soap.axis.AxisConnector;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOMessage;
 import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOMessage;
 
 public class AxisOverJMSWithTransactionsTestCase extends FunctionalTestCase
 {

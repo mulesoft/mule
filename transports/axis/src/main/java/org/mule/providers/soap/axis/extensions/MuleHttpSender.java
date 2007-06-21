@@ -10,6 +10,9 @@
 
 package org.mule.providers.soap.axis.extensions;
 
+import org.mule.util.StringUtils;
+import org.mule.util.SystemUtils;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -48,8 +51,6 @@ import org.apache.axis.transport.http.SocketInputStream;
 import org.apache.axis.utils.Messages;
 import org.apache.axis.utils.TeeOutputStream;
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.mule.util.StringUtils;
-import org.mule.util.SystemUtils;
 import org.apache.commons.logging.Log;
 
 /**

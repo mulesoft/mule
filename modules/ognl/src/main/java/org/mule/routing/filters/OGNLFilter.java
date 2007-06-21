@@ -14,11 +14,10 @@ import org.mule.config.ConfigurationException;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import ognl.Ognl;
 import ognl.OgnlException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class OGNLFilter implements UMOFilter
 {

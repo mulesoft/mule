@@ -10,8 +10,6 @@
 
 package org.mule.providers.file;
 
-import java.io.File;
-
 import org.mule.MuleException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
@@ -23,8 +21,6 @@ import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.util.ObjectUtils;
 
 import java.io.File;
-
-import org.mule.util.ObjectUtils;
 
 /**
  * <code>FileMessageAdapter</code> provides a wrapper for a file reference. Users

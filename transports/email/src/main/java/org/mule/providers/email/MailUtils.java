@@ -11,12 +11,11 @@
 package org.mule.providers.email;
 
 import org.mule.config.i18n.CoreMessages;
+import org.mule.util.StringUtils;
 
 import javax.mail.Address;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
-
-import org.mule.util.StringUtils;
 
 /**
  * Contains javax.mail helpers.

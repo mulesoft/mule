@@ -11,10 +11,10 @@
 package org.mule.providers.http.issues;
 
 import org.mule.MuleException;
-import org.mule.tck.functional.EventCallback;
-import org.mule.tck.functional.FunctionalTestNotification;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.impl.RequestContext;
+import org.mule.tck.functional.EventCallback;
+import org.mule.tck.functional.FunctionalTestNotification;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.util.StringMessageUtils;

@@ -10,16 +10,16 @@
 
 package org.mule.providers.jbi.components;
 
-import javax.jbi.messaging.MessageExchange;
-import javax.jbi.messaging.MessagingException;
-import javax.jbi.messaging.NormalizedMessage;
-
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleSession;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.jbi.JbiUtils;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
+
+import javax.jbi.messaging.MessageExchange;
+import javax.jbi.messaging.MessagingException;
+import javax.jbi.messaging.NormalizedMessage;
 
 /**
  * A JBI component that can dispatch Normalised Messages over a given transport

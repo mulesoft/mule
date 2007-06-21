@@ -10,8 +10,8 @@
 
 package org.mule.providers.ftp.server;
 
-import java.io.OutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 public class UploadFile extends File
 {

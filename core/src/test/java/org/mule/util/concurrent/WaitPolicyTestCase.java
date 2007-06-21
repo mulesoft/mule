@@ -12,6 +12,12 @@ package org.mule.util.concurrent;
 
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.ClassUtils;
+import org.mule.util.StringUtils;
+
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingQueue;
 import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionException;
@@ -20,14 +26,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 import edu.emory.mathcs.backport.java.util.concurrent.locks.Lock;
 import edu.emory.mathcs.backport.java.util.concurrent.locks.ReentrantLock;
-
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.collections.keyvalue.DefaultMapEntry;
-import org.mule.util.StringUtils;
 
 public class WaitPolicyTestCase extends AbstractMuleTestCase
 {

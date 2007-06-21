@@ -14,10 +14,10 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 
 import java.io.IOException;
 
-import org.apache.commons.pool.PoolableObjectFactory;
+import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
-import org.apache.commons.net.ftp.FTP;
+import org.apache.commons.pool.PoolableObjectFactory;
 
 public class FtpConnectionFactory implements PoolableObjectFactory
 {

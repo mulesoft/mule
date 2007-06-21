@@ -9,9 +9,9 @@
  */
 package org.mule.providers.email.config;
 
-import org.mule.tck.FunctionalTestCase;
 import org.mule.providers.email.Pop3Connector;
 import org.mule.providers.email.Pop3sConnector;
+import org.mule.tck.FunctionalTestCase;
 
 /**
  * TODO

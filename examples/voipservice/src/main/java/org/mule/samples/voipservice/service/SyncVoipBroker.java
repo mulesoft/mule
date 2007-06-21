@@ -10,8 +10,6 @@
 
 package org.mule.samples.voipservice.service;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
 import org.mule.samples.voipservice.interfaces.AddressValidation;
@@ -23,6 +21,9 @@ import org.mule.umo.UMOMessage;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * @author Binildas Christudas

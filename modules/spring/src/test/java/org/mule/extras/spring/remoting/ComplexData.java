@@ -10,9 +10,9 @@
 
 package org.mule.extras.spring.remoting;
 
-import java.io.Serializable;
-
 import org.mule.util.StringUtils;
+
+import java.io.Serializable;
 
 public class ComplexData implements Serializable
 {

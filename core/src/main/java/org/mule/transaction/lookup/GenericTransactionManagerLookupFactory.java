@@ -15,6 +15,7 @@ import org.mule.impl.container.JndiContextHelper;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOTransactionManagerFactory;
+import org.mule.util.StringUtils;
 
 import java.util.Map;
 
@@ -22,7 +23,6 @@ import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.transaction.TransactionManager;
 
-import org.mule.util.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

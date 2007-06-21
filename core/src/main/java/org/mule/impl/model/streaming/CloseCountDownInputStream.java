@@ -10,8 +10,8 @@
 
 package org.mule.impl.model.streaming;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 

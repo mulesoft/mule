@@ -9,8 +9,8 @@
  */
 package org.mule.config.spring;
 
-import org.mule.util.StringUtils;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
+import org.mule.util.StringUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

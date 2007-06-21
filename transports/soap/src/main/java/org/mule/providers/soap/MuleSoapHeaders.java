@@ -10,13 +10,10 @@
 
 package org.mule.providers.soap;
 
-import org.dom4j.Namespace;
-import org.dom4j.QName;
-import org.dom4j.dom.DOMElement;
 import org.mule.config.MuleProperties;
 import org.mule.umo.UMOEvent;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
+
+import java.util.Iterator;
 
 import javax.xml.soap.Name;
 import javax.xml.soap.SOAPElement;
@@ -24,7 +21,12 @@ import javax.xml.soap.SOAPEnvelope;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPHeaderElement;
-import java.util.Iterator;
+
+import org.dom4j.Namespace;
+import org.dom4j.QName;
+import org.dom4j.dom.DOMElement;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 /**
  * <code>MuleSoapHeaders</code> is a helper class for extracting and writing Mule

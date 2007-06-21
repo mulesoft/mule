@@ -11,6 +11,7 @@
 package org.mule.management.support;
 
 import org.mule.management.agents.JmxAgent;
+import org.mule.util.ObjectUtils;
 import org.mule.util.StringUtils;
 
 import java.util.Collections;
@@ -23,7 +24,6 @@ import javax.management.remote.JMXAuthenticator;
 import javax.management.remote.JMXPrincipal;
 import javax.security.auth.Subject;
 
-import org.mule.util.ObjectUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

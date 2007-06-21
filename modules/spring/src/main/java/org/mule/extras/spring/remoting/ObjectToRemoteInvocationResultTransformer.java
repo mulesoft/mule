@@ -10,11 +10,12 @@
 
 package org.mule.extras.spring.remoting;
 
+import org.mule.transformers.AbstractTransformer;
+import org.mule.umo.transformer.TransformerException;
+
 import java.io.ObjectOutputStream;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.mule.transformers.AbstractTransformer;
-import org.mule.umo.transformer.TransformerException;
 import org.springframework.remoting.support.RemoteInvocationResult;
 
 public class ObjectToRemoteInvocationResultTransformer extends AbstractTransformer

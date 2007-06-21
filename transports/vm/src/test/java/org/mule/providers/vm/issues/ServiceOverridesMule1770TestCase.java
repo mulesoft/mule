@@ -14,8 +14,8 @@ import org.mule.config.MuleProperties;
 import org.mule.providers.AbstractConnector;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestMessageDispatcherFactory;
-import org.mule.umo.transformer.UMOTransformer;
 import org.mule.transformers.NoActionTransformer;
+import org.mule.umo.transformer.UMOTransformer;
 
 public class ServiceOverridesMule1770TestCase extends FunctionalTestCase
 {

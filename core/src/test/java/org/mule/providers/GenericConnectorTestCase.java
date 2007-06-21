@@ -10,11 +10,11 @@
 
 package org.mule.providers;
 
-import org.mule.tck.AbstractMuleTestCase;
 import org.mule.MuleRuntimeException;
+import org.mule.tck.AbstractMuleTestCase;
 
-import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.Work;
+import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.WorkException;
 
 /**

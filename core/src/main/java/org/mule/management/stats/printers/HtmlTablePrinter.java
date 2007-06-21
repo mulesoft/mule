@@ -10,12 +10,12 @@
 
 package org.mule.management.stats.printers;
 
+import org.mule.util.StringUtils;
+
 import java.io.OutputStream;
 import java.io.Writer;
 import java.util.Collection;
 import java.util.StringTokenizer;
-
-import org.mule.util.StringUtils;
 
 /**
  * <code>HtmlTablePrinter</code> prints event processing stats as a HTML table

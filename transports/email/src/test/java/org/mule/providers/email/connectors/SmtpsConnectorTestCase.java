@@ -10,8 +10,8 @@
 
 package org.mule.providers.email.connectors;
 
-import org.mule.umo.provider.UMOConnector;
 import org.mule.providers.email.SmtpsConnector;
+import org.mule.umo.provider.UMOConnector;
 
 public class SmtpsConnectorTestCase extends SmtpConnectorTestCase
 {

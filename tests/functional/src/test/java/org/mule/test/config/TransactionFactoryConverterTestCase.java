@@ -10,10 +10,11 @@
 
 package org.mule.test.config;
 
-import org.apache.commons.beanutils.Converter;
 import org.mule.config.converters.TransactionFactoryConverter;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
 import org.mule.umo.UMOTransactionFactory;
+
+import org.apache.commons.beanutils.Converter;
 
 public class TransactionFactoryConverterTestCase extends AbstractConverterTestCase
 {

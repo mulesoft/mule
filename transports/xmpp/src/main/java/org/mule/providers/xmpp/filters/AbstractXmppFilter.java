@@ -10,10 +10,11 @@
 
 package org.mule.providers.xmpp.filters;
 
-import org.jivesoftware.smack.filter.PacketFilter;
-import org.jivesoftware.smack.packet.Packet;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
+
+import org.jivesoftware.smack.filter.PacketFilter;
+import org.jivesoftware.smack.packet.Packet;
 
 /**
  * <code>AbstractXmppFilter</code> is a filter adapter so that Smack Filters can be

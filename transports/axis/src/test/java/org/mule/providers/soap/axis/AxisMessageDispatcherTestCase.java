@@ -10,16 +10,17 @@
 
 package org.mule.providers.soap.axis;
 
-import java.util.List;
-import java.util.Map;
-
-import org.apache.axis.client.Call;
-import org.apache.axis.client.Service;
 import org.mule.impl.ImmutableMuleEndpoint;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+
+import java.util.List;
+import java.util.Map;
+
+import org.apache.axis.client.Call;
+import org.apache.axis.client.Service;
 
 /**
  * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>

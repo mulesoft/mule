@@ -10,11 +10,11 @@
 
 package org.mule.management.mbeans;
 
-import javax.management.ObjectName;
-
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.Startable;
 import org.mule.umo.lifecycle.Stoppable;
+
+import javax.management.ObjectName;
 
 /**
  * <code>ComponentServiceMBean</code> defines the management interface for a mule

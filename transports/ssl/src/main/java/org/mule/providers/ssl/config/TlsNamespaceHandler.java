@@ -9,8 +9,8 @@
  */
 package org.mule.providers.ssl.config;
 
-import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
+import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
 import org.mule.providers.ssl.TlsConnector;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;

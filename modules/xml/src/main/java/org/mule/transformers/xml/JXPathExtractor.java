@@ -10,6 +10,9 @@
 
 package org.mule.transformers.xml;
 
+import org.mule.transformers.AbstractTransformer;
+import org.mule.umo.transformer.TransformerException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,9 +21,6 @@ import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Node;
 import org.dom4j.XPath;
-
-import org.mule.transformers.AbstractTransformer;
-import org.mule.umo.transformer.TransformerException;
 
 /**
  * The JXPathExtractor is a simple transformer that evaluates an xpath expression

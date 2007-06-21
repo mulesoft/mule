@@ -14,7 +14,6 @@ import org.mule.impl.message.ExceptionPayload;
 import org.mule.providers.NullPayload;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-
 import org.mule.util.ObjectUtils;
 
 /**

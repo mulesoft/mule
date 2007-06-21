@@ -10,16 +10,16 @@
 
 package org.mule.providers.ejb;
 
+import org.mule.providers.rmi.RmiConnector;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.util.ClassUtils;
+
 import java.lang.reflect.Method;
 import java.net.UnknownHostException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import javax.ejb.EJBObject;
-
-import org.mule.providers.rmi.RmiConnector;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.util.ClassUtils;
 
 /**
  * Provides Connection configurstion for EJB endpoints

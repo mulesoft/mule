@@ -10,10 +10,10 @@
 
 package org.mule.providers.soap.axis.transport.smtp;
 
+import org.mule.providers.soap.axis.transport.VoidURLConnection;
+
 import java.net.URL;
 import java.net.URLConnection;
-
-import org.mule.providers.soap.axis.transport.VoidURLConnection;
 
 /**
  * A Dummy Url handler for handling smtp. This is needed becuase Axis uses

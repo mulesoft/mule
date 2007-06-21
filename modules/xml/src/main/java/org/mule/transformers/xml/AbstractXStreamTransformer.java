@@ -16,12 +16,12 @@ import org.mule.umo.transformer.TransformerException;
 
 import com.thoughtworks.xstream.XStream;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
 
 /**
  * <code>AbstractXStreamTransformer</code> is a base class for all XStream based

@@ -22,8 +22,8 @@ import com.icegreen.greenmail.util.Servers;
 
 import java.io.IOException;
 
-import javax.mail.MessagingException;
 import javax.mail.Message;
+import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase

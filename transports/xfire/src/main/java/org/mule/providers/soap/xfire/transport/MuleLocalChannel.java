@@ -19,8 +19,6 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.manager.UMOWorkManager;
 import org.mule.util.StringUtils;
 
-import edu.emory.mathcs.backport.java.util.concurrent.Semaphore;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -35,6 +33,7 @@ import javax.resource.spi.work.WorkException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import edu.emory.mathcs.backport.java.util.concurrent.Semaphore;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

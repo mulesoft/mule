@@ -10,15 +10,16 @@
 
 package org.mule.providers.xmpp.transformers;
 
-import java.util.Iterator;
-
-import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.packet.XMPPError;
 import org.mule.providers.xmpp.XmppConnector;
 import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
+
+import java.util.Iterator;
+
+import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.packet.XMPPError;
 
 /**
  * Creates an Xmpp message packet from a UMOMessage

@@ -11,8 +11,8 @@ package org.mule.management.support;
 
 import org.mule.util.ClassUtils;
 
-import java.lang.reflect.Method;
 import java.io.ObjectStreamException;
+import java.lang.reflect.Method;
 
 import javax.management.ObjectName;
 

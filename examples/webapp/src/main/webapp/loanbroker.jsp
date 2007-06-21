@@ -1,7 +1,7 @@
-<%@ page import="org.mule.extras.client.MuleClient,
+<%@ page import="org.mule.examples.loanbroker.esn.LoanBrokerApp,
                  org.mule.examples.loanbroker.messages.Customer,
-                 org.mule.examples.loanbroker.esn.LoanBrokerApp,
                  org.mule.examples.loanbroker.messages.CustomerQuoteRequest,
+                 org.mule.extras.client.MuleClient,
                  org.mule.umo.UMOMessage,
                  java.util.Iterator,
                  java.util.List"%>

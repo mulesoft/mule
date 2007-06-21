@@ -17,11 +17,10 @@ import org.mule.umo.routing.UMORouter;
 import org.mule.umo.routing.UMORouterCatchAllStrategy;
 import org.mule.umo.routing.UMORouterCollection;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-
 import java.util.Iterator;
 import java.util.List;
 
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

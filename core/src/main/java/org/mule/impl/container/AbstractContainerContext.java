@@ -17,11 +17,11 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.ContainerException;
 import org.mule.umo.manager.UMOContainerContext;
 import org.mule.util.ChainedReader;
+import org.mule.util.SystemUtils;
 
 import java.io.Reader;
 import java.io.StringReader;
 
-import org.mule.util.SystemUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

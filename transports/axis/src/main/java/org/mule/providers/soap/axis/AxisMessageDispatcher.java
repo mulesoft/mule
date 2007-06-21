@@ -27,6 +27,7 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.BeanUtils;
+import org.mule.util.StringUtils;
 import org.mule.util.TemplateParser;
 
 import java.util.ArrayList;
@@ -53,7 +54,6 @@ import org.apache.axis.constants.Style;
 import org.apache.axis.constants.Use;
 import org.apache.axis.wsdl.fromJava.Namespaces;
 import org.apache.axis.wsdl.fromJava.Types;
-import org.mule.util.StringUtils;
 
 /**
  * <code>AxisMessageDispatcher</code> is used to make soap requests via the Axis

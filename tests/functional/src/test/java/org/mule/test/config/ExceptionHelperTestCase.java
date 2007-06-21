@@ -10,13 +10,13 @@
 
 package org.mule.test.config;
 
-import java.util.List;
-import java.util.Map;
-
 import org.mule.MuleException;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.tck.AbstractMuleTestCase;
+
+import java.util.List;
+import java.util.Map;
 
 public class ExceptionHelperTestCase extends AbstractMuleTestCase
 {

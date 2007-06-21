@@ -13,9 +13,9 @@ package org.mule.umo.manager;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Startable;
 
-import edu.emory.mathcs.backport.java.util.concurrent.Executor;
-
 import javax.resource.spi.work.WorkManager;
+
+import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 
 /**
  * <code>UMOWorkManager</code> extends the standard JCA WorkManager with lifecycle

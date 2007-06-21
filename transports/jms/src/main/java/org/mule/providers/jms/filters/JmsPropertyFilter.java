@@ -12,8 +12,8 @@ package org.mule.providers.jms.filters;
 
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
-import org.mule.util.StringUtils;
 import org.mule.util.ClassUtils;
+import org.mule.util.StringUtils;
 
 import java.util.regex.Pattern;
 

@@ -10,10 +10,10 @@
 
 package org.mule.providers.soap;
 
+import org.mule.config.MuleProperties;
 import org.mule.interceptors.EnvelopeInterceptor;
 import org.mule.umo.Invocation;
 import org.mule.umo.UMOException;
-import org.mule.config.MuleProperties;
 
 /**
  * This Interceptor decorates the current message with a property that tells the

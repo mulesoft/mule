@@ -19,9 +19,6 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
@@ -29,6 +26,9 @@ import javax.jms.QueueConnection;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 import javax.jms.TopicConnection;
+
+import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public abstract class AbstractJmsQueueFunctionalTestCase extends AbstractJmsFunctionalTestCase
 {

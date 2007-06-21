@@ -10,9 +10,9 @@
 
 package org.mule.persistence;
 
-import java.io.File;
-
 import org.mule.umo.lifecycle.Initialisable;
+
+import java.io.File;
 
 /**
  * The purpose of a PersistenceSerializer is to customize the persistence

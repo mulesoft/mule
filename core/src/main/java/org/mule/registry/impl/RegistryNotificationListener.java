@@ -10,8 +10,8 @@
 
 package org.mule.registry.impl;
 
-import org.mule.registry.Registry;
 import org.mule.impl.internal.notifications.ModelNotification;
+import org.mule.registry.Registry;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.manager.UMOServerNotificationListener;
 import org.mule.umo.model.UMOModel;

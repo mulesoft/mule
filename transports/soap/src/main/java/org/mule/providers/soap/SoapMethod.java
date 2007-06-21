@@ -10,16 +10,17 @@
 
 package org.mule.providers.soap;
 
-import org.mule.util.StringUtils;
 import org.mule.config.converters.QNameConverter;
 import org.mule.util.ClassUtils;
+import org.mule.util.StringUtils;
 
-import javax.xml.namespace.QName;
-import javax.xml.rpc.ParameterMode;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
+
+import javax.xml.namespace.QName;
+import javax.xml.rpc.ParameterMode;
 
 /**
  * A SOAP method representation where the parameters are named

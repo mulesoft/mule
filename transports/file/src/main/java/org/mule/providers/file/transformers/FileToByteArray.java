@@ -12,6 +12,7 @@ package org.mule.providers.file.transformers;
 
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
+import org.mule.util.ArrayUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,7 +20,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
-import org.mule.util.ArrayUtils;
 
 /**
  * <code>FileToByteArray</code> reads the contents of a file as a byte array.

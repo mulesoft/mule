@@ -10,8 +10,6 @@
 
 package org.mule.providers.oracle.jms;
 
-import oracle.jms.AQjmsSession;
-
 import org.mule.providers.jms.Jms102bSupport;
 import org.mule.providers.jms.JmsConnector;
 import org.mule.util.ClassUtils;
@@ -29,6 +27,8 @@ import javax.jms.Session;
 import javax.jms.Topic;
 import javax.jms.TopicSession;
 import javax.naming.Context;
+
+import oracle.jms.AQjmsSession;
 
 /**
  * Extends the standard Mule JMS Provider with functionality specific to Oracle's JMS

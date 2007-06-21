@@ -10,12 +10,12 @@
 
 package org.mule.providers.udp;
 
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
+
+import java.net.DatagramPacket;
+import java.net.InetAddress;
 
 /**
  * <code>UdpMessageAdapter</code>

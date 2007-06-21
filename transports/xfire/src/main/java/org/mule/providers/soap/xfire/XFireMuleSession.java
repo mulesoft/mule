@@ -10,8 +10,9 @@
 
 package org.mule.providers.soap.xfire;
 
-import org.codehaus.xfire.transport.Session;
 import org.mule.umo.UMOSession;
+
+import org.codehaus.xfire.transport.Session;
 
 /**
  * Mules session wrapper for XFire

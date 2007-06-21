@@ -13,7 +13,6 @@ package org.mule.umo.lifecycle;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 import org.mule.umo.UMOException;
-
 import org.mule.util.ObjectUtils;
 
 /** <code>LifecycleException</code> TODO */

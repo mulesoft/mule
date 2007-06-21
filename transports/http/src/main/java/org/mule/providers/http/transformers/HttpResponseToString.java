@@ -10,6 +10,12 @@
 
 package org.mule.providers.http.transformers;
 
+import org.mule.providers.http.HttpConstants;
+import org.mule.providers.http.HttpResponse;
+import org.mule.providers.http.ResponseWriter;
+import org.mule.transformers.AbstractTransformer;
+import org.mule.umo.transformer.TransformerException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -20,11 +26,6 @@ import org.apache.commons.httpclient.ChunkedOutputStream;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.mule.providers.http.HttpConstants;
-import org.mule.providers.http.HttpResponse;
-import org.mule.providers.http.ResponseWriter;
-import org.mule.transformers.AbstractTransformer;
-import org.mule.umo.transformer.TransformerException;
 
 /**
  * Converts an Http Response object to String. Note that the response headers are

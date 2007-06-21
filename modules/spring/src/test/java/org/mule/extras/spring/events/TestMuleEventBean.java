@@ -10,9 +10,10 @@
 
 package org.mule.extras.spring.events;
 
+import org.mule.tck.functional.EventCallback;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.tck.functional.EventCallback;
 import org.springframework.context.ApplicationEvent;
 
 /**

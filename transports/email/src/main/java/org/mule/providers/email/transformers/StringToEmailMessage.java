@@ -18,6 +18,7 @@ import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.MapUtils;
+import org.mule.util.StringUtils;
 import org.mule.util.TemplateParser;
 
 import java.util.Calendar;
@@ -29,7 +30,6 @@ import java.util.Properties;
 import javax.mail.Message;
 import javax.mail.internet.MimeMessage;
 
-import org.mule.util.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

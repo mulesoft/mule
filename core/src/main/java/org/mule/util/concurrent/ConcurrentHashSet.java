@@ -16,14 +16,14 @@ package org.mule.util.concurrent;
  * http://creativecommons.org/licenses/publicdomain
  */
 
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.AbstractSet;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
+
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 
 public class ConcurrentHashSet/* <E> */extends AbstractSet/* <E> */implements Set/* <E> */, Serializable
 {

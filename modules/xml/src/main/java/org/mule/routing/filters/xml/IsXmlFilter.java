@@ -10,6 +10,9 @@
 
 package org.mule.routing.filters.xml;
 
+import org.mule.umo.UMOFilter;
+import org.mule.umo.UMOMessage;
+
 import java.io.ByteArrayInputStream;
 import java.io.StringReader;
 
@@ -17,9 +20,6 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-
-import org.mule.umo.UMOFilter;
-import org.mule.umo.UMOMessage;
 
 /**
  * <code>IsXmlFilter</code> accepts a String or byte[] if its contents are valid

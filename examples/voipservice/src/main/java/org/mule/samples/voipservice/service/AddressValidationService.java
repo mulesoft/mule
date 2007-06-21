@@ -10,10 +10,11 @@
 
 package org.mule.samples.voipservice.service;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.samples.voipservice.interfaces.AddressValidation;
 import org.mule.samples.voipservice.to.AddressTO;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * @author Binildas Christudas
