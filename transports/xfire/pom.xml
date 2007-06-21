@@ -117,73 +117,38 @@
         <dependency>
             <groupId>org.codehaus.xfire</groupId>
             <artifactId>xfire-core</artifactId>
-            <version>1.2.6</version>
             <exclusions>
-                <!-- we like slf4j -->
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>                
                 <exclusion>
                     <!-- we want the newer version below -->
                     <groupId>woodstox</groupId>
                     <artifactId>wstx-asl</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>xerces</groupId>
-                    <artifactId>xmlParserAPIs</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>junit</groupId>
-                    <artifactId>junit</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
         <dependency>
             <groupId>org.codehaus.xfire</groupId>
             <artifactId>xfire-aegis</artifactId>
-            <version>1.2.6</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.xfire</groupId>
             <artifactId>xfire-annotations</artifactId>
-            <version>1.2.6</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>qdox</groupId>
-                    <artifactId>qdox</artifactId>
-                </exclusion>
-                <!-- xfire-annotations dependends on commons-attributes,
-                which in turn pulls in an ancient ant-1.5 ?! -->
-                <exclusion>
-                    <groupId>ant</groupId>
-                    <artifactId>ant</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <!-- the following dependency is required to make the xfire-annotations
         work with jsr181 JDK5 annotations -->
         <dependency>
             <groupId>org.codehaus.xfire</groupId>
             <artifactId>xfire-java5</artifactId>
-            <version>1.2.6</version>
         </dependency>
         <!-- the following dependency will be needed for xmlbeans testing
         <dependency>
             <groupId>org.codehaus.xfire</groupId>
             <artifactId>xfire-xmlbeans</artifactId>
-            <version>1.2.6</version>
         </dependency>
         -->
         <!-- the following dependency will be needed for jaxb2 model annotations
         <dependency>
             <groupId>org.codehaus.xfire</groupId>
             <artifactId>xfire-jaxb2</artifactId>
-            <version>1.2.6</version>
         </dependency>
         -->
         <!-- need to explicitly mark javax.mail as provided -->
@@ -226,13 +191,7 @@
             <artifactId>jdom</artifactId>
             <version>1.0</version>
         </dependency>
-<!-- testing
-        <dependency>
-            <groupId>wsdl4j</groupId>
-            <artifactId>wsdl4j</artifactId>
-            <version>1.6.1</version>
-        </dependency>
--->
+
         <!-- re-add woodstox with newer groupId & version -->
         <dependency>
             <groupId>org.codehaus.woodstox</groupId>
