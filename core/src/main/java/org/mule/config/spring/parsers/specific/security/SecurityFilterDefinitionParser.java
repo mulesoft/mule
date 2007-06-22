@@ -17,7 +17,7 @@ public class SecurityFilterDefinitionParser extends ParentDefinitionParser
 
     public SecurityFilterDefinitionParser()
     {
-        withIgnored("xsi:type");
+        addIgnored("xsi:type");
     }
 
 }

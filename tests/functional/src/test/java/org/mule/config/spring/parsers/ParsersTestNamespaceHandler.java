@@ -27,12 +27,12 @@ public class ParsersTestNamespaceHandler extends NamespaceHandlerSupport
 {
     public void init()
     {
-        registerBeanDefinitionParser("orphan", new OrphanDefinitionParser(OrphanBean.class, true).withAlias("bar", "foo").withIgnored("ignored"));
-        registerBeanDefinitionParser("child", new ChildDefinitionParser("child", ChildBean.class).withAlias("bar", "foo").withIgnored("ignored"));
-        registerBeanDefinitionParser("kid", new ChildDefinitionParser("kids", ChildBean.class).withAlias("bar", "foo").withIgnored("ignored").withCollection("parsers-test:kid"));
-        registerBeanDefinitionParser("parent", new ParentDefinitionParser().withAlias("bar", "foo").withIgnored("ignored"));
-        registerBeanDefinitionParser("orphan1", new NamedDefinitionParser("orphan1").withAlias("bar", "foo").withIgnored("ignored"));
-        registerBeanDefinitionParser("orphan2", new NamedDefinitionParser("orphan2").withAlias("bar", "foo").withIgnored("ignored"));
+        registerBeanDefinitionParser("orphan", new OrphanDefinitionParser(OrphanBean.class, true).addAlias("bar", "foo").addIgnored("ignored").addCollection("offspring"));
+        registerBeanDefinitionParser("child", new ChildDefinitionParser("child", ChildBean.class).addAlias("bar", "foo").addIgnored("ignored").addCollection("offspring"));
+        registerBeanDefinitionParser("kid", new ChildDefinitionParser("kid", ChildBean.class).addAlias("bar", "foo").addIgnored("ignored"));
+        registerBeanDefinitionParser("parent", new ParentDefinitionParser().addAlias("bar", "foo").addIgnored("ignored").addCollection("offspring"));
+        registerBeanDefinitionParser("orphan1", new NamedDefinitionParser("orphan1").addAlias("bar", "foo").addIgnored("ignored").addCollection("offspring"));
+        registerBeanDefinitionParser("orphan2", new NamedDefinitionParser("orphan2").addAlias("bar", "foo").addIgnored("ignored"));
         registerBeanDefinitionParser("map-entry", new ChildMapEntryDefinitionParser("map", "key", "value"));
         registerBeanDefinitionParser("list-entry", new ChildListEntryDefinitionParser("list"));
     }

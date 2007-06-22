@@ -32,7 +32,7 @@ public class ReferenceCollectionAutoTestCase extends AbstractNamespaceTestCase
 
     public void testNamed()
     {
-        testChildRef(1, 3);
+        testChildRef(1, 2);
     }
 
     public void testOrphan()

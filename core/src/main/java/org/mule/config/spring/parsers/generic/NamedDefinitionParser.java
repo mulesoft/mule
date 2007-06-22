@@ -10,7 +10,6 @@
 
 package org.mule.config.spring.parsers.generic;
 
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.w3c.dom.Element;
 
 /**
@@ -37,9 +36,9 @@ public class NamedDefinitionParser extends ParentDefinitionParser
         this.name = name;
     }
 
-    protected BeanDefinition getParentBeanDefinition(Element element)
+    protected String getParentBeanName(Element element)
     {
-        return parserContext.getRegistry().getBeanDefinition(name);
+        return name;
     }
 
 }

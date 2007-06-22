@@ -29,7 +29,7 @@ public class TransactionConfigDefinitionParser extends ChildDefinitionParser
     public TransactionConfigDefinitionParser()
     {
         super("transactionConfig", MuleTransactionConfig.class);
-        registerValueMapping("action", "NONE=0,ALWAYS_BEGIN=1,BEGIN_OR_JOIN=2,JOIN_IF_POSSIBLE=3");
+        addMapping("action", "NONE=0,ALWAYS_BEGIN=1,BEGIN_OR_JOIN=2,JOIN_IF_POSSIBLE=3");
     }
 
 

@@ -14,13 +14,14 @@ public class CustomEncryptionStrategyDefinitionParser extends CustomSecurityDefi
 {
 
     public static final String STRATEGY = "strategy";
+    public static final String STRATEGY_REF = "strategy-ref";
     public static final String STRATEGIES = "encryptionStrategies";
 
     public CustomEncryptionStrategyDefinitionParser()
     {
         super(STRATEGIES);
-        withAlias(STRATEGY, STRATEGIES);
-        withCollection(STRATEGIES);
+        addAlias(STRATEGY, STRATEGIES);
+        addCollection(STRATEGIES);
     }
 
 }

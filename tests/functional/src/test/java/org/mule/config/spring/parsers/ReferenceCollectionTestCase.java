@@ -23,26 +23,26 @@ public class ReferenceCollectionTestCase extends AbstractNamespaceTestCase
         return "org/mule/config/spring/parsers/reference-collection-test.xml";
     }
 
-    protected void testChildRef(int index, int size)
+    protected void testOffspringRef(int index, int size)
     {
         OrphanBean orphan = (OrphanBean) assertBeanExists("orphan" + index, OrphanBean.class);
-        Collection kids = (Collection) assertContentExists(orphan.getKids(), Collection.class);
-        assertEquals(size, kids.size());
+        Collection offspring = (Collection) assertContentExists(orphan.getOffspring(), Collection.class);
+        assertEquals(size, offspring.size());
     }
 
     public void testNamed()
     {
-        testChildRef(1, 3);
+        testOffspringRef(1, 2);
     }
 
     public void testOrphan()
     {
-        testChildRef(2, 1);
+        testOffspringRef(2, 1);
     }
 
     public void testParent()
     {
-        testChildRef(3, 3);
+        testOffspringRef(3, 3);
     }
 
 }

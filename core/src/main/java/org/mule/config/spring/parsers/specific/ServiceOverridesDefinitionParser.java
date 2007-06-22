@@ -16,7 +16,6 @@ import org.mule.util.StringUtils;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
@@ -54,7 +53,7 @@ public class ServiceOverridesDefinitionParser extends AbstractChildDefinitionPar
         addOverride(overrides, element, "serviceFinder", MuleProperties.SERVICE_FINDER);
         builder.setSource(overrides);
 
-        addParentPropertyValue(element, new PropertyValue(getPropertyName(element), overrides));
+        getBeanAssembly(element, builder).extendTarget(getPropertyName(element), overrides, false);
     }
 
     protected void addOverride(Map overrides, Element e, String attributeName, String overrideName)

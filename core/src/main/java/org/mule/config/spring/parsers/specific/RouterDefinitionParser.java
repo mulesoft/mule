@@ -11,8 +11,6 @@ package org.mule.config.spring.parsers.specific;
 
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 
-import org.w3c.dom.Element;
-
 /**
  * Generic router definition parser for parsing all Router elements.
  */
@@ -22,13 +20,8 @@ public class RouterDefinitionParser extends ChildDefinitionParser
     public RouterDefinitionParser(String setterMethod, Class clazz)
     {
         super(setterMethod, clazz);
-        registerValueMapping("enableCorrelation", "IF_NOT_SET=0,ALWAYS=1,NEVER=2");
-        withAlias("transformers", "transformer");
+        addMapping("enableCorrelation", "IF_NOT_SET=0,ALWAYS=1,NEVER=2");
+        addAlias("transformers", "transformer");
     }
 
-
-    public boolean isCollection(Element element)
-    {
-        return true;
-    }
 }

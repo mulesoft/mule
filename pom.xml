@@ -233,10 +233,6 @@
                         <artifactId>spring-aop</artifactId>
                     </exclusion>
                     <exclusion>
-                        <groupId>aopalliance</groupId>
-                        <artifactId>aopalliance</artifactId>
-                    </exclusion>
-                    <exclusion>
                         <groupId>org.springframework</groupId>
                         <artifactId>spring-web</artifactId>
                     </exclusion>

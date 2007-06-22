@@ -9,6 +9,10 @@
  */
 package org.mule.config.spring.parsers;
 
+import org.mule.config.spring.parsers.assembly.DefaultBeanAssemblerFactory;
+import org.mule.config.spring.parsers.assembly.PropertyConfiguration;
+import org.mule.config.spring.parsers.assembly.BeanAssembler;
+import org.mule.config.spring.parsers.assembly.BeanAssemblerFactory;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.util.ClassUtils;
@@ -63,6 +67,8 @@ import org.w3c.dom.NamedNodeMap;
  *
  * 5. The 'singleton' property provides a fixed way to make sure the bean is always a singleton or not.
  *
+ * 6. Collections will be automatically created and extended if the setter matches "property+s". 
+ *
  * @see  AbstractBeanDefinitionParser
  */
 public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefinitionParser
@@ -77,7 +83,8 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    protected PropertyToolkit propertyToolkit = new PropertyToolkit();
+    protected BeanAssemblerFactory beanAssemblerFactory = new DefaultBeanAssemblerFactory();
+    protected PropertyConfiguration propertyConfiguration = new PropertyConfiguration();
     protected Properties attributeMappings;
     protected Map valueMappings;
     protected List beanReferences;
@@ -87,20 +94,25 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
     /** Allow the bean class to be set explicitly via the "class" attribute. */
     protected boolean allowClassAttribute = true;
 
-
-    public void registerBeanReference(String propertyName)
+    public AbstractMuleBeanDefinitionParser()
     {
-        propertyToolkit.registerBeanReference(propertyName);
+        addIgnored(ATTRIBUTE_ID);
+        addIgnored(ATTRIBUTE_IDREF);
     }
 
-    public void registerValueMapping(String propertyName, Map mappings)
+    public void addReference(String propertyName)
     {
-        propertyToolkit.registerValueMapping(propertyName, mappings);
+        propertyConfiguration.addReference(propertyName);
     }
 
-    public void registerValueMapping(String propertyName, String mappings)
+    public void addMapping(String propertyName, Map mappings)
     {
-        propertyToolkit.registerValueMapping(propertyName, mappings);
+        propertyConfiguration.addMapping(propertyName, mappings);
+    }
+
+    public void addMapping(String propertyName, String mappings)
+    {
+        propertyConfiguration.addMapping(propertyName, mappings);
     }
 
     /**
@@ -108,9 +120,9 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
      * @param propertyName The bean property name
      * @return This instance, allowing chaining during use, avoiding subclasses
      */
-    public AbstractMuleBeanDefinitionParser withAlias(String alias, String propertyName)
+    public AbstractMuleBeanDefinitionParser addAlias(String alias, String propertyName)
     {
-        propertyToolkit.registerAttributeMapping(alias, propertyName);
+        propertyConfiguration.addAlias(alias, propertyName);
         return this;
     }
 
@@ -118,9 +130,9 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
      * @param propertyName Property that is a collection
      * @return This instance, allowing chaining during use, avoiding subclasses
      */
-    public AbstractMuleBeanDefinitionParser withCollection(String propertyName)
+    public AbstractMuleBeanDefinitionParser addCollection(String propertyName)
     {
-        propertyToolkit.registerCollection(propertyName);
+        propertyConfiguration.addCollection(propertyName);
         return this;
     }
 
@@ -128,36 +140,15 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
      * @param propertyName Property that is to be ignored
      * @return This instance, allowing chaining during use, avoiding subclasses
      */
-    public AbstractMuleBeanDefinitionParser withIgnored(String propertyName)
+    public AbstractMuleBeanDefinitionParser addIgnored(String propertyName)
     {
-        propertyToolkit.registerIgnored(propertyName);
+        propertyConfiguration.addIgnored(propertyName);
         return this;
     }
 
     protected void processProperty(Attr attribute, BeanDefinitionBuilder builder)
     {
-        boolean isBeanReference = propertyToolkit.isBeanReference(attribute.getNodeName());
-        String propertyName = propertyToolkit.extractPropertyName(attribute.getNodeName());
-        String propertyValue = propertyToolkit.extractPropertyValue(propertyName, attribute.getValue());
-        Assert.state(StringUtils.hasText(propertyName),
-                "Illegal property name returned from 'extractPropertyName(String)': cannot be null or empty.");
-        addProperty(builder, propertyName, propertyValue, isBeanReference);
-    }
-
-    protected void addProperty(BeanDefinitionBuilder builder, String name, String value, boolean reference)
-    {
-        if (!propertyToolkit.isIgnored(name))
-        {
-            // The property may be a reference to another bean.
-            if (reference)
-            {
-                builder.addPropertyReference(name, value);
-            }
-            else
-            {
-                builder.addPropertyValue(name, value);
-            }
-        }
+        getOrphanBeanAssembly(builder).extendBean(attribute);
     }
 
     /**
@@ -234,6 +225,7 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
             // Inner bean definition must receive same singleton status as containing bean.
             builder.setSingleton(parserContext.getContainingBeanDefinition().isSingleton());
         }
+
         doParse(element, parserContext, builder);
         return builder.getBeanDefinition();
     }
@@ -298,23 +290,10 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
         for (int x = 0; x < attributes.getLength(); x++)
         {
             Attr attribute = (Attr) attributes.item(x);
-            String name = attribute.getLocalName();
-            //If we set an attribute manually, we pick up the name using getName()
-            if (name == null)
-            {
-                name = attribute.getNodeName();
-            }
-
-            if (ATTRIBUTE_ID.equals(name) || ATTRIBUTE_IDREF.equals(name))
-            {
-                continue;
-            }
-
             processProperty(attribute, builder);
         }
         postProcess(builder, element);
     }
-
 
     //@Override
     protected String resolveId(Element element, AbstractBeanDefinition definition, ParserContext parserContext) throws BeanDefinitionStoreException
@@ -330,6 +309,19 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
     protected boolean isSingleton()
     {
         return singleton;
+    }
+
+    /**
+     * Restricted use - does not include a target.
+     * If possible, use {@link org.mule.config.spring.parsers.AbstractHierarchicalDefinitionParser#getBeanAssembly(org.w3c.dom.Element, org.springframework.beans.factory.support.BeanDefinitionBuilder)}
+     *
+     * @param bean The bean being constructed
+     * @return An assembler that automates Mule-specific logic for bean construction
+     */
+    protected BeanAssembler getOrphanBeanAssembly(BeanDefinitionBuilder bean)
+    {
+        return beanAssemblerFactory.newBeanAssembler(
+                propertyConfiguration, bean, propertyConfiguration, null);
     }
 
 }

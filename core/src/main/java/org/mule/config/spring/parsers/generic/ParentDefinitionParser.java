@@ -10,15 +10,10 @@
 package org.mule.config.spring.parsers.generic;
 
 import org.mule.config.spring.parsers.AbstractHierarchicalDefinitionParser;
+import org.mule.config.spring.parsers.assembly.BeanAssembler;
 
-import java.util.Collection;
-
-import org.springframework.beans.MutablePropertyValues;
-import org.springframework.beans.PropertyValue;
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.Assert;
 import org.w3c.dom.Element;
@@ -35,15 +30,22 @@ public class ParentDefinitionParser extends AbstractHierarchicalDefinitionParser
     
     protected Class getBeanClass(Element element)
     {
-        //this has no impact since we just use the bean definition to hold property configurations
-        return Object.class;
+        try
+        {
+            return Class.forName(getParentBeanDefinition(element).getBeanClassName());
+        }
+        catch (Exception e)
+        {
+            // Should continue to work, but automatic collection detection etc will fail
+            logger.debug("No class for " + element);
+            return Object.class;
+        }
     }
 
     protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext)
     {
         setRegistry(parserContext.getRegistry());
 
-        parserContext.getContainingBeanDefinition();
         this.parserContext = parserContext;
         Class beanClass = getBeanClass(element);
         Assert.state(beanClass != null, "Class returned from getBeanClass(Element) must not be null, element is: " + element.getNodeName());
@@ -55,37 +57,10 @@ public class ParentDefinitionParser extends AbstractHierarchicalDefinitionParser
             builder.setSingleton(parserContext.getContainingBeanDefinition().isSingleton());
         }
         doParse(element, parserContext, builder);
-
-        BeanDefinition bd = getParentBeanDefinition(element);
-        MutablePropertyValues parentProperties = bd.getPropertyValues();
-        for (int i=0;i < builder.getBeanDefinition().getPropertyValues().getPropertyValues().length; i++)
-        {
-            PropertyValue newPropertyValue = builder.getBeanDefinition().getPropertyValues().getPropertyValues()[i];
-            String name = newPropertyValue.getName();
-            Object value = newPropertyValue.getValue();
-            if (!propertyToolkit.isIgnored(name))
-            {
-                if (propertyToolkit.isCollection(name))
-                {
-                    Collection values = new ManagedList();
-                    if (parentProperties.contains(name))
-                    {
-                        values = (Collection) parentProperties.getPropertyValue(name).getValue();
-                        parentProperties.removePropertyValue(name);
-                    }
-                    values.add(value);
-                    parentProperties.addPropertyValue(name, values);
-                }
-                else
-                {
-                    parentProperties.addPropertyValue(name, value);
-                }
-            }
-        }
-        
-//        AbstractBeanDefinition bd = (AbstractBeanDefinition)parserContext.getContainingBeanDefinition();
-        bd.setAttribute(COMPOUND_ELEMENT, Boolean.TRUE);
-        return (AbstractBeanDefinition) bd;
+        BeanAssembler beanAssembler = getBeanAssembly(element, builder);
+        beanAssembler.copyBeanToTarget();
+        beanAssembler.getTarget().setAttribute(COMPOUND_ELEMENT, Boolean.TRUE);
+        return (AbstractBeanDefinition) beanAssembler.getTarget();
     }
 
 }

@@ -23,9 +23,9 @@ public class SecurityManagerDefinitionParser extends NamedDefinitionParser
     public SecurityManagerDefinitionParser()
     {
         super(MuleProperties.OBJECT_SECURITY_MANAGER);
-        withIgnored("id");
-        withIgnored("name");
-        withIgnored("xsi:type");
+        addIgnored("id");
+        addIgnored("name");
+        addIgnored("type");
     }
 
     protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext)

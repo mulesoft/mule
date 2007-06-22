@@ -55,12 +55,6 @@ public class ChildMapEntryDefinitionParser extends AbstractChildDefinitionParser
         return ChildMapEntryDefinitionParser.KeyValuePair.class;
     }
 
-
-    public final boolean isCollection(Element element)
-    {
-        return true;
-    }
-
     protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
         String key = element.getAttribute(keyName);

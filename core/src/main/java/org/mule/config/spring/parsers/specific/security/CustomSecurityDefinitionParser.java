@@ -10,6 +10,10 @@
 
 package org.mule.config.spring.parsers.specific.security;
 
+import org.mule.config.spring.parsers.assembly.DefaultBeanAssembler;
+import org.mule.config.spring.parsers.assembly.PropertyConfiguration;
+import org.mule.config.spring.parsers.assembly.BeanAssembler;
+import org.mule.config.spring.parsers.assembly.BeanAssemblerFactory;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
 
 import org.springframework.beans.MutablePropertyValues;
@@ -19,7 +23,7 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-public class CustomSecurityDefinitionParser extends ParentDefinitionParser
+public class  CustomSecurityDefinitionParser extends ParentDefinitionParser
 {
 
     public static final String NAME = "name";
@@ -32,6 +36,7 @@ public class CustomSecurityDefinitionParser extends ParentDefinitionParser
     public CustomSecurityDefinitionParser(String componentAttributeName)
     {
         this.componentAttributeName = componentAttributeName;
+        this.beanAssemblerFactory = new LocalBeanAssemblerFactory();
     }
 
     // this is a bit of a hack - we transfer the name to the provider
@@ -45,30 +50,6 @@ public class CustomSecurityDefinitionParser extends ParentDefinitionParser
         return super.parseInternal(element, parserContext);
     }
 
-    // we don't know which will be set first and want to avoid setting name on the
-    // manager itself...
-    protected void addProperty(BeanDefinitionBuilder builder, String name, String value, boolean reference)
-    {
-        if (NAME.equals(name))
-        {
-            this.name = value;
-            if (null != componentAttributeValue)
-            {
-                setName();
-            }
-        }
-        else {
-            super.addProperty(builder, name, value, reference);
-            if (componentAttributeName.equals(name))
-            {
-                componentAttributeValue = value;
-                if (null != this.name)
-                {
-                    setName();
-                }
-            }
-        }
-    }
 
     //  only set name if not already given
     private void setName()
@@ -79,6 +60,51 @@ public class CustomSecurityDefinitionParser extends ParentDefinitionParser
         {
             propertyValues.addPropertyValue(NAME, name);
         }
+    }
+
+    private class LocalBeanAssembler extends DefaultBeanAssembler
+    {
+
+        public LocalBeanAssembler(PropertyConfiguration beanConfig, BeanDefinitionBuilder bean,
+                                      PropertyConfiguration targetConfig, BeanDefinition target)
+        {
+            super(beanConfig, bean, targetConfig, target);
+        }
+
+        public void extendBean(String newName, Object newValue, boolean isReference)
+        {
+            if (NAME.equals(newName) && newValue instanceof String)
+            {
+                name = (String) newValue;
+                if (null != componentAttributeValue)
+                {
+                    setName();
+                }
+            }
+            else {
+                super.extendBean(newName, newValue, isReference);
+                if (componentAttributeName.equals(newName) && newValue instanceof String)
+                {
+                    componentAttributeValue = (String) newValue;
+                    if (null != name)
+                    {
+                        setName();
+                    }
+                }
+            }
+        }
+
+    }
+
+    private class LocalBeanAssemblerFactory implements BeanAssemblerFactory
+    {
+
+        public BeanAssembler newBeanAssembler(PropertyConfiguration beanConfig, BeanDefinitionBuilder bean,
+                                                      PropertyConfiguration targetConfig, BeanDefinition target)
+        {
+            return new LocalBeanAssembler(beanConfig, bean, targetConfig, target);
+        }
+
     }
 
 }

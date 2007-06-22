@@ -22,15 +22,15 @@
 
     <parsers-test:orphan name="orphan1"/>
 
-    <parsers-test:orphan1 name="orphan1" id="foo" kids-ref="child1"/>
-    <parsers-test:orphan1 name="orphan1" id="foo" kids-ref="child2"/>
+    <parsers-test:orphan1 name="orphan1" id="foo" offspring-ref="child1"/>
+    <parsers-test:orphan1 name="orphan1" id="foo" offspring-ref="child2"/>
 
-    <parsers-test:orphan name="orphan2" kids-ref="child2"/>
+    <parsers-test:orphan name="orphan2" offspring-ref="child2"/>
 
     <parsers-test:orphan name="orphan3">
-        <parsers-test:parent name="orphan3" kids-ref="child1"/>
-        <parsers-test:parent name="orphan3" kids-ref="child2"/>
-        <parsers-test:parent name="orphan3" kids-ref="child3"/>
+        <parsers-test:parent name="orphan3" offspring-ref="child1"/>
+        <parsers-test:parent name="orphan3" offspring-ref="child2"/>
+        <parsers-test:parent name="orphan3" offspring-ref="child3"/>
     </parsers-test:orphan>
 
 </beans>

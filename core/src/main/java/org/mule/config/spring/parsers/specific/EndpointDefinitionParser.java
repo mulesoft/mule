@@ -30,10 +30,10 @@ public class EndpointDefinitionParser extends AbstractChildDefinitionParser
 
     public EndpointDefinitionParser()
     {
-        withAlias("address", "endpointURI");
-        withAlias("transformers", "transformer");
-        withAlias("responseTransformers", "responseTransformer");
-        registerValueMapping("createConnector", "GET_OR_CREATE=0,ALWAYS_CREATE=1,NEVER_CREATE=2");
+        addAlias("address", "endpointURI");
+        addAlias("transformers", "transformer");
+        addAlias("responseTransformers", "responseTransformer");
+        addMapping("createConnector", "GET_OR_CREATE=0,ALWAYS_CREATE=1,NEVER_CREATE=2");
     }
 
     /**
@@ -51,37 +51,6 @@ public class EndpointDefinitionParser extends AbstractChildDefinitionParser
             return null;
         }
         return "endpoint";
-    }
-
-
-    /**
-     * If the endpoint element is nested inside a parent element such as a router
-     * it is considered to be (potentially) a collection of endpoints and Mule will do
-     * some additional wiring behind the scenes.
-     * @param element the  current endpoint element
-     * @return
-     */
-    public boolean isCollection(Element element)
-    {
-        //Some types take a single endpoint, other take a collection
-        Element parent = (Element) element.getParentNode();
-        if (parent.getNodeName().equals("beans"))
-        {
-            return false;
-        }
-        else if ("forwarding-catch-all-strategy".equals(parent.getLocalName()))
-        {
-            return false;
-        }
-        else if ("wire-tap".equals(parent.getLocalName()))
-        {
-            return false;
-        }
-        else if ("binding".equals(parent.getLocalName()))
-        {
-            return false;
-        }
-        return true;
     }
 
     //@Override

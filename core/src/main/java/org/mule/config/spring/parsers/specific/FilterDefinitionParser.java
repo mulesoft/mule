@@ -99,29 +99,4 @@ public class FilterDefinitionParser extends AbstractChildDefinitionParser
         return "filter";
     }
 
-
-    public boolean isCollection(Element element)
-    {
-        String parent = element.getParentNode().getLocalName();
-        if(parent==null) return false;
-
-        if (parent.equals("and-filter"))
-        {
-            return true;
-        }
-        else if (parent.equals("or-filter"))
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    //@java.lang.Override
-    protected boolean isMap(Element element)
-    {
-        return false;
-    }
 }

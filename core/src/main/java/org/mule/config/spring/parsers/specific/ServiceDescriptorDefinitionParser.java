@@ -56,40 +56,4 @@ public class ServiceDescriptorDefinitionParser extends AbstractMuleBeanDefinitio
         super.doParse(element, parserContext, builder);
     }
 
-//    static class UMODescriptorFactoryBean extends MuleDescriptor implements FactoryBean, InitializingBean
-//    {
-//
-//        private UMODescriptor descriptor;
-//
-//        public Object getObject() throws Exception
-//        {
-//            descriptor = new MuleDescriptor(this);
-//            return descriptor;
-//        }
-//
-//        public Class getObjectType()
-//        {
-//            return MuleDescriptor.class;
-//        }
-//
-//        public boolean isSingleton()
-//        {
-//            return false;
-//        }
-//
-//        public void afterPropertiesSet() throws Exception
-//        {
-//            if (getModelName() == null)
-//            {
-//                throw new NullPointerException("Descriptor.modelName cannot be null");
-//            }
-//            UMOModel model = RegistryContext.getRegistry().lookupModel(getModelName());
-//            if(model==null)
-//            {
-//                throw new IllegalArgumentException("Model not forund with name: " + getModelName());
-//            }
-//            model.registerComponent(descriptor);
-//        }
-//
-//    }
 }

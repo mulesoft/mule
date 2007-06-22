@@ -31,7 +31,7 @@ public class ConfigurationDefinitionParser extends AbstractMuleBeanDefinitionPar
 
     public ConfigurationDefinitionParser()
     {
-        withAlias(ATTRIBUTE_SERVER_ID, ATTRIBUTE_ID);
+        addAlias(ATTRIBUTE_SERVER_ID, ATTRIBUTE_ID);
         singleton=true;
     }
 

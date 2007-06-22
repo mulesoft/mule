@@ -10,10 +10,11 @@
 package org.mule.config.spring.parsers;
 
 import org.mule.util.StringUtils;
+import org.mule.config.spring.parsers.assembly.BeanAssembler;
 
-import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.w3c.dom.Element;
 
 /**
@@ -79,9 +80,18 @@ public abstract class AbstractHierarchicalDefinitionParser extends AbstractMuleB
         return getRegistry().getBeanDefinition(parentBean);
     }
 
-    protected void addParentPropertyValue(Element element, PropertyValue pv)
+    /**
+     * The bean assembler gives more reliable/automatic processing of collections, maps, etc.
+     *
+     * @param element The current element
+     * @param bean The bean being constructed
+     * @return An assembler that includes Mule-specific construction logic
+     */
+    protected BeanAssembler getBeanAssembly(Element element, BeanDefinitionBuilder bean)
     {
-        getParentBeanDefinition(element).getPropertyValues().addPropertyValue(pv);
+        BeanDefinition target = getParentBeanDefinition(element);
+        return beanAssemblerFactory.newBeanAssembler(
+                propertyConfiguration, bean, propertyConfiguration, target);
     }
 
 }

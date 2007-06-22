@@ -18,8 +18,8 @@ public class XfireElementDefinitionParser extends OrphanDefinitionParser
     public XfireElementDefinitionParser()
     {
         super(XFireConnector.class, true);
-        this.withAlias("bindingProviderClass", "bindingProvider");
-        this.withAlias("clientTransportClass", "clientTransport");
-        this.withAlias("typeMappingRegistryClass", "typeMappingRegistry");
+        this.addAlias("bindingProviderClass", "bindingProvider");
+        this.addAlias("clientTransportClass", "clientTransport");
+        this.addAlias("typeMappingRegistryClass", "typeMappingRegistry");
     }
 }

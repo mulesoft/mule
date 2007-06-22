@@ -8,7 +8,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config.spring.parsers;
+package org.mule.config.spring.parsers.assembly;
+
+import org.mule.util.ClassUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,63 +19,67 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.lang.reflect.Method;
 
 import org.springframework.core.Conventions;
 import org.springframework.util.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * This collects together various constraints/rewrites that can be applied to attributes.  It
  * was extracted from AbstractMuleBeanDefinitionParser and should be used as a delegate
  * (see that class for an example).
  */
-public class PropertyToolkit
+public class PropertyConfiguration
 {
 
     public static final String ATTRIBUTE_REF_SUFFIX = "-ref";
-    protected List beanReferences = new ArrayList();
-    protected Properties attributeMappings = new Properties();
-    protected Map valueMappings = new HashMap();
-    protected Set collections = new HashSet();
-    protected Set ignored = new HashSet();
+    private List references = new ArrayList();
+    private Properties nameMappings = new Properties();
+    private Map valueMappings = new HashMap();
+    private Set collections = new HashSet();
+    private Set ignored = new HashSet();
+    private Log logger = LogFactory.getLog(getClass());
 
-    public void registerBeanReference(String propertyName)
+    public void addReference(String propertyName)
     {
-        beanReferences.add(propertyName);
+        references.add(propertyName);
     }
 
-    public void registerValueMapping(ValueMap mapping)
+    public void addMapping(ValueMap mapping)
     {
         valueMappings.put(mapping.getPropertyName(), mapping);
     }
 
-    public void registerValueMapping(String propertyName, Map mappings)
+    public void addMapping(String propertyName, Map mappings)
     {
         valueMappings.put(propertyName, new ValueMap(propertyName, mappings));
     }
 
-    public void registerValueMapping(String propertyName, String mappings)
+    public void addMapping(String propertyName, String mappings)
     {
         valueMappings.put(propertyName, new ValueMap(propertyName, mappings));
     }
 
-    public void registerAttributeMapping(String alias, String propertyName)
+    public void addAlias(String alias, String propertyName)
     {
-        attributeMappings.put(alias, propertyName);
+        nameMappings.put(alias, propertyName);
     }
 
-    public void registerCollection(String propertyName)
+    public void addCollection(String propertyName)
     {
         collections.add(propertyName);
     }
 
-    public void registerIgnored(String propertyName)
+    public void addIgnored(String propertyName)
     {
         ignored.add(propertyName);
     }
 
     public String getAttributeMapping(String alias)
     {
-        return attributeMappings.getProperty(alias, alias);
+        return nameMappings.getProperty(alias, alias);
     }
 
     public boolean isCollection(String propertyName)
@@ -86,13 +92,56 @@ public class PropertyToolkit
         return ignored.contains(propertyName);
     }
 
+    protected String bestGuessName(String oldName, String className)
+    {
+        String newName = translateName(oldName);
+        if (! methodExists(className, newName))
+        {
+            String plural = newName + "s";
+            if (methodExists(className, plural))
+            {
+                // this lets us avoid setting addCollection in the majority of cases
+                addCollection(plural);
+                return plural;
+            }
+        }
+        return newName;
+    }
+
+    protected boolean methodExists(String className, String newName)
+    {
+        try
+        {
+            // is there a better way than this?!
+            // BeanWrapperImpl instantiates an instance, which we don't want.
+            // if there really is no better way, i guess it should go in
+            // class or bean utils.
+            Class clazz = ClassUtils.getClass(className);
+            Method[] methods = clazz.getMethods();
+            String setter = "set" + newName;
+            for (int i = 0; i < methods.length; ++i)
+            {
+                if (methods[i].getName().equalsIgnoreCase(setter))
+                {
+                    return true;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            logger.debug("Could not access bean class " + className, e);
+        }
+        return false;
+    }
+
     /**
      * A property can be explicitly registered as a bean reference via registerBeanReference()
      * or it can simply use the "-ref" suffix.
+     * @param attributeName true if the name appears to correspond to a reference
      */
     public boolean isBeanReference(String attributeName)
     {
-        return (beanReferences.contains(attributeName) || attributeName.endsWith(ATTRIBUTE_REF_SUFFIX));
+        return (references.contains(attributeName) || attributeName.endsWith(ATTRIBUTE_REF_SUFFIX));
     }
 
      /**
@@ -104,31 +153,35 @@ public class PropertyToolkit
      * '<code>setBingoHallFavourite(String)</code>', the name returned had
      * better be '<code>bingoHallFavourite</code>' (with that exact casing).
      *
-     * @param attributeName the attribute name taken straight from the XML element being parsed; will never be <code>null</code>
+     * @param oldName the attribute name taken straight from the XML element being parsed; will never be <code>null</code>
      * @return the extracted JavaBean property name; must never be <code>null</code>
      */
-    public String extractPropertyName(String attributeName)
+    public String translateName(String oldName)
     {
         // Remove the bean reference suffix if any.
-        attributeName = org.mule.util.StringUtils.chomp(attributeName, ATTRIBUTE_REF_SUFFIX);
+        String name = org.mule.util.StringUtils.chomp(oldName, ATTRIBUTE_REF_SUFFIX);
         // Map to the real property name if necessary.
-        attributeName = getAttributeMapping(attributeName);
+        name = getAttributeMapping(name);
         // JavaBeans property convention.
-        return Conventions.attributeNameToPropertyName(attributeName);
+        name = Conventions.attributeNameToPropertyName(name);
+        if (!StringUtils.hasText(name))
+        {
+            throw new IllegalStateException("Illegal property name for " + oldName + ": cannot be null or empty.");
+        }
+        return name;
     }
 
-    public String extractPropertyValue(String attributeName, String attributeValue)
+    public String translateValue(String name, String value)
     {
-        ValueMap vm = (ValueMap) valueMappings.get(attributeName);
+        ValueMap vm = (ValueMap) valueMappings.get(name);
         if(vm!=null)
         {
-            return vm.getValue(attributeValue).toString();
+            return vm.getValue(value).toString();
         }
         else {
-            return attributeValue;
+            return value;
         }
     }
-
 
     public static class ValueMap
     {

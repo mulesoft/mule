@@ -30,6 +30,6 @@ class QuartzConnectorDefinitionParser extends OrphanDefinitionParser
     public QuartzConnectorDefinitionParser()
     {
         super(QuartzConnector.class, true);
-        withAlias("scheduler", "quartzScheduler");
+        addAlias("scheduler", "quartzScheduler");
     }
 }

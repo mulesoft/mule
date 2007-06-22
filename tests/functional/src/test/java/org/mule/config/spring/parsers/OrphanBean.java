@@ -20,6 +20,8 @@ public class OrphanBean extends AbstractBean
 
     // test implicit naming of collection
     private Collection kids;
+    // test explicit naming of collection
+    private Collection offspring;
 
     // test simple setter/getter
     private ChildBean child;
@@ -44,4 +46,14 @@ public class OrphanBean extends AbstractBean
         this.kids = kids;
     }
 
+    public Collection getOffspring()
+    {
+        return offspring;
+    }
+
+    public void setOffspring(Collection offspring)
+    {
+        this.offspring = offspring;
+    }
+    
 }

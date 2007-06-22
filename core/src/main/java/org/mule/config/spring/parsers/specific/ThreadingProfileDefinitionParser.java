@@ -23,7 +23,7 @@ public class ThreadingProfileDefinitionParser extends AbstractChildDefinitionPar
 
     public ThreadingProfileDefinitionParser()
     {
-        withAlias("poolExhaustedAction", "poolExhaustedActionString");
+        addAlias("poolExhaustedAction", "poolExhaustedActionString");
     }
 
     protected Class getBeanClass(Element element)

@@ -15,19 +15,22 @@ import org.mule.util.StringUtils;
 import org.mule.util.object.SimpleObjectFactory;
 import org.mule.util.object.SingletonObjectFactory;
 
-import org.springframework.beans.PropertyValue;
-import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
 public class ComponentDefinitionParser extends ChildDefinitionParser
 {
+
+    public static final String FACTORY_REF = "factory-ref";
+
     public ComponentDefinitionParser(String setterMethod)
     {
         super(setterMethod, null);
         allowClassAttribute = false;
-        withAlias("class", "objectClassName");
+        addAlias("class", "objectClassName");
+        addAlias("factory", "serviceFactory");
     }
     
     protected Class getBeanClass(Element element)
@@ -57,16 +60,16 @@ public class ComponentDefinitionParser extends ChildDefinitionParser
 
     protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
-        String factory = element.getAttribute("factory-ref");
-        element.removeAttribute("factory-ref");
-        if (StringUtils.isNotBlank(factory))
+        Attr factory = element.getAttributeNode(FACTORY_REF);
+        if (null != factory)
         {
-            addParentPropertyValue(element, 
-                new PropertyValue(getPropertyName(element), new RuntimeBeanReference(factory)));
+            getBeanAssembly(element, builder).extendTarget(factory);
+            element.removeAttributeNode(factory);
         }
         else
         {
             super.parseChild(element, parserContext, builder);
         }
     }
+
 }

@@ -23,8 +23,8 @@ public class PoolingProfileDefinitionParser extends AbstractChildDefinitionParse
 
     public PoolingProfileDefinitionParser()
     {
-        withAlias("initialisationPolicy", "initialisationPolicyString");
-        withAlias("exhaustedAction", "exhaustedActionString");
+        addAlias("initialisationPolicy", "initialisationPolicyString");
+        addAlias("exhaustedAction", "exhaustedActionString");
     }
 
     protected Class getBeanClass(Element element)

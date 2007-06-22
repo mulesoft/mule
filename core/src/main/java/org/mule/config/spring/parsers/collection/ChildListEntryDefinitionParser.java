@@ -42,16 +42,6 @@ public class ChildListEntryDefinitionParser extends AbstractChildDefinitionParse
         return ListEntry.class;
     }
 
-    public boolean isCollection(Element element)
-    {
-        return true;
-    }
-
-    protected boolean isMap(Element element)
-    {
-        return false;
-    }
-    
     protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {   
         String beanType = element.getChildNodes().item(0).getNodeValue();

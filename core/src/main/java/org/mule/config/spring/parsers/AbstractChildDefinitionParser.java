@@ -9,20 +9,9 @@
  */
 package org.mule.config.spring.parsers;
 
-import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
-import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
-import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.beans.PropertyValue;
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.ManagedList;
-import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
@@ -75,55 +64,7 @@ public abstract class AbstractChildDefinitionParser extends AbstractHierarchical
             return;
         }
 
-        PropertyValue pv;
-        try
-        {
-            pv = getParentPropertyValue(element);
-        }
-        catch (Exception e)
-        {
-            // MULE-1737 - remove this once fixed.
-            //RM*: I think we should still leave this in here for the time being, JIC
-            logger.warn("Skipping process for " + element, e);
-            return;
-        }
-
-        if (isMap(element))
-        {
-            if (pv == null)
-            {
-                pv = newParentPropertyValue(element, new ManagedMap());
-            }
-            ChildMapEntryDefinitionParser.KeyValuePair pair =
-                    (ChildMapEntryDefinitionParser.KeyValuePair) builder.getBeanDefinition().getSource();
-            ((Map) pv.getValue()).put(pair.getKey(), pair.getValue());
-
-        }
-        else if (isCollection(element))
-        {
-            if (pv == null)
-            {
-                pv = newParentPropertyValue(element, new ManagedList());
-            }
-            
-            List list = (List) pv.getValue();
-            Object source = builder.getBeanDefinition().getSource();
-            if (source instanceof ChildListEntryDefinitionParser.ListEntry)
-            {
-                ChildListEntryDefinitionParser.ListEntry listEntry =
-                    (ChildListEntryDefinitionParser.ListEntry)source;
-                list.add(listEntry.getProxiedObject());
-            }
-            else
-            {
-                list.add(builder.getBeanDefinition());
-            }
-        }
-        else
-        {
-            pv = newParentPropertyValue(element, builder.getBeanDefinition());
-        }
-        addParentPropertyValue(element, pv);
+        getBeanAssembly(element, builder).insertBeanInTarget(getPropertyName(element));
     }
 
     protected String generateChildBeanName(Element e)
@@ -154,64 +95,6 @@ public abstract class AbstractChildDefinitionParser extends AbstractHierarchical
         }
     }
 
-    protected PropertyValue getParentPropertyValue(Element element)
-    {
-        return getParentBeanDefinition(element)
-                .getPropertyValues().getPropertyValue(getBestGuessName(element));
-    }
-
-    protected PropertyValue newParentPropertyValue(Element element, Object value)
-    {
-        return new PropertyValue(getBestGuessName(element), value);
-    }
-
-    protected String getBestGuessName(Element element)
-    {
-        String name = getPropertyName(element);
-        if (! isCollection(element))
-        {
-            return name;
-        }
-        else
-        {
-            BeanDefinition parent = getParentBeanDefinition(element);
-            try
-            {
-                // is there a better way than this?!
-                // BeanWrapperImpl instantiates an instance, which we don't want.
-                // if there really is no better way, i guess it should go in
-                // class or bean utils.
-                Class clazz = ClassUtils.getClass(parent.getBeanClassName());
-                Method[] methods = clazz.getMethods();
-                String setter = "set" + name;
-                for (int i = 0; i < methods.length; ++i)
-                {
-                    if (methods[i].getName().equalsIgnoreCase(setter))
-                    {
-                        return name;
-                    }
-                }
-                // otherwise, guess this
-                return name + "s";
-            }
-            catch (Exception e)
-            {
-                logger.debug("Could not access bean class " + parent.getBeanClassName(), e);
-                return name;
-            }
-        }
-    }
-
     public abstract String getPropertyName(Element element);
-
-    public boolean isCollection(Element element)
-    {
-        return propertyToolkit.isCollection(element.getNodeName());
-    }
-
-    protected boolean isMap(Element element)
-    {
-        return ChildMapEntryDefinitionParser.KeyValuePair.class.equals(getBeanClass(element));
-    }
 
 }
