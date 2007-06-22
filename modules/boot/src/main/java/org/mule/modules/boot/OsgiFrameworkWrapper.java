@@ -14,7 +14,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
-import org.knopflerfish.framework.Main;
+//import org.knopflerfish.framework.Main;
 import org.tanukisoftware.wrapper.WrapperListener;
 import org.tanukisoftware.wrapper.WrapperManager;
 
@@ -60,10 +60,12 @@ public class OsgiFrameworkWrapper implements WrapperListener
         }
 
         try {
+            /* Disable this for now so that we can build mule-module-boot without OSGi
             Main.main(args);
             if (startGui) {
                 Main.main(new String[]{"-istart", DESKTOP_BUNDLE});
             }
+            */
             return null;
         } catch (Exception e) {
             e.printStackTrace();
@@ -89,7 +91,9 @@ public class OsgiFrameworkWrapper implements WrapperListener
      */
     public int stop( int exitCode )
     {
+        /* Disable this for now so that we can build mule-module-boot without OSGi
         Main.shutdown(exitCode);
+        */
         return exitCode;
     }
 

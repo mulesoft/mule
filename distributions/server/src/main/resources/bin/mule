@@ -36,7 +36,7 @@ APP_NAME=${MULE_APP}
 APP_LONG_NAME=${MULE_APP_LONG}
 
 # Wrapper
-WRAPPER_CMD="../sbin/wrapper"
+WRAPPER_CMD="../lib/boot/exec/wrapper"
 WRAPPER_CONF="../conf/wrapper.conf"
 
 # Set the startup directory so that any relative paths can be resolved later.

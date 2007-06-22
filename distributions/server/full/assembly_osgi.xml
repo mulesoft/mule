@@ -163,7 +163,6 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.transports:mule-transport-gigaspaces</include>
         <include>org.mule.transports:mule-transport-glue</include>
         <include>org.mule.transports:mule-transport-http</include>
-        <include>org.mule.transports:mule-transport-jbi</include>
         <include>org.mule.transports:mule-transport-jdbc</include>
         <include>org.mule.transports:mule-transport-jms</include>
         <include>org.mule.transports:mule-transport-multicast</include>
@@ -173,7 +172,7 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.transports:mule-transport-soap</include>
         <include>org.mule.transports:mule-transport-space</include>
         <include>org.mule.transports:mule-transport-ssl</include>
-        <include>org.mule.transports:mule-transport-stream</include>
+        <include>org.mule.transports:mule-transport-stdio</include>
         <include>org.mule.transports:mule-transport-tcp</include>
         <include>org.mule.transports:mule-transport-udp</include>
         <include>org.mule.transports:mule-transport-vm</include>
@@ -183,14 +182,12 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.modules:mule-module-acegi</include>
         <include>org.mule.modules:mule-module-builders</include>
         <include>org.mule.modules:mule-module-client</include>
-        <include>org.mule.modules:mule-module-hivemind</include>
         <include>org.mule.modules:mule-module-jaas</include>
         <include>org.mule.modules:mule-module-jotm</include>
         <include>org.mule.modules:mule-module-management</include>
         <include>org.mule.modules:mule-module-osgi</include>
         <include>org.mule.modules:mule-module-ognl</include>
         <include>org.mule.modules:mule-module-pgp</include>
-        <include>org.mule.modules:mule-module-picocontainer</include>
         <include>org.mule.modules:mule-module-scripting</include>
         <include>org.mule.modules:mule-module-springcore</include>
         <include>org.mule.modules:mule-module-spring</include>

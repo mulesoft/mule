@@ -52,14 +52,6 @@
                     <artifactId>carol</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>org.mule.modules</groupId>
-                    <artifactId>mule-module-boot</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.mule.modules</groupId>
-                    <artifactId>mule-module-registry</artifactId>
-                </exclusion>
-                <exclusion>
                     <groupId>xalan</groupId>
                     <artifactId>xalan</artifactId>
                 </exclusion>

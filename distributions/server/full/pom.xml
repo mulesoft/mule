@@ -136,7 +136,34 @@
             </plugin>
         </plugins>
     </build>
-        
+
+    <dependencies>
+        <dependency>
+            <groupId>org.mule.examples</groupId>
+            <artifactId>mule-examples-all</artifactId>
+            <version>${version}</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-modules-all</artifactId>
+            <version>${version}</version>
+            <type>pom</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>xalan</groupId>
+                    <artifactId>xalan</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transports-all</artifactId>
+            <version>${version}</version>
+            <type>pom</type>
+        </dependency>
+    </dependencies>
+
     <profiles>
         <profile>
             <id>osgi</id>
@@ -276,47 +303,6 @@
                   <classifier>jdk14</classifier>
                 </dependency>
             </dependencies>
-        </profile>
-        
+        </profile>        
     </profiles>
-
-
-    <dependencies>
-        <dependency>
-            <groupId>org.mule.examples</groupId>
-            <artifactId>mule-examples-all</artifactId>
-            <version>${version}</version>
-            <type>pom</type>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-modules-all</artifactId>
-            <version>${version}</version>
-            <type>pom</type>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.mule.modules.jca</groupId>
-                    <artifactId>mule-module-jca-generic</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.mule.modules.jca</groupId>
-                    <artifactId>mule-module-jca-jboss</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.mule.modules</groupId>
-                    <artifactId>mule-module-registry</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>xalan</groupId>
-                    <artifactId>xalan</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transports-all</artifactId>
-            <version>${version}</version>
-            <type>pom</type>
-        </dependency>
-    </dependencies>
 </project>

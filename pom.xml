@@ -131,6 +131,10 @@
                 <version>${springVersion}</version>
                 <exclusions>
                     <exclusion>
+                        <groupId>aopalliance</groupId>
+                        <artifactId>aopalliance</artifactId>
+                    </exclusion>
+                    <exclusion>
                         <artifactId>commons-logging</artifactId>
                         <groupId>commons-logging</groupId>
                     </exclusion>
@@ -141,6 +145,10 @@
                 <artifactId>spring-context</artifactId>
                 <version>${springVersion}</version>
                 <exclusions>
+                    <exclusion>
+                        <groupId>aopalliance</groupId>
+                        <artifactId>aopalliance</artifactId>
+                    </exclusion>
                     <exclusion>
                         <artifactId>commons-logging</artifactId>
                         <groupId>commons-logging</groupId>
@@ -153,6 +161,10 @@
                 <version>${springVersion}</version>
                 <exclusions>
                     <exclusion>
+                        <groupId>aopalliance</groupId>
+                        <artifactId>aopalliance</artifactId>
+                    </exclusion>
+                    <exclusion>
                         <artifactId>commons-logging</artifactId>
                         <groupId>commons-logging</groupId>
                     </exclusion>
@@ -163,6 +175,10 @@
                 <artifactId>spring-jdbc</artifactId>
                 <version>${springVersion}</version>
                 <exclusions>
+                    <exclusion>
+                        <groupId>aopalliance</groupId>
+                        <artifactId>aopalliance</artifactId>
+                    </exclusion>
                     <exclusion>
                         <artifactId>commons-logging</artifactId>
                         <groupId>commons-logging</groupId>
@@ -175,6 +191,10 @@
                 <version>${springVersion}</version>
                 <exclusions>
                     <exclusion>
+                        <groupId>aopalliance</groupId>
+                        <artifactId>aopalliance</artifactId>
+                    </exclusion>
+                    <exclusion>
                         <artifactId>commons-logging</artifactId>
                         <groupId>commons-logging</groupId>
                     </exclusion>
@@ -182,9 +202,13 @@
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
-                <artifactId>spring-hibernate3</artifactId>
+                <artifactId>spring-dao</artifactId>
                 <version>${springVersion}</version>
                 <exclusions>
+                    <exclusion>
+                        <groupId>aopalliance</groupId>
+                        <artifactId>aopalliance</artifactId>
+                    </exclusion>
                     <exclusion>
                         <artifactId>commons-logging</artifactId>
                         <groupId>commons-logging</groupId>
@@ -196,6 +220,37 @@
                 <artifactId>spring-remoting</artifactId>
                 <version>${springVersion}</version>
                 <exclusions>
+                    <exclusion>
+                        <groupId>aopalliance</groupId>
+                        <artifactId>aopalliance</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>commons-logging</artifactId>
+                        <groupId>commons-logging</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.springframework</groupId>
+                        <artifactId>spring-aop</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>aopalliance</groupId>
+                        <artifactId>aopalliance</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.springframework</groupId>
+                        <artifactId>spring-web</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-hibernate3</artifactId>
+                <version>${springVersion}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>aopalliance</groupId>
+                        <artifactId>aopalliance</artifactId>
+                    </exclusion>
                     <exclusion>
                         <artifactId>commons-logging</artifactId>
                         <groupId>commons-logging</groupId>

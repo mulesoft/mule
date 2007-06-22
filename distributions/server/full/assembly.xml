@@ -12,6 +12,10 @@ Assembly descriptor for the full Mule distribution.
     <fileSet>
       <directory>../src/main/resources</directory>
       <outputDirectory></outputDirectory>
+      <excludes>
+          <!-- A separate assembly-osgi.xml is used for OSGi -->
+          <exclude>**/osgi/**</exclude>
+      </excludes>
     </fileSet>
 
     <!-- Make binary directories executable. -->
@@ -29,13 +33,13 @@ Assembly descriptor for the full Mule distribution.
       </includes>
     </fileSet>
     <fileSet>
-      <directory>../src/main/resources/sbin</directory>
-      <outputDirectory>sbin</outputDirectory>
+      <directory>../src/main/resources/lib/boot/exec</directory>
+      <outputDirectory>lib/boot/exec</outputDirectory>
       <fileMode>755</fileMode>
     </fileSet>
     <fileSet>
-      <directory>../src/main/resources/sbin</directory>
-      <outputDirectory>sbin</outputDirectory>
+      <directory>../src/main/resources/lib/boot/exec</directory>
+      <outputDirectory>lib/boot/exec</outputDirectory>
       <fileMode>644</fileMode>
       <includes>
           <include>*.txt</include>
@@ -349,7 +353,6 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.transports:mule-transport-file</include>
         <include>org.mule.transports:mule-transport-ftp</include>
         <include>org.mule.transports:mule-transport-http</include>
-        <include>org.mule.transports:mule-transport-jbi</include>
         <include>org.mule.transports:mule-transport-jbpm</include>
         <include>org.mule.transports:mule-transport-jdbc</include>
         <include>org.mule.transports:mule-transport-jms</include>
@@ -359,7 +362,7 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.transports:mule-transport-rmi</include>
         <include>org.mule.transports:mule-transport-soap</include>
         <include>org.mule.transports:mule-transport-ssl</include>
-        <include>org.mule.transports:mule-transport-stream</include>
+        <include>org.mule.transports:mule-transport-stdio</include>
         <include>org.mule.transports:mule-transport-tcp</include>
         <include>org.mule.transports:mule-transport-udp</include>
         <include>org.mule.transports:mule-transport-vm</include>
@@ -369,16 +372,13 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.modules:mule-module-acegi</include>
         <include>org.mule.modules:mule-module-builders</include>
         <include>org.mule.modules:mule-module-client</include>
-        <include>org.mule.modules:mule-module-hivemind</include>
         <include>org.mule.modules:mule-module-jaas</include>
         <include>org.mule.modules:mule-module-jotm</include>
         <include>org.mule.modules:mule-module-management</include>
         <include>org.mule.modules:mule-module-ognl</include>
         <include>org.mule.modules:mule-module-pgp</include>
-        <include>org.mule.modules:mule-module-picocontainer</include>
         <include>org.mule.modules:mule-module-scripting</include>
         <include>org.mule.modules:mule-module-spring</include>
-        <include>org.mule.modules:mule-module-util</include>
         <include>org.mule.modules:mule-module-wssecurity</include>
         <include>org.mule.modules:mule-module-xml</include>
       </includes>
@@ -400,7 +400,6 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule.transports:mule-transport-file</exclude>
         <exclude>org.mule.transports:mule-transport-ftp</exclude>
         <exclude>org.mule.transports:mule-transport-http</exclude>
-        <exclude>org.mule.transports:mule-transport-jbi</exclude>
         <exclude>org.mule.transports:mule-transport-jbpm</exclude>
         <exclude>org.mule.transports:mule-transport-jdbc</exclude>
         <exclude>org.mule.transports:mule-transport-jms</exclude>
@@ -410,7 +409,7 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule.transports:mule-transport-rmi</exclude>
         <exclude>org.mule.transports:mule-transport-soap</exclude>
         <exclude>org.mule.transports:mule-transport-ssl</exclude>
-        <exclude>org.mule.transports:mule-transport-stream</exclude>
+        <exclude>org.mule.transports:mule-transport-stdio</exclude>
         <exclude>org.mule.transports:mule-transport-tcp</exclude>
         <exclude>org.mule.transports:mule-transport-udp</exclude>
         <exclude>org.mule.transports:mule-transport-vm</exclude>
@@ -422,17 +421,14 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule.modules:mule-module-builders</exclude>
         <exclude>org.mule.modules:mule-module-acegi</exclude>
         <exclude>org.mule.modules:mule-module-client</exclude>
-        <exclude>org.mule.modules:mule-module-hivemind</exclude>
         <exclude>org.mule.modules:mule-module-jaas</exclude>
         <exclude>org.mule.modules:mule-module-jca</exclude>
         <exclude>org.mule.modules:mule-module-jotm</exclude>
         <exclude>org.mule.modules:mule-module-management</exclude>
         <exclude>org.mule.modules:mule-module-ognl</exclude>
         <exclude>org.mule.modules:mule-module-pgp</exclude>
-        <exclude>org.mule.modules:mule-module-picocontainer</exclude>
         <exclude>org.mule.modules:mule-module-scripting</exclude>
         <exclude>org.mule.modules:mule-module-spring</exclude>
-        <exclude>org.mule.modules:mule-module-util</exclude>
         <include>org.mule.modules:mule-module-wssecurity</include>
         <exclude>org.mule.modules:mule-module-xml</exclude>
         <!-- Examples -->
