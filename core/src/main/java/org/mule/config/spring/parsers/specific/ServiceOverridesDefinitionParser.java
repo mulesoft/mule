@@ -53,7 +53,7 @@ public class ServiceOverridesDefinitionParser extends AbstractChildDefinitionPar
         addOverride(overrides, element, "serviceFinder", MuleProperties.SERVICE_FINDER);
         builder.setSource(overrides);
 
-        getBeanAssembly(element, builder).extendTarget(getPropertyName(element), overrides, false);
+        getBeanAssembler(element, builder).extendTarget(getPropertyName(element), overrides, false);
     }
 
     protected void addOverride(Map overrides, Element e, String attributeName, String overrideName)

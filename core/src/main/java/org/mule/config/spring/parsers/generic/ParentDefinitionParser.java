@@ -57,7 +57,7 @@ public class ParentDefinitionParser extends AbstractHierarchicalDefinitionParser
             builder.setSingleton(parserContext.getContainingBeanDefinition().isSingleton());
         }
         doParse(element, parserContext, builder);
-        BeanAssembler beanAssembler = getBeanAssembly(element, builder);
+        BeanAssembler beanAssembler = getBeanAssembler(element, builder);
         beanAssembler.copyBeanToTarget();
         beanAssembler.getTarget().setAttribute(COMPOUND_ELEMENT, Boolean.TRUE);
         return (AbstractBeanDefinition) beanAssembler.getTarget();

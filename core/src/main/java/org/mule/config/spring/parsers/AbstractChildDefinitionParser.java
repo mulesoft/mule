@@ -64,7 +64,7 @@ public abstract class AbstractChildDefinitionParser extends AbstractHierarchical
             return;
         }
 
-        getBeanAssembly(element, builder).insertBeanInTarget(getPropertyName(element));
+        getBeanAssembler(element, builder).insertBeanInTarget(getPropertyName(element));
     }
 
     protected String generateChildBeanName(Element e)

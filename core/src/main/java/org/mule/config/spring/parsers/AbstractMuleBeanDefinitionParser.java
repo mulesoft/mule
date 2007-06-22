@@ -148,7 +148,7 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
 
     protected void processProperty(Attr attribute, BeanDefinitionBuilder builder)
     {
-        getOrphanBeanAssembly(builder).extendBean(attribute);
+        getOrphanBeanAssembler(builder).extendBean(attribute);
     }
 
     /**
@@ -313,12 +313,12 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
 
     /**
      * Restricted use - does not include a target.
-     * If possible, use {@link org.mule.config.spring.parsers.AbstractHierarchicalDefinitionParser#getBeanAssembly(org.w3c.dom.Element, org.springframework.beans.factory.support.BeanDefinitionBuilder)}
+     * If possible, use {@link org.mule.config.spring.parsers.AbstractHierarchicalDefinitionParser#getBeanAssembler(org.w3c.dom.Element, org.springframework.beans.factory.support.BeanDefinitionBuilder)}
      *
      * @param bean The bean being constructed
      * @return An assembler that automates Mule-specific logic for bean construction
      */
-    protected BeanAssembler getOrphanBeanAssembly(BeanDefinitionBuilder bean)
+    protected BeanAssembler getOrphanBeanAssembler(BeanDefinitionBuilder bean)
     {
         return beanAssemblerFactory.newBeanAssembler(
                 propertyConfiguration, bean, propertyConfiguration, null);

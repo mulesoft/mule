@@ -63,7 +63,7 @@ public class ComponentDefinitionParser extends ChildDefinitionParser
         Attr factory = element.getAttributeNode(FACTORY_REF);
         if (null != factory)
         {
-            getBeanAssembly(element, builder).extendTarget(factory);
+            getBeanAssembler(element, builder).extendTarget(factory);
             element.removeAttributeNode(factory);
         }
         else
