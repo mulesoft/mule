@@ -1,5 +1,66 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
+       xmlns:stdio="http://www.mulesource.org/schema/mule/stdio/2.0"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd
+       http://www.mulesource.org/schema/mule/stdio/2.0 http://www.mulesource.org/schema/mule/stdio/2.0/mule-stdio.xsd">
 
+    <description>
+        The StockQuote SOAP example uses the Mule RestServiceWrapper to invoke a remote .Net service
+        Using SOAP RPC style invocation and displays the result.
+        The example demostrates how to set named parameters for Web Service invocations and how to 
+        invoke a non-java web service using Mule.
+    
+        The example invokes a StockQuote Web Service on www.webservicesx.com, the result is an Xml 
+        string that Mule converts to a StockQuote object by first running the result through an 
+        Xslt transformer and then using the XmlToObject transformer.
+    </description>
+    
+    <bean id="propertyPlaceholderConfigurer"
+          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>proxy.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <http:connector name="HttpConnector"
+                    proxyHostname="${proxyHostname}"
+                    proxyPassword="${proxyPassword}"
+                    proxyPort="${proxyPort}"
+                    proxyUsername="${proxyUsername}"/>
+
+    <mule:custom-transformer name="XmlToObject" class="org.mule.transformers.xml.XmlToObject"/>
+    <mule:transformer-xml-entity-decoder name="XmlDecoder"/>
+    <mule:custom-transformer name="Xslt" class="org.mule.transformers.xml.XsltTransformer">
+        <mule:property name="xslFile" value="xsl/rest-stock.xsl"/>
+    </mule:custom-transformer>
+
+    <mule:model-seda name="Sample">
+        <!-- 
+            This component can proxy external web service calls over Jms, tcp, ssl or any other transport.
+            For this example we use Vm.
+        -->
+        <mule:service name="serviceProxy">
+            <mule:component class="org.mule.components.simple.BridgeComponent"/>
+            <mule:inbound-router>
+                <mule:endpoint address="vm://stockquote"/>
+            </mule:inbound-router>
+            <mule:outbound-router>
+                <mule:pass-through-router>
+                    <mule:endpoint address="wsdl:http://www.webservicex.net/stockquote.asmx?WSDL&amp;method=GetQuote"/>
+                </mule:pass-through-router>
+            </mule:outbound-router>
+        </mule:service>
+    </mule:model-seda>
+</beans>
+<!-- 
 <!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
                                 "http://mule.mulesource.org/dtds/mule-configuration.dtd">
 
@@ -30,14 +91,14 @@
             </properties>
         </transformer>
     </transformers>
-    <!--
+    <!-
         The Mule model initialises and manages your UMO components
-    -->
+    ->
     <model name="Sample">
-        <!--
+        <!-
             This component can proxy external web service calls over Jms, tcp, ssl or any other transport.
             For this example we use Vm.
-        -->
+        ->
         <mule-descriptor name="serviceProxy" 
                          implementation="org.mule.components.simple.BridgeComponent"
                          responseTransformer="XmlDecoder Xslt XmlToObject">
@@ -53,3 +114,4 @@
 
     </model>
 </mule-configuration>
+-->

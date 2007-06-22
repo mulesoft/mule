@@ -25,13 +25,11 @@
         </property>
     </bean>
 
-    <!-- proxyPort cannot be substituted here - see MULE-1887 -->
     <http:connector name="HttpConnector"
                     proxyHostname="${proxyHostname}"
                     proxyPassword="${proxyPassword}"
-                    proxyPort="3128"
-                    proxyUsername="${proxyUsername}"
-            />
+                    proxyPort="${proxyPort}"
+                    proxyUsername="${proxyUsername}"/>
 
     <mule:custom-transformer name="XmlToObject" class="org.mule.transformers.xml.XmlToObject"/>
     <mule:transformer-xml-entity-decoder name="XmlDecoder"/>
@@ -55,5 +53,4 @@
             </mule:inbound-router>
         </mule:service>
     </mule:model-seda>
-
 </beans>
