@@ -35,7 +35,13 @@ import javax.activation.FileDataSource;
 
 public class SoapAttachmentsFunctionalTestCase extends AbstractProviderFunctionalTestCase
 {
+    // TODO DO: this config file will replace the functionality that's implemented here
+//    protected String getConfigResources()
+//    {
+//        return "axis-soap-attachments.xml";
+//    }
 
+    
     // //@Override
     protected void doSetUp() throws Exception
     {
