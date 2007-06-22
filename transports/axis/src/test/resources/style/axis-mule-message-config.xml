@@ -15,13 +15,15 @@
             <mule:component class="org.mule.providers.soap.axis.style.DefaultMessageService"/>
             <mule:inbound-router>
                 <mule:endpoint address="axis:http://localhost:8088">
-                    <property name="style" value="Message"/>
-                    <property name="serviceNamespace" value="http://muleumo.org"/>
-                    <property name="axisOptions">
-                        <map>
-                            <entry key="wsdlServiceElement" value="testService"/>
-                        </map>
-                    </property>
+                    <mule:properties>
+                        <entry key="style" value="Message"/>
+                        <entry key="serviceNamespace" value="http://muleumo.org"/>
+                        <entry key="axisOptions">
+                            <map>
+                                <entry key="wsdlServiceElement" value="testService"/>
+                            </map>
+                        </entry>
+                    </mule:properties>
                 </mule:endpoint>
             </mule:inbound-router>
         </mule:service>    
