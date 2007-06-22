@@ -54,11 +54,6 @@
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-jbi</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-jbpm</artifactId>
             <version>${version}</version>
         </dependency>
