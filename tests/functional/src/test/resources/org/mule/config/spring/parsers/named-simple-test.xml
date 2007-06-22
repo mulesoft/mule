@@ -10,7 +10,7 @@
 
     <parsers-test:orphan name="orphan1"/>
 
-    <parsers-test:orphan1 name="orphan1" id="foo" string="orphan1String">
+    <parsers-test:orphan1 string="orphan1String">
         <parsers-test:map-entry key="key1" value="orphan1Map1"/>
         <parsers-test:map-entry key="key2" value="orphan1Map2"/>
         <parsers-test:list-entry>orphan1List1</parsers-test:list-entry>
@@ -30,7 +30,7 @@
         <parsers-test:list-entry>orphan2List2</parsers-test:list-entry>
     </parsers-test:orphan>
 
-    <parsers-test:orphan2 name="orphan2" id="foo" string="orphan2String">
+    <parsers-test:orphan2 string="orphan2String">
         <parsers-test:child name="child2" string="child2String">
             <parsers-test:map-entry key="key1" value="child2Map1"/>
             <parsers-test:map-entry key="key2" value="child2Map2"/>

@@ -10,7 +10,7 @@
 
     <parsers-test:orphan name="orphan1"/>
 
-    <parsers-test:orphan1 name="orphan1" id="foo">
+    <parsers-test:orphan1>
         <parsers-test:kid name="child11"/>
         <parsers-test:kid name="child12"/>
     </parsers-test:orphan1>
@@ -22,7 +22,7 @@
     </parsers-test:orphan>
 
     <parsers-test:orphan name="orphan3">
-        <parsers-test:parent name="orphan3">
+        <parsers-test:parent>
             <parsers-test:kid name="child31"/>
             <parsers-test:kid name="child32"/>
             <parsers-test:kid name="child33"/>

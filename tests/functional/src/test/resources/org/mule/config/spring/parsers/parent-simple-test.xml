@@ -13,7 +13,7 @@
         <parsers-test:map-entry key="key2" value="orphan3Map2"/>
         <parsers-test:list-entry>orphan3List1</parsers-test:list-entry>
         <parsers-test:list-entry>orphan3List2</parsers-test:list-entry>
-        <parsers-test:parent name="orphan3">
+        <parsers-test:parent>
             <parsers-test:child name="child3" string="child3String">
                 <parsers-test:map-entry key="key1" value="child3Map1"/>
                 <parsers-test:map-entry key="key2" value="child3Map2"/>

@@ -15,7 +15,7 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.config.BeanDefinition;
 
 /**
- * Bean Assembly provides a high-level interface to constructing beans.  It encapsulates all
+ * Bean Assembler provides a high-level interface to constructing beans.  It encapsulates all
  * the "smart" logic about collections, maps, references, etc.
  *
  * <p>A bean assembly contains a bean (the thing we are constructing), a target (where we put the

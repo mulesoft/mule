@@ -69,7 +69,7 @@ public abstract class AbstractChildDefinitionParser extends AbstractHierarchical
 
     protected String generateChildBeanName(Element e)
     {
-        String parentId = getParentBeanId(e);
+        String parentId = getParentBeanName(e);
         String id = e.getAttribute(ATTRIBUTE_NAME);
         if (StringUtils.isBlank(id))
         {
