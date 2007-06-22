@@ -160,7 +160,7 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
     }
 
     /** 
-     * @deprecated Command-line arguments will be handled exclusively by the bootloader in 2.0 
+     * @deprecated MULE-1947 Command-line arguments will be handled exclusively by the bootloader in 2.0 
      */
     private static CommandLine parseCommandLine(String args[], String opts[][]) throws MuleException
     {
@@ -193,7 +193,7 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
      * example if the options are "-config mule-config.xml"
      * getCommandLineOption("config") would return "mule-config.xml"
      * 
-     * @deprecated Command-line arguments will be handled exclusively by the bootloader in 2.0
+     * @deprecated MULE-1947 Command-line arguments will be handled exclusively by the bootloader in 2.0
      */
     public static String getCommandLineOption(String option, String args[], String opts[][])
         throws MuleException
@@ -207,7 +207,7 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
      * options that don't have an argument, like "-cluster", which means that this
      * Mule instance is part of a cluster.
      * 
-     * @deprecated Command-line arguments will be handled exclusively by the bootloader in 2.0
+     * @deprecated MULE-1947 Command-line arguments will be handled exclusively by the bootloader in 2.0
      */
     public static boolean hasCommandLineOption(String option, String args[], String opts[][])
         throws MuleException
@@ -221,7 +221,7 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
      * option name. The value will be whatever is present on the command line.
      * Options that don't have an argument will have the String "true".
      * 
-     * @deprecated Command-line arguments will be handled exclusively by the bootloader in 2.0
+     * @deprecated MULE-1947 Command-line arguments will be handled exclusively by the bootloader in 2.0
      */
     public static Map getCommandLineOptions(String args[], String opts[][]) throws MuleException
     {
