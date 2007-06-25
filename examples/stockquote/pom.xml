@@ -18,9 +18,6 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <!-- waiting on MULE-1839 and MULE-1855 -->
-                        <exclude>**/WsdlStockQuoteFunctionalTestCase.*</exclude>
-                        <exclude>**/SoapStockQuoteFunctionalTestCase.*</exclude>
                     </excludes>
                 </configuration>
             </plugin>

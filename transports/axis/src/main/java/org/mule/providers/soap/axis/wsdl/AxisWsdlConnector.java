@@ -18,9 +18,6 @@ import java.util.List;
 
 /**
  * TODO document
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class AxisWsdlConnector extends AxisConnector
 {

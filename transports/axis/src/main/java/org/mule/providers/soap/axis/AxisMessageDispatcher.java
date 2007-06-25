@@ -539,7 +539,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
             properties.put("serviceName", event.getComponent().getDescriptor().getName());
         }
 
-        TemplateParser tp = TemplateParser.createAntStyleParser();
+        TemplateParser tp = TemplateParser.createSquareBracesStyleParser();
         soapAction = tp.parse(properties, soapAction);
 
         if (logger.isDebugEnabled())

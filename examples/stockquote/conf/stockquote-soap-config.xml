@@ -83,7 +83,7 @@
                     <mule:endpoint address="axis:http://www.webservicex.net/stockquote.asmx?method=GetQuote"
                         responseTransformers="XmlDecoder Xslt XmlToObject">
                         <mule:properties>
-<!--                            <entry key="soapAction" value="${methodNamespace}${method}"/>-->
+                            <entry key="soapAction" value="[methodNamespace][method]"/>
                             <entry key="soapMethods">
                                 <map>
                                     <entry key="qname{GetQuote:http://www.webserviceX.NET/}"> 

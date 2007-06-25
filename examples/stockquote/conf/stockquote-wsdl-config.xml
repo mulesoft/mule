@@ -54,7 +54,7 @@
             </mule:inbound-router>
             <mule:outbound-router>
                 <mule:pass-through-router>
-                    <mule:endpoint address="wsdl:http://www.webservicex.net/stockquote.asmx?WSDL&amp;method=GetQuote"/>
+                    <mule:endpoint address="wsdl-xfire:http://www.webservicex.net/stockquote.asmx?WSDL&amp;method=GetQuote"/>
                 </mule:pass-through-router>
             </mule:outbound-router>
         </mule:service>
