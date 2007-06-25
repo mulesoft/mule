@@ -13,7 +13,7 @@
                 <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
                     <endpoint address="axis:http://localhost:8080/mule-tests-external-xfire/services/TestService?method=getTest">
                         <properties>
-                            <property name="soapAction" value="${methodNamespace}${method}"/>
+                            <property name="soapAction" value="[methodNamespace][method]"/>
                             <map name="soapMethods">
                                 <property name="qname{getTest:http://mule.mulesource.org/Tests/TestService/}" value="in0;string;in,out;ns1:Test;out,returnClass;org.mule.tck.external.applications.Test"/>
                             </map>
