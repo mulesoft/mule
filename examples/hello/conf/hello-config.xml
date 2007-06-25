@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
-
-<mule-configuration id="Hello_Sample" version="1.0">
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:stdio="http://www.mulesource.org/schema/mule/stdio/2.0"
+       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+       xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+               http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+               http://www.mulesource.org/schema/mule/stdio/2.0 http://www.mulesource.org/schema/mule/stdio/2.0/mule-stdio.xsd
+               http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
 
     <description>
     The hello sample application has two components -
@@ -21,13 +26,10 @@
         messageDelayTime - is the time in milliseconds before the user is prompted again.
         These properties are set as bean properties on the connector.
     -->
-    <connector name="SystemStreamConnector" className="org.mule.providers.stdio.SystemStreamConnector">
-        <properties>
-            <property name="promptMessageCode" value="3"/>
-            <property name="resourceBundle" value="messages.hello-example-messages"/>
-            <property name="messageDelayTime" value="1000"/>
-        </properties>
-    </connector>
+    <stdio:connector name="SystemStreamConnector"
+        promptMessageCode="3"
+        resourceBundle="messages.hello-example-messages"
+        messageDelayTime="1000"/>
 
     <!--
         All transformers must be defined here.  For this example we have two transformers
@@ -36,14 +38,12 @@
         determine which method to call on our components based on the return types of these
         transformers.
     -->
-    <transformers>
-        <transformer name="StringToNameString" className="org.mule.samples.hello.StringToNameString"
-            returnClass="org.mule.samples.hello.NameString"/>
-        <transformer name="NameStringToChatString" className="org.mule.samples.hello.NameStringToChatString"
-            returnClass="org.mule.samples.hello.ChatString"/>
-        <transformer name="ChatStringToString" className="org.mule.samples.hello.ChatStringToString"
-            returnClass="java.lang.String"/>
-    </transformers>
+    <mule:custom-transformer class="org.mule.samples.hello.StringToNameString"
+        name="StringToNameString" returnClass="org.mule.samples.hello.NameString"/>
+    <mule:custom-transformer class="org.mule.samples.hello.NameStringToChatString"
+        name="NameStringToChatString" returnClass="org.mule.samples.hello.ChatString"/>
+    <mule:custom-transformer class="org.mule.samples.hello.ChatStringToString"
+        name="ChatStringToString" returnClass="java.lang.String"/>
 
     <!--
         An interceptor is a piece of code that can be configued to execute
@@ -55,41 +55,44 @@
         <!--<interceptor className="org.mule.interceptors.LoggingInterceptor"/>-->
         <!--<interceptor className="org.mule.interceptors.TimerInterceptor"/>-->
     <!--</interceptor-stack>-->
+
     <!--
         The Mule model initialises and manages your UMO components
     -->
-    <model name="helloSample">
+    <mule:model-seda name="helloSample">
         <!--
             A Mule descriptor defines all the necessary information about how your components will
             interact with the framework, other components in the system and external sources.
             Please refer to the Configuration Guide for a full description of all the parameters.
         -->
-        <mule-descriptor name="GreeterUMO" implementation="org.mule.samples.hello.Greeter">
-            <inbound-router>
-                <endpoint address="stream://System.in" transformers="StringToNameString"/>
-            </inbound-router>
-            <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="vm://chitchatter"/>
-                </router>
-            </outbound-router>
+        <mule:service name="GreetUMO">
+            <mule:component class="org.mule.samples.hello.Greeter"/>
+            <mule:inbound-router>
+                <mule:endpoint address="stdio://System.in" transformers="StringToNameString"/>
+            </mule:inbound-router>
+            <mule:outbound-router>
+                <mule:pass-through-router>
+                    <mule:endpoint address="vm://chitchatter"/>
+                </mule:pass-through-router>
+            </mule:outbound-router>
             <!--
             Here we tell this component to use the interceptor stack defined above
             -->
             <!--<interceptor name="default"/>-->
-        </mule-descriptor>
-
-        <mule-descriptor name="ChitChatUMO" implementation="org.mule.samples.hello.ChitChatter">
-
-            <inbound-router>
-                <endpoint address="vm://chitchatter" transformers="NameStringToChatString"/>
-            </inbound-router>
-            <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="stream://System.out" transformers="ChatStringToString" />
-                </router>
-            </outbound-router>
+        </mule:service>
+        <mule:service name="ChitChatUMO">
+            <mule:component class="org.mule.samples.hello.ChitChatter"/>
+            <mule:inbound-router>
+                <mule:endpoint address="vm://chitchatter" transformers="NameStringToChatString"/>
+            </mule:inbound-router>
+            <mule:outbound-router>
+                <mule:pass-through-router>
+                    <mule:endpoint address="stdio://System.out" transformers="ChatStringToString"/>
+                </mule:pass-through-router>
+            </mule:outbound-router>
             <!--<interceptor name="default"/>-->
-        </mule-descriptor>
-    </model>
-</mule-configuration>
+        </mule:service>
+    </mule:model-seda>
+
+</beans>
+        
