@@ -121,11 +121,6 @@
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-jbi</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-jdbc</artifactId>
             <version>${version}</version>
         </dependency>
@@ -211,11 +206,6 @@
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-hivemind</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-jotm</artifactId>
             <version>${version}</version>
         </dependency>
@@ -229,14 +219,6 @@
             <artifactId>mule-module-pgp</artifactId>
             <version>${version}</version>
         </dependency>
-        <!-- dirk: picocontainer is not part of the 2.0 release and will not 
-             be built. Do not reference it here.
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-picocontainer</artifactId>
-            <version>${version}</version>
-        </dependency>
-        -->
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring</artifactId>
@@ -247,7 +229,7 @@
             <artifactId>mule-module-scripting</artifactId>
             <version>${version}</version>
         </dependency>
-        
+
         <!-- need to re-add hsqldb -->
         <dependency>
             <groupId>hsqldb</groupId>
@@ -294,7 +276,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        
+
         <dependency>
             <groupId>ant</groupId>
             <artifactId>ant</artifactId>
@@ -428,5 +410,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
 </project>

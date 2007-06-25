@@ -57,7 +57,7 @@
             instead a module artifact id is erroneously substituted.
          -->
         <productUrl>http://mule.mulesource.org</productUrl>
-        <springVersion>2.0.5</springVersion>
+        <springVersion>2.0.6</springVersion>
         <xfireVersion>1.2.6</xfireVersion>
         <coberturaVersion>2.1</coberturaVersion>
     </properties>
@@ -252,6 +252,11 @@
                         <groupId>commons-logging</groupId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-aop</artifactId>
+                <version>${springVersion}</version>
             </dependency>
             <!--
                  The JDK version is fixed to 1.4 for now (see maven-enforcer-plugin config).
