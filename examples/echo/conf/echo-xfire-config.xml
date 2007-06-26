@@ -1,31 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
-
-<mule-configuration id="Mule_Echo_XFire_Sample" version="1.0">
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
     <description>
-    This config is identical to echo-config.xml but exposes the EchoUMO as a SOAP web service.
+        This config is identical to echo-config.xml but exposes the EchoUMO as a SOAP web service.
 
-    To invoke the EchoUMO hit the following URL -
-        http://localhost:8081/services/EchoUMO?method=echo&amp;param=Is there an echo?
-    (remember to replace the '&amp;' with an ampersand)
-
-    To view the WSDL for the EchoUMO service go to -
-        http://localhost:8081/services/EchoUMO?wsdl
-    </description>
+        To invoke the EchoUMO hit the following URL -
+            http://localhost:8081/services/EchoUMO?method=echo&amp;param=Is there an echo?
+        (remember to replace the '&amp;' with an ampersand)
     
-    <transformers>
-        <transformer name="HttpRequestToSoapRequest" className="org.mule.providers.soap.transformers.HttpRequestToSoapRequest"/>
-    </transformers>
+        To view the WSDL for the EchoUMO service go to -
+            http://localhost:8081/services/EchoUMO?wsdl
+    </description>
 
-    <model name="echoSample">
-        <mule-descriptor name="EchoUMO" implementation="org.mule.components.simple.EchoComponent">
-            <inbound-router>
-                <endpoint address="xfire:http://localhost:8081/services" transformers="HttpRequestToSoapRequest" />
-                <endpoint address="xfire:http://localhost:8082/services"/>
-            </inbound-router>
-        </mule-descriptor>
-    </model>
-</mule-configuration>
+    <mule:custom-transformer name="HttpRequestToSoapRequest"
+        class="org.mule.providers.soap.transformers.HttpRequestToSoapRequest"/>
+        
+    <mule:model-seda name="echoSample">
+        <mule:service name="EchoUMO">
+            <mule:component class="org.mule.components.simple.EchoComponent"/>
+            <mule:inbound-router>
+                <mule:endpoint address="xfire:http://localhost:8081/services" 
+                    transformers="HttpRequestToSoapRequest" />
+                <mule:endpoint address="xfire:http://localhost:8082/services"/>
+            </mule:inbound-router>
+        </mule:service>
+    </mule:model-seda>
+</beans>
