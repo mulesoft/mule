@@ -1,29 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:scripting="http://www.mulesource.org/schema/mule/scripting/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/scripting/2.0 http://www.mulesource.org/schema/mule/scripting/2.0/mule-scripting.xsd">
 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
-
-<mule-configuration id="ScriptingExample" version="1.0">
-    <description>This example demonstrates invoking a Groovy script as the service component.</description>
-
-    <model name="main">
-        <mule-descriptor name="ScriptService" implementation="org.mule.components.script.jsr223.ScriptComponent">
-            <inbound-router>
-                <endpoint address="stream://System.in">
-                    <properties>
-                        <property name="promptMessage" value="Please enter a message: "/>
-                        <property name="messageDelayTime" value="1000"/>
-                    </properties>
-                </endpoint>
-            </inbound-router>
-            <properties>
-                <property name="scriptEngineName" value="groovy"/>
-                <text-property name="scriptText">
-                     def msg = eventContext.transformedMessageAsString
-                     log.boilerPlate("Message Received: ${msg} - class: ${msg.class.name}")
-                     return ["Hello", ":-)"];
-                </text-property>
-            </properties>
-        </mule-descriptor>
-    </model>
-</mule-configuration>
+    <description>
+        This example demonstrates invoking a Groovy script as the service component.
+    </description>
+    
+    <!-- TODO See MULE-1729, this has to be implemented first -->
+    <scripting:script id="scriptText">
+        def msg = eventContext.transformedMessageAsString
+        log.boilerPlate("Message Received: ${msg} - class: ${msg.class.name}")
+        return ["Hello", ":-)"];
+    </bean>
+    
+    <mule:model-seda name="main">
+        <mule:service name="ScriptService">
+            <mule:component class="org.mule.components.script.jsr223.ScriptComponent">
+                <mule:properties>
+                    <entry key="scriptEngineName" value="groovy"/>
+                    <entry key="scriptText" value-ref="scriptText"/>
+                </mule:properties>
+            </mule:component>
+            <mule:inbound-router>
+                <mule:endpoint address="stdio://System.in">
+                    <mule:properties>
+                        <entry key="promptMessage" value="Please enter a message: "/>
+                        <entry key="messageDelayTime" value="1000"/>
+                    </mule:properties>
+                </mule:endpoint>
+            </mule:inbound-router>
+        </mule:service>
+    </mule:model-seda>
+</beans>
