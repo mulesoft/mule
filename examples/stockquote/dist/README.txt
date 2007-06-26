@@ -18,15 +18,25 @@ can run the example from the command line as follows:
 
     Linux / Unix
     ------------
-    mule -config ./conf/soap-config.xml
-    mule -config ./conf/wsdl-config.xml
-    mule -config ./conf/rest-config.xml
+    mule -config file:conf/soap-config.xml
+    mule -config file:conf/wsdl-config.xml
+    mule -config file:conf/rest-config.xml
+     or
+    export MULE_LIB=./conf
+    mule -config soap-config.xml
+    mule -config wsdl-config.xml
+    mule -config rest-config.xml
 
     Windows
     -------
-    mule.bat -config .\conf\soap-config.xml
-    mule.bat -config .\conf\wsdl-config.xml
-    mule.bat -config .\conf\rest-config.xml
+    mule.bat -config file:conf/soap-config.xml
+    mule.bat -config file:conf/wsdl-config.xml
+    mule.bat -config file:conf/rest-config.xml
+     or
+    SET MULE_LIB=.\conf
+    mule.bat -config soap-config.xml
+    mule.bat -config wsdl-config.xml
+    mule.bat -config rest-config.xml
 
 +-------------------+
 | Firewall settings |

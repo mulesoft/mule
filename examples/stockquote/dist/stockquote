@@ -1,6 +1,8 @@
 #! /bin/sh
 
 # There is no need to call this if you set the MULE_HOME in your environment
+# but you must also define MULE_LIB for the example (see below)
+# or specify the config as a file: URI (see README.txt)
 if [ -z "$MULE_HOME" ] ; then
   MULE_HOME=../..
   export MULE_HOME
@@ -12,6 +14,7 @@ if [ -z "$MULE_BASE" ] ; then
   export MULE_BASE
 fi
 
+# This extends the classpath to include the configuration directory
 # Any changes to the files in ./conf will take precedence over those deployed to $MULE_HOME/lib/user
 MULE_LIB=./conf
 export MULE_LIB
@@ -32,11 +35,11 @@ read i
 
 if [ 1 = $i ]
 then
-    exec "$MULE_BASE/bin/mule" -config "./conf/stdio-config.xml,./conf/stockquote-rest-config.xml" -builder spring
+    exec "$MULE_BASE/bin/mule" -config "stdio-config.xml,stockquote-rest-config.xml"
 elif [ 2 = $i ]
 then
-    exec "$MULE_BASE/bin/mule" -config "./conf/stdio-config.xml,./conf/stockquote-wsdl-config.xml" -builder spring
+    exec "$MULE_BASE/bin/mule" -config "stdio-config.xml,stockquote-wsdl-config.xml"
 elif [ 3 = $i ]
 then
-    exec "$MULE_BASE/bin/mule" -config "./conf/stdio-config.xml,./conf/stockquote-soap-config.xml"
+    exec "$MULE_BASE/bin/mule" -config "stdio-config.xml,stockquote-soap-config.xml"
 fi

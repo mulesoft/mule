@@ -1,6 +1,8 @@
 #! /bin/sh
 
 # There is no need to call this if you set the MULE_HOME in your environment
+# but you must also define MULE_LIB for the example (see below)
+# or specify the config as a file: URI (see README.txt)
 if [ -z "$MULE_HOME" ] ; then
   MULE_HOME=../..
   export MULE_HOME
@@ -12,9 +14,10 @@ if [ -z "$MULE_BASE" ] ; then
   export MULE_BASE
 fi
 
+# This extends the classpath to include the configuration directory
 # Any changes to the files in ./conf will take precedence over those deployed to $MULE_HOME/lib/user
 MULE_LIB=./conf
 export MULE_LIB
 
-exec "$MULE_BASE/bin/mule" -config ./conf/echo-config.xml
+exec "$MULE_BASE/bin/mule" -config echo-config.xml
 

@@ -17,11 +17,17 @@ can run the example from the command line as follows:
 
     Linux / Unix
     ------------
-    mule -config ./conf/echo-config.xml
+    mule -config file:conf/echo-config.xml
+     or
+    export MULE_LIB=./conf
+    mule -config echo-config.xml
 
     Windows
     -------
-    mule.bat -config .\conf\echo-config.xml
+    mule.bat -config file:conf/echo-config.xml
+     or
+    SET MULE_LIB=.\conf
+    mule.bat -config echo-config.xml
 
 +----------------------+
 | Building the example |

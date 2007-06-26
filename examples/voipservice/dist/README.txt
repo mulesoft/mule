@@ -15,7 +15,19 @@ the example.
 Alternatively, if you have added Mule to your executable path as recommended in INSTALL.txt, you 
 can run the example from the command line as follows:
 
-    mule -main org.mule.samples.voipservice.client.VoipConsumer
+    Linux / Unix
+    ------------
+    mule -config file:conf/voip-broker-sync-config.xml -main org.mule.samples.voipservice.client.VoipConsumer
+     or
+    export MULE_LIB=./conf
+    mule -config voip-broker-sync-config.xml -main org.mule.samples.voipservice.client.VoipConsumer
+
+    Windows
+    -------
+    mule.bat -config file:conf/voip-broker-sync-config.xml -main org.mule.samples.voipservice.client.VoipConsumer
+     or
+    SET MULE_LIB=.\conf
+    mule.bat -config voip-broker-sync-config.xml -main org.mule.samples.voipservice.client.VoipConsumer 
 
 +----------------------+
 | Building the example |

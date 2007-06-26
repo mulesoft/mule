@@ -36,11 +36,17 @@ INSTALL.txt, you can run the example from the command line as follows:
 
     Linux / Unix
     ------------
-    mule -config ./conf/error-config.xml
+    mule -config file:conf/error-config.xml
+     or
+    export MULE_LIB=./conf
+    mule -config error-config.xml
 
     Windows
     -------
     mule.bat -config .\conf\error-config.xml
+     or
+    SET MULE_LIB=.\conf
+    mule.bat -config error-config.xml
 
 In the second window, copy the files (one by one so you can see the results) from the
 ./test-data/out directory to the ./test-data/in directory.  Note that for the
@@ -56,8 +62,10 @@ file ./conf/email.properties  Then you can run the example as follows:
 
     Linux / Unix
     ------------
-    mule -config ./conf/error-config.xml -props ./conf/email.properties
+    mule -config file:conf/error-config.xml -props ./conf/email.properties
 
     Windows
     -------
-    mule.bat -config .\conf\error-config.xml -props .\conf\email.properties
+    mule.bat -config file:conf\error-config.xml -props .\conf\email.properties
+
+TODO - MULE-1969 - The above (email properties) may not work.

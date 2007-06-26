@@ -32,8 +32,14 @@ can run the example from the command line as follows:
 
     Linux / Unix
     ------------
-    mule -config ./conf/scripting-config.xml
+    mule -config file:conf/scripting-config.xml
+     or
+    export MULE_LIB=./conf
+    mule -config scripting-config.xml
 
     Windows
     -------
-    mule.bat -config .\conf\scripting-config.xml
+    mule.bat -config file:conf/scripting-config.xml
+     or
+    SET MULE_LIB=.\conf
+    mule.bat -config scripting-config.xml
