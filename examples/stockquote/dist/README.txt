@@ -45,17 +45,19 @@ can run the example from the command line as follows:
 If you are behind a firewall, you will need to configure the settings for your HTTP proxy
 in the ./conf/proxy.properties file.  Then you can run the example as follows:
 
+TODO - MULE-1969 - Unlikely to work
+
     Linux / Unix
     ------------
-    mule -config ./conf/soap-config.xml -props ./conf/proxy.properties
-    mule -config ./conf/wsdl-config.xml -props ./conf/proxy.properties
-    mule -config ./conf/rest-config.xml -props ./conf/proxy.properties
+    mule -config file:conf/soap-config.xml -props ./conf/proxy.properties
+    mule -config file:conf/wsdl-config.xml -props ./conf/proxy.properties
+    mule -config file:conf/rest-config.xml -props ./conf/proxy.properties
 
     Windows
     -------
-    mule.bat -config .\conf\soap-config.xml -props .\conf\proxy.properties
-    mule.bat -config .\conf\wsdl-config.xml -props .\conf\proxy.properties
-    mule.bat -config .\conf\rest-config.xml -props .\conf\proxy.properties
+    mule.bat -config file:conf/soap-config.xml -props .\conf\proxy.properties
+    mule.bat -config file:conf/wsdl-config.xml -props .\conf\proxy.properties
+    mule.bat -config file:conf/rest-config.xml -props .\conf\proxy.properties
 
 +----------------------+
 | Building the example |
