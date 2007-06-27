@@ -1,5 +1,172 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:file="http://www.mulesource.org/schema/mule/file/2.0"
+       xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
+       xmlns:smtp="http://www.mulesource.org/schema/mule/smtp/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/file/2.0 http://www.mulesource.org/schema/mule/file/2.0/mule-file.xsd
+       http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd
+       http://www.mulesource.org/schema/mule/smtp/2.0 http://www.mulesource.org/schema/mule/email/2.0/mule-smtp.xsd">
+       
+    <description>
+        This example demonstrates how to publish events to multiple outbound endpoints. 
+        The example consists of two components: ExceptionManager and BusinessErrorManager.
+    </description>
+    
+    <bean id="activeMqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+        <constructor-arg value="vm://localhost?broker.persistent=false&amp;broker.useJmx=false"/>
+    </bean>
 
+    <bean id="errorManager" class="org.mule.samples.errorhandler.ErrorManager">
+        <property name="handlers">
+            <list>
+                <ref local="fatalHandler"/>
+                <ref local="defaultHandler"/>
+                <ref local="businessHandler"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="businessErrorManager" class="org.mule.samples.errorhandler.BusinessErrorManager"/>
+
+    <bean id="defaultHandler" class="org.mule.samples.errorhandler.handlers.DefaultHandler">
+        <property name="endpointName" value="ExceptionFileWriter"/>
+        <property name="errorManager">
+            <ref local="errorManager"/>
+        </property>
+    </bean>
+
+    <bean id="fatalHandler" class="org.mule.samples.errorhandler.handlers.FatalHandler">
+        <property name="endpointName" value="ExceptionEmailer"/>
+        <property name="errorManager">
+            <ref local="errorManager"/>
+        </property>
+    </bean>
+
+    <bean id="businessHandler" class="org.mule.samples.errorhandler.handlers.BusinessHandler">
+        <property name="endpointName" value="ExceptionQueue"/>
+        <property name="errorManager">
+            <ref local="errorManager"/>
+        </property>
+    </bean>
+    
+    <bean id="propertyPlaceholderConfigurer"
+          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>email.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <smtp:connector name="EmailConnector"/>
+
+    <!-- TODO see MULE-1575 JMS connector is not spring-ified yet -->
+    <jms:connector name="JMSConnector" specification="1.1"/>
+    
+    <file:connector name="FileConnector" 
+                    pollingFrequency="1000" 
+                    moveToDirectory="./test-data/out"
+                    outputPattern="${DATE}.xml"/>
+
+    <!-- 
+        All transformers must be declared here to be referenced by their names in the 
+        endpoint definitions 
+    -->
+    <mule:custom-transformer name="XMLToExceptionBean"
+                             class="org.mule.transformers.xml.XmlToObject"
+                             returnClass="org.mule.samples.errorhandler.ExceptionBean"/>
+    <mule:custom-transformer name="ExceptionBeanToXML" 
+                             class="org.mule.transformers.xml.ObjectToXml"
+                             returnClass="java.lang.String"/>
+    <mule:custom-transformer name="ExceptionBeanToErrorMessage" 
+                             class="org.mule.samples.errorhandler.ExceptionBeanToErrorMessage"
+                             returnClass="org.mule.samples.errorhandler.ErrorMessage"/>
+    <mule:custom-transformer name="ErrorMessageToException" 
+                             class="org.mule.samples.errorhandler.ErrorMessageToException"
+                             returnClass="java.lang.Throwable"/>
+    <mule:custom-transformer name="ErrorMessageToExceptionBean" 
+                             class="org.mule.samples.errorhandler.ErrorMessageToExceptionBean"
+                             returnClass="org.mule.samples.errorhandler.ExceptionBean"/>
+    <mule:custom-transformer name="StringToEmailMessage" 
+                             class="org.mule.providers.email.transformers.StringToEmailMessage"
+                             returnClass="javax.mail.Message"/>
+    <mule:custom-transformer name="ObjectToJMSMessage"
+                             class="org.mule.providers.jms.transformers.ObjectToJMSMessage"
+                             returnClass="javax.jms.TextMessage"/>
+    <mule:custom-transformer name="JMSMessageToObject" 
+                             class="org.mule.providers.jms.transformers.JMSMessageToObject"
+                             returnClass="java.lang.String"/>
+
+    <!-- TODO how to handle this? The whole interceptor block is commented out in mule.xsd -->    
+<!--    <interceptor-stack name="default">-->
+<!--        <interceptor className="org.mule.interceptors.LoggingInterceptor"/>-->
+<!--        <interceptor className="org.mule.interceptors.TimerInterceptor"/>-->
+<!--    </interceptor-stack>-->
+    
+    <mule:model-seda name="errorhandler-test">
+        <!-- 
+            This uses an URL endpointUri instead of a provider config.  Note that this specifies 
+            a relative path as the endpoint though fully qualified uri will work i.e. 
+            file:///usr/test-data/samples/errorhandler/in
+        -->
+        <mule:service name="Error Manager">
+            <mule:component instance-ref="errorManager"/>
+            <mule:inbound-router>
+                <mule:endpoint address="file://./test-data/in"
+                               transformers="XMLToExceptionBean ExceptionBeanToErrorMessage"/>
+            </mule:inbound-router>
+            
+            <mule:outbound-router>
+                <mule:custom-catch-all-strategy class="org.mule.routing.LoggingCatchAllStrategy"/>
+                
+                <mule:filtering-router transformers="ErrorMessageToException">
+                    <mule:endpoint address="file://./test-data/exceptions"
+                                   transformers="ErrorMessageToExceptionBean ExceptionBeanToXML">
+                        <mule:properties>
+                            <entry key="outputPattern" value="Exception-${UUID}.xml"/>
+                        </mule:properties>
+                    </mule:endpoint>
+                </mule:filtering-router>
+                
+                <mule:filtering-router transformers="ErrorMessageToException">
+                    <mule:endpoint address="smtp://?address=${email.toAddress}"
+                                   transformers="ErrorMessageToExceptionBean ExceptionBeanToXML StringToEmailMessage">
+                        <mule:properties>
+                            <entry key="fromAddress" value="${email.fromAddress}"/>
+                            <entry key="subject" value="${email.subject}"/>
+                        </mule:properties>
+                    </mule:endpoint>
+                    <mule:payload-type-filter expectedType="org.mule.umo.lifecycle.FatalException"/>
+                </mule:filtering-router>
+                
+                <mule:filtering-router transformers="ErrorMessageToException">
+                    <mule:endpoint address="jms://exception.queue"
+                                   transformers="ErrorMessageToExceptionBean ExceptionBeanToXML ObjectToJMSMessage"/>
+                    <mule:payload-type-filter expectedType="org.mule.samples.errorhandler.exceptions.BusinessException"/>
+                </mule:filtering-router>
+
+                <!-- TODO how to handle this? The whole interceptor block is commented out in mule.xsd -->
+<!--                <interceptor name="default"/>-->
+            </mule:outbound-router>
+        </mule:service>
+        
+        <mule:service name="Business Error Manager">
+            <mule:component instance-ref="businessErrorManager"/>
+            
+            <mule:inbound-router>
+                <mule:endpoint address="jms://exception.queue"
+                               transformers="JMSMessageToObject XMLToExceptionBean ExceptionBeanToErrorMessage"/>
+            </mule:inbound-router>
+        </mule:service>
+    </mule:model-seda>
+</beans>
+
+<!-- 
 <!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
                                 "http://mule.mulesource.org/dtds/mule-configuration.dtd">
 
@@ -33,7 +200,7 @@
     <connector name="JMSConnector" className="org.mule.providers.jms.activemq.ActiveMqJmsConnector">
         <properties>
             <property name="specification" value="1.1"/>
-            <!-- This property references the Spring container defined above -->
+            <!- This property references the Spring container defined above ->
             <container-property name="connectionFactory" reference="activeMqConnectionFactory" />
         </properties>
     </connector>
@@ -74,9 +241,9 @@
 
     <model name="errorhandler-test">
 
-        <!-- this uses an Url endpointUri instead of a provider config.  Note that this specifies a relative path
+        <!- this uses an Url endpointUri instead of a provider config.  Note that this specifies a relative path
         as the endpoiint though fully qualified uri will work ie. file:///usr/test-data/samples/errorhandler/in
-        -->
+        ->
         <mule-descriptor name="Error Manager" implementation="errorManager">
             <inbound-router>
                 <endpoint address="file://./test-data/in"
@@ -135,3 +302,4 @@
         </mule-descriptor>
     </model>
 </mule-configuration>
+ -->

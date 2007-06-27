@@ -1,5 +1,8 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 
+<!-- TODO DO: this file can be deleted when closing MULE-1965 as all bean defintions
+     can reside in the main config now
+-->
 <beans>
     <bean id="activeMqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
         <constructor-arg value="vm://localhost?broker.persistent=false&amp;broker.useJmx=false"/>
