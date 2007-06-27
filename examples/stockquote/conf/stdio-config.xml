@@ -1,32 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:stdio="http://www.mulesource.org/schema/mule/stdio/2.0"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/stdio/2.0 http://www.mulesource.org/schema/mule/stdio/2.0/mule-stdio.xsd">
 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+    <stdio:connector name="SystemStreamConnector" 
+                     promptMessageCode="2"
+                     resourceBundle="messages.stockquote-example-messages"
+                     messageDelayTime="1000"/>
 
-<mule-configuration id="Mule_Dot_Net_Stock_Quote_Sample_using_REST" version="1.0">
-
-    <connector name="SystemStreamConnector" className="org.mule.providers.stream.SystemStreamConnector">
-        <properties>
-            <property name="promptMessageCode" value="2"/>
-            <property name="resourceBundle" value="messages.stockquote-example-messages"/>
-            <property name="messageDelayTime" value="1000"/>
-        </properties>
-    </connector>
-
-    <model name="Sample">
-        <mule-descriptor name="Console I/O"
-                         implementation="org.mule.components.simple.BridgeComponent">
-            <inbound-router>
-                <endpoint address="stream://System.in"/>
-            </inbound-router>
-            <outbound-router>
-                <!-- we use a chaining router to send the results of one endpoint execution as the input
-                for the next endpoint.  In this case it writes it out to System.out -->
-                <router className="org.mule.routing.outbound.ChainingRouter">
-                    <endpoint address="vm://stockquote"/>
-                    <endpoint address="stream://System.out"/>
-                </router>
-            </outbound-router>
-        </mule-descriptor>
-    </model>
-</mule-configuration>
+    <mule:model-seda name="Sample">
+        <mule:service name="Console I/O">
+            <mule:component class="org.mule.components.simple.BridgeComponent"/>
+            <mule:inbound-router>
+                <mule:endpoint address="stdio://System.in"/>
+            </mule:inbound-router>
+            <mule:outbound-router>
+                <!-- 
+                    We use a chaining router to send the results of one endpoint execution as the 
+                    input for the next endpoint. In this case it writes it out to System.out 
+                -->
+                <mule:chaining-router>
+                    <mule:endpoint address="vm://stockquote"/>
+                    <mule:endpoint address="stdio://System.out"/>
+                </mule:chaining-router>
+            </mule:outbound-router>    
+        </mule:service>
+    </mule:model-seda>
+</beans>
