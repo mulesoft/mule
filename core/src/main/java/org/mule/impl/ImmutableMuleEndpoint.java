@@ -349,6 +349,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     public UMOTransformer getTransformer()
     {
+        lazyInitTransformer();
         return transformer;
     }
 
@@ -577,28 +578,28 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
             }
         }
 
-        if (transformer == null)
-        {
-            if (connector instanceof AbstractConnector)
-            {
-                if (UMOEndpoint.ENDPOINT_TYPE_SENDER.equals(type))
-                {
-                    transformer = ((AbstractConnector) connector).getDefaultOutboundTransformer();
-                }
-                else if (UMOEndpoint.ENDPOINT_TYPE_SENDER_AND_RECEIVER.equals(type))
-                {
-                    transformer = ((AbstractConnector) connector).getDefaultInboundTransformer();
-                }
-                else
-                {
-                    transformer = ((AbstractConnector) connector).getDefaultInboundTransformer();
-                }
-            }
-        }
-        if (transformer != null)
-        {
-            transformer.setEndpoint(this);
-        }
+//        if (transformer == null)
+//        {
+//            if (connector instanceof AbstractConnector)
+//            {
+//                if (UMOEndpoint.ENDPOINT_TYPE_SENDER.equals(type))
+//                {
+//                    transformer = ((AbstractConnector) connector).getDefaultOutboundTransformer();
+//                }
+//                else if (UMOEndpoint.ENDPOINT_TYPE_SENDER_AND_RECEIVER.equals(type))
+//                {
+//                    transformer = ((AbstractConnector) connector).getDefaultInboundTransformer();
+//                }
+//                else
+//                {
+//                    transformer = ((AbstractConnector) connector).getDefaultInboundTransformer();
+//                }
+//            }
+//        }
+//        if (transformer != null)
+//        {
+//            transformer.setEndpoint(this);
+//        }
 
         if (endpointUri.getResponseTransformers() != null)
         {
@@ -660,6 +661,32 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         catch (RegistrationException re)
         {
             logger.warn(re);
+        }
+    }
+
+    protected synchronized void lazyInitTransformer()
+    {
+        if (transformer == null)
+        {
+            if (connector instanceof AbstractConnector)
+            {
+                if (UMOEndpoint.ENDPOINT_TYPE_SENDER.equals(type))
+                {
+                    transformer = ((AbstractConnector) connector).getDefaultOutboundTransformer();
+                }
+                else if (UMOEndpoint.ENDPOINT_TYPE_SENDER_AND_RECEIVER.equals(type))
+                {
+                    transformer = ((AbstractConnector) connector).getDefaultInboundTransformer();
+                }
+                else
+                {
+                    transformer = ((AbstractConnector) connector).getDefaultInboundTransformer();
+                }
+            }
+            if (transformer != null)
+            {
+                transformer.setEndpoint(this);
+            }
         }
     }
 

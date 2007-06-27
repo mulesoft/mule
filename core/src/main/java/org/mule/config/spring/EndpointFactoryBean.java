@@ -71,7 +71,7 @@ public class EndpointFactoryBean extends MuleEndpoint implements FactoryBean, Ap
         ep = RegistryContext.getRegistry().lookupEndpoint(name);
         if(ep==null)
         {
-            ep = new MuleEndpoint(name, new MuleEndpointURI(address), connector, transformer, type, createConnector, encoding, properties);
+            ep = new MuleEndpoint(name, new MuleEndpointURI(address), connector, getTransformer(), type, createConnector, encoding, properties);
         }
         else
         {
