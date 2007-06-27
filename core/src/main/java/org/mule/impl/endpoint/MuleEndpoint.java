@@ -136,11 +136,8 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint, 
 
     public void setTransformer(UMOTransformer trans)
     {
-        transformer = trans;
-        if (transformer != null)
-        {
-            transformer.setEndpoint(this);
-        }
+        transformer.set(trans);
+        updateTransformerEndpoint();
     }
 
     public void setProperties(Map props)

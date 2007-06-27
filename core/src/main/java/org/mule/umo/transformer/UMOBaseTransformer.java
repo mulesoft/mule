@@ -27,7 +27,9 @@ public interface UMOBaseTransformer extends Initialisable, Registerable
     UMOImmutableEndpoint getEndpoint();
 
     /**
-     * Sets the endpoint associated with with this connector
+     * Sets the endpoint associated with with this connector.
+     * This should be idempotent, since endpoints do not guarantee it will only
+     * be called once.
      * @param endpoint sets the endpoint associated with the transfromer
      */
     void setEndpoint(UMOImmutableEndpoint endpoint);

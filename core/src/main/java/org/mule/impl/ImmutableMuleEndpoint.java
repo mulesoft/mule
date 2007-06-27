@@ -49,6 +49,7 @@ import java.util.regex.Pattern;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -81,7 +82,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     /**
      * The transformer used to transform the incoming or outgoing data
      */
-    protected UMOTransformer transformer = null;
+    protected AtomicReference transformer = new AtomicReference(UninitialisedTransformer.NULL);
 
     /**
      * The transformer used to transform the incoming or outgoing data
@@ -203,11 +204,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
             this.endpointUri = new MuleEndpointURI(endpointUri);
         }
 
-        if (transformer != null)
-        {
-            transformer.setEndpoint(this);
-            this.transformer = transformer;
-        }
+        initTransformerIfNotNull(transformer);
 
         this.properties = new ConcurrentHashMap();
 
@@ -248,62 +245,54 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     protected void initFromDescriptor(UMOImmutableEndpoint source) throws UMOException
     {
-        if (this.name == null)
+        if (name == null)
         {
-            this.name = source.getName();
+            name = source.getName();
         }
 
-        if (this.endpointUri == null && source.getEndpointURI() != null)
+        if (endpointUri == null && source.getEndpointURI() != null)
         {
-            this.endpointUri = new MuleEndpointURI(source.getEndpointURI());
+            endpointUri = new MuleEndpointURI(source.getEndpointURI());
         }
 
-        if (this.endpointEncoding == null)
+        if (endpointEncoding == null)
         {
-            this.endpointEncoding = source.getEncoding();
+            endpointEncoding = source.getEncoding();
         }
 
-        if (this.connector == null)
+        if (connector == null)
         {
-            this.connector = source.getConnector();
+            connector = source.getConnector();
         }
 
-        if (this.transformer == null)
-        {
-            this.transformer = source.getTransformer();
-        }
+        initTransformerIfNotNull(source.getTransformer());
 
-        if (this.transformer != null)
+        if (responseTransformer == null)
         {
-            this.transformer.setEndpoint(this);
-        }
-
-        if (this.responseTransformer == null)
-        {
-            this.responseTransformer = source.getResponseTransformer();
+            responseTransformer = source.getResponseTransformer();
         }
 
         if (responseTransformer != null)
         {
-            this.responseTransformer.setEndpoint(this);
+            responseTransformer.setEndpoint(this);
         }
 
-        this.properties = new ConcurrentHashMap();
+        properties = new ConcurrentHashMap();
 
         if (source.getProperties() != null)
         {
-            this.properties.putAll(source.getProperties());
+            properties.putAll(source.getProperties());
         }
 
         if (endpointUri != null && endpointUri.getParams() != null)
         {
-            this.properties.putAll(endpointUri.getParams());
+            properties.putAll(endpointUri.getParams());
         }
 
-        this.type = source.getType();
-        this.transactionConfig = source.getTransactionConfig();
-        this.deleteUnacceptedMessages = source.isDeleteUnacceptedMessages();
-        this.initialState = source.getInitialState();
+        type = source.getType();
+        transactionConfig = source.getTransactionConfig();
+        deleteUnacceptedMessages = source.isDeleteUnacceptedMessages();
+        initialState = source.getInitialState();
 
         remoteSyncTimeout = new Integer(source.getRemoteSyncTimeout());
         remoteSync = Boolean.valueOf(source.isRemoteSync());
@@ -350,7 +339,20 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     public UMOTransformer getTransformer()
     {
         lazyInitTransformer();
-        return transformer;
+        return getTransformerValue();
+    }
+
+    protected UMOTransformer getTransformerValue()
+    {
+        UMOTransformer value = (UMOTransformer) transformer.get();
+        if (UninitialisedTransformer.NULL == value)
+        {
+            return null;
+        }
+        else
+        {
+            return value;
+        }
     }
 
     public Map getProperties()
@@ -393,8 +395,8 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
         }
 
-        return ClassUtils.getClassName(this.getClass()) + "{connector=" + connector + ", endpointUri="
-               + sanitizedEndPointUri + ", transformer=" + transformer + ", name='" + name + "'"
+        return ClassUtils.getClassName(getClass()) + "{connector=" + connector + ", endpointUri="
+               + sanitizedEndPointUri + ", transformer=" + getTransformerValue() + ", name='" + name + "'"
                + ", type='" + type + "'" + ", properties=" + properties + ", transactionConfig="
                + transactionConfig + ", filter=" + filter + ", deleteUnacceptedMessages="
                + deleteUnacceptedMessages + ", initialised=" + initialised + ", securityFilter="
@@ -459,12 +461,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 //        {
 //            return false;
 //        }
-        if (!type.equals(immutableMuleProviderDescriptor.type))
-        {
-            return false;
-        }
-
-        return true;
+        return type.equals(immutableMuleProviderDescriptor.type);
     }
 
     public int hashCode()
@@ -563,43 +560,21 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         // write-through aliasing problems with the exposed Map
         if (!(this instanceof MuleEndpoint))
         {
-            this.properties = Collections.unmodifiableMap(this.properties);
+            properties = Collections.unmodifiableMap(properties);
         }
 
         if (endpointUri.getTransformers() != null)
         {
             try
             {
-                transformer = MuleObjectHelper.getTransformer(endpointUri.getTransformers(), ",");
+                UMOTransformer newTransformer = MuleObjectHelper.getTransformer(endpointUri.getTransformers(), ",");
+                initTransformerIfNotNull(newTransformer);
             }
             catch (MuleException e)
             {
                 throw new InitialisationException(e, this);
             }
         }
-
-//        if (transformer == null)
-//        {
-//            if (connector instanceof AbstractConnector)
-//            {
-//                if (UMOEndpoint.ENDPOINT_TYPE_SENDER.equals(type))
-//                {
-//                    transformer = ((AbstractConnector) connector).getDefaultOutboundTransformer();
-//                }
-//                else if (UMOEndpoint.ENDPOINT_TYPE_SENDER_AND_RECEIVER.equals(type))
-//                {
-//                    transformer = ((AbstractConnector) connector).getDefaultInboundTransformer();
-//                }
-//                else
-//                {
-//                    transformer = ((AbstractConnector) connector).getDefaultInboundTransformer();
-//                }
-//            }
-//        }
-//        if (transformer != null)
-//        {
-//            transformer.setEndpoint(this);
-//        }
 
         if (endpointUri.getResponseTransformers() != null)
         {
@@ -655,7 +630,8 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         try
         {
             register();
-            if (transformer != null && transformer.getRegistryId() == null) transformer.register();
+            UMOTransformer transformerValue = getTransformerValue();
+            if (transformerValue != null && transformerValue.getRegistryId() == null) transformerValue.register();
             if (responseTransformer != null && responseTransformer.getRegistryId() == null) responseTransformer.register();
         }
         catch (RegistrationException re)
@@ -664,29 +640,51 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         }
     }
 
-    protected synchronized void lazyInitTransformer()
+    protected void lazyInitTransformer()
     {
-        if (transformer == null)
+        // for efficiency
+        if (UninitialisedTransformer.NULL == transformer.get())
         {
+            UMOTransformer newTransformer = null;
             if (connector instanceof AbstractConnector)
             {
                 if (UMOEndpoint.ENDPOINT_TYPE_SENDER.equals(type))
                 {
-                    transformer = ((AbstractConnector) connector).getDefaultOutboundTransformer();
+                    newTransformer = ((AbstractConnector) connector).getDefaultOutboundTransformer();
                 }
                 else if (UMOEndpoint.ENDPOINT_TYPE_SENDER_AND_RECEIVER.equals(type))
                 {
-                    transformer = ((AbstractConnector) connector).getDefaultInboundTransformer();
+                    newTransformer = ((AbstractConnector) connector).getDefaultInboundTransformer();
                 }
                 else
                 {
-                    transformer = ((AbstractConnector) connector).getDefaultInboundTransformer();
+                    newTransformer = ((AbstractConnector) connector).getDefaultInboundTransformer();
                 }
             }
-            if (transformer != null)
-            {
-                transformer.setEndpoint(this);
-            }
+            // this respects the original semantics; not sure it makes sense
+            // ie there is no further initialisation after this point - value
+            // may be forced to null here
+            transformer.compareAndSet(UninitialisedTransformer.NULL, newTransformer);
+            updateTransformerEndpoint();
+        }
+    }
+
+    protected void initTransformerIfNotNull(UMOTransformer newTransformer)
+    {
+        if (null != newTransformer)
+        {
+            transformer.compareAndSet(UninitialisedTransformer.NULL, newTransformer);
+            updateTransformerEndpoint();
+        }
+    }
+
+    protected void updateTransformerEndpoint()
+    {
+        UMOTransformer target = getTransformerValue();
+        if (null != target)
+        {
+            // setEndpoint should be idempotent
+            target.setEndpoint(this);
         }
     }
 
