@@ -128,5 +128,12 @@ public class MessagePropertyFilter implements UMOFilter
     {
         this.caseSensitive = caseSensitive;
     }
-
+    
+    /**
+     * All Filters that are configured via spring have to implement this method.
+     */
+    public void setPattern(String pattern)
+    {
+        this.setExpression(pattern);
+    }
 }
