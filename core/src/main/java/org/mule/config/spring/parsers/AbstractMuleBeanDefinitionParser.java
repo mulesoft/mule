@@ -33,6 +33,7 @@ import org.springframework.util.StringUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * This parser extends the Spring provided {@link AbstractBeanDefinitionParser} to provide additional features for
@@ -78,6 +79,9 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
     public static final String ATTRIBUTE_IDREF = "nameref";
     public static final String ATTRIBUTE_CLASS = "class";
     public static final String ATTRIBUTE_REF_SUFFIX = "-ref";
+    public static final String BASE_NAME = "autogenNameForMule-";
+    private static AtomicInteger nameCount = new AtomicInteger(0);
+
     /**
      * logger used by this class
      */
@@ -161,6 +165,7 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
      */
     protected void postProcess(BeanDefinitionBuilder beanDefinition, Element element)
     {
+        guaranteeElementName(element);
     }
 
     /**
@@ -228,6 +233,14 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
 
         doParse(element, parserContext, builder);
         return builder.getBeanDefinition();
+    }
+
+    protected void guaranteeElementName(Element element)
+    {
+        if (null == element.getAttributeNode(ATTRIBUTE_NAME))
+        {
+            element.setAttribute(ATTRIBUTE_NAME, BASE_NAME + nameCount.incrementAndGet());
+        }
     }
 
     protected BeanDefinitionBuilder createBeanDefinitionBuilder(Element element, Class beanClass)

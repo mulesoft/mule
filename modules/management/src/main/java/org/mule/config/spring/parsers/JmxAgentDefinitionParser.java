@@ -39,6 +39,7 @@ public class JmxAgentDefinitionParser extends AbstractMuleBeanDefinitionParser
 
 
         protected void postProcess(BeanDefinitionBuilder definition, Element element) {
+            super.postProcess(definition, element);
             NodeList childNodes = element.getChildNodes();
             for (int i = 0; i < childNodes.getLength(); i++) {
                 Node node = childNodes.item(i);

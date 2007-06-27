@@ -12,6 +12,7 @@ package org.mule.config.spring.parsers.assembly;
 
 import org.mule.util.ClassUtils;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,12 +20,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.lang.reflect.Method;
 
-import org.springframework.core.Conventions;
-import org.springframework.util.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.core.Conventions;
+import org.springframework.util.StringUtils;
 
 /**
  * This collects together various constraints/rewrites that can be applied to attributes.  It

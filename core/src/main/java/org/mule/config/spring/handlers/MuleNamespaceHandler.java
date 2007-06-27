@@ -15,6 +15,7 @@ import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
 import org.mule.config.spring.parsers.collection.OrphanMapDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.GrandchildDefinitionParser;
+import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
 import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
@@ -33,7 +34,6 @@ import org.mule.config.spring.parsers.specific.TransactionConfigDefinitionParser
 import org.mule.config.spring.parsers.specific.security.CustomEncryptionStrategyDefinitionParser;
 import org.mule.config.spring.parsers.specific.security.CustomSecurityDefinitionParser;
 import org.mule.config.spring.parsers.specific.security.SecurityFilterDefinitionParser;
-import org.mule.config.spring.parsers.specific.security.SecurityManagerDefinitionParser;
 import org.mule.impl.DefaultComponentExceptionStrategy;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.container.JndiContainerContext;
@@ -224,11 +224,7 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("static-recipient-list-router", new RouterDefinitionParser("router", StaticRecipientList.class));
         registerBeanDefinitionParser("template-endpoint-router", new RouterDefinitionParser("router", TemplateEndpointRouter.class));
         registerBeanDefinitionParser("custom-router", new RouterDefinitionParser("router", null));
-
-        ParentDefinitionParser replyToParser = new ParentDefinitionParser();
-        replyToParser.addAlias("address", "recipient");
-        replyToParser.addIgnored("name");
-        registerBeanDefinitionParser("reply-to", replyToParser);
+        registerBeanDefinitionParser("reply-to", new ParentDefinitionParser().addAlias("address", "recipient"));
         
         //Catch all Strategies
         registerBeanDefinitionParser("forwarding-catch-all-strategy", new ChildDefinitionParser("catchAllStrategy", ForwardingCatchAllStrategy.class));
@@ -255,7 +251,7 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("jndi-provider-properties", new ChildMapDefinitionParser("jndiProviderProperties"));
 
         //Security
-        registerBeanDefinitionParser("security-manager", new SecurityManagerDefinitionParser());
+        registerBeanDefinitionParser("security-manager", new NamedDefinitionParser(MuleProperties.OBJECT_SECURITY_MANAGER).addIgnored("type").addIgnored("name"));
         registerBeanDefinitionParser("custom-security-provider", new CustomSecurityDefinitionParser("providers"));
         registerBeanDefinitionParser("custom-encryption-strategy", new CustomEncryptionStrategyDefinitionParser());
         registerBeanDefinitionParser("password-encryption-strategy", new ChildDefinitionParser("encryptionStrategies", PasswordBasedEncryptionStrategy.class).addCollection("encryptionStrategies"));

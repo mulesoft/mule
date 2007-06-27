@@ -14,7 +14,7 @@ if [ -z "$MULE_BASE" ] ; then
   export MULE_BASE
 fi
 
-# Any changes to the files in ./conf will take precedence over those deployed to $MULE_HOME/lib/user
+# This extends the classpath to include the configuration directory
 # Any changes to the files in ./conf will take precedence over those deployed to $MULE_HOME/lib/user
 MULE_LIB=./conf
 export MULE_LIB
