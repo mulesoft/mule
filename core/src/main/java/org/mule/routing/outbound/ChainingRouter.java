@@ -11,6 +11,7 @@
 package org.mule.routing.outbound;
 
 import org.mule.config.i18n.CoreMessages;
+import org.mule.providers.NullPayload;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
@@ -67,7 +68,10 @@ public class ChainingRouter extends FilteringOutboundRouter
                     // Need to propagate correlation info and replyTo, because there
                     // is no guarantee that an external system will preserve headers
                     // (in fact most will not)
-                    if (localResult != null && intermediaryResult != null)
+                    if (localResult != null &&
+                        // null result can be wrapped in a NullPayload
+                        localResult.getPayload() != NullPayload.getInstance() &&
+                        intermediaryResult != null)
                     {
                         processIntermediaryResult(localResult, intermediaryResult);
                     }
@@ -79,8 +83,11 @@ public class ChainingRouter extends FilteringOutboundRouter
                                      + (intermediaryResult != null ? intermediaryResult.toString() : "null"));
                     }
 
-                    if (intermediaryResult == null)
+                    if (intermediaryResult == null || intermediaryResult.getPayload() == NullPayload.getInstance())
                     {
+                        // if there was an error in the first link of the chain, make sure we propagate back
+                        // any exception payloads alongside the NullPayload
+                        resultToReturn = intermediaryResult;
                         logger.warn("Chaining router cannot process any further endpoints. "
                                     + "There was no result returned from endpoint invocation: " + endpoint);
                         break;

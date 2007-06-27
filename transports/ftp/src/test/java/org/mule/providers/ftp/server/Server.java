@@ -33,10 +33,10 @@ public class Server
     public Server(int port) throws Exception
     {
         this.port = port;
-        state = new InOutState();
+        this.state = new InOutState();
 
         // this must be set BEFORE the configuration is created
-        // is is accessed BEFORE server startup
+        // it is accessed BEFORE server startup
         System.getProperties().put(FTP_STATE_KEY + port, state);
 
         Properties properties = new Properties();
@@ -46,6 +46,9 @@ public class Server
         properties.setProperty("config.connection-manager.default-idle-time", "1");
         properties.setProperty("config.connection-manager.max-login", "1000");
         properties.setProperty("config.connection-manager.max-anonymous-login", "1000");
+        properties.setProperty("config.user-manager.class", InMemoryUserManager.class.getName());
+        properties.setProperty("config.ip-restrictor.class", InMemoryIpRestrictor.class.getName());
+
         Configuration config = new PropertiesConfiguration(properties);
         FtpServerContext context = new ConfigurableFtpServerContext(config);
 

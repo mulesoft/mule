@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+        "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="ChainingRouterNulls" version="1.0">
+
+    <mule-environment-properties synchronous="true" serverUrl=""/>
+
+    <model name="ChainingRouterNullsModel">
+
+        <!--
+            Both first and last link elements succeed
+        -->
+        <mule-descriptor name="bridge1"
+                         implementation="org.mule.components.simple.BridgeComponent">
+            <inbound-router>
+                <endpoint address="vm://incomingPass"/>
+            </inbound-router>
+
+            <outbound-router>
+                <router className="org.mule.routing.outbound.ChainingRouter">
+                    <endpoint address="vm://component1"/>
+                    <endpoint address="vm://component2Pass"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+
+        <!--
+            First passes and tags the message, but the last one fails
+        -->
+        <mule-descriptor name="bridge2"
+                         implementation="org.mule.components.simple.BridgeComponent">
+            <inbound-router>
+                <endpoint address="vm://incomingLastFail"/>
+            </inbound-router>
+
+            <outbound-router>
+                <router className="org.mule.routing.outbound.ChainingRouter">
+                    <endpoint address="vm://component1"/>
+                    <endpoint address="vm://component2Fail"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+
+        <!--
+            First chain component fails, second never fires
+        -->
+        <mule-descriptor name="bridge3"
+                         implementation="org.mule.components.simple.BridgeComponent">
+            <inbound-router>
+                <endpoint address="vm://incomingFirstFail"/>
+            </inbound-router>
+
+            <outbound-router>
+                <router className="org.mule.routing.outbound.ChainingRouter">
+                    <endpoint address="vm://component1Fail"/>
+                    <endpoint address="vm://component2Pass"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="component1" implementation="org.mule.tck.functional.FunctionalTestComponent">
+            <inbound-router>
+                <endpoint address="vm://component1"/>
+            </inbound-router>
+            <properties>
+                <property name="appendComponentName" value="true"/>
+            </properties>
+        </mule-descriptor>
+
+        <mule-descriptor name="component1Fail" implementation="org.mule.tck.functional.FunctionalTestComponent">
+            <inbound-router>
+                <endpoint address="vm://component1Fail"/>
+            </inbound-router>
+            <properties>
+                <property name="throwException" value="true"/>
+                <property name="appendComponentName" value="true"/>
+            </properties>
+        </mule-descriptor>
+
+        <mule-descriptor name="component2Pass" implementation="org.mule.tck.functional.FunctionalTestComponent">
+            <inbound-router>
+                <endpoint address="vm://component2Pass"/>
+            </inbound-router>
+            <properties>
+                <property name="appendComponentName" value="true"/>
+            </properties>
+        </mule-descriptor>
+
+        <mule-descriptor name="component2Fail" implementation="org.mule.tck.functional.FunctionalTestComponent">
+            <inbound-router>
+                <endpoint address="vm://component2Fail"/>
+            </inbound-router>
+            <properties>
+                <property name="throwException" value="true"/>
+                <property name="appendComponentName" value="true"/>
+            </properties>
+        </mule-descriptor>
+
+    </model>
+
+</mule-configuration>

@@ -14,7 +14,18 @@
     <mule-environment-properties synchronous="true" serverUrl=""/>
  
     <!-- Synchronous VM connector (messages are processed in the same execution thread) -->
-    <connector name="syncVm" className="org.mule.providers.vm.VMConnector" />
+    <connector name="syncVm" className="org.mule.providers.vm.VMConnector">
+        <!-- TODO why is it locking up in this config when enabled? -->
+        <!--<properties>-->
+            <!--<property name="queueEvents" value="true"/>-->
+        <!--</properties>-->
+        <!--
+            TODO doThreading=false temporary fixes the race condition on dispatch.
+            Need to dig in DefaultMessageAdapter's propertyNames iterator, which is
+            a view over a concurrent map, and thus tolerates changes, but breaks us.
+        -->
+        <threading-profile id="dispatcher" doThreading="false"/>
+    </connector>
     
     <model name="loan-broker">
         <mule-descriptor name="LoanBroker" implementation="org.mule.examples.loanbroker.esn.SynchronousLoanBroker">

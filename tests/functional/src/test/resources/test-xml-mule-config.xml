@@ -6,7 +6,7 @@
 <mule-configuration id="Test_Mule_Properties" version="1.0">
 
     <environment-properties>
-        <!-- Whether mule transfromers should use compression when sending and recieving messages -->
+        <!-- Whether mule transfromers should use compression when sending and receiving messages -->
         <property name="doCompression" value="true"/>
         <property name="beanProperty1" value="this was set from the manager properties!"/>
         <system-property name="OS Version" key="os.version"/>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="QoSHeaders" version="1.0">
+
+    <!-- embed Spring configuration to create a Jms Connection factory -->
+    <container-context className="org.mule.extras.spring.SpringContainerContext">
+        <properties>
+            <text-property name="configuration">
+                <![CDATA[
+                <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+                <beans>
+                <bean id="jmsConnectionFactory"
+                      class="org.apache.activemq.ActiveMQConnectionFactory">
+                      <property name="brokerURL"><value>vm://localhost?broker.persistent=false&amp;broker.useJmx=false</value></property>
+                    </bean>
+                </beans>
+                ]]>
+            </text-property>
+        </properties>
+    </container-context>
+
+    <!-- This connector will propagate Qos JMS headers -->
+    <connector name="kindConnector" className="org.mule.providers.jms.JmsConnector">
+        <properties>
+            <property name="specification" value="1.1"/>
+            <container-property name="connectionFactory" reference="jmsConnectionFactory"/>
+            <property name="persistentDelivery" value="false"/>
+            <property name="honorQosHeaders" value="true"/>
+        </properties>
+    </connector>
+
+    <!-- This one is bad and disrespectful of message properties :) -->
+    <connector name="selfishConnector" className="org.mule.providers.jms.JmsConnector">
+        <properties>
+            <property name="specification" value="1.1"/>
+            <container-property name="connectionFactory" reference="jmsConnectionFactory"/>
+            <property name="persistentDelivery" value="false"/>
+            <property name="honorQosHeaders" value="false"/>
+        </properties>
+    </connector>
+
+    <model name="QoSHeadersTest">
+        <mule-descriptor name="Bridge1" implementation="org.mule.components.simple.BridgeComponent">
+            <inbound-router>
+                <endpoint address="jms://test.in.kind" connector="kindConnector"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="jms://test.out.kind" connector="kindConnector"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="Bridge2" implementation="org.mule.components.simple.BridgeComponent">
+            <inbound-router>
+                <endpoint address="jms://test.in.selfish" connector="selfishConnector"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="jms://test.out.selfish" connector="selfishConnector"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+    </model>
+</mule-configuration>

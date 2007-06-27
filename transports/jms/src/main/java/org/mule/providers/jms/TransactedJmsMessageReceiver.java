@@ -87,10 +87,6 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
         this.reuseSession = MapUtils.getBooleanValue(endpoint.getProperties(), "reuseSession",
                 this.reuseSession);
 
-        // Check if the destination is a queue and
-        // if we are in transactional mode.
-        // If true, set receiveMessagesInTransaction to true.
-        // It will start multiple threads, depending on the threading profile.
         final boolean topic = connector.getTopicResolver().isTopic(endpoint);
 
         // If we're using topics we don't want to use multiple receivers as we'll get
