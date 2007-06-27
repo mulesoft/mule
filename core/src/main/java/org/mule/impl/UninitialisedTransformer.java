@@ -17,14 +17,22 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.registry.RegistrationException;
 import org.mule.registry.DeregistrationException;
 
+/**
+ * A unique transformer instance than indicates the unintialised state and allows
+ * atomic assignment in the presence of external updates (ie we can't use null).
+ */
 public class UninitialisedTransformer implements UMOTransformer
 {
 
-    /**
-     * A unique transformer instance than indicates the unintialised state and allows
-     * atomic assignment in the presence of external updates (ie we can't use null).
-     */
-    public static final UninitialisedTransformer NULL = new UninitialisedTransformer();
+    private static class SingletonHolder
+    {
+        private static final UninitialisedTransformer instance = new UninitialisedTransformer();
+    }
+
+    public static UninitialisedTransformer getInstance()
+    {
+        return SingletonHolder.instance;
+    }
 
     private UninitialisedTransformer() {
         // no-op

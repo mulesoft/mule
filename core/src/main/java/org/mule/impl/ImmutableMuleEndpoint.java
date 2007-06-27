@@ -82,7 +82,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     /**
      * The transformer used to transform the incoming or outgoing data
      */
-    protected AtomicReference transformer = new AtomicReference(UninitialisedTransformer.NULL);
+    protected AtomicReference transformer = new AtomicReference(UninitialisedTransformer.getInstance());
 
     /**
      * The transformer used to transform the incoming or outgoing data
@@ -345,7 +345,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     protected UMOTransformer getTransformerValue()
     {
         UMOTransformer value = (UMOTransformer) transformer.get();
-        if (UninitialisedTransformer.NULL == value)
+        if (UninitialisedTransformer.getInstance() == value)
         {
             return null;
         }
@@ -643,7 +643,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     protected void lazyInitTransformer()
     {
         // for efficiency
-        if (UninitialisedTransformer.NULL == transformer.get())
+        if (UninitialisedTransformer.getInstance() == transformer.get())
         {
             UMOTransformer newTransformer = null;
             if (connector instanceof AbstractConnector)
@@ -664,7 +664,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
             // this respects the original semantics; not sure it makes sense
             // ie there is no further initialisation after this point - value
             // may be forced to null here
-            transformer.compareAndSet(UninitialisedTransformer.NULL, newTransformer);
+            transformer.compareAndSet(UninitialisedTransformer.getInstance(), newTransformer);
             updateTransformerEndpoint();
         }
     }
@@ -673,7 +673,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     {
         if (null != newTransformer)
         {
-            transformer.compareAndSet(UninitialisedTransformer.NULL, newTransformer);
+            transformer.compareAndSet(UninitialisedTransformer.getInstance(), newTransformer);
             updateTransformerEndpoint();
         }
     }
