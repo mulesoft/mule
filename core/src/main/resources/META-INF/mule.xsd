@@ -145,6 +145,15 @@
         <xsd:complexContent>
             <xsd:extension base="baseEndpointType">
                 <xsd:attribute name="address" type="xsd:string" use="required"/>
+                <!-- MULE-1837 - add endpoint type if necessary -->
+                <!-- xsd:attribute name="type">
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:NMTOKEN">
+                            <xsd:enumeration value="receiver"/>
+                            <xsd:enumeration value="sender"/>
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute -->
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
