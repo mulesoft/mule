@@ -10,10 +10,16 @@
 
 package org.mule.impl.model;
 
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentSkipListMap;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.DefaultComponentExceptionStrategy;
 import org.mule.impl.DefaultLifecycleAdapterFactory;
 import org.mule.impl.ImmutableMuleDescriptor;
+import org.mule.impl.ManagementContextAware;
 import org.mule.impl.MuleSession;
 import org.mule.impl.internal.notifications.ModelNotification;
 import org.mule.impl.model.resolvers.DynamicEntryPointResolver;
@@ -36,12 +42,6 @@ import java.beans.ExceptionListener;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentSkipListMap;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>MuleModel</code> is the default implementation of the UMOModel. The model
@@ -88,7 +88,6 @@ public abstract class AbstractModel implements UMOModel
         lifecycleAdapterFactory = new DefaultLifecycleAdapterFactory();
         components = new ConcurrentSkipListMap();
         descriptors = new ConcurrentHashMap();
-        exceptionListener = new DefaultComponentExceptionStrategy();
     }
 
 
@@ -475,6 +474,11 @@ public abstract class AbstractModel implements UMOModel
                 throw new InitialisationException(e, this);
             }
 
+            // TODO this doesn't feel right, should be injected?
+            if (exceptionListener instanceof ManagementContextAware)
+            {
+                ((ManagementContextAware) exceptionListener).setManagementContext(managementContext);
+            }
             if (exceptionListener instanceof Initialisable)
             {
                 ((Initialisable) exceptionListener).initialise();
