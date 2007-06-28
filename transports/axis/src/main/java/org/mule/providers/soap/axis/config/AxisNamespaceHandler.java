@@ -23,10 +23,9 @@ public class AxisNamespaceHandler extends UtilNamespaceHandler // NamespaceHandl
 {
     public void init()
     {
-        this.registerBeanDefinitionParser("connector", 
-            new OrphanDefinitionParser(AxisConnector.class, true));
-        this.registerBeanDefinitionParser("beanType", new ChildListEntryDefinitionParser("beanTypes"));
-        this.registerBeanDefinitionParser("supportedScheme", new ChildListEntryDefinitionParser("supportedSchemes"));
+        this.registerBeanDefinitionParser("connector", new OrphanDefinitionParser(AxisConnector.class, true));
+        this.registerBeanDefinitionParser("bean-type", new ChildListEntryDefinitionParser("beanTypes"));
+        this.registerBeanDefinitionParser("supported-scheme", new ChildListEntryDefinitionParser("supportedSchemes"));
     }
 }
 

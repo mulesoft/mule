@@ -23,7 +23,7 @@ import org.mule.examples.loanbroker.messages.LoanBrokerQuoteRequest;
  */
 public class SynchronousLoanBroker extends DefaultLoanBroker
 {
-    //A proxy for this object gets injected via the <nested-router> elemet configured on this service.
+    //A proxy for this object gets injected via the <nested-router> element configured on this service.
     //The proxy will then call out to an endpoint and return the result.
     //The transformers configured on the endpoint control how data is marshalled into and out of the call.
     private CreditAgencyService creditAgency;

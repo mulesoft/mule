@@ -49,7 +49,6 @@ public abstract class AbstractRouterCollection implements UMORouterCollection, I
         statistics = new RouterStatistics(type);
     }
 
-
     public void initialise() throws InitialisationException
     {
         for (Iterator iterator = routers.iterator(); iterator.hasNext();)
@@ -58,7 +57,6 @@ public abstract class AbstractRouterCollection implements UMORouterCollection, I
             router.initialise();
         }
     }
-
 
     public void dispose()
     {

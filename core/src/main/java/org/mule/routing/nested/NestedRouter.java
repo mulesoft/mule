@@ -34,7 +34,7 @@ public class NestedRouter extends AbstractRouter implements UMONestedRouter
 
     private String methodName;
 
-    //The router ued to actually ispatch the message
+    //The router used to actually dispatch the message
     protected UMOOutboundRouter outboundRouter;
 
     public NestedRouter()
@@ -42,12 +42,10 @@ public class NestedRouter extends AbstractRouter implements UMONestedRouter
         setRouterStatistics(new RouterStatistics(RouterStatistics.TYPE_NESTED));
     }
 
-
     public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous) throws MessagingException
     {
         return outboundRouter.route(message, session, synchronous);
     }
-
 
     public void setInterface(Class interfaceClass)
     {
@@ -58,7 +56,6 @@ public class NestedRouter extends AbstractRouter implements UMONestedRouter
     {
         return interfaceClass;
     }
-
 
     public String getMethod()
     {
@@ -79,6 +76,7 @@ public class NestedRouter extends AbstractRouter implements UMONestedRouter
         {
             Object proxy = Proxy.newProxyInstance(getInterface().getClassLoader(),
                     new Class[]{getInterface()}, new NestedInvocationHandler(this));
+            logger.debug("Have proxy?: " + (null != proxy));
             return proxy;
 
         }

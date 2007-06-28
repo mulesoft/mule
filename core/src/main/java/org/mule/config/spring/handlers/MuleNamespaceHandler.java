@@ -50,6 +50,7 @@ import org.mule.impl.security.SecretKeyEncryptionStrategy;
 import org.mule.impl.security.filters.MuleEncryptionEndpointSecurityFilter;
 import org.mule.providers.SimpleRetryConnectionStrategy;
 import org.mule.routing.ForwardingCatchAllStrategy;
+import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.inbound.CorrelationAggregator;
 import org.mule.routing.inbound.CorrelationEventResequencer;
 import org.mule.routing.inbound.IdempotentReceiver;
@@ -229,6 +230,7 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         //Catch all Strategies
         registerBeanDefinitionParser("forwarding-catch-all-strategy", new ChildDefinitionParser("catchAllStrategy", ForwardingCatchAllStrategy.class));
         registerBeanDefinitionParser("custom-catch-all-strategy", new ChildDefinitionParser("catchAllStrategy", null));
+        registerBeanDefinitionParser("logging-catch-all-strategy", new ChildDefinitionParser("catchAllStrategy", LoggingCatchAllStrategy.class));
 
         //Common Filters
         registerBeanDefinitionParser("and-filter", new FilterDefinitionParser());

@@ -11,6 +11,8 @@
 package org.mule.examples.loanbroker.esn;
 
 import org.mule.examples.loanbroker.tests.AbstractLoanBrokerTestCase;
+import org.mule.impl.model.seda.SedaModel;
+import org.mule.umo.UMOComponent;
 
 
 public class VMLoanBrokerSynchronousFunctionalTestCase extends AbstractLoanBrokerTestCase
@@ -26,4 +28,23 @@ public class VMLoanBrokerSynchronousFunctionalTestCase extends AbstractLoanBroke
     {
         return 1000;
     }
+
+    public void testBasicParsing()
+    {
+        Object objModel = managementContext.getRegistry().getModels().get("loan-broker");
+        assertNotNull(objModel);
+        assertTrue(objModel instanceof SedaModel);
+        SedaModel model = (SedaModel)objModel;
+        assertComponent(model, "LoanBroker");
+        assertComponent(model, "CreditAgencyService");
+        assertComponent(model, "LenderService");
+        assertComponent(model, "BankGateway");
+    }
+
+    protected void assertComponent(SedaModel model, String name)
+    {
+        UMOComponent component = model.getComponent(name);
+        assertNotNull(name + " missing", component);
+    }
+
 }

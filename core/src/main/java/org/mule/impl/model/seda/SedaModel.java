@@ -70,7 +70,6 @@ public class SedaModel extends AbstractModel
 
     public void initialise() throws InitialisationException
     {
-
         queueTimeout = RegistryContext.getConfiguration().getDefaultSynchronousEventTimeout();
         if(queueProfile==null) {
             queueProfile = new QueueProfile();

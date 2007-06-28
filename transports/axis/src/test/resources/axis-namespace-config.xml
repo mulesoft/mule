@@ -20,10 +20,10 @@
         serverConfig="test-axis-config.wsdd"
         treatMapAsNamedParams="false">
 
-        <axis:beanType>org.mule.tck.testmodels.fruit.Apple</axis:beanType>
-        <axis:beanType>org.mule.tck.testmodels.fruit.Banana</axis:beanType>
+        <axis:bean-type>org.mule.tck.testmodels.fruit.Apple</axis:bean-type>
+        <axis:bean-type>org.mule.tck.testmodels.fruit.Banana</axis:bean-type>
 
-        <axis:supportedScheme>http</axis:supportedScheme>
+        <axis:supported-scheme>http</axis:supported-scheme>
      </axis:connector>
 
     <axis:connector name="axisConnector2"

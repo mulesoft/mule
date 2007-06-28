@@ -25,8 +25,8 @@
         <xsd:complexContent>        
             <xsd:extension base="mule:connectorType">
                 <xsd:sequence>
-                    <xsd:element name="beanType" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
-                    <xsd:element name="supportedScheme" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+                    <xsd:element name="bean-type" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+                    <xsd:element name="supported-scheme" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
                 </xsd:sequence>
                 <xsd:attribute name="axisServer-ref" type="xsd:string">
                     <xsd:annotation>
