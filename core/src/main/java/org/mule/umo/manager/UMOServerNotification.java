@@ -22,7 +22,7 @@ import java.util.Map;
 /**
  * <code>UMOServerNotification</code> is an event triggered by something happening
  * in the Server itself such as the server starting or a component being registered
- * 
+ *
  */
 public abstract class UMOServerNotification extends EventObject
 {
@@ -41,10 +41,12 @@ public abstract class UMOServerNotification extends EventObject
     public static final int MESSAGE_EVENT_ACTION_START_RANGE = 800;
     public static final int SPACE_EVENT_ACTION_START_RANGE = 900;
     public static final int REGISTRY_EVENT_ACTION_START_RANGE = 1000;
+    public static final int EXCEPTION_EVENT_ACTION_START_RANGE = 1100;
+    public static final int TRANSACTION_EVENT_ACTION_START_RANGE = 1200;
     public static final int CUSTOM_EVENT_ACTION_START_RANGE = 100000;
 
     public static final int NULL_ACTION = 0;
-    public static final Object NULL_MESSAGE = new Object();
+    public static final Object NULL_MESSAGE = "";
 
     public final String EVENT_NAME = ClassUtils.getClassName(getClass());
 
@@ -139,7 +141,7 @@ public abstract class UMOServerNotification extends EventObject
 
     public static String getActionName(int action)
     {
-        return (String)actions.get(new Integer(action));
+        return (String) actions.get(new Integer(action));
     }
 
     public static int getActionId(String action)
