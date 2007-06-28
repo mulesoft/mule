@@ -1,22 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:servlet="http://www.mulesource.org/schema/mule/servlet/2.0"
+       xmlns:file="http://www.mulesource.org/schema/mule/file/2.0"
+       xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+               http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+               http://www.mulesource.org/schema/mule/servlet/2.0 http://www.mulesource.org/schema/mule/servlet/2.0/mule-servlet.xsd
+               http://www.mulesource.org/schema/mule/file/2.0 http://www.mulesource.org/schema/mule/file/2.0/mule-file.xsd">
 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+    <mule:endpoint name="restFileEndpoint" address="file://./.mule/restFile"/>    
 
-<mule-configuration id="Samples" version="1.0">
+    <mule:model-seda name="samples">
 
-    <global-endpoints>
-        <endpoint name="restFileEndpoint" address="file://./.mule/restFile"/>
-    </global-endpoints>
+        <mule:service name="restTest">
+            <mule:component class="org.mule.samples.rest.RestTester">
+                <mule:properties>
+                    <entry key="prefix" value="Received"/>
+                </mule:properties>
+            </mule:component>
+            <mule:inbound-router>
+                <mule:endpoint address="servlet://restPUTTest"/>
+            </mule:inbound-router>
+            <mule:outbound-router>
+                <mule:pass-through-router>
+                    <mule:endpoint address="restFileEndpoint"/>
+                </mule:pass-through-router>
+            </mule:outbound-router>
+        </mule:service>
 
-    <model name="samples">
-        <mule-descriptor name="RestTesterUMO"
-            inboundEndpoint="servlet://restPUTTest"
-            outboundEndpoint="restFileEndpoint" 
-            implementation="org.mule.samples.rest.RestTester">
-            <properties>
-                <property name="prefix" value="Received: "/>
-            </properties>
-        </mule-descriptor>
-    </model>
-</mule-configuration>
+    </mule:model-seda>
+
+</beans>
