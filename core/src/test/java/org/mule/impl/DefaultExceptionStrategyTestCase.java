@@ -10,23 +10,71 @@
 
 package org.mule.impl;
 
+import org.mule.impl.internal.notifications.ExceptionNotification;
+import org.mule.impl.internal.notifications.ExceptionNotificationListener;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.umo.manager.UMOServerNotification;
+
+import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 
 public class DefaultExceptionStrategyTestCase extends AbstractMuleTestCase
 {
+    // @Override
+    protected void doSetUp() throws Exception
+    {
+        managementContext.start();
+    }
+
+    // @Override
+    protected void doTearDown() throws Exception
+    {
+        managementContext.dispose();
+    }
 
     // MULE-1404
     public void testExceptions() throws Exception
     {
-        Instrumented instrumented = new Instrumented();
-        instrumented.exceptionThrown(new IllegalArgumentException("boom"));
-        assertEquals(1, instrumented.getCount());
+        InstrumentedExceptionStrategy strategy = new InstrumentedExceptionStrategy();
+        strategy.setManagementContext(managementContext);
+        strategy.exceptionThrown(new IllegalArgumentException("boom"));
+        assertEquals(1, strategy.getCount());
     }
 
-    private class Instrumented extends DefaultExceptionStrategy
+    // MULE-1627
+    public void testExceptionNotifications() throws Exception
     {
+        final CountDownLatch latch = new CountDownLatch(1);
+        final AtomicInteger notificationCount = new AtomicInteger(0);
 
-        private int count = 0;
+        managementContext.registerListener(new ExceptionNotificationListener()
+        {
+            public void onNotification(UMOServerNotification notification)
+            {
+                if (notification.getAction() == ExceptionNotification.EXCEPTION_ACTION)
+                {
+                    assertEquals("exception", notification.getActionName());
+                    assertEquals("Wrong info type", UMOServerNotification.TYPE_ERROR, notification.getType());
+                    notificationCount.incrementAndGet();
+                }
+            }
+        });
+
+        // throwing exception
+        DefaultExceptionStrategy strategy = new DefaultExceptionStrategy();
+        strategy.setManagementContext(managementContext);
+        strategy.exceptionThrown(new IllegalArgumentException("boom"));
+
+        // Wait for the notifcation event to be fired as they are queue
+        latch.await(2000, TimeUnit.MILLISECONDS);
+        assertEquals(1, notificationCount.get());
+
+    }
+
+    private class InstrumentedExceptionStrategy extends DefaultExceptionStrategy
+    {
+        private volatile int count = 0;
 
         // @Override
         protected void defaultHandler(Throwable t)

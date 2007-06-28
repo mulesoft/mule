@@ -11,6 +11,7 @@
 package org.mule.impl;
 
 import org.mule.config.ExceptionHelper;
+import org.mule.impl.internal.notifications.ExceptionNotification;
 import org.mule.impl.message.ExceptionMessage;
 import org.mule.providers.NullPayload;
 import org.mule.transaction.TransactionCoordination;
@@ -94,6 +95,8 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
 
     public void exceptionThrown(Exception e)
     {
+        fireNotification(new ExceptionNotification(e));
+        
         Throwable t = getExceptionType(e, RoutingException.class);
         if (t != null)
         {
@@ -343,6 +346,18 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
     public void dispose()
     {
         // Template method
+    }
+
+    /**
+     * Fires a server notification to all registered
+     * {@link org.mule.impl.internal.notifications.ExceptionNotificationListener}
+     * eventManager.
+     *
+     * @param notification the notification to fire.
+     */
+    protected void fireNotification(ExceptionNotification notification)
+    {
+        managementContext.fireNotification(notification);
     }
 
     /**

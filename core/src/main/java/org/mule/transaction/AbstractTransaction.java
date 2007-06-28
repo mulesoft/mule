@@ -10,7 +10,9 @@
 
 package org.mule.transaction;
 
+import org.mule.RegistryContext;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.impl.internal.notifications.TransactionNotification;
 import org.mule.umo.TransactionException;
 import org.mule.umo.UMOTransaction;
 
@@ -76,6 +78,7 @@ public abstract class AbstractTransaction implements UMOTransaction
         logger.debug("Beginning transaction");
         doBegin();
         TransactionCoordination.getInstance().bindTransaction(this);
+        fireNotification(new TransactionNotification(this, TransactionNotification.TRANSACTION_BEGAN));
     }
 
     /*
@@ -95,6 +98,7 @@ public abstract class AbstractTransaction implements UMOTransaction
             }
 
             doCommit();
+            fireNotification(new TransactionNotification(this, TransactionNotification.TRANSACTION_COMMITTED));
         }
         finally
         {
@@ -114,6 +118,7 @@ public abstract class AbstractTransaction implements UMOTransaction
             logger.debug("Rolling back transaction");
             setRollbackOnly();
             doRollback();
+            fireNotification(new TransactionNotification(this, TransactionNotification.TRANSACTION_ROLLEDBACK));
         }
         finally
         {
@@ -141,5 +146,16 @@ public abstract class AbstractTransaction implements UMOTransaction
      * @throws TransactionException
      */
     protected abstract void doRollback() throws TransactionException;
+
+    /**
+     * Fires a server notification to all registered
+     * {@link org.mule.impl.internal.notifications.TransactionNotificationListener}s.
+     *
+     */
+    protected void fireNotification(TransactionNotification notification)
+    {
+        // TODO profile this piece of code
+        RegistryContext.getRegistry().getManagementContext().fireNotification(notification);
+    }
 
 }

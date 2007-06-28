@@ -25,6 +25,8 @@ import org.mule.impl.internal.notifications.ConnectionNotification;
 import org.mule.impl.internal.notifications.ConnectionNotificationListener;
 import org.mule.impl.internal.notifications.CustomNotification;
 import org.mule.impl.internal.notifications.CustomNotificationListener;
+import org.mule.impl.internal.notifications.ExceptionNotification;
+import org.mule.impl.internal.notifications.ExceptionNotificationListener;
 import org.mule.impl.internal.notifications.ManagementNotification;
 import org.mule.impl.internal.notifications.ManagementNotificationListener;
 import org.mule.impl.internal.notifications.ManagerNotification;
@@ -36,6 +38,8 @@ import org.mule.impl.internal.notifications.RegistryNotificationListener;
 import org.mule.impl.internal.notifications.SecurityNotification;
 import org.mule.impl.internal.notifications.SecurityNotificationListener;
 import org.mule.impl.internal.notifications.ServerNotificationManager;
+import org.mule.impl.internal.notifications.TransactionNotification;
+import org.mule.impl.internal.notifications.TransactionNotificationListener;
 import org.mule.impl.lifecycle.ContainerManagedLifecyclePhase;
 import org.mule.impl.lifecycle.GenericLifecycleManager;
 import org.mule.impl.lifecycle.phases.ManagementContextStartPhase;
@@ -538,6 +542,8 @@ public class TransientRegistry extends AbstractRegistry
         notificationManager.registerEventType(CustomNotificationListener.class, CustomNotification.class);
         notificationManager.registerEventType(ConnectionNotificationListener.class, ConnectionNotification.class);
         notificationManager.registerEventType(RegistryNotificationListener.class, RegistryNotification.class);
+        notificationManager.registerEventType(ExceptionNotificationListener.class, ExceptionNotification.class);
+        notificationManager.registerEventType(TransactionNotificationListener.class, TransactionNotification.class);
 
         UMOSecurityManager securityManager = new MuleSecurityManager();
 

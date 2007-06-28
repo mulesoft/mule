@@ -128,6 +128,10 @@
                        value="org.mule.impl.internal.notifications.CustomNotification"/>
                 <entry key="org.mule.impl.internal.notifications.MessageNotificationListener" 
                        value="org.mule.impl.internal.notifications.MessageNotification"/>
+                <entry key="org.mule.impl.internal.notifications.ExceptionNotificationListener"
+                       value="org.mule.impl.internal.notifications.ExceptionNotification"/>
+                <entry key="org.mule.impl.internal.notifications.TransactionNotificationListener"
+                       value="org.mule.impl.internal.notifications.TransactionNotification"/>
             </map>
         </property>
     </bean>
