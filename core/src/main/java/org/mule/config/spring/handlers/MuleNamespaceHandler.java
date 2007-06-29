@@ -225,7 +225,7 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("static-recipient-list-router", new RouterDefinitionParser("router", StaticRecipientList.class));
         registerBeanDefinitionParser("template-endpoint-router", new RouterDefinitionParser("router", TemplateEndpointRouter.class));
         registerBeanDefinitionParser("custom-router", new RouterDefinitionParser("router", null));
-        registerBeanDefinitionParser("reply-to", new ParentDefinitionParser().addAlias("address", "recipient"));
+        registerBeanDefinitionParser("reply-to", new ParentDefinitionParser().addAlias("address", "replyTo"));
         
         //Catch all Strategies
         registerBeanDefinitionParser("forwarding-catch-all-strategy", new ChildDefinitionParser("catchAllStrategy", ForwardingCatchAllStrategy.class));
