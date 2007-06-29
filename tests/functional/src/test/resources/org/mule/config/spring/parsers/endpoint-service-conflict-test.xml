@@ -8,30 +8,30 @@
                http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
                http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
 
-    <description>
-    This loan broker example is modeled on the Enterprise integration Patterns book sample.
-    This implementation differs in that this configuration uses a synchronous model where
-    each component is invoked from the LoanBroker component.
-    </description>
+    <mule:endpoint name="CustomerRequests" address="vm://customer.requests" connector-ref="syncVm"/>
+    <mule:endpoint name="LoanBrokerQuotes" address="vm://loan.quotes" connector-ref="syncVm"/>
+    <mule:endpoint name="CreditAgency" address="vm://credit.agency" connector-ref="syncVm"/>
+    <mule:endpoint name="CreditAgencyIn" address="vm://credit.agency" connector-ref="syncVm"/>
+    <mule:endpoint name="LenderService" address="vm://lender.service?method=setLenderList" connector-ref="syncVm"/>
+    <mule:endpoint name="BankGateway" address="vm://bank.gateway" connector-ref="syncVm"/>
 
-    <!-- Synchronous VM connector (messages are processed in the same execution thread) -->
-    <vm:connector name="syncVm">
-        <!-- TODO - old config had queueEvents="true" disabled, with a comment indicating
-             that it caused the config to lock -->
-        <!-- TODO doThreading=false temporary fixes the race condition on dispatch.
-             Need to dig in DefaultMessageAdapter's propertyNames iterator, which is
-             a view over a concurrent map, and thus tolerates changes, but breaks us. -->
-        <mule:dispatcher-threading-profile doThreading="false"/>
-    </vm:connector>
+    <mule:endpoint name="Bank1" address="vm://bank.1" connector-ref="syncVm"/>
+    <mule:endpoint name="Bank1In" address="vm://bank.1" connector-ref="syncVm"/>
 
-    <!--
-       The Mule model initialises and manages your UMO components
-    -->
+    <mule:endpoint name="Bank2" address="vm://bank.2" connector-ref="syncVm"/>
+    <mule:endpoint name="Bank2In" address="vm://bank.2" connector-ref="syncVm"/>
+
+    <mule:endpoint name="Bank3" address="vm://bank.3" connector-ref="syncVm"/>
+    <mule:endpoint name="Bank3In" address="vm://bank.3" connector-ref="syncVm"/>
+
+    <mule:endpoint name="Bank4" address="vm://bank.4" connector-ref="syncVm"/>
+    <mule:endpoint name="Bank4In" address="vm://bank.4" connector-ref="syncVm"/>
+
+    <mule:endpoint name="Bank5" address="vm://bank.5" connector-ref="syncVm"/>
+    <mule:endpoint name="Bank5In" address="vm://bank.5" connector-ref="syncVm"/>
+
     <mule:model-seda name="loan-broker">
 
-        <!--
-        The loan broker is used to receive loan requests
-        -->
         <mule:service name="TheLoanBroker">
             <mule:component class="org.mule.examples.loanbroker.esn.SynchronousLoanBroker"/>
 
@@ -52,15 +52,8 @@
                 </mule:filtering-router>
             </mule:outbound-router>
 
-            <mule:response-router timeout="10000">
-                <mule:custom-router class="org.mule.examples.loanbroker.routers.BankQuotesResponseAggregator"/>
-                <mule:endpoint-ref nameref="LoanBrokerQuotes"/>
-            </mule:response-router>
         </mule:service>
 
-        <!--
-        The credit agency service will get the credit profile for a customer
-        -->
         <mule:service name="TheCreditAgencyService">
             <mule:component class="org.mule.examples.loanbroker.credit.DefaultCreditAgency"/>
             <mule:inbound-router>
@@ -68,10 +61,7 @@
             </mule:inbound-router>
         </mule:service>
 
-        <!--
-        The Lender service is used to determine which banks to contact for a quote
-        -->
-        <mule:service name="TheLenderService">
+        <mule:service name="LenderService">
             <mule:component class="org.mule.examples.loanbroker.lender.DefaultLender"/>
             <mule:inbound-router>
                 <mule:endpoint-ref nameref="LenderService"/>
@@ -84,7 +74,7 @@
             </mule:outbound-router>
         </mule:service>
 
-        <mule:service name="TheBankGateway">
+        <mule:service name="BankGateway">
             <mule:component class="org.mule.components.simple.BridgeComponent"/>
             <mule:inbound-router>
                 <mule:endpoint-ref nameref="BankGateway"/>
@@ -98,13 +88,6 @@
             </mule:outbound-router>
         </mule:service>
 
-        <!--
-        These are mock bank services that represent remote bank loan services
-        One or more of these are selected by the LenderService and a request
-        is routed to them.   The lenderService outbound router also defines a
-        replyTo property which will be used by Mule to route the responses back
-        to the LoanBrokerQuotes destination
-        -->
         <mule:service name="TheBank1">
             <mule:component class="org.mule.examples.loanbroker.bank.Bank"/>
             <mule:inbound-router>

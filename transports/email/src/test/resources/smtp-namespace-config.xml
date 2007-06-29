@@ -19,8 +19,8 @@
                    replyToAddresses="def@example.com"
                    subject="subject"
                    username="bob@example.com">
-        <smtp:header name="foo" value="bar"/>
-        <smtp:header name="baz" value="boz"/>
+        <smtp:header key="foo" value="bar"/>
+        <smtp:header key="baz" value="boz"/>
     </smtp:connector>
 
     <!-- need too revisit this once tests are working - it's not clear to me what
@@ -35,8 +35,8 @@
                      replyToAddresses="def@example.com"
                      subject="subject"
                      username="bob@example.com">
-        <smtps:header name="foo" value="bar"/>
-        <smtps:header name="baz" value="boz"/>
+        <smtps:header key="foo" value="bar"/>
+        <smtps:header key="baz" value="boz"/>
         <smtps:tls-client clientKeyStore="greenmail-truststore"
                           clientKeyStorePassword="password"/>
         <smtps:tls-trust-store trustStore="greenmail-truststore"

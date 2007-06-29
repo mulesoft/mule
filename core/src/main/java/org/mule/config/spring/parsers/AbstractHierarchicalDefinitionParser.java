@@ -9,11 +9,10 @@
  */
 package org.mule.config.spring.parsers;
 
-import org.mule.util.StringUtils;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
+import org.mule.util.StringUtils;
 
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.w3c.dom.Element;
 
@@ -30,32 +29,6 @@ import org.w3c.dom.Element;
  */
 public abstract class AbstractHierarchicalDefinitionParser extends AbstractMuleBeanDefinitionParser
 {
-    private BeanDefinitionRegistry registry;
-
-    /**
-     * This must be set at the start of processing (ie from within doParse).
-     *
-     * @param registry
-     */
-    protected void setRegistry(BeanDefinitionRegistry registry)
-    {
-        this.registry = registry;
-    }
-
-    protected BeanDefinitionRegistry getRegistry()
-    {
-        if (null == registry)
-        {
-            throw new IllegalStateException("Set the registry from within doParse");
-        }
-        return registry;
-    }
-
-    protected void preProcess()
-    {
-        registry = null;
-        super.preProcess();
-    }
 
     protected String getParentBeanName(Element element)
     {

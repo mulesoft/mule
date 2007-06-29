@@ -35,10 +35,10 @@ public class VMLoanBrokerSynchronousFunctionalTestCase extends AbstractLoanBroke
         assertNotNull(objModel);
         assertTrue(objModel instanceof SedaModel);
         SedaModel model = (SedaModel)objModel;
-        assertComponent(model, "LoanBroker");
-        assertComponent(model, "CreditAgencyService");
-        assertComponent(model, "LenderService");
-        assertComponent(model, "BankGateway");
+        assertComponent(model, "TheLoanBroker");
+        assertComponent(model, "TheCreditAgencyService");
+        assertComponent(model, "TheLenderService");
+        assertComponent(model, "TheBankGateway");
     }
 
     protected void assertComponent(SedaModel model, String name)

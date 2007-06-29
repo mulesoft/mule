@@ -24,6 +24,6 @@ public class SmtpNamespaceHandler extends NamespaceHandlerSupport
     public void init()
     {
         registerBeanDefinitionParser("connector", new OrphanDefinitionParser(SmtpConnector.class, true));
-        registerBeanDefinitionParser("header", new ChildMapEntryDefinitionParser("customHeaders", "name", "value"));
+        registerBeanDefinitionParser("header", new ChildMapEntryDefinitionParser("customHeaders", "key", "value"));
     }
 }

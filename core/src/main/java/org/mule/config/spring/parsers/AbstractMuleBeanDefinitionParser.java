@@ -26,6 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.Assert;
@@ -97,6 +98,7 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
     protected boolean singleton = false;
     /** Allow the bean class to be set explicitly via the "class" attribute. */
     protected boolean allowClassAttribute = true;
+    private BeanDefinitionRegistry registry;
 
     public AbstractMuleBeanDefinitionParser()
     {
@@ -170,10 +172,10 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
 
     /**
      * Hook method that derived classes can implement to modify internal state before processing.
-     * <p>The default implementation does nothing.
      */
     protected void preProcess()
     {
+        // default no-op
     }
 
     //-----------------------------------------------------------------------------------
@@ -196,6 +198,8 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
     {
         this.parserContext = parserContext;
         preProcess();
+        setRegistry(parserContext.getRegistry());
+        checkElementNameUnique(element);
         Class beanClass = null;
         if (allowClassAttribute)
         {
@@ -233,6 +237,32 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
 
         doParse(element, parserContext, builder);
         return builder.getBeanDefinition();
+    }
+
+    protected void setRegistry(BeanDefinitionRegistry registry)
+    {
+        this.registry = registry;
+    }
+
+    protected BeanDefinitionRegistry getRegistry()
+    {
+        if (null == registry)
+        {
+            throw new IllegalStateException("Set the registry from within doParse");
+        }
+        return registry;
+    }
+
+    protected void checkElementNameUnique(Element element)
+    {
+        if (null != element.getAttributeNode(ATTRIBUTE_NAME))
+        {
+            String name = element.getAttribute(ATTRIBUTE_NAME);
+            if (getRegistry().containsBeanDefinition(name))
+            {
+                throw new IllegalArgumentException("A component named " + name + " already exists.");
+            }
+        }
     }
 
     protected void guaranteeElementName(Element element)
