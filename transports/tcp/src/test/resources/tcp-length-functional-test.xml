@@ -12,7 +12,7 @@
     <tcp:connector name="tcpConnector"
                    keepSendSocketOpen="true"
                    socketSoLinger="0"
-                   tcpProtocolClassName="org.mule.providers.tcp.protocols.DefaultProtocol"/>
+                   tcpProtocolClassName="org.mule.providers.tcp.protocols.LengthProtocol"/>
 
     <mule:endpoint name="clientEndpoint" address="tcp://localhost:60198" synchronous="true"/>
 

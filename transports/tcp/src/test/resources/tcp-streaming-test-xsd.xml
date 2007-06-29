@@ -11,7 +11,8 @@
     <!-- MULE-1751 -->
     <!-- mule:configuration serverId="" defaultSynchronousEndpoints="false"/ -->
 
-    <tcp:connector name="default" validateConnections="false"/>
+    <tcp:connector name="default" validateConnections="false"
+            tcpProtocolClassName="org.mule.providers.tcp.protocols.DefaultProtocol"/>
 
     <mule:model-streaming name="echoModel">
         <!-- mule:model-custom class="org.mule.impl.model.streaming.StreamingModel" name="echoModel" -->

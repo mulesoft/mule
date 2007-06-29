@@ -33,10 +33,18 @@ public class LengthProtocol extends DefaultProtocol
     private static final Log logger = LogFactory.getLog(LengthProtocol.class);
     // TODO - can we not get this from the API somewhere?
     private static final int SIZE_INT = 4;
+    public static final int NO_MAX_LENGTH = -1;
+    private int maxLength;
 
     public LengthProtocol()
     {
+        this(NO_MAX_LENGTH);
+    }
+
+    public LengthProtocol(int maxLength)
+    {
         super(NO_STREAM, SIZE_INT);
+        this.maxLength = maxLength;
     }
 
     public Object read(InputStream is) throws IOException
@@ -48,7 +56,10 @@ public class LengthProtocol extends DefaultProtocol
         DataInputStream dis = new DataInputStream(is);
         dis.mark(SIZE_INT);
         // this pulls through SIZE_INT bytes
-        super.read(dis, SIZE_INT);
+        if (null == super.read(dis, SIZE_INT))
+        {
+            return null; // eof
+        }
 
         // reset and read the integer
         dis.reset();
@@ -56,6 +67,12 @@ public class LengthProtocol extends DefaultProtocol
         if (logger.isDebugEnabled())
         {
             logger.debug("length: " + length);
+        }
+
+        // this gives SafeProtocol additional safety
+        if (maxLength > 0 && length > maxLength)
+        {
+            throw new IOException("Length " + length + " exceeds limit: " + maxLength);
         }
 
         // finally read the rest of the data

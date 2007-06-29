@@ -14,7 +14,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.model.streaming.CallbackOutputStream;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.tcp.i18n.TcpMessages;
-import org.mule.providers.tcp.protocols.DefaultProtocol;
+import org.mule.providers.tcp.protocols.SafeProtocol;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
@@ -72,7 +72,7 @@ public class TcpConnector extends AbstractConnector
     {
         setSocketFactory(new TcpSocketFactory());
         setServerSocketFactory(new TcpServerSocketFactory());
-        setTcpProtocolClassName(DefaultProtocol.class.getName());
+        setTcpProtocolClassName(SafeProtocol.class.getName());
     }
 
     public void configureSocket(boolean client, Socket socket) throws SocketException

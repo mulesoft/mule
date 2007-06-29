@@ -13,7 +13,8 @@
 
     <mule:configuration serverId="" defaultSynchronousEndpoints="true"/>
 
-    <tcp:connector name="default" validateConnections="false"/>
+    <tcp:connector name="default" validateConnections="false"
+            tcpProtocolClassName="org.mule.providers.tcp.protocols.DefaultProtocol"/>
 
     <mule:model-streaming name="echoModel">
 
