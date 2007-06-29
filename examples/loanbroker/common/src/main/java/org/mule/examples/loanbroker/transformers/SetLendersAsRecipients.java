@@ -11,7 +11,6 @@
 package org.mule.examples.loanbroker.transformers;
 
 import org.mule.examples.loanbroker.bank.Bank;
-import org.mule.examples.loanbroker.messages.CustomerQuoteRequest;
 import org.mule.examples.loanbroker.messages.LoanBrokerQuoteRequest;
 import org.mule.routing.outbound.StaticRecipientList;
 import org.mule.transformers.AbstractEventAwareTransformer;
@@ -28,13 +27,14 @@ public class SetLendersAsRecipients extends AbstractEventAwareTransformer
 
     public SetLendersAsRecipients()
     {
-        this.registerSourceType(LoanBrokerQuoteRequest.class);
-        this.setReturnClass(CustomerQuoteRequest.class);
+        registerSourceType(LoanBrokerQuoteRequest.class);
+        // this makes no sense - the code below doesn't change any classes at all...
+        //setReturnClass(CustomerQuoteRequest.class);
     }
 
     public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
     {
-        Bank[] lenders = ((LoanBrokerQuoteRequest)src).getLenders();
+        Bank[] lenders = ((LoanBrokerQuoteRequest) src).getLenders();
 
         String recipients = "";
         for (int i = 0; i < lenders.length; i++)

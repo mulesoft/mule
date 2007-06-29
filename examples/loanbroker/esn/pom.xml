@@ -43,11 +43,9 @@
                 <configuration>
                     <forkMode>pertest</forkMode>
                     <excludes>
-                        <!-- MULE-1865 -->
-                        <exclude>**/*.*</exclude>
-                        <!-- these still fail quite often with an unexpected NullPayload :( -->
+                        <!-- MULE-1839 -->
                         <exclude>org/mule/examples/loanbroker/esn/AxisLoanBrokerSynchronousFunctionalTestCase.java</exclude>
-                        <exclude>org/mule/examples/loanbroker/esn/XFireLoanBrokerSynchronousFunctionalTestCase.java</exclude>
+                        <exclude>org/mule/examples/loanbroker/esn/AxisLoanBrokerAsynchronousFunctionalTestCase.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>

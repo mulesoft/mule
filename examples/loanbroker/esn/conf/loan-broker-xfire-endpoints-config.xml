@@ -21,24 +21,24 @@
 
     <mule:endpoint name="CustomerRequests" address="vm://customer.requests" connector-ref="syncVm"/>
     <mule:endpoint name="LoanBrokerQuotes" address="vm://loan.quotes" connector-ref="syncVm"/>
-    <mule:endpoint name="CreditAgency" address="xfire:http://localhost:18080/mule/CreditAgencyService?method=getCreditProfile"/>
+    <mule:endpoint name="CreditAgency" address="xfire:http://localhost:18080/mule/TheCreditAgencyService?method=getCreditProfile"/>
     <mule:endpoint name="CreditAgencyIn" address="xfire:http://localhost:18080/mule"/>
     <mule:endpoint name="LenderService" address="vm://lender.service?method=setLenderList" connector-ref="syncVm"/>
     <mule:endpoint name="BankGateway" address="vm://bank.gateway" connector-ref="syncVm"/>
 
-    <mule:endpoint name="Bank1" address="xfire:http://localhost:10080/mule/Bank1?method=getLoanQuote"/>
+    <mule:endpoint name="Bank1" address="xfire:http://localhost:10080/mule/TheBank1?method=getLoanQuote"/>
     <mule:endpoint name="Bank1In" address="xfire:http://localhost:10080/mule"/>
 
-    <mule:endpoint name="Bank2" address="xfire:http://localhost:20080/mule/Bank2?method=getLoanQuote"/>
+    <mule:endpoint name="Bank2" address="xfire:http://localhost:20080/mule/TheBank2?method=getLoanQuote"/>
     <mule:endpoint name="Bank2In" address="xfire:http://localhost:20080/mule"/>
 
-    <mule:endpoint name="Bank3" address="xfire:http://localhost:30080/mule/Bank3?method=getLoanQuote"/>
+    <mule:endpoint name="Bank3" address="xfire:http://localhost:30080/mule/TheBank3?method=getLoanQuote"/>
     <mule:endpoint name="Bank3In" address="xfire:http://localhost:30080/mule"/>
 
-    <mule:endpoint name="Bank4" address="xfire:http://localhost:40080/mule/Bank4?method=getLoanQuote"/>
+    <mule:endpoint name="Bank4" address="xfire:http://localhost:40080/mule/TheBank4?method=getLoanQuote"/>
     <mule:endpoint name="Bank4In" address="xfire:http://localhost:40080/mule"/>
 
-    <mule:endpoint name="Bank5" address="xfire:http://localhost:50080/mule/Bank5?method=getLoanQuote"/>
+    <mule:endpoint name="Bank5" address="xfire:http://localhost:50080/mule/TheBank5?method=getLoanQuote"/>
     <mule:endpoint name="Bank5In" address="xfire:http://localhost:50080/mule"/>
 
 </beans>
