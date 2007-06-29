@@ -11,10 +11,13 @@
 package org.mule.routing.outbound;
 
 import org.mule.impl.MuleMessage;
+import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.registry.RegistrationException;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.routing.CouldNotRouteOutboundMessageException;
 import org.mule.umo.routing.RoutingException;
 
@@ -129,7 +132,23 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
 
         try
         {
-            endpoint = getManagementContext().getRegistry().getEndpointFromUri(recipient);
+            if (null != getManagementContext() && null != getManagementContext().getRegistry())
+            {
+                endpoint = getManagementContext().getRegistry().getEndpointFromUri(recipient);
+            }
+            if (null == endpoint)
+            {
+                UMOEndpointURI uri = new MuleEndpointURI(recipient); // may raise malformed error
+                if (null != getManagementContext() && null != getManagementContext().getRegistry())
+                {
+                    endpoint = getManagementContext().getRegistry()
+                            .getOrCreateEndpointForUri(uri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
+                }
+            }
+            if (null == endpoint)
+            {
+                throw new RegistrationException("Failed to create endpoint for: " + recipient);
+            }
             endpoint.initialise();
         }
         catch (UMOException e)
