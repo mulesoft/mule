@@ -17,19 +17,18 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * This precedes every message with a cookie and has a limited capactiy.
+ * This precedes every message with a cookie.
  * It should probably not be used in production.
- * We use ths protocol as the default because previously people tended to use DefaultProtocol
- * without considering packet fragmentation etc.
+ * We use ths protocol as the default because previously people tended to use DefaultProtocol without considering packet fragmentation etc.
  * You should probably change to LengthProtocol.
  * Remember - both sender and receiver must use the same protocol.
  */
 public class SafeProtocol implements TcpProtocol
 {
 
-    public static final int MAX_PAYLOAD_LENGTH = 1000000;
-    public static final String OPEN_COOKIE = "You are using SafeProtocol";
-    private TcpProtocol delegate = new LengthProtocol(MAX_PAYLOAD_LENGTH);
+    public static final String COOKIE = "You are using SafeProtocol";
+    private TcpProtocol delegate = new LengthProtocol();
+    private TcpProtocol cookieProtocol = new LengthProtocol(COOKIE.length());
 
     public Object read(InputStream is) throws IOException
     {
@@ -57,15 +56,20 @@ public class SafeProtocol implements TcpProtocol
 
     private void assureSibling(OutputStream os) throws IOException
     {
-        delegate.write(os, OPEN_COOKIE);
+        cookieProtocol.write(os, COOKIE);
     }
 
+    /**
+     * @param is Stream to read data from
+     * @return true if further data are available; false if EOF
+     * @throws IOException
+     */
     private boolean assertSiblingSafe(InputStream is) throws IOException
     {
         Object cookie = null;
         try
         {
-            cookie = delegate.read(is);
+            cookie = cookieProtocol.read(is);
         }
         catch (Exception e)
         {
@@ -74,8 +78,8 @@ public class SafeProtocol implements TcpProtocol
         if (null != cookie)
         {
             if (!(cookie instanceof byte[]
-                    && ((byte[]) cookie).length == OPEN_COOKIE.length()
-                    && OPEN_COOKIE.equals(new String((byte[]) cookie))))
+                    && ((byte[]) cookie).length == COOKIE.length()
+                    && COOKIE.equals(new String((byte[]) cookie))))
             {
                 helpUser();
             }

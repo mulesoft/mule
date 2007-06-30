@@ -69,8 +69,7 @@ public class LengthProtocol extends DefaultProtocol
             logger.debug("length: " + length);
         }
 
-        // this gives SafeProtocol additional safety
-        if (maxLength > 0 && length > maxLength)
+        if (length < 0 || (maxLength > 0 && length > maxLength))
         {
             throw new IOException("Length " + length + " exceeds limit: " + maxLength);
         }
