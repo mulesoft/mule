@@ -100,7 +100,7 @@ public class SafeProtocol implements TcpProtocol
 
     private void helpUser(Exception e) throws IOException
     {
-        throw (IOException) new IOException("An error occurred while verifying you connection.  "
+        throw (IOException) new IOException("An error occurred while verifying your connection.  "
                 + "You may not be using a consistent protocol on your TCP transport. "
                 + "Please read the documentation for the TCP transport, "
                 + "paying particular attention to the protocol parameter.").initCause(e);
