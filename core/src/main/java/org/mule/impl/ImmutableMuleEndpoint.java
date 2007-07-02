@@ -627,17 +627,18 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
         // For now at least, we don't want a registration error to affect
         // the initialisation process.
-        try
-        {
-            register();
-            UMOTransformer transformerValue = getTransformerValue();
-            if (transformerValue != null && transformerValue.getRegistryId() == null) transformerValue.register();
-            if (responseTransformer != null && responseTransformer.getRegistryId() == null) responseTransformer.register();
-        }
-        catch (RegistrationException re)
-        {
-            logger.warn(re);
-        }
+// MULE-1989        
+//        try
+//        {
+//            register();
+//            UMOTransformer transformerValue = getTransformerValue();
+//            if (transformerValue != null && transformerValue.getRegistryId() == null) transformerValue.register();
+//            if (responseTransformer != null && responseTransformer.getRegistryId() == null) responseTransformer.register();
+//        }
+//        catch (RegistrationException re)
+//        {
+//            logger.warn(re);
+//        }
     }
 
     protected void lazyInitTransformer()
