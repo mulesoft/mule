@@ -17,6 +17,8 @@ import org.mule.umo.provider.UMOMessageAdapter;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.activation.DataHandler;
+
 /**
  * <code>DefaultMessageAdapter</code> can be used to wrap an arbitary object where
  * no special 'apapting' is needed. The adapter allows for a set of properties to be
@@ -68,12 +70,24 @@ public class DefaultMessageAdapter extends AbstractMessageAdapter
             {
                 this.message = message;
             }
+            // MULE-1564
+            // this is an iterator over a concurrent map and so is weakly consistent (not fail-safe)
+            // that means we don't get errors here, but may see changed values.
+            // so we can make this safe to null values (although not predictable) by simply checking values
             for (Iterator iterator = previous.getAttachmentNames().iterator(); iterator.hasNext();)
             {
                 String name = (String) iterator.next();
                 try
                 {
-                    addAttachment(name, previous.getAttachment(name));
+                    DataHandler dh = previous.getAttachment(name);
+                    if (null == dh)
+                    {
+                        logger.warn("Detected concurrent access to attachment " + name + " for " + previous);
+                    }
+                    else
+                    {
+                        addAttachment(name, dh);
+                    }
                 }
                 catch (Exception e)
                 {
@@ -85,7 +99,15 @@ public class DefaultMessageAdapter extends AbstractMessageAdapter
                 String name = (String) iterator.next();
                 try
                 {
-                    setProperty(name, previous.getProperty(name));
+                    Object value = previous.getProperty(name);
+                    if (null == value)
+                    {
+                        logger.warn("Detected concurrent access to property " + name + " for " + previous);
+                    }
+                    else
+                    {
+                        setProperty(name, value);
+                    }
                 }
                 catch (Exception e)
                 {
