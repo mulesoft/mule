@@ -522,12 +522,6 @@
             <url>http://dist.codehaus.org/mule/dependencies/maven2</url>
         </pluginRepository>
 
-        <!-- for buildnumber plugin -->
-        <pluginRepository>
-            <id>tlc</id>
-            <name>TLC Repository</name>
-            <url>http://commons.ucalgary.ca/pub/m2</url>
-        </pluginRepository>
     </pluginRepositories>
 
     <build>
@@ -603,31 +597,6 @@
                   </dependency>
                 </dependencies>
                 -->
-            </plugin>
-
-            <!-- add repository revision to manifests -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>maven-buildnumber-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>create</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <!-- never touch svn -->
-                    <doCheck>false</doCheck>
-                    <doUpdate>false</doUpdate>
-                    <!--
-                    <format>{0,date,yyyy-MMM-dd-HH:mm:ss}</format>
-                    <items>
-                        <item>timestamp</item>
-                    </items>
-                    -->
-                </configuration>
             </plugin>
 
             <plugin>
@@ -1044,6 +1013,55 @@
                 </site>
             </distributionManagement>
         </profile>
+
+        <profile>
+            <id>buildnumber-plugin</id>
+            <activation>
+                <property>
+                    <!--
+                         This profile is activated if NO system property
+                         'skipBuildnumber' is found. Disable this profile
+                         by specifying -DskipBuildnumber=true on the commandline
+                    -->
+                    <name>!skipBuildnumber</name>
+                </property>
+            </activation>
+            <pluginRepositories>
+                <!-- for buildnumber plugin -->
+                <pluginRepository>
+                    <id>tlc</id>
+                    <name>TLC Repository</name>
+                    <url>http://commons.ucalgary.ca/pub/m2</url>
+                </pluginRepository>
+            </pluginRepositories>
+            <build>
+                <plugins>
+                    <!-- add repository revision to manifests -->
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>maven-buildnumber-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>create</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <!-- never touch svn -->
+                            <doCheck>false</doCheck>
+                            <doUpdate>false</doUpdate>
+                            <!--
+                                <format>{0,date,yyyy-MMM-dd-HH:mm:ss}</format>
+                                <items>
+                                    <item>timestamp</item>
+                                </items>
+                            -->
+                        </configuration>
+                     </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 </project>
-
