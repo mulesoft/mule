@@ -71,7 +71,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
 
         for (Iterator iterator = recipients.iterator(); iterator.hasNext();)
         {
-            String recipient = (String) iterator.next();
+            Object recipient = iterator.next();
             // Make a copy of the message. Question is do we do a proper clone? in
             // which case there
             // would potentially be multiple messages with the same id...
