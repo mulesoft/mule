@@ -261,8 +261,8 @@ Assembly descriptor for the full Mule distribution.
         <outputDirectory>examples/voipservice</outputDirectory>
         <fileMode>755</fileMode>
         <includes>
-            <include>voipservice</include>
-            <include>voipservice.bat</include>
+            <include>voip</include>
+            <include>voip.bat</include>
         </includes>
     </fileSet>
 
