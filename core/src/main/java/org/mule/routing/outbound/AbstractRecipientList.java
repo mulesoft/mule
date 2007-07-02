@@ -121,47 +121,65 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         }
     }
 
-    protected UMOEndpoint getRecipientEndpoint(UMOMessage message, String recipient) throws RoutingException
+    protected UMOEndpoint getRecipientEndpoint(UMOMessage message, Object recipient) throws RoutingException
     {
-        UMOEndpoint endpoint = (UMOEndpoint) recipientCache.get(recipient);
-
-        if (endpoint != null)
-        {
-            return endpoint;
-        }
-
+        UMOEndpoint endpoint = null;
         try
         {
-            if (null != getManagementContext() && null != getManagementContext().getRegistry())
+            if (recipient instanceof UMOEndpointURI)
             {
-                endpoint = getManagementContext().getRegistry().getEndpointFromUri(recipient);
+                endpoint = getRecipientEndpointFromUri((UMOEndpointURI) recipient);
             }
-            if (null == endpoint)
+            else if (recipient instanceof String)
             {
-                UMOEndpointURI uri = new MuleEndpointURI(recipient); // may raise malformed error
-                if (null != getManagementContext() && null != getManagementContext().getRegistry())
-                {
-                    endpoint = getManagementContext().getRegistry()
-                            .getOrCreateEndpointForUri(uri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
-                }
+                endpoint = getRecipientEndpointFromString(message, (String) recipient);
             }
             if (null == endpoint)
             {
                 throw new RegistrationException("Failed to create endpoint for: " + recipient);
             }
-            endpoint.initialise();
+
+            UMOEndpoint existingEndpoint = (UMOEndpoint) recipientCache.putIfAbsent(recipient, endpoint);
+            if (existingEndpoint != null)
+            {
+                endpoint = existingEndpoint;
+            }
         }
         catch (UMOException e)
         {
             throw new RoutingException(message, endpoint, e);
         }
+        return endpoint;
+    }
 
-        UMOEndpoint existingEndpoint = (UMOEndpoint) recipientCache.putIfAbsent(recipient, endpoint);
-        if (existingEndpoint != null)
+    protected UMOEndpoint getRecipientEndpointFromUri(UMOEndpointURI uri)
+            throws UMOException
+    {
+        UMOEndpoint endpoint = null;
+        if (null != getManagementContext() && null != getManagementContext().getRegistry())
         {
-            endpoint = existingEndpoint;
+            endpoint = getManagementContext().getRegistry()
+                    .getOrCreateEndpointForUri(uri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
         }
+        if (null != endpoint)
+        {
+            endpoint.initialise();
+        }
+        return endpoint;
+    }
 
+    protected UMOEndpoint getRecipientEndpointFromString(UMOMessage message, String recipient)
+            throws UMOException
+    {
+        UMOEndpoint endpoint = (UMOEndpoint) recipientCache.get(recipient);
+        if (null == endpoint && null != getManagementContext() && null != getManagementContext().getRegistry())
+        {
+            endpoint = getManagementContext().getRegistry().getEndpointFromUri(recipient);
+        }
+        if (null == endpoint)
+        {
+            endpoint = getRecipientEndpointFromUri(new MuleEndpointURI(recipient));
+        }
         return endpoint;
     }
 
