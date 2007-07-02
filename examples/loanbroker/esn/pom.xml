@@ -43,6 +43,8 @@
                 <configuration>
                     <forkMode>pertest</forkMode>
                     <excludes>
+                        <!-- MULE-1564, MULE-1962 -->
+                        <exclude>**/*</exclude>
                         <!-- MULE-1839 -->
                         <exclude>org/mule/examples/loanbroker/esn/AxisLoanBrokerSynchronousFunctionalTestCase.java</exclude>
                         <exclude>org/mule/examples/loanbroker/esn/AxisLoanBrokerAsynchronousFunctionalTestCase.java</exclude>
