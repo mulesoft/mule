@@ -51,7 +51,7 @@
     <!-- 
         The Mule model initialises and manages your UMO components
     -->
-    <mule:model-seda name="Sample">
+    <mule:model-seda name="Sample-SOAP">
         <mule:service name="Console I/O">
             <mule:component class="org.mule.components.simple.BridgeComponent"/>
             <mule:inbound-router>

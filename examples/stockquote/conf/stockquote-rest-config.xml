@@ -37,7 +37,7 @@
         <mule:property name="xslFile" value="xsl/rest-stock.xsl"/>
     </mule:custom-transformer>
 
-    <mule:model-seda name="Sample">
+    <mule:model-seda name="Sample-Rest">
         <mule:service name="HTTPPostSample">
             <mule:component class="org.mule.components.rest.RestServiceWrapper">
                 <mule:properties>
