@@ -77,7 +77,7 @@ public class TcpConnector extends AbstractConnector
 
     public void configureSocket(boolean client, Socket socket) throws SocketException
     {
-        // There is some overhead in stting socket timeout and buffer size, so we're
+        // There is some overhead in setting socket timeout and buffer size, so we're
         // careful here only to set if needed
 
         if (newValue(getReceiveBufferSize(), socket.getReceiveBufferSize()))
