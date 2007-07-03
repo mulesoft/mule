@@ -36,53 +36,55 @@ public class MuleObjectNameProcessor implements BeanPostProcessor
 
     public Object postProcessBeforeInitialization(Object o, String s) throws BeansException
     {
-        if (!MuleObjectHelper.class.getName().equals(s))
+        if (MuleObjectHelper.class.getName().equals(s))
         {
-            if (o instanceof UMOConnector)
+            return o;
+        }
+        
+        if (o instanceof UMOConnector)
+        {
+            if (((UMOConnector)o).getName() == null || overwrite)
             {
-                if (((UMOConnector)o).getName() == null || overwrite)
-                {
-                    ((UMOConnector)o).setName(s);
-                }
+                ((UMOConnector)o).setName(s);
             }
-            else if (o instanceof UMOTransformer)
+        }
+        else if (o instanceof UMOTransformer)
+        {
+            ((UMOTransformer)o).setName(s);
+        }
+        else if (o instanceof UMOEndpoint)
+        {
+            // spring uses the class name of the object as the name if no other
+            // id is set; this is no good for endpoints
+            if ((((UMOEndpoint)o).getName() == null || overwrite)
+                && !MuleEndpoint.class.getName().equals(s))
             {
-                ((UMOTransformer)o).setName(s);
+                final UMOEndpoint endpoint = (UMOEndpoint) o;
+                final String name = ObjectNameHelper.getEndpointName(endpoint);
+                endpoint.setName(name);
             }
-            else if (o instanceof UMOEndpoint)
+        }
+        else if (o instanceof UMODescriptor)
+        {
+            if (((UMODescriptor)o).getName() == null || overwrite)
             {
-                // spring uses the class name of the object as the name if no other
-                // id is set; this is no good for endpoints
-                if ((((UMOEndpoint)o).getName() == null || overwrite)
-                    && !MuleEndpoint.class.getName().equals(s))
-                {
-                    final UMOEndpoint endpoint = (UMOEndpoint) o;
-                    final String name = ObjectNameHelper.getEndpointName(endpoint);
-                    endpoint.setName(name);
-                }
+                ((UMODescriptor)o).setName(s);
             }
-            else if (o instanceof UMODescriptor)
+        }
+        else if (o instanceof UMOModel)
+        {
+            if (((UMOModel)o).getName() == null || overwrite)
             {
-                if (((UMODescriptor)o).getName() == null || overwrite)
-                {
-                    ((UMODescriptor)o).setName(s);
-                }
+                ((UMOModel)o).setName(s);
             }
-            else if (o instanceof UMOModel)
-            {
-                if (((UMOModel)o).getName() == null || overwrite)
-                {
-                    ((UMOModel)o).setName(s);
-                }
-            }
-            else if (o instanceof UMOAgent)
-            {
-                ((UMOAgent)o).setName(s);
-            }
-             else if (o instanceof UMOContainerContext)
-            {
-                ((UMOContainerContext)o).setName(s);
-            }
+        }
+        else if (o instanceof UMOAgent)
+        {
+            ((UMOAgent)o).setName(s);
+        }
+        else if (o instanceof UMOContainerContext)
+        {
+            ((UMOContainerContext)o).setName(s);
         }
         return o;
     }
