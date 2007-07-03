@@ -49,4 +49,11 @@ public class ObjectNameHelperTestCase extends AbstractMuleTestCase
             true);
         assertEquals("this.is.another.Wierd.Name.x", ep.getName());
     }
+
+    public void testTestEndpoint() throws Exception
+    {
+        UMOEndpoint ep = new MuleEndpoint("test://exception.listener", true);
+        managementContext.getRegistry().registerEndpoint(ep);
+        assertEquals("endpoint.test.exception.listener", ep.getName());
+    }
 }

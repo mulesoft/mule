@@ -11,6 +11,7 @@
 package org.mule.util;
 
 import org.mule.RegistryContext;
+import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 
@@ -36,12 +37,13 @@ public final class ObjectNameHelper
     public static String getEndpointName(UMOImmutableEndpoint endpoint)
     {
         String name = endpoint.getName();
+        final UMOEndpointURI endpointUri = endpoint.getEndpointURI();
         if (name != null)
         {
             // If the name is the same as the address, we need to add the scheme
-            if (name.equals(endpoint.getEndpointURI().getAddress()))
+            if (name.equals(endpointUri.getAddress()))
             {
-                name = endpoint.getEndpointURI().getScheme() + SEPARATOR + name;
+                name = endpointUri.getScheme() + SEPARATOR + name;
             }
             name = replaceObjectNameChars(name);
             // This causes a stack overflow because we call lookup endpoint
@@ -53,9 +55,14 @@ public final class ObjectNameHelper
         }
         else
         {
-            String address = endpoint.getEndpointURI().getAddress();
+            String address = endpointUri.getAddress();
+            if (StringUtils.isBlank(address))
+            {
+                // for some endpoints in TCK like test://xxx
+                address = endpointUri.toString();
+            }
             // Make sure we include the endpoint scheme in the name
-            address = (address.indexOf(":/") > -1 ? address : endpoint.getEndpointURI().getScheme()
+            address = (address.indexOf(":/") > -1 ? address : endpointUri.getScheme()
                             + SEPARATOR + address);
             name = ENDPOINT_PREFIX + SEPARATOR + replaceObjectNameChars(address);
 
