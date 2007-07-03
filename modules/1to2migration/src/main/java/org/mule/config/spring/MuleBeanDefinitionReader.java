@@ -109,7 +109,10 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
                 logger.fatal("failed to create transformer: " + exception.getMessage(), exception);
             }
         });
-        System.out.println("Creating transformer from source: " + source);
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Creating transformer from source: " + source);
+        }
         Transformer transformer = factory.newTransformer(source);
         return transformer;
     }
