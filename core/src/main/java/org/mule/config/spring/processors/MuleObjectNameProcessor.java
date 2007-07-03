@@ -19,6 +19,7 @@ import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.MuleObjectHelper;
+import org.mule.util.ObjectNameHelper;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -55,7 +56,9 @@ public class MuleObjectNameProcessor implements BeanPostProcessor
                 if ((((UMOEndpoint)o).getName() == null || overwrite)
                     && !MuleEndpoint.class.getName().equals(s))
                 {
-                    ((UMOEndpoint)o).setName(s);
+                    final UMOEndpoint endpoint = (UMOEndpoint) o;
+                    final String name = ObjectNameHelper.getEndpointName(endpoint);
+                    endpoint.setName(name);
                 }
             }
             else if (o instanceof UMODescriptor)
