@@ -395,8 +395,8 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
         }
 
-        return ClassUtils.getClassName(getClass()) + "{connector=" + connector + ", endpointUri="
-               + sanitizedEndPointUri + ", transformer=" + getTransformerValue() + ", name='" + name + "'"
+        return ClassUtils.getClassName(getClass()) + "{endpointUri=" + sanitizedEndPointUri
+               + ", connector=" + connector +  ", transformer=" + getTransformerValue() + ", name='" + name + "'"
                + ", type='" + type + "'" + ", properties=" + properties + ", transactionConfig="
                + transactionConfig + ", filter=" + filter + ", deleteUnacceptedMessages="
                + deleteUnacceptedMessages + ", initialised=" + initialised + ", securityFilter="
@@ -555,7 +555,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         {
             properties.putAll(endpointUri.getParams());
         }
-        
+
         // seal the properties if we are immutable to avoid
         // write-through aliasing problems with the exposed Map
         if (!(this instanceof MuleEndpoint))
@@ -627,7 +627,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
         // For now at least, we don't want a registration error to affect
         // the initialisation process.
-// MULE-1989        
+// MULE-1989
 //        try
 //        {
 //            register();
