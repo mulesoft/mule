@@ -87,6 +87,7 @@ Assembly descriptor for the full Mule distribution.
         <excludes>
             <exclude>pom.xml</exclude>
             <exclude>all-examples/**</exclude>
+            <exclude>hello-osgi/**</exclude>
             <exclude>**/target/**</exclude> 
             <exclude>**/dist/**</exclude>
             <exclude>**/.*/**</exclude>
@@ -369,6 +370,7 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.transports:mule-transport-xfire</include>
         <include>org.mule.transports:mule-transport-xmpp</include>
         <!-- Modules -->
+        <include>org.mule.modules:mule-module-1to2migration</include>
         <include>org.mule.modules:mule-module-acegi</include>
         <include>org.mule.modules:mule-module-builders</include>
         <include>org.mule.modules:mule-module-client</include>
@@ -419,6 +421,7 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule.modules:mule-modules-all</exclude>
         <exclude>org.mule.modules:mule-module-boot</exclude>
         <exclude>org.mule.modules:mule-module-builders</exclude>
+        <exclude>org.mule.modules:mule-module-1to2migration</exclude>
         <exclude>org.mule.modules:mule-module-acegi</exclude>
         <exclude>org.mule.modules:mule-module-client</exclude>
         <exclude>org.mule.modules:mule-module-jaas</exclude>

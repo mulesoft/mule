@@ -44,6 +44,7 @@ Assembly descriptor for the composite Mule library (jar).
         <include>org.mule.transports:mule-transport-xfire</include>
         <include>org.mule.transports:mule-transport-xmpp</include>
         <!-- Modules -->
+        <include>org.mule.modules:mule-module-1to2migration</include>
         <include>org.mule.modules:mule-module-acegi</include>
         <include>org.mule.modules:mule-module-boot</include>
         <include>org.mule.modules:mule-module-builders</include>
