@@ -104,6 +104,16 @@ public class PropertyConfiguration
                 addCollection(plural);
                 return plural;
             }
+            if (newName.endsWith("y"))
+            {
+                String pluraly = newName.substring(0, newName.length()-1) + "ies";
+                if (methodExists(className, pluraly))
+                {
+                    // this lets us avoid setting addCollection in the majority of cases
+                    addCollection(pluraly);
+                    return pluraly;
+                }
+            }
         }
         return newName;
     }

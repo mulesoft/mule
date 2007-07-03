@@ -29,7 +29,7 @@
 	
 	<mule:security-manager xsi:type="pgp:securityManagerType">
         <pgp:pgp-security-provider name="pgpSecurityProvider" keyManager-ref="pgpKeyManager"/>
-        <pgp:keybased-encryption-strategy name="keyBasedEncryptionStrategy"  keyManager-ref="pgpKeyManager"/>
+        <pgp:keybased-encryption-strategy name="keyBasedEncryptionStrategy" keyManager-ref="pgpKeyManager"/>
     </mule:security-manager>
     
 </beans>

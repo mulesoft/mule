@@ -26,7 +26,7 @@ public class AcegiNamespaceHandler extends NamespaceHandlerSupport
     {
         registerBeanDefinitionParser("delegate-security-provider", new ChildDefinitionParser("provider", AcegiProviderAdapter.class));
         registerBeanDefinitionParser("http-security-filter", new GrandchildDefinitionParser("securityFilter", HttpBasicAuthenticationFilter.class));
-        registerBeanDefinitionParser("security-property", new ChildMapEntryDefinitionParser("securityProperties", "name", "value"));
+        registerBeanDefinitionParser("security-property", new ChildMapEntryDefinitionParser("securityProperty", "name", "value"));
     }
 
 }

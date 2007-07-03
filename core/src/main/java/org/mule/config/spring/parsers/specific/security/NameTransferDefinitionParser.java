@@ -23,17 +23,33 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-public class  CustomSecurityDefinitionParser extends ParentDefinitionParser
+/**
+ * This sets the "name" attribute of the reference being set.
+ * <p>It's easier to understand with an example. Consider a custom security provider, set with the
+ * following XML:</p>
+ * <pre>
+ &lt;mule:security-manager xsi:type="mule:defaultSecurityManagerType"&gt;
+     &lt;mule:custom-security-provider name="dummySecurityProvider"
+                                    provider-ref="dummySecurityProvider"/&gt;
+ &lt;/mule:security-manager&gt;</pre>
+ * <p>What is happening here?  First, the custom-security-provider is being handled by this class.
+ * Since this class extends ParentDefinitionParser, the provider value is set on the parent (the
+ * security manager).  But we want the name attribute to be set on the provider (the referenced
+ * bean).  So the "name" is set on the provider, not on the manager.  Then the provider is set on
+ * the manager.</p> 
+ */
+public class NameTransferDefinitionParser extends ParentDefinitionParser
 {
-
-    public static final String NAME = "name";
 
     private String name;
     private String componentAttributeValue;
     private String componentAttributeName;
-    private ParserContext parserContext;
 
-    public CustomSecurityDefinitionParser(String componentAttributeName)
+    /**
+     * @param componentAttributeName The attribute name (after processing, which will strip "-ref",
+     * add plurals, etc) that identifies the component which will receive the "name".
+     */
+    public NameTransferDefinitionParser(String componentAttributeName)
     {
         this.componentAttributeName = componentAttributeName;
         this.beanAssemblerFactory = new LocalBeanAssemblerFactory();
@@ -46,7 +62,6 @@ public class  CustomSecurityDefinitionParser extends ParentDefinitionParser
     {
         name = null;
         componentAttributeValue = null;
-        this.parserContext = parserContext;
         return super.parseInternal(element, parserContext);
     }
 
@@ -56,9 +71,9 @@ public class  CustomSecurityDefinitionParser extends ParentDefinitionParser
     {
         BeanDefinition beanDef = parserContext.getRegistry().getBeanDefinition(componentAttributeValue);
         MutablePropertyValues propertyValues = beanDef.getPropertyValues();
-        if (!propertyValues.contains(NAME))
+        if (!propertyValues.contains(ATTRIBUTE_NAME))
         {
-            propertyValues.addPropertyValue(NAME, name);
+            propertyValues.addPropertyValue(ATTRIBUTE_NAME, name);
         }
     }
 
@@ -73,7 +88,7 @@ public class  CustomSecurityDefinitionParser extends ParentDefinitionParser
 
         public void extendBean(String newName, Object newValue, boolean isReference)
         {
-            if (NAME.equals(newName) && newValue instanceof String)
+            if (ATTRIBUTE_NAME.equals(newName) && newValue instanceof String)
             {
                 name = (String) newValue;
                 if (null != componentAttributeValue)

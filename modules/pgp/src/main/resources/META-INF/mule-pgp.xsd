@@ -73,10 +73,10 @@
   <xsd:complexType name="pgpSecurityFilterType">
     <xsd:complexContent>
       <xsd:extension base="mule:securitySpecificFilterType">
-        <xsd:attribute name="strategyName" type="xsd:string" use="required"></xsd:attribute>
-        <xsd:attribute name="signRequired" type="xsd:string" use="required"></xsd:attribute>
-        <xsd:attribute name="keyManager-ref" type="xsd:NMTOKEN" use="required"></xsd:attribute>
-          <xsd:attribute name="credentialsAccessor-ref" type="xsd:NMTOKEN" use="required"></xsd:attribute>
+        <xsd:attribute name="strategyName" type="xsd:string" use="required"/>
+        <xsd:attribute name="signRequired" type="xsd:string" use="required"/>
+        <xsd:attribute name="keyManager-ref" type="xsd:NMTOKEN" use="required"/>
+        <xsd:attribute name="credentialsAccessor-ref" type="xsd:NMTOKEN" use="required"/>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
