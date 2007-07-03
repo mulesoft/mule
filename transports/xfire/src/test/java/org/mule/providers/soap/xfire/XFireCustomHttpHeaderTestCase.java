@@ -86,9 +86,8 @@ public class XFireCustomHttpHeaderTestCase extends FunctionalTestCase implements
             if (endpointAddress.equals(uri))
             {
                 notificationMsg = (UMOMessage)notification.getSource();
-            }
-            
-            latch.countDown();
+                latch.countDown();
+            }            
         }
         else
         {
