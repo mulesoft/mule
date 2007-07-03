@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.mulesource.org/schema/mule/pgp/2.0"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+            targetNamespace="http://www.mulesource.org/schema/mule/pgp/2.0"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.springframework.org/schema/beans"
+                schemaLocation="http://www.springframework.org/schema/beans"/>
+
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"/>
+
+  <xsd:complexType name="securityManagerType">
+    <xsd:complexContent>
+      <xsd:extension base="mule:securityManagerType">
+        <xsd:sequence>
+          <xsd:element ref="pgp-security-provider"></xsd:element>
+          <xsd:element ref="keybased-encryption-strategy"></xsd:element>  
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <!-- pgp provider -->	
+  <xsd:element name="pgp-security-provider" type="pgpSecurityProviderType">
+    <xsd:annotation>
+      <xsd:documentation>TODO</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:complexType name="pgpSecurityProviderType">
+    <xsd:complexContent>
+      <xsd:extension base="mule:securityProviderType">
+        <xsd:attribute name="keyManager-ref" type="xsd:NMTOKEN" use="required"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+    
+  <!-- key based encryption strategy -->	
+  <xsd:element name="keybased-encryption-strategy" type="keyBasedEncryptionStrategyType">
+    <xsd:annotation>
+      <xsd:documentation>TODO</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+	
+  <xsd:complexType name="keyBasedEncryptionStrategyType">
+    <xsd:complexContent>
+      <xsd:extension base="mule:encryptionStrategyType">
+        <xsd:attribute name="keyManager-ref" type="xsd:NMTOKEN" use="required"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+    
+  <!-- security filter -->	
+  <xsd:complexType name="securityFilterType">
+    <xsd:complexContent>
+      <xsd:extension base="mule:securityFilterType">
+        <xsd:sequence>
+          <xsd:element ref="pgp-security-filter"></xsd:element>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:element name="pgp-security-filter" type="pgpSecurityFilterType">
+    <xsd:annotation>
+      <xsd:documentation>TODO</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:complexType name="pgpSecurityFilterType">
+    <xsd:complexContent>
+      <xsd:extension base="mule:securitySpecificFilterType">
+        <xsd:attribute name="strategyName" type="xsd:string" use="required"></xsd:attribute>
+        <xsd:attribute name="signRequired" type="xsd:string" use="required"></xsd:attribute>
+        <xsd:attribute name="keyManager-ref" type="xsd:NMTOKEN" use="required"></xsd:attribute>
+          <xsd:attribute name="credentialsAccessor-ref" type="xsd:NMTOKEN" use="required"></xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+</xsd:schema>

@@ -9,8 +9,9 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd
        http://www.mulesource.org/schema/mule/pgp/2.0 http://www.mulesource.org/schema/mule/pgp/2.0/mule-pgp.xsd">
-	
-	<bean id="pgpKeyManager" class="org.mule.extras.pgp.PGPKeyRingImpl" init-method="initialise">
+
+
+<bean id="pgpKeyManager" class="org.mule.extras.pgp.PGPKeyRingImpl" init-method="initialise">
         <property name="publicKeyRingFileName">
             <value>serverPublic.gpg</value>
         </property>
@@ -30,27 +31,5 @@
         <pgp:pgp-security-provider name="pgpSecurityProvider" keyManager-ref="pgpKeyManager"/>
         <pgp:keybased-encryption-strategy name="keyBasedEncryptionStrategy"  keyManager-ref="pgpKeyManager"/>
     </mule:security-manager>
-	
-	 <mule:model-seda name="test">
-        <mule:service name="echo">
-            <mule:component class="org.mule.extras.pgp.EchoMsg"/>
-				<mule:inbound-router>
-					<mule:endpoint address="vm://echo">
-						<mule:security-filter xsi:type="pgp:securityFilterType">
-							<pgp:pgp-security-filter strategyName="KBE" signRequired="true" credentialsAccessor-ref="fakeCredentialAccessor" keyManager-ref="pgpKeyManager"/>
-						</mule:security-filter>
-					</mule:endpoint>
-				</mule:inbound-router>
-				<mule:outbound-router>
-					<mule:pass-through-router>
-						<mule:endpoint address="file:///WuTemp">
-							<mule:security-filter xsi:type="pgp:securityFilterType">
-								<pgp:pgp-security-filter strategyName="KBE" signRequired="true" credentialsAccessor-ref="fakeCredentialAccessor" keyManager-ref="pgpKeyManager"/>
-							</mule:security-filter>
-						</mule:endpoint>
-					</mule:pass-through-router>
-				</mule:outbound-router>
-			</mule:service>
-	</mule:model-seda>
     
 </beans>
