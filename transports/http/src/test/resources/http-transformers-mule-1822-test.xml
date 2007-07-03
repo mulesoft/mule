@@ -41,7 +41,7 @@
         <mule:service name="baseService1">
             <mule:component class="org.mule.components.simple.BridgeComponent"/>
             <mule:inbound-router>
-                <mule:endpoint-ref nameref="base"/>
+                <mule:endpoint endpoint-ref="base"/>
             </mule:inbound-router>
             <mule:outbound-router>
                 <mule:pass-through-router>
@@ -67,7 +67,7 @@
         <mule:service name="responseService1">
             <mule:component class="org.mule.components.simple.BridgeComponent"/>
             <mule:inbound-router>
-                <mule:endpoint-ref nameref="response" responseTransformers="appendResponse"/>
+                <mule:endpoint endpoint-ref="response" responseTransformers="appendResponse"/>
             </mule:inbound-router>
             <mule:outbound-router>
                 <mule:pass-through-router>
@@ -93,7 +93,7 @@
         <mule:service name="bothService1">
             <mule:component class="org.mule.components.simple.BridgeComponent"/>
             <mule:inbound-router>
-                <mule:endpoint-ref nameref="both"
+                <mule:endpoint endpoint-ref="both"
                                    transformers="appendString"
                                    responseTransformers="appendResponse"/>
             </mule:inbound-router>

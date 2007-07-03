@@ -111,7 +111,7 @@
     <!--==============================================================-->
 
 
-    <xsd:complexType name="baseEndpointType">
+    <xsd:complexType name="endpointType">
         <xsd:choice minOccurs="0" maxOccurs="unbounded">
             <xsd:element name="transaction" type="transactionType" minOccurs="0" maxOccurs="1"/>
             <xsd:group ref="filter" minOccurs="0" maxOccurs="unbounded"/>
@@ -122,6 +122,14 @@
                 <xsd:any namespace="##other" processContents="strict"/>
             </xsd:choice>
         </xsd:choice>
+
+        <!-- these next two attributes are mutually exclusive and one is required.
+             but there is no way to define this in a schema... -->
+        <!-- endpoint references - dynamically checked to make sure not top level -->
+        <xsd:attribute name="endpoint-ref" type="xsd:NMTOKEN"/>
+        <!-- explicit or global endpoints -->
+        <xsd:attribute name="address" type="xsd:string"/>
+
         <xsd:attribute name="name" type="xsd:string"/>
         <xsd:attribute name="transformers" type="xsd:string"/>
         <xsd:attribute name="responseTransformers" type="xsd:string"/>
@@ -139,33 +147,16 @@
                 </xsd:restriction>
             </xsd:simpleType>
         </xsd:attribute>
+        <!-- MULE-1837 - add endpoint type if necessary -->
+        <!-- xsd:attribute name="type">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="receiver"/>
+                    <xsd:enumeration value="sender"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute -->
     </xsd:complexType>
-
-    <xsd:complexType name="endpointType">
-        <xsd:complexContent>
-            <xsd:extension base="baseEndpointType">
-                <xsd:attribute name="address" type="xsd:string" use="required"/>
-                <!-- MULE-1837 - add endpoint type if necessary -->
-                <!-- xsd:attribute name="type">
-                    <xsd:simpleType>
-                        <xsd:restriction base="xsd:NMTOKEN">
-                            <xsd:enumeration value="receiver"/>
-                            <xsd:enumeration value="sender"/>
-                        </xsd:restriction>
-                    </xsd:simpleType>
-                </xsd:attribute -->
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:complexType name="endpointRefType">
-        <xsd:complexContent>
-            <xsd:extension base="baseEndpointType">
-                <xsd:attribute name="nameref" type="xsd:string" use="required"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
 
     <xsd:complexType name="transactionType">
         <xsd:attribute name="factory" type="xsd:NMTOKEN"/>
@@ -579,7 +570,6 @@
     <xsd:complexType name="exceptionStrategyType">
         <xsd:choice maxOccurs="unbounded" minOccurs="0">
             <xsd:element name="endpoint" type="endpointType" minOccurs="0" maxOccurs="unbounded"/>
-            <xsd:element name="endpoint-ref" type="endpointRefType" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:choice>
     </xsd:complexType>
 
@@ -871,7 +861,6 @@
     <xsd:complexType name="inboundRouterCollectionType">
         <xsd:choice maxOccurs="unbounded">
             <xsd:element name="endpoint" type="endpointType" minOccurs="0" maxOccurs="unbounded"/>
-            <xsd:element name="endpoint-ref" type="endpointRefType" minOccurs="0" maxOccurs="unbounded"/>
             <xsd:group ref="catchAllStrategies" minOccurs="0" maxOccurs="1"/>
             <xsd:group ref="inboundRouters" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:choice>
@@ -889,7 +878,6 @@
     <xsd:complexType name="nestedBindingType">
         <xsd:choice minOccurs="1" maxOccurs="1">
             <xsd:element name="endpoint" type="endpointType" minOccurs="0" maxOccurs="unbounded"/>
-            <xsd:element name="endpoint-ref" type="endpointRefType" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:choice>
         <xsd:attribute name="interface" use="required"/>
         <xsd:attribute name="method" use="optional"/>
@@ -898,7 +886,6 @@
     <xsd:complexType name="responseRouterCollectionType">
         <xsd:choice maxOccurs="unbounded">
             <xsd:element name="endpoint" type="endpointType" minOccurs="0" maxOccurs="unbounded"/>
-            <xsd:element name="endpoint-ref" type="endpointRefType" minOccurs="0" maxOccurs="unbounded"/>
             <xsd:group ref="responseRouters" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:choice>
         <xsd:attribute name="transformers" type="xsd:string"/>
@@ -919,7 +906,6 @@
     <xsd:complexType name="nestedInboundRouterType">
         <xsd:choice maxOccurs="unbounded">
             <xsd:element name="endpoint" type="endpointType" minOccurs="0"/>
-            <xsd:element name="endpoint-ref" type="endpointRefType" minOccurs="0"/>
             <xsd:group ref="filter" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:choice>
         <xsd:attribute name="propertyExtractor" type="xsd:NMTOKEN"/>
@@ -955,7 +941,6 @@
             <xsd:extension base="nestedInboundRouterType">
                 <xsd:choice minOccurs="0" maxOccurs="1">
                     <!--<xsd:element name="endpoint" type="endpointType"/>-->
-                    <!--<xsd:element name="endpoint-ref" type="endpointRefType"/>-->
                 </xsd:choice>
             </xsd:extension>
         </xsd:complexContent>
@@ -991,7 +976,6 @@
     <xsd:complexType name="responseRouterType">
         <xsd:choice maxOccurs="unbounded">
             <xsd:element name="endpoint" type="endpointType" minOccurs="0"/>
-            <xsd:element name="endpoint-ref" type="endpointRefType" minOccurs="0"/>
         </xsd:choice>
         <xsd:attribute name="propertyExtractor" type="xsd:NMTOKEN"/>
     </xsd:complexType>
@@ -1015,7 +999,6 @@
     <xsd:complexType name="outboundRouterType">
         <xsd:choice maxOccurs="unbounded">
             <xsd:element name="endpoint" type="endpointType" minOccurs="0"/>
-            <xsd:element name="endpoint-ref" type="endpointRefType" minOccurs="0"/>
             <xsd:element name="reply-to" type="replyToType" minOccurs="0"/>
             <xsd:element name="transaction" type="transactionType" minOccurs="0"/>
             <xsd:group ref="filter" minOccurs="0" maxOccurs="unbounded"/>
@@ -1106,7 +1089,6 @@
     <xsd:complexType name="forwardingCatchAllStrategyType">
         <xsd:choice maxOccurs="unbounded">
             <xsd:element name="endpoint" type="endpointType" minOccurs="0"/>
-            <xsd:element name="endpoint-ref" type="endpointRefType" minOccurs="0"/>
         </xsd:choice>
     </xsd:complexType>
 

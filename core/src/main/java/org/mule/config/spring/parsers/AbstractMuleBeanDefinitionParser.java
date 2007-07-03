@@ -103,7 +103,6 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
     public AbstractMuleBeanDefinitionParser()
     {
         addIgnored(ATTRIBUTE_ID);
-        addIgnored(ATTRIBUTE_IDREF);
     }
 
     public void addReference(String propertyName)

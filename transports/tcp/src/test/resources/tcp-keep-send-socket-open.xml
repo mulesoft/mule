@@ -20,7 +20,7 @@
     <mule:model-seda name="main">
         <mule:service name="testComponent" implementation="org.mule.tck.functional.FunctionalTestComponent">
             <mule:inbound-router>
-                <mule:endpoint-ref nameref="clientEndpoint"/>
+                <mule:endpoint endpoint-ref="clientEndpoint"/>
             </mule:inbound-router>
         </mule:service>
     </mule:model-seda>

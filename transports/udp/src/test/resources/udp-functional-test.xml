@@ -21,7 +21,7 @@
     <mule:model-seda name="main">
         <mule:service name="testUDP1" implementation="org.mule.tck.functional.FunctionalTestComponent">
             <mule:inbound-router>
-                <mule:endpoint-ref nameref="serverEndpoint"/>
+                <mule:endpoint endpoint-ref="serverEndpoint"/>
             </mule:inbound-router>
             <mule:outbound-router>
                 <mule:pass-through-router>

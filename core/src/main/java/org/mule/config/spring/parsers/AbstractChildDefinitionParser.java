@@ -73,21 +73,11 @@ public abstract class AbstractChildDefinitionParser extends AbstractHierarchical
         String id = e.getAttribute(ATTRIBUTE_NAME);
         if (StringUtils.isBlank(id))
         {
-            String idref = e.getAttribute(ATTRIBUTE_IDREF);
-            if (StringUtils.isBlank(idref))
-            {
-                id = e.getLocalName();
-            }
-            else
-            {
-                id = "ref:" + idref;
-            }
-
             if (!parentId.startsWith("."))
             {
                 parentId = "." + parentId;
             }
-            return parentId + ":" + id;
+            return parentId + ":" + e.getLocalName();
         }
         else
         {

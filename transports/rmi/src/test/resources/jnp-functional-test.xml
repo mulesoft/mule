@@ -42,11 +42,11 @@
             </mule:inbound-router>
             <mule:outbound-router>
                 <mule:filtering-router>
-                    <mule:endpoint-ref nameref="Sender"/>
+                    <mule:endpoint endpoint-ref="Sender"/>
                     <mule:payload-type-filter expectedType="java.lang.Integer"/>
                 </mule:filtering-router>
                 <mule:filtering-router>
-                    <mule:endpoint-ref nameref="Sender2"/>
+                    <mule:endpoint endpoint-ref="Sender2"/>
                     <mule:payload-type-filter expectedType="java.lang.String"/>
                 </mule:filtering-router>
             </mule:outbound-router>

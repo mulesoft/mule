@@ -27,13 +27,15 @@ import org.w3c.dom.Element;
 public class EndpointDefinitionParser extends AbstractChildDefinitionParser
 {
     public static final String ADDRESS_ATTRIBUTE = "address";
+    public static final String ENDPOINT_REF_ATTRIBUTE = "endpoint-ref";
 
     public EndpointDefinitionParser()
     {
         addAlias("address", "endpointURI");
+        addMapping("createConnector", "GET_OR_CREATE=0,ALWAYS_CREATE=1,NEVER_CREATE=2");
         addAlias("transformers", "transformer");
         addAlias("responseTransformers", "responseTransformer");
-        addMapping("createConnector", "GET_OR_CREATE=0,ALWAYS_CREATE=1,NEVER_CREATE=2");
+        addIgnored(ENDPOINT_REF_ATTRIBUTE);
     }
 
     /**
@@ -61,6 +63,36 @@ public class EndpointDefinitionParser extends AbstractChildDefinitionParser
         if (parent.getNodeName().equals("beans"))
         {
             builder.addPropertyValue("type", UMOImmutableEndpoint.ENDPOINT_TYPE_GLOBAL);
+            // if global, cannot be a reference (afaik)
+            if (null == element.getAttributeNode(ADDRESS_ATTRIBUTE))
+            {
+                throw new IllegalStateException("A global endpoint requires an " + ADDRESS_ATTRIBUTE + " attribute.");
+            }
+            if (null != element.getAttributeNode(ENDPOINT_REF_ATTRIBUTE))
+            {
+                throw new IllegalStateException("A global endpoint cannot contain a " + ENDPOINT_REF_ATTRIBUTE +
+                        " attribute.");
+            }
+        }
+        else
+        {
+            // must be reference *or* have an address
+            if (null == element.getAttributeNode(ADDRESS_ATTRIBUTE))
+            {
+                if (null == element.getAttributeNode(ENDPOINT_REF_ATTRIBUTE))
+                {
+                    throw new IllegalStateException("An endpoint requires either an " + ADDRESS_ATTRIBUTE + " or a " +
+                            ENDPOINT_REF_ATTRIBUTE + " attribute.");
+                }
+            }
+            else
+            {
+                if (null != element.getAttributeNode(ENDPOINT_REF_ATTRIBUTE))
+                {
+                    throw new IllegalStateException("The " + ADDRESS_ATTRIBUTE + " and " + ENDPOINT_REF_ATTRIBUTE +
+                            " attributes are mutually exclusive.");
+                }
+            }
         }
 
         //Register non-descriptive dependencies i.e. string values for objects listed in the container
@@ -90,4 +122,35 @@ public class EndpointDefinitionParser extends AbstractChildDefinitionParser
     {
         return MuleEndpoint.class;
     }
+
+    protected BeanDefinitionBuilder createBeanDefinitionBuilder(Element element, Class beanClass)
+    {
+        if (null == element.getAttributeNode(ENDPOINT_REF_ATTRIBUTE))
+        {
+            return super.createBeanDefinitionBuilder(element, beanClass);
+        }
+        else
+        {
+            String parent = element.getAttribute(ENDPOINT_REF_ATTRIBUTE);
+            BeanDefinitionBuilder bdb = BeanDefinitionBuilder.childBeanDefinition(parent);
+            bdb.getBeanDefinition().setBeanClassName(beanClass.getName());
+            // need to overload the type so it becomes a local endpoint
+            bdb.addPropertyValue("type", UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER_AND_RECEIVER);
+            return bdb;
+        }
+    }
+
+    // @Override
+    protected String generateChildBeanName(Element e)
+    {
+        if (null != e.getAttributeNode(ENDPOINT_REF_ATTRIBUTE))
+        {
+            return "ref:" + e.getAttribute(ENDPOINT_REF_ATTRIBUTE);
+        }
+        else
+        {
+            return super.generateChildBeanName(e);
+        }
+    }
+
 }

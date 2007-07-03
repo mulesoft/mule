@@ -15,7 +15,7 @@
         <mule:service name="testComponent">
             <mule:component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <mule:inbound-router>
-                <mule:endpoint-ref nameref="serverEndpoint"/>
+                <mule:endpoint endpoint-ref="serverEndpoint"/>
             </mule:inbound-router>
         </mule:service>
     </mule:model-seda>

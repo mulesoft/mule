@@ -46,7 +46,7 @@ public abstract class AbstractAsynchronousLoanBrokerTestCase extends AbstractLoa
         CustomerQuoteRequest request = new CustomerQuoteRequest(c, 100000, 48);
         // Send asynchronous request
         client.dispatch("CustomerRequests", request, null);
-        
+
         // Wait for asynchronous response
         UMOMessage result = client.receive("CustomerResponses", getDelay());
         assertNotNull("Result is null", result);

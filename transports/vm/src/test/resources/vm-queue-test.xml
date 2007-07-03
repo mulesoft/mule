@@ -22,7 +22,7 @@
             </mule:inbound-router>
             <mule:outbound-router>
                 <mule:pass-through-router>
-                    <mule:endpoint-ref nameref="queue"/>
+                    <mule:endpoint endpoint-ref="queue"/>
                 </mule:pass-through-router>
             </mule:outbound-router>
         </mule:service>
