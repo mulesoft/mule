@@ -285,6 +285,8 @@ public class DefaultMuleProxy implements MuleProxy
                 }
 
                 // Process Response Router
+                // TODO Alan C. - responseRouter is initialized to empty (no endpoints) in Mule 2.x, this line can be part of a solution
+                //if (returnMessage != null && descriptor.getResponseRouter() != null && !descriptor.getResponseRouter().getEndpoints().isEmpty())
                 if (returnMessage != null && descriptor.getResponseRouter() != null)
                 {
                     logger.debug("Waiting for response router message");

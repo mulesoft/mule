@@ -134,14 +134,15 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
     {
         while (!disposing.get())
         {
-            try
-            {
-                Thread.sleep(100);
-            }
-            catch (InterruptedException e)
-            {
-                break;
-            }
+            // TODO why is this spin loop here? It's not there on the trunk.
+            //try
+            //{
+            //    Thread.sleep(100);
+            //}
+            //catch (InterruptedException e)
+            //{
+            //    break;
+            //}
             if (connector.isStarted() && !disposing.get())
             {
                 Socket socket = null;
@@ -322,14 +323,18 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
                             {
                                 break;
                             }
-
+                            
+                            boolean remoteSync = endpoint.isRemoteSync();
                             Object result = processData(readMsg);
-                            if (result != null)
+                            
+                            //should send back only if rem synch or no outbound endpoints
+                            if (result != null && (remoteSync || !component.getDescriptor().getOutboundRouter().hasEndpoints()))
                             {
                                 protocol.write(dataOut, result);
+                                dataOut.flush();
                             }
 
-                            dataOut.flush();
+                            
                         }
                         catch (SocketTimeoutException e)
                         {

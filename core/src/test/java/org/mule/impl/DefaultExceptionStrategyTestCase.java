@@ -57,6 +57,7 @@ public class DefaultExceptionStrategyTestCase extends AbstractMuleTestCase
                     assertEquals("exception", notification.getActionName());
                     assertEquals("Wrong info type", UMOServerNotification.TYPE_ERROR, notification.getType());
                     notificationCount.incrementAndGet();
+                    latch.countDown();
                 }
             }
         });

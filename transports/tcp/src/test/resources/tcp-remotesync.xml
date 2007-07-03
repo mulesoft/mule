@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="TcpRemoteSync" version="1.0">
+	
+    
+	<mule-environment-properties synchronous="true"/>
+    
+    <connector name="TcpConnector" className="org.mule.providers.tcp.TcpConnector">
+        <properties>
+            <property name="timeout" value="1000000"/>
+        </properties>
+        
+    </connector>
+    
+	<model name="Tcp_wit_remote_sync">
+		
+        <mule-descriptor name="Echo1" implementation="org.mule.components.simple.BridgeComponent">
+            <inbound-router>
+                <endpoint address="tcp://localhost:6161" remoteSync="true"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="tcp://localhost:6162" />
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+        
+        <mule-descriptor name="Echo2" implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <endpoint address="tcp://localhost:6163" remoteSync="true"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="vm://synch"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+        
+        <mule-descriptor name="SynchPoint" implementation="org.mule.tck.testmodels.services.TestComponent">
+            <inbound-router>
+                <endpoint address="tcp://localhost:6162" synchronous="true"/>
+                <endpoint address="vm://synch"/>
+            </inbound-router>
+        </mule-descriptor>
+		
+	</model>
+</mule-configuration>

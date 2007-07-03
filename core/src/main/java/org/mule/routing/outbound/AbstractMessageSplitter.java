@@ -23,12 +23,11 @@ import java.util.List;
 
 /**
  * <code>AbstractMessageSplitter</code> is an outbound Message Splitter used to
- * split the contents of a received message into sup parts that can be processed by
+ * split the contents of a received message into sub parts that can be processed by
  * other components. Each Part is fired as a separate event to each endpoint on the
  * router. The endpoints can have filters on them to receive only certain message
  * parts.
  */
-
 public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
 {
     // Determines if the same endpoint will be matched multiple times until a

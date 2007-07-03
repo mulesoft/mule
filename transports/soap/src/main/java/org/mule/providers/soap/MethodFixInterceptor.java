@@ -20,7 +20,7 @@ import org.mule.umo.UMOException;
  * DynamicEntryPointResolver to ignore the 'method' property. The reason being is
  * that for the SOAP endpoints have an additional hop - http --->
  * AxisServiceComponent ---> WebService the 'method' param is targetted for the
- * WebService not the AxisServiceComponent, so we eed to ignore it
+ * WebService not the AxisServiceComponent, so we need to ignore it
  */
 public class MethodFixInterceptor extends EnvelopeInterceptor
 {
