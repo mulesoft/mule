@@ -126,7 +126,7 @@
         <!-- these next two attributes are mutually exclusive and one is required.
              but there is no way to define this in a schema... -->
         <!-- endpoint references - dynamically checked to make sure not top level -->
-        <xsd:attribute name="endpoint-ref" type="xsd:NMTOKEN"/>
+        <xsd:attribute name="ref" type="xsd:NMTOKEN"/>
         <!-- explicit or global endpoints -->
         <xsd:attribute name="address" type="xsd:string"/>
 

@@ -32,12 +32,12 @@
         <mule:service name="VoipBroker">
             <mule:component class="org.mule.samples.voipservice.service.SyncVoipBroker"/>
             <mule:inbound-router>
-                <mule:endpoint endpoint-ref="VoipBrokerRequests"/>
+                <mule:endpoint ref="VoipBrokerRequests"/>
             </mule:inbound-router>
             
             <mule:outbound-router>
                 <mule:filtering-router>
-                    <mule:endpoint endpoint-ref="AddressValidation"/>
+                    <mule:endpoint ref="AddressValidation"/>
                     <mule:payload-type-filter expectedType="org.mule.samples.voipservice.to.AddressTO"/>
                 </mule:filtering-router>
                 
@@ -47,13 +47,13 @@
                 </mule:static-recipient-list-router>
                 
                 <mule:filtering-router>
-                    <mule:endpoint endpoint-ref="PaymentValidation"/>
+                    <mule:endpoint ref="PaymentValidation"/>
                     <mule:payload-type-filter expectedType="java.lang.String"/>
                 </mule:filtering-router>
             </mule:outbound-router>
             
             <mule:response-router>
-                <mule:endpoint endpoint-ref="PaymentValidationResponse"/>
+                <mule:endpoint ref="PaymentValidationResponse"/>
                 <mule:custom-router class="org.mule.samples.voipservice.routers.PaymentValidationResponseAggregator"/>
             </mule:response-router>
         </mule:service>
@@ -61,28 +61,28 @@
         <mule:service name="AddressValidationService">
             <mule:component class="org.mule.samples.voipservice.service.AddressValidationService"/>
             <mule:inbound-router>
-                <mule:endpoint endpoint-ref="AddressValidationReceiver"/>
+                <mule:endpoint ref="AddressValidationReceiver"/>
             </mule:inbound-router>
         </mule:service>
         
         <mule:service name="PaymentValidationService">
             <mule:component class="org.mule.samples.voipservice.service.PaymentValidationService"/>
             <mule:inbound-router>
-                <mule:endpoint endpoint-ref="PaymentValidation"/>
+                <mule:endpoint ref="PaymentValidation"/>
             </mule:inbound-router>
         </mule:service>
 
         <mule:service name="CreditAgencyService">
             <mule:component class="org.mule.samples.voipservice.service.CreditAgencyService"/>
             <mule:inbound-router>
-                <mule:endpoint endpoint-ref="CreditAgencyReceiver"/>
+                <mule:endpoint ref="CreditAgencyReceiver"/>
             </mule:inbound-router>
         </mule:service>
 
         <mule:service name="BankAgencyService">
             <mule:component class="org.mule.samples.voipservice.service.BankAgencyService"/>
             <mule:inbound-router>
-                <mule:endpoint endpoint-ref="BankAgencyReceiver"/>
+                <mule:endpoint ref="BankAgencyReceiver"/>
             </mule:inbound-router>
         </mule:service>
     </mule:model-seda>

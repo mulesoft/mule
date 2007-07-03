@@ -36,19 +36,19 @@
             <mule:component class="org.mule.examples.loanbroker.esn.SynchronousLoanBroker"/>
 
             <mule:inbound-router>
-                <mule:endpoint endpoint-ref="CustomerRequests"/>
+                <mule:endpoint ref="CustomerRequests"/>
             </mule:inbound-router>
 
             <mule:nested-router>
                 <mule:binding interface="org.mule.examples.loanbroker.credit.CreditAgencyService">
-                    <mule:endpoint endpoint-ref="CreditAgency"/>
+                    <mule:endpoint ref="CreditAgency"/>
                 </mule:binding>
             </mule:nested-router>
 
             <mule:outbound-router>
                 <!-- couldn't this be pass-through? -->
                 <mule:filtering-router>
-                    <mule:endpoint endpoint-ref="LenderService"/>
+                    <mule:endpoint ref="LenderService"/>
                 </mule:filtering-router>
             </mule:outbound-router>
 
@@ -57,19 +57,19 @@
         <mule:service name="TheCreditAgencyService">
             <mule:component class="org.mule.examples.loanbroker.credit.DefaultCreditAgency"/>
             <mule:inbound-router>
-                <mule:endpoint endpoint-ref="CreditAgencyIn"/>
+                <mule:endpoint ref="CreditAgencyIn"/>
             </mule:inbound-router>
         </mule:service>
 
         <mule:service name="LenderService">
             <mule:component class="org.mule.examples.loanbroker.lender.DefaultLender"/>
             <mule:inbound-router>
-                <mule:endpoint endpoint-ref="LenderService"/>
+                <mule:endpoint ref="LenderService"/>
             </mule:inbound-router>
             <mule:outbound-router>
                 <!-- again, could be pass-through? -->
                 <mule:filtering-router>
-                    <mule:endpoint endpoint-ref="BankGateway" transformers="SetLendersAsRecipients"/>
+                    <mule:endpoint ref="BankGateway" transformers="SetLendersAsRecipients"/>
                 </mule:filtering-router>
             </mule:outbound-router>
         </mule:service>
@@ -77,7 +77,7 @@
         <mule:service name="BankGateway">
             <mule:component class="org.mule.components.simple.BridgeComponent"/>
             <mule:inbound-router>
-                <mule:endpoint endpoint-ref="BankGateway"/>
+                <mule:endpoint ref="BankGateway"/>
             </mule:inbound-router>
             <mule:outbound-router>
                 <mule:logging-catch-all-strategy/>
@@ -91,35 +91,35 @@
         <mule:service name="TheBank1">
             <mule:component class="org.mule.examples.loanbroker.bank.Bank"/>
             <mule:inbound-router>
-                <mule:endpoint endpoint-ref="Bank1In"/>
+                <mule:endpoint ref="Bank1In"/>
             </mule:inbound-router>
         </mule:service>
 
         <mule:service name="TheBank2">
             <mule:component class="org.mule.examples.loanbroker.bank.Bank"/>
             <mule:inbound-router>
-                <mule:endpoint endpoint-ref="Bank2In"/>
+                <mule:endpoint ref="Bank2In"/>
             </mule:inbound-router>
         </mule:service>
 
         <mule:service name="TheBank3">
             <mule:component class="org.mule.examples.loanbroker.bank.Bank"/>
             <mule:inbound-router>
-                <mule:endpoint endpoint-ref="Bank3In"/>
+                <mule:endpoint ref="Bank3In"/>
             </mule:inbound-router>
         </mule:service>
 
         <mule:service name="TheBank4">
             <mule:component class="org.mule.examples.loanbroker.bank.Bank"/>
             <mule:inbound-router>
-                <mule:endpoint endpoint-ref="Bank4In"/>
+                <mule:endpoint ref="Bank4In"/>
             </mule:inbound-router>
         </mule:service>
 
         <mule:service name="TheBank5">
             <mule:component class="org.mule.examples.loanbroker.bank.Bank"/>
             <mule:inbound-router>
-                <mule:endpoint endpoint-ref="Bank5In"/>
+                <mule:endpoint ref="Bank5In"/>
             </mule:inbound-router>
         </mule:service>
 

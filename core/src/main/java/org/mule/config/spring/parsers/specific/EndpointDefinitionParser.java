@@ -27,7 +27,7 @@ import org.w3c.dom.Element;
 public class EndpointDefinitionParser extends AbstractChildDefinitionParser
 {
     public static final String ADDRESS_ATTRIBUTE = "address";
-    public static final String ENDPOINT_REF_ATTRIBUTE = "endpoint-ref";
+    public static final String ENDPOINT_REF_ATTRIBUTE = "ref";
 
     public EndpointDefinitionParser()
     {

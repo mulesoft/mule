@@ -31,7 +31,7 @@
         <mule:service name="baseService1">
             <mule:component class="org.mule.components.simple.BridgeComponent"/>
             <mule:inbound-router>
-                <mule:endpoint endpoint-ref="base"/>
+                <mule:endpoint ref="base"/>
             </mule:inbound-router>
             <mule:outbound-router>
                 <mule:pass-through-router>
@@ -58,7 +58,7 @@
         <mule:service name="adaptedService1">
             <mule:component class="org.mule.providers.http.issues.NoTransformPassThroughComponent"/>
             <mule:inbound-router>
-                <mule:endpoint endpoint-ref="adapted"/>
+                <mule:endpoint ref="adapted"/>
             </mule:inbound-router>
             <mule:outbound-router>
                 <mule:pass-through-router>
@@ -84,7 +84,7 @@
         <mule:service name="ignoredService1">
             <mule:component class="org.mule.providers.http.issues.NoTransformPassThroughComponent"/>
             <mule:inbound-router>
-                <mule:endpoint endpoint-ref="ignored" transformers="appendString"/>
+                <mule:endpoint ref="ignored" transformers="appendString"/>
             </mule:inbound-router>
             <mule:outbound-router>
                 <mule:pass-through-router>
@@ -109,7 +109,7 @@
         <mule:service name="inboundService1">
             <mule:component class="org.mule.components.simple.BridgeComponent"/>
             <mule:inbound-router>
-                <mule:endpoint endpoint-ref="inbound" transformers="appendString"/>
+                <mule:endpoint ref="inbound" transformers="appendString"/>
             </mule:inbound-router>
             <mule:outbound-router>
                 <mule:pass-through-router>

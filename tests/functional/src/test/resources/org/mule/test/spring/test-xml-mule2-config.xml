@@ -104,7 +104,7 @@
                 </mule:forwarding-catch-all-strategy>
                 <mule:endpoint name="Orange" address="test://orange/" transformers="TestCompressionTransformer"
                                responseTransformers="TestCompressionTransformer"/>
-                <mule:endpoint endpoint-ref="orangeEndpoint" transformers="TestCompressionTransformer">
+                <mule:endpoint ref="orangeEndpoint" transformers="TestCompressionTransformer">
                     <mule:payload-type-filter expectedType="java.lang.String"/>
                     <mule:properties>
                         <entry key="testLocal" value="value1"/>
@@ -123,13 +123,13 @@
 
             <mule:outbound-router>
                 <mule:pass-through-router>
-                    <mule:endpoint endpoint-ref="appleInEndpoint" transformers="TestCompressionTransformer"/>
+                    <mule:endpoint ref="appleInEndpoint" transformers="TestCompressionTransformer"/>
                 </mule:pass-through-router>
             </mule:outbound-router>
 
             <mule:response-router timeout="10001">
                 <mule:endpoint address="test://response1"/>
-                <mule:endpoint endpoint-ref="appleResponseEndpoint"/>
+                <mule:endpoint ref="appleResponseEndpoint"/>
                 <mule:custom-router class="org.mule.tck.testmodels.mule.TestResponseAggregator"/>
             </mule:response-router>
 
@@ -168,7 +168,7 @@
             <mule:component scope="singleton" instance-ref="apple"/>
             <mule:inbound-router>
                 <mule:custom-catch-all-strategy class="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>
-                <mule:endpoint endpoint-ref="appleInEndpoint"/>
+                <mule:endpoint ref="appleInEndpoint"/>
                 <mule:selective-consumer-router>
                     <mule:payload-type-filter expectedType="java.lang.String"/>
                 </mule:selective-consumer-router>
@@ -184,7 +184,7 @@
                 </mule:filtering-router>
 
                 <mule:filtering-router>
-                    <mule:endpoint endpoint-ref="waterMelonEndpoint"/>
+                    <mule:endpoint ref="waterMelonEndpoint"/>
                     <mule:and-filter>
                         <mule:regex-filter pattern="the quick brown (.*)"/>
                         <mule:regex-filter pattern="(.*) brown (.*)"/>

@@ -53,7 +53,7 @@
                 figure out how to set the eventCallback bean as a property within mule:properties -->
             <mule:component scope="singleton" instance-ref="reply"/>
             <mule:inbound-router>
-                <mule:endpoint endpoint-ref="sendEndpoint"/>
+                <mule:endpoint ref="sendEndpoint"/>
             </mule:inbound-router>
         </mule:service>
 
@@ -62,7 +62,7 @@
                 figure out how to set the eventCallback bean as a property within mule:properties -->
             <mule:component scope="singleton" instance-ref="countAndReply"/>
             <mule:inbound-router>
-                <mule:endpoint endpoint-ref="sendManyEndpoint"/>
+                <mule:endpoint ref="sendManyEndpoint"/>
             </mule:inbound-router>
         </mule:service>
 
@@ -71,7 +71,7 @@
                 figure out how to set the eventCallback bean as a property within mule:properties -->
             <mule:component scope="singleton" instance-ref="asynchronous"/>
             <mule:inbound-router>
-                <mule:endpoint endpoint-ref="asyncEndpoint"/>
+                <mule:endpoint ref="asyncEndpoint"/>
             </mule:inbound-router>
         </mule:service>
 

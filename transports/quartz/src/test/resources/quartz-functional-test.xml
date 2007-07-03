@@ -31,14 +31,14 @@
         <mule:service name="quartzService1">
             <mule:component class="org.mule.providers.quartz.TestComponent"/>
             <mule:inbound-router>
-                <mule:endpoint endpoint-ref="quartz.in.1"/>
+                <mule:endpoint ref="quartz.in.1"/>
             </mule:inbound-router>
         </mule:service>
 
         <mule:service name="quartzService2">
             <mule:component class="org.mule.providers.quartz.TestComponent"/>
             <mule:inbound-router>
-                <mule:endpoint endpoint-ref="quartz.in.2"/>
+                <mule:endpoint ref="quartz.in.2"/>
             </mule:inbound-router>
         </mule:service>
     </mule:model-seda>

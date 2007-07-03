@@ -28,7 +28,7 @@
         <mule:service name="testComponent1">
             <mule:component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <mule:inbound-router>
-                <mule:endpoint endpoint-ref="clientEndpoint"/>
+                <mule:endpoint ref="clientEndpoint"/>
             </mule:inbound-router>
         </mule:service>
 
@@ -37,7 +37,7 @@
                 figure out how to set the eventCallback bean as a property within mule:properties -->
             <mule:component scope="singleton" instance-ref="test2"/>
             <mule:inbound-router>
-                <mule:endpoint endpoint-ref="asyncClientEndpoint"/>
+                <mule:endpoint ref="asyncClientEndpoint"/>
             </mule:inbound-router>
         </mule:service>
     </mule:model-seda>

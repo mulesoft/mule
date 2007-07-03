@@ -28,7 +28,7 @@
         <mule:service name="testComponent1">
             <mule:component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <mule:inbound-router>
-                <mule:endpoint endpoint-ref="clientEndpoint"/>
+                <mule:endpoint ref="clientEndpoint"/>
             </mule:inbound-router>
         </mule:service>
 
