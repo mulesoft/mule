@@ -42,6 +42,7 @@ junit-3.8.2
 jython-engine-1.0-jdk14
 mockobjects-core-0.09
 mule-core
+mule-module-1to2migration
 mule-module-acegi
 mule-module-builders
 mule-module-client
