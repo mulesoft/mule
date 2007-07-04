@@ -123,7 +123,7 @@ generateDeployCommand = {
   for (name in schemaNames) {
     source = schemaSources[name]
     uri = new URI(schemaDestinations[name])
-    println "mv $source ${offset}${uri.path}"
+    println "cp $source ${offset}${uri.path}"
   }
 }
 
