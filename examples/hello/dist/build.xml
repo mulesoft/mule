@@ -58,6 +58,7 @@
         <!-- Copy all resources to the output folder as well -->
         <copy todir="${dir.classes}">
             <fileset dir="${dir.conf}"/>
+            <fileset dir="${dir.java}/main/resources"/>
         </copy>
     </target>
 
