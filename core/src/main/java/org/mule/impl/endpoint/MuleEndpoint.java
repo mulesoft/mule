@@ -68,6 +68,7 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint, 
     public MuleEndpoint(UMOImmutableEndpoint endpoint) throws UMOException
     {
         super(endpoint);
+        this.setManagementContext(endpoint.getManagementContext());
     }
 
     public MuleEndpoint(String uri, boolean receiver) throws UMOException

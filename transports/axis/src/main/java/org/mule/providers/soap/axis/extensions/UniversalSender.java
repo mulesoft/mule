@@ -254,6 +254,8 @@ public class UniversalSender extends BasicHandler
         UMODescriptor axis = RegistryContext.getRegistry().lookupService(
             AxisConnector.AXIS_SERVICE_COMPONENT_NAME);
         UMOEndpointURI endpoint = new MuleEndpointURI(uri);
+        UMOManagementContext mgmtContext = RegistryContext.getRegistry().getManagementContext();
+        
         UMOEndpoint ep;
         if (axis != null)
         {
@@ -269,6 +271,7 @@ public class UniversalSender extends BasicHandler
                         logger.debug("Dispatch Endpoint uri: " + uri
                                      + " not found on the cache. Creating the endpoint instead.");
                         ep = new MuleEndpoint(uri, false);
+                        ((MuleEndpoint)ep).setManagementContext(mgmtContext);
                     }
                     else
                     {
@@ -284,6 +287,7 @@ public class UniversalSender extends BasicHandler
         else
         {
             ep = new MuleEndpoint(uri, false);
+            ((MuleEndpoint)ep).setManagementContext(mgmtContext);
         }
         return ep;
     }

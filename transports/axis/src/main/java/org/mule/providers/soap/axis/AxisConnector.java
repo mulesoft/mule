@@ -429,6 +429,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
         }
 
         UMOEndpoint serviceEndpoint = new MuleEndpoint(endpoint, true);
+        ((MuleEndpoint)serviceEndpoint).setManagementContext(managementContext);
         serviceEndpoint.setSynchronous(sync);
         serviceEndpoint.setName(ep.getScheme() + ":" + serviceName);
         // set the filter on the axis endpoint on the real receiver endpoint
