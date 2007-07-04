@@ -71,7 +71,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      * <li>From
      * {@link Thread#getContextClassLoader() Thread.currentThread().getContextClassLoader()}
      * <li>From
-     * {@link Class#getClassLoader() ClassLoaderUtil.class.getClassLoader()}
+     * {@link Class#getClassLoader() ClassUtils.class.getClassLoader()}
      * <li>From the {@link Class#getClassLoader() callingClass.getClassLoader() }
      * </ul>
      * 

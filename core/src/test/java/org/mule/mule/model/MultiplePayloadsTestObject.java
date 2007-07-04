@@ -11,7 +11,7 @@
 package org.mule.mule.model;
 
 /**
- * A test object with multiple matching payloads for the discovery to fail.
+ * A test object with multiple signatures matching a payload for the discovery to fail.
  */
 public class MultiplePayloadsTestObject
 {

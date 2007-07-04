@@ -319,7 +319,9 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
         }
         
         if (endpoint.isRemoteSync())
-           message.setBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, true);
+        {
+            message.setBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, true);
+        }
 
         if (logger.isDebugEnabled())
         {

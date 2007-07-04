@@ -59,7 +59,7 @@ public class TransactionTemplate
             else if (action == UMOTransactionConfig.ACTION_ALWAYS_JOIN && tx == null)
             {
                 throw new IllegalTransactionStateException(
-                    CoreMessages.transactionAvailableButActionIs("Always Join"));
+                    CoreMessages.transactionNotAvailableButActionIs("Always Join"));
             }
 
             if (action == UMOTransactionConfig.ACTION_ALWAYS_BEGIN

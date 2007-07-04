@@ -369,8 +369,13 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     {
         // Use the interface to retrieve the string and set
         // the endpoint uri to a default value
-        String sanitizedEndPointUri = endpointUri.toString();
-        URI uri = endpointUri.getUri();
+        String sanitizedEndPointUri = null;
+        URI uri = null;
+        if (endpointUri != null)
+        {
+            sanitizedEndPointUri = endpointUri.toString();
+            uri = endpointUri.getUri();
+        }
         //
         // The following will further sanitize the endpointuri by removing
         // the embedded password. This will only remove the password if the
