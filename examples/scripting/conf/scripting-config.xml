@@ -17,7 +17,7 @@
         def msg = eventContext.transformedMessageAsString
         log.boilerPlate("Message Received: ${msg} - class: ${msg.class.name}")
         return ["Hello", ":-)"];
-    </bean>
+    </scripting:script>
     
     <mule:model-seda name="main">
         <mule:service name="ScriptService">

@@ -100,7 +100,7 @@ scanAndCheckConfigs = {
         }
       }
     } catch (e) {
-      println "error parsing $f: $e"
+      println "WARNING: error parsing $f: $e"
     }
   }
 }

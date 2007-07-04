@@ -10,7 +10,7 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/file/2.0 http://www.mulesource.org/schema/mule/file/2.0/mule-file.xsd
        http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd
-       http://www.mulesource.org/schema/mule/smtp/2.0 http://www.mulesource.org/schema/mule/email/2.0/mule-smtp.xsd">
+       http://www.mulesource.org/schema/mule/smtp/2.0 http://www.mulesource.org/schema/mule/smtp/2.0/mule-smtp.xsd">
        
     <description>
         This example demonstrates how to publish events to multiple outbound endpoints. 
