@@ -230,7 +230,8 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements U
 
     public void addEndpoint(UMOEndpoint endpoint)
     {
-        //TODO RM** endpoint.setType(UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        //TODO RM** Ross, what's the TODO here for??
+        endpoint.setType(UMOEndpoint.ENDPOINT_TYPE_SENDER);
         endpoints.add(endpoint);
     }
 
