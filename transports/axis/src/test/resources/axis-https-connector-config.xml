@@ -12,11 +12,11 @@
 
     <https:connector name="myHttpsConnector" >
         <https:tls-key-store 
-            keyStore="serverKeystore" 
+            keyStore="axisServerKeystore" 
             keyStorePassword="mulepassword"
             keyPassword="mulepassword"/>
         <https:tls-server
-                trustStore="trustStore"
+                trustStore="axisTrustStore"
                 trustStorePassword="mulepassword"
                 requireClientAuthentication="false"/>
     </https:connector>
