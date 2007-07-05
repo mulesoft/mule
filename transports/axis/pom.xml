@@ -41,7 +41,6 @@
                         <!-- MULE-1553 -->
                         <exclude>**/AxisConnectorJmsFunctionalTestCase.java</exclude>
                         <exclude>**/AxisConnectorJmsTopicsFunctionalTestCase.java</exclude>
-                        <exclude>**/AxisConnectorVMFunctionalTestCase.java</exclude>
                         <exclude>**/AxisServletBindingTestCase.java</exclude>
                     </excludes>
                 </configuration>
