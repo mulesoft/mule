@@ -11,17 +11,9 @@
 package org.mule.extras.pgp;
 
 import org.mule.extras.client.MuleClient;
-import org.mule.impl.DefaultExceptionStrategy;
-import org.mule.impl.internal.notifications.ExceptionNotification;
-import org.mule.impl.internal.notifications.ExceptionNotificationListener;
-import org.mule.impl.internal.notifications.SecurityNotificationListener;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.manager.UMOServerNotification;
-import org.mule.umo.security.UnauthorisedException;
-
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 import java.io.File;
 import java.io.FileInputStream;
