@@ -83,6 +83,7 @@ public class DefaultMessageAdapter extends AbstractMessageAdapter
                     if (null == dh)
                     {
                         logger.warn("Detected concurrent access to attachment " + name + " for " + previous);
+//                        new Throwable().printStackTrace();
                     }
                     else
                     {
@@ -103,6 +104,7 @@ public class DefaultMessageAdapter extends AbstractMessageAdapter
                     if (null == value)
                     {
                         logger.warn("Detected concurrent access to property " + name + " for " + previous);
+//                        new Throwable().printStackTrace();
                     }
                     else
                     {

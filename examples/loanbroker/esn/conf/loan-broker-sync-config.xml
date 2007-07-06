@@ -14,13 +14,15 @@
     each component is invoked from the LoanBroker component.
     </description>
 
+    <mule:configuration serverId="" defaultSynchronousEndpoints="true"/>
+
     <!-- Synchronous VM connector (messages are processed in the same execution thread) -->
     <vm:connector name="syncVm">
         <!-- TODO - old config had queueEvents="true" disabled, with a comment indicating
              that it caused the config to lock -->
-        <!-- TODO doThreading=false temporary fixes the race condition on dispatch.
-             Need to dig in DefaultMessageAdapter's propertyNames iterator, which is
-             a view over a concurrent map, and thus tolerates changes, but breaks us. -->
+        <!-- This is intended to reduce the message properties scribbling issue.
+             It may seem odd in a synchronous configuration, but influences
+             StaticRecipientList (which would otherwise broadcast and collect, I think). -->
         <mule:dispatcher-threading-profile doThreading="false"/>
     </vm:connector>
 
