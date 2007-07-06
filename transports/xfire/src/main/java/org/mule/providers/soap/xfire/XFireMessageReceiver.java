@@ -10,6 +10,7 @@
 
 package org.mule.providers.soap.xfire;
 
+import org.mule.RegistryContext;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.soap.SoapConstants;
 import org.mule.umo.UMOComponent;
@@ -17,9 +18,11 @@ import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.umo.registry.RegistryFacade;
 import org.mule.util.ClassUtils;
 import org.mule.util.MapUtils;
 import org.mule.util.StringUtils;
+import org.mule.util.object.SimpleObjectFactory;
 
 import java.net.URL;
 import java.util.HashMap;
@@ -29,6 +32,7 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 
 import org.codehaus.xfire.annotations.WebAnnotations;
+import org.codehaus.xfire.annotations.WebServiceAnnotation;
 import org.codehaus.xfire.handler.Handler;
 import org.codehaus.xfire.service.Service;
 
@@ -46,13 +50,12 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
 
     protected List serviceInterfaces;
 
-    public XFireMessageReceiver(UMOConnector umoConnector,
-                                UMOComponent component,
-                                UMOEndpoint umoEndpoint) throws CreateException
+    public XFireMessageReceiver(UMOConnector umoConnector, UMOComponent component, UMOEndpoint umoEndpoint)
+        throws CreateException
     {
         super(umoConnector, component, umoEndpoint);
 
-        connector = (XFireConnector) umoConnector;
+        connector = (XFireConnector)umoConnector;
         create();
     }
 
@@ -64,24 +67,25 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
             props.putAll(endpoint.getProperties());
 
             // check if there is the namespace property on the component
-            String namespace = (String) component.getDescriptor().getProperties().get(
-                    SoapConstants.SOAP_NAMESPACE_PROPERTY);
+            String namespace = (String)component.getDescriptor().getProperties().get(
+                SoapConstants.SOAP_NAMESPACE_PROPERTY);
 
             // check for namespace set as annotation
             if (connector.isEnableJSR181Annotations())
             {
-                WebAnnotations wa = (WebAnnotations) ClassUtils.instanciateClass(
-                        XFireConnector.CLASSNAME_ANNOTATIONS, null, this.getClass());
-                throw new UnsupportedOperationException("Has to be reimplemented for Mule 2.x");
-                // TODO MR - UMODescriptor.getImplementationClass() is no longer available
-                //WebServiceAnnotation webServiceAnnotation = wa.getWebServiceAnnotation(component.getDescriptor().getImplementationClass());
-                //namespace = webServiceAnnotation.getTargetNamespace();
+                WebAnnotations wa = (WebAnnotations)ClassUtils.instanciateClass(
+                    XFireConnector.CLASSNAME_ANNOTATIONS, null, this.getClass());
+                // at this point, the object hasn't been created in the descriptor so
+                // we have to retrieve the implementation classname and create a
+                // class for it
+                WebServiceAnnotation webServiceAnnotation = wa.getWebServiceAnnotation(Class.forName(((SimpleObjectFactory)component.getDescriptor()
+                    .getServiceFactory()).getObjectClassName()));
+                namespace = webServiceAnnotation.getTargetNamespace();
             }
 
             if ((namespace == null) || (namespace.equalsIgnoreCase("")))
             {
-                namespace = MapUtils.getString(props, "namespace",
-                        XFireConnector.DEFAULT_MULE_NAMESPACE_URI);
+                namespace = MapUtils.getString(props, "namespace", XFireConnector.DEFAULT_MULE_NAMESPACE_URI);
             }
 
             if (props.size() == 0)
@@ -101,7 +105,7 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
                 rewriteProperty(props, "schemas");
             }
 
-            serviceInterfaces = (List) component.getDescriptor().getProperties().get("serviceInterfaces");
+            serviceInterfaces = (List)component.getDescriptor().getProperties().get("serviceInterfaces");
             Class exposedInterface;
 
             if (serviceInterfaces == null)
@@ -110,7 +114,7 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
             }
             else
             {
-                String className = (String) serviceInterfaces.get(0);
+                String className = (String)serviceInterfaces.get(0);
                 exposedInterface = ClassUtils.loadClass(className, this.getClass());
                 logger.info(className + " class was used to expose your service");
 
@@ -120,19 +124,18 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
                 }
             }
 
-            String wsdlUrl = (String) component.getDescriptor().getProperties().get(
-                    SoapConstants.WSDL_URL_PROPERTY);
+            String wsdlUrl = (String)component.getDescriptor().getProperties().get(
+                SoapConstants.WSDL_URL_PROPERTY);
 
             if (StringUtils.isBlank(wsdlUrl))
             {
                 service = connector.getServiceFactory().create(exposedInterface,
-                        component.getDescriptor().getName(), namespace, props);
+                    component.getDescriptor().getName(), namespace, props);
             }
             else
             {
                 service = connector.getServiceFactory().create(exposedInterface,
-                        new QName(namespace, component.getDescriptor().getName()), new URL(wsdlUrl),
-                        props);
+                    new QName(namespace, component.getDescriptor().getName()), new URL(wsdlUrl), props);
             }
 
             List inList = connector.getServerInHandlers();
@@ -141,7 +144,7 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
                 for (int i = 0; i < inList.size(); i++)
                 {
                     Class clazz = ClassUtils.loadClass(inList.get(i).toString(), this.getClass());
-                    Handler handler = (Handler) clazz.getConstructor(null).newInstance(null);
+                    Handler handler = (Handler)clazz.getConstructor(null).newInstance(null);
                     service.addInHandler(handler);
                 }
             }
@@ -149,7 +152,7 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
             boolean sync = endpoint.isSynchronous();
             // default to synchronous if using http
             if (endpoint.getEndpointURI().getScheme().startsWith("http")
-                    || endpoint.getEndpointURI().getScheme().startsWith("servlet"))
+                || endpoint.getEndpointURI().getScheme().startsWith("servlet"))
             {
                 sync = true;
             }
