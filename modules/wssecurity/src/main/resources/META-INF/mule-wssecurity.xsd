@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.mulesource.org/schema/mule/wssecurity/2.0"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+	        xmlns:spring="http://www.springframework.org/schema/beans"
+            targetNamespace="http://www.mulesource.org/schema/mule/wssecurity/2.0"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+	<xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.springframework.org/schema/beans"
+                schemaLocation="http://www.springframework.org/schema/beans"/>
+	<xsd:import namespace="http://www.springframework.org/schema/beans"
+                schemaLocation="http://www.springframework.org/schema/beans/spring-beans-2.0.xsd"/> 
+
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"/>
+                        
+	<xsd:complexType name="securityFilterType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:securityFilterType">
+                <xsd:sequence>
+                    <xsd:element ref="ws-security-filter"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="ws-security-filter" type="wsSecurityFilterType">
+        <xsd:annotation>
+            <xsd:documentation>
+                TODO
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="wsSecurityFilterType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:securitySpecificFilterType">
+				<xsd:sequence minOccurs="0" maxOccurs="unbounded">
+                    <xsd:element name="wssProperties" type="wssPropertyType">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Additional header name and value.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+						</xsd:sequence>
+                <xsd:attribute name="wsSignatureFile" type="xsd:string"/>
+                <xsd:attribute name="wsDecryptionFile" type="xsd:string"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+	
+	<xsd:complexType name="wssPropertyType">
+        <xsd:attribute name="key" type="xsd:string" use="required"/>
+        <xsd:attribute name="value" type="xsd:string" use="required"/>
+    </xsd:complexType>
+</xsd:schema>

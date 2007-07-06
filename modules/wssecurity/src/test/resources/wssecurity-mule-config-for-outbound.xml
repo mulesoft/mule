@@ -1,49 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+	   xmlns:xfire="http://www.mulesource.org/schema/mule/xfire/2.0"
+       xmlns:axis="http://www.mulesource.org/schema/mule/axis/2.0"
+	   xmlns:wssecurity="http://www.mulesource.org/schema/mule/wssecurity/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/xfire/2.0 http://www.mulesource.org/schema/mule/xfire/2.0/mule-xfire.xsd
+	   http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/axis/2.0/mule-axis.xsd
+  	   http://www.mulesource.org/schema/mule/wssecurity/2.0 http://www.mulesource.org/schema/mule/wssecurity/2.0/mule-wssecurity.xsd">
+	
+	<bean id="passwords" class="org.mule.extras.wssecurity.callbackhandlers.PasswordContainer">
+       <constructor-arg>
+           <props>
+               <prop key="mulealias">mulepassword</prop>
+               <prop key="gooduser">goodUserPassword</prop>
+           </props>
+       </constructor-arg>
+    </bean>
+	
+    <mule:environment-properties>
+        <entry key="synchronous" value="false"/>
+    </mule:environment-properties>
+	
+	<mule:model-seda name="test">
+        <mule:service name="BridgeUMO">
+			<mule:component class="org.mule.components.simple.BridgeComponent"/>
+            <mule:inbound-router>
+                <mule:endpoint address="vm://testin"/>
+            </mule:inbound-router>
+            <mule:outbound-router>
+                <mule:pass-through-router>
+                    <mule:endpoint address="xfire:http://localhost:8484/MySecuredUMO?method=echo"><!-- type="sender"-->
+                        <mule:security-filter xsi:type="wssecurity:securityFilterType">
+		                    <wssecurity:ws-security-filter wsSignatureFile="out-signed-security.properties" wsDecryptionFile="out-encrypted-security.properties"/>
+	                    </mule:security-filter>
+                    </mule:endpoint>
+                </mule:pass-through-router>
+            </mule:outbound-router>
+        </mule:service>
 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
-
-<mule-configuration id="Mule_Sample" version="1.0">
-
-    <mule-environment-properties synchronous="false"/>
-
-    <container-context className="org.mule.extras.spring.SpringContainerContext">
-        <properties>
-            <property name="configFile" value="spring-security.xml"/>
-        </properties>
-    </container-context>
-
-    <model name="test">
-        <mule-descriptor name="BridgeUMO" implementation="org.mule.components.simple.BridgeComponent">
-            <inbound-router>
-                <endpoint address="vm://testin" type="receiver"/>
-            </inbound-router>
-            <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="xfire:http://localhost:8484/MySecuredUMO?method=echo" type="sender">
-                        <security-filter className="org.mule.extras.wssecurity.filters.WsSecurityFilter">
-                            <properties>
-                                <property value="out-signed-security.properties" name="wsSignatureFile"/>
-                                <property value="out-encrypted-security.properties" name="wsDecryptionFile"/>
-                            </properties>
-                        </security-filter>
-                    </endpoint>
-                </router>
-            </outbound-router>
-        </mule-descriptor>
-
-        <mule-descriptor name="MySecuredUMO" implementation="org.mule.components.simple.EchoComponent">
-            <inbound-router>
-                <endpoint address="xfire:http://localhost:8484" type="receiver">
-                    <security-filter className="org.mule.extras.wssecurity.filters.WsSecurityFilter">
-                        <properties>
-                            <property value="in-signed-security.properties" name="wsSignatureFile"/>
-                            <property value="in-encrypted-security.properties" name="wsDecryptionFile"/>
-                        </properties>
-                    </security-filter>
-                </endpoint>
-            </inbound-router>
-        </mule-descriptor>
-
-       </model>
-</mule-configuration>
+        <mule:service name="MySecuredUMO"> 
+			<mule:component class="org.mule.components.simple.EchoComponent"/>
+            <mule:inbound-router>
+                <mule:endpoint address="xfire:http://localhost:8484">
+                    <mule:security-filter xsi:type="wssecurity:securityFilterType">
+	                    <wssecurity:ws-security-filter wsSignatureFile="in-signed-security.properties" wsDecryptionFile="in-encrypted-security.properties"/>
+                    </mule:security-filter>
+                </mule:endpoint>
+            </mule:inbound-router>
+        </mule:service>
+	</mule:model-seda>
+</beans>

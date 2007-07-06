@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+	   xmlns:xfire="http://www.mulesource.org/schema/mule/xfire/2.0"
+       xmlns:axis="http://www.mulesource.org/schema/mule/axis/2.0"
+	   xmlns:wssecurity="http://www.mulesource.org/schema/mule/wssecurity/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/xfire/2.0 http://www.mulesource.org/schema/mule/xfire/2.0/mule-xfire.xsd
+	   http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/axis/2.0/mule-axis.xsd
+  	   http://www.mulesource.org/schema/mule/wssecurity/2.0 http://www.mulesource.org/schema/mule/wssecurity/2.0/mule-wssecurity.xsd">
+
+    <bean id="passwords" class="org.mule.extras.wssecurity.callbackhandlers.PasswordContainer">
+	   <constructor-arg>
+		   <props>
+			   <prop key="mulealias">mulepassword</prop>
+			   <prop key="gooduser">goodUserPassword</prop>
+		   </props>
+		</constructor-arg>
+	</bean>
+													
+	<xfire:connector name="xfireConnector">      
+		<xfire:client-out-handler>org.codehaus.xfire.util.dom.DOMOutHandler</xfire:client-out-handler>
+		<xfire:client-out-handler>org.codehaus.xfire.security.wss4j.WSS4JOutHandler</xfire:client-out-handler>
+	</xfire:connector>
+												
+	<mule:model-seda name="test">
+		<mule:service name="MySecuredUMO">
+			<mule:component class="org.mule.components.simple.EchoComponent"/>
+			<mule:inbound-router>
+				<mule:endpoint address="xfire:http://localhost:4567" connector-ref="xfireConnector">
+					<mule:security-filter xsi:type="wssecurity:securityFilterType">
+						<wssecurity:ws-security-filter wsSignatureFile="in-signed-security.properties" wsDecryptionFile="in-encrypted-security.properties"/>
+					</mule:security-filter>
+				</mule:endpoint>
+			</mule:inbound-router>
+		</mule:service>
+	</mule:model-seda>
+</beans>
