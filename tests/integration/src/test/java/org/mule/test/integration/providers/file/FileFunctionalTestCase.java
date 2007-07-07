@@ -42,12 +42,14 @@ public class FileFunctionalTestCase extends FunctionalTestCase implements Functi
         managementContext.registerListener(this);
     }
 
+    // @Override
     protected void doTearDown() throws Exception
     {
         super.doTearDown();
         managementContext.unregisterListener(this);
     }
 
+    // @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/providers/file/file-config.xml";
