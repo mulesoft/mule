@@ -38,16 +38,13 @@ public class FileFunctionalTestCase extends FunctionalTestCase implements Functi
     //@Override
     protected void doSetUp() throws Exception
     {
-        managementContext.registerListener(this);
-    }
-
-    protected void doPostFunctionalSetUp() throws Exception
-    {
+        super.doSetUp();
         managementContext.registerListener(this);
     }
 
     protected void doTearDown() throws Exception
     {
+        super.doTearDown();
         managementContext.unregisterListener(this);
     }
 

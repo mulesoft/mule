@@ -28,8 +28,9 @@ public class XABridgeJmsJdbcTestCase extends FunctionalTestCase
         return "org/mule/test/integration/transaction/xabridge-jms-jdbc-mule.xml";
     }
 
-    protected void doPostFunctionalSetUp() throws Exception
+    protected void doSetUp() throws Exception
     {
+        super.doSetUp();
         emptyTable();
     }
 
