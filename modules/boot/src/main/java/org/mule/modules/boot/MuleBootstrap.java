@@ -10,10 +10,7 @@
 
 package org.mule.modules.boot;
 
-import org.mule.util.ClassUtils;
-
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -31,13 +28,13 @@ import org.tanukisoftware.wrapper.WrapperSimpleApp;
 
 /**
  * Determine which is the main class to run and delegate control to the Java Service
- * Wrapper.  If OSGi is not being used to boot with, configure the classpath based on 
+ * Wrapper.  If OSGi is not being used to boot with, configure the classpath based on
  * the libraries in $MULE_HOME/lib/*
- * 
+ *
  * Note: this class is intentionally kept free of any external library dependencies and
- * therefore repeats a few utility methods.  
+ * therefore repeats a few utility methods.
  */
-public class MuleBootstrap 
+public class MuleBootstrap
 {
     public static final String MAIN_CLASS_MULE_SERVER = "org.mule.modules.boot.MuleServerWrapper";
     public static final String MAIN_CLASS_OSGI_FRAMEWORK = "org.mule.modules.osgi.OsgiFrameworkWrapper";
@@ -54,9 +51,9 @@ public class MuleBootstrap
         CommandLine commandLine = parseCommandLine(args);
         // Any unrecognized arguments get passed through to the next class (e.g., to Knopflerfish).
         String[] remainingArgs = commandLine.getArgs();
-        
+
         String mainClassName = commandLine.getOptionValue("main");
-        if (commandLine.hasOption("osgi")) 
+        if (commandLine.hasOption("osgi"))
         {
             boolean startGui = !commandLine.hasOption("nogui");
             System.out.println("Starting the OSGi Framework...");
@@ -68,7 +65,7 @@ public class MuleBootstrap
             System.out.println("Starting the Mule Server...");
             WrapperManager.start((WrapperListener) Class.forName(MAIN_CLASS_MULE_SERVER).newInstance(), remainingArgs);
         }
-        else 
+        else
         {
             // Add the main class name as the first argument to the Wrapper.
             String[] appArgs = new String[remainingArgs.length + 1];
@@ -80,8 +77,7 @@ public class MuleBootstrap
         }
     }
 
-    private static void configureClasspath()
-        throws IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, IOException
+    private static void configureClasspath() throws Exception
     {
         // Make sure MULE_HOME is set.
         File muleHome = null;
@@ -118,7 +114,7 @@ public class MuleBootstrap
 
         // If the license ack file isn't on the classpath, we need to
         // display the EULA and make sure the user accepts it before continuing
-        if (ClassUtils.getResource("META-INF/mule/license.props", MuleBootstrap.class) == null)
+        if (ReflectionHelper.getResource("META-INF/mule/license.props", MuleBootstrap.class) == null)
         {
             LicenseHandler licenseHandler = new LicenseHandler(muleHome, muleBase);
             // If the user didn't accept the license, then we have to exit
@@ -126,16 +122,16 @@ public class MuleBootstrap
             // (by default it'll try to start 3 times)
             if (!licenseHandler.getAcceptance())
             {
-                WrapperManager.stop(-1);
+                ReflectionHelper.wrapperStop(-1);
             }
         }
 
         // One-time download to get libraries not included in the Mule distribution
         // due to silly licensing restrictions.
-        // 
+        //
         // Now we will download these libraries to MULE_BASE/lib/user. In
         // a standard installation, MULE_BASE will be MULE_HOME.
-        if (!isClassOnPath("javax.activation.DataSource"))
+        if (!ReflectionHelper.isClassOnPath("javax.activation.DataSource", MuleBootstrap.class))
         {
             LibraryDownloader downloader = new LibraryDownloader(muleBase);
             addLibrariesToClasspath(downloader.downloadLibraries());
@@ -187,10 +183,11 @@ public class MuleBootstrap
         }
     }
 
-    /** 
+    /**
      * Parse any command line arguments using the Commons CLI library.
      */
-    private static CommandLine parseCommandLine(String[] args) throws ParseException {
+    private static CommandLine parseCommandLine(String[] args) throws ParseException
+    {
         Options options = new Options();
         for (int i = 0; i < CLI_OPTIONS.length; i++)
         {
@@ -198,9 +195,9 @@ public class MuleBootstrap
         }
         return new BasicParser().parse(options, args, true);
     }
-    
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // The following utility methods are included here in order to keep the bootloader 
+    // The following utility methods are included here in order to keep the bootloader
     // free of any external library dependencies.
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
