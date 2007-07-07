@@ -39,8 +39,8 @@ public class DocIndexerPostGrapher extends AbstractIndexer
     public void postGrapher(GraphEnvironment env)
     {
         File[] htmlFiles = getFiles(env.getConfig(), ".html");
-        String targetFile = env.getConfig().applyWorkingDirectory(
-            env.getProperty("muleDocIndexerOutputName", "index.html"));
+        String targetFile = env.getConfig().applyOutputDirectory(
+                env.getProperty("muleDocIndexerOutputName", "index.html"));
         doRendering(env, htmlFiles, template, targetFile);
 
     }

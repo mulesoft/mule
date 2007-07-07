@@ -16,10 +16,9 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.providers.ConnectionStrategy;
 import org.mule.providers.SingleAttemptConnectionStrategy;
 import org.mule.umo.manager.DefaultWorkListener;
+import org.mule.util.FileUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.UUID;
-
-import java.io.File;
 
 import javax.resource.spi.work.WorkListener;
 
@@ -192,7 +191,7 @@ public class MuleConfiguration
     {
         this.synchronous = synchronous;
     }
-    
+
     public ThreadingProfile getDefaultMessageDispatcherThreadingProfile()
     {
         return getThreadingProfile(messageDispatcherThreadingProfile);
@@ -273,8 +272,8 @@ public class MuleConfiguration
 
     public void setWorkingDirectory(String workingDirectory)
     {
-        // fix windows backslashes in absolute paths, convert them to forward ones 
-        this.workingDirectory = new File(workingDirectory).getAbsolutePath().replaceAll("\\\\", "/");
+        // fix windows backslashes in absolute paths, convert them to forward ones
+        this.workingDirectory = FileUtils.newFile(workingDirectory).getAbsolutePath().replaceAll("\\\\", "/");
         updateApplicationProperty(MuleProperties.MULE_WORKING_DIRECTORY_PROPERTY, this.workingDirectory);
     }
 
@@ -299,7 +298,7 @@ public class MuleConfiguration
         }
     }
 
-   
+
     public int getDefaultTransactionTimeout()
     {
         return defaultTransactionTimeout;
@@ -319,7 +318,7 @@ public class MuleConfiguration
      * Returns a clone of the default Connection strategy. The clone ensures that the
      * connection strategy can be manipulated without affecting other connectors
      * using the same strategy
-     * 
+     *
      * @return a clone of the default Connection strategy
      */
     public ConnectionStrategy getDefaultConnectionStrategy()
@@ -337,7 +336,7 @@ public class MuleConfiguration
     /**
      * Sets the connection strategy used by all connectors managed in this Mule
      * instance if the connector has no connection strategy specifically set on it.
-     * 
+     *
      * @param connectionStrategy the default strategy to use
      */
     public void setDefaultConnectionStrategy(ConnectionStrategy connectionStrategy)

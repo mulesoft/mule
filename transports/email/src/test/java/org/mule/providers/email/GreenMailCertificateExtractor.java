@@ -10,10 +10,11 @@
 
 package org.mule.providers.email;
 
+import org.mule.util.FileUtils;
+
 import com.icegreen.greenmail.util.DummyTrustManager;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
@@ -66,7 +67,7 @@ public class GreenMailCertificateExtractor
             logger.info(certificate);
             assert(certificate instanceof X509Certificate);
             X509Certificate x509 = (X509Certificate) certificate;
-            (new FileOutputStream(new File("/tmp/greenmail-" + alias))).write(x509.getEncoded());
+            (new FileOutputStream(FileUtils.newFile("/tmp/greenmail-" + alias))).write(x509.getEncoded());
         }
         
     }

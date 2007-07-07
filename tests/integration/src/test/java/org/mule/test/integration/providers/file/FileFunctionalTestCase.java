@@ -17,10 +17,10 @@ import org.mule.tck.functional.FunctionalTestNotification;
 import org.mule.tck.functional.FunctionalTestNotificationListener;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.manager.UMOServerNotification;
+import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
@@ -56,7 +56,7 @@ public class FileFunctionalTestCase extends FunctionalTestCase implements Functi
         return "org/mule/test/integration/providers/file/file-config.xml";
     }
 
-    public void testRelative() throws FileNotFoundException, IOException, InterruptedException
+    public void testRelative() throws IOException, InterruptedException
     {
         // create binary file data to be written
         byte[] data = new byte[100000];
@@ -65,14 +65,14 @@ public class FileFunctionalTestCase extends FunctionalTestCase implements Functi
             data[i] = (byte)(Math.random() * 128);
         }
 
-        File f = new File("./test/testfile.temp");
+        File f = FileUtils.newFile("./test/testfile.temp");
         f.createNewFile();
         FileOutputStream fos = new FileOutputStream(f);
         IOUtils.write(data, fos);
         IOUtils.closeQuietly(fos);
 
         // atomically rename the file to make it available for polling
-        f.renameTo(new File(f.getPath().replaceAll(".temp", ".data")));
+        f.renameTo(FileUtils.newFile(f.getPath().replaceAll(".temp", ".data")));
 
         // give polling a chance
         Thread.sleep(5000);

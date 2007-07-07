@@ -36,7 +36,7 @@ public class FilenameUtils extends org.apache.commons.io.FilenameUtils
                 buf.append(File.separator);
             }
         }
-        return new File(buf.toString());
+        return FileUtils.newFile(buf.toString());
     }
     
     /**

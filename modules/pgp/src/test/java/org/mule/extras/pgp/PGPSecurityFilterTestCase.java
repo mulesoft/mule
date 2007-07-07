@@ -14,6 +14,7 @@ import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.UMOMessage;
+import org.mule.util.FileUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -40,7 +41,7 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
         URL url = Thread.currentThread().getContextClassLoader().getResource("./encrypted-signed.asc");
         
         
-        int length = (int)new File(url.getFile()).length();
+        int length = (int) FileUtils.newFile(url.getFile()).length();
         byte[] msg = new byte[length];
 
         FileInputStream in = new FileInputStream(url.getFile());
@@ -60,7 +61,7 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
             outputFile.close();
             
             //delete file not to be confused with tests to be performed later
-            File f = new File(DIRECTORY+TARGET);
+            File f = FileUtils.newFile(DIRECTORY+TARGET);
             f.delete();
         }
         catch (FileNotFoundException fileNotFound)
@@ -73,7 +74,7 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
 
-        UMOMessage reply = client.send("vm://echo", new String("An unsigned message"), null);
+        UMOMessage reply = client.send("vm://echo", "An unsigned message", null);
         
         assertNotNull(reply.getExceptionPayload());
         UMOExceptionPayload excPayload = reply.getExceptionPayload();

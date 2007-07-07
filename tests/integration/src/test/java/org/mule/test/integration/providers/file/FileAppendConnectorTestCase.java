@@ -12,6 +12,7 @@ package org.mule.test.integration.providers.file;
 
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.util.FileUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,7 +29,7 @@ public class FileAppendConnectorTestCase extends FunctionalTestCase
         FileInputStream myFileStream = null;
 
         // make sure there is no directory and file
-        File myDir = new File(myDirName);
+        File myDir = FileUtils.newFile(myDirName);
         if (myDir.isDirectory())
         {
             // Delete Any Existing Files
@@ -43,20 +44,20 @@ public class FileAppendConnectorTestCase extends FunctionalTestCase
 
         try
         {
-            assertFalse(new File(myDir, myFileName).exists());
+            assertFalse(FileUtils.newFile(myDir, myFileName).exists());
 
             MuleClient client = new MuleClient();
             client.send("vm://fileappend", "Hello1", null);
             client.send("vm://fileappend", "Hello2", null);
 
             // the output file should exist now
-            myFileStream = new FileInputStream(new File(myDir, myFileName));
+            myFileStream = new FileInputStream(FileUtils.newFile(myDir, myFileName));
             assertEquals("Hello1Hello2", IOUtils.toString(myFileStream));
         }
         finally
         {
             IOUtils.closeQuietly(myFileStream);
-            assertTrue(new File(myDir, myFileName).delete());
+            assertTrue(FileUtils.newFile(myDir, myFileName).delete());
             assertTrue(myDir.delete());
         }
     }

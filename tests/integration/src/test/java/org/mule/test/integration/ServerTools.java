@@ -11,6 +11,7 @@
 package org.mule.test.integration;
 
 import org.mule.providers.file.filters.FilenameWildcardFilter;
+import org.mule.util.FileUtils;
 
 import java.io.File;
 
@@ -85,13 +86,13 @@ public class ServerTools
         consoleLogger.setMessageOutputLevel(Project.MSG_INFO);
         project.addBuildListener(consoleLogger);
         Path path = new Path(project);
-        File[] jars = new File(activeMqHome + "\\lib").listFiles(new FilenameWildcardFilter("*.jar"));
-        path.add(new Path(project, new File(activeMqHome, "\\conf").getAbsolutePath()));
+        File[] jars = FileUtils.newFile(activeMqHome + "\\lib").listFiles(new FilenameWildcardFilter("*.jar"));
+        path.add(new Path(project, FileUtils.newFile(activeMqHome, "\\conf").getAbsolutePath()));
         for (int i = 0; i < jars.length; i++)
         {
             path.add(new Path(project, jars[i].getAbsolutePath()));
         }
-        jars = new File(activeMqHome + "\\lib\\optional").listFiles(new FilenameWildcardFilter("*.jar"));
+        jars = FileUtils.newFile(activeMqHome + "\\lib\\optional").listFiles(new FilenameWildcardFilter("*.jar"));
         for (int i = 0; i < jars.length; i++)
         {
             path.add(new Path(project, jars[i].getAbsolutePath()));
@@ -109,9 +110,9 @@ public class ServerTools
         }
         java.setArgs(brokerUrl);
         java.setFork(true);
-        java.setDir(new File(activeMqHome));
-        java.addSysproperty(createVar("activemq.home", new File(activeMqHome).getAbsolutePath()));
-        java.addSysproperty(createVar("derby.system.home", new File(activeMqHome, "\\var").getAbsolutePath()));
+        java.setDir(FileUtils.newFile(activeMqHome));
+        java.addSysproperty(createVar("activemq.home", FileUtils.newFile(activeMqHome).getAbsolutePath()));
+        java.addSysproperty(createVar("derby.system.home", FileUtils.newFile(activeMqHome, "\\var").getAbsolutePath()));
         java.createWatchdog();
         new Thread()
         {

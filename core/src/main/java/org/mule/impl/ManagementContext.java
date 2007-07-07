@@ -37,11 +37,11 @@ import org.mule.umo.manager.UMOWorkManager;
 import org.mule.umo.registry.RegistryFacade;
 import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.store.UMOStore;
+import org.mule.util.FileUtils;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.queue.QueueManager;
 
-import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
@@ -172,7 +172,7 @@ public class ManagementContext implements UMOManagementContext
             setupIds();
             validateEncoding();
             validateOSEncoding();
-            directories = new Directories(new File(config.getWorkingDirectory()));
+            directories = new Directories(FileUtils.newFile(config.getWorkingDirectory()));
 
             //We need to start the work manager straight away since we need it to fire notifications
             workManager.start();

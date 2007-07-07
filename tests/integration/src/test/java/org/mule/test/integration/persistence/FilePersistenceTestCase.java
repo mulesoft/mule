@@ -14,6 +14,7 @@ package org.mule.test.integration.persistence;
 import org.mule.RegistryContext;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.util.FileUtils;
 
 import java.io.File;
 
@@ -31,7 +32,7 @@ public class FilePersistenceTestCase extends FunctionalTestCase
         // Note that the FunctionalTestCase will remove the working directory after
         // each execution
         String path = RegistryContext.getConfiguration().getWorkingDirectory() + "/queuestore/test.queue";
-        File store = new File(path);
+        File store = FileUtils.newFile(path);
         assertFalse(store.exists());
 
         MuleClient client = new MuleClient();

@@ -11,6 +11,7 @@
 package org.mule.test.integration.providers.file;
 
 import org.mule.tck.FunctionalTestCase;
+import org.mule.util.FileUtils;
 
 import java.io.File;
 
@@ -26,11 +27,11 @@ public class FileRuntimeExceptionStrategyFunctionalTestCase extends FunctionalTe
 
     public void testExceptionInTransformer() throws Exception
     {
-        File f = new File("./.mule/in/test.txt");
+        File f = FileUtils.newFile("./.mule/in/test.txt");
         f.createNewFile();
 
         // try a couple of times with backoff strategy, then fail
-        File errorFile = new File("./.mule/errors/test-0.out");
+        File errorFile = FileUtils.newFile("./.mule/errors/test-0.out");
         boolean testSucceded = false;
         int timesTried = 0;
         while (timesTried <= 3)

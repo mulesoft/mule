@@ -12,6 +12,7 @@ package org.mule.test.integration.providers.file;
 
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.util.FileUtils;
 
 import java.io.File;
 
@@ -31,7 +32,7 @@ public class OutputPatternFromEndpointTestCase extends FunctionalTestCase
         String myFileName2 = "export.txt.OK";
 
         // make sure there is no directory and file
-        File myDir = new File(myFirstDirName);
+        File myDir = FileUtils.newFile(myFirstDirName);
         if (myDir.isDirectory())
         {
             // Delete Any Existing Files
@@ -44,7 +45,7 @@ public class OutputPatternFromEndpointTestCase extends FunctionalTestCase
             assertTrue(myDir.delete());
         }
 
-        File myDir2 = new File(mySecondDirName);
+        File myDir2 = FileUtils.newFile(mySecondDirName);
         if (myDir2.isDirectory())
         {
             // Delete Any Existing Files
@@ -59,21 +60,21 @@ public class OutputPatternFromEndpointTestCase extends FunctionalTestCase
 
         try
         {
-            assertFalse(new File(myDir, myFileName1).exists());
-            assertFalse(new File(myDir2, myFileName2).exists());
+            assertFalse(FileUtils.newFile(myDir, myFileName1).exists());
+            assertFalse(FileUtils.newFile(myDir2, myFileName2).exists());
 
             MuleClient client = new MuleClient();
             client.send("vm://filesend", "Hello", null);
 
             // the output file should exist now
             // check that the files with the correct output pattern were generated
-            assertTrue(new File(myDir, myFileName1).exists());
-            assertTrue(new File(myDir2, myFileName2).exists());
+            assertTrue(FileUtils.newFile(myDir, myFileName1).exists());
+            assertTrue(FileUtils.newFile(myDir2, myFileName2).exists());
         }
         finally
         {
-            assertTrue(new File(myDir, myFileName1).delete());
-            assertTrue(new File(myDir2, myFileName2).delete());
+            assertTrue(FileUtils.newFile(myDir, myFileName1).delete());
+            assertTrue(FileUtils.newFile(myDir2, myFileName2).delete());
             assertTrue(myDir.delete());
             assertTrue(myDir2.delete());
         }

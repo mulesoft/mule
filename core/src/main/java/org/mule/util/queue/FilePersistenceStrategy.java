@@ -69,7 +69,7 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy, Manage
     public Object store(String queue, Object obj) throws IOException
     {
         String id = getId(obj);
-        File file = new File(store, queue + File.separator + id + EXTENSION);
+        File file = FileUtils.newFile(store, queue + File.separator + id + EXTENSION);
         file.getParentFile().mkdirs();
         ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file));
         oos.writeObject(obj);
@@ -84,7 +84,7 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy, Manage
      */
     public void remove(String queue, Object id) throws IOException
     {
-        File file = new File(store, queue + File.separator + id + EXTENSION);
+        File file = FileUtils.newFile(store, queue + File.separator + id + EXTENSION);
         if (file.exists())
         {
             if (!file.delete())
@@ -105,7 +105,7 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy, Manage
      */
     public Object load(String queue, Object id) throws IOException
     {
-        File file = new File(store, queue + File.separator + id + EXTENSION);
+        File file = FileUtils.newFile(store, queue + File.separator + id + EXTENSION);
         ObjectInputStream ois = null;
         try
         {

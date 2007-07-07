@@ -142,7 +142,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
                 File destinationFile = null;
                 if (connector.getMoveToDirectory() != null)
                 {
-                    destinationFile = new File(connector.getMoveToDirectory(), result
+                    destinationFile = FileUtils.newFile(connector.getMoveToDirectory(), result
                         .getName());
                     if (!result.renameTo(destinationFile))
                     {

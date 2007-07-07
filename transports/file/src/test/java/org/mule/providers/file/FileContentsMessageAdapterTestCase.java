@@ -14,11 +14,11 @@ import org.mule.RegistryContext;
 import org.mule.tck.providers.AbstractMessageAdapterTestCase;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.UMOMessageAdapter;
+import org.mule.util.FileUtils;
 
 import java.io.File;
 import java.util.Arrays;
 
-import org.apache.commons.io.FileUtils;
 
 public class FileContentsMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 {
@@ -28,7 +28,7 @@ public class FileContentsMessageAdapterTestCase extends AbstractMessageAdapterTe
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see junit.framework.TestCase#setUp()
      */
     protected void doSetUp() throws Exception
@@ -36,7 +36,7 @@ public class FileContentsMessageAdapterTestCase extends AbstractMessageAdapterTe
         super.doSetUp();
 
         // The working directory is deleted on tearDown
-        File dir = new File(RegistryContext.getConfiguration().getWorkingDirectory(), "tmp");
+        File dir = FileUtils.newFile(RegistryContext.getConfiguration().getWorkingDirectory(), "tmp");
         if (!dir.exists())
         {
             dir.mkdirs();

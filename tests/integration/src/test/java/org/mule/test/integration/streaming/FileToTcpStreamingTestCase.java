@@ -14,13 +14,11 @@ import org.mule.RegistryContext;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.util.FileUtils;
 
-import java.io.File;
-
 public class FileToTcpStreamingTestCase extends FunctionalTestCase
 {
     protected void doFunctionalTearDown() throws Exception
     {
-        FileUtils.deleteDirectory(new File(RegistryContext.getConfiguration().getWorkingDirectory() + "/test-data"));
+        FileUtils.deleteDirectory(FileUtils.newFile(RegistryContext.getConfiguration().getWorkingDirectory() + "/test-data"));
     }
 
     protected String getConfigResources()
@@ -40,7 +38,7 @@ public class FileToTcpStreamingTestCase extends FunctionalTestCase
 
         Thread.sleep(3000);
 
-        String result = FileUtils.readFileToString(new File(basepath + "/out/foo.txt.processed"), "UTF8");
+        String result = FileUtils.readFileToString(FileUtils.newFile(basepath + "/out/foo.txt.processed"), "UTF8");
         assertEquals(text, result);
     }
 }

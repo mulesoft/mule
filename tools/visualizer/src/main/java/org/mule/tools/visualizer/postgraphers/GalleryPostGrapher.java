@@ -39,8 +39,8 @@ public class GalleryPostGrapher extends AbstractIndexer
     public void postGrapher(GraphEnvironment env)
     {
         File[] htmlFiles = getFiles(env.getConfig(), ".gif");
-        String targetFile = env.getConfig().applyWorkingDirectory(
-            env.getProperty("muleGalleryOutputName", "gallery.html"));
+        String targetFile = env.getConfig().applyOutputDirectory(
+                env.getProperty("muleGalleryOutputName", "gallery.html"));
         doRendering(env, htmlFiles, template, targetFile);
 
     }

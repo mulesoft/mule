@@ -11,6 +11,7 @@
 package org.mule.util;
 
 import org.mule.MuleRuntimeException;
+import org.mule.RegistryContext;
 import org.mule.config.i18n.MessageFactory;
 
 import java.io.BufferedOutputStream;
@@ -21,10 +22,15 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.JarURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.util.Enumeration;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -110,7 +116,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
      * Reads the incoming String into a file at at the given destination.
      *
      * @param filename name and path of the file to create
-     * @param data the contents of the file
+     * @param data     the contents of the file
      * @return the new file.
      * @throws IOException If the creating or writing to the file stream fails
      */
@@ -121,14 +127,14 @@ public class FileUtils extends org.apache.commons.io.FileUtils
 
     // TODO Document me!
     public static synchronized File stringToFile(String filename, String data, boolean append)
-        throws IOException
+            throws IOException
     {
         return stringToFile(filename, data, append, false);
     }
 
     // TODO Document me!
     public static synchronized File stringToFile(String filename, String data, boolean append, boolean newLine)
-        throws IOException
+            throws IOException
     {
         File f = createFile(filename);
         BufferedWriter writer = null;
@@ -159,7 +165,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
 
     // TODO Document me!
     public static String getResourcePath(String resourceName, Class callingClass, String encoding)
-        throws IOException
+            throws IOException
     {
         if (resourceName == null)
         {
@@ -173,7 +179,20 @@ public class FileUtils extends org.apache.commons.io.FileUtils
             // not found
             return null;
         }
+        return normalizeFilePath(url, encoding);
+    }
 
+    /**
+     * Remove from uri to file prefix file:/
+     * Add if need file separator to begin
+     *
+     * @param url      file uri to resource
+     * @param encoding - Java encoding names
+     * @return normalized file path
+     * @throws UnsupportedEncodingException if encoding is unknown
+     */
+    public static String normalizeFilePath(URL url, String encoding) throws UnsupportedEncodingException
+    {
         String resource = URLDecoder.decode(url.toExternalForm(), encoding);
         if (resource != null)
         {
@@ -186,9 +205,9 @@ public class FileUtils extends org.apache.commons.io.FileUtils
                 resource = File.separator + resource;
             }
         }
-
         return resource;
     }
+
 
     // TODO Document me!
     public static boolean deleteTree(File dir)
@@ -248,7 +267,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
             for (Enumeration entries = zip.entries(); entries.hasMoreElements();)
             {
                 ZipEntry entry = (ZipEntry) entries.nextElement();
-                File f = new File(directory, entry.getName());
+                File f = FileUtils.newFile(directory, entry.getName());
                 if (entry.isDirectory())
                 {
                     if (!f.mkdirs())
@@ -284,7 +303,6 @@ public class FileUtils extends org.apache.commons.io.FileUtils
      * No physical file created in this method.
      *
      * @see File
-     *
      */
     public static File newFile(String pathName)
     {
@@ -295,7 +313,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         catch (IOException e)
         {
             throw new MuleRuntimeException(
-                    MessageFactory.createStaticMessage("Unable to create a canonical file for " + pathName), 
+                    MessageFactory.createStaticMessage("Unable to create a canonical file for " + pathName),
                     e);
         }
     }
@@ -309,7 +327,6 @@ public class FileUtils extends org.apache.commons.io.FileUtils
      * No physical file created in this method.
      *
      * @see File
-     *
      */
     public static File newFile(URI uri)
     {
@@ -334,7 +351,6 @@ public class FileUtils extends org.apache.commons.io.FileUtils
      * No physical file created in this method.
      *
      * @see File
-     *
      */
     public static File newFile(File parent, String child)
     {
@@ -346,7 +362,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         {
             throw new MuleRuntimeException(
                     MessageFactory.createStaticMessage("Unable to create a canonical file for parent: "
-                        + parent + " and child: " + child),
+                            + parent + " and child: " + child),
                     e);
         }
     }
@@ -360,7 +376,6 @@ public class FileUtils extends org.apache.commons.io.FileUtils
      * No physical file created in this method.
      *
      * @see File
-     *
      */
     public static File newFile(String parent, String child)
     {
@@ -372,8 +387,166 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         {
             throw new MuleRuntimeException(
                     MessageFactory.createStaticMessage("Unable to create a canonical file for parent: "
-                                                       + parent + " and child: " + child),
+                            + parent + " and child: " + child),
                     e);
         }
     }
+
+    /**
+     * Extract the specified resource to the given directory for
+     * remain all directory struct
+     *
+     * @param resourceName        - full resource name
+     * @param callingClass        - classloader for this class is used
+     * @param outputDir           - extract to this directory
+     * @param keepParentDirectory true -  full structure of directories is kept; false - file - removed all directories, directory - started from resource point
+     * @throws IOException if any errors
+     */
+    public static void extractResources(String resourceName, Class callingClass, File outputDir, boolean keepParentDirectory) throws IOException
+    {
+        URL url = callingClass.getClassLoader().getResource(resourceName);
+        URLConnection connection = url.openConnection();
+        if (connection instanceof JarURLConnection)
+        {
+            extractJarResources((JarURLConnection) connection, outputDir, keepParentDirectory);
+        }
+        else
+        {
+            extractFileResources(normalizeFilePath(url,
+                                                   RegistryContext.getConfiguration().getDefaultEncoding()),
+                                                   outputDir, resourceName, keepParentDirectory);
+        }
+    }
+
+    /**
+     * Extract resources contain in file
+     *
+     * @param path                - path to file
+     * @param outputDir           Directory for unpack recources
+     * @param resourceName
+     * @param keepParentDirectory true -  full structure of directories is kept; false - file - removed all directories, directory - started from resource point
+     * @throws IOException if any error
+     */
+    private static void extractFileResources(String path, File outputDir, String resourceName, boolean keepParentDirectory) throws IOException
+    {
+        File file = FileUtils.newFile(path);
+        if (!file.exists())
+        {
+            throw new IOException("The resource by path " + path + " ");
+        }
+        if (file.isDirectory())
+        {
+            if (keepParentDirectory)
+            {
+                outputDir = FileUtils.newFile(outputDir.getPath() + File.separator + resourceName);
+                if (!outputDir.exists())
+                {
+                    outputDir.mkdirs();
+                }
+            }
+            else
+            {
+                outputDir = FileUtils.newFile(outputDir.getPath());
+            }
+            copyDirectory(file, outputDir);
+        }
+        else
+        {
+
+            if (keepParentDirectory)
+            {
+                outputDir = FileUtils.newFile(outputDir.getPath() + File.separator + resourceName);
+            }
+            else
+            {
+                outputDir = FileUtils.newFile(outputDir.getPath() + File.separator + file.getName());
+            }
+            copyFile(file, outputDir);
+        }
+    }
+
+    /**
+     * Extract recources contain if jar (have to in classpath)
+     *
+     * @param connection          JarURLConnection to jar library
+     * @param outputDir           Directory for unpack recources
+     * @param keepParentDirectory true -  full structure of directories is kept; false - file - removed all directories, directory - started from resource point
+     * @throws IOException if any error
+     */
+    private static void extractJarResources(JarURLConnection connection, File outputDir, boolean keepParentDirectory) throws IOException
+    {
+        JarFile jarFile = connection.getJarFile();
+        JarEntry jarResource = connection.getJarEntry();
+        Enumeration entries = jarFile.entries();
+        InputStream inputStream = null;
+        OutputStream outputStream = null;
+        int jarResourceNameLenght = jarResource.getName().length();
+        for (; entries.hasMoreElements();)
+        {
+            JarEntry entry = (JarEntry) entries.nextElement();
+            if (entry.getName().startsWith(jarResource.getName()))
+            {
+
+                String path = outputDir.getPath() + File.separator + entry.getName();
+
+                //remove directory struct for file and first dir for directory
+                if (!keepParentDirectory)
+                {
+                    if (entry.isDirectory())
+                    {
+                        if (entry.getName().equals(jarResource.getName()))
+                        {
+                            continue;
+                        }
+                        path = outputDir.getPath() + File.separator + entry.getName().substring(jarResourceNameLenght, entry.getName().length());
+                    }
+                    else
+                    {
+                        if (entry.getName().length() > jarResourceNameLenght)
+                        {
+                            path = outputDir.getPath() + File.separator + entry.getName().substring(jarResourceNameLenght, entry.getName().length());
+                        }
+                        else
+                        {
+                            path = outputDir.getPath() + File.separator + entry.getName().substring(entry.getName().lastIndexOf("/"), entry.getName().length());
+                        }
+                    }
+                }
+
+                File file = FileUtils.newFile(path);
+                if (!file.getParentFile().exists())
+                {
+                    if (!file.getParentFile().mkdirs())
+                    {
+                        throw new IOException("Could not create directory: " + file.getParentFile());
+                    }
+                }
+                if (entry.isDirectory())
+                {
+                    if (!file.exists() && !file.mkdirs())
+                    {
+                        throw new IOException("Could not create directory: " + file);
+                    }
+
+                }
+                else
+                {
+                    try
+                    {
+                        inputStream = jarFile.getInputStream(entry);
+                        outputStream = new BufferedOutputStream(new FileOutputStream(file));
+                        IOUtils.copy(inputStream, outputStream);
+                    }
+                    finally
+                    {
+                        IOUtils.closeQuietly(inputStream);
+                        IOUtils.closeQuietly(outputStream);
+                    }
+                }
+
+            }
+        }
+    }
+
+
 }

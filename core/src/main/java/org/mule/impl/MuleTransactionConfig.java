@@ -126,6 +126,8 @@ public class MuleTransactionConfig implements UMOTransactionConfig
         {
             case ACTION_ALWAYS_BEGIN :
                 return ACTION_ALWAYS_BEGIN_STRING;
+            case ACTION_BEGIN_OR_JOIN :
+                return ACTION_BEGIN_OR_JOIN_STRING; 
             case ACTION_ALWAYS_JOIN :
                 return ACTION_ALWAYS_JOIN_STRING;
             case ACTION_JOIN_IF_POSSIBLE :

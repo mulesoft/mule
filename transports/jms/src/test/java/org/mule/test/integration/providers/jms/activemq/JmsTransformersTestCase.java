@@ -15,6 +15,7 @@ import org.mule.providers.jms.transformers.AbstractJmsTransformer;
 import org.mule.providers.jms.transformers.JMSMessageToObject;
 import org.mule.providers.jms.transformers.ObjectToJMSMessage;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.util.FileUtils;
 import org.mule.util.compression.CompressionStrategy;
 import org.mule.util.compression.GZipCompression;
 
@@ -63,7 +64,7 @@ public class JmsTransformersTestCase extends AbstractMuleTestCase
         RequestContext.setEvent(getTestEvent("test"));
 
         ObjectMessage oMsg = session.createObjectMessage();
-        File f = new File("/some/random/path");
+        File f = FileUtils.newFile("/some/random/path");
         oMsg.setObject(f);
         AbstractJmsTransformer trans = new JMSMessageToObject();
         Object result = trans.transform(oMsg);

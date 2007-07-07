@@ -10,6 +10,7 @@
 
 package org.mule.providers.file;
 
+import org.mule.RegistryContext;
 import org.mule.impl.RequestContext;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOEvent;
@@ -26,17 +27,17 @@ public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleTest
     private String tempDirName = "input";
     File tempDir;
     UMOConnector connector;
-        
+
     public void testAutoDeleteFalseOnDispatcher() throws Exception
     {
         ((FileConnector)connector).setAutoDelete(false);
-                
+
         UMOEvent event = getTestEvent("TestData");
         RequestContext.setEvent(event);
 
         UMOMessage message = RequestContext.getEventContext().receiveEvent(getTestEndpointURI()+"/"+tempDirName+"?connector=FileConnector", 50000);
         assertNotNull(message.getPayload());
-             
+
         File[] files = tempDir.listFiles();
         assertTrue(files.length > 0);
         for (int i = 0; i < files.length; i++)
@@ -45,26 +46,26 @@ public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleTest
             files[i].delete();
         }
     }
-    
+
     public void testAutoDeleteTrueOnDispatcher() throws Exception
     {
         ((FileConnector)connector).setAutoDelete(true);
-        
+
         UMOEvent event = getTestEvent("TestData");
         RequestContext.setEvent(event);
-        
+
         UMOMessage message = RequestContext.getEventContext().receiveEvent(getTestEndpointURI()+"/"+tempDirName, 50000);
         assertNotNull(message.getPayload());
-        
+
         File[] files = tempDir.listFiles();
         assertTrue(files.length == 0);
     }
-    
+
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
         // The working directory is deleted on tearDown
-        tempDir = new File(managementContext.getRegistry().getConfiguration().getWorkingDirectory(), tempDirName);
+        tempDir = FileUtils.newFile(RegistryContext.getConfiguration().getWorkingDirectory(), tempDirName);
         if (!tempDir.exists())
         {
             tempDir.mkdirs();
@@ -78,10 +79,10 @@ public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleTest
     {
         // TestConnector dispatches events via the test: protocol to test://test
         // endpoints, which seems to end up in a directory called "test" :(
-        FileUtils.deleteTree(new File(getTestConnector().getProtocol()));
+        FileUtils.deleteTree(FileUtils.newFile(getTestConnector().getProtocol()));
         super.doTearDown();
     }
-    
+
     public UMOConnector getConnector() throws Exception {
         UMOConnector connector = new FileConnector();
         connector.setName("FileConnector");
