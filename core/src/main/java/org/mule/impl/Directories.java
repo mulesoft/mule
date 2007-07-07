@@ -56,7 +56,7 @@ public class Directories
             {
                 s = "0" + s;
             }
-            File f = new File(rootDir, File.separator + TEMP_DIR + File.separator + s);
+            File f = FileUtils.newFile(rootDir, File.separator + TEMP_DIR + File.separator + s);
             if (!f.exists())
             {
                 return f;
@@ -66,27 +66,27 @@ public class Directories
 
     public File getBundleInstallDir(String name)
     {
-        return new File(rootDir, BUNDLES_DIR + File.separator + validateString(name));
+        return FileUtils.newFile(rootDir, BUNDLES_DIR + File.separator + validateString(name));
     }
 
     public File getAutoInstallDir()
     {
-        return new File(rootDir, INSTALL_DIR);
+        return FileUtils.newFile(rootDir, INSTALL_DIR);
     }
 
     public File getAutoInstallProcessedDir()
     {
-        return new File(rootDir, INSTALL_DIR + File.separator + PROCESSED_DIR);
+        return FileUtils.newFile(rootDir, INSTALL_DIR + File.separator + PROCESSED_DIR);
     }
 
     public File getAutoDeployDir()
     {
-        return new File(rootDir, DEPLOY_DIR);
+        return FileUtils.newFile(rootDir, DEPLOY_DIR);
     }
 
     public File getAutoDeployProcessedDir()
     {
-        return new File(rootDir, DEPLOY_DIR + File.separator + PROCESSED_DIR);
+        return FileUtils.newFile(rootDir, DEPLOY_DIR + File.separator + PROCESSED_DIR);
     }
 
     public void deleteMarkedDirectories()
@@ -98,7 +98,7 @@ public class Directories
     {
         if (rootDir != null && rootDir.isDirectory())
         {
-            if (new File(rootDir, ".delete").isFile())
+            if (FileUtils.newFile(rootDir, ".delete").isFile())
             {
                 deleteDirectory(rootDir);
             }
@@ -118,7 +118,7 @@ public class Directories
 
     public void deleteDirectory(String dir)
     {
-        deleteDirectory(new File(dir));
+        deleteDirectory(FileUtils.newFile(dir));
     }
 
     public void deleteDirectory(File dir)
@@ -128,7 +128,7 @@ public class Directories
         {
             try
             {
-                new File(dir, ".delete").createNewFile();
+                FileUtils.newFile(dir, ".delete").createNewFile();
             }
             catch (IOException e)
             {
@@ -145,8 +145,8 @@ public class Directories
     public void createDirectories(File rootDir) throws IOException
     {
         createDirectory(rootDir);
-        createDirectory(new File(rootDir, BUNDLES_DIR));
-        createDirectory(new File(rootDir, WORKSPACE_DIR));
+        createDirectory(FileUtils.newFile(rootDir, BUNDLES_DIR));
+        createDirectory(FileUtils.newFile(rootDir, WORKSPACE_DIR));
         createDirectory(getAutoInstallDir());
         createDirectory(getAutoDeployDir());
         createDirectory(getAutoDeployProcessedDir());
