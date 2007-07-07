@@ -191,34 +191,9 @@ public class MuleBootstrap
         Options options = new Options();
         for (int i = 0; i < CLI_OPTIONS.length; i++)
         {
-            options.addOption(CLI_OPTIONS[i][0], CLI_OPTIONS[i][1].equals("true") ? true : false, CLI_OPTIONS[i][2]);
+            options.addOption(CLI_OPTIONS[i][0], "true".equalsIgnoreCase(CLI_OPTIONS[i][1]), CLI_OPTIONS[i][2]);
         }
         return new BasicParser().parse(options, args, true);
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // The following utility methods are included here in order to keep the bootloader
-    // free of any external library dependencies.
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * Imitates ClassUtils.isClassOnPath()
-     */
-    private static boolean isClassOnPath(String className) {
-        boolean found = false;
-        try {
-            found = (Thread.currentThread().getContextClassLoader().loadClass(className) != null);
-        } catch (ClassNotFoundException e) { }
-        if (!found) {
-            try {
-                found = (Class.forName(className) != null);
-            } catch (ClassNotFoundException e) { }
-        }
-        if (!found) {
-            try {
-                found = (MuleBootstrap.class.getClassLoader().loadClass(className) != null);
-            } catch (ClassNotFoundException e) { }
-        }
-        return found;
-    }
 }
