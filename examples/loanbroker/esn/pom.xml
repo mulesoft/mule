@@ -46,9 +46,6 @@
                         <!-- MULE-1564, MULE-1962 -->
                         <!-- Synchronous may work OK... -->
                         <exclude>**/*Asynchronous*.java</exclude>
-                        <!-- MULE-1839 -->
-                        <exclude>org/mule/examples/loanbroker/esn/AxisLoanBrokerSynchronousFunctionalTestCase.java</exclude>
-                        <exclude>org/mule/examples/loanbroker/esn/AxisLoanBrokerAsynchronousFunctionalTestCase.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>
