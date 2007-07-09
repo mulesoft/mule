@@ -34,7 +34,6 @@ public class MuleUrlStreamHandlerFactory extends Object implements URLStreamHand
     private static final String HANDLER_PKGS_SYSTEM_PROPERTY = "java.protocol.handler.pkgs";
     
     private static Map registry = Collections.synchronizedMap(new HashMap());
-    private static volatile boolean streamHandlerInstalled = false;
 
     /**
      * Install an instance of this class as UrlStreamHandlerFactory. This may be done exactly
@@ -45,10 +44,22 @@ public class MuleUrlStreamHandlerFactory extends Object implements URLStreamHand
      */
     public static synchronized void installUrlStreamHandlerFactory()
     {
-        if (streamHandlerInstalled == false)
+        /*
+         * When running under surefire, this class will be loaded by different class loaders and
+         * will be running in multiple "main" thread objects. Thus, there is no way for this class
+         * to register a globally available variable to store the info whether our custom 
+         * UrlStreamHandlerFactory was already registered.
+         * 
+         * The only way to accomplish this is to catch the Error that is thrown by URL when
+         * trying to re-register the custom UrlStreamHandlerFactory.
+         */
+        try
         {
             URL.setURLStreamHandlerFactory(new MuleUrlStreamHandlerFactory());
-            streamHandlerInstalled = true;
+        }
+        catch (Error err)
+        {
+            // our custom UrlStreamHandlerFactory is already installed.
         }
     }
     
