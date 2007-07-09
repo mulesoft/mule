@@ -36,6 +36,7 @@ import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.ClassUtils;
+import org.mule.util.MuleUrlStreamHandlerFactory;
 import org.mule.util.object.SingletonObjectFactory;
 
 import java.util.ArrayList;
@@ -158,7 +159,6 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
     protected void doInitialise() throws InitialisationException
     {
         // TODO DO: see if registered protocols were changed via external setter
-        
         if (axisTransportProtocols == null)
         {
             axisTransportProtocols = new HashMap();
@@ -224,21 +224,14 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
                 CoreMessages.cannotLoadFromClasspath(e.getMessage()), e, this);
         }
 
-        // Overload the UrlHandlers provided by Axis so Mule can use its transports
-        // to move
-        // Soap messages around
-        String handlerPkgs = System.getProperty("java.protocol.handler.pkgs", null);
-        if (handlerPkgs != null)
-        {
-            if (!handlerPkgs.endsWith("|"))
-            {
-                handlerPkgs += "|";
-            }
-            handlerPkgs = "org.mule.providers.soap.axis.transport|" + handlerPkgs;
-            System.setProperty("java.protocol.handler.pkgs", handlerPkgs);
-            logger.debug("Setting java.protocol.handler.pkgs to: " + handlerPkgs);
-        }
-
+        // Register all our UrlStreamHandlers here so they can be resolved. This is necessary
+        // to make Mule work in situations where modification of system properties at runtime
+        // is not reliable, e.g. when running in maven's surefire test executor.
+        MuleUrlStreamHandlerFactory.registerHandler("jms", new org.mule.providers.soap.axis.transport.jms.Handler());
+        MuleUrlStreamHandlerFactory.registerHandler("pop3", new org.mule.providers.soap.axis.transport.pop3.Handler());
+        MuleUrlStreamHandlerFactory.registerHandler("smtp", new org.mule.providers.soap.axis.transport.smtp.Handler());
+        MuleUrlStreamHandlerFactory.registerHandler("vm", new org.mule.providers.soap.axis.transport.vm.Handler());
+        
         try
         {
             registerTypes((TypeMappingRegistryImpl)axisServer.getTypeMappingRegistry(), beanTypes);

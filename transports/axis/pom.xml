@@ -33,6 +33,7 @@
                     <excludes>
                         <!-- MULE-1839, remaining tests waiting for JMS  -->
                         <exclude>**/AxisConnectorJmsTopicsFunctionalTestCase.java</exclude>
+                        <exclude>**/AxisServletBindingTestCase.java</exclude>
 
                         <!-- Only run tests with external dependencies in the tests-external profile -->
                         <exclude>**/AxisExternalServerTest.java</exclude>

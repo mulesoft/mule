@@ -16,6 +16,7 @@ import org.mule.config.i18n.Message;
 import org.mule.impl.MuleShutdownHook;
 import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
+import org.mule.util.MuleUrlStreamHandlerFactory;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.SystemUtils;
 
@@ -141,6 +142,9 @@ public class MuleServer implements Runnable
         {
             throw new IllegalArgumentException(me.toString());
         }
+        
+        // set our own UrlStreamHandlerFactory to become more independent of system properties
+        MuleUrlStreamHandlerFactory.installUrlStreamHandlerFactory();
 
         String config = (String) options.get("config");
         // Try default if no config file was given.
