@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.mulesource.org/schema/mule/jaas/2.0"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+            targetNamespace="http://www.mulesource.org/schema/mule/jaas/2.0"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.springframework.org/schema/beans"
+                schemaLocation="http://www.springframework.org/schema/beans"/>
+
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"/>
+    
+  <xsd:complexType name="securityManagerType">
+    <xsd:complexContent>
+      <xsd:extension base="mule:securityManagerType">
+        <xsd:sequence>
+          <xsd:element ref="jaas-security-provider"/>
+          <xsd:element name="password-encryption-strategy" type="mule:passwordEncryptionStrategyType" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+    
+  <!-- jaas provider -->	
+  <xsd:element name="jaas-security-provider" type="jaasSecurityProviderType">
+    <xsd:annotation>
+      <xsd:documentation>TODO</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:complexType name="jaasSecurityProviderType">
+    <xsd:complexContent>
+      <xsd:extension base="mule:securityProviderType">
+        <xsd:attribute name="loginContextName" type="xsd:string" use="required"/>
+        <xsd:attribute name="credentials" type="xsd:string"/>  
+        <xsd:attribute name="loginConfig" type="xsd:string"/>  
+        <xsd:attribute name="loginModule" type="xsd:string"/>  
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+</xsd:schema>

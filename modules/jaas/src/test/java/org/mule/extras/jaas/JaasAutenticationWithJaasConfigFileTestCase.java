@@ -15,6 +15,7 @@ import org.mule.extras.client.MuleClient;
 import org.mule.impl.security.MuleCredentials;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOEncryptionStrategy;
+import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.UMOMessage;
 
 import java.util.HashMap;
@@ -78,6 +79,11 @@ public class JaasAutenticationWithJaasConfigFileTestCase extends FunctionalTestC
         assertNotNull(m);
         assertTrue(m.getPayload() instanceof String);
         assertFalse(m.getPayloadAsString().equals("Test Received"));
+        
+        //assert exception
+        UMOExceptionPayload exceptionPayload = m.getExceptionPayload();
+        assertNotNull(exceptionPayload);
+        assertEquals("Authentication failed for principal Marie.Rizzo. Message payload is of type: String", exceptionPayload.getMessage());
     }
 
     public void testCaseBadUserName() throws Exception
@@ -94,6 +100,12 @@ public class JaasAutenticationWithJaasConfigFileTestCase extends FunctionalTestC
         assertNotNull(m);
         assertTrue(m.getPayload() instanceof String);
         assertFalse(m.getPayloadAsString().equals("Test Received"));
+        
+        //assert exception
+        UMOExceptionPayload exceptionPayload = m.getExceptionPayload();
+        assertNotNull(exceptionPayload);
+        assertEquals("Authentication failed for principal Evil. Message payload is of type: String", exceptionPayload.getMessage());
+        
     }
 
     public void testCaseBadPassword() throws Exception
@@ -110,6 +122,13 @@ public class JaasAutenticationWithJaasConfigFileTestCase extends FunctionalTestC
         assertNotNull(m);
         assertTrue(m.getPayload() instanceof String);
         assertFalse(m.getPayloadAsString().equals("Test Received"));
+  
+        //assert exception
+        UMOExceptionPayload exceptionPayload = m.getExceptionPayload();
+        assertNotNull(exceptionPayload);
+        assertEquals("Authentication failed for principal Marie.Rizzo. Message payload is of type: String", exceptionPayload.getMessage());
+        
+        
     }
 
     protected String getConfigResources()

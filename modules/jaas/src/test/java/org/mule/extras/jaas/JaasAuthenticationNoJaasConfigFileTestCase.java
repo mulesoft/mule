@@ -15,6 +15,7 @@ import org.mule.extras.client.MuleClient;
 import org.mule.impl.security.MuleCredentials;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOEncryptionStrategy;
+import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.UMOMessage;
 
 import java.util.HashMap;
@@ -27,6 +28,14 @@ public class JaasAuthenticationNoJaasConfigFileTestCase extends FunctionalTestCa
     {
         super();
         this.setDisposeManagerPerSuite(true);
+    }
+    
+    public void assertExceptionPayload(UMOMessage umoMessage, String exceptionMessage)
+    {
+        assertNotNull(umoMessage.getExceptionPayload());
+        UMOExceptionPayload exceptionPayload = umoMessage.getExceptionPayload();
+        assertNotNull(exceptionPayload);
+        assertEquals(exceptionMessage, exceptionPayload.getMessage());
     }
 
     public void testCaseGoodAuthentication() throws Exception
@@ -78,6 +87,9 @@ public class JaasAuthenticationNoJaasConfigFileTestCase extends FunctionalTestCa
         assertNotNull(m);
         assertTrue(m.getPayload() instanceof String);
         assertFalse(m.getPayloadAsString().equals("Test Received"));
+        
+        assertExceptionPayload(m, "Authentication failed for principal Marie.Rizzo. Message payload is of type: String");
+        
     }
 
     public void testCaseBadUserName() throws Exception
@@ -94,6 +106,8 @@ public class JaasAuthenticationNoJaasConfigFileTestCase extends FunctionalTestCa
         assertNotNull(m);
         assertTrue(m.getPayload() instanceof String);
         assertFalse(m.getPayloadAsString().equals("Test Received"));
+        
+        assertExceptionPayload(m, "Authentication failed for principal Evil. Message payload is of type: String");
     }
 
     public void testCaseBadPassword() throws Exception
@@ -110,6 +124,8 @@ public class JaasAuthenticationNoJaasConfigFileTestCase extends FunctionalTestCa
         assertNotNull(m);
         assertTrue(m.getPayload() instanceof String);
         assertFalse(m.getPayloadAsString().equals("Test Received"));
+        
+        assertExceptionPayload(m, "Authentication failed for principal Marie.Rizzo. Message payload is of type: String");
     }
 
     protected String getConfigResources()
