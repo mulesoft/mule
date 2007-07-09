@@ -43,6 +43,7 @@
                 <configuration>
                     <forkMode>pertest</forkMode>
                     <excludes>
+                        <exclude>**/*Asynchronous*.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>
