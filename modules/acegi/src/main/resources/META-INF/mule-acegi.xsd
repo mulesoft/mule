@@ -13,6 +13,12 @@
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"/>
 
     <xsd:complexType name="securityManagerType">
+        <xsd:annotation>
+            <xsd:documentation>
+                This is the security provider type that is used to configure Acegi related functionality.
+                It should be used as the "xsi:type" attribute in a "security-manager" element.
+            </xsd:documentation>
+        </xsd:annotation>
         <xsd:complexContent>
             <xsd:extension base="mule:securityManagerType">
                 <xsd:sequence>
@@ -60,7 +66,7 @@
     <xsd:element name="http-security-filter" type="httpSecurityFilterType">
         <xsd:annotation>
             <xsd:documentation>
-                TODO
+                This appears to authenticate users via information in standard HTTP headers.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

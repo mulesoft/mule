@@ -12,33 +12,36 @@
 
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"/>
     
-  <xsd:complexType name="securityManagerType">
-    <xsd:complexContent>
-      <xsd:extension base="mule:securityManagerType">
-        <xsd:sequence>
-          <xsd:element ref="jaas-security-provider"/>
-          <xsd:element name="password-encryption-strategy" type="mule:passwordEncryptionStrategyType" minOccurs="0" maxOccurs="unbounded"/>
-        </xsd:sequence>
-      </xsd:extension>
-    </xsd:complexContent>
-  </xsd:complexType>
+    <xsd:complexType name="securityManagerType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:securityManagerType">
+                <xsd:sequence>
+                    <xsd:element ref="jaas-security-provider"/>
+                    <xsd:element name="password-encryption-strategy" type="mule:passwordEncryptionStrategyType" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
     
-  <!-- jaas provider -->	
-  <xsd:element name="jaas-security-provider" type="jaasSecurityProviderType">
-    <xsd:annotation>
-      <xsd:documentation>TODO</xsd:documentation>
-    </xsd:annotation>
-  </xsd:element>
+    <!-- jaas provider -->
+    <xsd:element name="jaas-security-provider" type="jaasSecurityProviderType">
+        <xsd:annotation>
+            <xsd:documentation>
+                This is the security provider type that is used to configure JAAS related functionality.
+                It should be used as the "xsi:type" attribute in a "security-manager" element.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
 
-  <xsd:complexType name="jaasSecurityProviderType">
-    <xsd:complexContent>
-      <xsd:extension base="mule:securityProviderType">
-        <xsd:attribute name="loginContextName" type="xsd:string" use="required"/>
-        <xsd:attribute name="credentials" type="xsd:string"/>  
-        <xsd:attribute name="loginConfig" type="xsd:string"/>  
-        <xsd:attribute name="loginModule" type="xsd:string"/>  
-      </xsd:extension>
-    </xsd:complexContent>
-  </xsd:complexType>
+    <xsd:complexType name="jaasSecurityProviderType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:securityProviderType">
+                <xsd:attribute name="loginContextName" type="xsd:string" use="required"/>
+                <xsd:attribute name="credentials" type="xsd:string"/>
+                <xsd:attribute name="loginConfig" type="xsd:string"/>
+                <xsd:attribute name="loginModule" type="xsd:string"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
 </xsd:schema>
