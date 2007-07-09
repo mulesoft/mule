@@ -43,9 +43,6 @@
                 <configuration>
                     <forkMode>pertest</forkMode>
                     <excludes>
-                        <!-- MULE-1564, MULE-1962 -->
-                        <!-- Synchronous may work OK... -->
-                        <exclude>**/*Asynchronous*.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>
