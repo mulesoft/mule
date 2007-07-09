@@ -14,10 +14,8 @@ import org.mule.examples.loanbroker.messages.Customer;
 import org.mule.examples.loanbroker.messages.CustomerQuoteRequest;
 import org.mule.examples.loanbroker.messages.LoanQuote;
 import org.mule.extras.client.MuleClient;
-import org.mule.impl.model.seda.SedaModel;
 import org.mule.providers.NullPayload;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOMessage;
 
 public abstract class AbstractLoanBrokerTestCase extends FunctionalTestCase
