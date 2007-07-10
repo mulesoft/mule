@@ -50,7 +50,7 @@ public class SingleJmsMessageReceiver extends AbstractMessageReceiver implements
 
         try
         {
-            redeliveryHandler = this.connector.createRedeliveryHandler();
+            redeliveryHandler = (RedeliveryHandler) this.connector.getRedeliveryHandler().create();
             redeliveryHandler.setConnector(this.connector);
         }
         catch (Exception e)

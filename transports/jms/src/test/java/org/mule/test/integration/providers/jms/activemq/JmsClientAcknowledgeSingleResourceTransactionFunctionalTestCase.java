@@ -10,54 +10,11 @@
 
 package org.mule.test.integration.providers.jms.activemq;
 
-import org.mule.providers.jms.JmsClientAcknowledgeTransactionFactory;
-import org.mule.providers.jms.JmsConnector;
-import org.mule.providers.jms.TransactedSingleResourceJmsMessageReceiver;
-import org.mule.providers.jms.activemq.ActiveMqJmsConnector;
-import org.mule.umo.UMOTransactionFactory;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.jms.Session;
-
-public class JmsClientAcknowledgeSingleResourceTransactionFunctionalTestCase extends
-    ActiveMQJmsTransactionFunctionalTestCase
+public class JmsClientAcknowledgeSingleResourceTransactionFunctionalTestCase extends JmsClientAcknowledgeTransactionFunctionalTestCase
 {
-
-    public UMOTransactionFactory getTransactionFactory()
+    protected String getConfigResources()
     {
-        return new JmsClientAcknowledgeTransactionFactory();
-    }
-
-    public JmsConnector createConnector() throws Exception
-    {
-        ActiveMqJmsConnector connector = new ActiveMqJmsConnector();
-        connector.setName(CONNECTOR_NAME);
-        connector.setAcknowledgementMode(Session.CLIENT_ACKNOWLEDGE);
-        connector.getDispatcherThreadingProfile().setDoThreading(false);
-        Map overrides = new HashMap();
-        overrides.put("message.receiver", TransactedSingleResourceJmsMessageReceiver.class.getName());
-        overrides.put("transacted.message.receiver",
-            TransactedSingleResourceJmsMessageReceiver.class.getName());
-
-        connector.setServiceOverrides(overrides);
-
-        return connector;
-    }
-
-    protected int getAcknowledgementMode()
-    {
-        return Session.CLIENT_ACKNOWLEDGE;
-    }
-
-    public void testSendTransactedRollback() throws Exception
-    {
-        // Rollback not allowed for client acknowledge
-    }
-
-    public void testTransactedRedeliveryToDLDestination() throws Exception
-    {
-        // messages are not marked for redelivery in Client Ack mode
+        return "activemq-client-ack-single-resource.xml," + super.getConfigResources();
     }
 }

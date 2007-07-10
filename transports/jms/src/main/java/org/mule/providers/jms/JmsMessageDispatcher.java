@@ -87,7 +87,8 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         if (logger.isDebugEnabled())
         {
             logger.debug("dispatching on endpoint: " + event.getEndpoint().getEndpointURI()
-                         + ". Event id is: " + event.getId());
+                         + ". Event id is: " + event.getId()
+                         + ". outbound transformer is: " + event.getEndpoint().getTransformer());
         }
 
         try

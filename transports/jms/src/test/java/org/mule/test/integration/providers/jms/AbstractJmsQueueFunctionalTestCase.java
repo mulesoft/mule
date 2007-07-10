@@ -10,132 +10,72 @@
 
 package org.mule.test.integration.providers.jms;
 
-import org.mule.providers.jms.JmsMessageReceiver;
-import org.mule.tck.functional.EventCallback;
-import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.lifecycle.CreateException;
-import org.mule.umo.provider.UMOConnector;
-
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageListener;
-import javax.jms.QueueConnection;
-import javax.jms.Session;
-import javax.jms.TextMessage;
-import javax.jms.TopicConnection;
-
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import org.mule.RegistryContext;
+import org.mule.tck.functional.CountdownCallback;
+import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.umo.UMOException;
 
 public abstract class AbstractJmsQueueFunctionalTestCase extends AbstractJmsFunctionalTestCase
 {
-    protected static CountDownLatch receiverIsUp;
+    protected String getConfigResources()
+    {
+        return "jms-functional-test.xml";
+    }
 
     public void testSend() throws Exception
     {
-        final CountDownLatch countDown = new CountDownLatch(2);
-        receiverIsUp = new CountDownLatch(1);
+        FunctionalTestComponent ftc = lookupTestComponent();
 
-        EventCallback callback = new EventCallback()
-        {
-            public synchronized void eventReceived(UMOEventContext context, Object component)
-            {
-                callbackCalled = true;
-                assertNull(context.getCurrentTransaction());
-                countDown.countDown();
-            }
-        };
+        CountdownCallback callback = new CountdownCallback(1);
+        ftc.setEventCallback(callback);
 
-        initialiseComponent(callback);
-        // Start the server
-        managementContext.start();
+        send(TEST_MESSAGE, useTopics() ? "topic:in" : "in");
 
-        MessageConsumer mc;
-        // check replyTo
-        if (useTopics())
-        {
-            mc = JmsTestUtils.getTopicSubscriber((TopicConnection) cnn, getOutDest().getAddress());
-        }
-        else
-        {
-            mc = JmsTestUtils.getQueueReceiver((QueueConnection) cnn, getOutDest().getAddress());
-        }
-        mc.setMessageListener(new MessageListener()
-        {
-            public void onMessage(Message message)
-            {
-                currentMsg = message;
-                countDown.countDown();
-            }
-        });
-
-        logger.debug("Waiting for coutdown isReceiverUp");
-        assertTrue(receiverIsUp.await(LOCK_WAIT, TimeUnit.MILLISECONDS));
-        receiverIsUp = null;
-
-        send(DEFAULT_MESSAGE, false, Session.AUTO_ACKNOWLEDGE, null);
-        assertTrue(countDown.await(LOCK_WAIT, TimeUnit.MILLISECONDS));
-
-        assertNotNull(currentMsg);
-        assertTrue(currentMsg instanceof TextMessage);
-        assertEquals(DEFAULT_MESSAGE + " Received", ((TextMessage) currentMsg).getText());
-
-        assertTrue(callbackCalled);
+        assertTrue(callback.await(LOCK_TIMEOUT));
+        assertEquals(TEST_MESSAGE, ftc.getLastReceivedMessage());
+        
+        assertEquals(TEST_MESSAGE_RESPONSE, receiveTextMessage(useTopics() ? "topic:out" : "out"));
     }
+
+    // TODO This test fails due to concurrency issues.
+//    public void testMultipleSend() throws Exception
+//    {
+//        RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(true);
+//      
+//        FunctionalTestComponent ftc = lookupTestComponent();
+//
+//        CountdownCallback callback = new CountdownCallback(3);
+//        ftc.setEventCallback(callback);
+//
+//        send(TEST_MESSAGE, useTopics() ? "topic:in" : "in");
+//        send(TEST_MESSAGE, useTopics() ? "topic:in" : "in");
+//        send(TEST_MESSAGE, useTopics() ? "topic:in" : "in");
+//
+//        assertTrue(callback.await(LOCK_TIMEOUT));
+//        //assertEquals(3, ftc.getReceivedMessages());
+//        assertEquals(TEST_MESSAGE, ftc.getReceivedMessage(1));
+//        assertEquals(TEST_MESSAGE, ftc.getReceivedMessage(2));
+//        assertEquals(TEST_MESSAGE, ftc.getReceivedMessage(3));
+//        assertNull(ftc.getReceivedMessage(4));
+//
+//        assertEquals(TEST_MESSAGE_RESPONSE, receiveTextMessage(useTopics() ? "topic:out" : "out"));
+//        assertEquals(TEST_MESSAGE_RESPONSE, receiveTextMessage(useTopics() ? "topic:out" : "out"));
+//        assertEquals(TEST_MESSAGE_RESPONSE, receiveTextMessage(useTopics() ? "topic:out" : "out"));
+//    }
 
     public void testSendWithReplyTo() throws Exception
     {
-        final CountDownLatch countDown = new CountDownLatch(2);
-        receiverIsUp = new CountDownLatch(1);
+        FunctionalTestComponent ftc = lookupTestComponent();
 
-        EventCallback callback = new EventCallback()
-        {
-            public synchronized void eventReceived(UMOEventContext context, Object component)
-            {
-                callbackCalled = true;
-                assertNull(context.getCurrentTransaction());
-                countDown.countDown();
-            }
-        };
+        CountdownCallback callback = new CountdownCallback(1);
+        ftc.setEventCallback(callback);
 
-        initialiseComponent(callback);
-        // Start the server
-        managementContext.start();
+        send(TEST_MESSAGE, useTopics() ? "topic:in" : "in", false, getAcknowledgementMode(), "replyto");
 
-        MessageConsumer mc;
-        // check replyTo
-        if (useTopics())
-        {
-            mc = JmsTestUtils.getTopicSubscriber((TopicConnection) cnn, "replyto");
-        }
-        else
-        {
-            mc = JmsTestUtils.getQueueReceiver((QueueConnection) cnn, "replyto");
-        }
-        mc.setMessageListener(new MessageListener()
-        {
-            public void onMessage(Message message)
-            {
-                currentMsg = message;
-                countDown.countDown();
-            }
-        });
+        assertTrue(callback.await(LOCK_TIMEOUT));
+        assertEquals(TEST_MESSAGE, ftc.getLastReceivedMessage());
 
-        logger.debug("Waiting for coutdown isReceiverUp");
-        assertTrue(receiverIsUp.await(LOCK_WAIT, TimeUnit.MILLISECONDS));
-        receiverIsUp = null;
-
-        send(DEFAULT_MESSAGE, false, Session.AUTO_ACKNOWLEDGE, "replyto");
-
-        assertTrue(countDown.await(LOCK_WAIT, TimeUnit.MILLISECONDS));
-
-        assertNotNull(currentMsg);
-        assertTrue(currentMsg instanceof TextMessage);
-        assertEquals(DEFAULT_MESSAGE + " Received", ((TextMessage) currentMsg).getText());
-        assertTrue(callbackCalled);
+        assertEquals(TEST_MESSAGE_RESPONSE, receiveTextMessage(useTopics() ? "topic:out" : "out"));
     }
 
     public boolean useTopics()
@@ -143,23 +83,23 @@ public abstract class AbstractJmsQueueFunctionalTestCase extends AbstractJmsFunc
         return false;
     }
 
-    protected static class JmsMessageReceiverSynchronous extends JmsMessageReceiver
+    protected FunctionalTestComponent lookupTestComponent()
     {
-        public JmsMessageReceiverSynchronous(UMOConnector connector,
-                                             UMOComponent component,
-                                             UMOEndpoint endpoint) throws CreateException
+        try
         {
-            super(connector, component, endpoint);
-        }
-
-        protected void doConnect() throws Exception
-        {
-            super.doConnect();
-            if (receiverIsUp != null)
+            if (useTopics())
             {
-                logger.debug("Releasing coutdown isReceiverUp");
-                receiverIsUp.countDown();
+                return lookupTestComponent("testModel", "topicComponent");
             }
+            else
+            {
+                return lookupTestComponent("testModel", "queueComponent");
+            }
+        } catch (UMOException e)
+        {
+            logger.error(e);
+            return null;
         }
     }
 }
+

@@ -10,64 +10,12 @@
 
 package org.mule.test.integration.providers.jms.activemq;
 
-import org.mule.providers.jms.JmsConnector;
-import org.mule.providers.jms.JmsConstants;
-import org.mule.providers.jms.JmsTransactionFactory;
-import org.mule.providers.jms.TransactedSingleResourceJmsMessageReceiver;
-import org.mule.providers.jms.activemq.ActiveMqJmsConnector;
 import org.mule.test.integration.providers.jms.AbstractJmsTransactionFunctionalTest;
-import org.mule.umo.UMOTransactionFactory;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.jms.ConnectionFactory;
-
-import org.apache.activemq.ActiveMQConnectionFactory;
 
 public class ActiveMQJmsTransactionFunctionalTestCase extends AbstractJmsTransactionFunctionalTest
 {
-    protected ActiveMQConnectionFactory factory = null;
-
-    public ConnectionFactory getConnectionFactory() throws Exception
+    protected String getConfigResources()
     {
-        if (factory == null)
-        {
-            factory = new ActiveMQConnectionFactory("vm://localhost?broker.persistent=false&broker.useJmx=false");
-        }
-        return factory;
+        return "activemq-config.xml," + super.getConfigResources();
     }
-
-    protected void doTearDown() throws Exception
-    {
-        factory = null;
-        super.doTearDown();
-    }
-
-    public UMOTransactionFactory getTransactionFactory()
-    {
-        return new JmsTransactionFactory();
-    }
-
-    public JmsConnector createConnector() throws Exception
-    {
-        ActiveMqJmsConnector connector = new ActiveMqJmsConnector();
-        connector.setSpecification(JmsConstants.JMS_SPECIFICATION_11);
-        connector.setName(CONNECTOR_NAME);
-        connector.getDispatcherThreadingProfile().setDoThreading(false);
-        /** Always use the transacted Jms Message receivers for these test cases */
-        Map overrides = new HashMap();
-        //overrides.put("message.receiver", TransactedJmsMessageReceiver.class.getName());
-        overrides.put("transacted.message.receiver", TransactedSingleResourceJmsMessageReceiver.class.getName());
-        connector.setServiceOverrides(overrides);
-
-        // The following comment seems like doesn't count anymore
-        /*
-         * //Using multiple receiver threads with ActiveMQ causes the DLQ test case
-         * to fail //because of ActiveMQ prefetch. Disabling this feature fixes the
-         * problem //connector.setCreateMultipleTransactedReceivers(false);
-         */
-        return connector;
-    }
-
 }

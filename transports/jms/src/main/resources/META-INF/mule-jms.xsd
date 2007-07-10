@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.mulesource.org/schema/mule/jms/2.0"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:spring="http://www.springframework.org/schema/beans"
+            xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+            targetNamespace="http://www.mulesource.org/schema/mule/jms/2.0"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.springframework.org/schema/beans"/>
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"/>
+
+    <!-- Generic JMS Connector -->    
+    <xsd:element name="connector">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="mule:connectorType">
+                    <xsd:sequence>
+                        <!-- The ConnectionFactory is required for non-vendor JMS configs -->
+                        <xsd:element name="connection-factory" type="connectionFactoryType" minOccurs="1" maxOccurs="1"/>
+                        <xsd:group ref="jmsConnectorElements"/>
+                    </xsd:sequence>
+                    <xsd:attributeGroup ref="jmsConnectorAttributes"/>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <!-- Custom JMS Connector -->    
+    <xsd:element name="custom-connector">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="mule:customConnectorType">
+                    <xsd:sequence>
+                        <!-- The ConnectionFactory is required for non-vendor JMS configs -->
+                        <xsd:element name="connection-factory" type="connectionFactoryType" minOccurs="1" maxOccurs="1"/>
+                        <xsd:group ref="jmsConnectorElements"/>
+                    </xsd:sequence>
+                    <xsd:attributeGroup ref="jmsConnectorAttributes"/>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:group name="jmsConnectorElements">
+        <xsd:sequence>
+            <xsd:element name="redelivery-handler" type="mule:objectFactoryType" minOccurs="0" maxOccurs="1"/>
+        </xsd:sequence>
+    </xsd:group>
+
+    <xsd:attributeGroup name="jmsConnectorAttributes">
+        <xsd:attribute name="acknowledgementMode" default="AUTO_ACKNOWLEDGE">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="AUTO_ACKNOWLEDGE"/>
+                    <xsd:enumeration value="CLIENT_ACKNOWLEDGE"/>
+                    <xsd:enumeration value="DUPS_OK_ACKNOWLEDGE"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+        <xsd:attribute name="clientId" type="xsd:string"/>
+        <xsd:attribute name="durable" type="mule:substitutableBoolean"/>
+        <xsd:attribute name="noLocal" type="mule:substitutableBoolean"/>
+        <xsd:attribute name="persistentDelivery" type="mule:substitutableBoolean"/>
+        <xsd:attribute name="maxRedelivery" type="mule:substitutableInt"/>
+        <xsd:attribute name="cacheJmsSessions" type="mule:substitutableBoolean"/>
+        <xsd:attribute name="recoverJmsConnections" type="mule:substitutableBoolean"/>
+        <xsd:attribute name="eagerConsumer" type="mule:substitutableBoolean"/>
+        <xsd:attribute name="jndiDestinations" type="mule:substitutableBoolean"/>
+        <xsd:attribute name="forceJndiDestinations" type="mule:substitutableBoolean"/>
+    </xsd:attributeGroup>
+
+    <xsd:complexType name="connectionFactoryType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:objectFactoryType">
+                <xsd:attribute name="username" type="xsd:string"/>
+                <xsd:attribute name="password" type="xsd:string"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
+    <!-- ******************************************************************* 
+         Vendor-specific JMS Connectors 
+         ******************************************************************* -->    
+         
+    <xsd:complexType name="vendorJmsConnectorType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:connectorType">
+                <xsd:sequence>
+                    <!-- Optional, a default ConnectionFactory is provided for vendor JMS configs -->
+                    <xsd:element name="connection-factory" type="connectionFactoryType" minOccurs="0" maxOccurs="1"/>
+                    <xsd:group ref="jmsConnectorElements"/>
+                </xsd:sequence>
+                <xsd:attributeGroup ref="jmsConnectorAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="activemq-connector" type="activeMqConnectorType"/>
+    <xsd:element name="activemq-xa-connector" type="activeMqConnectorType"/>
+    
+    <xsd:complexType name="activeMqConnectorType">
+        <xsd:complexContent>
+            <xsd:extension base="vendorJmsConnectorType">
+                <xsd:attribute name="brokerURL" type="xsd:string"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
+    <!-- TODO MULE-1726 -->
+    <xsd:element name="oracleaq-connector">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="vendorJmsConnectorType">
+                    <!-- JDBC Data Source -->
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="weblogic-connector" type="vendorJmsConnectorType"/>
+
+    <xsd:element name="websphere-connector" type="vendorJmsConnectorType"/>
+ 
+</xsd:schema>

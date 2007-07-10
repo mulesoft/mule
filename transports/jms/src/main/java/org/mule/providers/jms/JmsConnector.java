@@ -29,16 +29,17 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.lifecycle.Disposable;
+import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.StartException;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.provider.UMOMessageAdapter;
-import org.mule.util.BeanUtils;
-import org.mule.util.ClassUtils;
+import org.mule.util.object.JndiObjectFactory;
+import org.mule.util.object.ObjectFactory;
+import org.mule.util.object.SimpleObjectFactory;
 
-import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
-import java.util.Hashtable;
 import java.util.Map;
 
 import javax.jms.Connection;
@@ -52,7 +53,6 @@ import javax.jms.TemporaryQueue;
 import javax.jms.TemporaryTopic;
 import javax.jms.XAConnectionFactory;
 import javax.naming.Context;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.apache.commons.lang.UnhandledException;
@@ -65,22 +65,10 @@ import org.apache.commons.lang.UnhandledException;
 
 public class JmsConnector extends AbstractConnector implements ConnectionNotificationListener
 {
-    /* Register the Jms Exception reader if this class gets loaded */
-    static
-    {
-        ExceptionHelper.registerExceptionReader(new JmsExceptionReader());
-    }
-
-    private String connectionFactoryJndiName;
-
-    private ConnectionFactory connectionFactory;
-
-    private String connectionFactoryClass;
-
-    private String jndiInitialFactory;
-
-    private String jndiProviderUrl;
-
+    ////////////////////////////////////////////////////////////////////////
+    // Properties
+    ////////////////////////////////////////////////////////////////////////
+    
     private int acknowledgementMode = Session.AUTO_ACKNOWLEDGE;
 
     private String clientId;
@@ -93,47 +81,133 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     
     private boolean honorQosHeaders;
 
-    private Map jndiProviderProperties;
-
-    private Map connectionFactoryProperties;
-
-    private Connection connection;
-
-    private String specification = JmsConstants.JMS_SPECIFICATION_102B;
-
-    private JmsSupport jmsSupport;
-
-    private Context jndiContext;
-
-    private boolean jndiDestinations = false;
-
-    private boolean forceJndiDestinations = false;
-
-    public String username = null;
-
-    public String password = null;
-
     private int maxRedelivery = 0;
-
-    private String redeliveryHandler = DefaultRedeliveryHandler.class.getName();
 
     private boolean cacheJmsSessions = false;
 
     private boolean recoverJmsConnections = true;
 
-    private JmsTopicResolver topicResolver;
-
     /** Whether to create a consumer on connect. */
     private boolean eagerConsumer = true;
 
-    public JmsConnector()
+    ////////////////////////////////////////////////////////////////////////
+    // JMS Connection
+    ////////////////////////////////////////////////////////////////////////
+    
+    /** Factory used to get an instance of the ConnectionFactory. */
+    // TODO type-checking with JDK 5
+    private ObjectFactory/*<ConnectionFactory>*/ connectionFactory;
+
+    public String username = null;
+
+    public String password = null;
+
+    /**
+     * JMS Connection, not settable by the user.
+     */
+    private Connection _connection;
+
+    ////////////////////////////////////////////////////////////////////////
+    // Strategy classes
+    ////////////////////////////////////////////////////////////////////////
+    
+    private String specification = JmsConstants.JMS_SPECIFICATION_102B;
+
+    private JmsSupport jmsSupport;
+
+    private JmsTopicResolver topicResolver;
+
+    /** Factory used to get an instance of the RedeliveryHandler. */
+    // TODO type-checking with JDK 5
+    private ObjectFactory/*<RedeliveryHandler>*/ redeliveryHandler;
+    
+    ////////////////////////////////////////////////////////////////////////
+    // JNDI
+    ////////////////////////////////////////////////////////////////////////
+
+    /**
+     * The JNDI Context can be configured on its own or, if a JndiObjectFactory is used for 
+     * <code>connectionFactory</code>, it will get configured from there.
+     */
+    private Context jndiContext;
+    
+    private boolean jndiDestinations = false;
+
+    private boolean forceJndiDestinations = false;
+
+    /**
+     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead. 
+     * @see http://www.springframework.org/docs/reference/xsd-config.html#xsd-config-body-schemas-jee
+     * @see org.mule.util.object.JndiObjectFactory
+     */
+    private String connectionFactoryJndiName;
+
+    /**
+     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead. 
+     * @see http://www.springframework.org/docs/reference/xsd-config.html#xsd-config-body-schemas-jee
+     * @see org.mule.util.object.JndiObjectFactory
+     */
+    private String jndiInitialFactory;
+
+    /**
+     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead. 
+     * @see http://www.springframework.org/docs/reference/xsd-config.html#xsd-config-body-schemas-jee
+     * @see org.mule.util.object.JndiObjectFactory
+     */
+    private String jndiProviderUrl;
+
+    /**
+     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead. 
+     * @see http://www.springframework.org/docs/reference/xsd-config.html#xsd-config-body-schemas-jee
+     * @see org.mule.util.object.JndiObjectFactory
+     */
+    private Map jndiProviderProperties;
+
+    ////////////////////////////////////////////////////////////////////////
+    // Methods
+    ////////////////////////////////////////////////////////////////////////
+
+    /* Register the Jms Exception reader if this class gets loaded */
+    static
     {
-        super();
-        topicResolver = new DefaultJmsTopicResolver(this);
+        ExceptionHelper.registerExceptionReader(new JmsExceptionReader());
+    }
+
+    public String getProtocol()
+    {
+        return "jms";
     }
 
     protected void doInitialise() throws InitialisationException
     {
+        if (connectionFactory == null)
+        {
+            if (jndiInitialFactory != null)
+            {
+                connectionFactory = new JndiObjectFactory(connectionFactoryJndiName, jndiInitialFactory, jndiProviderUrl, jndiProviderProperties);
+                ((Initialisable) connectionFactory).initialise();
+                jndiContext = ((JndiObjectFactory) connectionFactory).getContext();
+            }
+            else if (getDefaultConnectionFactory() != null)
+            {
+                connectionFactory = getDefaultConnectionFactory();
+                ((Initialisable) connectionFactory).initialise();
+            }
+            else
+            {
+                throw new InitialisationException(JmsMessages.noConnectionFactorySet(), this);
+            }
+        }
+        
+        if (topicResolver == null)
+        {
+            topicResolver = new DefaultJmsTopicResolver(this);
+        }
+        if (redeliveryHandler == null)
+        {
+            redeliveryHandler = new SimpleObjectFactory(DefaultRedeliveryHandler.class);
+            ((Initialisable) redeliveryHandler).initialise();
+        }            
 
         try
         {
@@ -145,112 +219,66 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         }
     }
 
+    /** Override this method to provide a default ConnectionFactory for a vendor-specific JMS Connector. */
+    protected ObjectFactory/*<ConnectionFactory>*/ getDefaultConnectionFactory()
+    {
+        return null;
+    }
+    
     protected void doDispose()
     {
-        if (connection != null)
+        if (_connection != null)
         {
             try
             {
-                connection.close();
+                _connection.close();
             }
             catch (JMSException e)
             {
                 logger.error("Jms connector failed to dispose properly: ", e);
             }
-            connection = null;
+            _connection = null;
         }
 
-        if (jndiContext != null)
+        if (connectionFactory != null && connectionFactory instanceof Disposable)
         {
-            try
-            {
-                jndiContext.close();
-            }
-            catch (NamingException e)
-            {
-                logger.error("Jms connector failed to dispose properly: ", e);
-            }
-            // need this line to flag for reinitialization in ConnectionStrategy
-            jndiContext = null;
-        }
-    }
-
-    protected void initJndiContext() throws NamingException, InitialisationException
-    {
-        if (jndiContext == null)
-        {
-            Hashtable props = new Hashtable();
-
-            if (jndiInitialFactory != null)
-            {
-                props.put(Context.INITIAL_CONTEXT_FACTORY, jndiInitialFactory);
-            }
-            else if (jndiProviderProperties == null
-                    || !jndiProviderProperties.containsKey(Context.INITIAL_CONTEXT_FACTORY))
-            {
-                throw new InitialisationException(CoreMessages.objectIsNull("jndiInitialFactory"), this);
-            }
-
-            if (jndiProviderUrl != null)
-            {
-                props.put(Context.PROVIDER_URL, jndiProviderUrl);
-            }
-
-            if (jndiProviderProperties != null)
-            {
-                props.putAll(jndiProviderProperties);
-            }
-            jndiContext = new InitialContext(props);
-        }
-    }
-
-    protected void setConnection(Connection connection)
-    {
-        this.connection = connection;
-    }
-
-    protected ConnectionFactory createConnectionFactory() throws InitialisationException, NamingException
-    {
-
-        Object temp = jndiContext.lookup(connectionFactoryJndiName);
-
-        if (temp instanceof ConnectionFactory)
-        {
-            return (ConnectionFactory) temp;
-        }
-        else
-        {
-            throw new InitialisationException(
-                    JmsMessages.invalidResourceType(ConnectionFactory.class,
-                            (temp == null ? null : temp.getClass())), this);
+            ((Disposable) connectionFactory).dispose();
         }
     }
 
     protected Connection createConnection() throws NamingException, JMSException, InitialisationException
     {
+        ConnectionFactory cf;
         Connection connection;
 
-        if (connectionFactory == null)
+        try
         {
-            connectionFactory = createConnectionFactory();
+            cf = (ConnectionFactory) connectionFactory.create();
+        }
+        catch (Exception e)
+        {
+            throw new InitialisationException(e, this);
+        }
+        if (cf == null)
+        {
+            throw new InitialisationException(CoreMessages.failedToCreate("ConnectionFactory"), this);
         }
 
-        if (connectionFactory != null && connectionFactory instanceof XAConnectionFactory)
+        if (cf instanceof XAConnectionFactory)
         {
             if (managementContext.getTransactionManager() != null)
             {
-                connectionFactory = new ConnectionFactoryWrapper(connectionFactory, managementContext
-                        .getTransactionManager());
+                cf = new ConnectionFactoryWrapper(cf, managementContext.getTransactionManager());
             }
         }
 
         if (username != null)
         {
-            connection = jmsSupport.createConnection(connectionFactory, username, password);
+            connection = jmsSupport.createConnection(cf, username, password);
         }
         else
         {
-            connection = jmsSupport.createConnection(connectionFactory);
+            connection = jmsSupport.createConnection(cf);
         }
 
         if (clientId != null)
@@ -304,51 +332,16 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     {
         try
         {
-            // have to instanciate it here, and not earlier in
-            // MuleXmlConfigurationBuilder, as
-            // native factory may initiate immediate connections, and that is not
-            // what we
-            // want if the descriptor's initial state is paused.
-            if (connectionFactoryClass != null)
-            {
-                connectionFactory = (ConnectionFactory) ClassUtils.instanciateClass(connectionFactoryClass,
-                        ClassUtils.NO_ARGS);
-            }
-
-            // If we have a connection factory, there is no need to initialise
-            // the JndiContext
-            if (connectionFactory == null || jndiInitialFactory != null)
-            {
-                initJndiContext();
-            }
-            else
-            {
-                // Set these to false so that the jndiContext
-                // will not be used by the JmsSupport classes
-                jndiDestinations = false;
-                forceJndiDestinations = false;
-            }
-
             if (jmsSupport == null)
             {
                 if (JmsConstants.JMS_SPECIFICATION_102B.equals(specification))
                 {
-                    jmsSupport = new Jms102bSupport(this, jndiContext, jndiDestinations,
-                            forceJndiDestinations);
+                    jmsSupport = new Jms102bSupport(this);
                 }
                 else
                 {
-                    jmsSupport = new Jms11Support(this, jndiContext, jndiDestinations, forceJndiDestinations);
+                    jmsSupport = new Jms11Support(this);
                 }
-            }
-            if (connectionFactory == null)
-            {
-                connectionFactory = createConnectionFactory();
-            }
-            if (connectionFactoryProperties != null && !connectionFactoryProperties.isEmpty())
-            {
-                // apply connection factory properties
-                BeanUtils.populateWithoutFail(connectionFactory, connectionFactoryProperties, true);
             }
         }
         catch (Exception e)
@@ -358,10 +351,10 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
         try
         {
-            connection = createConnection();
+            _connection = createConnection();
             if (started.get())
             {
-                connection.start();
+                _connection.start();
             }
         }
         catch (Exception e)
@@ -374,9 +367,9 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     {
         try
         {
-            if (connection != null)
+            if (_connection != null)
             {
-                connection.close();
+                _connection.close();
             }
         }
         catch (Exception e)
@@ -386,7 +379,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         finally
         {
             // connectionFactory = null;
-            connection = null;
+            _connection = null;
         }
     }
 
@@ -407,14 +400,14 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
         if (tx != null)
         {
-            if (tx.hasResource(connection))
+            if (tx.hasResource(_connection))
             {
                 if (logger.isDebugEnabled())
                 {
                     logger.debug("Retrieving jms session from current transaction " + tx);
                 }
 
-                return (Session) tx.getResource(connection);
+                return (Session) tx.getResource(_connection);
             }
         }
         return null;
@@ -451,14 +444,14 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
                             Boolean.valueOf(noLocal)}));
         }
 
-        session = jmsSupport.createSession(connection, topic, transacted || tx != null, acknowledgementMode,
+        session = jmsSupport.createSession(_connection, topic, transacted || tx != null, acknowledgementMode,
                 noLocal);
         if (tx != null)
         {
             logger.debug("Binding session to current transaction");
             try
             {
-                tx.bindResource(connection, session);
+                tx.bindResource(_connection, session);
             }
             catch (TransactionException e)
             {
@@ -470,11 +463,11 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
     protected void doStart() throws UMOException
     {
-        if (connection != null)
+        if (_connection != null)
         {
             try
             {
-                connection.start();
+                _connection.start();
             }
             catch (JMSException e)
             {
@@ -488,360 +481,9 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         // template method
     }
 
-    public String getProtocol()
-    {
-        return "jms";
-    }
-
-    /** @return Returns the acknowledgeMode. */
-    public int getAcknowledgementMode()
-    {
-        return acknowledgementMode;
-    }
-
-    /** @param acknowledgementMode The acknowledgementMode to set. */
-    public void setAcknowledgementMode(int acknowledgementMode)
-    {
-        this.acknowledgementMode = acknowledgementMode;
-    }
-
-    /** @return Returns the connectionFactoryJndiName. */
-    public String getConnectionFactoryJndiName()
-    {
-        return connectionFactoryJndiName;
-    }
-
-    /** @param connectionFactoryJndiName The connectionFactoryJndiName to set. */
-    public void setConnectionFactoryJndiName(String connectionFactoryJndiName)
-    {
-        this.connectionFactoryJndiName = connectionFactoryJndiName;
-    }
-
-    /** @return Returns the durable. */
-    public boolean isDurable()
-    {
-        return durable;
-    }
-
-    /** @param durable The durable to set. */
-    public void setDurable(boolean durable)
-    {
-        this.durable = durable;
-    }
-
-    /** @return Returns the noLocal. */
-    public boolean isNoLocal()
-    {
-        return noLocal;
-    }
-
-    /** @param noLocal The noLocal to set. */
-    public void setNoLocal(boolean noLocal)
-    {
-        this.noLocal = noLocal;
-    }
-
-    /** @return Returns the persistentDelivery. */
-    public boolean isPersistentDelivery()
-    {
-        return persistentDelivery;
-    }
-
-    /** @param persistentDelivery The persistentDelivery to set. */
-    public void setPersistentDelivery(boolean persistentDelivery)
-    {
-        this.persistentDelivery = persistentDelivery;
-    }
-
-    /**
-     * Sets <code>honorQosHeaders</code> property, which determines whether <code>JmsMessageDispatcher</code>
-     * should honor incoming message's QoS headers (JMSPriority, JMSDeliveryMode).
-     * @param honorQosHeaders <code>true</code> if <code>JmsMessageDispatcher</code> should honor incoming
-     * message's QoS headers; otherwise <code>false</code> Default is <code>false</code>, meaning that
-     * connector settings will override message headers.
-     */
-    public void setHonorQosHeaders(boolean honorQosHeaders)
-    {
-        this.honorQosHeaders = honorQosHeaders;
-    }
-
-    /**
-     * Gets the value of <code>honorQosHeaders</code> property.
-     * @return <code>true</code> if <code>JmsMessageDispatcher</code> should honor incoming
-     * message's QoS headers; otherwise <code>false</code> Default is <code>false</code>, meaning that
-     * connector settings will override message headers.
-     */
-    public boolean isHonorQosHeaders()
-    {
-        return honorQosHeaders;
-    }
-    
-    /**
-     * @return Returns the JNDI providerProperties.
-     * @since 1.1
-     */
-    public Map getJndiProviderProperties()
-    {
-        return jndiProviderProperties;
-    }
-
-    /**
-     * @param jndiProviderProperties The JNDI providerProperties to set.
-     * @since 1.1
-     */
-    public void setJndiProviderProperties(final Map jndiProviderProperties)
-    {
-        this.jndiProviderProperties = jndiProviderProperties;
-    }
-
-    /** @return Returns underlying connection factory properties. */
-    public Map getConnectionFactoryProperties()
-    {
-        return connectionFactoryProperties;
-    }
-
-    /**
-     * @param connectionFactoryProperties properties to be set on the underlying
-     *                                    ConnectionFactory.
-     */
-    public void setConnectionFactoryProperties(final Map connectionFactoryProperties)
-    {
-        this.connectionFactoryProperties = connectionFactoryProperties;
-    }
-
-    public String getJndiInitialFactory()
-    {
-        return jndiInitialFactory;
-    }
-
-    public void setJndiInitialFactory(String jndiInitialFactory)
-    {
-        this.jndiInitialFactory = jndiInitialFactory;
-    }
-
-    public String getJndiProviderUrl()
-    {
-        return jndiProviderUrl;
-    }
-
-    public void setJndiProviderUrl(String jndiProviderUrl)
-    {
-        this.jndiProviderUrl = jndiProviderUrl;
-    }
-
-    public ConnectionFactory getConnectionFactory()
-    {
-        return connectionFactory;
-    }
-
-    public void setConnectionFactory(ConnectionFactory connectionFactory)
-    {
-        this.connectionFactory = connectionFactory;
-    }
-
-    public String getConnectionFactoryClass()
-    {
-        return connectionFactoryClass;
-    }
-
-    public void setConnectionFactoryClass(String connectionFactoryClass)
-    {
-        this.connectionFactoryClass = connectionFactoryClass;
-    }
-
-    public JmsSupport getJmsSupport()
-    {
-        return jmsSupport;
-    }
-
-    public void setJmsSupport(JmsSupport jmsSupport)
-    {
-        this.jmsSupport = jmsSupport;
-    }
-
-    public String getSpecification()
-    {
-        return specification;
-    }
-
-    public void setSpecification(String specification)
-    {
-        this.specification = specification;
-    }
-
-    public boolean isJndiDestinations()
-    {
-        return jndiDestinations;
-    }
-
-    public void setJndiDestinations(boolean jndiDestinations)
-    {
-        this.jndiDestinations = jndiDestinations;
-    }
-
-    public boolean isForceJndiDestinations()
-    {
-        return forceJndiDestinations;
-    }
-
-    public void setForceJndiDestinations(boolean forceJndiDestinations)
-    {
-        this.forceJndiDestinations = forceJndiDestinations;
-    }
-
-    public Context getJndiContext()
-    {
-        return jndiContext;
-    }
-
-    public void setJndiContext(Context jndiContext)
-    {
-        this.jndiContext = jndiContext;
-    }
-
-    public void setRecoverJmsConnections(boolean recover)
-    {
-        this.recoverJmsConnections = recover;
-    }
-
-    public boolean isRecoverJmsConnections()
-    {
-        return this.recoverJmsConnections;
-    }
-
-    protected RedeliveryHandler createRedeliveryHandler()
-            throws IllegalAccessException, NoSuchMethodException, InvocationTargetException,
-            InstantiationException, ClassNotFoundException
-    {
-        if (redeliveryHandler != null)
-        {
-            return (RedeliveryHandler) ClassUtils.instanciateClass(redeliveryHandler, ClassUtils.NO_ARGS);
-        }
-        else
-        {
-            return new DefaultRedeliveryHandler();
-        }
-    }
-
     public ReplyToHandler getReplyToHandler()
     {
         return new JmsReplyToHandler(this, getDefaultResponseTransformer());
-    }
-
-    public String getUsername()
-    {
-        return username;
-    }
-
-    public void setUsername(String username)
-    {
-        this.username = username;
-    }
-
-    public String getPassword()
-    {
-        return password;
-    }
-
-    public void setPassword(String password)
-    {
-        this.password = password;
-    }
-
-    /** @return Returns the connection. */
-    public Connection getConnection()
-    {
-        return connection;
-    }
-
-    public String getClientId()
-    {
-        return clientId;
-    }
-
-    public void setClientId(String clientId)
-    {
-        this.clientId = clientId;
-    }
-
-    public int getMaxRedelivery()
-    {
-        return maxRedelivery;
-    }
-
-    public void setMaxRedelivery(int maxRedelivery)
-    {
-        this.maxRedelivery = maxRedelivery;
-    }
-
-    public String getRedeliveryHandler()
-    {
-        return redeliveryHandler;
-    }
-
-    public void setRedeliveryHandler(String redeliveryHandler)
-    {
-        this.redeliveryHandler = redeliveryHandler;
-    }
-
-    public boolean isRemoteSyncEnabled()
-    {
-        return true;
-    }
-
-
-    /**
-     * Getter for property 'topicResolver'.
-     *
-     * @return Value for property 'topicResolver'.
-     */
-    public JmsTopicResolver getTopicResolver()
-    {
-        return topicResolver;
-    }
-
-    /**
-     * Setter for property 'topicResolver'.
-     *
-     * @param topicResolver Value to set for property 'topicResolver'.
-     */
-    public void setTopicResolver(final JmsTopicResolver topicResolver)
-    {
-        this.topicResolver = topicResolver;
-    }
-
-    /**
-     * Getter for property 'eagerConsumer'. Default
-     * is {@code true}.
-     *
-     * @return Value for property 'eagerConsumer'.
-     * @see #eagerConsumer
-     */
-    public boolean isEagerConsumer()
-    {
-        return eagerConsumer;
-    }
-
-    /**
-     * A value of {@code true} will create a consumer on
-     * connect, in contrast to lazy instantiation in the poll loop.
-     * This setting very much depends on the JMS vendor.
-     * Affects transactional receivers, typical symptoms are:
-     * <ul>
-     * <li> consumer thread hanging forever, though a message is
-     * available
-     * <li>failure to consume the first message (the rest
-     * are fine)
-     * </ul>
-     * <p/>
-     *
-     * @param eagerConsumer Value to set for property 'eagerConsumer'.
-     * @see #eagerConsumer
-     * @see org.mule.providers.jms.TransactedJmsMessageReceiver
-     */
-    public void setEagerConsumer(final boolean eagerConsumer)
-    {
-        this.eagerConsumer = eagerConsumer;
     }
 
     public void onNotification(UMOServerNotification notification)
@@ -857,16 +499,6 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
             // AbstractConnector.connect(AbstractConnector.java:927)
             // disposeReceivers();
         }
-    }
-
-    public boolean isCacheJmsSessions()
-    {
-        return cacheJmsSessions;
-    }
-
-    public void setCacheJmsSessions(boolean cacheJmsSessions)
-    {
-        this.cacheJmsSessions = cacheJmsSessions;
     }
 
     /**
@@ -1076,4 +708,361 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
             }
         }
     }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Getters and Setters
+    ////////////////////////////////////////////////////////////////////////
+    
+    /** @return Returns the connection. */
+    public Connection getConnection()
+    {
+        return _connection;
+    }
+
+    protected void setConnection(Connection connection)
+    {
+        this._connection = connection;
+    }
+
+    /** @return Returns the acknowledgeMode. */
+    public int getAcknowledgementMode()
+    {
+        return acknowledgementMode;
+    }
+
+    /** @param acknowledgementMode The acknowledgementMode to set. */
+    public void setAcknowledgementMode(int acknowledgementMode)
+    {
+        this.acknowledgementMode = acknowledgementMode;
+    }
+
+    /** @return Returns the durable. */
+    public boolean isDurable()
+    {
+        return durable;
+    }
+
+    /** @param durable The durable to set. */
+    public void setDurable(boolean durable)
+    {
+        this.durable = durable;
+    }
+
+    /** @return Returns the noLocal. */
+    public boolean isNoLocal()
+    {
+        return noLocal;
+    }
+
+    /** @param noLocal The noLocal to set. */
+    public void setNoLocal(boolean noLocal)
+    {
+        this.noLocal = noLocal;
+    }
+
+    /** @return Returns the persistentDelivery. */
+    public boolean isPersistentDelivery()
+    {
+        return persistentDelivery;
+    }
+
+    /** @param persistentDelivery The persistentDelivery to set. */
+    public void setPersistentDelivery(boolean persistentDelivery)
+    {
+        this.persistentDelivery = persistentDelivery;
+    }
+
+    public JmsSupport getJmsSupport()
+    {
+        return jmsSupport;
+    }
+
+    public void setJmsSupport(JmsSupport jmsSupport)
+    {
+        this.jmsSupport = jmsSupport;
+    }
+
+    public String getSpecification()
+    {
+        return specification;
+    }
+
+    public void setSpecification(String specification)
+    {
+        this.specification = specification;
+    }
+
+    public void setRecoverJmsConnections(boolean recover)
+    {
+        this.recoverJmsConnections = recover;
+    }
+
+    public boolean isRecoverJmsConnections()
+    {
+        return this.recoverJmsConnections;
+    }
+    
+    public String getUsername()
+    {
+        return username;
+    }
+
+    public void setUsername(String username)
+    {
+        this.username = username;
+    }
+
+    public String getPassword()
+    {
+        return password;
+    }
+
+    public void setPassword(String password)
+    {
+        this.password = password;
+    }
+
+    public String getClientId()
+    {
+        return clientId;
+    }
+
+    public void setClientId(String clientId)
+    {
+        this.clientId = clientId;
+    }
+
+    public int getMaxRedelivery()
+    {
+        return maxRedelivery;
+    }
+
+    public void setMaxRedelivery(int maxRedelivery)
+    {
+        this.maxRedelivery = maxRedelivery;
+    }
+
+    public boolean isRemoteSyncEnabled()
+    {
+        return true;
+    }
+
+
+    /**
+     * Getter for property 'topicResolver'.
+     *
+     * @return Value for property 'topicResolver'.
+     */
+    public JmsTopicResolver getTopicResolver()
+    {
+        return topicResolver;
+    }
+
+    /**
+     * Setter for property 'topicResolver'.
+     *
+     * @param topicResolver Value to set for property 'topicResolver'.
+     */
+    public void setTopicResolver(final JmsTopicResolver topicResolver)
+    {
+        this.topicResolver = topicResolver;
+    }
+
+    /**
+     * Getter for property 'eagerConsumer'. Default
+     * is {@code true}.
+     *
+     * @return Value for property 'eagerConsumer'.
+     * @see #eagerConsumer
+     */
+    public boolean isEagerConsumer()
+    {
+        return eagerConsumer;
+    }
+
+    /**
+     * A value of {@code true} will create a consumer on
+     * connect, in contrast to lazy instantiation in the poll loop.
+     * This setting very much depends on the JMS vendor.
+     * Affects transactional receivers, typical symptoms are:
+     * <ul>
+     * <li> consumer thread hanging forever, though a message is
+     * available
+     * <li>failure to consume the first message (the rest
+     * are fine)
+     * </ul>
+     * <p/>
+     *
+     * @param eagerConsumer Value to set for property 'eagerConsumer'.
+     * @see #eagerConsumer
+     * @see org.mule.providers.jms.TransactedJmsMessageReceiver
+     */
+    public void setEagerConsumer(final boolean eagerConsumer)
+    {
+        this.eagerConsumer = eagerConsumer;
+    }
+
+    public boolean isCacheJmsSessions()
+    {
+        return cacheJmsSessions;
+    }
+
+    public void setCacheJmsSessions(boolean cacheJmsSessions)
+    {
+        this.cacheJmsSessions = cacheJmsSessions;
+    }
+
+    public ObjectFactory getConnectionFactory()
+    {
+        return connectionFactory;
+    }
+
+    public void setConnectionFactory(ObjectFactory connectionFactory)
+    {
+        this.connectionFactory = connectionFactory;
+    }
+
+    public ObjectFactory getRedeliveryHandler()
+    {
+        return redeliveryHandler;
+    }
+
+    public void setRedeliveryHandler(ObjectFactory redeliveryHandler)
+    {
+        this.redeliveryHandler = redeliveryHandler;
+    }
+
+    public boolean isJndiDestinations()
+    {
+        return jndiDestinations;
+    }
+
+    public void setJndiDestinations(boolean jndiDestinations)
+    {
+        this.jndiDestinations = jndiDestinations;
+    }
+
+    public Context getJndiContext()
+    {
+        return jndiContext;
+    }
+
+    public void setJndiContext(Context jndiContext)
+    {
+        this.jndiContext = jndiContext;
+    }
+    
+    public boolean isForceJndiDestinations()
+    {
+        return forceJndiDestinations;
+    }
+
+    public void setForceJndiDestinations(boolean forceJndiDestinations)
+    {
+        this.forceJndiDestinations = forceJndiDestinations;
+    }
+    
+    /**
+    * Sets <code>honorQosHeaders</code> property, which determines whether <code>JmsMessageDispatcher</code>
+    * should honor incoming message's QoS headers (JMSPriority, JMSDeliveryMode).
+    * @param honorQosHeaders <code>true</code> if <code>JmsMessageDispatcher</code> should honor incoming
+    * message's QoS headers; otherwise <code>false</code> Default is <code>false</code>, meaning that
+    * connector settings will override message headers.
+    */
+   public void setHonorQosHeaders(boolean honorQosHeaders)
+   {
+       this.honorQosHeaders = honorQosHeaders;
+   }
+
+   /**
+    * Gets the value of <code>honorQosHeaders</code> property.
+    * @return <code>true</code> if <code>JmsMessageDispatcher</code> should honor incoming
+    * message's QoS headers; otherwise <code>false</code> Default is <code>false</code>, meaning that
+    * connector settings will override message headers.
+    */
+   public boolean isHonorQosHeaders()
+   {
+       return honorQosHeaders;
+   }
+   
+    /**
+     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead. 
+     * @see http://www.springframework.org/docs/reference/xsd-config.html#xsd-config-body-schemas-jee
+     * @see org.mule.util.object.JndiObjectFactory
+     */
+    public String getConnectionFactoryJndiName()
+    {
+        return connectionFactoryJndiName;
+    }
+
+    /**
+     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead. 
+     * @see http://www.springframework.org/docs/reference/xsd-config.html#xsd-config-body-schemas-jee
+     * @see org.mule.util.object.JndiObjectFactory
+     */
+    public void setConnectionFactoryJndiName(String connectionFactoryJndiName)
+    {
+        this.connectionFactoryJndiName = connectionFactoryJndiName;
+    }
+
+    /**
+     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead. 
+     * @see http://www.springframework.org/docs/reference/xsd-config.html#xsd-config-body-schemas-jee
+     * @see org.mule.util.object.JndiObjectFactory
+     */
+    public String getJndiInitialFactory()
+    {
+        return jndiInitialFactory;
+    }
+
+    /**
+     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead. 
+     * @see http://www.springframework.org/docs/reference/xsd-config.html#xsd-config-body-schemas-jee
+     * @see org.mule.util.object.JndiObjectFactory
+     */
+    public void setJndiInitialFactory(String jndiInitialFactory)
+    {
+        this.jndiInitialFactory = jndiInitialFactory;
+    }
+
+    /**
+     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead. 
+     * @see http://www.springframework.org/docs/reference/xsd-config.html#xsd-config-body-schemas-jee
+     * @see org.mule.util.object.JndiObjectFactory
+     */
+    public String getJndiProviderUrl()
+    {
+        return jndiProviderUrl;
+    }
+
+    /**
+     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead. 
+     * @see http://www.springframework.org/docs/reference/xsd-config.html#xsd-config-body-schemas-jee
+     * @see org.mule.util.object.JndiObjectFactory
+     */
+    public void setJndiProviderUrl(String jndiProviderUrl)
+    {
+        this.jndiProviderUrl = jndiProviderUrl;
+    }
+
+    /**
+     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead. 
+     * @see http://www.springframework.org/docs/reference/xsd-config.html#xsd-config-body-schemas-jee
+     * @see org.mule.util.object.JndiObjectFactory
+     */
+    public Map getJndiProviderProperties()
+    {
+        return jndiProviderProperties;
+    }
+
+    /**
+     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead. 
+     * @see http://www.springframework.org/docs/reference/xsd-config.html#xsd-config-body-schemas-jee
+     * @see org.mule.util.object.JndiObjectFactory
+     */
+    public void setJndiProviderProperties(final Map jndiProviderProperties)
+    {
+        this.jndiProviderProperties = jndiProviderProperties;
+    }
+
 }

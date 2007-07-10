@@ -22,7 +22,6 @@ import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.Topic;
-import javax.naming.Context;
 import javax.naming.NamingException;
 
 /**
@@ -32,20 +31,11 @@ import javax.naming.NamingException;
 
 public class Jms11Support implements JmsSupport
 {
-    protected Context context;
-    protected boolean jndiDestinations = false;
-    protected boolean forceJndiDestinations = false;
     protected JmsConnector connector;
 
-    public Jms11Support(JmsConnector connector,
-                        Context context,
-                        boolean jndiDestinations,
-                        boolean forceJndiDestinations)
+    public Jms11Support(JmsConnector connector)
     {
         this.connector = connector;
-        this.context = context;
-        this.jndiDestinations = jndiDestinations;
-        this.forceJndiDestinations = forceJndiDestinations;
     }
 
     public Connection createConnection(ConnectionFactory connectionFactory, String username, String password)
@@ -132,19 +122,14 @@ public class Jms11Support implements JmsSupport
             throw new IllegalArgumentException("Destination name cannot be null when creating a destination");
         }
 
-        if (jndiDestinations)
+        if (connector.isJndiDestinations())
         {
-            if (context == null)
-            {
-                throw new IllegalArgumentException(
-                    "Jndi Context name cannot be null when looking up a destination");
-            }
             Destination dest = getJndiDestination(name);
             if (dest != null)
             {
                 return dest;
             }
-            else if (forceJndiDestinations)
+            else if (connector.isForceJndiDestinations())
             {
                 throw new JMSException("JNDI destination not found with name: " + name);
             }
@@ -165,7 +150,11 @@ public class Jms11Support implements JmsSupport
         Object temp;
         try
         {
-            temp = context.lookup(name);
+            if (connector.getJndiContext() == null)
+            {
+                throw new IllegalArgumentException("Jndi Context has not been configured correctly on the connector.");
+            }
+            temp = connector.getJndiContext().lookup(name);
         }
         catch (NamingException e)
         {
@@ -178,7 +167,7 @@ public class Jms11Support implements JmsSupport
             {
                 return (Destination) temp;
             }
-            else if (forceJndiDestinations)
+            else if (connector.isForceJndiDestinations())
             {
                 throw new JMSException("JNDI destination not found with name: " + name);
             }

@@ -8,12 +8,14 @@
  * LICENSE.txt file.
  */
 
-package org.mule.test.integration.providers.jms.activemq;
+package org.mule.providers.jms.test;
 
-public class ActiveMQJmsTopicFunctionalTestCase extends ActiveMQJmsQueueFunctionalTestCase
+import org.mule.providers.jms.DefaultRedeliveryHandler;
+
+
+public class TestRedeliveryHandler extends DefaultRedeliveryHandler
 {
-    public boolean useTopics()
-    {
-        return true;
-    }
+    // nop
 }
+
+

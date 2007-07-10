@@ -19,8 +19,16 @@
                  <artifactId>maven-surefire-plugin</artifactId>
                  <configuration>
                      <excludes>
-                         <!-- MULE-1846 -->
-                         <exclude>**/*</exclude>
+                         <!-- These are TCK classes, should really be in a separate module (mule-transport-jms-test) -->
+                         <exclude>org/mule/providers/jms/test/*.java</exclude>
+
+                         <!-- Topics not working for some reason -->
+                         <exclude>**/ActiveMQJmsTopicFunctionalTestCase.java</exclude>
+                         <!-- Not sure what this one is trying to test -->
+                         <exclude>**/MultipleJmsConnectorsTestCase.java</exclude>
+                         <!-- Transactions not working yet -->
+                         <exclude>**/*Transaction*TestCase.java</exclude>
+                         <exclude>**/*Xa*TestCase.java</exclude>
                      </excludes>
                  </configuration>
              </plugin>

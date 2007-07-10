@@ -28,7 +28,6 @@ import javax.jms.TopicConnection;
 import javax.jms.TopicConnectionFactory;
 import javax.jms.TopicPublisher;
 import javax.jms.TopicSession;
-import javax.naming.Context;
 
 /**
  * <code>Jms102bSupport</code> is a template class to provide an absstraction
@@ -38,12 +37,9 @@ import javax.naming.Context;
 
 public class Jms102bSupport extends Jms11Support
 {
-    public Jms102bSupport(JmsConnector connector,
-                          Context context,
-                          boolean jndiDestinations,
-                          boolean forceJndiDestinations)
+    public Jms102bSupport(JmsConnector connector)
     {
-        super(connector, context, jndiDestinations, forceJndiDestinations);
+        super(connector);
     }
 
     public Connection createConnection(ConnectionFactory connectionFactory, String username, String password)
@@ -173,9 +169,9 @@ public class Jms102bSupport extends Jms11Support
             throw new IllegalArgumentException("Destination name cannot be null when creating a destination");
         }
 
-        if (jndiDestinations)
+        if (connector.isJndiDestinations())
         {
-            if (context == null)
+            if (connector.getJndiContext() == null)
             {
                 throw new IllegalArgumentException("Jndi Context name cannot be null when looking up a destination");
             }
@@ -184,7 +180,7 @@ public class Jms102bSupport extends Jms11Support
             {
                 return dest;
             }
-            else if (forceJndiDestinations)
+            else if (connector.isForceJndiDestinations())
             {
                 throw new JMSException("JNDI destination not found with name: " + name);
             }

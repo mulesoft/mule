@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
+
+    <bean name="txFactory" class="org.mule.providers.jms.JmsClientAcknowledgeTransactionFactory" />
+    
+    <jms:activemq-connector name="jmsConnector" maxRedelivery="1"
+                            acknowledgementMode="CLIENT_ACKNOWLEDGE">
+        <mule:dispatcher-threading-profile doThreading="false"/>
+        <mule:service-overrides messageReceiver="org.mule.providers.jms.TransactedSingleResourceJmsMessageReceiver"
+                                transactedMessageReceiver="org.mule.providers.jms.TransactedSingleResourceJmsMessageReceiver"/>         
+    </jms:activemq-connector>
+    
+</beans>

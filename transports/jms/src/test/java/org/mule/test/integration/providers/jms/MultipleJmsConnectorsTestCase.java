@@ -10,28 +10,26 @@
 
 package org.mule.test.integration.providers.jms;
 
-import org.mule.extras.client.MuleClient;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.FunctionalTestCase;
+import org.mule.umo.endpoint.UMOEndpoint;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
-
-public class MultipleJmsConnectorsTestCase extends AbstractMuleTestCase
+public class MultipleJmsConnectorsTestCase extends FunctionalTestCase
 {
+    protected String getConfigResources()
+    {
+        return "jms-multiple-connectors.xml";
+    }
+    
     public void testMultipleJmsClientConnections() throws Exception
     {
-        ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(
-            "vm://localhost?broker.persistent=false&broker.useJmx=false");
-
-        MuleClient client = new MuleClient();
-        client.setProperty("jms.connectionFactory", factory);
-        client.setProperty("jms.specification", "1.1");
-        client.getManagementContext().start();
-        client.dispatch("jms://admin:admin@admin.queue?createConnector=ALWAYS", "testing", null);
-        client.dispatch("jms://ross:ross@ross.queue?createConnector=ALWAYS", "testing", null);
+        UMOEndpoint ep1 = managementContext.getRegistry().lookupEndpoint("ep1");
+        ep1.dispatch(getTestEvent("testing"));
+        UMOEndpoint ep2 = managementContext.getRegistry().lookupEndpoint("ep2");
+        ep2.dispatch(getTestEvent("testing"));
 
         // wait a bit to let the messages go on their way
         Thread.sleep(3000);
 
-        assertEquals(2, client.getManagementContext().getRegistry().getConnectors().size());
+        assertEquals(2, managementContext.getRegistry().getConnectors().size());
     }
 }

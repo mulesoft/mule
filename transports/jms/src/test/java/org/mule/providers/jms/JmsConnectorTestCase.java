@@ -12,6 +12,7 @@ package org.mule.providers.jms;
 
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.util.object.SingletonObjectFactory;
 
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
@@ -49,8 +50,8 @@ public class JmsConnectorTestCase extends AbstractConnectorTestCase
             connection.expect("stop");
             connection.expect("stop");
             connection.expect("setClientID", "mule.TestConnector");
-            connector.setConnectionFactory((ConnectionFactory)connectionFactory.proxy());
-            connector.initialise();
+            connector.setConnectionFactory(new SingletonObjectFactory(connectionFactory.proxy()));
+            //connector.initialise();
         }
         return connector;
     }

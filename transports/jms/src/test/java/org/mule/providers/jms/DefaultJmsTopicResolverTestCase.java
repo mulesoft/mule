@@ -10,8 +10,7 @@
 
 package org.mule.providers.jms;
 
-import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.endpoint.UMOEndpoint;
 
 import com.mockobjects.dynamic.Mock;
@@ -19,7 +18,7 @@ import com.mockobjects.dynamic.Mock;
 import javax.jms.Queue;
 import javax.jms.Topic;
 
-public class DefaultJmsTopicResolverTestCase extends AbstractMuleTestCase
+public class DefaultJmsTopicResolverTestCase extends FunctionalTestCase
 {
     private JmsConnector connector;
     private DefaultJmsTopicResolver resolver;
@@ -27,10 +26,15 @@ public class DefaultJmsTopicResolverTestCase extends AbstractMuleTestCase
     protected void doSetUp () throws Exception
     {
         super.doSetUp();
-        connector = new JmsConnector();
-        resolver = new DefaultJmsTopicResolver(connector);
+        connector = (JmsConnector) managementContext.getRegistry().lookupConnector("jmsConnector");
+        resolver = (DefaultJmsTopicResolver) connector.getTopicResolver();
     }
 
+    protected String getConfigResources()
+    {
+        return "jms-topic-resolver.xml";
+    }
+    
     public void testSameConnector()
     {
         assertSame(connector, resolver.getConnector());
@@ -38,25 +42,25 @@ public class DefaultJmsTopicResolverTestCase extends AbstractMuleTestCase
 
     public void testEndpointNotTopicNoFallback() throws Exception
     {
-        UMOEndpoint endpoint = new MuleEndpoint("jms://queue.NotATopic", true);
-        assertFalse(resolver.isTopic(endpoint));
+        UMOEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("ep1");
+        assertFalse(resolver.isTopic(endpoint));        
     }
 
     public void testEndpointTopicNoFallback() throws Exception
     {
-        UMOEndpoint endpoint = new MuleEndpoint("jms://topic:context.ThisIsATopic", true);
+        UMOEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("ep2");
         assertTrue(resolver.isTopic(endpoint));
     }
 
     public void testEndpointNotTopicWithFallback() throws Exception
     {
-        UMOEndpoint endpoint = new MuleEndpoint("jms://context.aTopic?topic=true", true);
+        UMOEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("ep3");
         assertTrue(resolver.isTopic(endpoint, true));
     }
 
     public void testEndpointTopicFallbackNotUsed() throws Exception
     {
-        UMOEndpoint endpoint = new MuleEndpoint("jms://topic:context.ThisIsATopic?topic=false", true);
+        UMOEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("ep4");
         assertTrue(resolver.isTopic(endpoint, true));
     }
 

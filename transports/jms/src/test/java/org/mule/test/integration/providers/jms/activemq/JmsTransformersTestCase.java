@@ -11,10 +11,11 @@
 package org.mule.test.integration.providers.jms.activemq;
 
 import org.mule.impl.RequestContext;
+import org.mule.providers.jms.JmsConnector;
 import org.mule.providers.jms.transformers.AbstractJmsTransformer;
 import org.mule.providers.jms.transformers.JMSMessageToObject;
 import org.mule.providers.jms.transformers.ObjectToJMSMessage;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.test.integration.providers.jms.AbstractJmsFunctionalTestCase;
 import org.mule.util.FileUtils;
 import org.mule.util.compression.CompressionStrategy;
 import org.mule.util.compression.GZipCompression;
@@ -25,38 +26,46 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.jms.BytesMessage;
+import javax.jms.ConnectionFactory;
 import javax.jms.MapMessage;
 import javax.jms.ObjectMessage;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 
 /**
  * <code>JmsTransformersTestCase</code> Tests the JMS transformer implementations.
  */
 
-public class JmsTransformersTestCase extends AbstractMuleTestCase
+public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
 {
-    private ActiveMQConnectionFactory factory = null;
     private Session session = null;
 
-    // @Override
+    protected String getConfigResources()
+    {
+        return "activemq-config.xml";
+    }
+
     protected void doSetUp() throws Exception
     {
-        factory = new ActiveMQConnectionFactory("vm://localhost?broker.persistent=false&broker.useJmx=false");
-
-        session = factory.createConnection().createSession(false, Session.AUTO_ACKNOWLEDGE);
+        super.doSetUp();
+        
+        JmsConnector connector = (JmsConnector) managementContext.getRegistry().lookupConnector("jmsConnector");
+        ConnectionFactory cf = (ConnectionFactory) connector.getConnectionFactory().create();
+        
+        session = cf.createConnection().createSession(false, Session.AUTO_ACKNOWLEDGE);                
     }
 
     // @Override
     protected void doTearDown() throws Exception
     {
         RequestContext.setEvent(null);
-        session.close();
-        session = null;
-        factory = null;
+        if (session != null)
+        {
+            session.close();
+            session = null;
+        }
     }
 
     public void testTransformObjectMessage() throws Exception

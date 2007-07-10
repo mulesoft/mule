@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.test.integration.providers.jms.tools;
+package org.mule.providers.jms.test;
 
 import org.mule.util.ClassUtils;
 import org.mule.util.FileUtils;
@@ -51,8 +51,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * <code>JmsTestUtils</code> contains some helper code necessary to test
- * interaction with different JMS providers.
+ * JMS "plumbing" code which is useful for testing Mule against a JMS provider.  
  */
 public class JmsTestUtils
 {

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
+
+    <jms:custom-connector name="jmsConnector1" class="org.mule.providers.jms.test.TestJmsConnector">
+        <mule:property name="providerProperty" value="TEST_VALUE" />
+        <jms:connection-factory class="org.mule.providers.jms.test.TestConnectionFactory" />
+    </jms:custom-connector>
+
+    <jms:connector name="jmsConnector2">
+        <jms:connection-factory class="org.mule.providers.jms.test.TestConnectionFactory">
+            <mule:properties>
+                <entry key="connectionFactoryProperty" value="TEST_VALUE" />
+            </mule:properties>
+        </jms:connection-factory>            
+    </jms:connector>
+
+</beans>

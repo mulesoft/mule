@@ -27,7 +27,7 @@ public class Jms11SupportTestCase extends AbstractMuleTestCase
 
     public void testNoLocalCalledForDurableTopic() throws Exception
     {
-        Jms11Support jmsSupport = new Jms11Support(new JmsConnector(), null, false, false);
+        Jms11Support jmsSupport = new Jms11Support(new JmsConnector());
 
         Mock mockTopic = new Mock(Topic.class);
         Topic topic = (Topic)mockTopic.proxy();
@@ -49,7 +49,7 @@ public class Jms11SupportTestCase extends AbstractMuleTestCase
 
     public void testNoLocalCalledForNonDurableTopic() throws Exception
     {
-        Jms11Support jmsSupport = new Jms11Support(new JmsConnector(), null, false, false);
+        Jms11Support jmsSupport = new Jms11Support(new JmsConnector());
 
         Mock mockTopic = new Mock(Topic.class);
         Topic topic = (Topic)mockTopic.proxy();
@@ -70,7 +70,7 @@ public class Jms11SupportTestCase extends AbstractMuleTestCase
 
     public void testNoLocalNotCalledForQueue() throws Exception
     {
-        Jms11Support jmsSupport = new Jms11Support(new JmsConnector(), null, false, false);
+        Jms11Support jmsSupport = new Jms11Support(new JmsConnector());
 
         Mock mockQueue = new Mock(Queue.class);
         Queue queue = (Queue)mockQueue.proxy();
@@ -90,7 +90,7 @@ public class Jms11SupportTestCase extends AbstractMuleTestCase
 
     public void testDurableWithQueueThrowsException() throws Exception
     {
-        Jms11Support jmsSupport = new Jms11Support(new JmsConnector(), null, false, false);
+        Jms11Support jmsSupport = new Jms11Support(new JmsConnector());
 
         Mock mockQueue = new Mock(Queue.class);
         Queue queue = (Queue)mockQueue.proxy();

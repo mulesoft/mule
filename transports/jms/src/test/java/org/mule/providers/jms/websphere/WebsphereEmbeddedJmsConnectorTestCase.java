@@ -11,14 +11,22 @@
 package org.mule.providers.jms.websphere;
 
 import org.mule.providers.jms.DefaultJmsTopicResolver;
+import org.mule.providers.jms.JmsConnector;
 import org.mule.providers.jms.JmsTopicResolver;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.FunctionalTestCase;
 
-public class WebsphereEmbeddedJmsConnectorTestCase extends AbstractMuleTestCase
+public class WebsphereEmbeddedJmsConnectorTestCase extends FunctionalTestCase
 {
-    public void testConfigurationDefaults()
+    protected String getConfigResources()
     {
-        WebsphereJmsConnector c = new WebsphereJmsConnector();
+        return "websphere-config.xml";
+    }
+
+    public void testDefaultConfig() throws Exception
+    {
+        JmsConnector c = (JmsConnector)managementContext.getRegistry().lookupConnector("jmsConnector");
+        assertNotNull(c);
+
         // TODO has to be confirmed for Websphere
         assertTrue(c.isEagerConsumer());
         assertFalse("JMS connection recovery is not supported by Websphere Embedded provider.",

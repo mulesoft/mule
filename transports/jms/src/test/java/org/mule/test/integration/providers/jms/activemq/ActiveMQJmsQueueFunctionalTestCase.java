@@ -10,46 +10,12 @@
 
 package org.mule.test.integration.providers.jms.activemq;
 
-import org.mule.providers.jms.JmsConnector;
-import org.mule.providers.jms.JmsConstants;
-import org.mule.providers.jms.activemq.ActiveMqJmsConnector;
 import org.mule.test.integration.providers.jms.AbstractJmsQueueFunctionalTestCase;
-
-import java.util.HashMap;
-
-import javax.jms.ConnectionFactory;
-
-import org.apache.activemq.ActiveMQConnectionFactory;
 
 public class ActiveMQJmsQueueFunctionalTestCase extends AbstractJmsQueueFunctionalTestCase
 {
-    protected ActiveMQConnectionFactory factory = null;
-
-    public ConnectionFactory getConnectionFactory() throws Exception
+    protected String getConfigResources()
     {
-        if (factory == null)
-        {
-            factory = new ActiveMQConnectionFactory("vm://localhost?broker.persistent=false&broker.useJmx=false");
-        }
-        return factory;
-    }
-
-    protected void doTearDown() throws Exception
-    {
-        factory = null;
-        super.doTearDown();
-    }
-
-    public JmsConnector createConnector() throws Exception
-    {
-        ActiveMqJmsConnector connector = new ActiveMqJmsConnector();
-        connector.setSpecification(JmsConstants.JMS_SPECIFICATION_11);
-        connector.setName(CONNECTOR_NAME);
-        connector.getDispatcherThreadingProfile().setDoThreading(false);
-
-        HashMap overrides = new HashMap();
-        overrides.put("message.receiver", JmsMessageReceiverSynchronous.class.getName());
-        connector.setServiceOverrides(overrides);
-        return connector;
+        return "activemq-config.xml," + super.getConfigResources();
     }
 }

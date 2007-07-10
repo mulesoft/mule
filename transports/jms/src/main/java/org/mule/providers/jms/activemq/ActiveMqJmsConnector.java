@@ -12,10 +12,15 @@ package org.mule.providers.jms.activemq;
 
 import org.mule.providers.ConnectException;
 import org.mule.providers.jms.JmsConnector;
+import org.mule.providers.jms.JmsConstants;
 import org.mule.providers.jms.xa.ConnectionFactoryWrapper;
+import org.mule.util.object.ObjectFactory;
+import org.mule.util.object.SimpleObjectFactory;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.jms.Connection;
 
@@ -24,15 +29,26 @@ import javax.jms.Connection;
  */
 public class ActiveMqJmsConnector extends JmsConnector
 {
+    static final String ACTIVEMQ_CONNECTION_FACTORY = "org.apache.activemq.ActiveMQConnectionFactory";
+    static final String BROKER_URL = "vm://localhost?broker.persistent=false&broker.useJmx=false";
+
     /**
      * Constructs a new ActiveMqJmsConnector.
      */
     public ActiveMqJmsConnector()
     {
+        setSpecification(JmsConstants.JMS_SPECIFICATION_11);
         setEagerConsumer(false);
         // TODO MULE-1409 better support for ActiveMQ 4.x temp destinations
     }
 
+    protected ObjectFactory/*<ConnectionFactory>*/ getDefaultConnectionFactory()
+    {
+        Map props = new HashMap();
+        props.put("brokerURL", BROKER_URL);
+        return new SimpleObjectFactory(ACTIVEMQ_CONNECTION_FACTORY, props);
+    }
+        
     /**
      * Will additionally try to cleanup the ActiveMq connection, otherwise there's a deadlock on shutdown.
      */
