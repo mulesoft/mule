@@ -10,6 +10,8 @@
 
 package org.mule.providers.oracle.jms;
 
+import oracle.jms.AQjmsSession;
+
 import org.mule.providers.jms.Jms102bSupport;
 import org.mule.providers.jms.JmsConnector;
 import org.mule.util.ClassUtils;
@@ -26,9 +28,6 @@ import javax.jms.QueueSession;
 import javax.jms.Session;
 import javax.jms.Topic;
 import javax.jms.TopicSession;
-import javax.naming.Context;
-
-import oracle.jms.AQjmsSession;
 
 /**
  * Extends the standard Mule JMS Provider with functionality specific to Oracle's JMS
@@ -52,12 +51,9 @@ public class OracleJmsSupport extends Jms102bSupport
      */
     private Map endpointProperties;
 
-    public OracleJmsSupport(JmsConnector connector,
-                            Context context,
-                            boolean jndiDestinations,
-                            boolean forceJndiDestinations)
+    public OracleJmsSupport(JmsConnector connector)
     {
-        super(connector, context, jndiDestinations, forceJndiDestinations);
+        super(connector);
     }
 
     /**
