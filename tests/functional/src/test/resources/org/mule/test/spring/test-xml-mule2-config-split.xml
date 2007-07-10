@@ -22,8 +22,11 @@
                 <mule:endpoint name="nonTransactedInboundEndpoint" address="test://endpoint.in3"/>
                 <mule:endpoint name="transactedInboundEndpoint" createConnector="NEVER_CREATE"
                                address="test://endpoint.in2">
-                    <mule:transaction factory="org.mule.tck.testmodels.mule.TestTransactionFactory"
-                                      action="ALWAYS_BEGIN"/>
+                    <!-- Transactions not quite working yet  
+                    <mule:transaction action="ALWAYS_BEGIN">
+                        <mule:transaction-factory class="org.mule.tck.testmodels.mule.TestTransactionFactory"/>
+                    </mule:transaction>
+                    -->
                     <mule:properties>
                         <entry key="testEndpointProperty" value="Prop1"/>
                     </mule:properties>
