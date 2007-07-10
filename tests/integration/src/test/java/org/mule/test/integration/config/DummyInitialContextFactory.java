@@ -16,6 +16,7 @@ import org.mule.impl.jndi.SimpleContext;
 import org.mule.management.agents.Log4jAgent;
 import org.mule.providers.vm.VMConnector;
 import org.mule.transformers.xml.XmlToObject;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.object.ObjectFactory;
 
 /**
@@ -36,5 +37,15 @@ public class DummyInitialContextFactory implements ObjectFactory
         c.bind("EchoUMO", d);
         c.bind("echoBean", new EchoComponent());
         return c;
+    }
+
+    public void initialise() throws InitialisationException
+    {
+        // do nothing
+    }
+
+    public void dispose()
+    {
+        // do nothing
     }
 }
