@@ -20,17 +20,15 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
-public class ComponentDefinitionParser extends ChildDefinitionParser
+public class ObjectFactoryDefinitionParser extends ChildDefinitionParser
 {
-
     public static final String FACTORY_REF = "factory-ref";
 
-    public ComponentDefinitionParser(String setterMethod)
+    public ObjectFactoryDefinitionParser(String setterMethod)
     {
         super(setterMethod, null);
         allowClassAttribute = false;
         addAlias("class", "objectClassName");
-        addAlias("factory", "serviceFactory");
     }
     
     protected Class getBeanClass(Element element)
