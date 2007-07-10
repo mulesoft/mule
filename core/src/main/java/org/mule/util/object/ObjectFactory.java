@@ -10,12 +10,13 @@
 
 package org.mule.util.object;
 
+import org.mule.umo.lifecycle.Disposable;
+import org.mule.umo.lifecycle.Initialisable;
+
 /**
  * <code>ObjectFactory</code> is a generic Factory interface.
  */
-public interface ObjectFactory
+public interface ObjectFactory extends Initialisable, Disposable
 {
-
     Object create() throws Exception;
-
 }

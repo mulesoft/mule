@@ -79,16 +79,22 @@ public interface RegistryFacade extends Initialisable, Registry
 
     UMOModel unregisterModel(String modelName);
 
+    /** @deprecated Use lookupModel() instead */
     Map getModels();
 
+    /** @deprecated Use lookupConnector() instead */
     Map getConnectors();
 
+    /** @deprecated Use lookupEndpoint() instead */
     Map getEndpoints();
 
+    /** @deprecated Use lookupAgent() instead */
     Map getAgents();
 
+    /** @deprecated Use lookupService() instead */
     Map getServices();
 
+    /** @deprecated Use lookupTransformer() instead */
     Map getTransformers();
 
     boolean isInitialised();

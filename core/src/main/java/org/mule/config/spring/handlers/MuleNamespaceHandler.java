@@ -24,6 +24,7 @@ import org.mule.config.spring.parsers.specific.ConnectionStrategyDefinitionParse
 import org.mule.config.spring.parsers.specific.EndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
 import org.mule.config.spring.parsers.specific.InheritedModelDefinitionParser;
+import org.mule.config.spring.parsers.specific.ObjectFactoryDefinitionParser;
 import org.mule.config.spring.parsers.specific.PoolingProfileDefinitionParser;
 import org.mule.config.spring.parsers.specific.RouterDefinitionParser;
 import org.mule.config.spring.parsers.specific.ServiceDescriptorDefinitionParser;
@@ -165,6 +166,7 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         //Endpoint elements
         registerBeanDefinitionParser("endpoint", new EndpointDefinitionParser());
         registerBeanDefinitionParser("transaction", new TransactionConfigDefinitionParser());
+        registerBeanDefinitionParser("transaction-factory", new ObjectFactoryDefinitionParser("factory"));
 
         //Container contexts
         registerBeanDefinitionParser("custom-container", new OrphanDefinitionParser(true));

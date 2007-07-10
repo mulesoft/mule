@@ -36,6 +36,16 @@ public class CommonsPoolProxyFactory extends AbstractProxyFactory implements Poo
         super(descriptor, model);
     }
 
+    public void initialise() throws InitialisationException
+    {
+        // nothing to do
+    }
+    
+    public void dispose()
+    {
+        // nothing to do
+    }
+
     public void activateObject(Object arg0) throws Exception
     {
         // nothing to do

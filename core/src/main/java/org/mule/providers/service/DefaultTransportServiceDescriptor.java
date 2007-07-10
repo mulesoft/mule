@@ -42,7 +42,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.StaticApplicationContext;
 
 /**
- * @inheritDocs
+ * @deprecated This functionality should move to the Registry.
  */
 public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor implements TransportServiceDescriptor
 {
@@ -52,6 +52,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
     private String messageReceiver;
     private Properties exceptionMappings = new Properties();
 
+    // TODO RM: Shouldn't this use the Registry interface?
     StaticApplicationContext context;
 
     public DefaultTransportServiceDescriptor(String service, Properties props, ApplicationContext appContext) throws ClassNotFoundException

@@ -10,6 +10,7 @@
 
 package org.mule.util.object;
 
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.BeanUtils;
 import org.mule.util.ClassUtils;
 
@@ -50,6 +51,16 @@ public class SimpleObjectFactory implements ObjectFactory
     {
         this.objectClass = objectClass;
         this.properties = properties;
+    }
+
+    public void initialise() throws InitialisationException
+    {
+        // nothing to do
+    }
+    
+    public void dispose()
+    {
+        // nothing to do
     }
 
     /**

@@ -30,6 +30,7 @@ import org.mule.util.MuleUrlStreamHandlerFactory;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.SystemUtils;
+import org.mule.util.concurrent.Latch;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -53,8 +54,11 @@ public abstract class AbstractMuleTestCase extends TestCase
      */
     private static final boolean verbose;
 
-    protected final Log logger = LogFactory.getLog(this.getClass());
-
+    /**
+     * Start the ManagementContext once it's configured (defaults to true).
+     */
+    private boolean startContext = true;
+    
     // This should be set to a string message describing any prerequisites not met
     private boolean offline = System.getProperty("org.mule.offline", "false").equalsIgnoreCase("true");
 
@@ -80,6 +84,22 @@ public abstract class AbstractMuleTestCase extends TestCase
         // register the custom UrlStreamHandlerFactory.
         MuleUrlStreamHandlerFactory.installUrlStreamHandlerFactory();
     }
+
+    /** Convenient test message for unit testing. */
+    public static final String TEST_MESSAGE = "Test Message";
+    
+    /** 
+     * Default timeout for multithreaded tests (using CountDownLatch, WaitableBoolean, etc.), 
+     * in milliseconds.  The higher this value, the more reliable the test will be, so it 
+     * should be set high for Continuous Integration.  However, this can waste time during 
+     * day-to-day development cycles, so you may want to temporarily lower it while debugging.  
+     */
+    public static final long LOCK_TIMEOUT = 30000;
+
+    /** Use this as a semaphore to the unit test to indicate when a callback has successfully been called. */
+    protected Latch callbackCalled;
+    
+    protected final transient Log logger = LogFactory.getLog(getClass());
 
     public AbstractMuleTestCase()
     {
@@ -231,6 +251,11 @@ public abstract class AbstractMuleTestCase extends TestCase
             }
 
             managementContext = createManagementContext();
+            if (startContext)
+            {
+                // TODO MULE-1988
+                //managementContext.start();
+            }
 
             doSetUp();
             if (getTestInfo().getRunCount() == 0)
@@ -478,5 +503,15 @@ public abstract class AbstractMuleTestCase extends TestCase
             return buf.append(name).append(", (").append(runCount).append(" / ").append(testCount).append(
                 ") tests run, disposePerSuite=").append(disposeManagerPerSuite).toString();
         }
+    }
+
+    protected boolean isStartContext()
+    {
+        return startContext;
+    }
+
+    protected void setStartContext(boolean startContext)
+    {
+        this.startContext = startContext;
     }
 }

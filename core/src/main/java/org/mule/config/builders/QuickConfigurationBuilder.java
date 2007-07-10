@@ -101,6 +101,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
             model.setName(defaultModelName);
             managementContext.getRegistry().registerModel(model);
         }
+        // TODO MULE-1988
         if (startManagementContext)
         {
             managementContext.start();

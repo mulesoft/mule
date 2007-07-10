@@ -59,6 +59,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
             fail("You need to set the connector name on the connector before returning it");
         }
         managementContext.getRegistry().registerConnector(connector);
+        // TODO MULE-1988
         managementContext.start();
     }
 

@@ -39,6 +39,13 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
     private String defaultConfigResource = "default-mule-config.xml";
 
     private boolean used = false;
+
+    /**
+     * Start the ManagementContext once it's configured (defaults to true).
+     * TODO MULE-1988
+     */
+    private boolean startContext = true;
+    
     /**
      * Will configure a UMOManager based on the configurations made available through
      * Readers.
@@ -136,7 +143,11 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         try
         {
             UMOManagementContext mc = context.getManagementContext();
-            mc.start();
+            // TODO MULE-1988
+            if (startContext)
+            {
+                mc.start();
+            }
 
             RegistryContext.getConfiguration().setConfigResources(resources);
             
@@ -198,5 +209,15 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
     public void setDefaultConfigResource(String defaultConfigResource)
     {
         this.defaultConfigResource = defaultConfigResource;
+    }
+
+    public boolean isStartContext()
+    {
+        return startContext;
+    }
+
+    public void setStartContext(boolean startContext)
+    {
+        this.startContext = startContext;
     }
 }

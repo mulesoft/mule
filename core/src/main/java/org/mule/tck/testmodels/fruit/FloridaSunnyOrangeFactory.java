@@ -10,12 +10,23 @@
 
 package org.mule.tck.testmodels.fruit;
 
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.object.ObjectFactory;
 
 public class FloridaSunnyOrangeFactory implements ObjectFactory
 {
     Integer segments = new Integer(10);
     Double radius = new Double(4.34);
+
+    public void initialise() throws InitialisationException
+    {
+        // nothing to do
+    }
+    
+    public void dispose()
+    {
+        // nothing to do
+    }
 
     public Object create() throws Exception
     {

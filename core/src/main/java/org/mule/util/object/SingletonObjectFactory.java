@@ -10,12 +10,16 @@
 
 package org.mule.util.object;
 
+import org.mule.umo.lifecycle.Disposable;
+import org.mule.umo.lifecycle.Initialisable;
+import org.mule.umo.lifecycle.InitialisationException;
+
 
 
 /**
  * Simple object factory which always returns the same object instance.
  */
-public class SingletonObjectFactory extends SimpleObjectFactory
+public class SingletonObjectFactory extends SimpleObjectFactory implements Initialisable, Disposable
 {
     private Object instance = null;
 
@@ -40,6 +44,29 @@ public class SingletonObjectFactory extends SimpleObjectFactory
         this.instance = instance;
     }
     
+    public void initialise() throws InitialisationException
+    {
+        if (instance == null)
+        {
+            try
+            {
+                instance = super.create();
+            }
+            catch (Exception e)
+            {
+                throw new InitialisationException(e, this);
+            }
+        }
+    }
+
+    public void dispose()
+    {
+        if (instance != null && instance instanceof Disposable)
+        {
+            ((Disposable) instance).dispose();
+        }
+    }
+
     /**
      * Always returns the same instance of the object.
      */
@@ -47,7 +74,7 @@ public class SingletonObjectFactory extends SimpleObjectFactory
     {
         if (instance == null)
         {
-            instance = super.create();
+            initialise();
         }
         return instance;
     }
