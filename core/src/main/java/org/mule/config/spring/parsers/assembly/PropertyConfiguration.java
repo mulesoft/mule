@@ -186,7 +186,15 @@ public class PropertyConfiguration
         ValueMap vm = (ValueMap) valueMappings.get(name);
         if(vm!=null)
         {
-            return vm.getValue(value).toString();
+            Object v = vm.getValue(value);
+            if (v != null)
+            {
+                return v.toString();
+            }
+            else 
+            {
+                return value;
+            }
         }
         else {
             return value;
