@@ -15,7 +15,14 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.impl.RequestContext;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.lifecycle.Callable;
+import org.mule.umo.lifecycle.Disposable;
+import org.mule.umo.lifecycle.Initialisable;
+import org.mule.util.NumberUtils;
 import org.mule.util.StringMessageUtils;
+
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,7 +41,7 @@ import org.apache.commons.logging.LogFactory;
  * @see org.mule.tck.functional.FunctionalTestNotificationListener
  */
 
-public class FunctionalTestComponent implements Callable
+public class FunctionalTestComponent implements Callable, Initialisable, Disposable
 {
     protected transient Log logger = LogFactory.getLog(getClass());
 
@@ -43,24 +50,45 @@ public class FunctionalTestComponent implements Callable
     private EventCallback eventCallback;
     private Object returnMessage = null;
     private boolean appendComponentName = false;
-    private boolean throwException = false;
+    private boolean throwException = false;    
+    private boolean enableMessageHistory = true;
+    
+    /** 
+     * Keeps a list of any messages received on this component. Note that only references
+     * to the messages (objects) are stored, so any subsequent changes to the objects
+     * will change the history.
+     */
+    private List messageHistory;
+
+    public void initialise()
+    {
+        if (enableMessageHistory)
+        {
+            messageHistory = new CopyOnWriteArrayList();
+        }
+    }
+
+    public void dispose()
+    {
+        // nothing to do
+    }
 
     /**
      * {@inheritDoc}
      */
     public Object onCall(UMOEventContext context) throws Exception
     {
+        if (enableMessageHistory)
+        {
+            messageHistory.add(context.getTransformedMessage());
+        }                
+        
         String contents = context.getTransformedMessageAsString();
         String msg = StringMessageUtils.getBoilerPlate("Message Received in component: "
                 + context.getComponentDescriptor().getName() + ". Content is: "
                 + StringMessageUtils.truncate(contents, 100, true), '*', 80);
 
         logger.info(msg);
-
-        if (eventCallback != null)
-        {
-            eventCallback.eventReceived(context, this);
-        }
 
         Object replyMessage;
         if (returnMessage != null)
@@ -80,6 +108,10 @@ public class FunctionalTestComponent implements Callable
             throw new MuleException(MessageFactory.createStaticMessage("Functional Test Component Exception"));
         }
 
+        if (eventCallback != null)
+        {
+            eventCallback.eventReceived(context, this);
+        }
         return replyMessage;
     }
 
@@ -262,5 +294,60 @@ public class FunctionalTestComponent implements Callable
         this.appendComponentName = appendComponentName;
     }
 
+    public boolean isEnableMessageHistory()
+    {
+        return enableMessageHistory;
+    }
+
+    public void setEnableMessageHistory(boolean enableMessageHistory)
+    {
+        this.enableMessageHistory = enableMessageHistory;
+    }
+
+    /** If enableMessageHistory = true, returns the number of messages received by this component. */
+    public int getReceivedMessages()
+    {
+        if (messageHistory != null)
+        {
+            return messageHistory.size();
+        }
+        else
+        {
+            return NumberUtils.INTEGER_MINUS_ONE.intValue();
+        }
+    }
+
+    /** 
+     * If enableMessageHistory = true, returns a message received by the component in chronological order.
+     * For example, getReceivedMessage(1) returns the first message received by the component, 
+     * getReceivedMessage(2) returns the second message received by the component, etc.
+     */
+    public Object getReceivedMessage(int number)
+    {
+        Object message = null;
+        if (messageHistory != null)
+        {
+            if (number <= messageHistory.size())
+            {
+                message = messageHistory.get(number - 1);
+            }
+        }
+        return message;
+    }
+
+    /** 
+     * If enableMessageHistory = true, returns the last message received by the component in chronological order.
+     */
+    public Object getLastReceivedMessage()
+    {
+        if (messageHistory != null)
+        {
+            return messageHistory.get(messageHistory.size() - 1);
+        }
+        else
+        {
+            return null;
+        }
+    }
 }
 

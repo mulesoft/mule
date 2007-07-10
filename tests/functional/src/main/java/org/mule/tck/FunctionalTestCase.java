@@ -12,8 +12,15 @@ package org.mule.tck;
 
 import org.mule.RegistryContext;
 import org.mule.config.ConfigurationBuilder;
+import org.mule.config.builders.MuleXmlConfigurationBuilder;
+import org.mule.impl.model.MuleProxy;
+import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.testmodels.mule.TestMuleProxy;
+import org.mule.tck.testmodels.mule.TestSedaComponent;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
-import org.mule.util.ClassUtils;
+import org.mule.umo.model.UMOModel;
 
 /**
  * Is a base tast case for tests that initialise Mule using a configuration file. The
@@ -27,9 +34,9 @@ import org.mule.util.ClassUtils;
  */
 public abstract class FunctionalTestCase extends AbstractMuleTestCase
 {
-
-    public static final String DEFAULT_BUILDER_CLASS = "org.mule.config.builders.MuleXmlConfigurationBuilder";
-
+    /** Expected response after the test message has passed through the FunctionalTestComponent. */
+    public static final String TEST_MESSAGE_RESPONSE = FunctionalTestComponent.received(TEST_MESSAGE);
+    
     protected UMOManagementContext createManagementContext() throws Exception
     {
         // Should we set up te manager for every method?
@@ -49,23 +56,28 @@ public abstract class FunctionalTestCase extends AbstractMuleTestCase
 
     protected ConfigurationBuilder getBuilder() throws Exception
     {
-
-        try
-        {
-            Class builderClass = ClassUtils.loadClass(DEFAULT_BUILDER_CLASS, getClass());
-            return (ConfigurationBuilder)builderClass.newInstance();
-        }
-        catch (ClassNotFoundException e)
-        {
-            throw new ClassNotFoundException(
-                "The builder "
-                                + DEFAULT_BUILDER_CLASS
-                                + " is not on your classpath and "
-                                + "the getBuilder() method of this class has not been overloaded to return a different builder. Please "
-                                + "check your functional test.", e);
-        }
-
+        MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
+        // TODO MULE-1988
+        builder.setStartContext(isStartContext());
+        return builder;
     }
 
     protected abstract String getConfigResources();
+    
+    protected FunctionalTestComponent lookupTestComponent(String modelName, String componentName) throws UMOException
+    {    
+        // TODO MULE-1995 Simplify this lookup
+        UMOModel m = managementContext.getRegistry().lookupModel(modelName);
+        assertNotNull("Model " + m + " not found", m);
+        UMOComponent c = m.getComponent(componentName);
+        assertNotNull("Component " + c + " not found", c);
+        assertTrue("Component should be a TestSedaComponent", c instanceof TestSedaComponent);
+        MuleProxy proxy = ((TestSedaComponent) c).getProxy();
+        assertNotNull("Component " + c + " does not have a proxy", proxy);
+        assertTrue("Proxy should be a TestMuleProxy", proxy instanceof TestMuleProxy);
+        Object component = ((TestMuleProxy) proxy).getComponent();
+        assertNotNull("No component for proxy", component);
+        assertTrue("Component should be a FunctionalTestComponent", component instanceof FunctionalTestComponent);
+        return (FunctionalTestComponent) component;
+    }
 }

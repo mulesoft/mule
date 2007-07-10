@@ -11,6 +11,7 @@
 package org.mule.config.spring.parsers;
 
 import org.mule.config.ConfigurationBuilder;
+import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.util.ClassUtils;
@@ -40,20 +41,7 @@ public abstract class AbstractBadConfigTestCase extends AbstractMuleTestCase
 
     protected ConfigurationBuilder getBuilder() throws Exception
     {
-        try
-        {
-            Class builderClass = ClassUtils.loadClass(FunctionalTestCase.DEFAULT_BUILDER_CLASS, getClass());
-            return (ConfigurationBuilder)builderClass.newInstance();
-        }
-        catch (ClassNotFoundException e)
-        {
-            throw new ClassNotFoundException(
-                "The builder "
-                                + FunctionalTestCase.DEFAULT_BUILDER_CLASS
-                                + " is not on your classpath and "
-                                + "the getBuilder() method of this class has not been overloaded to return a different builder. Please "
-                                + "check your functional test.", e);
-        }
+        return new MuleXmlConfigurationBuilder();
     }
 
     protected abstract String getConfigResources();
