@@ -17,8 +17,7 @@
         </xsd:annotation>
         <xsd:complexType>
             <xsd:complexContent>
-                <xsd:extension base="spring:mapType">
-                </xsd:extension>
+                <xsd:extension base="mapType" />
             </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
@@ -117,7 +116,7 @@
             <xsd:group ref="filter" minOccurs="0" maxOccurs="unbounded"/>
             <xsd:group ref="securityFilters" minOccurs="0" maxOccurs="1"/>
             <xsd:group ref="connectionStrategies" minOccurs="0" maxOccurs="1"/>
-            <xsd:element name="properties" type="spring:mapType" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="properties" type="mapType" minOccurs="0" maxOccurs="1"/>
             <xsd:choice minOccurs="0" maxOccurs="unbounded">
                 <xsd:any namespace="##other" processContents="strict"/>
             </xsd:choice>
@@ -159,7 +158,9 @@
     </xsd:complexType>
 
     <xsd:complexType name="transactionType">
-        <xsd:attribute name="factory" type="xsd:NMTOKEN"/>
+        <xsd:choice minOccurs="0" maxOccurs="1">
+            <xsd:element name="transaction-factory" type="objectFactoryType"/>
+        </xsd:choice>
         <xsd:attribute name="action">
             <xsd:simpleType>
                 <xsd:restriction base="xsd:NMTOKEN">
@@ -237,7 +238,7 @@
 
     <xsd:complexType name="customFilterType">
         <xsd:choice>
-            <xsd:element name="property" type="spring:propertyType" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element name="property" type="propertyType" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:choice>
         <xsd:attribute name="class" type="xsd:NMTOKEN"/>
         <xsd:attribute name="not" type="substitutableBoolean"/>
@@ -309,7 +310,7 @@
             <xsd:complexContent>
                 <xsd:extension base="transformerType">
                     <xsd:sequence>
-                        <xsd:element name="property" type="spring:propertyType" minOccurs="0" maxOccurs="unbounded"/>
+                        <xsd:element name="property" type="propertyType" minOccurs="0" maxOccurs="unbounded"/>
                     </xsd:sequence>
                     <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
                 </xsd:extension>
@@ -559,7 +560,7 @@
         <xsd:complexContent>
             <xsd:extension base="exceptionStrategyType">
                 <xsd:sequence>
-                    <xsd:element name="property" type="spring:propertyType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element name="property" type="propertyType" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
                 <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
             </xsd:extension>
@@ -659,22 +660,22 @@
 
 
     <!-- Custom connector element -->
-    <xsd:element name="custom-connector">
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="connectorType">
-                    <xsd:sequence>
-                        <xsd:element name="property" type="spring:propertyType" minOccurs="0" maxOccurs="unbounded"/>
-                        <!-- RM*: after much experimentation I couldn't get custom-connector to extend connectorType and add
-                         mover elements without the parser complaining. Instead I separated the connector elements into their
-                         own group and reference them from this type and the connectorType. -->
-                        <xsd:group ref="connectorElements"/>
-                    </xsd:sequence>
-                    <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
-                </xsd:extension>
-            </xsd:complexContent>
-        </xsd:complexType>
-    </xsd:element>
+    <xsd:element name="custom-connector" type="customConnectorType" />
+
+    <xsd:complexType name="customConnectorType">
+        <xsd:complexContent>
+            <xsd:extension base="connectorType">
+                <xsd:sequence>
+                    <xsd:element name="property" type="propertyType" minOccurs="0" maxOccurs="unbounded"/>
+                    <!-- RM*: after much experimentation I couldn't get custom-connector to extend connectorType and add
+                     more elements without the parser complaining. Instead I separated the connector elements into their
+                     own group and reference them from this type and the connectorType. -->
+                    <xsd:group ref="connectorElements"/>
+                </xsd:sequence>
+                <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
 
     <!--==============================================================-->
@@ -803,7 +804,7 @@
             <xsd:element name="pooling-profile" type="poolingProfileType" minOccurs="0" maxOccurs="1"/>
             <xsd:element name="queue-profile" type="queueProfileType" minOccurs="0" maxOccurs="1"/>
             <xsd:group ref="exceptionStrategies" maxOccurs="1" minOccurs="0"/>
-            <xsd:element name="meta-info" type="spring:mapType" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="meta-info" type="mapType" minOccurs="0" maxOccurs="1"/>
 
             <!--<xsd:any namespace="##other" processContents="strict" minOccurs="0" maxOccurs="unbounded"/>-->
         </xsd:choice>
@@ -1185,7 +1186,7 @@
             </xsd:documentation>
         </xsd:annotation>
         <xsd:choice maxOccurs="unbounded" minOccurs="0">
-            <xsd:element name="properties" type="spring:mapType">
+            <xsd:element name="properties" type="mapType">
                 <xsd:annotation>
                     <xsd:documentation>Properties to be set on the created object</xsd:documentation>
                 </xsd:annotation>
@@ -1375,7 +1376,7 @@
         <xsd:complexContent>
             <xsd:extension base="connectorType">
                 <xsd:sequence>
-                    <xsd:element name="jndi-provider-properties" type="spring:mapType" minOccurs="0" maxOccurs="1">
+                    <xsd:element name="jndi-provider-properties" type="mapType" minOccurs="0" maxOccurs="1">
                         <xsd:annotation>
                             <xsd:documentation>
                                 Direct setting of JNDI properties.
@@ -1422,22 +1423,21 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <!-- MULE-1909 -->
-    <!-- xsd:complexType name="mapType">
+    <xsd:complexType name="propertyType">
         <xsd:complexContent>
-            <xsd:extension base="spring:mapType">
-                <xsd:attribute name="mapClass" type="xsd:string"/>
-                <xsd:attribute name="name" type="xsd:string"/>
-            </xsd:extension>
+            <xsd:extension base="spring:propertyType" />
         </xsd:complexContent>
-    </xsd:complexType -->
+    </xsd:complexType>
+
+    <xsd:complexType name="mapType">
+        <xsd:complexContent>
+            <xsd:extension base="spring:mapType" />
+        </xsd:complexContent>
+    </xsd:complexType>
 
     <xsd:complexType name="propsType">
         <xsd:complexContent>
-            <xsd:extension base="spring:propsType">
-                <xsd:attribute name="location" type="xsd:string"/>
-                <xsd:attribute name="fileEncoding" type="xsd:string"/>
-            </xsd:extension>
+            <xsd:extension base="spring:propsType" />
         </xsd:complexContent>
     </xsd:complexType>
 
