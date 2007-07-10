@@ -11,6 +11,9 @@
   The last part is going to depend on the deploy method, so the final
   user will need to edit the code (see generateDeployCommand below).
 
+  It expects to be run in the buildtools/scripts directory (see "root"
+  variable below).
+
   Example schema and their locations:
     transports/file/src/main/resources/META-INF/mule-file.xsd
      -> http://www.mulesource.org/schema/mule/file/2.0/mule-file.xsd
@@ -36,6 +39,15 @@ base = "http://www.mulesource.org/schema/mule/"
 // the structure of xsd locations
 corexsd = /.*(\/|\\)core(\/|\\).*(\/|\\)mule.xsd/
 otherxsd = /.*(\/|\\)(transports|modules)(\/|\\)([^\/]+)(\/|\\).*(\/|\\)mule-(.*)\.xsd/
+
+checkCurrentDirectory = {
+  if (! (new File("").getCanonicalFile().getName() == "scripts")) {
+    println ""
+    println "WARNING: run from in the scripts directory"
+    println ""
+    System.exit(1)
+  }
+}
 
 scanForSchemaAndInferDestinations = {
   println ""
@@ -127,6 +139,7 @@ generateDeployCommand = {
   }
 }
 
+checkCurrentDirectory()
 scanForSchemaAndInferDestinations()
 scanAndCheckConfigs()
 //listSchema()
