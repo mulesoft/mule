@@ -8,9 +8,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.test.integration.providers.jms;
+package org.mule.providers.jms.transactions;
 
 import org.mule.config.MuleProperties;
+import org.mule.providers.jms.functional.AbstractJmsFunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.transaction.TransactionCoordination;

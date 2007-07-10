@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.test.integration.providers.jms;
+package org.mule.providers.jms.functional;
 
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.endpoint.UMOEndpoint;

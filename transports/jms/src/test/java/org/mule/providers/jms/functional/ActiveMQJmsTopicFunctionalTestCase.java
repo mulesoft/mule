@@ -8,14 +8,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.test.integration.providers.jms.activemq;
+package org.mule.providers.jms.functional;
 
-import org.mule.test.integration.providers.jms.AbstractJmsTransactionFunctionalTest;
-
-public class ActiveMQJmsSingleResourceTransactionFunctionalTestCase extends AbstractJmsTransactionFunctionalTest
+public class ActiveMQJmsTopicFunctionalTestCase extends ActiveMQJmsQueueFunctionalTestCase
 {
-    protected String getConfigResources()
+    public boolean useTopics()
     {
-        return "activemq-single-resource.xml," + super.getConfigResources();
+        return true;
     }
 }

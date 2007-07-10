@@ -8,14 +8,14 @@
  * LICENSE.txt file.
  */
 
-package org.mule.test.integration.providers.jms.activemq;
+package org.mule.providers.jms;
 
 import org.mule.impl.RequestContext;
 import org.mule.providers.jms.JmsConnector;
+import org.mule.providers.jms.functional.AbstractJmsFunctionalTestCase;
 import org.mule.providers.jms.transformers.AbstractJmsTransformer;
 import org.mule.providers.jms.transformers.JMSMessageToObject;
 import org.mule.providers.jms.transformers.ObjectToJMSMessage;
-import org.mule.test.integration.providers.jms.AbstractJmsFunctionalTestCase;
 import org.mule.util.FileUtils;
 import org.mule.util.compression.CompressionStrategy;
 import org.mule.util.compression.GZipCompression;

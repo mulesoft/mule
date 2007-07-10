@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.test.integration.providers.jms;
+package org.mule.providers.jms.functional;
 
 import org.mule.RegistryContext;
 import org.mule.tck.functional.CountdownCallback;

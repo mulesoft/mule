@@ -8,17 +8,18 @@
  * LICENSE.txt file.
  */
 
-package org.mule.providers.jms.weblogic;
+package org.mule.providers.jms.vendors;
 
+import org.mule.providers.jms.DefaultJmsTopicResolver;
 import org.mule.providers.jms.JmsConnector;
 import org.mule.providers.jms.JmsTopicResolver;
 import org.mule.tck.FunctionalTestCase;
 
-public class WeblogicJmsConnectorTestCase extends FunctionalTestCase
+public class WebsphereEmbeddedJmsConnectorTestCase extends FunctionalTestCase
 {
     protected String getConfigResources()
     {
-        return "weblogic-config.xml";
+        return "websphere-config.xml";
     }
 
     public void testDefaultConfig() throws Exception
@@ -26,11 +27,13 @@ public class WeblogicJmsConnectorTestCase extends FunctionalTestCase
         JmsConnector c = (JmsConnector)managementContext.getRegistry().lookupConnector("jmsConnector");
         assertNotNull(c);
 
-        // TODO has to be confirmed for Weblogic
+        // TODO has to be confirmed for Websphere
         assertTrue(c.isEagerConsumer());
+        assertFalse("JMS connection recovery is not supported by Websphere Embedded provider.",
+                    c.isRecoverJmsConnections());
         JmsTopicResolver resolver = c.getTopicResolver();
         assertNotNull("Topic resolver must not be null.", resolver);
         assertTrue("Wrong topic resolver configured on the connector.",
-                   resolver instanceof WeblogicJmsTopicResolver);
+                   resolver instanceof DefaultJmsTopicResolver);
     }
 }

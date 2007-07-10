@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.providers.jms.activemq;
+package org.mule.providers.jms.vendors;
 
 import org.mule.providers.jms.JmsConnector;
 import org.mule.providers.jms.xa.ConnectionFactoryWrapper;

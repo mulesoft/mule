@@ -8,9 +8,8 @@
  * LICENSE.txt file.
  */
 
-package org.mule.test.integration.providers.jms.activemq;
+package org.mule.providers.jms.transactions;
 
-import org.mule.test.integration.providers.jms.AbstractJmsTransactionFunctionalTest;
 
 import javax.jms.Session;
 

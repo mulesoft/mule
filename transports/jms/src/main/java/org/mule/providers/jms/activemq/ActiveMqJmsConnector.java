@@ -29,8 +29,8 @@ import javax.jms.Connection;
  */
 public class ActiveMqJmsConnector extends JmsConnector
 {
-    static final String ACTIVEMQ_CONNECTION_FACTORY = "org.apache.activemq.ActiveMQConnectionFactory";
-    static final String BROKER_URL = "vm://localhost?broker.persistent=false&broker.useJmx=false";
+    public static final String ACTIVEMQ_CONNECTION_FACTORY = "org.apache.activemq.ActiveMQConnectionFactory";
+    public static final String BROKER_URL = "vm://localhost?broker.persistent=false&broker.useJmx=false";
 
     /**
      * Constructs a new ActiveMqJmsConnector.
