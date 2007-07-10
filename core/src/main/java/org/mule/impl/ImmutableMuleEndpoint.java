@@ -41,15 +41,16 @@ import org.mule.util.ClassUtils;
 import org.mule.util.MuleObjectHelper;
 import org.mule.util.ObjectNameHelper;
 
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
+
 import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -666,6 +667,15 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
                 {
                     newTransformer = ((AbstractConnector) connector).getDefaultInboundTransformer();
                 }
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Creating new transformer " + newTransformer + " for endpoint " + this + " of type " + type);                
+                }
+            }
+            else
+            {
+                // Why would a connector not inherit AbstractConnector?
+                logger.warn("Connector " + connector.getName() + " does not inherit AbstractConnector");
             }
             // this respects the original semantics; not sure it makes sense
             // ie there is no further initialisation after this point - value
