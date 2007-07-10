@@ -15,6 +15,8 @@ Assembly descriptor for the full Mule distribution.
       <excludes>
           <!-- A separate assembly-osgi.xml is used for OSGi -->
           <exclude>**/osgi/**</exclude>
+          <!-- also exclude the Knopflerfish config files -->
+          <exclude>**/*.xargs</exclude>
       </excludes>
     </fileSet>
 
