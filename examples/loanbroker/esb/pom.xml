@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
@@ -62,101 +61,101 @@
             <groupId>castor</groupId>
             <artifactId>castor</artifactId>
             <version>0.9.9</version>
-            <scope>provided</scope> 
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-core</artifactId>
             <version>4.1.0-incubator</version>
-            <scope>provided</scope> 
+            <scope>provided</scope>
             <!-- Exclude everything except activeio-core -->
             <exclusions>
                 <exclusion>
-                  <groupId>org.apache.geronimo.specs</groupId>
-                  <artifactId>geronimo-jms_1.1_spec</artifactId>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-jms_1.1_spec</artifactId>
                 </exclusion>
                 <exclusion>
-                  <groupId>org.apache.activemq</groupId>
-                  <artifactId>activemq-jaas</artifactId>
+                    <groupId>org.apache.activemq</groupId>
+                    <artifactId>activemq-jaas</artifactId>
                 </exclusion>
                 <exclusion>
-                  <groupId>commons-pool</groupId>
-                  <artifactId>commons-pool</artifactId>
+                    <groupId>commons-pool</groupId>
+                    <artifactId>commons-pool</artifactId>
                 </exclusion>
                 <exclusion>
-                  <groupId>org.apache.derby</groupId>
-                  <artifactId>derby</artifactId>
+                    <groupId>org.apache.derby</groupId>
+                    <artifactId>derby</artifactId>
                 </exclusion>
                 <exclusion>
-                  <groupId>activemq</groupId>
-                  <artifactId>jmdns</artifactId>
+                    <groupId>activemq</groupId>
+                    <artifactId>jmdns</artifactId>
                 </exclusion>
                 <exclusion>
-                  <groupId>xalan</groupId>
-                  <artifactId>xalan</artifactId>
+                    <groupId>xalan</groupId>
+                    <artifactId>xalan</artifactId>
                 </exclusion>
                 <exclusion>
-                  <groupId>org.apache.xbean</groupId>
-                  <artifactId>xbean-spring</artifactId>
+                    <groupId>org.apache.xbean</groupId>
+                    <artifactId>xbean-spring</artifactId>
                 </exclusion>
                 <exclusion>
-                  <groupId>org.springframework</groupId>
-                  <artifactId>spring</artifactId>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring</artifactId>
                 </exclusion>
                 <exclusion>
-                  <groupId>org.apache.geronimo.specs</groupId>
-                  <artifactId>geronimo-jta_1.0.1B_spec</artifactId>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-jta_1.0.1B_spec</artifactId>
                 </exclusion>
                 <exclusion>
-                  <groupId>org.apache.geronimo.specs</groupId>
-                  <artifactId>geronimo-j2ee-jacc_1.0_spec</artifactId>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-j2ee-jacc_1.0_spec</artifactId>
                 </exclusion>
                 <exclusion>
-                  <groupId>backport-util-concurrent</groupId>
-                  <artifactId>backport-util-concurrent</artifactId>
+                    <groupId>backport-util-concurrent</groupId>
+                    <artifactId>backport-util-concurrent</artifactId>
                 </exclusion>
                 <exclusion>
-                  <groupId>commons-logging</groupId>
-                  <artifactId>commons-logging</artifactId>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
                 </exclusion>
                 <exclusion>
-                  <groupId>howl</groupId>
-                  <artifactId>howl-logger</artifactId>
+                    <groupId>howl</groupId>
+                    <artifactId>howl-logger</artifactId>
                 </exclusion>
                 <exclusion>
-                  <groupId>log4j</groupId>
-                  <artifactId>log4j</artifactId>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
                 </exclusion>
                 <exclusion>
-                  <groupId>geronimo</groupId>
-                  <artifactId>geronimo-kernel</artifactId>
+                    <groupId>geronimo</groupId>
+                    <artifactId>geronimo-kernel</artifactId>
                 </exclusion>
                 <exclusion>
-                  <groupId>geronimo</groupId>
-                  <artifactId>geronimo-j2ee</artifactId>
+                    <groupId>geronimo</groupId>
+                    <artifactId>geronimo-j2ee</artifactId>
                 </exclusion>
                 <exclusion>
-                  <groupId>activesoap</groupId>
-                  <artifactId>jaxp-api</artifactId>
+                    <groupId>activesoap</groupId>
+                    <artifactId>jaxp-api</artifactId>
                 </exclusion>
                 <exclusion>
-                  <groupId>mx4j</groupId>
-                  <artifactId>mx4j-jmx</artifactId>
+                    <groupId>mx4j</groupId>
+                    <artifactId>mx4j-jmx</artifactId>
                 </exclusion>
                 <exclusion>
-                  <groupId>mx4j</groupId>
-                  <artifactId>mx4j-remote</artifactId>
+                    <groupId>mx4j</groupId>
+                    <artifactId>mx4j-remote</artifactId>
                 </exclusion>
                 <exclusion>
-                  <groupId>mx4j</groupId>
-                  <artifactId>mx4j-tools</artifactId>
+                    <groupId>mx4j</groupId>
+                    <artifactId>mx4j-tools</artifactId>
                 </exclusion>
                 <exclusion>
-                  <groupId>mx4j</groupId>
-                  <artifactId>mx4j-impl</artifactId>
+                    <groupId>mx4j</groupId>
+                    <artifactId>mx4j-impl</artifactId>
                 </exclusion>
-           </exclusions>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -185,4 +184,23 @@
             <version>${version}</version>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <!-- This is needed so that the ActiveMQ tests don't trip over each other
+                        during startup/shutdown. -->
+                    <forkMode>pertest</forkMode>
+                    <excludes>
+                        <!-- MULE-1864 -->
+                        <exclude>**/*.*</exclude>
+                        <exclude implementation="java.lang.String">**/*LoanBrokerEsb*.*</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
