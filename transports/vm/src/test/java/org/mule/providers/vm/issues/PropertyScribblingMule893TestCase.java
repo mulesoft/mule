@@ -13,6 +13,7 @@ package org.mule.providers.vm.issues;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
+import org.mule.config.MuleProperties;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,7 +30,7 @@ public class PropertyScribblingMule893TestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
         Map properties = new HashMap();
-        properties.put("MULE_REPLY_TO", "receive");
+        properties.put(MuleProperties.MULE_REPLY_TO_PROPERTY, "receive");
         client.dispatch("dispatch", "Message", properties);
         UMOMessage response = client.receive("receive", 3000L);
         assertNotNull("Response is null", response);
