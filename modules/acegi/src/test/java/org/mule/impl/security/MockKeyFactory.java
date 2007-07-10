@@ -23,4 +23,13 @@ public class MockKeyFactory extends Named implements ObjectFactory
         return null;
     }
 
+    public void initialise()
+    {
+        // nothing to do
+    }
+
+    public void dispose()
+    {
+        // nothing to do
+    }
 }
