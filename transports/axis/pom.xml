@@ -59,7 +59,8 @@
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
                             <excludes>
-                                <!-- MULE-1553 -->
+                                <exclude>**/EndpointRetrievalMule2021TestCase.java</exclude>
+                                <!-- MULE-1839 -->
                                 <exclude>**/AxisConnectorHttpsTestCase.java</exclude>
                                 <exclude>**/AxisConnectorJmsFunctionalTestCase.java</exclude>
                                 <exclude>**/AxisConnectorJmsTopicsFunctionalTestCase.java</exclude>
