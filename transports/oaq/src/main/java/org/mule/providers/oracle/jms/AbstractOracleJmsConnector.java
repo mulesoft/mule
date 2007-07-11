@@ -12,10 +12,6 @@
 package org.mule.providers.oracle.jms;
 
 
-import oracle.jms.AQjmsSession;
-import oracle.jms.AdtMessage;
-import oracle.xdb.XMLType;
-
 import org.mule.config.i18n.CoreMessages;
 import org.mule.providers.ConnectException;
 import org.mule.providers.jms.JmsConnector;
@@ -34,6 +30,10 @@ import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.Session;
 import javax.naming.NamingException;
+
+import oracle.jms.AQjmsSession;
+import oracle.jms.AdtMessage;
+import oracle.xdb.XMLType;
 
 public abstract class AbstractOracleJmsConnector extends JmsConnector
 {

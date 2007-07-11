@@ -10,8 +10,6 @@
 
 package org.mule.providers.oracle.jms;
 
-import oracle.jdbc.pool.OracleDataSource;
-
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.util.object.SingletonObjectFactory;
@@ -23,6 +21,8 @@ import java.util.Enumeration;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.TextMessage;
+
+import oracle.jdbc.pool.OracleDataSource;
 
 public class OracleInContainerJmsConnectorTestCase extends AbstractConnectorTestCase
 {
