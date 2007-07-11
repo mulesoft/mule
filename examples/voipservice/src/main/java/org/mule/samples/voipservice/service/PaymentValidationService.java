@@ -10,10 +10,7 @@
 
 package org.mule.samples.voipservice.service;
 
-import org.mule.RegistryContext;
 import org.mule.samples.voipservice.interfaces.PaymentValidation;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOEndpointURI;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,14 +30,9 @@ public class PaymentValidationService implements PaymentValidation
     {
         logger.info("Inside PaymentValidationService.getCreditVendors() ***************");
         List endPoints = new ArrayList();
-        endPoints.add(this.getEndpointUri(CREDIT_AGENCY_LOOKUP_NAME));
-        endPoints.add(this.getEndpointUri(BANK_AGENCY_LOOKUP_NAME));
+        endPoints.add(CREDIT_AGENCY_LOOKUP_NAME);
+        endPoints.add(BANK_AGENCY_LOOKUP_NAME);
         return endPoints;
     }
 
-    private UMOEndpointURI getEndpointUri(String endpointName)
-    {
-        UMOEndpoint endpoint = RegistryContext.getRegistry().lookupEndpoint(endpointName);
-        return endpoint.getEndpointURI();
-    }
 }

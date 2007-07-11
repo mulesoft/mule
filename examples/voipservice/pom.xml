@@ -27,7 +27,6 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <exclude>**/VoipConsumerTestCase.*</exclude>
                     </excludes>
                 </configuration>
             </plugin>

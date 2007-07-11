@@ -26,7 +26,6 @@ public class CreditAgencyService implements CreditAgency
 
     public CreditProfileTO getCreditProfile(CreditProfileTO creditProfileTO)
     {
-
         logger.info("Inside CreditAgencyService.getCreditProfile() ***************");
         creditProfileTO.setCreditScore(1000000);
         return creditProfileTO;
