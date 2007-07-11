@@ -230,6 +230,15 @@
                 <enabled>false</enabled>
             </releases>
         </repository>
+        <!-- apache-activemq-4.1.0-incubator is not available in public repos any more -->
+        <repository>
+            <id>mule-deps</id>
+            <name>Mule Dependencies</name>
+            <url>http://dist.codehaus.org/mule/dependencies/maven2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
     </repositories>
     <pluginRepositories>
         <pluginRepository>
