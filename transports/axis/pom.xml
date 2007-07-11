@@ -31,6 +31,8 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <excludes>
+                        <exclude>**/EndpointRetrievalMule2021TestCase</exclude>
+                        
                         <!-- MULE-1839, remaining tests waiting for JMS  -->
                         <exclude>**/AxisConnectorJmsTopicsFunctionalTestCase.java</exclude>
 
