@@ -17,10 +17,6 @@
         The example consists of two components: ExceptionManager and BusinessErrorManager.
     </description>
     
-    <bean id="activeMqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
-        <constructor-arg value="vm://localhost?broker.persistent=false&amp;broker.useJmx=false"/>
-    </bean>
-
     <bean id="errorManager" class="org.mule.samples.errorhandler.ErrorManager">
         <property name="handlers">
             <list>
@@ -30,9 +26,7 @@
             </list>
         </property>
     </bean>
-
-    <bean id="businessErrorManager" class="org.mule.samples.errorhandler.BusinessErrorManager"/>
-
+    
     <bean id="defaultHandler" class="org.mule.samples.errorhandler.handlers.DefaultHandler">
         <property name="endpointName" value="ExceptionFileWriter"/>
         <property name="errorManager">
@@ -65,13 +59,16 @@
 
     <smtp:connector name="EmailConnector"/>
 
-    <!-- TODO see MULE-1575 JMS connector is not spring-ified yet -->
-    <jms:connector name="JMSConnector" specification="1.1"/>
+    <jms:activemq-connector name="JMSConnector"/>
+    <!-- TODO DO: how to specify this? Fortunately it's the default of AMQ connector but it
+         would be good to show an example to specify this anyway
+    -->
+<!--                            brokerURL="vm://localhost?broker.persistent=false&amp;broker.useJmx=false"/>-->
     
     <file:connector name="FileConnector" 
                     pollingFrequency="1000" 
                     moveToDirectory="./test-data/out"
-                    outputPattern="${DATE}.xml"/>
+                    outputPattern="[DATE].xml"/>
 
     <!-- 
         All transformers must be declared here to be referenced by their names in the 
@@ -115,10 +112,28 @@
             file:///usr/test-data/samples/errorhandler/in
         -->
         <mule:service name="Error Manager">
-            <mule:component instance-ref="errorManager"/>
+            <mule:component class="org.mule.samples.errorhandler.ErrorManager">
+                <mule:properties>
+                    <entry key="handlers">
+                        <list>
+                            <ref local="fatalHandler"/>
+                            <ref local="defaultHandler"/>
+                            <ref local="businessHandler"/>
+                        </list>
+                    </entry>
+                </mule:properties>
+            </mule:component>
             <mule:inbound-router>
                 <mule:endpoint address="file://./test-data/in"
-                               transformers="XMLToExceptionBean ExceptionBeanToErrorMessage"/>
+                               transformers="XMLToExceptionBean ExceptionBeanToErrorMessage">
+                    <!-- Ignore other files than our XML error input. When runngin this example from
+                         a svn checkout the file connector would try to process subversion's meta
+                         dirs which is not what we want.
+                    -->
+                    <mule:custom-filter class="org.mule.providers.file.filters.FilenameWildcardFilter">
+                        <mule:property name="pattern" value="*.xml"/>
+                    </mule:custom-filter>
+                </mule:endpoint>
             </mule:inbound-router>
             
             <mule:outbound-router>
@@ -128,7 +143,7 @@
                     <mule:endpoint address="file://./test-data/exceptions"
                                    transformers="ErrorMessageToExceptionBean ExceptionBeanToXML">
                         <mule:properties>
-                            <entry key="outputPattern" value="Exception-${UUID}.xml"/>
+                            <entry key="outputPattern" value="Exception-[UUID].xml"/>
                         </mule:properties>
                     </mule:endpoint>
                 </mule:filtering-router>
@@ -156,8 +171,7 @@
         </mule:service>
         
         <mule:service name="Business Error Manager">
-            <mule:component instance-ref="businessErrorManager"/>
-            
+            <mule:component class="org.mule.samples.errorhandler.BusinessErrorManager"/>
             <mule:inbound-router>
                 <mule:endpoint address="jms://exception.queue"
                                transformers="JMSMessageToObject XMLToExceptionBean ExceptionBeanToErrorMessage"/>

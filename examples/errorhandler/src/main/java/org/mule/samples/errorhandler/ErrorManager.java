@@ -16,6 +16,7 @@ import org.mule.umo.UMOException;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -32,21 +33,18 @@ public class ErrorManager
     private Map handlers = new HashMap();
     private ExceptionHandler defaultHandler = null;
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.impl.MuleUMO#initialise(java.util.Properties)
-     */
     public ErrorManager()
     {
         defaultHandler = new DefaultHandler();
     }
-
-    public void setHandlers(ExceptionHandler[] eh)
+    
+    public void setHandlers(List handlers)
     {
-        for (int i = 0; i < eh.length; i++)
+        Iterator handlerIter = handlers.iterator();
+        while (handlerIter.hasNext())
         {
-            addHandler(eh[i]);
+            ExceptionHandler handler = (ExceptionHandler)handlerIter.next();
+            this.addHandler(handler);
         }
     }
 
