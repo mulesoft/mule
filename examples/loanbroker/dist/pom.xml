@@ -3,10 +3,11 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    
+
     <groupId>org.mule.examples</groupId>
-    <artifactId>mule-example-loanbroker</artifactId>
+    <artifactId>mule-example-loanbroker-parent</artifactId>
     <version>1.0</version>
+    <packaging>pom</packaging>
     <name>Loan Broker Example</name>
     <description>The Loan Broker example application is based on the example presented in the Enterprise Integration Patterns book. This chapter of the book is available online so you can see a detailed description of the application here (http://www.eaipatterns.com/ComposedMessagingWS.html).</description>
 
@@ -41,7 +42,7 @@
             <version>${muleVersion}</version>
         </dependency>
     </dependencies>
-    
+
     <repositories>
         <repository>
             <id>codehaus</id>
@@ -76,7 +77,7 @@
             </releases>
         </pluginRepository>
     </pluginRepositories>
-  
+
     <build>
         <defaultGoal>install</defaultGoal>
 
