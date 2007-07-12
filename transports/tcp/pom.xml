@@ -24,7 +24,6 @@
                          <exclude>**/AsynchMule1869TestCase.*</exclude>
                          <!-- be careful when re-enabling this, it may hang the CI server -->
                          <exclude>**/KeepSendSocketOpenMule1491TestCase.*</exclude>
-                         <exclude>**/TcpRemoteSyncTestCase.*</exclude>
                      </excludes>
                  </configuration>
              </plugin>
