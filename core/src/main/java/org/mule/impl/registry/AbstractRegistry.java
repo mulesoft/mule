@@ -681,14 +681,15 @@ public abstract class AbstractRegistry implements RegistryFacade
      */
     public UMOEndpoint getEndpointFromUri(UMOEndpointURI uri) throws UMOException
     {
-        UMOEndpoint endpoint = getEndpointFromUri(uri.getEndpointName());
+        String name = uri.getEndpointName();
+        UMOEndpoint endpoint = getEndpointFromUri(name);
         if (null == endpoint)
         {
             String address = uri.getAddress();
             if (null != address)
             {
                 Map endpoints = getEndpoints();
-                if (endpoints.containsKey(uri.getEndpointName()))
+                if (null != name && endpoints.containsKey(name))
                 {
                     throw new IllegalStateException("Endpoint present, but direct lookup failed");
                 }
