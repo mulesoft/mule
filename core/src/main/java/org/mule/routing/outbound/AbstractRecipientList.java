@@ -174,7 +174,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         UMOEndpoint endpoint = (UMOEndpoint) recipientCache.get(recipient);
         if (null == endpoint && null != getManagementContext() && null != getManagementContext().getRegistry())
         {
-            endpoint = getManagementContext().getRegistry().getEndpointFromUri(recipient);
+            endpoint = getManagementContext().getRegistry().getEndpointFromName(recipient);
         }
         if (null == endpoint)
         {

@@ -113,7 +113,6 @@ public interface RegistryFacade extends Initialisable, Registry
 
     Object unregisterObject(String key);
 
-
     UMOAgent lookupAgent(String agentName);
 
     UMOAgent unregisterAgent(String agentName) throws UMOException;
@@ -144,7 +143,11 @@ public interface RegistryFacade extends Initialisable, Registry
 
     UMOEndpoint createEndpointFromUri(String uri, String type) throws UMOException;
 
+    /** @deprecated Use {@link #getEndpointFromUri(org.mule.umo.endpoint.UMOEndpointURI)}
+     *  or {@link #getEndpointFromName(String)} instead  **/
     UMOEndpoint getEndpointFromUri(String uri) throws ObjectNotFoundException;
+
+    UMOEndpoint getEndpointFromName(String name) throws ObjectNotFoundException;
 
     UMOEndpoint getEndpointFromUri(UMOEndpointURI uri) throws UMOException;
 

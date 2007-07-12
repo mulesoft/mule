@@ -34,9 +34,27 @@ public class EndpointRetrievalMule2021TestCase extends FunctionalTestCase
         assertEndpointOk(endpoint2);
     }
 
+    public void testGetEndpointFromName() throws UMOException
+    {
+        UMOEndpoint endpoint1 = managementContext.getRegistry().getEndpointFromName("Endpoint");
+        assertEndpointOk(endpoint1);
+        UMOEndpointURI uri = endpoint1.getEndpointURI();
+        UMOEndpoint endpoint2 = managementContext.getRegistry().getEndpointFromUri(uri);
+        assertEndpointOk(endpoint2);
+    }
+
     public void testGetOrCreateEndpointForUri() throws UMOException
     {
         UMOEndpoint endpoint1 = managementContext.getRegistry().getEndpointFromUri("Endpoint");
+        assertEndpointOk(endpoint1);
+        UMOEndpointURI uri = endpoint1.getEndpointURI();
+        UMOEndpoint endpoint2 = managementContext.getRegistry().getOrCreateEndpointForUri(uri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        assertEndpointOk(endpoint2);
+    }
+
+    public void testGetOrCreateEndpointForUriFromName() throws UMOException
+    {
+        UMOEndpoint endpoint1 = managementContext.getRegistry().getEndpointFromName("Endpoint");
         assertEndpointOk(endpoint1);
         UMOEndpointURI uri = endpoint1.getEndpointURI();
         UMOEndpoint endpoint2 = managementContext.getRegistry().getOrCreateEndpointForUri(uri, UMOEndpoint.ENDPOINT_TYPE_SENDER);

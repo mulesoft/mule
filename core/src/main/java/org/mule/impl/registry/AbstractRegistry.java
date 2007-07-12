@@ -652,21 +652,25 @@ public abstract class AbstractRegistry implements RegistryFacade
      * xfire:http://... and http://... are identical.  But I do not have a more
      * complete explanation.
      *
-     * <p>Given the mismatch between name and function this should perhaps be deprecated
-     * and replaced with getEndpointFromName.  See MULE-2022.
-     *
-     * @param uri
-     * @return
+     * @param name The endpoint name
+     * @return An endpoint, or null
      * @throws ObjectNotFoundException
      */
-    public UMOEndpoint getEndpointFromUri(String uri) throws ObjectNotFoundException
+    public UMOEndpoint getEndpointFromName(String name) throws ObjectNotFoundException
     {
-        UMOEndpoint endpoint = null;
-        if (uri != null)
+        if (null != name)
         {
-            endpoint = lookupEndpoint(uri);
+            return lookupEndpoint(name);
         }
-        return endpoint;
+        else
+        {
+            return null;
+        }
+    }
+
+    public UMOEndpoint getEndpointFromUri(String name) throws ObjectNotFoundException
+    {
+        return getEndpointFromName(name);
     }
 
     /**
@@ -682,7 +686,7 @@ public abstract class AbstractRegistry implements RegistryFacade
     public UMOEndpoint getEndpointFromUri(UMOEndpointURI uri) throws UMOException
     {
         String name = uri.getEndpointName();
-        UMOEndpoint endpoint = getEndpointFromUri(name);
+        UMOEndpoint endpoint = getEndpointFromName(name);
         if (null == endpoint)
         {
             String address = uri.getAddress();
@@ -723,7 +727,7 @@ public abstract class AbstractRegistry implements RegistryFacade
 
     public UMOEndpoint getOrCreateEndpointForUri(String uriIdentifier, String type) throws UMOException
     {
-        UMOEndpoint endpoint = getEndpointFromUri(uriIdentifier);
+        UMOEndpoint endpoint = getEndpointFromName(uriIdentifier);
         if (endpoint == null)
         {
             endpoint = createEndpointFromUri(new MuleEndpointURI(uriIdentifier), type);
