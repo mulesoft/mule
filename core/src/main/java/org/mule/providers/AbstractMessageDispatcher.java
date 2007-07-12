@@ -32,6 +32,7 @@ import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.ReceiveException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
+import org.mule.umo.routing.UMOResponseRouterCollection;
 import org.mule.util.ClassUtils;
 
 import java.beans.ExceptionListener;
@@ -440,7 +441,15 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
                 // component will be null for client calls
                 if (event.getComponent() != null)
                 {
-                    remoteSync = event.getComponent().getDescriptor().getResponseRouter() == null;
+                    UMOResponseRouterCollection responseRouters = event.getComponent().getDescriptor().getResponseRouter();
+                    if (responseRouters==null || !responseRouters.hasEndpoints())
+                    {
+                        remoteSync = true;
+                    }
+                    else
+                    {
+                        remoteSync = false;
+                    }
                 }
             }
         }

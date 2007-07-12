@@ -49,4 +49,6 @@ public interface UMOResponseRouterCollection extends UMORouterCollection
     int getTimeout();
 
     void setTimeout(int timeout);
+    
+    boolean hasEndpoints();
 }
