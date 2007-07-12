@@ -442,13 +442,13 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
                 if (event.getComponent() != null)
                 {
                     UMOResponseRouterCollection responseRouters = event.getComponent().getDescriptor().getResponseRouter();
-                    if (responseRouters==null || !responseRouters.hasEndpoints())
+                    if (responseRouters != null && responseRouters.hasEndpoints())
                     {
-                        remoteSync = true;
+                        remoteSync = false;
                     }
                     else
                     {
-                        remoteSync = false;
+                        remoteSync = true;
                     }
                 }
             }
