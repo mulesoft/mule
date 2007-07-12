@@ -41,10 +41,10 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.registry.RegistryFacade;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
-import org.mule.util.StringUtils;
 import org.mule.util.UUID;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -640,6 +640,25 @@ public abstract class AbstractRegistry implements RegistryFacade
         return endpoint;
     }
 
+    /**
+     * Return an endpoint, given that endpoint's <em>name</em>.
+     *
+     * <p>This only returns an endpoint if the argument is a name (at least, when working
+     * with Spring).  If the logic is changed to be similar to that of
+     * {@link #getEndpointFromUri(org.mule.umo.endpoint.UMOEndpointURI)} below (ie
+     * looping through addresses too) then endpoints are also returned if the address
+     * matches the argument.  HOWEVER, this breaks other tests (XFire i nparticular).
+     * As far as I can tell, this is because the "additional prefix" is lost, so
+     * xfire:http://... and http://... are identical.  But I do not have a more
+     * complete explanation.
+     *
+     * <p>Given the mismatch between name and function this should perhaps be deprecated
+     * and replaced with getEndpointFromName.  See MULE-2022.
+     *
+     * @param uri
+     * @return
+     * @throws ObjectNotFoundException
+     */
     public UMOEndpoint getEndpointFromUri(String uri) throws ObjectNotFoundException
     {
         UMOEndpoint endpoint = null;
@@ -650,23 +669,55 @@ public abstract class AbstractRegistry implements RegistryFacade
         return endpoint;
     }
 
+    /**
+     * Return an endpoint whose name or address matches the given URI.
+     *
+     * <p>This is more forgiving than {@link #getEndpointFromUri(String)} above, in that
+     * it recognises endpoints via both names and addresses.
+     *
+     * @param uri
+     * @return
+     * @throws UMOException
+     */
     public UMOEndpoint getEndpointFromUri(UMOEndpointURI uri) throws UMOException
     {
-        String endpointName = uri.getEndpointName();
-        if (endpointName != null)
+        UMOEndpoint endpoint = getEndpointFromUri(uri.getEndpointName());
+        if (null == endpoint)
         {
-            UMOEndpoint endpoint = lookupEndpoint(endpointName);
-            if (endpoint != null)
+            String address = uri.getAddress();
+            if (null != address)
             {
-                if (StringUtils.isNotEmpty(uri.getAddress()))
+                Map endpoints = getEndpoints();
+                if (endpoints.containsKey(uri.getEndpointName()))
                 {
-                    //TODO RM*    endpoint.setEndpointURI(uri);
+                    throw new IllegalStateException("Endpoint present, but direct lookup failed");
+                }
+
+                Iterator keys = endpoints.keySet().iterator();
+                while (keys.hasNext())
+                {
+                    Object key = keys.next(); // this is actually the global name
+                    Object value = endpoints.get(key);
+                    if (value instanceof UMOEndpoint)
+                    {
+                        UMOEndpoint candidate = (UMOEndpoint) value;
+                        String candidateAddress = candidate.getEndpointURI().getAddress();
+                        if (null != candidateAddress && address.equals(candidateAddress))
+                        {
+                            if (null == endpoint)
+                            {
+                                endpoint = candidate;
+                            }
+                            else
+                            {
+                                throw new IllegalStateException("Duplicate endpoint URI");
+                            }
+                        }
+                    }
                 }
             }
-            return endpoint;
         }
-
-        return null;
+        return endpoint;
     }
 
     public UMOEndpoint getOrCreateEndpointForUri(String uriIdentifier, String type) throws UMOException
@@ -716,9 +767,10 @@ public abstract class AbstractRegistry implements RegistryFacade
         return null;
     }
 
-    public void registerEndpoint(UMOEndpoint endpoint) throws UMOException
+    public void registerEndpoint(UMOEndpoint
+        lookup) throws UMOException
     {
-        unsupportedOperation("registerEndpoint", endpoint);
+        unsupportedOperation("registerEndpoint", lookup);
     }
 
     public UMOImmutableEndpoint unregisterEndpoint(String endpointName)
