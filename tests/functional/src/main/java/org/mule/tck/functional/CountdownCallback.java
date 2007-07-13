@@ -29,13 +29,16 @@ public class CountdownCallback implements EventCallback
 
     public void eventReceived(UMOEventContext context, Object Component) throws Exception
     {
-        if (countDown.getCount() > 0)
-        {
-            countDown.countDown();
-        }
-        else
-        {
-            throw new AssertionFailedError("Too many messages received");
+        synchronized (this)
+        {            
+            if (countDown.getCount() > 0)
+            {
+                countDown.countDown();
+            }
+            else
+            {
+                throw new AssertionFailedError("Too many messages received");
+            }
         }
     }
 
