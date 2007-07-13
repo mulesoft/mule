@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -16,7 +16,7 @@ import org.mule.umo.manager.UMOServerNotificationListener;
 /**
  * 
  * @author 
- * @version $Revision: $
+ * @version $Revision$
  */
 public class PersistenceNotificationListener implements UMOServerNotificationListener
 {

@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -29,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
  * This dummy registry just reports on registration events but
  * doesn't store anything
  *
- * @version $Revision: $
+ * @version $Revision$
  */
 public class DummyRegistry implements Registry {
 

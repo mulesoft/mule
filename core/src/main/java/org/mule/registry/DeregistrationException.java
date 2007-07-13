@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -14,7 +14,7 @@ import org.mule.MuleException;
 
 /**
  * @author
- * @version $Revision: $
+ * @version $Revision$
  */
 public class DeregistrationException extends MuleException
 {

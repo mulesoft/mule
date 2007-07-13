@@ -1,5 +1,5 @@
 /*
- * $Id: PersistenceManager.java 3649 2006-10-24 10:09:08Z holger $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -24,7 +24,7 @@ import org.mule.umo.lifecycle.Stoppable;
  * In the future, we might have different kinds of persistence managers.
  * 
  * @author 
- * @version $Revision: 3649 $
+ * @version $Revision$
  */
 public interface PersistenceManager extends Initialisable, Startable, Stoppable, Disposable
 {

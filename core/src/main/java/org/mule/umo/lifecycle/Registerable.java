@@ -1,5 +1,5 @@
 /*
- * $Id: Registerable.java 3649 2006-10-24 10:09:08Z holger $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -18,7 +18,7 @@ import org.mule.registry.RegistrationException;
  * register lifecycle stage of the implementing component.
  * 
  * @author 
- * @version $Revision: 3649 $
+ * @version $Revision$
  */
 public interface Registerable
 {

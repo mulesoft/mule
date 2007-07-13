@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -16,7 +16,7 @@ package org.mule.registry;
  * Actual implementation will probably be the OSGi Version.
  *
  * @author <a href="mailto:lajos@mulesource.com">Lajos Moczar</a>
- * @version $Revision: $
+ * @version $Revision$
  */
 
 public interface ComponentVersion 

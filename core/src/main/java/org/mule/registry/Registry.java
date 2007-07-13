@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -22,7 +22,7 @@ import java.util.Map;
  * This Registry is really a facade so that we can implement various
  * other types of registries in the future. 
  *
- * @version $Revision: $
+ * @version $Revision$
  */
 public interface Registry extends Disposable {
 

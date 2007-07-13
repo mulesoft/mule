@@ -1,5 +1,5 @@
 /*
- * $Id: Persistable.java 3649 2006-10-24 10:09:08Z holger $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -19,7 +19,7 @@ import org.mule.umo.manager.UMOServerNotificationListener;
  * the registry itself, but it can be extended to other components.
  * 
  * @author 
- * @version $Revision: 3649 $
+ * @version $Revision$
  */
 public interface Persistable
 {

@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -23,7 +23,7 @@ import java.util.Map;
  * The Registry store is responsible for storing and persisting
  * the component references. It is also queryable and discoverable.
  *
- * @version $Revision: $
+ * @version $Revision$
  */
 public interface RegistryStore extends Initialisable, Startable, Stoppable, Disposable, Persistable
 {
