@@ -33,8 +33,6 @@
                     <excludes>
                         <!-- MULE-1564 -->
                         <exclude>**/AxisConnectorVMFunctionalTestCase.java</exclude>
-
-                        <!-- MULE-1839, remaining tests waiting for JMS  -->
                         <exclude>**/AxisConnectorJmsTopicsFunctionalTestCase.java</exclude>
 
                         <!-- Only run tests with external dependencies in the tests-external profile -->
