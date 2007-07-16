@@ -19,7 +19,7 @@
     </description>
 
     <properties>
-        <muleVersion>1.4.2-SNAPSHOT</muleVersion>
+        <muleVersion>2.0-M1-SNAPSHOT</muleVersion>
     </properties>
 
     <dependencies>
