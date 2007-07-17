@@ -75,6 +75,9 @@ def process(input)
     input.renameTo(backupFile)
 
     outputFile.renameTo(input)
+    
+    // remove the backup file
+    backupFile.delete()
 }
 
 //-----------------------------------------------------------------------------
