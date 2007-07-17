@@ -31,8 +31,9 @@ public class AuthComponentAsynchFunctionalTestCase extends FunctionalTestCase
         return "auth-component-asynch-test.xml";
     }
 
+    // @Override
     // Clear the security context after each test.
-    public void doFunctionalTearDown()
+    public void doTearDown()
     {
         SecurityContextHolder.setContext(new SecurityContextImpl());
     }

@@ -28,7 +28,8 @@ public class AxisClientWithComplexTypesTestCase extends FunctionalTestCase
     private Trade trade = null;
     private String uri = "axis:http://localhost:8081/services/BackOfficeImplBindingImplUMO?method=submitTrade";
 
-    protected void doFunctionalSetUp() throws Exception
+    // @Override
+    protected void doSetUp() throws Exception
     {
         trade = new Trade();
         trade.setAccountID(11);

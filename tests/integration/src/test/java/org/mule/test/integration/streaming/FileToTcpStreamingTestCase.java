@@ -16,11 +16,13 @@ import org.mule.util.FileUtils;
 
 public class FileToTcpStreamingTestCase extends FunctionalTestCase
 {
-    protected void doFunctionalTearDown() throws Exception
+    // @Override
+    protected void doTearDown() throws Exception
     {
         FileUtils.deleteDirectory(FileUtils.newFile(RegistryContext.getConfiguration().getWorkingDirectory() + "/test-data"));
     }
 
+    // @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/streaming/file-to-tcp-streaming.xml";
@@ -38,7 +40,7 @@ public class FileToTcpStreamingTestCase extends FunctionalTestCase
 
         Thread.sleep(3000);
 
-        String result = FileUtils.readFileToString(FileUtils.newFile(basepath + "/out/foo.txt.processed"), "UTF8");
+        String result = FileUtils.readFileToString(FileUtils.newFile(basepath, "out/foo.txt.processed"), "UTF8");
         assertEquals(text, result);
     }
 }
