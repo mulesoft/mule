@@ -10,7 +10,6 @@
     <artifactId>bobberplus</artifactId>
     <packaging>maven-plugin</packaging>
     <name>BobberPlus Archetype Plugin</name>
-    <version>${version}</version>
     <description>Extended Bobber Custom Archetype Creator</description>
 
     <dependencies>
