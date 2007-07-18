@@ -38,6 +38,8 @@ import java.util.Map;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
 
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
@@ -63,6 +65,8 @@ public abstract class AbstractMuleTestCase extends TestCase
     private boolean offline = System.getProperty("org.mule.offline", "false").equalsIgnoreCase("true");
 
     private static Map testCounters;
+    
+    private TestCaseWatchdog watchdog;
 
     protected static UMOManagementContext managementContext;
 
@@ -226,6 +230,10 @@ public abstract class AbstractMuleTestCase extends TestCase
 
     protected final void setUp() throws Exception
     {
+        // start a watchdog thread that kills the VM after 30 minutes timeout
+        watchdog = new TestCaseWatchdog(30, TimeUnit.MINUTES);
+        watchdog.start();
+        
         if (verbose)
         {
             System.out.println(StringMessageUtils.getBoilerPlate("Testing: " + toString(), '=', 80));
@@ -316,18 +324,26 @@ public abstract class AbstractMuleTestCase extends TestCase
         }
         finally
         {
-            getTestInfo().incRunCount();
-            if (getTestInfo().getRunCount() == getTestInfo().getTestCount())
+            try
             {
-                try
+                getTestInfo().incRunCount();
+                if (getTestInfo().getRunCount() == getTestInfo().getTestCount())
                 {
-                    suitePostTearDown();
+                    try
+                    {
+                        suitePostTearDown();
+                    }
+                    finally
+                    {
+                        clearCounter();
+                        disposeManager();
+                    }
                 }
-                finally
-                {
-                    clearCounter();
-                    disposeManager();
-                }
+            }
+            finally 
+            {
+                // remove the watchdog thread in any case
+                watchdog.cancel();
             }
         }
     }

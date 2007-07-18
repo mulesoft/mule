@@ -84,6 +84,11 @@ public class MultiContainerContext implements UMOContainerContext
             realKey = (ContainerKeyPair) key;
         }
 
+        if (realKey == null)
+        {
+            throw new ObjectNotFoundException(null);
+        }
+        
         Object component = null;
         UMOContainerContext container;
         if (realKey.getContainerName() != null)

@@ -18,6 +18,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * A factory for loading URL protocol handlers. This factory is necessary to make
  * Mule work in cases where the standard approach using system properties does not
@@ -32,6 +35,7 @@ import java.util.StringTokenizer;
 public class MuleUrlStreamHandlerFactory extends Object implements URLStreamHandlerFactory
 {
     private static final String HANDLER_PKGS_SYSTEM_PROPERTY = "java.protocol.handler.pkgs";
+    private static final Log log = LogFactory.getLog(MuleUrlStreamHandlerFactory.class);
     
     private static Map registry = Collections.synchronizedMap(new HashMap());
 
@@ -59,7 +63,10 @@ public class MuleUrlStreamHandlerFactory extends Object implements URLStreamHand
         }
         catch (Error err)
         {
-            // our custom UrlStreamHandlerFactory is already installed.
+            if (log.isDebugEnabled())
+            {
+                log.debug("Custom MuleUrlStreamHandlerFactory already registered", err);
+            }
         }
     }
     

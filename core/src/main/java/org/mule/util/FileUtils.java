@@ -209,8 +209,27 @@ public class FileUtils extends org.apache.commons.io.FileUtils
     }
 
 
-    // TODO Document me!
+    /**
+     * Delete a file tree recursively.
+     * @param dir dir to wipe out
+     * @return false when the first unsuccessful attempt encountered
+     */
     public static boolean deleteTree(File dir)
+    {
+        return deleteTree(dir, null);
+    }
+
+    /**
+     * Delete a file tree recursively. This method additionally tries to be
+     * gentle with specified top-level dirs. E.g. this is the case when a
+     * transaction manager asynchronously handles the recovery log, and the test
+     * wipes out everything, leaving the transaction manager puzzled.  
+     * @param dir dir to wipe out
+     * @param topLevelDirsToIgnore which top-level directories to ignore,
+     *        if null or empty then ignored
+     * @return false when the first unsuccessful attempt encountered
+     */
+    public static boolean deleteTree(File dir, final String[] topLevelDirsToIgnore)
     {
         if (dir == null || !dir.exists())
         {
@@ -221,8 +240,20 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         {
             for (int i = 0; i < files.length; i++)
             {
+                OUTER:
                 if (files[i].isDirectory())
                 {
+                    if (topLevelDirsToIgnore != null)
+                    {
+                        for (int j = 0; j < topLevelDirsToIgnore.length; j++)
+                        {
+                            String ignored = topLevelDirsToIgnore[j];
+                            if (ignored.equals(FilenameUtils.getBaseName(files[i].getName())))
+                            {
+                                break OUTER;
+                            }
+                        }
+                    }
                     if (!deleteTree(files[i]))
                     {
                         return false;
