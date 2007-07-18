@@ -13,14 +13,13 @@ package org.mule.impl.model.streaming;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.RequestContext;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.model.AbstractComponent;
 import org.mule.impl.model.ComponentFactory;
 import org.mule.umo.ComponentException;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -61,17 +60,14 @@ public class StreamingComponent extends AbstractComponent
         // Right now we do not support transformers on the Streaming model
         for (Iterator iterator = descriptor.getInboundRouter().getEndpoints().iterator(); iterator.hasNext();)
         {
-            UMOImmutableEndpoint ep = (UMOImmutableEndpoint) iterator.next();
-            if (!ep.isStreaming())
-            {
-                logger.error("***********************************************");
-                logger.error("setting streaming = true");
-                logger.error("MULE-1752");
-                logger.error("***********************************************");
-                ((MuleEndpoint) ep).setStreaming(true);
+            //Enforce streaming
+            UMOEndpoint ep = (UMOEndpoint) iterator.next();
+            ep.setStreaming(true);
+//            if (!ep.isStreaming())
+//            {
 //                throw new InitialisationException(
 //                    CoreMessages.streamingEndpointsMustBeUsedWithStreamingModel(), this);
-            }
+//            }
             // TODO RM*: This restriction could be lifted in future
             if (ep.getTransformer() != null)
             {

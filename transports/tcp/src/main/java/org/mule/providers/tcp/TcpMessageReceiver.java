@@ -15,11 +15,14 @@ import org.mule.impl.ResponseOutputStream;
 import org.mule.impl.model.streaming.CloseCountDownInputStream;
 import org.mule.impl.model.streaming.CloseCountDownOutputStream;
 import org.mule.providers.AbstractMessageReceiver;
+import org.mule.providers.AbstractReceiverResourceWorker;
 import org.mule.providers.ConnectException;
 import org.mule.providers.tcp.i18n.TcpMessages;
+import org.mule.umo.TransactionException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.lifecycle.Disposable;
@@ -37,9 +40,10 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketAddress;
-import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
@@ -47,7 +51,6 @@ import javax.resource.spi.work.WorkManager;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 
 /**
  * <code>TcpMessageReceiver</code> acts like a TCP server to receive socket
@@ -122,7 +125,6 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
 
     /**
      * Obtain the serverSocket
-     *
      * @return the server socket for this server
      */
     public ServerSocket getServerSocket()
@@ -134,15 +136,6 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
     {
         while (!disposing.get())
         {
-            // TODO why is this spin loop here? It's not there on the trunk.
-            //try
-            //{
-            //    Thread.sleep(100);
-            //}
-            //catch (InterruptedException e)
-            //{
-            //    break;
-            //}
             if (connector.isStarted() && !disposing.get())
             {
                 Socket socket = null;
@@ -222,10 +215,17 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
 
     protected Work createWork(Socket socket) throws IOException
     {
-        return new TcpWorker(socket);
+        if (endpoint.isStreaming())
+        {
+            return new TcpStreamWorker(socket, this);
+        }
+        else
+        {
+            return new TcpWorker(socket, this);
+        }
     }
 
-    protected class TcpWorker implements Work, Disposable
+    protected class TcpWorker extends AbstractReceiverResourceWorker implements Disposable
     {
         protected Socket socket = null;
         protected InputStream dataIn;
@@ -233,28 +233,56 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
         protected AtomicBoolean closed = new AtomicBoolean(false);
         protected TcpProtocol protocol;
 
-        public TcpWorker(Socket socket)
+        public TcpWorker(Object resource, AbstractMessageReceiver receiver) throws IOException
         {
-            final TcpConnector tcpConnector = (TcpConnector) connector;
-            this.socket = socket;
+            super(resource, receiver, new ResponseOutputStream((Socket) resource));
+
+            this.socket = (Socket) resource;
+
+            final TcpConnector tcpConnector = ((TcpConnector) connector);
             this.protocol = tcpConnector.getTcpProtocol();
 
             try
             {
-                tcpConnector.configureSocket(TcpConnector.SERVER, socket);
+                //There is some overhead in stting socket timeout and buffer size, so we're
+                //careful here only to set if needed
+                if (tcpConnector.getReceiveBufferSize() != UMOConnector.INT_VALUE_NOT_SET
+                        && socket.getReceiveBufferSize() != tcpConnector.getReceiveBufferSize())
+                {
+                    socket.setReceiveBufferSize(tcpConnector.getReceiveBufferSize());
+                }
+                if (tcpConnector.getSendBufferSize() != UMOConnector.INT_VALUE_NOT_SET
+                        && socket.getSendBufferSize() != tcpConnector.getSendBufferSize())
+                {
+                    socket.setSendBufferSize(tcpConnector.getSendBufferSize());
+                }
+                // TODO MERGE no such methods in Mule 2.x, is it soTimeout?
+                //if (tcpConnector.getReceiveTimeout() != UMOConnector.INT_VALUE_NOT_SET
+                //        && socket.getSoTimeout() != tcpConnector.getReceiveTimeout())
+                //{
+                //    socket.setSoTimeout(tcpConnector.getReceiveTimeout());
+                //}
+
+                socket.setTcpNoDelay(tcpConnector.isSendTcpNoDelay());
+                socket.setKeepAlive(tcpConnector.isKeepAlive());
+
+                dataIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+                dataOut = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+
             }
-            catch (SocketException e)
+            catch (IOException e)
             {
                 logger.error("Failed to set Socket properties: " + e.getMessage(), e);
             }
-        }
 
-        public void release()
-        {
-            dispose();
         }
 
         public void dispose()
+        {
+            release();
+        }
+
+        public void release()
         {
             closed.set(true);
             try
@@ -284,82 +312,53 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
             }
         }
 
-        /** Accept requests from a given TCP port */
-        public void run()
+        protected void bindTransaction(UMOTransaction tx) throws TransactionException
         {
-            try
-            {
-                dataIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
-                dataOut = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+            //nothing to do
+        }
 
-                if (endpoint.isStreaming())
+        protected Object getNextMessage(Object resource) throws Exception
+        {
+            while (!socket.isClosed() && !disposing.get())
+            {
+                try
                 {
-                    // all we can do for streaming is connect the streams
-                    CountDownLatch latch;
-                    if (endpoint.isSynchronous())
+                    Object readMsg = protocol.read(dataIn);
+                    if (readMsg == null)
                     {
-                        latch = new CountDownLatch(2);
-                        dataOut = new CloseCountDownOutputStream(dataOut, latch);
+                        return null;
                     }
                     else
                     {
-                        latch = new CountDownLatch(2);
+                        return readMsg;
                     }
-                    dataIn = new CloseCountDownInputStream(dataIn, latch);
-
-                    UMOMessageAdapter adapter = connector.getStreamMessageAdapter(dataIn, dataOut);
-                    routeMessage(new MuleMessage(adapter), endpoint.isSynchronous(), null);
-
-                    latch.await();
                 }
-                else
+                catch (SocketTimeoutException e)
                 {
-                    while (!socket.isClosed() && !disposing.get())
+                    if (!socket.getKeepAlive())
                     {
-                        try
-                        {
-                            Object readMsg = protocol.read(dataIn);
-                            if (readMsg == null)
-                            {
-                                break;
-                            }
-                            
-                            boolean remoteSync = endpoint.isRemoteSync();
-                            Object result = processData(readMsg);
-                            
-                            //should send back only if rem synch or no outbound endpoints
-                            if (result != null && (remoteSync || !component.getDescriptor().getOutboundRouter().hasEndpoints()))
-                            {
-                                protocol.write(dataOut, result);
-                                dataOut.flush();
-                            }
-
-                            
-                        }
-                        catch (SocketTimeoutException e)
-                        {
-                            if (!socket.getKeepAlive())
-                            {
-                                break;
-                            }
-                        }
+                        return null;
                     }
                 }
             }
-            catch (Exception e)
+            return null;
+        }
+
+        //@Override
+        protected void handleResults(List messages) throws Exception
+        {
+            for (Iterator iterator = messages.iterator(); iterator.hasNext();)
             {
-                handleException(e);
-            }
-            finally
-            {
-                dispose();
+                Object o = iterator.next();
+                protocol.write(dataOut, o);
+                dataOut.flush();
             }
         }
 
         protected Object processData(Object data) throws Exception
         {
             UMOMessageAdapter adapter = connector.getMessageAdapter(data);
-            OutputStream os = new ResponseOutputStream(socket.getOutputStream(), socket);
+            OutputStream os = new ResponseOutputStream(socket);
             UMOMessage returnMessage = routeMessage(new MuleMessage(adapter), endpoint.isSynchronous(), os);
             if (returnMessage != null)
             {
@@ -376,14 +375,37 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
     protected class TcpStreamWorker extends TcpWorker
     {
 
-        public TcpStreamWorker(Socket socket)
+        private CountDownLatch latch;
+
+        public TcpStreamWorker(Socket socket, TcpMessageReceiver receiver) throws IOException
         {
-            super(socket);
+            super(socket, receiver);
         }
 
-        public void run()
+        //Override
+        protected Object getNextMessage(Object resource) throws Exception
         {
-            super.run();
+            //all we can do for streaming is connect the streams
+            if (endpoint.isSynchronous())
+            {
+                latch = new CountDownLatch(2);
+                dataOut = new CloseCountDownOutputStream(dataOut, latch);
+            }
+            else
+            {
+                latch = new CountDownLatch(2);
+            }
+            dataIn = new CloseCountDownInputStream(dataIn, latch);
+
+            UMOMessageAdapter adapter = connector.getStreamMessageAdapter(dataIn, dataOut);
+            return adapter;
+
+        }
+
+        //@Override
+        protected void handleResults(List messages) throws Exception
+        {
+            latch.await();
         }
     }
 

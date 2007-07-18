@@ -10,25 +10,6 @@
 
 package org.mule.providers.jms.transactions;
 
-import org.mule.providers.jms.JmsConnector;
-import org.mule.providers.jms.JmsConstants;
-import org.mule.providers.jms.TransactedJmsMessageReceiver;
-import org.mule.providers.jms.activemq.ActiveMqJmsConnector;
-import org.mule.transaction.XaTransactionFactory;
-import org.mule.umo.UMOTransactionFactory;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-import javax.transaction.TransactionManager;
-
-import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.ActiveMQXAConnectionFactory;
-import org.objectweb.jotm.Current;
-import org.objectweb.jotm.Jotm;
-
 public class ActiveMQJmsXaTransactionFunctionalTestCase extends ActiveMQJmsTransactionFunctionalTestCase
 {
 //    private TransactionManager txManager;

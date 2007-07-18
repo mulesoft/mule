@@ -27,6 +27,7 @@ import javax.jms.Session;
  */
 public class JmsTransaction extends AbstractSingleResourceTransaction
 {
+
     public void bindResource(Object key, Object resource) throws TransactionException
     {
         if (!(key instanceof Connection) || !(resource instanceof Session))

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.mule.transports</groupId>
@@ -11,7 +11,18 @@
     <artifactId>mule-transport-vm</artifactId>
     <!--<packaging>bundle</packaging>-->
     <name>VM Transport</name>
-    <description>A Mule transport that enables event sending and receiving over VM or embedded memory queues. These queues can be persistent or transient.</description>
+    <description>A Mule transport that enables event sending and receiving over VM or embedded memory queues. These
+        queues can be persistent or transient.
+    </description>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-client</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
     <build>
          <plugins>
@@ -21,6 +32,8 @@
                      <excludes>
                          <exclude>**/PropertyScribblingMule893TestCase.*</exclude>
                          <exclude>**/ServiceOverridesMule1770TestCase.*</exclude>
+                         <!-- MULE-2041 PersistentVMQueueTestCase needs a converted config -->
+                         <exclude>**/PersistentVMQueueTestCase.*</exclude>
                      </excludes>
                  </configuration>
              </plugin>
@@ -38,12 +51,4 @@
          </plugins>
     </build>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-client</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
 </project>

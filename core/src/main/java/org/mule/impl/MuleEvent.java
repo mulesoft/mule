@@ -11,6 +11,7 @@
 package org.mule.impl;
 
 import org.mule.MuleException;
+import org.mule.RegistryContext;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.security.MuleCredentials;
@@ -31,6 +32,7 @@ import org.mule.util.UUID;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OptionalDataException;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
@@ -56,7 +58,7 @@ public class MuleEvent extends EventObject implements UMOEvent
     /**
      * Serial version
      */
-    private static final long serialVersionUID = 7568207722883309919L;
+    private static final long serialVersionUID = 1L;
     /**
      * logger used by this class
      */
@@ -653,19 +655,52 @@ public class MuleEvent extends EventObject implements UMOEvent
         return outputStream;
     }
 
+    private void marshallTransformers(UMOTransformer trans, ObjectOutputStream out) throws IOException
+    {
+        if (trans != null)
+        {
+            out.writeObject(trans.getName());
+            marshallTransformers(trans.getNextTransformer(), out);
+        }
+    }
+
+    private UMOTransformer unmarshallTransformers(ObjectInputStream in) throws IOException, ClassNotFoundException
+    {
+        UMOTransformer trans = null;
+        try {
+            String transformerName = (String) in.readObject();
+            trans = RegistryContext.getRegistry().lookupTransformer(transformerName);
+            trans.setNextTransformer(unmarshallTransformers(in));
+        } catch (OptionalDataException e) {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Failed to load transformers from stream", e);
+            }
+        }
+        return trans;
+    }
+
     private void writeObject(ObjectOutputStream out) throws IOException
     {
         out.defaultWriteObject();
         out.writeObject(endpoint.getEndpointURI().toString());
+        marshallTransformers(endpoint.getTransformer(), out);
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
     {
+        logger = LogFactory.getLog(getClass());
         in.defaultReadObject();
         String uri = (String) in.readObject();
+        UMOTransformer trans = unmarshallTransformers(in);
         try
         {
             endpoint = getManagementContext().getRegistry().getOrCreateEndpointForUri(uri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
+
+            if (endpoint.getTransformer() == null)
+            {
+                ((UMOEndpoint) endpoint).setTransformer(trans);
+            }
         }
         catch (UMOException e)
         {

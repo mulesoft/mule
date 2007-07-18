@@ -29,6 +29,6 @@ public class NestedRouterTestCase extends FunctionalTestCase
         client.dispatch("vm://invoker.in", message, null);
         UMOMessage reply = client.receive("vm://invoker.out", 10000);
         assertNotNull(reply);
-        assertEquals("Received: Hello " + message, reply.getPayload());
+        assertEquals("Received: Hello " + message + " " + 0xC0DE, reply.getPayload());
     }
 }

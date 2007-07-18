@@ -50,7 +50,7 @@ public class GraphRenderer
 
     }
 
-    public void saveGraph(Graph graph, String filename, File outFolder) throws IOException
+    public String saveGraph(Graph graph, String filename, File outFolder) throws IOException
     {
         // output graph to *.gif
         final String dotFileName = new File(outFolder, filename + ".dot").getAbsolutePath();
@@ -78,6 +78,7 @@ public class GraphRenderer
             PostRenderer element = (PostRenderer) iter.next();
             element.postRender(env, context, graph);
         }
+        return gifFileName;
     }
 
     private String getSaveExecutable() throws FileNotFoundException

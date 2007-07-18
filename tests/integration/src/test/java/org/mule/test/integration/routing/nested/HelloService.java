@@ -12,8 +12,8 @@ package org.mule.test.integration.routing.nested;
 
 public class HelloService implements HelloInterface
 {
-    public String hello(String s)
+    public String hello(String s, Integer v)
     {
-        return "Hello " + s;
+        return "Hello " + s + " " + v;
     }
 }

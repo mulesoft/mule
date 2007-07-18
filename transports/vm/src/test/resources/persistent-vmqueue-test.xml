@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+        "http://mule.mulesource.org/dtds/mule-configuration.dtd" >
+
+<mule-configuration id="persistent_vmqueue_test" version="1.0">
+
+    <mule-environment-properties serverUrl="">
+        <queue-profile persistent="true" maxOutstandingMessages="10"/>
+        <persistence-strategy className="org.mule.util.queue.FilePersistenceStrategy"/>
+    </mule-environment-properties>
+
+    <connector name="vmQueue" className="org.mule.providers.vm.VMConnector">
+        <properties>
+            <property name="queueEvents" value="true"/>
+        </properties>
+    </connector>
+
+    <transformers>
+        <transformer name="testTransformer"
+                     className="org.mule.transformers.simple.StringToObjectArray"/>
+    </transformers>
+
+    <model name="TEST">
+
+        <mule-descriptor name="ReceiverUMO"
+                         implementation="org.mule.components.simple.BridgeComponent">
+            <inbound-router>
+                <endpoint address="vm://receiver">
+                </endpoint>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="vm://echo" transformers="testTransformer"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="EchoUMO"
+                         implementation="org.mule.components.simple.BridgeComponent">
+            <inbound-router>
+                <endpoint address="vm://echo"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="vm://out"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+
+    </model>
+
+</mule-configuration>

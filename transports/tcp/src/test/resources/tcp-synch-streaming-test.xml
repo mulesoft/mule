@@ -18,7 +18,7 @@
 
         <mule-descriptor name="echo" implementation="org.mule.components.simple.StreamingBridgeComponent">
             <inbound-router>
-                <endpoint address="tcp://localhost:65432" streaming="true"/>
+                <endpoint address="tcp://localhost:65432" streaming="false"/>
             </inbound-router>
         </mule-descriptor>
         

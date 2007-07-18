@@ -154,7 +154,7 @@ public abstract class ByteProtocol implements TcpProtocol
         catch (SocketException e)
         {
             // do not pollute the log with a stacktrace, log only the message
-            logger.debug("Socket exception occured: " + e.getMessage());
+            logger.warn("Socket exception occured: " + e.getMessage());
             return EOF;
         }
         catch (SocketTimeoutException e)

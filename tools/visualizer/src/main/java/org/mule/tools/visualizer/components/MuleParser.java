@@ -27,6 +27,7 @@ import com.oy.shared.lm.graph.Graph;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -65,9 +66,20 @@ public class MuleParser
 
     }
 
+    public void parseMuleConfig(InputStream in, Graph graph) throws JDOMException, IOException
+    {
+        Document doc = builder.build(in);
+        parseMuleConfig(doc, graph);
+    }
+
     public void parseMuleConfig(File myFile, Graph graph) throws JDOMException, IOException
     {
         Document doc = builder.build(myFile);
+        parseMuleConfig(doc, graph);
+    }
+
+    public void parseMuleConfig(Document doc, Graph graph) throws JDOMException, IOException
+    {
         Element root = doc.getRootElement();
         String caption = root.getAttribute("id").getValue();
         if (caption != null)

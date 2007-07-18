@@ -35,7 +35,7 @@ public class StringToObjectArray extends AbstractTransformer
 
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
-        String in = null;
+        String in;
 
         if (src instanceof byte[])
         {
@@ -62,7 +62,7 @@ public class StringToObjectArray extends AbstractTransformer
     }
 
     /**
-     * @param sets the delimiter
+     * @param delimiter the delimiter
      */
     public void setDelimiter(String delimiter)
     {

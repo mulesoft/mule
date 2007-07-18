@@ -15,7 +15,9 @@ import org.mule.umo.MessagingException;
 
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.mail.Header;
 import javax.mail.Message;
@@ -50,19 +52,26 @@ public class MailMessageAdapter extends SimpleMailMessageAdapter
 
         if (content instanceof Multipart)
         {
-            setMessage(((Multipart)content).getBodyPart(0));
-            logger.debug("Received Multipart message");
+            TreeMap attachments = new TreeMap();
+            MailUtils.getAttachments((Multipart)content, attachments);
 
-            for (int i = 1; i < ((Multipart)content).getCount(); i++)
+            logger.debug("Received Multipart message");
+            int i = 0;
+            for (Iterator iterator = attachments.entrySet().iterator(); iterator.hasNext();i++)
             {
-                Part part = ((Multipart)content).getBodyPart(i);
-                String name = part.getFileName();
-                if (name == null)
+                Map.Entry entry = (Map.Entry) iterator.next();
+                Part part = (Part)entry.getValue();
+                String name = entry.getKey().toString();
+                if(i==0)
                 {
-                    name = String.valueOf(i - 1);
+                    setMessage(part);
                 }
-                addAttachment(name, part.getDataHandler());
-                addAttachmentHeaders(name, part);
+                else
+                {
+                    addAttachment(name, part.getDataHandler());
+                    addAttachmentHeaders(name, part);
+                }
+
             }
         }
         else

@@ -48,6 +48,11 @@ public class TransactionTemplate
 
             if (action == UMOTransactionConfig.ACTION_NONE && tx != null)
             {
+                //TODO RM*: I'm not sure there is any value in throwing an exection here, since
+                //there may be a transaction in progress but has nothing to to with this invocation
+                //so maybe we just process outside the tx. Not sure yet
+                //return callback.doInTransaction();
+
                 throw new IllegalTransactionStateException(
                     CoreMessages.transactionAvailableButActionIs("None"));
             }

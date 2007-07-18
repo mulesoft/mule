@@ -234,7 +234,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             {
                 int priorityProp = eventMsg.getIntProperty(JmsConstants.JMS_PRIORITY, UMOConnector.INT_VALUE_NOT_SET);
                 int deliveryModeProp = eventMsg.getIntProperty(JmsConstants.JMS_DELIVERY_MODE, UMOConnector.INT_VALUE_NOT_SET);
-                
+
                 if (priorityProp != UMOConnector.INT_VALUE_NOT_SET)
                 {
                     priority = priorityProp;

@@ -147,26 +147,4 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
     {
         return key;
     }
-
-    /**
-     * Really begin the transaction. Note that resources are enlisted yet.
-     * 
-     * @throws TransactionException
-     */
-    protected abstract void doBegin() throws TransactionException;
-
-    /**
-     * Commit the transaction on the underlying resource
-     * 
-     * @throws TransactionException
-     */
-    protected abstract void doCommit() throws TransactionException;
-
-    /**
-     * Rollback the transaction on the underlying resource
-     * 
-     * @throws TransactionException
-     */
-    protected abstract void doRollback() throws TransactionException;
-
 }

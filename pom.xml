@@ -728,13 +728,6 @@
             </plugin>
 
             <plugin>
-                <!--
-                    When using IDEA 7 (Selena) builds 7020 and above
-                    make sure to apply the patch from
-                    http://jira.codehaus.org/browse/MIDEA-96 .
-                    Otherwise project will not open. One may need to
-                    run 'mvn idea:clean' before generating a new project.
-                -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-idea-plugin</artifactId>
                 <configuration>

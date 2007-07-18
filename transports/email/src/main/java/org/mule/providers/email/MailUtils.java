@@ -13,7 +13,13 @@ package org.mule.providers.email;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.StringUtils;
 
+import java.io.IOException;
+import java.util.Map;
+
 import javax.mail.Address;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.Part;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
@@ -88,6 +94,41 @@ public class MailUtils
         else
         {
             throw new IllegalArgumentException(CoreMessages.objectIsNull("Email address").toString());
+        }
+    }
+
+    public static void getAttachments(Multipart content, Map attachments) throws MessagingException, IOException
+    {
+        int x = 0;
+        for(int i=0; i < content.getCount(); i++)
+        {
+            Part p = content.getBodyPart(i);
+            if(p.getContentType().indexOf("multipart/mixed") > -1)
+            {
+                Multipart m = (Multipart)p.getContent();
+                getAttachments(m, attachments);
+            }
+            else
+            {
+                String key;
+                if(StringUtils.isNotEmpty(p.getDescription()))
+                {
+                    key = p.getDescription();
+                }
+                else if(StringUtils.isNotEmpty(p.getFileName()))
+                {
+                    key = p.getFileName();
+                }
+                else if(StringUtils.isNotEmpty(p.getDisposition()))
+                {
+                    key = p.getDisposition();
+                }
+                else
+                {
+                    key = String.valueOf(x++);
+                }
+                attachments.put(key, p);
+            }
         }
     }
 }

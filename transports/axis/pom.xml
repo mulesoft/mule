@@ -42,6 +42,7 @@
                         <!-- MULE-1553, remaining tests waiting for JMS  -->
                         <exclude>**/AxisConnectorJmsFunctionalTestCase.java</exclude>
                         <exclude>**/AxisConnectorJmsTopicsFunctionalTestCase.java</exclude>
+                        <exclude>**/SoapAttachmentsFunctionalTestCase.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>

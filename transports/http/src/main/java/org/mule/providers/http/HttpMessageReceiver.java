@@ -223,7 +223,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                             // according to rfc 2616 and http 1.1
                             // the processing will continue and the request will be fully
                             // read immediately after
-                            if (headers.get(HttpConnector.HTTP_VERSION_PROPERTY).equals(HttpConstants.HTTP11))
+                            if (HttpConstants.HTTP11.equals(headers.get(HttpConnector.HTTP_VERSION_PROPERTY)))
                             {
                                 // just in case we have something other than String in
                                 // the headers map

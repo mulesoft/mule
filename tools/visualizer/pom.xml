@@ -12,7 +12,6 @@
     <name>Mule Config Visualizer</name>
     <artifactId>mule-tools-visualizer</artifactId>
     <groupId>org.mule.tools</groupId>
-    <version>2.0-M1-SNAPSHOT</version>
     <inceptionYear>2005</inceptionYear>
     <description>A tool for generating visual representations of configuration Xml config files</description>
 
@@ -45,6 +44,11 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>

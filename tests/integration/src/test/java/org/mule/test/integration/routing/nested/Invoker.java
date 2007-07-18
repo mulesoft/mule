@@ -16,7 +16,7 @@ public class Invoker
 
     public String invoke(String s)
     {
-        return "Received: " + hello.hello(s);
+        return "Received: " + hello.hello(s, new Integer(0xC0DE));
     }
     
     public void setHello(HelloInterface hello)

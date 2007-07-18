@@ -1,0 +1,41 @@
+text/plain                   txt cgi java
+text/xml                     xml
+text/html                    htm html shtml
+application/octet-stream     bin class
+application/postscript       ps eps ai
+application/pdf              pdf
+
+# Image specific MIME types
+image/x-xbitmap              xbm
+image/x-xpixmap              xpm
+image/x-xwindowdump          xwd
+image/x-xbitmap              xbm
+image/x-cmu-raster           ras
+image/x-portable-anymap      pnm
+image/x-portable-bitmap      pbm
+image/x-portable-graymap     pgm
+image/x-rgb                  rgb
+image/gif                    gif
+image/jpeg                   jpeg jpe jpg
+image/tiff                   tiff tif
+
+# Audio video specific MIME types
+audio/basic                 au snd
+audio/x-wav                 wav
+video/mpeg                  mpeg mpe mpg
+video/quicktime             mov qt
+video/x-sgi-movie           movie
+application/java            java
+application/x-csh           csh
+application/x-sh            sh
+application/x-tcl           tcl
+application/x-shar          shar
+application/x-tar           tar
+application/x-dvi           dvi
+application/x-hdf           hdf
+application/x-x509-ca-cert  cer cert
+# zip files
+multipart/x-zip             zip
+application/zip             zip
+
+

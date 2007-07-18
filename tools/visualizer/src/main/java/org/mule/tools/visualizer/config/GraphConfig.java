@@ -24,8 +24,6 @@ import java.util.StringTokenizer;
 /**
  * TODO - document
  *
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class GraphConfig
 {
@@ -42,6 +40,7 @@ public class GraphConfig
     public static final String ARG_URLS = "-urls";
     public static final String ARG_CONFIG = "-config";
     public static final String ARG_WORKING_DIRECTORY = "-workingdir";
+    public static final String ARG_DEBUG = "-debug";
 
     public static final String ARG_SHOW_CONNECTORS = "-showconnectors";
     public static final String ARG_SHOW_MODELS = "-showmodels";
@@ -74,6 +73,7 @@ public class GraphConfig
     private boolean showConfig = false;
     private boolean showAgents = false;
     private boolean showAll = false;
+    private boolean debug = false;
 
     public GraphConfig()
     {
@@ -114,6 +114,7 @@ public class GraphConfig
         }
         setMappingsFile(getOpt(args, ARG_MAPPINGS, null));
         setUrlsFile(getOpt(args, ARG_URLS, null));
+        setDebug(Boolean.valueOf(getOpt(args, ARG_DEBUG, String.valueOf(debug))).booleanValue());
 
         return init();
     }
@@ -512,4 +513,13 @@ public class GraphConfig
         return workingDirectory;
     }
 
+    public boolean isDebug()
+    {
+        return this.debug;
+    }
+
+    public void setDebug(boolean debug)
+    {
+        this.debug = debug;
+    }
 }

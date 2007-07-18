@@ -16,15 +16,13 @@ import org.mule.tck.AbstractMuleTestCase;
 
 import java.util.MissingResourceException;
 
-import junit.framework.Assert;
-
 public class MessagesTestCase extends AbstractMuleTestCase
 {
     public void testMessageLoading() throws Exception
     {
         Message message = CoreMessages.authFailedForUser("Fred");
-        Assert.assertEquals("Authentication failed for principal Fred", message.getMessage());
-        Assert.assertEquals(135, message.getCode());
+        assertEquals("Authentication failed for principal Fred", message.getMessage());
+        assertEquals(135, message.getCode());
     }
 
     public void testBadBundle()
@@ -32,18 +30,18 @@ public class MessagesTestCase extends AbstractMuleTestCase
         try
         {
             InvalidMessageFactory.getInvalidMessage();
-            Assert.fail("should throw resource bundle not found exception");
+            fail("should throw resource bundle not found exception");
         }
         catch (MissingResourceException e)
         {
-            Assert.assertTrue(e.getMessage().startsWith("Can't find bundle"));
+            assertTrue(e.getMessage().startsWith("Can't find bundle"));
         }
     }
 
     public void testGoodBundle()
     {
         Message message = TestMessages.testMessage("one", "two", "three");
-        Assert.assertEquals("Testing, Testing, one, two, three", message.getMessage());
-        Assert.assertEquals(1, message.getCode());
+        assertEquals("Testing, Testing, one, two, three", message.getMessage());
+        assertEquals(1, message.getCode());
     }
 }

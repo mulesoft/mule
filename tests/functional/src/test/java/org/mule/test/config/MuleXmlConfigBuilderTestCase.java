@@ -34,8 +34,6 @@ import org.mule.util.properties.PropertyExtractor;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.Assert;
-
 public class MuleXmlConfigBuilderTestCase extends AbstractConfigBuilderTestCase
 {
 
@@ -142,9 +140,9 @@ public class MuleXmlConfigBuilderTestCase extends AbstractConfigBuilderTestCase
 
         // This will only work with the MuleXml Builder other implementations
         // will have to set this proerty manually or mimic Mules behaviour
-        Assert.assertEquals("this was set from the manager properties!",
+        assertEquals("this was set from the manager properties!",
             ((TestCompressionTransformer)t).getBeanProperty1());
-        Assert.assertEquals(12, ((TestCompressionTransformer)t).getBeanProperty2());
+        assertEquals(12, ((TestCompressionTransformer)t).getBeanProperty2());
 
         assertEquals(t.getReturnClass(), java.lang.String.class);
 

@@ -68,7 +68,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     ////////////////////////////////////////////////////////////////////////
     // Properties
     ////////////////////////////////////////////////////////////////////////
-    
+
     private int acknowledgementMode = Session.AUTO_ACKNOWLEDGE;
 
     private String clientId;
@@ -78,7 +78,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     private boolean noLocal;
 
     private boolean persistentDelivery;
-    
+
     private boolean honorQosHeaders;
 
     private int maxRedelivery = 0;
@@ -93,7 +93,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     ////////////////////////////////////////////////////////////////////////
     // JMS Connection
     ////////////////////////////////////////////////////////////////////////
-    
+
     /** Factory used to get an instance of the ConnectionFactory. */
     // TODO type-checking with JDK 5
     private ObjectFactory/*<ConnectionFactory>*/ connectionFactory;
@@ -105,12 +105,12 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     /**
      * JMS Connection, not settable by the user.
      */
-    private Connection _connection;
+    private Connection connection;
 
     ////////////////////////////////////////////////////////////////////////
     // Strategy classes
     ////////////////////////////////////////////////////////////////////////
-    
+
     private String specification = JmsConstants.JMS_SPECIFICATION_102B;
 
     private JmsSupport jmsSupport;
@@ -120,44 +120,44 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     /** Factory used to get an instance of the RedeliveryHandler. */
     // TODO type-checking with JDK 5
     private ObjectFactory/*<RedeliveryHandler>*/ redeliveryHandler;
-    
+
     ////////////////////////////////////////////////////////////////////////
     // JNDI
     ////////////////////////////////////////////////////////////////////////
 
     /**
-     * The JNDI Context can be configured on its own or, if a JndiObjectFactory is used for 
+     * The JNDI Context can be configured on its own or, if a JndiObjectFactory is used for
      * <code>connectionFactory</code>, it will get configured from there.
      */
     private Context jndiContext;
-    
+
     private boolean jndiDestinations = false;
 
     private boolean forceJndiDestinations = false;
 
     /**
-     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead. 
+     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead.
      * @see http://www.springframework.org/docs/reference/xsd-config.html#xsd-config-body-schemas-jee
      * @see org.mule.util.object.JndiObjectFactory
      */
     private String connectionFactoryJndiName;
 
     /**
-     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead. 
+     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead.
      * @see http://www.springframework.org/docs/reference/xsd-config.html#xsd-config-body-schemas-jee
      * @see org.mule.util.object.JndiObjectFactory
      */
     private String jndiInitialFactory;
 
     /**
-     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead. 
+     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead.
      * @see http://www.springframework.org/docs/reference/xsd-config.html#xsd-config-body-schemas-jee
      * @see org.mule.util.object.JndiObjectFactory
      */
     private String jndiProviderUrl;
 
     /**
-     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead. 
+     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead.
      * @see http://www.springframework.org/docs/reference/xsd-config.html#xsd-config-body-schemas-jee
      * @see org.mule.util.object.JndiObjectFactory
      */
@@ -198,7 +198,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
                 throw new InitialisationException(JmsMessages.noConnectionFactorySet(), this);
             }
         }
-        
+
         if (topicResolver == null)
         {
             topicResolver = new DefaultJmsTopicResolver(this);
@@ -207,7 +207,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         {
             redeliveryHandler = new SimpleObjectFactory(DefaultRedeliveryHandler.class);
             ((Initialisable) redeliveryHandler).initialise();
-        }            
+        }
 
         try
         {
@@ -224,20 +224,20 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     {
         return null;
     }
-    
+
     protected void doDispose()
     {
-        if (_connection != null)
+        if (connection != null)
         {
             try
             {
-                _connection.close();
+                connection.close();
             }
             catch (JMSException e)
             {
                 logger.error("Jms connector failed to dispose properly: ", e);
             }
-            _connection = null;
+            connection = null;
         }
 
         if (connectionFactory != null && connectionFactory instanceof Disposable)
@@ -351,10 +351,10 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
         try
         {
-            _connection = createConnection();
+            connection = createConnection();
             if (started.get())
             {
-                _connection.start();
+                connection.start();
             }
         }
         catch (Exception e)
@@ -367,9 +367,9 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     {
         try
         {
-            if (_connection != null)
+            if (connection != null)
             {
-                _connection.close();
+                connection.close();
             }
         }
         catch (Exception e)
@@ -379,7 +379,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         finally
         {
             // connectionFactory = null;
-            _connection = null;
+            connection = null;
         }
     }
 
@@ -400,14 +400,14 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
         if (tx != null)
         {
-            if (tx.hasResource(_connection))
+            if (tx.hasResource(connection))
             {
                 if (logger.isDebugEnabled())
                 {
                     logger.debug("Retrieving jms session from current transaction " + tx);
                 }
 
-                return (Session) tx.getResource(_connection);
+                return (Session) tx.getResource(connection);
             }
         }
         return null;
@@ -439,19 +439,18 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
                     "Retrieving new jms session from connection: " +
                             "topic={0}, transacted={1}, ack mode={2}, nolocal={3}",
                     new Object[]{Boolean.valueOf(topic),
-                            Boolean.valueOf(transacted || tx != null),
-                            new Integer(acknowledgementMode),
-                            Boolean.valueOf(noLocal)}));
+                                 Boolean.valueOf(transacted),
+                                 new Integer(acknowledgementMode),
+                                 Boolean.valueOf(noLocal)}));
         }
 
-        session = jmsSupport.createSession(_connection, topic, transacted || tx != null, acknowledgementMode,
-                noLocal);
+        session = jmsSupport.createSession(connection, topic, transacted, acknowledgementMode, noLocal);
         if (tx != null)
         {
             logger.debug("Binding session to current transaction");
             try
             {
-                tx.bindResource(_connection, session);
+                tx.bindResource(connection, session);
             }
             catch (TransactionException e)
             {
@@ -463,11 +462,11 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
     protected void doStart() throws UMOException
     {
-        if (_connection != null)
+        if (connection != null)
         {
             try
             {
-                _connection.start();
+                connection.start();
             }
             catch (JMSException e)
             {
@@ -712,16 +711,16 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     ////////////////////////////////////////////////////////////////////////
     // Getters and Setters
     ////////////////////////////////////////////////////////////////////////
-    
+
     /** @return Returns the connection. */
     public Connection getConnection()
     {
-        return _connection;
+        return connection;
     }
 
     protected void setConnection(Connection connection)
     {
-        this._connection = connection;
+        this.connection = connection;
     }
 
     /** @return Returns the acknowledgeMode. */
@@ -801,7 +800,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     {
         return this.recoverJmsConnections;
     }
-    
+
     public String getUsername()
     {
         return username;
@@ -895,7 +894,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
      *
      * @param eagerConsumer Value to set for property 'eagerConsumer'.
      * @see #eagerConsumer
-     * @see org.mule.providers.jms.TransactedJmsMessageReceiver
+     * @see org.mule.providers.jms.XaTransactedJmsMessageReceiver
      */
     public void setEagerConsumer(final boolean eagerConsumer)
     {
@@ -951,7 +950,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     {
         this.jndiContext = jndiContext;
     }
-    
+
     public boolean isForceJndiDestinations()
     {
         return forceJndiDestinations;
@@ -961,7 +960,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     {
         this.forceJndiDestinations = forceJndiDestinations;
     }
-    
+
     /**
     * Sets <code>honorQosHeaders</code> property, which determines whether <code>JmsMessageDispatcher</code>
     * should honor incoming message's QoS headers (JMSPriority, JMSDeliveryMode).
@@ -984,9 +983,9 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
    {
        return honorQosHeaders;
    }
-   
+
     /**
-     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead. 
+     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead.
      * @see http://www.springframework.org/docs/reference/xsd-config.html#xsd-config-body-schemas-jee
      * @see org.mule.util.object.JndiObjectFactory
      */
@@ -996,7 +995,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     }
 
     /**
-     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead. 
+     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead.
      * @see http://www.springframework.org/docs/reference/xsd-config.html#xsd-config-body-schemas-jee
      * @see org.mule.util.object.JndiObjectFactory
      */
@@ -1006,7 +1005,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     }
 
     /**
-     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead. 
+     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead.
      * @see http://www.springframework.org/docs/reference/xsd-config.html#xsd-config-body-schemas-jee
      * @see org.mule.util.object.JndiObjectFactory
      */
@@ -1016,7 +1015,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     }
 
     /**
-     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead. 
+     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead.
      * @see http://www.springframework.org/docs/reference/xsd-config.html#xsd-config-body-schemas-jee
      * @see org.mule.util.object.JndiObjectFactory
      */
@@ -1026,7 +1025,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     }
 
     /**
-     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead. 
+     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead.
      * @see http://www.springframework.org/docs/reference/xsd-config.html#xsd-config-body-schemas-jee
      * @see org.mule.util.object.JndiObjectFactory
      */
@@ -1036,7 +1035,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     }
 
     /**
-     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead. 
+     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead.
      * @see http://www.springframework.org/docs/reference/xsd-config.html#xsd-config-body-schemas-jee
      * @see org.mule.util.object.JndiObjectFactory
      */
@@ -1046,7 +1045,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     }
 
     /**
-     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead. 
+     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead.
      * @see http://www.springframework.org/docs/reference/xsd-config.html#xsd-config-body-schemas-jee
      * @see org.mule.util.object.JndiObjectFactory
      */
@@ -1056,7 +1055,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     }
 
     /**
-     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead. 
+     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead.
      * @see http://www.springframework.org/docs/reference/xsd-config.html#xsd-config-body-schemas-jee
      * @see org.mule.util.object.JndiObjectFactory
      */

@@ -18,10 +18,19 @@ import org.mule.transaction.constraints.ConstraintFilter;
  */
 public interface UMOTransactionConfig
 {
+    /** Whether there is a transaction available or not, ignore it */
     byte ACTION_NONE = 0;
+
+    /** Will ensure that a new transaction is created for each invocation */
     byte ACTION_ALWAYS_BEGIN = 1;
+
+    /** Will begin a new transaction if no transaction is already present */
     byte ACTION_BEGIN_OR_JOIN = 2;
+
+    /** There must always be a transaction present for the invocation */
     byte ACTION_ALWAYS_JOIN = 3;
+
+    /** If there is a transaction available, then use it, otherwise continue processing */
     byte ACTION_JOIN_IF_POSSIBLE = 4;
 
     UMOTransactionFactory getFactory();

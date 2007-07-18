@@ -81,6 +81,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         registerService(MuleProperties.CONNECTOR_DISPATCHER_FACTORY, null, props);
         registerService(MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS, null, props);
         registerService(MuleProperties.CONNECTOR_TRANSACTED_MESSAGE_RECEIVER_CLASS, null, props);
+        registerService(MuleProperties.CONNECTOR_XA_TRANSACTED_MESSAGE_RECEIVER_CLASS, null, props);
         registerService(MuleProperties.CONNECTOR_MESSAGE_ADAPTER, null, props);
         registerService(MuleProperties.CONNECTOR_STREAM_MESSAGE_ADAPTER, null, props);
         registerService(MuleProperties.CONNECTOR_INBOUND_TRANSFORMER, null, props);

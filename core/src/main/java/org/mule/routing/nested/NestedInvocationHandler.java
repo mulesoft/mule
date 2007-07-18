@@ -61,7 +61,7 @@ public class NestedInvocationHandler implements InvocationHandler
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
     {
 
-        UMOMessage message = new MuleMessage(args[0]);
+        UMOMessage message = new MuleMessage(args);
         UMONestedRouter router = (UMONestedRouter) routers.get(method.getName());
         if (router == null)
         {

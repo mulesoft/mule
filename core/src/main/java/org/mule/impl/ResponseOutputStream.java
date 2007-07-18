@@ -43,9 +43,9 @@ public class ResponseOutputStream extends BufferedOutputStream
         super(stream);
     }
 
-    public ResponseOutputStream(OutputStream stream, Socket socket)
+    public ResponseOutputStream(Socket socket) throws IOException
     {
-        super(stream);
+        super(socket.getOutputStream());
         this.socket = socket;
     }
 

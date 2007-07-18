@@ -31,11 +31,16 @@ public class JmsClientAcknowledgeTransaction extends AbstractSingleResourceTrans
 {
     private Message message;
 
+    public void setMessage(Message message)
+    {
+        this.message = message;
+    }
+
     /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transaction.AbstractSingleResourceTransaction#doBegin()
-     */
+    * (non-Javadoc)
+    *
+    * @see org.mule.transaction.AbstractSingleResourceTransaction#doBegin()
+    */
     protected void doBegin() throws TransactionException
     {
         // nothing to do

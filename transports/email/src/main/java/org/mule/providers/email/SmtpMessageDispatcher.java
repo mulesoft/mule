@@ -122,7 +122,7 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
     protected UMOMessage doSend(UMOEvent event) throws Exception
     {
         doDispatch(event);
-        return event.getMessage();
+        return null;
     }
 
     protected void sendMailMessage(Message message) throws MessagingException

@@ -24,69 +24,67 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
-/**
- * @goal graph
- **/
+/** @goal graph */
 public class MuleVisualizerPlugin extends AbstractMojo
 {
 
     /** @parameter */
     private List files = new LinkedList();
 
-    /** @parameter **/
+    /** @parameter * */
     private String exec;
 
-    /** @parameter **/
+    /** @parameter * */
     private String outputdir;
 
-    /** @parameter **/
+    /** @parameter * */
     private String outputfile;
 
-    /** @parameter **/
+    /** @parameter * */
     private String caption;
 
-    /** @parameter **/
+    /** @parameter * */
     private String mappings;
 
-    /** @parameter **/
+    /** @parameter * */
     private boolean keepdotfiles;
 
-    /** @parameter **/
+    /** @parameter * */
     private boolean combinefiles;
 
-    /** @parameter **/
+    /** @parameter * */
     private String urls;
 
-    /** @parameter **/
+    /** @parameter * */
     private String config;
 
-    /** @parameter **/
+    /** @parameter * */
     private String workingdir;
 
-    /** @parameter **/
+    /** @parameter * */
     private boolean showconnectors;
 
-    /** @parameter **/
+    /** @parameter * */
     private boolean showmodels;
 
-    /** @parameter **/
+    /** @parameter * */
     private boolean showconfig;
 
-    /** @parameter **/
+    /** @parameter * */
     private boolean showagents;
 
-    /** @parameter **/
+    /** @parameter * */
     private boolean showtransformers;
 
-    /** @parameter **/
+    /** @parameter * */
     private boolean showall;
 
-    /** @parameter **/
+    /** @parameter * */
     private String templateprops;
-    
+
     public MuleVisualizerPlugin()
     {
-        try 
+        try
         {
             setWorkingdir(FileUtils.getResourcePath("target", getClass()));
         }
@@ -100,16 +98,12 @@ public class MuleVisualizerPlugin extends AbstractMojo
     {
         dumpParameters();
 
-        try 
+        try
         {
             GraphConfig config = buildConfig();
             GraphEnvironment environment = new GraphEnvironment(config);
             MuleVisualizer visualizer = new MuleVisualizer(environment);
-            visualizer.run();
-        }
-        catch (MojoExecutionException e)
-        {
-            throw e;
+            visualizer.visualize(files);
         }
         catch (Exception e)
         {
@@ -128,7 +122,7 @@ public class MuleVisualizerPlugin extends AbstractMojo
         getLog().info("outputdir: " + getOutputdir());
     }
 
-    private GraphConfig buildConfig() throws IOException
+    protected GraphConfig buildConfig() throws IOException
     {
         // order here as in GraphConfig.init(String[]) in case of depepndencies
         GraphConfig config = new GraphConfig();
@@ -335,5 +329,4 @@ public class MuleVisualizerPlugin extends AbstractMojo
     {
         return templateprops;
     }
-
 }

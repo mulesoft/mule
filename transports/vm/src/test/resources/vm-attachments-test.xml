@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="attachments_test" version="1.0">
+
+    <mule-environment-properties serverUrl=""/>
+
+    <global-endpoints>
+        <endpoint address="vm://in" name="vm-in"/>
+    </global-endpoints>
+
+    <model name="main">
+        <mule-descriptor name="test" implementation="org.mule.providers.vm.functional.AttachmentsComponent">
+            <inbound-router>
+                <global-endpoint name="vm-in"/>
+            </inbound-router>
+        </mule-descriptor>
+    </model>
+</mule-configuration>
