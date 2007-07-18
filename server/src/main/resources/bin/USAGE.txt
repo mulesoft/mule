@@ -40,15 +40,10 @@ the server for configuration changes and/or new classes/libraries to take effect
 
 By default, the "org.mule.config.builders.MuleXmlConfigurationBuilder" class will be used
 to interpret your configuration file(s).  If you wish to use a different configuration
-builder, you can specify it using the "-builder" option.  For example, to use the Spring
+builder, you can specify it using the "-builder" option.  For example, to use the Scripting
 configuration builder you could specify:
 
-mule -config my-config.xml -builder org.mule.extras.spring.SpringConfigurationBuilder
-
-Since the Spring configuration builder is so commonly used, a shortcut has been created
-for it, so you can even abbreviate the above with:
-
-mule -config my-config.xml -builder spring
+mule -config my-config.xml -builder org.mule.config.builders.ScriptConfigurationBuilder
 
 +------------------+
 | ADVANCED OPTIONS |
