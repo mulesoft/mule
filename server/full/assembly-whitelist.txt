@@ -83,6 +83,7 @@ mule-module-spring
 mule-module-wssecurity
 mule-module-xml
 mule-tests-functional
+mule-tools-visualizer
 mule-transport-axis
 mule-transport-bpm
 mule-transport-ejb
@@ -113,6 +114,7 @@ ognl-2.6.9
 opensaml-1.0.1
 org.mortbay.jetty-5.1.12
 oro-2.0.7
+oy-lm-1.1
 quartz-all-1.5.2
 retrotranslator-runtime-1.2.1
 script-api-1.0-jdk14
@@ -130,6 +132,8 @@ spring-modules-jbpm31-nodeps-0.8a
 spring-hibernate3-2.0.6
 stax-api-1.0.1
 stax-utils-20040917
+velocity-1.4
+velocity-dep-1.4
 wrapper
 wrapper-3.2.3
 wsdl4j-1.6.1

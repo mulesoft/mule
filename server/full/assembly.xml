@@ -308,6 +308,37 @@ Assembly descriptor for the full Mule distribution.
             <include>stockquote-rest-config.xml</include>
         </includes>
     </fileSet>
+
+      <!--
+      ============================
+          Mule Tools: Visualizer
+      ============================
+      -->
+
+      <fileSet>
+          <directory>../../../tools/visualizer/win32</directory>
+          <outputDirectory>lib/native/visualizer</outputDirectory>
+      </fileSet>
+      <fileSet>
+          <directory>../../../tools/visualizer/src/main/resources/bin</directory>
+          <outputDirectory>bin</outputDirectory>
+          <fileMode>755</fileMode>
+          <includes>
+              <include>launcher</include>
+              <include>launcher.bat</include>
+              <include>visualizer</include>
+              <include>visualizer.bat</include>
+          </includes>
+      </fileSet>
+      <fileSet>
+          <directory>../../../tools/visualizer/src/main/resources/bin</directory>
+          <outputDirectory>bin</outputDirectory>
+          <includes>
+              <include>launcher.conf</include>
+              <include>visualizer.groovy</include>
+          </includes>
+      </fileSet>
+
   </fileSets>
 
     <!--
@@ -385,6 +416,8 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.modules:mule-module-spring</include>
         <include>org.mule.modules:mule-module-wssecurity</include>
         <include>org.mule.modules:mule-module-xml</include>
+        <!-- Tools -->
+        <include>org.mule.tools:mule-tools-visualizer</include>
       </includes>
     </dependencySet>
 
@@ -461,6 +494,9 @@ Assembly descriptor for the full Mule distribution.
 
         <exclude>org.apache.activemq:activemq-core</exclude>
         <exclude>org.apache.activemq:activeio-core</exclude>
+
+        <!-- Tools -->
+        <exclude>org.mule.tools:mule-tools-visualizer</exclude>
       </excludes>
     </dependencySet>
 
