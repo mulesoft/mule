@@ -23,15 +23,6 @@ public class AxisServletBindingTestCase extends AbstractSoapFunctionalTestCase
 {
     public static final int HTTP_PORT = 18088;
 
-    /*
-     * Hold a *static* reference to the HttpServer here as it will be created by the first instance
-     * of the test class running. The default lifecycle for JUnit creates an instance of this class
-     * for every test method it runs thus it guaranteed that the instance receiving the 
-     * suitePostTearDown call is not the same that created the httpServer.
-     * 
-     * In order to still shutdown the Server cleanly, keep a static reference here as no concurrency
-     * issues may be involved (all tests run sequentially in JUnit).
-     */
     private Server httpServer;
 
     // @Override
