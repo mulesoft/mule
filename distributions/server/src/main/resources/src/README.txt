@@ -1,5 +1,4 @@
-Source "bundles" are included in this directory for importing into your IDE.  This can be
-helpful while debugging your application.
+An export of the Mule source code is included in this directory for convenience.
 
-If you wish to browse or work with the Mule source code, please read the information at
+If you wish to browse or work directly with the source code, please read the information at
 http://www.muledocs.org/Subversion
