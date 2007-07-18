@@ -33,7 +33,7 @@ public class AxisServletWithSecurityTestCase extends FunctionalTestCase
     private Server httpServer;
 
     // @Override
-    protected void suitePostSetUp() throws Exception
+    protected void doSetUp() throws Exception
     {
         httpServer = new Server();
         SocketListener socketListener = new SocketListener(new InetAddrPort(HTTP_PORT));
@@ -51,9 +51,10 @@ public class AxisServletWithSecurityTestCase extends FunctionalTestCase
     }
 
     // @Override
-    protected void suitePostTearDown() throws Exception
+    protected void doTearDown() throws Exception
     {
-        httpServer.stop();
+        httpServer.stop(false);
+        httpServer.destroy();
     }
 
     public void testSecurityWithServletsUsingGet() throws Exception

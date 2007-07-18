@@ -35,11 +35,9 @@ import org.mule.util.concurrent.Latch;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
-
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
@@ -266,10 +264,6 @@ public abstract class AbstractMuleTestCase extends TestCase
             }
 
             doSetUp();
-            if (getTestInfo().getRunCount() == 0)
-            {
-                suitePostSetUp();
-            }
         }
         catch (Exception e)
         {
@@ -288,21 +282,18 @@ public abstract class AbstractMuleTestCase extends TestCase
         managementContext.getRegistry().registerModel(getDefaultModel(managementContext));
         return managementContext;
     }
+
+    /**
+     * Run <strong>before</strong> any testcase setup.
+     */
     protected void suitePreSetUp() throws Exception
     {
         // nothing to do
     }
 
-    protected void suitePostSetUp() throws Exception
-    {
-        // nothing to do
-    }
-
-    protected void suitePreTearDown() throws Exception
-    {
-        // nothing to do
-    }
-
+    /**
+     * Run <strong>after</strong> all testcase teardowns.
+     */
     protected void suitePostTearDown() throws Exception
     {
         // nothing to do
@@ -312,10 +303,6 @@ public abstract class AbstractMuleTestCase extends TestCase
     {
         try
         {
-            if (getTestInfo().getRunCount() == getTestInfo().getTestCount())
-            {
-                suitePreTearDown();
-            }
             doTearDown();
             if (!getTestInfo().isDisposeManagerPerSuite())
             {

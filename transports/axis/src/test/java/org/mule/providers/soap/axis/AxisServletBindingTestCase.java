@@ -32,11 +32,12 @@ public class AxisServletBindingTestCase extends AbstractSoapFunctionalTestCase
      * In order to still shutdown the Server cleanly, keep a static reference here as no concurrency
      * issues may be involved (all tests run sequentially in JUnit).
      */
-    private static Server httpServer;
+    private Server httpServer;
 
     // @Override
-    protected void suitePostSetUp() throws Exception
+    protected void doSetUp() throws Exception
     {
+        super.doSetUp();
         httpServer = new Server();
         SocketListener socketListener = new SocketListener(new InetAddrPort(HTTP_PORT));
         httpServer.addListener(socketListener);
@@ -52,8 +53,9 @@ public class AxisServletBindingTestCase extends AbstractSoapFunctionalTestCase
     }
 
     // @Override
-    protected void suitePostTearDown() throws Exception
+    protected void doTearDown() throws Exception
     {
+        super.doTearDown();
         // this generates an exception in GenericServlet which we can safely ignore
         httpServer.stop(false);
         httpServer.destroy();

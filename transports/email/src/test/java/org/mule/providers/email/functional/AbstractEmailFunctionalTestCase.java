@@ -10,8 +10,6 @@
 
 package org.mule.providers.email.functional;
 
-import com.icegreen.greenmail.util.ServerSetup;
-import com.icegreen.greenmail.util.Servers;
 import org.mule.extras.client.MuleClient;
 import org.mule.providers.email.GreenMailUtilities;
 import org.mule.providers.email.ImapConnector;
@@ -19,10 +17,14 @@ import org.mule.providers.email.Pop3Connector;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
+import com.icegreen.greenmail.util.ServerSetup;
+import com.icegreen.greenmail.util.Servers;
+
+import java.io.IOException;
+
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-import java.io.IOException;
 
 public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase
 {
@@ -85,7 +87,7 @@ public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase
 
 
     // @Override
-    protected void suitePreTearDown() throws Exception
+    protected void suitePostTearDown() throws Exception
     {
         stopServer();
     }

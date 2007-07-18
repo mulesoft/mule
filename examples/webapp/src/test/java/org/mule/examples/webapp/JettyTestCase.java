@@ -23,8 +23,9 @@ public class JettyTestCase extends AbstractWebappTestCase
     public static final String WEBAPP_CONTEXT_PATH = "/mule-examples";
     public static final int JETTY_PORT = 8090;
     
-    Server jetty = null;
+    private Server jetty = null;
     
+    // @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
@@ -46,9 +47,9 @@ public class JettyTestCase extends AbstractWebappTestCase
         }
     }
 
-    protected void suitePreTearDown() throws Exception
+    // @Override
+    protected void doTearDown() throws Exception
     {
-        super.suitePreTearDown();
         if (jetty != null)
         {
             jetty.stop();
