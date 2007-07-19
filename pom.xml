@@ -7,7 +7,7 @@
     <groupId>org.mule</groupId>
     <artifactId>mule</artifactId>
     <packaging>pom</packaging>
-    <version>2.0-M1-SNAPSHOT</version>
+    <version>2.0-M2-SNAPSHOT</version>
 
     <!-- Organization -->
     <organization>

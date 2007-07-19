@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.modules</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>2.0-M1-SNAPSHOT</version>
+        <version>2.0-M2-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-1to2migration</artifactId>
     <name>Mule 1 to Mule 2 Migration Support</name>

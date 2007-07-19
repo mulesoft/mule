@@ -12,7 +12,7 @@
     <description>The Loan Broker example application is based on the example presented in the Enterprise Integration Patterns book. This chapter of the book is available online so you can see a detailed description of the application here (http://www.eaipatterns.com/ComposedMessagingWS.html).</description>
 
     <properties>
-        <muleVersion>2.0-M1-SNAPSHOT</muleVersion>
+        <muleVersion>2.0-M2-SNAPSHOT</muleVersion>
     </properties>
 
     <modules>
