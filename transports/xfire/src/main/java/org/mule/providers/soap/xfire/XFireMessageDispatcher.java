@@ -41,6 +41,9 @@ import javax.activation.DataHandler;
 import javax.xml.namespace.QName;
 
 import org.codehaus.xfire.XFire;
+import org.codehaus.xfire.aegis.AegisBindingProvider;
+import org.codehaus.xfire.aegis.type.TypeMapping;
+import org.codehaus.xfire.aegis.type.basic.BeanType;
 import org.codehaus.xfire.client.Client;
 import org.codehaus.xfire.handler.Handler;
 import org.codehaus.xfire.service.OperationInfo;
@@ -197,7 +200,7 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
 
         if (method == null)
         {
-            throw new DispatchException(SoapMessages.cannotInvokeCallWithoutOperation(), 
+            throw new DispatchException(SoapMessages.cannotInvokeCallWithoutOperation(),
                 event.getMessage(), event.getEndpoint());
         }
 
@@ -237,6 +240,10 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
 
     protected UMOMessage doSend(UMOEvent event) throws Exception
     {
+        if (event.getEndpoint().getProperty("complexTypes") != null)
+        {
+            configureClientForComplexTypes(this.client, event);
+        }
         this.client.setTimeout(event.getTimeout());
         this.client.setProperty(MuleProperties.MULE_EVENT_PROPERTY, event);
         String method = getMethod(event);
@@ -290,7 +297,6 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
     /**
      * Make a specific request to the underlying transport
      *
-     * @param endpoint the endpoint to use when connecting to the resource
      * @param timeout the maximum time the operation should block before returning.
      *            The call should return immediately if there is data available. If
      *            no data becomes available before the timeout elapses, null will be
@@ -399,5 +405,24 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
         }
 
         return soapAction;
+    }
+
+    protected void configureClientForComplexTypes(Client client, UMOEvent event) throws ClassNotFoundException
+    {
+        Map complexTypes = (Map) event.getEndpoint().getProperty("complexTypes");
+        Object[] beans = complexTypes.keySet().toArray();
+
+        AegisBindingProvider bp = (AegisBindingProvider) client.getService().getBindingProvider();
+        TypeMapping typeMapping = bp.getTypeMapping(client.getService());
+
+        // for each complex type
+        for (int i = 0; i < beans.length; i++)
+        {
+            BeanType bt = new BeanType();
+            String[] queue = ((String) complexTypes.get(beans[i])).split(":", 2);
+            bt.setSchemaType(new QName(queue[1], queue[0]));
+            bt.setTypeClass(Class.forName(beans[i].toString()));
+            typeMapping.register(bt);
+        }
     }
 }

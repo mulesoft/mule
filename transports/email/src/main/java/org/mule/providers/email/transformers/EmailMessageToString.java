@@ -26,7 +26,6 @@ public class EmailMessageToString extends AbstractTransformer
     public EmailMessageToString()
     {
         registerSourceType(Message.class);
-        registerSourceType(String.class);
         setReturnClass(String.class);
     }
 
@@ -37,7 +36,7 @@ public class EmailMessageToString extends AbstractTransformer
      */
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
-        Message msg = (Message)src;
+        Message msg = (Message) src;
         try
         {
             /*
@@ -58,7 +57,7 @@ public class EmailMessageToString extends AbstractTransformer
             {
                 // very simplisitic, only gets first part
                 MimeMultipart part = (MimeMultipart)result;
-                String transMsg = (String)part.getBodyPart(0).getContent();
+                String transMsg = (String) part.getBodyPart(0).getContent();
                 return transMsg;
             }
         }

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="Mule_Test" version="1.0">
+    <model name="ComplexTypes">
+        <mule-descriptor name="WSBridge" implementation="org.mule.components.simple.BridgeComponent">
+            <inbound-router>
+                <endpoint address="vm://inbound"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="xfire:http://localhost:9999/services/PeopleServiceWS?method=addPersonWithConfirmation">
+                        <properties>
+                            <map name="complexTypes">
+                                 <property name="org.mule.tck.testmodels.services.Person" value="Person:http://services.testmodels.tck.mule.org"/>
+                            </map>
+                        </properties>
+                    </endpoint>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="PeopleServiceWS" implementation="org.mule.providers.soap.xfire.testmodels.XFireComplexTypeService">
+            <inbound-router>
+                <endpoint address="xfire:http://localhost:9999/services"/>
+            </inbound-router>
+            <properties>
+                <property name="style" value="document"/>
+                <property name="use" value="literal"/>
+            </properties>
+        </mule-descriptor>
+    </model>
+</mule-configuration>

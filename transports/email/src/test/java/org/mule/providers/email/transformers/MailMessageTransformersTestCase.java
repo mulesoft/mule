@@ -13,7 +13,9 @@ package org.mule.providers.email.transformers;
 import org.mule.impl.AlreadyInitialisedException;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.tck.AbstractTransformerTestCase;
+import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 
 import java.util.Properties;
@@ -79,8 +81,8 @@ public class MailMessageTransformersTestCase extends AbstractTransformerTestCase
     {
         if (src instanceof Message)
         {
-            Object objSrc = null;
-            Object objRes = null;
+            Object objSrc;
+            Object objRes;
             try
             {
                 objSrc = ((Message) src).getContent();
@@ -97,5 +99,29 @@ public class MailMessageTransformersTestCase extends AbstractTransformerTestCase
             return objRes.equals(objSrc);
         }
         return super.compareResults(src, result);
+    }
+
+    public void testStringSourceType() throws Exception
+    {
+        try
+        {
+            assertFalse(getTransformer().isSourceTypeSupported(String.class));
+            getTransformer().transform(getResultData());
+            fail("Should throw exception for string source type");
+        }
+        catch (TransformerException e)
+        {
+            // expected
+            assertTrue(true);
+        }
+    }
+
+    public void testStringSourceTypeWithIgnoreBadInput() throws Exception
+    {
+        AbstractTransformer trans = (AbstractTransformer) getTransformer();
+        trans.setIgnoreBadInput(true);
+        Object result = trans.transform(getResultData());
+        trans.setIgnoreBadInput(false);
+        assertSame(result, getResultData());
     }
 }
