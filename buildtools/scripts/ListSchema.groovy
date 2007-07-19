@@ -25,10 +25,22 @@
   $Id$
 */
 
+// Schema version
+version = 2.0
+
+// Provide the location where https://dav.codehaus.org/dist/mule is mounted on your file system
+// as a parameter to the script.
+davfs = "DAVMountPoint"
+if (args.size() > 0)
+{
+    davfs = args[0]
+}
+
 // schema are indexed by the xsd file names (eg mule-foo.xsd is "foo")
 schemaNames = []
 schemaSources = [:]
 schemaDestinations = [:]
+schemaDestinationPaths = [:]
 
 // assume we are running in the buildtools/scripts directory
 root = "../.."
@@ -63,13 +75,15 @@ scanForSchemaAndInferDestinations = {
     if (f.absolutePath ==~ corexsd) {
       schemaNames << "core"
       schemaSources.put("core", f)
-      schemaDestinations.put("core", "${base}core/2.0/mule.xsd")
+      schemaDestinations.put("core", "${base}core/${version}/mule.xsd")
+      schemaDestinationPaths.put("core", "${base}core/${version}")
     } else if (f.absolutePath ==~ otherxsd) {
       match = (f.absolutePath =~ otherxsd)
       name = match[0][7]
       schemaNames << name
       schemaSources.put(name, f)
-      schemaDestinations.put(name, "${base}${name}/2.0/mule-${name}.xsd")
+      schemaDestinations.put(name, "${base}${name}/${version}/mule-${name}.xsd")
+      schemaDestinationPaths.put(name, "${base}${name}/${version}")
     } else {
       println "WARNING: ignoring $f"
     }
@@ -131,11 +145,12 @@ generateDeployCommand = {
   println ""
   println "generating deploy command"
   println ""
-  offset = "offsetToDAV"
   for (name in schemaNames) {
     source = schemaSources[name]
-    uri = new URI(schemaDestinations[name])
-    println "cp $source ${offset}${uri.path}"
+    pathUri = new URI(schemaDestinationPaths[name])
+    schemaUri = new URI(schemaDestinations[name])
+    println "mkdir -p ${davfs}${pathUri.path}"
+    println "cp $source ${davfs}${schemaUri.path}"
   }
 }
 
