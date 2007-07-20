@@ -52,18 +52,25 @@ def process(input)
 
         if (processingParentElement && versionMatch)
         {
-            outputLine(output, switchVersion(line, oldVersion, newVersion))
+            outputLine(output, switchVersion(line, "version", oldVersion, newVersion))
         }
         else
         {
             if ((versionProcessed == false) && versionMatch)
             {
                 versionProcessed = true
-                outputLine(output, switchVersion(line, oldVersion, newVersion))
+                outputLine(output, switchVersion(line, "version", oldVersion, newVersion))
             }
             else
             {
-                outputLine(output, line)
+                if (line.indexOf("<muleVersion>") > -1)
+                {
+                    outputLine(output, switchVersion(line, "muleVersion", oldVersion, newVersion))
+                }
+                else
+                {
+                    outputLine(output, line)
+                }
             }
         }
     }
@@ -75,18 +82,21 @@ def process(input)
     input.renameTo(backupFile)
 
     outputFile.renameTo(input)
-    
+
     // remove the backup file
     backupFile.delete()
 }
 
 //-----------------------------------------------------------------------------
-def switchVersion(line, oldVersion, newVersion)
+def switchVersion(line, versionTag, oldVersion, newVersion)
 //-----------------------------------------------------------------------------
 {
+    startVersionTag = "<" + versionTag + ">"
+    endVersionTag = "</" + versionTag + ">"
+
     // include the tag length
-    int start = line.indexOf("<version>") + 9;
-    int end = line.indexOf("</version>");
+    int start = line.indexOf(startVersionTag) + startVersionTag.length();
+    int end = line.indexOf(endVersionTag);
     def version = line.substring(start, end);
 
     if ((version == oldVersion) == false)
