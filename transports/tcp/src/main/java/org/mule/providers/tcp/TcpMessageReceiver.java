@@ -244,7 +244,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
 
             try
             {
-                tcpConnector.configureSocket(true, socket);
+                tcpConnector.configureSocket(TcpConnector.SERVER, socket);
 
                 dataIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
                 dataOut = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
@@ -253,7 +253,6 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
             {
                 logger.error("Failed to set Socket properties: " + e.getMessage(), e);
             }
-
         }
 
         public void dispose()
