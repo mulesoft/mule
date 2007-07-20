@@ -90,6 +90,26 @@ scanForSchemaAndInferDestinations = {
   }
 }
 
+checkSchema = {
+  println ""
+  println "checking schema"
+  println ""
+  for (name in schemaNames) {
+    file = schemaSources[name]
+    parser = new XmlParser().parse(file)
+    for (element in parser.value) {
+      if (element.name.localPart == "import") {
+        namespace = element.attributes["namespace"]
+        if (namespace.contains("mulesource") && ! namespace.contains("core") && ! element.attributes.keySet().contains("schemaLocation")) {
+          println "WARNING: missing schema location"
+          println "in " + file
+          println "for " + namespace
+        }
+      }
+    }
+  }
+}
+
 scanAndCheckConfigs = {
   println ""
   println "checking configurations"
@@ -156,6 +176,7 @@ generateDeployCommand = {
 
 checkCurrentDirectory()
 scanForSchemaAndInferDestinations()
+checkSchema()
 scanAndCheckConfigs()
 //listSchema()
 generateDeployCommand()
