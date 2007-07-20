@@ -107,7 +107,7 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
         builder.registerComponent(FunctionalTestComponent.class.getName(), 
             "testComponent", null, endpoint, props);
 
-        UMOMessage message = new MuleMessage(getValidMessage());
+        UMOMessage message = new MuleMessage(MESSAGE);
         message.setStringProperty(MailProperties.TO_ADDRESSES_PROPERTY, EMAIL);
         UMOSession session = 
             getTestSession(getTestComponent(getTestDescriptor("apple", Apple.class.getName())));
