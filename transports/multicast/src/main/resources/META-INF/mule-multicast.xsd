@@ -7,7 +7,11 @@
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
 
-    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"/>
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.springframework.org/schema/beans"
+                schemaLocation="http://www.springframework.org/schema/beans"/>
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0" 
+                schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
     <xsd:import namespace="http://www.mulesource.org/schema/mule/udp/2.0"
                 schemaLocation="http://www.mulesource.org/schema/mule/udp/2.0/mule-udp.xsd"/>
 

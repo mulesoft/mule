@@ -12,8 +12,8 @@
                 schemaLocation="http://www.springframework.org/schema/beans"/>
     <xsd:import namespace="http://www.mulesource.org/schema/mule/file/2.0"
                 schemaLocation="http://www.mulesource.org/schema/mule/file/2.0/mule-file.xsd"/>
-
-    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"/>
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0" 
+                schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
 
     <xsd:element name="connector" type="ftpConnectorType"/>
 
