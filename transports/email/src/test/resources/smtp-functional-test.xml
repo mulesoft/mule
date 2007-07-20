@@ -20,15 +20,15 @@
             <mule:outbound-router>
                 <mule:pass-through-router>
                     <mule:endpoint address="smtp://localhost:65437">
-                        <!-- neither of these are necessary as value in mail message?-->
+                        <!-- this doesn't work -->
                         <!-- property name="properties">
                             <map>
                                 <entry key="toAddresses" value="bob@example.com"/>
                             </map>
                         </property -->
-                        <!-- mule:properties>
-                             <prop key="toAddresses">bob@example.com</prop>
-                         </mule:properties -->
+                        <mule:properties>
+                            <entry key="toAddresses" value="bob@example.com"/>
+                        </mule:properties>
                      </mule:endpoint>
                 </mule:pass-through-router>
             </mule:outbound-router>

@@ -8,14 +8,16 @@
  * LICENSE.txt file.
  */
 
-package org.mule.providers.email.functional;
+package org.mule.providers.email.issues;
 
-public class ImapStringFunctionalTestCase extends AbstractEmailFunctionalTestCase
+import org.mule.providers.email.functional.AbstractEmailFunctionalTestCase;
+
+public class Pop3MimeWithConnectorMule2042TestCase extends AbstractEmailFunctionalTestCase
 {
 
-    public ImapStringFunctionalTestCase()
+    public Pop3MimeWithConnectorMule2042TestCase()
     {
-        super(65443, STRING_MESSAGE, "imap", "imap-string-functional-test.xml");
+        super(65445, MIME_MESSAGE, "pop3", "pop3-mime-with-connector-mule-2042-test.xml");
     }
 
     public void testReceive() throws Exception

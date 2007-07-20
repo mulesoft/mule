@@ -18,15 +18,7 @@
         <mule:service name="relay">
             <mule:component class="org.mule.components.simple.BridgeComponent"/>
             <mule:inbound-router>
-                <!--
-                    Here, when a connector-ref is added, the behavior changes, and we get plain text email.
-                    Adding a noAction transformer to the endpoint fixes it.
-                -->
-                <mule:endpoint address="pop3://bob:password@localhost:65435" connector-ref="pop3Connector">
-                <!--
-                    This is the old version, ends up using MIME message.
-                -->
-                <!--<mule:endpoint address="pop3://bob:password@localhost:65435">-->
+                <mule:endpoint address="pop3://bob:password@localhost:65435">
                     <mule:retry-connection-strategy retryCount="3" retryFrequency="1000"/>
                 </mule:endpoint>
             </mule:inbound-router>

@@ -19,12 +19,6 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <!-- waiting on MULE-1840 -->
-                        <exclude>**/SmtpFunctionalTestCase.*</exclude>
-                        <exclude>**/SmtpMimeFunctionalTestCase.*</exclude>
-                        <exclude>**/SmtpsFunctionalTestCase.*</exclude>
-                        <exclude>org/mule/providers/email/functional/*TestCase.*</exclude>
-                        <exclude>org/mule/providers/email/connectors/*TestCase.*</exclude>
                     </excludes>
                 </configuration>
             </plugin>

@@ -13,7 +13,8 @@
     <pop3:connector name="pop3Connector"/>
     <vm:connector name="vmConnector" queueEvents="true"/>
 
-    <bean name="mailToString" class="org.mule.providers.email.transformers.EmailMessageToString"/>
+    <!-- for variety, this test uses a mime message, so blank out transformer -->
+    <mule:transformer-no-action name="noActionTransformer"/>
 
     <mule:model-seda name="test">
 
@@ -21,7 +22,8 @@
             <mule:component class="org.mule.components.simple.BridgeComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="pop3://bob:password@localhost:65445"
-                        transformers="mailToString">
+                               transformers="noActionTransformer"
+                               connector-ref="pop3Connector">
                     <mule:retry-connection-strategy retryCount="3" retryFrequency="1000"/>
                 </mule:endpoint>
             </mule:inbound-router>

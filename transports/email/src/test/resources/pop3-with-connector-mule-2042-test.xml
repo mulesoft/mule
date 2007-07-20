@@ -2,24 +2,15 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
-       xmlns:imap="http://www.mulesource.org/schema/mule/imap/2.0"
-       xmlns:imaps="http://www.mulesource.org/schema/mule/imaps/2.0"
+       xmlns:pop3="http://www.mulesource.org/schema/mule/pop3/2.0"
        xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
-       http://www.mulesource.org/schema/mule/imap/2.0 http://www.mulesource.org/schema/mule/imap/2.0/mule-imap.xsd
-       http://www.mulesource.org/schema/mule/imaps/2.0 http://www.mulesource.org/schema/mule/imaps/2.0/mule-imaps.xsd
+       http://www.mulesource.org/schema/mule/pop3/2.0 http://www.mulesource.org/schema/mule/pop3/2.0/mule-pop3.xsd
        http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
 
-    <imaps:connector name="imapsConnector">
-        <imaps:tls-client
-                clientKeyStore="clientKeystore"
-                clientKeyStorePassword="mulepassword"/>
-        <imaps:tls-trust-store
-                trustStore="greenmail-truststore"
-                trustStorePassword="password"/>
-    </imaps:connector>
+    <pop3:connector name="pop3Connector"/>
     <vm:connector name="vmConnector" queueEvents="true"/>
 
     <mule:model-seda name="test">
@@ -27,7 +18,9 @@
         <mule:service name="relay">
             <mule:component class="org.mule.components.simple.BridgeComponent"/>
             <mule:inbound-router>
-                <mule:endpoint address="imaps://bob:password@localhost:65444">
+                <!-- adding the connector-ref here was causing issues
+                     this should be identical to pop3-fucntional-test apart from this -->
+                <mule:endpoint address="pop3://bob:password@localhost:65435" connector-ref="pop3Connector">
                     <mule:retry-connection-strategy retryCount="3" retryFrequency="1000"/>
                 </mule:endpoint>
             </mule:inbound-router>

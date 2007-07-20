@@ -17,7 +17,7 @@
                    deleteReadMessages="false"
             />
 
-    <!-- need too revisit this once tests are working - it's not clear to me what
+    <!-- need to revisit this once tests are working - it's not clear to me what
          key store is being used in the tests -->
 
     <imaps:connector name="imapsConnector"
