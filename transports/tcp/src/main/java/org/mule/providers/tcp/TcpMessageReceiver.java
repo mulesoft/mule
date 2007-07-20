@@ -244,31 +244,10 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
 
             try
             {
-                //There is some overhead in stting socket timeout and buffer size, so we're
-                //careful here only to set if needed
-                if (tcpConnector.getReceiveBufferSize() != UMOConnector.INT_VALUE_NOT_SET
-                        && socket.getReceiveBufferSize() != tcpConnector.getReceiveBufferSize())
-                {
-                    socket.setReceiveBufferSize(tcpConnector.getReceiveBufferSize());
-                }
-                if (tcpConnector.getSendBufferSize() != UMOConnector.INT_VALUE_NOT_SET
-                        && socket.getSendBufferSize() != tcpConnector.getSendBufferSize())
-                {
-                    socket.setSendBufferSize(tcpConnector.getSendBufferSize());
-                }
-                // TODO MERGE no such methods in Mule 2.x, is it soTimeout?
-                //if (tcpConnector.getReceiveTimeout() != UMOConnector.INT_VALUE_NOT_SET
-                //        && socket.getSoTimeout() != tcpConnector.getReceiveTimeout())
-                //{
-                //    socket.setSoTimeout(tcpConnector.getReceiveTimeout());
-                //}
-
-                socket.setTcpNoDelay(tcpConnector.isSendTcpNoDelay());
-                socket.setKeepAlive(tcpConnector.isKeepAlive());
+                tcpConnector.configureSocket(true, socket);
 
                 dataIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
                 dataOut = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
-
             }
             catch (IOException e)
             {
