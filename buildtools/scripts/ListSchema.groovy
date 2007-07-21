@@ -26,33 +26,33 @@
 */
 
 // Schema version
-version = 2.0
+def version = 2.0
 
 // Provide the location where https://dav.codehaus.org/dist/mule is mounted on your file system
 // as a parameter to the script.
-davfs = "DAVMountPoint"
+def davfs = "DAVMountPoint"
 if (args.size() > 0)
 {
     davfs = args[0]
 }
 
 // schema are indexed by the xsd file names (eg mule-foo.xsd is "foo")
-schemaNames = []
-schemaSources = [:]
-schemaDestinations = [:]
-schemaDestinationPaths = [:]
+def schemaNames = []
+def schemaSources = [:]
+def schemaDestinations = [:]
+def schemaDestinationPaths = [:]
 
 // assume we are running in the buildtools/scripts directory
-root = "../.."
+def root = "../.."
 
 // destination base
-base = "http://www.mulesource.org/schema/mule/"
+def base = "http://www.mulesource.org/schema/mule/"
 
 // the structure of xsd locations
-corexsd = /.*(\/|\\)core(\/|\\).*(\/|\\)mule.xsd/
-otherxsd = /.*(\/|\\)(transports|modules)(\/|\\)([^\/]+)(\/|\\).*(\/|\\)mule-(.*)\.xsd/
+def corexsd = /.*(\/|\\)core(\/|\\).*(\/|\\)mule.xsd/
+def otherxsd = /.*(\/|\\)(transports|modules)(\/|\\)([^\/]+)(\/|\\).*(\/|\\)mule-(.*)\.xsd/
 
-checkCurrentDirectory = {
+def checkCurrentDirectory = {
   if (! (new File("").getCanonicalFile().getName() == "scripts")) {
     println ""
     println "WARNING: run from in the scripts directory"
@@ -61,7 +61,7 @@ checkCurrentDirectory = {
   }
 }
 
-scanForSchemaAndInferDestinations = {
+def scanForSchemaAndInferDestinations = {
   println ""
   println "scanning for schema"
   println ""
@@ -90,7 +90,7 @@ scanForSchemaAndInferDestinations = {
   }
 }
 
-checkSchema = {
+def checkSchema = {
   println ""
   println "checking schema"
   println ""
@@ -110,7 +110,7 @@ checkSchema = {
   }
 }
 
-scanAndCheckConfigs = {
+def scanAndCheckConfigs = {
   println ""
   println "checking configurations"
   println ""
@@ -121,7 +121,7 @@ scanAndCheckConfigs = {
                   }
                 }) {
     try {
-      parser = new XmlParser().parse(f)
+      def parser = new XmlParser().parse(f)
       for (key in parser?.attributes.keySet()) {
         if (key instanceof groovy.xml.QName
             && key.localPart == "schemaLocation") {
@@ -151,7 +151,7 @@ scanAndCheckConfigs = {
   }
 }
 
-listSchema = {
+def listSchema = {
   for (name in schemaNames) {
     println ""
     println "${name}:"
@@ -161,7 +161,7 @@ listSchema = {
 }
 
 // this is just a suggestion
-generateDeployCommand = {
+def generateDeployCommand = {
   println ""
   println "generating deploy command"
   println ""
