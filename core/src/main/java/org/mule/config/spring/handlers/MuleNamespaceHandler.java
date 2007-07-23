@@ -112,6 +112,8 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("configuration", new ConfigurationDefinitionParser());
         registerBeanDefinitionParser("environment-properties", new OrphanMapDefinitionParser(HashMap.class, MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES));
         registerBeanDefinitionParser("default-threading-profile", new ThreadingProfileDefinitionParser());
+        registerBeanDefinitionParser("default-dispatcher-threading-profile", new ThreadingProfileDefinitionParser());
+        registerBeanDefinitionParser("default-receiver-threading-profile", new ThreadingProfileDefinitionParser());
         registerBeanDefinitionParser("default-dispatcher-connection-strategy", new ConnectionStrategyDefinitionParser());
         registerBeanDefinitionParser("default-receiver-connection-strategy", new ConnectionStrategyDefinitionParser());
 

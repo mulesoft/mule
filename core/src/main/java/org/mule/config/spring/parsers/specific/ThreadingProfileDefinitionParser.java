@@ -64,11 +64,11 @@ public class ThreadingProfileDefinitionParser extends AbstractChildDefinitionPar
         }
         else if ("default-receiver-threading-profile".equals(name))
         {
-            return "defaultReceiverThreadingProfile";
+            return "defaultMessageReceiverThreadingProfile";
         }
         else if ("default-dispatcher-threading-profile".equals(name))
         {
-            return "defaultDispatcherThreadingProfile";
+            return "defaultMessageDispatcherThreadingProfile";
         }
         else if ("default-threading-profile".equals(name))
         {
