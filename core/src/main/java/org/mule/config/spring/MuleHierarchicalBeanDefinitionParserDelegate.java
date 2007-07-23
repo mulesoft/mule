@@ -38,7 +38,8 @@ import org.w3c.dom.NodeList;
 public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinitionParserDelegate
 {
     public static final String MULE_DEFAULT_NAMESPACE = "http://www.mulesource.org/schema/mule/core";
-
+    public static final String MULE_NAMESPACE_PREFIX = "http://www.mulesource.org/schema/mule/";    
+    
     /**
      * logger used by this class
      */
@@ -74,21 +75,29 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
         }
         root = bd;
 
-        //Grab all nested elements lised as children to this element
-        NodeList list = ele.getChildNodes();
-        for (int i = 0; i < list.getLength() ; i++)
+        // Only iterate and parse child mule name-spaced elements. Spring does not do
+        // hierarchical parsing by default so we need to maintain this behavior
+        // for non-mule elements to ensure that we don't break the parsing of any
+        // other custom name-spaces e.g spring-jee
+        String ns = ele.getNamespaceURI();
+        if (ns != null && ns.startsWith(MULE_NAMESPACE_PREFIX))
         {
-            if(list.item(i) instanceof Element)
+            //Grab all nested elements lised as children to this element
+            NodeList list = ele.getChildNodes();
+            for (int i = 0; i < list.getLength() ; i++)
             {
-                Element element = (Element) list.item(i);
-
-                if (logger.isDebugEnabled()) {
-                    logger.debug("parsing: " + writeNode(element));
-                }
-                if (!tryParsingSpringPropertyElements(element, bd))
+                if(list.item(i) instanceof Element)
                 {
-                    bd = parseCustomElement(element, bd);
-                    registerBean(element, bd);
+                    Element element = (Element) list.item(i);
+    
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("parsing: " + writeNode(element));
+                    }
+                    if (!tryParsingSpringPropertyElements(element, bd))
+                    {
+                        bd = parseCustomElement(element, bd);
+                        registerBean(element, bd);
+                    }
                 }
             }
         }
