@@ -359,7 +359,7 @@ Assembly descriptor for the full Mule distribution.
     <dependencySet>
       <outputDirectory>lib/boot</outputDirectory>
       <!-- No version number  -->
-      <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
+<!--       <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping> -->
       <includes>
         <include>org.mule.modules:mule-module-boot</include>
         <include>commons-cli:commons-cli</include>
@@ -491,6 +491,9 @@ Assembly descriptor for the full Mule distribution.
         <exclude>javax.activation:activation</exclude>
         <exclude>javax.mail:mail</exclude>
         <exclude>commons-logging:commons-logging</exclude>
+        <!-- these two are already in lib/boot -->
+        <exclude>commons-cli:commons-cli</exclude>
+        <exclude>tanukisoft:wrapper</exclude>
 
         <exclude>org.apache.activemq:activemq-core</exclude>
         <exclude>org.apache.activemq:activeio-core</exclude>
