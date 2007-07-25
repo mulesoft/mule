@@ -100,21 +100,23 @@ public class DefaultReplyToHandler implements ReplyToHandler
 
     protected synchronized UMOEndpoint getEndpoint(UMOEvent event, String endpointUri) throws UMOException
     {
-        UMOEndpoint endpoint = (UMOEndpoint) endpointCache.get(endpointUri);
+        UMOEndpoint endpoint = (UMOEndpoint)endpointCache.get(endpointUri);
         if (endpoint == null)
-        { 
-           endpoint = RegistryContext.getRegistry().lookupEndpoint(endpointUri);
-           if(endpoint!=null)
-           {
-               //TODO We should not need to set correct transformer here, this should rather be done generically based on the
-               //endpoint type. SEE MULE-2066
-               endpoint.setType(UMOEndpoint.ENDPOINT_TYPE_SENDER);
-               endpoint.setTransformer(((AbstractConnector)endpoint.getConnector()).getDefaultOutboundTransformer());
-           }
-           else
-           {
+        {
+            endpoint = RegistryContext.getRegistry().lookupEndpoint(endpointUri);
+            if (endpoint != null)
+            {
+                // TODO MULE-2066: We should not need to set correct transformer
+                // here, this should rather be done generically based on the endpoint
+                // type.
+                endpoint.setType(UMOEndpoint.ENDPOINT_TYPE_SENDER);
+                endpoint.setTransformer(((AbstractConnector) endpoint.getConnector()).getDefaultOutboundTransformer());
+            }
+            else
+            {
                 UMOEndpointURI ep = new MuleEndpointURI(endpointUri);
-                endpoint = event.getManagementContext().getRegistry().getOrCreateEndpointForUri(ep, UMOEndpoint.ENDPOINT_TYPE_SENDER);
+                endpoint = event.getManagementContext().getRegistry().getOrCreateEndpointForUri(ep,
+                    UMOEndpoint.ENDPOINT_TYPE_SENDER);
                 endpointCache.put(endpointUri, endpoint);
             }
         }
