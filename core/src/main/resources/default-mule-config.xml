@@ -148,5 +148,9 @@
         <property name="maxThreadsIdle" value="4"/>
         <property name="poolExhaustedActionString" value="WAIT"/>
     </bean>
+
+    <bean name="_muleProperties" class="java.util.HashMap"/>
+
     <!--<mule:properties-container includeSystemProperties="true" name="_muleSystemModelProperties"/>-->
+
 </beans>
