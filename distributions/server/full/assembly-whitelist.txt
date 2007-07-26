@@ -1,5 +1,6 @@
 acegi-security-1.0.1
 antlr-2.7.6
+aopalliance-1.0
 axis-1.4
 axis-jaxrpc-1.4
 axis-saaj-1.4
@@ -120,6 +121,7 @@ script-api-1.0-jdk14
 slf4j-api-1.4.0
 slf4j-log4j12-1.4.0
 smack-2.2.1
+spring-aop-2.0.6
 spring-beans-2.0.6
 spring-context-2.0.6
 spring-core-2.0.6

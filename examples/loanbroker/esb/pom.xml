@@ -183,8 +183,11 @@
             <artifactId>mule-module-spring</artifactId>
             <version>${version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aop</artifactId>
+        </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>
@@ -194,11 +197,6 @@
                     <!-- This is needed so that the ActiveMQ tests don't trip over each other
                         during startup/shutdown. -->
                     <forkMode>pertest</forkMode>
-                    <excludes>
-                        <!-- MULE-1864 -->
-                        <exclude>**/*.*</exclude>
-                        <exclude implementation="java.lang.String">**/*LoanBrokerEsb*.*</exclude>
-                    </excludes>
                 </configuration>
             </plugin>
         </plugins>

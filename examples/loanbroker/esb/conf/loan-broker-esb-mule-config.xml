@@ -1,204 +1,211 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+    xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+    xmlns:ejb="http://www.mulesource.org/schema/mule/ejb/2.0"
+    xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
+    xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+               http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+               http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd
+               http://www.mulesource.org/schema/mule/ejb/2.0 http://www.mulesource.org/schema/mule/ejb/2.0/mule-ejb.xsd
+               http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
-
-<mule-configuration id="Mule_Loan_broker_ESB" version="1.0">
     <description>
-    The Loan Broker ESB example implements the Loan Broker Example using an ESB topology.
-    See http://mule.mulesource.org/wiki/display/MULE/LoanBroker+ESB for details.
+        The Loan Broker ESB example implements the Loan Broker Example using an ESB topology. See
+        http://mule.mulesource.org/wiki/display/MULE/LoanBroker+ESB for details.
     </description>
 
-    <!-- Embed Spring configuration to create a Jms Connection factory -->
-    <container-context className="org.mule.extras.spring.SpringContainerContext">
-        <properties>
-            <text-property name="configuration">
-                <![CDATA[
-                <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-                <beans>
-                    <bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
-                        <property name="brokerURL"><value>vm://localhost?broker.persistent=false&amp;broker.useJmx=false</value></property>
-                    </bean>
-                </beans>
-                ]]>
-            </text-property>
-        </properties>
-    </container-context>
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:openejb.properties</value>
+            </list>
+        </property>
+    </bean>
 
-    <connector name="ejbConnector" className="org.mule.providers.ejb.EjbConnector">
-        <properties>
-            <property name="jndiInitialFactory" value="org.openejb.client.LocalInitialContextFactory"/>
-            <property name="securityPolicy" value="security.policy"/>
-            <map name="jndiProviderProperties">
-                <system-property name="openejb.base" key="mule.home"/>
-                <property name="openejb.configuration" value="./lib/user/openejb.conf"/>
-                <property name="logging.conf" value="./conf/log4j.properties"/>
-                <property name="openejb.nobanner" value="true"/>
-                <!-- Override properties for unit tests. -->
-                <file-properties location="openejb.properties" override="true"/>
-            </map>
-        </properties>
-    </connector>
-
-    <connector name="jmsConnector" className="org.mule.providers.jms.activemq.ActiveMqJmsConnector">
-        <properties>
-            <!-- The ActiveMQ ConnectionFactory is configured as a Spring bean. -->
-            <container-property name="connectionFactory" reference="jmsConnectionFactory"/>
-            <property name="specification" value="1.1"/>
-        </properties>
-    </connector>
-
-    <!-- TODO Move these to global-endpoints once MULE-1464 is fixed. -->
-    <endpoint-identifiers>
-        <endpoint-identifier name="CustomerRequestsREST" value="jetty:rest://localhost:8888/loanbroker"/>
-        <endpoint-identifier name="CustomerRequests" value="vm://customer.requests"/>
-        <endpoint-identifier name="CustomerResponses" value="LoanQuotes"/>
-        <endpoint-identifier name="LoanQuotes" value="jms://esb.loan.quotes"/>
-        <endpoint-identifier name="CreditAgencyGateway" value="jms://esb.credit.agency"/>
-        <!-- here we're telling Mule to invoke a remote Ejb directly (not host a
-        proxy service for the remote object as with the other example in mule-config-with-ejb-container.xml example)
-        -->
-        <endpoint-identifier name="CreditAgency" value="ejb://localhost:1099/local/CreditAgency?method=getCreditProfile"/>
-        <endpoint-identifier name="LenderGateway" value="jms://esb.lender.service"/>
-        <endpoint-identifier name="LenderService" value="vm://lender.service"/>
-        <endpoint-identifier name="BankingGateway" value="jms://esb.banks"/>
-    </endpoint-identifiers>
-
-    <transformers>
-        <transformer name="RestRequestToCustomerRequest" className="org.mule.examples.loanbroker.transformers.RestRequestToCustomerRequest"/>
-        <transformer name="LoanQuoteRequestToCreditProfileArgs" className="org.mule.examples.loanbroker.transformers.LoanQuoteRequestToCreditProfileArgs"/>
-        <transformer name="CreditProfileXmlToCreditProfile" className="org.mule.examples.loanbroker.transformers.CreditProfileXmlToCreditProfile"/>
-        <transformer name="SetLendersAsRecipients" className="org.mule.examples.loanbroker.transformers.SetLendersAsRecipients" />
-        <transformer name="ObjectToJMSMessage" className="org.mule.providers.jms.transformers.ObjectToJMSMessage"/>
-    </transformers>
-
-    <global-endpoints>
-        <endpoint name="Bank1" address="axis:http://localhost:10080/mule/Bank1?method=getLoanQuote"/>
-        <endpoint name="Bank2" address="axis:http://localhost:20080/mule/Bank2?method=getLoanQuote"/>
-        <endpoint name="Bank3" address="axis:http://localhost:30080/mule/Bank3?method=getLoanQuote"/>
-        <endpoint name="Bank4" address="axis:http://localhost:40080/mule/Bank4?method=getLoanQuote"/>
-        <endpoint name="Bank5" address="axis:http://localhost:50080/mule/Bank5?method=getLoanQuote"/>
-        <endpoint name="Bank1In" address="axis:http://localhost:10080/mule"/>
-        <endpoint name="Bank2In" address="axis:http://localhost:20080/mule"/>
-        <endpoint name="Bank3In" address="axis:http://localhost:30080/mule"/>
-        <endpoint name="Bank4In" address="axis:http://localhost:40080/mule"/>
-        <endpoint name="Bank5In" address="axis:http://localhost:50080/mule"/>
-    </global-endpoints>
-    
-    <!--
-        The Mule model initialises and manages your UMO components
+    <!--Use Default values as specified in documentation, 2.0 is not currently using these values.
+        See MULE-2073
     -->
-    <model name="loan-broker">
+    <mule:configuration serverId="loanBroker">
+        <mule:default-threading-profile threadWaitTimeout="30" maxThreadsActive="10" maxThreadsIdle="10"
+            maxBufferSize="0" threadTTL="60000" poolExhaustedAction="RUN" />
+    </mule:configuration>
+
+    <ejb:connector name="ejbConnector" securityPolicy="security.policy"
+        jndiInitialFactory="org.openejb.client.LocalInitialContextFactory">
+        <mule:jndi-provider-properties>
+            <entry key="openejb.base" value="${openejb.base}" />
+            <entry key="openejb.configuration" value="${openejb.configuration}" />
+            <entry key="logging.conf" value="${logging.conf}" />
+            <entry key="openejb.nobanner" value="${openejb.nobanner}" />
+        </mule:jndi-provider-properties>
+    </ejb:connector>
+
+    <jms:activemq-connector name="jmsConnector" />
+
+    <mule:custom-transformer name="RestRequestToCustomerRequest"
+        class="org.mule.examples.loanbroker.transformers.RestRequestToCustomerRequest" />
+    <mule:custom-transformer name="LoanQuoteRequestToCreditProfileArgs"
+        class="org.mule.examples.loanbroker.transformers.LoanQuoteRequestToCreditProfileArgs" />
+    <mule:custom-transformer name="CreditProfileXmlToCreditProfile"
+        class="org.mule.examples.loanbroker.transformers.CreditProfileXmlToCreditProfile" />
+    <mule:custom-transformer name="SetLendersAsRecipients"
+        class="org.mule.examples.loanbroker.transformers.SetLendersAsRecipients" />
+    <mule:custom-transformer name="ObjectToJMSMessage"
+        class="org.mule.providers.jms.transformers.ObjectToJMSMessage" />
+
+    <mule:endpoint name="CustomerRequestsREST" address="jetty:rest://localhost:8888/loanbroker" />
+    <mule:endpoint name="CustomerRequests" address="vm://customer.requests" />
+    <mule:endpoint name="CustomerResponses" address="LoanQuotes" />
+    <mule:endpoint name="LoanQuotes" address="jms://esb.loan.quotes" />
+    <mule:endpoint name="CreditAgencyGateway" address="jms://esb.credit.agency" />
+    <!-- here we're telling Mule to invoke a remote Ejb directly (not host a
+        proxy service for the remote object as with the other example in mule-config-with-ejb-container.xml example)
+    -->
+    <mule:endpoint name="CreditAgency"
+        address="ejb://localhost:1099/local/CreditAgency?method=getCreditProfile" />
+    <mule:endpoint name="LenderGateway" address="jms://esb.lender.service" />
+    <mule:endpoint name="LenderService" address="vm://lender.service" />
+    <mule:endpoint name="BankingGateway" address="jms://esb.banks" />
+    <mule:endpoint name="Bank1" address="axis:http://localhost:10080/mule/TheBank1?method=getLoanQuote"
+        synchronous="true" />
+    <mule:endpoint name="Bank2" address="axis:http://localhost:20080/mule/TheBank2?method=getLoanQuote"
+        synchronous="true" />
+    <mule:endpoint name="Bank3" address="axis:http://localhost:30080/mule/TheBank3?method=getLoanQuote"
+        synchronous="true" />
+    <mule:endpoint name="Bank4" address="axis:http://localhost:40080/mule/TheBank4?method=getLoanQuote"
+        synchronous="true" />
+    <mule:endpoint name="Bank5" address="axis:http://localhost:50080/mule/TheBank5?method=getLoanQuote"
+        synchronous="true" />
+    <mule:endpoint name="Bank1In" address="axis:http://localhost:10080/mule" />
+    <mule:endpoint name="Bank2In" address="axis:http://localhost:20080/mule" />
+    <mule:endpoint name="Bank3In" address="axis:http://localhost:30080/mule" />
+    <mule:endpoint name="Bank4In" address="axis:http://localhost:40080/mule" />
+    <mule:endpoint name="Bank5In" address="axis:http://localhost:50080/mule" />
+
+    <mule:model-seda name="loan-broker">
+
         <!--
-        The loan broker is used to receive loan requests
+            The loan broker is used to receive loan requests
         -->
-        <mule-descriptor name="LoanBroker"
-            implementation="org.mule.examples.loanbroker.AsynchronousLoanBroker">
+        <mule:service name="LoanBroker">
+            <mule:component class="org.mule.examples.loanbroker.AsynchronousLoanBroker" />
 
-            <inbound-router>
-                <endpoint address="CustomerRequestsREST" transformers="RestRequestToCustomerRequest"/>
-                <endpoint address="CustomerRequests"/>
-            </inbound-router>
+            <mule:inbound-router>
+                <mule:endpoint ref="CustomerRequestsREST" transformers="RestRequestToCustomerRequest" />
+                <mule:endpoint ref="CustomerRequests" />
+            </mule:inbound-router>
 
-            <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="CreditAgencyGateway"/>
-                </router>
-            </outbound-router>
+            <mule:outbound-router>
+                <mule:pass-through-router>
+                    <mule:endpoint ref="CreditAgencyGateway" />
+                </mule:pass-through-router>
+            </mule:outbound-router>
 
-            <response-router timeout="1000000">
-                <endpoint address="LoanQuotes"/>
-                <router className="org.mule.examples.loanbroker.routers.BankQuotesResponseAggregator"/>
-            </response-router>
-        </mule-descriptor>
+            <mule:response-router timeout="1000000">
+                <mule:endpoint ref="LoanQuotes" />
+                <mule:custom-router class="org.mule.examples.loanbroker.routers.BankQuotesResponseAggregator" />
+            </mule:response-router>
+        </mule:service>
 
         <!--
-        The credit agency service will get the credit profile for a customer
+            The credit agency service will get the credit profile for a customer
         -->
-         <mule-descriptor name="CreditAgencyGateway"
-            implementation="org.mule.components.builder.ReflectionMessageBuilder">
-            <inbound-router>
-                <endpoint address="CreditAgencyGateway"/>
-            </inbound-router>
-            <outbound-router>
-                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
+        <mule:service name="CreditAgencyGatewayService">
+            <mule:component class="org.mule.components.builder.ReflectionMessageBuilder" />
+            <mule:inbound-router>
+                <mule:endpoint ref="CreditAgencyGateway" />
+            </mule:inbound-router>
+            <mule:outbound-router>
+                <mule:filtering-router>
                     <!-- We invoke the credit Agency service using remoteSync which means that a response
-                    will be returned from the service. there is also a responseTransformer that will
-                    conver the Xml returned from the CreditAgency Ejb into a CreditProfile object -->
-                    <endpoint remoteSync="true" transformers="LoanQuoteRequestToCreditProfileArgs"
-                        responseTransformers="CreditProfileXmlToCreditProfile" address="CreditAgency"/>
-                    <endpoint address="LenderGateway"/>
-                </router>
-            </outbound-router>
-        </mule-descriptor>
+                        will be returned from the service. there is also a responseTransformer that will
+                        conver the Xml returned from the CreditAgency Ejb into a CreditProfile object -->
+                    <mule:endpoint remoteSync="true" transformers="LoanQuoteRequestToCreditProfileArgs"
+                        responseTransformers="CreditProfileXmlToCreditProfile" ref="CreditAgency" />
+                    <mule:endpoint ref="LenderGateway" />
+                </mule:filtering-router>
+            </mule:outbound-router>
+        </mule:service>
 
-        <mule-descriptor name="LenderGateway"
-                         implementation="org.mule.components.simple.BridgeComponent">
-            <inbound-router>
-                <endpoint address="LenderGateway"/>
-            </inbound-router>
-            <outbound-router>
-                <router className="org.mule.routing.outbound.ChainingRouter">
-                    <endpoint remoteSync="true" address="LenderService"/>
-                    <endpoint address="BankingGateway" transformers="SetLendersAsRecipients ObjectToJMSMessage"/>
-                </router>
-            </outbound-router>
-        </mule-descriptor>
+        <mule:service name="LenderGatewayService">
+            <mule:component class="org.mule.components.simple.BridgeComponent" />
+            <mule:inbound-router>
+                <mule:endpoint ref="LenderGateway" />
+            </mule:inbound-router>
+            <mule:outbound-router>
+                <mule:chaining-router>
+                    <mule:endpoint remoteSync="true" ref="LenderService" />
+                    <mule:endpoint ref="BankingGateway"
+                        transformers="SetLendersAsRecipients ObjectToJMSMessage" />
+                </mule:chaining-router>
+            </mule:outbound-router>
+        </mule:service>
 
-        <mule-descriptor name="LenderService"
-                         implementation="org.mule.examples.loanbroker.lender.DefaultLender">
-            <inbound-router>
-                <endpoint address="LenderService"/>
-            </inbound-router>
-        </mule-descriptor>
+        <mule:service name="LenderServiceService">
+            <mule:component class="org.mule.examples.loanbroker.lender.DefaultLender" />
+            <mule:inbound-router>
+                <mule:endpoint ref="LenderService" />
+            </mule:inbound-router>
+        </mule:service>
 
-        <mule-descriptor name="BankingGateway"
-            implementation="org.mule.components.simple.BridgeComponent">
-            <inbound-router>
-                <endpoint address="BankingGateway"/>
-            </inbound-router>
-            <outbound-router>
-                <router className="org.mule.routing.outbound.StaticRecipientList">
-                    <reply-to address="LoanQuotes"/>
-                </router>
-            </outbound-router>
-        </mule-descriptor>
+        <mule:service name="BankingGatewayService">
+            <mule:component class="org.mule.components.simple.BridgeComponent" />
+            <mule:inbound-router>
+                <mule:endpoint ref="BankingGateway" />
+            </mule:inbound-router>
+            <mule:outbound-router>
+                <mule:static-recipient-list-router>
+                    <mule:reply-to address="LoanQuotes" />
+                    <mule:message-property-filter pattern="recipients!=null" />
+                </mule:static-recipient-list-router>
+            </mule:outbound-router>
+        </mule:service>
 
         <!--
-        These are mock bank services that represent remote bank loan services
-        One or more of these are selected by the LenderService and a request
-        is routed to them.   The lenderService outbound router also defines a
-        replyTo property which will be used by Mule to route the responses back
-        to the LoanBrokerQuotes destination
+            These are mock bank services that represent remote bank loan services
+            One or more of these are selected by the LenderService and a request
+            is routed to them.   The lenderService outbound router also defines a
+            replyTo property which will be used by Mule to route the responses back
+            to the LoanBrokerQuotes destination
         -->
-        <mule-descriptor name="Bank1" implementation="org.mule.examples.loanbroker.bank.Bank">
-            <inbound-router>
-                <global-endpoint name="Bank1In"/>
-            </inbound-router>
-        </mule-descriptor>
+        <mule:service name="TheBank1">
+            <mule:component class="org.mule.examples.loanbroker.bank.Bank" />
+            <mule:inbound-router>
+                <mule:endpoint ref="Bank1In" />
+            </mule:inbound-router>
+        </mule:service>
 
-        <mule-descriptor name="Bank2" implementation="org.mule.examples.loanbroker.bank.Bank">
-            <inbound-router>
-                <global-endpoint name="Bank2In"/>
-            </inbound-router>
-        </mule-descriptor>
+        <mule:service name="TheBank2">
+            <mule:component class="org.mule.examples.loanbroker.bank.Bank" />
+            <mule:inbound-router>
+                <mule:endpoint ref="Bank2In" />
+            </mule:inbound-router>
+        </mule:service>
 
-        <mule-descriptor name="Bank3" implementation="org.mule.examples.loanbroker.bank.Bank">
-            <inbound-router>
-                <global-endpoint name="Bank3In"/>
-            </inbound-router>
-        </mule-descriptor>
+        <mule:service name="TheBank3">
+            <mule:component class="org.mule.examples.loanbroker.bank.Bank" />
+            <mule:inbound-router>
+                <mule:endpoint ref="Bank3In" />
+            </mule:inbound-router>
+        </mule:service>
 
-        <mule-descriptor name="Bank4" implementation="org.mule.examples.loanbroker.bank.Bank">
-            <inbound-router>
-                <global-endpoint name="Bank4In"/>
-            </inbound-router>
-        </mule-descriptor>
+        <mule:service name="TheBank4">
+            <mule:component class="org.mule.examples.loanbroker.bank.Bank" />
+            <mule:inbound-router>
+                <mule:endpoint ref="Bank4In" />
+            </mule:inbound-router>
+        </mule:service>
 
-        <mule-descriptor name="Bank5" implementation="org.mule.examples.loanbroker.bank.Bank">
-            <inbound-router>
-                <global-endpoint name="Bank5In"/>
-            </inbound-router>
-        </mule-descriptor>
-    </model>
-</mule-configuration>
+        <mule:service name="TheBank5">
+            <mule:component class="org.mule.examples.loanbroker.bank.Bank" />
+            <mule:inbound-router>
+                <mule:endpoint ref="Bank5In" />
+            </mule:inbound-router>
+        </mule:service>
+
+    </mule:model-seda>
+
+</beans>
