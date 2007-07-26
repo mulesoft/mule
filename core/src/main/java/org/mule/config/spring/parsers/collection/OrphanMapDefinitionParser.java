@@ -27,10 +27,12 @@ public class OrphanMapDefinitionParser extends AbstractMuleBeanDefinitionParser
 {
     private Class mapClass;
     private String name;
+    private boolean dynamicName = false;
 
     public OrphanMapDefinitionParser(Class mapClass)
     {
         this.mapClass = mapClass;
+        dynamicName = true;
     }
 
     public OrphanMapDefinitionParser(Class mapClass, String name)
@@ -51,6 +53,17 @@ public class OrphanMapDefinitionParser extends AbstractMuleBeanDefinitionParser
         builder.addPropertyValue("targetMapClass", mapClass.getName());
     }
 
+    //@Override
+
+    protected void preProcess()
+    {
+        super.preProcess();
+        if (dynamicName)
+        {
+            name = null;
+        }
+    }
+    
     //@java.lang.Override
     protected String resolveId(Element element, AbstractBeanDefinition definition, ParserContext parserContext) throws BeanDefinitionStoreException
     {

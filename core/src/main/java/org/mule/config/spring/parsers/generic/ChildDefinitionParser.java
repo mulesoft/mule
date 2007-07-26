@@ -46,6 +46,7 @@ public class ChildDefinitionParser extends AbstractChildDefinitionParser
 
     protected void preProcess()
     {
+        super.preProcess();
         if (resetEachUseMule1735)
         {
            clazz = null; // reset for this element

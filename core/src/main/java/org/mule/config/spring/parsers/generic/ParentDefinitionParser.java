@@ -44,6 +44,7 @@ public class ParentDefinitionParser extends AbstractHierarchicalDefinitionParser
 
     protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext)
     {
+        preProcess();
         setRegistry(parserContext.getRegistry());
         this.parserContext = parserContext;
         Class beanClass = getBeanClass(element);

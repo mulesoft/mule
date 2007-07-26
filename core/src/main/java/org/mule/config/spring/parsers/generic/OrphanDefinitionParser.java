@@ -21,6 +21,7 @@ import org.w3c.dom.Element;
 public class OrphanDefinitionParser extends AbstractMuleBeanDefinitionParser
 {
     private Class beanClass = null;
+    private boolean dynamicClass = false;
 
     /**
      * This constructor assumes that the class name will be explicitly specified as an attribute on the element.
@@ -28,6 +29,7 @@ public class OrphanDefinitionParser extends AbstractMuleBeanDefinitionParser
     public OrphanDefinitionParser(boolean singleton)
     {
         this.singleton = singleton;
+        dynamicClass = true;
     }
 
     public OrphanDefinitionParser(Class beanClass, boolean singleton)
@@ -36,6 +38,17 @@ public class OrphanDefinitionParser extends AbstractMuleBeanDefinitionParser
         this.singleton = singleton;
     }
 
+    // @Override
+    protected void preProcess()
+    {
+        super.preProcess();
+        if (dynamicClass)
+        {
+            beanClass = null;
+        }
+    }
+
+    // @Override
     protected Class getBeanClass(Element element)
     {
         return beanClass;

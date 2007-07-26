@@ -9,18 +9,18 @@
  */
 package org.mule.config.spring.parsers;
 
-import org.mule.config.spring.parsers.assembly.DefaultBeanAssemblerFactory;
-import org.mule.config.spring.parsers.assembly.PropertyConfiguration;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.assembly.BeanAssemblerFactory;
+import org.mule.config.spring.parsers.assembly.DefaultBeanAssemblerFactory;
+import org.mule.config.spring.parsers.assembly.ReusablePropertyConfiguration;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.util.ClassUtils;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
@@ -34,7 +34,6 @@ import org.springframework.util.StringUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * This parser extends the Spring provided {@link AbstractBeanDefinitionParser} to provide additional features for
@@ -71,6 +70,9 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
  *
  * 6. Collections will be automatically created and extended if the setter matches "property+s". 
  *
+ * Note that this class is not multi-thread safe.  The internal state is reset before each "use"
+ * by {@link #preProcess()} which assumes sequential access.
+ *
  * @see  AbstractBeanDefinitionParser
  */
 public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefinitionParser
@@ -89,10 +91,7 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
     protected transient Log logger = LogFactory.getLog(getClass());
 
     protected BeanAssemblerFactory beanAssemblerFactory = new DefaultBeanAssemblerFactory();
-    protected PropertyConfiguration propertyConfiguration = new PropertyConfiguration();
-    protected Properties attributeMappings;
-    protected Map valueMappings;
-    protected List beanReferences;
+    protected ReusablePropertyConfiguration propertyConfiguration = new ReusablePropertyConfiguration();
     protected ParserContext parserContext;
     //By default Mule objects are not singletons
     protected boolean singleton = false;
@@ -171,10 +170,16 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
 
     /**
      * Hook method that derived classes can implement to modify internal state before processing.
+     *
+     * Here we make sure that the internal property configuration state is reset to the
+     * initial configuration for each element (it may be modified by the BeanAssembler)
+     * and that other mutable instance variables are cleared.
      */
     protected void preProcess()
     {
-        // default no-op
+        parserContext = null;
+        registry = null;
+        propertyConfiguration.reset();
     }
 
     //-----------------------------------------------------------------------------------
@@ -195,8 +200,8 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
      */
     protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext)
     {
-        this.parserContext = parserContext;
         preProcess();
+        this.parserContext = parserContext;
         setRegistry(parserContext.getRegistry());
         checkElementNameUnique(element);
         Class beanClass = null;

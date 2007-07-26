@@ -12,10 +12,12 @@ package org.mule.config.spring.parsers.assembly;
 
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
+import org.mule.util.ClassUtils;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.lang.reflect.Method;
 
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValue;
@@ -25,10 +27,13 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.w3c.dom.Attr;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class DefaultBeanAssembler implements BeanAssembler
 {
 
+    private Log logger = LogFactory.getLog(getClass());
     private PropertyConfiguration beanConfig;
     private BeanDefinitionBuilder bean;
     private PropertyConfiguration targetConfig;
@@ -68,7 +73,7 @@ public class DefaultBeanAssembler implements BeanAssembler
     {
         String oldName = attributeName(attribute);
         String oldValue = attribute.getNodeValue();
-        String newName = beanConfig.bestGuessName(oldName, bean.getBeanDefinition().getBeanClassName());
+        String newName = bestGuessName(beanConfig, oldName, bean.getBeanDefinition().getBeanClassName());
         String newValue = beanConfig.translateValue(oldName, oldValue);
         if (!beanConfig.isIgnored(oldName))
         {
@@ -77,7 +82,7 @@ public class DefaultBeanAssembler implements BeanAssembler
     }
 
     /**
-     * Allow direct access to target for major hacks
+     * Allow direct access to bean for major hacks
      *
      * @param newName The property name to add
      * @param newValue The property value to add
@@ -112,7 +117,7 @@ public class DefaultBeanAssembler implements BeanAssembler
     {
         String oldName = attributeName(attribute);
         String oldValue = attribute.getNodeValue();
-        String newName = targetConfig.bestGuessName(oldName, bean.getBeanDefinition().getBeanClassName());
+        String newName = bestGuessName(targetConfig, oldName, bean.getBeanDefinition().getBeanClassName());
         String newValue = targetConfig.translateValue(oldName, oldValue);
         if (!targetConfig.isIgnored(oldName))
         {
@@ -156,7 +161,7 @@ public class DefaultBeanAssembler implements BeanAssembler
     public void insertBeanInTarget(String oldName)
     {
         assertTargetPresent();
-        String newName = targetConfig.bestGuessName(oldName, target.getBeanClassName());
+        String newName = bestGuessName(targetConfig, oldName, target.getBeanClassName());
         Object source = bean.getBeanDefinition().getSource();
         PropertyValue pv = target.getPropertyValues().getPropertyValue(newName);
         if (! targetConfig.isIgnored(oldName))
@@ -269,6 +274,58 @@ public class DefaultBeanAssembler implements BeanAssembler
         {
             throw new IllegalStateException("Bean assembler does not have a target");
         }
+    }
+
+    protected String bestGuessName(PropertyConfiguration config, String oldName, String className)
+    {
+        String newName = config.translateName(oldName);
+        if (! methodExists(className, newName))
+        {
+            String plural = newName + "s";
+            if (methodExists(className, plural))
+            {
+                // this lets us avoid setting addCollection in the majority of cases
+                config.addCollection(plural);
+                return plural;
+            }
+            if (newName.endsWith("y"))
+            {
+                String pluraly = newName.substring(0, newName.length()-1) + "ies";
+                if (methodExists(className, pluraly))
+                {
+                    // this lets us avoid setting addCollection in the majority of cases
+                    config.addCollection(pluraly);
+                    return pluraly;
+                }
+            }
+        }
+        return newName;
+    }
+
+    protected boolean methodExists(String className, String newName)
+    {
+        try
+        {
+            // is there a better way than this?!
+            // BeanWrapperImpl instantiates an instance, which we don't want.
+            // if there really is no better way, i guess it should go in
+            // class or bean utils.
+            Class clazz = ClassUtils.getClass(className);
+            Method[] methods = clazz.getMethods();
+            String setter = "set" + newName;
+            for (int i = 0; i < methods.length; ++i)
+            {
+                if (methods[i].getName().equalsIgnoreCase(setter))
+                {
+                    return true;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            logger.debug("Could not access bean class " + className, e);
+        }
+        return false;
     }
 
 }

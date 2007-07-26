@@ -43,7 +43,7 @@ public interface BeanAssembler
     void extendBean(Attr attribute);
 
     /**
-     * Allow direct access to target for major hacks
+     * Allow direct access to bean for major hacks
      *
      * @param newName The property name to add
      * @param newValue The property value to add

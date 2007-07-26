@@ -52,7 +52,7 @@ public interface UMOMessageDispatching
      *            returned
      * @return the result of the request wrapped in a UMOMessage object. Null will be
      *         returned if no data was avaialable
-     * @throws Exception if the call to the underlying protocal cuases an exception
+     * @throws Exception if the call to the underlying protocal causes an exception
      */
     UMOMessage receive(long timeout) throws Exception;
 
