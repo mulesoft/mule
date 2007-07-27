@@ -557,6 +557,8 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
+                <!-- MULE-2070: 1.0-alpha-3 is broke so enforce previous version  -->
+                <version>1.0-alpha-2</version>
                 <executions>
                     <execution>
                         <id>enforce-maven-version</id>
