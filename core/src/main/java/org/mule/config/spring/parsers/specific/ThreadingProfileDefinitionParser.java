@@ -11,24 +11,20 @@ package org.mule.config.spring.parsers.specific;
 
 import org.mule.config.MuleProperties;
 import org.mule.config.ThreadingProfile;
-import org.mule.config.spring.parsers.AbstractChildDefinitionParser;
+import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 
 import org.w3c.dom.Element;
 
 /**
  * This parser is responsible for processing the <code><threading-profile><code> configuration elements.
  */
-public class ThreadingProfileDefinitionParser extends AbstractChildDefinitionParser
+public class ThreadingProfileDefinitionParser extends ChildDefinitionParser
 {
 
-    public ThreadingProfileDefinitionParser()
+    public ThreadingProfileDefinitionParser(String propertyName)
     {
+        super(propertyName, ThreadingProfile.class);
         addAlias("poolExhaustedAction", "poolExhaustedActionString");
-    }
-
-    protected Class getBeanClass(Element element)
-    {
-        return ThreadingProfile.class;
     }
 
     protected String getParentBeanName(Element element)
@@ -45,40 +41,4 @@ public class ThreadingProfileDefinitionParser extends AbstractChildDefinitionPar
         }
     }
 
-    public String getPropertyName(Element e)
-    {
-        String name = e.getLocalName();
-        if ("receiver-threading-profile".equals(name))
-        {
-            return "receiverThreadingProfile";
-        }
-        else if ("dispatcher-threading-profile".equals(name))
-        {
-            return "dispatcherThreadingProfile";
-        }
-        else if (name.equals("default-threading-profile"))
-        {
-            //If this is one of the default profiles they should just be made available in the contianer
-            // and retrieved via the Registry
-            return "defaultThreadingProfile";
-        }
-        else if ("default-receiver-threading-profile".equals(name))
-        {
-            return "defaultMessageReceiverThreadingProfile";
-        }
-        else if ("default-dispatcher-threading-profile".equals(name))
-        {
-            return "defaultMessageDispatcherThreadingProfile";
-        }
-        else if ("default-threading-profile".equals(name))
-        {
-            //If this is one of the default profiles they should just be made available in the contianer
-            // and retrieved via the Registry
-            return "defaultThreadingProfile";
-        }
-        else
-        {
-            return "threadingProfile";
-        }
-    }
 }

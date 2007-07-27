@@ -50,6 +50,15 @@ import org.mule.impl.security.filters.MuleEncryptionEndpointSecurityFilter;
 import org.mule.providers.SimpleRetryConnectionStrategy;
 import org.mule.routing.ForwardingCatchAllStrategy;
 import org.mule.routing.LoggingCatchAllStrategy;
+import org.mule.routing.filters.logic.AndFilter;
+import org.mule.routing.filters.logic.OrFilter;
+import org.mule.routing.filters.logic.NotFilter;
+import org.mule.routing.filters.RegExFilter;
+import org.mule.routing.filters.ExceptionTypeFilter;
+import org.mule.routing.filters.MessagePropertyFilter;
+import org.mule.routing.filters.PayloadTypeFilter;
+import org.mule.routing.filters.WildcardFilter;
+import org.mule.routing.filters.EqualsFilter;
 import org.mule.routing.inbound.CorrelationAggregator;
 import org.mule.routing.inbound.CorrelationEventResequencer;
 import org.mule.routing.inbound.IdempotentReceiver;
@@ -111,14 +120,14 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         //Common elements
         registerBeanDefinitionParser("configuration", new ConfigurationDefinitionParser());
         registerBeanDefinitionParser("environment-properties", new OrphanMapDefinitionParser(HashMap.class, MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES));
-        registerBeanDefinitionParser("default-threading-profile", new ThreadingProfileDefinitionParser());
-        registerBeanDefinitionParser("default-dispatcher-threading-profile", new ThreadingProfileDefinitionParser());
-        registerBeanDefinitionParser("default-receiver-threading-profile", new ThreadingProfileDefinitionParser());
+        registerBeanDefinitionParser("default-threading-profile", new ThreadingProfileDefinitionParser("defaultThreadingProfile"));
+        registerBeanDefinitionParser("default-dispatcher-threading-profile", new ThreadingProfileDefinitionParser("defaultMessageDispatcherThreadingProfile"));
+        registerBeanDefinitionParser("default-receiver-threading-profile", new ThreadingProfileDefinitionParser("defaultMessageReceiverThreadingProfile"));
         registerBeanDefinitionParser("default-dispatcher-connection-strategy", new ConnectionStrategyDefinitionParser());
         registerBeanDefinitionParser("default-receiver-connection-strategy", new ConnectionStrategyDefinitionParser());
 
         //registerBeanDefinitionParser("mule-configuration", new ManagementContextDefinitionParser());
-        registerBeanDefinitionParser("threading-profile", new ThreadingProfileDefinitionParser());
+        registerBeanDefinitionParser("threading-profile", new ThreadingProfileDefinitionParser("threadingProfile"));
         registerBeanDefinitionParser("custom-exception-strategy", new ChildDefinitionParser("exceptionListener", null));
         registerBeanDefinitionParser("default-component-exception-strategy", new ChildDefinitionParser("exceptionListener", DefaultComponentExceptionStrategy.class));
         registerBeanDefinitionParser("default-connector-exception-strategy", new ChildDefinitionParser("exceptionListener", DefaultExceptionStrategy.class));
@@ -126,10 +135,10 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("queue-profile", new ChildDefinitionParser("queueProfile", QueueProfile.class));
 
         //Connector elements
-        registerBeanDefinitionParser("dispatcher-threading-profile", new ThreadingProfileDefinitionParser());
-        registerBeanDefinitionParser("receiver-threading-profile", new ThreadingProfileDefinitionParser());
-        registerBeanDefinitionParser("dispatcher-connection-straqtegy", new ConnectionStrategyDefinitionParser());
-        registerBeanDefinitionParser("receiver-connection-straqtegy", new ConnectionStrategyDefinitionParser());
+        registerBeanDefinitionParser("dispatcher-threading-profile", new ThreadingProfileDefinitionParser("dispatcherThreadingProfile"));
+        registerBeanDefinitionParser("receiver-threading-profile", new ThreadingProfileDefinitionParser("receiverThreadingProfile"));
+        registerBeanDefinitionParser("dispatcher-connection-straqtegy", new ConnectionStrategyDefinitionParser("dispatcherConnectionStrategy"));
+        registerBeanDefinitionParser("receiver-connection-straqtegy", new ConnectionStrategyDefinitionParser("receiverConnectionStrategy"));
         registerBeanDefinitionParser("service-overrides", new ServiceOverridesDefinitionParser());
         registerBeanDefinitionParser("custom-connector", new OrphanDefinitionParser(true));
 
@@ -234,15 +243,15 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("logging-catch-all-strategy", new ChildDefinitionParser("catchAllStrategy", LoggingCatchAllStrategy.class));
 
         //Common Filters
-        registerBeanDefinitionParser("and-filter", new FilterDefinitionParser());
-        registerBeanDefinitionParser("or-filter", new FilterDefinitionParser());
-        registerBeanDefinitionParser("not-filter", new FilterDefinitionParser());
-        registerBeanDefinitionParser("regex-filter", new FilterDefinitionParser());
-        registerBeanDefinitionParser("exception-type-filter", new FilterDefinitionParser());
-        registerBeanDefinitionParser("message-property-filter", new FilterDefinitionParser());
-        registerBeanDefinitionParser("payload-type-filter", new FilterDefinitionParser());
-        registerBeanDefinitionParser("wildcard-filter", new FilterDefinitionParser());
-        registerBeanDefinitionParser("equals-filter", new FilterDefinitionParser());
+        registerBeanDefinitionParser("and-filter", new FilterDefinitionParser(AndFilter.class));
+        registerBeanDefinitionParser("or-filter", new FilterDefinitionParser(OrFilter.class));
+        registerBeanDefinitionParser("not-filter", new FilterDefinitionParser(NotFilter.class));
+        registerBeanDefinitionParser("regex-filter", new FilterDefinitionParser(RegExFilter.class));
+        registerBeanDefinitionParser("exception-type-filter", new FilterDefinitionParser(ExceptionTypeFilter.class));
+        registerBeanDefinitionParser("message-property-filter", new FilterDefinitionParser(MessagePropertyFilter.class));
+        registerBeanDefinitionParser("payload-type-filter", new FilterDefinitionParser(PayloadTypeFilter.class));
+        registerBeanDefinitionParser("wildcard-filter", new FilterDefinitionParser(WildcardFilter.class));
+        registerBeanDefinitionParser("equals-filter", new FilterDefinitionParser(EqualsFilter.class));
         registerBeanDefinitionParser("custom-filter", new FilterDefinitionParser());
 
         //Retry strategies

@@ -11,25 +11,21 @@ package org.mule.config.spring.parsers.specific;
 
 import org.mule.config.MuleProperties;
 import org.mule.config.PoolingProfile;
-import org.mule.config.spring.parsers.AbstractChildDefinitionParser;
+import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 
 import org.w3c.dom.Element;
 
 /**
  * This parser is responsible for processing the <code><pooling-profile><code> configuration elements.
  */
-public class PoolingProfileDefinitionParser extends AbstractChildDefinitionParser
+public class PoolingProfileDefinitionParser extends ChildDefinitionParser
 {
 
     public PoolingProfileDefinitionParser()
     {
+        super("poolingProfile", PoolingProfile.class);
         addAlias("initialisationPolicy", "initialisationPolicyString");
         addAlias("exhaustedAction", "exhaustedActionString");
-    }
-
-    protected Class getBeanClass(Element element)
-    {
-        return PoolingProfile.class;
     }
 
     protected String getParentBeanName(Element element)
@@ -46,8 +42,4 @@ public class PoolingProfileDefinitionParser extends AbstractChildDefinitionParse
         }
     }
 
-    public String getPropertyName(Element e)
-    {
-        return "poolingProfile";
-    }
 }

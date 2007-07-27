@@ -27,7 +27,7 @@ public class ObjectFactoryDefinitionParser extends ChildDefinitionParser
     public ObjectFactoryDefinitionParser(String setterMethod)
     {
         super(setterMethod, null);
-        allowClassAttribute = false;
+        setAllowClassAttribute(false);
         addAlias("class", "objectClassName");
     }
     

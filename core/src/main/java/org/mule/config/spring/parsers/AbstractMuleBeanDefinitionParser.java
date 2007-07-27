@@ -29,7 +29,6 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
@@ -92,12 +91,14 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
 
     protected BeanAssemblerFactory beanAssemblerFactory = new DefaultBeanAssemblerFactory();
     protected ReusablePropertyConfiguration propertyConfiguration = new ReusablePropertyConfiguration();
-    protected ParserContext parserContext;
+    private ParserContext parserContext;
+    private BeanDefinitionRegistry registry;
     //By default Mule objects are not singletons
     protected boolean singleton = false;
+
     /** Allow the bean class to be set explicitly via the "class" attribute. */
-    protected boolean allowClassAttribute = true;
-    private BeanDefinitionRegistry registry;
+    private boolean allowClassAttribute = true;
+    private Class classConstraint = null;
 
     public AbstractMuleBeanDefinitionParser()
     {
@@ -201,19 +202,10 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
     protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext)
     {
         preProcess();
-        this.parserContext = parserContext;
+        setParserContext(parserContext);
         setRegistry(parserContext.getRegistry());
         checkElementNameUnique(element);
-        Class beanClass = null;
-        if (allowClassAttribute)
-        {
-            beanClass = getBeanClassFromAttribute(element);
-        }
-        if (beanClass == null)
-        {
-            beanClass = getBeanClass(element);
-        }
-        Assert.state(beanClass != null, "Class returned from getBeanClass(Element) must not be null, element is: " + element.getNodeName());
+        Class beanClass = getClassInternal(element);
         BeanDefinitionBuilder builder = createBeanDefinitionBuilder(element, beanClass);
         builder.setSource(parserContext.extractSource(element));
         builder.setSingleton(isSingleton());
@@ -280,6 +272,29 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
     protected BeanDefinitionBuilder createBeanDefinitionBuilder(Element element, Class beanClass)
     {
         return BeanDefinitionBuilder.rootBeanDefinition(beanClass);
+    }
+
+    protected Class getClassInternal(Element element)
+    {
+        Class beanClass = null;
+        if (isAllowClassAttribute())
+        {
+            beanClass = getBeanClassFromAttribute(element);
+        }
+        if (beanClass == null)
+        {
+            beanClass = getBeanClass(element);
+        }
+        if (null != beanClass && null != classConstraint && !classConstraint.isAssignableFrom(beanClass))
+        {
+            logger.error(beanClass + " not a subclass of " + classConstraint);
+            beanClass = null;
+        }
+        if (null == beanClass)
+        {
+            throw new IllegalStateException("No class for element " + element.getNodeName());
+        }
+        return beanClass;
     }
 
     /**
@@ -371,4 +386,33 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
                 propertyConfiguration, bean, propertyConfiguration, null);
     }
 
+    protected boolean isAllowClassAttribute()
+    {
+        return allowClassAttribute;
+    }
+
+    protected void setAllowClassAttribute(boolean allowClassAttribute)
+    {
+        this.allowClassAttribute = allowClassAttribute;
+    }
+
+    protected Class getClassConstraint()
+    {
+        return classConstraint;
+    }
+
+    protected void setClassConstraint(Class classConstraint)
+    {
+        this.classConstraint = classConstraint;
+    }
+
+    protected ParserContext getParserContext()
+    {
+        return parserContext;
+    }
+
+    protected void setParserContext(ParserContext parserContext)
+    {
+        this.parserContext = parserContext;
+    }
 }

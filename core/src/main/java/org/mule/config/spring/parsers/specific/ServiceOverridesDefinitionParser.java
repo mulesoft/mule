@@ -10,7 +10,7 @@
 package org.mule.config.spring.parsers.specific;
 
 import org.mule.config.MuleProperties;
-import org.mule.config.spring.parsers.AbstractChildDefinitionParser;
+import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.util.StringUtils;
 
 import java.util.HashMap;
@@ -23,26 +23,19 @@ import org.w3c.dom.Element;
 /**
  * Sets a Map of service overrides on the parent connector
  */
-public class ServiceOverridesDefinitionParser extends AbstractChildDefinitionParser
+public class ServiceOverridesDefinitionParser extends ChildDefinitionParser
 {
 
-    protected Class getBeanClass(Element element)
+    public ServiceOverridesDefinitionParser()
     {
-        return HashMap.class;
+        super("serviceOverrides", HashMap.class);
     }
-
-
-    public String getPropertyName(Element e)
-    {
-        return "serviceOverrides";
-    }
-
 
     protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
         Map overrides = new HashMap();
         addOverride(overrides, element, "messageReceiver", MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS);
-        addOverride(overrides, element, "transactedessageReceiver", MuleProperties.CONNECTOR_TRANSACTED_MESSAGE_RECEIVER_CLASS);
+        addOverride(overrides, element, "transactedMessageReceiver", MuleProperties.CONNECTOR_TRANSACTED_MESSAGE_RECEIVER_CLASS);
         addOverride(overrides, element, "dispatcherFactory", MuleProperties.CONNECTOR_DISPATCHER_FACTORY);
         addOverride(overrides, element, "messageAdapter", MuleProperties.CONNECTOR_MESSAGE_ADAPTER);
         addOverride(overrides, element, "streamMessageAdapter", MuleProperties.CONNECTOR_STREAM_MESSAGE_ADAPTER);

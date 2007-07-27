@@ -9,94 +9,28 @@
  */
 package org.mule.config.spring.parsers.specific;
 
-import org.mule.config.spring.parsers.AbstractChildDefinitionParser;
-import org.mule.routing.filters.EqualsFilter;
-import org.mule.routing.filters.ExceptionTypeFilter;
-import org.mule.routing.filters.MessagePropertyFilter;
-import org.mule.routing.filters.PayloadTypeFilter;
-import org.mule.routing.filters.RegExFilter;
-import org.mule.routing.filters.WildcardFilter;
-import org.mule.routing.filters.logic.AndFilter;
-import org.mule.routing.filters.logic.NotFilter;
-import org.mule.routing.filters.logic.OrFilter;
-import org.mule.util.ClassUtils;
-
-import org.springframework.beans.factory.BeanCreationException;
-import org.w3c.dom.Element;
+import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.umo.UMOFilter;
 
 /**
  * Parses all the core filter types such as logic (AND OR NOT) and generic filters such as <i>Payload Type</i>,
  * <i>RegEX</i> and <i>Message Property</i>
  * 
  */
-public class FilterDefinitionParser extends AbstractChildDefinitionParser
+public class FilterDefinitionParser extends ChildDefinitionParser
 {
 
-    protected Class getBeanClass(Element element)
+    public FilterDefinitionParser(Class clazz)
     {
-        if (element.getLocalName().equals("and-filter"))
-        {
-            return AndFilter.class;
-        }
-        else if (element.getLocalName().equals("or-filter"))
-        {
-            return OrFilter.class;
-        }
-        else if (element.getLocalName().equals("not-filter"))
-        {
-            return NotFilter.class;
-        }
-        else if (element.getLocalName().equals("regex-filter"))
-        {
-            return RegExFilter.class;
-        }
-        else if (element.getLocalName().equals("exception-type-filter"))
-        {
-            return ExceptionTypeFilter.class;
-        }
-        else if (element.getLocalName().equals("message-property-filter"))
-        {
-            return MessagePropertyFilter.class;
-        }
-        else if (element.getLocalName().equals("payload-type-filter"))
-        {
-            return PayloadTypeFilter.class;
-        }
-        else if (element.getLocalName().equals("exception-type-filter"))
-        {
-            return ExceptionTypeFilter.class;
-        }
-        else if (element.getLocalName().equals("wildcard-filter"))
-        {
-            return WildcardFilter.class;
-        }
-        else if (element.getLocalName().equals("equals-filter"))
-        {
-            return EqualsFilter.class;
-        }
-        else if (element.getLocalName().equals("custom-filter"))
-        {
-            try
-            {
-                String clazz = element.getAttribute("class");
-                element.removeAttribute("class");
-                if (clazz == null)
-                {
-                    throw new IllegalArgumentException("attribute 'class' may not be empty");
-                }
-                return ClassUtils.loadClass(clazz, getClass());
-            }
-            catch (ClassNotFoundException e)
-            {
-                throw new BeanCreationException("Failed to create custom Filter", e);
-            }
-        }
-        return null;
+        super("filter", clazz, UMOFilter.class, false);
     }
 
-    public String getPropertyName(Element e)
+    /**
+     * For custom filters that use the class attribute
+     */
+    public FilterDefinitionParser()
     {
-        return "filter";
+        super("filter", null, UMOFilter.class, true);
     }
 
 }

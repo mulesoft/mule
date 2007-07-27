@@ -69,7 +69,7 @@ public class NameTransferDefinitionParser extends ParentDefinitionParser
     //  only set name if not already given
     private void setName()
     {
-        BeanDefinition beanDef = parserContext.getRegistry().getBeanDefinition(componentAttributeValue);
+        BeanDefinition beanDef = getParserContext().getRegistry().getBeanDefinition(componentAttributeValue);
         MutablePropertyValues propertyValues = beanDef.getPropertyValues();
         if (!propertyValues.contains(ATTRIBUTE_NAME))
         {
