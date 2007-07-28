@@ -57,7 +57,7 @@ Assembly descriptor for the full Mule distribution.
       </includes>
     </fileSet>
 
-    <!-- Copy javadocs -->
+    <!-- Copy javadocs ("mvn site:site" must have been run previously) -->
     <fileSet>
       <directory>../../../target/site/apidocs</directory>
       <outputDirectory>docs/api</outputDirectory>
