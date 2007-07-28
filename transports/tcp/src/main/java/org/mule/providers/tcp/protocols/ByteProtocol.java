@@ -134,17 +134,13 @@ public abstract class ByteProtocol implements TcpProtocol
                 {
                     // wait for non-blocking input stream
                     // use new lock since not expecting notification
-                    Object lock = new Object();
-                    synchronized(lock)
+                    try
                     {
-                        try
-                        {
-                            lock.wait(PAUSE_PERIOD);
-                        }
-                        catch (InterruptedException e)
-                        {
-                            // no-op
-                        }
+                        Thread.sleep(PAUSE_PERIOD);
+                    }
+                    catch (InterruptedException e)
+                    {
+                        // no-op
                     }
                 }
             }
@@ -154,7 +150,7 @@ public abstract class ByteProtocol implements TcpProtocol
         catch (SocketException e)
         {
             // do not pollute the log with a stacktrace, log only the message
-            logger.warn("Socket exception occured: " + e.getMessage());
+            logger.info("Socket exception occured: " + e.getMessage());
             return EOF;
         }
         catch (SocketTimeoutException e)

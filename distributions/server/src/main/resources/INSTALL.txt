@@ -21,7 +21,7 @@ export PATH=$PATH:$MULE_HOME/bin
 
 Windows
 -------
-set MULE_HOME=C:\Program Files\Mule
+set MULE_HOME=C:\Mule
 set PATH=%PATH%;%MULE_HOME%\bin
 
 (or by using the System utility in the Control Panel for Windows NT/2000/XP)

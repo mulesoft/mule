@@ -30,6 +30,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -43,6 +44,10 @@ import org.apache.commons.logging.LogFactory;
 public class RestServiceWrapper implements Callable, Initialisable
 {
     public static final String REST_SERVICE_URL = "rest.service.url";
+    public static final String GET = "GET";
+    public static final String CONTENT_TYPE = "Content-Type";
+    public static final String CONTENT_TYPE_VALUE = "application/x-www-form-urlencoded";
+    public static final String HTTP_METHOD = "http.method";
 
     /**
      * logger used by this class
@@ -54,7 +59,7 @@ public class RestServiceWrapper implements Callable, Initialisable
     private Map requiredParams = new HashMap();
     private Map optionalParams = new HashMap();
     private String httpMethod = "GET";
-    private String payloadParameterName;
+    private List payloadParameterNames;
     private UMOFilter errorFilter;
     private String errorExpression;
 
@@ -110,14 +115,14 @@ public class RestServiceWrapper implements Callable, Initialisable
         this.httpMethod = httpMethod;
     }
 
-    public String getPayloadParameterName()
+    public List getPayloadParameterNames()
     {
-        return payloadParameterName;
+        return payloadParameterNames;
     }
 
-    public void setPayloadParameterName(String payloadParameterName)
+    public void setPayloadParameterNames(List payloadParameterNames)
     {
-        this.payloadParameterName = payloadParameterName;
+        this.payloadParameterNames = payloadParameterNames;
     }
 
     public UMOFilter getErrorFilter()
@@ -177,7 +182,7 @@ public class RestServiceWrapper implements Callable, Initialisable
     {
         String tempUrl;
         Object request = eventContext.getTransformedMessage();
-        Object requestBody = request;
+        Object requestBody;
         if (urlFromMessage)
         {
             tempUrl = eventContext.getMessage().getStringProperty(REST_SERVICE_URL, null);
@@ -192,24 +197,31 @@ public class RestServiceWrapper implements Callable, Initialisable
             tempUrl = serviceUrl;
         }
         StringBuffer urlBuffer = new StringBuffer(tempUrl);
-
-        if (payloadParameterName != null)
+        
+        if (this.httpMethod.compareToIgnoreCase(GET) == 0)
         {
             requestBody = NullPayload.getInstance();
+            
+            setRESTParams(urlBuffer, eventContext.getMessage(), request, requiredParams, false, null);
+            setRESTParams(urlBuffer, eventContext.getMessage(), request, optionalParams, true, null);
         }
-        else if (request instanceof Map)
+        else //if post
         {
-            requestBody = NullPayload.getInstance();
+            StringBuffer requestBodyBuffer = new StringBuffer();
+            eventContext.getMessage().setProperty(CONTENT_TYPE, CONTENT_TYPE_VALUE);
+            
+            setRESTParams(urlBuffer, eventContext.getMessage(), request, requiredParams, false, requestBodyBuffer);
+            setRESTParams(urlBuffer, eventContext.getMessage(), request, optionalParams, true, requestBodyBuffer);
+            
+            requestBody = requestBodyBuffer.toString();
         }
-
-        setRESTParams(urlBuffer, eventContext.getMessage(), request, requiredParams, false);
-        setRESTParams(urlBuffer, eventContext.getMessage(), request, optionalParams, true);
 
         tempUrl = urlBuffer.toString();
         logger.info("Invoking REST service: " + tempUrl);
 
         UMOEndpointURI endpointURI = new MuleEndpointURI(tempUrl);
-        eventContext.getMessage().setProperty("http.method", httpMethod);
+        eventContext.getMessage().setProperty(HTTP_METHOD, httpMethod);
+        
 
         UMOMessage result = eventContext.sendEvent(new MuleMessage(requestBody, eventContext.getMessage()),
             endpointURI);
@@ -221,18 +233,46 @@ public class RestServiceWrapper implements Callable, Initialisable
         }
         return result;
     }
-
-    private void setRESTParams(StringBuffer url, UMOMessage msg, Object body, Map args, boolean optional)
+    
+    private String getSeparator(String url)
     {
-        char sep;
+        String sep;
 
         if (url.indexOf("?") > -1)
         {
-            sep = '&';
+            sep = "&";
         }
         else
         {
-            sep = '?';
+            sep = "?";
+        }
+        
+        return sep;
+    }
+    
+    private String updateSeparator(String sep)
+    {
+        if (sep.compareTo("?") == 0 || sep.compareTo("") == 0)
+        {
+            return ("&");
+        }
+        
+        return sep;
+    }
+
+    //if requestBodyBuffer is null, it means that the request is a GET, otherwise it is a POST and  
+    //requestBodyBuffer must contain the body of the http method at the end of this function call
+    private void setRESTParams(StringBuffer url, UMOMessage msg, Object body, Map args, boolean optional, StringBuffer requestBodyBuffer)
+    {
+        String sep;
+        
+        if (requestBodyBuffer == null)
+        {
+            sep = getSeparator(url.toString());
+        }
+        else
+        {
+            sep = "";
         }
 
         for (Iterator iterator = args.entrySet().iterator(); iterator.hasNext();)
@@ -246,21 +286,56 @@ public class RestServiceWrapper implements Callable, Initialisable
             {
                 if (!optional)
                 {
-                    throw new IllegalArgumentException(
-                        CoreMessages.propertyIsNotSetOnEvent(exp).toString());
+                    throw new IllegalArgumentException(CoreMessages.propertyIsNotSetOnEvent(exp).toString());
                 }
+            }
+            else if (requestBodyBuffer != null) //implies this is a POST
+            {
+                requestBodyBuffer.append(sep);
+                requestBodyBuffer.append(name).append('=').append(value);
             }
             else
             {
                 url.append(sep);
-                sep = '&';
                 url.append(name).append('=').append(value);
             }
+            
+            sep = updateSeparator(sep);
         }
 
-        if (!optional && payloadParameterName != null)
+        if (!optional && payloadParameterNames != null)
         {
-            url.append(sep).append(payloadParameterName).append('=').append(body.toString());
+            if (body instanceof Object[])
+            {
+                Object[] requestArray = (Object[])body;
+                for(int i=0; i<payloadParameterNames.size(); i++)
+                {
+                    if (requestBodyBuffer != null)
+                    {
+                        requestBodyBuffer.append(sep).append(payloadParameterNames.get(i)).append('=').append(requestArray[i].toString());
+                    }
+                    else
+                    {
+                        url.append(sep).append(payloadParameterNames.get(i)).append('=').append(requestArray[i].toString());
+                    }
+                    
+                    sep = updateSeparator(sep);
+                }
+            }
+            else
+            {
+                if (payloadParameterNames.get(0) != null)
+                {
+                    if (requestBodyBuffer != null)
+                    {
+                        requestBodyBuffer.append(payloadParameterNames.get(0)).append('=').append(body.toString());
+                    }
+                    else
+                    {
+                        url.append(sep).append(payloadParameterNames.get(0)).append('=').append(body.toString());
+                    }
+                } 
+            }
         }
     }
 

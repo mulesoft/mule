@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id:MuleHttpMethodRetryHandler.java 7555 2007-07-18 03:17:16Z aperepel $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -20,6 +20,7 @@ public class MuleHttpMethodRetryHandler extends DefaultHttpMethodRetryHandler
 {
     public boolean retryMethod(final HttpMethod method, final IOException exception, int executionCount)
     {
+//        return false;
         if ((executionCount < this.getRetryCount()) && (exception instanceof SocketException))
         {
             return true;

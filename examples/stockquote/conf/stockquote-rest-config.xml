@@ -37,12 +37,20 @@
         <mule:property name="xslFile" value="xsl/rest-stock.xsl"/>
     </mule:custom-transformer>
 
+    <bean id="payloadParameterNames" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
+            <list>
+                <value>symbol</value>
+            </list>
+        </property>
+    </bean>
+
     <mule:model-seda name="Sample-Rest">
         <mule:service name="HTTPPostSample">
             <mule:component class="org.mule.components.rest.RestServiceWrapper">
                 <mule:properties>
                     <entry key="serviceUrl" value="http://www.webservicex.net/stockquote.asmx/GetQuote"/>
-                    <entry key="payloadParameterName" value="symbol"/>
+                    <entry key="payloadParameterNames" value-ref="payloadParameterNames"/>
                     <entry key="httpMethod" value="POST"/>
                 </mule:properties>
             </mule:component>
