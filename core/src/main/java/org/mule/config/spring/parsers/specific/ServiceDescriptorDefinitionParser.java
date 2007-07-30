@@ -24,6 +24,7 @@ import org.w3c.dom.Element;
  */
 public class ServiceDescriptorDefinitionParser extends AbstractMuleBeanDefinitionParser
 {
+
     protected Class getBeanClass(Element element)
     {
         return MuleDescriptor.class;

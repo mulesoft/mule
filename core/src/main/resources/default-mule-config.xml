@@ -62,9 +62,10 @@
             defaultEncoding="UTF-8"
             defaultTransactionTimeout="5000"
             workingDirectory=".mule">
-
-        <mule:default-threading-profile maxBufferSize="0" maxThreadsActive="8"
-                                        maxThreadsIdle="4" poolExhaustedAction="WAIT"/>
+        <mule:default-threading-profile
+                name="defaultThreadingProfile"
+                maxBufferSize="0" maxThreadsActive="8"
+                maxThreadsIdle="4" poolExhaustedAction="WAIT"/>
     </mule:configuration>
 
     <bean name="_muleLifecycleManager" class="org.mule.impl.lifecycle.GenericLifecycleManager" scope="prototype">
@@ -137,17 +138,12 @@
     </bean>
 
     <bean name="_muleWorkManager" class="org.mule.impl.work.MuleWorkManager">
-        <constructor-arg ref="_muleDefaultThreadingProfile"/>
+        <!-- this is the id for the default-threading-profile element above, defined in the xsd -->
+        <constructor-arg ref="defaultThreadingProfile"/>
         <constructor-arg value="MuleServer"/>
     </bean>
 
     <bean name="_muleSecurityManager" class="org.mule.impl.security.MuleSecurityManager"/>
-
-    <bean name="_muleDefaultThreadingProfile" class="org.mule.config.ThreadingProfile">
-        <property name="maxThreadsActive" value="8"/>
-        <property name="maxThreadsIdle" value="4"/>
-        <property name="poolExhaustedActionString" value="WAIT"/>
-    </bean>
 
     <bean name="_muleProperties" class="java.util.HashMap"/>
 

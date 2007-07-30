@@ -8,17 +8,21 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config.spring.parsers.specific;
+package org.mule.test.spring;
 
-public class ComponentDefinitionParser extends ObjectFactoryDefinitionParser
+import org.mule.tck.FunctionalTestCase;
+
+public class DefaultThreadingProfileMule2083TestCase extends FunctionalTestCase
 {
-    
-    public ComponentDefinitionParser(String setterMethod)
+
+    protected String getConfigResources()
     {
-        super(setterMethod);
-        addAlias("factory", "serviceFactory");
+        return "default-threading-profile-1-mule-2083.xml, default-threading-profile-2-mule-2083.xml";
+    }
+
+    public void testStartup()
+    {
+        // no-op
     }
 
 }
-
-

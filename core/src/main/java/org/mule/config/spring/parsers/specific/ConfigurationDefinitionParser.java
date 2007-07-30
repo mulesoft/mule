@@ -20,7 +20,7 @@ import org.w3c.dom.Element;
 
 /**
  * Parses the <mule:configuration> element. If this element appears in multiple Xml config files each will its configuration
- * to a singe {@link MuleConfiguration} object.
+ * to a single {@link MuleConfiguration} object.
  *
  * @see MuleConfiguration
  */
@@ -40,10 +40,10 @@ public class ConfigurationDefinitionParser extends AbstractMuleBeanDefinitionPar
         return MuleConfiguration.class;
     }
 
-    
     //@Override
     protected String resolveId(Element element, AbstractBeanDefinition definition, ParserContext parserContext) throws BeanDefinitionStoreException
     {
         return MuleProperties.OBJECT_MULE_CONFIGURATION;
     }
+
 }

@@ -548,6 +548,7 @@
         <xsd:attribute name="threadWaitTimeout" type="xsd:string"/>
         <xsd:attribute name="doThreading" type="substitutableBoolean" default="true"/>
         <xsd:attribute name="maxBufferSize" type="xsd:string"/>
+        <xsd:attribute name="name" type="xsd:string"/>
     </xsd:complexType>
 
     <!--==============================================================-->
@@ -805,7 +806,6 @@
             <xsd:element name="queue-profile" type="queueProfileType" minOccurs="0" maxOccurs="1"/>
             <xsd:group ref="exceptionStrategies" maxOccurs="1" minOccurs="0"/>
             <xsd:element name="meta-info" type="mapType" minOccurs="0" maxOccurs="1"/>
-
             <!--<xsd:any namespace="##other" processContents="strict" minOccurs="0" maxOccurs="unbounded"/>-->
         </xsd:choice>
         <xsd:attribute name="name" type="xsd:string" use="required"/>

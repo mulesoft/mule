@@ -12,6 +12,7 @@ package org.mule.tck;
 
 import org.mule.RegistryContext;
 import org.mule.config.MuleProperties;
+import org.mule.config.spring.MuleApplicationContext;
 import org.mule.impl.MuleDescriptor;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.mule.TestConnector;
@@ -41,7 +42,6 @@ import junit.framework.TestResult;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * <code>AbstractMuleTestCase</code> is a base class for Mule testcases. This
@@ -275,7 +275,8 @@ public abstract class AbstractMuleTestCase extends TestCase
     protected UMOManagementContext createManagementContext() throws Exception
     {
         //This will create the local registry too
-        ApplicationContext ctx = new ClassPathXmlApplicationContext("default-mule-config.xml");
+//        ApplicationContext ctx = new ClassPathXmlApplicationContext("default-mule-config.xml");
+        ApplicationContext ctx = new MuleApplicationContext("default-mule-config.xml");
 
         UMOManagementContext managementContext = (UMOManagementContext)ctx.getBean(MuleProperties.OBJECT_MANAGMENT_CONTEXT);
         //Add a default model for compoennts to run in

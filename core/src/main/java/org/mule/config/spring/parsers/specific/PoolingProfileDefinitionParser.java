@@ -9,16 +9,12 @@
  */
 package org.mule.config.spring.parsers.specific;
 
-import org.mule.config.MuleProperties;
 import org.mule.config.PoolingProfile;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-
-import org.w3c.dom.Element;
 
 /**
  * This parser is responsible for processing the <code><pooling-profile><code> configuration elements.
  */
-public class PoolingProfileDefinitionParser extends ChildDefinitionParser
+public class PoolingProfileDefinitionParser extends ConfigurationChildDefinitionParser
 {
 
     public PoolingProfileDefinitionParser()
@@ -26,20 +22,6 @@ public class PoolingProfileDefinitionParser extends ChildDefinitionParser
         super("poolingProfile", PoolingProfile.class);
         addAlias("initialisationPolicy", "initialisationPolicyString");
         addAlias("exhaustedAction", "exhaustedActionString");
-    }
-
-    protected String getParentBeanName(Element element)
-    {
-        //The mule:configuration element is a fixed name element so we need to handle the
-        //special case here
-        if("configuration".equals(element.getParentNode().getLocalName()))
-        {
-            return MuleProperties.OBJECT_MULE_CONFIGURATION;
-        }
-        else
-        {
-            return super.getParentBeanName(element);            
-        }
     }
 
 }

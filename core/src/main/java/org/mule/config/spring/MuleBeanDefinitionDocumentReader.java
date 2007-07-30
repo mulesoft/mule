@@ -18,7 +18,7 @@ import org.w3c.dom.Element;
  * Allows us to hook in our own Hierarchical Parser delegate. this enables the parsing of custom spring bean
  * elements nested within each other
  */
-public class   MuleBeanDefinitionDocumentReader extends DefaultBeanDefinitionDocumentReader
+public class MuleBeanDefinitionDocumentReader extends DefaultBeanDefinitionDocumentReader
 {
     protected BeanDefinitionParserDelegate createHelper(XmlReaderContext readerContext, Element root)
     {
