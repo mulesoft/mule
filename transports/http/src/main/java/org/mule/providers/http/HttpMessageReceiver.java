@@ -16,13 +16,14 @@ import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
 import org.mule.impl.NullSessionHandler;
 import org.mule.impl.RequestContext;
-import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.ConnectException;
 import org.mule.providers.NullPayload;
 import org.mule.providers.http.i18n.HttpMessages;
 import org.mule.providers.tcp.TcpMessageReceiver;
+import org.mule.umo.MessagingException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
@@ -30,6 +31,7 @@ import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UMOMessageReceiver;
+import org.mule.umo.transformer.TransformerException;
 import org.mule.util.MapUtils;
 import org.mule.util.ObjectUtils;
 
@@ -43,6 +45,7 @@ import javax.resource.spi.work.Work;
 
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.cookie.MalformedCookieException;
 
 /**
  * <code>HttpMessageReceiver</code> is a simple http server that can be used to
@@ -123,11 +126,12 @@ public class HttpMessageReceiver extends TcpMessageReceiver
 
             conn = new HttpServerConnection(socket, encoding);
 
-            cookieSpec = MapUtils.getString(endpoint.getProperties(),
-                    HttpConnector.HTTP_COOKIE_SPEC_PROPERTY, ((HttpConnector) connector).getCookieSpec());
-
-            enableCookies = MapUtils.getBooleanValue(endpoint.getProperties(),
-                    HttpConnector.HTTP_ENABLE_COOKIES_PROPERTY, ((HttpConnector) connector).isEnableCookies());
+            cookieSpec =
+                    MapUtils.getString(endpoint.getProperties(), HttpConnector.HTTP_COOKIE_SPEC_PROPERTY,
+                            ((HttpConnector) connector).getCookieSpec());
+            enableCookies =
+                    MapUtils.getBooleanValue(endpoint.getProperties(), HttpConnector.HTTP_ENABLE_COOKIES_PROPERTY,
+                            ((HttpConnector) connector).isEnableCookies());
         }
 
         public void run()
@@ -142,202 +146,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                     {
                         break;
                     }
-
-                    RequestLine requestLine = request.getRequestLine();
-                    String method = requestLine.getMethod();
-                    HttpResponse response;
-
-                    if (method.equals(HttpConstants.METHOD_HEAD))
-                    {
-                        UMOMessage message = new MuleMessage(NullPayload.getInstance());
-                        UMOEvent event = new MuleEvent(message, endpoint, new MuleSession(message, new NullSessionHandler()), true);
-                        RequestContext.setEvent(event);
-                        response = new HttpResponse();
-                        response.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_OK);
-                        response = (HttpResponse) connector.getDefaultResponseTransformer().transform(response);
-                    }
-                    else if (method.equals(HttpConstants.METHOD_GET)
-                            || method.equals(HttpConstants.METHOD_POST))
-                    {
-                        // Normal processing goes here
-                        Map headers = new HashMap();
-                        for (Iterator rhi = request.getHeaderIterator(); rhi.hasNext();)
-                        {
-                            Header header = (Header) rhi.next();
-                            String headerName = header.getName();
-                            Object headerValue = header.getValue();
-
-                            // fix Mule headers?
-                            if (headerName.startsWith("X-MULE"))
-                            {
-                                headerName = headerName.substring(2);
-                            }
-                            // Parse cookies?
-                            else if (headerName.equals(HttpConnector.HTTP_COOKIES_PROPERTY))
-                            {
-                                if (enableCookies)
-                                {
-                                    Cookie[] cookies = CookieHelper.parseCookies(header, cookieSpec);
-                                    if (cookies.length > 0)
-                                    {
-                                        // yum!
-                                        headerValue = cookies;
-                                    }
-                                    else
-                                    {
-                                        // bad cookies?!
-                                        continue;
-                                    }
-                                }
-                                else
-                                {
-                                    // no cookies for you!
-                                    continue;
-                                }
-                            }
-
-                            // accept header & value
-                            headers.put(headerName, headerValue);
-                        }
-
-                        headers.put(HttpConnector.HTTP_METHOD_PROPERTY, requestLine.getMethod());
-                        headers.put(HttpConnector.HTTP_REQUEST_PROPERTY, requestLine.getUri());
-                        headers.put(HttpConnector.HTTP_VERSION_PROPERTY, requestLine.getHttpVersion().toString());
-                        headers.put(HttpConnector.HTTP_COOKIE_SPEC_PROPERTY, cookieSpec);
-
-                        // TODO Mule 2.0 generic way to set stream message adapter
-                        UMOMessageAdapter adapter;
-                        Object body;
-                        if (endpoint.isStreaming() && request.getBody() != null)
-                        {
-                            adapter = connector.getStreamMessageAdapter(request.getBody(), conn.getOutputStream());
-                            for (Iterator iterator = headers.entrySet().iterator(); iterator.hasNext();)
-                            {
-                                Map.Entry entry = (Map.Entry) iterator.next();
-                                adapter.setProperty((String) entry.getKey(), entry.getValue());
-                            }
-                        }
-                        else
-                        {
-                            // respond with status code 100, for Expect handshake
-                            // according to rfc 2616 and http 1.1
-                            // the processing will continue and the request will be fully
-                            // read immediately after
-                            if (HttpConstants.HTTP11.equals(headers.get(HttpConnector.HTTP_VERSION_PROPERTY)))
-                            {
-                                // just in case we have something other than String in
-                                // the headers map
-                                String expectHeaderValue = ObjectUtils.toString(
-                                        headers.get(HttpConstants.HEADER_EXPECT)).toLowerCase();
-                                if (HttpConstants.HEADER_EXPECT_CONTINUE_REQUEST_VALUE.equals(expectHeaderValue))
-                                {
-                                    HttpResponse expected = new HttpResponse();
-                                    expected.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_CONTINUE);
-                                    final MuleEvent event = new MuleEvent(new MuleMessage(expected), endpoint,
-                                            new MuleSession(component), true);
-                                    RequestContext.setEvent(event);
-                                    expected = (HttpResponse) connector.getDefaultResponseTransformer().transform(
-                                            expected);
-                                    conn.writeResponse(expected);
-                                }
-                            }
-
-                            body = request.getBodyBytes();
-                            if (body == null)
-                            {
-                                body = requestLine.getUri();
-                            }
-                            adapter = connector.getMessageAdapter(new Object[]{body, headers});
-                        }
-
-                        UMOMessage message = new MuleMessage(adapter);
-
-                        if (logger.isDebugEnabled())
-                        {
-                            logger.debug(message.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY));
-                        }
-
-                        // determine if the request path on this request denotes a
-                        // different receiver
-                        // TODO HH: this cast seems to be necessary for routeMessage() - what to do?
-                        AbstractMessageReceiver receiver = (AbstractMessageReceiver) getTargetReceiver(message, endpoint);
-
-                        // the respone only needs to be transformed explicitly if
-                        // A) the request was not served or B) a null result was returned
-                        if (receiver != null)
-                        {
-                            UMOMessage returnMessage = receiver.routeMessage(message, endpoint.isSynchronous(), null);
-                            Object tempResponse;
-                            if (returnMessage != null)
-                            {
-                                tempResponse = returnMessage.getPayload();
-                            }
-                            else
-                            {
-                                tempResponse = NullPayload.getInstance();
-                            }
-                            // This removes the need for users to explicitly adding
-                            // the response transformer ObjectToHttpResponse in
-                            // their config
-                            if (tempResponse instanceof HttpResponse)
-                            {
-                                response = (HttpResponse) tempResponse;
-                            }
-                            else
-                            {
-                                response = (HttpResponse) connector.getDefaultResponseTransformer().transform(
-                                        tempResponse);
-                            }
-                            response.disableKeepAlive(!((HttpConnector) connector).isKeepAlive());
-                        }
-                        else
-                        {
-                            UMOEndpointURI uri = endpoint.getEndpointURI();
-                            String failedPath = uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort()
-                                    + getRequestPath(message);
-
-                            if (logger.isDebugEnabled())
-                            {
-                                logger.debug("Failed to bind to " + failedPath);
-                            }
-
-                            response = new HttpResponse();
-                            response.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_NOT_FOUND);
-                            response.setBodyString(HttpMessages.cannotBindToAddress(failedPath).toString());
-                            RequestContext.setEvent(new MuleEvent(new MuleMessage(response), endpoint,
-                                    new MuleSession(component), true));
-                            // The DefaultResponseTransformer will set the necessary
-                            // headers
-                            response = (HttpResponse) connector.getDefaultResponseTransformer()
-                                    .transform(response);
-                        }
-                    }
-                    else if (method.equals(HttpConstants.METHOD_OPTIONS)
-                            || method.equals(HttpConstants.METHOD_PUT)
-                            || method.equals(HttpConstants.METHOD_DELETE)
-                            || method.equals(HttpConstants.METHOD_TRACE)
-                            || method.equals(HttpConstants.METHOD_CONNECT))
-                    {
-                        UMOMessage message = new MuleMessage(NullPayload.getInstance());
-                        UMOEvent event = new MuleEvent(message, endpoint, new MuleSession(message, new NullSessionHandler()), true);
-                        RequestContext.setEvent(event);
-                        response = new HttpResponse();
-                        response.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_METHOD_NOT_ALLOWED);
-                        response.setBodyString(HttpMessages.methodNotAllowed(method).toString() + HttpConstants.CRLF);
-                        response = (HttpResponse) connector.getDefaultResponseTransformer().transform(response);
-                    }
-                    else
-                    {
-                        UMOMessage message = new MuleMessage(NullPayload.getInstance());
-                        UMOEvent event = new MuleEvent(message, endpoint, new MuleSession(message, new NullSessionHandler()), true);
-                        RequestContext.setEvent(event);
-                        response = new HttpResponse();
-                        response.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_BAD_REQUEST);
-                        response.setBodyString(HttpMessages.malformedSyntax().toString() + HttpConstants.CRLF);
-                        response = (HttpResponse) connector.getDefaultResponseTransformer().transform(response);
-                    }
-
-                    conn.writeResponse(response);
+                    conn.writeResponse(processRequest(request));
                 }
                 while (conn.isKeepAlive());
             }
@@ -352,11 +161,250 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             }
         }
 
+        protected HttpResponse processRequest(HttpRequest request) throws UMOException, IOException
+        {
+            RequestLine requestLine = request.getRequestLine();
+            String method = requestLine.getMethod();
+
+            if (method.equals(HttpConstants.METHOD_HEAD))
+            {
+                return doHead(requestLine);
+            }
+            else if (method.equals(HttpConstants.METHOD_GET)
+                    || method.equals(HttpConstants.METHOD_POST))
+            {
+                return doGetOrPost(request, requestLine);
+            }
+            else if (method.equals(HttpConstants.METHOD_OPTIONS)
+                    || method.equals(HttpConstants.METHOD_PUT)
+                    || method.equals(HttpConstants.METHOD_DELETE)
+                    || method.equals(HttpConstants.METHOD_TRACE)
+                    || method.equals(HttpConstants.METHOD_CONNECT))
+            {
+                return doOtherValid(requestLine, method);
+            }
+            else
+            {
+                return doBad(requestLine);
+            }
+        }
+
+        protected HttpResponse doHead(RequestLine requestLine) throws UMOException
+        {
+            UMOMessage message = new MuleMessage(NullPayload.getInstance());
+            UMOEvent event = new MuleEvent(message, endpoint, new MuleSession(message, new NullSessionHandler()), true);
+            RequestContext.unsafeSetEvent(event);
+            HttpResponse response = new HttpResponse();
+            response.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_OK);
+            response = (HttpResponse)connector.getDefaultResponseTransformer().transform(response);
+            return response;
+        }
+
+        protected HttpResponse doGetOrPost(HttpRequest request, RequestLine requestLine) throws IOException, UMOException
+        {
+            Map headers = parseHeaders(request);
+
+            // TODO Mule 2.0 generic way to set stream message adapter
+            UMOMessageAdapter adapter;
+            if (endpoint.isStreaming() && request.getBody() != null)
+            {
+                adapter = buildStreamingAdapter(request, headers);
+            }
+            else
+            {
+                adapter = buildStandardAdapter(request, headers);
+            }
+            UMOMessage message = new MuleMessage(adapter);
+
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(message.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY));
+            }
+
+            // determine if the request path on this request denotes a different receiver
+            UMOMessageReceiver receiver = getTargetReceiver(message, endpoint);
+
+            HttpResponse response;
+            // the response only needs to be transformed explicitly if
+            // A) the request was not served or B) a null result was returned
+            if (receiver != null)
+            {
+                UMOMessage returnMessage = receiver.routeMessage(message, endpoint.isSynchronous(), null);
+
+                Object tempResponse;
+                if (returnMessage != null)
+                {
+                    tempResponse = returnMessage.getPayload();
+                }
+                else
+                {
+                    tempResponse = NullPayload.getInstance();
+                }
+                // This removes the need for users to explicitly adding the response transformer
+                // ObjectToHttpResponse in their config
+                if (tempResponse instanceof HttpResponse)
+                {
+                    response = (HttpResponse)tempResponse;
+                }
+                else
+                {
+                    response = (HttpResponse)connector.getDefaultResponseTransformer().transform(tempResponse);
+                }
+                response.disableKeepAlive(!((HttpConnector)connector).isKeepAlive());
+            }
+            else
+            {
+                response = buildFailureResponse(requestLine, message);
+            }
+            return response;
+        }
+
+        protected HttpResponse doOtherValid(RequestLine requestLine, String method) throws UMOException
+        {
+            UMOMessage message = new MuleMessage(NullPayload.getInstance());
+            UMOEvent event = new MuleEvent(message, endpoint, new MuleSession(message, new NullSessionHandler()), true);
+            RequestContext.unsafeSetEvent(event);
+            HttpResponse response = new HttpResponse();
+            response.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_METHOD_NOT_ALLOWED);
+            response.setBodyString(HttpMessages.methodNotAllowed(method).toString() + HttpConstants.CRLF);
+            response = (HttpResponse)connector.getDefaultResponseTransformer().transform(response);
+            return response;
+        }
+
+        protected HttpResponse doBad(RequestLine requestLine) throws UMOException
+        {
+            UMOMessage message = new MuleMessage(NullPayload.getInstance());
+            UMOEvent event = new MuleEvent(message, endpoint, new MuleSession(message, new NullSessionHandler()), true);
+            RequestContext.unsafeSetEvent(event);
+            HttpResponse response = new HttpResponse();
+            response.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_BAD_REQUEST);
+            response.setBodyString(HttpMessages.malformedSyntax().toString() + HttpConstants.CRLF);
+            response = (HttpResponse)connector.getDefaultResponseTransformer().transform(response);
+            return response;
+        }
+
+        protected UMOMessageAdapter buildStreamingAdapter(HttpRequest request, Map headers) throws MessagingException
+        {
+            UMOMessageAdapter adapter = connector.getStreamMessageAdapter(request.getBody(), conn.getOutputStream());
+            for (Iterator iterator = headers.entrySet().iterator(); iterator.hasNext();)
+            {
+                Map.Entry entry = (Map.Entry)iterator.next();
+                adapter.setProperty((String)entry.getKey(), entry.getValue());
+            }
+            return adapter;
+        }
+
+        protected UMOMessageAdapter buildStandardAdapter(HttpRequest request, Map headers) throws MessagingException, TransformerException, IOException
+        {
+            RequestLine requestLine = request.getRequestLine();
+            // respond with status code 100, for Expect handshake
+            // according to rfc 2616 and http 1.1
+            // the processing will continue and the request will be fully
+            // read immediately after
+            if (HttpConstants.HTTP11.equals(headers.get(HttpConnector.HTTP_VERSION_PROPERTY)))
+            {
+                // just in case we have something other than String in
+                // the headers map
+                String expectHeaderValue = ObjectUtils.toString(
+                        headers.get(HttpConstants.HEADER_EXPECT)).toLowerCase();
+                if (HttpConstants.HEADER_EXPECT_CONTINUE_REQUEST_VALUE.equals(expectHeaderValue))
+                {
+                    HttpResponse expected = new HttpResponse();
+                    expected.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_CONTINUE);
+                    final MuleEvent event = new MuleEvent(new MuleMessage(expected), endpoint,
+                            new MuleSession(component), true);
+                    RequestContext.safeSetEvent(event);
+                    expected = (HttpResponse)connector.getDefaultResponseTransformer().transform(
+                            expected);
+                    conn.writeResponse(expected);
+                }
+            }
+
+            Object body = request.getBodyBytes();
+            if (body == null)
+            {
+                body = requestLine.getUri();
+            }
+            return connector.getMessageAdapter(new Object[]{body, headers});
+        }
+
+        protected HttpResponse buildFailureResponse(RequestLine requestLine, UMOMessage message) throws TransformerException
+        {
+            UMOEndpointURI uri = endpoint.getEndpointURI();
+            String failedPath = uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort()
+                    + getRequestPath(message);
+
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Failed to bind to " + failedPath);
+            }
+
+            HttpResponse response = new HttpResponse();
+            response.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_NOT_FOUND);
+            response.setBodyString(HttpMessages.cannotBindToAddress(failedPath).toString());
+            RequestContext.safeSetEvent(new MuleEvent(new MuleMessage(response), endpoint,
+                    new MuleSession(component), true));
+            // The DefaultResponseTransformer will set the necessary headers
+            return (HttpResponse)connector.getDefaultResponseTransformer().transform(response);
+        }
+
+        protected Map parseHeaders(HttpRequest request) throws MalformedCookieException
+        {
+            RequestLine requestLine = request.getRequestLine();
+            Map headers = new HashMap();
+
+            for (Iterator rhi = request.getHeaderIterator(); rhi.hasNext();)
+            {
+                Header header = (Header)rhi.next();
+                String headerName = header.getName();
+                Object headerValue = header.getValue();
+
+                // fix Mule headers?
+                if (headerName.startsWith("X-MULE"))
+                {
+                    headerName = headerName.substring(2);
+                }
+                // Parse cookies?
+                else if (headerName.equals(HttpConnector.HTTP_COOKIES_PROPERTY))
+                {
+                    if (enableCookies)
+                    {
+                        Cookie[] cookies = CookieHelper.parseCookies(header, cookieSpec);
+                        if (cookies.length > 0)
+                        {
+                            // yum!
+                            headerValue = cookies;
+                        }
+                        else
+                        {
+                            // bad cookies?!
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        // no cookies for you!
+                        continue;
+                    }
+                }
+
+                // accept header & value
+                headers.put(headerName, headerValue);
+            }
+
+            headers.put(HttpConnector.HTTP_METHOD_PROPERTY, requestLine.getMethod());
+            headers.put(HttpConnector.HTTP_REQUEST_PROPERTY, requestLine.getUri());
+            headers.put(HttpConnector.HTTP_VERSION_PROPERTY, requestLine.getHttpVersion().toString());
+            headers.put(HttpConnector.HTTP_COOKIE_SPEC_PROPERTY, cookieSpec);
+            return headers;
+        }
+
         public void release()
         {
             conn.close();
             conn = null;
         }
+
     }
 
     protected String getRequestPath(UMOMessage message)

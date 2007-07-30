@@ -28,4 +28,5 @@ public class EjbMessageAdapter extends RmiMessageAdapter
     {
         super(message);
     }
+
 }

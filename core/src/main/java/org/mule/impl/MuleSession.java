@@ -159,8 +159,10 @@ public final class MuleSession implements UMOSession
         UMOEvent event = createOutboundEvent(message, endpoint, null);
 
         dispatchEvent(event);
-        RequestContext.writeResponse(event.getMessage());
-        processResponse(event.getMessage());
+
+        // need a new copy here because we are going to mutate it (checked necessary)
+        UMOMessage response = RequestContext.criticalWriteResponse(event.getMessage());
+        processResponse(response);
     }
 
     public UMOMessage sendEvent(UMOMessage message, String endpointName) throws UMOException
@@ -183,7 +185,7 @@ public final class MuleSession implements UMOSession
         UMOMessage result = router.route(message, this, true);
         if (result != null)
         {
-            RequestContext.writeResponse(result);
+            RequestContext.safeWriteResponse(result);
             processResponse(result);
         }
 
@@ -216,7 +218,7 @@ public final class MuleSession implements UMOSession
 
         if (result != null)
         {
-            RequestContext.writeResponse(result);
+            RequestContext.unsafeWriteResponse(result);
             processResponse(result);
         }
 
@@ -268,9 +270,8 @@ public final class MuleSession implements UMOSession
                              + ", event is: " + event);
             }
             component.dispatchEvent(event);
-            RequestContext.writeResponse(event.getMessage());
-            processResponse(event.getMessage());
-
+            UMOMessage response = RequestContext.criticalWriteResponse(event.getMessage());
+            processResponse(response);
         }
         else
         {
@@ -323,7 +324,7 @@ public final class MuleSession implements UMOSession
                 }
 
                 UMOMessage response = event.getEndpoint().send(event);
-                RequestContext.writeResponse(response);
+                RequestContext.unsafeWriteResponse(response);
                 processResponse(response);
                 return response;
             }

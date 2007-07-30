@@ -65,6 +65,7 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         endpoint.expectAndReturn("getProperties", new HashMap());
         endpoint.expectAndReturn("getProperties", new HashMap());
         endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy"));
+        endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy"));
         endpoint.expect("dispatch", C.isA(MuleEvent.class));
 
         strategy.catchMessage(event.getMessage(), null, false);
@@ -104,6 +105,7 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         endpoint.expectAndReturn("getProperties", new HashMap());
         endpoint.expectAndReturn("getProperties", new HashMap());
 
+        endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy"));
         endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy"));
         endpoint.expect("send", new Constraint()
         {

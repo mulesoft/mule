@@ -668,7 +668,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
                 }
                 if (logger.isDebugEnabled())
                 {
-                    logger.debug("Creating new transformer " + newTransformer + " for endpoint " + this + " of type " + type);                
+                    logger.debug("Creating new transformer " + newTransformer + " for endpoint " + this + " of type " + type);
                 }
             }
             else

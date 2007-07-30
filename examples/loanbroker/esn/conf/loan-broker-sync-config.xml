@@ -1,146 +1,139 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
-       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
-       xsi:schemaLocation="
-               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-               http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
-               http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+        xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+        xsi:schemaLocation="
+                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+                http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+                http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
 
-    <description>
-    This loan broker example is modeled on the Enterprise integration Patterns book sample.
-    This implementation differs in that this configuration uses a synchronous model where
-    each component is invoked from the LoanBroker component.
-    </description>
+     <description>
+     This loan broker example is modeled on the Enterprise integration Patterns book sample.
+     This implementation differs in that this configuration uses a synchronous model where
+     each component is invoked from the LoanBroker component.
+     </description>
 
-    <mule:configuration serverId="" defaultSynchronousEndpoints="true"/>
+     <mule:configuration serverId="" defaultSynchronousEndpoints="true"/>
 
-    <!-- Synchronous VM connector (messages are processed in the same execution thread) -->
-    <vm:connector name="syncVm">
-        <!-- TODO - old config had queueEvents="true" disabled, with a comment indicating
-             that it caused the config to lock -->
-        <!-- This is intended to reduce the message properties scribbling issue.
-             It may seem odd in a synchronous configuration, but influences
-             StaticRecipientList (which would otherwise broadcast and collect, I think). -->
-        <mule:dispatcher-threading-profile doThreading="false"/>
-    </vm:connector>
+     <!-- Synchronous VM connector (messages are processed in the same execution thread) -->
+     <vm:connector name="syncVm"/>
 
     <!--
        The Mule model initialises and manages your UMO components
-    -->
+     -->
     <mule:model-seda name="loan-broker">
 
-        <!--
-        The loan broker is used to receive loan requests
-        -->
-        <mule:service name="TheLoanBroker">
-            <mule:component class="org.mule.examples.loanbroker.esn.SynchronousLoanBroker"/>
+             <!--
+             The loan broker is used to receive loan requests
+             -->
+             <mule:service name="TheLoanBroker">
+                 <mule:component class="org.mule.examples.loanbroker.esn.SynchronousLoanBroker"/>
 
-            <mule:inbound-router>
-                <mule:endpoint ref="CustomerRequests"/>
-            </mule:inbound-router>
+                 <mule:inbound-router>
+                     <mule:endpoint ref="CustomerRequests"/>
+                 </mule:inbound-router>
 
-            <mule:nested-router>
-                <mule:binding interface="org.mule.examples.loanbroker.credit.CreditAgencyService">
-                    <mule:endpoint ref="CreditAgency"/>
-                </mule:binding>
-            </mule:nested-router>
+                 <mule:nested-router>
+                     <mule:binding interface="org.mule.examples.loanbroker.credit.CreditAgencyService">
+                         <mule:endpoint ref="CreditAgency"/>
+                     </mule:binding>
+                 </mule:nested-router>
 
-            <mule:outbound-router>
-                <!-- couldn't this be pass-through? -->
-                <mule:filtering-router>
-                    <mule:endpoint ref="LenderService"/>
-                </mule:filtering-router>
-            </mule:outbound-router>
+                 <mule:outbound-router>
+                     <!-- couldn't this be pass-through? -->
+                     <mule:filtering-router>
+                         <mule:endpoint ref="LenderService"/>
+                     </mule:filtering-router>
+                 </mule:outbound-router>
 
-            <mule:response-router timeout="10000">
-                <mule:custom-router class="org.mule.examples.loanbroker.routers.BankQuotesResponseAggregator"/>
-                <mule:endpoint ref="LoanBrokerQuotes"/>
-            </mule:response-router>
-        </mule:service>
+                 <mule:response-router timeout="10000">
+                     <mule:custom-router class="org.mule.examples.loanbroker.routers.BankQuotesResponseAggregator"/>
+                     <mule:endpoint ref="LoanBrokerQuotes"/>
+                 </mule:response-router>
+             </mule:service>
 
-        <!--
-        The credit agency service will get the credit profile for a customer
-        -->
-        <mule:service name="TheCreditAgencyService">
-            <mule:component class="org.mule.examples.loanbroker.credit.DefaultCreditAgency"/>
-            <mule:inbound-router>
-                <mule:endpoint ref="CreditAgencyIn"/>
-            </mule:inbound-router>
-        </mule:service>
+             <!--
+             The credit agency service will get the credit profile for a customer
+             -->
+             <mule:service name="TheCreditAgencyService">
+                 <mule:component class="org.mule.examples.loanbroker.credit.DefaultCreditAgency"/>
+                 <mule:inbound-router>
+                     <mule:endpoint ref="CreditAgencyIn"/>
+                 </mule:inbound-router>
+             </mule:service>
 
-        <!--
-        The Lender service is used to determine which banks to contact for a quote
-        -->
-        <mule:service name="TheLenderService">
-            <mule:component class="org.mule.examples.loanbroker.lender.DefaultLender"/>
-            <mule:inbound-router>
-                <mule:endpoint ref="LenderService"/>
-            </mule:inbound-router>
-            <mule:outbound-router>
-                <!-- again, could be pass-through? -->
-                <mule:filtering-router>
-                    <mule:endpoint ref="BankGateway" transformers="SetLendersAsRecipients"/>
-                </mule:filtering-router>
-            </mule:outbound-router>
-        </mule:service>
+             <!--
+             The Lender service is used to determine which banks to contact for a quote
+             -->
+             <mule:service name="TheLenderService">
+                 <mule:component class="org.mule.examples.loanbroker.lender.DefaultLender"/>
+                 <mule:inbound-router>
+                     <mule:endpoint ref="LenderService"/>
+                 </mule:inbound-router>
+                 <mule:outbound-router>
+                     <!-- again, could be pass-through? -->
+                     <mule:filtering-router>
+                         <mule:endpoint ref="BankGateway" transformers="SetLendersAsRecipients"/>
+                     </mule:filtering-router>
+                 </mule:outbound-router>
+             </mule:service>
 
-        <mule:service name="TheBankGateway">
-            <mule:component class="org.mule.components.simple.BridgeComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint ref="BankGateway"/>
-            </mule:inbound-router>
-            <mule:outbound-router>
-                <mule:logging-catch-all-strategy/>
-                <mule:custom-router class="org.mule.routing.outbound.StaticRecipientList">
-                    <mule:reply-to address="LoanBrokerQuotes"/>
-                    <mule:message-property-filter pattern="recipients!=null"/>
-                </mule:custom-router>
-            </mule:outbound-router>
-        </mule:service>
+             <mule:service name="TheBankGateway">
+                 <mule:component class="org.mule.components.simple.BridgeComponent"/>
+                 <mule:inbound-router>
+                     <mule:endpoint ref="BankGateway"/>
+                 </mule:inbound-router>
+                 <mule:outbound-router>
+                     <mule:logging-catch-all-strategy/>
+                     <mule:custom-router class="org.mule.routing.outbound.StaticRecipientList">
+                         <mule:reply-to address="LoanBrokerQuotes"/>
+                         <mule:message-property-filter pattern="recipients!=null"/>
+                     </mule:custom-router>
+                 </mule:outbound-router>
+             </mule:service>
 
-        <!--
-        These are mock bank services that represent remote bank loan services
-        One or more of these are selected by the LenderService and a request
-        is routed to them.   The lenderService outbound router also defines a
-        replyTo property which will be used by Mule to route the responses back
-        to the LoanBrokerQuotes destination
-        -->
-        <mule:service name="TheBank1">
-            <mule:component class="org.mule.examples.loanbroker.bank.Bank"/>
-            <mule:inbound-router>
-                <mule:endpoint ref="Bank1In"/>
-            </mule:inbound-router>
-        </mule:service>
+             <!--
+             These are mock bank services that represent remote bank loan services
+             One or more of these are selected by the LenderService and a request
+             is routed to them.   The lenderService outbound router also defines a
+             replyTo property which will be used by Mule to route the responses back
+             to the LoanBrokerQuotes destination
+             -->
+             <mule:service name="TheBank1">
+                 <mule:component class="org.mule.examples.loanbroker.bank.Bank"/>
+                 <mule:inbound-router>
+                     <mule:endpoint ref="Bank1In"/>
+                 </mule:inbound-router>
+             </mule:service>
 
-        <mule:service name="TheBank2">
-            <mule:component class="org.mule.examples.loanbroker.bank.Bank"/>
-            <mule:inbound-router>
-                <mule:endpoint ref="Bank2In"/>
-            </mule:inbound-router>
-        </mule:service>
+             <mule:service name="TheBank2">
+                 <mule:component class="org.mule.examples.loanbroker.bank.Bank"/>
+                 <mule:inbound-router>
+                     <mule:endpoint ref="Bank2In"/>
+                 </mule:inbound-router>
+             </mule:service>
 
-        <mule:service name="TheBank3">
-            <mule:component class="org.mule.examples.loanbroker.bank.Bank"/>
-            <mule:inbound-router>
-                <mule:endpoint ref="Bank3In"/>
-            </mule:inbound-router>
-        </mule:service>
+             <mule:service name="TheBank3">
+                 <mule:component class="org.mule.examples.loanbroker.bank.Bank"/>
+                 <mule:inbound-router>
+                     <mule:endpoint ref="Bank3In"/>
+                 </mule:inbound-router>
+             </mule:service>
 
-        <mule:service name="TheBank4">
-            <mule:component class="org.mule.examples.loanbroker.bank.Bank"/>
-            <mule:inbound-router>
-                <mule:endpoint ref="Bank4In"/>
-            </mule:inbound-router>
-        </mule:service>
+             <mule:service name="TheBank4">
+                 <mule:component class="org.mule.examples.loanbroker.bank.Bank"/>
+                 <mule:inbound-router>
+                     <mule:endpoint ref="Bank4In"/>
+                 </mule:inbound-router>
+             </mule:service>
 
-        <mule:service name="TheBank5">
-            <mule:component class="org.mule.examples.loanbroker.bank.Bank"/>
-            <mule:inbound-router>
-                <mule:endpoint ref="Bank5In"/>
-            </mule:inbound-router>
-        </mule:service>
+             <mule:service name="TheBank5">
+                 <mule:component class="org.mule.examples.loanbroker.bank.Bank"/>
+                 <mule:inbound-router>
+                     <mule:endpoint ref="Bank5In"/>
+                 </mule:inbound-router>
+             </mule:service>
 
-    </mule:model-seda>
+         </mule:model-seda>
 </beans>

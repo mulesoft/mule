@@ -10,6 +10,7 @@
 
 package org.mule.providers.vm;
 
+import org.mule.impl.ThreadSafeAccess;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
@@ -35,6 +36,13 @@ public class VMMessageAdapter extends AbstractMessageAdapter
     public VMMessageAdapter(UMOMessage message) throws MessageTypeNotSupportedException
     {
         setMessage(message);
+    }
+
+    protected VMMessageAdapter(VMMessageAdapter template)
+    {
+        super(template);
+        // if this is an event, should we do a deep copy?
+        message = template.message;
     }
 
     /**
@@ -84,6 +92,11 @@ public class VMMessageAdapter extends AbstractMessageAdapter
     public String getUniqueId()
     {
         return message.getUniqueId();
+    }
+
+    public ThreadSafeAccess newThreadCopy()
+    {
+        return new VMMessageAdapter(this);
     }
 
 }

@@ -12,6 +12,7 @@ package org.mule.impl;
 
 import org.mule.MuleRuntimeException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.providers.AbstractMessageAdapter;
 import org.mule.providers.DefaultMessageAdapter;
 import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.UMOMessage;
@@ -23,17 +24,22 @@ import java.util.Set;
 
 import javax.activation.DataHandler;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * <code>MuleMessage</code> is a wrapper that contains a payload and properties
  * associated with the payload.
  */
 
-public class MuleMessage implements UMOMessage
+public class MuleMessage implements UMOMessage, ThreadSafeAccess
 {
     /**
      * Serial version
      */
     private static final long serialVersionUID = 1541720810851984842L;
+
+    private static Log logger = LogFactory.getLog(MuleMessage.class);
 
     private UMOMessageAdapter adapter;
 
@@ -55,6 +61,7 @@ public class MuleMessage implements UMOMessage
             adapter = new DefaultMessageAdapter(message);
         }
         addProperties(properties);
+        resetAccessControl();
     }
 
     public MuleMessage(Object message, UMOMessageAdapter previous)
@@ -91,6 +98,7 @@ public class MuleMessage implements UMOMessage
                 }
             }
         }
+        resetAccessControl();
     }
 
     public UMOMessageAdapter getAdapter()
@@ -437,4 +445,35 @@ public class MuleMessage implements UMOMessage
     {
         adapter.setStringProperty(name, value);
     }
+
+    public ThreadSafeAccess newThreadCopy()
+    {
+        if (adapter instanceof ThreadSafeAccess)
+        {
+            logger.debug("new copy of message for " + Thread.currentThread());
+            return new MuleMessage(((ThreadSafeAccess) adapter).newThreadCopy(), this);
+        }
+        else
+        {
+            // not much we can do here - streaming will have to handle things itself
+            return this;
+        }
+    }
+
+    public void resetAccessControl()
+    {
+        if (adapter instanceof AbstractMessageAdapter)
+        {
+            ((AbstractMessageAdapter) adapter).resetAccessControl();
+        }
+    }
+
+    public void assertAccess(boolean write)
+    {
+        if (adapter instanceof AbstractMessageAdapter)
+        {
+            ((AbstractMessageAdapter) adapter).assertAccess(write);
+        }
+    }
+
 }

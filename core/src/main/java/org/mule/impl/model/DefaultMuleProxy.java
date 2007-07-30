@@ -241,7 +241,7 @@ public class DefaultMuleProxy implements MuleProxy
         {
             if (event.getEndpoint().canReceive())
             {
-                RequestContext.setEvent(event);
+                event = RequestContext.unsafeSetEvent(event);
                 Object replyTo = event.getMessage().getReplyTo();
                 ReplyToHandler replyToHandler = getReplyToHandler(event.getMessage(), event.getEndpoint());
                 InterceptorsInvoker invoker = new InterceptorsInvoker(interceptorList, descriptor,
@@ -452,11 +452,11 @@ public class DefaultMuleProxy implements MuleProxy
             if (event.getEndpoint().canReceive())
             {
                 // dispatch the next receiver
-                RequestContext.setEvent(event);
+                event = RequestContext.criticalSetEvent(event);
                 Object replyTo = event.getMessage().getReplyTo();
                 ReplyToHandler replyToHandler = getReplyToHandler(event.getMessage(), event.getEndpoint());
-                InterceptorsInvoker invoker = new InterceptorsInvoker(interceptorList, descriptor,
-                    event.getMessage());
+                InterceptorsInvoker invoker =
+                        new InterceptorsInvoker(interceptorList, descriptor,  event.getMessage());
 
                 // do stats
                 long startTime = 0;

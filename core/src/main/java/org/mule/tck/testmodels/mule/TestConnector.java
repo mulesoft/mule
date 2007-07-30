@@ -10,6 +10,7 @@
 
 package org.mule.tck.testmodels.mule;
 
+import org.mule.impl.ThreadSafeAccess;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.providers.AbstractMessageDispatcherFactory;
@@ -203,6 +204,11 @@ public class TestConnector extends AbstractConnector
         public void release()
         {
             // nothing to do
+        }
+
+        public ThreadSafeAccess newThreadCopy()
+        {
+            return this;
         }
     }
 

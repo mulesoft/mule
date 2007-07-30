@@ -10,6 +10,7 @@
 
 package org.mule.providers.streaming;
 
+import org.mule.impl.ThreadSafeAccess;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.providers.NullPayload;
 import org.mule.umo.UMOEvent;
@@ -36,7 +37,7 @@ public class StreamMessageAdapter extends AbstractMessageAdapter implements UMOS
     protected InputStream in;
     protected OutputStream out;
     protected OutputHandler handler;
-    private NullPayload nullPayload = NullPayload.getInstance();
+    private static NullPayload NULL_PAYLOAD = NullPayload.getInstance();
 
     public StreamMessageAdapter(InputStream in)
     {
@@ -65,6 +66,14 @@ public class StreamMessageAdapter extends AbstractMessageAdapter implements UMOS
         this.in = in;
         this.out = out;
         this.handler = handler;
+    }
+
+    protected StreamMessageAdapter(StreamMessageAdapter template)
+    {
+        super(template);
+        in = template.in;
+        out = template.out;
+        handler = template.handler;
     }
 
     /**
@@ -105,7 +114,7 @@ public class StreamMessageAdapter extends AbstractMessageAdapter implements UMOS
         {
             return in;
         }
-        return nullPayload;
+        return NULL_PAYLOAD;
     }
 
     public InputStream getInputStream()
@@ -141,6 +150,11 @@ public class StreamMessageAdapter extends AbstractMessageAdapter implements UMOS
     public void release()
     {
         // nothing to do?
+    }
+
+    public ThreadSafeAccess newThreadCopy()
+    {
+        return new StreamMessageAdapter(this);
     }
 
 }

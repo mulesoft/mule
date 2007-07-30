@@ -48,8 +48,11 @@ public class AxisServletBindingTestCase extends AbstractSoapFunctionalTestCase
     {
         super.doTearDown();
         // this generates an exception in GenericServlet which we can safely ignore
-        httpServer.stop(false);
-        httpServer.destroy();
+        if (httpServer != null)
+        {
+            httpServer.stop(false);
+            httpServer.destroy();
+        }
     }
 
     public String getConfigResources()

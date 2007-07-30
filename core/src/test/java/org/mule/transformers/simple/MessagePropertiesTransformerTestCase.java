@@ -13,6 +13,7 @@ package org.mule.transformers.simple;
 import org.mule.impl.MuleMessage;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOEventContext;
+import org.mule.umo.UMOMessage;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,9 +29,11 @@ public class MessagePropertiesTransformerTestCase extends AbstractMuleTestCase
         add.put("addedProperty", "overwrittenValue");
         t.setAddProperties(add);
 
-        MuleMessage msg = new MuleMessage("message");
+        UMOMessage msg = new MuleMessage("message");
         msg.setProperty("addedProperty", "originalValue");
         UMOEventContext ctx = getTestEventContext(msg);
+        // context clones message
+        msg = ctx.getMessage();
         MuleMessage transformed = (MuleMessage) t.transform(msg, null, ctx);
         assertSame(msg, transformed);
         assertEquals(msg.getUniqueId(), transformed.getUniqueId());

@@ -23,7 +23,7 @@ public abstract class AbstractMessageAdapterTestCase extends AbstractMuleTestCas
 {
     protected void doSetUp() throws Exception
     {
-        RequestContext.setEvent(getTestEvent("hello"));
+        RequestContext.safeSetEvent(getTestEvent("hello"));
     }
 
     protected void doTearDown() throws Exception

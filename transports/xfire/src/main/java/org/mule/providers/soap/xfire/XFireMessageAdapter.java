@@ -11,6 +11,7 @@
 package org.mule.providers.soap.xfire;
 
 import org.mule.config.MuleProperties;
+import org.mule.impl.ThreadSafeAccess;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.providers.soap.MuleSoapHeaders;
 import org.mule.transformers.simple.SerializableToByteArray;
@@ -46,6 +47,13 @@ public class XFireMessageAdapter extends AbstractMessageAdapter
     public XFireMessageAdapter(Object message)
     {
         this.payload = message;
+    }
+
+    protected XFireMessageAdapter(XFireMessageAdapter template)
+    {
+        super(template);
+        payload = template.payload;
+        messageContext = template.messageContext;
     }
 
     /**
@@ -164,6 +172,11 @@ public class XFireMessageAdapter extends AbstractMessageAdapter
             // this will not happen
             logger.fatal("Failed to read attachments", e);
         }
+    }
+
+    public ThreadSafeAccess newThreadCopy()
+    {
+        return new XFireMessageAdapter(this);
     }
 
 }

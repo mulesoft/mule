@@ -33,7 +33,7 @@ public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleTest
         ((FileConnector)connector).setAutoDelete(false);
 
         UMOEvent event = getTestEvent("TestData");
-        RequestContext.setEvent(event);
+        event = RequestContext.safeSetEvent(event);
 
         UMOMessage message = RequestContext.getEventContext().receiveEvent(getTestEndpointURI()+"/"+tempDirName+"?connector=FileConnector", 50000);
         assertNotNull(message.getPayload());
@@ -52,7 +52,7 @@ public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleTest
         ((FileConnector)connector).setAutoDelete(true);
 
         UMOEvent event = getTestEvent("TestData");
-        RequestContext.setEvent(event);
+        event = RequestContext.safeSetEvent(event);
 
         UMOMessage message = RequestContext.getEventContext().receiveEvent(getTestEndpointURI()+"/"+tempDirName, 50000);
         assertNotNull(message.getPayload());

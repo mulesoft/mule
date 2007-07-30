@@ -133,7 +133,6 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         call.setProperty("axis.one.way", Boolean.TRUE);
         call.setProperty(MuleProperties.MULE_EVENT_PROPERTY, event);
         call.invoke(args);
-
     }
 
     protected UMOMessage doSend(UMOEvent event) throws Exception
@@ -158,76 +157,159 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
     protected Call getCall(UMOEvent event, Object[] args) throws Exception
     {
         UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
-        Object method = event.getMessage().getProperty(MuleProperties.MULE_METHOD_PROPERTY);
-        if (method == null)
-        {
-            method = event.getEndpoint().getEndpointURI().getParams().getProperty(
-                MuleProperties.MULE_METHOD_PROPERTY);
-        }
-        if (method == null)
-        {
-            throw new DispatchException(
-                SoapMessages.cannotInvokeCallWithoutOperation(), event.getMessage(),
-                    event.getEndpoint());
-        }
-        else if (method instanceof SoapMethod)
-        {
-            synchronized (this)
-            {
-                if (callParameters == null)
-                {
-                    callParameters = new HashMap();
-                }
-                callParameters.put(((SoapMethod)method).getName().getLocalPart(), method);
-            }
-        }
-
-        Call call = (Call)service.createCall();
-
-        String style = event.getMessage().getStringProperty("style", null);
-        String use = event.getMessage().getStringProperty("use", null);
-
-        // Note that Axis has specific rules to how these two variables are
-        // combined. This is handled for us
-        // Set style: RPC/wrapped/Doc/Message
-        if (style != null)
-        {
-            Style s = Style.getStyle(style);
-            if (s == null)
-            {
-                throw new IllegalArgumentException(
-                    CoreMessages.valueIsInvalidFor(style, "style").toString());
-            }
-            else
-            {
-                call.setOperationStyle(s);
-            }
-        }
-        // Set use: Endcoded/Literal
-        if (use != null)
-        {
-            Use u = Use.getUse(use);
-            if (u == null)
-            {
-                throw new IllegalArgumentException(
-                    CoreMessages.valueIsInvalidFor(use, "use").toString());
-            }
-            else
-            {
-                call.setOperationUse(u);
-            }
-        }
+        Object method = getInitialMethod(event); // changes object state
+        Call call = (Call) service.createCall();
+        parseStyle(event, call);
+        parseUse(event, call);
 
         // set properties on the call from the endpoint properties
         BeanUtils.populateWithoutFail(call, event.getEndpoint().getProperties(), false);
         call.setTargetEndpointAddress(endpointUri.getAddress());
 
-        String methodNamespace = null;
+        method = refineMethod(event, call, method);
+        String methodNamespace = call.getOperationName().getNamespaceURI();
+
+        // set Mule event here so that handlers can extract info
+        call.setProperty(MuleProperties.MULE_EVENT_PROPERTY, event);
+        call.setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, event.getEndpoint());
+
+        setCustomProperties(event, call);
+        call.setTimeout(new Integer(event.getTimeout()));
+        setUserCredentials(endpointUri, call);
+
+        Map methodCalls = (Map)event.getMessage().getProperty("soapMethods");
+        if (methodCalls == null && !(method instanceof SoapMethod))
+        {
+            buildSoapMethods(event, call, method, methodNamespace, args);
+        }
+
+        setCallParams(call, event, call.getOperationName());
+        setSoapAction(event, endpointUri, call);
+        addAttachments(event, call);
+        return call;
+    }
+
+    protected void addAttachments(UMOEvent event, Call call)
+    {
+        // Add any attachments to the call
+        for (Iterator iterator = event.getMessage().getAttachmentNames().iterator(); iterator.hasNext();)
+        {
+            String name = (String)iterator.next();
+            DataHandler dh = event.getMessage().getAttachment(name);
+            AttachmentPart part = new AttachmentPart(dh);
+            call.addAttachmentPart(part);
+        }
+    }
+    
+    protected void setSoapAction(UMOEvent event, UMOEndpointURI endpointUri, Call call)
+    {
+        // Set custom soap action if set on the event or endpoint
+        String soapAction = (String)event.getMessage().getProperty(SoapConstants.SOAP_ACTION_PROPERTY);
+        if (soapAction != null)
+        {
+            soapAction = parseSoapAction(soapAction, call.getOperationName(), event);
+            call.setSOAPActionURI(soapAction);
+            call.setUseSOAPAction(Boolean.TRUE.booleanValue());
+        }
+        else
+        {
+            call.setSOAPActionURI(endpointUri.getAddress());
+        }
+    }
+
+    protected void buildSoapMethods(UMOEvent event, Call call, Object method, String methodNamespace, Object[] args)
+    {
+        List params = new ArrayList();
+        for (int i = 0; i < args.length; i++)
+        {
+            if (args[i] == null)
+            {
+                QName qname = call.getTypeMapping().getTypeQName(Object.class);
+                params.add("value" + i + ";qname{" + qname.getPrefix() + ":" + qname.getLocalPart() + ":"
+                        + qname.getNamespaceURI() + "};in");
+            }
+            else if (args[i] instanceof DataHandler[])
+            {
+                params.add("attachments;qname{DataHandler:http://xml.apache.org/xml-soap};in");
+                // Convert key/value pairs into the parameters
+            }
+            else if (args[i] instanceof Map && connector.isTreatMapAsNamedParams())
+            {
+                for (Iterator iterator = ((Map)args[i]).entrySet().iterator(); iterator.hasNext();)
+                {
+                    Map.Entry entry = (Map.Entry)iterator.next();
+                    if (call.getTypeMapping().getTypeQName(entry.getValue().getClass()) != null)
+                    {
+                        QName type = call.getTypeMapping().getTypeQName(entry.getValue().getClass());
+                        params.add("qname{" + entry.getKey().toString()
+                                + (methodNamespace == null ? "" : ":" + methodNamespace) + "};qname{"
+                                + type.getPrefix() + ":" + type.getLocalPart() + ":"
+                                + type.getNamespaceURI() + "};in");
+                    }
+                    else
+                    {
+                        params.add("value" + i + ";qname{"
+                                + Types.getLocalNameFromFullName(args[i].getClass().getName()) + ":"
+                                + Namespaces.makeNamespace(args[i].getClass().getName()) + "};in");
+                        params.add("qname{" + entry.getKey().toString()
+                                + (methodNamespace == null ? "" : ":" + methodNamespace) + "};qname{"
+                                + Types.getLocalNameFromFullName(args[i].getClass().getName()) + ":"
+                                + Namespaces.makeNamespace(args[i].getClass().getName()) + "};in");
+                    }
+
+                }
+            }
+            else if (call.getTypeMapping().getTypeQName(args[i].getClass()) != null)
+            {
+                QName qname = call.getTypeMapping().getTypeQName(args[i].getClass());
+                params.add("value" + i + ";qname{" + qname.getPrefix() + ":" + qname.getLocalPart() + ":"
+                        + qname.getNamespaceURI() + "};in");
+            }
+            else
+            {
+                params.add("value" + i + ";qname{"
+                        + Types.getLocalNameFromFullName(args[i].getClass().getName()) + ":"
+                        + Namespaces.makeNamespace(args[i].getClass().getName()) + "};in");
+            }
+        }
+
+        HashMap map = new HashMap();
+        map.put(method, params);
+        event.getMessage().setProperty("soapMethods", map);
+    }
+
+    protected void setUserCredentials(UMOEndpointURI endpointUri, Call call)
+    {
+        if (endpointUri.getUserInfo() != null)
+        {
+            call.setUsername(endpointUri.getUsername());
+            call.setPassword(endpointUri.getPassword());
+        }
+    }
+
+    protected void setCustomProperties(UMOEvent event, Call call)
+    {
+        for (Iterator iter = event.getMessage().getPropertyNames().iterator(); iter.hasNext();)
+        {
+            String key = (String)iter.next();
+            if (!(key.startsWith(MuleProperties.PROPERTY_PREFIX)))
+            {
+                Object value = event.getMessage().getProperty(key);
+                if (value != null)
+                {
+                    call.setProperty(key, value);
+                }
+            }
+        }
+    }
+
+    protected Object refineMethod(UMOEvent event, Call call, Object method)
+    {
         if (method instanceof String)
         {
             // Set a custome method namespace if one is set. This will be used forthe
             // parameters too
-            methodNamespace = (String)event.getMessage().getProperty(SoapConstants.METHOD_NAMESPACE_PROPERTY);
+            String methodNamespace = (String)event.getMessage().getProperty(SoapConstants.METHOD_NAMESPACE_PROPERTY);
             if (methodNamespace != null)
             {
                 call.setOperationName(new QName(methodNamespace, method.toString()));
@@ -246,123 +328,74 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         {
             call.setOperationName(((SoapMethod)method).getName());
         }
+        return method;
+    }
 
-        methodNamespace = call.getOperationName().getNamespaceURI();
-
-        // set Mule event here so that handlers can extract info
-        call.setProperty(MuleProperties.MULE_EVENT_PROPERTY, event);
-        call.setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, event.getEndpoint());
-
-        // set custom properties
-        for (Iterator iter = event.getMessage().getPropertyNames().iterator(); iter.hasNext();)
+    protected void parseUse(UMOEvent event, Call call)
+    {
+        // Set use: Endcoded/Literal
+        String use = event.getMessage().getStringProperty("use", null);
+        if (use != null)
         {
-            String key = (String)iter.next();
-            if (!(key.startsWith(MuleProperties.PROPERTY_PREFIX)))
+            Use u = Use.getUse(use);
+            if (u == null)
             {
-                Object value = event.getMessage().getProperty(key);
-                if (value != null)
-                {
-                    call.setProperty(key, value);
-                }
+                throw new IllegalArgumentException(
+                        CoreMessages.valueIsInvalidFor(use, "use").toString());
+            }
+            else
+            {
+                call.setOperationUse(u);
             }
         }
-                
-        // Set timeout
-        call.setTimeout(new Integer(event.getTimeout()));
+    }
 
-        // Add User Creds
-        if (endpointUri.getUserInfo() != null)
+    protected void parseStyle(UMOEvent event, Call call)
+    {
+        // Note that Axis has specific rules to how these two variables are
+        // combined. This is handled for us
+        // Set style: RPC/wrapped/Doc/Message
+        String style = event.getMessage().getStringProperty("style", null);
+        if (style != null)
         {
-            call.setUsername(endpointUri.getUsername());
-            call.setPassword(endpointUri.getPassword());
-        }
-
-        Map methodCalls = (Map)event.getMessage().getProperty("soapMethods");
-        if (methodCalls == null && !(method instanceof SoapMethod))
-        {
-            List params = new ArrayList();
-            for (int i = 0; i < args.length; i++)
+            Style s = Style.getStyle(style);
+            if (s == null)
             {
-                if (args[i] == null)
-                {
-                    QName qname = call.getTypeMapping().getTypeQName(Object.class);
-                    params.add("value" + i + ";qname{" + qname.getPrefix() + ":" + qname.getLocalPart() + ":"
-                               + qname.getNamespaceURI() + "};in");
-                }
-                else if (args[i] instanceof DataHandler[])
-                {
-                    params.add("attachments;qname{DataHandler:http://xml.apache.org/xml-soap};in");
-                    // Convert key/value pairs into the parameters
-                }
-                else if (args[i] instanceof Map && connector.isTreatMapAsNamedParams())
-                {
-                    for (Iterator iterator = ((Map)args[i]).entrySet().iterator(); iterator.hasNext();)
-                    {
-                        Map.Entry entry = (Map.Entry)iterator.next();
-                        if (call.getTypeMapping().getTypeQName(entry.getValue().getClass()) != null)
-                        {
-                            QName type = call.getTypeMapping().getTypeQName(entry.getValue().getClass());
-                            params.add("qname{" + entry.getKey().toString()
-                                       + (methodNamespace == null ? "" : ":" + methodNamespace) + "};qname{"
-                                       + type.getPrefix() + ":" + type.getLocalPart() + ":"
-                                       + type.getNamespaceURI() + "};in");
-                        }
-                        else
-                        {
-                            params.add("value" + i + ";qname{"
-                                       + Types.getLocalNameFromFullName(args[i].getClass().getName()) + ":"
-                                       + Namespaces.makeNamespace(args[i].getClass().getName()) + "};in");
-                            params.add("qname{" + entry.getKey().toString()
-                                       + (methodNamespace == null ? "" : ":" + methodNamespace) + "};qname{"
-                                       + Types.getLocalNameFromFullName(args[i].getClass().getName()) + ":"
-                                       + Namespaces.makeNamespace(args[i].getClass().getName()) + "};in");
-                        }
-
-                    }
-                }
-                else if (call.getTypeMapping().getTypeQName(args[i].getClass()) != null)
-                {
-                    QName qname = call.getTypeMapping().getTypeQName(args[i].getClass());
-                    params.add("value" + i + ";qname{" + qname.getPrefix() + ":" + qname.getLocalPart() + ":"
-                               + qname.getNamespaceURI() + "};in");
-                }
-                else
-                {
-                    params.add("value" + i + ";qname{"
-                               + Types.getLocalNameFromFullName(args[i].getClass().getName()) + ":"
-                               + Namespaces.makeNamespace(args[i].getClass().getName()) + "};in");
-                }
+                throw new IllegalArgumentException(
+                        CoreMessages.valueIsInvalidFor(style, "style").toString());
             }
-
-            HashMap map = new HashMap();
-            map.put(method, params);
-            event.getMessage().setProperty("soapMethods", map);
+            else
+            {
+                call.setOperationStyle(s);
+            }
         }
+    }
 
-        setCallParams(call, event, call.getOperationName());
-
-        // Set custom soap action if set on the event or endpoint
-        String soapAction = (String)event.getMessage().getProperty(SoapConstants.SOAP_ACTION_PROPERTY);
-        if (soapAction != null)
+    protected Object getInitialMethod(UMOEvent event) throws DispatchException
+    {
+        Object method = event.getMessage().getProperty(MuleProperties.MULE_METHOD_PROPERTY);
+        if (method == null)
         {
-            soapAction = parseSoapAction(soapAction, call.getOperationName(), event);
-            call.setSOAPActionURI(soapAction);
-            call.setUseSOAPAction(Boolean.TRUE.booleanValue());
+            method = event.getEndpoint().getEndpointURI().getParams().getProperty(MuleProperties.MULE_METHOD_PROPERTY);
         }
-        else
+        if (method == null)
         {
-            call.setSOAPActionURI(endpointUri.getAddress());
+            throw new DispatchException(
+                    SoapMessages.cannotInvokeCallWithoutOperation(), event.getMessage(),
+                    event.getEndpoint());
         }
-
-        // Add any attachments to the call
-        for (Iterator iterator = event.getMessage().getAttachmentNames().iterator(); iterator.hasNext();)
+        else if (method instanceof SoapMethod)
         {
-            String name = (String)iterator.next();
-            DataHandler dh = event.getMessage().getAttachment(name);
-            AttachmentPart part = new AttachmentPart(dh);
-            call.addAttachmentPart(part);
+            synchronized (this)
+            {
+                if (callParameters == null)
+                {
+                    callParameters = new HashMap();
+                }
+                callParameters.put(((SoapMethod)method).getName().getLocalPart(), method);
+            }
         }
-        return call;
+        return method;
     }
 
     private Object[] getArgs(UMOEvent event) throws TransformerException
@@ -629,4 +662,5 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
             callParameters.put(soapMethod.getName().getLocalPart(), soapMethod);
         }
     }
+
 }

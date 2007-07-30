@@ -12,6 +12,7 @@ package org.mule.providers;
 
 import org.mule.MuleRuntimeException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.impl.ThreadSafeAccess;
 import org.mule.umo.provider.UMOMessageAdapter;
 
 import java.util.Iterator;
@@ -39,7 +40,7 @@ public class DefaultMessageAdapter extends AbstractMessageAdapter
 
     /**
      * Creates a default message adapter with properties and attachments
-     * 
+     *
      * @param message the message to wrap. If this is null and NullPayload object
      *            will be used
      * @see NullPayload
@@ -58,10 +59,9 @@ public class DefaultMessageAdapter extends AbstractMessageAdapter
 
     public DefaultMessageAdapter(Object message, UMOMessageAdapter previous)
     {
+        super(previous);
         if (previous != null)
         {
-            id = previous.getUniqueId();
-
             if (message == null)
             {
                 this.message = NullPayload.getInstance();
@@ -125,7 +125,7 @@ public class DefaultMessageAdapter extends AbstractMessageAdapter
 
     /**
      * Creates a default message adapter with properties and attachments
-     * 
+     *
      * @param message the message to wrap. If this is null and NullPayload object
      *            will be used
      * @param properties a map properties to set on the adapter. Can be null.
@@ -149,7 +149,7 @@ public class DefaultMessageAdapter extends AbstractMessageAdapter
 
     /**
      * Converts the message implementation into a String representation
-     * 
+     *
      * @param encoding The encoding to use when transforming the message (if
      *            necessary). The parameter is used when converting from a byte array
      * @return String representation of the message payload
@@ -176,7 +176,7 @@ public class DefaultMessageAdapter extends AbstractMessageAdapter
 
     /**
      * Converts the message implementation into a String representation
-     * 
+     *
      * @return String representation of the message
      * @throws Exception Implemetation may throw an endpoint specific exception
      */
@@ -197,4 +197,10 @@ public class DefaultMessageAdapter extends AbstractMessageAdapter
     {
         return id;
     }
+
+    public ThreadSafeAccess newThreadCopy()
+    {
+        return new DefaultMessageAdapter(getPayload(), this);
+    }
+
 }

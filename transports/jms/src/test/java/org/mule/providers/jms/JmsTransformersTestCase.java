@@ -11,7 +11,6 @@
 package org.mule.providers.jms;
 
 import org.mule.impl.RequestContext;
-import org.mule.providers.jms.JmsConnector;
 import org.mule.providers.jms.functional.AbstractJmsFunctionalTestCase;
 import org.mule.providers.jms.transformers.AbstractJmsTransformer;
 import org.mule.providers.jms.transformers.JMSMessageToObject;
@@ -60,7 +59,7 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
     // @Override
     protected void doTearDown() throws Exception
     {
-        RequestContext.setEvent(null);
+        RequestContext.safeSetEvent(null);
         if (session != null)
         {
             session.close();
@@ -70,7 +69,7 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
 
     public void testTransformObjectMessage() throws Exception
     {
-        RequestContext.setEvent(getTestEvent("test"));
+        RequestContext.safeSetEvent(getTestEvent("test"));
 
         ObjectMessage oMsg = session.createObjectMessage();
         File f = FileUtils.newFile("/some/random/path");
@@ -87,7 +86,7 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
 
     public void testTransformTextMessage() throws Exception
     {
-        RequestContext.setEvent(getTestEvent("test"));
+        RequestContext.safeSetEvent(getTestEvent("test"));
 
         String text = "This is a test TextMessage";
         TextMessage tMsg = session.createTextMessage();
@@ -105,7 +104,7 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
 
     public void testTransformMapMessage() throws Exception
     {
-        RequestContext.setEvent(getTestEvent("test"));
+        RequestContext.safeSetEvent(getTestEvent("test"));
 
         Properties p = new Properties();
         p.setProperty("Key1", "Value1");
@@ -126,7 +125,7 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
 
     public void testTransformByteMessage() throws Exception
     {
-        RequestContext.setEvent(getTestEvent("test"));
+        RequestContext.safeSetEvent(getTestEvent("test"));
 
         AbstractJmsTransformer trans = new SessionEnabledObjectToJMSMessage(session);
         trans.setReturnClass(BytesMessage.class);
@@ -153,7 +152,7 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
     // http://en.wikipedia.org/wiki/Zip_of_death
     public void testCompressedBytesMessage() throws Exception
     {
-        RequestContext.setEvent(getTestEvent("test"));
+        RequestContext.safeSetEvent(getTestEvent("test"));
 
         // use GZIP
         CompressionStrategy compressor = new GZipCompression();

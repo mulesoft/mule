@@ -187,7 +187,7 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
     {
         // Invoke method
         Object result;
-        UMOEvent event = RequestContext.getEvent();
+        UMOEvent event = RequestContext.getEvent();   // new copy here?
 
         try
         {

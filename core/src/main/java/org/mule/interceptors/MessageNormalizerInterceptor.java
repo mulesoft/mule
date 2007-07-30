@@ -60,7 +60,7 @@ public abstract class MessageNormalizerInterceptor implements UMOInterceptor
         if (bMessage != null)
         {
             // update the current event
-            RequestContext.rewriteEvent(bMessage);
+            RequestContext.safeRewriteEvent(bMessage);
             // update the message in the invocation
             invocation.setMessage(bMessage);
             // remove any method override as it will not apply to the new

@@ -120,6 +120,12 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
     {
         UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
 
+        // because this is vm th emessage will not be serialized, even though it will
+        // be passed to a new thread.  so we need to generate a new copy of the message
+        // at this point
+        //event = event.newCopy();
+        // doesn't help needs to be later?
+
         if (endpointUri == null)
         {
             throw new DispatchException(
@@ -142,7 +148,6 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
 
             if (event.isStreaming())
             {
-
                 PipedInputStream in = new PipedInputStream();
                 PipedOutputStream out = new PipedOutputStream(in);
                 UMOStreamMessageAdapter sma = connector.getStreamMessageAdapter(in, out);

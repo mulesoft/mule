@@ -54,6 +54,8 @@ public interface MuleProperties
     String MULE_START_AFTER_CONFIG_SYSTEM_PROPERTY = SYSTEM_PROPERTY_PREFIX
                                                                   + "start.after.config";
 
+    String MULE_THREAD_UNSAFE_MESSAGES_PROPERTY = SYSTEM_PROPERTY_PREFIX + "disable.threadsafemessages";
+
     // End System properties
 
     /********************************************************************************

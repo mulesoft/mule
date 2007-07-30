@@ -10,9 +10,9 @@
 
 package org.mule.providers.http;
 
+import org.mule.impl.ThreadSafeAccess;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.transformers.simple.SerializableToByteArray;
-import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.umo.transformer.UMOTransformer;
 
@@ -39,7 +39,7 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
     private final Object message;
     private boolean http11 = true;
 
-    public HttpMessageAdapter(Object message) throws MessagingException
+    public HttpMessageAdapter(Object message) throws MessageTypeNotSupportedException
     {
         if (message instanceof Object[])
         {
@@ -82,7 +82,6 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
         }
 
         // set the encoding
-        String charset = null;
         Header contenttype = getHeader(HttpConstants.HEADER_CONTENT_TYPE);
         if (contenttype != null)
         {
@@ -92,19 +91,22 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
                 NameValuePair param = values[0].getParameterByName("charset");
                 if (param != null)
                 {
-                    charset = param.getValue();
+                    encoding = param.getValue();
                 }
             }
         }
-        if (charset != null)
-        {
-            encoding = charset;
-        }
+    }
+
+    protected HttpMessageAdapter(HttpMessageAdapter template)
+    {
+        super(template);
+        message = template.message;
+        http11 = template.http11;
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.providers.UMOMessageAdapter#getPayload()
      */
     public Object getPayload()
@@ -114,7 +116,7 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.providers.UMOMessageAdapter#getPayloadAsBytes()
      */
     public byte[] getPayloadAsBytes() throws Exception
@@ -135,7 +137,7 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.providers.UMOMessageAdapter#getPayloadAsString(String
      *      encoding)
      */
@@ -160,7 +162,7 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.providers.UMOMessageAdapter#getProperty(java.lang.Object)
      */
     public Object getProperty(String key)
@@ -199,4 +201,10 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
         }
         return new Header(name, value);
     }
+
+    public ThreadSafeAccess newThreadCopy()
+    {
+        return new HttpMessageAdapter(this);
+    }
+
 }

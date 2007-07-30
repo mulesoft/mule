@@ -53,7 +53,7 @@ import org.apache.commons.logging.LogFactory;
  * and retrieved by Mule UMO components.
  */
 
-public class MuleEvent extends EventObject implements UMOEvent
+public class MuleEvent extends EventObject implements UMOEvent, ThreadSafeAccess
 {
     /**
      * Serial version
@@ -126,7 +126,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /**
      * Contructor.
-     * 
+     *
      * @param message the event payload
      * @param endpoint the endpoint to associate with the event
      * @param session the previous event if any
@@ -150,7 +150,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /**
      * Contructor.
-     * 
+     *
      * @param message the event payload
      * @param endpoint the endpoint to associate with the event
      * @param session the previous event if any
@@ -173,7 +173,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /**
      * A helper constructor used to rewrite an event payload
-     * 
+     *
      * @param message
      * @param rewriteEvent
      */
@@ -259,7 +259,7 @@ public class MuleEvent extends EventObject implements UMOEvent
      * set on the currect event don't verwrite with the previous event value 2. If
      * the propery name appears in the ignorredPropertyOverrides list, then we always
      * set it on the new event
-     * 
+     *
      * @param key
      * @return
      */
@@ -289,7 +289,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     protected void setCredentials()
     {
-        if (endpoint.getEndpointURI().getUserInfo() != null)
+        if (null != endpoint && null != endpoint.getEndpointURI() && null != endpoint.getEndpointURI().getUserInfo())
         {
             final String userName = endpoint.getEndpointURI().getUsername();
             final String password = endpoint.getEndpointURI().getPassword();
@@ -355,7 +355,7 @@ public class MuleEvent extends EventObject implements UMOEvent
      * and return that. Otherwise if the the result is a string it will serialized
      * the CONTENTS of the string not the String object. finally it will check if the
      * result is a Serializable object and convert that to an array of bytes.
-     * 
+     *
      * @return a byte[] representation of the message
      * @throws TransformerException if an unsupported encoding is being used or if
      *             the result message is not a String byte[] or Seializable object
@@ -394,7 +394,7 @@ public class MuleEvent extends EventObject implements UMOEvent
         else
         {
             throw new TransformerException(
-                CoreMessages.transformOnObjectNotOfSpecifiedType(msg.getClass().getName(), 
+                CoreMessages.transformOnObjectNotOfSpecifiedType(msg.getClass().getName(),
                     "byte[] or " + Serializable.class.getName()));
         }
     }
@@ -403,7 +403,7 @@ public class MuleEvent extends EventObject implements UMOEvent
      * Returns the message transformed into it's recognised or expected format and
      * then into a String. The transformer used is the one configured on the endpoint
      * through which this event was received.
-     * 
+     *
      * @return the message transformed into it's recognised or expected format as a
      *         Strings.
      * @throws org.mule.umo.transformer.TransformerException if a failure occurs in
@@ -424,7 +424,7 @@ public class MuleEvent extends EventObject implements UMOEvent
      * Returns the message transformed into it's recognised or expected format and
      * then into a String. The transformer used is the one configured on the endpoint
      * through which this event was received.
-     * 
+     *
      * @param encoding the encoding to use when converting the message to string
      * @return the message transformed into it's recognised or expected format as a
      *         Strings.
@@ -446,7 +446,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /**
      * Returns the message contents as a string
-     * 
+     *
      * @param encoding the encoding to use when converting the message to string
      * @return the message contents as a string
      * @throws org.mule.umo.UMOException if the message cannot be converted into a
@@ -467,7 +467,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMOEvent#getId()
      */
     public String getId()
@@ -485,7 +485,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMOEvent#getProperty(java.lang.String, java.lang.Object,
      *      boolean)
      */
@@ -520,7 +520,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMOEvent#getEndpoint()
      */
     public UMOImmutableEndpoint getEndpoint()
@@ -530,7 +530,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     public String toString()
@@ -569,7 +569,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /**
      * Determines whether the default processing for this event will be executed
-     * 
+     *
      * @return Returns the stopFurtherProcessing.
      */
     public boolean isStopFurtherProcessing()
@@ -585,7 +585,7 @@ public class MuleEvent extends EventObject implements UMOEvent
      * programatically by using the component on the current event 2. The UMO doesn't
      * send the current event out through a endpoint. i.e. the processing of the
      * event stops in the uMO.
-     * 
+     *
      * @param stopFurtherProcessing The stopFurtherProcessing to set.
      */
     public void setStopFurtherProcessing(boolean stopFurtherProcessing)
@@ -646,7 +646,7 @@ public class MuleEvent extends EventObject implements UMOEvent
     /**
      * An outputstream can optionally be used to write response data to an incoming
      * message.
-     * 
+     *
      * @return an output strem if one has been made available by the message receiver
      *         that received the message
      */
@@ -710,7 +710,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     /**
      * Determines whether the event flow is being streamed
-     * 
+     *
      * @return true if the request should be streamed
      */
     public boolean isStreaming()
@@ -723,7 +723,7 @@ public class MuleEvent extends EventObject implements UMOEvent
      * set on the endpoint, if not it will check the message itself and finally it
      * will fall back to the Mule global configuration for encoding which cannot be
      * null.
-     * 
+     *
      * @return the encoding for the event
      */
     public String getEncoding()
@@ -731,15 +731,45 @@ public class MuleEvent extends EventObject implements UMOEvent
         String encoding = message.getEncoding();
         if (encoding == null)
         {
-            encoding = endpoint.getEncoding(); 
+            encoding = endpoint.getEncoding();
         }
-      
+
         return encoding;
     }
-
 
     public UMOManagementContext getManagementContext()
     {
         return endpoint.getManagementContext();
     }
+
+    public ThreadSafeAccess newThreadCopy()
+    {
+        if (message instanceof ThreadSafeAccess)
+        {
+            MuleEvent copy = new MuleEvent((UMOMessage) ((ThreadSafeAccess) message).newThreadCopy(), this);
+            copy.resetAccessControl();
+            return copy;
+        }
+        else
+        {
+            return this;
+        }
+    }
+
+    public void resetAccessControl()
+    {
+        if (message instanceof ThreadSafeAccess)
+        {
+            ((ThreadSafeAccess) message).resetAccessControl();
+        }
+    }
+
+    public void assertAccess(boolean write)
+    {
+        if (message instanceof ThreadSafeAccess)
+        {
+            ((ThreadSafeAccess) message).assertAccess(write);
+        }
+    }
+
 }

@@ -10,8 +10,8 @@
 
 package org.mule.providers.udp;
 
+import org.mule.impl.ThreadSafeAccess;
 import org.mule.providers.AbstractMessageAdapter;
-import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 
 import java.net.DatagramPacket;
@@ -33,7 +33,7 @@ public class UdpMessageAdapter extends AbstractMessageAdapter
 
     private byte[] message;
 
-    public UdpMessageAdapter(Object message) throws MessagingException
+    public UdpMessageAdapter(Object message) throws MessageTypeNotSupportedException
     {
         if (message instanceof DatagramPacket)
         {
@@ -53,6 +53,12 @@ public class UdpMessageAdapter extends AbstractMessageAdapter
         {
             throw new MessageTypeNotSupportedException(message, getClass());
         }
+    }
+
+    protected UdpMessageAdapter(UdpMessageAdapter template)
+    {
+        super(template);
+        message = template.message;
     }
 
     /**
@@ -78,4 +84,10 @@ public class UdpMessageAdapter extends AbstractMessageAdapter
     {
         return message;
     }
+
+    public ThreadSafeAccess newThreadCopy()
+    {
+        return new UdpMessageAdapter(this);
+    }
+
 }

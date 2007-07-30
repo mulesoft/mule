@@ -10,6 +10,7 @@
 
 package org.mule.providers.stdio;
 
+import org.mule.impl.ThreadSafeAccess;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 
@@ -36,6 +37,12 @@ public class StdioMessageAdapter extends AbstractMessageAdapter
         {
             throw new MessageTypeNotSupportedException(message, StdioMessageAdapter.class);
         }
+    }
+
+    protected StdioMessageAdapter(StdioMessageAdapter template)
+    {
+        super(template);
+        message = template.message;
     }
 
     /**
@@ -70,5 +77,10 @@ public class StdioMessageAdapter extends AbstractMessageAdapter
     {
         return message;
     }
+
+    public ThreadSafeAccess newThreadCopy()
+    {
+        return new StdioMessageAdapter(this);
+}
 
 }

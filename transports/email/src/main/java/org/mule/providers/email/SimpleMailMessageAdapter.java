@@ -11,6 +11,7 @@
 package org.mule.providers.email;
 
 import org.mule.config.i18n.CoreMessages;
+import org.mule.impl.ThreadSafeAccess;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
@@ -71,6 +72,13 @@ public class SimpleMailMessageAdapter extends AbstractMessageAdapter
         {
             throw new MessagingException(CoreMessages.failedToCreate("Message Adapter"), e);
         }
+    }
+
+    protected SimpleMailMessageAdapter(SimpleMailMessageAdapter template)
+    {
+        super(template);
+        message = template.message;
+        cache = template.cache;
     }
 
     /**
@@ -262,4 +270,9 @@ public class SimpleMailMessageAdapter extends AbstractMessageAdapter
         return buffer.toString().getBytes(encoding);
     }
 
+    public ThreadSafeAccess newThreadCopy()
+    {
+        return new SimpleMailMessageAdapter(this);
+    }
+    
 }
