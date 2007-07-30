@@ -9,6 +9,10 @@
 # Customized for Mule
 ######################################################################
 
+# Configure remote Java debugging options here
+# Setting suspend=y will wait for you to connect before proceeding
+JPDA_OPTS="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005"
+
 # Check for MULE_HOME
 if [ -z "$MULE_HOME" ] ; then
     echo "You must specify the MULE_HOME environment variable before starting Mule"
@@ -448,7 +452,7 @@ console() {
     getpid
     if [ "X$pid" = "X" ]
     then
-        # The string passed to eval must handles spaces in paths correctly.
+        # The string passed to eval must handle spaces in paths correctly.
         COMMAND_LINE="$CMDNICE \"$WRAPPER_CMD\" \"$WRAPPER_CONF\" wrapper.syslog.ident=$APP_NAME wrapper.pidfile=\"$PIDFILE\" $ANCHORPROP $LOCKPROP"
         ######################################################################
         # Customized for Mule
@@ -573,6 +577,26 @@ dump() {
     fi
 }
 
+checkDebug() {
+    # Checking if "-debug" option is specified
+    debugEnabled=false
+    for arg in $@
+    do
+        if [ "$arg" = "-debug" ]; then
+            debugEnabled=true;
+            break
+        fi
+    done
+
+    if [ $debugEnabled = true ]; then
+        echo Debug enabled
+        # Generating additional wrapper-jpda.conf (should be included in wrapper.conf at the end)
+        $MULE_HOME/bin/launcher $MULE_HOME/bin/jpda_settings.groovy $WRAPPER_CONF $JPDA_OPTS
+    else
+        rm -f `echo $WRAPPER_CONF | sed 's/[^\/]*$/wrapper-jpda\.conf/'`
+    fi
+}
+
 ######################################################################
 # Customized for Mule
 ######################################################################
@@ -591,11 +615,13 @@ case "$1" in
 
     'console')
         checkUser touchlock $1
+        checkDebug $*
         console
         ;;
 
     'start')
         checkUser touchlock $1
+        checkDebug $*
         start
         ;;
 
