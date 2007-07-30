@@ -11,6 +11,11 @@ echo This script only works with NT-based versions of Windows.
 goto :eof
 
 :nt
+
+rem Configure remote Java debugging options here
+rem Setting suspend=y will wait for you to connect before proceeding
+set JPDA_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005
+
 rem
 rem Find the application home.
 rem
@@ -89,8 +94,23 @@ set MULE_EXE=%MULE_HOME%\bin
 rem Mule options: Set the working directory to the current one and pass all command-line
 rem options (-config, -builder, etc.) straight through to the main() method.
 set MULE_OPTS=set.MULE_APP=%MULE_APP% set.MULE_APP_LONG=%MULE_APP_LONG% set.MULE_EXE="%MULE_EXE%" set.MULE_LIB=%MULE_LIB% wrapper.working.dir="%CD%" wrapper.app.parameter.1=%1 wrapper.app.parameter.2=%2  wrapper.app.parameter.3=%3  wrapper.app.parameter.4=%4  wrapper.app.parameter.5=%5  wrapper.app.parameter.6=%6  wrapper.app.parameter.7=%7  wrapper.app.parameter.8=%8 wrapper.app.parameter.9=%9
-rem ###############################################################
 
+rem Adding debug jvm arguments to wrapper configuration if enabled
+set params= %*
+
+rem Searching "-debug" command-line argument
+SET marker=%params:* -debug= -debug%
+IF "%marker:~0,7%" NEQ " -debug" goto :clean
+
+call %MULE_HOME%\bin\launcher.bat %MULE_HOME%\bin\jpda_settings.groovy %_WRAPPER_CONF% "%JPDA_OPTS%"
+
+goto :run
+:clean
+del /Q /F %_REALPATH%..\conf\wrapper-jpda.conf 2>nul
+
+:run
+
+rem ###############################################################
 rem
 rem Run the application.
 rem At runtime, the current directory will be that of wrapper.exe

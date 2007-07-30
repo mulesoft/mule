@@ -636,8 +636,14 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
             String endpoint;
             for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
             {
-                endpoint = (String)iterator.next();
-                descriptor.getInboundRouter().addEndpoint(new MuleEndpoint(endpoint, true));
+                endpoint = (String) iterator.next();
+                MuleEndpoint ep = new MuleEndpoint(endpoint, true);
+
+                // check whether the endpoint has already been set on the MuleEventMulticastor
+                if (descriptor.getInboundRouter().getEndpoint(ep.getName()) == null)
+                {
+                    descriptor.getInboundRouter().addEndpoint(ep);
+                }
             }
         }
     }
