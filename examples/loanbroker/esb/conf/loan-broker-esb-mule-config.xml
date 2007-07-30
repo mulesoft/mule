@@ -25,14 +25,6 @@
         </property>
     </bean>
 
-    <!--Use Default values as specified in documentation, 2.0 is not currently using these values.
-        See MULE-2073
-    -->
-    <mule:configuration serverId="loanBroker">
-        <mule:default-threading-profile threadWaitTimeout="30" maxThreadsActive="10" maxThreadsIdle="10"
-            maxBufferSize="0" threadTTL="60000" poolExhaustedAction="RUN" />
-    </mule:configuration>
-
     <ejb:connector name="ejbConnector" securityPolicy="security.policy"
         jndiInitialFactory="org.openejb.client.LocalInitialContextFactory">
         <mule:jndi-provider-properties>
