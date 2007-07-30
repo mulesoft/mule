@@ -25,7 +25,7 @@ public class StreamingCapacityTestCase extends AbstractStreamingCapacityTestCase
 
     public StreamingCapacityTestCase()
     {
-        super(100 * ONE_MB);
+        super(100 * ONE_MB, "tcp://localhost:65432");
     }
 
     protected String getConfigResources()

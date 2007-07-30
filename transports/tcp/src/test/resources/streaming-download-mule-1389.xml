@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="streaming-download-mule-1389" version="1.0">
+
+    <mule-environment-properties serverUrl=""/>
+
+    <model name="main">
+        <mule-descriptor name="testComponent" implementation="org.mule.providers.tcp.issues.InputStreamSource">
+            <inbound-router>
+                <endpoint address="tcp://localhost:65432"/>
+            </inbound-router>
+        </mule-descriptor>
+    </model>
+
+</mule-configuration>

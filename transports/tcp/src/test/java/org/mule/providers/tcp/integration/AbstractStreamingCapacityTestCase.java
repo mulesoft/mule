@@ -19,10 +19,6 @@ import org.mule.umo.UMOEventContext;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOStreamMessageAdapter;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.MessageFormat;
-
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
@@ -44,10 +40,12 @@ public abstract class AbstractStreamingCapacityTestCase extends FunctionalTestCa
 
     protected final Log logger = LogFactory.getLog(getClass());
     private long size;
+    private String endpoint;
 
-    public AbstractStreamingCapacityTestCase(long size)
+    public AbstractStreamingCapacityTestCase(long size, String endpoint)
     {
         this.size = size;
+        this.endpoint = endpoint;
         setDisposeManagerPerSuite(true);
     }
 
@@ -87,10 +85,11 @@ public abstract class AbstractStreamingCapacityTestCase extends FunctionalTestCa
         runtime.gc(); // i know, i know...
         long freeStart = runtime.freeMemory();
         long maxStart = runtime.maxMemory();
+        long timeStart = System.currentTimeMillis();
 
         BigInputStream stream = new BigInputStream(size, MESSAGES);
         UMOStreamMessageAdapter adapter = new StreamMessageAdapter(stream);
-        client.dispatchStream("tcp://localhost:65432", adapter);
+        client.dispatchStream(endpoint, adapter);
 
         // if we assume 1MB/sec then we need at least...
         int pause = (int) Math.max(size / ONE_MB, 10);
@@ -105,80 +104,15 @@ public abstract class AbstractStreamingCapacityTestCase extends FunctionalTestCa
 
         long freeEnd = runtime.freeMemory();
         long delta = freeStart - freeEnd;
+        long timeEnd = System.currentTimeMillis();
+        double speed = size / (double) (timeEnd - timeStart) * 1000 / ONE_MB;
+        logger.info("Transfer speed " + speed + " MB/s (" + size + " B in " + (timeEnd - timeStart) + " ms)");
         double usePercent = 100.0 * delta / ((double) size);
-        logger.info("Memory delta " + delta + " = " + usePercent + "%");
+        logger.info("Memory delta " + delta + " B = " + usePercent + "%");
         assertTrue("Memory used too high", usePercent < 10);
 
         long maxEnd = runtime.maxMemory();
         assertEquals("Max memory shifted", 0,  maxEnd - maxStart);
-    }
-
-    private static class BigInputStream extends InputStream
-    {
-
-        private static final int SUMMARY_SIZE = 4;
-        private static final  MessageFormat FORMAT  =
-            new MessageFormat("Sent {0,number,#} bytes, {1,number,###.##}% (free {2,number,#}/{3,number,#})");
-        private final Log logger = LogFactory.getLog(getClass());
-        private long size;
-        private int messages;
-
-        private long sent = 0;
-        private byte[] data;
-        private int dataIndex = 0;
-        private int printedMessages = 0;
-        private int nextMessage = 0;
-
-
-        public BigInputStream(long size, int messages)
-        {
-            this.size = size;
-            this.messages = messages;
-            data = ("This message is repeated for " + size + " bytes. ").getBytes();
-        }
-
-        /**
-         * @return String matching {@link org.mule.tck.functional.FunctionalStreamingTestComponent}
-         */
-        public String summary()
-        {
-
-            byte[] tail = new byte[SUMMARY_SIZE];
-            for (int i = 0; i < SUMMARY_SIZE; ++i)
-            {
-                tail[i] = data[(int) ((sent - SUMMARY_SIZE + i) % data.length)];
-            }
-            return "Received stream; length: " + sent + "; '" +
-                    new String(data, 0, 4) + "..." + new String(tail) +
-                    "'";
-        }
-
-        public int read() throws IOException
-        {
-            if (sent == size)
-            {
-                return -1;
-            }
-            else
-            {
-                if (++sent > nextMessage)
-                {
-                    double percent = 100l * sent / ((double) size);
-                    Runtime runtime = Runtime.getRuntime();
-                    logger.info(FORMAT.format(new Object[]{
-                            new Long(sent), new Double(percent),
-                            new Long(runtime.freeMemory()), new Long(runtime.maxMemory())}));
-                    nextMessage = ++printedMessages *
-                            ((int) Math.floor(((double) size) / (messages - 1)) - 1);
-                }
-                if (dataIndex == data.length)
-                {
-                    dataIndex = 0;
-                }
-                return data[dataIndex++];
-            }
-        }
-
     }
 
 }

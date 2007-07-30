@@ -52,4 +52,20 @@ public class TcpFunctionalTestCase extends FunctionalTestCase
 //        assertEquals(TEST_MESSAGE + " Received Async", result.getPayloadAsString());
 //    }
 
+    public void timeMultipleSend() throws Exception
+    {
+        MuleClient client = new MuleClient();
+        Map props = new HashMap();
+        long now = System.currentTimeMillis();
+        int count = 1000;
+        for (int i = 0; i < count; i++)
+        {
+            UMOMessage result = client.send("clientEndpoint", TEST_MESSAGE, props);
+            assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
+        }
+        long later = System.currentTimeMillis();
+        double speed = count * 1000.0 / (later - now);
+        logger.error(speed + " messages per second");
+    }
+
 }

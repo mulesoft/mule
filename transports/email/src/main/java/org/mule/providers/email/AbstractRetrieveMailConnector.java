@@ -29,9 +29,14 @@ public abstract class AbstractRetrieveMailConnector extends AbstractMailConnecto
     private volatile long checkFrequency = DEFAULT_CHECK_FREQUENCY;
 
     /**
-     * holds a path where messages should be backed up to
+     * Holds a path where messages should be backed up to (auto-generated if empty)
      */
     private volatile String backupFolder = null;
+
+    /**
+     * Should we save backups to backupFolder?
+     */
+    private boolean backupEnabled = false;
 
     /**
      * Once a message has been read, should it be deleted
@@ -61,7 +66,6 @@ public abstract class AbstractRetrieveMailConnector extends AbstractMailConnecto
         checkFrequency = l;
     }
 
-    
     /**
      * @return a relative or absolute path to a directory on the file system
      */
@@ -83,7 +87,7 @@ public abstract class AbstractRetrieveMailConnector extends AbstractMailConnecto
      */
     public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception
     {
-        Object[] args = {new Long(checkFrequency), backupFolder};
+        Object[] args = {new Long(checkFrequency), Boolean.valueOf(isBackupEnabled()), backupFolder};
         return serviceDescriptor.createMessageReceiver(this, component, endpoint, args);
     }
 
@@ -96,5 +100,15 @@ public abstract class AbstractRetrieveMailConnector extends AbstractMailConnecto
     {
         this.deleteReadMessages = deleteReadMessages;
     }
-    
+
+    public boolean isBackupEnabled()
+    {
+        return backupEnabled;
+    }
+
+    public void setBackupEnabled(boolean backupEnabled)
+    {
+        this.backupEnabled = backupEnabled;
+    }
+
 }

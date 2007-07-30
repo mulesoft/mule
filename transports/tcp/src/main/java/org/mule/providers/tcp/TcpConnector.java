@@ -48,7 +48,7 @@ public class TcpConnector extends AbstractConnector
     public static final int DEFAULT_BUFFER_SIZE = INT_VALUE_NOT_SET;
     public static final int DEFAULT_BACKLOG = INT_VALUE_NOT_SET;
 
-    // to clarify arg to configureSocket 
+    // to clarify arg to configureSocket
     public static final boolean SERVER = false;
     public static final boolean CLIENT = true;
 
@@ -59,6 +59,7 @@ public class TcpConnector extends AbstractConnector
     private int receiveBacklog = DEFAULT_BACKLOG;
     private boolean sendTcpNoDelay;
     private boolean validateConnections = true;
+    private Boolean reuseAddress = null; // not set - Java default
     private int socketSoLinger = INT_VALUE_NOT_SET;
     private String tcpProtocolClassName;
     private TcpProtocol tcpProtocol;
@@ -132,7 +133,7 @@ public class TcpConnector extends AbstractConnector
         dispatcherSocketsPool.setFactory(getSocketFactory());
         dispatcherSocketsPool.setTestOnBorrow(true);
         dispatcherSocketsPool.setTestOnReturn(true);
-        //There should only be one pooled instance per socket (key)        
+        //There should only be one pooled instance per socket (key)
         dispatcherSocketsPool.setMaxActive(1);
     }
 
@@ -413,7 +414,7 @@ public class TcpConnector extends AbstractConnector
 
     protected ServerSocket getServerSocket(URI uri) throws IOException
     {
-        return getServerSocketFactory().createServerSocket(uri, getReceiveBacklog());
+        return getServerSocketFactory().createServerSocket(uri, getReceiveBacklog(), isReuseAddress());
     }
 
     private static int valueOrDefault(int value, int threshhold, int deflt)
@@ -446,4 +447,23 @@ public class TcpConnector extends AbstractConnector
     {
         this.validateConnections = validateConnections;
     }
+
+    /**
+     * @return true if the server socket sets SO_REUSEADDRESS before opening
+     */
+    public Boolean isReuseAddress()
+    {
+        return reuseAddress;
+    }
+
+    /**
+     * This allows closed sockets to be reused while they are still in TIME_WAIT state
+     *
+     * @param reuseAddress Whether the server socket sets SO_REUSEADDRESS before opening
+     */
+    public void setReuseAddress(Boolean reuseAddress)
+    {
+        this.reuseAddress = reuseAddress;
+    }
+
 }

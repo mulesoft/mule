@@ -23,9 +23,23 @@
                          <exclude>**/AsynchMule1869TestCase.*</exclude>
                          <!-- be careful when re-enabling this, it may hang the CI server -->
                          <exclude>**/KeepSendSocketOpenMule1491TestCase.*</exclude>
+                         <exclude>**/*Mule1389TestCase.java</exclude>
+                         <exclude>**/*Mule1687TestCase.java</exclude>
+                         <exclude>**/*Mule2067TestCase.java</exclude>
                      </excludes>
                  </configuration>
              </plugin>
+             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
               <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
