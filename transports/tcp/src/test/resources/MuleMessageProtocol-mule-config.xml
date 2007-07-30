@@ -10,6 +10,11 @@
                http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd
                http://www.mulesource.org/schema/mule/tcp/2.0 http://www.mulesource.org/schema/mule/tcp/2.0/mule-tcp.xsd">
 
+    <mule:configuration serverId="1.4-config">
+        <mule:default-threading-profile threadWaitTimeout="30" maxThreadsActive="10" maxThreadsIdle="10"
+            maxBufferSize="0" threadTTL="60000" poolExhaustedAction="RUN" />
+    </mule:configuration>
+
     <vm:connector name="quedvm"
                   queueEvents="true"/>
 

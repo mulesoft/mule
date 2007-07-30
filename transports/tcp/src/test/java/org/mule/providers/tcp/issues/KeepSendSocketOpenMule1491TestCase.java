@@ -25,7 +25,7 @@ import java.util.Map;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 
-public class KeepSendSocketOpenMule1491TestCase  extends FunctionalTestCase 
+public class KeepSendSocketOpenMule1491TestCase extends FunctionalTestCase 
 {
 
     protected static String TEST_MESSAGE = "Test TCP Request";

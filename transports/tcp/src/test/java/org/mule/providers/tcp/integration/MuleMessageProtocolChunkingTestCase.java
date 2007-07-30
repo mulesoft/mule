@@ -23,32 +23,29 @@ public class MuleMessageProtocolChunkingTestCase extends FunctionalTestCase
     private static int messages = 2;
     private static int messagelength = 10;
 
-    // TODO - add these back in once the other test is working
-    // (the first is OK and the second seems to be the same problem as the third).
+    public void testChunking() throws Exception
+    {
 
-//    public void testChunking() throws Exception
-//    {
-//
-//        String message = "";
-//        for (int i = 0; i < messagelength; i++)
-//        {
-//            for (int j = 0; j < 10; j++)
-//                message += i;
-//        }
-//
-//        sendString(message);
-//    }
-//
-//    public void testHugeChunk() throws Exception
-//    {
-//        StringBuffer message = new StringBuffer();
-//        // send 50K of stuff;
-//        for (int i = 1000; i < 2000; i++)
-//        {
-//            message.append(i);
-//        }
-//        sendString(message.toString());
-//    }
+        String message = "";
+        for (int i = 0; i < messagelength; i++)
+        {
+            for (int j = 0; j < 10; j++)
+                message += i;
+        }
+
+        sendString(message);
+    }
+
+    public void testHugeChunk() throws Exception
+    {
+        StringBuffer message = new StringBuffer();
+        // send 50K of stuff;
+        for (int i = 1000; i < 2000; i++)
+        {
+            message.append(i);
+        }
+        sendString(message.toString());
+    }
 
     public void testCustomObject() throws Exception
     {
