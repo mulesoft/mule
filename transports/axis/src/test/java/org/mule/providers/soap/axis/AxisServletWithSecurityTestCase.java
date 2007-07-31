@@ -53,8 +53,11 @@ public class AxisServletWithSecurityTestCase extends FunctionalTestCase
     // @Override
     protected void doTearDown() throws Exception
     {
-        httpServer.stop(false);
-        httpServer.destroy();
+        if (httpServer != null)
+        {
+            httpServer.stop(false);
+            httpServer.destroy();
+        }
     }
 
     public void testSecurityWithServletsUsingGet() throws Exception
