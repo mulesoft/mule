@@ -719,20 +719,24 @@ public class AxisServiceComponent implements Initialisable, Callable
         SOAPService service = msgContext.getAxisEngine().getConfig().getService(
             new QName(serviceName.substring(1)));
 
-        // Component Name is set by Mule so if its null we can skip this check
-        if (service.getOption(AxisConnector.SERVICE_PROPERTY_COMPONENT_NAME) != null)
-        {
-            String servicePath = (String)service.getOption("servicePath");
-            if (StringUtils.isEmpty(endpointUri.getPath()))
+        // if using jms or vm we can skip this
+        if (!("vm".equalsIgnoreCase(endpointUri.getScheme()) || "jms".equalsIgnoreCase(endpointUri.getScheme())))
+        {            
+            // Component Name is set by Mule so if its null we can skip this check
+            if (service.getOption(AxisConnector.SERVICE_PROPERTY_COMPONENT_NAME) != null)
             {
-                if (!("/" + endpointUri.getAddress()).startsWith(servicePath + serviceName))
+                String servicePath = (String)service.getOption("servicePath");
+                if (StringUtils.isEmpty(endpointUri.getPath()))
                 {
-                    throw new AxisFault("Failed to find service: " + "/" + endpointUri.getAddress());
+                    if (!("/" + endpointUri.getAddress()).startsWith(servicePath + serviceName))
+                    {
+                        throw new AxisFault("Failed to find service: " + "/" + endpointUri.getAddress());
+                    }
                 }
-            }
-            else if (!endpointUri.getPath().startsWith(servicePath + serviceName))
-            {
-                throw new AxisFault("Failed to find service: " + endpointUri.getPath());
+                else if (!endpointUri.getPath().startsWith(servicePath + serviceName))
+                {
+                    throw new AxisFault("Failed to find service: " + endpointUri.getPath());
+                }
             }
         }
 
@@ -831,6 +835,5 @@ public class AxisServiceComponent implements Initialisable, Callable
     public void setAxisServer(AxisServer axisServer)
     {
         this.axisServer = axisServer;
-
     }
 }

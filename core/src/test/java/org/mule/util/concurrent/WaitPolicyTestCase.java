@@ -11,10 +11,11 @@
 package org.mule.util.concurrent;
 
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -24,15 +25,13 @@ import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionException
 import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
-import edu.emory.mathcs.backport.java.util.concurrent.locks.Lock;
 import edu.emory.mathcs.backport.java.util.concurrent.locks.ReentrantLock;
-import org.apache.commons.collections.keyvalue.DefaultMapEntry;
 
 public class WaitPolicyTestCase extends AbstractMuleTestCase
 {
-    private ExceptionCollectingThreadGroup _asyncGroup;
-    private ThreadPoolExecutor _executor;
-    private Lock _executorLock;
+    private ExceptionCollectingThreadGroup threadGroup;
+    private ThreadPoolExecutor executor;
+    private ReentrantLock executorLock;
 
     // @Override
     protected void doSetUp() throws Exception
@@ -40,62 +39,84 @@ public class WaitPolicyTestCase extends AbstractMuleTestCase
         super.doSetUp();
 
         // allow 1 active & 1 queued Thread
-        _executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue(1));
-        _executor.prestartAllCoreThreads();
+        executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue(1));
+        executor.prestartAllCoreThreads();
+
         // the lock must be fair to guarantee FIFO access to the executor;
         // 'synchronized' on a monitor is not good enough.
-        _executorLock = new ReentrantLock(true);
-        _asyncGroup = new ExceptionCollectingThreadGroup();
-        SleepyTask.activeTasks = new AtomicInteger(0);
+        executorLock = new ReentrantLock(true);
+
+        // this is a Threadgroup that collects uncaught exceptions. Necessary for JDK
+        // 1.4.x only.
+        threadGroup = new ExceptionCollectingThreadGroup();
+
+        // reset counter of active SleepyTasks
+        SleepyTask.activeTasks.set(0);
     }
 
     // @Override
     protected void doTearDown() throws Exception
     {
-        _executor.shutdown();
-        _asyncGroup.destroy();
+        executor.shutdown();
+        threadGroup.destroy();
         super.doTearDown();
     }
 
-    // Submit the given Runnable to an ExecutorService, but do so in a separate
-    // thread to avoid blocking the test case when the Executor's queue is full.
-    // Returns control to the caller when the thread has been started in
+    // Submit the given Runnables to an ExecutorService, but do so in separate
+    // threads to avoid blocking the test case when the Executors queue is full.
+    // Returns control to the caller when the threads have been started in
     // order to avoid OS-dependent delays in the control flow.
-    // The submitting thread waits on a fair Lock to guarantee FIFO ordering.
-    // At the time of return the Runnable may or may not be in the queue,
+    // A submitting thread waits on a fair Lock to guarantee FIFO ordering.
+    // At the time of return the Runnables may or may not be in the queue,
     // rejected, running or already finished. :-)
-    private Thread execute(final Runnable r) throws InterruptedException
+    protected LinkedList/* <Thread> */execute(final List/* <Runnable> */tasks) throws InterruptedException
     {
-        final Latch submitterIsRunning = new Latch();
-
-        Runnable submitterAction = new Runnable()
+        if (tasks == null || tasks.isEmpty())
         {
-            public void run()
+            throw new IllegalArgumentException("List<Runnable> must not be empty");
+        }
+
+        LinkedList submitters = new LinkedList();
+
+        executorLock.lock();
+
+        for (Iterator i = tasks.iterator(); i.hasNext();)
+        {
+            final Runnable task = (Runnable)i.next();
+
+            Runnable submitterAction = new Runnable()
             {
-                // signal start of submitter thread
-                submitterIsRunning.countDown();
+                public void run()
+                {
+                    // the lock is important because otherwise two submitters might
+                    // stumble over each other, submitting their runnables out-of-order
+                    // and causing test failures.
+                    try
+                    {
+                        executorLock.lock();
+                        executor.execute(task);
+                    }
+                    finally
+                    {
+                        executorLock.unlock();
+                    }
+                }
+            };
 
-                // the lock is REALLY important because otherwise two asynchronously
-                // started submitters might stumble over each other, submitting their
-                // runnables out-of-order and thus causing test failures.
-                try
-                {
-                    _executorLock.lock();
-                    _executor.execute(r);
-                }
-                finally
-                {
-                    _executorLock.unlock();
-                }
+            Thread submitter = new Thread(threadGroup, submitterAction);
+            submitter.setDaemon(true);
+            submitters.add(submitter);
+            submitter.start();
+
+            // wait until the thread is actually enqueued on the lock
+            while (submitter.isAlive() && !executorLock.hasQueuedThread(submitter))
+            {
+                Thread.sleep(10);
             }
-        };
+        }
 
-        Thread submitter = new Thread(_asyncGroup, submitterAction);
-        submitter.setDaemon(true);
-        submitter.start();
-
-        submitterIsRunning.await();
-        return submitter;
+        executorLock.unlock();
+        return submitters;
     }
 
     public void testWaitPolicyWithShutdownExecutor() throws Exception
@@ -103,19 +124,25 @@ public class WaitPolicyTestCase extends AbstractMuleTestCase
         assertEquals(0, SleepyTask.activeTasks.get());
 
         // wants to wait forever, but will fail immediately
-        _executor.setRejectedExecutionHandler(new LastRejectedWaitPolicy());
-        _executor.shutdown();
+        executor.setRejectedExecutionHandler(new LastRejectedWaitPolicy());
+        executor.shutdown();
 
-        // must fail immediately
-        Thread failedThread = this.execute(new SleepyTask("boo", 1000));
-        Thread.sleep(500);
+        // create a task
+        List tasks = new ArrayList();
+        tasks.add(new SleepyTask("rejected", 1000));
 
-        List exceptions = _asyncGroup.collectedExceptions();
+        // should fail and return immediately
+        LinkedList submitters = this.execute(tasks);
+        assertFalse(submitters.isEmpty());
+
+        // let submitted tasks run
+        Thread.sleep(1000);
+
+        LinkedList exceptions = threadGroup.collectedExceptions();
         assertEquals(1, exceptions.size());
 
-        Map.Entry threadFailure = (Map.Entry)exceptions.iterator().next();
-        assertNotNull(threadFailure);
-        assertEquals(failedThread, threadFailure.getKey());
+        Map.Entry threadFailure = (Map.Entry)((Map)(exceptions.getFirst())).entrySet().iterator().next();
+        assertEquals(submitters.getFirst(), threadFailure.getKey());
         assertEquals(RejectedExecutionException.class, threadFailure.getValue().getClass());
         assertEquals(0, SleepyTask.activeTasks.get());
     }
@@ -124,29 +151,27 @@ public class WaitPolicyTestCase extends AbstractMuleTestCase
     {
         assertEquals(0, SleepyTask.activeTasks.get());
 
-        // wait forever
+        // tasks wait forever
         LastRejectedWaitPolicy policy = new LastRejectedWaitPolicy(-1, TimeUnit.SECONDS);
-        _executor.setRejectedExecutionHandler(policy);
+        executor.setRejectedExecutionHandler(policy);
 
+        // create tasks
+        List tasks = new ArrayList();
         // task 1 runs immediately
-        this.execute(new SleepyTask("hans", 1000));
-
+        tasks.add(new SleepyTask("hans", 1000));
         // task 2 is queued
-        this.execute(new SleepyTask("franz", 1000));
-
+        tasks.add(new SleepyTask("franz", 1000));
         // task 3 is initially rejected but waits forever
-        Runnable s3 = new SleepyTask("beavis", 0);
-        this.execute(s3);
+        Runnable t3 = new SleepyTask("beavis", 1000);
+        tasks.add(t3);
 
-        // at least one task should have been queued
-        assertFalse(_executor.awaitTermination(5000, TimeUnit.MILLISECONDS));
-        assertEquals(s3, policy.lastRejectedRunnable());
-        assertEquals(0, SleepyTask.activeTasks.get());
+        // submit tasks
+        LinkedList submitters = this.execute(tasks);
+        assertFalse(submitters.isEmpty());
 
-        // shutdown & try again
-        _executor.shutdown();
-        assertTrue(_executor.awaitTermination(3000, TimeUnit.MILLISECONDS));
-        assertEquals(s3, policy.lastRejectedRunnable());
+        // the last task should have been queued
+        assertFalse(executor.awaitTermination(4000, TimeUnit.MILLISECONDS));
+        assertSame(t3, policy.lastRejectedRunnable());
         assertEquals(0, SleepyTask.activeTasks.get());
     }
 
@@ -156,57 +181,63 @@ public class WaitPolicyTestCase extends AbstractMuleTestCase
 
         // set a reasonable retry interval
         LastRejectedWaitPolicy policy = new LastRejectedWaitPolicy(2500, TimeUnit.MILLISECONDS);
-        _executor.setRejectedExecutionHandler(policy);
+        executor.setRejectedExecutionHandler(policy);
 
+        // create tasks
+        List tasks = new ArrayList();
         // task 1 runs immediately
-        this.execute(new SleepyTask("hans", 1000));
+        tasks.add(new SleepyTask("hans", 1000));
+        // task 2 is queued
+        tasks.add(new SleepyTask("franz", 1000));
+        // task 3 is initially rejected but will eventually succeed
+        Runnable t3 = new SleepyTask("tweety", 1000);
+        tasks.add(t3);
 
-        // 2 is queued
-        this.execute(new SleepyTask("franz", 1000));
+        // submit tasks
+        LinkedList submitters = this.execute(tasks);
+        assertFalse(submitters.isEmpty());
 
-        // 3 is initially rejected but will eventually succeed
-        Runnable s3 = new SleepyTask("tweety", 1000);
-        this.execute(s3);
-
-        assertFalse(_executor.awaitTermination(5000, TimeUnit.MILLISECONDS));
-        assertEquals(s3, policy.lastRejectedRunnable());
+        assertFalse(executor.awaitTermination(5000, TimeUnit.MILLISECONDS));
+        assertSame(t3, policy.lastRejectedRunnable());
         assertEquals(0, SleepyTask.activeTasks.get());
     }
 
-    // TODO HH: disabled since it still seems to fail occasionally =:(
-    // most likely the failure intervals just need to be adjusted..
-    public void _testWaitPolicyWithTimeoutFailure() throws Exception
+    public void testWaitPolicyWithTimeoutFailure() throws Exception
     {
         assertEquals(0, SleepyTask.activeTasks.get());
 
         // set a really short wait interval
-        long failureInterval = 100;
+        long failureInterval = 100L;
         LastRejectedWaitPolicy policy = new LastRejectedWaitPolicy(failureInterval, TimeUnit.MILLISECONDS);
-        _executor.setRejectedExecutionHandler(policy);
+        executor.setRejectedExecutionHandler(policy);
 
+        // create tasks
+        List tasks = new ArrayList();
         // task 1 runs immediately
-        this.execute(new SleepyTask("hans", 1000));
+        tasks.add(new SleepyTask("hans", 1000));
+        // task 2 is queued
+        tasks.add(new SleepyTask("franz", 1000));
+        // task 3 is initially rejected & will retry but should fail quickly
+        Runnable failedTask = new SleepyTask("tweety", 1000);
+        tasks.add(failedTask);
 
-        // 2 is queued
-        this.execute(new SleepyTask("franz", 1000));
+        // submit tasks
+        LinkedList submitters = this.execute(tasks);
+        assertFalse(submitters.isEmpty());
 
-        // 3 is initially rejected & will retry but should fail quickly
-        Runnable s3 = new SleepyTask("butthead", 1000);
-        Thread failedThread = this.execute(s3);
         // give failure a chance
         Thread.sleep(failureInterval * 2);
 
-        List exceptions = _asyncGroup.collectedExceptions();
+        LinkedList exceptions = threadGroup.collectedExceptions();
         assertEquals(1, exceptions.size());
 
-        Map.Entry threadFailure = (Map.Entry)exceptions.iterator().next();
-        assertNotNull(threadFailure);
-        assertEquals(failedThread, threadFailure.getKey());
+        Map.Entry threadFailure = (Map.Entry)((Map)(exceptions.getFirst())).entrySet().iterator().next();
+        assertEquals(submitters.getLast(), threadFailure.getKey());
         assertEquals(RejectedExecutionException.class, threadFailure.getValue().getClass());
 
-        _executor.shutdown();
-        assertTrue(_executor.awaitTermination(2500, TimeUnit.MILLISECONDS));
-        assertEquals(s3, policy.lastRejectedRunnable());
+        executor.shutdown();
+        assertTrue(executor.awaitTermination(2500, TimeUnit.MILLISECONDS));
+        assertSame(failedTask, policy.lastRejectedRunnable());
         assertEquals(0, SleepyTask.activeTasks.get());
     }
 
@@ -214,8 +245,8 @@ public class WaitPolicyTestCase extends AbstractMuleTestCase
 
 class LastRejectedWaitPolicy extends WaitPolicy
 {
-    // needed to hand the rejected Runnable back to the TestCase
-    private volatile Runnable _lastRejected;
+    // needed to hand the last rejected Runnable back to the TestCase
+    private volatile Runnable _rejected;
 
     public LastRejectedWaitPolicy()
     {
@@ -229,25 +260,24 @@ class LastRejectedWaitPolicy extends WaitPolicy
 
     public Runnable lastRejectedRunnable()
     {
-        return _lastRejected;
+        return _rejected;
     }
 
     // @Override
     public void rejectedExecution(Runnable r, ThreadPoolExecutor e)
     {
-        _lastRejected = r;
+        _rejected = r;
         super.rejectedExecution(r, e);
     }
-
 }
 
 // task to execute - just sleeps for the given interval
 class SleepyTask extends Object implements Runnable
 {
-    public static AtomicInteger activeTasks;
+    public static final AtomicInteger activeTasks = new AtomicInteger(0);
 
-    private final String _name;
-    private final long _sleepTime;
+    private final String name;
+    private final long sleepTime;
 
     public SleepyTask(String name, long sleepTime)
     {
@@ -256,14 +286,13 @@ class SleepyTask extends Object implements Runnable
             throw new IllegalArgumentException("SleepyTask needs a name!");
         }
 
-        _name = name;
-        _sleepTime = sleepTime;
+        this.name = name;
+        this.sleepTime = sleepTime;
     }
 
-    // @Override
     public String toString()
     {
-        return ClassUtils.getClassName(this.getClass()) + "{" + _name + ", " + _sleepTime + "}";
+        return this.getClass().getName() + '{' + name + ", " + sleepTime + '}';
     }
 
     public void run()
@@ -272,15 +301,16 @@ class SleepyTask extends Object implements Runnable
 
         try
         {
-            Thread.sleep(_sleepTime);
+            Thread.sleep(sleepTime);
         }
         catch (InterruptedException iex)
         {
             Thread.currentThread().interrupt();
-            throw new RuntimeException(iex);
         }
-
-        activeTasks.decrementAndGet();
+        finally
+        {
+            activeTasks.decrementAndGet();
+        }
     }
 
 }
@@ -288,24 +318,26 @@ class SleepyTask extends Object implements Runnable
 // ThreadGroup wrapper that collects uncaught exceptions
 class ExceptionCollectingThreadGroup extends ThreadGroup
 {
-    private final List _exceptions = Collections.synchronizedList(new LinkedList());
+    private final LinkedList/* <Map<Thread, Throwable>> */exceptions = new LinkedList();
 
     public ExceptionCollectingThreadGroup()
     {
-        super("asyncGroup");
+        super("ExceptionCollectingThreadGroup");
     }
 
-    // collected Map.Entry(Thread, Throwable) associations
-    public List collectedExceptions()
+    // collected Map(Thread, Throwable) associations
+    public LinkedList collectedExceptions()
     {
-        return _exceptions;
+        return exceptions;
     }
 
     // all uncaught Thread exceptions end up here
     // @Override
     public void uncaughtException(Thread t, Throwable e)
     {
-        _exceptions.add(new DefaultMapEntry(t, e));
+        synchronized (exceptions)
+        {
+            exceptions.add(Collections.singletonMap(t, e));
+        }
     }
-
 }

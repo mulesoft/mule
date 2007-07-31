@@ -12,7 +12,7 @@
     <!--<packaging>bundle</packaging>-->
     <name>SOAP Transport: Axis</name>
     <description>A Mule transport for Soap Connectivity using Axis.</description>
-    
+
     <build>
         <plugins>
               <plugin>
@@ -103,7 +103,7 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-        
+
         <dependency>
             <groupId>axis</groupId>
             <artifactId>axis</artifactId>
@@ -113,7 +113,7 @@
                 <exclusion>
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
-                </exclusion>                
+                </exclusion>
             </exclusions>
         </dependency>
         <!-- In Axis 1.4, this is a runtime dependency so we need to pull
@@ -133,7 +133,7 @@
                 <exclusion>
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
-                </exclusion>                
+                </exclusion>
             </exclusions>
         </dependency>
         <!-- needed by the Axis Service component -->
@@ -176,6 +176,12 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-acegi</artifactId>
             <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-core</artifactId>
+            <version>4.1.0-incubator</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

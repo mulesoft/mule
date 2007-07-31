@@ -26,16 +26,41 @@ import javax.jms.TextMessage;
 /**
  * <code>AbstractJmsTransactionFunctionalTest</code> is a base class for all JMS
  * based functional tests with or without transactions.
- * 
+ *
  * TODO Tests for BEGIN_OR_JOIN, ALWAYS_JOIN, JOIN_IF_POSSIBLE
  */
 public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFunctionalTestCase
 {
-    /** 
-     * A callback method will set this with the current tranaction while proceesing the event.  
+    public static final int SEND_NOT_TRANSACTED = 0x01;
+    public static final int SEND_TRANSACTED_ALWAYS = 0x02;
+    public static final int SEND_TRANSACTED_IF_POSSIBLE_WITH_TRANSACTION = 0x04;
+    public static final int SEND_TRANSACTED_IF_POSSIBLE_WITHOUT_TRANSACTION = 0x08;
+    public static final int SEND_TRANSACTED_ROLLBACK = 0x10;
+    public static final int CLEANUP = 0x20;
+    public static final int TRANSACTED_REDELIVERY_TO_DL_DESTINATION = 0x40;
+    public static final int ALL = 0xffff;
+
+    /**
+     * A callback method will set this with the current tranaction while proceesing the event.
      * The unit test can later verify whether the transaction has been committed or rolled back.
      */
     protected volatile UMOTransaction currentTx;
+    protected int exclusionFlag = 0;
+
+    protected void exclude(int flag)
+    {
+        exclusionFlag = flag;
+    }
+
+    protected boolean notExcluded(int flag)
+    {
+        boolean excluded = (flag & exclusionFlag) != 0;
+        if (excluded)
+        {
+            logger.warn("Excluding this test");
+        }
+        return ! excluded;
+    }
 
     protected String getConfigResources()
     {
@@ -68,7 +93,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
                 // Verify no transaction.
                 currentTx = context.getCurrentTransaction();
                 assertNull(currentTx);
-                
+
                 callbackCalled.countDown();
             }
         };
@@ -83,7 +108,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
 
         // Verify no transaction.
         assertNull(currentTx);
-        
+
         assertEquals(TEST_MESSAGE_RESPONSE, receiveTextMessage("component1Out"));
     }
 
@@ -134,7 +159,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
                 // Mark the transaction for rollback.
                 logger.info("@@@@ Rolling back transaction @@@@");
                 currentTx.setRollbackOnly();
-                
+
                 callbackCalled.countDown();
             }
         };
@@ -154,7 +179,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
         assertTrue(currentTx.isRolledBack());
 
         // Verify outbound message did _not_ get delivered.
-        assertNull("Transaction was rolled back, but message got delivered anyways.", 
+        assertNull("Transaction was rolled back, but message got delivered anyways.",
                    receive("component2Out", 1000));
     }
 
@@ -172,7 +197,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
                 // Mark the transaction for rollback.
                 logger.info("@@@@ Rolling back transaction @@@@");
                 currentTx.setRollbackOnly();
-                
+
                 callbackCalled.countDown();
             }
         };
@@ -192,7 +217,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
         assertTrue(currentTx.isRolledBack());
 
         // Verify outbound message did _not_ get delivered.
-        assertNull("Transaction was rolled back, but message got delivered anyways.", 
+        assertNull("Transaction was rolled back, but message got delivered anyways.",
                    receive("component3Out", 1000));
 
         // Verify message got sent to dead letter queue instead.
@@ -206,17 +231,17 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
         assertEquals("jms://dead.letter", dest);
     }
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
 //    public void testCleanup() throws Exception
 //    {
 //        assertNull("There should be no transaction associated with this thread",

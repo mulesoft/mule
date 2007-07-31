@@ -27,6 +27,15 @@ import javax.jms.TopicConnection;
 
 public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 {
+    public static final String DEFAULT_IN_QUEUE = "jms://in.q";
+    public static final String DEFAULT_OUT_QUEUE = "jms://out.q";
+    public static final String DEFAULT_DL_QUEUE = "jms://dlq";
+    public static final String DEFAULT_IN_TOPIC = "jms://topic:in.t";
+    public static final String DEFAULT_OUT_TOPIC = "jms://topic:out.t";
+    public static final String DEFAULT_DL_TOPIC = "jms://topic:dlt";
+    public static final String DEFAULT_MESSAGE = "Test Message";
+    public static final String CONNECTOR_NAME = "testConnector";
+    
     /** 
      * Default timeout for reading from a JMS queue/topic.  The higher this value, the more 
      * reliable the test will be, so it should be set high for Continuous Integration.  However, 

@@ -173,12 +173,17 @@ public class UniversalSender extends BasicHandler
             {
                 props = AxisCleanAndAddProperties.cleanAndAdd(RequestContext.getEventContext());
             }
-
-            if (call.useSOAPAction())
+            
+            // with jms and vm the default SOAPAction will result in the name of the endpoint, which we may not necessarily want. This should be set manually on the endpoint
+            String scheme = requestEndpoint.getEndpointURI().getScheme(); 
+            if (!("vm".equalsIgnoreCase(scheme) || "jms".equalsIgnoreCase(scheme)))
             {
-                uri = call.getSOAPActionURI();
+                if (call.useSOAPAction())
+                {
+                    uri = call.getSOAPActionURI();
+                }
+                props.put("SOAPAction", uri);
             }
-            props.put("SOAPAction", uri);
             if (contentLength > 0)
             {
                 props.put(HttpConstants.HEADER_CONTENT_LENGTH, Integer.toString(contentLength)); // necessary

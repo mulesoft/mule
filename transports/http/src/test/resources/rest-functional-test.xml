@@ -11,7 +11,7 @@
         
     </connector>
     
-	<model name="REST">
+    <model name="REST">
         
         <mule-descriptor name="RESTServiceWrapper1" implementation="org.mule.components.rest.RestServiceWrapper">
             <inbound-router>

@@ -30,6 +30,7 @@
                         <exclude>**/XFireWsdlTestCase.java</exclude>
                         <!-- Makes for cyclic dependency with axis ... hold for now -->
                         <exclude>**/XFireServiceUsingAxisEndpointTestCase.java</exclude>
+                        <exclude>**/ComplexTypeMethodTestCase.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>
