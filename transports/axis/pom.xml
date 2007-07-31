@@ -43,6 +43,7 @@
                         <exclude>**/AxisConnectorJmsFunctionalTestCase.java</exclude>
                         <exclude>**/AxisConnectorJmsTopicsFunctionalTestCase.java</exclude>
                         <exclude>**/SoapAttachmentsFunctionalTestCase.java</exclude>
+                        <exclude>**/AxisConnectorJmsEndpointFormatTestCase.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>
