@@ -590,8 +590,8 @@
     <!--==============================================================-->
 
 
-	<xsd:complexType name="connectorType">
-		<xsd:group ref="connectorElements"/>
+    <xsd:complexType name="connectorType">
+        <xsd:group ref="connectorElements"/>
         <xsd:attributeGroup ref="connectorAttributes"/>
     </xsd:complexType>
     <xsd:attributeGroup name="connectorAttributes">
@@ -666,9 +666,9 @@
 
     <xsd:complexType name="customConnectorType">
         <!--
-        MULE-2091 / MULE-2093: Don't extend "connectorType" as this results in elements in "connectorElements" group being included
-        twice which violates the xml schema "Unique Particle Attribution" rule and results in "non-deterministic content model"
-        errors with some parsers/validators.
+        MULE-2091 / MULE-2093: Don't extend "connectorType" as this results in elements in "connectorElements" group 
+        being included twice which violates the xml schema "Unique Particle Attribution" rule and results in 
+        "non-deterministic content model" errors with some parsers/validators.
         <xsd:complexContent>
             <xsd:extension base="connectorType">
         -->
