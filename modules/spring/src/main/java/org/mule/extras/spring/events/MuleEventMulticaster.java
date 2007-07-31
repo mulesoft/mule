@@ -379,9 +379,9 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
     /**
      * Matches a subscription to the current event endpointUri
      * 
-     * @param endpoint
-     * @param subscriptions
-     * @return
+     * @param endpoint endpoint
+     * @param subscriptions subscriptions
+     * @return true if there's a match
      */
     private boolean isSubscriptionMatch(String endpoint, String[] subscriptions)
     {
@@ -472,7 +472,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
      */
     protected void dispatchEvent(MuleApplicationEvent applicationEvent) throws ApplicationEventException
     {
-        UMOEndpoint endpoint = null;
+        UMOEndpoint endpoint;
         try
         {
             endpoint = managementContext.getRegistry().getOrCreateEndpointForUri(applicationEvent.getEndpoint(),
@@ -530,7 +530,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
     /**
      * Set the current Spring application context
      * 
-     * @param applicationContext
+     * @param applicationContext application context
      * @throws BeansException
      */
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
@@ -692,7 +692,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
         // register any endpointUri mappings
         if (endpointMappings != null)
         {
-            Map.Entry entry = null;
+            Map.Entry entry;
             for (Iterator iterator = endpointMappings.entrySet().iterator(); iterator.hasNext();)
             {
                 entry = (Map.Entry)iterator.next();
@@ -828,7 +828,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                 setSubscriptionFilter(WildcardFilter.class);
             }
             ObjectFilter filter = (ObjectFilter)ClassUtils.instanciateClass(getSubscriptionFilter(),
-                new Object[]{pattern});
+                new Object[] {pattern});
             return filter;
         }
         catch (Exception e)
