@@ -6,7 +6,7 @@
 
 <mule-configuration version="1.0">
 
-    <mule-environment-properties serverUrl=""/>
+    <mule-environment-properties/>
 
 
     <container-context

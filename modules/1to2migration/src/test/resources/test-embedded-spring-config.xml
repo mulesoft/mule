@@ -4,7 +4,7 @@
                                 "http://mule.mulesource.org/dtds/mule-configuration.dtd">
 
 <mule-configuration id="endpoint_test" version="1.0">
-    <mule-environment-properties serverUrl=""/>
+    <mule-environment-properties/>
     
     <container-context className="org.mule.extras.spring.SpringContainerContext">
         <properties>
