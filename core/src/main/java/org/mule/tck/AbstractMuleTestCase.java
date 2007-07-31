@@ -361,7 +361,7 @@ public abstract class AbstractMuleTestCase extends TestCase
         // template method
     }
 
-   protected void doTearDown() throws Exception
+    protected void doTearDown() throws Exception
     {
         // template method
     }
