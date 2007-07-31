@@ -11,8 +11,6 @@ package org.mule.providers.udp;
 
 import org.mule.tck.FunctionalTestCase;
 
-import junit.framework.Assert;
-
 /**
  * TODO
  */
@@ -28,12 +26,12 @@ public class UdpNamespaceHandlerTestCase extends FunctionalTestCase
         UdpConnector c = (UdpConnector)managementContext.getRegistry().lookupConnector("udpConnector");
         assertNotNull(c);
 
-        Assert.assertEquals(1234, c.getReceiveBufferSize());
-        Assert.assertEquals(2345, c.getReceiveTimeout());
-        Assert.assertEquals(3456, c.getSendBufferSize());
-        Assert.assertEquals(4567, c.getSendTimeout());
-        Assert.assertEquals(true, c.isBroadcast());
-        Assert.assertEquals(false, c.isKeepSendSocketOpen());
+        assertEquals(1234, c.getReceiveBufferSize());
+        assertEquals(2345, c.getReceiveTimeout());
+        assertEquals(3456, c.getSendBufferSize());
+        assertEquals(4567, c.getSendTimeout());
+        assertEquals(true, c.isBroadcast());
+        assertEquals(false, c.isKeepSendSocketOpen());
 
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());

@@ -11,8 +11,6 @@ package org.mule.providers.multicast;
 
 import org.mule.tck.FunctionalTestCase;
 
-import junit.framework.Assert;
-
 /**
  * TODO
  */
@@ -28,14 +26,14 @@ public class MulticastNamespaceHandlerTestCase extends FunctionalTestCase
         MulticastConnector c = (MulticastConnector)managementContext.getRegistry().lookupConnector("multicastConnector");
         assertNotNull(c);
 
-        Assert.assertEquals(1234, c.getReceiveBufferSize());
-        Assert.assertEquals(2345, c.getReceiveTimeout());
-        Assert.assertEquals(3456, c.getSendBufferSize());
-        Assert.assertEquals(4567, c.getSendTimeout());
-        Assert.assertEquals(5678, c.getTimeToLive());
-        Assert.assertEquals(true, c.isBroadcast());
-        Assert.assertEquals(true, c.isLoopback());
-        Assert.assertEquals(false, c.isKeepSendSocketOpen());
+        assertEquals(1234, c.getReceiveBufferSize());
+        assertEquals(2345, c.getReceiveTimeout());
+        assertEquals(3456, c.getSendBufferSize());
+        assertEquals(4567, c.getSendTimeout());
+        assertEquals(5678, c.getTimeToLive());
+        assertEquals(true, c.isBroadcast());
+        assertEquals(true, c.isLoopback());
+        assertEquals(false, c.isKeepSendSocketOpen());
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());
     }

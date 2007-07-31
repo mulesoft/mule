@@ -12,8 +12,6 @@ package org.mule.providers.xmpp;
 
 import org.mule.tck.FunctionalTestCase;
 
-import junit.framework.Assert;
-
 public class XmppNamespaceHandlerTestCase extends FunctionalTestCase
 {
     protected String getConfigResources()
@@ -26,6 +24,6 @@ public class XmppNamespaceHandlerTestCase extends FunctionalTestCase
         XmppConnector connector = 
             (XmppConnector)managementContext.getRegistry().lookupConnector("xmppConnector");
         
-        Assert.assertNotNull(connector);
+        assertNotNull(connector);
     }
 }

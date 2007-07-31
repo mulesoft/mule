@@ -14,8 +14,6 @@ import org.mule.providers.soap.axis.mock.MockAxisServer;
 import org.mule.providers.soap.axis.mock.MockProvider;
 import org.mule.tck.FunctionalTestCase;
 
-import junit.framework.Assert;
-
 public class AxisNamespaceHandlerTestCase extends FunctionalTestCase
 {   
     protected String getConfigResources()
@@ -28,16 +26,16 @@ public class AxisNamespaceHandlerTestCase extends FunctionalTestCase
         AxisConnector connector = 
             (AxisConnector)managementContext.getRegistry().lookupConnector("axisConnector");
         
-        Assert.assertNotNull(connector);
-        Assert.assertEquals("test-axis-config.wsdd", connector.getServerConfig());
-        Assert.assertEquals("test-axis-config.wsdd", connector.getClientConfig());
-        Assert.assertFalse(connector.isTreatMapAsNamedParams());
-        Assert.assertFalse(connector.isDoAutoTypes());
-        Assert.assertEquals(2, connector.getBeanTypes().size());
-        Assert.assertTrue(connector.getBeanTypes().contains("org.mule.tck.testmodels.fruit.Apple"));
-        Assert.assertTrue(connector.getBeanTypes().contains("org.mule.tck.testmodels.fruit.Banana"));
-        Assert.assertEquals(1, connector.getSupportedSchemes().size());
-        Assert.assertEquals("http", connector.getSupportedSchemes().get(0));
+        assertNotNull(connector);
+        assertEquals("test-axis-config.wsdd", connector.getServerConfig());
+        assertEquals("test-axis-config.wsdd", connector.getClientConfig());
+        assertFalse(connector.isTreatMapAsNamedParams());
+        assertFalse(connector.isDoAutoTypes());
+        assertEquals(2, connector.getBeanTypes().size());
+        assertTrue(connector.getBeanTypes().contains("org.mule.tck.testmodels.fruit.Apple"));
+        assertTrue(connector.getBeanTypes().contains("org.mule.tck.testmodels.fruit.Banana"));
+        assertEquals(1, connector.getSupportedSchemes().size());
+        assertEquals("http", connector.getSupportedSchemes().get(0));
     }
 
     public void testInjectedObjects()
@@ -45,9 +43,9 @@ public class AxisNamespaceHandlerTestCase extends FunctionalTestCase
         AxisConnector connector = 
             (AxisConnector)managementContext.getRegistry().lookupConnector("axisConnector2");
 
-        Assert.assertNotNull(connector);
-        Assert.assertEquals(MockAxisServer.class, connector.getAxisServer().getClass());
-        Assert.assertEquals(MockProvider.class, connector.getClientProvider().getClass());
+        assertNotNull(connector);
+        assertEquals(MockAxisServer.class, connector.getAxisServer().getClass());
+        assertEquals(MockProvider.class, connector.getClientProvider().getClass());
     }
 }
 
