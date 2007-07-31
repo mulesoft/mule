@@ -18,8 +18,6 @@ import org.mule.umo.manager.UMOServerNotification;
  * starting occurs. The payload of this event will always be a reference to the
  *managementContext.
  *
- * @see org.mule.MuleManager
- * @see org.mule.umo.manager.UMOManager
  */
 public class ManagerNotification extends UMOServerNotification implements BlockingServerEvent
 {
