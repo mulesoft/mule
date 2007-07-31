@@ -590,14 +590,15 @@
     <!--==============================================================-->
 
 
-    <xsd:complexType name="connectorType">
-        <xsd:group ref="connectorElements"/>
-
-        <xsd:attribute name="name" type="xsd:string" use="required"/>
-        <xsd:attribute name="createDispatcherPerRequest" type="substitutableBoolean"/>
-        <xsd:attribute name="createMultipleTransactedReceivers" type="substitutableBoolean"/>
-    </xsd:complexType>
-
+	<xsd:complexType name="connectorType">
+		<xsd:group ref="connectorElements"/>
+        <xsd:attributeGroup ref="connectorAttributes"/>
+	</xsd:complexType>
+    <xsd:attributeGroup name="connectorAttributes">
+		<xsd:attribute name="name" type="xsd:string" use="required"/>
+		<xsd:attribute name="createDispatcherPerRequest" type="substitutableBoolean"/>
+		<xsd:attribute name="createMultipleTransactedReceivers" type="substitutableBoolean"/>
+    </xsd:attributeGroup>
     <xsd:group name="connectorElements">
         <xsd:sequence>
             <xsd:element name="receiver-threading-profile" type="threadingProfileType" minOccurs="0"
@@ -663,20 +664,28 @@
     <!-- Custom connector element -->
     <xsd:element name="custom-connector" type="customConnectorType" />
 
-    <xsd:complexType name="customConnectorType">
-        <xsd:complexContent>
-            <xsd:extension base="connectorType">
-                <xsd:sequence>
-                    <xsd:element name="property" type="propertyType" minOccurs="0" maxOccurs="unbounded"/>
-                    <!-- RM*: after much experimentation I couldn't get custom-connector to extend connectorType and add
-                     more elements without the parser complaining. Instead I separated the connector elements into their
-                     own group and reference them from this type and the connectorType. -->
-                    <xsd:group ref="connectorElements"/>
-                </xsd:sequence>
-                <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
+	<xsd:complexType name="customConnectorType">
+	    <!--
+        MULE-2091 / MULE-2093: Don't extend "connectorType" as this results in elements in "connectorElements" group being included
+        twice which violates the xml schema "Unique Particle Attribution" rule and results in "non-deterministic content model"
+        errors with some parsers/validators.
+      	<xsd:complexContent>
+			<xsd:extension base="connectorType">
+        -->
+		<xsd:sequence>
+			<xsd:element name="property" type="propertyType" minOccurs="0" maxOccurs="unbounded"/>
+			<!-- RM*: after much experimentation I couldn't get custom-connector to extend connectorType and add
+             more elements without the parser complaining. Instead I separated the connector elements into their
+             own group and reference them from this type and the connectorType. See above.-->
+			<xsd:group ref="connectorElements"/>
+		</xsd:sequence>
+		<xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
+        <xsd:attributeGroup ref="connectorAttributes"/>
+		<!--
             </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
+		</xsd:complexContent>
+        -->
+	</xsd:complexType>
 
 
     <!--==============================================================-->
