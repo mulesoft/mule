@@ -29,12 +29,13 @@ public class EmbeddedBeansXmlTestCase extends AbstractMuleTestCase
     //@java.lang.Override
     protected UMOManagementContext createManagementContext() throws Exception
     {
+        // not required
         return null;
     }
 
     public void testEmbeddedXmlNotSupported() throws Exception
     {
-         ConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
+        ConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
         try
         {
             builder.configure(getConfigResources(), null);

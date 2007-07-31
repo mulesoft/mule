@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+
+<mule-configuration version="1.0">
+
+    <mule-environment-properties serverUrl=""/>
+
+    <container-context
+            name="spring"
+            className="org.mule.extras.spring.SpringContainerContext">
+        <properties>
+            <property name="configResources" value="test-application-context.xml,test-application-context-2.xml"/>
+        </properties>
+    </container-context>
+
+    <model name="MultiSpringContextModel" />
+
+</mule-configuration>

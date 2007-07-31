@@ -67,7 +67,7 @@ public abstract class AbstractContainerContextTestCase extends AbstractMuleTestC
     /**
      * Usage 2: the implementation reference on the descriptor is to a component in
      * the container
-     * 
+     *
      * @throws Exception
      */
     public void testExternalUMOReference() throws Exception
@@ -87,6 +87,7 @@ public abstract class AbstractContainerContextTestCase extends AbstractMuleTestC
         assertNotNull(container);
         container.initialise();
         descriptor.initialise();
+        FruitBowl fruitBowl = (FruitBowl) container.getComponent(getFruitBowlComponentName());
         fail("Need to figure out whether this test is relevant for Mule 2.0");
         // TODO MULE-1908
         return null;
@@ -104,4 +105,8 @@ public abstract class AbstractContainerContextTestCase extends AbstractMuleTestC
 
     public abstract UMOContainerContext getContainerContext() throws ConfigurationException;
 
+    protected String getFruitBowlComponentName()
+    {
+        return FruitBowl.class.getName();
+    }
 }

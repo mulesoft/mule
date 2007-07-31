@@ -10,9 +10,12 @@
 
 package org.mule.config;
 
+import org.mule.util.IOUtils;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 
 import org.springframework.core.io.AbstractResource;
@@ -49,6 +52,11 @@ public class CachedResource extends AbstractResource
     {
         this.buffer = source;
         this.description = description;
+    }
+
+    public CachedResource(Reader reader, String encoding) throws IOException
+    {
+        this(IOUtils.toByteArray(reader, encoding), DEFAULT_DESCRIPTION);
     }
 
     public String getDescription()

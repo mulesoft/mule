@@ -10,88 +10,54 @@
 
 package org.mule.extras.spring;
 
-import org.mule.RegistryContext;
 import org.mule.config.CachedResource;
 import org.mule.config.ConfigurationException;
-import org.mule.config.ReaderInputStream;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.config.i18n.MessageFactory;
+import org.mule.config.spring.MuleApplicationContext;
 import org.mule.impl.container.AbstractContainerContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.ContainerException;
 import org.mule.umo.manager.ObjectNotFoundException;
-import org.mule.util.ClassUtils;
+import org.mule.util.ArrayUtils;
+import org.mule.util.StringUtils;
 
+import java.io.IOException;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.xml.XmlBeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.context.support.FileSystemXmlApplicationContext;
-import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 
 /**
- * Provides an acess facade to the Spring bean factory
- * @deprecated No longer required in Mule 2.0 since Mule's Xml configuration is based on Spring
- * TODO MULE-1908
+ * <code>SpringContainerContext</code> is a Spring Context that can expose
+ * spring-managed components for use in the Mule framework.
  */
-public class SpringContainerContext extends AbstractContainerContext
+public class SpringContainerContext extends AbstractContainerContext implements BeanFactoryAware
 {
     public static final String SPRING_DOCTYPE_REF = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE beans PUBLIC \"-//SPRING//DTD BEAN//EN\" \"http://www.springframework.org/dtd/spring-beans.dtd\">\n";
-    public static final String DEFAULT_CONTAINER_NAME = "spring";
 
     /**
-     * the application contect to use when resolving components
+     * the application context to use when resolving components
      */
     protected BeanFactory beanFactory;
 
     protected BeanFactory externalBeanFactory;
 
-    protected String configFile;
+    /** One or more Spring XML config files */
+    protected String configResources;
 
-    protected String configuration = null;
+    /** The Spring XML itself */
+    protected String configXml;
 
     public SpringContainerContext()
     {
-        super(DEFAULT_CONTAINER_NAME);
+        super("spring");
     }
 
-    /**
-     * Sets the spring application context used to build components
-     *
-     * @param beanFactory the context to use
-     */
-    public void setBeanFactory(BeanFactory beanFactory)
-    {
-        this.beanFactory = beanFactory;
-    }
-
-    public void setExternalBeanFactory(BeanFactory factory)
-    {
-        this.externalBeanFactory = factory;
-    }
-
-    /**
-     * The spring application context used to build components
-     *
-     * @return spring application context
-     */
-    public BeanFactory getBeanFactory()
-    {
-        if (externalBeanFactory != null)
-        {
-            return externalBeanFactory;
-        }
-        return beanFactory;
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.model.UMOContainerContext#getComponent(java.lang.Object)
-     */
     public Object getComponent(Object key) throws ObjectNotFoundException
     {
         if (getBeanFactory() == null)
@@ -129,84 +95,49 @@ public class SpringContainerContext extends AbstractContainerContext
         }
     }
 
-    public String getConfigFile()
+    //@Override
+    public void configure(Reader reader) throws ContainerException
     {
-        return configFile;
-    }
-
-    /**
-     * @param configFile The configFile to set.
-     */
-    public void setConfigFile(String configFile) throws ConfigurationException
-    {
-        this.configFile = configFile;
-    }
-
-    public void configure(Reader configuration) throws ContainerException
-    {
-        BeanFactory bf = new XmlBeanFactory(new InputStreamResource(new ReaderInputStream(configuration)));
-        setExternalBeanFactory(bf);
-    }
-
-    /**
-     * Configure Spring by passing an in-memory XML Spring config.
-     *
-     * @param configurationXmlAsString XML config contents
-     * @throws ContainerException in case of any error
-     */
-    public void configure(String configurationXmlAsString) throws ContainerException
-    {
-        final String encoding = RegistryContext.getConfiguration().getDefaultEncoding();
-        try
+        Resource[] resources;
+        try 
         {
-            BeanFactory bf = new XmlBeanFactory(new CachedResource(configurationXmlAsString, encoding));
-            setExternalBeanFactory(bf);
+            final String encoding = managementContext.getRegistry().getConfiguration().getDefaultEncoding();
+            resources = new Resource[]{ new CachedResource(reader, encoding)};
         }
-        catch (UnsupportedEncodingException e)
+        catch (IOException e)
         {
-            throw new ContainerException(CoreMessages.failedToConvertStringUsingEncoding(encoding), e);
+            throw new ContainerException(MessageFactory.createStaticMessage("Unable to read resource"), e);
         }
+        setExternalBeanFactory(new MuleApplicationContext(resources));
     }
 
     public void initialise() throws InitialisationException
     {
-        if (configFile == null)
+        // Load Spring XML in-memory
+        if (configXml != null)
         {
-            if (configuration != null)
+            final String encoding = managementContext.getRegistry().getConfiguration().getDefaultEncoding();
+            Resource[] resources;
+            try 
             {
-                try
-                {
-                    configure(configuration);
-                    return;
-                }
-                catch (ContainerException e)
-                {
-                    throw new InitialisationException(e, this);
-                }
+                resources = new Resource[]{new CachedResource(configXml, encoding)};
             }
-            else
+            catch (UnsupportedEncodingException e)
             {
-                return;
+                throw new InitialisationException(CoreMessages.failedToConvertStringUsingEncoding(encoding), e, this);
             }
+            setExternalBeanFactory(new MuleApplicationContext(resources));
         }
 
-        try
-        {
-            if (ClassUtils.getResource(configFile, getClass()) == null)
+        // Load Spring XML from one or more config files
+        else if (configResources != null)
+        {        
+            String[] resources = StringUtils.splitAndTrim(configResources, ",");
+            if (logger.isDebugEnabled())
             {
-                logger.warn("Spring config resource: " + configFile
-                            + " not found on class path, attempting to load it from local file");
-                setExternalBeanFactory(new FileSystemXmlApplicationContext(configFile));
+                logger.debug("There is/are " + resources.length + " configuration resource(s): " + ArrayUtils.toString(resources));
             }
-            else
-            {
-                logger.info("Loading Spring config from classpath, resource is: " + configFile);
-                setExternalBeanFactory(new ClassPathXmlApplicationContext(configFile));
-            }
-        }
-        catch (BeansException e)
-        {
-            throw new InitialisationException(new ConfigurationException(CoreMessages.failedToLoad("Application Context: " + configFile), e), this);
+            setExternalBeanFactory(new MuleApplicationContext(resources));
         }
     }
 
@@ -217,16 +148,96 @@ public class SpringContainerContext extends AbstractContainerContext
             ((ConfigurableApplicationContext)externalBeanFactory).close();
         }
         super.dispose();
-
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    // Getters and Setters
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    
+    /**
+     * The spring application context used to build components
+     * 
+     * @return spring application context
+     */
+    public BeanFactory getBeanFactory()
+    {
+        if (externalBeanFactory != null)
+        {
+            return externalBeanFactory;
+        }
+        return beanFactory;
+    }
+
+    /**
+     * Sets the spring application context used to build components
+     * 
+     * @param beanFactory the context to use
+     */
+    public void setBeanFactory(BeanFactory beanFactory)
+    {
+        this.beanFactory = beanFactory;
+    }
+
+    public void setExternalBeanFactory(BeanFactory factory)
+    {
+        this.externalBeanFactory = factory;
+    }
+
+    /** The Spring XML itself */
+    public String getConfigXml()
+    {
+        return configXml;
+    }
+
+    /** The Spring XML itself */
+    public void setConfigXml(String configXml)
+    {
+        this.configXml = configXml;
+    }
+
+    /** 
+     * The Spring XML itself.
+     * @deprecated use getConfigXml() instead 
+     */
     public String getConfiguration()
     {
-        return configuration;
+        return configXml;
     }
 
+    /** 
+     * The Spring XML itself.
+     * @deprecated use setConfigXml() instead 
+     */
     public void setConfiguration(String configuration)
     {
-        this.configuration = configuration;
+        this.configXml = configuration;
+    }
+
+    /** One or more Spring XML config files */
+    public String getConfigResources()
+    {
+        return configResources;
+    }
+
+    /** One or more Spring XML config files */
+    public void setConfigResources(String configResources)
+    {
+        this.configResources = configResources;
+    }
+
+    /**
+     * @deprecated use getConfigResources() instead
+     */
+    public String getConfigFile()
+    {
+        return configResources;
+    }
+
+    /**
+     * @deprecated use setConfigResources() instead
+     */
+    public void setConfigFile(String configFile) throws ConfigurationException
+    {
+        this.configResources = configFile;
     }
 }

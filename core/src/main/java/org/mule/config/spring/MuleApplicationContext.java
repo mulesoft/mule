@@ -20,33 +20,35 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.AbstractBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractXmlApplicationContext;
+import org.springframework.core.io.Resource;
 
 /**
- * <code>MuleApplicationContext</code> is a simple extension Application context
+ * <code>MuleApplicationContext</code> is A Simple extension Application context
  * that allows rosurces to be loaded from the Classpath of file system using the
  * MuleBeanDefinitionReader.
  *
- * @see MuleBeanDefinitionReader
  */
 public class MuleApplicationContext extends AbstractXmlApplicationContext
 {
     public static final String LEGACY_BEAN_READER_CLASS = "org.mule.config.spring.MuleBeanDefinitionReader";
 
+    private final Resource[] configResources;
     private final String[] configLocations;
 
-
-    public MuleApplicationContext(ApplicationContext parent, String[] configLocations)
+    public MuleApplicationContext(Resource[] configResources)
     {
-        super(parent);
-        this.configLocations = configLocations;
-        refresh();
+        this(configResources, true);
     }
 
-    public MuleApplicationContext(String configLocation)
+    public MuleApplicationContext(Resource[] configResources, boolean refresh) throws BeansException
     {
-        this(new String[]{configLocation});
+        this.configResources = configResources;
+        this.configLocations = null;
+        if (refresh)
+        {
+            refresh();
+        }
     }
 
     public MuleApplicationContext(String[] configLocations)
@@ -57,12 +59,20 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
     public MuleApplicationContext(String[] configLocations, boolean refresh) throws BeansException
     {
         this.configLocations = configLocations;
+        this.configResources = null;
         if (refresh)
         {
             refresh();
         }
     }
 
+    //@Override
+    protected Resource[] getConfigResources()
+    {
+        return configResources;
+    }
+
+    //@Override
     protected String[] getConfigLocations()
     {
         return configLocations;
@@ -70,16 +80,16 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
 
     protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException
     {
-        XmlBeanDefinitionReader beanDefinitionReader = null;
+        XmlBeanDefinitionReader beanDefinitionReader;
 
         //If the migration module is on the classpath, lets use the MuleBeanDefinitionReader, that allws use
         //to process Mule 1.x configuration as well as Mule 2.x.
-        if(ClassUtils.isClassOnPath(LEGACY_BEAN_READER_CLASS, getClass()))
+        if (ClassUtils.isClassOnPath(LEGACY_BEAN_READER_CLASS, getClass()))
         {
             try
             {
-                beanDefinitionReader = (XmlBeanDefinitionReader)ClassUtils.instanciateClass(
-                        LEGACY_BEAN_READER_CLASS, new Object[]{beanFactory, configLocations});
+                beanDefinitionReader = (XmlBeanDefinitionReader) ClassUtils.instanciateClass(
+                        LEGACY_BEAN_READER_CLASS, new Object[] {beanFactory, configLocations});
             }
             catch (Exception e)
             {
@@ -96,18 +106,18 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
         beanDefinitionReader.loadBeanDefinitions(configLocations);
 
     }
+
     public UMOManagementContext getManagementContext()
     {
-        return (UMOManagementContext)getBeanFactory().getBean(MuleProperties.OBJECT_MANAGMENT_CONTEXT);
+        return (UMOManagementContext) getBeanFactory().getBean(MuleProperties.OBJECT_MANAGMENT_CONTEXT);
 
     }
-
 
     //@Override
     protected DefaultListableBeanFactory createBeanFactory()
     {
         //Copy all postProcessors defined in the defaultMuleConfig so that they get applied to the child container
-        DefaultListableBeanFactory bf = super.createBeanFactory(); 
+        DefaultListableBeanFactory bf = super.createBeanFactory();
         if(getParent()!=null)
         {
             //Copy over all processors

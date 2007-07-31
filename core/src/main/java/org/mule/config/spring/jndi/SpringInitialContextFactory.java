@@ -91,6 +91,6 @@ public class SpringInitialContextFactory implements InitialContextFactory
 
     protected BeanFactory createContext(Resource resource) {
         log.info("Loading JNDI context from: " + resource);
-        return new MuleApplicationContext(resource.getFilename());
+        return new MuleApplicationContext(new Resource[] {resource});
     }
 }

@@ -276,7 +276,7 @@ public abstract class AbstractMuleTestCase extends TestCase
     {
         //This will create the local registry too
 //        ApplicationContext ctx = new ClassPathXmlApplicationContext("default-mule-config.xml");
-        ApplicationContext ctx = new MuleApplicationContext("default-mule-config.xml");
+        ApplicationContext ctx = new MuleApplicationContext(new String[] {"default-mule-config.xml"});
 
         UMOManagementContext managementContext = (UMOManagementContext)ctx.getBean(MuleProperties.OBJECT_MANAGMENT_CONTEXT);
         //Add a default model for compoennts to run in
