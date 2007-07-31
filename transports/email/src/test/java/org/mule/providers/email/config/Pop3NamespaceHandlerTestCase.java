@@ -28,6 +28,7 @@ public class Pop3NamespaceHandlerTestCase extends FunctionalTestCase
         Pop3Connector c = (Pop3Connector)managementContext.getRegistry().lookupConnector("pop3Connector");
         assertNotNull(c);
 
+        assertTrue(c.isBackupEnabled());
         assertEquals("newBackup", c.getBackupFolder());
         assertEquals(1234, c.getCheckFrequency());
         assertEquals("newMailbox", c.getMailboxFolder());
@@ -45,6 +46,7 @@ public class Pop3NamespaceHandlerTestCase extends FunctionalTestCase
         Pop3sConnector c = (Pop3sConnector)managementContext.getRegistry().lookupConnector("pop3sConnector");
         assertNotNull(c);
 
+        assertTrue(c.isBackupEnabled());
         assertEquals("newBackup", c.getBackupFolder());
         assertEquals(1234, c.getCheckFrequency());
         assertEquals("newMailbox", c.getMailboxFolder());

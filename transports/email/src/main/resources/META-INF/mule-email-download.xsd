@@ -17,6 +17,13 @@
     <xsd:complexType name="emailDownloadConnectorType">
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
+                <xsd:attribute name="backupEnabled" type="mule:substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Should we save copies to backupFolder (default is false)?
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="backupFolder" type="xsd:NMTOKEN">
                     <xsd:annotation>
                         <xsd:documentation>

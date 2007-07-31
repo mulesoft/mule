@@ -11,20 +11,22 @@
        http://www.mulesource.org/schema/mule/imaps/2.0 http://www.mulesource.org/schema/mule/imaps/2.0/mule-imaps.xsd">
 
     <imap:connector name="imapConnector"
-                   backupFolder="newBackup"
-                   checkFrequency="1234"
-                   mailboxFolder="newMailbox"
-                   deleteReadMessages="false"
+                    backupEnabled="true"
+                    backupFolder="newBackup"
+                    checkFrequency="1234"
+                    mailboxFolder="newMailbox"
+                    deleteReadMessages="false"
             />
 
     <!-- need to revisit this once tests are working - it's not clear to me what
          key store is being used in the tests -->
 
     <imaps:connector name="imapsConnector"
-                   backupFolder="newBackup"
-                   checkFrequency="1234"
-                   mailboxFolder="newMailbox"
-                   deleteReadMessages="false">
+                     backupEnabled="false"
+                     backupFolder="newBackup"
+                     checkFrequency="1234"
+                     mailboxFolder="newMailbox"
+                     deleteReadMessages="false">
         <imaps:tls-client clientKeyStore="greenmail-truststore"
                           clientKeyStorePassword="password"/>
         <imaps:tls-trust-store trustStore="greenmail-truststore"

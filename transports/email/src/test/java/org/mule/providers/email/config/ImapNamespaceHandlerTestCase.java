@@ -28,6 +28,7 @@ public class ImapNamespaceHandlerTestCase extends FunctionalTestCase
         ImapConnector c = (ImapConnector)managementContext.getRegistry().lookupConnector("imapConnector");
         assertNotNull(c);
 
+        assertTrue(c.isBackupEnabled());
         assertEquals("newBackup", c.getBackupFolder());
         assertEquals(1234, c.getCheckFrequency());
         assertEquals("newMailbox", c.getMailboxFolder());
@@ -44,6 +45,7 @@ public class ImapNamespaceHandlerTestCase extends FunctionalTestCase
         ImapsConnector c = (ImapsConnector)managementContext.getRegistry().lookupConnector("imapsConnector");
         assertNotNull(c);
 
+        assertFalse(c.isBackupEnabled());
         assertEquals("newBackup", c.getBackupFolder());
         assertEquals(1234, c.getCheckFrequency());
         assertEquals("newMailbox", c.getMailboxFolder());
