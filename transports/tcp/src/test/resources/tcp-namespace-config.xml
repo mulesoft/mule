@@ -13,6 +13,7 @@
                    receiveBufferSize="1024"
                    sendBufferSize="2048"
                    receiveBacklog="50"
+                   reuseAddress="false"
                    clientSoTimeout="3000"
                    socketSoLinger="1234"/>
 

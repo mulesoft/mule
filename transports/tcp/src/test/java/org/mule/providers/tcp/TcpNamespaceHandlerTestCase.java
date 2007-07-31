@@ -28,6 +28,7 @@ public class TcpNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals(1024, c.getReceiveBufferSize());
         assertEquals(2048, c.getSendBufferSize());
         assertEquals(50, c.getReceiveBacklog());
+        assertFalse(c.isReuseAddress().booleanValue());
         // this is what we want - i was worried that the client was used as default if the server
         // wasn't set, but that's not the case
         assertEquals(-1, c.getServerSoTimeout());

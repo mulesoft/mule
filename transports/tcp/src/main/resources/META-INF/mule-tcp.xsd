@@ -52,6 +52,15 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="reuseAddress" type="mule:substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            If set (the default) then SO_REUSEADDRESS is set on server sockets before
+                            binding.  This helps reduce "address already in use" errors when a socket
+                            is re-used.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="clientSoTimeout" type="mule:substitutableInt">
                     <xsd:annotation>
                         <xsd:documentation>

@@ -59,7 +59,7 @@ public class TcpConnector extends AbstractConnector
     private int receiveBacklog = DEFAULT_BACKLOG;
     private boolean sendTcpNoDelay;
     private boolean validateConnections = true;
-    private Boolean reuseAddress = null; // not set - Java default
+    private Boolean reuseAddress = Boolean.TRUE; // this could be null for Java default
     private int socketSoLinger = INT_VALUE_NOT_SET;
     private String tcpProtocolClassName;
     private TcpProtocol tcpProtocol;
