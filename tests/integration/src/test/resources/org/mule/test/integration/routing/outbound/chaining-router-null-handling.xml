@@ -5,7 +5,7 @@
 
 <mule-configuration id="ChainingRouterNulls" version="1.0">
 
-    <mule-environment-properties synchronous="true" serverUrl=""/>
+    <mule-environment-properties synchronous="true"/>
 
     <model name="ChainingRouterNullsModel">
 

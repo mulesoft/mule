@@ -5,7 +5,7 @@
 <mule-configuration id="test" version="1.0">
 
     <!-- Mule properties -->
-    <mule-environment-properties serverUrl="" />
+    <mule-environment-properties />
 
     <!-- embed Spring configuration to create a Jms Connection factory -->
     <container-context className="org.mule.extras.spring.SpringContainerContext">

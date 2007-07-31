@@ -6,7 +6,7 @@
 
 <mule-configuration id="TcpSynchStreaming" version="1.0">
 
-    <mule-environment-properties serverUrl="" synchronous="true"/>
+    <mule-environment-properties synchronous="true"/>
 
     <connector name="default" className="org.mule.providers.tcp.TcpConnector">
         <properties>

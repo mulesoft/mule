@@ -11,7 +11,7 @@
 
     <mule-environment-properties
         synchronous="false"
-        serverUrl=""
+       
         model="test-dev"/>
 
     <transaction-manager factory="org.mule.tck.testmodels.mule.TestTransactionManagerFactory"/>

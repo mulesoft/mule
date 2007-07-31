@@ -5,7 +5,7 @@
 
 <mule-configuration id="Loan_broker_sync" version="1.0">
 
-    <mule-environment-properties synchronous="true" serverUrl=""/>
+    <mule-environment-properties synchronous="true"/>
 
     <agents>
         <agent name="JmxAgent" className="org.mule.management.agents.JmxAgent"/>

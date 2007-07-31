@@ -5,7 +5,7 @@
 
 <mule-configuration id="helloSampleProperties" version="1.0">
 
-    <mule-environment-properties serverUrl=""/>
+    <mule-environment-properties/>
     
     <container-context className="org.mule.extras.spring.SpringContainerContext">
         <properties>

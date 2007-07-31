@@ -5,7 +5,7 @@
 <mule-configuration id="test" version="1.0">
 
     <!-- Mule properties -->
-    <mule-environment-properties synchronous="false" remoteSync="false" serverUrl=""  />
+    <mule-environment-properties synchronous="false" remoteSync="false"  />
 
     <transformers>
         <transformer name="ByteArrayToString"

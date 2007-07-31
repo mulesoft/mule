@@ -5,7 +5,7 @@
 
 <mule-configuration id="axis_doclit_test" version="1.0">
 
-    <mule-environment-properties serverUrl=""/>
+    <mule-environment-properties/>
     <model name="test">
         <mule-descriptor name="mycomponent"
             implementation="org.mule.tck.testmodels.services.TestServiceComponent"

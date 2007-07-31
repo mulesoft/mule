@@ -48,7 +48,7 @@
 
 <mule-configuration id="xfire_test" version="1.0">
 
-    <mule-environment-properties serverUrl="">
+    <mule-environment-properties>
         <threading-profile maxThreadsActive="4"/>
     </mule-environment-properties>
 

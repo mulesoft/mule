@@ -5,7 +5,7 @@
 
 <mule-configuration version="1.0">
     
-    <mule-environment-properties serverUrl=""/>
+    <mule-environment-properties/>
 
     <global-endpoints>
         <endpoint name="inbound" address="test:/inbound" createConnector="ALWAYS_CREATE"/>

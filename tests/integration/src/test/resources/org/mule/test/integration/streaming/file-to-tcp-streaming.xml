@@ -5,7 +5,7 @@
 
 <mule-configuration id="FileToTcp" version="1.0">
 
-    <mule-environment-properties serverUrl="" synchronous="true"/>
+    <mule-environment-properties synchronous="true"/>
     
     <model name="main" type="streaming">
         <mule-descriptor name="bridge1" implementation="org.mule.components.simple.StreamingBridgeComponent">

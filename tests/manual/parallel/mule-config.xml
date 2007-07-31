@@ -5,7 +5,7 @@
 
 <mule-configuration id="Dummy" version="1.0">
 
-    <mule-environment-properties serverUrl="" />
+    <mule-environment-properties />
 
     <connector name="SystemStreamConnector" className="org.mule.providers.stdio.SystemStreamConnector">
         <properties>

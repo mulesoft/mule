@@ -5,7 +5,7 @@
 
 <mule-configuration id="tcp_functional_test" version="1.0">
 
-    <mule-environment-properties serverUrl=""/>
+    <mule-environment-properties/>
 
     <global-endpoints>
         <endpoint name="clientEndpoint" address="tcp://localhost:60198" synchronous="true"/>

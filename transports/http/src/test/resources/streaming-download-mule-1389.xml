@@ -5,7 +5,7 @@
 
 <mule-configuration id="streaming-download-mule-1389" version="1.0">
 
-    <mule-environment-properties serverUrl=""/>
+    <mule-environment-properties/>
 
     <model name="main">
         <mule-descriptor name="testComponent" implementation="org.mule.providers.tcp.issues.InputStreamSource">

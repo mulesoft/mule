@@ -5,7 +5,7 @@
 
 <mule-configuration id="quartz_test" version="1.0">
 
-    <mule-environment-properties serverUrl=""/>
+    <mule-environment-properties/>
 
     <connector name="vmQueueConnector" className="org.mule.providers.vm.VMConnector">
         <properties>

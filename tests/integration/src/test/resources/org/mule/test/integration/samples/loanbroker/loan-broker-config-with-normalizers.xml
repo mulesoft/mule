@@ -13,7 +13,7 @@ the different components are made from the loan broker component (a la hub and s
 
 <mule-configuration id="Loan_broker_Async" version="1.0">
 
-    <mule-environment-properties serverUrl=""/>
+    <mule-environment-properties/>
 
     <agents>
         <agent name="JmxAgent" className="org.mule.management.agents.JmxAgent"/>

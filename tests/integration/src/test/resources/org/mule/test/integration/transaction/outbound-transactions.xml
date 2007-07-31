@@ -4,7 +4,7 @@
 
 <mule-configuration id="test" version="1.0">
 
-    <mule-environment-properties synchronous="false" synchronousEventTimeout="5000" serverUrl="" />
+    <mule-environment-properties synchronous="false" synchronousEventTimeout="5000" />
 
     <!-- Embed Spring configuration to create a Jms Connection factory -->
     <container-context className="org.mule.extras.spring.SpringContainerContext">

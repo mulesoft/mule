@@ -5,7 +5,7 @@
 
 <mule-configuration id="groovy_test" version="1.0">
 
-    <mule-environment-properties serverUrl=""/>
+    <mule-environment-properties/>
 
     <model name="model">
         <mule-descriptor name="GroovyUMO1" implementation="org.mule.components.script.jsr223.ScriptMessageBuilder">

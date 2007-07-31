@@ -5,7 +5,7 @@
 
 <mule-configuration id="Test_Multiple_Connectors" version="1.0">
 
-    <mule-environment-properties serverUrl=""/>
+    <mule-environment-properties/>
 
     <connector name="testConnector1" className="org.mule.tck.testmodels.mule.TestConnector"/>
     <connector name="testConnector2" className="org.mule.tck.testmodels.mule.TestConnector"/>

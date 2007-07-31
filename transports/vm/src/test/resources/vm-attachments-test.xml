@@ -5,7 +5,7 @@
 
 <mule-configuration id="attachments_test" version="1.0">
 
-    <mule-environment-properties serverUrl=""/>
+    <mule-environment-properties/>
 
     <global-endpoints>
         <endpoint address="vm://in" name="vm-in"/>

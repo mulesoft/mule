@@ -5,7 +5,7 @@
 
 <mule-configuration version="1.0">
     
-    <mule-environment-properties serverUrl=""/>
+    <mule-environment-properties/>
 
     <transformers>
         <transformer name="hop1ResponseEnricher" className="org.mule.transformers.simple.MessagePropertiesTransformer">

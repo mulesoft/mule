@@ -5,7 +5,7 @@
 
 <mule-configuration id="Mule_Axis_VM_Bridge" version="1.0">
 
-    <mule-environment-properties synchronous="true" serverUrl=""/>
+    <mule-environment-properties synchronous="true"/>
 
     <connector name="axisConnector" className="org.mule.providers.soap.axis.AxisConnector">
         <properties>

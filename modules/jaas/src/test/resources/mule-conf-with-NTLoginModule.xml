@@ -11,7 +11,7 @@
        http://www.mulesource.org/schema/mule/jaas/2.0 http://www.mulesource.org/schema/mule/jaas/2.0/mule-jaas.xsd">
 	
 
-    <!--mule-environment-properties serverUrl="" synchronous="true"/-->
+    <!--mule-environment-properties synchronous="true"/-->
 
     <mule:security-manager xsi:type="jaas:securityManagerType">
         <jaas:jaas-security-provider name="jaasSecurityProvider" loginContextName="jaasTest" loginModule="com.sun.security.auth.module.NTLoginModule"/>
@@ -39,7 +39,7 @@
 
 <mule-configuration id="Mule_Sample" version="1.0">
 
-    <mule-environment-properties serverUrl="" synchronous="true"/>
+    <mule-environment-properties synchronous="true"/>
 
     <security-manager>
         <security-provider name="JaasProvider" className="org.mule.extras.jaas.JaasSimpleAuthenticationProvider">

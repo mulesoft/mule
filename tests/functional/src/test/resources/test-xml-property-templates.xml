@@ -11,7 +11,7 @@
         <file-properties location="test-template.properties"/>
     </environment-properties>
 
-    <mule-environment-properties synchronous="false" model="${model.name}" serverUrl=""/>
+    <mule-environment-properties synchronous="false" model="${model.name}"/>
 
     <connector name="myTestConnector" className="org.mule.tck.testmodels.mule.TestConnector"/>
 
