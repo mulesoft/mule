@@ -10,7 +10,6 @@
 
 package org.mule.providers.jms.functional;
 
-import org.mule.RegistryContext;
 import org.mule.tck.functional.CountdownCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.umo.UMOException;
@@ -29,12 +28,12 @@ public abstract class AbstractJmsQueueFunctionalTestCase extends AbstractJmsFunc
         CountdownCallback callback = new CountdownCallback(1);
         ftc.setEventCallback(callback);
 
-        send(TEST_MESSAGE, useTopics() ? "topic:in" : "in");
+        send(TEST_MESSAGE, "in");
 
         assertTrue(callback.await(LOCK_TIMEOUT));
         assertEquals(TEST_MESSAGE, ftc.getLastReceivedMessage());
         
-        assertEquals(TEST_MESSAGE_RESPONSE, receiveTextMessage(useTopics() ? "topic:out" : "out"));
+        assertEquals(TEST_MESSAGE_RESPONSE, receiveTextMessage("out"));
     }
 
     // TODO This test fails due to concurrency issues.
@@ -47,9 +46,9 @@ public abstract class AbstractJmsQueueFunctionalTestCase extends AbstractJmsFunc
 //        CountdownCallback callback = new CountdownCallback(3);
 //        ftc.setEventCallback(callback);
 //
-//        send(TEST_MESSAGE, useTopics() ? "topic:in" : "in");
-//        send(TEST_MESSAGE, useTopics() ? "topic:in" : "in");
-//        send(TEST_MESSAGE, useTopics() ? "topic:in" : "in");
+//        send(TEST_MESSAGE, "in");
+//        send(TEST_MESSAGE, "in");
+//        send(TEST_MESSAGE, "in");
 //
 //        assertTrue(callback.await(LOCK_TIMEOUT));
 //        //assertEquals(3, ftc.getReceivedMessages());
@@ -58,9 +57,9 @@ public abstract class AbstractJmsQueueFunctionalTestCase extends AbstractJmsFunc
 //        assertEquals(TEST_MESSAGE, ftc.getReceivedMessage(3));
 //        assertNull(ftc.getReceivedMessage(4));
 //
-//        assertEquals(TEST_MESSAGE_RESPONSE, receiveTextMessage(useTopics() ? "topic:out" : "out"));
-//        assertEquals(TEST_MESSAGE_RESPONSE, receiveTextMessage(useTopics() ? "topic:out" : "out"));
-//        assertEquals(TEST_MESSAGE_RESPONSE, receiveTextMessage(useTopics() ? "topic:out" : "out"));
+//        assertEquals(TEST_MESSAGE_RESPONSE, receiveTextMessage("out"));
+//        assertEquals(TEST_MESSAGE_RESPONSE, receiveTextMessage("out"));
+//        assertEquals(TEST_MESSAGE_RESPONSE, receiveTextMessage("out"));
 //    }
 
     public void testSendWithReplyTo() throws Exception
@@ -70,12 +69,12 @@ public abstract class AbstractJmsQueueFunctionalTestCase extends AbstractJmsFunc
         CountdownCallback callback = new CountdownCallback(1);
         ftc.setEventCallback(callback);
 
-        send(TEST_MESSAGE, useTopics() ? "topic:in" : "in", false, getAcknowledgementMode(), "replyto");
+        send(TEST_MESSAGE, "in", false, getAcknowledgementMode(), "replyto");
 
         assertTrue(callback.await(LOCK_TIMEOUT));
         assertEquals(TEST_MESSAGE, ftc.getLastReceivedMessage());
 
-        assertEquals(TEST_MESSAGE_RESPONSE, receiveTextMessage(useTopics() ? "topic:out" : "out"));
+        assertEquals(TEST_MESSAGE_RESPONSE, receiveTextMessage("out"));
     }
 
     public boolean useTopics()
