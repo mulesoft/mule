@@ -32,7 +32,8 @@ public class ScriptDefinitionParser extends OrphanDefinitionParser
     protected void postProcess(BeanDefinitionBuilder beanDefinition, Element element)
     {
         super.postProcess(beanDefinition, element);
-        beanDefinition.addConstructorArg(element.getTextContent());
+        // there's no getTextContent() in JDK 1.4
+        beanDefinition.addConstructorArg(element.getNodeValue());
     }
 
 }
