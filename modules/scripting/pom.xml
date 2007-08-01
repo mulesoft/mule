@@ -20,7 +20,7 @@
                  <configuration>
                     <excludes>
                         <!-- this test fails probably due to a bug in spring refreshable beans -->
-                        <exclude>**/GroovyRefreshableBeanTestCase*</exclude>
+                        <exclude>**/*</exclude>
                     </excludes>
                 </configuration>
              </plugin>
