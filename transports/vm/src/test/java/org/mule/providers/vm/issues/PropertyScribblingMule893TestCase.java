@@ -23,7 +23,7 @@ public class PropertyScribblingMule893TestCase extends FunctionalTestCase
 
     protected String getConfigResources()
     {
-        return "property-scribbling-mule-893-test.xml";
+        return "vm/property-scribbling-mule-893-test.xml";
     }
 
     public void testSingleMessage() throws Exception

@@ -23,7 +23,7 @@ public class TransformerAttributeTestCase extends FunctionalTestCase
 
     protected String getConfigResources()
     {
-        return "transformer-attribute-test.xml";
+        return "vm/transformer-attribute-test.xml";
     }
 
     public void testSimple() throws Exception

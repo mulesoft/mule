@@ -22,7 +22,7 @@ public class ServiceOverridesMule1770TestCase extends FunctionalTestCase
 
     protected String getConfigResources()
     {
-        return "service-overrides-mule-1770-test.xml";
+        return "vm/service-overrides-mule-1770-test.xml";
     }
 
     public void testServiceOverrides()

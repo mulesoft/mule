@@ -196,6 +196,10 @@
                 <xsd:element name="message-property-filter" type="patternFilterType"/>
                 <xsd:element name="equals-filter" type="filterType"/>
                 <xsd:element name="custom-filter" type="customFilterType"/>
+                <!-- for extension by general modules using xsi:type -->
+                <xsd:element name="module-filter" type="moduleFilterType"/>
+                <!-- tighter integration for xml filters --> 
+                <xsd:any namespace="http://www.mulesource.org/schema/mule/xml-filter/2.0" processContents="strict"/>
             </xsd:choice>
         </xsd:sequence>
     </xsd:group>
@@ -243,6 +247,20 @@
         <xsd:attribute name="class" type="xsd:NMTOKEN"/>
         <xsd:attribute name="not" type="substitutableBoolean"/>
     </xsd:complexType>
+
+    <xsd:complexType name="moduleFilterType">
+       <xsd:annotation>
+            <xsd:documentation>
+                This is an empty holder that can be extended by modules that want to
+                provide filters.  The type of the filter should be given using the xsi:type
+                attribute - as an example, for a "bar" filter in module "foo" the type might
+                be foo:barFilterType.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:extension base="filterType"/>
+        </xsd:complexContent>
+     </xsd:complexType>
 
     <xsd:group name="securityFilters">
         <xsd:sequence>

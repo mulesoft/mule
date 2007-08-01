@@ -23,7 +23,7 @@ public class VMAttachmentsTestCase extends FunctionalTestCase
 {
     protected String getConfigResources()
     {
-        return "vm-attachments-test.xml";
+        return "vm/vm-attachments-test.xml";
     }
 
     public void testAttachments() throws Exception

@@ -30,8 +30,6 @@
                  <artifactId>maven-surefire-plugin</artifactId>
                  <configuration>
                      <excludes>
-                         <exclude>**/PropertyScribblingMule893TestCase.*</exclude>
-                         <exclude>**/ServiceOverridesMule1770TestCase.*</exclude>
                          <!-- MULE-2041 PersistentVMQueueTestCase needs a converted config -->
                          <exclude>**/PersistentVMQueueTestCase.*</exclude>
                      </excludes>

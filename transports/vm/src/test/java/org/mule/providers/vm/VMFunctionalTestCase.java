@@ -18,7 +18,7 @@ public class VMFunctionalTestCase extends FunctionalTestCase
 {
     protected String getConfigResources()
     {
-        return "vm-functional-test.xml";
+        return "vm/vm-functional-test.xml";
     }
 
     public void testSingleMessage() throws Exception

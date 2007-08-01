@@ -20,7 +20,7 @@ public class ManySendsMule1758TestCase extends FunctionalTestCase
 
     protected String getConfigResources()
     {
-        return "many-sends-test.xml";
+        return "vm/many-sends-test.xml";
     }
 
     public void testSingleSend() throws Exception

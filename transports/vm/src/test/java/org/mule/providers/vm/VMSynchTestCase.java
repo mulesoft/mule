@@ -22,7 +22,7 @@ public class VMSynchTestCase extends FunctionalTestCase
 
     protected String getConfigResources()
     {
-        return "vm-synch-test.xml";
+        return "vm/vm-synch-test.xml";
     }
 
     public void testSingleMessage() throws Exception

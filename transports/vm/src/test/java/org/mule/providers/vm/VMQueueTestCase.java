@@ -24,7 +24,7 @@ public class VMQueueTestCase extends FunctionalTestCase
 {
     protected String getConfigResources()
     {
-        return "vm-queue-test.xml";
+        return "vm/vm-queue-test.xml";
     }
 
     public void testSingleMessage() throws Exception

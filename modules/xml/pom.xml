@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.mule.modules</groupId>
@@ -14,8 +14,8 @@
     <description>Functionality for working with XML</description>
     
     <build>
-         <plugins>
-              <plugin>
+        <plugins>
+            <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
@@ -29,16 +29,16 @@
                 </configuration>
             </plugin>
 
-             <plugin>
-                 <artifactId>maven-surefire-plugin</artifactId>
-                 <configuration>
-                     <excludes>
-                         <!-- See MULE-1700 for more info -->
-                         <exclude>**/XmlUMOMessageTransformersTestCase.*</exclude>
-                     </excludes>
-                 </configuration>
-             </plugin>
-         </plugins>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <!-- See MULE-1700 for more info -->
+                        <exclude>**/XmlUMOMessageTransformersTestCase.*</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
 
     <profiles>
@@ -231,6 +231,7 @@
     </profiles>
     
     <dependencies>
+
         <!-- Used for de/serialising objects -->
         <dependency>
             <groupId>com.thoughtworks.xstream</groupId>
@@ -262,6 +263,7 @@
             <version>1.0</version>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
-   
+
 </project>

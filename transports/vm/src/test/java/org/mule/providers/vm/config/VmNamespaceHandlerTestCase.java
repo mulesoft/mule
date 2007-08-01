@@ -21,7 +21,7 @@ public class VmNamespaceHandlerTestCase extends FunctionalTestCase
 {
     protected String getConfigResources()
     {
-        return "vm-namespace-config.xml";
+        return "vm/vm-namespace-config.xml";
     }
 
     public void testDefaults() throws Exception

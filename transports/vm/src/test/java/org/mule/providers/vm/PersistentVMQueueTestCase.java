@@ -14,7 +14,7 @@ public class PersistentVMQueueTestCase extends FunctionalTestCase
 
     protected String getConfigResources()
     {
-        return "persistent-vmqueue-test.xml";
+        return "vm/persistent-vmqueue-test.xml";
     }
 
     public void testAsynchronousDispatching() throws Exception

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.mule.transports</groupId>
@@ -14,22 +14,22 @@
     <description>A Mule transport for Tcp Connectivity. This transport supplies a tcp Server and client implementation.</description>
 
     <build>
-         <plugins>
-             <plugin>
-                 <artifactId>maven-surefire-plugin</artifactId>
-                 <configuration>
-                     <excludes>
-                         <exclude>**/SynchStreamingMule1687TestCase.*</exclude>
-                         <exclude>**/AsynchMule1869TestCase.*</exclude>
-                         <!-- be careful when re-enabling this, it may hang the CI server -->
-                         <exclude>**/KeepSendSocketOpenMule1491TestCase.*</exclude>
-                         <exclude>**/*Mule1389TestCase.java</exclude>
-                         <exclude>**/*Mule1687TestCase.java</exclude>
-                         <exclude>**/*Mule2067TestCase.java</exclude>
-                     </excludes>
-                 </configuration>
-             </plugin>
-             <plugin>
+        <plugins>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>**/SynchStreamingMule1687TestCase.*</exclude>
+                        <exclude>**/AsynchMule1869TestCase.*</exclude>
+                        <!-- be careful when re-enabling this, it may hang the CI server -->
+                        <exclude>**/KeepSendSocketOpenMule1491TestCase.*</exclude>
+                        <exclude>**/*Mule1389TestCase.java</exclude>
+                        <exclude>**/*Mule1687TestCase.java</exclude>
+                        <exclude>**/*Mule2067TestCase.java</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <executions>
@@ -40,7 +40,7 @@
                     </execution>
                 </executions>
             </plugin>
-              <plugin>
+            <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
@@ -55,7 +55,7 @@
                     </instructions>
                 </configuration>
             </plugin>
-         </plugins>
+        </plugins>
     </build>    
 
     <dependencies>
@@ -65,7 +65,7 @@
             <version>${version}</version>
             <scope>test</scope>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>
             <version>${version}</version>
