@@ -75,5 +75,3 @@ public class AxisConnectorJmsEndpointFormatTestCase extends FunctionalTestCase
     }
 
 }
-
-
