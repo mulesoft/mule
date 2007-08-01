@@ -1040,7 +1040,7 @@
                 </xsd:restriction>
             </xsd:simpleType>
         </xsd:attribute>
-        <xsd:attribute name="propertyExtractor" type="xsd:NMTOKEN"/>
+        <xsd:attribute name="propertyExtractor-ref" type="xsd:NMTOKEN"/>
     </xsd:complexType>
 
 
@@ -1052,12 +1052,14 @@
             <xsd:element name="chaining-router" type="filteringOutboundRouterType"/>
             <xsd:element name="endpoint-selector-router" type="endpointSelectorRouterType"/>
             <xsd:element name="exception-based-router" type="filteringOutboundRouterType"/>
-            <xsd:element name="list-message-splitter-router" type="messageSplitterendpointSelectorRouterType"/>
+            <xsd:element name="list-message-splitter-router" type="messageSplitterOutboundRouterType"/>
             <xsd:element name="message-chunking-router" type="chunkingRouterType"/>
             <xsd:element name="multicasting-router" type="filteringOutboundRouterType"/>
             <xsd:element name="static-recipient-list-router" type="staticRecipientListRouterType"/>
             <xsd:element name="template-endpoint-router" type="filteringOutboundRouterType"/>
             <xsd:element name="custom-router" type="customOutboundRouterType"/>
+            <!-- tight integration for xml routers -->
+            <xsd:any namespace="http://www.mulesource.org/schema/mule/xml-outbound/2.0" processContents="strict"/>
         </xsd:choice>
     </xsd:group>
 
@@ -1077,11 +1079,12 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="messageSplitterendpointSelectorRouterType">
+    <xsd:complexType name="messageSplitterOutboundRouterType">
         <xsd:complexContent>
             <xsd:extension base="filteringOutboundRouterType">
-                <xsd:attribute name="multimatch" type="substitutableBoolean"/>
-                <xsd:attribute name="honourSynchronicity" type="substitutableBoolean"/>
+                <!-- this isn't exposed to the user afaict? -->
+                <!-- xsd:attribute name="multimatch" type="substitutableBoolean"/ -->
+                <xsd:attribute name="honorSynchronicity" type="substitutableBoolean"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

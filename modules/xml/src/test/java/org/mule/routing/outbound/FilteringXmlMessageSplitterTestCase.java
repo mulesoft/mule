@@ -72,8 +72,8 @@ public class FilteringXmlMessageSplitterTestCase extends AbstractMuleTestCase
     
     public void testStringPayloadXmlMessageSplitterWithoutXsd() throws Exception
     {
-     xmlSplitter.setExternalSchemaLocation(null);
-     xmlSplitter.setValidateSchema(false);
+        xmlSplitter.setExternalSchemaLocation(null);
+        xmlSplitter.setValidateSchema(false);
         String payload = IOUtils.getResourceAsString("purchase-order.xml", getClass());
         internalTestSuccessfulXmlSplitter(payload);
     }
@@ -139,7 +139,7 @@ public class FilteringXmlMessageSplitterTestCase extends AbstractMuleTestCase
         catch (IllegalArgumentException iaex)
         {
             assertTrue("Wrong exception?", iaex.getMessage().indexOf(
-                "Couldn't find schema at " + invalidSchemaLocation) != -1);
+                    "Couldn't find schema at " + invalidSchemaLocation) != -1);
         }
         session.verify();
     }
@@ -179,7 +179,7 @@ public class FilteringXmlMessageSplitterTestCase extends AbstractMuleTestCase
         catch (IllegalArgumentException iaex)
         {
             assertTrue("Wrong exception message.", iaex.getMessage().startsWith(
-                "Failed to initialise the payload: "));
+                    "Failed to initialise the payload: "));
         }
 
     }

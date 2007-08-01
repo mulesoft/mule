@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Collections;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
@@ -73,6 +74,11 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
     public void setNamespaces(Map namespaces)
     {
         this.namespaces = namespaces;
+    }
+
+    public Map getNamespaces()
+    {
+        return Collections.unmodifiableMap(namespaces);
     }
 
     public String getSplitExpression()

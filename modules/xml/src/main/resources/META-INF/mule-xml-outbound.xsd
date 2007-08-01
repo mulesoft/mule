@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<xsd:schema xmlns="http://www.mulesource.org/schema/mule/xml-filter/2.0"
+<xsd:schema xmlns="http://www.mulesource.org/schema/mule/xml-outbound/2.0"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
             xmlns:spring="http://www.springframework.org/schema/beans"
             xmlns:mxml="http://www.mulesource.org/schema/mule/xml/2.0"
-            targetNamespace="http://www.mulesource.org/schema/mule/xml-filter/2.0"
+            targetNamespace="http://www.mulesource.org/schema/mule/xml-outbound/2.0"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
 
@@ -16,27 +16,32 @@
     <xsd:import namespace="http://www.mulesource.org/schema/mule/xml/2.0"
                 schemaLocation="http://www.mulesource.org/schema/mule/xml/2.0/mule-xml.xsd" />
 
-    <xsd:element name="jxpath-filter" type="jxpathFilterType"/>
-    <xsd:complexType name="jxpathFilterType">
+    <!-- if we decide to integrate these in the mule: namespace then we should probably modify
+         the names to include "xml" -->
+
+    <xsd:element name="message-splitter" type="messageSplitterType"/>
+    <xsd:complexType name="messageSplitterType">
         <xsd:complexContent>
-            <xsd:extension base="mule:moduleFilterType">
-                <!-- mirrors mule:patternFilterType -->
-                <xsd:choice>
+            <xsd:extension base="mule:messageSplitterOutboundRouterType">
+                <!-- these appear after endpoints, which is ugly.  refactor? -->
+                <xsd:sequence>
                     <xsd:element name="namespace" type="mxml:namespaceType" minOccurs="0" maxOccurs="unbounded"/>
-                    <xsd:element name="contextProperty" type="spring:propertyType" minOccurs="0" maxOccurs="unbounded"/>
-                </xsd:choice>
-                <xsd:attribute name="pattern" type="xsd:string" use="required"/>
-                <xsd:attribute name="lenient" type="mule:substitutableBoolean" default="true"/>
-                <xsd:attribute name="expectedValue" type="xsd:string"/>
+                </xsd:sequence>
+                <xsd:attribute name="splitExpression" type="xsd:string"/>
+                <xsd:attribute name="externalSchemaLocation" type="xsd:string"/>
+                <xsd:attribute name="validateSchema" type="mule:substitutableBoolean"/>
            </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="is-xml-filter" type="isXmlFilterType"/>
-    <xsd:complexType name="isXmlFilterType">
+    <xsd:element name="round-robin-splitter" type="roundRobinSplitterType"/>
+    <xsd:complexType name="roundRobinSplitterType">
         <xsd:complexContent>
-            <xsd:extension base="mule:moduleFilterType"/>
+            <xsd:extension base="messageSplitterType">
+                <xsd:attribute name="endpointFiltering" type="mule:substitutableBoolean"/>
+            </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+
 
 </xsd:schema>
