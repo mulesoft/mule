@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:lang="http://www.springframework.org/schema/lang"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:scripting="http://www.mulesource.org/schema/mule/scripting/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/scripting/2.0 http://www.mulesource.org/schema/mule/scripting/2.0/mule-scripting.xsd">
+
+    <lang:groovy id="groovy_class" refresh-check-delay="100" script-source="classpath:groovy-dynamic-script.groovy"/>
+    
+    <scripting:groovyRefreshable name="groovyRefreshable" refreshableBean-ref="groovy_class" methodName="receive"/>
+    
+    <mule:model-seda name="main">
+        
+        <mule:service name="GroovyUMO">
+            <mule:component instance-ref="groovyRefreshable" scope="singleton"/>
+            <mule:inbound-router>
+                <mule:endpoint address="vm://groovy_refresh"/>
+            </mule:inbound-router>
+        </mule:service>          
+                    
+    </mule:model-seda>
+    
+</beans>

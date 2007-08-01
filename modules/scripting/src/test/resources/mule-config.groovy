@@ -1,45 +1,45 @@
-import org.mule.tck.testmodels.mule.TestTransactionManagerFactory;
-import org.mule.tck.testmodels.mule.TestExceptionStrategy;
-import org.mule.tck.testmodels.mule.TestConnector;
-import org.mule.tck.testmodels.mule.TestCompressionTransformer;
-import org.mule.tck.testmodels.mule.TestEntryPointResolver;
-import org.mule.tck.testmodels.mule.TestDefaultLifecycleAdapterFactory;
-import org.mule.tck.testmodels.mule.TestResponseAggregator;
+package org.mule.config.builders;
+
+import org.mule.impl.DefaultComponentExceptionStrategy;
+import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.impl.model.seda.SedaModel;
+import org.mule.management.agents.JmxAgent;
+import org.mule.management.agents.RmiRegistryAgent;
+import org.mule.providers.SimpleRetryConnectionStrategy;
+import org.mule.routing.ForwardingCatchAllStrategy;
+import org.mule.routing.filters.PayloadTypeFilter;
+import org.mule.routing.filters.xml.JXPathFilter;
+import org.mule.routing.inbound.InboundRouterCollection;
+import org.mule.routing.nested.NestedRouter;
+import org.mule.routing.nested.NestedRouterCollection;
+import org.mule.routing.response.ResponseRouterCollection;
 import org.mule.tck.testmodels.fruit.FruitCleaner;
 import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.umo.manager.UMOAgent;
-import org.mule.umo.model.UMOModel;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.tck.testmodels.mule.TestCompressionTransformer;
+import org.mule.tck.testmodels.mule.TestConnector;
+import org.mule.tck.testmodels.mule.TestDefaultLifecycleAdapterFactory;
+import org.mule.tck.testmodels.mule.TestEntryPointResolver;
+import org.mule.tck.testmodels.mule.TestExceptionStrategy;
+import org.mule.tck.testmodels.mule.TestResponseAggregator;
+import org.mule.tck.testmodels.mule.TestTransactionManagerFactory;
 import org.mule.umo.UMODescriptor;
-import org.mule.umo.UMOInterceptorStack;
+import org.mule.umo.UMOManagementContext;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.model.UMOModel;
 import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.routing.UMONestedRouterCollection;
 import org.mule.umo.routing.UMOResponseRouterCollection;
-import org.mule.umo.UMOManagementContext;
-import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.impl.model.seda.SedaModel;
-import org.mule.impl.DefaultComponentExceptionStrategy;
-import org.mule.interceptors.InterceptorStack;
-import org.mule.interceptors.LoggingInterceptor;
-import org.mule.interceptors.TimerInterceptor;
-import org.mule.routing.filters.xml.JXPathFilter;
-import org.mule.routing.filters.PayloadTypeFilter;
-import org.mule.routing.ForwardingCatchAllStrategy;
-import org.mule.routing.response.ResponseRouterCollection;
-import org.mule.routing.nested.NestedRouter;
-import org.mule.routing.nested.NestedRouterCollection;
-import org.mule.routing.inbound.InboundRouterCollection;
-import org.mule.providers.SimpleRetryConnectionStrategy;
-import org.mule.management.agents.JmxAgent;
-import org.mule.management.agents.RmiRegistryAgent;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-
+     
 // need this when running with JMX
+//TODO MULE-1988 
+managementContext.stop();
 managementContext.setId("GroovyScriptTestCase");
+managementContext.start();
 
 //set global properties
 managementContext.getRegistry().registerProperty("doCompression", "true");
@@ -82,7 +82,7 @@ filter.setValue("bar");
 Map ns = new HashMap();
 ns.put("foo", "http://foo.com");
 filter.setNamespaces(ns);
-builder.registerEndpoint( "test://fruitBowlPublishQ", "fruitBowlEndpoint", false, null, filter);
+builder.registerEndpoint("test://fruitBowlPublishQ", "fruitBowlEndpoint", false, null, filter);
 builder.registerEndpoint("test://AppleQueue", "appleInEndpoint", true);
 builder.registerEndpoint("test://AppleResponseQueue", "appleResponseEndpoint", false);
 builder.registerEndpoint("test://apple.queue", "AppleQueue", false);
@@ -92,13 +92,13 @@ UMOEndpoint ep = new MuleEndpoint("test://test.queue2", false);
 ep.setName("testEPWithCS");
 SimpleRetryConnectionStrategy cs = new SimpleRetryConnectionStrategy();
 cs.setRetryCount(4);
-cs.setFrequency(3000);
+cs.setRetryFrequency(3000);
 ep.setConnectionStrategy(cs);
 builder.getManagementContext().getRegistry().registerEndpoint(ep);
 
 Map props = new HashMap();
 props.put("testGlobal", "value1");
-builder.registerEndpoint( "test://orangeQ", "orangeEndpoint",false, props);
+builder.registerEndpoint("test://orangeQ", "orangeEndpoint", false, props);
 
 //register model
 UMOModel model = new SedaModel();
@@ -179,6 +179,6 @@ cprops.put("arrayProperties", nested3);
 d.setProperties(cprops);
 
 d.setModelName("main");
-        
+
 //register components
 managementContext.getRegistry().registerService(d);

@@ -79,8 +79,8 @@ public class ScriptConfigurationBuilder extends Scriptable implements Configurat
     {
         try
         {
-            UMOManagementContext context = configure(configResources, FileUtils.DEFAULT_ENCODING);
-            context.start();
+            UMOManagementContext context = configure(configResources, null);
+            //context.start();
             return context;
         }
         catch (UMOException e)
