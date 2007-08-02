@@ -20,7 +20,7 @@
                  <configuration>
                      <excludes>
                          <!-- MULE-1925 -->
-                         <exclude>**/QuartzLegacyFunctionalTestCase.*</exclude>
+                         <exclude>**/QuartzFunctionalLegacyTestCase.*</exclude>
                          <exclude>**/QuartzFunctionalTestCase.*</exclude>
                      </excludes>
                  </configuration>
