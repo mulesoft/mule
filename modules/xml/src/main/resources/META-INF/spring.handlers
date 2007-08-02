@@ -1,2 +1,3 @@
 http\://www.mulesource.org/schema/mule/xml-filter/2.0=org.mule.config.spring.handlers.XmlFilterNamespaceHandler
 http\://www.mulesource.org/schema/mule/xml-outbound/2.0=org.mule.config.spring.handlers.XmlOutboundNamespaceHandler
+http\://www.mulesource.org/schema/mule/xml-transformer/2.0=org.mule.config.spring.handlers.XmlTransformerNamespaceHandler

@@ -16,7 +16,7 @@ import org.mule.routing.filters.xml.JXPathFilter;
 
 /**
  * Handles all filters in XML config module (separate namespaces for separate component
- * typres helps keep schema restricted)
+ * types helps keep schema restricted)
  */
 public class XmlFilterNamespaceHandler extends AbstractIgnorableNamespaceHandler
 {

@@ -16,7 +16,7 @@ import org.mule.routing.outbound.RoundRobinXmlSplitter;
 
 /**
  * Handles all outbound routers in XML config module (separate namespaces for separate component
- * typres helps keep schema restricted)
+ * types helps keep schema restricted)
  */
 public class XmlOutboundNamespaceHandler extends AbstractIgnorableNamespaceHandler
 {

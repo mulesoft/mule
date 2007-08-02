@@ -29,7 +29,7 @@ public class ObjectFactoryDefinitionParser extends ChildDefinitionParser
         super(setterMethod, null);
         setAllowClassAttribute(false);
         addAlias("class", "objectClassName");
-    }
+    }                                                             
     
     protected Class getBeanClass(Element element)
     {
