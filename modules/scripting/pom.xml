@@ -50,7 +50,7 @@
             <scope>test</scope>
         </dependency>
         
-        <!-- need to explicitly mark javax.mail as provided -->
+        <!-- need to explicitly mark javax.activation as provided -->
         <dependency>
             <groupId>javax.activation</groupId>
             <artifactId>activation</artifactId>
