@@ -58,10 +58,10 @@
     <mule:transformer-no-action name="Default"/>
 
     <mule:endpoint name="fruitBowlEndpoint" address="test://fruitBowlPublishQ">
-        <xml-filter:jxpath-filter expectedValue="bar" pattern="name">
+        <xml-filter:jxpath expectedValue="bar" pattern="name">
             <xml-filter:namespace prefix="foo" uri="http://foo.com"/>
             <xml-filter:namespace prefix="bar" uri="http://bar.com"/>
-        </xml-filter:jxpath-filter>
+        </xml-filter:jxpath>
     </mule:endpoint>
     <mule:endpoint name="waterMelonEndpoint" address="test://test.queue"/>
     <mule:endpoint name="appleInEndpoint" address="test://AppleQueue"/>

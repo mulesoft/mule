@@ -225,7 +225,7 @@ public class XsltTransformer extends AbstractXmlTransformer
         {
             StreamSource source = XsltTransformer.this.getStreamSource();
             String factoryClassName = XsltTransformer.this.getXslTransformerFactory();
-            TransformerFactory factory = null;
+            TransformerFactory factory;
 
             if (StringUtils.isNotEmpty(factoryClassName))
             {
@@ -297,7 +297,7 @@ public class XsltTransformer extends AbstractXmlTransformer
     }
 
     /**
-     * @return The current maximum number of allowable idle transformer objects in
+     * @return The current maximum number of allowable active transformer objects in
      *         the pool
      */
     public int getMaxActiveTransformers()
@@ -306,10 +306,10 @@ public class XsltTransformer extends AbstractXmlTransformer
     }
 
     /**
-     * Sets the the current maximum number of idle transformer objects allowed in the
+     * Sets the the current maximum number of active transformer objects allowed in the
      * pool
      * 
-     * @param maxIdleTransformers New maximum size to set
+     * @param maxActiveTransformers New maximum size to set
      */
     public void setMaxActiveTransformers(int maxActiveTransformers)
     {

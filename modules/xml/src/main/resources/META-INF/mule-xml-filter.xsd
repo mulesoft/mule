@@ -16,7 +16,7 @@
     <xsd:import namespace="http://www.mulesource.org/schema/mule/xml/2.0"
                 schemaLocation="http://www.mulesource.org/schema/mule/xml/2.0/mule-xml.xsd" />
 
-    <xsd:element name="jxpath-filter" type="jxpathFilterType"/>
+    <xsd:element name="jxpath" type="jxpathFilterType"/>
     <xsd:complexType name="jxpathFilterType">
         <xsd:complexContent>
             <xsd:extension base="mule:moduleFilterType">
@@ -32,7 +32,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="is-xml-filter" type="isXmlFilterType"/>
+    <xsd:element name="is-xml" type="isXmlFilterType"/>
     <xsd:complexType name="isXmlFilterType">
         <xsd:complexContent>
             <xsd:extension base="mule:moduleFilterType"/>

@@ -28,12 +28,12 @@
             <mule:outbound-router>
                 <mule:filtering-router>
                     <mule:endpoint address="vm://xml" connector-ref="default"/>
-                    <xml-filter:is-xml-filter/>
+                    <xml-filter:is-xml/>
                 </mule:filtering-router>
                 <mule:filtering-router>
                     <mule:endpoint ref="notxml"/>
                     <mule:not-filter>
-                        <xml-filter:is-xml-filter/>
+                        <xml-filter:is-xml/>
                     </mule:not-filter>
                 </mule:filtering-router>
             </mule:outbound-router>
@@ -50,10 +50,10 @@
                 </mule:forwarding-catch-all-strategy>
                 <mule:filtering-router>
                     <mule:endpoint ref="self"/>
-                    <xml-filter:jxpath-filter pattern="/spring:beans/mule:model-seda/mule:service[2]/@name" expectedValue="filter xml for content">
+                    <xml-filter:jxpath pattern="/spring:beans/mule:model-seda/mule:service[2]/@name" expectedValue="filter xml for content">
                         <xml-filter:namespace prefix="spring" uri="http://www.springframework.org/schema/beans"/>
                         <xml-filter:namespace prefix="mule" uri="http://www.mulesource.org/schema/mule/core/2.0"/>
-                    </xml-filter:jxpath-filter>
+                    </xml-filter:jxpath>
                 </mule:filtering-router>
             </mule:outbound-router>
         </mule:service>

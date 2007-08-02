@@ -40,10 +40,10 @@
                 <xml-outbound:message-splitter splitExpression="/spring:beans/mule:model-seda/mule:service">
                     <mule:endpoint ref="service1">
                         <!-- why does this work, even though the mule namespace is not defined here? -->
-                        <xml-filter:jxpath-filter pattern="/mule:service/@name" expectedValue="service splitter"/>
+                        <xml-filter:jxpath pattern="/mule:service/@name" expectedValue="service splitter"/>
                     </mule:endpoint>
                     <mule:endpoint ref="service2">
-                        <xml-filter:jxpath-filter pattern="/mule:service/@name" expectedValue="round robin"/>
+                        <xml-filter:jxpath pattern="/mule:service/@name" expectedValue="round robin"/>
                     </mule:endpoint>
                     <!-- this is for the splitter; the element ordering is unfortunate -->
                     <xml-outbound:namespace prefix="spring" uri="http://www.springframework.org/schema/beans"/>

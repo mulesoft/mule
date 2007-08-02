@@ -20,8 +20,7 @@ import java.util.Map;
 
 /**
  * Serializes objects using XStream. This is equivelent of using the ObjectToXml and
- * XmlToObject except that there is not source or return type checking. WireFormats
- * are only
+ * XmlToObject except that there is no source or return type checking.
  */
 public class XStreamWireFormat extends TransformerPairWireFormat
 {
