@@ -275,7 +275,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertEquals(UMOEndpoint.ENDPOINT_TYPE_RESPONSE, ep.getType());
     }
 
-    public void testAgentConfiguration() throws UMOException
+    public void _testAgentConfiguration() throws UMOException
     {
         JmxAgent agent = (JmxAgent)managementContext.getRegistry().lookupAgent("jmxAgent");
         assertNotNull(agent);

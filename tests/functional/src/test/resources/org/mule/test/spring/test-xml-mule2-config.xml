@@ -30,10 +30,11 @@
     <!--<mule:custom-transaction-manager-factory class="org.mule.tck.testmodels.mule.TestTransactionManagerFactory"/>-->
     <bean name="txManagerFactory" class="org.mule.tck.testmodels.mule.TestTransactionManagerFactory"/>
 
-    <mgmt:rmi-server name="rmiAgent"/>
-    <mgmt:jmx-server name="jmxAgent">
-        <mgmt:connector-server url="service:jmx:rmi:///jndi/rmi://localhost:1099/server" rebind="true"/>
-    </mgmt:jmx-server>
+    <!--<mgmt:jmx-default-config name="jmxAgent"/>-->
+    <!--<mgmt:rmi-server name="rmiAgent"/>-->
+    <!--<mgmt:jmx-server name="jmxAgent">-->
+        <!--<mgmt:connector-server url="service:jmx:rmi:///jndi/rmi://localhost:1099/server" rebind="true"/>-->
+    <!--</mgmt:jmx-server>-->
 
     <!--<mgmt:chainsaw-notifications chainsawHost="localhost" chainsawPort="20202" name="chainsaw">-->
     <!--<mgmt:level-mappings>-->
