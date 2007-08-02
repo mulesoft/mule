@@ -18,11 +18,10 @@ import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
 
-public class XmlFilterFunctionalTestCase extends FunctionalTestCase
+public class XmlFilterFunctionalTestCase extends AbstractXmlFunctionalTestCase
 {
 
     public static final String STRING_MESSAGE = "Hello world";
-    public static final long TIMEOUT = 1000L;
 
     protected String getConfigResources()
     {
@@ -41,19 +40,16 @@ public class XmlFilterFunctionalTestCase extends FunctionalTestCase
 
     public void testOther() throws Exception
     {
-        doTestXml("other", "vm/many-sends-test.xml");
+        doTestXml("other", getResourceAsString("vm/many-sends-test.xml"));
     }
 
     public void testSelf() throws Exception
     {
-        doTestXml("self", getConfigResources());
+        doTestXml("self", getConfigAsString());
     }
 
-    public void doTestXml(String endpoint, String resource) throws Exception
+    public void doTestXml(String endpoint, String xml) throws Exception
     {
-        InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(resource);
-        assertNotNull(resource, is);
-        String xml = IOUtils.toString(is);
         MuleClient client = new MuleClient();
         client.dispatch("in", xml, null);
         UMOMessage response = client.receive(endpoint, TIMEOUT);

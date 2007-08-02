@@ -30,6 +30,8 @@
                  <artifactId>maven-surefire-plugin</artifactId>
                  <configuration>
                      <excludes>
+                         <!-- MULE-2103 -->
+                         <exclude>**/RoundRobinXmlSplitterFunctionalTestCase.*</exclude>
                          <!-- MULE-2041 PersistentVMQueueTestCase needs a converted config -->
                          <exclude>**/PersistentVMQueueTestCase.*</exclude>
                      </excludes>

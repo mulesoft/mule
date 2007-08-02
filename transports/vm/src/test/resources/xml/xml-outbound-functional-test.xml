@@ -22,11 +22,15 @@
     <mule:endpoint name="roundrobin" address="vm://roundrobin" connector-ref="default"/>
     <mule:endpoint name="robin1" address="vm://robin1" connector-ref="queue"/>
     <mule:endpoint name="robin2" address="vm://robin2" connector-ref="queue"/>
+    <mule:endpoint name="robin3" address="vm://robin3" connector-ref="queue"/>
 
     <bean name="dom4jpe" class="org.mule.util.properties.Dom4jPropertyExtractor"/>
 
     <mule:model-seda name="xml outbound tests">
 
+        <!-- given this configuration, this service splits the DOM into separate
+             services via message-splitter.  the service name is then used in the
+             jxpath-filter to send each service to a separate endpoint -->
         <mule:service name="service splitter">
             <mule:component class="org.mule.components.simple.BridgeComponent"/>
             <mule:inbound-router>
@@ -35,11 +39,13 @@
             <mule:outbound-router>
                 <xml-outbound:message-splitter splitExpression="/spring:beans/mule:model-seda/mule:service">
                     <mule:endpoint ref="service1">
-                        <xml-filter:jxpath-filter pattern="/@name" expectedValue="service splitter"/>
+                        <!-- why does this work, even though the mule namespace is not defined here? -->
+                        <xml-filter:jxpath-filter pattern="/mule:service/@name" expectedValue="service splitter"/>
                     </mule:endpoint>
-                    <mule:endpoint ref="service1">
-                        <xml-filter:jxpath-filter pattern="/@name" expectedValue="round robin"/>
+                    <mule:endpoint ref="service2">
+                        <xml-filter:jxpath-filter pattern="/mule:service/@name" expectedValue="round robin"/>
                     </mule:endpoint>
+                    <!-- this is for the splitter; the element ordering is unfortunate -->
                     <xml-outbound:namespace prefix="spring" uri="http://www.springframework.org/schema/beans"/>
                     <xml-outbound:namespace prefix="mule" uri="http://www.mulesource.org/schema/mule/core/2.0"/>
                 </xml-outbound:message-splitter>
@@ -51,6 +57,15 @@
             <mule:inbound-router>
                 <mule:endpoint ref="roundrobin"/>
             </mule:inbound-router>
+            <mule:outbound-router>
+                <xml-outbound:message-splitter splitExpression="/spring:beans/mule:model-seda/mule:service">
+                    <mule:endpoint ref="robin1"/>
+                    <mule:endpoint ref="robin2"/>
+                    <mule:endpoint ref="robin3"/>
+                    <xml-outbound:namespace prefix="spring" uri="http://www.springframework.org/schema/beans"/>
+                    <xml-outbound:namespace prefix="mule" uri="http://www.mulesource.org/schema/mule/core/2.0"/>
+                </xml-outbound:message-splitter>
+            </mule:outbound-router>
         </mule:service>
 
     </mule:model-seda>
