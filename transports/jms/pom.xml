@@ -22,7 +22,7 @@
                          <forkMode>pertest</forkMode>
                          <exclude>**/*Mule2071*.*</exclude>
                          <!-- MULE-2065 -->
-                         <exclude>**/ActiveMQJmsTransactionFunctionalTestCase.*</exclude>
+                         <exclude>**/ActiveMQ*.*</exclude>
                          <!-- These are TCK classes, should really be in a separate module (mule-transport-jms-test) -->
                          <exclude>org/mule/providers/jms/test/*.java</exclude>
 
