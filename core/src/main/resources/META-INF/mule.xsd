@@ -818,12 +818,37 @@
     <!--==============================================================-->
 
     <xsd:complexType name="muleServiceType">
-        <xsd:choice maxOccurs="unbounded">
-            <xsd:element name="component" type="objectFactoryType" minOccurs="1" maxOccurs="1">
-                <xsd:annotation>
-                    <xsd:documentation>The underlying service component (your business logic)</xsd:documentation>
-                </xsd:annotation>
-            </xsd:element>
+        <xsd:sequence>
+            <!-- DF: minOccurs should be 1, is currenlty 0 because of the deprecated "implementation" attribute -->
+            <xsd:choice minOccurs="0">
+                <xsd:element name="component" type="objectFactoryType">
+                    <xsd:annotation>
+                        <xsd:documentation>The underlying service component (your business logic)</xsd:documentation>
+                    </xsd:annotation>
+                </xsd:element>
+                <xsd:element name="bridge-component">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Built-in BridgeComponent that enables a bridge between an inbound and outbound endpoints.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:element>
+                <xsd:element name="echo-component">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Built-in EchoComponent that logs the message and returns the payload back as the result.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:element>
+                <xsd:element name="log-component">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Built-in LogComponent that simply logs the message content (or content length if it is a
+                            large message).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:element>
+            </xsd:choice>
             <xsd:element name="inbound-router" type="inboundRouterCollectionType" minOccurs="0" maxOccurs="1"/>
             <xsd:element name="nested-router" type="nestedRouterCollectionType" minOccurs="0" maxOccurs="1"/>
             <xsd:element name="outbound-router" type="outboundRouterCollectionType" minOccurs="0" maxOccurs="1"/>
@@ -834,7 +859,7 @@
             <xsd:group ref="exceptionStrategies" maxOccurs="1" minOccurs="0"/>
             <xsd:element name="meta-info" type="mapType" minOccurs="0" maxOccurs="1"/>
             <!--<xsd:any namespace="##other" processContents="strict" minOccurs="0" maxOccurs="unbounded"/>-->
-        </xsd:choice>
+        </xsd:sequence>
         <xsd:attribute name="name" type="xsd:string" use="required"/>
         <xsd:attribute name="implementation" type="xsd:NMTOKEN">
             <xsd:annotation>
