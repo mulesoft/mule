@@ -42,9 +42,8 @@ public class SimpleComponentDefinitionParser extends ChildDefinitionParser
 
     protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
-        builder.setSingleton(isSingleton());
-        builder.addPropertyValue("objectClass", simpleComponentClass);
-        postProcess(builder, element);
+        super.parseChild(element, parserContext, builder);
+        getBeanAssembler(element, builder).extendBean("objectClass", simpleComponentClass, false);
     }
 
     protected Class getBeanClass(Element element)
