@@ -20,7 +20,7 @@
                  <configuration>
                     <excludes>
                         <!-- this test fails probably due to a bug in spring refreshable beans -->
-                        <exclude>**/*</exclude>
+                        <exclude>**/GroovyRefreshableBeanTestCase.*</exclude>
                     </excludes>
                 </configuration>
              </plugin>
@@ -48,6 +48,13 @@
             <artifactId>mule-tests-functional</artifactId>
             <version>${version}</version>
             <scope>test</scope>
+        </dependency>
+        
+        <!-- need to explicitly mark javax.mail as provided -->
+        <dependency>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Used by ScriptConfigurationBuilder -->
