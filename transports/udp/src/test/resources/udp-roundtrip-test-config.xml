@@ -10,16 +10,6 @@
                http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd
                http://www.mulesource.org/schema/mule/udp/2.0 http://www.mulesource.org/schema/mule/udp/2.0/mule-udp.xsd">
 
-    <!--<mule:environment-properties>-->
-        <!-- what to do here? -->
-        <!-- container-context className="org.mule.impl.container.PropertiesContainerContext">
-            <properties>
-                <factory-property name="hostname"
-                    factory="org.mule.config.factories.HostNameFactory"/>
-            </properties>
-        </container-context -->
-    <!--</mule:environment-properties>-->
-
     <mule:transformer-serializable-to-byte-array name="SerializableToByteArray"/>
 
     <mule:model-seda name="main">
@@ -27,11 +17,13 @@
         <mule:service name="PassingThrough">
             <mule:component class="org.mule.components.simple.PassThroughComponent"/>
             <mule:inbound-router>
-                <mule:endpoint address="udp://${hostname}:9001"/>
+                <!-- mule:endpoint address="udp://${hostname}:9001"/ -->
+                <mule:endpoint address="udp://localhost:9001"/>
             </mule:inbound-router>
             <mule:outbound-router>
                 <mule:pass-through-router>
-                    <mule:endpoint address="udp://${hostname}:9002"/>
+                    <!-- mule:endpoint address="udp://${hostname}:9002"/ -->
+                    <mule:endpoint address="udp://localhost:9002"/>
                 </mule:pass-through-router>
             </mule:outbound-router>
         </mule:service>
