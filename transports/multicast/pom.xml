@@ -20,7 +20,7 @@
                  <configuration>
                      <excludes>
                          <!-- TODO: AC - think this may just be my network -->
-                         <exclude>**/MulticastConnectorFunctionalTestCase.*</exclude>
+                         <!-- exclude>**/MulticastConnectorFunctionalTestCase.*</exclude -->
                      </excludes>
                  </configuration>
              </plugin>
