@@ -17,6 +17,7 @@
         <mule:service name="PassingThrough">
             <mule:component class="org.mule.components.simple.PassThroughComponent"/>
             <mule:inbound-router>
+                <!-- MULE-2109 -->
                 <!-- mule:endpoint address="udp://${hostname}:9001"/ -->
                 <mule:endpoint address="udp://localhost:9001"/>
             </mule:inbound-router>

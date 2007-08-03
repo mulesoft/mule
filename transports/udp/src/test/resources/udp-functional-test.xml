@@ -16,7 +16,9 @@
 
     <vm:connector name="vm-queue" queueEvents="true"/>
 
-    <mule:endpoint name="serverEndpoint" address="udp://null:60131"/>
+    <!-- MULE-2109 -->
+    <!-- mule:endpoint name="serverEndpoint" address="udp://null:60131"/ -->
+    <mule:endpoint name="serverEndpoint" address="udp://localhost:60131"/>
 
     <mule:model-seda name="main">
         <mule:service name="testUDP1" implementation="org.mule.tck.functional.FunctionalTestComponent">
