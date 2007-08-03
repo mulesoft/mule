@@ -180,8 +180,8 @@
             <mule:outbound-router>
                 <mule:custom-catch-all-strategy class="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>
                 <mule:filtering-router transformers="TestCompressionTransformer">
-                    <mule:payload-type-filter expectedType="java.lang.String"/>
                     <mule:endpoint address="test://appleQ2" name="TestApple-Out"/>
+                    <mule:payload-type-filter expectedType="java.lang.String"/>
                 </mule:filtering-router>
 
                 <mule:filtering-router>
