@@ -123,7 +123,7 @@
         </mule:service>
 
         <mule:service name="LenderGatewayService">
-            <mule:component class="org.mule.components.simple.BridgeComponent" />
+            <mule:bridge-component />
             <mule:inbound-router>
                 <mule:endpoint ref="LenderGateway" />
             </mule:inbound-router>
@@ -144,7 +144,7 @@
         </mule:service>
 
         <mule:service name="BankingGatewayService">
-            <mule:component class="org.mule.components.simple.BridgeComponent" />
+            <mule:bridge-component />
             <mule:inbound-router>
                 <mule:endpoint ref="BankingGateway" />
             </mule:inbound-router>
