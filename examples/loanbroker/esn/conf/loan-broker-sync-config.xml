@@ -48,8 +48,8 @@
                  </mule:outbound-router>
 
                  <mule:response-router timeout="10000">
-                     <mule:custom-router class="org.mule.examples.loanbroker.routers.BankQuotesResponseAggregator"/>
                      <mule:endpoint ref="LoanBrokerQuotes"/>
+                     <mule:custom-router class="org.mule.examples.loanbroker.routers.BankQuotesResponseAggregator"/>
                  </mule:response-router>
              </mule:service>
 
