@@ -37,8 +37,8 @@
                 <mule:filtering-router>
                     <mule:endpoint address="vm://groovy.2"/>
                     <mule:endpoint address="vm://groovy.3"/>
-				</mule:filtering-router>
-			</mule:outbound-router>
+                </mule:filtering-router>
+            </mule:outbound-router>
         </mule:service>
                     
         <mule:service name="GroovyUMO2">
