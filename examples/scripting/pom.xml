@@ -30,5 +30,12 @@
             <artifactId>mule-module-scripting</artifactId>
             <version>${version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>

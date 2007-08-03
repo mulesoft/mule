@@ -27,12 +27,7 @@
                 </mule:properties>
             </mule:component>
             <mule:inbound-router>
-                <mule:endpoint address="stdio://System.in">
-                    <mule:properties>
-                        <entry key="promptMessage" value="Please enter a message: "/>
-                        <entry key="messageDelayTime" value="1000"/>
-                    </mule:properties>
-                </mule:endpoint>
+                <mule:endpoint address="vm://scripting"/>
             </mule:inbound-router>
         </mule:service>
     </mule:model-seda>
