@@ -22,9 +22,9 @@ public class ScriptingExampleTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
         UMOMessage reply = client.send("vm://scripting", new MuleMessage("mule"));
         
-//        assertNotNull(reply);
-//        assertNotNull(reply.getPayload());
-//        assertEquals("[Hello, :-)]", reply.getPayloadAsString());
+        assertNotNull(reply);
+        assertNotNull(reply.getPayload());
+        assertEquals("[Hello, :-)]", reply.getPayloadAsString());
     }
 
     protected String getConfigResources()
