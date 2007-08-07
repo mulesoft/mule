@@ -82,6 +82,15 @@ public class Apple implements Fruit, Callable
         this.cleaner = cleaner;
     }
 
+    /**
+     * Used in {@link org.mule.components.simple.NoArgsCallWrapper} tests.
+     * @return will always return null
+     */
+    public Object methodReturningNull()
+    {
+        return null;
+    }
+
     public boolean equals(Object o)
     {
         if (this == o)
@@ -113,5 +122,10 @@ public class Apple implements Fruit, Callable
         result = (bitten ? 1 : 0);
         result = 29 * result + (washed ? 1 : 0);
         return result;
+    }
+
+    public String toString()
+    {
+        return "Just an apple.";
     }
 }

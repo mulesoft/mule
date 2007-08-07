@@ -124,7 +124,7 @@ public class CoreMessages extends MessageFactory
     {
         return connectorCausedError(null);
     }
-    
+
     public static Message connectorCausedError(Object connector)
     {
         return createMessage(BUNDLE_PATH, 33, connector);
@@ -134,7 +134,7 @@ public class CoreMessages extends MessageFactory
     {
         return createMessage(BUNDLE_PATH, 34);
     }
-    
+
     public static Message listenerAlreadyRegistered(UMOEndpointURI endpointUri)
     {
         return createMessage(BUNDLE_PATH, 35, endpointUri);
@@ -211,7 +211,7 @@ public class CoreMessages extends MessageFactory
             ClassUtils.getSimpleName(returnClass));
     }
 
-    public static Message transformOnObjectUnsupportedTypeOfEndpoint(String name, Class class1, 
+    public static Message transformOnObjectUnsupportedTypeOfEndpoint(String name, Class class1,
         UMOImmutableEndpoint endpoint)
     {
         return createMessage(BUNDLE_PATH, 54, name, StringMessageUtils.toString(class1),
@@ -249,7 +249,7 @@ public class CoreMessages extends MessageFactory
             StringMessageUtils.toString(types));
     }
 
-    public static Message cannotSetPropertyOnObjectWithParamType(String property, 
+    public static Message cannotSetPropertyOnObjectWithParamType(String property,
         Class class1, Class class2)
     {
         return createMessage(BUNDLE_PATH, 61, property, StringMessageUtils.toString(class1),
@@ -552,7 +552,7 @@ public class CoreMessages extends MessageFactory
     {
         return createMessage(BUNDLE_PATH, 140);
     }
-    
+
     public static Message failedToCreateManagerInstance(String className)
     {
         return createMessage(BUNDLE_PATH, 144, className);
@@ -598,7 +598,7 @@ public class CoreMessages extends MessageFactory
         return createMessage(BUNDLE_PATH, 156, scheme);
     }
 
-    public static Message propertyIsNotSupportedType(String property, Class expected, 
+    public static Message propertyIsNotSupportedType(String property, Class expected,
         Class actual)
     {
         return createMessage(BUNDLE_PATH, 157, property, StringMessageUtils.toString(expected),
@@ -684,7 +684,7 @@ public class CoreMessages extends MessageFactory
     {
         return createMessage(BUNDLE_PATH, 180);
     }
-    
+
     public static Message propertiesNotSet(String string)
     {
         return createMessage(BUNDLE_PATH, 183, string);
@@ -828,29 +828,43 @@ public class CoreMessages extends MessageFactory
         return createMessage(BUNDLE_PATH, 223);
     }
 
+    public static Message noEntryPointFoundForNoArgsMethod(final Object component, final String methodName)
+    {
+        return createMessage(BUNDLE_PATH, 224, component, methodName);
+    }
+
+    public static Message noDelegateClassAndMethodProvidedForNoArgsWrapper()
+    {
+        return createMessage(BUNDLE_PATH, 225);
+    }
+
+    public static Message noDelegateClassIfDelegateInstanceSpecified()
+    {
+        return createMessage(BUNDLE_PATH, 226);
+    }
+
     public static Message noServiceTransportDescriptor(String protocol)
     {
-        return createMessage(BUNDLE_PATH, 224, protocol);
+        return createMessage(BUNDLE_PATH, 227, protocol);
     }
 
     public static Message failedToInvokeLifecycle(String phaseName, Object object)
     {
-        return createMessage(BUNDLE_PATH, 225, phaseName, object);
+        return createMessage(BUNDLE_PATH, 228, phaseName, object);
     }
 
     public static Message unrecognisedServiceType(String type)
     {
-        return createMessage(BUNDLE_PATH, 226, type);
+        return createMessage(BUNDLE_PATH, 229, type);
     }
 
     public static Message serviceFinderCantFindService(String name)
     {
-        return createMessage(BUNDLE_PATH, 227, name);
+        return createMessage(BUNDLE_PATH, 230, name);
     }
 
-     public static Message modelNameDoesNotMatchModel(UMOImmutableDescriptor descriptor, String modelName)
+    public static Message modelNameDoesNotMatchModel(UMOImmutableDescriptor descriptor, String modelName)
     {
-        return createMessage(BUNDLE_PATH, 228, descriptor.getName(), descriptor.getModelName(), modelName);
+        return createMessage(BUNDLE_PATH, 231, descriptor.getName(), descriptor.getModelName(), modelName);
     }
-
 }

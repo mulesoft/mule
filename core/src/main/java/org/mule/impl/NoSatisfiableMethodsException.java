@@ -47,6 +47,11 @@ public class NoSatisfiableMethodsException extends UMOException
         this(component, args, null);
     }
 
+    public NoSatisfiableMethodsException(Object component, String methodName)
+    {
+        super(CoreMessages.noEntryPointFoundForNoArgsMethod(component, methodName));
+    }
+
     public NoSatisfiableMethodsException(Object component, Class[] args, Exception cause)
     {
         super(CoreMessages.noEntryPointFoundWithArgs(component, args), cause);
