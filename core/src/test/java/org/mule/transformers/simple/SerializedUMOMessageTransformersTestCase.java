@@ -34,7 +34,7 @@ public class SerializedUMOMessageTransformersTestCase extends AbstractTransforme
     // @Override
     protected void doSetUp() throws Exception
     {
-        RequestContext.safeSetEvent(new MuleEvent(testObject, getTestEndpoint("test", "sender"), MuleTestUtils
+        RequestContext.setEvent(new MuleEvent(testObject, getTestEndpoint("test", "sender"), MuleTestUtils
             .getTestSession(), true));
     }
 

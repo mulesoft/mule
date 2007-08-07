@@ -14,7 +14,7 @@ import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.NoSatisfiableMethodsException;
-import org.mule.impl.RequestContext;
+import org.mule.impl.OptimizedRequestContext;
 import org.mule.impl.TooManySatisfiableMethodsException;
 import org.mule.impl.VoidResult;
 import org.mule.providers.NullPayload;
@@ -180,7 +180,7 @@ public class DynamicEntryPoint implements UMOEntryPoint
                     method = this.getMethodByArgumentType(payload.getClass().getName());
                     if (method != null)
                     {
-                        RequestContext.unsafeRewriteEvent(new MuleMessage(payload, context.getMessage()));
+                        OptimizedRequestContext.unsafeRewriteEvent(new MuleMessage(payload, context.getMessage()));
                     }
                 }
                 else
@@ -217,7 +217,7 @@ public class DynamicEntryPoint implements UMOEntryPoint
             {
                 // no method for context: try payload
                 payload = context.getTransformedMessage();
-                RequestContext.unsafeRewriteEvent(new MuleMessage(payload, context.getMessage()));
+                OptimizedRequestContext.unsafeRewriteEvent(new MuleMessage(payload, context.getMessage()));
 
                 methods = ClassUtils.getSatisfiableMethods(component.getClass(), ClassUtils
                     .getClassTypes(payload), true, true, IgnoredMethodNames);
@@ -247,7 +247,7 @@ public class DynamicEntryPoint implements UMOEntryPoint
         if (payload == null)
         {
             payload = context.getTransformedMessage();
-            RequestContext.unsafeRewriteEvent(new MuleMessage(payload, context.getMessage()));
+            OptimizedRequestContext.unsafeRewriteEvent(new MuleMessage(payload, context.getMessage()));
         }
 
         if (logger.isDebugEnabled())

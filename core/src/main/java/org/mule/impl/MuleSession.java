@@ -161,7 +161,7 @@ public final class MuleSession implements UMOSession
         dispatchEvent(event);
 
         // need a new copy here because we are going to mutate it (checked necessary)
-        UMOMessage response = RequestContext.criticalWriteResponse(event.getMessage());
+        UMOMessage response = OptimizedRequestContext.criticalWriteResponse(event.getMessage());
         processResponse(response);
     }
 
@@ -185,7 +185,7 @@ public final class MuleSession implements UMOSession
         UMOMessage result = router.route(message, this, true);
         if (result != null)
         {
-            RequestContext.safeWriteResponse(result);
+            RequestContext.writeResponse(result);
             processResponse(result);
         }
 
@@ -218,7 +218,7 @@ public final class MuleSession implements UMOSession
 
         if (result != null)
         {
-            RequestContext.unsafeWriteResponse(result);
+            OptimizedRequestContext.unsafeWriteResponse(result);
             processResponse(result);
         }
 
@@ -270,7 +270,7 @@ public final class MuleSession implements UMOSession
                              + ", event is: " + event);
             }
             component.dispatchEvent(event);
-            UMOMessage response = RequestContext.criticalWriteResponse(event.getMessage());
+            UMOMessage response = OptimizedRequestContext.criticalWriteResponse(event.getMessage());
             processResponse(response);
         }
         else
@@ -324,7 +324,7 @@ public final class MuleSession implements UMOSession
                 }
 
                 UMOMessage response = event.getEndpoint().send(event);
-                RequestContext.unsafeWriteResponse(response);
+                OptimizedRequestContext.unsafeWriteResponse(response);
                 processResponse(response);
                 return response;
             }

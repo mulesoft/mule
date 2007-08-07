@@ -391,7 +391,7 @@ public class RemoteDispatcher implements Disposable
         throws UMOException
     {
 
-        RequestContext.safeSetEvent(new MuleEvent(message, endpoint, new MuleSession(message,
+        RequestContext.setEvent(new MuleEvent(message, endpoint, new MuleSession(message,
             new MuleSessionHandler()), synchronous));
     }
 }

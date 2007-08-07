@@ -14,6 +14,7 @@ import org.mule.MuleRuntimeException;
 import org.mule.RegistryContext;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.impl.OptimizedRequestContext;
 import org.mule.impl.RequestContext;
 import org.mule.impl.internal.notifications.ConnectionNotification;
 import org.mule.impl.internal.notifications.MessageNotification;
@@ -157,7 +158,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
         event.setSynchronous(false);
         event.getMessage().setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY,
             event.getEndpoint().getEndpointURI().toString());
-        event = RequestContext.unsafeSetEvent(event);
+        event = OptimizedRequestContext.criticalSetEvent(event); // MULE-2112
 
         // Apply Security filter if one is set
         UMOImmutableEndpoint endpoint = event.getEndpoint();
@@ -233,7 +234,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
         event.setSynchronous(true);
         event.getMessage().setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY,
             event.getEndpoint().getEndpointURI().toString());
-        event = RequestContext.unsafeSetEvent(event);
+        event = OptimizedRequestContext.unsafeSetEvent(event);
 
         // Apply Security filter if one is set
         UMOImmutableEndpoint endpoint = event.getEndpoint();
@@ -611,7 +612,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
         {
             try
             {
-                event = RequestContext.criticalSetEvent(event);
+                event = OptimizedRequestContext.criticalSetEvent(event);
                 // Make sure we are connected
                 connectionStrategy.connect(AbstractMessageDispatcher.this);
                 AbstractMessageDispatcher.this.doDispatch(event);

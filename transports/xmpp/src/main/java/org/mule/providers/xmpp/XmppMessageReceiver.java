@@ -143,7 +143,7 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements Pack
 
                 if (returnMessage != null && packet instanceof Message)
                 {
-                    RequestContext.safeRewriteEvent(returnMessage);
+                    RequestContext.rewriteEvent(returnMessage);
                     Packet result = (Packet) connector.getDefaultResponseTransformer().transform(
                             returnMessage.getPayload());
                     xmppConnection.sendPacket(result);

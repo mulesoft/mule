@@ -24,6 +24,11 @@ import junit.framework.TestCase;
 public class ThreadSafeAccessTestCase extends TestCase
 {
 
+    protected void setUp() throws Exception
+    {
+        System.setProperty(MuleProperties.MULE_THREAD_UNSAFE_MESSAGES_PROPERTY, "false");
+    }
+
     public void testMessage() throws InterruptedException
     {
         basicPattern(new MuleMessage(new Object(), (Map)null));

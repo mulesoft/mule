@@ -59,7 +59,7 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
     // @Override
     protected void doTearDown() throws Exception
     {
-        RequestContext.safeSetEvent(null);
+        RequestContext.setEvent(null);
         if (session != null)
         {
             session.close();
@@ -69,7 +69,7 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
 
     public void testTransformObjectMessage() throws Exception
     {
-        RequestContext.safeSetEvent(getTestEvent("test"));
+        RequestContext.setEvent(getTestEvent("test"));
 
         ObjectMessage oMsg = session.createObjectMessage();
         File f = FileUtils.newFile("/some/random/path");
@@ -86,7 +86,7 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
 
     public void testTransformTextMessage() throws Exception
     {
-        RequestContext.safeSetEvent(getTestEvent("test"));
+        RequestContext.setEvent(getTestEvent("test"));
 
         String text = "This is a test TextMessage";
         TextMessage tMsg = session.createTextMessage();
@@ -104,7 +104,7 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
 
     public void testTransformMapMessage() throws Exception
     {
-        RequestContext.safeSetEvent(getTestEvent("test"));
+        RequestContext.setEvent(getTestEvent("test"));
 
         Properties p = new Properties();
         p.setProperty("Key1", "Value1");
@@ -125,7 +125,7 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
 
     public void testTransformByteMessage() throws Exception
     {
-        RequestContext.safeSetEvent(getTestEvent("test"));
+        RequestContext.setEvent(getTestEvent("test"));
 
         AbstractJmsTransformer trans = new SessionEnabledObjectToJMSMessage(session);
         trans.setReturnClass(BytesMessage.class);
@@ -152,7 +152,7 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
     // http://en.wikipedia.org/wiki/Zip_of_death
     public void testCompressedBytesMessage() throws Exception
     {
-        RequestContext.safeSetEvent(getTestEvent("test"));
+        RequestContext.setEvent(getTestEvent("test"));
 
         // use GZIP
         CompressionStrategy compressor = new GZipCompression();

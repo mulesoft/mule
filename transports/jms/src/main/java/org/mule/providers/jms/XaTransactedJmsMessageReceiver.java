@@ -33,8 +33,13 @@ import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.Session;
 
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageReceiver
 {
+    public static final long DEFAULT_VM_POLL_FREQUENCY = 1;
+    public static final TimeUnit DEFAULT_VM_POLL_TIMEUNIT = TimeUnit.NANOSECONDS;
+    
     protected final JmsConnector connector;
     protected boolean reuseConsumer;
     protected boolean reuseSession;
@@ -70,9 +75,11 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
     public XaTransactedJmsMessageReceiver(UMOConnector umoConnector, UMOComponent component, UMOEndpoint endpoint)
         throws CreateException
     {
+        super(umoConnector, component, endpoint);
         // TODO AP: find appropriate value for polling frequency with the scheduler;
         // see setFrequency/setTimeUnit & VMMessageReceiver for more
-        super(umoConnector, component, endpoint);
+        this.setFrequency(DEFAULT_VM_POLL_FREQUENCY);
+        this.setTimeUnit(DEFAULT_VM_POLL_TIMEUNIT);
         this.connector = (JmsConnector) umoConnector;
         this.timeout = endpoint.getTransactionConfig().getTimeout();
 
@@ -122,12 +129,11 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
     {
         if (connector.isConnected() && connector.isEagerConsumer())
         {
-            // TODO Fix Bug
+            createConsumer();
             // creating this consumer now would prevent from the actual worker
             // consumer
             // to receive the message!
             //Antoine Borg 08 Dec 2006 - Uncommented for MULE-1150
-            createConsumer();
             // if we comment this line, if one tries to restart the service through
             // JMX,
             // this will fail...

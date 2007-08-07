@@ -30,7 +30,7 @@ public class InterceptorsTestCase extends AbstractMuleTestCase
     protected void doSetUp() throws Exception
     {
         // Make sure there is no current event
-        RequestContext.safeSetEvent(null);
+        RequestContext.setEvent(null);
     }
 
     public void testSingleFilter() throws Exception

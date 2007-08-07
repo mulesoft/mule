@@ -109,12 +109,12 @@ public final class MuleTestUtils
         try
         {
             UMOEvent event = getTestEvent(data, context);
-            RequestContext.safeSetEvent(event);
+            RequestContext.setEvent(event);
             return RequestContext.getEventContext();
         }
         finally
         {
-            RequestContext.safeSetEvent(null);
+            RequestContext.setEvent(null);
         }
     }
 

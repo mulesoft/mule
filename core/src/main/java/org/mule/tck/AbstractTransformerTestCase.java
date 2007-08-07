@@ -24,13 +24,13 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
     protected void doSetUp() throws Exception
     {
         // setup a dummy context for transformers that are event aware
-        RequestContext.safeSetEvent(getTestEvent("test"));
+        RequestContext.setEvent(getTestEvent("test"));
     }
 
     //@Override
     protected void doTearDown() throws Exception
     {
-        RequestContext.safeSetEvent(null);
+        RequestContext.setEvent(null);
     }
 
     // Remove tabs and line breaks in the passed String; this makes comparison of XML

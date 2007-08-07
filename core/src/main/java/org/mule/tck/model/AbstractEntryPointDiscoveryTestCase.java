@@ -46,7 +46,7 @@ public abstract class AbstractEntryPointDiscoveryTestCase extends AbstractMuleTe
 
         try
         {
-            RequestContext.safeSetEvent(getTestEvent("Hello"));
+            RequestContext.setEvent(getTestEvent("Hello"));
             ep.invoke(new InvalidSatsuma(), RequestContext.getEventContext());
             fail("Should have failed to find entrypoint on Satsuma");
 
@@ -57,7 +57,7 @@ public abstract class AbstractEntryPointDiscoveryTestCase extends AbstractMuleTe
         }
         finally
         {
-            RequestContext.safeSetEvent(null);
+            RequestContext.setEvent(null);
         }
 
     }
