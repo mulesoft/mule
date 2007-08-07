@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id:XFireBadSoapRequestTestCase.java 7586 2007-07-19 04:06:50Z aperepel $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -46,8 +46,8 @@ public class XFireBadSoapRequestTestCase extends FunctionalTestCase
                              + "</ssss>"
                              + "</soap:Body>" + "</soap:Envelope>";
 
-        UMOMessage reply = client.send("http://localhost:33381/services/TestComponent", 
-            new MuleMessage(soapRequest));
+        UMOMessage reply = client.send("http://localhost:63381/services/TestComponent", new MuleMessage(
+            soapRequest));
 
         assertNotNull(reply);
         assertNotNull(reply.getPayload());

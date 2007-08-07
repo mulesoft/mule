@@ -37,8 +37,8 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageReceiver
 {
-    public static final long DEFAULT_VM_POLL_FREQUENCY = 1;
-    public static final TimeUnit DEFAULT_VM_POLL_TIMEUNIT = TimeUnit.NANOSECONDS;
+    public static final long DEFAULT_JMS_POLL_FREQUENCY = 1;
+    public static final TimeUnit DEFAULT_JMS_POLL_TIMEUNIT = TimeUnit.NANOSECONDS;
     
     protected final JmsConnector connector;
     protected boolean reuseConsumer;
@@ -78,8 +78,8 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
         super(umoConnector, component, endpoint);
         // TODO AP: find appropriate value for polling frequency with the scheduler;
         // see setFrequency/setTimeUnit & VMMessageReceiver for more
-        this.setFrequency(DEFAULT_VM_POLL_FREQUENCY);
-        this.setTimeUnit(DEFAULT_VM_POLL_TIMEUNIT);
+        this.setFrequency(DEFAULT_JMS_POLL_FREQUENCY);
+        this.setTimeUnit(DEFAULT_JMS_POLL_TIMEUNIT);
         this.connector = (JmsConnector) umoConnector;
         this.timeout = endpoint.getTransactionConfig().getTimeout();
 

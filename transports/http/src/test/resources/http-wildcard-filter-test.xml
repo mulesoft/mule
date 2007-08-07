@@ -14,7 +14,7 @@
             <mule:component class="org.mule.components.simple.EchoComponent"/>
 
             <mule:inbound-router>
-                <mule:endpoint address="http://localhost:60198" synchronous="true">
+                <mule:endpoint address="http://localhost:60201" synchronous="true">
                     <mule:not-filter>
                         <mule:wildcard-filter pattern="*xyz*"/>
                     </mule:not-filter>

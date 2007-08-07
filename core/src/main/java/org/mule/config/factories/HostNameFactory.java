@@ -23,6 +23,9 @@ public class HostNameFactory implements PropertyFactory
 
     public Object create(Map props) throws Exception
     {
+        // we could use getCanonicalHostName here.  however, on machines behind
+        // NAT firewalls it seems that is often the NAT address, which corresponds
+        // to an interface on the firewall, not on the local machine.
         return InetAddress.getLocalHost().getHostName();
     }
 

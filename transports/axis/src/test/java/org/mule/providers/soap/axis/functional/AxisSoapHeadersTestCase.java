@@ -45,7 +45,7 @@ public class AxisSoapHeadersTestCase extends FunctionalTestCase
                             + "<Action>storeModuleInformation</Action>"
                             + // this should be ignored
                             "<mule:header>"
-                            + "<mule:MULE_REPLYTO>http://localhost:12182/reply</mule:MULE_REPLYTO>"
+                            + "<mule:MULE_REPLYTO>http://localhost:62182/reply</mule:MULE_REPLYTO>"
                             + "</mule:header>"
                             + "</soapenv:Header>"
                             +
@@ -53,7 +53,7 @@ public class AxisSoapHeadersTestCase extends FunctionalTestCase
                             "<soapenv:Body><echo soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><value0 xsi:type=\"soapenc:string\" xmlns:soapenc=\"http://schemas.xmlsoap.org/soap/encoding/\">Test Message</value0></echo></soapenv:Body>"
                             + "</soapenv:Envelope>");
 
-        UMOMessage reply = client.send("http://localhost:12181/services/component", soapRequest, properties);
+        UMOMessage reply = client.send("http://localhost:62181/services/component", soapRequest, properties);
 
         // Put this in so that no spurious exceptions are thrown
         // TODO research and see why sometimes we get 404 or Connection refused

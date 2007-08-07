@@ -20,7 +20,7 @@ public class StreamingDownloadMule1389TestCase extends AbstractStreamingDownload
 
     public StreamingDownloadMule1389TestCase()
     {
-        super("http://localhost:65432");
+        super("http://localhost:60208");
     }
 
     protected String getConfigResources()

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="Mule_Sample" version="1.0">
+
+    <mule-environment-properties synchronous="false"/>
+
+    <container-context className="org.mule.extras.spring.SpringContainerContext">
+        <properties>
+            <property name="configFile" value="spring-security.xml"/>
+        </properties>
+    </container-context>
+
+    <connector name="SecuredConnector" className="org.mule.providers.soap.xfire.XFireConnector">
+        <properties>
+            <list name="clientOutHandlers">
+                <entry value="org.codehaus.xfire.util.dom.DOMOutHandler"/>
+                <entry value="org.codehaus.xfire.security.wss4j.WSS4JOutHandler"/>
+            </list>
+        </properties> 
+    </connector>
+    
+    <connector name="UnsecuredConnector"  className="org.mule.providers.soap.xfire.XFireConnector"/>
+
+    <model name="test">
+        
+        <mule-descriptor name="SecureBride" implementation="org.mule.components.simple.BridgeComponent">
+            <inbound-router>
+                <endpoint address="vm://secured"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint name="secured" address="xfire:http://localhost:8282/SecuredWs?method=echo" connector="SecuredConnector"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+        
+        <mule-descriptor name="SecuredWs" implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <endpoint address="xfire:http://localhost:8282" connector="SecuredConnector">
+                    <security-filter className="org.mule.extras.wssecurity.filters.WsSecurityFilter">
+                        <properties>
+                            <property value="in-signed-security.properties" name="wsSignatureFile"/>
+                            <property value="in-encrypted-security.properties" name="wsDecryptionFile"/>
+                        </properties>
+                    </security-filter>
+                </endpoint>
+            </inbound-router>
+        </mule-descriptor>
+        
+        <mule-descriptor name="UnsecureBride" implementation="org.mule.components.simple.BridgeComponent">
+            <inbound-router>
+                <endpoint address="vm://unsecured"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint name="unsecured" address="xfire:http://localhost:8284/UnSecuredWs?method=echo" connector="UnsecuredConnector"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+        
+        <mule-descriptor name="UnSecuredWs"  implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <endpoint address="xfire:http://localhost:8284" connector="UnsecuredConnector"/>
+            </inbound-router>
+        </mule-descriptor>
+       </model>
+</mule-configuration>

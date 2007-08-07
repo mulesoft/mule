@@ -52,7 +52,7 @@ public class AxisNamedParametersTestCase extends FunctionalTestCase
         // when making the call
         props.put(MuleProperties.MULE_SOAP_METHOD, soapMethod);
 
-        UMOMessage result = client.send("axis:http://localhost:38011/mule/mycomponent2?method=echo",
+        UMOMessage result = client.send("axis:http://localhost:62111/mule/mycomponent2?method=echo",
             "Hello Named", props);
         assertEquals("Hello Named", result.getPayload());
     }

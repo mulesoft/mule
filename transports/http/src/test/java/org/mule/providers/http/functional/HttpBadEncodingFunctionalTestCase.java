@@ -20,12 +20,6 @@ import java.util.Map;
 
 public class HttpBadEncodingFunctionalTestCase extends HttpEncodingFunctionalTestCase
 {
-    protected static String TEST_MESSAGE = "Test Http Request (R�dgr�d), 57 = \u06f7\u06f5 in Arabic";
-
-    protected String getConfigResources()
-    {
-        return "http-encoding-test.xml";
-    }
 
     public void testSend() throws Exception
     {

@@ -44,7 +44,7 @@
   </wsdl:binding>
   <wsdl:service name="muleService1">
     <wsdl:port binding="impl:muleServicePortSoapBinding" name="muleServicePort1">
-      <wsdlsoap:address location="http://localhost:8083/services/EchoService3"/>
+      <wsdlsoap:address location="http://localhost:62083/services/EchoService3"/>
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>

@@ -21,7 +21,7 @@
             </mule:component>
 
             <mule:inbound-router>
-                <mule:endpoint address="http://localhost:8081/mycomponent1" synchronous="true"/>
+                <mule:endpoint address="http://localhost:60211/mycomponent1" synchronous="true"/>
             </mule:inbound-router>
         </mule:service>
 
@@ -33,7 +33,7 @@
             </mule:component>
 
             <mule:inbound-router>
-                <mule:endpoint address="http://localhost:8081/mycomponent2" synchronous="true"/>
+                <mule:endpoint address="http://localhost:60211/mycomponent2" synchronous="true"/>
             </mule:inbound-router>
         </mule:service>
 

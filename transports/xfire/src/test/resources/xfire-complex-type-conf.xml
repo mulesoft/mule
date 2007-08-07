@@ -5,7 +5,7 @@
 <mule-configuration id="Mule_Test" version="1.0">
 
     <global-endpoints>
-        <endpoint address="wsdl-xfire:http://localhost:9999/services/PeopleServiceWS?WSDL&amp;method=addPersonWithConfirmation" name="wsdlEndpoint">
+        <endpoint address="wsdl-xfire:http://localhost:63999/services/PeopleServiceWS?WSDL&amp;method=addPersonWithConfirmation" name="wsdlEndpoint">
             <properties>
                 <map name="complexTypes">
                     <property name="org.mule.tck.testmodels.services.Person" value="Person:http://services.testmodels.tck.mule.org"/>
@@ -15,7 +15,7 @@
                 </map>
             </properties>
         </endpoint>
-        <endpoint address="xfire:http://localhost:9999/services/PeopleServiceWS?method=addPersonWithConfirmation" name="xfireEndpoint">
+        <endpoint address="xfire:http://localhost:63999/services/PeopleServiceWS?method=addPersonWithConfirmation" name="xfireEndpoint">
             <properties>
                 <map name="complexTypes">
                     <property name="org.mule.tck.testmodels.services.Person" value="Person:http://services.testmodels.tck.mule.org"/>
@@ -30,7 +30,7 @@
     <model name="ComplexTypes">
         <mule-descriptor name="PeopleServiceWS" implementation="org.mule.providers.soap.xfire.testmodels.XFireComplexTypeService">
             <inbound-router>
-                <endpoint address="xfire:http://localhost:9999/services"/>
+                <endpoint address="xfire:http://localhost:63999/services"/>
             </inbound-router>
             <properties>
                 <property name="SOAP_NAMESPACE_PROPERTY" value="http://services.testmodels.tck.mule.org"/>

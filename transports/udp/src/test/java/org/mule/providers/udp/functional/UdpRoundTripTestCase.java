@@ -33,8 +33,8 @@ public class UdpRoundTripTestCase extends FunctionalTestCase
 
     public void testSendAndReceiveUDP() throws IOException
     {
-        int outPort = 9001;
-        int inPort = 9002;
+        int outPort = 61000;
+        int inPort = 61001;
 
         // the socket we talk to
         DatagramSocket socket = new DatagramSocket(inPort, InetAddress.getLocalHost());

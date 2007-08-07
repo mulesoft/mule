@@ -17,7 +17,7 @@ public class StreamingSpeedMule1389TestCase extends AbstractStreamingCapacityTes
 
     public StreamingSpeedMule1389TestCase()
     {
-        super(100 * ONE_MB, "tcp://localhost:65432");
+        super(100 * ONE_MB, "tcp://localhost:60210");
     }
 
     protected String getConfigResources()

@@ -25,7 +25,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public class XFireCustomHttpHeaderTestCase extends FunctionalTestCase implements MessageNotificationListener
 {
-    protected static final String endpointAddress = "http://localhost:10181/services/TestComponent?method=onReceive";
+    protected static final String endpointAddress = "http://localhost:63181/services/TestComponent?method=onReceive";
 
     private UMOMessage notificationMsg = null;
     private CountDownLatch latch = null;

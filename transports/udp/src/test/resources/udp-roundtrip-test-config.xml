@@ -19,12 +19,12 @@
             <mule:inbound-router>
                 <!-- MULE-2109 -->
                 <!-- mule:endpoint address="udp://${hostname}:9001"/ -->
-                <mule:endpoint address="udp://localhost:9001"/>
+                <mule:endpoint address="udp://localhost:61000"/>
             </mule:inbound-router>
             <mule:outbound-router>
                 <mule:pass-through-router>
                     <!-- mule:endpoint address="udp://${hostname}:9002"/ -->
-                    <mule:endpoint address="udp://localhost:9002"/>
+                    <mule:endpoint address="udp://localhost:61001"/>
                 </mule:pass-through-router>
             </mule:outbound-router>
         </mule:service>

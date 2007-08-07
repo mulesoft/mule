@@ -10,11 +10,11 @@
         This config is identical to echo-config.xml but exposes the EchoUMO as a SOAP web service.
 
         To invoke the EchoUMO hit the following URL -
-            http://localhost:8081/services/EchoUMO?method=echo&amp;param=Is there an echo?
+            http://localhost:65081/services/EchoUMO?method=echo&amp;param=Is there an echo?
         (remember to replace the '&amp;' with an ampersand)
     
         To view the WSDL for the EchoUMO service go to -
-            http://localhost:8081/services/EchoUMO?wsdl
+            http://localhost:65081/services/EchoUMO?wsdl
     </description>
 
     <mule:custom-transformer name="HttpRequestToSoapRequest" 
@@ -24,9 +24,9 @@
         <mule:service name="EchoUMO">
             <mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
-                <mule:endpoint address="axis:http://localhost:8081/services" 
+                <mule:endpoint address="axis:http://localhost:65081/services"
                     transformers="HttpRequestToSoapRequest"/>
-                <mule:endpoint address="axis:http://localhost:8082/services"/>
+                <mule:endpoint address="axis:http://localhost:65082/services"/>
                 <mule:endpoint address="vm://echo" />                
             </mule:inbound-router>
         </mule:service>

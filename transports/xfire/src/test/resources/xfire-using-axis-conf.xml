@@ -8,14 +8,14 @@
         Testing Web Services
     </description>
 
-    <mule-environment-properties serverUrl="tcp://localhost:60500"/>
+    <mule-environment-properties serverUrl="tcp://localhost:63500"/>
 
     <model name="Testing_an_xfire_service_using_axis">
 
         <!--Hosting the XFire service-->
         <mule-descriptor name="XfireService" implementation="org.mule.tck.testmodels.services.TestComponent">
             <inbound-router>
-                <endpoint address="xfire:http://localhost:33382/services"/>
+                <endpoint address="xfire:http://localhost:63382/services"/>
             </inbound-router>
         </mule-descriptor>
 
@@ -26,7 +26,7 @@
             </inbound-router>
             <outbound-router>
                 <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="axis:http://localhost:33382/services/XfireService?method=receive">
+                    <endpoint address="axis:http://localhost:63382/services/XfireService?method=receive">
                         <properties>
                             <property name="soapAction" value="${methodNamespace}${method}"/>
                             <map name="soapMethods">

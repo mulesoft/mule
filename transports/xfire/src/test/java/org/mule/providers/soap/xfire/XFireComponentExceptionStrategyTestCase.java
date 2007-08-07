@@ -27,7 +27,7 @@ public class XFireComponentExceptionStrategyTestCase extends FunctionalTestCase
 
         try
         {
-            client.send("xfire:http://localhost:10181/services/XFireDefault?method=testXFireException", "TEST", null);
+            client.send("xfire:http://localhost:63181/services/XFireDefault?method=testXFireException", "TEST", null);
         }
         catch (DispatchException ex)
         {
@@ -43,7 +43,7 @@ public class XFireComponentExceptionStrategyTestCase extends FunctionalTestCase
 
         try
         {
-            client.send("xfire:http://localhost:10181/services/XFireWithExceptionStrategy?method=testXFireException", "TEST", null);
+            client.send("xfire:http://localhost:63181/services/XFireWithExceptionStrategy?method=testXFireException", "TEST", null);
         }
         catch (DispatchException ex)
         {
@@ -64,7 +64,7 @@ public class XFireComponentExceptionStrategyTestCase extends FunctionalTestCase
 
         try
         {
-            client.send("xfire:http://localhost:10181/services/XFireWithExceptionStrategy?method=testNonXFireException", "TEST", null);
+            client.send("xfire:http://localhost:63181/services/XFireWithExceptionStrategy?method=testNonXFireException", "TEST", null);
         }
         catch (DispatchException ex)
         {

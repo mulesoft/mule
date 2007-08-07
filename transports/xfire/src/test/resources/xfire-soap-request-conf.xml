@@ -38,7 +38,7 @@
         
         <mule-descriptor name="TestComponent" implementation="org.mule.tck.testmodels.services.TestComponent">
             <inbound-router>
-                <endpoint address="xfire:http://localhost:33381/services"/>
+                <endpoint address="xfire:http://localhost:63381/services"/>
             </inbound-router>
         </mule-descriptor>
     </model>

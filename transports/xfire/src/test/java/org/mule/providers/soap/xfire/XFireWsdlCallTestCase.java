@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id:XFireWsdlCallTestCase.java 7586 2007-07-19 04:06:50Z aperepel $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -32,7 +32,7 @@ import org.mortbay.util.InetAddrPort;
 
 public class XFireWsdlCallTestCase extends FunctionalTestCase
 {
-    public static final int HTTP_PORT = 18088;
+    public static final int HTTP_PORT = 63088;
 
     private Server httpServer;
 
@@ -100,7 +100,7 @@ public class XFireWsdlCallTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
         Map props = new HashMap();
         props.put("http.method", "GET");
-        UMOMessage reply = client.send("http://localhost:18082/xfireService?wsdl", null, props);
+        UMOMessage reply = client.send("http://localhost:63082/xfireService?wsdl", null, props);
 
         assertNotNull(reply);
         assertNotNull(reply.getPayload());

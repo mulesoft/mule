@@ -47,7 +47,7 @@ public class HttpMethodTestCase extends FunctionalTestCase
     public void testHead() throws Exception
     {
         HttpClient client = new HttpClient();
-        method = new HeadMethod("http://localhost:60198");
+        method = new HeadMethod("http://localhost:60200");
         int statusCode = client.executeMethod(method);
         assertEquals(Integer.toString(HttpStatus.SC_OK), Integer.toString(statusCode));
 
@@ -56,7 +56,7 @@ public class HttpMethodTestCase extends FunctionalTestCase
     public void testOptions() throws Exception
     {
         HttpClient client = new HttpClient();
-        method = new OptionsMethod("http://localhost:60198");
+        method = new OptionsMethod("http://localhost:60200");
         int statusCode = client.executeMethod(method);
         assertEquals(Integer.toString(HttpStatus.SC_METHOD_NOT_ALLOWED), Integer.toString(statusCode));
     }
@@ -64,7 +64,7 @@ public class HttpMethodTestCase extends FunctionalTestCase
     public void testPut() throws Exception
     {
         HttpClient client = new HttpClient();
-        method = new PutMethod("http://localhost:60198");
+        method = new PutMethod("http://localhost:60200");
         int statusCode = client.executeMethod(method);
         assertEquals(Integer.toString(HttpStatus.SC_METHOD_NOT_ALLOWED), Integer.toString(statusCode));
     }
@@ -72,7 +72,7 @@ public class HttpMethodTestCase extends FunctionalTestCase
     public void testDelete() throws Exception
     {
         HttpClient client = new HttpClient();
-        method = new DeleteMethod("http://localhost:60198");
+        method = new DeleteMethod("http://localhost:60200");
         int statusCode = client.executeMethod(method);
         assertEquals(Integer.toString(HttpStatus.SC_METHOD_NOT_ALLOWED), Integer.toString(statusCode));
     }
@@ -80,7 +80,7 @@ public class HttpMethodTestCase extends FunctionalTestCase
     public void testTrace() throws Exception
     {
         HttpClient client = new HttpClient();
-        method = new TraceMethod("http://localhost:60198");
+        method = new TraceMethod("http://localhost:60200");
         int statusCode = client.executeMethod(method);
         assertEquals(Integer.toString(HttpStatus.SC_METHOD_NOT_ALLOWED), Integer.toString(statusCode));
     }
@@ -88,7 +88,7 @@ public class HttpMethodTestCase extends FunctionalTestCase
     public void testConnect() throws Exception
     {
         HttpClient client = new HttpClient();
-        method = new HttpMethodBase("http://localhost:60198")
+        method = new HttpMethodBase("http://localhost:60200")
         {
             public String getName()
             {
@@ -102,7 +102,7 @@ public class HttpMethodTestCase extends FunctionalTestCase
     public void testFoo() throws Exception
     {
         HttpClient client = new HttpClient();
-        method = new HttpMethodBase("http://localhost:60198")
+        method = new HttpMethodBase("http://localhost:60200")
         {
             public String getName()
             {

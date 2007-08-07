@@ -23,7 +23,7 @@
             <mule:component class="org.mule.tck.functional.FunctionalTestComponent" scope="singleton"/>
             <mule:inbound-router>
                 <mule:endpoint name="httpEndpoint" connector-ref="PollingHttpConnector"
-                               address="http://localhost:12345/TestServer"/>
+                               address="http://localhost:60206/TestServer"/>
             </mule:inbound-router>
             <mule:outbound-router>
                 <mule:pass-through-router>
@@ -39,7 +39,7 @@
                 </mule:properties>
             </mule:component>
             <mule:inbound-router>
-                <mule:endpoint address="http://localhost:12345" connector-ref="HttpConnector"/>
+                <mule:endpoint address="http://localhost:60206" connector-ref="HttpConnector"/>
             </mule:inbound-router>
         </mule:service>
 

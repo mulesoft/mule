@@ -60,12 +60,12 @@
     <model name="test">
         <mule-descriptor name="mycomponent"
             implementation="org.mule.tck.testmodels.services.TestServiceComponent"
-            inboundEndpoint="axis:http://localhost:38008/mule">
+            inboundEndpoint="axis:http://localhost:62108/mule">
         </mule-descriptor>
 
         <mule-descriptor name="mycomponent2"
             implementation="org.mule.tck.testmodels.services.TestServiceComponent"
-            inboundEndpoint="axis:http://localhost:38009/mule/services">
+            inboundEndpoint="axis:http://localhost:62109/mule/services">
             <properties>
                 <list name="serviceInterfaces">
                     <entry value="org.mule.components.simple.EchoService"/>
@@ -76,13 +76,13 @@
 
         <mule-descriptor name="mycomponent3"
             implementation="org.mule.tck.testmodels.services.TestServiceComponent"
-            inboundEndpoint="axis:http://localhost:38009">
+            inboundEndpoint="axis:http://localhost:62109">
         </mule-descriptor>
 
         <mule-descriptor name="mycomponent4"
             implementation="org.mule.tck.testmodels.services.TestServiceComponent">
             <inbound-router>
-                <endpoint address="axis:http://localhost:38010" synchronous="false"/>
+                <endpoint address="axis:http://localhost:62110" synchronous="false"/>
             </inbound-router>
         </mule-descriptor>
     </model>

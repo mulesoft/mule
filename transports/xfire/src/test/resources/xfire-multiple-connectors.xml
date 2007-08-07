@@ -46,8 +46,8 @@
     <connector name="XFireConnector2" className="org.mule.providers.soap.xfire.XFireConnector"/>
 
     <global-endpoints>
-     <endpoint name="xfire1" address="xfire:http://localhost:8081/services/TestComponent1?method=receive" connector="XFireConnector1"/>
-     <endpoint name="xfire2" address="xfire:http://localhost:8082/services/TestComponent2?method=receive" connector="XFireConnector2"/>
+     <endpoint name="xfire1" address="xfire:http://localhost:61081/services/TestComponent1?method=receive" connector="XFireConnector1"/>
+     <endpoint name="xfire2" address="xfire:http://localhost:61082/services/TestComponent2?method=receive" connector="XFireConnector2"/>
     </global-endpoints>
 
     <model name="TestXfireConnectors">
@@ -55,13 +55,13 @@
         <!- Two separate components are created instead of 1 with 2 endpoints so that exceptions are not compomised ->
         <mule-descriptor name="TestComponent1" implementation="org.mule.tck.testmodels.services.TestComponent">
             <inbound-router>
-                <endpoint address="xfire:http://localhost:8081/services" connector="XFireConnector1"/>
+                <endpoint address="xfire:http://localhost:61081/services" connector="XFireConnector1"/>
             </inbound-router>
         </mule-descriptor>
 
         <mule-descriptor name="TestComponent2" implementation="org.mule.tck.testmodels.services.TestComponent">
             <inbound-router>
-                <endpoint address="xfire:http://localhost:8082/services" connector="XFireConnector2"/>
+                <endpoint address="xfire:http://localhost:61082/services" connector="XFireConnector2"/>
             </inbound-router>
         </mule-descriptor>
 

@@ -68,7 +68,7 @@
         
         <mule-descriptor name="Echo" implementation="org.mule.components.simple.EchoComponent">
             <inbound-router>
-                <endpoint address="http://localhost:8090" synchronous="true"/>
+                <endpoint address="http://localhost:60207" synchronous="true"/>
             </inbound-router>
         </mule-descriptor>
     </model>

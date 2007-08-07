@@ -58,7 +58,7 @@
     <model name="test">
         <mule-descriptor name="EchoService1" implementation="org.mule.components.simple.EchoComponent">
             <inbound-router>
-                <endpoint address="axis:http://localhost:8081/services"/>
+                <endpoint address="axis:http://localhost:62081/services"/>
             </inbound-router>
             <properties>
                     <property name="serviceNamespace" value="http://foo"/>
@@ -67,7 +67,7 @@
 
         <mule-descriptor name="EchoService2" implementation="org.mule.components.simple.EchoComponent">
             <inbound-router>
-                <endpoint address="axis:http://localhost:8082/services"/>
+                <endpoint address="axis:http://localhost:62082/services"/>
             </inbound-router>
             <properties>
                     <map name="axisOptions">
@@ -80,7 +80,7 @@
 
         <mule-descriptor name="EchoService3" implementation="org.mule.components.simple.EchoComponent">
             <inbound-router>
-                <endpoint address="axis:http://localhost:8083/services"/>
+                <endpoint address="axis:http://localhost:62083/services"/>
             </inbound-router>
             <properties>
                     <property name="wsdlFile" value="test-service.wsdl"/>

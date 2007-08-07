@@ -12,7 +12,7 @@
         <mule:service name="httpIn">
             <mule:component class="org.mule.components.simple.EchoComponent" />
             <mule:inbound-router>
-                <mule:endpoint address="http://localhost:60198" synchronous="true"/>
+                <mule:endpoint address="http://localhost:60200" synchronous="true"/>
             </mule:inbound-router>
         </mule:service>
     </mule:model-seda>

@@ -29,11 +29,11 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 /**
  * <code>AbstractPollingMessageReceiver</code> implements a base class for polling
- * message receivers. The receiver provides a {@link #poll()} method that
- * implementations must implement to execute their custom code. Note that the
- * receiver will not poll if the associated connector is not started.
+ * message receivers. The receiver provides a {@link #poll()} method that implementations
+ * must implement to execute their custom code. Note that the receiver will not poll if
+ * the associated connector is not started.
  */
-public abstract class AbstractPollingMessageReceiver extends AbstractMessageReceiver implements Work
+public abstract class AbstractPollingMessageReceiver extends AbstractMessageReceiver
 {
     public static final long DEFAULT_POLL_FREQUENCY = 1000;
     public static final TimeUnit DEFAULT_POLL_TIMEUNIT = TimeUnit.MILLISECONDS;
@@ -53,20 +53,6 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
         super(connector, component, endpoint);
     }
 
-    /**
-     * @deprecated please use
-     *             {@link #AbstractPollingMessageReceiver(UMOConnector,UMOComponent,UMOEndpoint)
-     *             instead and configure any other properties manually as required.
-     */
-    public AbstractPollingMessageReceiver(UMOConnector connector,
-                                          UMOComponent component,
-                                          final UMOEndpoint endpoint,
-                                          long frequency) throws CreateException
-    {
-        this(connector, component, endpoint);
-        this.setFrequency(frequency);
-    }
-
     protected void doStart() throws UMOException
     {
         try
@@ -77,15 +63,15 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
                 // polling takes longer than the specified frequency, e.g. when the
                 // polled database or network is slow or returns large amounts of
                 // data.
-                ScheduledFuture schedule = connector.getScheduler().scheduleWithFixedDelay(this,
-                        DEFAULT_STARTUP_DELAY, this.getFrequency(), this.getTimeUnit());
+                ScheduledFuture schedule = connector.getScheduler().scheduleWithFixedDelay(this.createWork(),
+                    DEFAULT_STARTUP_DELAY, this.getFrequency(), this.getTimeUnit());
                 schedules.add(schedule);
 
                 if (logger.isDebugEnabled())
                 {
                     logger.debug(ObjectUtils.identityToShortString(this) + " scheduled "
-                            + ObjectUtils.identityToShortString(schedule) + " with " + frequency
-                            + "ms polling frequency");
+                                 + ObjectUtils.identityToShortString(schedule) + " with " + frequency
+                                 + "ms polling frequency");
                 }
             }
         }
@@ -104,46 +90,22 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
             // progress
             for (Iterator i = schedules.iterator(); i.hasNext();)
             {
-                ScheduledFuture schedule = (ScheduledFuture) i.next();
+                ScheduledFuture schedule = (ScheduledFuture)i.next();
                 schedule.cancel(false);
                 i.remove();
 
                 if (logger.isDebugEnabled())
                 {
                     logger.debug(ObjectUtils.identityToShortString(this) + " cancelled polling schedule: "
-                            + ObjectUtils.identityToShortString(schedule));
+                                 + ObjectUtils.identityToShortString(schedule));
                 }
             }
         }
     }
 
-    // the run() method will exit after each poll() since it will be invoked again
-    // by the scheduler
-    public void run()
+    protected Work createWork()
     {
-        if (!stopped.get())
-        {
-            try
-            {
-                // make sure we are connected, wait if necessary
-                connected.whenTrue(null);
-                this.poll();
-            }
-            catch (InterruptedException e)
-            {
-                // stop polling
-                this.stop();
-            }
-            catch (Exception e)
-            {
-                this.handleException(e);
-            }
-        }
-    }
-
-    public void release()
-    {
-        this.stop();
+        return new PollingReceiverWorker(this);
     }
 
     public long getFrequency()

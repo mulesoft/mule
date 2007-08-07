@@ -66,7 +66,7 @@
         <!- hosting the Axis Service ->
         <mule-descriptor name="AxisService" implementation="org.mule.tck.testmodels.services.TestComponent">
             <inbound-router>
-                <endpoint address="axis:http://localhost:33381/services"/>
+                <endpoint address="axis:http://localhost:63381/services"/>
             </inbound-router>
             <properties>
                     <property name="style" value="Wrapped"/>
@@ -81,8 +81,8 @@
             </inbound-router>
             <outbound-router>
                 <router className="org.mule.routing.outbound.ExceptionBasedRouter">
-                    <endpoint address="axis:http://localhost:33380/services/AxisService?method=receive"/>
-                    <endpoint address="axis:http://localhost:33381/services/AxisService?method=receive"/>
+                    <endpoint address="axis:http://localhost:63380/services/AxisService?method=receive"/>
+                    <endpoint address="axis:http://localhost:63381/services/AxisService?method=receive"/>
                 </router>
             </outbound-router>
         </mule-descriptor>
@@ -94,7 +94,7 @@
             </inbound-router>
             <outbound-router>
                 <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="wsdl-xfire:http://localhost:33381/services/AxisService?WSDL&amp;method=receive"/>
+                    <endpoint address="wsdl-xfire:http://localhost:63381/services/AxisService?WSDL&amp;method=receive"/>
                 </router>
             </outbound-router>
         </mule-descriptor>

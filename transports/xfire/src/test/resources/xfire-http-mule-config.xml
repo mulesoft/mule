@@ -56,28 +56,28 @@
         <mule-descriptor name="mycomponent"
                          implementation="org.mule.tck.testmodels.services.TestServiceComponent">
             <inbound-router>
-                <endpoint address="xfire:http://localhost:38008/mule"/>
+                <endpoint address="xfire:http://localhost:62108/mule"/>
             </inbound-router>
         </mule-descriptor>
 
         <mule-descriptor name="mycomponent2"
                          implementation="org.mule.tck.testmodels.services.TestServiceComponent">
             <inbound-router>
-                <endpoint address="xfire:http://localhost:38009/mule/services"/>
+                <endpoint address="xfire:http://localhost:62109/mule/services"/>
             </inbound-router>
         </mule-descriptor>
 
         <mule-descriptor name="mycomponent3"
                          implementation="org.mule.tck.testmodels.services.TestServiceComponent">
             <inbound-router>
-                <endpoint address="xfire:http://localhost:38009"/>
+                <endpoint address="xfire:http://localhost:62109"/>
             </inbound-router>
         </mule-descriptor>
 
         <mule-descriptor name="mycomponent4"
                          implementation="org.mule.tck.testmodels.services.TestServiceComponent">
             <inbound-router>
-                <endpoint address="xfire:http://localhost:38010" synchronous="false"/>
+                <endpoint address="xfire:http://localhost:62110" synchronous="false"/>
             </inbound-router>
         </mule-descriptor>
     </model>

@@ -49,7 +49,7 @@
     <model name="Https_Test_Model">
         <mule-descriptor name="TestUMO" implementation="org.mule.components.simple.EchoComponent">
             <inbound-router>
-                <endpoint address="axis:https://localhost:8000"/>
+                <endpoint address="axis:https://localhost:62000"/>
             </inbound-router>
         </mule-descriptor>
     </model>

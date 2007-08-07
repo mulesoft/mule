@@ -11,7 +11,7 @@
             </inbound-router>
             <outbound-router>
                 <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="axis:http://localhost:8080/mule-tests-external-xfire/services/TestService?method=getTest">
+                    <endpoint address="axis:http://localhost:62080/mule-tests-external-xfire/services/TestService?method=getTest">
                         <properties>
                             <property name="soapAction" value="[methodNamespace][method]"/>
                             <map name="soapMethods">

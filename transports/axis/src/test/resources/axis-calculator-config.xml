@@ -6,7 +6,7 @@
 <mule-configuration id="axis_calculator_test" version="1.0">
 
     <global-endpoints>
-        <endpoint name="calculatorAddEndpoint" address="axis:http://localhost:8088/axis/Calculator?method=add">
+        <endpoint name="calculatorAddEndpoint" address="axis:http://localhost:62088/axis/Calculator?method=add">
             <properties>
                 <property name="style" value="wrapped"/>
                 <property name="use" value="literal"/>
@@ -23,7 +23,7 @@
     <model name="test">
         <mule-descriptor name="Calculator"
             implementation="org.mule.providers.soap.axis.Calculator"
-            inboundEndpoint="axis:http://localhost:8088/axis">
+            inboundEndpoint="axis:http://localhost:62088/axis">
 
             <properties>
                 <property name="style" value="document"/>

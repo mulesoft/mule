@@ -47,7 +47,7 @@
             </inbound-router>
             <outbound-router>
                 <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                <endpoint address="axis:http://localhost:38011/mule/mycomponent2?method=echo" synchronous="true">
+                <endpoint address="axis:http://localhost:62111/mule/mycomponent2?method=echo" synchronous="true">
                     <properties>
                         <map name="soapMethods">
                             <property name="echo" value="value:string:in,return:string"/>
@@ -60,7 +60,7 @@
         <mule-descriptor name="mycomponent2"
             implementation="org.mule.tck.testmodels.services.TestServiceComponent">
             <inbound-router>
-                <endpoint address="axis:http://localhost:38011/mule" synchronous="true">
+                <endpoint address="axis:http://localhost:62111/mule" synchronous="true">
                 </endpoint>
             </inbound-router>
         </mule-descriptor>

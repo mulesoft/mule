@@ -37,7 +37,7 @@
 <mule-configuration id="Mule_Sample" version="1.0">
     <connector name="servlet" className="org.mule.providers.http.servlet.ServletConnector">
         <properties>
-            <property name="servletUrl" value="http://localhost:18088/services"/>
+            <property name="servletUrl" value="http://localhost:63088/services"/>
         </properties>
     </connector>
 
@@ -49,7 +49,7 @@
 
         <mule-descriptor name="xfireService" implementation="org.mule.tck.testmodels.services.TestServiceComponent">
             <inbound-router>
-                <endpoint address="xfire:http://localhost:18082"/>
+                <endpoint address="xfire:http://localhost:63082"/>
             </inbound-router>
         </mule-descriptor>
     </model>

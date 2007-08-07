@@ -75,7 +75,7 @@ public class AxisEchoTestCase extends FunctionalTestCase
     public void testPostEcho() throws Exception
     {
         MuleClient client = new MuleClient();
-        UMOMessage result = client.send("http://localhost:8081/services/EchoUMO?method=echo", "hello", null);
+        UMOMessage result = client.send("http://localhost:65081/services/EchoUMO?method=echo", "hello", null);
         assertNotNull(result);
         assertNull(result.getExceptionPayload());
         assertFalse(result.getPayload() instanceof NullPayload);
@@ -87,7 +87,7 @@ public class AxisEchoTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
         Map props = new HashMap();
         props.put("http.method", "GET");
-        UMOMessage result = client.send("http://localhost:8081/services/EchoUMO?method=echo", "hello", props);
+        UMOMessage result = client.send("http://localhost:65081/services/EchoUMO?method=echo", "hello", props);
         assertNotNull(result);
         // TODO: MULE-1113
         if ((this instanceof XFireEchoTestCase))
@@ -102,7 +102,7 @@ public class AxisEchoTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
         UMOMessage result = client.send(
-            getProtocol() + ":http://localhost:8082/services/EchoUMO?method=echo", "hello", null);
+            getProtocol() + ":http://localhost:65082/services/EchoUMO?method=echo", "hello", null);
         assertNotNull(result);
         assertNull(result.getExceptionPayload());
         assertFalse(result.getPayload() instanceof NullPayload);

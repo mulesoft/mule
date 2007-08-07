@@ -48,7 +48,7 @@ public class AxisServiceUsingXFireEndpointTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
         Map props = new HashMap();
         props.put("http.method", "GET");
-        UMOMessage reply = client.send("http://localhost:33381/services/AxisService?WSDL", "", props);
+        UMOMessage reply = client.send("http://localhost:63381/services/AxisService?WSDL", "", props);
 
         assertNotNull(reply);
         assertNotNull(reply.getPayload());

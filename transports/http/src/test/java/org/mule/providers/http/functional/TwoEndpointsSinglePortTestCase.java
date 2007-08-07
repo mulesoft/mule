@@ -33,8 +33,8 @@ public class TwoEndpointsSinglePortTestCase extends FunctionalTestCase
     public void testSendToEach() throws Exception
     {
 
-        sendWithResponse("http://localhost:8081/mycomponent1", "test", "mycomponent1", 10);
-        sendWithResponse("http://localhost:8081/mycomponent2", "test", "mycomponent2", 10);
+        sendWithResponse("http://localhost:60211/mycomponent1", "test", "mycomponent1", 10);
+        sendWithResponse("http://localhost:60211/mycomponent2", "test", "mycomponent2", 10);
     }
 
     public void testSendToEachWithBadEndpoint() throws Exception
@@ -42,17 +42,17 @@ public class TwoEndpointsSinglePortTestCase extends FunctionalTestCase
 
         MuleClient client = new MuleClient();
 
-        sendWithResponse("http://localhost:8081/mycomponent1", "test", "mycomponent1", 5);
-        sendWithResponse("http://localhost:8081/mycomponent2", "test", "mycomponent2", 5);
+        sendWithResponse("http://localhost:60211/mycomponent1", "test", "mycomponent1", 5);
+        sendWithResponse("http://localhost:60211/mycomponent2", "test", "mycomponent2", 5);
 
-        UMOMessage result = client.send("http://localhost:8081/mycomponent-notfound", "test", null);
+        UMOMessage result = client.send("http://localhost:60211/mycomponent-notfound", "test", null);
         assertNotNull(result);
         assertNotNull(result.getExceptionPayload());
         assertEquals(404, result.getIntProperty("http.status", 0));
 
         // Test that after the exception the endpoints still receive events
-        sendWithResponse("http://localhost:8081/mycomponent1", "test", "mycomponent1", 5);
-        sendWithResponse("http://localhost:8081/mycomponent2", "test", "mycomponent2", 5);
+        sendWithResponse("http://localhost:60211/mycomponent1", "test", "mycomponent1", 5);
+        sendWithResponse("http://localhost:60211/mycomponent2", "test", "mycomponent2", 5);
     }
 
     protected void sendWithResponse(String endpoint, String message, String response, int noOfMessages)

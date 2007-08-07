@@ -10,7 +10,7 @@
     <model name="main">
         <mule-descriptor name="testComponent" implementation="org.mule.providers.tcp.issues.InputStreamSource">
             <inbound-router>
-                <endpoint address="http://localhost:65432"/>
+                <endpoint address="http://localhost:60208"/>
             </inbound-router>
         </mule-descriptor>
     </model>

@@ -12,10 +12,10 @@
         <mule:service name="component">
             <mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
-                <mule:endpoint address="axis:http://localhost:12181/services"/>
+                <mule:endpoint address="axis:http://localhost:62181/services"/>
             </mule:inbound-router>
             <mule:response-router>
-                <mule:endpoint address="http://localhost:12182/reply"/>
+                <mule:endpoint address="http://localhost:62182/reply"/>
             </mule:response-router>
         </mule:service>    
     </mule:model-seda>
@@ -30,10 +30,10 @@
     <model name="Axis_Headers_TestCase">
         <mule-descriptor name="component" implementation="org.mule.components.simple.EchoComponent">
             <inbound-router>
-                <endpoint address="axis:http://localhost:12181/services"/>
+                <endpoint address="axis:http://localhost:62181/services"/>
             </inbound-router>
             <response-router>
-                <endpoint address="http://localhost:12182/reply"/>
+                <endpoint address="http://localhost:62182/reply"/>
             </response-router>
         </mule-descriptor>
 

@@ -30,7 +30,7 @@
 
     <connector name="servlet" className="org.mule.providers.http.servlet.ServletConnector">
         <properties>
-            <property name="servletUrl" value="http://localhost:18088/services"/>
+            <property name="servletUrl" value="http://localhost:62188/services"/>
         </properties>
     </connector>
 

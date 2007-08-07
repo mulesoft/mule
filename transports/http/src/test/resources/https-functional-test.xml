@@ -23,7 +23,7 @@
 
     <mule:endpoint
             name="clientEndpoint"
-            address="https://localhost:60198"
+            address="https://localhost:60202"
             synchronous="true"
             connector-ref="httpConnector"/>
 
