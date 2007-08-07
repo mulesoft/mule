@@ -5,12 +5,10 @@
 
 <mule-configuration version="1.0">
 
-    <mule-environment-properties serverUrl=""/>
-
     <global-endpoints>
         <endpoint name="inbound" address="vm://inbound"/>
-        <endpoint name="hop1" address="vm://hop1"/>
-        <endpoint name="hop2" address="vm://hop2"/>
+        <endpoint name="endpointHop1" address="vm://hop1"/>
+        <endpoint name="endpointHop2" address="vm://hop2"/>
     </global-endpoints>
 
     <model name="main">
@@ -20,21 +18,21 @@
             </inbound-router>
             <outbound-router>
                 <router className="org.mule.routing.outbound.MulticastingRouter">
-                    <global-endpoint name="hop1"/>
-                    <global-endpoint name="hop2"/>
+                    <global-endpoint name="endpointHop1"/>
+                    <global-endpoint name="endpointHop2"/>
                 </router>
             </outbound-router>
         </mule-descriptor>
 
         <mule-descriptor name="hop1" implementation="org.mule.tck.functional.FunctionalTestComponent" singleton="true">
             <inbound-router>
-                <global-endpoint name="hop1"/>
+                <global-endpoint name="endpointHop1"/>
             </inbound-router>
         </mule-descriptor>
 
         <mule-descriptor name="hop2" implementation="org.mule.tck.functional.FunctionalTestComponent" singleton="true">
             <inbound-router>
-                <global-endpoint name="hop2"/>
+                <global-endpoint name="endpointHop2"/>
             </inbound-router>
         </mule-descriptor>
     </model>
