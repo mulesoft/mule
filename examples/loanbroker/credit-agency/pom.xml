@@ -17,8 +17,13 @@
             <groupId>openejb</groupId>
             <artifactId>openejb-core</artifactId>
             <version>1.0</version>
-            <scope>provided</scope> 
+            <scope>provided</scope>
             <exclusions>
+                <!-- exclude older concurrency backport -->
+                <exclusion>
+                    <groupId>backport-util-concurrent</groupId>
+                    <artifactId>backport-util-concurrent</artifactId>
+                </exclusion>
                 <!-- Tries to pull an unpublished castor version -->
                 <exclusion>
                     <groupId>castor</groupId>

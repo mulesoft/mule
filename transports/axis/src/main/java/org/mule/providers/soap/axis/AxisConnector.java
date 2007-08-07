@@ -99,6 +99,9 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
     private List beanTypes;
     private MuleDescriptor axisDescriptor;
 
+    //this will store the name of the descriptor of the current connector's AxisServiceComponent
+    private String specificAxisServiceComponentName;
+
     /**
      * These protocols will be set on client invocations. By default Mule uses it's
      * own transports rather that Axis's. This is only because it gives us more
@@ -151,41 +154,40 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
 
         for (Iterator iterator = supportedSchemes.iterator(); iterator.hasNext();)
         {
-            String s = (String)iterator.next();
+            String s = (String) iterator.next();
             registerSupportedProtocol(s);
         }
     }
 
     protected void doInitialise() throws InitialisationException
     {
-        // TODO DO: see if registered protocols were changed via external setter
-        if (axisTransportProtocols == null)
+        axisTransportProtocols = new HashMap();
+        specificAxisServiceComponentName = AXIS_SERVICE_COMPONENT_NAME + "_" + name;
+
+        axisTransportProtocols = new HashMap();
+        try
         {
-            axisTransportProtocols = new HashMap();
-            try
+            for (Iterator iterator = supportedSchemes.iterator(); iterator.hasNext();)
             {
-                for (Iterator iterator = supportedSchemes.iterator(); iterator.hasNext();)
-                {
-                    String s = (String)iterator.next();
-                    axisTransportProtocols.put(s, MuleTransport.getTransportClass(s));
-                    registerSupportedProtocol(s);
-                }
-                managementContext.registerListener(this);
+                String s = (String) iterator.next();
+                axisTransportProtocols.put(s, MuleTransport.getTransportClass(s));
+                registerSupportedProtocol(s);
             }
-            catch (Exception e)
-            {
-                throw new InitialisationException(e, this);
-            }
+            managementContext.registerListener(this);
+        }
+        catch (Exception e)
+        {
+            throw new InitialisationException(e, this);
         }
         // TODO DO: call registerSupportedProtocol if axisTransportProtocols are set from external?
-            
+
         if (clientProvider == null)
         {
             clientProvider = createAxisProvider(clientConfig);
         }
         else
         {
-            if (clientConfig.equals(DEFAULT_MULE_AXIS_CLIENT_CONFIG) == false)
+            if (!DEFAULT_MULE_AXIS_CLIENT_CONFIG.equals(clientConfig))
             {
                 logger.warn(AxisMessages.clientProviderAndClientConfigConfigured());
             }
@@ -199,7 +201,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
             }
             else
             {
-                if (serverConfig.equals(DEFAULT_MULE_AXIS_SERVER_CONFIG) == false)
+                if (!DEFAULT_MULE_AXIS_SERVER_CONFIG.equals(serverConfig))
                 {
                     logger.warn(AxisMessages.serverProviderAndServerConfigConfigured());
                 }
@@ -210,7 +212,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
             // principle of least surprise: doAutoTypes only has effect on our self-configured AxisServer
             axisServer.setOption("axis.doAutoTypes", Boolean.valueOf(doAutoTypes));
         }
-        
+
         // Register the Mule service serverProvider
         WSDDProvider.registerProvider(QNAME_MULE_PROVIDER, new WSDDJavaMuleProvider(this));
 
@@ -231,7 +233,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
         MuleUrlStreamHandlerFactory.registerHandler("pop3", new org.mule.providers.soap.axis.transport.pop3.Handler());
         MuleUrlStreamHandlerFactory.registerHandler("smtp", new org.mule.providers.soap.axis.transport.smtp.Handler());
         MuleUrlStreamHandlerFactory.registerHandler("vm", new org.mule.providers.soap.axis.transport.vm.Handler());
-        
+
         try
         {
             registerTypes((TypeMappingRegistryImpl)axisServer.getTypeMappingRegistry(), beanTypes);
@@ -245,21 +247,21 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
     protected void registerTransportTypes() throws ClassNotFoundException
     {
         // Register Transport handlers
-        // By default these will alll be handled by Mule, however some companies may
-        // have their own they wish to use
-        Map transportProtocols = this.getAxisTransportProtocols();
-        for (Iterator iterator = transportProtocols.keySet().iterator(); iterator.hasNext();)
+        // By default these will all be handled by Mule, however some companies may
+        // have
+        // their own they wish to use
+        for (Iterator iterator = getAxisTransportProtocols().keySet().iterator(); iterator.hasNext();)
         {
             String protocol = (String)iterator.next();
-            Object temp = transportProtocols.get(protocol);
-            Class clazz = null;
+            Object temp = getAxisTransportProtocols().get(protocol);
+            Class clazz;
             if (temp instanceof String)
             {
                 clazz = ClassUtils.loadClass(temp.toString(), getClass());
             }
             else
             {
-                clazz = (Class)temp;
+                clazz = (Class) temp;
             }
             Call.setTransportForProtocol(protocol, clazz);
         }
@@ -268,12 +270,13 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
     protected SimpleProvider createAxisProvider(String config) throws InitialisationException
     {
         // Use our custom file provider that does not require services to be declared
-        // in the WSDD. This only affects the client side as the client will fallback 
-        // to the FileProvider when invoking a service.
+        // in the WSDD. This only affects the
+        // client side as the client will fallback to the FileProvider when invoking
+        // a service.
         WSDDFileProvider fileProvider = new WSDDFileProvider(config);
         fileProvider.setSearchClasspath(true);
         /*
-         * Wrap the FileProvider with a SimpleProvider so we can prgrammatically
+         * Wrap the FileProvider with a SimpleProvider so we can programmatically
          * configure the Axis server (you can only use wsdd descriptors with the
          * FileProvider)
          */
@@ -287,11 +290,11 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
 
     /**
      * The method determines the key used to store the receiver against.
-     * 
+     *
      * @param component the component for which the endpoint is being registered
      * @param endpoint the endpoint being registered for the component
      * @return the key to store the newly created receiver against. In this case it
-     *         is the component name, which is equivilent to the Axis service name.
+     *         is the component name, which is equivalent to the Axis service name.
      */
     protected Object getReceiverKey(UMOComponent component, UMOEndpoint endpoint)
     {
@@ -307,8 +310,8 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
 
     public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception
     {
-        // this is always initialisaed as synchronous as ws invocations should
-        // always execute in a single thread unless the endpont has explicitly
+        // this is always initialised as synchronous as ws invocations should
+        // always execute in a single thread unless the endpoint has explicitly
         // been set to run asynchronously
         if (!endpoint.isSynchronousSet() && !endpoint.isSynchronous())
         {
@@ -362,8 +365,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
             // See if the axis descriptor has already been added. This allows
             // developers to override the default configuration, say to increase
             // the threadpool
-            axisDescriptor = (MuleDescriptor)managementContext.getRegistry().lookupService(
-                AXIS_SERVICE_COMPONENT_NAME);
+            axisDescriptor = getAxisDescriptorFromSystemModel();
             if (axisDescriptor == null)
             {
                 axisDescriptor = createAxisDescriptor();
@@ -374,6 +376,13 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
                 // then register
                 // again later
                 managementContext.getRegistry().lookupModel(ModelHelper.SYSTEM_MODEL).unregisterComponent(axisDescriptor);
+
+                //if the descriptor still contains the original AXIS_SERVICE_COMPONENT_NAME name,
+                //we need to change it to the specific name which is AXIS_SERVICE_COMPONENT_NAME_<connector_name>
+                if (AXIS_SERVICE_COMPONENT_NAME.equals(axisDescriptor.getName()))
+                {
+                    axisDescriptor.setName(specificAxisServiceComponentName);
+                }
             }
             // if the axis server hasn't been set, set it now. The Axis server
             // may be set
@@ -390,7 +399,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
         // the port is different
         // If we're using VM or Jms we just use the resource infor directly without
         // appending a service name
-        String endpoint = null;
+        String endpoint;
         String scheme = ep.getScheme().toLowerCase();
         if (scheme.equals("jms") || scheme.equals("vm"))
         {
@@ -440,14 +449,14 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
             serviceEndpoint.setTransformer(receiver.getEndpoint().getTransformer());
             receiver.getEndpoint().setTransformer(null);
         }
-        
+
         //set transaction properties
         if(receiver.getEndpoint().getTransactionConfig()!= null)
         {
             serviceEndpoint.setTransactionConfig(receiver.getEndpoint().getTransactionConfig());
             receiver.getEndpoint().setTransactionConfig(null);
         }
-        
+
         // propagate properties to the service endpoint
         serviceEndpoint.getProperties().putAll(receiver.getEndpoint().getProperties());
 
@@ -470,21 +479,39 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
         return endpointKey.toString();
     }
 
-    protected MuleDescriptor createAxisDescriptor()
+    private MuleDescriptor getAxisDescriptorFromSystemModel()
     {
-        MuleDescriptor axisDescriptor = (MuleDescriptor)managementContext.getRegistry().lookupService(
-            AXIS_SERVICE_COMPONENT_NAME);
+        MuleDescriptor axisDescriptor = (MuleDescriptor) managementContext.getRegistry().lookupService(specificAxisServiceComponentName);
+
         if (axisDescriptor == null)
         {
-            axisDescriptor = new MuleDescriptor(AXIS_SERVICE_COMPONENT_NAME);
+            axisDescriptor = (MuleDescriptor) managementContext.getRegistry().lookupService(specificAxisServiceComponentName);
+
+//            if (axisDescriptor != null)
+//            {
+//                axisDescriptor.setName(specificAxisServiceComponentName);
+//            }
+        }
+
+        return axisDescriptor;
+    }
+
+    protected MuleDescriptor createAxisDescriptor()
+    {
+        MuleDescriptor axisDescriptor = getAxisDescriptorFromSystemModel();
+
+        if (axisDescriptor == null)
+        {
+            axisDescriptor = new MuleDescriptor(specificAxisServiceComponentName);
             axisDescriptor.setServiceFactory(new SingletonObjectFactory(new AxisServiceComponent()));
         }
+
         return axisDescriptor;
     }
 
     /**
      * Template method to perform any work when starting the connectoe
-     * 
+     *
      * @throws org.mule.umo.UMOException if the method fails
      */
     protected void doStart() throws UMOException
@@ -494,7 +521,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
 
     /**
      * Template method to perform any work when stopping the connectoe
-     * 
+     *
      * @throws org.mule.umo.UMOException if the method fails
      */
     protected void doStop() throws UMOException
@@ -656,7 +683,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
             // different http port the
             // model needs to be restarted before the listener is available
             UMOModel systemModel = managementContext.getRegistry().lookupModel(ModelHelper.SYSTEM_MODEL);
-            if (!systemModel.isComponentRegistered(AXIS_SERVICE_COMPONENT_NAME))
+            if (!systemModel.isComponentRegistered(specificAxisServiceComponentName))
             {
                 try
                 {

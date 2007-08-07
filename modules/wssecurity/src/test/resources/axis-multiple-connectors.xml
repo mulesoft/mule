@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN" "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="Mule_Example" version="1.0">
+
+    <description>
+        An example project on running Web Services on Mule.
+    </description>
+
+    <mule-environment-properties synchronous="true" />
+
+    <container-context className="org.mule.extras.spring.SpringContainerContext">
+        <properties>
+            <property name="configFile" value="spring-security.xml"/>
+        </properties>
+    </container-context>
+    
+    <connector name="SystemStreamConnector"
+        className="org.mule.providers.stream.SystemStreamConnector">
+        <properties>
+            <property name="promptMessage"
+                value="Please enter an input message: " />
+            <property name="messageDelayTime" value="1000" />
+        </properties>
+    </connector>
+
+
+    <connector name="HttpConnector" className="org.mule.providers.http.HttpConnector">
+        <properties>
+            <property value="10000" name="timeout"/>
+        </properties>
+    </connector>
+
+
+    <connector name="SecuredConnector" className="org.mule.providers.soap.axis.AxisConnector">
+        <properties>
+            <property name="serverConfig" value="mule-axis-secure-server-config.wsdd" />
+            <property name="clientConfig" value="mule-axis-secure-client-config.wsdd" />
+        </properties>
+    </connector>
+    
+    <connector name="UnsecuredConnector" className="org.mule.providers.soap.axis.AxisConnector"/>
+    
+    <model name="_system">
+        <mule-descriptor name="_axisServiceComponent" implementation="org.mule.providers.soap.axis.AxisServiceComponent">
+            <threading-profile maxBufferSize="100" threadTTL="600000" maxThreadsActive="30" maxThreadsIdle="20" />
+            <!--<pooling-profile exhaustedAction="GROW" maxActive="20" maxIdle="20"/>-->
+        </mule-descriptor>
+        
+        <!--mule-descriptor name="_axisServiceComponent_UnsecuredConnector" implementation="org.mule.providers.soap.axis.AxisServiceComponent">
+            <threading-profile maxBufferSize="100" threadTTL="600000" maxThreadsActive="30" maxThreadsIdle="20" />
+            <pooling-profile exhaustedAction="GROW" maxActive="20" maxIdle="20"/>
+        </mule-descriptor-->
+    </model>
+    
+    <model name="WebServiceExample">
+
+        <mule-descriptor name="SecureBride" implementation="org.mule.components.simple.BridgeComponent">
+            <inbound-router>
+                <endpoint address="vm://secured"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint name="secured" address="axis:http://localhost:8070/services/SecuredWS?method=echo" connector="SecuredConnector"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+        
+        <mule-descriptor name="UnSecureBride1" implementation="org.mule.components.simple.BridgeComponent">
+            <inbound-router>
+                <endpoint address="vm://unsecured1"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="axis:http://localhost:8077/services/UnsecuredWS1?method=echo" connector="UnsecuredConnector"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+        
+        <mule-descriptor name="UnSecureBride2" implementation="org.mule.components.simple.BridgeComponent">
+            <inbound-router>
+                <endpoint address="vm://unsecured2"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="axis:http://localhost:8078/services/UnsecuredWS2?method=echo" connector="UnsecuredConnector"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+        
+        <mule-descriptor name="SecuredWS" implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <endpoint address="axis:http://localhost:8070/services" connector="SecuredConnector">
+                    <security-filter className="org.mule.extras.wssecurity.filters.WsSecurityFilter">
+                        <properties>
+                            <property value="in-encrypted-security.properties" name="wsDecryptionFile" />
+                        </properties>
+                    </security-filter>
+                </endpoint>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
+                    <endpoint address="stream://System.out"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor> 
+            
+        <mule-descriptor name="UnsecuredWS1" implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <endpoint address="axis:http://localhost:8077/services" connector="UnsecuredConnector"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
+                    <endpoint address="stream://System.out"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+        
+        <mule-descriptor name="UnsecuredWS2" implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <endpoint address="axis:http://localhost:8078/services" connector="UnsecuredConnector"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
+                    <endpoint address="stream://System.out"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+    </model>
+
+</mule-configuration>
+
+

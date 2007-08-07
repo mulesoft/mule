@@ -89,6 +89,12 @@
             <version>1.0.2</version>
             <scope>test</scope>
             <exclusions>
+                <!-- exclude older concurrency backport -->
+                <exclusion>
+                    <groupId>backport-util-concurrent</groupId>
+                    <artifactId>backport-util-concurrent</artifactId>
+                </exclusion>
+                <!-- exclude older slf4j -->
                 <exclusion>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-api</artifactId>

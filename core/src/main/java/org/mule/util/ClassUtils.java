@@ -439,7 +439,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      * @param implementation the class to build methods on
      * @param parameterTypes the argument param types to look for
      * @param voidOk whether void methods shouldbe included in the found list
-     * @param matchOnObject determines whether parameters of OBject type are matched
+     * @param matchOnObject determines whether parameters of Object type are matched
      *            when they are of Object.class type
      * @param ignoredMethodNames a Set of method names to ignore. Often 'equals' is
      *            not a desired match. This argument can be null.

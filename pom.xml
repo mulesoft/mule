@@ -548,6 +548,17 @@
         </filters
         -->
 
+        <!-- specify versions of the plugins used in child poms here -->
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.mule.tools</groupId>
+                    <artifactId>mule-assembly-verifier</artifactId>
+                    <version>1.1</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
         <plugins>
             <!-- Enforce minimum maven version.
                  This must be done through the maven-enforcer-plugin as per

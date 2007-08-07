@@ -10,8 +10,8 @@
 
 package org.mule.providers;
 
-import org.mule.config.MuleManifest;
 import org.mule.MuleRuntimeException;
+import org.mule.config.MuleManifest;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.ThreadSafeAccess;
@@ -551,7 +551,7 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter, Threa
     protected IllegalStateException newException(String message)
     {
         IllegalStateException exception = new IllegalStateException(message);
-        logger.error("Message access violation", exception);
+        logger.warn("Message access violation", exception);
         return exception;
     }
 
@@ -580,6 +580,22 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter, Threa
         mutable.set(true);
     }
 
-    public abstract ThreadSafeAccess newThreadCopy();
+    /**
+     * By default we return "this".  This allows older code to inter-operate but doesn't,
+     * of course, give the required safety.  Subclasses should override this method.
+     * Re-writing the threading handling should remove this requirement....
+     *
+     * @return A new copy of this
+     */
+    public ThreadSafeAccess newThreadCopy()
+    {
+        if (logger.isInfoEnabled())
+        {
+            logger.info("The newThreadCopy method in AbstractMessageAdapter is being used directly. "
+                    + "This code may be susceptible to 'scribbling' issues with messages. "
+                    + "Please consider implementing the ThreadSafeAccess interface in the message adapter.");
+        }
+        return this;
+    }
 
 }

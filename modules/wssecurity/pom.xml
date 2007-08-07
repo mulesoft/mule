@@ -12,7 +12,7 @@
     <!--<packaging>bundle</packaging>-->
     <name>Web Service Security</name>
     <description>Mule WS-Security uses Apache's WSS4J and XFire's WSS4JHandlers to secure WebServices using SOAP</description>
-
+    
     <build>
          <plugins>
              <plugin>
@@ -106,6 +106,7 @@
     </profiles>
 
     <dependencies>
+        
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-axis</artifactId>
@@ -169,6 +170,12 @@
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-stdio</artifactId>
             <version>${version}</version>
             <scope>test</scope>
         </dependency>

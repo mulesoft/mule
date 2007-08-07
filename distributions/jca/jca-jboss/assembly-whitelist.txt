@@ -33,7 +33,7 @@ groovy-engine-1.0-jdk14
 hibernate-3.2.2.ga
 jaxen-1.1.1
 jbpm-3.1.4
-jcl104-over-slf4j-1.4.0
+jcl104-over-slf4j-1.4.1
 jdom-1.0
 jruby-engine-1.0-jdk14
 js-engine-1.0-jdk14
@@ -90,8 +90,8 @@ oro-2.0.7
 quartz-all-1.5.2
 retrotranslator-runtime-1.2.1
 script-api-1.0-jdk14
-slf4j-api-1.4.0
-slf4j-log4j12-1.4.0
+slf4j-api-1.4.1
+slf4j-log4j12-1.4.1
 smack-2.2.1
 spring-beans-2.0.6
 spring-context-2.0.6

@@ -10,7 +10,7 @@
 
     <groupId>org.mule.tools</groupId>
     <artifactId>mule-assembly-verifier</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
     <packaging>maven-plugin</packaging>
     <name>Mule Assembly Verifier Plugin</name>
 
@@ -20,6 +20,7 @@
 
     <properties>
         <muleVersion>2.0-M2-SNAPSHOT</muleVersion>
+        <groovyMojoVersion>1.0-beta-1</groovyMojoVersion>
     </properties>
 
     <dependencies>
@@ -32,12 +33,24 @@
         <dependency>
             <groupId>org.codehaus.mojo.groovy</groupId>
             <artifactId>groovy-mojo-support</artifactId>
-            <version>1.0-alpha-3</version>
+            <version>${groovyMojoVersion}</version>
         </dependency>
     </dependencies>
 
     <build>
         <defaultGoal>install</defaultGoal>
+
+        <!-- 
+             WebDAV for remote deployment (necessary as this pom does not have the
+             toplevel pom as parent)
+        -->
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-webdav</artifactId>
+            </extension>
+        </extensions>
+
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo.groovy</groupId>
@@ -72,7 +85,7 @@
                     <dependency>
                         <groupId>org.codehaus.mojo.groovy</groupId>
                         <artifactId>groovy-mojo-tools</artifactId>
-                        <version>1.0-alpha-3</version>
+                        <version>${groovyMojoVersion}</version>
                     </dependency>
                 </dependencies>
             </plugin>

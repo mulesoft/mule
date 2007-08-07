@@ -29,7 +29,7 @@
             <plugin>
                 <groupId>org.mule.tools</groupId>
                 <artifactId>mule-assembly-verifier</artifactId>
-                <version>1.0</version>
+                <!-- version is provided by the global pluginManagement -->
                 <executions>
                     <execution>
                         <phase>verify</phase>
