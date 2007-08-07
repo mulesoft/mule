@@ -9,7 +9,7 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/file/2.0 http://www.mulesource.org/schema/mule/file/2.0/mule-file.xsd 
        http://www.mulesource.org/schema/mule/jaas/2.0 http://www.mulesource.org/schema/mule/jaas/2.0/mule-jaas.xsd">
-	
+    
     <mule:configuration serverId="" defaultSynchronousEndpoints="true"/>
 
     <mule:security-manager xsi:type="jaas:securityManagerType">
@@ -20,14 +20,14 @@
     <mule:model-seda name="test">
         <mule:service name="TestUMO">
             <mule:component class="org.mule.tck.functional.FunctionalTestComponent"/>
-				<mule:inbound-router>
-					<mule:endpoint address="vm://test">
-						<mule:security-filter xsi:type="mule:defaultSecurityFilterType">
-							<mule:encryption-security-filter strategy-ref="PBE"/>
-						</mule:security-filter>
-					</mule:endpoint>
-				</mule:inbound-router>
-			</mule:service>
-	</mule:model-seda>
+                <mule:inbound-router>
+                    <mule:endpoint address="vm://test">
+                        <mule:security-filter xsi:type="mule:defaultSecurityFilterType">
+                            <mule:encryption-security-filter strategy-ref="PBE"/>
+                        </mule:security-filter>
+                    </mule:endpoint>
+                </mule:inbound-router>
+            </mule:service>
+    </mule:model-seda>
 
 </beans>
