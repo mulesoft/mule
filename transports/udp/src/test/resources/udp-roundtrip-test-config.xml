@@ -12,6 +12,16 @@
 
     <mule:transformer-serializable-to-byte-array name="SerializableToByteArray"/>
 
+    <bean class="org.mule.config.spring.processors.PropertyPlaceholderProcessor">
+        <property name="factories">
+            <map>
+                <entry key="hostname">
+                    <bean class="org.mule.config.factories.HostNameFactory"/>
+                </entry>
+            </map>
+        </property>
+    </bean>
+
     <mule:model-seda name="main">
 
         <mule:service name="PassingThrough">
@@ -19,12 +29,12 @@
             <mule:inbound-router>
                 <!-- MULE-2109 -->
                 <!-- mule:endpoint address="udp://${hostname}:9001"/ -->
-                <mule:endpoint address="udp://localhost:61000"/>
+                <mule:endpoint address="udp://${hostname}:61000"/>
             </mule:inbound-router>
             <mule:outbound-router>
                 <mule:pass-through-router>
                     <!-- mule:endpoint address="udp://${hostname}:9002"/ -->
-                    <mule:endpoint address="udp://localhost:61001"/>
+                    <mule:endpoint address="udp://${hostname}:61001"/>
                 </mule:pass-through-router>
             </mule:outbound-router>
         </mule:service>
