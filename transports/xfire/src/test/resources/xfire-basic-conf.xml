@@ -16,14 +16,14 @@
         <mule:service name="echoService">
             <mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
-                <mule:endpoint address="xfire:http://localhost:10081/services"/>
+                <mule:endpoint address="xfire:http://localhost:63081/services"/>
             </mule:inbound-router>
         </mule:service>
         
         <mule:service name="echoService2">
             <mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
-                <mule:endpoint address="xfire:http://localhost:10082/services">
+                <mule:endpoint address="xfire:http://localhost:63082/services">
                     <property name="wsdlUrl" value="file://xfire-blat"/>
                 </mule:endpoint>
             </mule:inbound-router>
@@ -32,7 +32,7 @@
         <mule:service name="echoService3">
             <mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
-                <mule:endpoint address="xfire:http://localhost:10083/services" synchronous="true"/>
+                <mule:endpoint address="xfire:http://localhost:63083/services" synchronous="true"/>
             </mule:inbound-router>
         </mule:service>
     </mule:model-seda>
