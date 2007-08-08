@@ -12,9 +12,9 @@
     <vm:connector name="queue" queueEvents="true"/>
 
     <mule:endpoint name="in" address="vm://in" connector-ref="default"/>
-
     <mule:endpoint name="direct" address="vm://direct" connector-ref="queue"/>
-    <mule:endpoint name="transformed" address="vm://transformed" connector-ref="queue"/>
+    <mule:endpoint name="global-name-global-transformer" address="vm://global-name-global-transformer" connector-ref="queue" transformers="transformer"/>
+    <mule:endpoint name="global-name-local-transformer" address="vm://global-name-local-transformer" connector-ref="queue"/>
 
     <mule:custom-transformer name="transformer" class="org.mule.tck.functional.StringAppendTestTransformer"/>
 
@@ -28,7 +28,11 @@
             <mule:outbound-router>
                 <mule:multicasting-router>
                     <mule:endpoint ref="direct"/>
-                    <mule:endpoint ref="transformed" transformers="transformer"/>
+                    <mule:endpoint ref="global-name-global-transformer"/>
+                    <mule:endpoint name="local-name-local-transformer" address="vm://local-name-local-transformer" connector-ref="queue" transformers="transformer"/>
+                    <!-- these two don't transform -->
+                    <mule:endpoint ref="global-name-local-transformer" transformers="transformer"/>
+                    <mule:endpoint address="vm://no-name-local-transformer" connector-ref="queue" transformers="transformer"/>
                 </mule:multicasting-router>
             </mule:outbound-router>
         </mule:service>

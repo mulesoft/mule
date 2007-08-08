@@ -40,9 +40,29 @@ public class EndpointTransformerMule2131TestCase extends FunctionalTestCase
         assertEquals(MESSAGE, response);
     }
 
-    public void testTransformed() throws Exception
+    public void testGlobalNameGlobalTransformer() throws Exception
     {
-        String response = receive(send(), "transformed");
+        doTestTransformed("global-name-global-transformer");
+    }
+
+    public void testGlobalNameLocalTransformer() throws Exception
+    {
+        doTestTransformed("global-name-local-transformer");
+    }
+
+    public void testNoNameLocalTransformer() throws Exception
+    {
+        doTestTransformed("vm://no-name-local-transformer?connector=queue");
+    }
+
+    public void testLocalNameLocalTransformer() throws Exception
+    {
+        doTestTransformed("local-name-local-transformer");
+    }
+
+    protected void doTestTransformed(String endpoint) throws Exception
+    {
+        String response = receive(send(), endpoint);
         assertEquals(MESSAGE + StringAppendTestTransformer.DEFAULT_TEXT, response);
     }
 
