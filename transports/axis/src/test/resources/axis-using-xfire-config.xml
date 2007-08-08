@@ -15,7 +15,7 @@
         <mule:service name="AxisService">
             <mule:component class="org.mule.tck.testmodels.services.TestComponent"/>
             <mule:inbound-router>
-                <mule:endpoint address="axis:http://localhost:33381/services">
+                <mule:endpoint address="axis:http://localhost:63381/services">
                     <property name="style" value="Wrapped"/>
                     <property name="use" value="Literal"/>
                 </mule:endpoint>
@@ -30,8 +30,8 @@
             </mule:inbound-router>
             <mule:outbound-router>
                 <mule:exception-based-router>
-                    <mule:endpoint address="axis:http://localhost:33380/services/AxisService?method=receive"/>
-                    <mule:endpoint address="axis:http://localhost:33381/services/AxisService?method=receive"/>
+                    <mule:endpoint address="axis:http://localhost:63380/services/AxisService?method=receive"/>
+                    <mule:endpoint address="axis:http://localhost:63381/services/AxisService?method=receive"/>
                 </mule:exception-based-router>
             </mule:outbound-router>
         </mule:service>
@@ -44,62 +44,9 @@
             </mule:inbound-router>
             <mule:outbound-router>
                 <mule:pass-through-router>
-                    <mule:endpoint address="wsdl-xfire:http://localhost:33381/services/AxisService?WSDL&amp;method=receive"/>
+                    <mule:endpoint address="wsdl-xfire:http://localhost:63381/services/AxisService?WSDL&amp;method=receive"/>
                 </mule:pass-through-router>
             </mule:outbound-router>
         </mule:service>    
     </mule:model-seda>
 </beans>
-<!-- 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
-
-<mule-configuration id="Default" version="1.0">
-    <description>
-        Testing Web Services
-    </description>
-
-    <mule-environment-properties serverUrl="tcp://localhost:60500"/>
-
-    <model name="Testing_an_axis_service_using_xfire_dynamic_client">
-
-        <!- hosting the Axis Service ->
-        <mule-descriptor name="AxisService" implementation="org.mule.tck.testmodels.services.TestComponent">
-            <inbound-router>
-                <endpoint address="axis:http://localhost:63381/services"/>
-            </inbound-router>
-            <properties>
-                    <property name="style" value="Wrapped"/>
-                    <property name="use" value="Literal"/>
-            </properties>
-        </mule-descriptor>
-
-        <!- Bridge Component used to test the ExceptionBasedRouting on Axis ->
-        <mule-descriptor name="test" implementation="org.mule.components.simple.BridgeComponent">
-            <inbound-router>
-                <endpoint address="vm://localhost.test"/>
-            </inbound-router>
-            <outbound-router>
-                <router className="org.mule.routing.outbound.ExceptionBasedRouter">
-                    <endpoint address="axis:http://localhost:63380/services/AxisService?method=receive"/>
-                    <endpoint address="axis:http://localhost:63381/services/AxisService?method=receive"/>
-                </router>
-            </outbound-router>
-        </mule-descriptor>
-
-        <!- Accessing an Axis hosted web-service using XFire dynamic client ->
-        <mule-descriptor name="BridgeToAxisService" implementation="org.mule.components.simple.BridgeComponent">
-            <inbound-router>
-                <endpoint address="vm://axis.in"/>
-            </inbound-router>
-            <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="wsdl-xfire:http://localhost:63381/services/AxisService?WSDL&amp;method=receive"/>
-                </router>
-            </outbound-router>
-        </mule-descriptor>
-
-    </model>
-    
-</mule-configuration>
- -->

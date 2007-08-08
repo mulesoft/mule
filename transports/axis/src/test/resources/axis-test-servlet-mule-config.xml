@@ -10,7 +10,7 @@
     
     <servlet:connector 
         name="servlet" 
-        servletUrl="http://localhost:18088/services"/>
+        servletUrl="http://localhost:62088/services"/>
         
     <mule:model-seda name="test">
         <mule:service name="mycomponent">
@@ -21,24 +21,3 @@
         </mule:service>
     </mule:model-seda>
 </beans>
-
-<!-- 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
-
-<mule-configuration id="axis_test" version="1.0">
-
-    <connector name="servlet" className="org.mule.providers.http.servlet.ServletConnector">
-        <properties>
-            <property name="servletUrl" value="http://localhost:62188/services"/>
-        </properties>
-    </connector>
-
-    <model name="test">
-        <mule-descriptor name="mycomponent"
-            implementation="org.mule.tck.testmodels.services.TestServiceComponent"
-            inboundEndpoint="axis:servlet://mycomponent">
-        </mule-descriptor>
-    </model>
-</mule-configuration>
- -->

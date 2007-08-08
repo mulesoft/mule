@@ -20,24 +20,3 @@
         </mule:service>    
     </mule:model-seda>
 </beans>
-
-<!-- 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
-
-<mule-configuration id="AxisSoapHeaders" version="1.0">
-   
-    <model name="Axis_Headers_TestCase">
-        <mule-descriptor name="component" implementation="org.mule.components.simple.EchoComponent">
-            <inbound-router>
-                <endpoint address="axis:http://localhost:62181/services"/>
-            </inbound-router>
-            <response-router>
-                <endpoint address="http://localhost:62182/reply"/>
-            </response-router>
-        </mule-descriptor>
-
-    </model>
-
-</mule-configuration>
- -->

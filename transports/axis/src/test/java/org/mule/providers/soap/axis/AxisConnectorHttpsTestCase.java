@@ -23,7 +23,7 @@ public class AxisConnectorHttpsTestCase extends FunctionalTestCase
     
     public void testHttpsConnection() throws Exception{
         MuleClient client = new MuleClient();
-        UMOMessage m = client.send("axis:https://localhost:8000/TestUMO?method=echo",new MuleMessage("hello"));
+        UMOMessage m = client.send("axis:https://localhost:62000/TestUMO?method=echo",new MuleMessage("hello"));
         assertNotNull(m);
         
         // check that our https connector is being used

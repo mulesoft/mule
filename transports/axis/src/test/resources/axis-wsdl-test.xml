@@ -12,7 +12,7 @@
         <mule:service name="EchoService1">
             <mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
-                <mule:endpoint address="axis:http://localhost:8081/services">
+                <mule:endpoint address="axis:http://localhost:62081/services">
                     <mule:properties>
                         <entry key="serviceNamespace" value="http://foo"/>
                     </mule:properties>
@@ -23,7 +23,7 @@
         <mule:service name="EchoService2">
             <mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
-                <mule:endpoint address="axis:http://localhost:8082/services">
+                <mule:endpoint address="axis:http://localhost:62082/services">
                     <mule:properties>
                         <entry key="axisOptions">
                             <map>
@@ -40,7 +40,7 @@
         <mule:service name="EchoService3">
             <mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
-                <mule:endpoint address="axis:http://localhost:8083/services">
+                <mule:endpoint address="axis:http://localhost:62083/services">
                     <mule:properties>
                         <entry key="wsdlFile" value="test-service.wsdl"/>
                     </mule:properties>
@@ -49,43 +49,3 @@
         </mule:service>    
     </mule:model-seda>
 </beans>
-
-<!-- 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
-
-<mule-configuration id="axis_test" version="1.0">
-    <model name="test">
-        <mule-descriptor name="EchoService1" implementation="org.mule.components.simple.EchoComponent">
-            <inbound-router>
-                <endpoint address="axis:http://localhost:62081/services"/>
-            </inbound-router>
-            <properties>
-                    <property name="serviceNamespace" value="http://foo"/>
-            </properties>
-        </mule-descriptor>
-
-        <mule-descriptor name="EchoService2" implementation="org.mule.components.simple.EchoComponent">
-            <inbound-router>
-                <endpoint address="axis:http://localhost:62082/services"/>
-            </inbound-router>
-            <properties>
-                    <map name="axisOptions">
-                        <property name="wsdlPortType" value="mulePortType"/>
-                        <property name="wsdlServiceElement" value="muleService"/>
-                        <property name="wsdlServicePort" value="muleServicePort"/>
-                    </map>
-            </properties>
-        </mule-descriptor>
-
-        <mule-descriptor name="EchoService3" implementation="org.mule.components.simple.EchoComponent">
-            <inbound-router>
-                <endpoint address="axis:http://localhost:62083/services"/>
-            </inbound-router>
-            <properties>
-                    <property name="wsdlFile" value="test-service.wsdl"/>
-            </properties>
-        </mule-descriptor>
-    </model>
-</mule-configuration>
- -->

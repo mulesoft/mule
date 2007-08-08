@@ -16,7 +16,7 @@
             </mule:inbound-router>
             <mule:outbound-router>
                 <mule:pass-through-router>
-                    <mule:endpoint address="axis:http://localhost:38011/mule/mycomponent2?method=echo"
+                    <mule:endpoint address="axis:http://localhost:62111/mule/mycomponent2?method=echo"
                         synchronous="true">
                         <property name="soapMethods" value="value:string:in,return:string"/>
                     </mule:endpoint>
@@ -27,43 +27,9 @@
         <mule:service name="mycomponent2">
             <mule:component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             <mule:inbound-router>
-                <mule:endpoint address="axis:http://localhost:38011/mule" synchronous="true"/>
+                <mule:endpoint address="axis:http://localhost:62111/mule" synchronous="true"/>
             </mule:inbound-router>
         </mule:service>
     </mule:model-seda>
 </beans>
 
-<!-- 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
-
-<mule-configuration id="axis_test" version="1.0">
-
-    <model name="test">
-        <mule-descriptor name="mycomponent1"
-            implementation="org.mule.components.simple.EchoComponent">
-            <inbound-router>
-                <endpoint address="vm://mycomponent1"/>
-            </inbound-router>
-            <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                <endpoint address="axis:http://localhost:62111/mule/mycomponent2?method=echo" synchronous="true">
-                    <properties>
-                        <map name="soapMethods">
-                            <property name="echo" value="value:string:in,return:string"/>
-                        </map>
-                    </properties>
-                </endpoint>
-                    </router>
-            </outbound-router>
-        </mule-descriptor>
-        <mule-descriptor name="mycomponent2"
-            implementation="org.mule.tck.testmodels.services.TestServiceComponent">
-            <inbound-router>
-                <endpoint address="axis:http://localhost:62111/mule" synchronous="true">
-                </endpoint>
-            </inbound-router>
-        </mule-descriptor>
-    </model>
-</mule-configuration>
- -->
