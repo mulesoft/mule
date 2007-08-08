@@ -17,14 +17,14 @@
         <mule:service name="XFireWithExceptionStrategy">
             <mule:component class="org.mule.providers.soap.xfire.testmodels.TestXFireComponent"/>
             <mule:inbound-router>
-                <mule:endpoint address="xfire:http://localhost:10181/services"/>
+                <mule:endpoint address="xfire:http://localhost:63181/services"/>
             </mule:inbound-router>
             <mule:custom-exception-strategy class="org.mule.providers.soap.xfire.XFireComponentExceptionStrategy"/>
         </mule:service>
         <mule:service name="XFireDefault">
             <mule:component class="org.mule.providers.soap.xfire.testmodels.TestXFireComponent"/>
             <mule:inbound-router>
-                <mule:endpoint address="xfire:http://localhost:10181/services"/>
+                <mule:endpoint address="xfire:http://localhost:63181/services"/>
             </mule:inbound-router>
         </mule:service>
     </mule:model-seda>
