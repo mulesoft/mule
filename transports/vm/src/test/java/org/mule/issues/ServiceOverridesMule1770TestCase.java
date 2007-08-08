@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.providers.vm.issues;
+package org.mule.issues;
 
 import org.mule.config.MuleProperties;
 import org.mule.providers.AbstractConnector;
@@ -22,7 +22,7 @@ public class ServiceOverridesMule1770TestCase extends FunctionalTestCase
 
     protected String getConfigResources()
     {
-        return "vm/service-overrides-mule-1770-test.xml";
+        return "issues/service-overrides-mule-1770-test.xml";
     }
 
     public void testServiceOverrides()

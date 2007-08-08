@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.providers.vm.issues;
+package org.mule.issues;
 
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
@@ -20,7 +20,7 @@ public class ManySendsMule1758TestCase extends FunctionalTestCase
 
     protected String getConfigResources()
     {
-        return "vm/many-sends-test.xml";
+        return "issues/many-sends-mule-1758-test.xml";
     }
 
     public void testSingleSend() throws Exception

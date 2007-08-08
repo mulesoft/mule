@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.providers.vm.issues;
+package org.mule.issues;
 
 import org.mule.extras.client.MuleClient;
 import org.mule.impl.MuleMessage;
@@ -25,7 +25,7 @@ public class MulticastRouterMule2112TestCase  extends FunctionalTestCase
 
     protected String getConfigResources()
     {
-        return "multicast-router-mule-2112-test.xml";
+        return "issues/multicast-router-mule-2112-test.xml";
     }
 
     public void testMulticastRoutingOverTwoEndpoints() throws Exception

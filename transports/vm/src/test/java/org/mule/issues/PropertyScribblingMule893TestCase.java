@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.providers.vm.issues;
+package org.mule.issues;
 
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
@@ -23,7 +23,7 @@ public class PropertyScribblingMule893TestCase extends FunctionalTestCase
 
     protected String getConfigResources()
     {
-        return "vm/property-scribbling-mule-893-test.xml";
+        return "issues/property-scribbling-mule-893-test.xml";
     }
 
     public void testSingleMessage() throws Exception

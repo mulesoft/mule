@@ -11,12 +11,7 @@
 package org.mule.modules.xml.functional;
 
 import org.mule.extras.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
-
-import java.io.InputStream;
-
-import org.apache.commons.io.IOUtils;
 
 public class XmlFilterFunctionalTestCase extends AbstractXmlFunctionalTestCase
 {
@@ -40,7 +35,7 @@ public class XmlFilterFunctionalTestCase extends AbstractXmlFunctionalTestCase
 
     public void testOther() throws Exception
     {
-        doTestXml("other", getResourceAsString("vm/many-sends-test.xml"));
+        doTestXml("other", getResourceAsString("issues/many-sends-mule-1758-test.xml"));
     }
 
     public void testSelf() throws Exception
