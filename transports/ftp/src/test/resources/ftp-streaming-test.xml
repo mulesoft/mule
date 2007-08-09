@@ -11,7 +11,7 @@
                http://www.mulesource.org/schema/mule/tcp/2.0 http://www.mulesource.org/schema/mule/tcp/2.0/mule-tcp.xsd">
 
     <ftp:connector name="ftp" pollingFrequency="2000">
-        <mule:custom-exception-strategy class="org.mule.providers.ftp.DebugExceptionStrategy"/>
+        <mule:custom-exception-strategy class="org.mule.tck.functional.QuietExceptionStrategy"/>
     </ftp:connector>
 
     <tcp:connector name="tcp" tcpProtocolClassName="org.mule.providers.tcp.protocols.DefaultProtocol"/>

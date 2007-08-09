@@ -10,13 +10,18 @@
        http://www.mulesource.org/schema/mule/xml-transformer/2.0 http://www.mulesource.org/schema/mule/xml-transformer/2.0/mule-xml-transformer.xsd
        http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
 
-    <vm:connector name="default"/>
-    <vm:connector name="queue" queueEvents="true"/>
+    <vm:connector name="default">
+        <mule:custom-exception-strategy class="org.mule.tck.functional.QuietExceptionStrategy"/>
+    </vm:connector>
+    
+    <vm:connector name="queue" queueEvents="true">
+        <mule:custom-exception-strategy class="org.mule.tck.functional.QuietExceptionStrategy"/>
+    </vm:connector>
 
     <xml-transformer:dom-to-xml name="domToXml"/>
     <xml-transformer:xml-to-dom name="xmlToDom"/>
 
-    <xml-transformer:jxpath-extractor name="jxpathExtractor" expression="/expression"/>
+    <xml-transformer:jxpath-extractor name="jxpath" expression="count(//parent)"/>
 
     <xml-transformer:object-to-xml name="objectToXml"/>
     <xml-transformer:xml-to-object name="xmlToObject"/>
@@ -35,11 +40,9 @@
     </xml-transformer:xslt>
 
     <mule:endpoint name="xml-in" address="vm://xml-in" connector-ref="default"/>
-    <mule:endpoint name="dom-in" address="vm://dom-in" connector-ref="default"/>
-
-    <mule:endpoint name="xml-out" address="vm://xml-out" connector-ref="queue"/>
-    <mule:endpoint name="xml-dom-out" address="vm://xml-dom-out" connector-ref="queue"/>
-    <mule:endpoint name="dom-xml-out" address="vm://dom-xml-out" connector-ref="queue"/>
+    <mule:endpoint name="object-in" address="vm://object-in" connector-ref="default"/>
+    <mule:endpoint name="object-in-2" address="vm://object-in-2" connector-ref="default"/>
+    <mule:endpoint name="dom-in" address="vm://dom-in" connector-ref="default" transformers="xmlToDom"/>
 
     <mule:model-seda name="xml transformer tests">
 
@@ -50,9 +53,43 @@
             </mule:inbound-router>
             <mule:outbound-router>
                 <mule:multicasting-router>
-                    <mule:endpoint ref="xml-out"/>
-                    <mule:endpoint ref="xml-dom-out" transformers="xmlToDom"/>
-                    <mule:endpoint ref="dom-in" transformers="xmlToDom"/>
+                    <mule:endpoint name="xml-out" address="vm://xml-out" connector-ref="queue"/>
+                    <mule:endpoint name="xml-xslt-out" address="vm://xml-xslt-out" connector-ref="queue" transformers="xslt"/>
+                    <mule:endpoint name="xml-jxpath-out" address="vm://xml-jxpath-out" connector-ref="queue" transformers="jxpath"/>
+                    <mule:endpoint name="xml-dom-out" address="vm://xml-dom-out" connector-ref="queue" transformers="xmlToDom"/>
+                    <mule:endpoint name="xml-object-out" address="vm://xml-object-out" connector-ref="queue" transformers="xmlToObject"/>
+                    <mule:endpoint ref="dom-in"/>
+                </mule:multicasting-router>
+            </mule:outbound-router>
+        </mule:service>
+
+        <mule:service name="object to xml">
+            <mule:component class="org.mule.components.simple.BridgeComponent"/>
+            <mule:inbound-router>
+                <mule:endpoint ref="object-in"/>
+            </mule:inbound-router>
+            <mule:outbound-router>
+                <mule:multicasting-router>
+                    <mule:endpoint name="object-out" address="vm://object-out" connector-ref="queue"/>
+                    <mule:endpoint name="object-xml-out" address="vm://object-xml-out" connector-ref="queue" transformers="objectToXml"/>
+                    <!-- MULE-2136 -->
+                    <!-- mule:endpoint ref="xml-in" transformers="objectToXml"/ -->
+                </mule:multicasting-router>
+            </mule:outbound-router>
+        </mule:service>
+
+        <!-- Need to split this across two service to avoid MULE-2136 -->
+        <mule:service name="object to xml 2">
+            <mule:component class="org.mule.components.simple.BridgeComponent"/>
+            <mule:inbound-router>
+                <mule:endpoint ref="object-in-2"/>
+            </mule:inbound-router>
+            <mule:outbound-router>
+                <mule:multicasting-router>
+                    <!-- MULE-2136 -->
+                    <!-- mule:endpoint name="object-out" address="vm://object-out" connector-ref="queue"/ -->
+                    <!-- mule:endpoint name="object-xml-out" address="vm://object-xml-out" connector-ref="queue" transformers="objectToXml"/ -->
+                    <mule:endpoint ref="xml-in" transformers="objectToXml"/>
                 </mule:multicasting-router>
             </mule:outbound-router>
         </mule:service>
@@ -64,7 +101,7 @@
             </mule:inbound-router>
             <mule:outbound-router>
                 <mule:multicasting-router>
-                    <mule:endpoint ref="dom-xml-out" transformers="domToXml"/>
+                    <mule:endpoint name="dom-xml-out" address="vm://dom-xml-out" connector-ref="queue" transformers="domToXml"/>
                 </mule:multicasting-router>
             </mule:outbound-router>
         </mule:service>
