@@ -61,7 +61,7 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter, Threa
      * Should we fail when we detect scribbling?  This can be overridden by setting the
      * property {@link org.mule.config.MuleProperties#MULE_THREAD_UNSAFE_MESSAGES_PROPERTY}
      */
-    public static final boolean DEFAULT_FAILFAST = false;
+    public static final boolean DEFAULT_FAILFAST = true;
 
     protected UMOExceptionPayload exceptionPayload;
     protected String id = UUID.getUUID();
