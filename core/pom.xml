@@ -64,8 +64,6 @@
                          <!-- Do we intend to support other containers for 2.0? -->
                          <exclude>**/MuleContainerContextTestCase.*</exclude>
                          <exclude>**/JndiContainerContextTestCase.*</exclude>
-                         <!-- http://mule.mulesource.org/jira/browse/MULE-2124 -->
-                         <exclude>**/NoArgsCallWrapperTestCase.*</exclude>
                      </excludes>
                  </configuration>
              </plugin>
