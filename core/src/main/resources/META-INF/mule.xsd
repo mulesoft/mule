@@ -1552,5 +1552,16 @@
             </xsd:simpleType>
         </xsd:union>
     </xsd:simpleType>
+    
+    
+    <!--==============================================================-->
+    <!--  ObjectFactory Types                                         -->
+    <!--==============================================================-->
+    
+    <xsd:complexType name="propertyExtractorType">
+        <xsd:complexContent>
+            <xsd:extension base="objectFactoryType" />
+        </xsd:complexContent>
+    </xsd:complexType>
 
 </xsd:schema>
