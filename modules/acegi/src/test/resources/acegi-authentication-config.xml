@@ -23,10 +23,10 @@
         <property name="userDetailsService" ref="inMemoryDaoImpl"/>
     </bean>
 
-    <mule:security-manager xsi:type="acegi:securityManagerType">
+    <acegi:security-manager>
         <acegi:delegate-security-provider name="memory-dao"
                                           delegate-ref="daoAuthenticationProvider"/>
-    </mule:security-manager>
+    </acegi:security-manager>
 
     <mule:model-seda name="test">
         <mule:service name="echo">

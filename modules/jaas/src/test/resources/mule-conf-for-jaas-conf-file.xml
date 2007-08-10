@@ -12,10 +12,10 @@
     
     <mule:configuration serverId="" defaultSynchronousEndpoints="true"/>
 
-    <mule:security-manager xsi:type="jaas:securityManagerType">
-        <jaas:jaas-security-provider name="jaasSecurityProvider" loginContextName="jaasTest" loginConfig="jaas.conf"/>
+    <jaas:security-manager>
+        <jaas:security-provider name="jaasSecurityProvider" loginContextName="jaasTest" loginConfig="jaas.conf"/>
         <jaas:password-encryption-strategy  name="PBE" password="mule"/>
-    </mule:security-manager>
+    </jaas:security-manager>
 
     <mule:model-seda name="test">
         <mule:service name="TestUMO">

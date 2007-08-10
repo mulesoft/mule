@@ -11,9 +11,7 @@
        http://www.mulesource.org/schema/mule/acegi/2.0 http://www.mulesource.org/schema/mule/acegi/2.0/mule-acegi.xsd">
 
     <bean id="daoAuthenticationProvider" class="org.acegisecurity.providers.dao.DaoAuthenticationProvider">
-        <property name="userDetailsService">
-            <ref bean="inMemoryDaoImpl"/>
-        </property>
+        <property name="userDetailsService" ref="inMemoryDaoImpl"/>
     </bean>
 
     <bean id="inMemoryDaoImpl" class="org.acegisecurity.userdetails.memory.InMemoryDaoImpl">
@@ -25,10 +23,10 @@
         </property>
     </bean>
 
-    <mule:security-manager xsi:type="acegi:securityManagerType">
+    <acegi:security-manager>
         <acegi:delegate-security-provider name="memory-dao"
                                           delegate-ref="daoAuthenticationProvider"/>
-    </mule:security-manager>
+    </acegi:security-manager>
 
     <mule:model-seda name="http secured test model">
         <mule:service name="SecureUMO">

@@ -3,31 +3,22 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:pgp="http://www.mulesource.org/schema/mule/pgp/2.0"
-    xsi:schemaLocation="
+       xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/pgp/2.0 http://www.mulesource.org/schema/mule/pgp/2.0/mule-pgp.xsd">
 
-
-<bean id="pgpKeyManager" class="org.mule.extras.pgp.PGPKeyRingImpl" init-method="initialise">
-        <property name="publicKeyRingFileName">
-            <value>serverPublic.gpg</value>
-        </property>
-        <property name="secretKeyRingFileName">
-            <value>serverPrivate.gpg</value>
-        </property>
-        <property name="secretAliasId">
-            <value>0x6168F39C</value>
-        </property>
-        <property name="secretPassphrase">
-            <value>TestingPassphrase</value>
-        </property>
+    <bean id="pgpKeyManager" class="org.mule.extras.pgp.PGPKeyRingImpl" init-method="initialise">
+        <property name="publicKeyRingFileName" value="serverPublic.gpg"/>
+        <property name="secretKeyRingFileName" value="serverPrivate.gpg"/>
+        <property name="secretAliasId" value="0x6168F39C"/>
+        <property name="secretPassphrase" value="TestingPassphrase"/>
     </bean>
     <bean id="fakeCredentialAccessor" class="org.mule.extras.pgp.FakeCredentialAccessor" />
 	
-	<mule:security-manager xsi:type="pgp:securityManagerType">
-        <pgp:pgp-security-provider name="pgpSecurityProvider" keyManager-ref="pgpKeyManager"/>
+    <pgp:security-manager>
+        <pgp:security-provider name="pgpSecurityProvider" keyManager-ref="pgpKeyManager"/>
         <pgp:keybased-encryption-strategy name="keyBasedEncryptionStrategy" keyManager-ref="pgpKeyManager"/>
-    </mule:security-manager>
-    
+    </pgp:security-manager>
+
 </beans>

@@ -16,17 +16,18 @@
         <xsd:annotation>
             <xsd:documentation>
                 This is the security provider type that is used to configure Acegi related functionality.
-                It should be used as the "xsi:type" attribute in a "security-manager" element.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:complexContent>
-            <xsd:extension base="mule:securityManagerType">
+            <xsd:extension base="mule:abstractSecurityManagerType">
                 <xsd:sequence>
                     <xsd:element ref="delegate-security-provider"/>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+
+    <xsd:element name="security-manager" type="securityManagerType" substitutionGroup="mule:abstract-security-manager"/>
 
     <xsd:complexType name="securityProperty">
         <xsd:attribute name="name" type="xsd:string" use="required"/>

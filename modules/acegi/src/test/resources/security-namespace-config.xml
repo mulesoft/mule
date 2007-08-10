@@ -10,7 +10,7 @@
     <bean name="dummyEncryptionStrategy" class="org.mule.impl.security.MockEncryptionStrategy"/>
     <bean name="dummyKeyFactory" class="org.mule.impl.security.MockKeyFactory"/>
 
-    <mule:security-manager xsi:type="mule:defaultSecurityManagerType">
+    <mule:security-manager>
         <mule:custom-security-provider name="dummySecurityProvider"
                                        provider-ref="dummySecurityProvider"/>
         <mule:custom-encryption-strategy name="dummyEncryptionStrategy"

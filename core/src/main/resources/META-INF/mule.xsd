@@ -17,7 +17,7 @@
         </xsd:annotation>
         <xsd:complexType>
             <xsd:complexContent>
-                <xsd:extension base="mapType" />
+                <xsd:extension base="mapType"/>
             </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
@@ -411,18 +411,18 @@
     </xsd:complexType>
 
 
-    <xsd:element name="security-manager" type="securityManagerType">
+    <xsd:element name="abstract-security-manager" type="abstractSecurityManagerType" abstract="true">
         <xsd:annotation>
             <xsd:documentation>
                 A security manager is a container for security providers. More than one
                 security manager may be configured; each contains providers from a particular
-                module and has that module's type. The type is specified using the xsi:type
-                attribute - as an example, for module foo the type would be foo:securityManagerType.
+                module and has that module's type.  This element is abstract - a security
+                related module or transport will provide a suitable implementation.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:complexType name="securityManagerType">
+    <xsd:complexType name="abstractSecurityManagerType">
         <xsd:annotation>
             <xsd:documentation>
                 This is an empty holder that can be extended by modules that want to
@@ -435,6 +435,34 @@
         </xsd:annotation>
         <xsd:attribute name="id" fixed="_muleSecurityManager"/>
         <xsd:attribute name="name" fixed="_muleSecurityManager"/>
+    </xsd:complexType>
+
+    <xsd:element name="security-manager" type="securityManagerType" substitutionGroup="abstract-security-manager">
+        <xsd:annotation>
+            <xsd:documentation>
+                The default security manager.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="securityManagerType">
+        <xsd:annotation>
+            <xsd:documentation>
+                The default security manager (type mule:defaultSecurityManagerType) provides
+                basic support for security functions. Other modules (eg Acegi, JAAS, PGP)
+                provide more advanced functionality.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:extension base="abstractSecurityManagerType">
+                <xsd:sequence>
+                    <xsd:element name="custom-security-provider" type="customSecurityProviderType" minOccurs="0"/>
+                    <xsd:element name="custom-encryption-strategy" type="customEncryptionStrategyType" minOccurs="0"/>
+                    <xsd:element name="secret-key-encryption-strategy" type="secretKeyEncryptionStrategyType" minOccurs="0"/>
+                    <xsd:element name="password-encryption-strategy" type="passwordEncryptionStrategyType" minOccurs="0"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
 
     <xsd:complexType name="securityProviderType">
@@ -453,26 +481,6 @@
             </xsd:documentation>
         </xsd:annotation>
         <xsd:attribute name="name" type="xsd:string" use="required"/>
-    </xsd:complexType>
-
-    <xsd:complexType name="defaultSecurityManagerType">
-        <xsd:annotation>
-            <xsd:documentation>
-                The default security manager (type mule:defaultSecurityManagerType) provides
-                basic support for security functions. Other modules (eg Acegi, JAAS, PGP)
-                provide more advanced functionality.
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:complexContent>
-            <xsd:extension base="securityManagerType">
-                <xsd:sequence>
-                    <xsd:element name="custom-security-provider" type="customSecurityProviderType" minOccurs="0"/>
-                    <xsd:element name="custom-encryption-strategy" type="customEncryptionStrategyType" minOccurs="0"/>
-                    <xsd:element name="secret-key-encryption-strategy" type="secretKeyEncryptionStrategyType" minOccurs="0"/>
-                    <xsd:element name="password-encryption-strategy" type="passwordEncryptionStrategyType" minOccurs="0"/>
-                </xsd:sequence>
-            </xsd:extension>
-        </xsd:complexContent>
     </xsd:complexType>
 
     <xsd:complexType name="customSecurityProviderType">

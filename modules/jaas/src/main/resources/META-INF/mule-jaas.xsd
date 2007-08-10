@@ -12,11 +12,13 @@
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0" 
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
     
+    <xsd:element name="security-manager" type="securityManagerType" substitutionGroup="mule:abstract-security-manager"/>
+
     <xsd:complexType name="securityManagerType">
         <xsd:complexContent>
-            <xsd:extension base="mule:securityManagerType">
+            <xsd:extension base="mule:abstractSecurityManagerType">
                 <xsd:sequence>
-                    <xsd:element ref="jaas-security-provider"/>
+                    <xsd:element ref="security-provider"/>
                     <xsd:element name="password-encryption-strategy" type="mule:passwordEncryptionStrategyType" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
             </xsd:extension>
@@ -24,11 +26,10 @@
     </xsd:complexType>
     
     <!-- jaas provider -->
-    <xsd:element name="jaas-security-provider" type="jaasSecurityProviderType">
+    <xsd:element name="security-provider" type="jaasSecurityProviderType">
         <xsd:annotation>
             <xsd:documentation>
                 This is the security provider type that is used to configure JAAS related functionality.
-                It should be used as the "xsi:type" attribute in a "security-manager" element.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

@@ -23,12 +23,12 @@
         <property name="userDetailsService" ref="inMemoryDaoImpl"/>
     </bean>
 
-    <mule:security-manager xsi:type="acegi:securityManagerType">
+    <acegi:security-manager>
         <acegi:delegate-security-provider name="memory-dao"
                                           delegate-ref="daoAuthenticationProvider"/>
-    </mule:security-manager>
+    </acegi:security-manager>
 
-    <mule:security-manager xsi:type="mule:defaultSecurityManagerType">
+    <mule:security-manager xsi:type="mule:securityManagerType">
         <mule:password-encryption-strategy name="PBE" password="mule"/>
     </mule:security-manager>
 

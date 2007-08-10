@@ -23,6 +23,7 @@ public class NamedDefinitionParser extends ParentDefinitionParser
 
     public NamedDefinitionParser(String name)
     {
+        addIgnored(ATTRIBUTE_NAME);
         this.name = name;
     }
 

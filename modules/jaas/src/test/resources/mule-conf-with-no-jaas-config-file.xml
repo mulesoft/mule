@@ -13,11 +13,11 @@
     <mule:configuration serverId="" defaultSynchronousEndpoints="true"/>
     <!--mule-environment-properties synchronous="true"/-->
 
-    <mule:security-manager xsi:type="jaas:securityManagerType">
+    <jaas:security-manager>
         <!-- uses DefaultLoginModule -->
-        <jaas:jaas-security-provider name="jaasSecurityProvider" loginContextName="jaasTest" credentials="anon:anon;Marie.Rizzo:dragon;"/>
+        <jaas:security-provider name="jaasSecurityProvider" loginContextName="jaasTest" credentials="anon:anon;Marie.Rizzo:dragon;"/>
         <jaas:password-encryption-strategy  name="PBE" password="mule"/>
-    </mule:security-manager>
+    </jaas:security-manager>
 
     <mule:model-seda name="test">
         <mule:service name="TestUMO">

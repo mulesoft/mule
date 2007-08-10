@@ -3,9 +3,7 @@
 <beans>
 
     <bean id="daoAuthenticationProvider" class="org.acegisecurity.providers.dao.DaoAuthenticationProvider">
-        <property name="userDetailsService">
-            <ref bean="inMemoryDaoImpl"/>
-        </property>
+        <property name="userDetailsService" ref="inMemoryDaoImpl"/>
     </bean>
 
     <bean id="inMemoryDaoImpl" class="org.acegisecurity.userdetails.memory.InMemoryDaoImpl">

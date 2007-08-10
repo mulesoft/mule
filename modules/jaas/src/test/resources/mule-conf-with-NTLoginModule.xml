@@ -13,10 +13,10 @@
 
     <!--mule-environment-properties synchronous="true"/-->
 
-    <mule:security-manager xsi:type="jaas:securityManagerType">
-        <jaas:jaas-security-provider name="jaasSecurityProvider" loginContextName="jaasTest" loginModule="com.sun.security.auth.module.NTLoginModule"/>
+    <jaas:security-manager>
+        <jaas:security-provider name="jaasSecurityProvider" loginContextName="jaasTest" loginModule="com.sun.security.auth.module.NTLoginModule"/>
         <jaas:password-encryption-strategy  name="PBE" password="mule"/>
-    </mule:security-manager>
+    </jaas:security-manager>
 
     <mule:model-seda name="test">
         <mule:service name="TestUMO">

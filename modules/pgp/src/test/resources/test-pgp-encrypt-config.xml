@@ -11,35 +11,28 @@
        http://www.mulesource.org/schema/mule/pgp/2.0 http://www.mulesource.org/schema/mule/pgp/2.0/mule-pgp.xsd">
 	
 	<bean id="pgpKeyManager" class="org.mule.extras.pgp.PGPKeyRingImpl" init-method="initialise">
-        <property name="publicKeyRingFileName">
-            <value>serverPublic.gpg</value>
-        </property>
-        <property name="secretKeyRingFileName">
-            <value>serverPrivate.gpg</value>
-        </property>
-        <property name="secretAliasId">
-            <value>0x6168F39C</value>
-        </property>
-        <property name="secretPassphrase">
-            <value>TestingPassphrase</value>
-        </property>
+        <property name="publicKeyRingFileName" value="serverPublic.gpg"/>
+        <property name="secretKeyRingFileName" value="serverPrivate.gpg"/>
+        <property name="secretAliasId" value="0x6168F39C"/>
+        <property name="secretPassphrase" value="TestingPassphrase"/>
     </bean>
     <bean id="fakeCredentialAccessor" class="org.mule.extras.pgp.FakeCredentialAccessor" />
 	
     <file:connector name="sendConnector" outputPattern="[TARGET_FILE]"/>
     
-	<mule:security-manager xsi:type="pgp:securityManagerType">
-        <pgp:pgp-security-provider name="pgpSecurityProvider" keyManager-ref="pgpKeyManager"/>
+	<pgp:security-manager>
+        <pgp:security-provider name="pgpSecurityProvider" keyManager-ref="pgpKeyManager"/>
         <pgp:keybased-encryption-strategy name="keyBasedEncryptionStrategy" keyManager-ref="pgpKeyManager"/>
-    </mule:security-manager>
-	
-	 <mule:model-seda name="test">
+    </pgp:security-manager>
+
+     <mule:model-seda name="test">
         <mule:service name="echo">
             <mule:component class="org.mule.extras.pgp.EchoMsg"/>
 				<mule:inbound-router>
 					<mule:endpoint address="vm://echo">
-						<mule:security-filter xsi:type="pgp:securityFilterType">
-							<pgp:pgp-security-filter strategyName="keyBasedEncryptionStrategy" signRequired="true" credentialsAccessor-ref="fakeCredentialAccessor" keyManager-ref="pgpKeyManager"/>
+                        <!--   TODO !!!!!!!!!!!!!!!!!! -->
+                        <mule:security-filter xsi:type="pgp:securityFilterType">
+							<pgp:security-filter strategyName="keyBasedEncryptionStrategy" signRequired="true" credentialsAccessor-ref="fakeCredentialAccessor" keyManager-ref="pgpKeyManager"/>
 						</mule:security-filter>
 					</mule:endpoint>
 				</mule:inbound-router>
@@ -47,7 +40,7 @@
 					<mule:pass-through-router>
 						<mule:endpoint address="file://output">
 							<mule:security-filter xsi:type="pgp:securityFilterType">
-								<pgp:pgp-security-filter strategyName="keyBasedEncryptionStrategy" signRequired="true" credentialsAccessor-ref="fakeCredentialAccessor" keyManager-ref="pgpKeyManager"/>
+								<pgp:security-filter strategyName="keyBasedEncryptionStrategy" signRequired="true" credentialsAccessor-ref="fakeCredentialAccessor" keyManager-ref="pgpKeyManager"/>
 							</mule:security-filter>
 						</mule:endpoint>
 					</mule:pass-through-router>
