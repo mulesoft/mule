@@ -36,7 +36,7 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
     public JdbcMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
         super(endpoint);
-        this.connector = (JdbcConnector)endpoint.getConnector();
+        this.connector = (JdbcConnector) endpoint.getConnector();
     }
 
     /*

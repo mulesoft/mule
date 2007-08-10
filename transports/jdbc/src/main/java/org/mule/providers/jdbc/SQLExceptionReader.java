@@ -25,13 +25,13 @@ public class SQLExceptionReader implements ExceptionReader
 {
     public String getMessage(Throwable t)
     {
-        SQLException e = (SQLException)t;
+        SQLException e = (SQLException) t;
         return e.getMessage() + "(SQL Code: " + e.getErrorCode() + ", SQL State: + " + e.getSQLState() + ")";
     }
 
     public Throwable getCause(Throwable t)
     {
-        SQLException e = (SQLException)t;
+        SQLException e = (SQLException) t;
         Throwable cause = e.getNextException();
         if (cause == null)
         {
@@ -53,7 +53,7 @@ public class SQLExceptionReader implements ExceptionReader
      */
     public Map getInfo(Throwable t)
     {
-        SQLException e = (SQLException)t;
+        SQLException e = (SQLException) t;
         Map info = new HashMap();
         if (e.getErrorCode() != 0)
         {

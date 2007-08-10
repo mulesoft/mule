@@ -504,8 +504,9 @@ public class JdbcConnector extends AbstractConnector
      */
     protected ResultSetHandler createResultSetHandler()
     {
-        try{
-            if(resultSetHandler != null)
+        try
+        {
+            if (resultSetHandler != null)
             {
                 return (ResultSetHandler) resultSetHandler.create();
             }
@@ -557,14 +558,14 @@ public class JdbcConnector extends AbstractConnector
     {
         try
         {
-            if(queryRunner != null)
+            if (queryRunner != null)
             {
                 return (QueryRunner) queryRunner.create();
             }
             else
             {
                 return (QueryRunner) ClassUtils.instanciateClass(DEFAULT_QUERY_RUNNER,
-                                                                         ClassUtils.NO_ARGS);
+                                                                 ClassUtils.NO_ARGS);
             }
         }
         catch (Exception e)
