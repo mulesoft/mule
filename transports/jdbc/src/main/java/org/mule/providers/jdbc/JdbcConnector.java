@@ -26,6 +26,8 @@ import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.ClassUtils;
 import org.mule.util.ExceptionUtils;
 import org.mule.util.StringUtils;
+import org.mule.util.object.ObjectFactory;
+import org.mule.util.object.SimpleObjectFactory;
 import org.mule.util.properties.BeanPropertyExtractor;
 import org.mule.util.properties.MapPropertyExtractor;
 import org.mule.util.properties.MessagePropertyExtractor;
@@ -76,49 +78,59 @@ public class JdbcConnector extends AbstractConnector
     protected String jndiProviderUrl;
     protected Map providerProperties;
     protected Map queries;
-    protected String resultSetHandler = DEFAULT_RESULTSET_HANDLER;
-    protected String queryRunner = DEFAULT_QUERY_RUNNER;
-    protected Set queryValueExtractors;
-    protected Set propertyExtractors;
+    protected ObjectFactory resultSetHandler;
+    protected ObjectFactory queryRunner;
+    //protected String resultSetHandler = DEFAULT_RESULTSET_HANDLER;
+    //protected String queryRunner = DEFAULT_QUERY_RUNNER;
+    protected Set queryValueExtractors = new HashSet();
+    protected ObjectFactory dataSourceFactory;
 
     protected void doInitialise() throws InitialisationException
     {
         try
         {
-            // If we have a dataSource, there is no need to initialise
-            // the JndiContext
-            if (dataSource == null)
+            //Use this order to insitalise dataSource
+            // 1) Use dataSourceFactory ObjectFactory
+            // 2) Use datasource instance
+            // 3) Use jndi context (configured via jndi properties) and jndi
+            // datasource name
+            if (dataSourceFactory != null)
             {
-                initJndiContext();
-                createDataSource();
+                dataSource = (DataSource) dataSourceFactory.create();
+            }
+            else
+            {
+                // If we have a dataSource, there is no need to initialise
+                // the JndiContext
+                if (dataSource == null)
+                {
+                    initJndiContext();
+                    createDataSource();
+
+                }
             }
             // setup property Extractors for queries
-            if (queryValueExtractors == null)
+            if (queryValueExtractors.isEmpty())
             {
                 // Add defaults
                 queryValueExtractors = new HashSet();
-                queryValueExtractors.add(MessagePropertyExtractor.class.getName());
-                queryValueExtractors.add(NowPropertyExtractor.class.getName());
-                queryValueExtractors.add(PayloadPropertyExtractor.class.getName());
-                queryValueExtractors.add(MapPropertyExtractor.class.getName());
-                queryValueExtractors.add(BeanPropertyExtractor.class.getName());
+                queryValueExtractors.add(new SimpleObjectFactory(MessagePropertyExtractor.class));
+                queryValueExtractors.add(new SimpleObjectFactory(NowPropertyExtractor.class));
+                queryValueExtractors.add(new SimpleObjectFactory(PayloadPropertyExtractor.class));
+                queryValueExtractors.add(new SimpleObjectFactory(MapPropertyExtractor.class));
+                queryValueExtractors.add(new SimpleObjectFactory(BeanPropertyExtractor.class));
 
                 if (ClassUtils.isClassOnPath("org.mule.util.properties.Dom4jPropertyExtractor", getClass()))
                 {
-                    queryValueExtractors.add("org.mule.util.properties.Dom4jPropertyExtractor");
+                    queryValueExtractors.add(new SimpleObjectFactory(
+                        "org.mule.util.properties.Dom4jPropertyExtractor"));
                 }
 
                 if (ClassUtils.isClassOnPath("org.mule.util.properties.JDomPropertyExtractor", getClass()))
                 {
-                    queryValueExtractors.add("org.mule.util.properties.JDomPropertyExtractor");
+                    queryValueExtractors.add(new SimpleObjectFactory(
+                        "org.mule.util.properties.JDomPropertyExtractor"));
                 }
-            }
-
-            propertyExtractors = new HashSet();
-            for (Iterator iterator = queryValueExtractors.iterator(); iterator.hasNext();)
-            {
-                String s = (String)iterator.next();
-                propertyExtractors.add(ClassUtils.instanciateClass(s, ClassUtils.NO_ARGS));
             }
         }
         catch (Exception e)
@@ -303,6 +315,7 @@ public class JdbcConnector extends AbstractConnector
 
     /**
      * @return Returns the dataSource.
+     * @deprecated
      */
     public DataSource getDataSource()
     {
@@ -311,6 +324,7 @@ public class JdbcConnector extends AbstractConnector
 
     /**
      * @param dataSource The dataSource to set.
+     * @deprecated
      */
     public void setDataSource(DataSource dataSource)
     {
@@ -351,6 +365,7 @@ public class JdbcConnector extends AbstractConnector
 
     /**
      * @return Returns the dataSourceJndiName.
+     * @deprecated
      */
     public String getDataSourceJndiName()
     {
@@ -359,6 +374,7 @@ public class JdbcConnector extends AbstractConnector
 
     /**
      * @param dataSourceJndiName The dataSourceJndiName to set.
+     * @deprecated
      */
     public void setDataSourceJndiName(String dataSourceJndiName)
     {
@@ -367,6 +383,7 @@ public class JdbcConnector extends AbstractConnector
 
     /**
      * @return Returns the jndiContext.
+     * @deprecated
      */
     public Context getJndiContext()
     {
@@ -375,6 +392,7 @@ public class JdbcConnector extends AbstractConnector
 
     /**
      * @param jndiContext The jndiContext to set.
+     * @deprecated
      */
     public void setJndiContext(Context jndiContext)
     {
@@ -383,6 +401,7 @@ public class JdbcConnector extends AbstractConnector
 
     /**
      * @return Returns the jndiInitialFactory.
+     * @deprecated
      */
     public String getJndiInitialFactory()
     {
@@ -391,6 +410,7 @@ public class JdbcConnector extends AbstractConnector
 
     /**
      * @param jndiInitialFactory The jndiInitialFactory to set.
+     * @deprecated
      */
     public void setJndiInitialFactory(String jndiInitialFactory)
     {
@@ -399,6 +419,7 @@ public class JdbcConnector extends AbstractConnector
 
     /**
      * @return Returns the jndiProviderUrl.
+     * @deprecated
      */
     public String getJndiProviderUrl()
     {
@@ -407,6 +428,7 @@ public class JdbcConnector extends AbstractConnector
 
     /**
      * @param jndiProviderUrl The jndiProviderUrl to set.
+     * @deprecated
      */
     public void setJndiProviderUrl(String jndiProviderUrl)
     {
@@ -415,6 +437,7 @@ public class JdbcConnector extends AbstractConnector
 
     /**
      * @return Returns the providerProperties.
+     * @deprecated
      */
     public Map getProviderProperties()
     {
@@ -423,6 +446,7 @@ public class JdbcConnector extends AbstractConnector
 
     /**
      * @param providerProperties The providerProperties to set.
+     * @deprecated
      */
     public void setProviderProperties(Map providerProperties)
     {
@@ -461,7 +485,7 @@ public class JdbcConnector extends AbstractConnector
     /**
      * @return Returns the resultSetHandler.
      */
-    public String getResultSetHandler()
+    public ObjectFactory getResultSetHandler()
     {
         return this.resultSetHandler;
     }
@@ -469,7 +493,7 @@ public class JdbcConnector extends AbstractConnector
     /**
      * @param resultSetHandler The resultSetHandler class name to set.
      */
-    public void setResultSetHandler(String resultSetHandler)
+    public void setResultSetHandler(ObjectFactory resultSetHandler)
     {
         this.resultSetHandler = resultSetHandler;
     }
@@ -480,10 +504,16 @@ public class JdbcConnector extends AbstractConnector
      */
     protected ResultSetHandler createResultSetHandler()
     {
-        try
-        {
-            return (ResultSetHandler) ClassUtils.instanciateClass(getResultSetHandler(),
-                                                                  ClassUtils.NO_ARGS);
+        try{
+            if(queryRunner != null)
+            {
+                return (ResultSetHandler) resultSetHandler.create();
+            }
+            else
+            {
+                return (ResultSetHandler) ClassUtils.instanciateClass(DEFAULT_RESULTSET_HANDLER,
+                                                                      ClassUtils.NO_ARGS);
+            }
         }
         catch (Exception e)
         {
@@ -506,7 +536,7 @@ public class JdbcConnector extends AbstractConnector
     /**
      * @return Returns the queryRunner.
      */
-    public String getQueryRunner()
+    public ObjectFactory getQueryRunner()
     {
         return this.queryRunner;
     }
@@ -514,7 +544,7 @@ public class JdbcConnector extends AbstractConnector
     /**
      * @param queryRunner The QueryRunner class name to set.
      */
-    public void setQueryRunner(String queryRunner)
+    public void setQueryRunner(ObjectFactory queryRunner)
     {
         this.queryRunner = queryRunner;
     }
@@ -527,8 +557,15 @@ public class JdbcConnector extends AbstractConnector
     {
         try
         {
-            return (QueryRunner) ClassUtils.instanciateClass(getQueryRunner(),
-                                                             ClassUtils.NO_ARGS);
+            if(queryRunner != null)
+            {
+                return (QueryRunner) queryRunner.create();
+            }
+            else
+            {
+                return (QueryRunner) ClassUtils.instanciateClass(DEFAULT_QUERY_RUNNER,
+                                                                         ClassUtils.NO_ARGS);
+            }
         }
         catch (Exception e)
         {
@@ -577,9 +614,9 @@ public class JdbcConnector extends AbstractConnector
             boolean foundValue = false;
             if (message != null)
             {
-                for (Iterator iterator = propertyExtractors.iterator(); iterator.hasNext();)
+                for (Iterator iterator = queryValueExtractors.iterator(); iterator.hasNext();)
                 {
-                    PropertyExtractor pe = (PropertyExtractor)iterator.next();
+                    PropertyExtractor pe = (PropertyExtractor) ((ObjectFactory) iterator.next()).create();
                     value = pe.getProperty(name, message);
                     if (value != null)
                     {
@@ -609,4 +646,15 @@ public class JdbcConnector extends AbstractConnector
         }
         return params;
     }
+
+    public ObjectFactory getDataSourceFactory()
+    {
+        return dataSourceFactory;
+    }
+
+    public void setDataSourceFactory(ObjectFactory dataSourceFactory)
+    {
+        this.dataSourceFactory = dataSourceFactory;
+    }
+
 }

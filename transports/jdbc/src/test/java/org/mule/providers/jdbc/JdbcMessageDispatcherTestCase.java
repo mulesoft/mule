@@ -10,10 +10,12 @@
 
 package org.mule.providers.jdbc;
 
+import org.mule.RegistryContext;
 import org.mule.impl.ImmutableMuleEndpoint;
 import org.mule.providers.jdbc.test.TestDataSource;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.util.object.SimpleObjectFactory;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -27,11 +29,13 @@ public class JdbcMessageDispatcherTestCase extends AbstractMuleTestCase
 
     public void testCustomResultSetHandlerIsNotIgnored() throws Exception
     {
+        
+        JdbcConnector connector = new JdbcConnector();
+        connector.setQueryRunner(new SimpleObjectFactory(TestQueryRunner.class));
+        connector.setResultSetHandler(new SimpleObjectFactory(TestResultSetHandler.class));
+        connector.setDataSourceFactory(new SimpleObjectFactory(TestDataSource.class));
+        RegistryContext.getRegistry().registerConnector(connector);
         UMOImmutableEndpoint ep = new ImmutableMuleEndpoint("jdbc://select * from test", false);
-        JdbcConnector connector = (JdbcConnector)ep.getConnector();
-        connector.setQueryRunner(TestQueryRunner.class.getName());
-        connector.setResultSetHandler(TestResultSetHandler.class.getName());
-        connector.setDataSource(new TestDataSource());
         ep.receive(0);
     }
 

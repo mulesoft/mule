@@ -9,7 +9,9 @@
  */
 package org.mule.providers.jdbc.config;
 
+import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
+import org.mule.config.spring.parsers.specific.ObjectFactoryDefinitionParser;
 import org.mule.providers.jdbc.JdbcConnector;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
@@ -20,16 +22,9 @@ public class JdbcNamespaceHandler extends NamespaceHandlerSupport
     public void init()
     {
         registerBeanDefinitionParser("connector", new OrphanDefinitionParser(JdbcConnector.class, true));
-//        registerBeanDefinitionParser("jndi-resource", new ChildDefinitionParser("jndiResource", JndiResource.class));
-//        registerBeanDefinitionParser("provider-properties", new ChildMapDefinitionParser("providerProperties"));
+        registerBeanDefinitionParser("dataSource", new ObjectFactoryDefinitionParser("dataSourceFactory"));
+        registerBeanDefinitionParser("queries", new ChildMapDefinitionParser("queries"));
+        registerBeanDefinitionParser("queryValueExtractor", new ObjectFactoryDefinitionParser("queryValueExtractor"));
     }
 
-//    class JndiResourceDefinitionParser extends ChildDefinitionParser
-//    {
-//        public JndiResourceDefinitionParser(String setterMethod)
-//        {
-//            super(setterMethod, JndiResource.class);
-//            registerAttributeMapping("scheduler", "quartzScheduler");
-//        }
-//    }
 }

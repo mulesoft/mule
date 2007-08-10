@@ -7,28 +7,29 @@
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
 
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:import namespace="http://www.springframework.org/schema/beans"
-                schemaLocation="http://www.springframework.org/schema/beans"/>
-    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0" 
+                schemaLocation="http://www.springframework.org/schema/beans" />
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
 
-    <xsd:element name="connector" type="jdbcConnectorType"/>
+    <xsd:element name="connector" type="jdbcConnectorType" />
 
     <xsd:complexType name="jdbcConnectorType">
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
-                <xsd:attribute name="dataSource-ref" type="xsd:NMTOKEN"/>
-                <xsd:attribute name="pollingFrequency" type="mule:substitutableLong"/>
+                <xsd:sequence>
+                    <xsd:element name="dataSource" type="mule:objectFactoryType" />
+                    <xsd:element name="queries" type="mule:mapType" minOccurs="0"></xsd:element>
+                    <xsd:element name="queryValueExtractor" type="mule:propertyExtractorType" minOccurs="0"
+                                 maxOccurs="unbounded">
+                    </xsd:element>
+                    <xsd:element name="resultSetHandler" type="mule:objectFactoryType" minOccurs="0" />
+                    <xsd:element name="queryRunner" type="mule:objectFactoryType" minOccurs="0" />
+                </xsd:sequence>
+                <xsd:attribute name="pollingFrequency" type="mule:substitutableLong" />
             </xsd:extension>
         </xsd:complexContent>
-   </xsd:complexType>
-</xsd:schema>
+    </xsd:complexType>
 
-<!--  
-    protected Map queries;
-    protected String resultSetHandler = DEFAULT_RESULTSET_HANDLER;
-    protected String queryRunner = DEFAULT_QUERY_RUNNER;
-    protected Set queryValueExtractors;
-    protected Set propertyExtractors;
--->
+</xsd:schema>

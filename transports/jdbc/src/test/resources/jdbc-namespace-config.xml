@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
-       xmlns:jee="http://www.springframework.org/schema/jee"
-       xmlns:util="http://www.springframework.org/schema/util"
-       xmlns:jdbc="http://www.mulesource.org/schema/mule/jdbc/2.0"
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0" xmlns:jee="http://www.springframework.org/schema/jee"
+       xmlns:util="http://www.springframework.org/schema/util" xmlns:jdbc="http://www.mulesource.org/schema/mule/jdbc/2.0"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-2.0.xsd
@@ -12,15 +9,48 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/jdbc/2.0 http://www.mulesource.org/schema/mule/jdbc/2.0/mule-jdbc.xsd">
 
-    <jdbc:connector name="jdbcConnector1" dataSource-ref="testDS1"/>
+    <jdbc:connector name="jdbcConnector1">
+        <jdbc:dataSource instance-ref="testDS1" scope="singleton" />
+    </jdbc:connector>
 
-    <bean id="testDS1" class="org.mule.providers.jdbc.test.TestDataSource"/>
+    <jdbc:connector name="jdbcConnector2">
+        <jdbc:dataSource instance-ref="testDS2" scope="singleton" />
+    </jdbc:connector>
 
-    <jdbc:connector name="jdbcConnector2" dataSource-ref="testDS2"/>
+    <jdbc:connector name="jdbcConnector3">
+        <jdbc:dataSource instance-ref="testDS1" scope="singleton" />
+        <jdbc:queries>
+            <entry key="getTest"
+                   value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE =
+                         ${type} AND ACK IS NULL" />
+            <entry key="getTest2"
+                   value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE =
+                         ${type} AND ACK IS NULL" />
+            <entry key="getTest.ack"
+                   value="UPDATE TEST SET ACK = ${NOW} WHERE ID = ${id} AND TYPE =
+                         ${type} AND DATA = ${data}" />
+        </jdbc:queries>
+        <jdbc:queryValueExtractor class="org.mule.util.properties.BeanPropertyExtractor" />
+        <jdbc:queryValueExtractor class="org.mule.providers.jdbc.NowPropertyExtractor" />
+    </jdbc:connector>
 
-    <jee:jndi-lookup id="testDS2" jndi-name="jdbc/testDS" environment-ref="jndiEnv"/>
+    <mule:endpoint name="testJdbcEndpoint" address="jdbc://getTest?type=1" connector-ref="jdbcConnector3">
+        <mule:properties>
+            <entry key="queries">
+                <map>
+                    <entry key="getTest2" value="OVERRIDDEN VALUE" />
+                    <entry key="getTest3"
+                           value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = ${type} AND ACK IS NULL" />
+                </map>
+            </entry>
+        </mule:properties>
+    </mule:endpoint>
+
+    <bean id="testDS1" class="org.mule.providers.jdbc.test.TestDataSource" />
+
+    <jee:jndi-lookup id="testDS2" jndi-name="jdbc/testDS" environment-ref="jndiEnv" />
 
     <util:map id="jndiEnv">
-        <entry key="java.naming.factory.initial" value="org.mule.providers.jdbc.test.JdbcTestContextFactory"/>
+        <entry key="java.naming.factory.initial" value="org.mule.providers.jdbc.test.JdbcTestContextFactory" />
     </util:map>
 </beans>

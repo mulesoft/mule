@@ -17,13 +17,6 @@
          <plugins>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>**/JdbcEndpointTestCase.java</exclude>
-                        <exclude>**/JdbcNamespaceHandlerTestCase.java</exclude>
-                        <exclude>**/JdbcMessageDispatcherTestCase.java</exclude>
-                    </excludes>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.felix</groupId>
