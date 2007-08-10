@@ -505,7 +505,7 @@ public class JdbcConnector extends AbstractConnector
     protected ResultSetHandler createResultSetHandler()
     {
         try{
-            if(queryRunner != null)
+            if(resultSetHandler != null)
             {
                 return (ResultSetHandler) resultSetHandler.create();
             }
