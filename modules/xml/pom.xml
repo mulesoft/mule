@@ -28,16 +28,6 @@
                     </instructions>
                 </configuration>
             </plugin>
-
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <!-- See MULE-1700 for more info -->
-                        <exclude>**/XmlUMOMessageTransformersTestCase.*</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 
@@ -262,6 +252,12 @@
             <artifactId>xmlunit</artifactId>
             <version>1.0</version>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+            <scope>provided</scope>
         </dependency>
 
     </dependencies>
