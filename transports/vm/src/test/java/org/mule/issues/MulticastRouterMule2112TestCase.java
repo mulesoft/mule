@@ -16,7 +16,6 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.umo.UMOEventContext;
-import org.mule.umo.model.UMOModel;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
@@ -30,9 +29,8 @@ public class MulticastRouterMule2112TestCase  extends FunctionalTestCase
 
     public void testMulticastRoutingOverTwoEndpoints() throws Exception
     {
-        UMOModel model = managementContext.getRegistry().lookupModel("main");
-        FunctionalTestComponent hop1 = (FunctionalTestComponent) model.getComponent("hop1").getInstance();
-        FunctionalTestComponent hop2 = (FunctionalTestComponent) model.getComponent("hop2").getInstance();
+        FunctionalTestComponent hop1 = lookupTestComponent("main", "hop1");
+        FunctionalTestComponent hop2 = lookupTestComponent("main", "hop2");
         assertNotNull(hop1);
         assertNotNull(hop2);
 

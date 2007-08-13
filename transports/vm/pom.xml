@@ -34,8 +34,6 @@
                          <exclude>**/RoundRobinXmlSplitterFunctionalTestCase.*</exclude>
                          <!-- MULE-2041 PersistentVMQueueTestCase needs a converted config -->
                          <exclude>**/PersistentVMQueueTestCase.*</exclude>
-                         <!-- MULE-2125 -->
-                         <exclude>**/MulticastRouterMule2112TestCase.*</exclude>
                          <!-- MULE-2136 -->
                          <exclude>**/MulticastRouterMule2136TestCase.*</exclude>
                          <!-- MULE-2131 -->
