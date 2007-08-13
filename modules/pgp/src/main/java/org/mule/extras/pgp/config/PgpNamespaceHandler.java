@@ -10,9 +10,10 @@
 
 package org.mule.extras.pgp.config;
 
+import org.mule.config.MuleProperties;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
-import org.mule.config.MuleProperties;
+import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
 import org.mule.extras.pgp.KeyBasedEncryptionStrategy;
 import org.mule.extras.pgp.PGPSecurityProvider;
 import org.mule.extras.pgp.filters.PGPSecurityFilter;
@@ -25,6 +26,7 @@ public class PgpNamespaceHandler extends NamespaceHandlerSupport
     {
         registerBeanDefinitionParser("security-manager", new NamedDefinitionParser(MuleProperties.OBJECT_SECURITY_MANAGER));
         registerBeanDefinitionParser("security-provider", new ChildDefinitionParser("provider", PGPSecurityProvider.class));
+        registerBeanDefinitionParser("security-filters", new ParentDefinitionParser());
         registerBeanDefinitionParser("security-filter", new ChildDefinitionParser("securityFilter", PGPSecurityFilter.class));
         registerBeanDefinitionParser("keybased-encryption-strategy", new ChildDefinitionParser("encryptionStrategy", KeyBasedEncryptionStrategy.class));
     }

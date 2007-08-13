@@ -59,10 +59,17 @@
         </xsd:complexContent>
     </xsd:complexType>
     
-    <!-- security filter -->
-    <xsd:complexType name="securityFilterType">
+    <xsd:element name="security-filters" type="securityFiltersType" substitutionGroup="mule:abstract-security-filters">
+        <xsd:annotation>
+            <xsd:documentation>
+                A container for security filters provided by the PGP module.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="securityFiltersType">
         <xsd:complexContent>
-            <xsd:extension base="mule:securityFilterType">
+            <xsd:extension base="mule:securityFiltersType">
                 <xsd:sequence>
                     <xsd:element ref="security-filter"/>
                 </xsd:sequence>
@@ -80,7 +87,7 @@
 
     <xsd:complexType name="pgpSecurityFilterType">
         <xsd:complexContent>
-            <xsd:extension base="mule:securitySpecificFilterType">
+            <xsd:extension base="mule:securityFilterType">
                 <xsd:attribute name="strategyName" type="xsd:string" use="required"/>
                 <xsd:attribute name="signRequired" type="xsd:string" use="required"/>
                 <xsd:attribute name="keyManager-ref" type="xsd:NMTOKEN" use="required"/>

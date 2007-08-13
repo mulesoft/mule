@@ -12,18 +12,26 @@
                 schemaLocation="http://www.springframework.org/schema/beans"/>
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0" 
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
-                        
-	<xsd:complexType name="securityFilterType">
+
+    <xsd:element name="security-filters" type="securityFiltersType" substitutionGroup="mule:abstract-security-filters">
+        <xsd:annotation>
+            <xsd:documentation>
+                Container for security filtes provided by the WS Security Module.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="securityFiltersType">
         <xsd:complexContent>
-            <xsd:extension base="mule:securityFilterType">
+            <xsd:extension base="mule:securityFiltersType">
                 <xsd:sequence>
-                    <xsd:element ref="ws-security-filter"/>
+                    <xsd:element ref="security-filter"/>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="ws-security-filter" type="wsSecurityFilterType">
+    <xsd:element name="security-filter" type="wsSecurityFilterType">
         <xsd:annotation>
             <xsd:documentation>
                 TODO
@@ -33,9 +41,9 @@
 
     <xsd:complexType name="wsSecurityFilterType">
         <xsd:complexContent>
-            <xsd:extension base="mule:securitySpecificFilterType">
+            <xsd:extension base="mule:securityFilterType">
 				<xsd:sequence minOccurs="0" maxOccurs="unbounded">
-                    <xsd:element name="wssProperties" type="wssPropertyType">
+                    <xsd:element name="property" type="wssPropertyType">
                         <xsd:annotation>
                             <xsd:documentation>
                                 Additional header name and value.
@@ -43,8 +51,8 @@
                         </xsd:annotation>
                     </xsd:element>
 						</xsd:sequence>
-                <xsd:attribute name="wsSignatureFile" type="xsd:string"/>
-                <xsd:attribute name="wsDecryptionFile" type="xsd:string"/>
+                <xsd:attribute name="signatureFile" type="xsd:string"/>
+                <xsd:attribute name="decryptionFile" type="xsd:string"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -53,4 +61,5 @@
         <xsd:attribute name="key" type="xsd:string" use="required"/>
         <xsd:attribute name="value" type="xsd:string" use="required"/>
     </xsd:complexType>
+
 </xsd:schema>

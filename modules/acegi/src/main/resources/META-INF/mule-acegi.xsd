@@ -54,15 +54,23 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="securityFilterType">
+    <xsd:complexType name="securityFiltersType">
         <xsd:complexContent>
-            <xsd:extension base="mule:securityFilterType">
+            <xsd:extension base="mule:abstractSecurityFiltersType">
                 <xsd:sequence>
                     <xsd:element ref="http-security-filter"/>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+
+    <xsd:element name="security-filters" type="securityFiltersType" substitutionGroup="mule:abstract-security-filters">
+        <xsd:annotation>
+            <xsd:documentation>
+                A container for security filters provided by the Acegi module.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
 
     <xsd:element name="http-security-filter" type="httpSecurityFilterType">
         <xsd:annotation>
@@ -74,7 +82,7 @@
 
     <xsd:complexType name="httpSecurityFilterType">
         <xsd:complexContent>
-            <xsd:extension base="mule:securitySpecificFilterType">
+            <xsd:extension base="mule:securityFilterType">
                 <xsd:attribute name="realm" type="xsd:string" use="required"/>
             </xsd:extension>
         </xsd:complexContent>

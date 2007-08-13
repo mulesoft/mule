@@ -35,9 +35,9 @@
 
     <bean id="roleVoter" class="org.acegisecurity.vote.RoleVoter"/>
 
-    <bean id="EchoComponent" class="org.mule.components.simple.EchoComponent"/>
+    <bean id="echoComponent" class="org.mule.components.simple.EchoComponent"/>
 
-    <bean id="EchoComponentSecurity" class="org.acegisecurity.intercept.method.aopalliance.MethodSecurityInterceptor">
+    <bean id="echoComponentSecurity" class="org.acegisecurity.intercept.method.aopalliance.MethodSecurityInterceptor">
         <property name="authenticationManager" ref="authenticationManager"/>
         <property name="accessDecisionManager" ref="accessDecisionManager"/>
         <property name="objectDefinitionSource" value="org.mule.umo.lifecycle.Callable.onCall=ROLE_ADMIN"/>
@@ -45,10 +45,10 @@
 
     <bean id="autoProxyCreator" class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
         <property name="interceptorNames">
-            <list><value>EchoComponentSecurity</value></list>
+            <list><value>echoComponentSecurity</value></list>
         </property>
         <property name="beanNames">
-            <list><value>EchoComponent</value></list>
+            <list><value>echoComponent</value></list>
         </property>
     </bean>
 

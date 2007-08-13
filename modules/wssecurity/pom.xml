@@ -19,7 +19,12 @@
                  <artifactId>maven-surefire-plugin</artifactId>
                  <configuration>
                      <excludes>
-                         <exclude>**/*</exclude>
+                         <!-- these are also excluded in the axis pom -->
+                         <exclude>**/AxisConnectorJmsEndpointFormatTestCase.java</exclude>
+                         <exclude>**/AxisConnectorJmsTopicsFunctionalTestCase.java</exclude>
+                         <exclude>**/AxisConnectorJmsFunctionalTestCase.java</exclude>
+                         <exclude>**/VmToAxisProxyTestCase.java</exclude>
+                         <exclude>**/AxisExternalServerTest.java</exclude>
                      </excludes>
                  </configuration>
              </plugin>
