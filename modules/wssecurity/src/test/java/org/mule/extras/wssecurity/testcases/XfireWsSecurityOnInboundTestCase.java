@@ -34,7 +34,7 @@ public class XfireWsSecurityOnInboundTestCase extends FunctionalTestCase
             // Callback used to retrive password for given user.
             props.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, "org.mule.extras.wssecurity.callbackhandlers.MuleWsSecurityCallbackHandler");
             
-            UMOMessage m = client.send("xfire:http://localhost:8282/MySecuredUMO?method=echo","Test",props);
+            UMOMessage m = client.send("xfire:http://localhost:64282/MySecuredUMO?method=echo","Test",props);
             assertNotNull(m);
             assertTrue(m.getPayload() instanceof String);
             assertTrue(((String)m.getPayload()).equals("Test"));
@@ -55,7 +55,7 @@ public class XfireWsSecurityOnInboundTestCase extends FunctionalTestCase
             
             UMOMessage m = null;
             try{
-                m = client.send("xfire:http://localhost:8282/MySecuredUMO?method=echo","Test",props);
+                m = client.send("xfire:http://localhost:64282/MySecuredUMO?method=echo","Test",props);
             }
             catch(Exception e){
                 assertNotNull(e);
@@ -76,7 +76,7 @@ public class XfireWsSecurityOnInboundTestCase extends FunctionalTestCase
             // Property file containing the Encryption properties
             props.setProperty(WSHandlerConstants.ENC_PROP_FILE,"out-encrypted-security.properties");
             
-            UMOMessage m = client.send("xfire:http://localhost:8282/MySecuredUMO?method=echo","Test",props);
+            UMOMessage m = client.send("xfire:http://localhost:64282/MySecuredUMO?method=echo","Test",props);
             assertNotNull(m);
             assertTrue(m.getPayload() instanceof String);
             assertTrue(((String)m.getPayload()).equals("Test"));
@@ -97,7 +97,7 @@ public class XfireWsSecurityOnInboundTestCase extends FunctionalTestCase
             
             UMOMessage m = null;
             try{
-                m = client.send("xfire:http://localhost:8282/MySecuredUMO?method=echo","Test",props);
+                m = client.send("xfire:http://localhost:64282/MySecuredUMO?method=echo","Test",props);
             }
             catch(Exception e){
                 assertNotNull(e);
@@ -120,7 +120,7 @@ public class XfireWsSecurityOnInboundTestCase extends FunctionalTestCase
             // possible values are : "IssuerSerial" ( recommended ) and "DirectReference"
             props.setProperty(WSHandlerConstants.SIG_KEY_ID,"IssuerSerial");
             
-            UMOMessage m = client.send("xfire:http://localhost:8282/MySecuredUMO?method=echo","Test",props);
+            UMOMessage m = client.send("xfire:http://localhost:64282/MySecuredUMO?method=echo","Test",props);
             assertNotNull(m);
             assertTrue(m.getPayload() instanceof String);
             assertTrue(((String)m.getPayload()).equals("Test"));    

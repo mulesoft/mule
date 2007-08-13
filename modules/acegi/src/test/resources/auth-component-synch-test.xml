@@ -22,13 +22,13 @@
     </mule:security-manager>
 
     <mule:model-seda name="test">
-        <mule:service name="EchoUMO">
-            <mule:component scope="singleton" instance-ref="EchoComponent"/>
+        <mule:service name="echoUMO">
+            <mule:component scope="singleton" instance-ref="echoComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="vm://test">
-                    <mule:security-filter xsi:type="mule:defaultSecurityFilterType">
+                    <mule:security-filters>
                         <mule:encryption-security-filter strategy-ref="PBE"/>
-                    </mule:security-filter>
+                    </mule:security-filters>
                 </mule:endpoint>
             </mule:inbound-router>
         </mule:service>

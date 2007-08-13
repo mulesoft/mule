@@ -34,12 +34,13 @@
         <mule:service name="MySecuredUMO">
             <mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
-                <mule:endpoint address="axis:http://localhost:8282" connector-ref="axisConnector">
-                    <mule:security-filter xsi:type="wssecurity:securityFilterType">
-                        <wssecurity:ws-security-filter wsSignatureFile="in-signed-security.properties" wsDecryptionFile="in-encrypted-security.properties"/>
-                    </mule:security-filter>
+                <mule:endpoint address="axis:http://localhost:64282" connector-ref="axisConnector">
+                    <wssecurity:security-filters>
+                        <wssecurity:security-filter signatureFile="in-signed-security.properties" decryptionFile="in-encrypted-security.properties"/>
+                    </wssecurity:security-filters>
                 </mule:endpoint>
             </mule:inbound-router>
         </mule:service>
      </mule:model-seda>
+
 </beans>

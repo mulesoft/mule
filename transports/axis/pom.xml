@@ -31,10 +31,6 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <!-- MULE-1564 -->
-                        <exclude>**/AxisConnectorVMFunctionalTestCase.java</exclude>
-                        <exclude>**/AxisConnectorJmsTopicsFunctionalTestCase.java</exclude>
-
                         <!-- Only run tests with external dependencies in the tests-external profile -->
                         <exclude>**/AxisExternalServerTest.java</exclude>
                         <exclude>**/VmToAxisProxyTestCase.java</exclude>
@@ -42,7 +38,6 @@
                         <!-- MULE-1553, remaining tests waiting for JMS  -->
                         <exclude>**/AxisConnectorJmsFunctionalTestCase.java</exclude>
                         <exclude>**/AxisConnectorJmsTopicsFunctionalTestCase.java</exclude>
-                        <exclude>**/SoapAttachmentsFunctionalTestCase.java</exclude>
                         <exclude>**/AxisConnectorJmsEndpointFormatTestCase.java</exclude>
                     </excludes>
                 </configuration>

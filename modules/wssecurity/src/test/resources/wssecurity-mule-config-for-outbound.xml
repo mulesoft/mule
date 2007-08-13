@@ -33,10 +33,10 @@
             </mule:inbound-router>
             <mule:outbound-router>
                 <mule:pass-through-router>
-                    <mule:endpoint address="xfire:http://localhost:8484/MySecuredUMO?method=echo"><!-- type="sender"-->
-                        <mule:security-filter xsi:type="wssecurity:securityFilterType">
-		                    <wssecurity:ws-security-filter wsSignatureFile="out-signed-security.properties" wsDecryptionFile="out-encrypted-security.properties"/>
-	                    </mule:security-filter>
+                    <mule:endpoint address="xfire:http://localhost:64484/MySecuredUMO?method=echo"><!-- type="sender"-->
+                        <wssecurity:security-filters>
+		                    <wssecurity:security-filter signatureFile="out-signed-security.properties" decryptionFile="out-encrypted-security.properties"/>
+	                    </wssecurity:security-filters>
                     </mule:endpoint>
                 </mule:pass-through-router>
             </mule:outbound-router>
@@ -45,10 +45,10 @@
         <mule:service name="MySecuredUMO"> 
 			<mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
-                <mule:endpoint address="xfire:http://localhost:8484">
-                    <mule:security-filter xsi:type="wssecurity:securityFilterType">
-	                    <wssecurity:ws-security-filter wsSignatureFile="in-signed-security.properties" wsDecryptionFile="in-encrypted-security.properties"/>
-                    </mule:security-filter>
+                <mule:endpoint address="xfire:http://localhost:64484">
+                    <wssecurity:security-filters>
+	                    <wssecurity:security-filter signatureFile="in-signed-security.properties" decryptionFile="in-encrypted-security.properties"/>
+                    </wssecurity:security-filters>
                 </mule:endpoint>
             </mule:inbound-router>
         </mule:service>

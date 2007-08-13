@@ -19,7 +19,7 @@
                  <artifactId>maven-surefire-plugin</artifactId>
                  <configuration>
                      <excludes>
-                         <exclude>**/*</exclude>
+                         <exclude>**/XfireMultipleConnectorsWSSecurityTestCase.*</exclude>
                      </excludes>
                  </configuration>
              </plugin>

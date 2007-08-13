@@ -50,7 +50,7 @@
         <property name="delegate" ref="daoAuthenticationProvider"/>
     </bean>
 
-    <mule:security-manager xsi:type="mule:securityManagerType">
+    <mule:security-manager>
         <mule:custom-security-provider name="willOverwriteName"
                                        provider-ref="explicitCreation2"/>
     </mule:security-manager>

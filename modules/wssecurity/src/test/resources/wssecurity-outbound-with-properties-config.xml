@@ -33,15 +33,15 @@
             </mule:inbound-router>
             <mule:outbound-router>
                 <mule:pass-through-router>
-                    <mule:endpoint address="xfire:http://localhost:8484/MySecuredUMO?method=echo">
-                        <mule:security-filter xsi:type="wssecurity:securityFilterType">
-		                    <wssecurity:ws-security-filter wsSignatureFile="out-signed-security.properties" wsDecryptionFile="out-encrypted-security.properties">
-							    <wssecurity:wssProperties key="action" value="UsernameToken"/>
-								<wssecurity:wssProperties key="passwordType" value="PasswordDigest"/>
-								<wssecurity:wssProperties key="user" value="gooduser"/>
-								<wssecurity:wssProperties key="passwordCallbackClass" value="org.mule.extras.wssecurity.callbackhandlers.MuleWsSecurityCallbackHandler"/>
-							</wssecurity:ws-security-filter>		
-	                    </mule:security-filter>
+                    <mule:endpoint address="xfire:http://localhost:64484/MySecuredUMO?method=echo">
+                        <wssecurity:security-filters>
+		                    <wssecurity:security-filter signatureFile="out-signed-security.properties" decryptionFile="out-encrypted-security.properties">
+							    <wssecurity:property key="action" value="UsernameToken"/>
+								<wssecurity:property key="passwordType" value="PasswordDigest"/>
+								<wssecurity:property key="user" value="gooduser"/>
+								<wssecurity:property key="passwordCallbackClass" value="org.mule.extras.wssecurity.callbackhandlers.MuleWsSecurityCallbackHandler"/>
+							</wssecurity:security-filter>
+	                    </wssecurity:security-filters>
                     </mule:endpoint>
                 </mule:pass-through-router>
             </mule:outbound-router>
@@ -50,10 +50,10 @@
         <mule:service name="MySecuredUMO"> 
 			<mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
-                <mule:endpoint address="xfire:http://localhost:8484">
-                    <mule:security-filter xsi:type="wssecurity:securityFilterType">
-	                    <wssecurity:ws-security-filter wsDecryptionFile="in-encrypted-security.properties"/>
-                    </mule:security-filter>
+                <mule:endpoint address="xfire:http://localhost:64484">
+                    <wssecurity:security-filters>
+	                    <wssecurity:security-filter decryptionFile="in-encrypted-security.properties"/>
+                    </wssecurity:security-filters>
                 </mule:endpoint>
             </mule:inbound-router>
         </mule:service>
