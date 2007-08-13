@@ -24,9 +24,9 @@
             <mule:component class="org.mule.tck.functional.FunctionalTestComponent"/>
                 <mule:inbound-router>
                     <mule:endpoint address="vm://test">
-                        <mule:security-filters>
+                        <mule:security-filter xsi:type="mule:defaultSecurityFilterType">
                             <mule:encryption-security-filter strategy-ref="PBE"/>
-                        </mule:security-filters>
+                        </mule:security-filter>
                     </mule:endpoint>
                 </mule:inbound-router>
             </mule:service>

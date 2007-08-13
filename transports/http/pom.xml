@@ -19,6 +19,9 @@
                  <artifactId>maven-surefire-plugin</artifactId>
                  <configuration>
                      <excludes>
+                         <!-- temporary(?) - site down -->
+                         <exclude>**/RESTTestCase.*</exclude>
+
                          <exclude>**/TwoEndpointsSinglePortTestCase.*</exclude>
                          <exclude>**/*Mule1389TestCase.java</exclude>
                      </excludes>

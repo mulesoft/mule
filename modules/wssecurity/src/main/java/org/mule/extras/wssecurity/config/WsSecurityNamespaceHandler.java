@@ -12,9 +12,7 @@ package org.mule.extras.wssecurity.config;
 
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.generic.GrandchildDefinitionParser;
-import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
 import org.mule.extras.wssecurity.filters.WsSecurityFilter;
-
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 /**
@@ -24,8 +22,9 @@ public class WsSecurityNamespaceHandler extends NamespaceHandlerSupport
 {
     public void init()
     {
-        registerBeanDefinitionParser("security-filters", new ParentDefinitionParser());
-        registerBeanDefinitionParser("security-filter", new GrandchildDefinitionParser("securityFilter", WsSecurityFilter.class));
-        registerBeanDefinitionParser("properties", new ChildMapEntryDefinitionParser("addOutboundProperties", "key", "value"));
+        registerBeanDefinitionParser("ws-security-filter", new GrandchildDefinitionParser("securityFilter",
+            WsSecurityFilter.class));
+        registerBeanDefinitionParser("wssProperties", new ChildMapEntryDefinitionParser(
+            "addOutboundProperties", "key", "value"));
     }
 }

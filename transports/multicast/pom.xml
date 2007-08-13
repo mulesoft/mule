@@ -19,8 +19,9 @@
                  <artifactId>maven-surefire-plugin</artifactId>
                  <configuration>
                      <excludes>
-                         <!-- TODO: AC - think this may just be my network -->
-                         <!-- exclude>**/MulticastConnectorFunctionalTestCase.*</exclude -->
+                         <!-- TODO: AC - think this is just my network
+                              If this is commiited, please complain -->
+                         <exclude>**/MulticastConnectorFunctionalTestCase.*</exclude>
                      </excludes>
                  </configuration>
              </plugin>

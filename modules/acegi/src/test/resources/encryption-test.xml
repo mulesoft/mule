@@ -28,7 +28,7 @@
                                           delegate-ref="daoAuthenticationProvider"/>
     </acegi:security-manager>
 
-    <mule:security-manager>
+    <mule:security-manager xsi:type="mule:securityManagerType">
         <mule:password-encryption-strategy name="PBE" password="mule"/>
     </mule:security-manager>
 
@@ -37,14 +37,14 @@
             <mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="vm://my.queue">
-                    <mule:security-filters>
+                    <mule:security-filter xsi:type="mule:defaultSecurityFilterType">
                         <mule:encryption-security-filter strategy-ref="PBE"/>
-                    </mule:security-filters>
+                    </mule:security-filter>
                 </mule:endpoint>
                 <mule:endpoint address="http://localhost:4567">
-                    <mule:security-filters>
+                    <mule:security-filter xsi:type="mule:defaultSecurityFilterType">
                         <mule:encryption-security-filter strategy-ref="PBE"/>
-                    </mule:security-filters>
+                    </mule:security-filter>
                 </mule:endpoint>
             </mule:inbound-router>
         </mule:service>

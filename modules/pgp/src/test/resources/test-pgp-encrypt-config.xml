@@ -30,17 +30,18 @@
             <mule:component class="org.mule.extras.pgp.EchoMsg"/>
 				<mule:inbound-router>
 					<mule:endpoint address="vm://echo">
-                        <pgp:security-filters>
+                        <!--   TODO !!!!!!!!!!!!!!!!!! -->
+                        <mule:security-filter xsi:type="pgp:securityFilterType">
 							<pgp:security-filter strategyName="keyBasedEncryptionStrategy" signRequired="true" credentialsAccessor-ref="fakeCredentialAccessor" keyManager-ref="pgpKeyManager"/>
-						</pgp:security-filters>
+						</mule:security-filter>
 					</mule:endpoint>
 				</mule:inbound-router>
 				<mule:outbound-router>
 					<mule:pass-through-router>
 						<mule:endpoint address="file://output">
-							<pgp:security-filters>
+							<mule:security-filter xsi:type="pgp:securityFilterType">
 								<pgp:security-filter strategyName="keyBasedEncryptionStrategy" signRequired="true" credentialsAccessor-ref="fakeCredentialAccessor" keyManager-ref="pgpKeyManager"/>
-							</pgp:security-filters>
+							</mule:security-filter>
 						</mule:endpoint>
 					</mule:pass-through-router>
 				</mule:outbound-router>

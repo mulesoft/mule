@@ -111,7 +111,7 @@
         <xsd:sequence>
             <xsd:element name="transaction" type="transactionType" minOccurs="0"/>
             <xsd:group ref="filter" minOccurs="0"/>
-            <xsd:element ref="abstract-security-filters" minOccurs="0"/>
+            <xsd:group ref="securityFilters" minOccurs="0"/>
             <xsd:group ref="connectionStrategies" minOccurs="0"/>
             <xsd:element name="properties" type="mapType" minOccurs="0"/>
             <xsd:any namespace="##other" processContents="strict" minOccurs="0" maxOccurs="unbounded"/>
@@ -254,45 +254,39 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-
-    <xsd:element name="abstract-security-filters" type="abstractSecurityFiltersType" abstract="true">
-        <xsd:annotation>
-            <xsd:documentation>
-                An empty, abstract container that can be implemented to contain module-specific
-                security filters.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:complexType name="abstractSecurityFiltersType"/>
-
-    <xsd:element name="security-filters" type="securityFiltersType" substitutionGroup="abstract-security-filters">
-        <xsd:annotation>
-            <xsd:documentation>
-                Container for the default Mule security filters.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:complexType name="securityFiltersType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractSecurityFiltersType">
-                <xsd:choice>
-                    <xsd:element name="encryption-security-filter" type="encryptionSecurityFilterType" minOccurs="0"
-                                 maxOccurs="unbounded"/>
-                </xsd:choice>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
+    <xsd:group name="securityFilters">
+        <xsd:choice>
+            <xsd:element name="security-filter" type="securityFilterType"/>
+        </xsd:choice>
+    </xsd:group>
 
     <xsd:complexType name="securityFilterType">
         <xsd:annotation>
             <xsd:documentation>
-                This is a base type that can be extended by modules that want to
-                provide security filters.
+                This is an empty holder that can be extended by modules that want to
+                provide security filters. Typically it will contain elements called
+                module:type-security-filter which extend securitySpecificFilterType
+                where "module" might be "acegi" and "type" might be "http", for example.
+                The type of the filter should be given using the xsi:type
+                attribute - as an example, for module foo the type would be foo:securityFilterType.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:attribute name="name" type="xsd:string"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="securitySpecificFilterType">
+        <xsd:attribute name="name" type="xsd:string"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="defaultSecurityFilterType">
+        <xsd:complexContent>
+            <xsd:extension base="securityFilterType">
+                <xsd:sequence>
+                    <xsd:element name="encryption-security-filter" type="encryptionSecurityFilterType" minOccurs="0"
+                                 maxOccurs="unbounded"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
 
     <xsd:complexType name="encryptionSecurityFilterType">
@@ -302,7 +296,7 @@
             </xsd:documentation>
         </xsd:annotation>
         <xsd:complexContent>
-            <xsd:extension base="securityFilterType">
+            <xsd:extension base="securitySpecificFilterType">
                 <xsd:attribute name="strategy-ref" type="xsd:NMTOKEN"/>
             </xsd:extension>
         </xsd:complexContent>

@@ -21,20 +21,20 @@
         </acegi:delegate-security-provider>
     </acegi:security-manager>
 
-    <mule:security-manager>
+    <mule:security-manager xsi:type="mule:securityManagerType">
         <mule:password-encryption-strategy name="PBE" password="mule"/>
     </mule:security-manager>
 
     <vm:connector name="vmQueue" queueEvents="true"/>
 
     <mule:model-seda name="test">
-        <mule:service name="echoUMO">
-            <mule:component scope="singleton" instance-ref="echoComponent"/>
+        <mule:service name="EchoUMO">
+            <mule:component scope="singleton" instance-ref="EchoComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="vm://test">
-                    <mule:security-filters>
+                    <mule:security-filter xsi:type="mule:defaultSecurityFilterType">
                         <mule:encryption-security-filter strategy-ref="PBE"/>
-                    </mule:security-filters>
+                    </mule:security-filter>
                 </mule:endpoint>
             </mule:inbound-router>
             <mule:outbound-router>

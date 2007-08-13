@@ -43,5 +43,4 @@
             </mule:inbound-router>
         </mule:service>
     </mule:model-seda>
-    
 </beans>

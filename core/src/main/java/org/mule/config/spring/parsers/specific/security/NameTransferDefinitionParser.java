@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config.spring.parsers.specific;
+package org.mule.config.spring.parsers.specific.security;
 
 import org.mule.config.spring.parsers.assembly.DefaultBeanAssembler;
 import org.mule.config.spring.parsers.assembly.PropertyConfiguration;
