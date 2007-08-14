@@ -2,12 +2,10 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
-       xmlns:xml-transformer="http://www.mulesource.org/schema/mule/xml-transformer/2.0"
        xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
-       http://www.mulesource.org/schema/mule/xml-transformer/2.0 http://www.mulesource.org/schema/mule/xml-transformer/2.0/mule-xml-transformer.xsd
        http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
 
     <vm:connector name="default">
@@ -18,15 +16,15 @@
         <mule:custom-exception-strategy class="org.mule.tck.functional.QuietExceptionStrategy"/>
     </vm:connector>
 
-    <xml-transformer:dom-to-xml name="domToXml"/>
-    <xml-transformer:xml-to-dom name="xmlToDom"/>
+    <mule:dom-to-xml name="domToXml"/>
+    <mule:xml-to-dom name="xmlToDom"/>
 
-    <xml-transformer:jxpath-extractor name="jxpath" expression="count(//parent)"/>
+    <mule:xml-jxpath-extractor name="jxpath" expression="count(//parent)"/>
 
-    <xml-transformer:object-to-xml name="objectToXml"/>
-    <xml-transformer:xml-to-object name="xmlToObject"/>
+    <mule:object-to-xml name="objectToXml"/>
+    <mule:xml-to-object name="xmlToObject"/>
 
-    <xml-transformer:xslt name="xslt">
+    <mule:xml-xslt name="xslt">
         <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
             <!-- test for this string in test -->
             <!-- Whenever you match any node or any attribute -->
@@ -37,7 +35,7 @@
                 </xsl:copy>
             </xsl:template>
         </xsl:stylesheet>
-    </xml-transformer:xslt>
+    </mule:xml-xslt>
 
     <mule:endpoint name="xml-in" address="vm://xml-in" connector-ref="default"/>
     <mule:endpoint name="object-in" address="vm://object-in" connector-ref="default"/>

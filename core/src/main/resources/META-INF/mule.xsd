@@ -110,7 +110,7 @@
     <xsd:complexType name="endpointType">
         <xsd:sequence>
             <xsd:element name="transaction" type="transactionType" minOccurs="0"/>
-            <xsd:group ref="filter" minOccurs="0"/>
+            <xsd:group ref="xmlExtendedFilters" minOccurs="0"/>
             <xsd:element ref="abstract-security-filters" minOccurs="0"/>
             <xsd:group ref="connectionStrategies" minOccurs="0"/>
             <xsd:element name="properties" type="mapType" minOccurs="0"/>
@@ -177,7 +177,7 @@
     <!--   Filter elements                                          -->
     <!--==============================================================-->
 
-    <xsd:group name="filter">
+    <xsd:group name="filters">
         <xsd:choice>
             <xsd:element name="and-filter" type="collectionFilterType"/>
             <xsd:element name="or-filter" type="collectionFilterType"/>
@@ -191,15 +191,13 @@
             <xsd:element name="custom-filter" type="customFilterType"/>
             <!-- for extension by general modules using xsi:type -->
             <xsd:element name="module-filter" type="moduleFilterType"/>
-            <!-- tighter integration for xml filters -->
-            <xsd:any namespace="http://www.mulesource.org/schema/mule/xml-filter/2.0" processContents="strict"/>
         </xsd:choice>
     </xsd:group>
 
     <xsd:complexType name="unitaryFilterType">
         <xsd:complexContent>
             <xsd:extension base="filterType">
-                <xsd:group ref="filter"/>
+                <xsd:group ref="xmlExtendedFilters"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -207,7 +205,7 @@
     <xsd:complexType name="collectionFilterType">
         <xsd:complexContent>
             <xsd:extension base="filterType">
-                <xsd:group ref="filter" minOccurs="2" maxOccurs="unbounded"/>
+                <xsd:group ref="xmlExtendedFilters" minOccurs="2" maxOccurs="unbounded"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -938,7 +936,7 @@
     <xsd:complexType name="outboundRouterCollectionType">
         <xsd:sequence>
             <xsd:group ref="catchAllStrategies" minOccurs="0"/>
-            <xsd:group ref="outboundRouters" maxOccurs="unbounded"/>
+            <xsd:group ref="xmlExtendedOutboundRouters" maxOccurs="unbounded"/>
         </xsd:sequence>
         <xsd:attribute name="matchAll" type="substitutableBoolean" default="false"/>
     </xsd:complexType>
@@ -948,7 +946,7 @@
 
     <xsd:complexType name="nestedInboundRouterType">
         <xsd:sequence>
-            <xsd:group ref="filter" minOccurs="0"/>
+            <xsd:group ref="xmlExtendedFilters" minOccurs="0"/>
         </xsd:sequence>
         <xsd:attribute name="propertyExtractor" type="xsd:NMTOKEN"/>
     </xsd:complexType>
@@ -1074,8 +1072,6 @@
             <xsd:element name="static-recipient-list-router" type="staticRecipientListRouterType"/>
             <xsd:element name="template-endpoint-router" type="filteringOutboundRouterType"/>
             <xsd:element name="custom-router" type="customOutboundRouterType"/>
-            <!-- tight integration for xml routers -->
-            <xsd:any namespace="http://www.mulesource.org/schema/mule/xml-outbound/2.0" processContents="strict"/>
         </xsd:choice>
     </xsd:group>
 
@@ -1083,7 +1079,7 @@
         <xsd:complexContent>
             <xsd:extension base="outboundRouterType">
                 <xsd:sequence>
-                    <xsd:group ref="filter" minOccurs="0"/>
+                    <xsd:group ref="xmlExtendedFilters" minOccurs="0"/>
                 </xsd:sequence>
                 <xsd:attribute name="transformers" type="xsd:string"/>
             </xsd:extension>
@@ -1576,6 +1572,133 @@
         <xsd:complexContent>
             <xsd:extension base="objectFactoryType" />
         </xsd:complexContent>
+    </xsd:complexType>
+
+
+    <!--==============================================================-->
+    <!--  XML Module supprt                                           -->
+    <!-- Xml module is closely integrated mainly because there is no  -->
+    <!-- simple, elegant, extensible way to have extensible filters.  -->
+    <!-- Filters may be nested, so a container element is not         -->
+    <!-- suitable.  The only alternative seems to be xsi:type with    -->
+    <!-- moduleFilterType, which is ugly.  And XML is only a separate -->
+    <!-- module to help separate dependencies during development.     -->
+    <!-- So we place XML filters in the mule namespace.  And then we  -->
+    <!-- add the rest of the XML stuff because it seems odd to have   -->
+    <!-- a separate namespace for the rest...                         -->
+    <!--==============================================================-->
+
+    <!-- xml filters -->
+
+    <xsd:group name="xmlExtendedFilters">
+        <xsd:choice>
+            <xsd:group ref="filters"/>
+            <xsd:element name="xml-jxpath" type="jxpathFilterType"/>
+            <xsd:element name="is-xml" type="filterType"/>
+        </xsd:choice>
+    </xsd:group>
+
+    <xsd:complexType name="jxpathFilterType">
+        <xsd:complexContent>
+            <xsd:extension base="patternFilterType">
+                <xsd:choice>
+                    <xsd:element name="namespace" type="namespaceType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element name="contextProperty" type="spring:propertyType" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:choice>
+                <xsd:attribute name="lenient" type="substitutableBoolean" default="true"/>
+                <xsd:attribute name="expectedValue" type="xsd:string"/>
+           </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <!-- xml outbound routers -->
+
+    <xsd:group name="xmlExtendedOutboundRouters">
+        <xsd:choice>
+            <xsd:group ref="outboundRouters"/>
+            <xsd:element name="xml-message-splitter" type="xmlMessageSplitterType"/>
+            <xsd:element name="xml-round-robin-splitter" type="xmlRoundRobinSplitterType"/>
+        </xsd:choice>
+    </xsd:group>
+
+    <xsd:complexType name="xmlMessageSplitterType">
+        <xsd:complexContent>
+            <xsd:extension base="messageSplitterOutboundRouterType">
+                <!-- these appear after endpoints, which is ugly.  refactor? -->
+                <xsd:sequence>
+                    <xsd:element name="namespace" type="namespaceType" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attribute name="splitExpression" type="xsd:string"/>
+                <xsd:attribute name="externalSchemaLocation" type="xsd:string"/>
+                <xsd:attribute name="validateSchema" type="substitutableBoolean"/>
+           </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="xmlRoundRobinSplitterType">
+        <xsd:complexContent>
+            <xsd:extension base="xmlMessageSplitterType">
+                <xsd:attribute name="endpointFiltering" type="substitutableBoolean"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <!-- xml transformers -->
+    <!-- these just appear at the top level, there's no extended group -->
+
+    <xsd:complexType name="xmlTransformerType">
+        <xsd:complexContent>
+            <xsd:extension base="transformerType">
+                <xsd:attribute name="outputEncoding" type="xsd:string"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="dom-to-xml" type="xmlTransformerType"/>
+
+    <xsd:element name="xml-jxpath-extractor" type="xmlJxpathExtractorType"/>
+    <xsd:complexType name="xmlJxpathExtractorType">
+        <xsd:complexContent>
+            <xsd:extension base="transformerType">
+                <xsd:attribute name="expression" type="xsd:string"/>
+                <xsd:attribute name="singleResult" type="substitutableBoolean"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="object-to-xml" type="objectToXmlType"/>
+    <xsd:complexType name="objectToXmlType">
+        <xsd:complexContent>
+            <xsd:extension base="transformerType">
+                <xsd:attribute name="acceptUMOMessage" type="substitutableBoolean"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="xml-to-dom" type="xmlTransformerType"/>
+    <xsd:element name="xml-to-object" type="transformerType"/>
+
+    <xsd:element name="xml-xslt" type="xsltTransformerType"/>
+    <xsd:complexType name="xsltTransformerType">
+        <xsd:complexContent>
+            <xsd:extension base="xmlTransformerType">
+                <xsd:sequence>
+                    <xsd:any namespace="http://www.w3.org/1999/XSL/Transform" minOccurs="0" maxOccurs="1" processContents="lax"/>
+                </xsd:sequence>
+                <xsd:attribute name="maxIdleTransformers" type="substitutableInt"/>
+                <xsd:attribute name="maxActiveTransformers" type="substitutableInt"/>
+                <xsd:attribute name="xslt" type="xsd:string"/>
+                <xsd:attribute name="xsl-file" type="xsd:string"/>
+                <xsd:attribute name="transformerFactoryClass" type="xsd:NMTOKEN"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <!-- xml support -->
+
+    <xsd:complexType name="namespaceType">
+        <xsd:attribute name="prefix" type="xsd:string" use="required"/>
+        <xsd:attribute name="uri" type="xsd:string" use="required"/>
     </xsd:complexType>
 
 </xsd:schema>

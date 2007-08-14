@@ -2,45 +2,43 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
-       xmlns:xml-transformer="http://www.mulesource.org/schema/mule/xml-transformer/2.0"
        xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
-       http://www.mulesource.org/schema/mule/xml-transformer/2.0 http://www.mulesource.org/schema/mule/xml-transformer/2.0/mule-xml-transformer.xsd
        http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
 
-    <xml-transformer:dom-to-xml
+    <mule:dom-to-xml
             ignoreBadInput="true"
             returnClass="java.lang.Object"
             name="domToXml"
             outputEncoding="foo"/>
 
-    <xml-transformer:jxpath-extractor
+    <mule:xml-jxpath-extractor
             expression="/expression"
             singleResult="false"
             ignoreBadInput="true"
             returnClass="java.lang.Object"
             name="jxpathExtractor"/>
 
-    <xml-transformer:object-to-xml
+    <mule:object-to-xml
             ignoreBadInput="true"
             returnClass="java.lang.Object"
             name="objectToXml"
             acceptUMOMessage="true"/>
 
-    <xml-transformer:xml-to-dom
+    <mule:xml-to-dom
             ignoreBadInput="true"
             returnClass="java.lang.Object"
             name="xmlToDom"
             outputEncoding="foo"/>
 
-    <xml-transformer:xml-to-object
+    <mule:xml-to-object
             ignoreBadInput="true"
             returnClass="java.lang.Object"
             name="xmlToObject"/>
 
-    <xml-transformer:xslt
+    <mule:xml-xslt
             ignoreBadInput="true"
             returnClass="java.lang.Object"
             name="xslt"
@@ -60,6 +58,6 @@
                 </xsl:copy>
             </xsl:template>
         </xsl:stylesheet>
-    </xml-transformer:xslt>
+    </mule:xml-xslt>
 
 </beans>

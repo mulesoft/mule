@@ -4,12 +4,10 @@
        xmlns:util="http://www.springframework.org/schema/util"
        xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:mgmt="http://www.mulesource.org/schema/mule/management/2.0"
-       xmlns:xml-filter="http://www.mulesource.org/schema/mule/xml-filter/2.0"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
-       http://www.mulesource.org/schema/mule/xml-filter/2.0 http://www.mulesource.org/schema/mule/xml-filter/2.0/mule-xml-filter.xsd
        http://www.mulesource.org/schema/mule/management/2.0 http://www.mulesource.org/schema/mule/management/2.0/mule-management.xsd">
 
     <mule:configuration serverId="test_Spring" defaultSynchronousEndpoints="false" domainId="org.mule">
@@ -59,10 +57,10 @@
     <mule:transformer-no-action name="Default"/>
 
     <mule:endpoint name="fruitBowlEndpoint" address="test://fruitBowlPublishQ">
-        <xml-filter:jxpath expectedValue="bar" pattern="name">
-            <xml-filter:namespace prefix="foo" uri="http://foo.com"/>
-            <xml-filter:namespace prefix="bar" uri="http://bar.com"/>
-        </xml-filter:jxpath>
+        <mule:xml-jxpath expectedValue="bar" pattern="name">
+            <mule:namespace prefix="foo" uri="http://foo.com"/>
+            <mule:namespace prefix="bar" uri="http://bar.com"/>
+        </mule:xml-jxpath>
     </mule:endpoint>
     <mule:endpoint name="waterMelonEndpoint" address="test://test.queue"/>
     <mule:endpoint name="appleInEndpoint" address="test://AppleQueue"/>

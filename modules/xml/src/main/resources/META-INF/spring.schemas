@@ -1,4 +1,0 @@
-http\://www.mulesource.org/schema/mule/xml/2.0/mule-xml.xsd=META-INF/mule-xml.xsd
-http\://www.mulesource.org/schema/mule/xml-filter/2.0/mule-xml-filter.xsd=META-INF/mule-xml-filter.xsd
-http\://www.mulesource.org/schema/mule/xml-outbound/2.0/mule-xml-outbound.xsd=META-INF/mule-xml-outbound.xsd
-http\://www.mulesource.org/schema/mule/xml-transformer/2.0/mule-xml-transformer.xsd=META-INF/mule-xml-transformer.xsd

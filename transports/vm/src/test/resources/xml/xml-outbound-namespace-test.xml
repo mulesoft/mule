@@ -2,13 +2,10 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
-       xmlns:xml-outbound="http://www.mulesource.org/schema/mule/xml-outbound/2.0"
        xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
-       http://www.mulesource.org/schema/mule/xml-filter/2.0 http://www.mulesource.org/schema/mule/xml-filter/2.0/mule-xml-filter.xsd
-       http://www.mulesource.org/schema/mule/xml-outbound/2.0 http://www.mulesource.org/schema/mule/xml-outbound/2.0/mule-xml-outbound.xsd
        http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
 
     <bean name="dom4jpe" class="org.mule.util.properties.Dom4jPropertyExtractor"/>
@@ -18,22 +15,22 @@
         <mule:service name="fancy config splitter">
             <mule:component class="org.mule.components.simple.BridgeComponent"/>
             <mule:outbound-router>
-                <xml-outbound:message-splitter
+                <mule:xml-message-splitter
                         splitExpression="/expression"
                         enableCorrelation="ALWAYS"
                         externalSchemaLocation="external"
                         honorSynchronicity="true"
                         propertyExtractor-ref="dom4jpe"
                         validateSchema="true">
-                    <xml-outbound:namespace prefix="bar" uri="foo"/>
-                </xml-outbound:message-splitter>
+                    <mule:namespace prefix="bar" uri="foo"/>
+                </mule:xml-message-splitter>
             </mule:outbound-router>
         </mule:service>
 
         <mule:service name="fancy config round robin">
             <mule:component class="org.mule.components.simple.BridgeComponent"/>
             <mule:outbound-router>
-                <xml-outbound:round-robin-splitter
+                <mule:xml-round-robin-splitter
                         splitExpression="/expression"
                         enableCorrelation="IF_NOT_SET"
                         externalSchemaLocation="external"
@@ -41,8 +38,8 @@
                         propertyExtractor-ref="dom4jpe"
                         validateSchema="true"
                         endpointFiltering="true">
-                    <xml-outbound:namespace prefix="bar" uri="foo"/>
-                </xml-outbound:round-robin-splitter>
+                    <mule:namespace prefix="bar" uri="foo"/>
+                </mule:xml-round-robin-splitter>
             </mule:outbound-router>
         </mule:service>
 

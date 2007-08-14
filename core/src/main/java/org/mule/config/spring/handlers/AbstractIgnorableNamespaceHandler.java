@@ -17,16 +17,16 @@ import org.w3c.dom.Element;
 
 /**
  * This Namespace handler extends the default Spring {@link org.springframework.beans.factory.xml.NamespaceHandlerSupport}
- * to allow certain elements in document to be ignorred by the handler.
+ * to allow certain elements in document to be ignored by the handler.
  */
-public abstract class AbstractIgnorableNamespaceHandler extends NamespaceHandlerSupport
+public abstract class AbstractIgnorableNamespaceHandler extends AbstractPriorityNamespaceHandler
 {
     protected final void registerIgnoredElement(String name)
     {
-        registerBeanDefinitionParser(name, new IgnorredDefinitionParser());
+        registerBeanDefinitionParser(name, new IgnoredDefinitionParser());
     }
 
-    private class IgnorredDefinitionParser implements BeanDefinitionParser
+    private class IgnoredDefinitionParser implements BeanDefinitionParser
     {
 
         public BeanDefinition parse(Element element, ParserContext parserContext)
