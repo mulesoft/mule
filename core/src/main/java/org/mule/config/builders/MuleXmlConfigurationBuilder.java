@@ -25,8 +25,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import org.springframework.beans.factory.parsing.BeanDefinitionParsingException;
-
 /**
  * <code>MuleXmlConfigurationBuilder</code> Enables Mule to be loaded from as Spring
  * context. Multiple configuration files can be loaded from this builder (specified
@@ -126,7 +124,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
 //        }
 //        else
 //        {
-            context = newContext(all);
+            context = new MuleApplicationContext(all);
         //}
 //        try
 //        {
@@ -158,19 +156,6 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         catch (Exception e)
         {
             throw new ConfigurationException(CoreMessages.failedToInvokeLifecycle("start", "Mule"), e);
-        }
-    }
-
-    protected MuleApplicationContext newContext(String[] resources)
-    {
-        try
-        {
-            return new MuleApplicationContext(resources);
-        }
-        catch (BeanDefinitionParsingException e)
-        {
-            // TODO
-            throw e;
         }
     }
 
