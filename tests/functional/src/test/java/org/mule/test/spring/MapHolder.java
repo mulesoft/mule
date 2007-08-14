@@ -1,0 +1,30 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the MuleSource MPL
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
+package org.mule.test.spring;
+
+import java.util.Map;
+
+public class MapHolder
+{
+
+    private Map map;
+
+    public Map getMap()
+    {
+        return map;
+    }
+
+    public void setMap(Map map)
+    {
+        this.map = map;
+    }
+    
+}

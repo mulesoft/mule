@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
+
+    <mule:environment-properties>
+        <entry key="prop1" value="value1"/>
+    </mule:environment-properties>
+
+    <bean id="propertyPlaceholderConfigurer"
+          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <!-- defines prop2 as value2 -->
+                <value>org/mule/test/spring/test.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="props" class="org.mule.test.spring.MapHolder">
+        <property name="map">
+            <map>
+                <entry key="prop1" value="${prop1}"/>
+                <entry key="prop2" value="${prop2}"/>
+                <entry key="prop3" value="${java.version}"/>
+            </map>
+        </property>
+    </bean>
+
+</beans>
