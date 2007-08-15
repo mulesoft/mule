@@ -64,6 +64,8 @@
                          <!-- Do we intend to support other containers for 2.0? -->
                          <exclude>**/MuleContainerContextTestCase.*</exclude>
                          <exclude>**/JndiContainerContextTestCase.*</exclude>
+                         <!-- MULE-2164 -->
+                        <exclude>**/MuleCopiedEndpointURITestCase.*</exclude>
                      </excludes>
                  </configuration>
              </plugin>

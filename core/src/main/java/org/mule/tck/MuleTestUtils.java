@@ -95,6 +95,26 @@ public final class MuleTestUtils
         endpoint.initialise();
         return endpoint;
     }
+    
+    public static UMOEndpoint getTestSchemeMetaInfoEndpoint(String name, String type, String protocol, UMOManagementContext context)
+        throws Exception
+    {
+        UMOEndpoint endpoint = new MuleEndpoint();
+        // need to build endpoint this way to avoid depenency to any endpoint jars
+        AbstractConnector connector = null;
+        connector = (AbstractConnector) ClassUtils.loadClass("org.mule.tck.testmodels.mule.TestConnector",
+            AbstractMuleTestCase.class).newInstance();
+
+        connector.setName("testConnector");
+        connector.setManagementContext(context);
+        connector.initialise();
+        connector.registerSupportedProtocol(protocol);
+        endpoint.setConnector(connector);
+        endpoint.setEndpointURI(new MuleEndpointURI("test:" + protocol + "://test"));
+        endpoint.setName(name);
+        endpoint.setType(type);
+        return endpoint;
+    }
 
     public static UMOEvent getTestEvent(Object data, UMOManagementContext context) throws Exception
     {

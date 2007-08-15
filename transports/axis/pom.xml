@@ -39,6 +39,8 @@
                         <exclude>**/AxisConnectorJmsFunctionalTestCase.java</exclude>
                         <exclude>**/AxisConnectorJmsTopicsFunctionalTestCase.java</exclude>
                         <exclude>**/AxisConnectorJmsEndpointFormatTestCase.java</exclude>
+                        <!-- MULE-2164 -->
+                        <exclude>**/AxisEndpointMule2164TestCase.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>
