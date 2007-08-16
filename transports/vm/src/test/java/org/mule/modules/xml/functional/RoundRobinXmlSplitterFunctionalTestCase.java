@@ -54,14 +54,7 @@ public class RoundRobinXmlSplitterFunctionalTestCase extends AbstractXmlOutbound
         assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 2, SERVICE_SPLITTER);
         assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 1, ROUND_ROBIN_DET);
         assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 2, ROUND_ROBIN_INDET);
-        doSend("roundrobin-indet");
-        doSend("roundrobin-indet");
-        assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 1, SERVICE_SPLITTER);
-        assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 2, ROUND_ROBIN_DET);
-        assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 1, ROUND_ROBIN_INDET);
-        assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 2, SERVICE_SPLITTER);
-        assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 1, ROUND_ROBIN_DET);
-        assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 2, ROUND_ROBIN_INDET);
+        // skip last bit (above) - order uncertain here
     }
 
 }
