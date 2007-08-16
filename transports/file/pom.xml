@@ -21,8 +21,6 @@
                  <artifactId>maven-surefire-plugin</artifactId>
                  <configuration>
                      <excludes>
-                         <!-- waiting on MULE-1841 -->
-                         <exclude>**/ConnectorServiceOverridesTestCase.*</exclude>
                          <!-- waiting on MULE-1842 -->
                          <exclude>**/IndirectReceiveMule1842TestCase.*</exclude>
                      </excludes>
