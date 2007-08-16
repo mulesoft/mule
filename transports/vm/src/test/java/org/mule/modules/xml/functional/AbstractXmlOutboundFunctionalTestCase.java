@@ -11,10 +11,13 @@
 package org.mule.modules.xml.functional;
 
 import org.mule.extras.client.MuleClient;
-import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -27,6 +30,7 @@ public abstract class AbstractXmlOutboundFunctionalTestCase extends AbstractXmlF
     public static final String ROUND_ROBIN_INDET = "round robin indeterministic";
     public static final String SPLITTER_ENDPOINT_PREFIX = "service";
     public static final String ROUND_ROBIN_ENDPOINT_PREFIX = "robin";
+    public static final String NAME = "name";
 
     protected String getConfigResources()
     {
@@ -50,7 +54,26 @@ public abstract class AbstractXmlOutboundFunctionalTestCase extends AbstractXmlF
         Document document = (Document) response.getPayload();
         assertEquals("service", document.getRootElement().getName());
         Element element = document.getRootElement();
-        assertEquals(service, element.attributeValue("name"));
+        assertEquals(service, element.attributeValue(NAME));
+    }
+
+    protected void assertServices(String prefix, int index, String[] services) throws UMOException, IOException
+    {
+        List remaining = new LinkedList(Arrays.asList(services)); // asList is immutable
+        while (remaining.size() > 0)
+        {
+            MuleClient client = new MuleClient();
+            UMOMessage response = client.receive(prefix + index, TIMEOUT);
+            assertNotNull(response);
+            assertNotNull(response.getPayload());
+            assertTrue(response.getPayload().getClass().getName(), response.getPayload() instanceof Document);
+            Document document = (Document) response.getPayload();
+            assertEquals("service", document.getRootElement().getName());
+            Element element = document.getRootElement();
+            String name = element.attributeValue(NAME);
+            assertTrue(name, remaining.contains(name));
+            remaining.remove(name);
+        }
     }
 
 }
