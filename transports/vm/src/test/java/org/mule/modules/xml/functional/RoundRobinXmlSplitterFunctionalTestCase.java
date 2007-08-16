@@ -19,25 +19,49 @@ public class RoundRobinXmlSplitterFunctionalTestCase extends AbstractXmlOutbound
 
     public void testSimple() throws UMOException, IOException
     {
-        doSend("roundrobin");
+        doSend("roundrobin-det");
         assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 1, SERVICE_SPLITTER);
-        assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 2, ROUND_ROBIN);
+        assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 2, ROUND_ROBIN_DET);
     }
 
-    public void testComplex() throws UMOException, IOException
+    public void testDeterministic() throws UMOException, IOException
     {
-        doSend("roundrobin");
+        doSend("roundrobin-det");
         assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 1, SERVICE_SPLITTER);
-        assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 2, ROUND_ROBIN);
-        doSend("roundrobin");
-        assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 3, SERVICE_SPLITTER);
-        assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 1, ROUND_ROBIN);
-        doSend("roundrobin");
-        doSend("roundrobin");
+        assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 2, ROUND_ROBIN_DET);
+        assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 1, ROUND_ROBIN_INDET);
+        doSend("roundrobin-det");
+        assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 1, SERVICE_SPLITTER);
+        assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 2, ROUND_ROBIN_DET);
+        assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 1, ROUND_ROBIN_INDET);
+        doSend("roundrobin-det");
+        doSend("roundrobin-det");
+        assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 1, SERVICE_SPLITTER);
+        assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 2, ROUND_ROBIN_DET);
+        assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 1, ROUND_ROBIN_INDET);
+        assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 1, SERVICE_SPLITTER);
+        assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 2, ROUND_ROBIN_DET);
+        assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 1, ROUND_ROBIN_INDET);
+    }
+
+    public void testIndeterministic() throws UMOException, IOException
+    {
+        doSend("roundrobin-indet");
+        assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 1, SERVICE_SPLITTER);
+        assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 2, ROUND_ROBIN_DET);
+        assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 1, ROUND_ROBIN_INDET);
+        doSend("roundrobin-indet");
         assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 2, SERVICE_SPLITTER);
-        assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 3, ROUND_ROBIN);
+        assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 1, ROUND_ROBIN_DET);
+        assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 2, ROUND_ROBIN_INDET);
+        doSend("roundrobin-indet");
+        doSend("roundrobin-indet");
         assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 1, SERVICE_SPLITTER);
-        assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 2, ROUND_ROBIN);
+        assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 2, ROUND_ROBIN_DET);
+        assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 1, ROUND_ROBIN_INDET);
+        assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 2, SERVICE_SPLITTER);
+        assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 1, ROUND_ROBIN_DET);
+        assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 2, ROUND_ROBIN_INDET);
     }
 
 }

@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.dom4j.Document;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * This router will split the Xml message into parts based on the xpath expression
@@ -36,6 +37,8 @@ public class RoundRobinXmlSplitter extends FilteringXmlMessageSplitter
     // round robin endpoints
     // So for performance lets turn it off by default
     protected volatile boolean enableEndpointFiltering = false;
+    private boolean deterministic = true;
+    private static final AtomicInteger globalCounter = new AtomicInteger(0);
 
     public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous)
         throws RoutingException
@@ -56,14 +59,11 @@ public class RoundRobinXmlSplitter extends FilteringXmlMessageSplitter
                 return null;
             }
             int correlationSequence = 1;
-            int epCounter = 0;
-            for (Iterator iterator = parts.iterator(); iterator.hasNext(); epCounter++)
+            Counter epCounter = new Counter();
+            Iterator iterator = parts.iterator();
+            while (iterator.hasNext())
             {
                 part = (Document)iterator.next();
-                if (epCounter == endpoints.size())
-                {
-                    epCounter = 0;
-                }
                 // Create the message
                 Map theProperties = (Map)propertiesContext.get();
                 message = new MuleMessage(part, new HashMap(theProperties));
@@ -74,7 +74,7 @@ public class RoundRobinXmlSplitter extends FilteringXmlMessageSplitter
                 }
                 else
                 {
-                    endpoint = (UMOEndpoint)getEndpoints().get(epCounter);
+                    endpoint = (UMOEndpoint)getEndpoints().get(epCounter.next());
                 }
 
                 if (endpoint == null)
@@ -185,4 +185,39 @@ public class RoundRobinXmlSplitter extends FilteringXmlMessageSplitter
     {
         this.enableEndpointFiltering = enableEndpointFiltering;
     }
+
+    public boolean isDeterministic()
+    {
+        return deterministic;
+    }
+
+    public void setDeterministic(boolean deterministic)
+    {
+        this.deterministic = deterministic;
+    }
+
+    private class Counter
+    {
+
+        private AtomicInteger counter;
+
+        public Counter()
+        {
+            if (isDeterministic())
+            {
+                counter = new AtomicInteger(0);
+            }
+            else
+            {
+                counter = globalCounter;
+            }
+        }
+
+        public int next()
+        {
+            return counter.getAndIncrement() % getEndpoints().size();
+        }
+
+    }
+
 }

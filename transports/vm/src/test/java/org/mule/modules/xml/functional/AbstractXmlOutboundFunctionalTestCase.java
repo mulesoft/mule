@@ -23,7 +23,8 @@ public abstract class AbstractXmlOutboundFunctionalTestCase extends AbstractXmlF
 {
 
     public static final String SERVICE_SPLITTER = "service splitter";
-    public static final String ROUND_ROBIN = "round robin";
+    public static final String ROUND_ROBIN_DET = "round robin deterministic";
+    public static final String ROUND_ROBIN_INDET = "round robin indeterministic";
     public static final String SPLITTER_ENDPOINT_PREFIX = "service";
     public static final String ROUND_ROBIN_ENDPOINT_PREFIX = "robin";
 

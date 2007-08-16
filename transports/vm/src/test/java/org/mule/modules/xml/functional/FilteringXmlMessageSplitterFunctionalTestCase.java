@@ -17,7 +17,7 @@ public class FilteringXmlMessageSplitterFunctionalTestCase extends AbstractXmlOu
     {
         doSend("split");
         assertService(SPLITTER_ENDPOINT_PREFIX, 1, SERVICE_SPLITTER);
-        assertService(SPLITTER_ENDPOINT_PREFIX, 2, ROUND_ROBIN);
+        assertService(SPLITTER_ENDPOINT_PREFIX, 2, ROUND_ROBIN_DET);
     }
 
 }
