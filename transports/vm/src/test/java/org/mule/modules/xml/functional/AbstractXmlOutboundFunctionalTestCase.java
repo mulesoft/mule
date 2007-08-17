@@ -72,7 +72,11 @@ public abstract class AbstractXmlOutboundFunctionalTestCase extends AbstractXmlF
             Element element = document.getRootElement();
             String name = element.attributeValue(NAME);
             assertTrue(name, remaining.contains(name));
+            int size = remaining.size();
             remaining.remove(name);
+            // check we don't delete all instances of same value
+            // (apparently not - which makes sense, this is a list, not a set).
+            assertEquals(size, remaining.size() + 1);
         }
     }
 
