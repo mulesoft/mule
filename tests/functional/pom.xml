@@ -19,7 +19,6 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <exclude>**/AlwaysCreateConnectorTestCase.*</exclude>
                         <exclude>**/PlaceholderProcessorTestCase.*</exclude>
                         <exclude>**/MuleConfigurationTestCase.*</exclude>
                         <exclude>**/PropertyTemplatesTestCase.*</exclude>
