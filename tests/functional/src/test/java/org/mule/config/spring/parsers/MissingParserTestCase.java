@@ -16,7 +16,7 @@ import org.mule.util.StringUtils;
 
 import junit.framework.TestCase;
 
-public class MissingParserTestCase extends TestCase
+public class MissingParserTestCase extends AbstractBadConfigTestCase
 {
 
     protected String getConfigResources()
@@ -24,17 +24,9 @@ public class MissingParserTestCase extends TestCase
         return "org/mule/config/spring/parsers/missing-parser-test.xml";
     }
 
-    public void testHelpfulErrorMessage() throws UMOException
+    public void testHelpfulErrorMessage() throws Exception
     {
-        try
-        {
-            MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
-            builder.configure(getConfigResources());
-        }
-        catch (Exception e)
-        {
-            assertTrue(StringUtils.contains(e.getMessage(), "Is the module or transport"));
-        }
+        assertErrorContains("Is the module or transport");
     }
 
 }
