@@ -23,4 +23,5 @@ public class AlwaysCreateConnectorTestCase extends FunctionalTestCase
     {
         assertEquals(2, managementContext.getRegistry().getConnectors().size());
     }
+    
 }
