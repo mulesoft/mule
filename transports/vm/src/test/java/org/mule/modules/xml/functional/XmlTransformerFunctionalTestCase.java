@@ -14,6 +14,7 @@ import org.mule.extras.client.MuleClient;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 
+import org.custommonkey.xmlunit.XMLAssert;
 import org.w3c.dom.Document;
 
 public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestCase
@@ -54,10 +55,10 @@ public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestC
         return client;
     }
 
-    public void testXmlOut() throws UMOException
+    public void testXmlOut() throws Exception
     {
         String xml = (String) receive(sendXml(), "xml-out", String.class);
-        assertEquals(SIMPLE_XML, xml);
+        XMLAssert.assertXMLEqual(SIMPLE_XML, xml);
     }
 
     public void testXmlDomOut() throws UMOException
@@ -66,27 +67,27 @@ public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestC
         assertEquals("parent", dom.getDocumentElement().getLocalName());
     }
 
-    public void testXmlXsltOut() throws UMOException
+    public void testXmlXsltOut() throws Exception
     {
         String xml = (String) receive(sendXml(), "xml-xslt-out", String.class);
-        assertEquals(CHILDLESS_XML, xml);
+        XMLAssert.assertXMLEqual(CHILDLESS_XML, xml);
     }
 
-    public void testDomXmlOut() throws UMOException
+    public void testDomXmlOut() throws Exception
     {
         String xml = (String) receive(sendXml(), "dom-xml-out", String.class);
-        assertEquals(SIMPLE_XML, xml);
+        XMLAssert.assertXMLEqual(SIMPLE_XML, xml);
     }
 
-    public void testObjectOut() throws UMOException
+    public void testObjectOut() throws Exception
     {
         receive(sendObject(), "object-out", Parent.class);
     }
 
-    public void testObjectXmlOut() throws UMOException
+    public void testObjectXmlOut() throws Exception
     {
         String xml = (String) receive(sendObject(), "object-xml-out", String.class);
-        assertEquals(SERIALIZED, xml);
+        XMLAssert.assertXMLEqual(SERIALIZED, xml);
     }
 
     public void testXmlObjectOut() throws UMOException
@@ -94,7 +95,7 @@ public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestC
         receive(sendObject2(), "xml-object-out", Parent.class);
     }
 
-    public void testXmlJxpathOut() throws UMOException
+    public void testXmlJxpathOut() throws Exception
     {
         String xml = (String) receive(sendXml(), "xml-jxpath-out", String.class);
         assertEquals("1", xml);
