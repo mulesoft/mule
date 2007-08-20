@@ -16,6 +16,8 @@
     <xsd:element name="orphan1" type="namedType"/>
     <xsd:element name="orphan2" type="namedType"/>
     <xsd:element name="missing" type="abstractBeanType"/>
+    <xsd:element name="named" type="dynamicNamedType"/>
+    <xsd:element name="inherit" type="inheritType"/>
 
     <xsd:complexType name="orphanType">
         <xsd:complexContent>
@@ -61,6 +63,23 @@
                 <xsd:attribute name="kids-ref" type="xsd:NMTOKEN"/>
                 <xsd:attribute name="offspring-ref" type="xsd:NMTOKEN"/>
              </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="dynamicNamedType">
+        <xsd:complexContent>
+            <xsd:extension base="namedType">
+                <xsd:attribute name="name" type="xsd:NMTOKEN"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="inheritType">
+        <xsd:complexContent>
+            <xsd:extension base="dynamicNamedType">
+                <xsd:attribute name="inherit" type="xsd:boolean"/>
+                <xsd:attribute name="id" type="xsd:NMTOKEN"/>
+            </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 

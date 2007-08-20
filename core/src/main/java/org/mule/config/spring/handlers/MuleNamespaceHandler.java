@@ -12,12 +12,15 @@ package org.mule.config.spring.handlers;
 import org.mule.components.simple.BridgeComponent;
 import org.mule.components.simple.EchoComponent;
 import org.mule.components.simple.LogComponent;
+import org.mule.components.simple.NullComponent;
 import org.mule.config.MuleProperties;
 import org.mule.config.QueueProfile;
 import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
 import org.mule.config.spring.parsers.collection.OrphanMapDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.GrandchildDefinitionParser;
+import org.mule.config.spring.parsers.generic.InheritDefinitionParser;
+import org.mule.config.spring.parsers.generic.NameTransferDefinitionParser;
 import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
@@ -35,7 +38,6 @@ import org.mule.config.spring.parsers.specific.ServiceOverridesDefinitionParser;
 import org.mule.config.spring.parsers.specific.SimpleComponentDefinitionParser;
 import org.mule.config.spring.parsers.specific.ThreadingProfileDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransactionConfigDefinitionParser;
-import org.mule.config.spring.parsers.specific.NameTransferDefinitionParser;
 import org.mule.impl.DefaultComponentExceptionStrategy;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.container.JndiContainerContext;
@@ -189,7 +191,7 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("properties-container", new OrphanDefinitionParser(PropertiesContainerContext.class, true));
 
         //Model Elements
-        registerBeanDefinitionParser("model-seda", new OrphanDefinitionParser(SedaModel.class, true));
+        registerBeanDefinitionParser("model-seda", new InheritDefinitionParser(new OrphanDefinitionParser(SedaModel.class, true), new NamedDefinitionParser()));
         registerBeanDefinitionParser("model-inherited", new InheritedModelDefinitionParser());
         registerBeanDefinitionParser("model-seda-optimised", new OrphanDefinitionParser(OptimisedSedaModel.class, true));
         registerBeanDefinitionParser("model-simple", new OrphanDefinitionParser(DirectModel.class, true));
@@ -210,6 +212,7 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("bridge-component", new SimpleComponentDefinitionParser("serviceFactory", BridgeComponent.class));
         registerBeanDefinitionParser("log-component", new SimpleComponentDefinitionParser("serviceFactory", LogComponent.class));
         registerBeanDefinitionParser("echo-component", new SimpleComponentDefinitionParser("serviceFactory", EchoComponent.class));
+        registerBeanDefinitionParser("null-component", new SimpleComponentDefinitionParser("serviceFactory", NullComponent.class));
         registerBeanDefinitionParser("inbound-router", new ChildDefinitionParser("inboundRouter", InboundRouterCollection.class));
         registerBeanDefinitionParser("outbound-router", new ChildDefinitionParser("outboundRouter", OutboundRouterCollection.class));
         registerBeanDefinitionParser("nested-router", new ChildDefinitionParser("nestedRouter", NestedRouterCollection.class));

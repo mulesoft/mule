@@ -11,15 +11,23 @@
 package org.mule.config.spring.parsers.generic;
 
 import org.w3c.dom.Element;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.xml.ParserContext;
 
 /**
  * Behaves as {@link org.mule.config.spring.parsers.generic.ParentDefinitionParser},
  * but allows any named bean to be the parent, rather than using the enclosing element in the DOM tree.
  */
-public class NamedDefinitionParser extends ParentDefinitionParser
+public class NamedDefinitionParser extends ParentDefinitionParser implements DelegateDefinitionParser
 {
 
     private String name;
+    private boolean isDynamic = false;
+
+    public NamedDefinitionParser()
+    {
+        isDynamic = true;
+    }
 
     public NamedDefinitionParser(String name)
     {
@@ -40,6 +48,28 @@ public class NamedDefinitionParser extends ParentDefinitionParser
     protected String getParentBeanName(Element element)
     {
         return name;
+    }
+
+    protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext)
+    {
+        if (isDynamic)
+        {
+            if (element.hasAttribute(ATTRIBUTE_NAME))
+            {
+                setName(element.getAttribute(ATTRIBUTE_NAME));
+                element.removeAttribute(ATTRIBUTE_NAME);
+            }
+            else
+            {
+                throw new IllegalStateException("Missing name attribute for " + element.getLocalName());
+            }
+        }
+        return super.parseInternal(element, parserContext);
+    }
+
+    public AbstractBeanDefinition parseDelegate(Element element, ParserContext parserContext)
+    {
+        return parseInternal(element, parserContext);
     }
 
 }

@@ -105,19 +105,22 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
         addIgnored(ATTRIBUTE_ID);
     }
 
-    public void addReference(String propertyName)
+    public AbstractMuleBeanDefinitionParser addReference(String propertyName)
     {
         propertyConfiguration.addReference(propertyName);
+        return this;
     }
 
-    public void addMapping(String propertyName, Map mappings)
+    public AbstractMuleBeanDefinitionParser addMapping(String propertyName, Map mappings)
     {
         propertyConfiguration.addMapping(propertyName, mappings);
+        return this;
     }
 
-    public void addMapping(String propertyName, String mappings)
+    public AbstractMuleBeanDefinitionParser addMapping(String propertyName, String mappings)
     {
         propertyConfiguration.addMapping(propertyName, mappings);
+        return this;
     }
 
     /**

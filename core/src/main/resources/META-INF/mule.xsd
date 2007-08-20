@@ -726,6 +726,7 @@
                     <xsd:element name="component-pool-factory" type="componentPoolFactoryType" minOccurs="0"/>
                     <xsd:element name="service" type="sedaServiceType" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
+                <xsd:attribute name="inherit" type="xsd:boolean"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -833,6 +834,13 @@
                         <xsd:documentation>
                             Built-in LogComponent that simply logs the message content (or content length if it is a
                             large message).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:element>
+                <xsd:element name="null-component">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Built-in NullComponent that will throw an exception if it receives a message.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:element>

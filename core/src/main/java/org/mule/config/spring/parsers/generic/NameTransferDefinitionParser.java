@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id:NameTransferDefinitionParser.java 7863 2007-08-13 20:20:43Z acooke $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config.spring.parsers.specific;
+package org.mule.config.spring.parsers.generic;
 
 import org.mule.config.spring.parsers.assembly.DefaultBeanAssembler;
 import org.mule.config.spring.parsers.assembly.PropertyConfiguration;
@@ -24,11 +24,13 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
- * This sets the "name" attribute of the reference being set.
+ * This extends {@link ParentDefinitionParser} so that the "name" attribute is set locally,
+ * not on the parent.
+ *
  * <p>It's easier to understand with an example. Consider a custom security provider, set with the
  * following XML:</p>
  * <pre>
- &lt;mule:security-manager xsi:type="mule:defaultSecurityManagerType"&gt;
+ &lt;mule:security-manager&gt;
      &lt;mule:custom-security-provider name="dummySecurityProvider"
                                     provider-ref="dummySecurityProvider"/&gt;
  &lt;/mule:security-manager&gt;</pre>

@@ -22,7 +22,6 @@
                         <exclude>**/MuleConfigurationTestCase.*</exclude>
                         <exclude>**/PropertyTemplatesTestCase.*</exclude>
                         <exclude>**/MuleXmlConfigBuilderTestCase.*</exclude>
-                        <exclude>**/MuleXmlConfigBuilderSplitComponentsTestCase.*</exclude>
                     </excludes>
                 </configuration>
             </plugin>

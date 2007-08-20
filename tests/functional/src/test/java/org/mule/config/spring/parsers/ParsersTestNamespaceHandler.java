@@ -16,6 +16,7 @@ import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
+import org.mule.config.spring.parsers.generic.InheritDefinitionParser;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
@@ -35,6 +36,10 @@ public class ParsersTestNamespaceHandler extends NamespaceHandlerSupport
         registerBeanDefinitionParser("orphan2", new NamedDefinitionParser("orphan2").addAlias("bar", "foo").addIgnored("ignored"));
         registerBeanDefinitionParser("map-entry", new ChildMapEntryDefinitionParser("map", "key", "value"));
         registerBeanDefinitionParser("list-entry", new ChildListEntryDefinitionParser("list"));
+        registerBeanDefinitionParser("named", new NamedDefinitionParser().addAlias("bar", "foo").addIgnored("ignored"));
+        registerBeanDefinitionParser("inherit", new InheritDefinitionParser(
+                new OrphanDefinitionParser(OrphanBean.class, true),
+                new NamedDefinitionParser()).addAlias("bar", "foo").addIgnored("ignored").addCollection("offspring"));
     }
 
 }

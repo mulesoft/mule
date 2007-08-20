@@ -1,14 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+    <!-- part 3 of 3 -->
 
-<mule-configuration id="Test_Split_Components" version="1.0">
-    <description>Part 3 of 3</description>
+    <!-- previous test has same model name here, with "inherited" set to true.
+         this option not available in 2.0 -->
+    <mule:model-seda name="main" inherit="true">
+        <mule:service name="Component3">
+            <mule:null-component/>
+        </mule:service>
+        <mule:service name="Component4">
+            <mule:null-component/>
+        </mule:service>
+        <mule:service name="Component5">
+            <mule:null-component/>
+        </mule:service>
+    </mule:model-seda>
 
-    <model name="main" type="inherited">
-        <mule-descriptor name="Component3" implementation="org.mule.components.simple.NullComponent" />
-        <mule-descriptor name="Component4" implementation="org.mule.components.simple.NullComponent" />
-        <mule-descriptor name="Component5" implementation="org.mule.components.simple.NullComponent" />
-    </model>
-</mule-configuration>
+</beans>
