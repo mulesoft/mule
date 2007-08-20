@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
+
+    <mule:model-seda name="main">
+
+        <mule:service name="default">
+            <mule:null-component/>
+            <mule:pooling-profile/>
+        </mule:service>
+
+        <mule:service name="fail_all">
+            <mule:null-component/>
+            <mule:pooling-profile exhaustedAction="WHEN_EXHAUSTED_FAIL"
+                                  initialisationPolicy="INITIALISE_ALL"
+                                  maxActive="1" maxIdle="2" maxWait="3"/>
+        </mule:service>
+
+        <mule:service name="grow_one">
+            <mule:null-component/>
+            <mule:pooling-profile exhaustedAction="WHEN_EXHAUSTED_GROW"
+                                  initialisationPolicy="INITIALISE_ONE"
+                                  maxActive="2" maxIdle="3" maxWait="4"/>
+        </mule:service>
+
+        <mule:service name="wait_none">
+            <mule:null-component/>
+            <mule:pooling-profile exhaustedAction="WHEN_EXHAUSTED_WAIT"
+                                  initialisationPolicy="INITIALISE_NONE"
+                                  maxActive="3" maxIdle="4" maxWait="5"/>
+        </mule:service>
+
+    </mule:model-seda>
+
+</beans>

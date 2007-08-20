@@ -386,21 +386,21 @@
     <xsd:complexType name="poolingProfileType">
         <xsd:attribute name="maxActive" type="xsd:string"/>
         <xsd:attribute name="maxIdle" type="xsd:string"/>
-        <xsd:attribute name="initialisationPolicy" default="INITIALISE_FIRST">
+        <xsd:attribute name="initialisationPolicy" default="INITIALISE_ONE">
             <xsd:simpleType>
                 <xsd:restriction base="xsd:NMTOKEN">
                     <xsd:enumeration value="INITIALISE_NONE"/>
-                    <xsd:enumeration value="INITIALISE_FIRST"/>
+                    <xsd:enumeration value="INITIALISE_ONE"/>
                     <xsd:enumeration value="INITIALISE_ALL"/>
                 </xsd:restriction>
             </xsd:simpleType>
         </xsd:attribute>
-        <xsd:attribute name="exhaustedAction" default="GROW">
+        <xsd:attribute name="exhaustedAction" default="WHEN_EXHAUSTED_GROW">
             <xsd:simpleType>
                 <xsd:restriction base="xsd:NMTOKEN">
-                    <xsd:enumeration value="GROW"/>
-                    <xsd:enumeration value="WAIT"/>
-                    <xsd:enumeration value="FAIL"/>
+                    <xsd:enumeration value="WHEN_EXHAUSTED_GROW"/>
+                    <xsd:enumeration value="WHEN_EXHAUSTED_WAIT"/>
+                    <xsd:enumeration value="WHEN_EXHAUSTED_FAIL"/>
                 </xsd:restriction>
             </xsd:simpleType>
         </xsd:attribute>

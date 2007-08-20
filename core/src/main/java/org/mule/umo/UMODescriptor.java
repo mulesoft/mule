@@ -10,6 +10,7 @@
 
 package org.mule.umo;
 
+import org.mule.config.PoolingProfile;
 import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.routing.UMONestedRouterCollection;
 import org.mule.umo.routing.UMOOutboundRouterCollection;
@@ -142,4 +143,7 @@ public interface UMODescriptor extends UMOImmutableDescriptor
      * @param modelName name of the model
      */
     void setModelName(String modelName);
+
+    void setPoolingProfile(PoolingProfile profile);
+    
 }

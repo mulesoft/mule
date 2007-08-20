@@ -156,7 +156,7 @@ on the mule-configuration.
      after which a NoSuchElementException will be thrown. If maxThraedWait is non-positive, it will block
      indefinitely.
 -->
-<!ATTLIST pooling-profile exhaustedAction          (GROW | WAIT | FAIL)      "GROW">
+<!ATTLIST pooling-profile exhaustedAction          (WHEN_EXHAUSTED_GROW | WHEN_EXHAUSTED_WAIT | WHEN_EXHAUSTED_FAIL)      "WHEN_EXHAUSTED_GROW">
 <!--
 Specifies the number of milliseconds to wait for a pooled component to become available
 when the pool is exhausted and the exhaustedAction is set to 'wait'.

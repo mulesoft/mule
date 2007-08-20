@@ -42,7 +42,7 @@
         <mule:service name="_axisServiceComponent">
             <mule:component class="org.mule.providers.soap.axis.AxisServiceComponent"/>
             <mule:threading-profile maxBufferSize="100" threadTTL="600000" maxThreadsActive="30" maxThreadsIdle="20" />
-            <!--<pooling-profile exhaustedAction="GROW" maxActive="20" maxIdle="20"/>-->
+            <mule:pooling-profile exhaustedAction="WHEN_EXHAUSTED_GROW" maxActive="20" maxIdle="20"/>
         </mule:service>
     </mule:model-seda>
 

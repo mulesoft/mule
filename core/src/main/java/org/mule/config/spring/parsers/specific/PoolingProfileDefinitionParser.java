@@ -20,8 +20,8 @@ public class PoolingProfileDefinitionParser extends ConfigurationChildDefinition
     public PoolingProfileDefinitionParser()
     {
         super("poolingProfile", PoolingProfile.class);
-        addAlias("initialisationPolicy", "initialisationPolicyString");
-        addAlias("exhaustedAction", "exhaustedActionString");
+        addMapping("initialisationPolicy", PoolingProfile.POOL_INITIALISATION_POLICIES);
+        addMapping("exhaustedAction", PoolingProfile.POOL_EXHAUSTED_ACTIONS);
     }
 
 }

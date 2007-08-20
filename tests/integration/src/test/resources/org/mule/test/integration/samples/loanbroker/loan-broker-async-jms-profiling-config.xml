@@ -17,7 +17,7 @@ the different components are made from the loan broker component (a la hub and s
 
     <mule-environment-properties>
         <threading-profile maxThreadsActive="20" maxThreadsIdle="20" maxBufferSize="0" poolExhaustedAction="WAIT"/>
-        <pooling-profile exhaustedAction="GROW" maxActive="20" maxIdle="20" maxWait="-1"
+        <pooling-profile exhaustedAction="WHEN_EXHAUSTED_GROW" maxActive="20" maxIdle="20" maxWait="-1"
                          initialisationPolicy="INITIALISE_ALL"/>
         <queue-profile maxOutstandingMessages="500"/>
     </mule-environment-properties>

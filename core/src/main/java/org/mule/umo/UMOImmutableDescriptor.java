@@ -17,6 +17,7 @@ import org.mule.umo.routing.UMONestedRouterCollection;
 import org.mule.umo.routing.UMOOutboundRouterCollection;
 import org.mule.umo.routing.UMOResponseRouterCollection;
 import org.mule.util.object.ObjectFactory;
+import org.mule.config.PoolingProfile;
 
 import java.beans.ExceptionListener;
 import java.util.List;
@@ -138,5 +139,7 @@ public interface UMOImmutableDescriptor extends Initialisable, Registerable
      * @return
      */
     UMOManagementContext getManagementContext();
+
+    PoolingProfile getPoolingProfile();
 
 }

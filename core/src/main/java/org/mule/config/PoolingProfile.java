@@ -31,22 +31,16 @@ public class PoolingProfile
      * Tells the object pool not to initialise any components on startup.
      */
     public static final int INITIALISE_NONE = 0;
-    /** @deprecated use INITIALISE_NONE instead */
-    public static final int POOL_INITIALISE_NO_COMPONENTS = INITIALISE_NONE;
 
     /**
      * Tells the object pool only to initialise one component on startup.
      */
     public static final int INITIALISE_ONE = 1;
-    /** @deprecated use INITIALISE_ONE instead */
-    public static final int POOL_INITIALISE_ONE_COMPONENT = INITIALISE_ONE;
 
     /**
      * Tells the object pool to initialise all components on startup.
      */
     public static final int INITIALISE_ALL = 2;
-    /** @deprecated use INITIALISE_ALL instead */
-    public static final int POOL_INITIALISE_ALL_COMPONENTS = INITIALISE_ALL;
 
     /**
      * Controls the maximum number of Mule UMOs that can be borrowed from a component
@@ -101,7 +95,7 @@ public class PoolingProfile
     public static final int DEFAULT_POOL_INITIALISATION_POLICY = INITIALISE_ONE;
 
     // map pool exhaustion strings to their respective values
-    private static final Map POOL_EXHAUSTED_ACTIONS = new CaseInsensitiveMap()
+    public static final Map POOL_EXHAUSTED_ACTIONS = new CaseInsensitiveMap()
     {
         private static final long serialVersionUID = 1L;
 
@@ -112,22 +106,17 @@ public class PoolingProfile
 
             Integer value = new Integer(ObjectPool.WHEN_EXHAUSTED_WAIT);
             this.put("WHEN_EXHAUSTED_WAIT", value);
-            this.put("WAIT", value);
-            // TODO HH: remove for 2.0 (only keep WAIT)
-            this.put("BLOCK", value);
 
             value = new Integer(ObjectPool.WHEN_EXHAUSTED_FAIL);
             this.put("WHEN_EXHAUSTED_FAIL", value);
-            this.put("FAIL", value);
 
             value = new Integer(ObjectPool.WHEN_EXHAUSTED_GROW);
             this.put("WHEN_EXHAUSTED_GROW", value);
-            this.put("GROW", value);
         }
     };
 
     // map pool initialisation policy strings to their respective values
-    private static final Map POOL_INITIALISATION_POLICIES = new CaseInsensitiveMap()
+    public static final Map POOL_INITIALISATION_POLICIES = new CaseInsensitiveMap()
     {
         private static final long serialVersionUID = 1L;
 
@@ -138,8 +127,6 @@ public class PoolingProfile
 
             value = new Integer(INITIALISE_ONE);
             this.put("INITIALISE_ONE", value);
-            // TODO HH: remove for 2.0 (only keep INITIALISE_ONE)
-            this.put("INITIALISE_FIRST", value);
 
             value = new Integer(INITIALISE_ALL);
             this.put("INITIALISE_ALL", value);
@@ -251,18 +238,6 @@ public class PoolingProfile
     public void setExhaustedAction(int exhaustedAction)
     {
         this.exhaustedAction = exhaustedAction;
-    }
-
-    public void setExhaustedActionString(String poolExhaustedAction)
-    {
-        this.exhaustedAction = MapUtils.getIntValue(POOL_EXHAUSTED_ACTIONS, poolExhaustedAction,
-            ObjectPool.DEFAULT_EXHAUSTED_ACTION);
-    }
-
-    public void setInitialisationPolicyString(String policy)
-    {
-        this.initialisationPolicy = MapUtils.getIntValue(POOL_INITIALISATION_POLICIES, policy,
-            DEFAULT_POOL_INITIALISATION_POLICY);
     }
 
     public UMOPoolFactory getPoolFactory()
