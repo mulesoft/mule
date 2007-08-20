@@ -19,8 +19,6 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <exclude>**/MuleConfigurationTestCase.*</exclude>
-                        <exclude>**/PropertyTemplatesTestCase.*</exclude>
                         <exclude>**/MuleXmlConfigBuilderTestCase.*</exclude>
                     </excludes>
                 </configuration>
