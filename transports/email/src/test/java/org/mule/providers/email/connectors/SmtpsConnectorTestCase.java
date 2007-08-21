@@ -22,7 +22,7 @@ public class SmtpsConnectorTestCase extends SmtpConnectorTestCase
     }
     
     // @Override
-    public UMOConnector getConnector(boolean init) throws Exception
+    public UMOConnector createConnector(boolean init) throws Exception
     {
         SmtpsConnector connector = new SmtpsConnector();
         connector.setName(getConnectorName());
