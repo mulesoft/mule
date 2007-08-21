@@ -15,6 +15,13 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 import org.mule.util.IOUtils;
 
+import com.ibm.wsdl.xml.WSDLReaderImpl;
+
+import javax.wsdl.Definition;
+import javax.wsdl.extensions.soap.SOAPBinding;
+import javax.wsdl.xml.WSDLReader;
+import javax.xml.namespace.QName;
+
 import org.custommonkey.xmlunit.XMLUnit;
 
 public class XFireBasicTestCase extends FunctionalTestCase
@@ -37,6 +44,18 @@ public class XFireBasicTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
         UMOMessage result = client.send("xfire:http://localhost:63083/services/echoService3?method=echo", "Hello!", null);
+        assertEquals("Hello!", result.getPayload());
+    }
+    
+    public void testNoLocalBinding() throws Exception
+    {
+        WSDLReader wsdlReader = new WSDLReaderImpl();
+        Definition wsdlDefinition = wsdlReader.readWSDL("http://localhost:63084/services/echoService4?wsdl");
+        assertEquals(1, wsdlDefinition.getAllBindings().size());
+        SOAPBinding soapBinding = (SOAPBinding) wsdlDefinition.getBinding(new QName("http://www.muleumo.org", "echoService4HttpBinding")).getExtensibilityElements().get(0);
+        assertEquals("http://schemas.xmlsoap.org/soap/http", soapBinding.getTransportURI());
+        MuleClient client = new MuleClient();
+        UMOMessage result = client.send("xfire:http://localhost:63084/services/echoService4?method=echo", "Hello!", null);
         assertEquals("Hello!", result.getPayload());
     }
     

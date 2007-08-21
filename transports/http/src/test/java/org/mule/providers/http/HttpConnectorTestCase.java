@@ -20,6 +20,8 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
 
+import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
+
 public class HttpConnectorTestCase extends AbstractConnectorTestCase
 {
     public UMOConnector getConnector() throws Exception
@@ -61,12 +63,17 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
 
     public void testProperties() throws Exception
     {
-        HttpConnector c = (HttpConnector)getConnector();
+        HttpConnector c = (HttpConnector) getConnector();
 
         c.setSendBufferSize(1024);
         assertEquals(1024, c.getSendBufferSize());
         c.setSendBufferSize(0);
         assertEquals(TcpConnector.DEFAULT_BUFFER_SIZE, c.getSendBufferSize());
+
+        int maxThreadsActive = c.getDispatcherThreadingProfile().getMaxThreadsActive();
+        HttpConnectionManagerParams params = c.getClientConnectionManager().getParams();
+        assertEquals(maxThreadsActive, params.getDefaultMaxConnectionsPerHost());
+        assertEquals(maxThreadsActive, params.getMaxTotalConnections());
 
         c.dispose();
 

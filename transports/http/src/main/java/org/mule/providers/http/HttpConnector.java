@@ -91,17 +91,32 @@ public class HttpConnector extends TcpConnector
     protected void doInitialise() throws InitialisationException
     {
         super.doInitialise();
-        if(clientConnectionManager==null)
+        if (clientConnectionManager == null)
         {
             clientConnectionManager = new MultiThreadedHttpConnectionManager();
             HttpConnectionManagerParams params = new HttpConnectionManagerParams();
-            if(getSendBufferSize()!= INT_VALUE_NOT_SET ) params.setSendBufferSize(getSendBufferSize());
-            if(getReceiveBufferSize()!= INT_VALUE_NOT_SET ) params.setReceiveBufferSize(getReceiveBufferSize());
-            if(getClientSoTimeout()!= INT_VALUE_NOT_SET ) params.setSoTimeout(getClientSoTimeout());
-            if(getSocketSoLinger()!= INT_VALUE_NOT_SET ) params.setLinger(getSocketSoLinger());
+            if (getSendBufferSize() != INT_VALUE_NOT_SET)
+            {
+                params.setSendBufferSize(getSendBufferSize());
+            }
+            if (getReceiveBufferSize() != INT_VALUE_NOT_SET)
+            {
+                params.setReceiveBufferSize(getReceiveBufferSize());
+            }
+            if (getClientSoTimeout() != INT_VALUE_NOT_SET)
+            {
+                params.setSoTimeout(getClientSoTimeout());
+            }
+            if (getSocketSoLinger() != INT_VALUE_NOT_SET)
+            {
+                params.setLinger(getSocketSoLinger());
+            }
 
             params.setTcpNoDelay(isSendTcpNoDelay());
             params.setMaxTotalConnections(getDispatcherThreadingProfile().getMaxThreadsActive());
+            params.setDefaultMaxConnectionsPerHost(getDispatcherThreadingProfile().getMaxThreadsActive());
+
+            clientConnectionManager.setParams(params);
         }
     }
 

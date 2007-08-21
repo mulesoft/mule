@@ -10,7 +10,6 @@
 
 package org.mule.providers.soap.xfire;
 
-import org.mule.RegistryContext;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.soap.SoapConstants;
 import org.mule.umo.UMOComponent;
@@ -18,7 +17,6 @@ import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.umo.registry.RegistryFacade;
 import org.mule.util.ClassUtils;
 import org.mule.util.MapUtils;
 import org.mule.util.StringUtils;
@@ -55,7 +53,7 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
     {
         super(umoConnector, component, umoEndpoint);
 
-        connector = (XFireConnector)umoConnector;
+        connector = (XFireConnector) umoConnector;
         create();
     }
 
@@ -67,13 +65,13 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
             props.putAll(endpoint.getProperties());
 
             // check if there is the namespace property on the component
-            String namespace = (String)component.getDescriptor().getProperties().get(
+            String namespace = (String) component.getDescriptor().getProperties().get(
                 SoapConstants.SOAP_NAMESPACE_PROPERTY);
 
             // check for namespace set as annotation
             if (connector.isEnableJSR181Annotations())
             {
-                WebAnnotations wa = (WebAnnotations)ClassUtils.instanciateClass(
+                WebAnnotations wa = (WebAnnotations) ClassUtils.instanciateClass(
                     XFireConnector.CLASSNAME_ANNOTATIONS, null, this.getClass());
                 // at this point, the object hasn't been created in the descriptor so
                 // we have to retrieve the implementation classname and create a
@@ -86,6 +84,12 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
             if ((namespace == null) || (namespace.equalsIgnoreCase("")))
             {
                 namespace = MapUtils.getString(props, "namespace", XFireConnector.DEFAULT_MULE_NAMESPACE_URI);
+            }
+
+            //Convert createDefaultBindings string to boolean before rewriting as xfire property
+            if (props.get("createDefaultBindings") != null)
+            {
+                props.put("createDefaultBindings", Boolean.valueOf((String) props.get("createDefaultBindings")));
             }
 
             if (props.size() == 0)
@@ -114,7 +118,7 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
             }
             else
             {
-                String className = (String)serviceInterfaces.get(0);
+                String className = (String) serviceInterfaces.get(0);
                 exposedInterface = ClassUtils.loadClass(className, this.getClass());
                 logger.info(className + " class was used to expose your service");
 
@@ -124,7 +128,7 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
                 }
             }
 
-            String wsdlUrl = (String)component.getDescriptor().getProperties().get(
+            String wsdlUrl = (String) component.getDescriptor().getProperties().get(
                 SoapConstants.WSDL_URL_PROPERTY);
 
             if (StringUtils.isBlank(wsdlUrl))
@@ -144,7 +148,7 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
                 for (int i = 0; i < inList.size(); i++)
                 {
                     Class clazz = ClassUtils.loadClass(inList.get(i).toString(), this.getClass());
-                    Handler handler = (Handler)clazz.getConstructor(null).newInstance(null);
+                    Handler handler = (Handler) clazz.getConstructor(null).newInstance(null);
                     service.addInHandler(handler);
                 }
             }
