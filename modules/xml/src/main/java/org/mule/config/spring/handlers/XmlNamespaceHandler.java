@@ -36,8 +36,8 @@ public class XmlNamespaceHandler extends MuleNamespaceHandler
     public void init()
     {
         super.init();
-        registerBeanDefinitionParser("xml-jxpath", new ChildDefinitionParser("filter", JXPathFilter.class));
-        registerBeanDefinitionParser("is-xml", new ChildDefinitionParser("filter", IsXmlFilter.class));
+        registerBeanDefinitionParser("xml-jxpath-filter", new ChildDefinitionParser("filter", JXPathFilter.class));
+        registerBeanDefinitionParser("is-xml-filter", new ChildDefinitionParser("filter", IsXmlFilter.class));
         registerBeanDefinitionParser("xml-message-splitter", new RouterDefinitionParser("router", FilteringXmlMessageSplitter.class));
         registerBeanDefinitionParser("xml-round-robin-splitter", new RouterDefinitionParser("router", RoundRobinXmlSplitter.class).addAlias("endpointFiltering", "enableEndpointFiltering"));
         registerBeanDefinitionParser("dom-to-xml", new OrphanDefinitionParser(DomDocumentToXml.class, false));
@@ -47,6 +47,7 @@ public class XmlNamespaceHandler extends MuleNamespaceHandler
         registerBeanDefinitionParser("xml-to-object", new OrphanDefinitionParser(XmlToObject.class, false));
         registerBeanDefinitionParser("xml-xslt", new XsltTransformerDefinitionParser());
         registerBeanDefinitionParser("namespace", new ChildMapEntryDefinitionParser("namespaces", "prefix", "uri"));
+        registerBeanDefinitionParser("context-property", new ChildMapEntryDefinitionParser("contextProperties", "key", "value"));
     }
 
 }

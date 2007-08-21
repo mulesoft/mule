@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:test="http://www.mulesource.org/schema/mule/test/2.0"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/test/2.0 http://www.mulesource.org/schema/mule/test/2.0/mule-test.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
+
+    <mule:model-seda name="main" inherit="true">
+
+        <mule:service name="testPropertiesComponent">
+            <mule:component scope="singleton" instance-ref="prop-test-ref"/>
+            <mule:inbound-router>
+                <mule:endpoint address="test://blah?transformers=TestCompressionTransformer&amp;responseTransformers=TestCompressionTransformer"/>
+            </mule:inbound-router>
+        </mule:service>
+
+    </mule:model-seda>
+
+    <bean name="anApple" class="org.mule.tck.testmodels.fruit.Apple"/>
+
+    <bean name="prop-test-ref" class="org.mule.tck.testmodels.fruit.Apple">
+    </bean>
+
+    <bean name="factory-test" class="org.mule.tck.testmodels.mule.TestDependentObject"/>
+        
+    <bean name="factoryObject" factory-bean="factory-test" factory-method="create">
+        <constructor-arg>
+            <map>
+                <entry key="test1" value="test1"/>
+                <entry key="test2" value="test2"/>
+                <entry key="containerObject" value-ref="anApple"/>
+                <entry key="osVersion" value="${os.version}"/>
+                <!-- no defaults -->
+                <entry key="propertiesMap">
+                    <map>
+                        <entry key="test1" value="test1"/>
+                        <entry key="test2" value="test2"/>
+                        <entry key="containerObject" value-ref="anApple"/>
+                        <entry key="osVersion" value="${os.version}"/>
+                        <!-- no nested factory (could repeat, but life is short...) -->
+                    </map>
+                </entry>
+                <entry key="propertiesList">
+                    <list>
+                        <value>test1</value>
+                        <value>test2</value>
+                        <ref bean="anApple"/>
+                        <value>${os.version}</value>
+                    </list>
+                </entry>
+            </map>
+        </constructor-arg>
+    </bean>
+</beans>
+
+
+        <!-- mule-descriptor name="testPropertiesComponent"
+            inboundEndpoint="test://blah?transformers=TestCompressionTransformer&amp;responseTransformers=TestCompressionTransformer"
+            implementation="org.mule.tck.testmodels.fruit.Apple">
+            <properties>
+                <property name="test1" value="test1"/>
+                <property name="test2" value="test2"/>
+                <factory-property name="factoryObject" factory="org.mule.tck.testmodels.mule.TestDependentObject"/>
+                <container-property name="containerObject" reference="org.mule.tck.testmodels.fruit.Apple" required="true"/>
+                <container-property name="doesNotExist" reference="org.mule.tck.testmodels.fruit.XAppleX" required="false"/>
+                <system-property name="osVersion" key="os.version"/>
+                <system-property name="notASystemProperty" key="not.a.system.property" defaultValue="defaultValue"/>
+                <map name="propertiesMap">
+                    <property name="test1" value="test1"/>
+                    <property name="test2" value="test2"/>
+                    <factory-property name="factoryObject" factory="org.mule.tck.testmodels.mule.TestDependentObject"/>
+                    <container-property name="containerObject" reference="org.mule.tck.testmodels.fruit.Apple" required="true"/>
+                    <container-property name="doesNotExist" reference="org.mule.tck.testmodels.fruit.XAppleX" required="false"/>
+                    <system-property name="osVersion" key="os.version"/>
+                    <system-property name="notASystemProperty" key="not.a.system.property" defaultValue="defaultValue"/>
+                </map>
+                <list name="propertiesList">
+                    <factory-entry factory="org.mule.tck.testmodels.mule.TestDependentObject"/>
+                    <container-entry reference="org.mule.tck.testmodels.fruit.Apple" required="true"/>
+                    <container-entry reference="org.mule.tck.testmodels.fruit.XAppleX" required="false"/>
+                    <system-entry key="os.version"/>
+                    <system-entry key="not.a.system.property" defaultValue="defaultValue"/>
+                    <entry value="test1"/>
+                    <entry value="test2"/>
+                </list>
+            </properties>
+        </mule-descriptor -->

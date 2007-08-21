@@ -123,7 +123,7 @@
         <!-- explicit or global endpoints -->
         <xsd:attribute name="address" type="xsd:string"/>
 
-        <xsd:attribute name="name" type="xsd:string"/>
+        <xsd:attribute name="name" type="xsd:NMTOKEN"/>
         <xsd:attribute name="transformers" type="xsd:string"/>
         <xsd:attribute name="responseTransformers" type="xsd:string"/>
         <xsd:attribute name="synchronous" type="substitutableBoolean"/>
@@ -313,7 +313,7 @@
 
     <xsd:complexType name="transformerType">
         <xsd:attribute name="name" type="xsd:string"/>
-        <xsd:attribute name="returnClass" type="xsd:NMTOKEN"/>
+        <xsd:attribute name="returnClass" type="substitutableClass"/>
         <xsd:attribute name="ignoreBadInput" type="substitutableBoolean"/>
     </xsd:complexType>
 
@@ -1503,6 +1503,25 @@
         </xsd:restriction>
     </xsd:simpleType>
 
+    <xsd:simpleType name="substitutableClass">
+        <xsd:annotation>
+            <xsd:documentation>
+                A custom xsd:NMTOKEN-like type that also allows for Ant-style property placeholders
+                and a leading [
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:union>
+            <xsd:simpleType>
+                <xsd:restriction base="propertyPlaceholderType"/>
+            </xsd:simpleType>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                    <xsd:pattern value="\[?[A-Za-z0-9\.]+"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:union>
+    </xsd:simpleType>
+
     <xsd:simpleType name="substitutablePortNumber">
         <xsd:annotation>
             <xsd:documentation>
@@ -1601,18 +1620,18 @@
     <xsd:group name="xmlExtendedFilters">
         <xsd:choice>
             <xsd:group ref="filters"/>
-            <xsd:element name="xml-jxpath" type="jxpathFilterType"/>
-            <xsd:element name="is-xml" type="filterType"/>
+            <xsd:element name="xml-jxpath-filter" type="jxpathFilterType"/>
+            <xsd:element name="is-xml-filter" type="filterType"/>
         </xsd:choice>
     </xsd:group>
 
     <xsd:complexType name="jxpathFilterType">
         <xsd:complexContent>
             <xsd:extension base="patternFilterType">
-                <xsd:choice>
+                <xsd:sequence>
                     <xsd:element name="namespace" type="namespaceType" minOccurs="0" maxOccurs="unbounded"/>
-                    <xsd:element name="contextProperty" type="spring:propertyType" minOccurs="0" maxOccurs="unbounded"/>
-                </xsd:choice>
+                    <xsd:element name="context-property" type="spring:entryType" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
                 <xsd:attribute name="lenient" type="substitutableBoolean" default="true"/>
                 <xsd:attribute name="expectedValue" type="xsd:string"/>
            </xsd:extension>

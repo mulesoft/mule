@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:test="http://www.mulesource.org/schema/mule/test/2.0"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/test/2.0 http://www.mulesource.org/schema/mule/test/2.0/mule-test.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
+
+    <mule:model-seda name="main" inherit="true">
+
+        <mule:service name="appleComponent2">
+            <mule:component class="org.mule.tck.testmodels.fruit.Apple"/>
+
+            <mule:inbound-router>
+                <mule:endpoint name="nonTransactedInboundEndpoint" address="test://endpoint.in3"/>
+                <!-- endpoint name="nonTransactedInboundEndpoint" address="test://endpoint.in3"/ -->
+                <mule:endpoint name="transactedInboundEndpoint" createConnector="NEVER_CREATE" address="test://endpoint.in2">
+                    <!-- mule:transaction action="ALWAYS_BEGIN" -->
+                        <!-- TODO -->
+                        <!-- incorrect classes - need UMOTransactionFactory, not SimpleObjectFactory -->
+                        <!-- mule:transaction-factory class="org.mule.tck.testmodels.mule.TestTransactionFactory"/ -->
+                    <!-- /mule:transaction -->
+                    <mule:properties>
+                        <entry key="testEndpointProperty" value="Prop1"/>
+                    </mule:properties>
+                </mule:endpoint>
+                <!-- endpoint name="transactedInboundEndpoint" createConnector="NEVER_CREATE" type="receiver"
+                          address="test://endpoint.in2">
+                    <transaction factory="org.mule.tck.testmodels.mule.TestTransactionFactory" action="ALWAYS_BEGIN"/>
+                    <properties>
+                        <property name="testEndpointProperty" value="Prop1"/>
+                    </properties>
+                </endpoint -->
+            </mule:inbound-router>
+
+            <mule:outbound-router>
+                <mule:filtering-router>
+                    <mule:endpoint name="transactedOutboundEndpoint" address="test://endpoint.out">
+                        <!-- mule:transaction action="ALWAYS_BEGIN" -->
+                            <!-- TODO -->
+                            <!-- no support for constraints? -->
+                            <!-- factory required? -->
+                        <!-- /mule:transaction -->
+                    </mule:endpoint>
+                </mule:filtering-router>
+            </mule:outbound-router>
+            <!-- outbound-router>
+                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
+                    <endpoint name="transactedOutboundEndpoint" type="sender" address="test://endpoint.out">
+                        <transaction action="ALWAYS_BEGIN">
+                            <constraint batchSize="3" className="org.mule.transaction.constraints.BatchConstraint"/>
+                        </transaction>
+                    </endpoint>
+                </router>
+            </outbound-router -->
+
+            <mule:threading-profile maxBufferSize="6" maxThreadsActive="12" maxThreadsIdle="6"/>
+            <!-- threading-profile maxBufferSize="6" maxThreadsActive="12" maxThreadsIdle="6"/ -->
+            <mule:pooling-profile exhaustedAction="WHEN_EXHAUSTED_WAIT" initialisationPolicy="INITIALISE_ALL"/>
+            <!-- pooling-profile exhaustedAction="WAIT" initialisationPolicy="INITIALISE_ALL"/ -->
+            <mule:queue-profile maxOutstandingMessages="102"/>
+            <!-- queue-profile maxOutstandingMessages="102"/ -->
+
+        </mule:service>
+
+    </mule:model-seda>
+
+</beans>

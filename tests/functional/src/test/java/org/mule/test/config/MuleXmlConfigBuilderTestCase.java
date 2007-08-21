@@ -39,7 +39,7 @@ public class MuleXmlConfigBuilderTestCase extends AbstractConfigBuilderTestCase
 
     public String getConfigResources()
     {
-        return "test-xml-mule-config.xml,test-xml-mule-config-split.xml,test-xml-mule-config-split-properties.xml";
+        return "test-xml-mule2-config.xml,test-xml-mule2-config-split.xml,test-xml-mule2-config-split-properties.xml";
     }
 
     public ConfigurationBuilder getBuilder()
