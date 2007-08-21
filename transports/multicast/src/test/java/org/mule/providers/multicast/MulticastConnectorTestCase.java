@@ -24,7 +24,8 @@ import java.net.DatagramPacket;
 public class MulticastConnectorTestCase extends AbstractConnectorTestCase
 {
 
-    public UMOConnector getConnector() throws Exception
+    // @Override
+    public UMOConnector createConnector() throws Exception
     {
         MulticastConnector c = new MulticastConnector();
         c.setName("MulticastConnector");
@@ -46,7 +47,7 @@ public class MulticastConnectorTestCase extends AbstractConnectorTestCase
         MuleDescriptor d = getTestDescriptor("orange", Orange.class.getName());
         UMOComponent component = getTestComponent(d);
         UMOEndpoint endpoint = getTestEndpoint("Test", UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
-
+        UMOConnector connector = getConnector();
 
         try
         {
@@ -56,7 +57,8 @@ public class MulticastConnectorTestCase extends AbstractConnectorTestCase
             fail("cannot register with null endpointUri");
         }
         catch (Exception e)
-        { /* expected */
+        {
+            // expected
         }
 
         try
@@ -66,7 +68,8 @@ public class MulticastConnectorTestCase extends AbstractConnectorTestCase
             fail("cannot register with empty endpointUri");
         }
         catch (Exception e)
-        { /* expected */
+        {
+            // expected
         }
 
         endpoint = new MuleEndpoint();
@@ -78,8 +81,10 @@ public class MulticastConnectorTestCase extends AbstractConnectorTestCase
             fail("cannot register on the same endpointUri");
         }
         catch (Exception e)
-        { /* expected */
+        {
+            // expected
         }
+
         connector.dispose();
     }
 

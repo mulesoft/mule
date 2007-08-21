@@ -25,7 +25,8 @@ import java.io.IOException;
 public class SslConnectorTestCase extends AbstractConnectorTestCase
 {
 
-    public UMOConnector getConnector() throws Exception
+    // @Override
+    public UMOConnector createConnector() throws Exception
     {
         return createConnector(true);
     }
@@ -75,6 +76,7 @@ public class SslConnectorTestCase extends AbstractConnectorTestCase
         MuleDescriptor d = getTestDescriptor("orange", Orange.class.getName());
         UMOComponent component = getTestComponent(d);
         UMOEndpoint endpoint = getTestEndpoint("Test", UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
+        UMOConnector connector = getConnector();
 
         try
         {
@@ -85,7 +87,7 @@ public class SslConnectorTestCase extends AbstractConnectorTestCase
         }
         catch (Exception e)
         {
-            /* expected */
+            //  expected
         }
 
         try
@@ -96,7 +98,7 @@ public class SslConnectorTestCase extends AbstractConnectorTestCase
         }
         catch (Exception e)
         {
-            /* expected */
+            // expected
         }
 
         endpoint = new MuleEndpoint();
@@ -111,13 +113,13 @@ public class SslConnectorTestCase extends AbstractConnectorTestCase
         }
         catch (Exception e)
         {
-            /* expected */
+            // expected
         }
     }
 
     public void testProperties() throws Exception
     {
-        SslConnector c = (SslConnector)connector;
+        SslConnector c = (SslConnector)getConnector();
 
         c.setSendBufferSize(1024);
         assertEquals(1024, c.getSendBufferSize());

@@ -70,7 +70,7 @@ public abstract class AbstractReceivingMailConnectorTestCase extends AbstractMai
         });
 
         QuickConfigurationBuilder builder = new QuickConfigurationBuilder(false);
-        managementContext.getRegistry().registerConnector(getConnector(false));
+        managementContext.getRegistry().registerConnector(createConnector(false));
         builder.registerComponent(
             FunctionalTestComponent.class.getName(), "testComponent", getTestEndpointURI(), null, props);
 

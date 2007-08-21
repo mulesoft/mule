@@ -24,7 +24,9 @@ import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 
 public class HttpConnectorTestCase extends AbstractConnectorTestCase
 {
-    public UMOConnector getConnector() throws Exception
+
+    // @Override
+    public UMOConnector createConnector() throws Exception
     {
         HttpConnector c = new HttpConnector();
         c.setName("HttpConnector");
@@ -58,7 +60,7 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
         }
 
         endpoint.setEndpointURI(new MuleEndpointURI(getTestEndpointURI()));
-        connector.registerListener(component, endpoint);
+        getConnector().registerListener(component, endpoint);
     }
 
     public void testProperties() throws Exception
@@ -79,4 +81,5 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
 
         // all kinds of timeouts are now being tested in TcpConnectorTestCase
     }
+
 }

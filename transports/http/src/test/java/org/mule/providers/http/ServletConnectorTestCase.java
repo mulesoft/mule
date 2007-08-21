@@ -17,7 +17,8 @@ import org.mule.umo.provider.UMOConnector;
 public class ServletConnectorTestCase extends AbstractConnectorTestCase
 {
 
-    public UMOConnector getConnector() throws Exception
+    // @Override
+    public UMOConnector createConnector() throws Exception
     {
         ServletConnector c = new ServletConnector();
         c.setName("test");

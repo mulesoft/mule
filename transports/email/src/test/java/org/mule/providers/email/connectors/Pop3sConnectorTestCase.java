@@ -24,7 +24,7 @@ public class Pop3sConnectorTestCase extends AbstractReceivingMailConnectorTestCa
         super("Pop3sConnector");
     }
     
-    public UMOConnector getConnector(boolean init) throws Exception
+    public UMOConnector createConnector(boolean init) throws Exception
     {
         Pop3sConnector connector = new Pop3sConnector();
         connector.setName(getConnectorName());

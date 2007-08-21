@@ -139,12 +139,12 @@ public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractCo
         return connectorName;
     }
     
-    public UMOConnector getConnector() throws Exception
+    public UMOConnector createConnector() throws Exception
     {
-        return getConnector(false);
+        return createConnector(false);
     }
     
-    public abstract UMOConnector getConnector(boolean init) throws Exception;
+    public abstract UMOConnector createConnector(boolean init) throws Exception;
         
     protected String getPop3TestEndpointURI()
     {

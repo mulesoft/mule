@@ -50,7 +50,8 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
      *
      * @see org.mule.tck.providers.AbstractConnectorTestCase#createConnector()
      */
-    public UMOConnector getConnector() throws Exception
+    // @Override
+    public UMOConnector createConnector() throws Exception
     {
         UMOConnector connector = new FileConnector();
         connector.setName("testFile");

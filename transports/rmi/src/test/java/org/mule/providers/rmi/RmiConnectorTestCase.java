@@ -16,7 +16,8 @@ import org.mule.umo.provider.UMOConnector;
 public class RmiConnectorTestCase extends AbstractConnectorTestCase
 {
 
-    public UMOConnector getConnector() throws Exception
+    // @Override
+    public UMOConnector createConnector() throws Exception
     {
         RmiConnector c = new RmiConnector();
         c.setName("RmiConnector");
@@ -36,7 +37,7 @@ public class RmiConnectorTestCase extends AbstractConnectorTestCase
 
     public void testProperties() throws Exception
     {
-        RmiConnector c = (RmiConnector)connector;
+        RmiConnector c = (RmiConnector)getConnector();
 
         String securityPolicy = "rmi.policy";
         String serverCodebase = "file:///E:/projects/MyTesting/JAVA/rmi/classes/";

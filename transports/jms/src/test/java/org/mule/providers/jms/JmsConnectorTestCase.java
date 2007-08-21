@@ -33,7 +33,8 @@ public class JmsConnectorTestCase extends AbstractConnectorTestCase
      * 
      * @see org.mule.tck.providers.AbstractConnectorTestCase#getConnectorName()
      */
-    public UMOConnector getConnector() throws Exception
+    // @Override
+    public UMOConnector createConnector() throws Exception
     {
         if (connector == null)
         {

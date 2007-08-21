@@ -15,7 +15,9 @@ import org.mule.umo.provider.UMOConnector;
 
 public class JnpConnectorTestCase extends AbstractConnectorTestCase
 {
-    public UMOConnector getConnector() throws Exception
+
+    // @Override
+    public UMOConnector createConnector() throws Exception
     {
         JnpConnector c = new JnpConnector();
         c.setName("JnpConnector");

@@ -24,7 +24,8 @@ import java.net.DatagramPacket;
 public class UdpConnectorTestCase extends AbstractConnectorTestCase
 {
 
-    public UMOConnector getConnector() throws Exception
+    // @Override
+    public UMOConnector createConnector() throws Exception
     {
         UdpConnector c = new UdpConnector();
         c.setName("UdpConnector");
@@ -46,6 +47,8 @@ public class UdpConnectorTestCase extends AbstractConnectorTestCase
         MuleDescriptor d = getTestDescriptor("orange", Orange.class.getName());
         UMOComponent component = getTestComponent(d);
         UMOEndpoint endpoint = getTestEndpoint("Test", UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
+        UMOConnector connector = getConnector();
+
         try
         {
             endpoint.setEndpointURI(null);
@@ -55,7 +58,7 @@ public class UdpConnectorTestCase extends AbstractConnectorTestCase
         }
         catch (Exception e)
         {
-            /* expected */
+            // expected
         }
 
         endpoint = getTestEndpoint("Test", UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
@@ -67,7 +70,7 @@ public class UdpConnectorTestCase extends AbstractConnectorTestCase
         }
         catch (Exception e)
         {
-            /* expected */
+            // expected
         }
 
         endpoint = new MuleEndpoint();
@@ -80,15 +83,14 @@ public class UdpConnectorTestCase extends AbstractConnectorTestCase
         }
         catch (Exception e)
         {
-            logger.debug(e, e);
-            /* expected */
+            // expected
         }
         connector.dispose();
     }
 
     public void testProperties() throws Exception
     {
-        UdpConnector connector = (UdpConnector)this.connector;
+        UdpConnector connector = (UdpConnector)this.getConnector();
 
         connector.setReceiveBufferSize(1024);
         assertEquals(1024, connector.getReceiveBufferSize());

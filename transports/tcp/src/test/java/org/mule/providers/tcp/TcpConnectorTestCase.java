@@ -22,7 +22,8 @@ import org.mule.umo.provider.UMOConnector;
 public class TcpConnectorTestCase extends AbstractConnectorTestCase
 {
 
-    public UMOConnector getConnector() throws Exception
+    // @Override
+    public UMOConnector createConnector() throws Exception
     {
         TcpConnector c = new TcpConnector();
         c.setName("TcpConnector");
@@ -44,6 +45,7 @@ public class TcpConnectorTestCase extends AbstractConnectorTestCase
         MuleDescriptor d = getTestDescriptor("orange", Orange.class.getName());
         UMOComponent component = getTestComponent(d);
         UMOEndpoint endpoint = new MuleEndpoint(getTestEndpointURI(), true);
+        UMOConnector connector = getConnector();
 
         try
         {
@@ -52,7 +54,7 @@ public class TcpConnectorTestCase extends AbstractConnectorTestCase
         }
         catch (Exception e)
         {
-            /* expected */
+            // expected
         }
 
         endpoint.setEndpointURI(new MuleEndpointURI(getTestEndpointURI()));
@@ -61,7 +63,7 @@ public class TcpConnectorTestCase extends AbstractConnectorTestCase
 
     public void testProperties() throws Exception
     {
-        TcpConnector c = (TcpConnector)connector;
+        TcpConnector c = (TcpConnector)getConnector();
 
         c.setSendBufferSize(1024);
         assertEquals(1024, c.getSendBufferSize());

@@ -35,7 +35,8 @@ public class FTPConnectorTestCase extends AbstractConnectorTestCase
      * 
      * @see org.mule.tck.providers.AbstractConnectorTestCase#createConnector()
      */
-    public UMOConnector getConnector() throws Exception
+    // @Override
+    public UMOConnector createConnector() throws Exception
     {
         return internalGetConnector(false);
     }
@@ -56,8 +57,9 @@ public class FTPConnectorTestCase extends AbstractConnectorTestCase
     public void testConnectorPollingFrequency() throws Exception
     {
         UMOEndpoint endpoint = getTestEndpoint("mock", UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER);
-        UMOComponent component = getTestComponent(descriptor);
-        UMOMessageReceiver receiver = ((FtpConnector) connector).createReceiver(component, endpoint);
+        UMOComponent component = getTestComponent(getDescriptor());
+        FtpConnector connector = (FtpConnector)getConnector();
+        UMOMessageReceiver receiver = connector.createReceiver(component, endpoint);
         assertEquals("Connector's polling frequency must not be ignored.", POLLING_FREQUENCY,
             ((FtpMessageReceiver)receiver).getFrequency());
     }
@@ -74,8 +76,9 @@ public class FTPConnectorTestCase extends AbstractConnectorTestCase
         props.put(FtpConnector.PROPERTY_POLLING_FREQUENCY, String.valueOf(POLLING_FREQUENCY_OVERRIDE));
         endpoint.setProperties(props);
 
-        UMOComponent component = getTestComponent(descriptor);
-        UMOMessageReceiver receiver = ((FtpConnector) connector).createReceiver(component, endpoint);
+        UMOComponent component = getTestComponent(getDescriptor());
+        FtpConnector connector = (FtpConnector)getConnector();
+        UMOMessageReceiver receiver = connector.createReceiver(component, endpoint);
         assertEquals("Polling frequency endpoint override must not be ignored.", POLLING_FREQUENCY_OVERRIDE,
             ((FtpMessageReceiver)receiver).getFrequency());
     }
@@ -88,12 +91,13 @@ public class FTPConnectorTestCase extends AbstractConnectorTestCase
         final UMOEndpointURI endpointURI = endpoint.getEndpointURI();
 
         FtpConnectionFactory testFactory = new TestFtpConnectionFactory(endpointURI);
+        FtpConnector connector = (FtpConnector)getConnector();
 
-        ((FtpConnector) connector).setConnectionFactoryClass(testFactory.getClass().getName());
+        connector.setConnectionFactoryClass(testFactory.getClass().getName());
         // no validate call for simplicity
-        ((FtpConnector) connector).setValidateConnections(false);
+        connector.setValidateConnections(false);
 
-        ObjectPool pool = ((FtpConnector) connector).getFtpPool(endpointURI);
+        ObjectPool pool = connector.getFtpPool(endpointURI);
         Object obj = pool.borrowObject();
         assertEquals("Custom FTP connection factory has been ignored.", testObject, obj);
     }

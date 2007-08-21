@@ -15,12 +15,14 @@ import org.mule.umo.provider.UMOConnector;
 
 public class XFireConnectorTestCase extends AbstractConnectorTestCase
 {
+
     public String getTestEndpointURI()
     {
         return "xfire:http://localhost:38009/xfire";
     }
 
-    public UMOConnector getConnector() throws Exception
+    // @Override
+    public UMOConnector createConnector() throws Exception
     {
         XFireConnector c = new XFireConnector();
         c.setName("xfireConnector");
@@ -32,4 +34,5 @@ public class XFireConnectorTestCase extends AbstractConnectorTestCase
     {
         return "Test Message";
     }
+
 }

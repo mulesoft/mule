@@ -21,7 +21,7 @@ public class PromptStdioConnectorTestCase extends AbstractConnectorTestCase
         return "stdio://System.out";
     }
 
-    public UMOConnector getConnector() throws Exception
+    public UMOConnector createConnector() throws Exception
     {
         UMOConnector cnn = new PromptStdioConnector();
         cnn.setName("TestStdio");
@@ -32,4 +32,5 @@ public class PromptStdioConnectorTestCase extends AbstractConnectorTestCase
     {
         return "Test Message";
     }
+
 }

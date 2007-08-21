@@ -27,7 +27,9 @@ import java.io.IOException;
 
 public class HttpsConnectorTestCase extends AbstractConnectorTestCase
 {
-    public UMOConnector getConnector() throws Exception
+
+    // @Override
+    public UMOConnector createConnector() throws Exception
     {
         return createConnector(managementContext, false);
     }
@@ -80,7 +82,7 @@ public class HttpsConnectorTestCase extends AbstractConnectorTestCase
         }
 
         endpoint.setEndpointURI(new MuleEndpointURI(getTestEndpointURI()));
-        connector.registerListener(component, endpoint);
+        getConnector().registerListener(component, endpoint);
     }
 
     public void testProperties() throws Exception

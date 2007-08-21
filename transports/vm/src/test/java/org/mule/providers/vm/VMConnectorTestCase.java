@@ -16,7 +16,8 @@ import org.mule.umo.provider.UMOConnector;
 
 public class VMConnectorTestCase extends AbstractConnectorTestCase
 {
-    public UMOConnector getConnector() throws Exception
+    // @Override
+    public UMOConnector createConnector() throws Exception
     {
         VMConnector conn = new VMConnector();
         conn.setName("TestVM");
