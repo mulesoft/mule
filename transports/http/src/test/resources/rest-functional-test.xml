@@ -1,75 +1,85 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
-<mule-configuration version="1.0">
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
+       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd
+       http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd">
     
-    <connector name="http" className="org.mule.providers.http.HttpConnector">
-        <properties>
-            <property name="bufferSize" value="655350"/>
-        </properties>
+    <mule:model-seda name="REST Functional TestCase">
         
-    </connector>
-    
-    <model name="REST">
+        <mule:service name="RESTServiceWrapper1">
+            <mule:component class="org.mule.components.rest.RestServiceWrapper">
+                <mule:properties>
+                    <entry key="serviceUrl" value="http://www.webservicex.net/stockquote.asmx/GetQuote"/>
+                    <entry key="httpMethod" value="POST"/>
+                    <entry key="payloadParameterNames">
+                        <list>
+                            <value>symbol</value>
+                        </list>
+                    </entry>
+                </mule:properties>
+            </mule:component>
+            <mule:inbound-router>
+                <mule:endpoint address="vm://in1"/>
+            </mule:inbound-router>
+        </mule:service>
         
-        <mule-descriptor name="RESTServiceWrapper1" implementation="org.mule.components.rest.RestServiceWrapper">
-            <inbound-router>
-                <endpoint address="vm://in1"/>
-            </inbound-router>
-            <properties>
-                <property name="serviceUrl" value="http://www.webservicex.net/stockquote.asmx/GetQuote"/>
-                <list name="payloadParameterNames">
-                    <entry value="symbol"/>
-                </list>
-                <property name="httpMethod" value="POST"/>
-            </properties>
-        </mule-descriptor>
+        <mule:service name="RESTServiceWrapper2">
+            <mule:component class="org.mule.components.rest.RestServiceWrapper">
+                <mule:properties>
+                    <entry key="serviceUrl" value="http://www.webservicex.net/CurrencyConvertor.asmx/ConversionRate"/>
+                    <entry key="httpMethod" value="POST"/>
+                    <entry key="payloadParameterNames">
+                        <list>
+                            <value>FromCurrency</value>
+                            <value>ToCurrency</value>
+                        </list>
+                    </entry>
+                </mule:properties>
+            </mule:component>
+            <mule:inbound-router>
+                <mule:endpoint address="vm://in2"/>
+            </mule:inbound-router>
+        </mule:service>
         
-        <mule-descriptor name="RESTServiceWrapper2" implementation="org.mule.components.rest.RestServiceWrapper">
-            <inbound-router>
-                <endpoint address="vm://in2"/>
-            </inbound-router>
-            <properties>
-                <property name="serviceUrl" value="http://www.webservicex.net/CurrencyConvertor.asmx/ConversionRate"/>
-                <list name="payloadParameterNames">
-                    <entry value="FromCurrency"/>
-                    <entry value="ToCurrency"/>
-                </list>
-                <property name="httpMethod" value="POST"/>
-            </properties>
-        </mule-descriptor>
+        <mule:service name="RESTServiceWrapper3">
+            <mule:component class="org.mule.components.rest.RestServiceWrapper">
+                <mule:properties>
+                    <entry key="serviceUrl" value="http://www.webservicex.net/stockquote.asmx/GetQuote"/>
+                    <entry key="httpMethod" value="GET"/>
+                    <entry key="payloadParameterNames">
+                        <list>
+                            <value>symbol</value>
+                        </list>
+                    </entry>
+                </mule:properties>
+            </mule:component>
+            <mule:inbound-router>
+                <mule:endpoint address="vm://in3"/>
+            </mule:inbound-router>
+        </mule:service>
         
-        <mule-descriptor name="RESTServiceWrapper3" implementation="org.mule.components.rest.RestServiceWrapper">
-            <inbound-router>
-                <endpoint address="vm://in3"/>
-            </inbound-router>
-            <properties>
-                <property name="serviceUrl" value="http://www.webservicex.net/stockquote.asmx/GetQuote"/>
-                <list name="payloadParameterNames">
-                    <entry value="symbol"/>
-                </list>
-                <property name="httpMethod" value="GET"/>
-            </properties>
-        </mule-descriptor>
-        <mule-descriptor name="RESTServiceWrapper4" implementation="org.mule.components.rest.RestServiceWrapper">
-            <inbound-router>
-                <endpoint address="vm://in4"/>
-            </inbound-router>
-            <properties>
-                <property name="serviceUrl" value="http://www.webservicex.net/CurrencyConvertor.asmx/ConversionRate"/>
-                <list name="payloadParameterNames">
-                    <entry value="FromCurrency"/>
-                    <entry value="ToCurrency"/>
-                </list>
-                <property name="httpMethod" value="GET"/>
-            </properties>
-        </mule-descriptor>
-        
-        <mule-descriptor name="Echo" implementation="org.mule.components.simple.EchoComponent">
-            <inbound-router>
-                <endpoint address="http://localhost:60207" synchronous="true"/>
-            </inbound-router>
-        </mule-descriptor>
-    </model>
-</mule-configuration>
+        <mule:service name="RESTServiceWrapper4">
+            <mule:component class="org.mule.components.rest.RestServiceWrapper">
+                <mule:properties>
+                    <entry key="serviceUrl" value="http://www.webservicex.net/CurrencyConvertor.asmx/ConversionRate"/>
+                    <entry key="httpMethod" value="GET"/>
+                    <entry key="payloadParameterNames">
+                        <list>
+                            <value>FromCurrency</value>
+                            <value>ToCurrency</value>
+                        </list>
+                    </entry>
+                </mule:properties>
+            </mule:component>
+            <mule:inbound-router>
+                <mule:endpoint address="vm://in4"/>
+            </mule:inbound-router>
+        </mule:service>
+    </mule:model-seda>
+</beans>
