@@ -49,4 +49,10 @@
         </nest:simple>
     </nest:root>
 
+    <!-- unfortunately, this validates because abstract and subclass are defined at
+         the "top level" of their schema.  i don't know how to avoid this -->
+    <ext:subclass/>
+    <!-- this won't work though, because it's abstract -->
+    <!-- nest:abstract/ -->
+
 </beans>
