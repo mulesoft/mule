@@ -10,14 +10,13 @@
 
 package org.mule.test.integration.transaction.extras;
 
-import org.mule.MuleManager;
-
 public class MyComponent
 {
     public boolean doInsertTitle(Book book) throws Exception
     {
-        LibraryDao library = (LibraryDao) MuleManager.getInstance().getContainerContext().getComponent("myManager");
-        return library.insertBook(book);
+        //LibraryDao library = (LibraryDao) MuleManager.getInstance().getContainerContext().getComponent("myManager");
+        //return library.insertBook(book);
+        return false;
     }
 }
 

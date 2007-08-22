@@ -1,3 +1,13 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the MuleSource MPL
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
 package org.mule.tck.external.services.servlet.tomcat;
 
 import java.io.BufferedReader;
@@ -23,7 +33,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tomcat.util.IntrospectionUtils;
 
-public class TomcatService 
+public class TomcatService
 {
     private String baseDir;
     private String workDir;
@@ -34,7 +44,7 @@ public class TomcatService
     private StandardHost host = null;
     private final Log logger = LogFactory.getLog(getClass());
 
-    public TomcatService() 
+    public TomcatService()
     {
     }
 
@@ -82,11 +92,11 @@ public class TomcatService
         this.port = port;
     }
 
-    public void init() 
+    public void init()
     {
         logger.info("Tomcat init start");
 
-        try 
+        try
         {
             tomcat = new Embedded();
 
@@ -97,13 +107,13 @@ public class TomcatService
             engine.setName("MuleTestTomcatEngine");
             engine.setDefaultHost("localhost");
 
-            host = 
+            host =
                 (StandardHost)tomcat.createHost("localhost", baseDir + "/apps");
             host.setWorkDir(workDir);
             engine.addChild(host);
 
             tomcat.addEngine(engine);
-            Connector connector = 
+            Connector connector =
                 tomcat.createConnector((InetAddress)null, port, false);
 
             tomcat.addConnector(connector);

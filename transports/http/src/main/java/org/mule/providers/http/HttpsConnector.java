@@ -34,6 +34,9 @@ import javax.net.ssl.TrustManagerFactory;
 public class HttpsConnector extends HttpConnector
         implements TlsDirectKeyStore, TlsIndirectKeyStore, TlsDirectTrustStore, TlsProtocolHandler
 {
+    public static final String PEER_CERTIFICATES = "PEER_CERTIFICATES";
+    public static final String LOCAL_CERTIFICATES = "LOCAL_CERTIFICATES";
+
     private TlsConfiguration tls = new TlsConfiguration(TlsConfiguration.DEFAULT_KEYSTORE);
 
     public HttpsConnector()

@@ -359,7 +359,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
 
         private CountDownLatch latch;
 
-        public TcpStreamWorker(Socket socket, TcpMessageReceiver receiver) throws IOException
+        public TcpStreamWorker(Socket socket, AbstractMessageReceiver receiver) throws IOException
         {
             super(socket, receiver);
         }

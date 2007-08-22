@@ -106,7 +106,9 @@ public abstract class AbstractReceiverWorker implements Work
                             adapter = endpoint.getConnector().getMessageAdapter(o);
                         }
 
-                        UMOMessage result = receiver.routeMessage(new MuleMessage(adapter), tx, endpoint.isSynchronous(), out);
+                        MuleMessage muleMessage = new MuleMessage(adapter);
+                        preRouteMuleMessage(muleMessage);
+                        UMOMessage result = receiver.routeMessage(muleMessage, tx,  endpoint.isSynchronous(), out);
                         if (result != null)
                         {
                             o = postProcessMessage(result);
@@ -134,6 +136,18 @@ public abstract class AbstractReceiverWorker implements Work
         {
             messages.clear();
         }
+    }
+
+    /**
+     * This callback is called before a message is routed into Mule and can be used by the worker to set connection
+     * specific properties to message before it gets routed
+     *
+     * @param message the next message to be processed
+     * @throws Exception
+     */
+    protected void preRouteMuleMessage(MuleMessage message) throws Exception
+    {
+        //no op
     }
 
     /**

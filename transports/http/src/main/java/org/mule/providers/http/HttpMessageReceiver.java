@@ -111,7 +111,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         return message;
     }
 
-    private class HttpWorker implements Work
+    protected class HttpWorker implements Work
     {
         private HttpServerConnection conn = null;
         private String cookieSpec;
@@ -230,6 +230,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             // A) the request was not served or B) a null result was returned
             if (receiver != null)
             {
+                preRouteMessage(message);
                 UMOMessage returnMessage = receiver.routeMessage(message, endpoint.isSynchronous(), null);
 
                 Object tempResponse;
@@ -398,6 +399,16 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             headers.put(HttpConnector.HTTP_VERSION_PROPERTY, requestLine.getHttpVersion().toString());
             headers.put(HttpConnector.HTTP_COOKIE_SPEC_PROPERTY, cookieSpec);
             return headers;
+        }
+
+        /**
+         * Needed for setting connection specific properties (like ssl-certificates) in {@link HttpsMessageReceiver}
+         * @see HttpsMessageReceiver
+         * @param message
+         */
+        protected void preRouteMessage(UMOMessage message)
+        {
+            // no op
         }
 
         public void release()
