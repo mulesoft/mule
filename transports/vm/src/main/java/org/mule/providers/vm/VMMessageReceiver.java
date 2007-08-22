@@ -34,8 +34,8 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
  */
 public class VMMessageReceiver extends TransactedPollingMessageReceiver
 {
-    public static final long DEFAULT_VM_POLL_FREQUENCY = 1;
-    public static final TimeUnit DEFAULT_VM_POLL_TIMEUNIT = TimeUnit.NANOSECONDS;
+    public static final long DEFAULT_VM_POLL_FREQUENCY = 10;
+    public static final TimeUnit DEFAULT_VM_POLL_TIMEUNIT = TimeUnit.MILLISECONDS;
 
     private VMConnector connector;
     private final Object lock = new Object();
@@ -44,7 +44,6 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
             throws CreateException
     {
         super(connector, component, endpoint);
-        // compare with superclass' implementation - is this really correct?
         this.setReceiveMessagesInTransaction(endpoint.getTransactionConfig().isTransacted());
         this.setFrequency(DEFAULT_VM_POLL_FREQUENCY);
         this.setTimeUnit(DEFAULT_VM_POLL_TIMEUNIT);

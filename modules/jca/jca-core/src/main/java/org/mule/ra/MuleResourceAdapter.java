@@ -102,11 +102,11 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
 
                 try
                 {
-
                     managementContext = builder.configure(info.getConfigurations(), null);
                 }
                 catch (ConfigurationException e)
                 {
+                    logger.error(e);
                     throw new ResourceAdapterInternalException("Failed to load configurations: "
                                                                + info.getConfigurations(), e);
                 }

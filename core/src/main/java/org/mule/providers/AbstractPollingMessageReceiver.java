@@ -22,8 +22,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.resource.spi.work.Work;
-
 import edu.emory.mathcs.backport.java.util.concurrent.ScheduledFuture;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
@@ -63,15 +61,16 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
                 // polling takes longer than the specified frequency, e.g. when the
                 // polled database or network is slow or returns large amounts of
                 // data.
-                ScheduledFuture schedule = connector.getScheduler().scheduleWithFixedDelay(this.createWork(),
-                    DEFAULT_STARTUP_DELAY, this.getFrequency(), this.getTimeUnit());
+                ScheduledFuture schedule = connector.getScheduler().scheduleWithFixedDelay(
+                    new PollingReceiverWorkerSchedule(this.createWork()), DEFAULT_STARTUP_DELAY,
+                    this.getFrequency(), this.getTimeUnit());
                 schedules.add(schedule);
 
                 if (logger.isDebugEnabled())
                 {
                     logger.debug(ObjectUtils.identityToShortString(this) + " scheduled "
                                  + ObjectUtils.identityToShortString(schedule) + " with " + frequency
-                                 + "ms polling frequency");
+                                 + " " + getTimeUnit() + " polling frequency");
                 }
             }
         }
@@ -103,7 +102,7 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
         }
     }
 
-    protected Work createWork()
+    protected PollingReceiverWorker createWork()
     {
         return new PollingReceiverWorker(this);
     }

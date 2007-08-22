@@ -1495,10 +1495,11 @@ public abstract class AbstractConnector
         if (scheduler.get() == null)
         {
             ThreadFactory threadFactory = new NamedThreadFactory(this.getName() + ".scheduler");
-            ScheduledThreadPoolExecutor newExecutor = new ScheduledThreadPoolExecutor(1, threadFactory);
+            ScheduledThreadPoolExecutor newExecutor = new ScheduledThreadPoolExecutor(4, threadFactory);
             newExecutor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
             newExecutor.setKeepAliveTime(this.getReceiverThreadingProfile().getThreadTTL(),
                 TimeUnit.MILLISECONDS);
+            newExecutor.allowCoreThreadTimeOut(true);
 
             if (!scheduler.compareAndSet(null, newExecutor))
             {

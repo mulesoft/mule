@@ -8,7 +8,7 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/stdio/2.0 http://www.mulesource.org/schema/mule/stdio/2.0/mule-stdio.xsd">
 
-    <stdio:connector name="SystemStreamConnector" 
+    <stdio:connector name="SystemStreamConnector"
                      promptMessageCode="2"
                      resourceBundle="messages.stockquote-example-messages"
                      messageDelayTime="1000"/>
@@ -20,15 +20,15 @@
                 <mule:endpoint address="stdio://System.in"/>
             </mule:inbound-router>
             <mule:outbound-router>
-                <!-- 
-                    We use a chaining router to send the results of one endpoint execution as the 
-                    input for the next endpoint. In this case it writes it out to System.out 
+                <!--
+                    We use a chaining router to send the results of one endpoint execution as the
+                    input for the next endpoint. In this case it writes it out to System.out
                 -->
                 <mule:chaining-router>
                     <mule:endpoint address="vm://stockquote"/>
-                    <mule:endpoint address="stdio://System.out"/>
+                    <mule:endpoint address="stdio://System.out" transformers="XmlDecoder Xslt XmlToObject"/>
                 </mule:chaining-router>
-            </mule:outbound-router>    
+            </mule:outbound-router>
         </mule:service>
     </mule:model-seda>
 </beans>

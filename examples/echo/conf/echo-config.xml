@@ -9,18 +9,18 @@
        http://www.mulesource.org/schema/mule/stdio/2.0 http://www.mulesource.org/schema/mule/stdio/2.0/mule-stdio.xsd">
 
     <description>
-        This is a simple component example that demostrates how to expose 
+        This is a simple component example that demostrates how to expose
         a component over multiple transports.
     </description>
 
    <!--
-        The stdio connector is used to send and receive information via System.in and System.out. 
+        The stdio connector is used to send and receive information via System.in and System.out.
         Note this connector is only really useful for testing purposes.
             promptMessage - is what is written to the console
             messageDelayTime - is the time in milliseconds before the user is prompted again.
         These properties are set as bean properties on the connector.
     -->
-    <stdio:connector name="SystemStreamConnector" 
+    <stdio:connector name="SystemStreamConnector"
         promptMessage="Please enter something: "
         messageDelayTime="1000"/>
 
@@ -35,18 +35,18 @@
         -->
         <mule:service name="EchoUMO">
             <mule:component class="org.mule.components.simple.EchoComponent"/>
-            
+
             <!-- any number of endpoints can be added to an inbound router -->
             <mule:inbound-router>
                 <mule:endpoint address="stdio://System.in"/>
                 <mule:endpoint address="vm://echo"/>
             </mule:inbound-router>
-            
-            <!-- 
-                An outbound router can have one or more router configurations that can be 
-                invoked depending on business rules, message contents, headers or any other 
-                criteria. The pass-through-router is a router that automically passes 
-                on every message it receives 
+
+            <!--
+                An outbound router can have one or more router configurations that can be
+                invoked depending on business rules, message contents, headers or any other
+                criteria. The pass-through-router is a router that automically passes
+                on every message it receives
             -->
             <mule:outbound-router>
                 <mule:pass-through-router>

@@ -147,7 +147,7 @@ public class DefaultJmxSupportAgent extends AbstractAgent
                 }
             }
 
-            // remove this agent once t has registered the other agents
+            // remove this agent once it has registered the other agents
             //TODO RM* this currently does nothing!!!
             managementContext.getRegistry().unregisterAgent(name);
         }

@@ -98,7 +98,7 @@
             </lib>
             <fileset dir="${dir.webapp}"/>
             <classes dir="${dir.classes}"/>
-            <webinf dir="${dir.conf}"/>
+            <classes dir="${dir.conf}"/>
         </war>
    </target>
 </project>

@@ -198,7 +198,7 @@ public class RestServiceWrapper implements Callable, Initialisable
         }
         StringBuffer urlBuffer = new StringBuffer(tempUrl);
         
-        if (this.httpMethod.compareToIgnoreCase(GET) == 0)
+        if (GET.equalsIgnoreCase(this.httpMethod))
         {
             requestBody = NullPayload.getInstance();
             
@@ -341,11 +341,7 @@ public class RestServiceWrapper implements Callable, Initialisable
 
     protected boolean isErrorPayload(UMOMessage message)
     {
-        if (errorFilter != null)
-        {
-            return errorFilter.accept(message);
-        }
-        return false;
+        return errorFilter != null && errorFilter.accept(message);
     }
 
     protected void handleException(RestServiceException e, UMOMessage result) throws Exception

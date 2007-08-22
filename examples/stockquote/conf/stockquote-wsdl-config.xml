@@ -13,14 +13,14 @@
     <description>
         The StockQuote SOAP example uses the Mule RestServiceWrapper to invoke a remote .Net service
         Using SOAP RPC style invocation and displays the result.
-        The example demostrates how to set named parameters for Web Service invocations and how to 
+        The example demostrates how to set named parameters for Web Service invocations and how to
         invoke a non-java web service using Mule.
-    
-        The example invokes a StockQuote Web Service on www.webservicesx.com, the result is an Xml 
-        string that Mule converts to a StockQuote object by first running the result through an 
+
+        The example invokes a StockQuote Web Service on www.webservicesx.com, the result is an Xml
+        string that Mule converts to a StockQuote object by first running the result through an
         Xslt transformer and then using the XmlToObject transformer.
     </description>
-    
+
     <bean id="propertyPlaceholderConfigurer"
           class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
@@ -43,7 +43,7 @@
     </mule:custom-transformer>
 
     <mule:model-seda name="Sample-WSDL">
-        <!-- 
+        <!--
             This component can proxy external web service calls over Jms, tcp, ssl or any other transport.
             For this example we use Vm.
         -->

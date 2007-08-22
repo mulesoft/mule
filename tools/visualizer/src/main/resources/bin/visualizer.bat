@@ -1,3 +1,3 @@
 @echo off
 
-call launcher visualizer.groovy %*
+call %MULE_HOME%\bin\launcher %MULE_HOME%\bin\visualizer.groovy %*

@@ -14,7 +14,7 @@
     </environment-properties>
 
     <mule-environment-properties synchronous="false">
-        <threading-profile id="default" maxBufferSize="0" maxThreadsActive="8"
+        <threading-profile id="default" maxBufferSize="0" maxThreadsActive="16"
             maxThreadsIdle="4" poolExhaustedAction="WAIT" threadTTL="60001"/>
     </mule-environment-properties>
 

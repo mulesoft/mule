@@ -160,7 +160,7 @@
                     </property>
                 </bean>
             </list>
-        </property> 
+        </property>
         <property name="createSchema">
             <value>false</value>
         </property>
@@ -186,7 +186,7 @@
                 <prop key="hibernate.jdbc.batch_size">0</prop>
                 <!-- Create/update the database tables automatically when the JVM starts up -->
                 <prop key="hibernate.hbm2ddl.auto">update</prop>
-                <!-- EhCache is no longer the default cache provider as of Hibernate 3.2 
+                <!-- EhCache is no longer the default cache provider as of Hibernate 3.2
                     Refer to http://www.hibernate.org/hib_docs/v3/reference/en/html/performance.html
                     for Hibernate's different cache providers. -->
                 <prop key="hibernate.cache.provider_class">org.hibernate.cache.HashtableCacheProvider</prop>

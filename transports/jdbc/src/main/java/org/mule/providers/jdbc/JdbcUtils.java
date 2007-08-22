@@ -19,6 +19,11 @@ import java.sql.SQLException;
 public abstract class JdbcUtils
 {
 
+    protected JdbcUtils()
+    {
+        // empty, just to restrict instanciation
+    }
+
     public static void close(Connection con) throws SQLException
     {
         if (con != null && !con.isClosed())
@@ -31,7 +36,7 @@ public abstract class JdbcUtils
     {
         if (con != null)
         {
-            if (con.getAutoCommit() == false)
+            if (!con.getAutoCommit())
             {
                 con.commit();
             }
@@ -43,7 +48,7 @@ public abstract class JdbcUtils
     {
         if (con != null)
         {
-            if (con.getAutoCommit() == false)
+            if (!con.getAutoCommit())
             {
                 con.rollback();
             }

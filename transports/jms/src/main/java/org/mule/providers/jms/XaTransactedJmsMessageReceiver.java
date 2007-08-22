@@ -37,8 +37,8 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageReceiver
 {
-    public static final long DEFAULT_JMS_POLL_FREQUENCY = 1;
-    public static final TimeUnit DEFAULT_JMS_POLL_TIMEUNIT = TimeUnit.NANOSECONDS;
+    public static final long DEFAULT_JMS_POLL_FREQUENCY = 100;
+    public static final TimeUnit DEFAULT_JMS_POLL_TIMEUNIT = TimeUnit.MILLISECONDS;
     
     protected final JmsConnector connector;
     protected boolean reuseConsumer;

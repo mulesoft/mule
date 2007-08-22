@@ -18,18 +18,21 @@ import org.apache.commons.logging.LogFactory;
 
 public class TestCaseWatchdog extends Thread
 {
-    protected static final Log log = LogFactory.getLog(TestCaseWatchdog.class);
     protected static final AtomicInteger threadNumber = new AtomicInteger(0);
 
-    private final long delay;
-    private final TimeUnit unit;
+    protected final Log log = LogFactory.getLog(getClass());
 
-    public TestCaseWatchdog(long delay, TimeUnit unit)
+    protected final long delay;
+    protected final TimeUnit unit;
+    protected final TestCaseWatchdogTimeoutHandler handler;
+
+    public TestCaseWatchdog(long delay, TimeUnit unit, TestCaseWatchdogTimeoutHandler timeoutHandler)
     {
         super("WatchdogThread-" + threadNumber.getAndIncrement());
         this.setDaemon(true);
         this.delay = delay;
         this.unit = unit;
+        this.handler = timeoutHandler;
     }
 
     public void run()
@@ -43,10 +46,7 @@ public class TestCaseWatchdog extends Thread
         try
         {
             Thread.sleep(millisToWait);
-            log.fatal("Timeout of " + millisToWait + "ms exceeded - exiting VM!");
-            // we should really log a thread dump here to find deadlocks;
-            // too bad the required JMX functionality is not in JDK 1.4 :(
-            Runtime.getRuntime().halt(1);
+            handler.handleTimeout(delay, unit);
         }
         catch (InterruptedException interrupted)
         {
@@ -54,7 +54,6 @@ public class TestCaseWatchdog extends Thread
             {
                 log.debug("Watchdog stopped.");
             }
-            Thread.currentThread().interrupt();
         }
     }
 
@@ -62,4 +61,5 @@ public class TestCaseWatchdog extends Thread
     {
         this.interrupt();
     }
+
 }

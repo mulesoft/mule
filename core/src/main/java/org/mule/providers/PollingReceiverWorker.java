@@ -14,12 +14,23 @@ import javax.resource.spi.work.Work;
 
 public class PollingReceiverWorker implements Work
 {
-    private final AbstractPollingMessageReceiver receiver;
+    protected final AbstractPollingMessageReceiver receiver;
+    protected volatile boolean running = false;
 
     public PollingReceiverWorker(AbstractPollingMessageReceiver pollingMessageReceiver)
     {
         super();
         receiver = pollingMessageReceiver;
+    }
+
+    public AbstractPollingMessageReceiver getReceiver()
+    {
+        return receiver;
+    }
+    
+    public boolean isRunning()
+    {
+        return running;
     }
 
     // the run() method will exit after each poll() since it will be invoked again
@@ -30,6 +41,7 @@ public class PollingReceiverWorker implements Work
         {
             try
             {
+                running = true;
                 // make sure we are connected, wait if necessary
                 receiver.connected.whenTrue(null);
                 receiver.poll();
@@ -42,6 +54,10 @@ public class PollingReceiverWorker implements Work
             catch (Exception e)
             {
                 receiver.handleException(e);
+            }
+            finally
+            {
+                running = false;
             }
         }
     }

@@ -39,7 +39,7 @@ public class ThreadingProfile
     /**
      * Default value for MAX_THREADS_ACTIVE
      */
-    public static final int DEFAULT_MAX_THREADS_ACTIVE = 8;
+    public static final int DEFAULT_MAX_THREADS_ACTIVE = 16;
 
     /**
      * Default value for MAX_THREADS_IDLE
