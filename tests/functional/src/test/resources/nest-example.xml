@@ -55,11 +55,12 @@
     <!-- this won't work though, because it's abstract -->
     <!-- nest:abstract/ -->
 
-    <!-- we can also use xsi:type explicitly, btu are forced to use the same
+    <!-- we can also use xsi:type explicitly, but are forced to use the same
          element name -->
     <nest:root>
         <nest:simple>
             <nest:simple xsi:type="ext:typedSubclassType" more="foo">
+                <nest:simple/>
                 <ext:another/>
             </nest:simple>
         </nest:simple>
