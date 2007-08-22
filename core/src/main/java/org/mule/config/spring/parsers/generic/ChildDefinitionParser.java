@@ -12,6 +12,8 @@ package org.mule.config.spring.parsers.generic;
 import org.mule.config.spring.parsers.AbstractChildDefinitionParser;
 
 import org.w3c.dom.Element;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.xml.ParserContext;
 
 /**
  * Creates a definition parser that will construct a single child element and inject it into

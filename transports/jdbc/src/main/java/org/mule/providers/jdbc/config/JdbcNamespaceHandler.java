@@ -11,8 +11,11 @@ package org.mule.providers.jdbc.config;
 
 import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
+import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
+import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.specific.ObjectFactoryDefinitionParser;
 import org.mule.providers.jdbc.JdbcConnector;
+import org.mule.providers.jdbc.NowPropertyExtractor;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
@@ -24,7 +27,8 @@ public class JdbcNamespaceHandler extends NamespaceHandlerSupport
         registerBeanDefinitionParser("connector", new OrphanDefinitionParser(JdbcConnector.class, true));
         registerBeanDefinitionParser("dataSource", new ObjectFactoryDefinitionParser("dataSourceFactory"));
         registerBeanDefinitionParser("queries", new ChildMapDefinitionParser("queries"));
-        registerBeanDefinitionParser("queryValueExtractor", new ObjectFactoryDefinitionParser("queryValueExtractor"));
+        registerBeanDefinitionParser("extractors", new ParentDefinitionParser());
+        registerBeanDefinitionParser("now-property-extractor", new ChildDefinitionParser("propertyExtractor", NowPropertyExtractor.class));
     }
 
 }

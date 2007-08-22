@@ -19,8 +19,6 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <!-- temporary, pending MULE-2186 -->
-                        <exclude>**/JdbcNamespaceHandlerTestCase.*</exclude>
                     </excludes>
                 </configuration>
              </plugin>

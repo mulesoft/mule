@@ -38,10 +38,10 @@ public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(ds);
         assertEquals(TestDataSource.class, ds.getClass());
         
-        assertTrue(c.getQueryValueExtractors().size() >= 5);
-        assertTrue(c.getQueryValueExtractors().size() <= 7);
-        assertTrue(ObjectFactory.class.isAssignableFrom((c.getQueryValueExtractors().toArray()[0]).getClass()));
-        assertTrue(((ObjectFactory)c.getQueryValueExtractors().toArray()[0]).create() instanceof PropertyExtractor);
+        assertTrue(c.getPropertyExtractors().size() >= 5);
+        assertTrue(c.getPropertyExtractors().size() <= 7);
+        assertTrue(ObjectFactory.class.isAssignableFrom((c.getPropertyExtractors().toArray()[0]).getClass()));
+        assertTrue(((ObjectFactory)c.getPropertyExtractors().toArray()[0]).create() instanceof PropertyExtractor);
         assertNull(c.getQueries());
         
     }
@@ -57,10 +57,10 @@ public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(ds);
         assertEquals(TestDataSource.class, ds.getClass());
         
-        assertTrue(c.getQueryValueExtractors().size()>=5);
-        assertTrue(c.getQueryValueExtractors().size()<=7);
-        assertTrue(ObjectFactory.class.isAssignableFrom((c.getQueryValueExtractors().toArray()[0]).getClass()));
-        assertTrue(((ObjectFactory)c.getQueryValueExtractors().toArray()[0]).create() instanceof PropertyExtractor);
+        assertTrue(c.getPropertyExtractors().size()>=5);
+        assertTrue(c.getPropertyExtractors().size()<=7);
+        assertTrue(ObjectFactory.class.isAssignableFrom((c.getPropertyExtractors().toArray()[0]).getClass()));
+        assertTrue(((ObjectFactory)c.getPropertyExtractors().toArray()[0]).create() instanceof PropertyExtractor);
         assertNull(c.getQueries());
         
         assertTrue(c.isConnected());
@@ -78,9 +78,8 @@ public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(ds);
         assertEquals(TestDataSource.class, ds.getClass());
         
-        assertEquals(2,c.getQueryValueExtractors().size());
-        assertTrue(ObjectFactory.class.isAssignableFrom((c.getQueryValueExtractors().toArray()[0]).getClass()));
-        assertTrue(((ObjectFactory)c.getQueryValueExtractors().toArray()[0]).create() instanceof PropertyExtractor);
+        assertEquals(2,c.getPropertyExtractors().size());
+        assertTrue(c.getPropertyExtractors().iterator().next() instanceof PropertyExtractor);
         assertNotNull(c.getQueries());
         assertEquals(3, c.getQueries().size());
         

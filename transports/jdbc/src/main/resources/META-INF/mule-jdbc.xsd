@@ -20,14 +20,22 @@
             <xsd:extension base="mule:connectorType">
                 <xsd:sequence>
                     <xsd:element name="dataSource" type="mule:objectFactoryType" />
-                    <xsd:element name="queries" type="mule:mapType" minOccurs="0"></xsd:element>
-                    <xsd:element name="queryValueExtractor" type="mule:propertyExtractorType" minOccurs="0"
-                                 maxOccurs="unbounded">
-                    </xsd:element>
+                    <xsd:element name="queries" type="mule:mapType" minOccurs="0"/>
+                    <xsd:element name="extractors" type="extractorsType" minOccurs="0"/>
                     <xsd:element name="resultSetHandler" type="mule:objectFactoryType" minOccurs="0" />
                     <xsd:element name="queryRunner" type="mule:objectFactoryType" minOccurs="0" />
                 </xsd:sequence>
                 <xsd:attribute name="pollingFrequency" type="mule:substitutableLong" />
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="extractorsType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractPropertyExtractorsType">
+                <xsd:choice minOccurs="0" maxOccurs="unbounded">
+                    <xsd:element name="now-property-extractor"/>
+                </xsd:choice>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

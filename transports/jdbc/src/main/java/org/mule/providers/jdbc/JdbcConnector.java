@@ -27,6 +27,7 @@ import org.mule.util.ClassUtils;
 import org.mule.util.ExceptionUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.object.ObjectFactory;
+import org.mule.util.object.ObjectFactoryUtils;
 import org.mule.util.object.SimpleObjectFactory;
 import org.mule.util.properties.BeanPropertyExtractor;
 import org.mule.util.properties.MapPropertyExtractor;
@@ -82,7 +83,7 @@ public class JdbcConnector extends AbstractConnector
     protected ObjectFactory queryRunner;
     //protected String resultSetHandler = DEFAULT_RESULTSET_HANDLER;
     //protected String queryRunner = DEFAULT_QUERY_RUNNER;
-    protected Set queryValueExtractors = new HashSet();
+    protected Set propertyExtractors = new HashSet();
     protected ObjectFactory dataSourceFactory;
 
     protected void doInitialise() throws InitialisationException
@@ -110,25 +111,25 @@ public class JdbcConnector extends AbstractConnector
                 }
             }
             // setup property Extractors for queries
-            if (queryValueExtractors.isEmpty())
+            if (propertyExtractors.isEmpty())
             {
                 // Add defaults
-                queryValueExtractors = new HashSet();
-                queryValueExtractors.add(new SimpleObjectFactory(MessagePropertyExtractor.class));
-                queryValueExtractors.add(new SimpleObjectFactory(NowPropertyExtractor.class));
-                queryValueExtractors.add(new SimpleObjectFactory(PayloadPropertyExtractor.class));
-                queryValueExtractors.add(new SimpleObjectFactory(MapPropertyExtractor.class));
-                queryValueExtractors.add(new SimpleObjectFactory(BeanPropertyExtractor.class));
+                propertyExtractors = new HashSet();
+                propertyExtractors.add(new SimpleObjectFactory(MessagePropertyExtractor.class));
+                propertyExtractors.add(new SimpleObjectFactory(NowPropertyExtractor.class));
+                propertyExtractors.add(new SimpleObjectFactory(PayloadPropertyExtractor.class));
+                propertyExtractors.add(new SimpleObjectFactory(MapPropertyExtractor.class));
+                propertyExtractors.add(new SimpleObjectFactory(BeanPropertyExtractor.class));
 
                 if (ClassUtils.isClassOnPath("org.mule.util.properties.Dom4jPropertyExtractor", getClass()))
                 {
-                    queryValueExtractors.add(new SimpleObjectFactory(
+                    propertyExtractors.add(new SimpleObjectFactory(
                         "org.mule.util.properties.Dom4jPropertyExtractor"));
                 }
 
                 if (ClassUtils.isClassOnPath("org.mule.util.properties.JDomPropertyExtractor", getClass()))
                 {
-                    queryValueExtractors.add(new SimpleObjectFactory(
+                    propertyExtractors.add(new SimpleObjectFactory(
                         "org.mule.util.properties.JDomPropertyExtractor"));
                 }
             }
@@ -524,14 +525,14 @@ public class JdbcConnector extends AbstractConnector
         }
     }
 
-    public Set getQueryValueExtractors()
+    public Set getPropertyExtractors()
     {
-        return queryValueExtractors;
+        return propertyExtractors;
     }
 
-    public void setQueryValueExtractors(Set queryValueExtractors)
+    public void setPropertyExtractors(Set propertyExtractors)
     {
-        this.queryValueExtractors = queryValueExtractors;
+        this.propertyExtractors = propertyExtractors;
     }
 
     /**
@@ -615,9 +616,11 @@ public class JdbcConnector extends AbstractConnector
             boolean foundValue = false;
             if (message != null)
             {
-                for (Iterator iterator = queryValueExtractors.iterator(); iterator.hasNext();)
+                for (Iterator iterator = propertyExtractors.iterator(); iterator.hasNext();)
                 {
-                    PropertyExtractor pe = (PropertyExtractor) ((ObjectFactory) iterator.next()).create();
+                    PropertyExtractor pe =
+                            (PropertyExtractor) ObjectFactoryUtils.createIfNecessary(iterator.next(),
+                                    PropertyExtractor.class);
                     value = pe.getProperty(name, message);
                     if (value != null)
                     {

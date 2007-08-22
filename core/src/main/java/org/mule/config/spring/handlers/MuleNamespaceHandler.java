@@ -110,6 +110,7 @@ import org.mule.transformers.simple.HexStringToByteArray;
 import org.mule.transformers.simple.ObjectToByteArray;
 import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.transformers.simple.StringToByteArray;
+import org.mule.util.properties.BeanPropertyExtractor;
 
 import java.util.HashMap;
 
@@ -245,6 +246,10 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("template-endpoint-router", new RouterDefinitionParser("router", TemplateEndpointRouter.class));
         registerBeanDefinitionParser("custom-router", new RouterDefinitionParser("router", null));
         registerBeanDefinitionParser("reply-to", new ParentDefinitionParser().addAlias("address", "replyTo"));
+
+        //Property Extractors
+        registerBeanDefinitionParser("bean-property-extractor", new ChildDefinitionParser("propertyExtractor", BeanPropertyExtractor.class));
+        registerBeanDefinitionParser("custom-property-extractor", new ObjectFactoryDefinitionParser("propertyExtractor"));
         
         //Catch all Strategies
         registerBeanDefinitionParser("forwarding-catch-all-strategy", new ChildDefinitionParser("catchAllStrategy", ForwardingCatchAllStrategy.class));
