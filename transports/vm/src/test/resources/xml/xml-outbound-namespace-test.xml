@@ -8,8 +8,6 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
 
-    <bean name="dom4jpe" class="org.mule.util.properties.Dom4jPropertyExtractor"/>
-
     <mule:model-seda name="xml outbound namespace tests">
 
         <mule:service name="fancy config splitter">
@@ -20,8 +18,8 @@
                         enableCorrelation="ALWAYS"
                         externalSchemaLocation="external"
                         honorSynchronicity="true"
-                        propertyExtractor-ref="dom4jpe"
                         validateSchema="true">
+                    <mule:xml-dom4j-property-extractor/>
                     <mule:namespace prefix="bar" uri="foo"/>
                 </mule:xml-message-splitter>
             </mule:outbound-router>
@@ -35,9 +33,9 @@
                         enableCorrelation="IF_NOT_SET"
                         externalSchemaLocation="external"
                         honorSynchronicity="true"
-                        propertyExtractor-ref="dom4jpe"
                         validateSchema="true"
                         endpointFiltering="true">
+                    <mule:xml-dom4j-property-extractor/>
                     <mule:namespace prefix="bar" uri="foo"/>
                 </mule:xml-round-robin-splitter>
             </mule:outbound-router>

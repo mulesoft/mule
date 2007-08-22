@@ -24,14 +24,14 @@ public class Dom4jPropertyExtractorTestCase extends AbstractXmlPropertyExtractor
     protected Object getMatchMessage()
     {
         Document document = DocumentHelper.createDocument();
-        document.addElement( "root" ).addElement( "endpoint" ).addText( "name" );
+        document.addElement("endpoint").addText("name");
         return document;
     }
 
     protected Object getErrorMessage()
     {
         Document document = DocumentHelper.createDocument();
-        document.addElement( "root" ).addElement( "endpoint" ).addText( "missing" );
+        document.addElement("endpoint").addText("missing");
         return document;
     }
 

@@ -34,7 +34,7 @@
                 <mule:endpoint address="vm://unreliable" connector-ref="default"/>
             </mule:inbound-router>
             <mule:outbound-router>
-                <mule:endpoint-selector-router selectorProperty="endpoint" extractorEnabled="true">
+                <mule:endpoint-selector-router selectorProperty="/endpoint" extractorEnabled="true">
                      <mule:endpoint name="name" address="vm://match" connector-ref="queue"/>
                      <mule:xml-jdom-property-extractor/>
                 </mule:endpoint-selector-router>

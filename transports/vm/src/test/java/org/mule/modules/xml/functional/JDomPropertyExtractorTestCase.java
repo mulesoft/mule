@@ -10,15 +10,39 @@
 
 package org.mule.modules.xml.functional;
 
-/**
- * This is a bit odd, but we don't seem to be using jdom any more...
- */
-public class JDomPropertyExtractorTestCase extends Dom4jPropertyExtractorTestCase
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+public class JDomPropertyExtractorTestCase extends AbstractXmlPropertyExtractorTestCase
 {
 
     protected String getConfigResources()
     {
         return "xml/jdom-property-extractor-test.xml";
+    }
+
+    protected Object getMatchMessage() throws ParserConfigurationException
+    {
+        return documentFor("name");
+    }
+
+    protected Object getErrorMessage() throws ParserConfigurationException
+    {
+        return documentFor("missing");
+    }
+
+    protected Document documentFor(String name) throws ParserConfigurationException
+    {
+        DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        Document doc = builder.newDocument();
+        Element endpoint = doc.createElement("endpoint");
+        endpoint.appendChild(doc.createTextNode(name));
+        doc.appendChild(endpoint);
+        return doc;
     }
 
 }

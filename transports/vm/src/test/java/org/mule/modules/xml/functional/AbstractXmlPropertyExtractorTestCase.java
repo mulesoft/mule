@@ -15,15 +15,17 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.extras.client.MuleClient;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 public abstract class AbstractXmlPropertyExtractorTestCase extends FunctionalTestCase
 {
     public static long WAIT_PERIOD = 3000L;
 
-    protected abstract Object getMatchMessage();
+    protected abstract Object getMatchMessage() throws Exception;
 
-    protected abstract Object getErrorMessage();
+    protected abstract Object getErrorMessage() throws Exception;
 
-    public void testMatch() throws UMOException
+    public void testMatch() throws Exception
     {
         MuleClient client = new MuleClient();
         client.dispatch("in", getMatchMessage(), null);
@@ -31,7 +33,7 @@ public abstract class AbstractXmlPropertyExtractorTestCase extends FunctionalTes
         assertNotNull(message);
     }
 
-    public void testError() throws UMOException
+    public void testError() throws Exception
     {
         MuleClient client = new MuleClient();
         client.dispatch("in", getErrorMessage(), null);
