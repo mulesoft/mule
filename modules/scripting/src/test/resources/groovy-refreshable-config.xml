@@ -10,18 +10,54 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/scripting/2.0 http://www.mulesource.org/schema/mule/scripting/2.0/mule-scripting.xsd">
 
-    <lang:groovy id="groovy_class" refresh-check-delay="100" script-source="classpath:groovy-dynamic-script.groovy"/>
+
+    <lang:groovy id="groovy_class_callable" refresh-check-delay="100" script-source="classpath:groovy-dynamic-script-callable.groovy"/>
+    <lang:groovy id="groovy_class_bean" refresh-check-delay="100" script-source="classpath:groovy-dynamic-script-bean.groovy"/>
+    <lang:groovy id="groovy_class_changeInterfaces" refresh-check-delay="100" script-source="classpath:groovy-dynamic-script.groovy"/>
     
-    <scripting:groovyRefreshable name="groovyRefreshable" refreshableBean-ref="groovy_class" methodName="receive"/>
+    <!--
+        The script for this bean will always extend froom the Callable interface, therefore we do not need
+        to set the attribute methodName. The GroovyRefreshableBeanBuilder will check for this interface
+        and if the bean does inherit from this interface, it will execute the onCall() method 
+    -->
+    <scripting:groovyRefreshable name="groovyRefreshableCallable" refreshableBean-ref="groovy_class_callable"/>
+    
+    <!--
+        The script for this class will never inherit from the Callable interface. Due to this fact, the user
+        will need to set methodName attribute and the GroovyRefreshableBeanBuilder will execute this method
+    -->
+    <scripting:groovyRefreshable name="groovyRefreshableBean" refreshableBean-ref="groovy_class_bean"  methodName="receive"/>
+    
+    <!--
+        The test case will set the script to a class which extends from the Callable inteface, and executes
+        the onCall() method. Following that, the test case will change the script to an object which does not extend from
+        the Callable and execute the method specified by the methodName attribute. This tests whether the 
+        GroovyRefreshableBeanBuilder supports a change in the interfaces implemented by the refreshable bean.
+    -->
+    <scripting:groovyRefreshable name="groovyRefreshableBeanChangeInterfaces" refreshableBean-ref="groovy_class_changeInterfaces"  methodName="receive"/>
     
     <mule:model-seda name="main">
         
-        <mule:service name="GroovyUMO">
-            <mule:component instance-ref="groovyRefreshable" scope="singleton"/>
+        <mule:service name="GroovyUMO_Callable">
+            <mule:component instance-ref="groovyRefreshableCallable" scope="singleton"/>
             <mule:inbound-router>
-                <mule:endpoint address="vm://groovy_refresh"/>
+                <mule:endpoint address="vm://groovy_refresh_callable"/>
             </mule:inbound-router>
-        </mule:service>          
+        </mule:service>   
+        
+        <mule:service name="GroovyUMO_Bean">
+            <mule:component instance-ref="groovyRefreshableBean" scope="singleton"/>
+            <mule:inbound-router>
+                <mule:endpoint address="vm://groovy_refresh_bean"/>
+            </mule:inbound-router>
+        </mule:service>     
+        
+        <mule:service name="GroovyUMO_ChangeIntefaces">
+            <mule:component instance-ref="groovyRefreshableBeanChangeInterfaces" scope="singleton"/>
+            <mule:inbound-router>
+                <mule:endpoint address="vm://groovy_refresh_changeInterfaces"/>
+            </mule:inbound-router>
+        </mule:service>   
                     
     </mule:model-seda>
     

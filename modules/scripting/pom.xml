@@ -18,10 +18,7 @@
              <plugin>
                  <artifactId>maven-surefire-plugin</artifactId>
                  <configuration>
-                    <excludes>
-                        <!-- this test fails probably due to a bug in spring refreshable beans -->
-                        <exclude>**/GroovyRefreshableBeanTestCase.*</exclude>
-                    </excludes>
+                    <excludes/>
                 </configuration>
              </plugin>
               <plugin>

@@ -10,46 +10,30 @@
 
 package org.mule.components.script.refreshable;
 
-import org.mule.extras.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOMessage;
 
-import java.io.FileWriter;
-import java.io.IOException;
-
-public class GroovyRefreshableBeanTestCase extends FunctionalTestCase
+public class GroovyRefreshableBeanTestCase extends AbstractRefreshableBeanTestCase
 {
-    protected static final String scriptPath = "./target/test-classes/groovy-dynamic-script.groovy";
-    protected static final String script1 = "import org.mule.umo.UMOEventContext; import org.mule.umo.lifecycle.Callable; public class GroovyDynamicScript implements Callable { public Object onCall(UMOEventContext eventContext) throws Exception{ return eventContext.getMessage().getPayloadAsString() + \" Received\"; }}";
-    protected static final String script2 = script1.replaceAll(" Received", " Received2");
-    protected static final String script3 = "public class GroovyDynamicScript { public String receive(String src) { return src + \" Received\"; }}";
-    protected static final String script4 = script3.replaceAll(" Received", " Received2");
-    protected static final int waitTime = 1000;
-    
+
+    public GroovyRefreshableBeanTestCase()
+    {
+        scriptPath_callable = "./target/test-classes/groovy-dynamic-script-callable.groovy";
+        scriptPath_bean = "./target/test-classes/groovy-dynamic-script-bean.groovy";
+        scriptPath_changeInterfaces = "./target/test-classes/groovy-dynamic-script.groovy"; 
+        script1 = "import org.mule.umo.UMOEventContext; import org.mule.umo.lifecycle.Callable; public class GroovyDynamicScript implements Callable { public Object onCall(UMOEventContext eventContext) throws Exception{ return eventContext.getMessage().getPayloadAsString() + \" Received\"; }}";
+        script2 = script1.replaceAll(" Received", " Received2");
+        script3 = "public class GroovyDynamicScript { public String receive(String src) { return src + \" Received\"; }}";
+        script4 = script3.replaceAll(" Received", " Received2");
+        
+    }
     protected String getConfigResources()
     {
         return "groovy-refreshable-config.xml";
     }
-    
-    private void writeScript(String src) throws IOException, InterruptedException
-    {
-        for (int i=0; i<1; i++)
-        {
-            FileWriter scriptFile = new FileWriter(scriptPath, false);
-            scriptFile.write(src);
-            scriptFile.flush();
-            scriptFile.close();
-        }
-    }
 
+    
     public void testFirstOnCallRefresh() throws Exception
     {
-        writeScript(script1);
-        Thread.sleep(waitTime); // wait for bean to refresh
-        MuleClient client = new MuleClient();
-        UMOMessage m = client.send("vm://groovy_refresh", "Test:", null);
-        assertNotNull(m);
-        assertEquals("Test: Received", m.getPayloadAsString());
+        runScriptTest(script1, scriptPath_callable, "vm://groovy_refresh_callable", "Test:", "Test: Received");
     }
     
     public void testCallFirstTest() throws Exception
@@ -57,35 +41,27 @@ public class GroovyRefreshableBeanTestCase extends FunctionalTestCase
         testFirstOnCallRefresh();
     }
     
-    public void testSecondOnCallRefresh() throws Exception
-    {
-        writeScript(script2);
-        Thread.sleep(waitTime); // wait for bean to refresh
-        MuleClient client = new MuleClient();
-        UMOMessage m = client.send("vm://groovy_refresh", "Test:", null);
-        assertNotNull(m);
-        assertEquals("Test: Received2", m.getPayloadAsString());
-    }
-    
     public void testFirstPojoRefresh() throws Exception
     {
-        writeScript(script3);
-        Thread.sleep(waitTime); // wait for bean to refresh
-        MuleClient client = new MuleClient();
-        UMOMessage m = client.send("vm://groovy_refresh", "Test:", null);
-        assertNotNull(m);
-        assertEquals("Test: Received", m.getPayloadAsString());
+        runScriptTest(script3, scriptPath_bean, "vm://groovy_refresh_bean", "Test:", "Test: Received");
     }
     
     public void testSecondPojoRefresh() throws Exception
     {
-        writeScript(script4);
-        Thread.sleep(waitTime); // wait for bean to refresh
-        MuleClient client = new MuleClient();
-        UMOMessage m = client.send("vm://groovy_refresh", "Test:", null);
-        assertNotNull(m);
-        assertEquals("Test: Received2", m.getPayloadAsString());
+        runScriptTest(script4, scriptPath_bean, "vm://groovy_refresh_bean", "Test:", "Test: Received2");
     }
+    
+    public void testFirstChangeInterfaces() throws Exception
+    {
+        runScriptTest(script1, scriptPath_changeInterfaces, "vm://groovy_refresh_changeInterfaces", "Test:", "Test: Received");
+    }
+    
+    public void testSecondChangeInterfaces() throws Exception
+    {
+        runScriptTest(script3, scriptPath_changeInterfaces, "vm://groovy_refresh_changeInterfaces", "Test:", "Test: Received");
+    }
+    
+    
 
 }
 
