@@ -11,7 +11,7 @@
 package org.mule.tck;
 
 import org.mule.impl.AbstractExceptionListener;
-import org.mule.management.agents.JmxAgent;
+//import org.mule.management.agents.JmxAgent;
 import org.mule.providers.SimpleRetryConnectionStrategy;
 import org.mule.routing.ForwardingCatchAllStrategy;
 import org.mule.routing.filters.xml.JXPathFilter;
@@ -275,6 +275,8 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertEquals(UMOEndpoint.ENDPOINT_TYPE_RESPONSE, ep.getType());
     }
 
+    /* excluded - dep on management
+
     public void _testAgentConfiguration() throws UMOException
     {
         JmxAgent agent = (JmxAgent)managementContext.getRegistry().lookupAgent("jmxAgent");
@@ -285,4 +287,5 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
 //        assertNotNull(agent.getConnectorServerProperties());
 //        assertEquals("true", agent.getConnectorServerProperties().get("jmx.remote.jndi.rebind"));
     }
+    */
 }

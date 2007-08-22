@@ -42,12 +42,5 @@
             <scope>test</scope>
         </dependency>
         
-        <!-- required for JMX at runtime -->
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-management</artifactId>
-            <version>${version}</version>
-        </dependency>
-
     </dependencies>
 </project>

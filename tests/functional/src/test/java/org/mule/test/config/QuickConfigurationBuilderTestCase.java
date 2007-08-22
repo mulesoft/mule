@@ -14,7 +14,7 @@ import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.impl.DefaultComponentExceptionStrategy;
 import org.mule.impl.model.seda.SedaModel;
-import org.mule.management.agents.JmxAgent;
+//import org.mule.management.agents.JmxAgent;
 import org.mule.providers.SimpleRetryConnectionStrategy;
 import org.mule.routing.ForwardingCatchAllStrategy;
 import org.mule.routing.filters.PayloadTypeFilter;
@@ -72,9 +72,11 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             // Set a dummy TX manager
             managementContext.setTransactionManager(new TestTransactionManagerFactory().create());
             // register agents
+/* excluded - dep on management
             UMOAgent agent = new JmxAgent();
             agent.setName("jmxAgent");
             registry.registerAgent(agent);
+            */
 
             // register connector
             TestConnector c = new TestConnector();
