@@ -56,7 +56,8 @@
     <!-- nest:abstract/ -->
 
     <!-- we can also use xsi:type explicitly, but are forced to use the same
-         element name -->
+         element name.  since definition parsers are associated with names this
+         is only practical for containers. -->
     <nest:root>
         <nest:simple>
             <nest:simple xsi:type="ext:typedSubclassType" more="foo">
