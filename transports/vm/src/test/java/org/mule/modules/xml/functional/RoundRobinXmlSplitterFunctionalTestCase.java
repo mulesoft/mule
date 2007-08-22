@@ -20,7 +20,7 @@ public class RoundRobinXmlSplitterFunctionalTestCase extends AbstractXmlOutbound
     public void testSimple() throws UMOException, IOException
     {
         doSend("roundrobin-det");
-        assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 1, SERVICE_SPLITTER);
+        assertServices(ROUND_ROBIN_ENDPOINT_PREFIX, 1,  new String[]{SERVICE_SPLITTER, ROUND_ROBIN_INDET});
         assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 2, ROUND_ROBIN_DET);
     }
 
