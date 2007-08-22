@@ -11,7 +11,9 @@
 package org.mule.providers.email.transformers;
 
 import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOException;
+import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.transformer.TransformerException;
 
 import java.io.IOException;
@@ -22,13 +24,13 @@ import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import junit.framework.TestCase;
-
-/**
- * Unit tests for the two RFC 822 related transformers
- */
-public class Rfc822ByteArrayTestCase extends TestCase
+public class Rfc822ByteArrayTestCase extends FunctionalTestCase
 {
+
+    protected String getConfigResources()
+    {
+        return "rfc822-byte-array-test.xml";
+    }
 
     public void testToByteArray() throws MessagingException, TransformerException
     {
@@ -49,7 +51,7 @@ public class Rfc822ByteArrayTestCase extends TestCase
     protected MimeMessage byteArrayToMimeMessage(byte[] bytes) throws UMOException
     {
         Rfc822ByteArraytoMimeMessage transformer = new Rfc822ByteArraytoMimeMessage();
-        MuleEndpoint endpoint = new MuleEndpoint("smtp://localhost", false);
+        UMOEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("smtp");
         transformer.setEndpoint(endpoint);
         Object result = transformer.transform(bytes);
         assertTrue(result instanceof MimeMessage);
