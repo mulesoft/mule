@@ -21,5 +21,16 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+    
+    <xsd:complexType name="typedSubclassType">
+        <xsd:complexContent>
+            <xsd:extension base="base:nestableType">
+                <xsd:sequence minOccurs="0">
+                    <xsd:element name="another"/>
+                </xsd:sequence>
+                <xsd:attribute name="more"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
 </xsd:schema>

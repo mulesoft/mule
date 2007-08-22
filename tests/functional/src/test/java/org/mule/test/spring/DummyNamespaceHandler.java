@@ -22,5 +22,6 @@ public class DummyNamespaceHandler extends MuleNamespaceHandler
         registerBeanDefinitionParser("simple", new OrphanDefinitionParser(Nestable.class, false));
         registerBeanDefinitionParser("subclass", new OrphanDefinitionParser(Nestable.class, false));
         registerBeanDefinitionParser("random", new OrphanDefinitionParser(Nestable.class, false));
+        registerBeanDefinitionParser("another", new OrphanDefinitionParser(Nestable.class, false));
     }
 }
