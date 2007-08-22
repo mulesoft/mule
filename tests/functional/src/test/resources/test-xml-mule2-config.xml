@@ -29,8 +29,7 @@
     </environment-properties -->
 
     <mule:configuration serverId="ijio" defaultSynchronousEndpoints="false">
-        <mule:default-threading-profile name="default"
-                                        maxBufferSize="0"
+        <mule:default-threading-profile maxBufferSize="0"
                                         maxThreadsActive="8"
                                         maxThreadsIdle="4"
                                         poolExhaustedAction="WAIT"
@@ -192,10 +191,6 @@
             <entry value="prop6"/>
         </list>
     </properties -->
-
-    <!-- TODO -->
-    <!-- this already has a config, but is not integrated? -->
-    <bean name="extractor" class="org.mule.util.properties.JXPathPropertyExtractor"/>
 
     <mule:model-seda name="main">
 
@@ -377,7 +372,9 @@
             <mule:component class="org.mule.tck.testmodels.fruit.Apple"/>
             <mule:inbound-router/>
             <mule:outbound-router>
-                <mule:filtering-router propertyExtractor-ref="extractor"/>
+                <mule:filtering-router>
+                    <mule:xml-jxpath-property-extractor/>
+                </mule:filtering-router>
             </mule:outbound-router>
             <!-- outbound-router>
                 <router className="org.mule.routing.outbound.FilteringOutboundRouter"

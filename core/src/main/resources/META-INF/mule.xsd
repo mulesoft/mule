@@ -1169,9 +1169,13 @@
 
     <xsd:group name="propertyExtractors">
         <xsd:choice>
-            <xsd:element name="custom-property-extractor" type="customPropertyExtractorType"/>
-            <xsd:element name="module-property-extractor" type="modulePropertyExtractorType"/>
             <xsd:element name="bean-property-extractor" type="propertyExtractorType"/>
+            <xsd:element name="correlation-property-extractor" type="propertyExtractorType"/>
+            <xsd:element name="custom-property-extractor" type="customPropertyExtractorType"/>
+            <xsd:element name="map-property-extractor" type="propertyExtractorType"/>
+            <xsd:element name="message-property-extractor" type="propertyExtractorType"/>
+            <xsd:element name="module-property-extractor" type="abstractModulePropertyExtractorType"/>
+            <xsd:element name="payload-property-extractor" type="propertyExtractorType"/>
         </xsd:choice>
     </xsd:group>
 
@@ -1183,7 +1187,7 @@
         </xsd:annotation>
     </xsd:complexType>
 
-    <xsd:complexType name="modulePropertyExtractorType">
+    <xsd:complexType name="abstractModulePropertyExtractorType" abstract="true">
        <xsd:annotation>
             <xsd:documentation>
                 This is an empty holder that can be extended by modules that want to

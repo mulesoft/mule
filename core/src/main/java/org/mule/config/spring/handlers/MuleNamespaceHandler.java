@@ -53,6 +53,7 @@ import org.mule.impl.security.PasswordBasedEncryptionStrategy;
 import org.mule.impl.security.SecretKeyEncryptionStrategy;
 import org.mule.impl.security.filters.MuleEncryptionEndpointSecurityFilter;
 import org.mule.providers.SimpleRetryConnectionStrategy;
+import org.mule.routing.CorrelationPropertiesExtractor;
 import org.mule.routing.ForwardingCatchAllStrategy;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.filters.EqualsFilter;
@@ -111,6 +112,9 @@ import org.mule.transformers.simple.ObjectToByteArray;
 import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.transformers.simple.StringToByteArray;
 import org.mule.util.properties.BeanPropertyExtractor;
+import org.mule.util.properties.MapPropertyExtractor;
+import org.mule.util.properties.MessagePropertyExtractor;
+import org.mule.util.properties.PayloadPropertyExtractor;
 
 import java.util.HashMap;
 
@@ -249,8 +253,12 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
 
         //Property Extractors
         registerBeanDefinitionParser("bean-property-extractor", new ChildDefinitionParser("propertyExtractor", BeanPropertyExtractor.class));
+        registerBeanDefinitionParser("correlation-property-extractor", new ChildDefinitionParser("propertyExtractor", CorrelationPropertiesExtractor.class));
         registerBeanDefinitionParser("custom-property-extractor", new ObjectFactoryDefinitionParser("propertyExtractor"));
-        
+        registerBeanDefinitionParser("map-property-extractor", new ChildDefinitionParser("propertyExtractor", MapPropertyExtractor.class));
+        registerBeanDefinitionParser("message-property-extractor", new ChildDefinitionParser("propertyExtractor", MessagePropertyExtractor.class));
+        registerBeanDefinitionParser("payload-property-extractor", new ChildDefinitionParser("propertyExtractor", PayloadPropertyExtractor.class));
+
         //Catch all Strategies
         registerBeanDefinitionParser("forwarding-catch-all-strategy", new ChildDefinitionParser("catchAllStrategy", ForwardingCatchAllStrategy.class));
         registerBeanDefinitionParser("custom-catch-all-strategy", new ChildDefinitionParser("catchAllStrategy", null));
