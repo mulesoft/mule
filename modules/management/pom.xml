@@ -21,6 +21,7 @@
                      <excludes>
                          <exclude>**/ComponentServiceTestCase.*</exclude>
                          <exclude>**/JmxAgentTestCase.*</exclude>
+                         <exclude>**/ManagementNamespaceHandlerTestCase.*</exclude>
                      </excludes>
                  </configuration>
              </plugin>
@@ -82,6 +83,13 @@
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.14</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
         </dependency>
   </dependencies>
 </project>

@@ -43,6 +43,7 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
+import org.mule.util.object.ObjectFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -112,6 +113,7 @@ public class JmxAgent extends AbstractAgent
      * authentication.
      */
     private Map credentials = new HashMap();
+    private ObjectFactory mBeanServerObjectFactory;
 
     static {
         Map props = new HashMap(1);
@@ -150,6 +152,18 @@ public class JmxAgent extends AbstractAgent
     {
         if (initialized.get()) {
             return;
+        }
+        //Obtain mBeanServer from objectFactory. 
+        //mBeanServerObjectFactory has priority over mBeanServer in intialization.
+        if (mBeanServerObjectFactory != null){
+            try
+            {
+                mBeanServer=(MBeanServer) mBeanServerObjectFactory.create();
+            }
+            catch (Exception e)
+            {
+                throw new InitialisationException(CoreMessages.failedToCreate(mBeanServerObjectFactory.toString()),this);
+            }
         }
         if (mBeanServer == null && !locateServer && !createServer) {
             throw new InitialisationException(ManagementMessages.createOrLocateShouldBeSet(), this);
@@ -519,10 +533,20 @@ public class JmxAgent extends AbstractAgent
 
     /**
      * @param mBeanServer The mBeanServer to set.
+     * @deprecated
      */
     public void setMBeanServer(MBeanServer mBeanServer)
     {
         this.mBeanServer = mBeanServer;
+    }
+    
+    /**
+     * @param mBeanServer The mBeanServer to set.
+     */
+    public void setMBeanServerObjectFactory(ObjectFactory mBeanServerObjectFactory)
+    {
+
+        this.mBeanServerObjectFactory =  mBeanServerObjectFactory;
     }
 
     /**
