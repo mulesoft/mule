@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.mulesource.org/schema/mule/nest-example-base/2.0"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://www.mulesource.org/schema/mule/nest-example-base/2.0"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+    <xsd:element name="simple" type="nestableType"/>
+    <xsd:element name="abstract" type="abstractNestableType"/>
+
+    <xsd:complexType name="nestableType">
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:group ref="nestables"/>
+        </xsd:choice>
+        <xsd:attribute name="simpleAttr" type="xsd:string"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="abstractNestableType" abstract="true">
+        <xsd:complexContent>
+            <xsd:extension base="nestableType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:group name="nestables">
+        <xsd:choice>
+            <xsd:element ref="simple"/>
+            <xsd:element ref="abstract"/>
+        </xsd:choice>
+    </xsd:group>
+
+</xsd:schema>

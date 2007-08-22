@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.mulesource.org/schema/mule/nest-example-extension/2.0"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:base="http://www.mulesource.org/schema/mule/nest-example-base/2.0"
+            targetNamespace="http://www.mulesource.org/schema/mule/nest-example-extension/2.0"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/nest-example-base/2.0"
+                schemaLocation="http://www.mulesource.org/schema/mule/nest-example-base/2.0/nest-example-base.xsd"/>
+
+    <xsd:element name="subclass" type="subclassType" substitutionGroup="base:abstract"/>
+
+    <xsd:complexType name="subclassType">
+        <xsd:complexContent>
+            <xsd:extension base="base:abstractNestableType">
+                <xsd:choice minOccurs="0">
+                    <xsd:element name="random"/>
+                </xsd:choice>
+                <xsd:attribute name="another"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+</xsd:schema>

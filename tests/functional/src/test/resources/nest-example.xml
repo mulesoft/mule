@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:nest="http://www.mulesource.org/schema/mule/nest-example-base/2.0"
+       xmlns:ext="http://www.mulesource.org/schema/mule/nest-example-extension/2.0"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/nest-example-base/2.0 http://www.mulesource.org/schema/mule/nest-example-base/2.0/nest-example-base.xsd
+       http://www.mulesource.org/schema/mule/nest-example-extension/2.0 http://www.mulesource.org/schema/mule/nest-example-extension/2.0/nest-example-extension.xsd">
+
+    <!-- simple nesting -->
+    <nest:simple>
+        <nest:simple simpleAttr="foo">
+            <nest:simple/>
+        </nest:simple>
+        <nest:simple/>
+    </nest:simple>
+
+    <!-- abstract won't validate -->
+    <nest:simple>
+        <!-- nest:abstract/ -->
+    </nest:simple>
+
+    <!-- this validates and allows nesting -->
+    <nest:simple>
+        <ext:subclass>
+            <nest:simple>
+                <ext:subclass/>
+            </nest:simple>
+        </ext:subclass>
+    </nest:simple>
+
+    <!-- you can extend the subclass with elements and attributes -->
+    <!-- disclaimer: i didn't think attributes could be added! -->
+    <nest:simple>
+        <ext:subclass simpleAttr="bar" another="baz">
+            <ext:random/>
+        </ext:subclass>
+    </nest:simple>
+
+
+</beans>
