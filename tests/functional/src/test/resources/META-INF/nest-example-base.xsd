@@ -5,8 +5,14 @@
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
 
-    <xsd:element name="simple" type="nestableType"/>
+    <xsd:element name="root" type="rootType"/>
     <xsd:element name="abstract" type="abstractNestableType"/>
+
+    <xsd:complexType name="rootType">
+        <xsd:sequence>
+            <xsd:group ref="nestables"/>
+        </xsd:sequence>
+    </xsd:complexType>
 
     <xsd:complexType name="nestableType">
         <xsd:choice minOccurs="0" maxOccurs="unbounded">
@@ -23,7 +29,7 @@
 
     <xsd:group name="nestables">
         <xsd:choice>
-            <xsd:element ref="simple"/>
+            <xsd:element name="simple" type="nestableType"/>
             <xsd:element ref="abstract"/>
         </xsd:choice>
     </xsd:group>
