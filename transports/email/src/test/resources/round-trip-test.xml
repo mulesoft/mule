@@ -1,63 +1,62 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
-<mule-configuration version="1.0">
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:smtp="http://www.mulesource.org/schema/mule/smtp/2.0"
+       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+       xmlns:pop3="http://www.mulesource.org/schema/mule/pop3/2.0"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/smtp/2.0 http://www.mulesource.org/schema/mule/smtp/2.0/mule-smtp.xsd
+       http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd
+       http://www.mulesource.org/schema/mule/pop3/2.0 http://www.mulesource.org/schema/mule/pop3/2.0/mule-pop3.xsd">
 
-    <mule-environment-properties/>
+    <vm:connector name="default"/>
+    <vm:connector name="queue" queueEvents="true"/>
+    <pop3:connector name="pop3">
+        <!-- By default the POP3 connector has a transformer that converts the message to a
+             String.  We don't want that - we are going to do our own transformation to RFC822
+             bytes below.  Alternative approaches include specifying the RFC822 transformer
+             here, or on the pop3 endpoint (which would override this default transformer;
+             this is the approach used for SMTP below).
+             See http://mulesource.org/display/MULE/General+Transport+Configuration for more
+             information on "service overrides". -->
+        <mule:service-overrides inboundTransformer="org.mule.transformers.NoActionTransformer"/>
+    </pop3:connector>
 
-    <connector name="default" className="org.mule.providers.vm.VMConnector"/>
-    <connector name="queue" className="org.mule.providers.vm.VMConnector">
-        <properties>
-            <property name="queueEvents" value="true"/>
-        </properties>
-    </connector>
-    <connector name="pop3" className="org.mule.providers.email.Pop3Connector">
-        <properties>
-            <map name="serviceOverrides">
-                <!-- By default the POP3 connector has a transformer that converts the message to a
-                     String.  We don't want that - we are going to do our own transformation to RFC822
-                     bytes below.  Alternative approaches include specifying the RFC822 transformer
-                     here, or on the pop3 endpoint (which would override this default transformer;
-                     this is the approach used for SMTP below).
-                     See http://mulesource.org/display/MULE/General+Transport+Configuration for more
-                     information on "service overrides". -->
-                <property name="inbound.transformer" value="org.mule.transformers.NoActionTransformer"/>
-            </map>
-        </properties>
-    </connector>
+    <!-- TODO - make shortcuts -->
+    <mule:custom-transformer name="toRfc822" class="org.mule.providers.email.transformers.MimeMessageToRfc822ByteArray"/>
+    <mule:custom-transformer name="fromRfc822" class="org.mule.providers.email.transformers.Rfc822ByteArraytoMimeMessage"/>
 
-    <transformers>
-        <transformer name="toRfc822" className="org.mule.providers.email.transformers.MimeMessageToRfc822ByteArray"/>
-        <transformer name="fromRfc822" className="org.mule.providers.email.transformers.Rfc822ByteArraytoMimeMessage"/>
-    </transformers>
+    <mule:model-seda name="main">
 
-    <model name="main">
-        
-        <mule-descriptor name="source" implementation="org.mule.components.simple.BridgeComponent">
-            <inbound-router>
-                <endpoint address="pop3://bob:secret@localhost:62002"/>
-            </inbound-router>
-            <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="vm://sink" transformers="toRfc822" connector="default"/>
-                </router>
-            </outbound-router>
-        </mule-descriptor>
+        <mule:service name="source">
+            <mule:bridge-component/>
+            <mule:inbound-router>
+                <mule:endpoint address="pop3://bob:secret@localhost:62002"/>
+            </mule:inbound-router>
+            <mule:outbound-router>
+                <mule:pass-through-router>
+                    <mule:endpoint address="vm://sink" transformers="toRfc822" connector-ref="default"/>
+                </mule:pass-through-router>
+            </mule:outbound-router>
+        </mule:service>
 
-        <mule-descriptor name="sink" implementation="org.mule.components.simple.BridgeComponent">
-            <inbound-router>
-                <endpoint address="vm://sink" connector="default"/>
-            </inbound-router>
-            <outbound-router>
-                <router className="org.mule.routing.outbound.MulticastingRouter">
-                    <endpoint address="vm://rfc822" connector="queue"/>
+        <mule:service name="sink">
+            <mule:bridge-component/>
+            <mule:inbound-router>
+                <mule:endpoint address="vm://sink" connector-ref="default"/>
+            </mule:inbound-router>
+            <mule:outbound-router>
+                <mule:multicasting-router>
+                    <mule:endpoint address="vm://rfc822" connector-ref="queue"/>
                     <!-- Here we override the default SMTP transformer -->
-                    <endpoint address="smtp://alice:secret@localhost:62000" transformers="fromRfc822"/>
-                </router>
-            </outbound-router>
-        </mule-descriptor>
+                    <mule:endpoint address="smtp://alice:secret@localhost:62000" transformers="fromRfc822"/>
+                </mule:multicasting-router>
+            </mule:outbound-router>
+        </mule:service>
 
-    </model>
+    </mule:model-seda>
 
-</mule-configuration>
-        
+</beans>
