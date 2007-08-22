@@ -17,7 +17,13 @@
          <plugins>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-            </plugin>
+                <configuration>
+                    <excludes>
+                        <!-- temporary, pending MULE-2186 -->
+                        <exclude>**/JdbcNamespaceHandlerTestCase.*</exclude>
+                    </excludes>
+                </configuration>
+             </plugin>
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
