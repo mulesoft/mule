@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
+
+    <vm:connector name="default"/>
+    <vm:connector name="queue" queueEvents="true"/>
+
+    <mule:endpoint name="in" address="vm://in" connector-ref="default"/>
+
+    <mule:model-seda name="jxpath property extractor test">
+
+        <mule:service name="test">
+            <mule:component class="org.mule.components.simple.BridgeComponent"/>
+            <mule:inbound-router>
+                <mule:endpoint ref="in"/>
+            </mule:inbound-router>
+            <mule:outbound-router>
+                <mule:exception-based-router>
+                    <mule:endpoint address="vm://unreliable" connector-ref="default"/>
+                    <mule:endpoint address="vm://error" connector-ref="queue"/>
+                </mule:exception-based-router>
+           </mule:outbound-router>
+        </mule:service>
+
+        <mule:service name="unreliable">
+            <mule:component class="org.mule.components.simple.BridgeComponent"/>
+            <mule:inbound-router>
+                <mule:endpoint address="vm://unreliable" connector-ref="default"/>
+            </mule:inbound-router>
+            <mule:outbound-router>
+                <mule:endpoint-selector-router selectorProperty="endpoint" extractorEnabled="true">
+                     <mule:endpoint name="name" address="vm://match" connector-ref="queue"/>
+                     <mule:xml-dom4j-property-extractor/>
+                </mule:endpoint-selector-router>
+           </mule:outbound-router>
+        </mule:service>
+
+    </mule:model-seda>
+
+</beans>

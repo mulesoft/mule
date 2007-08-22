@@ -42,11 +42,29 @@ import java.util.Iterator;
 public class EndpointSelector extends FilteringOutboundRouter
 {
     private String selectorProperty = "endpoint";
+    private boolean extractorEnabled = false;
 
     public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous)
         throws RoutingException
     {
-        String endpointName = message.getStringProperty(getSelectorProperty(), null);
+        String endpointName;
+        if (extractorEnabled)
+        {
+            if (null == getPropertyExtractor())
+            {
+                throw new IllegalArgumentException("No property extractor specified");
+            }
+            Object property = getPropertyExtractor().getProperty(getSelectorProperty(), message);
+            if (!(property instanceof String))
+            {
+                throw new IllegalArgumentException("No property for " + getSelectorProperty());
+            }
+            endpointName = (String) property;
+        }
+        else
+        {
+            endpointName = message.getStringProperty(getSelectorProperty(), null);
+        }
         if (endpointName == null)
         {
             throw new IllegalArgumentException("selectorProperty '" + getSelectorProperty()
@@ -112,4 +130,15 @@ public class EndpointSelector extends FilteringOutboundRouter
     {
         this.selectorProperty = selectorProperty;
     }
+
+    public boolean isExtractorEnabled()
+    {
+        return extractorEnabled;
+    }
+
+    public void setExtractorEnabled(boolean extractorEnabled)
+    {
+        this.extractorEnabled = extractorEnabled;
+    }
+
 }

@@ -955,8 +955,8 @@
     <xsd:complexType name="nestedInboundRouterType">
         <xsd:sequence>
             <xsd:group ref="xmlExtendedFilters" minOccurs="0"/>
+            <xsd:group ref="xmlExtendedPropertyExtractors" minOccurs="0"/>
         </xsd:sequence>
-        <xsd:attribute name="propertyExtractor" type="xsd:NMTOKEN"/>
     </xsd:complexType>
 
     <!-- Inbound Router impls -->
@@ -1027,8 +1027,8 @@
     <xsd:complexType name="responseRouterType">
         <xsd:sequence>
             <xsd:element name="endpoint" type="endpointType" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:group ref="xmlExtendedPropertyExtractors" minOccurs="0"/>
         </xsd:sequence>
-        <xsd:attribute name="propertyExtractor" type="xsd:NMTOKEN"/>
     </xsd:complexType>
 
     <xsd:complexType name="customResponseRouterType">
@@ -1052,6 +1052,7 @@
             <xsd:element name="endpoint" type="endpointType" minOccurs="0" maxOccurs="unbounded"/>
             <xsd:element name="reply-to" type="replyToType" minOccurs="0"/>
             <xsd:element name="transaction" type="transactionType" minOccurs="0"/>
+            <xsd:group ref="xmlExtendedPropertyExtractors" minOccurs="0"/>
         </xsd:sequence>
         <xsd:attribute name="enableCorrelation" default="IF_NOT_SET">
             <xsd:simpleType>
@@ -1062,7 +1063,6 @@
                 </xsd:restriction>
             </xsd:simpleType>
         </xsd:attribute>
-        <xsd:attribute name="propertyExtractor-ref" type="xsd:NMTOKEN"/>
     </xsd:complexType>
 
 
@@ -1098,6 +1098,7 @@
         <xsd:complexContent>
             <xsd:extension base="filteringOutboundRouterType">
                 <xsd:attribute name="selectorProperty" type="xsd:string" use="required"/>
+                <xsd:attribute name="extractorEnabled" type="substitutableBoolean" default="false"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -1162,6 +1163,36 @@
             <xsd:element name="custom-catch-all-strategy" type="customCatchAllStrategyType"/>
         </xsd:choice>
     </xsd:group>
+
+
+    <!-- property extractors -->
+
+    <xsd:group name="propertyExtractors">
+        <xsd:choice>
+            <xsd:element name="custom-property-extractor" type="customPropertyExtractorType"/>
+            <xsd:element name="module-property-extractor" type="modulePropertyExtractorType"/>
+        </xsd:choice>
+    </xsd:group>
+
+    <xsd:complexType name="propertyExtractorType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A property extractor retrieves a value from the message.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:complexType>
+
+    <xsd:complexType name="modulePropertyExtractorType">
+       <xsd:annotation>
+            <xsd:documentation>
+                This is an empty holder that can be extended by modules that want to
+                provide property extractors.  The type of the filter should be given using the
+                xsi:type attribute - as an example, for a "bar" filter in module "foo" the type
+                might be foo:barFilterType.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:complexType>
+
 
 
     <!--==============================================================-->
@@ -1595,7 +1626,7 @@
     <!--  ObjectFactory Types                                         -->
     <!--==============================================================-->
     
-    <xsd:complexType name="propertyExtractorType">
+    <xsd:complexType name="customPropertyExtractorType">
         <xsd:complexContent>
             <xsd:extension base="objectFactoryType" />
         </xsd:complexContent>
@@ -1739,6 +1770,19 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+
+    <!-- xml property extractors -->
+
+    <xsd:group name="xmlExtendedPropertyExtractors">
+        <xsd:choice>
+            <xsd:group ref="propertyExtractors"/>
+            <xsd:element name="xml-jxpath-property-extractor" type="propertyExtractorType"/>
+            <xsd:element name="xml-dom4j-property-extractor" type="propertyExtractorType"/>
+            <xsd:element name="xml-jdom-property-extractor" type="propertyExtractorType"/>
+        </xsd:choice>
+    </xsd:group>
+
+
 
     <!-- xml support -->
 

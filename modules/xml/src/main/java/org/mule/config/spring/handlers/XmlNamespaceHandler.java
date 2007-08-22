@@ -10,20 +10,23 @@
 
 package org.mule.config.spring.handlers;
 
-import org.mule.config.spring.parsers.specific.RouterDefinitionParser;
+import org.mule.config.spring.parsers.XsltTransformerDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
-import org.mule.config.spring.parsers.XsltTransformerDefinitionParser;
+import org.mule.config.spring.parsers.specific.RouterDefinitionParser;
+import org.mule.routing.filters.xml.IsXmlFilter;
+import org.mule.routing.filters.xml.JXPathFilter;
 import org.mule.routing.outbound.FilteringXmlMessageSplitter;
 import org.mule.routing.outbound.RoundRobinXmlSplitter;
-import org.mule.routing.filters.xml.JXPathFilter;
-import org.mule.routing.filters.xml.IsXmlFilter;
 import org.mule.transformers.xml.DomDocumentToXml;
 import org.mule.transformers.xml.JXPathExtractor;
 import org.mule.transformers.xml.ObjectToXml;
 import org.mule.transformers.xml.XmlToDomDocument;
 import org.mule.transformers.xml.XmlToObject;
+import org.mule.util.properties.Dom4jPropertyExtractor;
+import org.mule.util.properties.JDomPropertyExtractor;
+import org.mule.util.properties.JXPathPropertyExtractor;
 
 public class XmlNamespaceHandler extends MuleNamespaceHandler
 {
@@ -46,6 +49,9 @@ public class XmlNamespaceHandler extends MuleNamespaceHandler
         registerBeanDefinitionParser("xml-to-dom", new OrphanDefinitionParser(XmlToDomDocument.class, false));
         registerBeanDefinitionParser("xml-to-object", new OrphanDefinitionParser(XmlToObject.class, false));
         registerBeanDefinitionParser("xml-xslt", new XsltTransformerDefinitionParser());
+        registerBeanDefinitionParser("xml-jxpath-property-extractor", new ChildDefinitionParser("propertyExtractor", JXPathPropertyExtractor.class));
+        registerBeanDefinitionParser("xml-dom4j-property-extractor", new ChildDefinitionParser("propertyExtractor", Dom4jPropertyExtractor.class));
+        registerBeanDefinitionParser("xml-jdom-property-extractor", new ChildDefinitionParser("propertyExtractor", JDomPropertyExtractor.class));
         registerBeanDefinitionParser("namespace", new ChildMapEntryDefinitionParser("namespaces", "prefix", "uri"));
         registerBeanDefinitionParser("context-property", new ChildMapEntryDefinitionParser("contextProperties", "key", "value"));
     }
