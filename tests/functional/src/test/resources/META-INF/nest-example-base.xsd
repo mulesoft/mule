@@ -5,6 +5,7 @@
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
 
+    <!-- global elements -->
     <xsd:element name="root" type="rootType"/>
     <xsd:element name="abstract" type="abstractNestableType"/>
 
@@ -33,5 +34,40 @@
             <xsd:element ref="abstract"/>
         </xsd:choice>
     </xsd:group>
+
+
+    <!-- separate example, sketches service structure -->
+
+    <xsd:element name="abstract-service" abstract="true" type="abstractServiceType"/>
+    <xsd:complexType name="abstractServiceType">
+        <xsd:sequence>
+            <xsd:element ref="abstract-component"/>
+            <xsd:element ref="abstract-router"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:element name="abstract-component" abstract="true" type="abstractComponentType"/>
+    <xsd:complexType name="abstractComponentType"/>
+
+    <xsd:element name="abstract-router" abstract="true" type="abstractRouterType"/>
+    <xsd:complexType name="abstractRouterType">
+        <xsd:choice>
+            <xsd:element ref="abstract-filter" maxOccurs="unbounded"/>
+        </xsd:choice>
+    </xsd:complexType>
+
+    <xsd:element name="abstract-filter" abstract="true" type="abstractFilterType"/>
+    <xsd:complexType name="abstractFilterType"/>
+
+    <xsd:element name="abstract-nesting-filter" abstract="true" type="abstractNestingFilterType"/>
+    <xsd:complexType name="abstractNestingFilterType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractFilterType">
+                <xsd:choice maxOccurs="unbounded">
+                    <xsd:element ref="abstract-filter"/>
+                </xsd:choice>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
 </xsd:schema>

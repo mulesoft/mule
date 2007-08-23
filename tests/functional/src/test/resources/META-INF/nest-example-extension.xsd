@@ -33,4 +33,42 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+
+    <!-- separate example, sketches service implementation -->
+
+    <xsd:element name="service" type="serviceType" substitutionGroup="base:abstract-service"/>
+    <xsd:complexType name="serviceType">
+        <xsd:complexContent>
+            <xsd:extension base="base:abstractServiceType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="component" type="componentType" substitutionGroup="base:abstract-component"/>
+    <xsd:complexType name="componentType">
+        <xsd:complexContent>
+            <xsd:extension base="base:abstractComponentType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="router" type="routerType" substitutionGroup="base:abstract-router"/>
+    <xsd:complexType name="routerType">
+        <xsd:complexContent>
+            <xsd:extension base="base:abstractRouterType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="filter" type="filterType" substitutionGroup="base:abstract-filter"/>
+    <xsd:complexType name="filterType">
+        <xsd:complexContent>
+            <xsd:extension base="base:abstractFilterType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="nesting-filter" type="nestingFilterType" substitutionGroup="base:abstract-filter"/>
+    <xsd:complexType name="nestingFilterType">
+        <xsd:complexContent>
+            <xsd:extension base="base:abstractNestingFilterType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
 </xsd:schema>

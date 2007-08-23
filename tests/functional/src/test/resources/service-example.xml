@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:nest="http://www.mulesource.org/schema/mule/nest-example-base/2.0"
+       xmlns:ext="http://www.mulesource.org/schema/mule/nest-example-extension/2.0"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/nest-example-base/2.0 http://www.mulesource.org/schema/mule/nest-example-base/2.0/nest-example-base.xsd
+       http://www.mulesource.org/schema/mule/nest-example-extension/2.0 http://www.mulesource.org/schema/mule/nest-example-extension/2.0/nest-example-extension.xsd">
+
+    <ext:service>
+        <ext:component/>
+        <ext:router>
+            <ext:filter/>
+            <ext:nesting-filter>
+                <ext:nesting-filter>
+                    <ext:filter/>
+                </ext:nesting-filter>
+                <ext:filter/>
+                <!-- nesting elements inside filter fail to validate -->
+            </ext:nesting-filter>
+        </ext:router>
+    </ext:service>
+
+</beans>
