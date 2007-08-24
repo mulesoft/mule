@@ -16,7 +16,7 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.routing.UMOOutboundRouter;
 
-// TODO Reimplement this test using a config file instead of the QuickConfigurationBuilder
+// TODO MULE-2206 Reimplement this test using a config file instead of the QuickConfigurationBuilder
 public class ConnectorCreationTestCase extends AbstractMuleTestCase
 {
 

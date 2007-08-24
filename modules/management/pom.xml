@@ -19,6 +19,7 @@
                  <artifactId>maven-surefire-plugin</artifactId>
                  <configuration>
                      <excludes>
+                         <!-- MULE-1833 -->
                          <exclude>**/ComponentServiceTestCase.*</exclude>
                          <exclude>**/JmxAgentTestCase.*</exclude>
                          <exclude>**/ManagementNamespaceHandlerTestCase.*</exclude>                         

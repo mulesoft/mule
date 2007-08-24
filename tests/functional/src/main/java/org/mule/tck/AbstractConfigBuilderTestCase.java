@@ -291,7 +291,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
 //        assertNull(inEndpoint.getTransactionConfig().getConstraint());
 //    }
 
-    // TODO Mule 1.x <environment-properties> are not getting picked-up.
+    // TODO MULE-2207 Mule 1.x <environment-properties> are not getting picked-up.
 //    public void testEnvironmentProperties()
 //    {
 //        Registry r = managementContext.getRegistry();

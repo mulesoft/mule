@@ -19,7 +19,7 @@
                  <artifactId>maven-surefire-plugin</artifactId>
                  <configuration>
                     <excludes>
-                        <!-- TODO Update script to use registry instead of QuickConfigurationBuilder (MULE-2203) -->
+                        <!-- TODO Update script to use registry instead of QuickConfigurationBuilder (MULE-2205) -->
                         <exclude>**/GroovyScriptConfigurationBuilderTestCase.*</exclude>
                     </excludes>
                 </configuration>
