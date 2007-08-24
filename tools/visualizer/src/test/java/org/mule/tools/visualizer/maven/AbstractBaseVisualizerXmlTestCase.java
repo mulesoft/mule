@@ -15,7 +15,7 @@ import java.util.Arrays;
 
 import junit.framework.TestCase;
 
-public abstract class AbstractBaseVisualizerXmlTestCase extends TestCase 
+public abstract class AbstractBaseVisualizerXmlTestCase extends TestCase
 {
 
     abstract String getXmlConfig();
@@ -30,4 +30,5 @@ public abstract class AbstractBaseVisualizerXmlTestCase extends TestCase
         plugin.setOutputdir(FileUtils.getResourcePath("target", getClass()));
         plugin.execute();
     }
+
 }
