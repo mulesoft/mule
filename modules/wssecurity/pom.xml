@@ -21,6 +21,8 @@
                      <excludes>
                          <!-- MULE-1176 -->
                          <exclude>**/XfireMultipleConnectorsWSSecurityTestCase.*</exclude>
+                         <exclude>**/XfireWsSecurityOnOutboundTestCase.*</exclude>
+                         <exclude>**/XfireWsSecurityOnOutboundUsingPropertiesTestCase.*</exclude>
                      </excludes>
                  </configuration>
              </plugin>
