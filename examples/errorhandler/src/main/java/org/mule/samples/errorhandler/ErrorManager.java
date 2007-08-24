@@ -28,7 +28,7 @@ import org.apache.commons.logging.LogFactory;
 public class ErrorManager
 {
     /** logger used by this class */
-    private static transient Log logger = LogFactory.getLog(ErrorManager.class);
+    private static final Log logger = LogFactory.getLog(ErrorManager.class);
 
     private Map handlers = new HashMap();
     private ExceptionHandler defaultHandler = null;

@@ -31,11 +31,14 @@
             </inbound-router>
             <outbound-router>
                 <router className="org.mule.routing.outbound.MulticastingRouter">
+                    <!-- this doesn't transform -->
+                    <endpoint address="vm://no-name-local-transformer" connector="queue" transformers="transformer"/>
                     <!-- impossible before 2.0? -->
                     <!-- endpoint name="local-name-local-transformer" address="vm://local-name-local-transformer" connector="queue" transformers="transformer"/ -->
-                    <endpoint address="vm://no-name-local-transformer" connector="queue" transformers="transformer"/>
+                    <!-- these two are ok -->
                     <global-endpoint name="direct"/>
                     <global-endpoint name="global-name-global-transformer"/>
+                    <!-- this doesn't transform -->
                     <global-endpoint name="global-name-local-transformer" transformers="transformer"/>
                 </router>
             </outbound-router>

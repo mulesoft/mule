@@ -40,7 +40,7 @@ public class Bank implements UMODescriptorAware, Serializable, BankService
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(Bank.class);
+    protected static final Log logger = LogFactory.getLog(Bank.class);
 
     private String bankName;
     private double primeRate;

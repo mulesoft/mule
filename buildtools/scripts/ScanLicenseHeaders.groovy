@@ -26,4 +26,6 @@ scanner.each { file ->
 	{
 	    println("check file " + file)
 	}
+	
+	reader.close()
 }

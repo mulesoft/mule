@@ -17,6 +17,8 @@ import org.mule.util.ClassUtils;
  */
 public class ExceptionBean
 {
+    private static boolean showRootStackOnly = true;
+
     /**
      * Specific details about the Throwable. For example, for
      * <tt>FileNotFoundException</tt>, this contains the name of the file that
@@ -36,8 +38,6 @@ public class ExceptionBean
      * The stack trace, as returned by getStackTrace().
      */
     private String[] stackTrace;
-
-    static transient boolean showRootStackOnly = true;
 
     private String exceptionClass = null;
 

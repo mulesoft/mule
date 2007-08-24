@@ -36,7 +36,7 @@ public class EmailRoundTripTestCase extends FunctionalTestCase
 
     protected String getConfigResources()
     {
-        return "round-trip-test.xml";
+        return "email-round-trip-test.xml";
     }
 
     public void testRoundTrip() throws UMOException, InterruptedException

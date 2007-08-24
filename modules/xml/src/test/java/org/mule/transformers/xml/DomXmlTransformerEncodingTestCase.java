@@ -1,5 +1,5 @@
 /*
- * $Id: DomXmlTransformersTestCase.java 3921 2006-11-18 18:19:12Z holger $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *

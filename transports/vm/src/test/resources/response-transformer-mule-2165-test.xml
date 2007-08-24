@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+<mule-configuration version="1.0">
+
+    <mule-environment-properties serverUrl=""/>
+
+    <connector name="default" className="org.mule.providers.vm.VMConnector">
+        <properties>
+            <map name="serviceOverrides">
+                <property name="inbound.transformer" value="org.mule.providers.vm.issues.InboundAppendTransformer"/>
+                <property name="outbound.transformer" value="org.mule.providers.vm.issues.OutboundAppendTransformer"/>
+            </map>
+        </properties>
+    </connector>
+    <connector name="queue" className="org.mule.providers.vm.VMConnector">
+        <properties>
+            <property name="queueEvents" value="true"/>
+        </properties>
+    </connector>
+
+    <transformers>
+        <transformer name="response" className="org.mule.providers.vm.issues.StringAppendTransformer">
+            <properties>
+                <property name="text" value=" response"/>
+            </properties>
+        </transformer>
+    </transformers>
+
+    <global-endpoints>
+        <endpoint name="in-global-name-global-transformer" address="vm://in-global-name-global-transformer" connector="default"/>
+        <endpoint name="out-global-name-global-transformer" address="vm://out-global-name-global-transformer" connector="queue"/>
+        <endpoint name="global-name-global-transformer" address="vm://global-name-global-transformer" connector="default" responseTransformers="response" synchronous="true"/>
+
+        <endpoint name="in-global-name-url-transformer" address="vm://in-global-name-url-transformer" connector="default"/>
+        <endpoint name="out-global-name-url-transformer" address="vm://out-global-name-url-transformer" connector="queue"/>
+        <endpoint name="global-name-url-transformer" address="vm://global-name-url-transformer?responseTransformers=response" connector="default" synchronous="true"/>
+
+        <endpoint name="in-global-name-local-transformer" address="vm://in-global-name-local-transformer" connector="default"/>
+        <endpoint name="out-global-name-local-transformer" address="vm://out-global-name-local-transformer" connector="queue"/>
+        <endpoint name="global-name-local-transformer" address="vm://global-name-local-transformer" connector="default" synchronous="true"/>
+
+        <endpoint name="in-local-name-local-transformer" address="vm://in-local-name-local-transformer" connector="default"/>
+        <endpoint name="out-local-name-local-transformer" address="vm://out-local-name-local-transformer" connector="queue"/>
+
+        <endpoint name="in-local-name-url-transformer" address="vm://in-local-name-url-transformer" connector="default"/>
+        <endpoint name="out-local-name-url-transformer" address="vm://out-local-name-url-transformer" connector="queue"/>
+    </global-endpoints>
+
+    <model name="response transformer tests">
+
+        <mule-descriptor name="gngt" implementation="org.mule.components.simple.BridgeComponent">
+            <inbound-router>
+                <global-endpoint name="in-global-name-global-transformer"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.ChainingRouter">
+                    <global-endpoint name="global-name-global-transformer"/>
+                    <global-endpoint name="out-global-name-global-transformer"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="gngt-bounce" implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <global-endpoint name="global-name-global-transformer"/>
+            </inbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="gnut" implementation="org.mule.components.simple.BridgeComponent">
+            <inbound-router>
+                <global-endpoint name="in-global-name-url-transformer"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.ChainingRouter">
+                    <global-endpoint name="global-name-url-transformer"/>
+                    <global-endpoint name="out-global-name-url-transformer"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="gnut-bounce" implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <global-endpoint name="global-name-url-transformer"/>
+            </inbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="gnlt" implementation="org.mule.components.simple.BridgeComponent">
+            <inbound-router>
+                <global-endpoint name="in-global-name-local-transformer"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.ChainingRouter">
+                    <global-endpoint name="global-name-local-transformer" responseTransformers="response"/>
+                    <global-endpoint name="out-global-name-local-transformer"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="gnlt-bounce" implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <global-endpoint name="global-name-local-transformer"/>
+            </inbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="lnlt" implementation="org.mule.components.simple.BridgeComponent">
+            <inbound-router>
+                <global-endpoint name="in-local-name-local-transformer"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.ChainingRouter">
+                    <endpoint address="vm://local-name-local-transformer" responseTransformers="response" synchronous="true" connector="default"/>
+                    <global-endpoint name="out-local-name-local-transformer"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="lnlt-bounce" implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <endpoint address="vm://local-name-local-transformer" connector="default"/>
+            </inbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="lnut" implementation="org.mule.components.simple.BridgeComponent">
+            <inbound-router>
+                <global-endpoint name="in-local-name-url-transformer"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.ChainingRouter">
+                    <endpoint address="vm://local-name-url-transformer?responseTransformers=response" synchronous="true" connector="default"/>
+                    <global-endpoint name="out-local-name-url-transformer"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="lnut-bounce" implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <endpoint address="vm://local-name-url-transformer" connector="default"/>
+            </inbound-router>
+        </mule-descriptor>
+
+    </model>
+
+</mule-configuration>

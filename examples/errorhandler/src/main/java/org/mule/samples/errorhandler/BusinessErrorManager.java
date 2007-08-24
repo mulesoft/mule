@@ -29,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
 public class BusinessErrorManager implements Callable
 {
     /** logger used by this class */
-    private static transient Log logger = LogFactory.getLog(BusinessErrorManager.class);
+    private static final Log logger = LogFactory.getLog(BusinessErrorManager.class);
 
     public Object onCall(UMOEventContext context) throws UMOException
     {

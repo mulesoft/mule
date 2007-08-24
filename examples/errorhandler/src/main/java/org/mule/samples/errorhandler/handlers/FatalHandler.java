@@ -25,7 +25,7 @@ import org.apache.commons.logging.LogFactory;
 public class FatalHandler extends DefaultHandler
 {
     /** logger used by this class */
-    private static transient Log logger = LogFactory.getLog(FatalHandler.class);
+    private static final Log logger = LogFactory.getLog(FatalHandler.class);
 
     public FatalHandler()
     {

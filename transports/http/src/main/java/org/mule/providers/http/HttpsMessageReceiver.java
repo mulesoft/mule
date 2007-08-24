@@ -10,7 +10,6 @@
 
 package org.mule.providers.http;
 
-import org.mule.providers.ssl.SslConnector;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -57,8 +56,14 @@ public class HttpsMessageReceiver extends HttpMessageReceiver
 
         protected void preRouteMessage(UMOMessage message)
         {
-            if(peerCertificateChain != null) message.setProperty(HttpsConnector.PEER_CERTIFICATES, peerCertificateChain);
-            if(localCertificateChain != null) message.setProperty(HttpsConnector.LOCAL_CERTIFICATES, localCertificateChain);
+            if (peerCertificateChain != null)
+            {
+                message.setProperty(HttpsConnector.PEER_CERTIFICATES, peerCertificateChain);
+            }
+            if (localCertificateChain != null)
+            {
+                message.setProperty(HttpsConnector.LOCAL_CERTIFICATES, localCertificateChain);
+            }
         }
 
         public void handshakeCompleted(HandshakeCompletedEvent event)

@@ -49,7 +49,7 @@ import org.jbpm.taskmgmt.exe.TaskInstance;
  */
 public class Jbpm implements BPMS
 {
-    protected static transient Log logger = LogFactory.getLog(Jbpm.class);
+    protected static final Log logger = LogFactory.getLog(Jbpm.class);
 
     protected JbpmConfiguration jbpmConfiguration = null;
 

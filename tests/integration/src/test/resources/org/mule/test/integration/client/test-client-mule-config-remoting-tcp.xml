@@ -5,7 +5,7 @@
 
 <mule-configuration id="client_test" version="1.0">
 
-    <mule-environment-properties synchronous="true" serverUrl="tcp://localhost:60504" synchronousEventTimeout="100000000"/>
+    <mule-environment-properties synchronous="true" synchronousEventTimeout="100000000"/>
 
     <!-- this connector/provider simulates an existing endpoint on a remote server -->
     <connector name="vmRemoteQueueConnector" className="org.mule.providers.vm.VMConnector">
@@ -26,7 +26,7 @@
             </inbound-router>
             <outbound-router>
                 <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="stream://System.out"/>
+                    <endpoint address="stdio://System.out"/>
                 </router>
             </outbound-router>
         </mule-descriptor>
