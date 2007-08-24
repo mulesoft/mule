@@ -11,8 +11,6 @@
 package org.mule.tck;
 
 import org.mule.RegistryContext;
-import org.mule.config.ConfigurationBuilder;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.impl.model.MuleProxy;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.testmodels.mule.TestMuleProxy;
@@ -37,33 +35,20 @@ public abstract class FunctionalTestCase extends AbstractMuleTestCase
     /** Expected response after the test message has passed through the FunctionalTestComponent. */
     public static final String TEST_MESSAGE_RESPONSE = FunctionalTestComponent.received(TEST_MESSAGE);
     
+    public FunctionalTestCase()
+    {
+        super();
+        // A functional test case starts up the management context by default.
+        setStartContext(true);
+    }
+    
     protected UMOManagementContext createManagementContext() throws Exception
     {
-        // Should we set up te manager for every method?
-        UMOManagementContext context;
-        if (getTestInfo().isDisposeManagerPerSuite() && managementContext!=null)
-        {
-            context = managementContext;
-        }
-        else
-        {
-            ConfigurationBuilder builder = getBuilder();
-            context = builder.configure(getConfigResources());
-            RegistryContext.getConfiguration().setDefaultWorkListener(new TestingWorkListener());
-        }
-        return context;
+        UMOManagementContext mc = super.createManagementContext();
+        RegistryContext.getConfiguration().setDefaultWorkListener(new TestingWorkListener());
+        return mc;
     }
 
-    protected ConfigurationBuilder getBuilder() throws Exception
-    {
-        MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
-        // TODO MULE-1988
-        builder.setStartContext(isStartContext());
-        return builder;
-    }
-
-    protected abstract String getConfigResources();
-    
     protected FunctionalTestComponent lookupTestComponent(String modelName, String componentName) throws UMOException
     {    
         // TODO MULE-1995 Simplify this lookup

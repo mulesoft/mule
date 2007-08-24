@@ -10,9 +10,10 @@
 
 package org.mule.tck;
 
+import org.mule.MuleServer;
 import org.mule.RegistryContext;
-import org.mule.config.MuleProperties;
-import org.mule.config.spring.MuleApplicationContext;
+import org.mule.config.ConfigurationBuilder;
+import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.impl.MuleDescriptor;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.mule.TestConnector;
@@ -24,7 +25,6 @@ import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.model.UMOModel;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.FileUtils;
 import org.mule.util.MuleUrlStreamHandlerFactory;
@@ -33,17 +33,16 @@ import org.mule.util.StringUtils;
 import org.mule.util.SystemUtils;
 import org.mule.util.concurrent.Latch;
 
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.context.ApplicationContext;
 
 /**
  * <code>AbstractMuleTestCase</code> is a base class for Mule testcases. This
@@ -57,9 +56,9 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
     private static final boolean verbose;
 
     /**
-     * Start the ManagementContext once it's configured (defaults to true).
+     * Start the ManagementContext once it's configured (defaults to false for AbstractMuleTestCase, true for FunctionalTestCase).
      */
-    private boolean startContext = true;
+    private boolean startContext = false;
     
     // This should be set to a string message describing any prerequisites not met
     private boolean offline = System.getProperty("org.mule.offline", "false").equalsIgnoreCase("true");
@@ -270,10 +269,11 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
             }
 
             managementContext = createManagementContext();
-            if (startContext)
+            MuleServer.setManagementContext(managementContext);
+            if (isStartContext() && managementContext.isStarted() == false)
             {
                 // TODO MULE-1988
-                //managementContext.start();
+                managementContext.start();
             }
 
             doSetUp();
@@ -287,15 +287,33 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
 
     protected UMOManagementContext createManagementContext() throws Exception
     {
-        //This will create the local registry too
-        ApplicationContext ctx = new MuleApplicationContext(new String[] {"default-mule-config.xml"});
-
-        UMOManagementContext managementContext = (UMOManagementContext)ctx.getBean(MuleProperties.OBJECT_MANAGMENT_CONTEXT);
-        //Add a default model for compoennts to run in
-        managementContext.getRegistry().registerModel(getDefaultModel(managementContext));
-        return managementContext;
+        // Should we set up the manager for every method?
+        UMOManagementContext context;
+        if (getTestInfo().isDisposeManagerPerSuite() && managementContext!=null)
+        {
+            context = managementContext;
+        }
+        else
+        {
+            ConfigurationBuilder builder = getBuilder();
+            context = builder.configure(getConfigResources());
+        }
+        return context;
     }
 
+    protected ConfigurationBuilder getBuilder() throws Exception
+    {
+        MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
+        // TODO MULE-1988
+        builder.setStartContext(false);
+        return builder;
+    }
+
+    protected String getConfigResources()
+    {
+        return "";
+    }
+    
     /**
      * Run <strong>before</strong> any testcase setup.
      */
@@ -376,11 +394,6 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
     protected void doTearDown() throws Exception
     {
         // template method
-    }
-
-    public static UMOModel getDefaultModel(UMOManagementContext context) throws UMOException
-    {
-        return MuleTestUtils.getDefaultModel(context);
     }
 
     public static UMOEndpoint getTestEndpoint(String name, String type) throws Exception
