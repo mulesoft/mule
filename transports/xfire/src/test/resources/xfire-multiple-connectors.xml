@@ -19,7 +19,7 @@
         address="xfire:http://localhost:61082/services/TestComponent2?method=receive" 
         connector-ref="XFireConnector2"/>
 
-    <mule:model-seda name="TestXfireConnectors">
+    <mule:model name="TestXfireConnectors">
         <!-- Two separate components are created instead of 1 with 2 endpoints so that exceptions are not compomised -->
         <mule:service name="TestComponent1">
             <mule:component class="org.mule.tck.testmodels.services.TestComponent"/>
@@ -34,5 +34,5 @@
                 <mule:endpoint address="xfire:http://localhost:61082/services" connector-ref="XFireConnector2"/>
             </mule:inbound-router>
         </mule:service>
-    </mule:model-seda>
+    </mule:model>
 </beans>

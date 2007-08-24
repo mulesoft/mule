@@ -14,7 +14,7 @@
 
     <mule:custom-connector name="testConnector" class="org.mule.tck.testmodels.mule.TestConnector"/>
 
-    <mule:model-seda name="main">
+    <mule:model name="main">
         <mule:service name="testComponent">
             <mule:component class="org.mule.providers.soap.axis.functional.SoapAttachmentsFunctionalTestComponent"/>
             <mule:inbound-router>
@@ -26,5 +26,5 @@
                 </mule:outbound-pass-through-router>
             </mule:outbound-router>
         </mule:service>
-    </mule:model-seda>
+    </mule:model>
 </beans>

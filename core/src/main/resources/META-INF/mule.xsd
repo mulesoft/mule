@@ -30,6 +30,9 @@
         </xsd:complexType>
     </xsd:element>
 
+    <xsd:element name="abstract-connector" abstract="true" type="abstractConnectorType"/>
+    <xsd:complexType name="abstractConnectorType"/>
+
     <xsd:element name="abstract-endpoint" abstract="true" type="abstractEndpointType"/>
     <xsd:complexType name="abstractEndpointType"/>
 
@@ -746,29 +749,20 @@
 
     <!-- Custom connector element -->
 
-    <xsd:element name="custom-connector" type="customConnectorType" />
+    <xsd:element name="custom-connector" type="customConnectorType" substitutionGroup="abstract-connector"/>
 
     <xsd:complexType name="customConnectorType">
-        <!--
-        MULE-2091 / MULE-2093: Don't extend "connectorType" as this results in elements in "connectorElements" group 
-        being included twice which violates the xml schema "Unique Particle Attribution" rule and results in 
-        "non-deterministic content model" errors with some parsers/validators.
         <xsd:complexContent>
-            <xsd:extension base="connectorType">
-        -->
+            <xsd:extension base="abstractConnectorType">
+                <!-- MULE-2091, 2093 - cannot extent connectorType as need properties first -->
                 <xsd:sequence>
                     <xsd:element name="property" type="propertyType" minOccurs="0" maxOccurs="unbounded" />
-                    <!-- RM*: after much experimentation I couldn't get custom-connector to extend connectorType and add
-                        more elements without the parser complaining. Instead I separated the connector elements into their
-                        own group and reference them from this type and the connectorType. See above.-->
                     <xsd:group ref="connectorElements" />
                 </xsd:sequence>
                 <xsd:attribute name="class" type="xsd:NMTOKEN" use="required" />
                 <xsd:attributeGroup ref="connectorAttributes" />
-        <!--
-            </xsd:extension>
+             </xsd:extension>
         </xsd:complexContent>
-        -->
     </xsd:complexType>
 
 
@@ -776,7 +770,7 @@
     <!--   Model Types (should be in separate namespaces)             -->
     <!--==============================================================-->
 
-    <xsd:element name="model-seda" type="sedaModelType" substitutionGroup="abstract-model"/>
+    <xsd:element name="model" type="sedaModelType" substitutionGroup="abstract-model"/>
     <xsd:complexType name="sedaModelType">
         <xsd:complexContent>
             <xsd:extension base="abstractModelType">
@@ -794,38 +788,6 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="model-streaming" type="streamingModelType" substitutionGroup="abstract-model"/>
-    <xsd:complexType name="streamingModelType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractModelType">
-                <xsd:sequence>
-                    <xsd:element name="service-streaming" type="streamingServiceType" minOccurs="0" maxOccurs="unbounded"/>
-                </xsd:sequence>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="model-simple" type="directModelType" substitutionGroup="abstract-model"/>
-    <xsd:complexType name="directModelType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractModelType">
-                <xsd:sequence>
-                    <xsd:element name="service-simple" type="directServiceType" minOccurs="0" maxOccurs="unbounded"/>
-                </xsd:sequence>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="model-custom" type="customModelType" substitutionGroup="abstract-model"/>
-    <xsd:complexType name="customModelType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractModelType">
-                <xsd:sequence>
-                    <xsd:element name="service-custom" type="customServiceType" minOccurs="0" maxOccurs="unbounded"/>
-                </xsd:sequence>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
 
     <!--==============================================================-->
     <!--   Model elements                                          -->
@@ -890,24 +852,6 @@
                 <xsd:attribute name="enablePooling" type="xsd:boolean"/>
                 <xsd:attribute name="componentPerRequest" type="xsd:boolean"/>
             </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:complexType name="streamingServiceType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractServiceType"/>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:complexType name="directServiceType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractServiceType"/>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:complexType name="customServiceType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractServiceType"/>
         </xsd:complexContent>
     </xsd:complexType>
 
@@ -1421,58 +1365,6 @@
         </xsd:attribute>
     </xsd:complexType>
 
-    <!-- TODO - this should be in jndi / management -->
-    <xsd:complexType name="jndiConnectorType">
-        <xsd:complexContent>
-            <xsd:extension base="connectorType">
-                <xsd:sequence>
-                    <xsd:element name="jndi-provider-properties" type="mapType" minOccurs="0">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Direct setting of JNDI properties.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
-                </xsd:sequence>
-                <xsd:attribute name="jndiContext-ref" type="xsd:NMTOKEN">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Set the complete context directly, via a bean reference.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="jndiInitialFactory" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The initial context factory to use. The value
-                            of the property should be the fully qualified class name
-                            of the factory class that will create an initial context.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="jndiProviderUrl" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The service provider to use. The value of the property
-                            should contain a URL string (e.g. "ldap://somehost:389").
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="jndiUrlPkgPrefixes" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The list of package prefixes to use when
-                            loading in URL context factories. The value
-                            of the property should be a colon-separated list of package
-                            prefixes for the class name of the factory class that will create
-                            a URL context factory.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
     <xsd:complexType name="propertyType">
         <xsd:complexContent>
             <xsd:extension base="spring:propertyType" />
@@ -1607,14 +1499,24 @@
     <!--==============================================================-->
 
     <xsd:complexType name="connectorType">
-        <xsd:group ref="connectorElements"/>
-        <xsd:attributeGroup ref="connectorAttributes"/>
+        <xsd:complexContent>
+            <xsd:extension base="abstractConnectorType">
+                <xsd:group ref="connectorElements"/>
+                <xsd:attributeGroup ref="connectorAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
+
+    <!-- we do this so that they can be included elsewhere - necessary because
+         custom connector needs "properties" to be first element, so cannot
+         inherit directly -->
+
     <xsd:attributeGroup name="connectorAttributes">
         <xsd:attribute name="name" type="xsd:string" use="required"/>
         <xsd:attribute name="createDispatcherPerRequest" type="substitutableBoolean"/>
         <xsd:attribute name="createMultipleTransactedReceivers" type="substitutableBoolean"/>
     </xsd:attributeGroup>
+
     <xsd:group name="connectorElements">
         <xsd:sequence>
             <xsd:element name="receiver-threading-profile" type="threadingProfileType" minOccurs="0"/>
@@ -1623,6 +1525,7 @@
             <xsd:element name="service-overrides" type="serviceOverridesType" minOccurs="0"/>
         </xsd:sequence>
     </xsd:group>
+    
     <xsd:complexType name="serviceOverridesType">
         <xsd:attribute name="messageReceiver" type="xsd:NMTOKEN"/>
         <xsd:attribute name="transactedMessageReceiver" type="xsd:NMTOKEN"/>
@@ -1635,5 +1538,61 @@
         <xsd:attribute name="streamMessageAdapter" type="xsd:NMTOKEN"/>
         <xsd:attribute name="serviceFinder" type="xsd:NMTOKEN"/>
     </xsd:complexType>
+
+    
+    <!--==============================================================-->
+    <!--   JNDI support                                               -->
+    <!--==============================================================-->
+
+    <xsd:complexType name="jndiConnectorType">
+         <xsd:complexContent>
+             <xsd:extension base="connectorType">
+                 <xsd:sequence>
+                     <xsd:element name="jndi-provider-properties" type="mapType" minOccurs="0">
+                         <xsd:annotation>
+                             <xsd:documentation>
+                                 Direct setting of JNDI properties.
+                             </xsd:documentation>
+                         </xsd:annotation>
+                     </xsd:element>
+                 </xsd:sequence>
+                 <xsd:attribute name="jndiContext-ref" type="xsd:NMTOKEN">
+                     <xsd:annotation>
+                         <xsd:documentation>
+                             Set the complete context directly, via a bean reference.
+                         </xsd:documentation>
+                     </xsd:annotation>
+                 </xsd:attribute>
+                 <xsd:attribute name="jndiInitialFactory" type="xsd:string">
+                     <xsd:annotation>
+                         <xsd:documentation>
+                             The initial context factory to use. The value
+                             of the property should be the fully qualified class name
+                             of the factory class that will create an initial context.
+                         </xsd:documentation>
+                     </xsd:annotation>
+                 </xsd:attribute>
+                 <xsd:attribute name="jndiProviderUrl" type="xsd:string">
+                     <xsd:annotation>
+                         <xsd:documentation>
+                             The service provider to use. The value of the property
+                             should contain a URL string (e.g. "ldap://somehost:389").
+                         </xsd:documentation>
+                     </xsd:annotation>
+                 </xsd:attribute>
+                 <xsd:attribute name="jndiUrlPkgPrefixes" type="xsd:string">
+                     <xsd:annotation>
+                         <xsd:documentation>
+                             The list of package prefixes to use when
+                             loading in URL context factories. The value
+                             of the property should be a colon-separated list of package
+                             prefixes for the class name of the factory class that will create
+                             a URL context factory.
+                         </xsd:documentation>
+                     </xsd:annotation>
+                 </xsd:attribute>
+             </xsd:extension>
+         </xsd:complexContent>
+     </xsd:complexType>
 
 </xsd:schema>

@@ -196,13 +196,9 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("properties-container", new OrphanDefinitionParser(PropertiesContainerContext.class, true));
 
         //Model Elements
-        registerBeanDefinitionParser("model-seda", new InheritDefinitionParser(new OrphanDefinitionParser(SedaModel.class, true), new NamedDefinitionParser()));
-        registerBeanDefinitionParser("model-inherited", new InheritedModelDefinitionParser());
-        registerBeanDefinitionParser("model-seda-optimised", new OrphanDefinitionParser(OptimisedSedaModel.class, true));
-        registerBeanDefinitionParser("model-simple", new OrphanDefinitionParser(DirectModel.class, true));
-        registerBeanDefinitionParser("model-pipeline", new OrphanDefinitionParser(PipelineModel.class, true));
-        registerBeanDefinitionParser("model-streaming", new OrphanDefinitionParser(StreamingModel.class, true));
-        registerBeanDefinitionParser("model-custom", new OrphanDefinitionParser(true));
+        registerBeanDefinitionParser("model", new InheritDefinitionParser(new OrphanDefinitionParser(SedaModel.class, true), new NamedDefinitionParser()));
+//        registerBeanDefinitionParser("model-seda-optimised", new OrphanDefinitionParser(OptimisedSedaModel.class, true));
+//        registerBeanDefinitionParser("model-pipeline", new OrphanDefinitionParser(PipelineModel.class, true));
 
         registerBeanDefinitionParser("component-lifecycle-adapter-factory", new ChildDefinitionParser("lifecycleAdapterFactory", null));
         registerBeanDefinitionParser("callable-entrypoint-resolver", new ChildDefinitionParser("entryPointResolver", CallableEntryPointResolver.class));
@@ -222,9 +218,6 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("outbound-router", new ChildDefinitionParser("outboundRouter", OutboundRouterCollection.class));
         registerBeanDefinitionParser("nested-router", new ChildDefinitionParser("nestedRouter", NestedRouterCollection.class));
         registerBeanDefinitionParser("response-router", new ChildDefinitionParser("responseRouter", ResponseRouterCollection.class));
-
-        registerBeanDefinitionParser("service-streaming", new ServiceDescriptorDefinitionParser());
-        registerBeanDefinitionParser("service-custom", new ServiceDescriptorDefinitionParser());
 
         //Inbound Routers
         registerBeanDefinitionParser("inbound-pass-through-router", new RouterDefinitionParser("router", InboundPassThroughRouter.class));

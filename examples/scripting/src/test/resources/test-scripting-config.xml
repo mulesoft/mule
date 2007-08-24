@@ -18,7 +18,7 @@
         return ["Hello", ":-)"];
     </scripting:script>
     
-    <mule:model-seda name="main">
+    <mule:model name="main">
         <mule:service name="ScriptService">
             <mule:component class="org.mule.components.script.jsr223.ScriptComponent">
                 <mule:properties>
@@ -30,5 +30,5 @@
                 <mule:endpoint address="vm://scripting"/>
             </mule:inbound-router>
         </mule:service>
-    </mule:model-seda>
+    </mule:model>
 </beans>

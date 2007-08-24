@@ -36,7 +36,7 @@
     -->
     <scripting:groovyRefreshable name="groovyRefreshableBeanChangeInterfaces" refreshableBean-ref="groovy_class_changeInterfaces"  methodName="receive"/>
     
-    <mule:model-seda name="main">
+    <mule:model name="main">
         
         <mule:service name="GroovyUMO_Callable">
             <mule:component instance-ref="groovyRefreshableCallable" scope="singleton"/>
@@ -59,6 +59,6 @@
             </mule:inbound-router>
         </mule:service>   
                     
-    </mule:model-seda>
+    </mule:model>
     
 </beans>

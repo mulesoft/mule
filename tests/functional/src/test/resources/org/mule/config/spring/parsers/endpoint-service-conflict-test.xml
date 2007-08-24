@@ -30,7 +30,7 @@
     <mule:endpoint name="Bank5" address="vm://bank.5" connector-ref="syncVm"/>
     <mule:endpoint name="Bank5In" address="vm://bank.5" connector-ref="syncVm"/>
 
-    <mule:model-seda name="loan-broker">
+    <mule:model name="loan-broker">
 
         <mule:service name="TheLoanBroker">
             <mule:component class="org.mule.examples.loanbroker.esn.SynchronousLoanBroker"/>
@@ -123,5 +123,5 @@
             </mule:inbound-router>
         </mule:service>
 
-    </mule:model-seda>
+    </mule:model>
 </beans>

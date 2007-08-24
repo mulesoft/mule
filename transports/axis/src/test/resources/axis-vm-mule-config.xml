@@ -10,7 +10,7 @@
         <property name="objectClass" value="org.mule.tck.testmodels.services.TestServiceComponent"/>
     </bean>
 
-    <mule:model-seda name="test">
+    <mule:model name="test">
         <mule:service name="mycomponent">
             <mule:component factory-ref="tscFactory"/>
             <mule:inbound-router>
@@ -47,5 +47,5 @@
                 <mule:endpoint address="axis:vm://mycomponent4" synchronous="true"/>
             </mule:inbound-router>
         </mule:service>
-    </mule:model-seda>
+    </mule:model>
 </beans>

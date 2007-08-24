@@ -17,13 +17,13 @@
 
     <mule:endpoint address="tcp://localhost:60198?connector=openConnector" name="clientEndpoint" synchronous="true"/>
 
-    <mule:model-seda name="main">
+    <mule:model name="main">
         <mule:service name="testComponent">
             <mule:component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <mule:inbound-router>
                 <mule:endpoint ref="clientEndpoint"/>
             </mule:inbound-router>
         </mule:service>
-    </mule:model-seda>
+    </mule:model>
 
 </beans>

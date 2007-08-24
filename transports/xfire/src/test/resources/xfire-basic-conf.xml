@@ -12,7 +12,7 @@
         Basic XFire tests
      -->
 
-    <mule:model-seda name="TestXfire">
+    <mule:model name="TestXfire">
         <mule:service name="echoService">
             <mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
@@ -53,5 +53,5 @@
             </mule:inbound-router>
         </mule:service>
 
-    </mule:model-seda>
+    </mule:model>
 </beans>

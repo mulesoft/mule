@@ -11,7 +11,7 @@
     <tcp:connector name="safe"/>
     <tcp:connector name="unsafe" tcpProtocolClassName="org.mule.providers.tcp.protocols.DefaultProtocol"/>
 
-    <mule:model-seda name="main">
+    <mule:model name="main">
         <mule:service name="service">
             <mule:component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <mule:inbound-router>
@@ -19,6 +19,6 @@
                 <mule:endpoint address="tcp://localhost:65433" connector-ref="unsafe" synchronous="true"/>
             </mule:inbound-router>
         </mule:service>
-    </mule:model-seda>
+    </mule:model>
 
 </beans>

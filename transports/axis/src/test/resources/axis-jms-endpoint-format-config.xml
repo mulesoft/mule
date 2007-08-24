@@ -28,7 +28,7 @@
     <mule:endpoint name="noSoapActionDefined" address="axis:jms://soap.my.queue?method=echo&amp;MULE_REMOTE_SYNC=true"/>
     <mule:endpoint name="noMethodDefined" address="axis:jms://soap.my.queue"/>
 
-    <mule:model-seda name="test">
+    <mule:model name="test">
         <mule:service name="echoComponent">
             <mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
@@ -42,6 +42,6 @@
                 <mule:endpoint address="axis:jms://myComponent"/>
             </mule:inbound-router>
         </mule:service>
-    </mule:model-seda>
+    </mule:model>
     
 </beans>

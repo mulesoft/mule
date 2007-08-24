@@ -10,7 +10,7 @@
 
     <bpm:connector name="bpmConnector" bpms-ref="jbpm"/>
 
-    <mule:model-seda name="processModel">
+    <mule:model name="processModel">
         <mule:service name="fromSimpleProcess">
             <mule:component class="org.mule.components.simple.LogComponent"/>
             <mule:inbound-router>
@@ -36,7 +36,7 @@
                 <mule:endpoint address="vm://echo" />
             </mule:inbound-router>
         </mule:service>
-    </mule:model-seda>
+    </mule:model>
     
     <!-- ***************************************************
          BPMS Configuration

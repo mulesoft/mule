@@ -12,7 +12,7 @@
     <mule:endpoint name="endpointHop1" address="vm://hop1"/>
     <mule:endpoint name="endpointHop2" address="vm://hop2"/>
 
-    <mule:model-seda name="main" class="org.mule.tck.testmodels.mule.TestSedaModel">
+    <mule:model name="main" class="org.mule.tck.testmodels.mule.TestSedaModel">
         <mule:service name="multicastComponent">
             <mule:component class="org.mule.components.simple.PassThroughComponent"/>
             <mule:inbound-router>
@@ -39,6 +39,6 @@
                 <mule:endpoint ref="endpointHop2"/>
             </mule:inbound-router>
         </mule:service>
-    </mule:model-seda>
+    </mule:model>
 
 </beans>

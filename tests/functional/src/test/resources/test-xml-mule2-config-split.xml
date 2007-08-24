@@ -8,7 +8,7 @@
        http://www.mulesource.org/schema/mule/test/2.0 http://www.mulesource.org/schema/mule/test/2.0/mule-test.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
-    <mule:model-seda name="main" inherit="true">
+    <mule:model name="main" inherit="true">
 
         <mule:service name="appleComponent2">
             <mule:component class="org.mule.tck.testmodels.fruit.Apple"/>
@@ -65,6 +65,6 @@
 
         </mule:service>
 
-    </mule:model-seda>
+    </mule:model>
 
 </beans>

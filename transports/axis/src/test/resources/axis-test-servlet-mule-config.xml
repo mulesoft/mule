@@ -12,12 +12,12 @@
         name="servlet" 
         servletUrl="http://localhost:62088/services"/>
         
-    <mule:model-seda name="test">
+    <mule:model name="test">
         <mule:service name="mycomponent">
             <mule:component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="axis:servlet://mycomponent"/>
             </mule:inbound-router>
         </mule:service>
-    </mule:model-seda>
+    </mule:model>
 </beans>

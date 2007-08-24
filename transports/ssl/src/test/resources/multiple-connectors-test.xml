@@ -23,7 +23,7 @@
 
     <mule:endpoint name="clientEndpoint" address="ssl://localhost:60198" synchronous="true"/>
 
-    <mule:model-seda name="main">
+    <mule:model name="main">
 
         <mule:service name="testComponent1">
             <mule:component class="org.mule.tck.functional.FunctionalTestComponent"/>
@@ -32,6 +32,6 @@
             </mule:inbound-router>
         </mule:service>
 
-    </mule:model-seda>
+    </mule:model>
 
 </beans>

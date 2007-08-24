@@ -6,7 +6,7 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
-    <mule:model-seda name="main">
+    <mule:model name="main">
         <mule:service name="orange1">
             <mule:component class="org.mule.tck.testmodels.fruit.Orange"/>
         </mule:service>
@@ -28,7 +28,7 @@
         <mule:service name="orange4">
             <mule:component factory-ref="myCustomFactory"/>
         </mule:service>
-    </mule:model-seda>
+    </mule:model>
 
     <!-- Singleton instance -->
     <bean name="myOnlyOrange" class="org.mule.tck.testmodels.fruit.Orange"/>

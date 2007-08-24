@@ -18,7 +18,7 @@
     <mule:endpoint name="self" address="vm://self" connector-ref="queue"/>
     <mule:endpoint name="other" address="vm://other" connector-ref="queue"/>
 
-    <mule:model-seda name="xml filter test">
+    <mule:model name="xml filter test">
 
         <mule:service name="test for xml">
             <mule:component class="org.mule.components.simple.BridgeComponent"/>
@@ -50,7 +50,7 @@
                 </mule:forwarding-catch-all-strategy>
                 <mule:filtering-router>
                     <mule:endpoint ref="self"/>
-                    <mxml:jxpath-filter pattern="/spring:beans/mule:model-seda/mule:service[2]/@name" expectedValue="filter xml for content">
+                    <mxml:jxpath-filter pattern="/spring:beans/mule:model/mule:service[2]/@name" expectedValue="filter xml for content">
                         <mxml:namespace prefix="spring" uri="http://www.springframework.org/schema/beans"/>
                         <mxml:namespace prefix="mule" uri="http://www.mulesource.org/schema/mule/core/2.0"/>
                     </mxml:jxpath-filter>
@@ -58,6 +58,6 @@
             </mule:outbound-router>
         </mule:service>
 
-    </mule:model-seda>
+    </mule:model>
 
 </beans>

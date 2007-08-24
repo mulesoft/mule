@@ -11,16 +11,16 @@
     <mule:custom-transformer name="appendString"
                              class="org.mule.tck.functional.StringAppendTestTransformer"/>
 
-    <mule:model-seda name="testSimple">
+    <mule:model name="testSimple">
         <mule:service name="testServiceSimple">
             <mule:component class="org.mule.tck.functional.FunctionalTestComponent" />
             <mule:inbound-router>
                 <mule:endpoint address="vm://simple" transformers="appendString"/>
             </mule:inbound-router>
         </mule:service>
-    </mule:model-seda>
+    </mule:model>
 
-    <mule:model-seda name="testChained">
+    <mule:model name="testChained">
         <mule:service name="testServiceChained">
             <mule:component class="org.mule.components.simple.BridgeComponent" />
             <mule:inbound-router>
@@ -38,5 +38,5 @@
                 <mule:endpoint address="vm://out" transformers="appendString"/>
             </mule:inbound-router>
         </mule:service>
-    </mule:model-seda>
+    </mule:model>
 </beans>

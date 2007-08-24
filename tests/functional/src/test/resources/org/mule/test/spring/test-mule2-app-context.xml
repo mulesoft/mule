@@ -33,7 +33,7 @@
     </bean>
 
 
-    <mule:model-seda name="main">
+    <mule:model name="main">
 
         <mule:service name="LoanBroker">
             <mule:component instance-ref="apple"/>
@@ -54,5 +54,5 @@
         </mule:service>
 
 
-    </mule:model-seda>
+    </mule:model>
 </beans>

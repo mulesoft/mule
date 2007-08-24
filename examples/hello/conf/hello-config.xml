@@ -59,7 +59,7 @@
     <!--
         The Mule model initialises and manages your UMO components
     -->
-    <mule:model-seda name="helloSample">
+    <mule:model name="helloSample">
         <!--
             A Mule descriptor defines all the necessary information about how your components will
             interact with the framework, other components in the system and external sources.
@@ -92,7 +92,7 @@
             </mule:outbound-router>
             <!--<interceptor name="default"/>-->
         </mule:service>
-    </mule:model-seda>
+    </mule:model>
 
 </beans>
         

@@ -26,7 +26,7 @@
     <!-- first, the simple two service model we use in all cases, with no additional
          transformers -->
 
-    <mule:model-seda name="baseModel">
+    <mule:model name="baseModel">
 
         <mule:service name="baseService1">
             <mule:component class="org.mule.components.simple.BridgeComponent"/>
@@ -47,13 +47,13 @@
             </mule:inbound-router>
         </mule:service>
 
-    </mule:model-seda>
+    </mule:model>
 
 
     <!-- next, the same model but with adapted components that call
          getMessage() rather than getTransformedMessage() -->
 
-    <mule:model-seda name="adaptedModel">
+    <mule:model name="adaptedModel">
 
         <mule:service name="adaptedService1">
             <mule:component class="org.mule.providers.http.issues.NoTransformPassThroughComponent"/>
@@ -74,12 +74,12 @@
             </mule:inbound-router>
         </mule:service>
 
-    </mule:model-seda>
+    </mule:model>
 
 
     <!-- now we add transformers to the adapted model - they should have no effect -->
 
-    <mule:model-seda name="ignoredModel">
+    <mule:model name="ignoredModel">
 
         <mule:service name="ignoredService1">
             <mule:component class="org.mule.providers.http.issues.NoTransformPassThroughComponent"/>
@@ -100,11 +100,11 @@
             </mule:inbound-router>
         </mule:service>
 
-    </mule:model-seda>
+    </mule:model>
 
     <!-- adding transformers to the base model will have an effect -->
 
-    <mule:model-seda name="inboundModel">
+    <mule:model name="inboundModel">
 
         <mule:service name="inboundService1">
             <mule:component class="org.mule.components.simple.BridgeComponent"/>
@@ -125,6 +125,6 @@
             </mule:inbound-router>
         </mule:service>
 
-    </mule:model-seda>
+    </mule:model>
 
 </beans>

@@ -13,7 +13,7 @@
     
     <servlet:connector name="servlet" servletUrl="http://localhost:63088/services"/>
 
-    <mule:model-seda name="test">
+    <mule:model name="test">
         <mule:service name="mycomponent">
             <mule:component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             <mule:inbound-router>
@@ -27,5 +27,5 @@
                 <mule:endpoint address="xfire:http://localhost:63082"/>
             </mule:inbound-router>
         </mule:service>    
-    </mule:model-seda>
+    </mule:model>
 </beans>

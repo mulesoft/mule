@@ -11,7 +11,7 @@
 
     <http:connector name="httpConnector" keepAlive="false"/>
 
-    <mule:model-seda name="test">
+    <mule:model name="test">
 
         <mule:service name="mycomponent1">
             <mule:component class="org.mule.tck.functional.FunctionalTestComponent">
@@ -37,6 +37,6 @@
             </mule:inbound-router>
         </mule:service>
 
-    </mule:model-seda>
+    </mule:model>
 
 </beans>

@@ -30,7 +30,7 @@
 
     <mule:endpoint name="PaymentValidationResponse" address="vm://PaymentValidationResponse"/>
     
-    <mule:model-seda name="voip-broker">
+    <mule:model name="voip-broker">
         <mule:service name="VoipBroker">
             <mule:component class="org.mule.samples.voipservice.service.SyncVoipBroker"/>
 
@@ -88,5 +88,5 @@
                 <mule:endpoint ref="BankAgencyReceiver"/>
             </mule:inbound-router>
         </mule:service>
-    </mule:model-seda>
+    </mule:model>
 </beans>

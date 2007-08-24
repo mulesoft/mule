@@ -12,7 +12,7 @@
         <entry key="serverUrl" value=""/>
     </mule:environment-properties>
     
-    <mule:model-seda name="test">
+    <mule:model name="test">
         <mule:service name="mycomponent">
             <mule:component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             <mule:inbound-router>
@@ -47,5 +47,5 @@
                 <mule:endpoint address="axis:http://localhost:62110" synchronous="false"/>
             </mule:inbound-router>
         </mule:service>
-    </mule:model-seda>
+    </mule:model>
 </beans>

@@ -88,7 +88,7 @@
     <mule:endpoint name="Bank4In" address="axis:http://localhost:40080/mule" />
     <mule:endpoint name="Bank5In" address="axis:http://localhost:50080/mule" />
 
-    <mule:model-seda name="loan-broker">
+    <mule:model name="loan-broker">
 
         <!--
             The loan broker is used to receive loan requests
@@ -220,6 +220,6 @@
             </mule:inbound-router>
         </mule:service>
 
-    </mule:model-seda>
+    </mule:model>
 
 </beans>

@@ -20,7 +20,7 @@
     <!-- mule:endpoint name="serverEndpoint" address="udp://null:60131"/ -->
     <mule:endpoint name="serverEndpoint" address="udp://localhost:60131"/>
 
-    <mule:model-seda name="main">
+    <mule:model name="main">
         <mule:service name="testUDP1">
             <mule:component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <mule:inbound-router>
@@ -32,7 +32,7 @@
                 </mule:outbound-pass-through-router>
             </mule:outbound-router>
         </mule:service>
-    </mule:model-seda>
+    </mule:model>
 
 </beans>
         

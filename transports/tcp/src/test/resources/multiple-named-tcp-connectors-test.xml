@@ -11,7 +11,7 @@
     <tcp:connector name="tcpConnector1"/>
     <tcp:connector name="tcpConnector2"/>
 
-    <mule:model-seda name="MultilpleConnectorsTestModel">
+    <mule:model name="MultilpleConnectorsTestModel">
         <mule:service name="testDescriptor">
             <mule:component class="org.mule.components.simple.BridgeComponent"/>
             <mule:inbound-router>
@@ -20,6 +20,6 @@
                 <mule:endpoint address="tcp://localhost:12345" connector-ref="tcpConnector2"/>
             </mule:inbound-router>
         </mule:service>
-    </mule:model-seda>
+    </mule:model>
 
 </beans>

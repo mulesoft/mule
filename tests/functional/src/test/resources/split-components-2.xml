@@ -9,13 +9,13 @@
 
     <!-- part 2 of 3 -->
 
-    <mule:model-seda name="main">
+    <mule:model name="main">
         <mule:service name="Component1">
             <mule:null-component/>
         </mule:service>
         <mule:service name="Component2">
             <mule:null-component/>
         </mule:service>
-    </mule:model-seda>
+    </mule:model>
 
 </beans>

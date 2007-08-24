@@ -105,7 +105,7 @@
 <!--        <interceptor className="org.mule.interceptors.TimerInterceptor"/>-->
 <!--    </interceptor-stack>-->
     
-    <mule:model-seda name="errorhandler-test">
+    <mule:model name="errorhandler-test">
         <!-- 
             This uses an URL endpointUri instead of a provider config.  Note that this specifies 
             a relative path as the endpoint though fully qualified uri will work i.e. 
@@ -177,7 +177,7 @@
                                transformers="JMSMessageToObject XMLToExceptionBean ExceptionBeanToErrorMessage"/>
             </mule:inbound-router>
         </mule:service>
-    </mule:model-seda>
+    </mule:model>
 </beans>
 
 <!-- 

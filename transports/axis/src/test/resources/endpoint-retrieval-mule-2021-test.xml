@@ -8,12 +8,12 @@
 
     <mule:endpoint name="Endpoint" address="axis:http://localhost:18081/mule/Service?method=toString"/>
 
-    <mule:model-seda name="model">
+    <mule:model name="model">
 
         <mule:service name="Service">
             <mule:component class="java.lang.Object"/>
         </mule:service>
 
-    </mule:model-seda>
+    </mule:model>
 
 </beans>

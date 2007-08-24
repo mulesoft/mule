@@ -17,7 +17,7 @@
         <jaas:password-encryption-strategy  name="PBE" password="mule"/>
     </jaas:security-manager>
 
-    <mule:model-seda name="test">
+    <mule:model name="test">
         <mule:service name="TestUMO">
             <mule:component class="org.mule.tck.functional.FunctionalTestComponent"/>
                 <mule:inbound-router>
@@ -26,6 +26,6 @@
                     </mule:endpoint>
                 </mule:inbound-router>
             </mule:service>
-    </mule:model-seda>
+    </mule:model>
 
 </beans>

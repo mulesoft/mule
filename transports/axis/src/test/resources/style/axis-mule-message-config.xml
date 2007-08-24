@@ -10,7 +10,7 @@
 
     <mule:configuration serverId="" defaultSynchronousEndpoints="true"/>
     
-    <mule:model-seda name="WebService_Test">
+    <mule:model name="WebService_Test">
         <mule:service name="ServiceEntryPoint">
             <mule:component class="org.mule.providers.soap.axis.style.DefaultMessageService"/>
             <mule:inbound-router>
@@ -27,7 +27,7 @@
                 </mule:endpoint>
             </mule:inbound-router>
         </mule:service>    
-    </mule:model-seda>
+    </mule:model>
 </beans>
 
 <!-- 

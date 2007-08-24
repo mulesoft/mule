@@ -28,7 +28,7 @@
                                           delegate-ref="daoAuthenticationProvider"/>
     </acegi:security-manager>
 
-    <mule:model-seda name="http secured test model">
+    <mule:model name="http secured test model">
         <mule:service name="SecureUMO">
             <mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
@@ -37,6 +37,6 @@
                 </mule:endpoint>
             </mule:inbound-router>
         </mule:service>
-    </mule:model-seda>
+    </mule:model>
 
 </beans>

@@ -38,7 +38,7 @@
     <mule:endpoint name="MediumBank" address="vm://medium.bank" connector-ref="syncVm" />
     <mule:endpoint name="SmallBank" address="vm://small.bank" connector-ref="syncVm" />
 
-    <mule:model-seda name="loan-broker">
+    <mule:model name="loan-broker">
 
         <!-- ***************************************************
             Process Engine
@@ -130,7 +130,7 @@
                 <mule:endpoint ref="SmallBank" />
             </mule:inbound-router>
         </mule:service>
-    </mule:model-seda>
+    </mule:model>
 
     <!-- ***************************************************
         BPMS Configuration

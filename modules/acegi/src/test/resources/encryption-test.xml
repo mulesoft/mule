@@ -32,7 +32,7 @@
         <mule:password-encryption-strategy name="PBE" password="mule"/>
     </mule:security-manager>
 
-    <mule:model-seda name="test">
+    <mule:model name="test">
         <mule:service name="echo">
             <mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
@@ -44,6 +44,6 @@
                 </mule:endpoint>
             </mule:inbound-router>
         </mule:service>
-    </mule:model-seda>
+    </mule:model>
 
 </beans>

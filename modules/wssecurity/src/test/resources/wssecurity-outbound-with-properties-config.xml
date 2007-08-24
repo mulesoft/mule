@@ -25,7 +25,7 @@
         <entry key="synchronous" value="false"/>
     </mule:environment-properties>
 
-	<mule:model-seda name="test">
+	<mule:model name="test">
         <mule:service name="BridgeUMO">
 			<mule:component class="org.mule.components.simple.BridgeComponent"/>
             <mule:inbound-router>
@@ -53,5 +53,5 @@
                 </mule:endpoint>
             </mule:inbound-router>
         </mule:service>
-	</mule:model-seda>
+	</mule:model>
 </beans>

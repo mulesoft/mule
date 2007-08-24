@@ -8,7 +8,7 @@
                http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
                http://www.mulesource.org/schema/mule/tcp/2.0 http://www.mulesource.org/schema/mule/tcp/2.0/mule-tcp.xsd">
 
-    <mule:model-seda name="Tcp_with_remote_sync">
+    <mule:model name="Tcp_with_remote_sync">
 
         <mule:service name="Echo1">
             <mule:component class="org.mule.components.simple.BridgeComponent"/>
@@ -42,6 +42,6 @@
             </mule:inbound-router>
         </mule:service>
 
-    </mule:model-seda>
+    </mule:model>
 
 </beans>

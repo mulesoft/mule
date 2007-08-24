@@ -18,7 +18,7 @@
 
     <mule:custom-transformer name="transformer" class="org.mule.tck.functional.StringAppendTestTransformer"/>
 
-    <mule:model-seda name="endpoint transformer tests">
+    <mule:model name="endpoint transformer tests">
 
         <mule:service name="main">
             <mule:component class="org.mule.components.simple.BridgeComponent"/>
@@ -37,6 +37,6 @@
             </mule:outbound-router>
         </mule:service>
 
-    </mule:model-seda>
+    </mule:model>
 
 </beans>

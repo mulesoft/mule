@@ -13,12 +13,12 @@
      -->
     <mule:configuration serverId="" defaultSynchronousEndpoints="true"/>
     
-    <mule:model-seda name="XfireSoapRequest">
+    <mule:model name="XfireSoapRequest">
         <mule:service name="TestComponent">
             <mule:component class="org.mule.tck.testmodels.services.TestComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="xfire:http://localhost:63381/services"/>
             </mule:inbound-router>
         </mule:service>
-    </mule:model-seda>
+    </mule:model>
 </beans>

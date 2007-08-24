@@ -6,7 +6,7 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
-    <mule:model-seda name="main" class="org.mule.tck.testmodels.mule.TestSedaModel">
+    <mule:model name="main" class="org.mule.tck.testmodels.mule.TestSedaModel">
         <mule:service name="unique1">
             <mule:component class="org.mule.tck.services.UniqueComponent" />
         </mule:service>
@@ -19,7 +19,7 @@
         <!-- SEDA-specific attributes 
         <mule:service name="unique4" serviceFactory-ref="genericFactory" enablePooling="false"/>
         -->
-    </mule:model-seda>
+    </mule:model>
 
     <!-- Singleton bean -->    
     <bean name="myUniqueBean" class="org.mule.tck.services.UniqueComponent" />

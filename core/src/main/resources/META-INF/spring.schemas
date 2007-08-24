@@ -1,1 +1,4 @@
 http\://www.mulesource.org/schema/mule/core/2.0/mule.xsd=META-INF/mule.xsd
+http\://www.mulesource.org/schema/mule/streaming/2.0/mule-streaming.xsd=META-INF/mule-streaming.xsd
+http\://www.mulesource.org/schema/mule/simple/2.0/mule-simple.xsd=META-INF/mule-simple.xsd
+http\://www.mulesource.org/schema/mule/custom/2.0/mule-custom.xsd=META-INF/mule-custom.xsd

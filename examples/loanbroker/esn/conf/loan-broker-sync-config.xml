@@ -22,7 +22,7 @@
     <!--
        The Mule model initialises and manages your UMO components
      -->
-    <mule:model-seda name="loan-broker">
+    <mule:model name="loan-broker">
 
              <!--
              The loan broker is used to receive loan requests
@@ -135,5 +135,5 @@
                  </mule:inbound-router>
              </mule:service>
 
-         </mule:model-seda>
+         </mule:model>
 </beans>

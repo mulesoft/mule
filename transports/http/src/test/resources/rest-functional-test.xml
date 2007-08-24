@@ -10,7 +10,7 @@
        http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd
        http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd">
     
-    <mule:model-seda name="REST Functional TestCase">
+    <mule:model name="REST Functional TestCase">
         
         <mule:service name="RESTServiceWrapper1">
             <mule:component class="org.mule.components.rest.RestServiceWrapper">
@@ -81,5 +81,5 @@
                 <mule:endpoint address="vm://in4"/>
             </mule:inbound-router>
         </mule:service>
-    </mule:model-seda>
+    </mule:model>
 </beans>

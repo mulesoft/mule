@@ -66,7 +66,7 @@
     <!--
         The Mule model initialises and manages your UMO components
     -->
-    <mule:model-seda name="helloSample">
+    <mule:model name="helloSample">
         <!--
             This component receives input from 3 different endpoints (http, servlet, vm) and routes
             them all to the same place.
@@ -109,6 +109,6 @@
             </mule:inbound-router>
             <!--<interceptor name="default"/>-->
         </mule:service>
-    </mule:model-seda>
+    </mule:model>
 
 </beans>

@@ -46,7 +46,7 @@
         </property>
     </bean>
 
-    <mule:model-seda name="main" class="org.mule.tck.testmodels.mule.TestSedaModel">
+    <mule:model name="main" class="org.mule.tck.testmodels.mule.TestSedaModel">
 
         <mule:service name="testComponent1">
             <!-- Note: this doesn't need to be a singleton, it's a workaround because I couldn't 
@@ -75,6 +75,6 @@
             </mule:inbound-router>
         </mule:service>
 
-    </mule:model-seda>
+    </mule:model>
 
 </beans>

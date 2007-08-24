@@ -12,7 +12,7 @@
         <mule:default-threading-profile threadWaitTimeout="60000" threadTTL="60000"/>
     </mule:configuration>
 
-    <mule:model-seda name="synchTestModel">
+    <mule:model name="synchTestModel">
         <mule:service name="mySynchService">
             <mule:component class="org.mule.tck.functional.FunctionalTestComponent">
                 <mule:properties>
@@ -24,6 +24,6 @@
                 <mule:endpoint address="vm://s-in" synchronous="true"/>
             </mule:inbound-router>
         </mule:service>
-    </mule:model-seda>
+    </mule:model>
 </beans>
         

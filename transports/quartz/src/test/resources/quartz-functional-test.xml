@@ -25,7 +25,7 @@
         </mule:properties>
     </mule:endpoint>
 
-    <mule:model-seda name="quartz">
+    <mule:model name="quartz">
         <mule:pooling-profile maxActive="1" exhaustedAction="WAIT"/>
 
         <mule:service name="quartzService1">
@@ -41,5 +41,5 @@
                 <mule:endpoint ref="quartz.in.2"/>
             </mule:inbound-router>
         </mule:service>
-    </mule:model-seda>
+    </mule:model>
 </beans>

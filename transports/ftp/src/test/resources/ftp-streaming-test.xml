@@ -2,11 +2,13 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:stream="http://www.mulesource.org/schema/mule/streaming/2.0"
        xmlns:ftp="http://www.mulesource.org/schema/mule/ftp/2.0"
        xmlns:tcp="http://www.mulesource.org/schema/mule/tcp/2.0"
        xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
                http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+               http://www.mulesource.org/schema/mule/streaming/2.0 http://www.mulesource.org/schema/mule/streaming/2.0/mule-streaming.xsd
                http://www.mulesource.org/schema/mule/ftp/2.0 http://www.mulesource.org/schema/mule/ftp/2.0/mule-ftp.xsd
                http://www.mulesource.org/schema/mule/tcp/2.0 http://www.mulesource.org/schema/mule/tcp/2.0/mule-tcp.xsd">
 
@@ -16,9 +18,9 @@
 
     <tcp:connector name="tcp" tcpProtocolClassName="org.mule.providers.tcp.protocols.DefaultProtocol"/>
 
-    <mule:model-streaming name="main">
+    <stream:model name="main">
 
-        <mule:service-streaming name="bridge">
+        <stream:service name="bridge">
             <mule:component class="org.mule.components.simple.StreamingBridgeComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="tcp://localhost:60196">
@@ -36,9 +38,9 @@
                     </mule:endpoint>
                 </mule:outbound-pass-through-router>
             </mule:outbound-router>
-        </mule:service-streaming>
+        </stream:service>
 
-        <mule:service-streaming name="testComponent">
+        <stream:service name="testComponent">
             <mule:component scope="singleton" class="org.mule.tck.functional.FunctionalStreamingTestComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="ftp://anonymous:email@localhost:60197">
@@ -47,8 +49,8 @@
                             retryFrequency="2000"/>
                 </mule:endpoint>
             </mule:inbound-router>
-        </mule:service-streaming>
+        </stream:service>
 
-    </mule:model-streaming>
+    </stream:model>
 
 </beans>

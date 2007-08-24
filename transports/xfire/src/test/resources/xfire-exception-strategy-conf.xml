@@ -13,7 +13,7 @@
      -->
     <mule:configuration serverId="" defaultSynchronousEndpoints="true"/>
     
-    <mule:model-seda name="TestXFireComponentExceptionStrategy">
+    <mule:model name="TestXFireComponentExceptionStrategy">
         <mule:service name="XFireWithExceptionStrategy">
             <mule:component class="org.mule.providers.soap.xfire.testmodels.TestXFireComponent"/>
             <mule:inbound-router>
@@ -27,5 +27,5 @@
                 <mule:endpoint address="xfire:http://localhost:63181/services"/>
             </mule:inbound-router>
         </mule:service>
-    </mule:model-seda>
+    </mule:model>
 </beans>

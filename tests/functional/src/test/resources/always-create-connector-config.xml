@@ -9,7 +9,7 @@
     <mule:endpoint name="inbound" address="test:/inbound" createConnector="ALWAYS_CREATE"/>
     <mule:endpoint name="outbound" address="test://outbound" createConnector="ALWAYS_CREATE"/>
 
-    <mule:model-seda name="dual connector test">
+    <mule:model name="dual connector test">
         <mule:service name="inbound listener">
             <mule:echo-component/>
             <mule:inbound-router>
@@ -21,7 +21,7 @@
                 </mule:outbound-pass-through-router>
             </mule:outbound-router>
         </mule:service>
-    </mule:model-seda>
+    </mule:model>
 
     <!-- model name="Dual Connector Test">
         <mule-descriptor name="Inbound Listener"

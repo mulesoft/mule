@@ -30,7 +30,7 @@
 		 <xfire:client-out-handler>org.codehaus.xfire.security.wss4j.WSS4JOutHandler</xfire:client-out-handler>
 	</xfire:connector>
 
- 	 <mule:model-seda name="test">
+ 	 <mule:model name="test">
         <mule:service name="MySecuredUMO">
             <mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
@@ -39,5 +39,5 @@
                 </mule:endpoint>
             </mule:inbound-router>
         </mule:service>
-     </mule:model-seda>
+     </mule:model>
 </beans>

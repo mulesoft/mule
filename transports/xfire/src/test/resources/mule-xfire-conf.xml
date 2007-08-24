@@ -14,13 +14,13 @@
 
     <mule:configuration serverId="" defaultSynchronousEndpoints="true"/>
 
-    <mule:model-seda name="TestXfireHeaders">
+    <mule:model name="TestXfireHeaders">
         <mule:service name="TestComponent">
         <mule:component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="xfire:http://localhost:63181/services"/>
             </mule:inbound-router>
         </mule:service>
-    </mule:model-seda>
+    </mule:model>
 </beans>
 

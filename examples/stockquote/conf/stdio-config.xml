@@ -13,7 +13,7 @@
                      resourceBundle="messages.stockquote-example-messages"
                      messageDelayTime="1000"/>
 
-    <mule:model-seda name="Sample">
+    <mule:model name="Sample">
         <mule:service name="Console I/O">
             <mule:component class="org.mule.components.simple.BridgeComponent"/>
             <mule:inbound-router>
@@ -30,5 +30,5 @@
                 </mule:chaining-router>
             </mule:outbound-router>
         </mule:service>
-    </mule:model-seda>
+    </mule:model>
 </beans>

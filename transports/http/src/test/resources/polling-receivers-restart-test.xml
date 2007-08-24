@@ -16,7 +16,7 @@
 
     <http:connector name="HttpConnector"/>
 
-    <mule:model-seda name="main" class="org.mule.tck.testmodels.mule.TestSedaModel">
+    <mule:model name="main" class="org.mule.tck.testmodels.mule.TestSedaModel">
 
         <!-- singleton for easier testing only -->
         <mule:service name="Test">
@@ -43,6 +43,6 @@
             </mule:inbound-router>
         </mule:service>
 
-    </mule:model-seda>
+    </mule:model>
 
 </beans>

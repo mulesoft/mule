@@ -25,7 +25,7 @@
 
     <http:connector name="HttpConnector"/>
 
-    <mule:model-seda name="http secured test model">
+    <mule:model name="http secured test model">
         <mule:service name="SecureUMO">
             <mule:component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <mule:inbound-router>
@@ -34,6 +34,6 @@
                 </mule:endpoint>
             </mule:inbound-router>
         </mule:service>
-    </mule:model-seda>
+    </mule:model>
 
 </beans>

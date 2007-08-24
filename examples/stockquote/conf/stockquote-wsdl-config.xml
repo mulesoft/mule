@@ -42,7 +42,7 @@
         <mule:property name="xslFile" value="xsl/rest-stock.xsl"/>
     </mule:custom-transformer>
 
-    <mule:model-seda name="Sample-WSDL">
+    <mule:model name="Sample-WSDL">
         <!--
             This component can proxy external web service calls over Jms, tcp, ssl or any other transport.
             For this example we use Vm.
@@ -58,5 +58,5 @@
                 </mule:outbound-pass-through-router>
             </mule:outbound-router>
         </mule:service>
-    </mule:model-seda>
+    </mule:model>
 </beans>

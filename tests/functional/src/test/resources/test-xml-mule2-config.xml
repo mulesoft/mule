@@ -194,7 +194,7 @@
         </list>
     </properties -->
 
-    <mule:model-seda name="main">
+    <mule:model name="main">
 
         <!-- TODO -->
         <!-- entry point resolver? -->
@@ -402,5 +402,5 @@
             </response-router -->
         </mule:service>
 
-    </mule:model-seda>
+    </mule:model>
 </beans>

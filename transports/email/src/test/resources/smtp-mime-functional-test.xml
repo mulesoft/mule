@@ -14,7 +14,7 @@
                 outboundTransformer="org.mule.transformers.NoActionTransformer"/>
     </smtp:connector>
 
-    <mule:model-seda name="test">
+    <mule:model name="test">
 
         <mule:service name="relay">
             <mule:component class="org.mule.components.simple.BridgeComponent"/>
@@ -28,6 +28,6 @@
             </mule:outbound-router>
         </mule:service>
 
-    </mule:model-seda>
+    </mule:model>
 
 </beans>

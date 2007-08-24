@@ -21,12 +21,12 @@
                 requireClientAuthentication="false"/>
     </https:connector>
 
-    <mule:model-seda name="Https_Test_Model">
+    <mule:model name="Https_Test_Model">
         <mule:service name="TestUMO">
             <mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="axis:https://localhost:62000"/>
             </mule:inbound-router>
         </mule:service>
-    </mule:model-seda>
+    </mule:model>
 </beans>

@@ -32,7 +32,7 @@
                     serverConfig="mule-axis-secure-server-config.wsdd">
     </axis:connector>
 
-    <mule:model-seda name="test">
+    <mule:model name="test">
 		 
         <mule:service name="BridgeUMO">
             <mule:component class="org.mule.components.simple.BridgeComponent"/>
@@ -61,6 +61,6 @@
                 </mule:endpoint>
             </mule:inbound-router>
         </mule:service>
-    </mule:model-seda>
+    </mule:model>
 
 </beans>

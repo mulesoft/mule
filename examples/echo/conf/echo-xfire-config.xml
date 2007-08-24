@@ -20,7 +20,7 @@
     <mule:custom-transformer name="HttpRequestToSoapRequest"
         class="org.mule.providers.soap.transformers.HttpRequestToSoapRequest"/>
 
-    <mule:model-seda name="echoSample">
+    <mule:model name="echoSample">
         <mule:service name="EchoUMO">
             <mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
@@ -29,5 +29,5 @@
                 <mule:endpoint address="xfire:http://localhost:65082/services"/>
             </mule:inbound-router>
         </mule:service>
-    </mule:model-seda>
+    </mule:model>
 </beans>
