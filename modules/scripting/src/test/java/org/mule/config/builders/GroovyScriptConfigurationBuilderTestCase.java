@@ -19,6 +19,7 @@ public class GroovyScriptConfigurationBuilderTestCase extends AbstractScriptConf
 
     public String getConfigResources()
     {
+        // TODO Update script to use registry instead of QuickConfigurationBuilder
         return "mule-config.groovy";
     }
 

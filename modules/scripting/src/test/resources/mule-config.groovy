@@ -36,10 +36,7 @@ import java.util.List;
 import java.util.Map;
      
 // need this when running with JMX
-//TODO MULE-1988 
-managementContext.stop();
 managementContext.setId("GroovyScriptTestCase");
-managementContext.start();
 
 //set global properties
 managementContext.getRegistry().registerProperty("doCompression", "true");
