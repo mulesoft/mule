@@ -17,9 +17,6 @@ import java.util.List;
  * <code>QueuePersistenceStrategy</code> defines the The api to a persistent queue
  * store. A persistence strategy can be transient (in memory or non-restorable) or
  * non-transient such as File system or DB.
- * 
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
  */
 public interface QueuePersistenceStrategy
 {

@@ -15,9 +15,6 @@ import org.mule.config.i18n.Message;
 /**
  * <code>ContainerException</code> is an Exception thrown by the component resolver
  * when it fials to find a component
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class ContainerException extends ManagerException
 {

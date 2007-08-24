@@ -23,9 +23,6 @@ import java.lang.reflect.Proxy;
 /**
  * <code>MuleProxyListener</code> is a generic listent proxy that can be used to
  * foward calls as Mule events from any Observer/Observerable implementation.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class MuleProxyListener implements InvocationHandler

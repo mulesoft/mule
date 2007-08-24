@@ -15,9 +15,6 @@ import org.mule.umo.UMOException;
 
 /**
  * <code>FatalException</code> TODO (document class)
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class FatalException extends UMOException
 {

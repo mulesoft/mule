@@ -13,10 +13,6 @@ package org.mule.test.usecases;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.lifecycle.Callable;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class ReceiverComponent implements Callable
 {
     public Object onCall(UMOEventContext eventContext) throws Exception

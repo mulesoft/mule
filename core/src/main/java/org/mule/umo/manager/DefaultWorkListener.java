@@ -18,9 +18,6 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Default exception Handler used when executing work in the work manager
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class DefaultWorkListener implements WorkListener
 {

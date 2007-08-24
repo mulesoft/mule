@@ -20,10 +20,7 @@ import org.springframework.context.ApplicationContextAware;
 
 /**
  * <code>OrderManagerBean</code> receives order beans from Mule and dispatches
- * process relsults back through Mule via the applicationContext
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * process relsults back through Mule via the applicationContext.
  */
 public class AsyncOrderManagerBean extends OrderManagerBean
     implements AsyncOrderManager, ApplicationContextAware

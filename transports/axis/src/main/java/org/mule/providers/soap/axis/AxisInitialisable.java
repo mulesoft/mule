@@ -17,9 +17,6 @@ import org.apache.axis.handlers.soap.SOAPService;
 /**
  * <code>AxisInitialisable</code> can be implemented by a Mule component that will
  * be used as an Axis service to customise the Axis Service object
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public interface AxisInitialisable
 {

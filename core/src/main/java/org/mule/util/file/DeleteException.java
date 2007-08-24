@@ -13,10 +13,6 @@ package org.mule.util.file;
 import java.io.File;
 import java.io.IOException;
 
-/**
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
- */
 public class DeleteException extends IOException
 {
     /**

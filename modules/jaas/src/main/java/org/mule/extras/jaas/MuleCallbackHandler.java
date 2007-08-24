@@ -20,9 +20,6 @@ import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
-/**
- * @author Marie.Rizzo
- */
 public class MuleCallbackHandler implements CallbackHandler
 {
     private UMOAuthentication authentication;

@@ -17,14 +17,11 @@ import org.mule.umo.UMOSession;
 import org.mule.umo.routing.RoutingException;
 
 /**
- * A router that breaks up the current message onto smaller parts and sends them to
- * the same destination. The Destination component needs to have a
- * MessageChunkingAggregator inbound router in order to rebuild the message at the
- * other end.
+ * A router that breaks up the current message onto smaller parts and sends them to the
+ * same destination. The Destination component needs to have a MessageChunkingAggregator
+ * inbound router in order to rebuild the message at the other end.
  * 
  * @see org.mule.routing.inbound.MessageChunkingAggregator
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class MessageChunkingRouter extends FilteringOutboundRouter
 {
@@ -67,9 +64,8 @@ public class MessageChunkingRouter extends FilteringOutboundRouter
             }
             catch (Exception e)
             {
-                throw new RoutingException(
-                    CoreMessages.failedToReadPayload(), 
-                    message, getEndpoint(0, message), e);
+                throw new RoutingException(CoreMessages.failedToReadPayload(), message, getEndpoint(0,
+                    message), e);
             }
 
             int parts = data.length / messageSize;

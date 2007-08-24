@@ -15,10 +15,7 @@ import org.mule.umo.UMOException;
 
 /**
  * <code>ManagementException</code> is a general exception thrown by management
- * extensions
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * extensions.
  */
 public abstract class ManagementException extends UMOException
 {

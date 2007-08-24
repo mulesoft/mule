@@ -15,9 +15,6 @@ import org.mule.util.FileUtils;
 
 import java.io.File;
 
-/**
- * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
- */
 public class FileRuntimeExceptionStrategyFunctionalTestCase extends FunctionalTestCase
 {
     protected String getConfigResources()

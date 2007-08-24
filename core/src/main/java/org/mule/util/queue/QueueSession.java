@@ -12,10 +12,6 @@ package org.mule.util.queue;
 
 import org.mule.util.xa.ResourceManagerException;
 
-/**
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
- */
 public interface QueueSession
 {
 

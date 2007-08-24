@@ -27,13 +27,22 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a> Sample config:
- *         <outbound-router> <router
- *         className="org.mule.routing.outbound.EndpointSelector"> <endpoint
- *         name="dest1" address="jms://queue1" /> <endpoint name="dest2"
- *         address="jms://queue2" /> <endpoint name="dest3" address="jms://queue3" />
- *         <properties> <property name="selector" value="endpoint" /> </properties>
- *         </router> </outbound-router>
+ * Sample config:
+ * 
+ * <pre>
+ * &lt;outbound-router&gt;
+ *      &lt;router className=&quot;org.mule.routing.outbound.EndpointSelector&quot;&gt;
+ *          &lt;endpoint name=&quot;dest1&quot; address=&quot;jms://queue1&quot; /&gt;
+ *          &lt;endpoint name=&quot;dest2&quot; address=&quot;jms://queue2&quot; /&gt;
+ *          &lt;endpoint name=&quot;dest3&quot; address=&quot;jms://queue3&quot; /&gt;
+ *          &lt;properties&gt;
+ *              &lt;property name=&quot;selector&quot; value=&quot;endpoint&quot; /&gt;
+ *          &lt;/properties&gt;
+ *      &lt;/router&gt;
+ * &lt;/outbound-router&gt;
+ * </pre>
+ * 
+ * </pre>
  */
 public class EndpointSelectorTestCase extends AbstractMuleTestCase
 {
@@ -70,7 +79,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
 
         assertTrue(router.isMatch(message));
         session.expect("dispatchEvent", C.eq(message, dest3));
-        router.route(message, (UMOSession)session.proxy(), false);
+        router.route(message, (UMOSession) session.proxy(), false);
         session.verify();
     }
 
@@ -88,7 +97,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
 
         assertTrue(router.isMatch(message));
         session.expect("dispatchEvent", C.eq(message, dest2));
-        router.route(message, (UMOSession)session.proxy(), false);
+        router.route(message, (UMOSession) session.proxy(), false);
         session.verify();
     }
 
@@ -100,7 +109,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
 
         try
         {
-            router.route(message, (UMOSession)session.proxy(), false);
+            router.route(message, (UMOSession) session.proxy(), false);
             fail("Router should have thrown an exception if endpoint was not found.");
         }
         catch (CouldNotRouteOutboundMessageException e)
@@ -115,7 +124,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
 
         try
         {
-            router.route(message, (UMOSession)session.proxy(), false);
+            router.route(message, (UMOSession) session.proxy(), false);
             fail("Router should have thrown an exception if no selector property was set on the message.");
         }
         catch (IllegalArgumentException e)

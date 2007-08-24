@@ -19,10 +19,6 @@ import org.mule.util.object.ObjectPool;
 
 import com.mockobjects.dynamic.Mock;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public abstract class AbstractProxyPoolFactoryTestCase extends AbstractMuleTestCase
 {
     public void testCreateProxyFromFactory() throws Exception

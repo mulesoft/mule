@@ -12,9 +12,6 @@ package org.mule.samples.voipservice.to;
 
 import java.io.Serializable;
 
-/**
- * @author Binildas Christudas
- */
 public class CreditProfileTO implements Serializable
 {
     /**

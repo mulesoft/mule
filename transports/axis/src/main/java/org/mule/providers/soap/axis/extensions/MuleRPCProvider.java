@@ -42,11 +42,8 @@ import org.apache.axis.soap.SOAPConstants;
 import org.apache.axis.utils.JavaUtils;
 
 /**
- * <code>MuleProvider</code> Is an Axis service endpoint that builds services from
- * Mule managed components
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>MuleProvider</code> is an Axis service endpoint that builds services from
+ * Mule managed components.
  */
 public class MuleRPCProvider extends RPCProvider
 {

@@ -19,9 +19,6 @@ import org.apache.axis.handlers.soap.SOAPService;
 /**
  * Override the File provider to stop exceptions being thrown in Axis if the service
  * does not exist. Mule adds services after the WSDD has been loaded.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class WSDDFileProvider extends FileProvider
 {

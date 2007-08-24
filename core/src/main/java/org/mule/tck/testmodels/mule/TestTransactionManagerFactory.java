@@ -20,9 +20,6 @@ import javax.transaction.TransactionManager;
 
 /**
  * <code>TestTransactionManagerFactory</code> TODO
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class TestTransactionManagerFactory implements UMOTransactionManagerFactory

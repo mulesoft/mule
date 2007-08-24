@@ -14,10 +14,7 @@ import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 
 /**
- * <code>ModelServiceMBean</code> JMX Service interface for the UMOModel
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>ModelServiceMBean</code> JMX Service interface for the UMOModel.
  */
 public interface ModelServiceMBean
 {

@@ -12,10 +12,6 @@ package org.mule.management.mbeans;
 
 /**
  * <code>ComponentStatsMBean</code> TODO
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @author Guillaume Nodet
- * @version $Revision$
  */
 public interface ComponentStatsMBean
 {

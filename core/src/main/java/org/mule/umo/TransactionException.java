@@ -16,9 +16,6 @@ import org.mule.config.i18n.Message;
  * <p>
  * <code>TransactionException</code> is thrown when an exception occurs while
  * trying to create, start commit or rollback an exception
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class TransactionException extends UMOException
 {

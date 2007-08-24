@@ -16,9 +16,6 @@ import org.mule.umo.UMOException;
 /**
  * <code>ManagerException</code> is thrown when an exception occurs with Manager
  * objects
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class ManagerException extends UMOException
 {

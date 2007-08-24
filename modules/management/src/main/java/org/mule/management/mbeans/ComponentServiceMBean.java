@@ -18,10 +18,7 @@ import javax.management.ObjectName;
 
 /**
  * <code>ComponentServiceMBean</code> defines the management interface for a mule
- * managed component
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * managed component.
  */
 public interface ComponentServiceMBean extends Stoppable, Startable, ComponentStatsMBean
 {

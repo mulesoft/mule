@@ -20,11 +20,6 @@ import java.util.Map;
 
 import org.apache.activemq.command.ActiveMQTextMessage;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public class ReplytoChainIntegrationTestCase extends FunctionalTestCase
 {
     public ReplytoChainIntegrationTestCase()

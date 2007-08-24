@@ -18,19 +18,15 @@ import org.mule.umo.UMOInterceptor;
 import org.mule.umo.UMOMessage;
 
 /**
- * <code>MessageNormalizerInterceptor</code> can be used as a simple pre/post
- * message normalizer for a given component. This is useful in situations where you
- * have an existing component that may accept a one or more child objects of the
- * incoming object. For example, you may Have a BankQuoteRequest object that contains
- * customer, credit and loan details, but one component is only interested in
- * enriching the customer information. Rather than have your component understand how
- * to deal with a BankLoanRequest this interceptor can be used to extract the
- * customer and pass that to the component. Once the component have finshed
- * processing this interceptor update the BankLoanRequest with the new customer
- * information.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>MessageNormalizerInterceptor</code> can be used as a simple pre/post message
+ * normalizer for a given component. This is useful in situations where you have an
+ * existing component that may accept a one or more child objects of the incoming object.
+ * For example, you may Have a BankQuoteRequest object that contains customer, credit and
+ * loan details, but one component is only interested in enriching the customer
+ * information. Rather than have your component understand how to deal with a
+ * BankLoanRequest this interceptor can be used to extract the customer and pass that to
+ * the component. Once the component have finshed processing this interceptor update the
+ * BankLoanRequest with the new customer information.
  */
 public abstract class MessageNormalizerInterceptor implements UMOInterceptor
 {

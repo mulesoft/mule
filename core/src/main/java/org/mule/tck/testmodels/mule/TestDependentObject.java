@@ -17,9 +17,6 @@ import java.util.Map;
 
 /**
  * <code>TestDependentObject</code> is used as a mock dependency for an object
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class TestDependentObject implements PropertyFactory
 {

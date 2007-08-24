@@ -21,9 +21,6 @@ package org.mule.util.counters;
  * are computed using one or more associated counters. Such counters represent
  * operations computed on associated counters. Usually, these counters will never be
  * used directly, but will only used to retrieve the computed values.
- * 
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
  */
 public interface Counter
 {

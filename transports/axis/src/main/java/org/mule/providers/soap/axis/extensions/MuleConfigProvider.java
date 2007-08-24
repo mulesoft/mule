@@ -21,10 +21,7 @@ import org.apache.axis.configuration.SimpleProvider;
 
 /**
  * <code>MuleConfigProvider</code> is needed because the Simple Provider does not
- * list services in the defaultConfiguration
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * list services in the defaultConfiguration.
  */
 public class MuleConfigProvider extends SimpleProvider
 {

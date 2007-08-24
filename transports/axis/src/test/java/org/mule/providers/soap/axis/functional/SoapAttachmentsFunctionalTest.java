@@ -12,10 +12,6 @@ package org.mule.providers.soap.axis.functional;
 
 import javax.activation.DataHandler;
 
-/**
- * @author <a href="mailto:risears@gmail.com">Rick Sears</a>
- * @version $Revision$
- */
 public interface SoapAttachmentsFunctionalTest
 {
     public String receiveMessageWithAttachments(String payload, DataHandler[] attachments);

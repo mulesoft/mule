@@ -14,9 +14,6 @@ import org.mule.impl.security.MuleAuthentication;
 import org.mule.umo.security.UMOAuthentication;
 import org.mule.umo.security.UMOSecurityContext;
 
-/**
- * @author Marie.Rizzo
- */
 public class JaasSecurityContext implements UMOSecurityContext
 {
 

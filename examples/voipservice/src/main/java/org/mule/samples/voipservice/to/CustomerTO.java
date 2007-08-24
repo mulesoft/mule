@@ -16,9 +16,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author Binildas Christudas
- */
 public class CustomerTO implements Serializable, Cloneable
 {
     /**

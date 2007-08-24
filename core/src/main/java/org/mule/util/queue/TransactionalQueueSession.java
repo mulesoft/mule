@@ -17,9 +17,6 @@ import java.io.IOException;
 
 /**
  * A Queue session that is used to manage the transaction context of a Queue
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 class TransactionalQueueSession extends DefaultXASession implements QueueSession
 {

@@ -15,9 +15,6 @@ import org.mule.config.i18n.CoreMessages;
 /**
  * <code>ObjectNotFoundException</code> is thrown when a reference to a component
  * in a configured container is not found
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class ObjectNotFoundException extends ContainerException
 {

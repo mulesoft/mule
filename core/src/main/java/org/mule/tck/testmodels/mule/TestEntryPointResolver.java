@@ -16,17 +16,11 @@ import org.mule.umo.model.ModelException;
 import org.mule.umo.model.UMOEntryPoint;
 
 /**
- * <code>TestEntryPointResolver</code> TODO (document class)
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>TestEntryPointResolver</code> TODO document
  */
 public class TestEntryPointResolver extends DynamicEntryPointResolver
 {
 
-    /**
-     * 
-     */
     public TestEntryPointResolver()
     {
         super();

@@ -15,9 +15,6 @@ import org.mule.umo.UMODescriptor;
 
 /**
  * <code>UMOComponentFactory</code> is used to create UMOComponent instances
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public interface UMOComponentFactory
 {

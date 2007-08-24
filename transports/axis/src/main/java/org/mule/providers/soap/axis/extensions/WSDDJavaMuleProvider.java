@@ -19,11 +19,9 @@ import org.apache.axis.deployment.wsdd.WSDDService;
 
 /**
  * <code>WSDDJavaMuleProvider</code> is a factory class for creating the
- * MuleProvider
+ * MuleProvider.
  * 
  * @see MuleRPCProvider
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class WSDDJavaMuleProvider extends WSDDProvider
 {

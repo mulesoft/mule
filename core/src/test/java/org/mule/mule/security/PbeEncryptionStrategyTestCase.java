@@ -13,10 +13,6 @@ package org.mule.mule.security;
 import org.mule.impl.security.PasswordBasedEncryptionStrategy;
 import org.mule.tck.AbstractMuleTestCase;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class PbeEncryptionStrategyTestCase extends AbstractMuleTestCase
 {
     public void testRoundTripEncryption() throws Exception

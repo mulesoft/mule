@@ -19,10 +19,6 @@ import org.mule.umo.provider.UMOConnector;
 
 import org.jivesoftware.smack.XMPPConnection;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class XmppFunctionalTestCase extends AbstractProviderFunctionalTestCase
 {
     private XMPPConnection cnn;

@@ -13,10 +13,7 @@ package org.mule.umo.manager;
 /**
  * <code>UMOServerNotificationListener</code> is an observer interface that ojects
  * can implement and register themselves with the Mule Server to receive
- * notifications when the sevrver, model and components stop, start, initilise, etc.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * notifications when the server, model and components stop, start, initialise, etc.
  */
 public interface UMOServerNotificationListener
 {

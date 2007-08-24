@@ -25,12 +25,6 @@ import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * TODO: document this class
- * 
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
- */
 public class InterceptorStackTestCase extends AbstractMuleTestCase
 {
 

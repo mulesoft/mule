@@ -30,9 +30,6 @@ import java.lang.reflect.Proxy;
  * <code>ServiceProxy</code> is a proxy that wraps a soap endpointUri to look like
  * a Web service. Also provides helper methods for building and describing web
  * service interfaces in Mule.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class AxisServiceProxy extends ServiceProxy

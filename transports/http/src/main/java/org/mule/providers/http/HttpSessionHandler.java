@@ -25,9 +25,6 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Will read and write Http Cookie information to and from the Mule Session
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class HttpSessionHandler implements UMOSessionHandler
 {

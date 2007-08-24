@@ -21,10 +21,6 @@ import org.enhydra.jdbc.standard.StandardXADataSource;
 import org.objectweb.jotm.Current;
 import org.objectweb.jotm.Jotm;
 
-/**
- * @author Guillaume Nodet
- * @version $Revision$
- */
 public class JdbcTransactionalXaFunctionalTestCase extends AbstractJdbcTransactionalFunctionalTestCase
 {
 

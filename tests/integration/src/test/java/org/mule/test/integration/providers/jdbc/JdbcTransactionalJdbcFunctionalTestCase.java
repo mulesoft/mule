@@ -17,10 +17,6 @@ import javax.sql.DataSource;
 
 import org.enhydra.jdbc.standard.StandardDataSource;
 
-/**
- * @author Guillaume Nodet
- * @version $Revision$
- */
 public class JdbcTransactionalJdbcFunctionalTestCase extends AbstractJdbcTransactionalFunctionalTestCase
 {
 

@@ -26,10 +26,7 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>ComponentService</code> exposes service information about a Mule Managed
- * component
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * component.
  */
 public class ComponentService implements ComponentServiceMBean, MBeanRegistration, ComponentStatsMBean
 {

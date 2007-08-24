@@ -10,10 +10,6 @@
 
 package org.mule.test.integration.client;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class MuleXFireSoapClientTestCase extends MuleAxisSoapClientTestCase
 {
     public String getSoapProvider()

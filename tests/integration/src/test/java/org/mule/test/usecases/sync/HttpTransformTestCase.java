@@ -18,10 +18,6 @@ import org.mule.umo.UMOMessage;
 
 import java.util.Arrays;
 
-/**
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
- */
 public class HttpTransformTestCase extends FunctionalTestCase
 {
 

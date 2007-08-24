@@ -18,7 +18,7 @@ import org.mule.util.StringMessageUtils;
 
 /**
  * <code>DefaultHandler</code> TODO (document class)
- * 
+ *
  */
 public class DefaultHandler extends AbstractExceptionHandler
 {

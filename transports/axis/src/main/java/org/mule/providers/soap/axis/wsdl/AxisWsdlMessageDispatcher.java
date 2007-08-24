@@ -30,10 +30,7 @@ import org.apache.axis.wsdl.symbolTable.ServiceEntry;
 import org.apache.axis.wsdl.symbolTable.SymTabEntry;
 
 /**
- * Creates and Axis client services from WSDL and invokes it
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * Creates and Axis client services from WSDL and invokes it.
  */
 public class AxisWsdlMessageDispatcher extends AxisMessageDispatcher
 {

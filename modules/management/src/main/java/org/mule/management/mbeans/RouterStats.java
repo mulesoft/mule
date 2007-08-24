@@ -16,9 +16,6 @@ import java.util.Map;
 
 /**
  * <code>RouterStats</code> TODO
- * 
- * @author Guillaume Nodet
- * @version $Revision$
  */
 public class RouterStats implements RouterStatsMBean
 {

@@ -15,9 +15,6 @@ import java.io.IOException;
 /**
  * <code>CompressionStrategy</code> is a base interface for Different compression
  * strategies
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public interface CompressionStrategy
 {

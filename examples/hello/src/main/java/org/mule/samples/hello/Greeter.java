@@ -12,9 +12,6 @@ package org.mule.samples.hello;
 
 /**
  * <code>Greeter</code> TODO (document class)
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class Greeter
 {

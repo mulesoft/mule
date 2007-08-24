@@ -15,11 +15,6 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public class AggregatorIntegrationTestCase extends FunctionalTestCase
 {
     protected String getConfigResources()

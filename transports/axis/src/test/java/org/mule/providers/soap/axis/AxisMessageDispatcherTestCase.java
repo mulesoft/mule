@@ -22,9 +22,6 @@ import java.util.Map;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 
-/**
- * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
- */
 public class AxisMessageDispatcherTestCase extends AbstractMuleTestCase
 {
     public void testNullParametersInCallAllowed() throws Exception

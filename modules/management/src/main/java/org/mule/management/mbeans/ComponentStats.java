@@ -22,10 +22,6 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>ComponentStats</code> TODO
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @author Guillaume Nodet
- * @version $Revision$
  */
 public class ComponentStats implements ComponentStatsMBean, MBeanRegistration
 {

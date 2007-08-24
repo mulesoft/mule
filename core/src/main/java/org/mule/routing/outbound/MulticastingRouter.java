@@ -20,11 +20,8 @@ import org.mule.umo.routing.RoutePathNotFoundException;
 import org.mule.umo.routing.RoutingException;
 
 /**
- * <code>MulticastingRouter</code> will broadcast the current message to every
- * endpoint registed with the router.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>MulticastingRouter</code> will broadcast the current message to every endpoint
+ * registed with the router.
  */
 
 public class MulticastingRouter extends FilteringOutboundRouter

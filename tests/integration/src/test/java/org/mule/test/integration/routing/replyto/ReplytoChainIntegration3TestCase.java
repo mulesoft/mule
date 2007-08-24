@@ -14,11 +14,6 @@ import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public class ReplytoChainIntegration3TestCase extends FunctionalTestCase
 {
     public ReplytoChainIntegration3TestCase()

@@ -14,9 +14,6 @@ import java.util.LinkedList;
 
 /**
  * Stores information about a Queue
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class QueueInfo
 {

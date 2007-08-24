@@ -27,9 +27,6 @@ import java.io.IOException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * @author Binildas Christudas
- */
 public class VoipConsumer
 {
 

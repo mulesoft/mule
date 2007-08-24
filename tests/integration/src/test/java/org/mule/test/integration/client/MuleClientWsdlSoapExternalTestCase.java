@@ -17,10 +17,6 @@ import org.mule.umo.UMOMessage;
 import org.mule.util.ExceptionUtils;
 import org.mule.util.StringUtils;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class MuleClientWsdlSoapExternalTestCase extends AbstractMuleTestCase
 {
     public static final String WSDL_URL = "http://www.dataaccess.com/webservicesserver/conversions.wso?WSDL";

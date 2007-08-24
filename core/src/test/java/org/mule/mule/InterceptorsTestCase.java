@@ -21,10 +21,6 @@ import org.mule.umo.UMODescriptor;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class InterceptorsTestCase extends AbstractMuleTestCase
 {
     protected void doSetUp() throws Exception

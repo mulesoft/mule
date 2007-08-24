@@ -10,13 +10,8 @@
 
 package org.mule.test.integration.models;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class OptimisedSedaPipelineTestCase extends AbstractPipelineTestCase
 {
-
     protected String getModelType()
     {
         return "seda-optimised";

@@ -23,10 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Maintains a list of interceptors that can be applied to components
- * 
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
+ * Maintains a list of interceptors that can be applied to components.
  */
 public class InterceptorStack implements UMOInterceptorStack, Initialisable, Disposable
 {

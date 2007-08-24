@@ -34,10 +34,6 @@ import org.apache.commons.logging.LogFactory;
  * transactional Queues. Queues can also be persistent by setting a persistence
  * strategy on the manager. Default straties are provided for Memory, Jounaling,
  * Cache and File.
- * 
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class TransactionalQueueManager extends AbstractXAResourceManager implements QueueManager
 {

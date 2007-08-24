@@ -13,10 +13,6 @@ package org.mule.util.xa;
 import org.mule.config.i18n.Message;
 import org.mule.umo.UMOException;
 
-/**
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
- */
 public class ResourceManagerException extends UMOException
 {
     /**

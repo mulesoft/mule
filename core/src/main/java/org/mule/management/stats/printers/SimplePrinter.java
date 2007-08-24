@@ -16,9 +16,6 @@ import java.util.Collection;
 
 /**
  * <code>SimplePrinter</code> Default stats printer
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class SimplePrinter extends AbstractTablePrinter
 {

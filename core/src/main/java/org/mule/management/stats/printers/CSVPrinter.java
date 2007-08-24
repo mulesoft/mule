@@ -16,9 +16,6 @@ import java.util.Collection;
 
 /**
  * <code>CSVPrinter</code> prints component stats in CSV format
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class CSVPrinter extends AbstractTablePrinter
 {

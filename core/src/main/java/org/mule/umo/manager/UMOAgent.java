@@ -17,9 +17,6 @@ import org.mule.umo.lifecycle.Lifecycle;
  * <code>UMOAgent</code> is a server plugin that can be initialised, started and
  * destroyed along with the UMOManager itself. Agents can initialise or bind to
  * external services such as a Jmx server.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public interface UMOAgent extends Lifecycle, Initialisable
 {

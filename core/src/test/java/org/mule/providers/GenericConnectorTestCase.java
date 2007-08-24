@@ -20,8 +20,6 @@ import javax.resource.spi.work.WorkException;
 /**
  * The test is not there in AbstractConnector, because we need to call a protected
  * method, and the latter class is in a different package.
- * 
- * @author <a href="mailto:aperepel@gmail.com">Andrew Perepelytsya</a>
  */
 public class GenericConnectorTestCase extends AbstractMuleTestCase
 {

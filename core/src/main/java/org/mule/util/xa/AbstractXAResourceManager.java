@@ -15,10 +15,6 @@ import java.util.Map;
 
 import javax.transaction.xa.Xid;
 
-/**
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
- */
 public abstract class AbstractXAResourceManager extends AbstractResourceManager
 {
 

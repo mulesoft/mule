@@ -63,8 +63,6 @@ import mx4j.tools.adaptor.ssl.SSLAdaptorServerSocketFactoryMBean;
  * <li> {@link #setKeyManagerPassword}("keypwd");
  * </ul>
  * before {@link #createServerSocket} is called.
- * 
- * @version $Revision$
  */
 public class IBMSslAdapterServerSocketFactory implements SSLAdaptorServerSocketFactoryMBean
 {

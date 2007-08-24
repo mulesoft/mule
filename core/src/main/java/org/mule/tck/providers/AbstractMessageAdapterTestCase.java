@@ -16,9 +16,6 @@ import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.umo.provider.UMOMessageAdapter;
 
-/**
- * @author Ross Mason
- */
 public abstract class AbstractMessageAdapterTestCase extends AbstractMuleTestCase
 {
     protected void doSetUp() throws Exception

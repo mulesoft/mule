@@ -17,12 +17,8 @@ import org.mule.umo.UMOTransaction;
 import java.io.OutputStream;
 
 /**
- * A listener used to receive Muleevents from a transport receiver. The listener can
- * be swapped out to deliver message to other frameworks, bypassing the Mule
- * container.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * A listener used to receive Muleevents from a transport receiver. The listener can be
+ * swapped out to deliver message to other frameworks, bypassing the Mule container.
  */
 public interface InternalMessageListener
 {

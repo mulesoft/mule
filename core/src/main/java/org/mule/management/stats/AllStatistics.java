@@ -20,9 +20,6 @@ import java.util.Iterator;
 
 /**
  * <code>AllStatistics</code> TODO
- * 
- * @author <a href="mailto:S.Vanmeerhaege@gfdi.be">Vanmeerhaeghe Stéphane </a>
- * @version $Revision$
  */
 public class AllStatistics
 {

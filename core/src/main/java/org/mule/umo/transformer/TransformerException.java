@@ -16,9 +16,6 @@ import org.mule.umo.endpoint.EndpointException;
 /**
  * <code>TransformerException</code> is a simple exception that is thrown by
  * transformers.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class TransformerException extends EndpointException

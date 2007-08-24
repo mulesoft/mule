@@ -30,10 +30,6 @@ import org.apache.tools.ant.util.Watchdog;
 
 /**
  * Will start external test servers needed for the integration tests
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
  */
 
 public class ServerTools

@@ -14,10 +14,6 @@ import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
-/**
- *
- */
-
 public class PersistentVMQueueTestCase extends FunctionalTestCase
 {
     private static final int RECEIVE_TIMEOUT = 5000;

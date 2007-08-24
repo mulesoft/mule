@@ -28,14 +28,10 @@ import java.util.Map;
 
 /**
  * The template endpoint router allows endpoints to be alered at runtime based on
- * properties set on the current event of fallback values set on the endpoint
- * properties. Templated values are expressed using square braces around a property
- * name i.e. axis:http://localhost:8082/MyService?method=[SOAP_METHOD] Note that Ant
- * style property templates cannot be used in valid URI strings, so we must use
- * Square braces instead
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * properties set on the current event of fallback values set on the endpoint properties.
+ * Templated values are expressed using square braces around a property name i.e.
+ * axis:http://localhost:8082/MyService?method=[SOAP_METHOD] Note that Ant style property
+ * templates cannot be used in valid URI strings, so we must use Square braces instead.
  */
 public class TemplateEndpointRouter extends FilteringOutboundRouter
 {
@@ -76,9 +72,8 @@ public class TemplateEndpointRouter extends FilteringOutboundRouter
             UMOEndpointURI newUri = new MuleEndpointURI(uri);
             if (!newUri.getScheme().equalsIgnoreCase(ep.getEndpointURI().getScheme()))
             {
-                throw new CouldNotRouteOutboundMessageException(
-                    CoreMessages.schemeCannotChangeForRouter(ep.getEndpointURI().getScheme(),
-                    newUri.getScheme()), message, ep);
+                throw new CouldNotRouteOutboundMessageException(CoreMessages.schemeCannotChangeForRouter(
+                    ep.getEndpointURI().getScheme(), newUri.getScheme()), message, ep);
             }
             ep.setEndpointURI(new MuleEndpointURI(uri));
             if (synchronous)

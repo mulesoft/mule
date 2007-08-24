@@ -12,10 +12,7 @@ package org.mule.management.mbeans;
 
 /**
  * <code>MuleConfigurationServiceMBean</code> is a JMx service interface for the
- * Mule server configuration
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * Mule server configuration.
  */
 public interface MuleConfigurationServiceMBean
 {

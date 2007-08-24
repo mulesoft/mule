@@ -16,10 +16,7 @@ import org.mule.umo.UMOException;
 import org.mule.umo.model.UMOEntryPointResolver;
 
 /**
- * <code>TestDefaultLifecycleAdapter</code> TODO (document class)
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>TestDefaultLifecycleAdapter</code> TODO document
  */
 public class TestDefaultLifecycleAdapter extends DefaultLifecycleAdapter
 {

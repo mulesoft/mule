@@ -14,12 +14,8 @@ import org.mule.samples.voipservice.to.AddressTO;
 
 import java.io.IOException;
 
-/**
- * @author Binildas Christudas
- */
 public interface AddressValidation
 {
-
     int SUCCESS = 1;
     int FAILURE = -1;
 

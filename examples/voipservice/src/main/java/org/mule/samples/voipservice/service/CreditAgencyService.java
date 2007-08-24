@@ -16,9 +16,6 @@ import org.mule.samples.voipservice.to.CreditProfileTO;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * @author Binildas Christudas
- */
 public class CreditAgencyService implements CreditAgency
 {
 

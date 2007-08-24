@@ -28,8 +28,6 @@ import java.util.TimerTask;
  * interface. 2. Create a FileMonitor instance. 3. Add the file(s)/directory(ies) to
  * listen for. fileChanged() will be called when a monitored file is created, deleted
  * or its modified time changes.
- * 
- * @author <a href="mailto:jacob.dreyer@geosoft.no">Jacob Dreyer</a>
  */
 public class FileMonitor
 {

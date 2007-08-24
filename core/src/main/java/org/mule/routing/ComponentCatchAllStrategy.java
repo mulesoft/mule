@@ -21,11 +21,8 @@ import org.mule.umo.routing.ComponentRoutingException;
 import org.mule.umo.routing.RoutingException;
 
 /**
- * <code>ComponentCatchAllStrategy</code> is used to catch any events and forward
- * the events to the component as is.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>ComponentCatchAllStrategy</code> is used to catch any events and forward the
+ * events to the component as is.
  */
 public class ComponentCatchAllStrategy extends AbstractCatchAllStrategy
 {

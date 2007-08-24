@@ -10,10 +10,6 @@
 
 package org.mule.util.queue;
 
-/**
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
- */
 public class NoPersistenceTestCase extends AbstractTransactionQueueManagerTestCase
 {
     /*

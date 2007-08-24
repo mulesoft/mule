@@ -13,9 +13,6 @@ package org.mule.umo.model;
 import org.mule.config.i18n.Message;
 import org.mule.umo.UMOException;
 
-/**
- * @author Ross Mason
- */
 public class ModelException extends UMOException
 {
     /**

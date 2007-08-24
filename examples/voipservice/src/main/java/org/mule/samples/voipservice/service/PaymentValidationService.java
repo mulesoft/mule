@@ -21,9 +21,6 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * @author Binildas Christudas
- */
 public class PaymentValidationService implements PaymentValidation
 {
 

@@ -14,9 +14,6 @@ import org.mule.samples.voipservice.LocaleMessage;
 
 import java.io.Serializable;
 
-/**
- * @author Binildas Christudas
- */
 public class ServiceParamTO implements Serializable
 {
     /**

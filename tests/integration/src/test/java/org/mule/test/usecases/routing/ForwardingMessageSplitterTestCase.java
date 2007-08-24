@@ -17,10 +17,6 @@ import org.mule.umo.UMOMessage;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
 public class ForwardingMessageSplitterTestCase extends FunctionalTestCase
 {
     protected String getConfigResources()

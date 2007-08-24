@@ -13,9 +13,6 @@ package org.mule.samples.voipservice.interfaces;
 import java.io.IOException;
 import java.util.List;
 
-/**
- * @author Binildas Christudas
- */
 public interface PaymentValidation
 {
 

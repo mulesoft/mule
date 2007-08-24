@@ -17,10 +17,7 @@ import org.mule.umo.model.UMOModel;
 
 /**
  * <code>ModelService</code> exposes service information and actions on the Mule
- * Model
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * Model.
  */
 public class ModelService implements ModelServiceMBean
 {

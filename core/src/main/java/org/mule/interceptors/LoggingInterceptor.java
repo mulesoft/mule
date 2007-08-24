@@ -16,11 +16,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * <code>LoggingInterceptor</code> is a simple interceptor that logs a message
- * before and after the event processing.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>LoggingInterceptor</code> is a simple interceptor that logs a message before
+ * and after the event processing.
  */
 public class LoggingInterceptor extends EnvelopeInterceptor
 {

@@ -15,9 +15,6 @@ import java.io.IOException;
 
 /**
  * Interface for listening to disk file changes.
- * 
- * @see FileMonitor
- * @author <a href="mailto:jacob.dreyer@geosoft.no">Jacob Dreyer</a>
  */
 public interface FileListener
 {

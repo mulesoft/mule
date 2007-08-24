@@ -26,10 +26,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * <code>Bank</code> is a representation of a bank form which to obtain loan
+ * <code>Bank</code> is a representation of a bank from which to obtain loan
  * quotes.
- * 
- * @author Gregor Hohpe, Bobby Wolfe, et al. EI Patterns
  */
 
 public class Bank implements UMODescriptorAware, Serializable, BankService

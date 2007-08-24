@@ -25,9 +25,6 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * <code>SpringEventsJmsExampleTestCase</code> is a testcase used to test the
  * example config in the docco. this test is not run when building this module as it
  * relies on Jms, it's used to verify the example config works.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class SpringEventsJmsAsyncExampleTestCase extends AbstractMuleTestCase
 {

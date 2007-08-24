@@ -14,10 +14,6 @@ import javax.transaction.Status;
 
 import org.safehaus.uuid.UUIDGenerator;
 
-/**
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
- */
 public class AbstractTransactionContext
 {
 

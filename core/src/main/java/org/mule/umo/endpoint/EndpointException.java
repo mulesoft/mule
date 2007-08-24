@@ -16,9 +16,6 @@ import org.mule.umo.UMOException;
 /**
  * <code>EndpointException</code> is an abstract exception extended by endpoint
  * specific exceptions.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public class EndpointException extends UMOException

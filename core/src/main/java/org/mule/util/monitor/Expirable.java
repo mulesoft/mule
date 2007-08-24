@@ -12,9 +12,6 @@ package org.mule.util.monitor;
 
 /**
  * <code>Expirable</code> implementing classes can be notified when they expire
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 
 public interface Expirable

@@ -12,10 +12,6 @@ package org.mule.util.xa;
 
 import org.mule.config.i18n.Message;
 
-/**
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
- */
 public class ResourceManagerSystemException extends ResourceManagerException
 {
 

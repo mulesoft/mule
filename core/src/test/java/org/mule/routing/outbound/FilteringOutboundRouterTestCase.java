@@ -30,11 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
 {
     public void testFilteringOutboundRouter() throws Exception

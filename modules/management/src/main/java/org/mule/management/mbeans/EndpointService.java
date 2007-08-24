@@ -21,9 +21,6 @@ import org.apache.commons.logging.LogFactory;
 /**
  * The EndpointServiceMBean allows you to check the confiugration of an endpoint and
  * conect/disconnect endpoints manually.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class EndpointService implements EndpointServiceMBean
 {

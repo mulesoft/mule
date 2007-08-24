@@ -14,11 +14,7 @@ import org.mule.samples.voipservice.to.CreditProfileTO;
 
 import java.io.IOException;
 
-/**
- * @author Binildas Christudas
- */
 public interface BankAgency
 {
-
     CreditProfileTO getAuthorisedStatus(CreditProfileTO creditProfileTO) throws IOException;
 }

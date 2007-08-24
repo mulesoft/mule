@@ -18,11 +18,6 @@ import org.mule.umo.UMOMessage;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public class ReplytoChainIntegration2TestCase extends FunctionalTestCase
 {
     public ReplytoChainIntegration2TestCase()

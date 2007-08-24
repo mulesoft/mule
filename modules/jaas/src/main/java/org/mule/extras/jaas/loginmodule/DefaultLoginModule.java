@@ -26,8 +26,8 @@ import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 
 /**
- * @author Marie.Rizzo This is the Default Login Module for the Mule Jaas
- *         Authentication. It extends Jaas' own LoginModule interface.
+ * This is the Default Login Module for the Mule Jaas Authentication.
+ * It extends Jaas' own LoginModule interface.
  */
 public class DefaultLoginModule implements LoginModule
 {

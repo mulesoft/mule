@@ -24,8 +24,6 @@ import java.util.Map;
 /**
  * <code>RouterStatistics</code> TODO
  *
- * @author <a href="mailto:S.Vanmeerhaege@gfdi.be">Vanmeerhaeghe Stéphane</a>
- * @version $Revision$
  */
 public class RouterStatistics implements Statistics
 {

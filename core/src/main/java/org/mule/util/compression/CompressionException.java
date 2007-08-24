@@ -13,10 +13,7 @@ package org.mule.util.compression;
 import java.io.IOException;
 
 /**
- * <code>CompressionException</code> TODO -document class
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>CompressionException</code> TODO document
  */
 public class CompressionException extends IOException
 {

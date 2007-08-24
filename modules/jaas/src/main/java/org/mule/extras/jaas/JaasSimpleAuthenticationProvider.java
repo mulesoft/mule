@@ -30,7 +30,9 @@ import javax.security.auth.login.Configuration;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
-/** @author Marie.Rizzo This is the Provider for Mule's Jaas Security */
+/**
+ *  This is the Provider for Mule's Jaas Security.
+ */
 public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider
 {
 
@@ -180,7 +182,6 @@ public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider
      * callback handler and the name of the class or directory to prtect. If the
      * Login Context is successfully created, it will then attempt to login.
      *
-     * @param UMOAuthentication
      * @return UMOAuthentication
      * @throws org.mule.umo.security.SecurityException
      *

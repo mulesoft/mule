@@ -12,9 +12,6 @@ package org.mule.samples.hello;
 
 /**
  * <code>ChitChatter</code> TODO (document class)
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class ChitChatter
 {

@@ -25,11 +25,6 @@ import com.mockobjects.dynamic.Mock;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
- */
-
 public class MulticastingRouterTestCase extends AbstractMuleTestCase
 {
     public void testMulticastingRouter() throws Exception

@@ -20,10 +20,7 @@ import org.apache.axis.AxisFault;
 
 /**
  * Will format and display additional information stored with an Axis fault that is
- * usually hidden when logged
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * usually hidden when logged.
  */
 public class AxisFaultExceptionReader implements ExceptionReader
 {

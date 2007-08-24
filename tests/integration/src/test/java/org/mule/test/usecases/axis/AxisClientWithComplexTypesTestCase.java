@@ -19,9 +19,6 @@ import java.util.Map;
 
 /**
  * TODO document
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class AxisClientWithComplexTypesTestCase extends FunctionalTestCase
 {

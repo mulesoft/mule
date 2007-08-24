@@ -14,10 +14,7 @@ import org.mule.management.stats.Statistics;
 
 /**
  * <code>StatisticsServiceMBean</code> is a JMX interfaces for querying Mule event
- * processing statistics
- * 
- * @author <a href="mailto:S.Vanmeerhaege@gfdi.be">Vanmeerhaeghe Stéphane</a>
- * @version $Revision$
+ * processing statistics.
  */
 public interface StatisticsServiceMBean extends Statistics
 {

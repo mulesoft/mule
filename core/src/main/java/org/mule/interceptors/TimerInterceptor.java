@@ -19,11 +19,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * <code>TimerInterceptor</code> simply times and displays the time taken to
- * process an event.
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ * <code>TimerInterceptor</code> simply times and displays the time taken to process an
+ * event.
  */
 public class TimerInterceptor implements UMOInterceptor
 {

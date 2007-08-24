@@ -26,9 +26,6 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>MuleService</code> exposes certain Mule server functions for management
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class MuleService implements MuleServiceMBean
 {

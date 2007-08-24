@@ -12,9 +12,6 @@ package org.mule.test.usecases.axis;
 
 /**
  * TODO document
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class Trade implements java.io.Serializable
 {

@@ -12,10 +12,6 @@ package org.mule.util.counters.impl;
 
 import org.mule.util.counters.CounterFactory.Type;
 
-/**
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
- */
 public class Number extends AbstractCounter
 {
 

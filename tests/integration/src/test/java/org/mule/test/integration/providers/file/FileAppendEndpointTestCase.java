@@ -10,12 +10,8 @@
 
 package org.mule.test.integration.providers.file;
 
-/**
- * @author <a href="mailto:stephen.fenech@symphonysoft.com">Stephen Fenech</a>
- */
 public class FileAppendEndpointTestCase extends FileAppendConnectorTestCase
 {
-
     protected String getConfigResources()
     {
         return "org/mule/test/integration/providers/file/mule-fileappend-connector-config.xml";
