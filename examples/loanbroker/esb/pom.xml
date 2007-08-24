@@ -202,6 +202,10 @@
                     <!-- This is needed so that the ActiveMQ tests don't trip over each other
                         during startup/shutdown. -->
                     <forkMode>pertest</forkMode>
+                    <excludes>
+                        <exclude>**/LoanBrokerEsbContainerTestCase.*</exclude>
+                        <exclude>**/LoanBrokerEsbTestCase.*</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
         </plugins>
