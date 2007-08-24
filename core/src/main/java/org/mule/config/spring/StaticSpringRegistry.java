@@ -10,7 +10,9 @@
 package org.mule.config.spring;
 
 import org.mule.MuleException;
+import org.mule.registry.RegistrationException;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
@@ -31,12 +33,16 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.StaticApplicationContext;
 
 /**
- * TODO
+ * This class is not yet in use.  It is still a work-in-progress.
  */
 public class StaticSpringRegistry extends SpringRegistry
 {
     public static final String REGISTRY_ID = "org.mule.Registry.StaticSpring";
 
+    public static final Integer OBJECT_SCOPE_SINGLETON = new Integer(1);
+    public static final Integer OBJECT_SCOPE_PROTOTYPE = new Integer(2);
+    public static final Integer OBJECT_SCOPE_POOLED = new Integer(3);
+    
     protected StaticApplicationContext registryContext;
 
     public StaticSpringRegistry()
@@ -100,6 +106,9 @@ public class StaticSpringRegistry extends SpringRegistry
         setApplicationContext(registryContext);
     }
 
+    // Does this actually create an instance of the object?
+    // The object already exists (it's passed in as a parameter), so this seems to generate a bean definition 
+    // ("recipe" for creating the bean) based on the already existing object - a bit counterintuitive.
     protected void registerSingleton(Object o) throws UMOException
     {
         try
@@ -128,6 +137,44 @@ public class StaticSpringRegistry extends SpringRegistry
         }
     }
 
+    protected void doRegisterObject(String key, Object value, Object metadata, UMOManagementContext managementContext) throws RegistrationException
+    {
+        if (metadata instanceof Integer)
+        {
+            try 
+            {
+                if (metadata.equals(OBJECT_SCOPE_SINGLETON))
+                {
+                    registerSingleton(value);
+                }
+                else if (metadata.equals(OBJECT_SCOPE_PROTOTYPE))
+                {
+                    registerPrototype(value);
+                }
+                else
+                {
+                    throw new RegistrationException("Object scope not recognized: " + metadata);
+                }
+            } 
+            catch (UMOException e)
+            {
+                throw new RegistrationException(e);
+            }
+        }
+        else
+        {
+            throw new RegistrationException("Object scope not recognized");
+        }
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void registerConnector(UMOConnector connector, UMOManagementContext managementContext) throws UMOException
+    {
+        registerObject(connector.getName(), connector, OBJECT_SCOPE_SINGLETON, managementContext);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -145,9 +192,9 @@ public class StaticSpringRegistry extends SpringRegistry
     /**
      * {@inheritDoc}
      */
-    public void registerEndpoint(UMOImmutableEndpoint endpoint) throws UMOException
+    public void registerEndpoint(UMOImmutableEndpoint endpoint, UMOManagementContext managementContext) throws UMOException
     {
-        registerPrototype(endpoint);
+        registerObject(endpoint.getName(), endpoint, OBJECT_SCOPE_PROTOTYPE, managementContext);
     }
 
     /**
@@ -166,9 +213,9 @@ public class StaticSpringRegistry extends SpringRegistry
     /**
      * {@inheritDoc}
      */
-    public void registerTransformer(UMOTransformer transformer) throws UMOException
+    public void registerTransformer(UMOTransformer transformer, UMOManagementContext managementContext) throws UMOException
     {
-        registerPrototype(transformer);
+        registerObject(transformer.getName(), transformer, OBJECT_SCOPE_PROTOTYPE, managementContext);
     }
 
     /**
@@ -183,13 +230,17 @@ public class StaticSpringRegistry extends SpringRegistry
         return t;
     }
 
-
-
-    public void registerModel(UMOModel model) throws UMOException
+    /**
+     * {@inheritDoc}
+     */
+    public void registerModel(UMOModel model, UMOManagementContext managementContext) throws UMOException
     {
-        registerSingleton(model);
+        registerObject(model.getName(), model, OBJECT_SCOPE_SINGLETON, managementContext);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public UMOModel unregisterModel(String name)
     {
         UMOModel model = lookupModel(name);
@@ -203,12 +254,10 @@ public class StaticSpringRegistry extends SpringRegistry
     /**
      * {@inheritDoc}
      */
-    public void registerAgent(UMOAgent agent) throws UMOException
+    public void registerAgent(UMOAgent agent, UMOManagementContext managementContext) throws UMOException
     {
-        registerSingleton(agent);
+        registerObject(agent.getName(), agent, OBJECT_SCOPE_SINGLETON, managementContext);
     }
-
-
 
     /**
      * {@inheritDoc}
@@ -216,7 +265,7 @@ public class StaticSpringRegistry extends SpringRegistry
     public UMOAgent unregisterAgent(String name) throws UMOException
     {
 
-        UMOAgent agent = (UMOAgent) lookupObject(name, UMOAgent.class);
+        UMOAgent agent = (UMOAgent) lookupObject(name);
         if (agent != null)
         {
             //TODO AP Is this the wrong way round?

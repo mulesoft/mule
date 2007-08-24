@@ -10,11 +10,13 @@
 package org.mule.impl.registry;
 
 import org.mule.MuleRuntimeException;
+import org.mule.MuleServer;
 import org.mule.RegistryContext;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.MuleProperties;
 import org.mule.config.ThreadingProfile;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.impl.ManagementContext;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.internal.notifications.AdminNotification;
@@ -50,6 +52,8 @@ import org.mule.impl.model.ModelServiceDescriptor;
 import org.mule.impl.security.MuleSecurityManager;
 import org.mule.impl.work.MuleWorkManager;
 import org.mule.registry.AbstractServiceDescriptor;
+import org.mule.registry.RegistrationException;
+import org.mule.registry.Registry;
 import org.mule.registry.ServiceDescriptor;
 import org.mule.registry.ServiceDescriptorFactory;
 import org.mule.registry.ServiceException;
@@ -63,12 +67,10 @@ import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.UMOLifecycleManager;
 import org.mule.umo.lifecycle.UMOLifecyclePhase;
-import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.umo.manager.UMOAgent;
 import org.mule.umo.manager.UMOWorkManager;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.umo.registry.RegistryFacade;
 import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.BeanUtils;
@@ -79,6 +81,7 @@ import org.mule.util.queue.MemoryPersistenceStrategy;
 import org.mule.util.queue.QueueManager;
 import org.mule.util.queue.TransactionalQueueManager;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -110,7 +113,7 @@ public class TransientRegistry extends AbstractRegistry
      */
     private Map registry;
 
-    //TODO how do we handle Muleconfig across Registries
+    //TODO MULE-2162 how do we handle Muleconfig across Registries
     private MuleConfiguration config; // = new MuleConfiguration();
 
     public TransientRegistry()
@@ -119,7 +122,7 @@ public class TransientRegistry extends AbstractRegistry
         init();
     }
 
-    public TransientRegistry(RegistryFacade parent)
+    public TransientRegistry(Registry parent)
     {
         super(REGISTRY_ID, parent);
         init();
@@ -142,10 +145,10 @@ public class TransientRegistry extends AbstractRegistry
     {
         GenericLifecycleManager lcm = new GenericLifecycleManager();
         UMOLifecyclePhase initPhase = new TransientRegistryInitialisePhase();
-        initPhase.setRegistryScope(RegistryFacade.SCOPE_IMMEDIATE);
+        initPhase.setRegistryScope(Registry.SCOPE_IMMEDIATE);
         lcm.registerLifecycle(initPhase);
         UMOLifecyclePhase disposePhase = new TransientRegistryDisposePhase();
-        disposePhase.setRegistryScope(RegistryFacade.SCOPE_IMMEDIATE);
+        disposePhase.setRegistryScope(Registry.SCOPE_IMMEDIATE);
         lcm.registerLifecycle(disposePhase);
         return lcm;
     }
@@ -154,7 +157,7 @@ public class TransientRegistry extends AbstractRegistry
     protected void doInitialise() throws InitialisationException
     {
         int oldScope = getDefaultScope();
-        setDefaultScope(RegistryFacade.SCOPE_IMMEDIATE);
+        setDefaultScope(Registry.SCOPE_IMMEDIATE);
         try
         {
             applyProcessors(getConnectors());
@@ -163,9 +166,9 @@ public class TransientRegistry extends AbstractRegistry
             applyProcessors(getAgents());
             applyProcessors(getModels());
             applyProcessors(getServices());
-            applyProcessors(lookupCollection(Object.class));
+            applyProcessors(lookupObjects(Object.class));
 
-            getManagementContext().fireNotification(new RegistryNotification(this, RegistryNotification.REGISTRY_INITIALISED));
+            MuleServer.getManagementContext().fireNotification(new RegistryNotification(this, RegistryNotification.REGISTRY_INITIALISED));
         }
         finally
         {
@@ -180,8 +183,8 @@ public class TransientRegistry extends AbstractRegistry
         for (Iterator iterator = objects.values().iterator(); iterator.hasNext();)
         {
             Object o = iterator.next();
-            Map processors = lookupCollection(ObjectProcessor.class);
-            for (Iterator iterator2 = processors.values().iterator(); iterator2.hasNext();)
+            Collection processors = lookupObjects(ObjectProcessor.class);
+            for (Iterator iterator2 = processors.iterator(); iterator2.hasNext();)
             {
                 ObjectProcessor op = (ObjectProcessor)iterator2.next();
                 op.process(o);
@@ -190,25 +193,21 @@ public class TransientRegistry extends AbstractRegistry
     }
 
 
-    protected Object doLookupObject(Object key, Class returntype) throws ObjectNotFoundException
+    protected Object doLookupObject(String key) 
     {
-        if(key==null)
+        Object o = null;
+        if (key != null)
         {
-            throw new NullPointerException("Object key cannot be null");
-        }
-        Map objects = (Map) registry.get(returntype);
-        if (objects == null)
-        {
-            objects = (Map) registry.get(Object.class);
-            if (objects == null)
+            Map map;
+            for (Iterator it = registry.values().iterator(); it.hasNext();)
             {
-                throw new ObjectNotFoundException(key.toString());
+                map = (Map) it.next();
+                o = map.get(key);
+                if (o != null)
+                {
+                    return o;
+                }
             }
-        }
-        Object o = objects.get(key);
-        if(o==null)
-        {
-            throw new ObjectNotFoundException(key.toString());
         }
         return o;
     }
@@ -223,9 +222,17 @@ public class TransientRegistry extends AbstractRegistry
         this.config = config;
     }
 
-    public Map doLookupCollection(Class returntype)
+    public Collection doLookupObjects(Class returntype)
     {
-        return (Map) registry.get(returntype);
+        Map map = (Map) registry.get(returntype);
+        if (map != null)
+        {
+            return map.values();
+        }
+        else
+        {
+            return null;
+        }
     }
 
 
@@ -271,6 +278,11 @@ public class TransientRegistry extends AbstractRegistry
 
     protected Map getObjectTypeMap(Object o)
     {
+        if (o == null)
+        {
+            o = Object.class;
+        }
+            
         Object key;
         if(o instanceof Class)
         {
@@ -296,8 +308,8 @@ public class TransientRegistry extends AbstractRegistry
     protected Object applyProcessors(Object object)
     {
         Object theObject = object;
-        Map processors = lookupCollection(ObjectProcessor.class);
-        for (Iterator iterator = processors.values().iterator(); iterator.hasNext();)
+        Collection processors = lookupObjects(ObjectProcessor.class);
+        for (Iterator iterator = processors.iterator(); iterator.hasNext();)
         {
             ObjectProcessor o = (ObjectProcessor)iterator.next();
             theObject = o.process(theObject);
@@ -305,26 +317,21 @@ public class TransientRegistry extends AbstractRegistry
         return theObject;
     }
 
-    protected void applyLifecycle(Object object)
+    protected void applyLifecycle(Object object, UMOManagementContext managementContext)
     {
+        if (managementContext == null)
+        {
+            throw new MuleRuntimeException(MessageFactory.createStaticMessage("Attempt to apply lifecycle to object " + object + " without providing a ManagementContext."));
+        }
+        UMOLifecycleManager lm = managementContext.getLifecycleManager();
         try
         {
-            getManagementContext().getLifecycleManager().applyLifecycle(getManagementContext(), object);
+            lm.applyLifecycle(managementContext, object);
         }
         catch (UMOException e)
         {
-            throw new MuleRuntimeException(CoreMessages.failedToInvokeLifecycle(
-                    getManagementContext().getLifecycleManager().getCurrentPhase(), object), e);
+            throw new MuleRuntimeException(CoreMessages.failedToInvokeLifecycle(lm.getCurrentPhase(), object), e);
         }
-    }
-    /**
-     * Allows for arbitary registration of transient objects
-     * @param key
-     * @param value
-     */
-    public void registerObject(Object key, Object value)
-    {
-        registerObject(Object.class, key, value);
     }
 
     /**
@@ -332,82 +339,91 @@ public class TransientRegistry extends AbstractRegistry
      * @param key
      * @param value
      */
-    public void registerObject(Class type, Object key, Object value)
+    protected void doRegisterObject(String key, Object value) throws RegistrationException
+    {
+        doRegisterObject(key, value, Object.class, null);
+    }
+
+    /**
+     * Allows for arbitary registration of transient objects
+     * @param key
+     * @param value
+     */
+    protected void doRegisterObject(String key, Object value, Object metadata, UMOManagementContext managementContext) throws RegistrationException
     {
         if(isInitialised() || isInitialising())
         {
             value = applyProcessors(value);
         }
-        getObjectTypeMap(type).put(key, value);
-        applyLifecycle(value);
+        Map objectMap = getObjectTypeMap((Class) metadata);
+        if (objectMap != null)
+        {
+            objectMap.put(key, value);
+            // TODO Why should registering an object affect its lifecycle?
+            applyLifecycle(value, managementContext);
+        }
+        else
+        {
+            throw new RegistrationException("No object map exists for type " + metadata);
+        }
     }
 
-    //@java.lang.Override
-    public void registerAgent(UMOAgent agent) throws UMOException
+    public void unregisterObject(String key)
     {
-        registerObject(UMOAgent.class, agent.getName(), agent);
+        getObjectTypeMap(Object.class).remove(key);
     }
 
     //@java.lang.Override
-    public void registerConnector(UMOConnector connector) throws UMOException
+    public void registerAgent(UMOAgent agent, UMOManagementContext managementContext) throws UMOException
     {
-        registerObject(UMOConnector.class, connector.getName(), connector);
+        registerObject(agent.getName(), agent, UMOAgent.class, managementContext);
     }
 
     //@java.lang.Override
-    public void registerEndpoint(UMOEndpoint endpoint) throws UMOException
+    public void registerConnector(UMOConnector connector, UMOManagementContext managementContext) throws UMOException
     {
-        registerObject(UMOImmutableEndpoint.class, endpoint.getName(), endpoint);
+        registerObject(connector.getName(), connector, UMOConnector.class, managementContext);
     }
 
     //@java.lang.Override
-    public void registerModel(UMOModel model) throws UMOException
+    public void registerEndpoint(UMOEndpoint endpoint, UMOManagementContext managementContext) throws UMOException
     {
-        registerObject(UMOModel.class, model.getName(), model);
+        registerObject(endpoint.getName(), endpoint, UMOImmutableEndpoint.class, managementContext);
     }
 
-
     //@java.lang.Override
-    public void registerProperties(Map props)
+    public void registerModel(UMOModel model, UMOManagementContext managementContext) throws UMOException
     {
-        getObjectTypeMap(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES).putAll(props);
+        registerObject(model.getName(), model, UMOModel.class, managementContext);
     }
 
     //@java.lang.Override
-    public void registerProperty(Object key, Object value)
+    public void registerTransformer(UMOTransformer transformer, UMOManagementContext managementContext) throws UMOException
     {
-        getObjectTypeMap(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES).put(key, value);
+        registerObject(transformer.getName(), transformer, UMOTransformer.class, managementContext);
     }
 
     //@java.lang.Override
-    public Object lookupProperty(Object key)
-    {
-        return getObjectTypeMap(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES).get(key);
-    }
-
-    //@java.lang.Override
-    public void registerTransformer(UMOTransformer transformer) throws UMOException
-    {
-        registerObject(UMOTransformer.class, transformer.getName(), transformer);
-    }
-
-    //@java.lang.Override
-    public void registerService(UMODescriptor service) throws UMOException
+    public void registerService(UMODescriptor service, UMOManagementContext managementContext) throws UMOException
     {
         String modelName = service.getModelName();
-        if(modelName==null)
+        UMOModel model;
+        if(modelName != null)
         {
-            logger.warn("Model name not ser on service, using default: " + UMOModel.DEFAULT_MODEL_NAME);
-            modelName = UMOModel.DEFAULT_MODEL_NAME;
-            service.setModelName(modelName);
+            model = lookupModel(modelName);
         }
-        UMOModel model = lookupModel(modelName);
-        if(model==null)
+        else
+        {
+            logger.warn("Model name not set on service, using system model");
+            model = lookupSystemModel();
+            service.setModelName(model.getName());
+        }
+        if(model == null)
         {
             //TODO
             throw new IllegalStateException("Service must be associated with an existing model. Not found: " + modelName);
         }
-        registerObject(UMODescriptor.class, service.getName(), service);
+        registerObject(service.getName(), service, UMODescriptor.class, managementContext);
         model.registerComponent(service);
     }
 
@@ -446,6 +462,30 @@ public class TransientRegistry extends AbstractRegistry
     public UMOTransformer unregisterTransformer(String transformerName)
     {
         return (UMOTransformer)getObjectTypeMap(UMOTransformer.class).remove(transformerName);
+    }
+
+    //@java.lang.Override
+    public void registerProperties(Map props)
+    {
+        getObjectTypeMap(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES).putAll(props);
+    }
+
+    // TODO MULE-2200 This doesn't make much sense, we might as well just register each property on its own as an Object.
+    public void registerProperty(String key, Object value)
+    {
+        getObjectTypeMap(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES).put(key, value);
+    }
+
+    // TODO MULE-2200 This doesn't make much sense, we might as well just register each property on its own as an Object.
+    public void unregisterProperty(String key)
+    {
+        getObjectTypeMap(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES).remove(key);
+    }
+
+    //@java.lang.Override
+    public Object lookupProperty(String key)
+    {
+        return getObjectTypeMap(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES).get(key);
     }
 
     //@java.lang.Override
@@ -504,8 +544,6 @@ public class TransientRegistry extends AbstractRegistry
         return false;
     }
 
-
-
     public static TransientRegistry createNew() throws UMOException
     {
         //Use the default server lifecycleManager
@@ -550,15 +588,17 @@ public class TransientRegistry extends AbstractRegistry
         UMOManagementContext context = new ManagementContext(lifecycleManager);
         context.setId(UUID.getUUID());
 
-        registry.registerObject(UMOManagementContext.class, MuleProperties.OBJECT_MANAGMENT_CONTEXT, context);
-        registry.registerObject(ObjectProcessor.class, MuleProperties.OBJECT_MANAGMENT_CONTEXT_PROCESSOR,
-                new ManagementContextDependencyProcessor(context));
+//      // TODO MULE-2161
+        MuleServer.setManagementContext(context);
+        registry.registerObject(MuleProperties.OBJECT_MANAGEMENT_CONTEXT, context, context);
+//        registry.registerObject(ObjectProcessor.class, MuleProperties.OBJECT_MANAGEMENT_CONTEXT_PROCESSOR,
+//                new ManagementContextDependencyProcessor(context));
 
         //Register objects so we get lifecycle management
-        registry.registerObject(MuleProperties.OBJECT_SECURITY_MANAGER, securityManager);
-        registry.registerObject(MuleProperties.OBJECT_WORK_MANAGER, workManager);
-        registry.registerObject(MuleProperties.OBJECT_NOTIFICATION_MANAGER, notificationManager);
-        registry.registerObject(MuleProperties.OBJECT_QUEUE_MANAGER, queueManager);
+        registry.registerObject(MuleProperties.OBJECT_SECURITY_MANAGER, securityManager, context);
+        registry.registerObject(MuleProperties.OBJECT_WORK_MANAGER, workManager, context);
+        registry.registerObject(MuleProperties.OBJECT_NOTIFICATION_MANAGER, notificationManager, context);
+        registry.registerObject(MuleProperties.OBJECT_QUEUE_MANAGER, queueManager, context);
 
         //Set the object explicitly on the ManagementContext
         context.setWorkManager(workManager);
@@ -574,6 +614,7 @@ public class TransientRegistry extends AbstractRegistry
         UMOModel model = sd.createModel();
         model.setName(MuleProperties.OBJECT_SYSTEM_MODEL);
         registry.registerModel(model);
+        context.initialise();
         registry.initialise();
         return registry;
     }
