@@ -50,11 +50,9 @@
             <mule:echo-component/>
             <mule:inbound-router>
                 <mule:endpoint address="xfire:http://localhost:64282" connector-ref="SecuredConnector">
-                    <wssecurity:security-filters>
-                        <wssecurity:security-filter
-                                decryptionFile="in-encrypted-security.properties"
-                                signatureFile="in-signed-security.properties"/>
-                    </wssecurity:security-filters>
+                    <wssecurity:security-filter
+                            decryptionFile="in-encrypted-security.properties"
+                            signatureFile="in-signed-security.properties"/>
                 </mule:endpoint>
             </mule:inbound-router>
         </mule:service>

@@ -32,9 +32,7 @@
             <mule:component scope="singleton" instance-ref="echoComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="vm://test">
-                    <mule:security-filters>
-                        <mule:encryption-security-filter strategy-ref="PBE"/>
-                    </mule:security-filters>
+                    <mule:encryption-security-filter strategy-ref="PBE"/>
                 </mule:endpoint>
             </mule:inbound-router>
             <mule:outbound-router>

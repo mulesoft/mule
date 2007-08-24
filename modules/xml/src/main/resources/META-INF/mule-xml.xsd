@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.mulesource.org/schema/mule/xml/2.0"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+            xmlns:spring="http://www.springframework.org/schema/beans"
+            targetNamespace="http://www.mulesource.org/schema/mule/xml/2.0"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.springframework.org/schema/beans"
+                schemaLocation="http://www.springframework.org/schema/beans"/>
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"
+                schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
+
+    <!-- xml filters -->
+
+    <xsd:element name="is-xml-filter" type="mule:abstractFilterType" substitutionGroup="mule:abstract-filter"/>
+
+    <xsd:element name="jxpath-filter" type="jxpathFilterType" substitutionGroup="mule:abstract-filter"/>
+    <xsd:complexType name="jxpathFilterType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:patternFilterType">
+                <xsd:sequence>
+                    <xsd:element name="namespace" type="namespaceType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element name="context-property" type="spring:entryType" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attribute name="lenient" type="mule:substitutableBoolean" default="true"/>
+                <xsd:attribute name="expectedValue" type="xsd:string"/>
+           </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <!-- xml outbound routers -->
+
+    <xsd:element name="message-splitter" type="messageSplitterType" substitutionGroup="mule:abstract-outbound-router"/>
+    <xsd:complexType name="messageSplitterType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:messageSplitterOutboundRouterType">
+                <!-- these appear after endpoints, which is ugly.  refactor? -->
+                <xsd:sequence>
+                    <xsd:element name="namespace" type="namespaceType" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attribute name="splitExpression" type="xsd:string"/>
+                <xsd:attribute name="externalSchemaLocation" type="xsd:string"/>
+                <xsd:attribute name="validateSchema" type="mule:substitutableBoolean"/>
+           </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="round-robin-splitter" type="roundRobinSplitterType" substitutionGroup="mule:abstract-outbound-router"/>
+    <xsd:complexType name="roundRobinSplitterType">
+        <xsd:complexContent>
+            <xsd:extension base="messageSplitterType">
+                <xsd:attribute name="endpointFiltering" type="mule:substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            If true then the message part is sent to the first endpoint whose
+                            filter accepts the part.  The default is false.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="deterministic" type="mule:substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            If endpointFiltering is false and this option is true (the default)
+                            then the first message part if routed to the first endpoint, the
+                            second part to the second endpoint, etc, with the nth part going to
+                            the (n modulo number of endpoints) endpoint.
+                            If false then the messages will be distributed equally amongst all
+                            endpoints.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <!-- xml transformers -->
+    <!-- these just appear at the top level, there's no extended group -->
+
+    <xsd:complexType name="xmlTransformerType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:transformerType">
+                <xsd:attribute name="outputEncoding" type="xsd:string"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="dom-to-xml" type="xmlTransformerType"/>
+
+    <xsd:element name="jxpath-extractor" type="jxpathExtractorType"/>
+    <xsd:complexType name="jxpathExtractorType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:transformerType">
+                <xsd:attribute name="expression" type="xsd:string"/>
+                <xsd:attribute name="singleResult" type="mule:substitutableBoolean"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="object-to-xml" type="objectToXmlType"/>
+    <xsd:complexType name="objectToXmlType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:transformerType">
+                <xsd:attribute name="acceptUMOMessage" type="mule:substitutableBoolean"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="xml-to-dom" type="xmlTransformerType"/>
+    <xsd:element name="xml-to-object" type="mule:transformerType"/>
+
+    <xsd:element name="xslt-transformer" type="xsltTransformerType"/>
+    <xsd:complexType name="xsltTransformerType">
+        <xsd:complexContent>
+            <xsd:extension base="xmlTransformerType">
+                <xsd:sequence>
+                    <xsd:any namespace="http://www.w3.org/1999/XSL/Transform" minOccurs="0" maxOccurs="1" processContents="lax"/>
+                </xsd:sequence>
+                <xsd:attribute name="maxIdleTransformers" type="mule:substitutableInt"/>
+                <xsd:attribute name="maxActiveTransformers" type="mule:substitutableInt"/>
+                <xsd:attribute name="xslt" type="xsd:string"/>
+                <xsd:attribute name="xsl-file" type="xsd:string"/>
+                <xsd:attribute name="transformerFactoryClass" type="xsd:NMTOKEN"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <!-- xml property extractors -->
+
+    <xsd:element name="jxpath-property-extractor" type="mule:abstractPropertyExtractorType" substitutionGroup="mule:abstract-property-extractor"/>
+    <xsd:element name="dom4j-property-extractor" type="mule:abstractPropertyExtractorType" substitutionGroup="mule:abstract-property-extractor"/>
+    <xsd:element name="jdom-property-extractor" type="mule:abstractPropertyExtractorType" substitutionGroup="mule:abstract-property-extractor"/>
+
+    <!-- xml support -->
+
+    <xsd:complexType name="namespaceType">
+        <xsd:attribute name="prefix" type="xsd:string" use="required"/>
+        <xsd:attribute name="uri" type="xsd:string" use="required"/>
+    </xsd:complexType>
+
+</xsd:schema>

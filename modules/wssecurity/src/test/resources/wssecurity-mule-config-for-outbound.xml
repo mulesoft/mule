@@ -34,9 +34,7 @@
             <mule:outbound-router>
                 <mule:outbound-pass-through-router>
                     <mule:endpoint address="xfire:http://localhost:64484/MySecuredUMO?method=echo"><!-- type="sender"-->
-                        <wssecurity:security-filters>
-		                    <wssecurity:security-filter signatureFile="out-signed-security.properties" decryptionFile="out-encrypted-security.properties"/>
-	                    </wssecurity:security-filters>
+                        <wssecurity:security-filter signatureFile="out-signed-security.properties" decryptionFile="out-encrypted-security.properties"/>
                     </mule:endpoint>
                 </mule:outbound-pass-through-router>
             </mule:outbound-router>
@@ -46,9 +44,7 @@
 			<mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="xfire:http://localhost:64484">
-                    <wssecurity:security-filters>
-	                    <wssecurity:security-filter signatureFile="in-signed-security.properties" decryptionFile="in-encrypted-security.properties"/>
-                    </wssecurity:security-filters>
+                    <wssecurity:security-filter signatureFile="in-signed-security.properties" decryptionFile="in-encrypted-security.properties"/>
                 </mule:endpoint>
             </mule:inbound-router>
         </mule:service>

@@ -1,3 +1,2 @@
-# we over-ride the mule handler to add additional handlers for the xml elements
-http\://www.mulesource.org/schema/mule/core/2.0=org.mule.config.spring.handlers.XmlNamespaceHandler
+http\://www.mulesource.org/schema/mule/xml/2.0=org.mule.config.spring.handlers.XmlNamespaceHandler
 

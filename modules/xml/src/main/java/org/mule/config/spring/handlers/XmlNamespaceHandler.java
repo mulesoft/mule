@@ -28,30 +28,26 @@ import org.mule.util.properties.Dom4jPropertyExtractor;
 import org.mule.util.properties.JDomPropertyExtractor;
 import org.mule.util.properties.JXPathPropertyExtractor;
 
-public class XmlNamespaceHandler extends MuleNamespaceHandler
-{
+import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
-    public XmlNamespaceHandler()
-    {
-        setPriority(1); // override MuleNamespaceHandler (which this extends)
-    }
+public class XmlNamespaceHandler extends NamespaceHandlerSupport
+{
 
     public void init()
     {
-        super.init();
-        registerBeanDefinitionParser("xml-jxpath-filter", new ChildDefinitionParser("filter", JXPathFilter.class));
+        registerBeanDefinitionParser("jxpath-filter", new ChildDefinitionParser("filter", JXPathFilter.class));
         registerBeanDefinitionParser("is-xml-filter", new ChildDefinitionParser("filter", IsXmlFilter.class));
-        registerBeanDefinitionParser("xml-message-splitter", new RouterDefinitionParser("router", FilteringXmlMessageSplitter.class));
-        registerBeanDefinitionParser("xml-round-robin-splitter", new RouterDefinitionParser("router", RoundRobinXmlSplitter.class).addAlias("endpointFiltering", "enableEndpointFiltering"));
+        registerBeanDefinitionParser("message-splitter", new RouterDefinitionParser("router", FilteringXmlMessageSplitter.class));
+        registerBeanDefinitionParser("round-robin-splitter", new RouterDefinitionParser("router", RoundRobinXmlSplitter.class).addAlias("endpointFiltering", "enableEndpointFiltering"));
         registerBeanDefinitionParser("dom-to-xml", new OrphanDefinitionParser(DomDocumentToXml.class, false));
-        registerBeanDefinitionParser("xml-jxpath-extractor", new OrphanDefinitionParser(JXPathExtractor.class, false));
+        registerBeanDefinitionParser("jxpath-extractor", new OrphanDefinitionParser(JXPathExtractor.class, false));
         registerBeanDefinitionParser("object-to-xml", new OrphanDefinitionParser(ObjectToXml.class, false));
         registerBeanDefinitionParser("xml-to-dom", new OrphanDefinitionParser(XmlToDomDocument.class, false));
         registerBeanDefinitionParser("xml-to-object", new OrphanDefinitionParser(XmlToObject.class, false));
-        registerBeanDefinitionParser("xml-xslt", new XsltTransformerDefinitionParser());
-        registerBeanDefinitionParser("xml-jxpath-property-extractor", new ChildDefinitionParser("propertyExtractor", JXPathPropertyExtractor.class));
-        registerBeanDefinitionParser("xml-dom4j-property-extractor", new ChildDefinitionParser("propertyExtractor", Dom4jPropertyExtractor.class));
-        registerBeanDefinitionParser("xml-jdom-property-extractor", new ChildDefinitionParser("propertyExtractor", JDomPropertyExtractor.class));
+        registerBeanDefinitionParser("xslt-transformer", new XsltTransformerDefinitionParser());
+        registerBeanDefinitionParser("jxpath-property-extractor", new ChildDefinitionParser("propertyExtractor", JXPathPropertyExtractor.class));
+        registerBeanDefinitionParser("dom4j-property-extractor", new ChildDefinitionParser("propertyExtractor", Dom4jPropertyExtractor.class));
+        registerBeanDefinitionParser("jdom-property-extractor", new ChildDefinitionParser("propertyExtractor", JDomPropertyExtractor.class));
         registerBeanDefinitionParser("namespace", new ChildMapEntryDefinitionParser("namespaces", "prefix", "uri"));
         registerBeanDefinitionParser("context-property", new ChildMapEntryDefinitionParser("contextProperties", "key", "value"));
     }

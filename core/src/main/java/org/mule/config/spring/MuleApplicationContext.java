@@ -103,8 +103,6 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
         }
         //hook in our custom hierarchical reader
         beanDefinitionReader.setDocumentReaderClass(MuleBeanDefinitionDocumentReader.class);
-        //allow XML to over-write mule
-        beanDefinitionReader.setNamespaceHandlerResolver(new MuleNamespaceHandlerResolver());
         //add error reporting
         beanDefinitionReader.setProblemReporter(new MissingParserProblemReporter());
         beanDefinitionReader.loadBeanDefinitions(configLocations);

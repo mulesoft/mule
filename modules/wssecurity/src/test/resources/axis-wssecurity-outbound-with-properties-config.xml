@@ -42,14 +42,12 @@
             <mule:outbound-router>
                 <mule:outbound-pass-through-router>
                     <mule:endpoint address="axis:http://localhost:64484/MySecuredUMO?method=echo" connector-ref="axisConnector">
-                        <wssecurity:security-filters>
-                            <wssecurity:security-filter decryptionFile="in-encrypted-security.properties">
-                                <wssecurity:property key="action" value="Encrypt"/>
-                                <wssecurity:property key="encryptionPropFile" value="out-encrypted-security.properties"/>
-                                <wssecurity:property key="user" value="mulealias"/>
-                                <wssecurity:property key="passwordCallbackClass" value="org.mule.extras.wssecurity.callbackhandlers.MuleWsSecurityCallbackHandler"/>
-                            </wssecurity:security-filter>
-                        </wssecurity:security-filters>
+                        <wssecurity:security-filter decryptionFile="in-encrypted-security.properties">
+                            <wssecurity:property key="action" value="Encrypt"/>
+                            <wssecurity:property key="encryptionPropFile" value="out-encrypted-security.properties"/>
+                            <wssecurity:property key="user" value="mulealias"/>
+                            <wssecurity:property key="passwordCallbackClass" value="org.mule.extras.wssecurity.callbackhandlers.MuleWsSecurityCallbackHandler"/>
+                        </wssecurity:security-filter>
                     </mule:endpoint>
                 </mule:outbound-pass-through-router>
             </mule:outbound-router>
@@ -59,9 +57,7 @@
             <mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="axis:http://localhost:64484" connector-ref="axisConnector">
-                    <wssecurity:security-filters>
-                        <wssecurity:security-filter decryptionFile="in-encrypted-security.properties"/>
-                    </wssecurity:security-filters>
+                    <wssecurity:security-filter decryptionFile="in-encrypted-security.properties"/>
                 </mule:endpoint>
             </mule:inbound-router>
         </mule:service>

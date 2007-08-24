@@ -33,9 +33,7 @@
             <mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="http://localhost:4567">
-                    <acegi:security-filters>
-                        <acegi:http-security-filter realm="mule-realm"/>
-                    </acegi:security-filters>
+                    <acegi:http-security-filter realm="mule-realm"/>
                 </mule:endpoint>
             </mule:inbound-router>
         </mule:service>

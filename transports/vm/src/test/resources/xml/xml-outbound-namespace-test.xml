@@ -2,10 +2,12 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:mxml="http://www.mulesource.org/schema/mule/xml/2.0"
        xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/xml/2.0 http://www.mulesource.org/schema/mule/xml/2.0/mule-xml.xsd
        http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
 
     <mule:model-seda name="xml outbound namespace tests">
@@ -13,31 +15,31 @@
         <mule:service name="fancy config splitter">
             <mule:component class="org.mule.components.simple.BridgeComponent"/>
             <mule:outbound-router>
-                <mule:xml-message-splitter
+                <mxml:message-splitter
                         splitExpression="/expression"
                         enableCorrelation="ALWAYS"
                         externalSchemaLocation="external"
                         honorSynchronicity="true"
                         validateSchema="true">
-                    <mule:xml-dom4j-property-extractor/>
-                    <mule:namespace prefix="bar" uri="foo"/>
-                </mule:xml-message-splitter>
+                    <mxml:dom4j-property-extractor/>
+                    <mxml:namespace prefix="bar" uri="foo"/>
+                </mxml:message-splitter>
             </mule:outbound-router>
         </mule:service>
 
         <mule:service name="fancy config round robin">
             <mule:component class="org.mule.components.simple.BridgeComponent"/>
             <mule:outbound-router>
-                <mule:xml-round-robin-splitter
+                <mxml:round-robin-splitter
                         splitExpression="/expression"
                         enableCorrelation="IF_NOT_SET"
                         externalSchemaLocation="external"
                         honorSynchronicity="true"
                         validateSchema="true"
                         endpointFiltering="true">
-                    <mule:xml-dom4j-property-extractor/>
-                    <mule:namespace prefix="bar" uri="foo"/>
-                </mule:xml-round-robin-splitter>
+                    <mxml:dom4j-property-extractor/>
+                    <mxml:namespace prefix="bar" uri="foo"/>
+                </mxml:round-robin-splitter>
             </mule:outbound-router>
         </mule:service>
 

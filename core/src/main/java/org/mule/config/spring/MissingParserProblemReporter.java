@@ -10,8 +10,6 @@
 
 package org.mule.config.spring;
 
-import org.mule.util.StringUtils;
-
 import org.springframework.beans.factory.parsing.FailFastProblemReporter;
 import org.springframework.beans.factory.parsing.Problem;
 import org.w3c.dom.Element;
@@ -26,9 +24,6 @@ public class MissingParserProblemReporter extends FailFastProblemReporter
 {
 
     public static final String NO_PARSER_PREFIX = "Cannot locate BeanDefinitionParser";
-    public static final String MULESOURCE = "mulesource.org";
-    public static final String CORE = "/core/";
-    public static final String XML = "xml";
 
     // @Override
     public void fatal(Problem problem)
@@ -52,20 +47,9 @@ public class MissingParserProblemReporter extends FailFastProblemReporter
         try
         {
             String element = ((Element) problem.getLocation().getSource()).getLocalName();
-            String message = "The element '" + element + "' does not have an associated Bean Definition Parser.";
             String namespace = ((Element) problem.getLocation().getSource()).getNamespaceURI();
-            if (StringUtils.contains(namespace, MULESOURCE) && StringUtils.contains(namespace, CORE) &&
-                    StringUtils.contains(element, XML))
-
-            {
-                // we have a problem with XML
-                message += "  You appear to be using XML functionality from the Mule core."
-                        + "  Is the XML module present on the classpath?";
-            }
-            else
-            {
-                message += "  Is the module or transport associated with " + namespace + " present on the classpath?";
-            }
+            String message = "The element '" + element + "' does not have an associated Bean Definition Parser."
+                    +"  Is the module or transport associated with " + namespace + " present on the classpath?";
             return new Problem(message, problem.getLocation(), problem.getParseState(), problem.getRootCause());
         }
         catch (Exception e)

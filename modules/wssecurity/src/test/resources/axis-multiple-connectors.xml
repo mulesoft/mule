@@ -88,9 +88,7 @@
             <mule:echo-component/>
             <mule:inbound-router>
                 <mule:endpoint address="axis:http://localhost:64070/services" connector-ref="SecuredConnector">
-                    <wssecurity:security-filters>
-                        <wssecurity:security-filter decryptionFile="in-encrypted-security.properties"/>
-                    </wssecurity:security-filters>
+                    <wssecurity:security-filter decryptionFile="in-encrypted-security.properties"/>
                 </mule:endpoint>
             </mule:inbound-router>
             <mule:outbound-router>

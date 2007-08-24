@@ -3,10 +3,12 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:test="http://www.mulesource.org/schema/mule/test/2.0"
        xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:mxml="http://www.mulesource.org/schema/mule/xml/2.0"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/test/2.0 http://www.mulesource.org/schema/mule/test/2.0/mule-test.xsd
-       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/xml/2.0 http://www.mulesource.org/schema/mule/xml/2.0/mule-xml.xsd">
 
     <!-- this is a mule 2 version of test-mule-config.xml.  there is also another
          conversion, with the same name, done by ross, in org.mule.test.spring directory.
@@ -107,10 +109,10 @@
     </transformers -->
 
     <mule:endpoint name="fruitBowlEndpoint" address="test://fruitBowlPublishQ">
-        <mule:xml-jxpath-filter pattern="name">
-            <mule:namespace prefix="foo" uri="http://foo.com"/>
-            <mule:context-property key="value" value="bar"/>
-        </mule:xml-jxpath-filter>
+        <mxml:jxpath-filter pattern="name">
+            <mxml:namespace prefix="foo" uri="http://foo.com"/>
+            <mxml:context-property key="value" value="bar"/>
+        </mxml:jxpath-filter>
     </mule:endpoint>
     <!-- TODO -->
     <!-- cannot have aliases -->
@@ -373,7 +375,7 @@
             <mule:inbound-router/>
             <mule:outbound-router>
                 <mule:filtering-router>
-                    <mule:xml-jxpath-property-extractor/>
+                    <mxml:jxpath-property-extractor/>
                 </mule:filtering-router>
             </mule:outbound-router>
             <!-- outbound-router>

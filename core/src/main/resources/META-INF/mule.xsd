@@ -204,6 +204,9 @@
     <xsd:element name="abstract-property-extractor" abstract="true" type="abstractPropertyExtractorType"/>
     <xsd:complexType name="abstractPropertyExtractorType"/>
 
+    <xsd:element name="abstract-security-filter" abstract="true" type="abstractSecurityFilterType"/>
+    <xsd:complexType name="abstractSecurityFilterType"/>
+
 
     <!--==============================================================-->
     <!--   Component elements                                         -->
@@ -285,7 +288,7 @@
                 <xsd:sequence>
                     <xsd:element ref="abstract-transaction" minOccurs="0"/>
                     <xsd:element ref="abstract-filter" minOccurs="0"/>
-                    <xsd:element ref="abstract-security-filters" minOccurs="0"/>
+                    <xsd:element ref="abstract-security-filter" minOccurs="0"/>
                     <xsd:element ref="abstract-connection-strategy" minOccurs="0"/>
                     <xsd:element name="properties" type="mapType" minOccurs="0"/>
                     <!-- TODO - can this go now?  we can extend endpoints in modules... -->
@@ -410,44 +413,7 @@
 
     <!-- security filters -->
 
-    <xsd:element name="abstract-security-filters" type="abstractSecurityFiltersType" abstract="true">
-        <xsd:annotation>
-            <xsd:documentation>
-                An empty, abstract container that can be implemented to contain module-specific
-                security filters.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="abstractSecurityFiltersType"/>
-
-    <xsd:element name="security-filters" type="securityFiltersType" substitutionGroup="abstract-security-filters">
-        <xsd:annotation>
-            <xsd:documentation>
-                Container for the default Mule security filters.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="securityFiltersType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractSecurityFiltersType">
-                <xsd:choice>
-                    <xsd:element name="encryption-security-filter" type="encryptionSecurityFilterType" minOccurs="0"
-                                 maxOccurs="unbounded"/>
-                </xsd:choice>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:complexType name="securityFilterType">
-        <xsd:annotation>
-            <xsd:documentation>
-                This is a base type that can be extended by modules that want to
-                provide security filters.
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:attribute name="name" type="xsd:string"/>
-    </xsd:complexType>
-
+    <xsd:element name="encryption-security-filter" type="encryptionSecurityFilterType" substitutionGroup="abstract-security-filter"/>
     <xsd:complexType name="encryptionSecurityFilterType">
         <xsd:annotation>
             <xsd:documentation>
@@ -455,7 +421,7 @@
             </xsd:documentation>
         </xsd:annotation>
         <xsd:complexContent>
-            <xsd:extension base="securityFilterType">
+            <xsd:extension base="abstractSecurityFilterType">
                 <xsd:attribute name="strategy-ref" type="xsd:NMTOKEN"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -744,42 +710,6 @@
                 <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
-    </xsd:complexType>
-
-
-    <!--==============================================================-->
-    <!--   Connector elements                                          -->
-    <!--==============================================================-->
-
-
-    <xsd:complexType name="connectorType">
-        <xsd:group ref="connectorElements"/>
-        <xsd:attributeGroup ref="connectorAttributes"/>
-    </xsd:complexType>
-    <xsd:attributeGroup name="connectorAttributes">
-        <xsd:attribute name="name" type="xsd:string" use="required"/>
-        <xsd:attribute name="createDispatcherPerRequest" type="substitutableBoolean"/>
-        <xsd:attribute name="createMultipleTransactedReceivers" type="substitutableBoolean"/>
-    </xsd:attributeGroup>
-    <xsd:group name="connectorElements">
-        <xsd:sequence>
-            <xsd:element name="receiver-threading-profile" type="threadingProfileType" minOccurs="0"/>
-            <xsd:element name="dispatcher-threading-profile" type="threadingProfileType" minOccurs="0"/>
-            <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
-            <xsd:element name="service-overrides" type="serviceOverridesType" minOccurs="0"/>
-        </xsd:sequence>
-    </xsd:group>
-    <xsd:complexType name="serviceOverridesType">
-        <xsd:attribute name="messageReceiver" type="xsd:NMTOKEN"/>
-        <xsd:attribute name="transactedMessageReceiver" type="xsd:NMTOKEN"/>
-        <xsd:attribute name="dispatcherFactory" type="xsd:NMTOKEN"/>
-        <xsd:attribute name="inboundTransformer" type="xsd:NMTOKEN"/>
-        <xsd:attribute name="outboundTransformer" type="xsd:NMTOKEN"/>
-        <xsd:attribute name="responseTransformer" type="xsd:NMTOKEN"/>
-        <xsd:attribute name="endpointBuilder" type="xsd:NMTOKEN"/>
-        <xsd:attribute name="messageAdapter" type="xsd:NMTOKEN"/>
-        <xsd:attribute name="streamMessageAdapter" type="xsd:NMTOKEN"/>
-        <xsd:attribute name="serviceFinder" type="xsd:NMTOKEN"/>
     </xsd:complexType>
 
 
@@ -1491,6 +1421,7 @@
         </xsd:attribute>
     </xsd:complexType>
 
+    <!-- TODO - this should be in jndi / management -->
     <xsd:complexType name="jndiConnectorType">
         <xsd:complexContent>
             <xsd:extension base="connectorType">
@@ -1672,143 +1603,37 @@
 
 
     <!--==============================================================-->
-    <!--  XML Module supprt                                           -->
-    <!-- Xml module is closely integrated mainly because there is no  -->
-    <!-- simple, elegant, extensible way to have extensible filters.  -->
-    <!-- Filters may be nested, so a container element is not         -->
-    <!-- suitable.  The only alternative seems to be xsi:type with    -->
-    <!-- moduleFilterType, which is ugly.  And XML is only a separate -->
-    <!-- module to help separate dependencies during development.     -->
-    <!-- So we place XML filters in the mule namespace.  And then we  -->
-    <!-- add the rest of the XML stuff because it seems odd to have   -->
-    <!-- a separate namespace for the rest...                         -->
+    <!--   Connector support                                          -->
     <!--==============================================================-->
 
-    <!-- xml filters -->
-
-    <xsd:element name="is-xml-filter" type="abstractFilterType" substitutionGroup="abstract-filter"/>
-
-    <xsd:element name="xml-jxpath-filter" type="jxpathFilterType" substitutionGroup="abstract-filter"/>
-    <xsd:complexType name="jxpathFilterType">
-        <xsd:complexContent>
-            <xsd:extension base="patternFilterType">
-                <xsd:sequence>
-                    <xsd:element name="namespace" type="namespaceType" minOccurs="0" maxOccurs="unbounded"/>
-                    <xsd:element name="context-property" type="spring:entryType" minOccurs="0" maxOccurs="unbounded"/>
-                </xsd:sequence>
-                <xsd:attribute name="lenient" type="substitutableBoolean" default="true"/>
-                <xsd:attribute name="expectedValue" type="xsd:string"/>
-           </xsd:extension>
-        </xsd:complexContent>
+    <xsd:complexType name="connectorType">
+        <xsd:group ref="connectorElements"/>
+        <xsd:attributeGroup ref="connectorAttributes"/>
     </xsd:complexType>
-
-    <!-- xml outbound routers -->
-
-    <xsd:element name="xml-message-splitter" type="xmlMessageSplitterType" substitutionGroup="abstract-outbound-router"/>
-    <xsd:complexType name="xmlMessageSplitterType">
-        <xsd:complexContent>
-            <xsd:extension base="messageSplitterOutboundRouterType">
-                <!-- these appear after endpoints, which is ugly.  refactor? -->
-                <xsd:sequence>
-                    <xsd:element name="namespace" type="namespaceType" minOccurs="0" maxOccurs="unbounded"/>
-                </xsd:sequence>
-                <xsd:attribute name="splitExpression" type="xsd:string"/>
-                <xsd:attribute name="externalSchemaLocation" type="xsd:string"/>
-                <xsd:attribute name="validateSchema" type="substitutableBoolean"/>
-           </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="xml-round-robin-splitter" type="xmlRoundRobinSplitterType" substitutionGroup="abstract-outbound-router"/>
-    <xsd:complexType name="xmlRoundRobinSplitterType">
-        <xsd:complexContent>
-            <xsd:extension base="xmlMessageSplitterType">
-                <xsd:attribute name="endpointFiltering" type="substitutableBoolean">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            If true then the message part is sent to the first endpoint whose
-                            filter accepts the part.  The default is false.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="deterministic" type="substitutableBoolean">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            If endpointFiltering is false and this option is true (the default)
-                            then the first message part if routed to the first endpoint, the
-                            second part to the second endpoint, etc, with the nth part going to
-                            the (n modulo number of endpoints) endpoint.
-                            If false then the messages will be distributed equally amongst all
-                            endpoints.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <!-- xml transformers -->
-    <!-- these just appear at the top level, there's no extended group -->
-
-    <xsd:complexType name="xmlTransformerType">
-        <xsd:complexContent>
-            <xsd:extension base="transformerType">
-                <xsd:attribute name="outputEncoding" type="xsd:string"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="dom-to-xml" type="xmlTransformerType"/>
-
-    <xsd:element name="xml-jxpath-extractor" type="xmlJxpathExtractorType"/>
-    <xsd:complexType name="xmlJxpathExtractorType">
-        <xsd:complexContent>
-            <xsd:extension base="transformerType">
-                <xsd:attribute name="expression" type="xsd:string"/>
-                <xsd:attribute name="singleResult" type="substitutableBoolean"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="object-to-xml" type="objectToXmlType"/>
-    <xsd:complexType name="objectToXmlType">
-        <xsd:complexContent>
-            <xsd:extension base="transformerType">
-                <xsd:attribute name="acceptUMOMessage" type="substitutableBoolean"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="xml-to-dom" type="xmlTransformerType"/>
-    <xsd:element name="xml-to-object" type="transformerType"/>
-
-    <xsd:element name="xml-xslt" type="xsltTransformerType"/>
-    <xsd:complexType name="xsltTransformerType">
-        <xsd:complexContent>
-            <xsd:extension base="xmlTransformerType">
-                <xsd:sequence>
-                    <xsd:any namespace="http://www.w3.org/1999/XSL/Transform" minOccurs="0" maxOccurs="1" processContents="lax"/>
-                </xsd:sequence>
-                <xsd:attribute name="maxIdleTransformers" type="substitutableInt"/>
-                <xsd:attribute name="maxActiveTransformers" type="substitutableInt"/>
-                <xsd:attribute name="xslt" type="xsd:string"/>
-                <xsd:attribute name="xsl-file" type="xsd:string"/>
-                <xsd:attribute name="transformerFactoryClass" type="xsd:NMTOKEN"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <!-- xml property extractors -->
-
-    <xsd:element name="xml-jxpath-property-extractor" type="abstractPropertyExtractorType" substitutionGroup="abstract-property-extractor"/>
-    <xsd:element name="xml-dom4j-property-extractor" type="abstractPropertyExtractorType" substitutionGroup="abstract-property-extractor"/>
-    <xsd:element name="xml-jdom-property-extractor" type="abstractPropertyExtractorType" substitutionGroup="abstract-property-extractor"/>
-
-    <!-- xml support -->
-
-    <xsd:complexType name="namespaceType">
-        <xsd:attribute name="prefix" type="xsd:string" use="required"/>
-        <xsd:attribute name="uri" type="xsd:string" use="required"/>
+    <xsd:attributeGroup name="connectorAttributes">
+        <xsd:attribute name="name" type="xsd:string" use="required"/>
+        <xsd:attribute name="createDispatcherPerRequest" type="substitutableBoolean"/>
+        <xsd:attribute name="createMultipleTransactedReceivers" type="substitutableBoolean"/>
+    </xsd:attributeGroup>
+    <xsd:group name="connectorElements">
+        <xsd:sequence>
+            <xsd:element name="receiver-threading-profile" type="threadingProfileType" minOccurs="0"/>
+            <xsd:element name="dispatcher-threading-profile" type="threadingProfileType" minOccurs="0"/>
+            <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
+            <xsd:element name="service-overrides" type="serviceOverridesType" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:group>
+    <xsd:complexType name="serviceOverridesType">
+        <xsd:attribute name="messageReceiver" type="xsd:NMTOKEN"/>
+        <xsd:attribute name="transactedMessageReceiver" type="xsd:NMTOKEN"/>
+        <xsd:attribute name="dispatcherFactory" type="xsd:NMTOKEN"/>
+        <xsd:attribute name="inboundTransformer" type="xsd:NMTOKEN"/>
+        <xsd:attribute name="outboundTransformer" type="xsd:NMTOKEN"/>
+        <xsd:attribute name="responseTransformer" type="xsd:NMTOKEN"/>
+        <xsd:attribute name="endpointBuilder" type="xsd:NMTOKEN"/>
+        <xsd:attribute name="messageAdapter" type="xsd:NMTOKEN"/>
+        <xsd:attribute name="streamMessageAdapter" type="xsd:NMTOKEN"/>
+        <xsd:attribute name="serviceFinder" type="xsd:NMTOKEN"/>
     </xsd:complexType>
 
 </xsd:schema>

@@ -13,25 +13,7 @@
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0" 
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
 
-    <xsd:element name="security-filters" type="securityFiltersType" substitutionGroup="mule:abstract-security-filters">
-        <xsd:annotation>
-            <xsd:documentation>
-                Container for security filtes provided by the WS Security Module.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:complexType name="securityFiltersType">
-        <xsd:complexContent>
-            <xsd:extension base="mule:securityFiltersType">
-                <xsd:sequence>
-                    <xsd:element ref="security-filter"/>
-                </xsd:sequence>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="security-filter" type="securityFilterType">
+    <xsd:element name="security-filter" type="securityFilterType" substitutionGroup="mule:abstract-security-filter">
         <xsd:annotation>
             <xsd:documentation>
                 TODO
@@ -41,7 +23,7 @@
 
     <xsd:complexType name="securityFilterType">
         <xsd:complexContent>
-            <xsd:extension base="mule:securityFilterType">
+            <xsd:extension base="mule:abstractSecurityFilterType">
 				<xsd:sequence minOccurs="0" maxOccurs="unbounded">
                     <xsd:element name="property" type="propertyType">
                         <xsd:annotation>

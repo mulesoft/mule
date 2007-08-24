@@ -296,7 +296,6 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("custom-encryption-strategy", new NameTransferDefinitionParser("encryptionStrategies").addAlias("strategy", "encryptionStrategy"));
         registerBeanDefinitionParser("password-encryption-strategy", new ChildDefinitionParser("encryptionStrategy", PasswordBasedEncryptionStrategy.class));
         registerBeanDefinitionParser("secret-key-encryption-strategy", new ChildDefinitionParser("encryptionStrategy", SecretKeyEncryptionStrategy.class));
-        registerBeanDefinitionParser("security-filters", new ParentDefinitionParser());
-        registerBeanDefinitionParser("encryption-security-filter", new GrandchildDefinitionParser("securityFilter", MuleEncryptionEndpointSecurityFilter.class));
+        registerBeanDefinitionParser("encryption-security-filter", new ChildDefinitionParser("securityFilter", MuleEncryptionEndpointSecurityFilter.class));
     }
 }

@@ -37,14 +37,10 @@
             <mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="vm://my.queue">
-                    <mule:security-filters>
-                        <mule:encryption-security-filter strategy-ref="PBE"/>
-                    </mule:security-filters>
+                    <mule:encryption-security-filter strategy-ref="PBE"/>
                 </mule:endpoint>
                 <mule:endpoint address="http://localhost:4567">
-                    <mule:security-filters>
-                        <mule:encryption-security-filter strategy-ref="PBE"/>
-                    </mule:security-filters>
+                    <mule:encryption-security-filter strategy-ref="PBE"/>
                 </mule:endpoint>
             </mule:inbound-router>
         </mule:service>

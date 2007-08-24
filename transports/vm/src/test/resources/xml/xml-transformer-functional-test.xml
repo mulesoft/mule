@@ -2,10 +2,12 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:mxml="http://www.mulesource.org/schema/mule/xml/2.0"
        xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/xml/2.0 http://www.mulesource.org/schema/mule/xml/2.0/mule-xml.xsd
        http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
 
     <vm:connector name="default">
@@ -16,15 +18,15 @@
         <mule:custom-exception-strategy class="org.mule.tck.functional.QuietExceptionStrategy"/>
     </vm:connector>
 
-    <mule:dom-to-xml name="domToXml"/>
-    <mule:xml-to-dom name="xmlToDom"/>
+    <mxml:dom-to-xml name="domToXml"/>
+    <mxml:xml-to-dom name="xmlToDom"/>
 
-    <mule:xml-jxpath-extractor name="jxpath" expression="count(//parent)"/>
+    <mxml:jxpath-extractor name="jxpath" expression="count(//parent)"/>
 
-    <mule:object-to-xml name="objectToXml"/>
-    <mule:xml-to-object name="xmlToObject"/>
+    <mxml:object-to-xml name="objectToXml"/>
+    <mxml:xml-to-object name="xmlToObject"/>
 
-    <mule:xml-xslt name="xslt">
+    <mxml:xslt-transformer name="xslt">
         <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
             <!-- test for this string in test -->
             <!-- Whenever you match any node or any attribute -->
@@ -35,7 +37,7 @@
                 </xsl:copy>
             </xsl:template>
         </xsl:stylesheet>
-    </mule:xml-xslt>
+    </mxml:xslt-transformer>
 
     <mule:endpoint name="xml-in" address="vm://xml-in" connector-ref="default"/>
     <mule:endpoint name="object-in" address="vm://object-in" connector-ref="default"/>
