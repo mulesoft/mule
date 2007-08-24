@@ -14,7 +14,6 @@ import org.mule.MuleException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.impl.model.seda.SedaModel;
 import org.mule.providers.AbstractConnector;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -65,9 +64,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
      */
     protected void doSetUp() throws Exception
     {
-        model = new SedaModel();
-        model.setName("default");
-        managementContext.getRegistry().registerModel(model);
+        model = managementContext.getRegistry().lookupSystemModel();
         descriptor = getTestDescriptor("apple", Apple.class.getName());
         connector = createConnector();
         connectorName = connector.getName();
@@ -75,7 +72,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         {
             fail("You need to set the connector name on the connector before returning it");
         }
-        managementContext.getRegistry().registerConnector(connector);
+        managementContext.getRegistry().registerConnector(connector, managementContext);
         // TODO MULE-1988
         managementContext.start();
     }
@@ -153,13 +150,11 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
 
         MuleDescriptor d = getTestDescriptor("anApple", Apple.class.getName());
         d.setModelName(model.getName());
-        managementContext.getRegistry().registerService(d);
+        managementContext.getRegistry().registerService(d, managementContext);
         UMOComponent component = model.getComponent(d.getName());
 
-//        UMOEndpoint endpoint = new MuleEndpoint("test", new MuleEndpointURI(getTestEndpointURI()), connector,
-//                null, UMOEndpoint.ENDPOINT_TYPE_SENDER, 0, null, new HashMap());
         UMOEndpoint endpoint = managementContext.getRegistry().createEndpointFromUri(
-                new MuleEndpointURI(getTestEndpointURI()), UMOEndpoint.ENDPOINT_TYPE_SENDER);
+                new MuleEndpointURI(getTestEndpointURI()), UMOEndpoint.ENDPOINT_TYPE_SENDER, managementContext);
 
         try
         {

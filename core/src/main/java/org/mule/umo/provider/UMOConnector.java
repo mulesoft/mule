@@ -22,7 +22,6 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.Lifecycle;
-import org.mule.umo.lifecycle.Registerable;
 
 import java.beans.ExceptionListener;
 import java.io.InputStream;
@@ -32,7 +31,7 @@ import java.io.OutputStream;
  * <code>UMOConnector</code> is the mechanism used to connect to external systems
  * and protocols in order to send and receive data.
  */
-public interface UMOConnector extends Lifecycle, Initialisable, Registerable, ManagementContextAware
+public interface UMOConnector extends Lifecycle, Initialisable, ManagementContextAware
 {
     int INT_VALUE_NOT_SET = -1;
 

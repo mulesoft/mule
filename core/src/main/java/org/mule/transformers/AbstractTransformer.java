@@ -10,25 +10,21 @@
 
 package org.mule.transformers;
 
-import org.mule.RegistryContext;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.providers.NullPayload;
-import org.mule.registry.DeregistrationException;
-import org.mule.registry.RegistrationException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.lifecycle.Registerable;
-import org.mule.umo.registry.RegistryFacade;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.StringMessageUtils;
 
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+
 import java.util.List;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -79,11 +75,6 @@ public abstract class AbstractTransformer implements UMOTransformer
      * passed is is not supported or the return tye is incorrect
      */
     private boolean ignoreBadInput = false;
-
-    /**
-     * Registry ID
-     */
-    protected String registryId = null;
 
     /**
      * default constructor required for discovery
@@ -342,50 +333,6 @@ public abstract class AbstractTransformer implements UMOTransformer
     public void initialise() throws InitialisationException
     {
         // nothing to do
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.lifecycle.Registerable#register()
-     */
-    public void register() throws RegistrationException
-    {
-        RegistryFacade registry = RegistryContext.getRegistry();
-        if (registry == null) throw new RegistrationException("No registry available");
-        Registerable parent = null;
-        if (endpoint != null)
-        {
-            parent = endpoint;
-        }
-        else 
-        {
-            //TODO LM: what should the parent be
-            parent = null;
-        }
-
-        registryId = registry.registerMuleObject(parent, this).getId();
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.lifecycle.Registerable#deregister()
-     */
-    public void deregister() throws DeregistrationException
-    {
-        RegistryContext.getRegistry().deregisterComponent(registryId);
-        registryId = null;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.lifecycle.Registerable#getRegistryId()
-     */
-    public String getRegistryId()
-    {
-        return registryId;
     }
 
     protected String generateTransformerName()

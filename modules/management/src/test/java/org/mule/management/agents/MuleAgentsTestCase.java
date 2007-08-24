@@ -19,6 +19,10 @@ import javax.management.MBeanServerFactory;
 
 public class MuleAgentsTestCase extends AbstractMuleTestCase
 {
+    public MuleAgentsTestCase()
+    {
+        setStartContext(true);
+    }
 
     public void testRemoveNonExistentAgent() throws Exception
     {
@@ -42,8 +46,6 @@ public class MuleAgentsTestCase extends AbstractMuleTestCase
         agentSecond.setName("mx4jAgent");
         managementContext.getRegistry().registerAgent(agentSecond);
 
-        managementContext.start();
-
         // should not throw an exception
     }
 
@@ -65,6 +67,5 @@ public class MuleAgentsTestCase extends AbstractMuleTestCase
         jmxAgent.setLocateServer(false);
         jmxAgent.setMBeanServer(server);
         managementContext.getRegistry().registerAgent(jmxAgent);
-        managementContext.start();
     }
 }

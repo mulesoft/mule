@@ -9,20 +9,21 @@
  */
 package org.mule.impl.lifecycle;
 
+import org.mule.RegistryContext;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.registry.Registry;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.lifecycle.UMOLifecyclePhase;
-import org.mule.umo.registry.RegistryFacade;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringMessageUtils;
 
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -51,7 +52,7 @@ public class LifecyclePhase implements UMOLifecyclePhase
     private String name;
     private String oppositeLifecyclePhase;
     private Set supportedPhases;
-    private int registryScope = RegistryFacade.SCOPE_REMOTE;
+    private int registryScope = Registry.SCOPE_REMOTE;
 
     public LifecyclePhase(String name, Class lifecycleClass, String oppositeLifecyclePhase)
     {
@@ -90,12 +91,12 @@ public class LifecyclePhase implements UMOLifecyclePhase
             {
                 fireDefault = false;
             }
-            Map objects = managementContext.getRegistry().lookupCollection(lo.getType(), getRegistryScope());
+            Collection objects = RegistryContext.getRegistry().lookupObjects(lo.getType(), getRegistryScope());
             if (objects != null && objects.size() > 0)
             {
                 lo.firePreNotification(managementContext);
 
-                for (Iterator iterator1 = objects.values().iterator(); iterator1.hasNext();)
+                for (Iterator iterator1 = objects.iterator(); iterator1.hasNext();)
                 {
                     Object o = iterator1.next();
                     if (called.contains(new Integer(o.hashCode())))

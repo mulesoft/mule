@@ -10,6 +10,7 @@
 
 package org.mule.management;
 
+import org.mule.RegistryContext;
 import org.mule.impl.internal.notifications.ComponentNotification;
 import org.mule.impl.internal.notifications.ComponentNotificationListener;
 import org.mule.impl.internal.notifications.CustomNotification;
@@ -39,11 +40,15 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
     private final AtomicInteger customNotificationCount = new AtomicInteger(0);
     private UMOModel model;
 
+    public ServerNotificationsTestCase()
+    {
+        setStartContext(true);
+    }
+    
     // @Override
     protected void doSetUp() throws Exception
     {
-        model = managementContext.getRegistry().lookupModel(UMOModel.DEFAULT_MODEL_NAME);
-        managementContext.start();
+        model = RegistryContext.getRegistry().lookupSystemModel();
     }
 
     // @Override

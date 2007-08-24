@@ -15,8 +15,6 @@ import org.mule.config.MuleConfiguration;
 import org.mule.config.PoolingProfile;
 import org.mule.config.QueueProfile;
 import org.mule.config.ThreadingProfile;
-import org.mule.registry.DeregistrationException;
-import org.mule.registry.RegistrationException;
 import org.mule.routing.inbound.InboundPassThroughRouter;
 import org.mule.routing.inbound.InboundRouterCollection;
 import org.mule.routing.nested.NestedRouterCollection;
@@ -32,14 +30,14 @@ import org.mule.umo.routing.UMOOutboundRouterCollection;
 import org.mule.umo.routing.UMOResponseRouterCollection;
 import org.mule.util.object.ObjectFactory;
 
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+
 import java.beans.ExceptionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * <code>MuleDescriptor</code> describes all the properties for a Mule UMO. New
@@ -207,37 +205,6 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 //            nestedRouter.initialise();
 //        }
 
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.lifecycle.Registerable#register()
-     */
-    public void register() throws RegistrationException
-    {
-        //registryId = managementContext.getRegistry().registerMuleObject(MulemanagementContext.getRegistry().lookupModel(modelName), this).getId();
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.lifecycle.Registerable#deregister()
-     */
-    public void deregister() throws DeregistrationException
-    {
-        managementContext.getRegistry().deregisterComponent(registryId);
-        registryId = null;
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.lifecycle.Registerable#getRegistryId()
-     */
-    public String getRegistryId()
-    {
-        return registryId;
     }
 
     /*

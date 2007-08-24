@@ -11,7 +11,6 @@
 package org.mule.providers.stdio;
 
 import org.mule.config.i18n.MessageFactory;
-import org.mule.registry.metadata.ObjectMetadata;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
@@ -31,9 +30,6 @@ import java.io.OutputStream;
  */
 public class PromptStdioConnector extends StdioConnector
 {
-
-    public static ObjectMetadata objectMetadata = new ObjectMetadata(PromptStdioConnector.class, true, new String[] { "promptMessage", "outputMessage", "messageDelayTime", "firstTime" });
-
     private String promptMessage;
     private String promptMessageCode = null;
     private String resourceBundle = null;

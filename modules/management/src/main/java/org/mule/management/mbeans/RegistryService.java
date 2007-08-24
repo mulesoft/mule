@@ -43,10 +43,10 @@ public class RegistryService implements RegistryServiceMBean
     }
     */
 
-    public String getPersistenceMode()
-    {
-        return registry.getPersistenceMode();
-    }
+//    public String getPersistenceMode()
+//    {
+//        return registry.getPersistenceMode();
+//    }
 
     public String getName()
     {

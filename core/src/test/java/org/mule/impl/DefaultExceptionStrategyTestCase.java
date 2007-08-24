@@ -21,18 +21,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 
 public class DefaultExceptionStrategyTestCase extends AbstractMuleTestCase
 {
-    // @Override
-    protected void doSetUp() throws Exception
-    {
-        managementContext.start();
-    }
-
-    // @Override
-    protected void doTearDown() throws Exception
-    {
-        managementContext.dispose();
-    }
-
     // MULE-1404
     public void testExceptions() throws Exception
     {

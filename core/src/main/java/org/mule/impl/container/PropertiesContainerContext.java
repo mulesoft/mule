@@ -11,6 +11,7 @@
 package org.mule.impl.container;
 
 import org.mule.RegistryContext;
+import org.mule.registry.RegistrationException;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.ContainerException;
 import org.mule.umo.manager.ObjectNotFoundException;
@@ -61,7 +62,14 @@ public class PropertiesContainerContext extends AbstractContainerContext
                 entry = (Map.Entry)iterator.next();
                 value = entry.getValue().toString();
                 value = templateParser.parse(managementContext.getRegistry().lookupProperties(), value);
-                managementContext.getRegistry().registerProperty(entry.getKey(), value);
+                try
+                {
+                    managementContext.getRegistry().registerProperty((String) entry.getKey(), value);
+                }
+                catch (RegistrationException e)
+                {
+                    throw new InitialisationException(e, this);
+                }
             }
         }
         setSystemProperties(null);
@@ -132,7 +140,14 @@ public class PropertiesContainerContext extends AbstractContainerContext
                 entry = (Map.Entry) iterator.next();
                 value = entry.getValue().toString();
                 value = templateParser.parse(managementContext.getRegistry().lookupProperties(), value.toString());
-                managementContext.getRegistry().registerProperty(entry.getKey(), value);
+                try
+                {
+                    managementContext.getRegistry().registerProperty((String) entry.getKey(), value);
+                }
+                catch (RegistrationException e)
+                {
+                    logger.error(e);
+                }
             }
         }
     }

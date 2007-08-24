@@ -18,6 +18,7 @@ import org.mule.providers.AbstractConnector;
 import org.mule.registry.ServiceDescriptorFactory;
 import org.mule.registry.ServiceException;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
@@ -27,9 +28,8 @@ import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.BeanUtils;
 import org.mule.util.MuleObjectHelper;
 import org.mule.util.ObjectNameHelper;
-import org.mule.util.PropertiesUtils;
 
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
@@ -56,7 +56,7 @@ public class TransportFactory
     public static final int NEVER_CREATE_CONNECTOR = 2;
     public static final int USE_CONNECTOR = 3;
 
-    public static UMOEndpoint createEndpoint(UMOEndpointURI uri, String type) throws EndpointException
+    public static UMOEndpoint createEndpoint(UMOEndpointURI uri, String type, UMOManagementContext managementContext) throws EndpointException
     {
         String scheme = uri.getFullScheme();
         UMOConnector connector;
@@ -64,7 +64,7 @@ public class TransportFactory
         {
             if (uri.getCreateConnector() == ALWAYS_CREATE_CONNECTOR)
             {
-                connector = createConnector(uri);
+                connector = createConnector(uri, managementContext);
             }
             else if (uri.getCreateConnector() == NEVER_CREATE_CONNECTOR)
             {
@@ -84,7 +84,7 @@ public class TransportFactory
                 connector = getConnectorByProtocol(scheme);
                 if (connector == null)
                 {
-                    connector = createConnector(uri);
+                    connector = createConnector(uri, managementContext);
                 }
             }
         }
@@ -108,8 +108,8 @@ public class TransportFactory
         {
             endpoint.setName(uri.getEndpointName());
         }
-        //TODO RM* I dont think this is needed String name = ObjectNameHelper.getEndpointName(endpoint);
-        //endpoint.setName(name);
+        String name = ObjectNameHelper.getEndpointName(endpoint);
+        endpoint.setName(name);
 
         if (type != null)
         {
@@ -226,7 +226,7 @@ public class TransportFactory
      * @return a new Connector
      * @throws TransportFactoryException
      */
-    public static UMOConnector createConnector(UMOEndpointURI url) throws TransportFactoryException
+    public static UMOConnector createConnector(UMOEndpointURI url, UMOManagementContext managementContext) throws TransportFactoryException
     {
 
         try
@@ -257,18 +257,19 @@ public class TransportFactory
 
             connector.setName(ObjectNameHelper.getConnectorName(connector));
 
+            // TODO Do we still need to support this for 2.x?
             // set any manager default properties for the connector
             // these are set on the Manager with a protocol i.e.
             // jms.specification=1.1
-            Map props = new HashMap();
-            PropertiesUtils.getPropertiesWithPrefix(RegistryContext.getRegistry().lookupProperties(),
-                connector.getProtocol().toLowerCase(), props);
-            if (props.size() > 0)
-            {
-                props = PropertiesUtils.removeNamespaces(props);
-                BeanUtils.populateWithoutFail(connector, props, true);
-            }
-            RegistryContext.getRegistry().registerConnector(connector);
+//            Map props = new HashMap();
+//            PropertiesUtils.getPropertiesWithPrefix(RegistryContext.getRegistry().lookupProperties(),
+//                connector.getProtocol().toLowerCase(), props);
+//            if (props.size() > 0)
+//            {
+//                props = PropertiesUtils.removeNamespaces(props);
+//                BeanUtils.populateWithoutFail(connector, props, true);
+//            }
+            RegistryContext.getRegistry().registerConnector(connector, managementContext);
 
             return connector;
         }
@@ -279,19 +280,19 @@ public class TransportFactory
         }
     }
 
-    public static UMOConnector getOrCreateConnectorByProtocol(UMOEndpointURI uri)
+    public static UMOConnector getOrCreateConnectorByProtocol(UMOEndpointURI uri, UMOManagementContext managementContext)
         throws TransportFactoryException
     {
-        return getOrCreateConnectorByProtocol(uri, uri.getCreateConnector());
+        return getOrCreateConnectorByProtocol(uri, uri.getCreateConnector(), managementContext);
     }
 
-    public static UMOConnector getOrCreateConnectorByProtocol(UMOImmutableEndpoint endpoint)
+    public static UMOConnector getOrCreateConnectorByProtocol(UMOImmutableEndpoint endpoint, UMOManagementContext managementContext)
         throws TransportFactoryException
     {
-        return getOrCreateConnectorByProtocol(endpoint.getEndpointURI(), endpoint.getCreateConnector());
+        return getOrCreateConnectorByProtocol(endpoint.getEndpointURI(), endpoint.getCreateConnector(), managementContext);
     }
 
-    private static UMOConnector getOrCreateConnectorByProtocol(UMOEndpointURI uri, int create)
+    private static UMOConnector getOrCreateConnectorByProtocol(UMOEndpointURI uri, int create, UMOManagementContext managementContext)
         throws TransportFactoryException
     {
         String connectorName = uri.getConnectorName();
@@ -309,7 +310,7 @@ public class TransportFactory
         if (ALWAYS_CREATE_CONNECTOR == create
             || (connector == null && create == GET_OR_CREATE_CONNECTOR))
         {
-            connector = createConnector(uri);
+            connector = createConnector(uri, managementContext);
             try
             {
                 BeanUtils.populate(connector, uri.getParams());
@@ -333,8 +334,8 @@ public class TransportFactory
     {
         UMOConnector connector;
         UMOConnector resultConnector = null;
-        Map connectors = RegistryContext.getRegistry().getConnectors();
-        for (Iterator iterator = connectors.values().iterator(); iterator.hasNext();)
+        Collection connectors = RegistryContext.getRegistry().getConnectors();
+        for (Iterator iterator = connectors.iterator(); iterator.hasNext();)
         {
             connector = (UMOConnector)iterator.next();
             if (connector.supportsProtocol(protocol))

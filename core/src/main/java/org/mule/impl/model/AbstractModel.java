@@ -14,12 +14,9 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.DefaultComponentExceptionStrategy;
 import org.mule.impl.DefaultLifecycleAdapterFactory;
 import org.mule.impl.ImmutableMuleDescriptor;
-import org.mule.impl.ManagementContextAware;
 import org.mule.impl.MuleSession;
 import org.mule.impl.internal.notifications.ModelNotification;
 import org.mule.impl.model.resolvers.DynamicEntryPointResolver;
-import org.mule.registry.DeregistrationException;
-import org.mule.registry.RegistrationException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
@@ -33,14 +30,15 @@ import org.mule.umo.model.ModelException;
 import org.mule.umo.model.UMOEntryPointResolver;
 import org.mule.umo.model.UMOModel;
 
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentSkipListMap;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 import java.beans.ExceptionListener;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentSkipListMap;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -75,8 +73,6 @@ public abstract class AbstractModel implements UMOModel
     private AtomicBoolean started = new AtomicBoolean(false);
 
     private ExceptionListener exceptionListener = new DefaultComponentExceptionStrategy();
-
-    protected String registryId = null;
 
     /**
      * Default constructor
@@ -180,6 +176,7 @@ public abstract class AbstractModel implements UMOModel
         if (component == null)
         {
             component = createComponent(descriptor);
+            component.setManagementContext(managementContext);
             descriptors.put(descriptor.getName(), descriptor);
             components.put(descriptor.getName(), component);
         }
@@ -216,7 +213,6 @@ public abstract class AbstractModel implements UMOModel
             component.stop();
             descriptors.remove(descriptor.getName());
             component.dispose();
-            component.deregister();
             logger.info("The component: " + descriptor.getName() + " has been unregistered and disposing");
         }
     }
@@ -466,20 +462,12 @@ public abstract class AbstractModel implements UMOModel
         if (!initialised.get())
         {
             fireNotification(new ModelNotification(this, ModelNotification.MODEL_INITIALISING));
-            try
-            {
-                register();
-            }
-            catch (RegistrationException e)
-            {
-                throw new InitialisationException(e, this);
-            }
 
             // TODO this doesn't feel right, should be injected?
-            if (exceptionListener instanceof ManagementContextAware)
-            {
-                ((ManagementContextAware) exceptionListener).setManagementContext(managementContext);
-            }
+//            if (exceptionListener instanceof ManagementContextAware)
+//            {
+//                ((ManagementContextAware) exceptionListener).setManagementContext(managementContext);
+//            }
             if (exceptionListener instanceof Initialisable)
             {
                 ((Initialisable) exceptionListener).initialise();
@@ -501,37 +489,6 @@ public abstract class AbstractModel implements UMOModel
         {
             logger.debug("Model already initialised");
         }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.lifecycle.Registerable#register()
-     */
-    public void register() throws RegistrationException
-    {
-        registryId = managementContext.getRegistry().registerMuleObject(managementContext, this).getId();
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.lifecycle.Registerable#deregister()
-     */
-    public void deregister() throws DeregistrationException
-    {
-        getManagementContext().getRegistry().deregisterComponent(registryId);
-        registryId = null;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.lifecycle.Registerable#getRegistryId()
-     */
-    public String getRegistryId()
-    {
-        return registryId;
     }
 
     public ExceptionListener getExceptionListener()
@@ -566,19 +523,19 @@ public abstract class AbstractModel implements UMOModel
 
     void fireNotification(UMOServerNotification notification)
     {
-        getManagementContext().fireNotification(notification);
+        if (managementContext != null)
+        {
+            managementContext.fireNotification(notification);
+        }
+        else if (logger.isDebugEnabled())
+        {
+            logger.debug("ManagementContext is not yet available for firing notifications, ignoring event: " + notification);
+        }
     }
-
 
     public void setManagementContext(UMOManagementContext context)
     {
         this.managementContext = context;
-    }
-
-
-    public UMOManagementContext getManagementContext()
-    {
-        return managementContext;
     }
 
     protected abstract UMOComponent createComponent(UMODescriptor descriptor);

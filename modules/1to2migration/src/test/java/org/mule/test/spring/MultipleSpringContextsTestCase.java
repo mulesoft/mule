@@ -24,9 +24,11 @@ public class MultipleSpringContextsTestCase extends FunctionalTestCase
 
     public void testMultiptleSpringContexts() throws Exception
     {
-        Object bowl1 = AbstractMuleTestCase.managementContext.getRegistry().lookupObject("org.mule.tck.testmodels.fruit.FruitBowl", FruitBowl.class);
+        Object bowl1 = AbstractMuleTestCase.managementContext.getRegistry().lookupObject("org.mule.tck.testmodels.fruit.FruitBowl");
         assertNotNull(bowl1);
-        Object bowl2 = AbstractMuleTestCase.managementContext.getRegistry().lookupObject("org.mule.tck.testmodels.fruit.FruitBowl2", FruitBowl.class);
+        assertTrue(bowl1 instanceof FruitBowl);
+        Object bowl2 = AbstractMuleTestCase.managementContext.getRegistry().lookupObject("org.mule.tck.testmodels.fruit.FruitBowl2");
         assertNotNull(bowl2);
+        assertTrue(bowl2 instanceof FruitBowl);
     }
 }

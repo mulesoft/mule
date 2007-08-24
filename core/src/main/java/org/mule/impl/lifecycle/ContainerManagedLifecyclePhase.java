@@ -10,7 +10,6 @@
 package org.mule.impl.lifecycle;
 
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
 
 /**
  * A container-managed lifecycle phase is called by the container itself. This class acts as a marker to enable
@@ -24,7 +23,7 @@ public class ContainerManagedLifecyclePhase extends LifecyclePhase
     }
 
     //@java.lang.Override
-    public void fireLifecycle(UMOManagementContext managementContext, String currentPhase) throws UMOException
+    public void fireLifecycle(String currentPhase) throws UMOException
     {
         //The container manages this lifecycle
         return;

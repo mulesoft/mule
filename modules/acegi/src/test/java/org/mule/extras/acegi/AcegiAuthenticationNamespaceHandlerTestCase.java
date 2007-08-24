@@ -13,8 +13,8 @@ package org.mule.extras.acegi;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.endpoint.UMOEndpoint;
 
+import java.util.Collection;
 import java.util.Iterator;
-import java.util.Map;
 
 public class AcegiAuthenticationNamespaceHandlerTestCase extends FunctionalTestCase
 {
@@ -26,13 +26,12 @@ public class AcegiAuthenticationNamespaceHandlerTestCase extends FunctionalTestC
 
     public void testAcegi()
     {
-        Map endpoints = managementContext.getRegistry().getEndpoints();
-        Iterator names = endpoints.keySet().iterator();
-        while (names.hasNext())
+        Collection endpoints = managementContext.getRegistry().getEndpoints();
+        Iterator it = endpoints.iterator();
+        while (it.hasNext())
         {
-            String name = (String) names.next();
-            UMOEndpoint endpoint = (UMOEndpoint) endpoints.get(name);
-            logger.debug(name + " : " + endpoint);
+            UMOEndpoint endpoint = (UMOEndpoint) it.next();
+            logger.debug(endpoint.getName() + " : " + endpoint);
         }
     }
 

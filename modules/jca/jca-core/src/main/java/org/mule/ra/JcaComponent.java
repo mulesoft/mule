@@ -17,8 +17,6 @@ import org.mule.impl.ManagementContextAware;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.RequestContext;
 import org.mule.management.stats.ComponentStatistics;
-import org.mule.registry.DeregistrationException;
-import org.mule.registry.RegistrationException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
@@ -216,20 +214,5 @@ public class JcaComponent implements UMOComponent, ManagementContextAware
     public Object getInstance() throws UMOException
     {
         return component;
-    }
-
-    public void deregister() throws DeregistrationException
-    {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    public String getRegistryId()
-    {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    public void register() throws RegistrationException
-    {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 }

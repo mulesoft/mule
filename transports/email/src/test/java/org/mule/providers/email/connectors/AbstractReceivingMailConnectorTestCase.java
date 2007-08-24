@@ -11,17 +11,17 @@
 package org.mule.providers.email.connectors;
 
 import org.mule.config.MuleProperties;
-import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.providers.email.transformers.EmailMessageToString;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.umo.UMOEventContext;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Given an endpoint ({@link #getTestEndpointURI()}) this waits for up to 10 seconds,
@@ -69,13 +69,12 @@ public abstract class AbstractReceivingMailConnectorTestCase extends AbstractMai
             }
         });
 
-        QuickConfigurationBuilder builder = new QuickConfigurationBuilder(false);
-        managementContext.getRegistry().registerConnector(createConnector(false));
-        builder.registerComponent(
-            FunctionalTestComponent.class.getName(), "testComponent", getTestEndpointURI(), null, props);
-
-//        logger.debug("starting mule");
-//        managementContext.start();
+        managementContext.getRegistry().registerConnector(createConnector(false), managementContext);
+        managementContext.getRegistry().registerService(
+            MuleTestUtils.createDescriptor(FunctionalTestComponent.class.getName(), 
+                                           "testComponent", getTestEndpointURI(), 
+                                           null, props, managementContext),
+            managementContext);
 
         logger.debug("waiting for count down");
         assertTrue(countDown.await(WAIT_PERIOD_MS, TimeUnit.MILLISECONDS));

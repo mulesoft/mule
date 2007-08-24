@@ -16,8 +16,8 @@ import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.model.UMOModel;
 
+import java.util.Collection;
 import java.util.Iterator;
-import java.util.Map;
 
 /**
  * @deprecated This functionality should be moved to the registry
@@ -39,7 +39,7 @@ public final class ModelHelper
     
     public static boolean isComponentRegistered(String name)
     {
-        for (Iterator iterator = RegistryContext.getRegistry().getModels().values().iterator(); iterator.hasNext();)
+        for (Iterator iterator = RegistryContext.getRegistry().getModels().iterator(); iterator.hasNext();)
         {
             UMOModel m = (UMOModel) iterator.next();
             if (m.isComponentRegistered(name))
@@ -52,7 +52,7 @@ public final class ModelHelper
 
     public static UMOComponent getComponent(String name)
     {
-        for (Iterator iterator = RegistryContext.getRegistry().getModels().values().iterator(); iterator.hasNext();)
+        for (Iterator iterator = RegistryContext.getRegistry().getModels().iterator(); iterator.hasNext();)
         {
             UMOModel m = (UMOModel) iterator.next();
             if (m.isComponentRegistered(name))
@@ -93,8 +93,8 @@ public final class ModelHelper
 
     public static UMOModel getFirstUserModel() throws UMOException
     {
-        Map models = RegistryContext.getRegistry().getModels();
-        for (Iterator iterator = models.values().iterator(); iterator.hasNext();)
+        Collection models = RegistryContext.getRegistry().getModels();
+        for (Iterator iterator = models.iterator(); iterator.hasNext();)
         {
             UMOModel model = (UMOModel) iterator.next();
             if(!model.getName().equals(MuleProperties.OBJECT_SYSTEM_MODEL))

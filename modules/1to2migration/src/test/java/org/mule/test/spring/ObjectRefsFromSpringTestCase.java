@@ -14,9 +14,10 @@ import org.mule.config.ConfigurationBuilder;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.config.spring.LegacyXmlException;
-import org.mule.tck.AbstractMuleTestCase;
 
-public class ObjectRefsFromSpringTestCase extends AbstractMuleTestCase
+import junit.framework.TestCase;
+
+public class ObjectRefsFromSpringTestCase extends TestCase
 {
 
     protected String getConfigResources()

@@ -20,7 +20,7 @@ public class ConnectorFactoryTestCase extends AbstractMuleTestCase
     public void testCreate() throws Exception
     {
         MuleEndpointURI url = new MuleEndpointURI("tcp://7877");
-        UMOEndpoint endpoint = TransportFactory.createEndpoint(url, UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
+        UMOEndpoint endpoint = TransportFactory.createEndpoint(url, UMOEndpoint.ENDPOINT_TYPE_RECEIVER, managementContext);
         assertNotNull(endpoint);
         assertNotNull(endpoint.getConnector());
         assertEquals("tcp://localhost:7877", endpoint.getEndpointURI().getAddress());

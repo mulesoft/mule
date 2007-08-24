@@ -11,6 +11,7 @@
 package org.mule.impl.internal.notifications;
 
 import org.mule.RegistryContext;
+import org.mule.config.MuleConfiguration;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.ManagementContextAware;
 import org.mule.routing.filters.WildcardFilter;
@@ -22,6 +23,11 @@ import org.mule.umo.manager.UMOServerNotificationListener;
 import org.mule.umo.manager.UMOWorkManager;
 import org.mule.util.ClassUtils;
 import org.mule.util.concurrent.ConcurrentHashSet;
+
+import edu.emory.mathcs.backport.java.util.concurrent.BlockingDeque;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
+import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingDeque;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,10 +41,6 @@ import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkListener;
 import javax.resource.spi.work.WorkManager;
 
-import edu.emory.mathcs.backport.java.util.concurrent.BlockingDeque;
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
-import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingDeque;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -73,7 +75,6 @@ public class ServerNotificationManager implements Work, Disposable, ManagementCo
     public void setManagementContext(UMOManagementContext context)
     {
         this.managementContext = context;
-        workListener = RegistryContext.getConfiguration().getDefaultWorkListener();
     }
 
     public void start(UMOWorkManager workManager) throws LifecycleException
@@ -343,6 +344,14 @@ public class ServerNotificationManager implements Work, Disposable, ManagementCo
 
     public WorkListener getWorkListener()
     {
+        if (workListener == null)
+        {
+            MuleConfiguration config = RegistryContext.getConfiguration();
+            if (config != null)
+            {
+                workListener = config.getDefaultWorkListener();
+            }
+        }
         return workListener;
     }
 

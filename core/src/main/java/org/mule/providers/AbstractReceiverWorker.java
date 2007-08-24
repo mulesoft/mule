@@ -9,7 +9,7 @@
  */
 package org.mule.providers;
 
-import org.mule.RegistryContext;
+import org.mule.MuleServer;
 import org.mule.impl.MuleMessage;
 import org.mule.transaction.TransactionCallback;
 import org.mule.transaction.TransactionCoordination;
@@ -70,7 +70,10 @@ public abstract class AbstractReceiverWorker implements Work
      */
     protected void doRun()
     {
-        UMOManagementContext managementContext = RegistryContext.getRegistry().getManagementContext();
+        // TODO Remove this call to MuleServer.getManagementContext().  The managementContext should be passed
+        // in and stored as a local variable (ManagementContextAware).  It is used down the line for
+        // getTransactionManager() (XaTransactionFactory) and getQueueManager() (VMTransaction)
+        UMOManagementContext managementContext = MuleServer.getManagementContext();
         TransactionTemplate tt = new TransactionTemplate(endpoint.getTransactionConfig(),
                                                          endpoint.getConnector().getExceptionListener(),
                                                          managementContext);

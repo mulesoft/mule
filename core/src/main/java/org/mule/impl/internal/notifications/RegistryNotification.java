@@ -10,8 +10,8 @@
 
 package org.mule.impl.internal.notifications;
 
+import org.mule.registry.Registry;
 import org.mule.umo.manager.UMOServerNotification;
-import org.mule.umo.registry.RegistryFacade;
 
 /**
  * <code>RegistyNotification</code> is fired when an event such as an object being
@@ -40,12 +40,12 @@ public class RegistryNotification extends UMOServerNotification
         registerAction("disposed", REGISTRY_DISPOSED);
     }
 
-    public RegistryNotification(RegistryFacade registry, String action)
+    public RegistryNotification(Registry registry, String action)
     {
         this(registry, getActionId(action));
     }
 
-    public RegistryNotification(RegistryFacade registry, int action)
+    public RegistryNotification(Registry registry, int action)
     {
         super(registry.getRegistryId(), action);
         resourceIdentifier = registry.getRegistryId();

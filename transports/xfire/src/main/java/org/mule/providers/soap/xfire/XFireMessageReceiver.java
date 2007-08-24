@@ -12,6 +12,7 @@ package org.mule.providers.soap.xfire;
 
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.soap.SoapConstants;
+import org.mule.registry.Registry;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;

@@ -11,7 +11,7 @@
 package org.mule.providers.soap.axis;
 
 import org.mule.config.ExceptionHelper;
-import org.mule.config.builders.QuickConfigurationBuilder;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.providers.soap.AbstractSoapUrlEndpointFunctionalTestCase;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -52,9 +52,12 @@ public class AxisConnectorHttpFunctionalTestCase extends AbstractSoapUrlEndpoint
     {
         try
         {
-            QuickConfigurationBuilder builder = new QuickConfigurationBuilder(false);
-            builder.registerComponent(ComponentWithoutInterfaces.class.getName(),
-                "testComponentWithoutInterfaces", getComponentWithoutInterfacesEndpoint(), null, null);
+            managementContext.getRegistry().registerService(
+                MuleTestUtils.createDescriptor(ComponentWithoutInterfaces.class.getName(),
+                                               "testComponentWithoutInterfaces", 
+                                               getComponentWithoutInterfacesEndpoint(), 
+                                               null, null, managementContext), 
+                managementContext);
             fail();
         }
         catch (UMOException e)

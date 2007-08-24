@@ -22,8 +22,8 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.transformer.UMOTransformer;
 
+import java.util.Collection;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.StringTokenizer;
 
 /**
@@ -84,8 +84,8 @@ public final class MuleObjectHelper
     public static UMOEndpoint getEndpointByProtocol(String protocol) throws UMOException
     {
         UMOImmutableEndpoint iprovider;
-        Map endpoints = RegistryContext.getRegistry().getEndpoints();
-        for (Iterator iterator = endpoints.values().iterator(); iterator.hasNext();)
+        Collection endpoints = RegistryContext.getRegistry().getEndpoints();
+        for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
         {
             iprovider = (UMOImmutableEndpoint) iterator.next();
             if (iprovider.getProtocol().equals(protocol))
@@ -110,9 +110,9 @@ public final class MuleObjectHelper
         }
 
         UMOImmutableEndpoint iprovider;
-        Map endpoints = RegistryContext.getRegistry().getEndpoints();
+        Collection endpoints = RegistryContext.getRegistry().getEndpoints();
 
-        for (Iterator iterator = endpoints.values().iterator(); iterator.hasNext();)
+        for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
         {
             iprovider = (UMOImmutableEndpoint) iterator.next();
             if (filter.accept(iprovider.getEndpointURI()))

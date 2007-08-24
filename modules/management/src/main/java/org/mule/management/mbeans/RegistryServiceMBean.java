@@ -22,7 +22,7 @@ public interface RegistryServiceMBean
 
     void stop() throws UMOException;
 
-    String getPersistenceMode();
+    //String getPersistenceMode();
 
     String getName();
 

@@ -10,6 +10,7 @@
 
 package org.mule.extras.client;
 
+import org.mule.MuleServer;
 import org.mule.RegistryContext;
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleEvent;
@@ -34,13 +35,14 @@ import org.mule.umo.provider.DispatchException;
 import org.mule.umo.security.UMOCredentials;
 import org.mule.util.MuleObjectHelper;
 
+import edu.emory.mathcs.backport.java.util.concurrent.Callable;
+import edu.emory.mathcs.backport.java.util.concurrent.Executor;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.Map;
 
-import edu.emory.mathcs.backport.java.util.concurrent.Callable;
-import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -281,7 +283,7 @@ public class RemoteDispatcher implements Disposable
     {
 
         UMOEndpoint endpoint = TransportFactory.createEndpoint(serverEndpoint.getEndpointURI(),
-            UMOEndpoint.ENDPOINT_TYPE_SENDER);
+            UMOEndpoint.ENDPOINT_TYPE_SENDER, MuleServer.getManagementContext());
         endpoint.setRemoteSync(synchronous);
         updateContext(new MuleMessage(action), endpoint, synchronous);
 

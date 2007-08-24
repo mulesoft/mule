@@ -25,7 +25,6 @@ import org.mule.impl.model.DefaultMuleProxy;
 import org.mule.impl.model.MuleProxy;
 import org.mule.management.stats.ComponentStatistics;
 import org.mule.management.stats.SedaComponentStatistics;
-import org.mule.registry.metadata.ObjectMetadata;
 import org.mule.umo.ComponentException;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
@@ -55,8 +54,6 @@ import javax.resource.spi.work.WorkManager;
  */
 public class SedaComponent extends AbstractComponent implements Work, WorkListener
 {
-    public static ObjectMetadata objectMetadata = new ObjectMetadata(SedaComponent.class);
-
     // Use setPoolingProfile(), setQueueProfile() instead.
 //    public static final String QUEUE_PROFILE_PROPERTY = "queueProfile";
 //    public static final String POOLING_PROFILE_PROPERTY = "poolingProfile";
@@ -156,12 +153,12 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
             poolingProfile = ((SedaModel) model).getPoolingProfile();
         }
 
-        queueManager = getManagementContext().getQueueManager();
+        queueManager = managementContext.getQueueManager();
 
         try
         {
             // Setup event Queue (used for VM execution)
-            queueProfile.configureQueue(descriptor.getName(), getManagementContext().getQueueManager());
+            queueProfile.configureQueue(descriptor.getName(), managementContext.getQueueManager());
         }
         catch (InitialisationException e)
         {
@@ -457,7 +454,7 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
 
     public int getQueueSize()
     {
-        QueueSession queueSession = getManagementContext().getQueueManager().getQueueSession();
+        QueueSession queueSession = managementContext.getQueueManager().getQueueSession();
         return queueSession.getQueue(descriptor.getName()).size();
     }
 
@@ -469,7 +466,7 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
     {
         MuleEvent event = null;
         MuleProxy proxy = null;
-        QueueSession queueSession = getManagementContext().getQueueManager().getQueueSession();
+        QueueSession queueSession = managementContext.getQueueManager().getQueueSession();
 
         while (!stopped.get())
         {
@@ -608,7 +605,7 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
 
     protected void enqueue(UMOEvent event) throws Exception
     {
-        QueueSession session = getManagementContext().getQueueManager().getQueueSession();
+        QueueSession session = managementContext.getQueueManager().getQueueSession();
         session.getQueue(descriptorQueueName).put(event);
     }
 

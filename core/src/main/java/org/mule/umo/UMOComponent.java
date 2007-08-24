@@ -10,9 +10,9 @@
 
 package org.mule.umo;
 
+import org.mule.impl.ManagementContextAware;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.Lifecycle;
-import org.mule.umo.lifecycle.Registerable;
 
 import java.io.Serializable;
 
@@ -22,7 +22,7 @@ import java.io.Serializable;
  * the component as well as managing pooled resources.
  */
 
-public interface UMOComponent extends Serializable, Lifecycle, Initialisable, Registerable
+public interface UMOComponent extends Serializable, Lifecycle, Initialisable, ManagementContextAware
 {
     /**
      * @return the UMODescriptor associated with the component

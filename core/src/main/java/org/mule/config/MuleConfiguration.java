@@ -15,6 +15,7 @@ import org.mule.RegistryContext;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.providers.ConnectionStrategy;
 import org.mule.providers.SingleAttemptConnectionStrategy;
+import org.mule.registry.RegistrationException;
 import org.mule.umo.manager.DefaultWorkListener;
 import org.mule.util.FileUtils;
 import org.mule.util.StringUtils;
@@ -418,7 +419,14 @@ public class MuleConfiguration
     {
         if(RegistryContext.getRegistry()!=null)
         {
-            RegistryContext.getRegistry().registerProperty(name, value);
+            try
+            {
+                RegistryContext.getRegistry().registerProperty(name, value);
+            }
+            catch (RegistrationException e)
+            {
+                logger.error(e);
+            }
         }
     }
 

@@ -11,6 +11,7 @@
 package org.mule.umo;
 
 import org.mule.config.PoolingProfile;
+import org.mule.impl.ManagementContextAware;
 import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.routing.UMONestedRouterCollection;
 import org.mule.umo.routing.UMOOutboundRouterCollection;
@@ -25,7 +26,7 @@ import java.util.Map;
  * <code>UMODescriptor</code> describes all the properties for a Mule UMO. New Mule
  * Managed components can be initialised as needed from their descriptor.
  */
-public interface UMODescriptor extends UMOImmutableDescriptor
+public interface UMODescriptor extends UMOImmutableDescriptor, ManagementContextAware
 {
     /**
      * Interceptors are executable objects that can be chained together. Interceptors

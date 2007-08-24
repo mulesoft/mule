@@ -22,16 +22,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public class TransactionNotificationsTestCase extends AbstractMuleTestCase
 {
-    protected void doSetUp() throws Exception
-    {
-        managementContext.start();
-    }
-
-    protected void doTearDown() throws Exception
-    {
-        managementContext.dispose();
-    }
-
     public void testTransactionNotifications() throws Exception
     {
         final CountDownLatch latch = new CountDownLatch(3);

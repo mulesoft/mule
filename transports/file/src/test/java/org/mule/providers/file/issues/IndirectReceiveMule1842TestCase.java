@@ -30,7 +30,7 @@ public class IndirectReceiveMule1842TestCase extends AbstractFileFunctionalTestC
         File target = initForReceive();
 
         // add a receiver endpoint that will poll the readFromDirectory
-        UMOModel model = (UMOModel) managementContext.getRegistry().getModels().get("receiveModel");
+        UMOModel model = (UMOModel) managementContext.getRegistry().lookupModel("receiveModel");
         assertNotNull(model);
         UMOComponent relay = model.getComponent("relay");
         assertNotNull(relay);

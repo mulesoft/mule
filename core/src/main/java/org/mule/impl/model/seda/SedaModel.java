@@ -15,7 +15,6 @@ import org.mule.config.PoolingProfile;
 import org.mule.config.QueueProfile;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.model.AbstractModel;
-import org.mule.registry.metadata.ObjectMetadata;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -27,8 +26,6 @@ import org.mule.umo.lifecycle.InitialisationException;
  */
 public class SedaModel extends AbstractModel
 {
-    public static ObjectMetadata objectMetadata = new ObjectMetadata(SedaModel.class, true, new String[] { "name" });
-
     /**
      * The time out used for taking from the Seda Queue.
      */

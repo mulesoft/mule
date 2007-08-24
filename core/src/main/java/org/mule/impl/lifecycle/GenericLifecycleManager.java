@@ -176,7 +176,7 @@ public class GenericLifecycleManager implements UMOLifecycleManager
         {
             if (phaseIndex.intValue() > 0)
             {
-                throw new IllegalStateException("The first lifecycle phase has to be calle before the '" + name + "' phase");
+                throw new IllegalStateException("The first lifecycle phase has to be called before the '" + name + "' phase");
             }
         }
         else

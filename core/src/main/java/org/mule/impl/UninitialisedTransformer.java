@@ -10,12 +10,10 @@
 
 package org.mule.impl;
 
-import org.mule.umo.transformer.UMOTransformer;
-import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.registry.RegistrationException;
-import org.mule.registry.DeregistrationException;
+import org.mule.umo.transformer.TransformerException;
+import org.mule.umo.transformer.UMOTransformer;
 
 /**
  * A unique transformer instance than indicates the unintialised state and allows
@@ -97,20 +95,4 @@ public class UninitialisedTransformer implements UMOTransformer
     {
         throw new NullPointerException("Null transformer");
     }
-
-    public void register() throws RegistrationException
-    {
-        throw new NullPointerException("Null transformer");
-    }
-
-    public void deregister() throws DeregistrationException
-    {
-        throw new NullPointerException("Null transformer");
-    }
-
-    public String getRegistryId()
-    {
-        throw new NullPointerException("Null transformer");
-    }
-
 }

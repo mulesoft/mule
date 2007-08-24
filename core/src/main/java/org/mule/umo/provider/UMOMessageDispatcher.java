@@ -11,13 +11,12 @@
 package org.mule.umo.provider;
 
 import org.mule.umo.lifecycle.Disposable;
-import org.mule.umo.lifecycle.Registerable;
 
 /**
  * <code>UMOMessageDispatcher</code> combines {@link UMOMessageDispatching} with
  * various lifecycle methods for the actual instances doing message sending/receiving.
  */
-public interface UMOMessageDispatcher extends Registerable, Disposable, UMOConnectable, UMOMessageDispatching
+public interface UMOMessageDispatcher extends Disposable, UMOConnectable, UMOMessageDispatching
 {
 
     /**

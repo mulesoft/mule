@@ -31,7 +31,7 @@ public class VMLoanBrokerSynchronousFunctionalTestCase extends AbstractLoanBroke
 
     public void testBasicParsing()
     {
-        Object objModel = managementContext.getRegistry().getModels().get("loan-broker");
+        Object objModel = managementContext.getRegistry().lookupModel("loan-broker");
         assertNotNull(objModel);
         assertTrue(objModel instanceof SedaModel);
         SedaModel model = (SedaModel)objModel;

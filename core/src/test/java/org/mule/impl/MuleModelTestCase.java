@@ -24,7 +24,7 @@ public class MuleModelTestCase extends AbstractMuleTestCase
         final String descriptorName = "TEST_COMPONENT_1";
         MuleDescriptor descriptor = getTestDescriptor(descriptorName, "java.lang.Object");
         MuleDescriptor duplicateDescriptor = getTestDescriptor(descriptorName, "java.lang.Object");
-        final UMOModel model = getDefaultModel(managementContext);
+        final UMOModel model = managementContext.getRegistry().lookupSystemModel();
         model.registerComponent(descriptor);
         try
         {

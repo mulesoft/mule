@@ -45,6 +45,8 @@ import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.object.ObjectFactory;
 
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -65,7 +67,6 @@ import javax.management.remote.JMXConnectorServerFactory;
 import javax.management.remote.JMXServiceURL;
 import javax.management.remote.rmi.RMIConnectorServer;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -359,7 +360,7 @@ public class JmxAgent extends AbstractAgent
         final WrapperManagerAgent wmAgent = new WrapperManagerAgent();
         if (managementContext.getRegistry().lookupAgent(wmAgent.getName()) == null)
         {
-            managementContext.getRegistry().registerAgent(wmAgent);
+           managementContext.getRegistry().registerAgent(wmAgent, managementContext);
         }
     }
 
@@ -379,7 +380,7 @@ public class JmxAgent extends AbstractAgent
     protected void registerModelServices() throws NotCompliantMBeanException, MBeanRegistrationException,
                                                   InstanceAlreadyExistsException, MalformedObjectNameException
     {
-        for (Iterator iterator = managementContext.getRegistry().getModels().values().iterator(); iterator.hasNext();)
+        for (Iterator iterator = managementContext.getRegistry().getModels().iterator(); iterator.hasNext();)
         {
             UMOModel model = (UMOModel) iterator.next();
             ModelServiceMBean serviceMBean = new ModelService(model);
@@ -415,7 +416,7 @@ public class JmxAgent extends AbstractAgent
     protected void registerComponentServices() throws NotCompliantMBeanException, MBeanRegistrationException,
             InstanceAlreadyExistsException, MalformedObjectNameException
     {
-        for (Iterator iterator = managementContext.getRegistry().getModels().values().iterator(); iterator.hasNext();)
+        for (Iterator iterator = managementContext.getRegistry().getModels().iterator(); iterator.hasNext();)
         {
             UMOModel model = (UMOModel) iterator.next();
             Iterator iter = model.getComponentNames();
@@ -437,7 +438,7 @@ public class JmxAgent extends AbstractAgent
     protected void registerEndpointServices() throws NotCompliantMBeanException, MBeanRegistrationException,
             InstanceAlreadyExistsException, MalformedObjectNameException
     {
-        Iterator iter = managementContext.getRegistry().getConnectors().values().iterator();
+        Iterator iter = managementContext.getRegistry().getConnectors().iterator();
         UMOConnector connector;
         while (iter.hasNext())
         {
@@ -479,7 +480,7 @@ public class JmxAgent extends AbstractAgent
                                                 MBeanRegistrationException,
                                                 InstanceAlreadyExistsException
     {
-        Iterator iter = managementContext.getRegistry().getConnectors().values().iterator();
+        Iterator iter = managementContext.getRegistry().getConnectors().iterator();
         while (iter.hasNext())
         {
             UMOConnector connector = (UMOConnector) iter.next();

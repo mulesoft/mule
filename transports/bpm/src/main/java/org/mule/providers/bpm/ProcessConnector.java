@@ -90,7 +90,7 @@ public class ProcessConnector extends AbstractConnector implements MessageServic
             // TODO MULE-1221 It would be cleaner to use something like the dynamic:// transport
             if ((allowGlobalDispatcher == true) && (muleClient == null))
             {
-                muleClient = new MuleClient(false);
+                muleClient = new MuleClient(managementContext);
             }
         }
         catch (Exception e)

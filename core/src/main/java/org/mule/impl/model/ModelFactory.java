@@ -17,6 +17,7 @@ import org.mule.umo.model.UMOModel;
 
 /**
  * Will locate the model service using the model type as the key and construct the model.
+ * @deprecated This class doesn't make much sense, remove for 2.x
  */
 public final class ModelFactory
 {

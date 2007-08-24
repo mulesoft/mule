@@ -59,7 +59,7 @@ public class OutboundRouterCollection extends AbstractRouterCollection implement
                 final UMOOutboundRouter router = umoOutboundRouter;
                 UMODescriptor descriptor = session.getComponent().getDescriptor();
                 TransactionTemplate tt = new TransactionTemplate(umoOutboundRouter.getTransactionConfig(),
-                    descriptor.getExceptionListener(), descriptor.getManagementContext());
+                    descriptor.getExceptionListener(), managementContext);
 
                 TransactionCallback cb = new TransactionCallback()
                 {

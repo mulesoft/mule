@@ -26,7 +26,7 @@ public class ComponentServiceTestCase extends AbstractMuleJmxTestCase
 
         final MuleDescriptor descriptor = new MuleDescriptor("TEST_SERVICE");
         descriptor.setServiceFactory(new SingletonObjectFactory(new Object()));
-        getDefaultModel(managementContext).registerComponent(descriptor);
+        managementContext.getRegistry().lookupSystemModel().registerComponent(descriptor);
 
         managementContext.start();
         final ComponentService service = new ComponentService("TEST_SERVICE");

@@ -10,7 +10,6 @@
 
 package org.mule.providers.email.connectors;
 
-import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
@@ -19,6 +18,7 @@ import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.email.MailProperties;
 import org.mule.providers.email.SmtpConnector;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.umo.UMOComponent;
@@ -106,11 +106,12 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
     {
         HashMap props = new HashMap();
 
-        QuickConfigurationBuilder builder = new QuickConfigurationBuilder(false);
-        managementContext.getRegistry().registerConnector(createConnector(false));
+        managementContext.getRegistry().registerConnector(createConnector(false), managementContext);
         UMOEndpoint endpoint = new MuleEndpoint(getTestEndpointURI(), false);
-        builder.registerComponent(FunctionalTestComponent.class.getName(), 
-            "testComponent", null, endpoint, props);
+        managementContext.getRegistry().registerService(
+            MuleTestUtils.createDescriptor(FunctionalTestComponent.class.getName(), 
+                                           "testComponent", null, endpoint, props),
+            managementContext);
 
         UMOMessage message = new MuleMessage(MESSAGE);
         message.setStringProperty(MailProperties.TO_ADDRESSES_PROPERTY, EMAIL);

@@ -10,7 +10,7 @@
 
 package org.mule.transaction;
 
-import org.mule.RegistryContext;
+import org.mule.MuleServer;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.internal.notifications.TransactionNotification;
 import org.mule.umo.TransactionException;
@@ -155,7 +155,7 @@ public abstract class AbstractTransaction implements UMOTransaction
     protected void fireNotification(TransactionNotification notification)
     {
         // TODO profile this piece of code
-        RegistryContext.getRegistry().getManagementContext().fireNotification(notification);
+        MuleServer.getManagementContext().fireNotification(notification);
     }
 
 }

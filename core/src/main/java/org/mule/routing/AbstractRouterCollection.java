@@ -10,17 +10,20 @@
 
 package org.mule.routing;
 
+import org.mule.impl.ManagementContextAware;
 import org.mule.management.stats.RouterStatistics;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.routing.UMORouter;
 import org.mule.umo.routing.UMORouterCatchAllStrategy;
 import org.mule.umo.routing.UMORouterCollection;
 
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+
 import java.util.Iterator;
 import java.util.List;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -29,7 +32,7 @@ import org.apache.commons.logging.LogFactory;
  * router collections for in and outbound routers.
  */
 
-public abstract class AbstractRouterCollection implements UMORouterCollection, Initialisable
+public abstract class AbstractRouterCollection implements UMORouterCollection, Initialisable, ManagementContextAware
 {
     /**
      * logger used by this class
@@ -43,6 +46,8 @@ public abstract class AbstractRouterCollection implements UMORouterCollection, I
     private RouterStatistics statistics;
 
     private UMORouterCatchAllStrategy catchAllStrategy;
+    
+    protected UMOManagementContext managementContext;
 
     public AbstractRouterCollection(int type)
     {
@@ -130,5 +135,10 @@ public abstract class AbstractRouterCollection implements UMORouterCollection, I
     public void setStatistics(RouterStatistics stat)
     {
         this.statistics = stat;
+    }
+
+    public void setManagementContext(UMOManagementContext context)
+    {
+        this.managementContext = context;
     }
 }

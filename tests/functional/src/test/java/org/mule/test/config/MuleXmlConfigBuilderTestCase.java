@@ -153,9 +153,7 @@ public class MuleXmlConfigBuilderTestCase extends AbstractConfigBuilderTestCase
 
     public void testSystemPropertyOverride()
     {
-        Map props = managementContext.getRegistry().lookupProperties();
-        assertNotNull(props);
-        assertEquals("default", props.get("system-prop2"));
+        assertEquals("default", managementContext.getRegistry().lookupProperty("system-prop2"));
     }
 
     /**

@@ -14,11 +14,9 @@ import org.mule.impl.ManagementContextAware;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOSession;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.Lifecycle;
-import org.mule.umo.lifecycle.Registerable;
 import org.mule.umo.lifecycle.UMOLifecycleAdapterFactory;
 
 import java.beans.ExceptionListener;
@@ -30,10 +28,8 @@ import java.util.List;
  * Mule Server instance. It is responsible for maintaining the UMOs instances and
  * their configuration.
  */
-public interface UMOModel extends Lifecycle, Initialisable, Registerable, ManagementContextAware
+public interface UMOModel extends Lifecycle, Initialisable, ManagementContextAware
 {
-    public static final String DEFAULT_MODEL_NAME = "default";
-
     /**
      * Sets the model's name. It is poosible to configure more than one model in a
      * config file. The name can then be used to reference the Model use when
@@ -240,6 +236,4 @@ public interface UMOModel extends Lifecycle, Initialisable, Registerable, Manage
      * @return an iterator of all component names
      */
     Iterator getComponentNames();
-
-    UMOManagementContext getManagementContext();
 }

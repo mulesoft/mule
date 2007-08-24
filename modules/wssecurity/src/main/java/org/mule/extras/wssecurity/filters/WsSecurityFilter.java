@@ -29,7 +29,9 @@ import org.mule.umo.security.UnknownAuthenticationTypeException;
 import org.mule.umo.security.UnsupportedAuthenticationSchemeException;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -105,17 +107,21 @@ public class WsSecurityFilter extends AbstractEndpointSecurityFilter
             Service service = server.getServiceRegistry().getService(serviceName);
 
             // remove security in handlers if present
-            Object[] connectorArray = RegistryContext.getRegistry().getConnectors().values().toArray();
             XFireConnector connector = null;
-            for (i = 0; i < connectorArray.length; i++)
+            Collection objs = RegistryContext.getRegistry().lookupObjects(XFireConnector.class);
+            Iterator it = objs.iterator();
+            if (it.hasNext())
             {
-                if (connectorArray[i] instanceof XFireConnector)
-                {
-                    connector = (XFireConnector)connectorArray[i];
-                }
+                connector = (XFireConnector) it.next();
+            }
+            if (it.hasNext())
+            {
+                logger.warn("More than one XFire connector found, only one expected");
+                // TODO Shouldn't we throw an exception here instead?
+                //throw new org.mule.config.ConfigurationException(MessageFactory.createStaticMessage("More than one XFire connector found."));
             }
 
-            if (connector != null)
+             if (connector != null)
             {
                 Object[] outhandlers = service.getOutHandlers().toArray();
                 for (i = 0; i < outhandlers.length; i++)

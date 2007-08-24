@@ -13,7 +13,6 @@ package org.mule.impl;
 import org.mule.config.PoolingProfile;
 import org.mule.config.QueueProfile;
 import org.mule.config.ThreadingProfile;
-import org.mule.registry.RegistrationException;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOInterceptor;
 import org.mule.umo.UMOManagementContext;
@@ -34,7 +33,7 @@ import org.apache.commons.logging.LogFactory;
  * <code>MuleDescriptor</code> describes all the properties for a Mule UMO. New
  * Mule UMOs can be initialised as needed from their descriptor.
  */
-public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescriptor, ManagementContextAware
+public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescriptor
 {
     /**
      * logger used by this class
@@ -212,17 +211,6 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
     {
         this.initialState = state;
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.lifecycle.Registerable#register()
-     */
-    public void register() throws RegistrationException
-    {
-        super.register();
-    }
-
 
     public void setModelName(String modelName)
     {

@@ -32,7 +32,7 @@ public class FileFunctionalTestCase extends AbstractFileFunctionalTestCase
         target.deleteOnExit();
 
         FileConnector connector =
-                (FileConnector) managementContext.getRegistry().getConnectors().get("sendConnector");
+                (FileConnector) managementContext.getRegistry().lookupConnector("sendConnector");
         connector.setWriteToDirectory(target.getParent());
         logger.debug("Directory is " + connector.getWriteToDirectory());
         Map props = new HashMap();

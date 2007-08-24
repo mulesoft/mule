@@ -22,8 +22,6 @@ import org.mule.impl.internal.notifications.ConnectionNotification;
 import org.mule.providers.service.TransportFactory;
 import org.mule.providers.service.TransportServiceDescriptor;
 import org.mule.providers.service.TransportServiceException;
-import org.mule.registry.DeregistrationException;
-import org.mule.registry.RegistrationException;
 import org.mule.registry.ServiceDescriptorFactory;
 import org.mule.registry.ServiceException;
 import org.mule.routing.filters.WildcardFilter;
@@ -57,24 +55,9 @@ import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
 import org.mule.util.ObjectNameHelper;
 import org.mule.util.ObjectUtils;
-import org.mule.util.PropertiesUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.concurrent.NamedThreadFactory;
 import org.mule.util.concurrent.WaitableBoolean;
-
-import java.beans.ExceptionListener;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
-import javax.resource.spi.work.WorkEvent;
-import javax.resource.spi.work.WorkListener;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
@@ -84,6 +67,20 @@ import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
+
+import java.beans.ExceptionListener;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.resource.spi.work.WorkEvent;
+import javax.resource.spi.work.WorkListener;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
@@ -247,11 +244,6 @@ public abstract class AbstractConnector
      */
     protected volatile UMOSessionHandler sessionHandler = new MuleSessionHandler();
 
-    /**
-     * Registry ID
-     */
-    protected String registryId = null;
-
     protected UMOManagementContext managementContext;
 
     public AbstractConnector()
@@ -350,38 +342,6 @@ public abstract class AbstractConnector
         }
 
         initialised.set(true);
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.lifecycle.Registerable#register()
-     */
-    public void register() throws RegistrationException
-    {
-        //TODO
-        registryId = RegistryContext.getRegistry().registerMuleObject(managementContext, this).getId();
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.lifecycle.Registerable#deregister()
-     */
-    public void deregister() throws DeregistrationException
-    {
-        RegistryContext.getRegistry().deregisterComponent(registryId);
-        registryId = null;
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.lifecycle.Registerable#getRegistryId()
-     */
-    public String getRegistryId()
-    {
-        return registryId;
     }
 
     /*
@@ -1741,18 +1701,19 @@ public abstract class AbstractConnector
 
             sessionHandler = serviceDescriptor.createSessionHandler();
 
+            // TODO Do we still need to support this for 2.x?
             // Set any manager default properties for the connector. These are set on
             // the Manager with a protocol e.g. jms.specification=1.1
             // This provides a really convenient way to set properties on an object
             // from unit tests
-            Map props = new HashMap();
-            PropertiesUtils.getPropertiesWithPrefix(managementContext.getRegistry().lookupProperties(), getProtocol()
-                .toLowerCase(), props);
-            if (props.size() > 0)
-            {
-                props = PropertiesUtils.removeNamespaces(props);
-                org.mule.util.BeanUtils.populateWithoutFail(this, props, true);
-            }
+//            Map props = new HashMap();
+//            PropertiesUtils.getPropertiesWithPrefix(managementContext.getRegistry().lookupProperties(), getProtocol()
+//                .toLowerCase(), props);
+//            if (props.size() > 0)
+//            {
+//                props = PropertiesUtils.removeNamespaces(props);
+//                org.mule.util.BeanUtils.populateWithoutFail(this, props, true);
+//            }
         }
         catch (Exception e)
         {
@@ -1911,7 +1872,6 @@ public abstract class AbstractConnector
         sb.append(", connected=").append(connected);
         sb.append(", supportedProtocols=").append(supportedProtocols);
         sb.append(", serviceOverrides=").append(serviceOverrides);
-        sb.append(", registryId='").append(registryId).append('\'');
         sb.append('}');
         return sb.toString();
     }

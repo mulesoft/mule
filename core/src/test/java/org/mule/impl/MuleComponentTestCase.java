@@ -10,44 +10,33 @@
 
 package org.mule.impl;
 
-import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.providers.AbstractConnector;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.umo.ComponentException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
-import org.mule.umo.UMOSession;
-import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOMessageReceiver;
 
 import java.util.Iterator;
 
 public class MuleComponentTestCase extends AbstractMuleTestCase
 {
-    QuickConfigurationBuilder builder;
-
-    protected UMOManagementContext createManagementContext() throws Exception
+    public MuleComponentTestCase()
     {
-        //TODO We always need to return a ManagementContext instance so that the base class can create Test objects
-        //correctly. Ideally, thse test objects should be created via the Registry in some way, but I'm not
-        //sure how to do this..
-        builder = new QuickConfigurationBuilder();
-        return builder.getManagementContext();
+        setStartContext(true);
     }
-
-
-
+    
     public void testSendToPausedComponent() throws Exception
     {
-       //QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
+        managementContext.getRegistry().registerService(
+            MuleTestUtils.createDescriptor(Orange.class.getName(), "orangeComponent", "test://in", "test://out", null, managementContext),
+            managementContext);
 
-        builder.registerComponent(Orange.class.getName(), "orangeComponent", "test://in", "test://out", null);
-        UMOModel model = builder.getModel();
-
-        final UMOComponent comp = model.getComponent("orangeComponent");
+        // TODO MULE-1995
+        final UMOComponent comp = managementContext.getRegistry().lookupSystemModel().getComponent("orangeComponent");
         assertTrue(comp.isStarted());
         comp.pause();
         new Thread(new Runnable()
@@ -112,18 +101,16 @@ public class MuleComponentTestCase extends AbstractMuleTestCase
     // MULE-494
     public void testInitialStateStopped() throws Exception
     {
-        //QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
         // Test connector
-        builder.getManagementContext().getRegistry().registerConnector(getTestConnector());
+        managementContext.getRegistry().registerConnector(getTestConnector(), managementContext);
         // Test component
-        UMODescriptor d = builder.createDescriptor(Orange.class.getName(), "orangeComponent",
-            builder.createEndpoint("test://in", null, true), null, null);
+        UMODescriptor d = 
+            MuleTestUtils.createDescriptor(Orange.class.getName(), "orangeComponent", "test://in", "test://out", null, managementContext);
         d.setInitialState(ImmutableMuleDescriptor.INITIAL_STATE_STOPPED);
-        builder.registerComponent(d);
+        managementContext.getRegistry().registerService(d, managementContext);
 
-        UMOModel model = builder.getModel();
-        UMOSession session = new MuleSession(model.getComponent("orangeComponent"));
-        final UMOComponent c = session.getComponent();
+        // TODO MULE-1995
+        final UMOComponent c = managementContext.getRegistry().lookupSystemModel().getComponent("orangeComponent");
         // Component initially stopped
         assertFalse(c.isStarted());
 
@@ -150,16 +137,15 @@ public class MuleComponentTestCase extends AbstractMuleTestCase
     // MULE-503
     public void testStoppingComponentStopsEndpoints() throws Exception
     {
-        //QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
         // Test connector
-        builder.getManagementContext().getRegistry().registerConnector(getTestConnector());
+        managementContext.getRegistry().registerConnector(getTestConnector(), managementContext);
         // Test component
-        builder.registerComponent(Orange.class.getName(), "orangeComponent", "test://in", "test://out", null);
+        managementContext.getRegistry().registerService(
+            MuleTestUtils.createDescriptor(Orange.class.getName(), "orangeComponent", "test://in", "test://out", null, managementContext),
+            managementContext);
 
-        // Start model
-        UMOModel model = builder.getModel();
-        UMOSession session = new MuleSession(model.getComponent("orangeComponent"));
-        final UMOComponent c = session.getComponent();
+        // TODO MULE-1995
+        final UMOComponent c = managementContext.getRegistry().lookupSystemModel().getComponent("orangeComponent");
         assertTrue(c.isStarted());
 
         // The listeners should be registered and started.

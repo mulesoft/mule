@@ -43,7 +43,7 @@ public class DelegatingJob implements Job
             }
             else
             {
-                tempJob = RegistryContext.getRegistry().lookupObject(tempJob);
+                tempJob = RegistryContext.getRegistry().lookupObject((String) tempJob);
                 if(tempJob==null)
                 {
                     throw new JobExecutionException("Job not found: " + tempJob);

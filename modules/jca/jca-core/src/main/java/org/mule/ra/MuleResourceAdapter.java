@@ -150,7 +150,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
             {
                 UMOEndpointURI uri = new MuleEndpointURI(((MuleActivationSpec)activationSpec).getEndpoint());
                 UMOEndpoint endpoint = TransportFactory.createEndpoint(uri,
-                    UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
+                    UMOEndpoint.ENDPOINT_TYPE_RECEIVER, managementContext);
 
                 ((AbstractConnector)endpoint.getConnector()).getReceiverThreadingProfile()
                     .setWorkManagerFactory(new ThreadingProfile.WorkManagerFactory()
