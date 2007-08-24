@@ -10,6 +10,7 @@
 
 package org.mule.tck;
 
+import org.mule.config.MuleProperties;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.ManagementContext;
 import org.mule.impl.MuleDescriptor;
@@ -22,7 +23,10 @@ import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.model.seda.SedaComponent;
 import org.mule.impl.model.seda.SedaModel;
 import org.mule.providers.AbstractConnector;
+import org.mule.providers.service.TransportFactory;
+import org.mule.routing.inbound.InboundRouterCollection;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
+import org.mule.routing.outbound.OutboundRouterCollection;
 import org.mule.tck.testmodels.mule.TestAgent;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.mule.tck.testmodels.mule.TestConnector;
@@ -38,7 +42,6 @@ import org.mule.umo.UMOTransactionFactory;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
@@ -57,20 +60,6 @@ import java.util.Map;
  */
 public final class MuleTestUtils
 {
-    public static UMOModel getDefaultModel(UMOManagementContext context) throws UMOException
-    {
-        UMOModel m = context.getRegistry().lookupModel(UMOModel.DEFAULT_MODEL_NAME);
-        if (m == null)
-        {
-            m = new SedaModel();
-            m.setName(UMOModel.DEFAULT_MODEL_NAME);
-            m.setManagementContext(context);
-            m.initialise();
-        }
-        return m;
-
-    }
-
     public static UMOEndpoint getTestEndpoint(String name, String type, UMOManagementContext context) throws Exception
     {
         Map props = new HashMap();
@@ -267,4 +256,120 @@ public final class MuleTestUtils
         return new Mock(UMOTransactionFactory.class, "umoTransactionFactory");
     }
 
+    /**
+     * Creates a Mule Descriptor that can be further maniputalted by the calling
+     * class before registering it with the UMOModel
+     *
+     * @param implementation      either a container refernece to an object or a fully
+     *                            qualified class name to use as the component implementation which
+     *                            event to invoke based on the evnet payload type
+     * @param name                The identifying name of the component. This can be used to later
+     *                            unregister it
+     * @param inboundEndpointUri  The url endpointUri to listen to. Can be null
+     * @param outboundEndpointUri The url endpointUri to dispatch to. Can be null
+     * @param properties          properties to set on the component. Can be null
+     * @throws UMOException
+     */
+    public static UMODescriptor createDescriptor(String implementation,
+                                          String name,
+                                          String inboundEndpointUri,
+                                          String outboundEndpointUri,
+                                          Map properties,
+                                          UMOManagementContext managementContext) throws UMOException
+    {
+        UMOEndpointURI inEndpointUri = null;
+        UMOEndpointURI outEndpointUri = null;
+        if (inboundEndpointUri != null)
+        {
+            inEndpointUri = new MuleEndpointURI(inboundEndpointUri);
+        }
+        if (outboundEndpointUri != null)
+        {
+            outEndpointUri = new MuleEndpointURI(outboundEndpointUri);
+        }
+
+        return createDescriptor(implementation, name, inEndpointUri, outEndpointUri, properties, managementContext);
+    }
+
+    /**
+     * Creates a Mule Descriptor that can be further maniputalted by the calling
+     * class before registering it with the UMOModel
+     *
+     * @param implementation      either a container refernece to an object or a fully
+     *                            qualified class name to use as the component implementation which
+     *                            event to invoke based on the evnet payload type
+     * @param name                The identifying name of the component. This can be used to later
+     *                            unregister it
+     * @param inboundEndpointUri  The url endpointUri to listen to. Can be null
+     * @param outboundEndpointUri The url endpointUri to dispatch to. Can be null
+     * @param properties          properties to set on the component. Can be null
+     * @throws UMOException
+     */
+    public static UMODescriptor createDescriptor(String implementation,
+                                          String name,
+                                          UMOEndpointURI inboundEndpointUri,
+                                          UMOEndpointURI outboundEndpointUri,
+                                          Map properties,
+                                          UMOManagementContext managementContext) throws UMOException
+    {
+        // Create the endpoints
+        UMOEndpoint inboundEndpoint = null;
+        UMOEndpoint outboundEndpoint = null;
+        if (inboundEndpointUri != null)
+        {
+            inboundEndpoint = TransportFactory.createEndpoint(inboundEndpointUri,
+                    UMOEndpoint.ENDPOINT_TYPE_RECEIVER, managementContext);
+        }
+        if (outboundEndpointUri != null)
+        {
+            outboundEndpoint = TransportFactory.createEndpoint(outboundEndpointUri,
+                    UMOEndpoint.ENDPOINT_TYPE_SENDER, managementContext);
+        }
+        return createDescriptor(implementation, name, inboundEndpoint, outboundEndpoint, properties);
+    }
+
+    /**
+     * Creates a Mule Descriptor that can be further maniputalted by the calling
+     * class before registering it with the UMOModel
+     *
+     * @param implementation   either a container refernece to an object or a fully
+     *                         qualified class name to use as the component implementation which
+     *                         event to invoke based on the evnet payload type
+     * @param name             The identifying name of the component. This can be used to later
+     *                         unregister it
+     * @param inboundEndpoint  The endpoint to listen to. Can be null
+     * @param outboundEndpoint The endpoint to dispatch to. Can be null
+     * @param properties       properties to set on the component. Can be null
+     * @throws UMOException
+     */
+    public static UMODescriptor createDescriptor(String implementation,
+                                          String name,
+                                          UMOEndpoint inboundEndpoint,
+                                          UMOEndpoint outboundEndpoint,
+                                          Map properties) throws UMOException
+    {
+        MuleDescriptor descriptor = new MuleDescriptor();
+        descriptor.setServiceFactory(new SimpleObjectFactory(implementation, properties));
+        descriptor.setName(name);
+        descriptor.setModelName(MuleProperties.OBJECT_SYSTEM_MODEL);
+        if (properties != null)
+        {
+            descriptor.getProperties().putAll(properties);
+        }
+
+        descriptor.setOutboundRouter(new OutboundRouterCollection());
+        if (outboundEndpoint != null)
+        {
+            OutboundPassThroughRouter router = new OutboundPassThroughRouter();
+            router.addEndpoint(outboundEndpoint);
+            descriptor.getOutboundRouter().addRouter(router);
+        }
+        descriptor.setInboundRouter(new InboundRouterCollection());
+        if (inboundEndpoint != null)
+        {
+            descriptor.getInboundRouter().addEndpoint(inboundEndpoint);
+        }
+
+        return descriptor;
+    }
 }
