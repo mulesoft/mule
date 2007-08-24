@@ -10,11 +10,11 @@
 
 package org.mule.extras.spring.events;
 
+import org.mule.MuleException;
 import org.mule.MuleRuntimeException;
 import org.mule.RegistryContext;
 import org.mule.config.MuleProperties;
 import org.mule.config.ThreadingProfile;
-import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.extras.spring.i18n.SpringMessages;
 import org.mule.impl.ManagementContextAware;
 import org.mule.impl.MuleDescriptor;
@@ -45,6 +45,9 @@ import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
 import org.mule.util.object.SimpleObjectFactory;
 
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArraySet;
+import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
+
 import java.beans.ExceptionListener;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -52,8 +55,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArraySet;
-import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
@@ -111,8 +112,9 @@ import org.springframework.context.event.ContextRefreshedEvent;
  * @see MuleEventListener
  * @see MuleSubscriptionEventListener
  * @see ApplicationEventMulticaster
+ * 
+ * @deprecated Does this class still make any sense for Mule 2.x?
  */
-
 public class MuleEventMulticaster implements ApplicationEventMulticaster, ApplicationContextAware, ManagementContextAware
 {
     public static final String EVENT_MULTICASTER_DESCRIPTOR_NAME = "muleEventMulticasterDescriptor";
@@ -650,41 +652,42 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
 
     private boolean registerAsSoap(String endpoint, Object listener) throws UMOException
     {
-        if (endpoint.startsWith("glue") || endpoint.startsWith("soap") || endpoint.startsWith("axis") || endpoint.startsWith("xfire"))
-        {
-            UMOEndpointURI ep = new MuleEndpointURI(endpoint);
-            QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
-
-            // get the service name from the URI path
-            String serviceName = null;
-            if (ep.getPath() != null)
-            {
-                String path = ep.getPath();
-                if (path.endsWith("/"))
-                {
-                    path = path.substring(0, path.length() - 1);
-                }
-                int i = path.lastIndexOf("/");
-                if (i > -1)
-                {
-                    serviceName = path.substring(i + 1);
-                }
-            }
-            else
-            {
-                serviceName = descriptor.getName();
-            }
-            // now strip off the service name
-            String newEndpoint = endpoint;
-            int i = newEndpoint.indexOf(serviceName);
-            newEndpoint = newEndpoint.substring(0, i - 1);
-            builder.registerComponentInstance(listener, serviceName, new MuleEndpointURI(newEndpoint));
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        throw new MuleException("Need to reimplement this method without using the QuickConfigurationBuilder.");
+//        if (endpoint.startsWith("glue") || endpoint.startsWith("soap") || endpoint.startsWith("axis") || endpoint.startsWith("xfire"))
+//        {
+//            UMOEndpointURI ep = new MuleEndpointURI(endpoint);
+//            QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
+//
+//            // get the service name from the URI path
+//            String serviceName = null;
+//            if (ep.getPath() != null)
+//            {
+//                String path = ep.getPath();
+//                if (path.endsWith("/"))
+//                {
+//                    path = path.substring(0, path.length() - 1);
+//                }
+//                int i = path.lastIndexOf("/");
+//                if (i > -1)
+//                {
+//                    serviceName = path.substring(i + 1);
+//                }
+//            }
+//            else
+//            {
+//                serviceName = descriptor.getName();
+//            }
+//            // now strip off the service name
+//            String newEndpoint = endpoint;
+//            int i = newEndpoint.indexOf(serviceName);
+//            newEndpoint = newEndpoint.substring(0, i - 1);
+//            builder.registerComponentInstance(listener, serviceName, new MuleEndpointURI(newEndpoint));
+//            return true;
+//        }
+//        else
+//        {
+//            return false;
+//        }
     }
 
     protected void registerEndpointMappings() throws UMOException
