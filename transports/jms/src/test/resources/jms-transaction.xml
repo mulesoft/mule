@@ -17,9 +17,9 @@
             </mule:inbound-router>
             <mule:component class="org.mule.tck.functional.FunctionalTestComponent" scope="singleton"/>
             <mule:outbound-router>
-                <mule:pass-through-router>
+                <mule:outbound-pass-through-router>
                     <mule:endpoint address="jms://component1Out"/>
-                </mule:pass-through-router>
+                </mule:outbound-pass-through-router>
             </mule:outbound-router>
         </mule:service>
 
@@ -33,11 +33,11 @@
             </mule:inbound-router>
             <mule:component class="org.mule.tck.functional.FunctionalTestComponent" scope="singleton"/>
             <mule:outbound-router>
-                <mule:pass-through-router>
+                <mule:outbound-pass-through-router>
                     <mule:endpoint address="jms://component2Out">
                         <mule:transaction action="ALWAYS_JOIN" />
                     </mule:endpoint>
-                </mule:pass-through-router>
+                </mule:outbound-pass-through-router>
             </mule:outbound-router>
         </mule:service>
 
@@ -51,11 +51,11 @@
             </mule:inbound-router>
             <mule:component class="org.mule.tck.functional.FunctionalTestComponent" scope="singleton"/>
             <mule:outbound-router>
-                <mule:pass-through-router>
+                <mule:outbound-pass-through-router>
                     <mule:endpoint address="jms://component3Out">
                         <mule:transaction action="ALWAYS_JOIN" />
                     </mule:endpoint>
-                </mule:pass-through-router>
+                </mule:outbound-pass-through-router>
             </mule:outbound-router>
             <mule:default-connector-exception-strategy>
                 <mule:endpoint address="jms://dead.letter">

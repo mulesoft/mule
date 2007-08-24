@@ -81,10 +81,10 @@
             </mule:inbound-router>
             <mule:outbound-router>
                 <mule:logging-catch-all-strategy/>
-                <mule:custom-router class="org.mule.routing.outbound.StaticRecipientList">
+                <mule:custom-outbound-router class="org.mule.routing.outbound.StaticRecipientList">
                     <mule:reply-to address="LoanBrokerQuotes"/>
                     <mule:message-property-filter pattern="recipients!=null"/>
-                </mule:custom-router>
+                </mule:custom-outbound-router>
             </mule:outbound-router>
         </mule:service>
 

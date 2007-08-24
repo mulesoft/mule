@@ -18,7 +18,7 @@
 
     <mule:model-streaming name="main">
 
-        <mule:service name="bridge">
+        <mule:service-streaming name="bridge">
             <mule:component class="org.mule.components.simple.StreamingBridgeComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="tcp://localhost:60196">
@@ -28,17 +28,17 @@
                 </mule:endpoint>
             </mule:inbound-router>
             <mule:outbound-router>
-                <mule:pass-through-router>
+                <mule:outbound-pass-through-router>
                     <mule:endpoint address="ftp://anonymous:email@localhost:60197">
                         <mule:retry-connection-strategy
                                 retryCount="3"
                                 retryFrequency="2000"/>
                     </mule:endpoint>
-                </mule:pass-through-router>
+                </mule:outbound-pass-through-router>
             </mule:outbound-router>
-        </mule:service>
+        </mule:service-streaming>
 
-        <mule:service name="testComponent">
+        <mule:service-streaming name="testComponent">
             <mule:component scope="singleton" class="org.mule.tck.functional.FunctionalStreamingTestComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="ftp://anonymous:email@localhost:60197">
@@ -47,7 +47,7 @@
                             retryFrequency="2000"/>
                 </mule:endpoint>
             </mule:inbound-router>
-        </mule:service>
+        </mule:service-streaming>
 
     </mule:model-streaming>
 

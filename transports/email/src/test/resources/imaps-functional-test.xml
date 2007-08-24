@@ -32,9 +32,9 @@
                 </mule:endpoint>
             </mule:inbound-router>
             <mule:outbound-router>
-                <mule:pass-through-router>
+                <mule:outbound-pass-through-router>
                     <mule:endpoint address="vm://receive"/>
-                </mule:pass-through-router>
+                </mule:outbound-pass-through-router>
             </mule:outbound-router>
         </mule:service>
 

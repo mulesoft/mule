@@ -34,9 +34,9 @@
                 <!-- mule:endpoint address="file:///tmp/foo"/ -->
             </mule:inbound-router>
             <mule:outbound-router>
-                <mule:pass-through-router>
+                <mule:outbound-pass-through-router>
                     <mule:endpoint address="vm://receive" name="receive"/>
-                </mule:pass-through-router>
+                </mule:outbound-pass-through-router>
             </mule:outbound-router>
         </mule:service>
 

@@ -31,13 +31,13 @@
     </xsd:complexType>
 
     <xsd:complexType name="extractorsType">
-        <xsd:complexContent>
-            <xsd:extension base="mule:abstractPropertyExtractorsType">
-                <xsd:choice minOccurs="0" maxOccurs="unbounded">
-                    <xsd:element name="now-property-extractor"/>
-                </xsd:choice>
-            </xsd:extension>
-        </xsd:complexContent>
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element ref="mule:abstract-property-extractor"/>
+        </xsd:choice>
     </xsd:complexType>
+
+    <xsd:element name="now-property-extractor"
+                 type="mule:abstractPropertyExtractorType"
+                 substitutionGroup="mule:abstract-property-extractor"/>
 
 </xsd:schema>

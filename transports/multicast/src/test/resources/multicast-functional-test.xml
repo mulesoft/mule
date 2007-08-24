@@ -27,9 +27,9 @@
                 <mule:endpoint ref="serverEndpoint"/>
             </mule:inbound-router>
             <mule:outbound-router>
-                <mule:pass-through-router>
+                <muleoutbound-:pass-through-router>
                     <mule:endpoint address="vm://foo"/>
-                </mule:pass-through-router>
+                </mule:outbound-pass-through-router>
             </mule:outbound-router>
         </mule:service>
 
@@ -43,9 +43,9 @@
                 <mule:endpoint ref="serverEndpoint"/>
             </mule:inbound-router>
             <mule:outbound-router>
-                <mule:pass-through-router>
+                <mule:outbound-pass-through-router>
                     <mule:endpoint address="vm://foo"/>
-                </mule:pass-through-router>
+                </mule:outbound-pass-through-router>
             </mule:outbound-router>
         </mule:service>
 
@@ -59,9 +59,9 @@
                 <mule:endpoint ref="serverEndpoint"/>
             </mule:inbound-router>
             <mule:outbound-router>
-                <mule:pass-through-router>
+                <mule:outbound-pass-through-router>
                     <mule:endpoint address="vm://foo"/>
-                </mule:pass-through-router>
+                </mule:outbound-pass-through-router>
             </mule:outbound-router>
         </mule:service>
 

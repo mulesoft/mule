@@ -24,9 +24,9 @@
                 <mule:endpoint address="servlet://restPUTTest"/>
             </mule:inbound-router>
             <mule:outbound-router>
-                <mule:pass-through-router>
+                <mule:outbound-pass-through-router>
                     <mule:endpoint address="restFileEndpoint"/>
-                </mule:pass-through-router>
+                </mule:outbound-pass-through-router>
             </mule:outbound-router>
         </mule:service>
 

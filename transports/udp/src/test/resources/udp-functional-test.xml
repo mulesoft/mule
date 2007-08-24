@@ -21,14 +21,15 @@
     <mule:endpoint name="serverEndpoint" address="udp://localhost:60131"/>
 
     <mule:model-seda name="main">
-        <mule:service name="testUDP1" implementation="org.mule.tck.functional.FunctionalTestComponent">
+        <mule:service name="testUDP1">
+            <mule:component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <mule:inbound-router>
                 <mule:endpoint ref="serverEndpoint"/>
             </mule:inbound-router>
             <mule:outbound-router>
-                <mule:pass-through-router>
+                <mule:outbound-pass-through-router>
                     <mule:endpoint address="vm://foo"/>
-                </mule:pass-through-router>
+                </mule:outbound-pass-through-router>
             </mule:outbound-router>
         </mule:service>
     </mule:model-seda>

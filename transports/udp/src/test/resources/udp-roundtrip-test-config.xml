@@ -32,10 +32,10 @@
                 <mule:endpoint address="udp://${hostname}:61000"/>
             </mule:inbound-router>
             <mule:outbound-router>
-                <mule:pass-through-router>
+                <mule:outbound-pass-through-router>
                     <!-- mule:endpoint address="udp://${hostname}:9002"/ -->
                     <mule:endpoint address="udp://${hostname}:61001"/>
-                </mule:pass-through-router>
+                </mule:outbound-pass-through-router>
             </mule:outbound-router>
         </mule:service>
 

@@ -142,7 +142,7 @@
     </bean>
 
     <bean name="_muleWorkManager" class="org.mule.impl.work.MuleWorkManager">
-        <!-- this is the id for the default-threading-profile element above, defined in the xsd -->
+        <!-- this is the name for the default-threading-profile element above -->
         <constructor-arg ref="defaultThreadingProfile"/>
         <constructor-arg value="MuleServer"/>
     </bean>

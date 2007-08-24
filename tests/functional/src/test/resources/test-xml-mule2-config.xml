@@ -256,11 +256,11 @@
             </mule:nested-router>
 
             <mule:outbound-router>
-                <mule:pass-through-router>
+                <mule:outbound-pass-through-router>
                     <!-- TODO -->
                     <!-- shouldn't it be transformers-ref? -->
                     <mule:endpoint ref="appleInEndpoint" transformers="TestCompressionTransformer"/>
-                </mule:pass-through-router>
+                </mule:outbound-pass-through-router>
             </mule:outbound-router>
             <!-- outbound-router>
                 <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
@@ -271,7 +271,7 @@
             <mule:response-router timeout="10001">
                 <mule:endpoint address="test://response1"/>
                 <mule:endpoint ref="appleResponseEndpoint"/>
-                <mule:custom-router class="org.mule.tck.testmodels.mule.TestResponseAggregator"/>
+                <mule:custom-response-router class="org.mule.tck.testmodels.mule.TestResponseAggregator"/>
             </mule:response-router>
             <!-- response-router timeout="10001">
                 <endpoint address="test://response1"/>
@@ -391,7 +391,7 @@
                 <!-- this should be predefined -->
                 <!-- TODO -->
                 <!-- propertyExtractor doesn't exist on the class.. should it? -->
-                <!-- mule:custom-router class="org.mule.routing.response.SingleResponseRouter"
+                <!-- mule:custom-response-router class="org.mule.routing.response.SingleResponseRouter"
                                     propertyExtractor="extractor"/ -->
             </mule:response-router>
             <!-- response-router>

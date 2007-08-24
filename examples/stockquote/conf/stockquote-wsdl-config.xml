@@ -53,9 +53,9 @@
                 <mule:endpoint address="vm://stockquote"/>
             </mule:inbound-router>
             <mule:outbound-router>
-                <mule:pass-through-router>
+                <mule:outbound-pass-through-router>
                     <mule:endpoint address="wsdl-xfire:http://www.webservicex.net/stockquote.asmx?WSDL&amp;method=GetQuote"/>
-                </mule:pass-through-router>
+                </mule:outbound-pass-through-router>
             </mule:outbound-router>
         </mule:service>
     </mule:model-seda>

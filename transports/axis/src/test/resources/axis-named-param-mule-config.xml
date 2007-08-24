@@ -15,12 +15,12 @@
                 <mule:endpoint address="vm://mycomponent1"/>
             </mule:inbound-router>
             <mule:outbound-router>
-                <mule:pass-through-router>
+                <mule:outbound-pass-through-router>
                     <mule:endpoint address="axis:http://localhost:62111/mule/mycomponent2?method=echo"
                         synchronous="true">
                         <property name="soapMethods" value="value:string:in,return:string"/>
                     </mule:endpoint>
-                </mule:pass-through-router>
+                </mule:outbound-pass-through-router>
             </mule:outbound-router>
         </mule:service>
 

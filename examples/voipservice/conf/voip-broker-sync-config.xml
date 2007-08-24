@@ -57,7 +57,7 @@
             
             <mule:response-router>
                 <mule:endpoint ref="PaymentValidationResponse"/>
-                <mule:custom-router class="org.mule.samples.voipservice.routers.PaymentValidationResponseAggregator"/>
+                <mule:custom-response-router class="org.mule.samples.voipservice.routers.PaymentValidationResponseAggregator"/>
             </mule:response-router>
         </mule:service>
         

@@ -25,13 +25,13 @@
                 <mule:endpoint address="vm://send"/>
             </mule:inbound-router>
             <mule:outbound-router>
-                <mule:pass-through-router>
+                <mule:outbound-pass-through-router>
                     <mule:endpoint address="smtps://localhost:65439">
                         <mule:properties>
                             <entry key="toAddresses" value="bob@example.com"/>
                         </mule:properties>
                     </mule:endpoint>
-                </mule:pass-through-router>
+                </mule:outbound-pass-through-router>
             </mule:outbound-router>
         </mule:service>
 

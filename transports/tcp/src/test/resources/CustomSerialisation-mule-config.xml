@@ -20,25 +20,27 @@
 
     <mule:model-seda name="model">
 
-        <mule:service name="BridgeIn" implementation="org.mule.components.simple.PassThroughComponent">
+        <mule:service name="BridgeIn">
+            <mule:component class="org.mule.components.simple.PassThroughComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="vm://in"/>
             </mule:inbound-router>
             <mule:outbound-router>
-                <mule:pass-through-router>
+                <mule:outbound-pass-through-router>
                     <mule:endpoint address="tcp://localhost:9994" transformers="NoAction"/>
-                </mule:pass-through-router>
+                </mule:outbound-pass-through-router>
             </mule:outbound-router>
         </mule:service>
 
-        <mule:service name="BridgeOut" implementation="org.mule.components.simple.PassThroughComponent">
+        <mule:service name="BridgeOut">
+            <mule:bridge-component/>
             <mule:inbound-router>
                 <mule:endpoint address="tcp://localhost:9994" transformers="NoAction"/>
             </mule:inbound-router>
             <mule:outbound-router>
-                <mule:pass-through-router>
+                <mule:outbound-pass-through-router>
                     <mule:endpoint address="vm://out"/>
-                </mule:pass-through-router>
+                </mule:outbound-pass-through-router>
             </mule:outbound-router>
         </mule:service>
 

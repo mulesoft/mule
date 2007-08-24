@@ -91,14 +91,14 @@
             </mule:inbound-router>
 
             <mule:outbound-router>
-                <mule:pass-through-router>
+                <mule:outbound-pass-through-router>
                     <mule:endpoint ref="CreditAgencyGateway" />
-                </mule:pass-through-router>
+                </mule:outbound-pass-through-router>
             </mule:outbound-router>
 
             <mule:response-router timeout="1000000">
                 <mule:endpoint ref="LoanQuotes" />
-                <mule:custom-router class="org.mule.examples.loanbroker.routers.BankQuotesResponseAggregator" />
+                <mule:custom-response-router class="org.mule.examples.loanbroker.routers.BankQuotesResponseAggregator" />
             </mule:response-router>
         </mule:service>
 

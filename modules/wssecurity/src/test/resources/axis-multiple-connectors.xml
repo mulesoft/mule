@@ -54,9 +54,9 @@
                 <mule:endpoint address="vm://secured"/>
             </mule:inbound-router>
             <mule:outbound-router>
-                <mule:pass-through-router>
+                <mule:outbound-pass-through-router>
                     <mule:endpoint name="secured" address="axis:http://localhost:64070/services/SecuredWS?method=echo" connector-ref="SecuredConnector"/>
-                </mule:pass-through-router>
+                </mule:outbound-pass-through-router>
             </mule:outbound-router>
         </mule:service>
 
@@ -66,9 +66,9 @@
                 <mule:endpoint address="vm://unsecured1"/>
             </mule:inbound-router>
             <mule:outbound-router>
-                <mule:pass-through-router>
+                <mule:outbound-pass-through-router>
                     <mule:endpoint address="axis:http://localhost:64077/services/UnsecuredWS1?method=echo" connector-ref="UnsecuredConnector"/>
-                </mule:pass-through-router>
+                </mule:outbound-pass-through-router>
             </mule:outbound-router>
         </mule:service>
 
@@ -78,9 +78,9 @@
                 <mule:endpoint address="vm://unsecured2"/>
             </mule:inbound-router>
             <mule:outbound-router>
-                <mule:pass-through-router>
+                <mule:outbound-pass-through-router>
                     <mule:endpoint address="axis:http://localhost:64078/services/UnsecuredWS2?method=echo" connector-ref="UnsecuredConnector"/>
-                </mule:pass-through-router>
+                </mule:outbound-pass-through-router>
             </mule:outbound-router>
         </mule:service>
 

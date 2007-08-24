@@ -40,7 +40,7 @@
                 <mule:endpoint address="vm://testin"/>
             </mule:inbound-router>
             <mule:outbound-router>
-                <mule:pass-through-router>
+                <mule:outbound-pass-through-router>
                     <mule:endpoint address="axis:http://localhost:64484/MySecuredUMO?method=echo" connector-ref="axisConnector">
                         <wssecurity:security-filters>
                             <wssecurity:security-filter decryptionFile="in-encrypted-security.properties">
@@ -51,7 +51,7 @@
                             </wssecurity:security-filter>
                         </wssecurity:security-filters>
                     </mule:endpoint>
-                </mule:pass-through-router>
+                </mule:outbound-pass-through-router>
             </mule:outbound-router>
         </mule:service>
 		  

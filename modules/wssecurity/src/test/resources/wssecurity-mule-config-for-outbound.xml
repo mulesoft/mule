@@ -32,13 +32,13 @@
                 <mule:endpoint address="vm://testin"/>
             </mule:inbound-router>
             <mule:outbound-router>
-                <mule:pass-through-router>
+                <mule:outbound-pass-through-router>
                     <mule:endpoint address="xfire:http://localhost:64484/MySecuredUMO?method=echo"><!-- type="sender"-->
                         <wssecurity:security-filters>
 		                    <wssecurity:security-filter signatureFile="out-signed-security.properties" decryptionFile="out-encrypted-security.properties"/>
 	                    </wssecurity:security-filters>
                     </mule:endpoint>
-                </mule:pass-through-router>
+                </mule:outbound-pass-through-router>
             </mule:outbound-router>
         </mule:service>
 

@@ -40,9 +40,9 @@
                 <mule:endpoint address="vm://secured"/>
             </mule:inbound-router>
             <mule:outbound-router>
-                <mule:pass-through-router>
+                <mule:outbound-pass-through-router>
                     <mule:endpoint name="secured" address="xfire:http://localhost:64282/SecuredWs?method=echo" connector-ref="SecuredConnector"/>
-                </mule:pass-through-router>
+                </mule:outbound-pass-through-router>
             </mule:outbound-router>
         </mule:service>
 
@@ -65,9 +65,9 @@
                 <mule:endpoint address="vm://unsecured"/>
             </mule:inbound-router>
             <mule:outbound-router>
-                <mule:pass-through-router>
+                <mule:outbound-pass-through-router>
                     <mule:endpoint address="xfire:http://localhost:64284/UnSecuredWs?method=echo" connector-ref="UnsecuredConnector"/>
-                </mule:pass-through-router>
+                </mule:outbound-pass-through-router>
             </mule:outbound-router>
         </mule:service>
 

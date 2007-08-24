@@ -22,9 +22,9 @@
                 <mule:endpoint ref="dispatch"/>
             </mule:inbound-router>
             <mule:outbound-router>
-                <mule:pass-through-router>
+                <mule:outbound-pass-through-router>
                     <mule:endpoint address="vm://responder" synchronous="false" remoteSync="true" connector-ref="default"/>
-                </mule:pass-through-router>
+                </mule:outbound-pass-through-router>
             </mule:outbound-router>
         </mule:service>
 

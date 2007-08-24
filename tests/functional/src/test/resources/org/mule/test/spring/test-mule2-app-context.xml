@@ -35,7 +35,8 @@
 
     <mule:model-seda name="main">
 
-        <mule:service name="LoanBroker" implementation="apple">
+        <mule:service name="LoanBroker">
+            <mule:component instance-ref="apple"/>
             <mule:inbound-router>
                 <mule:endpoint address="vm://LoanBrokerRequests"/>
             </mule:inbound-router>
@@ -48,7 +49,7 @@
 
             <!--<mule:response-router timeout="10000" failOnTimeout="false">-->
                 <!--<mule:endpoint address="vm://LoanBrokerQuotes"/>-->
-                <!--<mule:custom-router class="org.mule.samples.loanbroker.routers.BankQuotesResponseAggregator"/>-->
+                <!--<mule:custom-response-router class="org.mule.samples.loanbroker.routers.BankQuotesResponseAggregator"/>-->
             <!--</mule:response-router>-->
         </mule:service>
 

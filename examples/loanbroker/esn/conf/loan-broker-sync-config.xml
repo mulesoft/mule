@@ -49,7 +49,7 @@
 
                  <mule:response-router timeout="10000">
                      <mule:endpoint ref="LoanBrokerQuotes"/>
-                     <mule:custom-router class="org.mule.examples.loanbroker.routers.BankQuotesResponseAggregator"/>
+                     <mule:custom-response-router class="org.mule.examples.loanbroker.routers.BankQuotesResponseAggregator"/>
                  </mule:response-router>
              </mule:service>
 
@@ -86,10 +86,10 @@
                  </mule:inbound-router>
                  <mule:outbound-router>
                      <mule:logging-catch-all-strategy/>
-                     <mule:custom-router class="org.mule.routing.outbound.StaticRecipientList">
+                     <mule:custom-outbound-router class="org.mule.routing.outbound.StaticRecipientList">
                          <mule:reply-to address="LoanBrokerQuotes"/>
                          <mule:message-property-filter pattern="recipients!=null"/>
-                     </mule:custom-router>
+                     </mule:custom-outbound-router>
                  </mule:outbound-router>
              </mule:service>
 

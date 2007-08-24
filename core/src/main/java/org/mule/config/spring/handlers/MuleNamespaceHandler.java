@@ -223,8 +223,11 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("nested-router", new ChildDefinitionParser("nestedRouter", NestedRouterCollection.class));
         registerBeanDefinitionParser("response-router", new ChildDefinitionParser("responseRouter", ResponseRouterCollection.class));
 
+        registerBeanDefinitionParser("service-streaming", new ServiceDescriptorDefinitionParser());
+        registerBeanDefinitionParser("service-custom", new ServiceDescriptorDefinitionParser());
+
         //Inbound Routers
-        registerBeanDefinitionParser("pass-through-router", new RouterDefinitionParser("router", InboundPassThroughRouter.class));
+        registerBeanDefinitionParser("inbound-pass-through-router", new RouterDefinitionParser("router", InboundPassThroughRouter.class));
         registerBeanDefinitionParser("idempotent-receiver-router", new RouterDefinitionParser("router", IdempotentReceiver.class));
         registerBeanDefinitionParser("idempotent-secure-hash-receiver-router", new RouterDefinitionParser("router", IdempotentSecureHashReceiver.class));
         registerBeanDefinitionParser("selective-consumer-router", new RouterDefinitionParser("router", SelectiveConsumer.class));
@@ -232,13 +235,13 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("correlation-aggregator-router", new RouterDefinitionParser("router", CorrelationAggregator.class));
         registerBeanDefinitionParser("message-chunking-aggregator-router", new RouterDefinitionParser("router", MessageChunkingAggregator.class));
         registerBeanDefinitionParser("correlation-resequencer-router", new RouterDefinitionParser("router", CorrelationEventResequencer.class));
-        registerBeanDefinitionParser("custom-router", new RouterDefinitionParser("router", null));
+        registerBeanDefinitionParser("custom-inbound-router", new RouterDefinitionParser("router", null));
 
         //Nested binding
         registerBeanDefinitionParser("binding", new RouterDefinitionParser("router", NestedRouter.class));
 
         //Outbound Routers
-        registerBeanDefinitionParser("pass-through-router", new RouterDefinitionParser("router", OutboundPassThroughRouter.class));
+        registerBeanDefinitionParser("outbound-pass-through-router", new RouterDefinitionParser("router", OutboundPassThroughRouter.class));
         registerBeanDefinitionParser("filtering-router", new RouterDefinitionParser("router", FilteringOutboundRouter.class));
         registerBeanDefinitionParser("chaining-router", new RouterDefinitionParser("router", ChainingRouter.class));
         registerBeanDefinitionParser("endpoint-selector-router", new RouterDefinitionParser("router", EndpointSelector.class));
@@ -248,8 +251,11 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("multicasting-router", new RouterDefinitionParser("router", MulticastingRouter.class));
         registerBeanDefinitionParser("static-recipient-list-router", new RouterDefinitionParser("router", StaticRecipientList.class));
         registerBeanDefinitionParser("template-endpoint-router", new RouterDefinitionParser("router", TemplateEndpointRouter.class));
-        registerBeanDefinitionParser("custom-router", new RouterDefinitionParser("router", null));
+        registerBeanDefinitionParser("custom-outbound-router", new RouterDefinitionParser("router", null));
         registerBeanDefinitionParser("reply-to", new ParentDefinitionParser().addAlias("address", "replyTo"));
+
+        //Response Routers
+        registerBeanDefinitionParser("custom-response-router", new RouterDefinitionParser("router", null));
 
         //Property Extractors
         registerBeanDefinitionParser("bean-property-extractor", new ChildDefinitionParser("propertyExtractor", BeanPropertyExtractor.class));

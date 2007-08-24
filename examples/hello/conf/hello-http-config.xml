@@ -88,10 +88,10 @@
                     synchronous="true"/>
             </mule:inbound-router>
             <mule:outbound-router>
-                <mule:pass-through-router>
+                <mule:outbound-pass-through-router>
                     <mule:endpoint address="vm://chitchatter"
                         synchronous="true"/>
-                </mule:pass-through-router>
+                </mule:outbound-pass-through-router>
             </mule:outbound-router>
             <!--
             Here we tell this component to use the interceptor stack defined above

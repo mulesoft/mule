@@ -28,12 +28,12 @@
             connector-ref="httpConnector"/>
 
     <mule:model-custom name="main" class="org.mule.tck.testmodels.mule.TestSedaModel">
-        <mule:service name="testComponent">
+        <mule:service-custom name="testComponent">
             <mule:component class="org.mule.tck.functional.FunctionalTestComponent" scope="singleton"/>
             <mule:inbound-router>
                 <mule:endpoint ref="clientEndpoint"/>
             </mule:inbound-router>
-        </mule:service>
+        </mule:service-custom>
     </mule:model-custom>
 
 </beans>

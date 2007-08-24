@@ -118,13 +118,13 @@
                 <mule:endpoint ref="BigBank" />
             </mule:inbound-router>
         </mule:service>
-        <mule:service name="AMediumBank" implementation="org.mule.examples.loanbroker.bank.Bank">
+        <mule:service name="AMediumBank">
             <mule:component class="org.mule.examples.loanbroker.bank.Bank" />
             <mule:inbound-router>
                 <mule:endpoint ref="MediumBank" />
             </mule:inbound-router>
         </mule:service>
-        <mule:service name="ASmallBank" implementation="org.mule.examples.loanbroker.bank.Bank">
+        <mule:service name="ASmallBank">
             <mule:component class="org.mule.examples.loanbroker.bank.Bank" />
             <mule:inbound-router>
                 <mule:endpoint ref="SmallBank" />

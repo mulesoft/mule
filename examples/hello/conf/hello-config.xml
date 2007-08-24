@@ -71,9 +71,9 @@
                 <mule:endpoint address="stdio://System.in" transformers="StringToNameString"/>
             </mule:inbound-router>
             <mule:outbound-router>
-                <mule:pass-through-router>
+                <mule:outbound-pass-through-router>
                     <mule:endpoint address="vm://chitchatter"/>
-                </mule:pass-through-router>
+                </mule:outbound-pass-through-router>
             </mule:outbound-router>
             <!--
             Here we tell this component to use the interceptor stack defined above
@@ -86,9 +86,9 @@
                 <mule:endpoint address="vm://chitchatter" transformers="NameStringToChatString"/>
             </mule:inbound-router>
             <mule:outbound-router>
-                <mule:pass-through-router>
+                <mule:outbound-pass-through-router>
                     <mule:endpoint address="stdio://System.out" transformers="ChatStringToString"/>
-                </mule:pass-through-router>
+                </mule:outbound-pass-through-router>
             </mule:outbound-router>
             <!--<interceptor name="default"/>-->
         </mule:service>
