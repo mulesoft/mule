@@ -9,13 +9,13 @@
  */
 package org.mule.impl;
 
+import org.mule.MuleServer;
 import org.mule.RegistryContext;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
-import org.mule.umo.registry.RegistryFacade;
 import org.mule.util.StringMessageUtils;
 
 import java.util.ArrayList;
@@ -82,7 +82,7 @@ public class MuleShutdownHook extends Thread
         msgs.add(CoreMessages.fatalErrorInShutdown());
         if(RegistryContext.getRegistry()!=null)
         {
-            UMOManagementContext context = RegistryContext.getRegistry().getManagementContext();
+            UMOManagementContext context = MuleServer.getManagementContext();
             if(context!=null)
             {
                 msgs.add(CoreMessages.serverStartedAt(context.getStartDate()));
@@ -108,13 +108,8 @@ public class MuleShutdownHook extends Thread
         List msgs = new ArrayList();
         msgs.add(CoreMessages.normalShutdown());
 
-        UMOManagementContext context = null;
-        RegistryFacade registry = RegistryContext.getRegistry();
+        UMOManagementContext context = MuleServer.getManagementContext();
 
-        if(registry!=null)
-        {
-            context = registry.getManagementContext();
-        }
         if(context!=null)
         {
             msgs.add(CoreMessages.serverStartedAt(context.getStartDate()));

@@ -14,6 +14,7 @@ import org.mule.config.ConfigurationBuilder;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 import org.mule.impl.MuleShutdownHook;
+import org.mule.umo.UMOManagementContext;
 import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.MuleUrlStreamHandlerFactory;
@@ -97,6 +98,14 @@ public class MuleServer implements Runnable
 
     protected Map options = Collections.EMPTY_MAP;
 
+    /** 
+     * The ManagementContext should contain anything which does not belong in the Registry.  
+     * There is one ManagementContext per Mule instance.  
+     * Assuming it has been created, a handle to the local ManagementContext can be obtained from anywhere 
+     * by calling MuleServer.getManagementContext()
+     */
+    protected static UMOManagementContext managementContext = null;
+    
     /**
      * Application entry point.
      *
@@ -324,7 +333,8 @@ public class MuleServer implements Runnable
                 logger.warn("A configuration file was not set, using default: " + DEFAULT_CONFIGURATION);
                 configurationResources = DEFAULT_CONFIGURATION;
             }
-            cfgBuilder.configure(configurationResources, getStartupPropertiesFile());
+            // TODO MULE-1988
+            managementContext = cfgBuilder.configure(configurationResources, getStartupPropertiesFile());
         }
         logger.info("Mule Server initialized.");
     }
@@ -391,5 +401,15 @@ public class MuleServer implements Runnable
     public static void setStartupPropertiesFile(String startupPropertiesFile)
     {
         MuleServer.startupPropertiesFile = startupPropertiesFile;
+    }
+
+    public static UMOManagementContext getManagementContext()
+    {
+        return managementContext;
+    }
+
+    public static void setManagementContext(UMOManagementContext managementContext)
+    {
+        MuleServer.managementContext = managementContext;
     }
 }

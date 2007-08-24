@@ -13,15 +13,14 @@ import org.mule.impl.Directories;
 import org.mule.impl.internal.notifications.NotificationException;
 import org.mule.impl.internal.notifications.ServerNotificationManager;
 import org.mule.management.stats.AllStatistics;
+import org.mule.registry.Registry;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.Lifecycle;
-import org.mule.umo.lifecycle.Registerable;
 import org.mule.umo.lifecycle.UMOLifecycleManager;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.manager.UMOServerNotificationListener;
 import org.mule.umo.manager.UMOWorkManager;
-import org.mule.umo.registry.RegistryFacade;
 import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.store.UMOStore;
 import org.mule.util.queue.QueueManager;
@@ -31,13 +30,8 @@ import javax.transaction.TransactionManager;
 /**
  * TODO document
  */
-public interface UMOManagementContext extends Initialisable, Lifecycle, Registerable
+public interface UMOManagementContext extends Initialisable, Lifecycle
 {
-    //TODO LM: Replce with Real Registry
-    RegistryFacade getRegistry();
-
-    void setRegistry(RegistryFacade registry);
-
     String getSystemName();
 
     UMOStore getStore(String name) throws UMOException;
@@ -239,7 +233,9 @@ public interface UMOManagementContext extends Initialisable, Lifecycle, Register
 
     public void setStatistics(AllStatistics stats);
 
-
     UMOLifecycleManager getLifecycleManager();
 
+    void setLifecycleManager(UMOLifecycleManager lifecycleManager);
+    
+    Registry getRegistry();
 }

@@ -10,27 +10,30 @@
 package org.mule;
 
 import org.mule.config.MuleConfiguration;
-import org.mule.umo.registry.RegistryFacade;
+import org.mule.registry.Registry;
 
-/**
- * TODO
+/** 
+ * A handle to the Mule Registry.  We should make no assumptions about the location of the actual Registry
+ * implementation.  It might be simply a singleton object in the same JVM, or it might be in another JVM or 
+ * even running remotely on another machine.
  */
 public class RegistryContext
 {
-    protected static RegistryFacade registry;
-
-    public static RegistryFacade getRegistry()
+    protected static Registry registry;
+    
+    public static Registry getRegistry()
     {
         return registry;
     }
 
-    public static MuleConfiguration getConfiguration()
-    {
-        return registry.getConfiguration();
-    }
-
-    public static void setRegistry(RegistryFacade registry)
+    public static void setRegistry(Registry registry)
     {
         RegistryContext.registry = registry;
+    }
+
+    // TODO MULE-2162 MuleConfiguration belongs in the ManagementContext rather than the Registry
+    public static MuleConfiguration getConfiguration()
+    {
+        return registry != null ? registry.getConfiguration() : null;
     }
 }
