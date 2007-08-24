@@ -20,6 +20,7 @@ import javax.management.ObjectName;
 
 public class ConnectorServiceTestCase extends AbstractMuleJmxTestCase
 {
+    // TODO Finds 5 components registered now instead of 6.  What are the 6?  Why 6?  Documentation, please!
     public void testUndeploy() throws Exception
     {
         final String configId = "ConnectorServiceTest";
