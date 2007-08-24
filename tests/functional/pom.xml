@@ -20,6 +20,8 @@
                 <configuration>
                     <excludes>
                         <exclude>**/MuleXmlConfigBuilderTestCase.*</exclude>
+                        <!-- TODO Reimplement this test using a config file instead of the QuickConfigurationBuilder (MULE-2203) -->
+                        <exclude>**/ConnectorCreationTestCase.*</exclude>
                     </excludes>
                 </configuration>
             </plugin>
