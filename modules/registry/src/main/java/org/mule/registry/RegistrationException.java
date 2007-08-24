@@ -18,10 +18,5 @@ public class RegistrationException extends MuleException
     {
         super(message);
     }
-    
-    public RegistrationException(Throwable cause)
-    {
-        super(cause);
-    }
 }
 
