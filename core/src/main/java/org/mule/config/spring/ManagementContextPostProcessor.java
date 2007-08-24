@@ -9,10 +9,9 @@
  */
 package org.mule.config.spring;
 
+import org.mule.config.MuleProperties;
 import org.mule.impl.ManagementContextAware;
 import org.mule.umo.UMOManagementContext;
-
-import java.util.Map;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -59,21 +58,22 @@ public class ManagementContextPostProcessor implements BeanPostProcessor, Applic
 
     protected UMOManagementContext getManagementContext()
     {
-        //TODO RM* This will not work until we can migrate the ManagementContextFactory Bean to use a ManagementContext not the MuleManager
-        if(context==null)
-        {
-            Map mContexts = applicationContext.getBeansOfType(UMOManagementContext.class, false, true);
-            if(mContexts.size()==1)
-            {
-                context = (UMOManagementContext)mContexts.values().iterator().next();
-            }
-            else
-            {
-                return null;
-                //throw new IllegalStateException("There must be exactly one MAnagementContext. Currently there are " + mContexts.size() + " registered");
-            }
-        }
-        return context;
+        return (UMOManagementContext) applicationContext.getBean(MuleProperties.OBJECT_MANAGEMENT_CONTEXT);
+//        //TODO RM* This will not work until we can migrate the ManagementContextFactory Bean to use a ManagementContext not the MuleManager
+//        if(context==null)
+//        {
+//            Map mContexts = applicationContext.getBeansOfType(UMOManagementContext.class, false, true);
+//            if(mContexts.size()==1)
+//            {
+//                context = (UMOManagementContext)mContexts.values().iterator().next();
+//            }
+//            else
+//            {
+//                return null;
+//                //throw new IllegalStateException("There must be exactly one MAnagementContext. Currently there are " + mContexts.size() + " registered");
+//            }
+//        }
+//        return context;
     }
 
     

@@ -10,6 +10,7 @@
 
 package org.mule.config.builders;
 
+import org.mule.MuleServer;
 import org.mule.RegistryContext;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.ConfigurationException;
@@ -105,50 +106,24 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         String[] resources = org.springframework.util.StringUtils.tokenizeToStringArray(configResource, ",;",
             true, true);
 
-        MuleApplicationContext root = null;
-        if(defaultConfigResource!=null)
-        {
-           // new MuleApplicationContext(defaultConfigResource);
-        }
-
         String[] all = new String[resources.length + 1];
         all[0] = defaultConfigResource;
         System.arraycopy(resources, 0, all, 1, resources.length);
 
-        used = true;
-        MuleApplicationContext context;
-
-//        if(root!=null)
-//        {
-//            context = new MuleApplicationContext(root, resources);
-//        }
-//        else
-//        {
-            context = new MuleApplicationContext(all);
-        //}
-//        try
-//        {
-//            if (System.getProperty(MuleProperties.MULE_START_AFTER_CONFIG_SYSTEM_PROPERTY, "true")
-//                .equalsIgnoreCase("true"))
-//            {
-//                managementContext.start();
-//            }
-//        }
-//        catch (UMOException e)
-//        {
-//            throw new ConfigurationException(new Message(Messages.FAILED_TO_START_X,
-//                "Mule server from builder"), e);
-//        }
+        MuleApplicationContext context = new MuleApplicationContext(all);
 
         try
         {
+            // TODO MULE-2163 It doesn't make sense for Spring to create the Registry, it should have already been created.
             UMOManagementContext mc = context.getManagementContext();
+            MuleServer.setManagementContext(mc);
             // TODO MULE-1988
             if (startContext)
             {
                 mc.start();
             }
 
+            // TODO Is this still needed?
             RegistryContext.getConfiguration().setConfigResources(resources);
             
             return mc;

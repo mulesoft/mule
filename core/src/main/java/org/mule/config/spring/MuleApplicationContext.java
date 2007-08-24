@@ -11,6 +11,7 @@
 package org.mule.config.spring;
 
 import org.mule.config.MuleProperties;
+import org.mule.registry.Registry;
 import org.mule.umo.UMOManagementContext;
 import org.mule.util.ClassUtils;
 
@@ -111,7 +112,13 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
 
     public UMOManagementContext getManagementContext()
     {
-        return (UMOManagementContext) getBeanFactory().getBean(MuleProperties.OBJECT_MANAGMENT_CONTEXT);
+        return (UMOManagementContext) getBeanFactory().getBean(MuleProperties.OBJECT_MANAGEMENT_CONTEXT);
+
+    }
+
+    public Registry getRegistry()
+    {
+        return (Registry) getBeanFactory().getBean(MuleProperties.OBJECT_REGISTRY);
 
     }
 

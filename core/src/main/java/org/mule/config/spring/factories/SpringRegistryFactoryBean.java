@@ -12,7 +12,7 @@ package org.mule.config.spring.factories;
 import org.mule.RegistryContext;
 import org.mule.config.spring.SpringRegistry;
 import org.mule.impl.registry.TransientRegistry;
-import org.mule.umo.registry.RegistryFacade;
+import org.mule.registry.Registry;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
@@ -20,13 +20,13 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 /**
- * TODO
+ * TODO MULE-2163
  */
 public class SpringRegistryFactoryBean extends AbstractFactoryBean implements ApplicationContextAware
 {
 
     private ApplicationContext context;
-    private RegistryFacade registry;
+    private Registry registry;
 
     public Class getObjectType()
     {
@@ -47,18 +47,18 @@ public class SpringRegistryFactoryBean extends AbstractFactoryBean implements Ap
 
 
     //@Override
-    public void afterPropertiesSet() throws Exception
-    {
-        super.afterPropertiesSet();
-        registry.initialise();
-    }
-
-
-    //@Override
-    public void destroy() throws Exception
-    {
-        super.destroy();
-        RegistryContext.setRegistry(null);
-        registry.dispose();
-    }
+//    public void afterPropertiesSet() throws Exception
+//    {
+//        super.afterPropertiesSet();
+//        registry.initialise();
+//    }
+//
+//
+//    //@Override
+//    public void destroy() throws Exception
+//    {
+//        super.destroy();
+//        RegistryContext.setRegistry(null);
+//        registry.dispose();
+//    }
 }

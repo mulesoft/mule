@@ -10,6 +10,7 @@
 
 package org.mule.config.builders;
 
+import org.mule.MuleServer;
 import org.mule.RegistryContext;
 import org.mule.components.script.jsr223.Scriptable;
 import org.mule.config.ConfigurationBuilder;
@@ -17,6 +18,7 @@ import org.mule.config.ConfigurationException;
 import org.mule.config.MuleProperties;
 import org.mule.config.ReaderResource;
 import org.mule.config.builders.i18n.BuildersMessages;
+import org.mule.impl.ManagementContextAware;
 import org.mule.impl.registry.TransientRegistry;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
@@ -32,19 +34,15 @@ import javax.script.CompiledScript;
 /**
  * Configures a MuleManager from one or more script files.
  */
-public class ScriptConfigurationBuilder extends Scriptable implements ConfigurationBuilder
+public class ScriptConfigurationBuilder extends Scriptable implements ConfigurationBuilder, ManagementContextAware
 {
-
     public static final String SCRIPT_ENGINE_NAME_PROPERTY = "org.mule.script.engine";
 
     protected UMOManagementContext managementContext = null;
-    protected QuickConfigurationBuilder builder = null;
     protected boolean initialised = false;
 
     public ScriptConfigurationBuilder() throws UMOException
     {
-        builder = new QuickConfigurationBuilder();
-        managementContext = builder.getManagementContext();
         String scriptName = System.getProperty(SCRIPT_ENGINE_NAME_PROPERTY);
         if (scriptName == null)
         {
@@ -64,14 +62,14 @@ public class ScriptConfigurationBuilder extends Scriptable implements Configurat
 
     public ScriptConfigurationBuilder(String scriptEngineName, boolean createDefaultRegistry) throws UMOException
     {
-        //Createa Registry by default if we do not have one
+        //Create a Registry by default if we do not have one
         if(RegistryContext.getRegistry()==null && createDefaultRegistry)
         {
+            // TODO MULE-2161
             TransientRegistry registry = TransientRegistry.createNew();
             RegistryContext.setRegistry(registry);
+            managementContext = MuleServer.getManagementContext();
         }
-        builder = new QuickConfigurationBuilder();
-        managementContext = builder.getManagementContext();
         this.setScriptEngineName(scriptEngineName);
     }
 
@@ -79,8 +77,10 @@ public class ScriptConfigurationBuilder extends Scriptable implements Configurat
     {
         try
         {
+            // TODO MULE-1988
             UMOManagementContext context = configure(configResources, null);
-            //context.start();
+            context.initialise();
+            context.start();
             return context;
         }
         catch (UMOException e)
@@ -131,13 +131,13 @@ public class ScriptConfigurationBuilder extends Scriptable implements Configurat
     public UMOManagementContext configure(ReaderResource[] configResources, Properties startupProperties)
         throws ConfigurationException
     {
-        if (startupProperties != null)
-        {
-            managementContext.getRegistry().registerProperties(startupProperties);
-        }
-
         try
         {
+            if (startupProperties != null)
+            {
+                managementContext.getRegistry().registerProperties(startupProperties);
+            }
+            
             for (int i = 0; i < configResources.length; i++)
             {
                 ReaderResource configResource = configResources[i];
@@ -169,7 +169,6 @@ public class ScriptConfigurationBuilder extends Scriptable implements Configurat
     protected void populateBindings(Bindings bindings)
     {
         bindings.put("managementContext", managementContext);
-        bindings.put("builder", builder);
     }
 
     public boolean isConfigured()
@@ -177,4 +176,8 @@ public class ScriptConfigurationBuilder extends Scriptable implements Configurat
         return managementContext != null;
     }
 
+    public void setManagementContext(UMOManagementContext context)
+    {
+        this.managementContext = context;
+    }
 }

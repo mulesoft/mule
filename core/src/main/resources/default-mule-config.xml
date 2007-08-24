@@ -50,8 +50,11 @@
     <bean name="_muleRegistry" class="org.mule.config.spring.factories.SpringRegistryFactoryBean">
     </bean>
 
+    <mule:model-seda name="_muleSystemModel" />
+    <!-- 
     <bean name="_muleSystemModel" class="org.mule.config.spring.factories.SystemModelFactoryBean"
           depends-on="_muleManagementContext"/>
+    -->
 
     <mule:configuration
             serverId="_defaultx"

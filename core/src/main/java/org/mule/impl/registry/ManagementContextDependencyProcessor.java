@@ -9,12 +9,13 @@
  */
 package org.mule.impl.registry;
 
-import org.mule.RegistryContext;
+import org.mule.MuleServer;
 import org.mule.impl.ManagementContextAware;
 import org.mule.umo.UMOManagementContext;
 
 /**
  * TODO
+ * @deprecated This class is not even being used.
  */
 public class ManagementContextDependencyProcessor implements ObjectProcessor
 {
@@ -35,7 +36,7 @@ public class ManagementContextDependencyProcessor implements ObjectProcessor
         {
             if(context==null)
             {
-                context= RegistryContext.getRegistry().getManagementContext();
+                context= MuleServer.getManagementContext();
                 if(context==null)
                 {
                     //todo

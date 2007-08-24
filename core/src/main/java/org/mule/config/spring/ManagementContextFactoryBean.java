@@ -13,11 +13,12 @@ import org.mule.RegistryContext;
 import org.mule.config.MuleProperties;
 import org.mule.impl.ManagementContext;
 import org.mule.impl.internal.notifications.ServerNotificationManager;
+import org.mule.registry.RegistrationException;
+import org.mule.registry.Registry;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.UMOLifecycleManager;
 import org.mule.umo.manager.UMOTransactionManagerFactory;
 import org.mule.umo.manager.UMOWorkManager;
-import org.mule.umo.registry.RegistryFacade;
 import org.mule.umo.security.UMOSecurityManager;
 import org.mule.util.ClassUtils;
 import org.mule.util.queue.QueueManager;
@@ -73,7 +74,7 @@ public class ManagementContextFactoryBean extends AbstractFactoryBean
 
     protected UMOManagementContext managementContext;
 
-    protected RegistryFacade registry;
+    protected Registry registry;
 
     private ApplicationContext context;
 
@@ -101,7 +102,6 @@ public class ManagementContextFactoryBean extends AbstractFactoryBean
     {
         if (managementContext == null)
         {
-
             this.managementContext = new ManagementContext(lifecycleManager);
         }
         return managementContext;
@@ -247,7 +247,14 @@ public class ManagementContextFactoryBean extends AbstractFactoryBean
     {
         if (props != null)
         {
-            registry.registerProperties(props);
+            try
+            {
+                registry.registerProperties(props);
+            }
+            catch (RegistrationException e)
+            {
+                logger.error(e);
+            }
         }
     }
 
@@ -299,5 +306,25 @@ public class ManagementContextFactoryBean extends AbstractFactoryBean
     public void setWorkManager(UMOWorkManager workManager)
     {
         this.workManager = workManager;
+    }
+
+    public UMOLifecycleManager getLifecycleManager()
+    {
+        return lifecycleManager;
+    }
+
+    public void setLifecycleManager(UMOLifecycleManager lifecycleManager)
+    {
+        this.lifecycleManager = lifecycleManager;
+    }
+
+    public Registry getRegistry()
+    {
+        return registry;
+    }
+
+    public void setRegistry(Registry registry)
+    {
+        this.registry = registry;
     }
 }

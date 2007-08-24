@@ -10,6 +10,7 @@
 
 package org.mule.extras.client;
 
+import org.mule.MuleServer;
 import org.mule.RegistryContext;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.ConfigurationException;
@@ -28,6 +29,8 @@ import org.mule.impl.registry.TransientRegistry;
 import org.mule.impl.security.MuleCredentials;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.service.TransportFactory;
+import org.mule.registry.RegistrationException;
+import org.mule.registry.Registry;
 import org.mule.umo.FutureMessageResult;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMODescriptor;
@@ -43,10 +46,12 @@ import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.ReceiveException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOStreamMessageAdapter;
-import org.mule.umo.registry.RegistryFacade;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.MuleObjectHelper;
 import org.mule.util.StringUtils;
+
+import edu.emory.mathcs.backport.java.util.concurrent.Callable;
+import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,8 +59,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import edu.emory.mathcs.backport.java.util.concurrent.Callable;
-import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -124,18 +127,6 @@ public class MuleClient implements Disposable
     {
         this.managementContext = context;
         init(false);
-    }
-
-    /**
-     * Creates a default Mule client that will use the default serverEndpoint to
-     * connect to a remote server instance.
-     * 
-     * @param startManager start the Mule Manager if it has not yet been initialised
-     * @throws UMOException
-     */
-    public MuleClient(boolean startManager) throws UMOException
-    {
-        init(startManager);
     }
 
     /**
@@ -225,9 +216,9 @@ public class MuleClient implements Disposable
                 logger.info("There is already a managementContext locally available to this client, no need to create a new one");
             }
         }
-        else if(RegistryContext.getRegistry()!=null)
+        else if (MuleServer.getManagementContext() != null)
         {
-            managementContext = RegistryContext.getRegistry().getManagementContext();
+            managementContext = MuleServer.getManagementContext();
         }
         else
         {
@@ -235,14 +226,13 @@ public class MuleClient implements Disposable
             {
                 logger.info("There is no managementContext instance locally available for this client, creating a new Manager");
             }
-            RegistryFacade registry = TransientRegistry.createNew();
-
-            managementContext = registry.getManagementContext();
+            Registry registry = TransientRegistry.createNew();
+            managementContext = MuleServer.getManagementContext();
         }
 
         asyncExecutor = managementContext.getWorkManager();
 
-        if (!managementContext.isInitialised() && startManager == true)
+        if (!managementContext.isStarted() && startManager == true)
         {
             if (logger.isInfoEnabled()) logger.info("Starting Mule Manager for this client");
             managementContext.start();
@@ -899,7 +889,7 @@ public class MuleClient implements Disposable
         {
             UMOConnector connector = null;
             UMOEndpointURI defaultEndpointUri = new MuleEndpointURI("vm://mule.client");
-            connector = TransportFactory.createConnector(defaultEndpointUri);
+            connector = TransportFactory.createConnector(defaultEndpointUri, managementContext);
             managementContext.getRegistry().registerConnector(connector);
             connector.start();
             endpoint = new MuleEndpoint("muleClientProvider", defaultEndpointUri, connector, null,
@@ -1082,12 +1072,19 @@ public class MuleClient implements Disposable
         }
     }
 
-    public void setProperty(Object key, Object value)
+    public void setProperty(String key, Object value)
     {
-       managementContext.getRegistry().registerProperty(key, value);
+        try
+        {
+            managementContext.getRegistry().registerProperty(key, value);
+        }
+        catch (RegistrationException e)
+        {
+            logger.error(e);
+        }
     }
 
-    public Object getProperty(Object key)
+    public Object getProperty(String key)
     {
         return managementContext.getRegistry().lookupProperty(key);
     }

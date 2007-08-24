@@ -10,6 +10,7 @@
 package org.mule.config.spring.factories;
 
 import org.mule.RegistryContext;
+import org.mule.config.MuleConfiguration;
 import org.mule.config.MuleProperties;
 import org.mule.impl.ManagementContextAware;
 import org.mule.impl.model.ModelFactory;
@@ -20,6 +21,7 @@ import org.springframework.beans.factory.config.AbstractFactoryBean;
 
 /**
  * TODO
+ * @deprecated Do we really need a special factory to create this?  It's just a SEDA model.
  */
 public class SystemModelFactoryBean extends AbstractFactoryBean implements ManagementContextAware
 {
@@ -37,7 +39,15 @@ public class SystemModelFactoryBean extends AbstractFactoryBean implements Manag
 
     protected Object createInstance() throws Exception
     {
-        type = RegistryContext.getRegistry().getConfiguration().getSystemModelType();
+        // Registry may not yet exist when this method is called.
+        if (RegistryContext.getRegistry() != null && RegistryContext.getRegistry().getConfiguration() != null)
+        {
+            type = RegistryContext.getRegistry().getConfiguration().getSystemModelType();
+        }
+        if (type == null)
+        {
+            type = MuleConfiguration.DEFAULT_SYSTEM_MODEL_TYPE; 
+        }
         
         model = ModelFactory.createModel(type);
         model.setName(MuleProperties.OBJECT_SYSTEM_MODEL);
