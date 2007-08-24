@@ -300,12 +300,12 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         filter = source.getFilter();
         securityFilter = source.getSecurityFilter();
 
-        if(connectionStrategy == null)
+        if (connectionStrategy == null)
         {
             connectionStrategy = source.getConnectionStrategy();
         }
 
-        if(source.getManagementContext()!=null)
+        if (source.getManagementContext() != null)
         {
             initialise();
         }
@@ -388,20 +388,20 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
             Matcher sanitizerMatcher = sanitizerPattern.matcher(uri.getRawUserInfo());
             if (sanitizerMatcher.matches())
             {
-               sanitizedEndPointUri = new StringBuffer(uri.getScheme())
-                   .append("://").append(sanitizerMatcher.group(1))
-                   .append(":<password>").append("@")
-                   .append(uri.getHost()).append(uri.getRawPath()).toString();
+                sanitizedEndPointUri = new StringBuffer(uri.getScheme())
+                        .append("://").append(sanitizerMatcher.group(1))
+                        .append(":<password>").append("@")
+                        .append(uri.getHost()).append(uri.getRawPath()).toString();
             }
-            if ( uri.getRawQuery() != null)
+            if (uri.getRawQuery() != null)
             {
-               sanitizedEndPointUri = sanitizedEndPointUri + "?" + uri.getRawQuery();
+                sanitizedEndPointUri = sanitizedEndPointUri + "?" + uri.getRawQuery();
             }
 
         }
 
         return ClassUtils.getClassName(getClass()) + "{endpointUri=" + sanitizedEndPointUri
-               + ", connector=" + connector +  ", transformer=" + getTransformerValue() + ", name='" + name + "'"
+               + ", connector=" + connector + ", transformer=" + getTransformerValue() + ", name='" + name + "'"
                + ", type='" + type + "'" + ", properties=" + properties + ", transactionConfig="
                + transactionConfig + ", filter=" + filter + ", deleteUnacceptedMessages="
                + deleteUnacceptedMessages + ", initialised=" + initialised + ", securityFilter="
@@ -418,7 +418,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     public boolean canReceive()
     {
         return (getType().equals(ENDPOINT_TYPE_RECEIVER) || getType().equals(
-            ENDPOINT_TYPE_SENDER_AND_RECEIVER));
+                ENDPOINT_TYPE_SENDER_AND_RECEIVER));
     }
 
     public boolean canSend()
@@ -449,9 +449,9 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
             return false;
         }
         if (endpointUri != null && immutableMuleProviderDescriptor.endpointUri != null
-                        ? !endpointUri.getAddress().equals(
-                            immutableMuleProviderDescriptor.endpointUri.getAddress())
-                        : immutableMuleProviderDescriptor.endpointUri != null)
+            ? !endpointUri.getAddress().equals(
+                immutableMuleProviderDescriptor.endpointUri.getAddress())
+            : immutableMuleProviderDescriptor.endpointUri != null)
         {
             return false;
         }
@@ -510,7 +510,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
         endpointUri.initialise();
 
-        if(endpointEncoding==null)
+        if (endpointEncoding == null)
         {
             endpointEncoding = RegistryContext.getConfiguration().getDefaultEncoding();
         }
@@ -534,13 +534,13 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
                     if (connector == null)
                     {
                         throw new InitialisationException(
-                            CoreMessages.connectorWithProtocolNotRegistered(endpointUri.getScheme()), this);
+                                CoreMessages.connectorWithProtocolNotRegistered(endpointUri.getScheme()), this);
                     }
                 }
                 catch (TransportFactoryException e)
                 {
                     throw new InitialisationException(
-                        CoreMessages.failedToCreateConnectorFromUri(endpointUri), e, this);
+                            CoreMessages.failedToCreateConnectorFromUri(endpointUri), e, this);
                 }
             }
 
@@ -623,7 +623,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
             remoteSyncTimeout = Integer.valueOf(rsTimeout);
         }
 
-        if(connectionStrategy==null)
+        if (connectionStrategy == null)
         {
             connectionStrategy = new SingleAttemptConnectionStrategy();
         }
@@ -706,10 +706,12 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     public void register() throws RegistrationException
     {
         if (connector == null || connector.getRegistryId() == null)
+        {
             throw new RegistrationException("Unable to find the endpoint's connector registryId");
+        }
 
         registryId =
-            managementContext.getRegistry().registerMuleObject(connector, this).getId();
+                managementContext.getRegistry().registerMuleObject(connector, this).getId();
     }
 
     public void deregister() throws DeregistrationException
@@ -838,7 +840,6 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         return value;
     }
 
-
     // TODO the following methods should most likely be lifecycle-enabled
 
     public void dispatch(UMOEvent event) throws DispatchException
@@ -849,8 +850,8 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         }
         else
         {
-            //TODO: Either remove because this should never happen or i18n the message
-            throw new IllegalStateException("The connector on the endpoint: " + toString() + "is null. Please contact " + MuleManifest.getDevListEmail());
+            //TODO Either remove because this should never happen or i18n the message
+            throw new IllegalStateException("The connector on the endpoint: " + toString() + " is null. Please contact " + MuleManifest.getDevListEmail());
         }
     }
 
@@ -862,8 +863,8 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         }
         else
         {
-            //TODO: Either remove because this should never happen or i18n the message
-            throw new IllegalStateException("The connector on the endpoint: " + toString() + "is null. Please contact " + MuleManifest.getDevListEmail());
+            //TODO Either remove because this should never happen or i18n the message
+            throw new IllegalStateException("The connector on the endpoint: " + toString() + " is null. Please contact " + MuleManifest.getDevListEmail());
         }
     }
 
@@ -875,8 +876,8 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         }
         else
         {
-            //TODO: Either remove because this should never happen or i18n the message
-            throw new IllegalStateException("The connector on the endpoint: " + toString() + "is null. Please contact " + MuleManifest.getDevListEmail());
+            //TODO Either remove because this should never happen or i18n the message
+            throw new IllegalStateException("The connector on the endpoint: " + toString() + " is null. Please contact " + MuleManifest.getDevListEmail());
         }
     }
 
