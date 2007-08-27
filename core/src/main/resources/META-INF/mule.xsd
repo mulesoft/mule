@@ -56,15 +56,6 @@
     <xsd:element name="abstract-entrypoint-resolver" abstract="true" type="abstractEntrypointResolverType"/>
     <xsd:complexType name="abstractEntrypointResolverType"/>
 
-    <!-- obsolete? -->
-    <xsd:element name="abstract-component-factory" abstract="true" type="abstractComponentFactoryType"/>
-    <xsd:complexType name="abstractComponentFactoryType"/>
-
-    <!-- obsolete? -->
-    <xsd:element name="abstract-component-lifecycle-adapter-factory" abstract="true" type="abstractComponentLifecycleAdapterFactoryType"/>
-    <xsd:complexType name="abstractComponentLifecycleAdapterFactoryType"/>
-
-    <!-- obsolete? -->
     <xsd:element name="abstract-component-pool-factory" abstract="true" type="abstractComponentPoolFactoryType"/>
     <xsd:complexType name="abstractComponentPoolFactoryType"/>
 
@@ -173,7 +164,6 @@
     <xsd:complexType name="abstractTransactionManagerType"/>
 
     <!-- this isn't abstract because it's a system singleton -->
-
     <xsd:element name="configuration" type="muleManagementContextType"/>
     <xsd:complexType name="muleManagementContextType">
         <xsd:sequence>
@@ -262,7 +252,6 @@
 
 
     <!-- Transaction Managers -->
-    <!-- TODO - these should be moved into modules - not needed here -->
 
     <xsd:complexType name="transactionManagerType">
         <xsd:complexContent>
@@ -778,8 +767,6 @@
                     <xsd:element ref="abstract-pooling-profile" minOccurs="0"/>
                     <xsd:element ref="abstract-queue-profile" minOccurs="0"/>
                     <xsd:element ref="abstract-entrypoint-resolver" minOccurs="0"/>
-                    <xsd:element ref="abstract-component-factory" minOccurs="0"/>
-                    <xsd:element ref="abstract-component-lifecycle-adapter-factory" minOccurs="0"/>
                     <xsd:element ref="abstract-component-pool-factory" minOccurs="0"/>
                     <xsd:element ref="abstract-seda-service" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
@@ -792,24 +779,6 @@
     <!--==============================================================-->
     <!--   Model elements                                          -->
     <!--==============================================================-->
-
-    <xsd:element name="component-factory" substitutionGroup="abstract-component-factory"/>
-    <xsd:complexType name="componentFactoryType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractComponentFactoryType">
-                <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="component-lifecycle-adapter-factory" type="componentLifecycleAdapterFactoryType" substitutionGroup="abstract-component-lifecycle-adapter-factory"/>
-    <xsd:complexType name="componentLifecycleAdapterFactoryType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractComponentLifecycleAdapterFactoryType">
-                <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
 
     <xsd:element name="component-pool-factory" type="componentPoolFactoryType" substitutionGroup="abstract-component-pool-factory"/>
     <xsd:complexType name="componentPoolFactoryType">

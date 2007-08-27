@@ -92,10 +92,6 @@
 
         <mule:custom-entrypoint-resolver class="org.mule.tck.testmodels.mule.TestEntryPointResolver"/>
 
-
-        <mule:component-lifecycle-adapter-factory
-                class="org.mule.tck.testmodels.mule.TestDefaultLifecycleAdapterFactory"/>
-
         <mule:service name="orangeComponent">
             <mule:component scope="singleton" instance-ref="orange"/>
             <mule:inbound-router>

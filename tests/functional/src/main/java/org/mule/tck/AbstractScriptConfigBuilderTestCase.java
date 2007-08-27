@@ -132,8 +132,6 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
 
         assertEquals("test://component.exceptions", ep.getEndpointURI().toString());
 
-        assertTrue(model.getLifecycleAdapterFactory() instanceof TestDefaultLifecycleAdapterFactory);
-
        // assertTrue(model.isComponentRegistered("orangeComponent"));
     }
 

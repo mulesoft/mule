@@ -200,7 +200,6 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
 //        registerBeanDefinitionParser("model-seda-optimised", new OrphanDefinitionParser(OptimisedSedaModel.class, true));
 //        registerBeanDefinitionParser("model-pipeline", new OrphanDefinitionParser(PipelineModel.class, true));
 
-        registerBeanDefinitionParser("component-lifecycle-adapter-factory", new ChildDefinitionParser("lifecycleAdapterFactory", null));
         registerBeanDefinitionParser("callable-entrypoint-resolver", new ChildDefinitionParser("entryPointResolver", CallableEntryPointResolver.class));
         registerBeanDefinitionParser("custom-entrypoint-resolver", new ChildDefinitionParser("entryPointResolver", null));
         //registerBeanDefinitionParser("method-entrypoint-resolver", new ChildDefinitionParser("entrypointResolver", MethodEntryPointResolver.class));

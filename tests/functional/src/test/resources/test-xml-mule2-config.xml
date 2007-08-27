@@ -207,7 +207,6 @@
            <endpoint address="test://component.exceptions"/>
         </exception-strategy -->
 
-        <mule:component-lifecycle-adapter-factory class="org.mule.tck.testmodels.mule.TestDefaultLifecycleAdapterFactory"/>
         <!-- component-lifecycle-adapter-factory className="org.mule.tck.testmodels.mule.TestDefaultLifecycleAdapterFactory"/ -->
 
         <mule:service name="orangeComponent">
