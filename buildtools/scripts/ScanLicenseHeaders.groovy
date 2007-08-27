@@ -10,20 +10,21 @@ def scanner = ant.fileScanner {
     }
 }
 
-def licenseLine = "The software in this package is published under the terms of the MuleSource MPL";
+def licenseLine = "The software in this package is published under the terms of the CPAL v1.0";
 
 scanner.each { file ->
-    def reader = new BufferedReader(file.newReader())
 
-    // using the standard file header, the license is in line 5
-    def line = null
-    for (i in 0..5)
-    {
-        line = reader.readLine()
-    }
+    file.withReader { reader ->
+    
+        // using the standard file header, the license is in line 6
+        def line = null
+        6.times {
+            line = reader.readLine()
+        }
 
-    if (line.indexOf(licenseLine) == -1)
-    {
-        println("check file " + file)
+        if (line.indexOf(licenseLine) == -1)
+        {
+            println("check file " + file)
+        }
     }
 }
