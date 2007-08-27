@@ -1,7 +1,7 @@
 <!--
  Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
 
- The software in this package is published under the terms of the MuleSource MPL
+ The software in this package is published under the terms of the CPAL v1.0
  license, a copy of which has been included with this distribution in the
  LICENSE.txt file.
 -->
@@ -20,7 +20,7 @@
     </target>
 
     <target name="init">
-            
+
         <!-- Create the build directory if it doesn't exist -->
         <mkdir dir="${dir.classes}"/>
     </target>
@@ -28,7 +28,7 @@
     <target name="compile"
             depends="init"
             description="Compile the application.">
-            
+
         <!-- Copy all resources to the output folder as well -->
         <copy todir="${dir.classes}">
             <fileset dir="${dir.conf}"/>
