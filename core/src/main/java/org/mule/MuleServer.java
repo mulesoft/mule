@@ -70,11 +70,6 @@ public class MuleServer implements Runnable
     public static final String DEFAULT_CONFIGURATION = "mule-config.xml";
 
     /**
-     * the message to display when the server shuts down
-     */
-    private static String shutdownMessage = null;
-
-    /**
      * one or more configuration urls or filenames separated by commas
      */
     private String configurationResources = null;
