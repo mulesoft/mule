@@ -59,6 +59,10 @@ import org.apache.commons.io.IOUtils;
  */
 public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 {
+    /**
+     * Range start for http error status codes.
+     */
+    public static final int ERROR_STATUS_CODE_RANGE_START = 400;
     private final HttpConnector connector;
     private volatile HttpClient client = null;
     private final UMOTransformer receiveTransformer;
@@ -112,7 +116,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
     {
         HttpMethod httpMethod = getMethod(event);
         execute(event, httpMethod, true);
-        if (httpMethod.getStatusCode() >= 400)
+        if (httpMethod.getStatusCode() >= ERROR_STATUS_CODE_RANGE_START)
         {
             logger.error(httpMethod.getResponseBodyAsString());
             throw new DispatchException(event.getMessage(), event.getEndpoint(), new Exception(
@@ -317,7 +321,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
                 logger.debug("Http response is: " + status);
             }
             ExceptionPayload ep = null;
-            if (httpMethod.getStatusCode() >= 400)
+            if (httpMethod.getStatusCode() >= ERROR_STATUS_CODE_RANGE_START)
             {
                 ep = new ExceptionPayload(new DispatchException(event.getMessage(), event.getEndpoint(),
                     new Exception("Http call returned a status of: " + httpMethod.getStatusCode() + " "

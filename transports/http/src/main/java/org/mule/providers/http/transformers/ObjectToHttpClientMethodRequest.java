@@ -24,10 +24,7 @@ import org.mule.util.StringUtils;
 
 import java.io.InputStream;
 import java.net.URI;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
 
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpVersion;
@@ -46,8 +43,6 @@ import org.apache.commons.httpclient.params.HttpMethodParams;
 public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransformer
 {
     private final SerializableToByteArray serializableToByteArray;
-    public static final Set ignornedProperties = new HashSet(Arrays.asList(new String[]{
-        HttpConstants.HEADER_CONTENT_LENGTH}));
 
     public ObjectToHttpClientMethodRequest()
     {
@@ -243,40 +238,18 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
         {
             headerName = (String)iterator.next();
 
-            // filter out properties which could have been propagated from a previous http request
-            if (!ignornedProperties.contains(headerName))
+            headerValue = msg.getStringProperty(headerName, null);
+            if (HttpConstants.REQUEST_HEADER_NAMES.get(headerName) == null)
             {
-                headerValue = msg.getStringProperty(headerName, null);
-                if (HttpConstants.REQUEST_HEADER_NAMES.get(headerName) == null)
+                if (headerName.startsWith(MuleProperties.PROPERTY_PREFIX))
                 {
-                    if (headerName.startsWith(MuleProperties.PROPERTY_PREFIX))
-                    {
-                        headerName = new StringBuffer(30).append("X-").append(headerName).toString();
-                    }
-                    // Make sure we have a valid header name otherwise we will
-                    // corrupt the request
-                    // If it is Content-Length we should check the Response Headers
-                    // before setting it
-                    
-                    
-                    // TODO We have filtered out some http properties (including Content-Length), therefore the property
-                    // Content-Length will never make it up till this point. Should we
-                    // move this code outside the IF statement or delete it
-                    // completely. Note that sometimes this property was being propagated from old requests
-                    if (headerName.startsWith(HttpConstants.HEADER_CONTENT_LENGTH))
-                    {
-                        if (httpMethod.getResponseHeader(HttpConstants.HEADER_CONTENT_LENGTH) == null)
-                        {
-                            httpMethod.addRequestHeader(headerName, headerValue);
-                        }
-                    }
-                    else
-                    {
-                        httpMethod.addRequestHeader(headerName, headerValue);
-                    }
+                    headerName = new StringBuffer(30).append("X-").append(headerName).toString();
                 }
+
+                httpMethod.addRequestHeader(headerName, headerValue);
             }
         }
+
 
         if (context.getMessage().getPayload() instanceof InputStream)
         {

@@ -10,7 +10,16 @@
                http://www.mulesource.org/schema/mule/servlet/2.0 http://www.mulesource.org/schema/mule/servlet/2.0/mule-servlet.xsd
                http://www.mulesource.org/schema/mule/file/2.0 http://www.mulesource.org/schema/mule/file/2.0/mule-file.xsd">
 
-    <mule:endpoint name="restFileEndpoint" address="file://./.mule/restFile"/>    
+    <mule:endpoint name="restFileEndpoint" address="file://./.mule/restFile"/>
+
+    <!-- workaround for http://mule.mulesource.org/jira/browse/MULE-1827 -->
+    <mule:custom-transformer class="org.mule.transformers.simple.MessagePropertiesTransformer">
+        <mule:property name="addProperties">
+            <map>
+                <entry key="Content-Type" value="text/plain"/>
+            </map>
+        </mule:property>
+    </mule:custom-transformer>
 
     <mule:model name="samples">
 
@@ -21,7 +30,7 @@
                 </mule:properties>
             </mule:component>
             <mule:inbound-router>
-                <mule:endpoint address="servlet://restPUTTest"/>
+                <mule:endpoint address="servlet://restPUTTest" responseTransformers="PlainTextResponseTransformer"/>
             </mule:inbound-router>
             <mule:outbound-router>
                 <mule:outbound-pass-through-router>

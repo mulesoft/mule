@@ -11,6 +11,7 @@
     <property environment="env"/>
 
     <property name="dir.java" value="src"/>
+    <property name="dir.resources" value="${dir.java}/main/resources"/>
     <property name="dir.conf" value="conf"/>
     <property name="dir.build" value="target"/>
     <property name="dir.classes" value="${dir.build}/classes"/>
@@ -21,7 +22,6 @@
     </target>
 
     <target name="init">
-            
         <!-- Create the build directory if it doesn't exist -->
         <mkdir dir="${dir.classes}"/>
 
@@ -46,7 +46,7 @@
     <target name="compile"
             depends="init"
             description="Compile the application.">
-            
+
         <javac srcdir="${dir.java}"
                destdir="${dir.classes}"
                debug="true"
@@ -54,17 +54,18 @@
                target="1.4">
             <classpath refid="classpath.mule"/>
         </javac>
-        
+
         <!-- Copy all resources to the output folder as well -->
         <copy todir="${dir.classes}">
             <fileset dir="${dir.conf}"/>
+            <fileset dir="${dir.resources}"/>
         </copy>
     </target>
 
    <target name="package" 
            depends="compile" 
            description="Package the application">
-           
+
         <jar jarfile="${dir.build}/${app.name}.jar" 
              basedir="${dir.classes}"/>
    </target>
@@ -72,7 +73,7 @@
    <target name="deploy" 
            depends="package" 
            description="Deploy the application to the Mule server">
-           
+
         <copy file="${dir.build}/${app.name}.jar" 
               todir="${dir.user.lib}" 
               overwrite="true"
@@ -107,5 +108,4 @@
       <property name="dir.user.lib" value="${dir.mule.home}/lib/user/"/>
       <antcall target="deploy"/>
    </target>
-
 </project>

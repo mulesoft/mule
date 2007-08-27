@@ -1,0 +1,921 @@
+<?xml version="1.0"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <soap:Body>
+        <MX_PURCHASE_ORDER xmlns="http://peoplesoft.com/MX_PURCHASE_ORDERSoapIn">
+            <FieldTypes>
+                <PO_HDR class="R">
+                    <BUSINESS_UNIT type="CHAR"/>
+                    <PO_ID type="CHAR"/>
+                    <CHNG_ORD_BATCH type="NUMBER"/>
+                    <PO_TYPE type="CHAR"/>
+                    <PO_STATUS type="CHAR"/>
+                    <HOLD_STATUS type="CHAR"/>
+                    <RECV_STATUS type="CHAR"/>
+                    <DISP_ACTION type="CHAR"/>
+                    <DISP_METHOD type="CHAR"/>
+                    <CHANGE_STATUS type="CHAR"/>
+                    <PO_DT type="DATE"/>
+                    <PO_REF type="CHAR"/>
+                    <VENDOR_SETID type="CHAR"/>
+                    <VENDOR_ID type="CHAR"/>
+                    <VNDR_LOC type="CHAR"/>
+                    <PRICE_SETID type="CHAR"/>
+                    <PRICE_VENDOR type="CHAR"/>
+                    <PRICE_LOC type="CHAR"/>
+                    <PYMNT_TERMS_CD type="CHAR"/>
+                    <BUYER_ID type="CHAR"/>
+                    <ORIGIN type="CHAR"/>
+                    <CHNG_ORD_SEQ type="NUMBER"/>
+                    <ADDRESS_SEQ_NUM type="NUMBER"/>
+                    <CNTCT_SEQ_NUM type="NUMBER"/>
+                    <SALES_CNTCT_SEQ_N type="NUMBER"/>
+                    <BILL_LOCATION type="CHAR"/>
+                    <TAX_EXEMPT type="CHAR"/>
+                    <TAX_EXEMPT_ID type="CHAR"/>
+                    <CURRENCY_CD type="CHAR"/>
+                    <RT_TYPE type="CHAR"/>
+                    <MATCH_ACTION type="CHAR"/>
+                    <MATCH_CNTRL_ID type="CHAR"/>
+                    <MATCH_STATUS_PO type="CHAR"/>
+                    <MATCH_PROCESS_FLG type="CHAR"/>
+                    <PROCESS_INSTANCE type="NUMBER"/>
+                    <APPL_JRNL_ID_ENC type="CHAR"/>
+                    <POST_DOC type="CHAR"/>
+                    <DST_CNTRL_ID type="CHAR"/>
+                    <OPRID_ENTERED_BY type="CHAR"/>
+                    <ENTERED_DT type="DATE"/>
+                    <OPRID_APPROVED_BY type="CHAR"/>
+                    <APPROVAL_DT type="DATE"/>
+                    <OPRID_MODIFIED_BY type="CHAR"/>
+                    <LAST_DTTM_UPDATE type="DATETIME"/>
+                    <ACCOUNTING_DT type="DATE"/>
+                    <BUSINESS_UNIT_GL type="CHAR"/>
+                    <IN_PROCESS_FLG type="CHAR"/>
+                    <ACTIVITY_DATE type="DATE"/>
+                    <PO_POST_STATUS type="CHAR"/>
+                    <NEXT_MOD_SEQ_NBR type="NUMBER"/>
+                    <ERS_ACTION type="CHAR"/>
+                    <ACCRUE_USE_TAX type="CHAR"/>
+                    <CURRENCY_CD_BASE type="CHAR"/>
+                    <RATE_DATE type="DATE"/>
+                    <RATE_MULT type="NUMBER"/>
+                    <RATE_DIV type="NUMBER"/>
+                    <VAT_ENTITY type="CHAR"/>
+                    <BUDGET_HDR_STATUS type="CHAR"/>
+                    <KK_AMOUNT_TYPE type="CHAR"/>
+                    <KK_TRAN_OVER_FLAG type="CHAR"/>
+                    <KK_TRAN_OVER_OPRID type="CHAR"/>
+                    <KK_TRAN_OVER_DTTM type="DATETIME"/>
+                    <LC_ID type="CHAR"/>
+                    <BUDGET_HDR_STS_NP type="CHAR"/>
+                    <PREPAID_PO_FLG type="CHAR"/>
+                    <PREPAID_AMT type="NUMBER"/>
+                    <PREPAID_AUTH_STAT type="CHAR"/>
+                    <PREPAID_STATUS_PO type="CHAR"/>
+                    <PAY_TRM_BSE_DT_OPT type="CHAR"/>
+                    <TERMS_BASIS_DT type="DATE"/>
+                    <BACKORDER_STATUS type="CHAR"/>
+                    <DOC_TOL_HDR_STATUS type="CHAR"/>
+                    <MID_ROLL_STATUS type="CHAR"/>
+                    <USER_HDR_CHAR1 type="CHAR"/>
+                    <BUDGET_CHECK type="CHAR"/>
+                </PO_HDR>
+                <PO_HDR_MISC class="R">
+                    <BUSINESS_UNIT type="CHAR"/>
+                    <PO_ID type="CHAR"/>
+                    <MISC_CHARGE_SETID type="CHAR"/>
+                    <MISC_CHARGE_CODE type="CHAR"/>
+                    <LC_COMP_FLAG type="CHAR"/>
+                    <LC_ACCRUAL_FLAG type="CHAR"/>
+                    <DST_ACCT_TYPE type="CHAR"/>
+                    <LC_COMP_ALLOC type="CHAR"/>
+                    <LC_COMP_ON_PO type="CHAR"/>
+                    <CHARGE_AMOUNT type="NUMBER"/>
+                    <CURRENCY_CD type="CHAR"/>
+                    <X_VENDOR_SETID type="CHAR"/>
+                    <X_VENDOR_ID type="CHAR"/>
+                    <X_VNDR_LOC type="CHAR"/>
+                    <LC_RTV_CREDIT type="CHAR"/>
+                    <CHARGE_AMT_BSE type="NUMBER"/>
+                    <CURRENCY_CD_BASE type="CHAR"/>
+                    <RATE_DATE type="DATE"/>
+                    <RT_TYPE type="CHAR"/>
+                    <RATE_MULT type="NUMBER"/>
+                    <RATE_DIV type="NUMBER"/>
+                </PO_HDR_MISC>
+                <PO_COMMENTS_FS class="R">
+                    <BUSINESS_UNIT type="CHAR"/>
+                    <PO_ID type="CHAR"/>
+                    <OPRID type="CHAR"/>
+                    <COMMENT_ID type="DATETIME"/>
+                    <RANDOM_CMMT_NBR type="NUMBER"/>
+                    <PUBLIC_FLG type="CHAR"/>
+                    <SOURCE_FROM type="CHAR"/>
+                    <SOURCE_BU_SETID type="CHAR"/>
+                    <SOURCE_ID type="CHAR"/>
+                    <SOURCE_LINE_NBR type="NUMBER"/>
+                    <STATUS type="CHAR"/>
+                    <ALLOW_MODIFY type="CHAR"/>
+                    <FILENAME type="CHAR"/>
+                    <FILE_EXTENSION type="CHAR"/>
+                    <RECV_VIEW_FLG type="CHAR"/>
+                    <VCHR_VIEW_FLG type="CHAR"/>
+                    <COMMENT_TYPE type="CHAR"/>
+                    <SHIPTO_ID type="CHAR"/>
+                    <LINE_NBR type="NUMBER"/>
+                    <COMMENTS_2000 type="CHAR"/>
+                </PO_COMMENTS_FS>
+                <PO_DISPATCHED class="R">
+                    <BUSINESS_UNIT type="CHAR"/>
+                    <PO_ID type="CHAR"/>
+                    <PROCESS_INSTANCE type="NUMBER"/>
+                    <EIP_CTL_ID type="CHAR"/>
+                    <VENDOR_ID type="CHAR"/>
+                    <VNDR_LOC type="CHAR"/>
+                    <CHNG_ORD_BATCH type="NUMBER"/>
+                    <DISP_METHOD type="CHAR"/>
+                    <DATETIME_DISP type="DATETIME"/>
+                    <OPRID type="CHAR"/>
+                    <FAX_SERVER_DIR type="CHAR"/>
+                    <FILENAME type="CHAR"/>
+                    <EMAIL_SERVER_DIR type="CHAR"/>
+                    <PATHNAME type="CHAR"/>
+                </PO_DISPATCHED>
+                <PO_LINE class="R">
+                    <BUSINESS_UNIT type="CHAR"/>
+                    <PO_ID type="CHAR"/>
+                    <LINE_NBR type="NUMBER"/>
+                    <CANCEL_STATUS type="CHAR"/>
+                    <CHANGE_STATUS type="CHAR"/>
+                    <ITM_SETID type="CHAR"/>
+                    <INV_ITEM_ID type="CHAR"/>
+                    <ITM_ID_VNDR type="CHAR"/>
+                    <VNDR_CATALOG_ID type="CHAR"/>
+                    <CATEGORY_ID type="CHAR"/>
+                    <CHNG_ORD_SEQ type="NUMBER"/>
+                    <UNIT_OF_MEASURE type="CHAR"/>
+                    <QTY_TYPE type="CHAR"/>
+                    <PRICE_DT_TYPE type="CHAR"/>
+                    <MFG_ID type="CHAR"/>
+                    <MFG_ITM_ID type="CHAR"/>
+                    <CNTRCT_SETID type="CHAR"/>
+                    <CNTRCT_ID type="CHAR"/>
+                    <CNTRCT_LINE_NBR type="NUMBER"/>
+                    <RELEASE_NBR type="NUMBER"/>
+                    <MILESTONE_NBR type="NUMBER"/>
+                    <CNTRCT_RATE_MULT type="NUMBER"/>
+                    <CNTRCT_RATE_DIV type="NUMBER"/>
+                    <RFQ_ID type="CHAR"/>
+                    <RFQ_LINE_NBR type="NUMBER"/>
+                    <INSPECT_CD type="CHAR"/>
+                    <ROUTING_ID type="CHAR"/>
+                    <RECV_REQ type="CHAR"/>
+                    <PRICE_CAN_CHANGE type="CHAR"/>
+                    <WTHD_SW type="CHAR"/>
+                    <WTHD_CD type="CHAR"/>
+                    <CONFIG_CODE type="CHAR"/>
+                    <CP_TEMPLATE_ID type="CHAR"/>
+                    <DESCR254_MIXED type="CHAR"/>
+                    <PACKING_WEIGHT type="NUMBER"/>
+                    <PACKING_VOLUME type="NUMBER"/>
+                    <UNIT_MEASURE_WT type="CHAR"/>
+                    <UNIT_MEASURE_VOL type="CHAR"/>
+                    <REPLEN_OPT type="CHAR"/>
+                    <AMT_ONLY_FLG type="CHAR"/>
+                    <USER_LINE_CHAR1 type="CHAR"/>
+                    <GPO_ID type="CHAR"/>
+                    <GPO_CNTRCT_NBR type="CHAR"/>
+                </PO_LINE>
+                <MX_ITM_CAT class="R">
+                    <CATEGORY_CD type="CHAR"/>
+                </MX_ITM_CAT>
+                <PO_LINE_SHIP class="R">
+                    <BUSINESS_UNIT type="CHAR"/>
+                    <PO_ID type="CHAR"/>
+                    <LINE_NBR type="NUMBER"/>
+                    <SCHED_NBR type="NUMBER"/>
+                    <CANCEL_STATUS type="CHAR"/>
+                    <BAL_STATUS type="CHAR"/>
+                    <CHANGE_STATUS type="CHAR"/>
+                    <CHNG_ORD_SEQ type="NUMBER"/>
+                    <PRICE_PO type="NUMBER"/>
+                    <PRICE_PO_BSE type="NUMBER"/>
+                    <CUSTOM_PRICE type="CHAR"/>
+                    <ZERO_PRICE_IND type="CHAR"/>
+                    <DUE_DT type="DATE"/>
+                    <DUE_TIME type="TIME"/>
+                    <SHIPTO_SETID type="CHAR"/>
+                    <SHIPTO_ID type="CHAR"/>
+                    <ORIG_PROM_DT type="DATE"/>
+                    <QTY_PO type="NUMBER"/>
+                    <CURRENCY_CD type="CHAR"/>
+                    <MERCHANDISE_AMT type="NUMBER"/>
+                    <CURRENCY_CD_BASE type="CHAR"/>
+                    <MERCH_AMT_BSE type="NUMBER"/>
+                    <FREIGHT_TERMS type="CHAR"/>
+                    <SHIP_TYPE_ID type="CHAR"/>
+                    <DISTRIB_MTHD_FLG type="CHAR"/>
+                    <UNIT_PRC_TOL type="NUMBER"/>
+                    <UNIT_PRC_TOL_BSE type="NUMBER"/>
+                    <PCT_UNIT_PRC_TOL type="NUMBER"/>
+                    <EXT_PRC_TOL type="NUMBER"/>
+                    <EXT_PRC_TOL_BSE type="NUMBER"/>
+                    <PCT_EXT_PRC_TOL type="NUMBER"/>
+                    <QTY_RECV_TOL_PCT type="NUMBER"/>
+                    <PCT_UNDER_QTY type="NUMBER"/>
+                    <MATCH_STATUS_LN_PO type="CHAR"/>
+                    <MATCH_LINE_OPT type="CHAR"/>
+                    <BUSINESS_UNIT_OM type="CHAR"/>
+                    <ORDER_NO type="CHAR"/>
+                    <ORDER_INT_LINE_NO type="NUMBER"/>
+                    <SCHED_LINE_NBR type="NUMBER"/>
+                    <SHIP_TO_CUST_ID type="CHAR"/>
+                    <BUSINESS_UNIT_IN type="CHAR"/>
+                    <PRODUCTION_ID type="CHAR"/>
+                    <OP_SEQUENCE type="NUMBER"/>
+                    <FROZEN_FLG type="CHAR"/>
+                    <PLAN_CHANGE_FLG type="CHAR"/>
+                    <NET_CHANGE_EP type="CHAR"/>
+                    <CARRIER_ID type="CHAR"/>
+                    <SUT_BASE_ID type="CHAR"/>
+                    <TAX_CD_SUT type="CHAR"/>
+                    <ULTIMATE_USE_CD type="CHAR"/>
+                    <SUT_EXCPTN_TYPE type="CHAR"/>
+                    <SUT_EXCPTN_CERTIF type="CHAR"/>
+                    <SUT_APPLICABILITY type="CHAR"/>
+                    <VAT_RCRD_INPT_FLG type="CHAR"/>
+                    <VAT_RCRD_OUTPT_FLG type="CHAR"/>
+                    <VAT_DCLRTN_POINT type="CHAR"/>
+                    <VAT_CALC_GROSS_NET type="CHAR"/>
+                    <VAT_CALC_FRGHT_FLG type="CHAR"/>
+                    <VAT_CALC_MISC_FLG type="CHAR"/>
+                    <VAT_RECALC_FLG type="CHAR"/>
+                    <VAT_TREATMENT_PUR type="CHAR"/>
+                    <VAT_EXCPTN_TYPE type="CHAR"/>
+                    <VAT_EXCPTN_CERTIF type="CHAR"/>
+                    <COUNTRY_SHIP_TO type="CHAR"/>
+                    <COUNTRY_SHIP_FROM type="CHAR"/>
+                    <COUNTRY_VAT_SHIPTO type="CHAR"/>
+                    <COUNTRY_VAT_BILLTO type="CHAR"/>
+                    <COUNTRY_VAT_BILLFR type="CHAR"/>
+                    <VAT_RGSTRN_SELLER type="CHAR"/>
+                    <VAT_TXN_TYPE_CD type="CHAR"/>
+                    <VAT_APPLICABILITY type="CHAR"/>
+                    <TAX_CD_VAT type="CHAR"/>
+                    <VAT_USE_ID type="CHAR"/>
+                    <IST_TXN_FLG type="CHAR"/>
+                    <VAT_CALC_TYPE type="CHAR"/>
+                    <BUSINESS_UNIT_RTV type="CHAR"/>
+                    <RTV_ID type="CHAR"/>
+                    <RTV_LN_NBR type="NUMBER"/>
+                    <RTV_VERIFIED type="CHAR"/>
+                    <SHIP_DATE type="DATE"/>
+                    <UNIT_PRC_TOL_L type="NUMBER"/>
+                    <PCT_UNIT_PRC_TOL_L type="NUMBER"/>
+                    <EXT_PRC_TOL_L type="NUMBER"/>
+                    <PCT_EXT_PRC_TOL_L type="NUMBER"/>
+                    <UNIT_PRC_TOL_BSE_L type="NUMBER"/>
+                    <EXT_PRC_TOL_BSE_L type="NUMBER"/>
+                    <RJCT_OVER_TOL_FLAG type="CHAR"/>
+                    <REJECT_DAYS type="NUMBER"/>
+                    <TAX_VAT_FLG type="CHAR"/>
+                    <TAX_FRGHT_FLG type="CHAR"/>
+                    <TAX_MISC_FLG type="CHAR"/>
+                    <TRFT_RULE_CD type="CHAR"/>
+                    <QTY_RFQ type="NUMBER"/>
+                    <SHIP_ID_EST type="CHAR"/>
+                    <X_VENDOR_SETID type="CHAR"/>
+                    <X_VENDOR_ID type="CHAR"/>
+                    <X_VNDR_LOC type="CHAR"/>
+                    <FRT_CHRG_METHOD type="CHAR"/>
+                    <FRT_CHRG_OVERRIDE type="CHAR"/>
+                    <VAT_ROUND_RULE type="CHAR"/>
+                    <REVISION type="CHAR"/>
+                    <PUBLISHED_SHIPTO type="CHAR"/>
+                    <BCKORD_ORG_SCHED type="NUMBER"/>
+                    <USER_SCHED_CHAR1 type="CHAR"/>
+                </PO_LINE_SHIP>
+                <PO_VAL_ADJ class="R">
+                    <BUSINESS_UNIT type="CHAR"/>
+                    <PO_ID type="CHAR"/>
+                    <LINE_NBR type="NUMBER"/>
+                    <SCHED_NBR type="NUMBER"/>
+                    <ADJ_IMPACT_TYPE type="CHAR"/>
+                    <ADJ_NBR type="NUMBER"/>
+                    <ADJ_TYPE type="CHAR"/>
+                    <BASE_PRICE_TYPE type="CHAR"/>
+                    <ADJ_TBL_UOM_FLG type="CHAR"/>
+                    <ADJ_TBL_SHIPTO_FLG type="CHAR"/>
+                    <QTY_MIN type="NUMBER"/>
+                    <QTY_PO type="NUMBER"/>
+                    <TAX_CD type="CHAR"/>
+                    <ADJ_TYPE_OTHER type="CHAR"/>
+                    <ADJ_METH type="CHAR"/>
+                    <CURRENCY_CD type="CHAR"/>
+                    <ADJ_AMT type="NUMBER"/>
+                    <CURRENCY_CD_BASE type="CHAR"/>
+                    <ADJ_AMT_BSE type="NUMBER"/>
+                    <ADJ_PCT type="NUMBER"/>
+                    <ADJ_PCT_TYPE type="CHAR"/>
+                    <APPLY_ADJ type="CHAR"/>
+                    <NOT_APPLY_REASON type="CHAR"/>
+                    <MISC_CHARGE_CODE type="CHAR"/>
+                    <DST_ACCT_TYPE type="CHAR"/>
+                    <X_VENDOR_SETID type="CHAR"/>
+                    <X_VENDOR_ID type="CHAR"/>
+                    <X_VNDR_LOC type="CHAR"/>
+                    <LC_COMP_FLAG type="CHAR"/>
+                    <LC_ACCRUAL_FLAG type="CHAR"/>
+                    <LC_COMP_CALC type="CHAR"/>
+                    <LC_COMP_ALLOC type="CHAR"/>
+                    <LC_COMP_ON_PO type="CHAR"/>
+                    <UNIT_PRICE type="NUMBER"/>
+                    <FLAT_AMOUNT type="NUMBER"/>
+                    <PCT_VALUE type="NUMBER"/>
+                    <UNIT_OF_MEASURE type="CHAR"/>
+                    <MISC_CHARGE_ORIGN type="CHAR"/>
+                    <UNIT_PRICE_LC type="NUMBER"/>
+                    <SALETX_PRORATE_FLG type="CHAR"/>
+                    <USETAX_PRORATE_FLG type="CHAR"/>
+                    <VAT_NRCVR_PRO_FLG type="CHAR"/>
+                    <VAT_PRORATE_FLG type="CHAR"/>
+                    <FRGHT_PRORATE_FLG type="CHAR"/>
+                    <MISC_PRORATE_FLG type="CHAR"/>
+                    <ACTUAL_CHRG_FLG type="CHAR"/>
+                    <LC_RTV_CREDIT type="CHAR"/>
+                    <RATE_DATE type="DATE"/>
+                    <RT_TYPE type="CHAR"/>
+                    <RATE_MULT type="NUMBER"/>
+                    <RATE_DIV type="NUMBER"/>
+                </PO_VAL_ADJ>
+                <PO_LINE_DISTRIB class="R">
+                    <BUSINESS_UNIT type="CHAR"/>
+                    <PO_ID type="CHAR"/>
+                    <LINE_NBR type="NUMBER"/>
+                    <SCHED_NBR type="NUMBER"/>
+                    <DST_ACCT_TYPE type="CHAR"/>
+                    <DISTRIB_LINE_NUM type="NUMBER"/>
+                    <QTY_PO type="NUMBER"/>
+                    <CURRENCY_CD type="CHAR"/>
+                    <MERCHANDISE_AMT type="NUMBER"/>
+                    <CURRENCY_CD_BASE type="CHAR"/>
+                    <MERCH_AMT_BSE type="NUMBER"/>
+                    <LOCATION type="CHAR"/>
+                    <ACCOUNT type="CHAR"/>
+                    <ALTACCT type="CHAR"/>
+                    <DEPTID type="CHAR"/>
+                    <OPERATING_UNIT type="CHAR"/>
+                    <PRODUCT type="CHAR"/>
+                    <FUND_CODE type="CHAR"/>
+                    <CLASS_FLD type="CHAR"/>
+                    <PROGRAM_CODE type="CHAR"/>
+                    <BUDGET_REF type="CHAR"/>
+                    <AFFILIATE type="CHAR"/>
+                    <AFFILIATE_INTRA1 type="CHAR"/>
+                    <AFFILIATE_INTRA2 type="CHAR"/>
+                    <CHARTFIELD1 type="CHAR"/>
+                    <CHARTFIELD2 type="CHAR"/>
+                    <CHARTFIELD3 type="CHAR"/>
+                    <PROJECT_ID type="CHAR"/>
+                    <STATISTICS_CODE type="CHAR"/>
+                    <STATISTIC_AMOUNT type="NUMBER"/>
+                    <CHARTFIELD_STATUS type="CHAR"/>
+                    <BUSINESS_UNIT_GL type="CHAR"/>
+                    <DISTRIB_LN_STATUS type="CHAR"/>
+                    <DIST_PROCESSED_FLG type="CHAR"/>
+                    <SYSTEM_SOURCE type="CHAR"/>
+                    <BUSINESS_UNIT_REQ type="CHAR"/>
+                    <BUSINESS_UNIT_PC type="CHAR"/>
+                    <ACTIVITY_ID type="CHAR"/>
+                    <ANALYSIS_TYPE type="CHAR"/>
+                    <RESOURCE_TYPE type="CHAR"/>
+                    <RESOURCE_CATEGORY type="CHAR"/>
+                    <RESOURCE_SUB_CAT type="CHAR"/>
+                    <PROCESS_INSTANCE type="NUMBER"/>
+                    <PROCESS_MAN_CLOSE type="CHAR"/>
+                    <REQ_ID type="CHAR"/>
+                    <REQ_LINE_NBR type="NUMBER"/>
+                    <REQ_SCHED_NBR type="NUMBER"/>
+                    <REQ_DISTRIB_NBR type="NUMBER"/>
+                    <PO_POST_AMT type="NUMBER"/>
+                    <PO_POST_AMT_BSE type="NUMBER"/>
+                    <PC_DISTRIB_STATUS type="CHAR"/>
+                    <PC_DISTRIB_AMT type="NUMBER"/>
+                    <PC_DISTRIB_AMT_BSE type="NUMBER"/>
+                    <PROFILE_ID type="CHAR"/>
+                    <TAG_NUMBER type="CHAR"/>
+                    <CAP_NUM type="CHAR"/>
+                    <CAP_SEQUENCE type="NUMBER"/>
+                    <EMPLID type="CHAR"/>
+                    <BUSINESS_UNIT_AM type="CHAR"/>
+                    <BUSINESS_UNIT_IN type="CHAR"/>
+                    <PO_POST_STATUS type="CHAR"/>
+                    <CLOSE_AMOUNT type="NUMBER"/>
+                    <CLOSE_AMOUNT_BSE type="NUMBER"/>
+                    <QTY_REQ type="NUMBER"/>
+                    <DISTRIB_TYPE type="CHAR"/>
+                    <DISTRIB_PCT type="NUMBER"/>
+                    <INVOICE_CLOSE_IND type="CHAR"/>
+                    <FINANCIAL_ASSET_SW type="CHAR"/>
+                    <COST_TYPE type="CHAR"/>
+                    <TAX_CD_SUT type="CHAR"/>
+                    <TAX_CD_SUT_PCT type="NUMBER"/>
+                    <SALETX_AMT type="NUMBER"/>
+                    <SALETX_AMT_BSE type="NUMBER"/>
+                    <USETAX_AMT type="NUMBER"/>
+                    <USETAX_AMT_BSE type="NUMBER"/>
+                    <SUT_APPLICABILITY type="CHAR"/>
+                    <VAT_TXN_TYPE_CD type="CHAR"/>
+                    <VAT_APPLICABILITY type="CHAR"/>
+                    <TAX_CD_VAT type="CHAR"/>
+                    <TAX_CD_VAT_PCT type="NUMBER"/>
+                    <VAT_AMT type="NUMBER"/>
+                    <VAT_AMT_BASE type="NUMBER"/>
+                    <VAT_BASIS_AMT type="NUMBER"/>
+                    <VAT_BASIS_AMT_BSE type="NUMBER"/>
+                    <VAT_RECOVERY_PCT type="NUMBER"/>
+                    <VAT_RCVRY_AMT type="NUMBER"/>
+                    <VAT_RCVRY_AMT_BSE type="NUMBER"/>
+                    <VAT_REBATE_PCT type="NUMBER"/>
+                    <VAT_REBATE_AMT type="NUMBER"/>
+                    <VAT_REBATE_AMT_BSE type="NUMBER"/>
+                    <VAT_USE_ID type="CHAR"/>
+                    <RT_TYPE type="CHAR"/>
+                    <RATE_MULT type="NUMBER"/>
+                    <RATE_DIV type="NUMBER"/>
+                    <FREIGHT_AMT type="NUMBER"/>
+                    <FREIGHT_AMT_BSE type="NUMBER"/>
+                    <FREIGHT_AMT_NP type="NUMBER"/>
+                    <FREIGHT_AMT_NP_BSE type="NUMBER"/>
+                    <MISC_AMT type="NUMBER"/>
+                    <MISC_AMT_BSE type="NUMBER"/>
+                    <MISC_AMT_NP type="NUMBER"/>
+                    <MISC_AMT_NP_BSE type="NUMBER"/>
+                    <MONETARY_AMOUNT type="NUMBER"/>
+                    <MONETARY_AMT_BSE type="NUMBER"/>
+                    <BUDGET_DT type="DATE"/>
+                    <BUDGET_LINE_STATUS type="CHAR"/>
+                    <KK_CLOSE_FLAG type="CHAR"/>
+                    <KK_PROCESS_PRIOR type="CHAR"/>
+                    <VAT_CALC_TYPE type="CHAR"/>
+                    <SALETX_PRORATE_FLG type="CHAR"/>
+                    <USETAX_PRORATE_FLG type="CHAR"/>
+                    <VAT_NRCVR_PRO_FLG type="CHAR"/>
+                    <VAT_PRORATE_FLG type="CHAR"/>
+                    <CONSIGNED_FLAG type="CHAR"/>
+                    <VAT_RCVRY_PCT_SRC type="CHAR"/>
+                    <VAT_REBATE_PCT_SRC type="CHAR"/>
+                    <VAT_TRANS_AMT type="NUMBER"/>
+                    <VAT_TRANS_AMT_BSE type="NUMBER"/>
+                    <PUBLISHED_IBU type="CHAR"/>
+                    <VAT_APORT_CNTRL type="CHAR"/>
+                    <KK_CLOSE_PRIOR type="CHAR"/>
+                    <DOC_TOL_LN_STATUS type="CHAR"/>
+                    <ROLL_STAT_R type="CHAR"/>
+                    <USER_DIST_CHAR1 type="CHAR"/>
+                    <ENTRY_EVENT type="CHAR"/>
+                </PO_LINE_DISTRIB>
+                <PSCAMA class="R">
+                    <LANGUAGE_CD type="CHAR"/>
+                    <AUDIT_ACTN type="CHAR"/>
+                    <BASE_LANGUAGE_CD type="CHAR"/>
+                    <MSG_SEQ_FLG type="CHAR"/>
+                    <PROCESS_INSTANCE type="NUMBER"/>
+                    <PUBLISH_RULE_ID type="CHAR"/>
+                    <MSGNODENAME type="CHAR"/>
+                </PSCAMA>
+            </FieldTypes>
+            <MsgData>
+                <Transaction>
+                    <PO_HDR class="R">
+                        <BUSINESS_UNIT IsChanged="Y">1LCRA</BUSINESS_UNIT>
+                        <PO_ID IsChanged="Y">0000045657</PO_ID>
+                        <CHNG_ORD_BATCH>0</CHNG_ORD_BATCH>
+                        <PO_TYPE IsChanged="Y">GEN</PO_TYPE>
+                        <PO_STATUS IsChanged="Y">D</PO_STATUS>
+                        <HOLD_STATUS IsChanged="Y">N</HOLD_STATUS>
+                        <RECV_STATUS IsChanged="Y">N</RECV_STATUS>
+                        <DISP_ACTION IsChanged="Y">Y</DISP_ACTION>
+                        <DISP_METHOD IsChanged="Y">PRN</DISP_METHOD>
+                        <CHANGE_STATUS IsChanged="Y">U</CHANGE_STATUS>
+                        <PO_DT IsChanged="Y">2007-03-30</PO_DT>
+                        <PO_REF IsChanged="Y">PS PO Sourced from MAXIMO Requ</PO_REF>
+                        <VENDOR_SETID IsChanged="Y">1LCRA</VENDOR_SETID>
+                        <VENDOR_ID IsChanged="Y">042037902</VENDOR_ID>
+                        <VNDR_LOC IsChanged="Y">1</VNDR_LOC>
+                        <PRICE_SETID IsChanged="Y">1LCRA</PRICE_SETID>
+                        <PRICE_VENDOR IsChanged="Y">042037902</PRICE_VENDOR>
+                        <PRICE_LOC IsChanged="Y">1</PRICE_LOC>
+                        <PYMNT_TERMS_CD IsChanged="Y">30</PYMNT_TERMS_CD>
+                        <BUYER_ID IsChanged="Y">ABAIN</BUYER_ID>
+                        <ORIGIN IsChanged="Y">ONL</ORIGIN>
+                        <CHNG_ORD_SEQ>0</CHNG_ORD_SEQ>
+                        <ADDRESS_SEQ_NUM IsChanged="Y">2</ADDRESS_SEQ_NUM>
+                        <CNTCT_SEQ_NUM>0</CNTCT_SEQ_NUM>
+                        <SALES_CNTCT_SEQ_N>0</SALES_CNTCT_SEQ_N>
+                        <BILL_LOCATION IsChanged="Y">ACCTSPAY</BILL_LOCATION>
+                        <TAX_EXEMPT IsChanged="Y">Y</TAX_EXEMPT>
+                        <TAX_EXEMPT_ID IsChanged="Y">17460029154</TAX_EXEMPT_ID>
+                        <CURRENCY_CD IsChanged="Y">USD</CURRENCY_CD>
+                        <RT_TYPE IsChanged="Y">CRRNT</RT_TYPE>
+                        <MATCH_ACTION IsChanged="Y">Y</MATCH_ACTION>
+                        <MATCH_CNTRL_ID IsChanged="Y">STANDARD</MATCH_CNTRL_ID>
+                        <MATCH_STATUS_PO IsChanged="Y">T</MATCH_STATUS_PO>
+                        <MATCH_PROCESS_FLG IsChanged="Y">N</MATCH_PROCESS_FLG>
+                        <PROCESS_INSTANCE IsChanged="Y">1478770</PROCESS_INSTANCE>
+                        <APPL_JRNL_ID_ENC/>
+                        <POST_DOC IsChanged="Y">Y</POST_DOC>
+                        <DST_CNTRL_ID IsChanged="Y">STANDARD</DST_CNTRL_ID>
+                        <OPRID_ENTERED_BY IsChanged="Y">AMOSES_2T</OPRID_ENTERED_BY>
+                        <ENTERED_DT IsChanged="Y">2007-03-30</ENTERED_DT>
+                        <OPRID_APPROVED_BY IsChanged="Y">AMOSES_2T</OPRID_APPROVED_BY>
+                        <APPROVAL_DT IsChanged="Y">2007-03-30</APPROVAL_DT>
+                        <OPRID_MODIFIED_BY IsChanged="Y">AMOSES_2T</OPRID_MODIFIED_BY>
+                        <LAST_DTTM_UPDATE IsChanged="Y">2007-03-30T10:17:24.000000-0500</LAST_DTTM_UPDATE>
+                        <ACCOUNTING_DT IsChanged="Y">2007-03-30</ACCOUNTING_DT>
+                        <BUSINESS_UNIT_GL IsChanged="Y">BSSCO</BUSINESS_UNIT_GL>
+                        <IN_PROCESS_FLG IsChanged="Y">N</IN_PROCESS_FLG>
+                        <ACTIVITY_DATE IsChanged="Y">2007-03-30</ACTIVITY_DATE>
+                        <PO_POST_STATUS IsChanged="Y">N</PO_POST_STATUS>
+                        <NEXT_MOD_SEQ_NBR>0</NEXT_MOD_SEQ_NBR>
+                        <ERS_ACTION IsChanged="Y">N</ERS_ACTION>
+                        <ACCRUE_USE_TAX IsChanged="Y">N</ACCRUE_USE_TAX>
+                        <CURRENCY_CD_BASE IsChanged="Y">USD</CURRENCY_CD_BASE>
+                        <RATE_DATE IsChanged="Y">2007-03-30</RATE_DATE>
+                        <RATE_MULT IsChanged="Y">1</RATE_MULT>
+                        <RATE_DIV IsChanged="Y">1</RATE_DIV>
+                        <VAT_ENTITY/>
+                        <BUDGET_HDR_STATUS IsChanged="Y">V</BUDGET_HDR_STATUS>
+                        <KK_AMOUNT_TYPE/>
+                        <KK_TRAN_OVER_FLAG/>
+                        <KK_TRAN_OVER_OPRID/>
+                        <KK_TRAN_OVER_DTTM/>
+                        <LC_ID/>
+                        <BUDGET_HDR_STS_NP IsChanged="Y">V</BUDGET_HDR_STS_NP>
+                        <PREPAID_PO_FLG IsChanged="Y">N</PREPAID_PO_FLG>
+                        <PREPAID_AMT>0</PREPAID_AMT>
+                        <PREPAID_AUTH_STAT IsChanged="Y">N</PREPAID_AUTH_STAT>
+                        <PREPAID_STATUS_PO IsChanged="Y">N</PREPAID_STATUS_PO>
+                        <PAY_TRM_BSE_DT_OPT IsChanged="Y">I</PAY_TRM_BSE_DT_OPT>
+                        <TERMS_BASIS_DT/>
+                        <BACKORDER_STATUS IsChanged="Y">1</BACKORDER_STATUS>
+                        <DOC_TOL_HDR_STATUS IsChanged="Y">V</DOC_TOL_HDR_STATUS>
+                        <MID_ROLL_STATUS IsChanged="Y">N</MID_ROLL_STATUS>
+                        <USER_HDR_CHAR1/>
+                        <BUDGET_CHECK IsChanged="Y">N</BUDGET_CHECK>
+                        <PO_COMMENTS_FS class="R">
+                            <BUSINESS_UNIT IsChanged="Y">1LCRA</BUSINESS_UNIT>
+                            <PO_ID IsChanged="Y">0000045657</PO_ID>
+                            <OPRID IsChanged="Y">REQLOAD</OPRID>
+                            <COMMENT_ID IsChanged="Y">2007-03-30T09:19:55.000000-0500</COMMENT_ID>
+                            <RANDOM_CMMT_NBR IsChanged="Y">1</RANDOM_CMMT_NBR>
+                            <PUBLIC_FLG IsChanged="Y">Y</PUBLIC_FLG>
+                            <SOURCE_FROM/>
+                            <SOURCE_BU_SETID/>
+                            <SOURCE_ID/>
+                            <SOURCE_LINE_NBR>0</SOURCE_LINE_NBR>
+                            <STATUS IsChanged="Y">A</STATUS>
+                            <ALLOW_MODIFY IsChanged="Y">Y</ALLOW_MODIFY>
+                            <FILENAME/>
+                            <FILE_EXTENSION/>
+                            <RECV_VIEW_FLG IsChanged="Y">Y</RECV_VIEW_FLG>
+                            <VCHR_VIEW_FLG IsChanged="Y">Y</VCHR_VIEW_FLG>
+                            <COMMENT_TYPE IsChanged="Y">HDR</COMMENT_TYPE>
+                            <SHIPTO_ID/>
+                            <LINE_NBR>0</LINE_NBR>
+                            <COMMENTS_2000 IsChanged="Y">LTC #1710 - ELECTROSWITCH - STORES 02 INVENTORY</COMMENTS_2000>
+                        </PO_COMMENTS_FS>
+                        <PO_COMMENTS_FS class="R">
+                            <BUSINESS_UNIT>1LCRA</BUSINESS_UNIT>
+                            <PO_ID>0000045657</PO_ID>
+                            <OPRID IsChanged="Y">REQLOAD</OPRID>
+                            <COMMENT_ID IsChanged="Y">2007-03-30T09:19:56.000000-0500</COMMENT_ID>
+                            <RANDOM_CMMT_NBR IsChanged="Y">2</RANDOM_CMMT_NBR>
+                            <PUBLIC_FLG IsChanged="Y">Y</PUBLIC_FLG>
+                            <SOURCE_FROM/>
+                            <SOURCE_BU_SETID/>
+                            <SOURCE_ID/>
+                            <SOURCE_LINE_NBR>0</SOURCE_LINE_NBR>
+                            <STATUS IsChanged="Y">A</STATUS>
+                            <ALLOW_MODIFY IsChanged="Y">Y</ALLOW_MODIFY>
+                            <FILENAME/>
+                            <FILE_EXTENSION/>
+                            <RECV_VIEW_FLG IsChanged="Y">Y</RECV_VIEW_FLG>
+                            <VCHR_VIEW_FLG IsChanged="Y">Y</VCHR_VIEW_FLG>
+                            <COMMENT_TYPE IsChanged="Y">LIN</COMMENT_TYPE>
+                            <SHIPTO_ID/>
+                            <LINE_NBR IsChanged="Y">1</LINE_NBR>
+                            <COMMENTS_2000 IsChanged="Y">SWITCH, BREAKER CONTROL, 4-DECKS, ES 74PD204LC</COMMENTS_2000>
+                        </PO_COMMENTS_FS>
+                        <PO_DISPATCHED class="R">
+                            <BUSINESS_UNIT IsChanged="Y">1LCRA</BUSINESS_UNIT>
+                            <PO_ID IsChanged="Y">0000045657</PO_ID>
+                            <PROCESS_INSTANCE IsChanged="Y">1478790</PROCESS_INSTANCE>
+                            <EIP_CTL_ID/>
+                            <VENDOR_ID IsChanged="Y">042037902</VENDOR_ID>
+                            <VNDR_LOC IsChanged="Y">1</VNDR_LOC>
+                            <CHNG_ORD_BATCH>0</CHNG_ORD_BATCH>
+                            <DISP_METHOD IsChanged="Y">PRN</DISP_METHOD>
+                            <DATETIME_DISP IsChanged="Y">2007-04-04T08:43:48.000000-0500</DATETIME_DISP>
+                            <OPRID IsChanged="Y">AMOSES_2T</OPRID>
+                            <FAX_SERVER_DIR/>
+                            <FILENAME/>
+                            <EMAIL_SERVER_DIR/>
+                            <PATHNAME/>
+                        </PO_DISPATCHED>
+                        <PO_LINE class="R">
+                            <BUSINESS_UNIT IsChanged="Y">1LCRA</BUSINESS_UNIT>
+                            <PO_ID IsChanged="Y">0000045657</PO_ID>
+                            <LINE_NBR IsChanged="Y">1</LINE_NBR>
+                            <CANCEL_STATUS IsChanged="Y">A</CANCEL_STATUS>
+                            <CHANGE_STATUS IsChanged="Y">U</CHANGE_STATUS>
+                            <ITM_SETID IsChanged="Y">1LCRA</ITM_SETID>
+                            <INV_ITEM_ID IsChanged="Y">4606028015</INV_ITEM_ID>
+                            <ITM_ID_VNDR/>
+                            <VNDR_CATALOG_ID/>
+                            <CATEGORY_ID IsChanged="Y">12005</CATEGORY_ID>
+                            <CHNG_ORD_SEQ>0</CHNG_ORD_SEQ>
+                            <UNIT_OF_MEASURE IsChanged="Y">EA</UNIT_OF_MEASURE>
+                            <QTY_TYPE IsChanged="Y">L</QTY_TYPE>
+                            <PRICE_DT_TYPE IsChanged="Y">P</PRICE_DT_TYPE>
+                            <MFG_ID/>
+                            <MFG_ITM_ID/>
+                            <CNTRCT_SETID IsChanged="Y">1LCRA</CNTRCT_SETID>
+                            <CNTRCT_ID IsChanged="Y">0000000000000000000001710</CNTRCT_ID>
+                            <CNTRCT_LINE_NBR>0</CNTRCT_LINE_NBR>
+                            <RELEASE_NBR IsChanged="Y">80</RELEASE_NBR>
+                            <MILESTONE_NBR>0</MILESTONE_NBR>
+                            <CNTRCT_RATE_MULT IsChanged="Y">1</CNTRCT_RATE_MULT>
+                            <CNTRCT_RATE_DIV IsChanged="Y">1</CNTRCT_RATE_DIV>
+                            <RFQ_ID/>
+                            <RFQ_LINE_NBR>0</RFQ_LINE_NBR>
+                            <INSPECT_CD IsChanged="Y">N</INSPECT_CD>
+                            <ROUTING_ID/>
+                            <RECV_REQ IsChanged="Y">Y</RECV_REQ>
+                            <PRICE_CAN_CHANGE IsChanged="Y">Y</PRICE_CAN_CHANGE>
+                            <WTHD_SW IsChanged="Y">N</WTHD_SW>
+                            <WTHD_CD/>
+                            <CONFIG_CODE/>
+                            <CP_TEMPLATE_ID/>
+                            <DESCR254_MIXED IsChanged="Y">SWITCH, BREAKER CONTROL, 4-DECKS, ES 74PD204LC</DESCR254_MIXED>
+                            <PACKING_WEIGHT>0</PACKING_WEIGHT>
+                            <PACKING_VOLUME>0</PACKING_VOLUME>
+                            <UNIT_MEASURE_WT/>
+                            <UNIT_MEASURE_VOL/>
+                            <REPLEN_OPT IsChanged="Y">01</REPLEN_OPT>
+                            <AMT_ONLY_FLG IsChanged="Y">N</AMT_ONLY_FLG>
+                            <USER_LINE_CHAR1 IsChanged="Y">L</USER_LINE_CHAR1>
+                            <GPO_ID/>
+                            <GPO_CNTRCT_NBR/>
+                            <MX_ITM_CAT class="R">
+                                <CATEGORY_CD IsChanged="Y">28579</CATEGORY_CD>
+                            </MX_ITM_CAT>
+                            <PO_LINE_SHIP class="R">
+                                <BUSINESS_UNIT IsChanged="Y">1LCRA</BUSINESS_UNIT>
+                                <PO_ID IsChanged="Y">0000045657</PO_ID>
+                                <LINE_NBR IsChanged="Y">1</LINE_NBR>
+                                <SCHED_NBR IsChanged="Y">1</SCHED_NBR>
+                                <CANCEL_STATUS IsChanged="Y">A</CANCEL_STATUS>
+                                <BAL_STATUS IsChanged="Y">I</BAL_STATUS>
+                                <CHANGE_STATUS IsChanged="Y">U</CHANGE_STATUS>
+                                <CHNG_ORD_SEQ>0</CHNG_ORD_SEQ>
+                                <PRICE_PO>0</PRICE_PO>
+                                <PRICE_PO_BSE>0</PRICE_PO_BSE>
+                                <CUSTOM_PRICE IsChanged="Y">N</CUSTOM_PRICE>
+                                <ZERO_PRICE_IND IsChanged="Y">N</ZERO_PRICE_IND>
+                                <DUE_DT IsChanged="Y">2006-03-06</DUE_DT>
+                                <DUE_TIME/>
+                                <SHIPTO_SETID IsChanged="Y">1LCRA</SHIPTO_SETID>
+                                <SHIPTO_ID IsChanged="Y">02</SHIPTO_ID>
+                                <ORIG_PROM_DT IsChanged="Y">2006-03-06</ORIG_PROM_DT>
+                                <QTY_PO IsChanged="Y">20</QTY_PO>
+                                <CURRENCY_CD IsChanged="Y">USD</CURRENCY_CD>
+                                <MERCHANDISE_AMT>0</MERCHANDISE_AMT>
+                                <CURRENCY_CD_BASE IsChanged="Y">USD</CURRENCY_CD_BASE>
+                                <MERCH_AMT_BSE>0</MERCH_AMT_BSE>
+                                <FREIGHT_TERMS IsChanged="Y">DST</FREIGHT_TERMS>
+                                <SHIP_TYPE_ID IsChanged="Y">BST</SHIP_TYPE_ID>
+                                <DISTRIB_MTHD_FLG IsChanged="Y">Q</DISTRIB_MTHD_FLG>
+                                <UNIT_PRC_TOL>0</UNIT_PRC_TOL>
+                                <UNIT_PRC_TOL_BSE>0</UNIT_PRC_TOL_BSE>
+                                <PCT_UNIT_PRC_TOL>0</PCT_UNIT_PRC_TOL>
+                                <EXT_PRC_TOL>0</EXT_PRC_TOL>
+                                <EXT_PRC_TOL_BSE>0</EXT_PRC_TOL_BSE>
+                                <PCT_EXT_PRC_TOL>0</PCT_EXT_PRC_TOL>
+                                <QTY_RECV_TOL_PCT>0</QTY_RECV_TOL_PCT>
+                                <PCT_UNDER_QTY>0</PCT_UNDER_QTY>
+                                <MATCH_STATUS_LN_PO IsChanged="Y">N</MATCH_STATUS_LN_PO>
+                                <MATCH_LINE_OPT IsChanged="Y">F</MATCH_LINE_OPT>
+                                <BUSINESS_UNIT_OM/>
+                                <ORDER_NO/>
+                                <ORDER_INT_LINE_NO>0</ORDER_INT_LINE_NO>
+                                <SCHED_LINE_NBR>0</SCHED_LINE_NBR>
+                                <SHIP_TO_CUST_ID/>
+                                <BUSINESS_UNIT_IN/>
+                                <PRODUCTION_ID/>
+                                <OP_SEQUENCE>0</OP_SEQUENCE>
+                                <FROZEN_FLG IsChanged="Y">N</FROZEN_FLG>
+                                <PLAN_CHANGE_FLG IsChanged="Y">N</PLAN_CHANGE_FLG>
+                                <NET_CHANGE_EP IsChanged="Y">Y</NET_CHANGE_EP>
+                                <CARRIER_ID/>
+                                <SUT_BASE_ID IsChanged="Y">02</SUT_BASE_ID>
+                                <TAX_CD_SUT/>
+                                <ULTIMATE_USE_CD/>
+                                <SUT_EXCPTN_TYPE IsChanged="Y">N</SUT_EXCPTN_TYPE>
+                                <SUT_EXCPTN_CERTIF/>
+                                <SUT_APPLICABILITY IsChanged="Y">E</SUT_APPLICABILITY>
+                                <VAT_RCRD_INPT_FLG IsChanged="Y">Y</VAT_RCRD_INPT_FLG>
+                                <VAT_RCRD_OUTPT_FLG IsChanged="Y">N</VAT_RCRD_OUTPT_FLG>
+                                <VAT_DCLRTN_POINT IsChanged="Y">I</VAT_DCLRTN_POINT>
+                                <VAT_CALC_GROSS_NET IsChanged="Y">N</VAT_CALC_GROSS_NET>
+                                <VAT_CALC_FRGHT_FLG IsChanged="Y">N</VAT_CALC_FRGHT_FLG>
+                                <VAT_CALC_MISC_FLG IsChanged="Y">N</VAT_CALC_MISC_FLG>
+                                <VAT_RECALC_FLG IsChanged="Y">N</VAT_RECALC_FLG>
+                                <VAT_TREATMENT_PUR/>
+                                <VAT_EXCPTN_TYPE IsChanged="Y">N</VAT_EXCPTN_TYPE>
+                                <VAT_EXCPTN_CERTIF/>
+                                <COUNTRY_SHIP_TO/>
+                                <COUNTRY_SHIP_FROM/>
+                                <COUNTRY_VAT_SHIPTO/>
+                                <COUNTRY_VAT_BILLTO/>
+                                <COUNTRY_VAT_BILLFR/>
+                                <VAT_RGSTRN_SELLER/>
+                                <VAT_TXN_TYPE_CD/>
+                                <VAT_APPLICABILITY/>
+                                <TAX_CD_VAT/>
+                                <VAT_USE_ID/>
+                                <IST_TXN_FLG IsChanged="Y">N</IST_TXN_FLG>
+                                <VAT_CALC_TYPE IsChanged="Y">E</VAT_CALC_TYPE>
+                                <BUSINESS_UNIT_RTV/>
+                                <RTV_ID/>
+                                <RTV_LN_NBR>0</RTV_LN_NBR>
+                                <RTV_VERIFIED/>
+                                <SHIP_DATE/>
+                                <UNIT_PRC_TOL_L>0</UNIT_PRC_TOL_L>
+                                <PCT_UNIT_PRC_TOL_L>0</PCT_UNIT_PRC_TOL_L>
+                                <EXT_PRC_TOL_L>0</EXT_PRC_TOL_L>
+                                <PCT_EXT_PRC_TOL_L>0</PCT_EXT_PRC_TOL_L>
+                                <UNIT_PRC_TOL_BSE_L>0</UNIT_PRC_TOL_BSE_L>
+                                <EXT_PRC_TOL_BSE_L>0</EXT_PRC_TOL_BSE_L>
+                                <RJCT_OVER_TOL_FLAG IsChanged="Y">N</RJCT_OVER_TOL_FLAG>
+                                <REJECT_DAYS>0</REJECT_DAYS>
+                                <TAX_VAT_FLG IsChanged="Y">N</TAX_VAT_FLG>
+                                <TAX_FRGHT_FLG IsChanged="Y">N</TAX_FRGHT_FLG>
+                                <TAX_MISC_FLG IsChanged="Y">N</TAX_MISC_FLG>
+                                <TRFT_RULE_CD/>
+                                <QTY_RFQ>0</QTY_RFQ>
+                                <SHIP_ID_EST/>
+                                <X_VENDOR_SETID/>
+                                <X_VENDOR_ID/>
+                                <X_VNDR_LOC/>
+                                <FRT_CHRG_METHOD/>
+                                <FRT_CHRG_OVERRIDE IsChanged="Y">N</FRT_CHRG_OVERRIDE>
+                                <VAT_ROUND_RULE/>
+                                <REVISION/>
+                                <PUBLISHED_SHIPTO/>
+                                <BCKORD_ORG_SCHED>0</BCKORD_ORG_SCHED>
+                                <USER_SCHED_CHAR1/>
+                                <PO_LINE_DISTRIB class="R">
+                                    <BUSINESS_UNIT IsChanged="Y">1LCRA</BUSINESS_UNIT>
+                                    <PO_ID IsChanged="Y">0000045657</PO_ID>
+                                    <LINE_NBR IsChanged="Y">1</LINE_NBR>
+                                    <SCHED_NBR IsChanged="Y">1</SCHED_NBR>
+                                    <DST_ACCT_TYPE IsChanged="Y">DST</DST_ACCT_TYPE>
+                                    <DISTRIB_LINE_NUM IsChanged="Y">1</DISTRIB_LINE_NUM>
+                                    <QTY_PO IsChanged="Y">20</QTY_PO>
+                                    <CURRENCY_CD IsChanged="Y">USD</CURRENCY_CD>
+                                    <MERCHANDISE_AMT>0</MERCHANDISE_AMT>
+                                    <CURRENCY_CD_BASE IsChanged="Y">USD</CURRENCY_CD_BASE>
+                                    <MERCH_AMT_BSE>0</MERCH_AMT_BSE>
+                                    <LOCATION IsChanged="Y">02</LOCATION>
+                                    <ACCOUNT IsChanged="Y">154020</ACCOUNT>
+                                    <ALTACCT/>
+                                    <DEPTID IsChanged="Y">AAA</DEPTID>
+                                    <OPERATING_UNIT IsChanged="Y">10000</OPERATING_UNIT>
+                                    <PRODUCT/>
+                                    <FUND_CODE/>
+                                    <CLASS_FLD/>
+                                    <PROGRAM_CODE/>
+                                    <BUDGET_REF/>
+                                    <AFFILIATE/>
+                                    <AFFILIATE_INTRA1/>
+                                    <AFFILIATE_INTRA2/>
+                                    <CHARTFIELD1/>
+                                    <CHARTFIELD2/>
+                                    <CHARTFIELD3/>
+                                    <PROJECT_ID/>
+                                    <STATISTICS_CODE/>
+                                    <STATISTIC_AMOUNT>0</STATISTIC_AMOUNT>
+                                    <CHARTFIELD_STATUS IsChanged="Y">V</CHARTFIELD_STATUS>
+                                    <BUSINESS_UNIT_GL IsChanged="Y">TENCO</BUSINESS_UNIT_GL>
+                                    <DISTRIB_LN_STATUS IsChanged="Y">O</DISTRIB_LN_STATUS>
+                                    <DIST_PROCESSED_FLG IsChanged="Y">N</DIST_PROCESSED_FLG>
+                                    <SYSTEM_SOURCE IsChanged="Y">BPO</SYSTEM_SOURCE>
+                                    <BUSINESS_UNIT_REQ IsChanged="Y">1LCRA</BUSINESS_UNIT_REQ>
+                                    <BUSINESS_UNIT_PC/>
+                                    <ACTIVITY_ID/>
+                                    <ANALYSIS_TYPE/>
+                                    <RESOURCE_TYPE/>
+                                    <RESOURCE_CATEGORY/>
+                                    <RESOURCE_SUB_CAT/>
+                                    <PROCESS_INSTANCE IsChanged="Y">1478770</PROCESS_INSTANCE>
+                                    <PROCESS_MAN_CLOSE IsChanged="Y">N</PROCESS_MAN_CLOSE>
+                                    <REQ_ID IsChanged="Y">M000060611</REQ_ID>
+                                    <REQ_LINE_NBR IsChanged="Y">1</REQ_LINE_NBR>
+                                    <REQ_SCHED_NBR IsChanged="Y">1</REQ_SCHED_NBR>
+                                    <REQ_DISTRIB_NBR IsChanged="Y">1</REQ_DISTRIB_NBR>
+                                    <PO_POST_AMT>0</PO_POST_AMT>
+                                    <PO_POST_AMT_BSE>0</PO_POST_AMT_BSE>
+                                    <PC_DISTRIB_STATUS IsChanged="Y">N</PC_DISTRIB_STATUS>
+                                    <PC_DISTRIB_AMT>0</PC_DISTRIB_AMT>
+                                    <PC_DISTRIB_AMT_BSE>0</PC_DISTRIB_AMT_BSE>
+                                    <PROFILE_ID/>
+                                    <TAG_NUMBER/>
+                                    <CAP_NUM/>
+                                    <CAP_SEQUENCE>0</CAP_SEQUENCE>
+                                    <EMPLID IsChanged="Y">ABAIN</EMPLID>
+                                    <BUSINESS_UNIT_AM/>
+                                    <BUSINESS_UNIT_IN/>
+                                    <PO_POST_STATUS IsChanged="Y">N</PO_POST_STATUS>
+                                    <CLOSE_AMOUNT>0</CLOSE_AMOUNT>
+                                    <CLOSE_AMOUNT_BSE>0</CLOSE_AMOUNT_BSE>
+                                    <QTY_REQ IsChanged="Y">20</QTY_REQ>
+                                    <DISTRIB_TYPE/>
+                                    <DISTRIB_PCT IsChanged="Y">100</DISTRIB_PCT>
+                                    <INVOICE_CLOSE_IND IsChanged="Y">N</INVOICE_CLOSE_IND>
+                                    <FINANCIAL_ASSET_SW IsChanged="Y">N</FINANCIAL_ASSET_SW>
+                                    <COST_TYPE/>
+                                    <TAX_CD_SUT/>
+                                    <TAX_CD_SUT_PCT>0</TAX_CD_SUT_PCT>
+                                    <SALETX_AMT>0</SALETX_AMT>
+                                    <SALETX_AMT_BSE>0</SALETX_AMT_BSE>
+                                    <USETAX_AMT>0</USETAX_AMT>
+                                    <USETAX_AMT_BSE>0</USETAX_AMT_BSE>
+                                    <SUT_APPLICABILITY IsChanged="Y">E</SUT_APPLICABILITY>
+                                    <VAT_TXN_TYPE_CD/>
+                                    <VAT_APPLICABILITY/>
+                                    <TAX_CD_VAT/>
+                                    <TAX_CD_VAT_PCT>0</TAX_CD_VAT_PCT>
+                                    <VAT_AMT>0</VAT_AMT>
+                                    <VAT_AMT_BASE>0</VAT_AMT_BASE>
+                                    <VAT_BASIS_AMT>0</VAT_BASIS_AMT>
+                                    <VAT_BASIS_AMT_BSE>0</VAT_BASIS_AMT_BSE>
+                                    <VAT_RECOVERY_PCT>0</VAT_RECOVERY_PCT>
+                                    <VAT_RCVRY_AMT>0</VAT_RCVRY_AMT>
+                                    <VAT_RCVRY_AMT_BSE>0</VAT_RCVRY_AMT_BSE>
+                                    <VAT_REBATE_PCT>0</VAT_REBATE_PCT>
+                                    <VAT_REBATE_AMT>0</VAT_REBATE_AMT>
+                                    <VAT_REBATE_AMT_BSE>0</VAT_REBATE_AMT_BSE>
+                                    <VAT_USE_ID/>
+                                    <RT_TYPE IsChanged="Y">CRRNT</RT_TYPE>
+                                    <RATE_MULT IsChanged="Y">1</RATE_MULT>
+                                    <RATE_DIV IsChanged="Y">1</RATE_DIV>
+                                    <FREIGHT_AMT>0</FREIGHT_AMT>
+                                    <FREIGHT_AMT_BSE>0</FREIGHT_AMT_BSE>
+                                    <FREIGHT_AMT_NP>0</FREIGHT_AMT_NP>
+                                    <FREIGHT_AMT_NP_BSE>0</FREIGHT_AMT_NP_BSE>
+                                    <MISC_AMT>0</MISC_AMT>
+                                    <MISC_AMT_BSE>0</MISC_AMT_BSE>
+                                    <MISC_AMT_NP>0</MISC_AMT_NP>
+                                    <MISC_AMT_NP_BSE>0</MISC_AMT_NP_BSE>
+                                    <MONETARY_AMOUNT>0</MONETARY_AMOUNT>
+                                    <MONETARY_AMT_BSE>0</MONETARY_AMT_BSE>
+                                    <BUDGET_DT IsChanged="Y">2007-03-30</BUDGET_DT>
+                                    <BUDGET_LINE_STATUS IsChanged="Y">V</BUDGET_LINE_STATUS>
+                                    <KK_CLOSE_FLAG IsChanged="Y">N</KK_CLOSE_FLAG>
+                                    <KK_PROCESS_PRIOR IsChanged="Y">Y</KK_PROCESS_PRIOR>
+                                    <VAT_CALC_TYPE IsChanged="Y">E</VAT_CALC_TYPE>
+                                    <SALETX_PRORATE_FLG IsChanged="Y">N</SALETX_PRORATE_FLG>
+                                    <USETAX_PRORATE_FLG IsChanged="Y">N</USETAX_PRORATE_FLG>
+                                    <VAT_NRCVR_PRO_FLG IsChanged="Y">N</VAT_NRCVR_PRO_FLG>
+                                    <VAT_PRORATE_FLG IsChanged="Y">N</VAT_PRORATE_FLG>
+                                    <CONSIGNED_FLAG IsChanged="Y">N</CONSIGNED_FLAG>
+                                    <VAT_RCVRY_PCT_SRC IsChanged="Y">A</VAT_RCVRY_PCT_SRC>
+                                    <VAT_REBATE_PCT_SRC IsChanged="Y">A</VAT_REBATE_PCT_SRC>
+                                    <VAT_TRANS_AMT>0</VAT_TRANS_AMT>
+                                    <VAT_TRANS_AMT_BSE>0</VAT_TRANS_AMT_BSE>
+                                    <PUBLISHED_IBU/>
+                                    <VAT_APORT_CNTRL IsChanged="Y">T</VAT_APORT_CNTRL>
+                                    <KK_CLOSE_PRIOR IsChanged="Y">N</KK_CLOSE_PRIOR>
+                                    <DOC_TOL_LN_STATUS IsChanged="Y">V</DOC_TOL_LN_STATUS>
+                                    <ROLL_STAT_R IsChanged="Y">N</ROLL_STAT_R>
+                                    <USER_DIST_CHAR1/>
+                                    <ENTRY_EVENT/>
+                                </PO_LINE_DISTRIB>
+                            </PO_LINE_SHIP>
+                        </PO_LINE>
+                    </PO_HDR>
+                    <PSCAMA class="R">
+                        <LANGUAGE_CD>ENG</LANGUAGE_CD>
+                        <AUDIT_ACTN/>
+                        <BASE_LANGUAGE_CD>ENG</BASE_LANGUAGE_CD>
+                        <MSG_SEQ_FLG/>
+                        <PROCESS_INSTANCE>0</PROCESS_INSTANCE>
+                        <PUBLISH_RULE_ID/>
+                        <MSGNODENAME/>
+                    </PSCAMA>
+                </Transaction>
+            </MsgData>
+        </MX_PURCHASE_ORDER>
+    </soap:Body>
+</soap:Envelope>

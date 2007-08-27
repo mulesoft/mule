@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="Mule_Http_Properties_Propagation" version="1.0">
+
+
+<mule-environment-properties synchronous="true"/>
+
+    <transformers>
+        <transformer name="Xslt" className="org.mule.transformers.xml.XsltTransformer">
+            <properties>
+                <property name="xslFile" value="stylesheet.xsl"/>
+            </properties>
+        </transformer>
+    </transformers >
+    
+    <model name="PSMaxIntegration">
+
+        <mule-descriptor name="PSMaxMsg1" implementation="org.mule.components.simple.BridgeComponent" >
+            <inbound-router>
+                <endpoint name="httpEndpoint" address="http://localhost:8085" transformers="Xslt">
+                    <properties>
+                        <property name="Content-Type" value="text/xml"/>
+                    </properties>
+                </endpoint>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="http://localhost:8087"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+        
+        <mule-descriptor name="PSMaxMsg2" implementation="org.mule.components.simple.BridgeComponent" >
+            <inbound-router>
+                <endpoint address="http://localhost:8087"/>
+            </inbound-router>
+        </mule-descriptor>
+        
+    </model>
+</mule-configuration>
+

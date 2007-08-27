@@ -186,7 +186,6 @@ public class XsltTransformer extends AbstractXmlTransformer
      * Returns the StreamSource corresponding to xslFile
      * 
      * @return The StreamSource
-     * @throws InitialisationException
      */
     protected StreamSource getStreamSource() throws InitialisationException
     {

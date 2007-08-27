@@ -154,7 +154,7 @@ public class HttpConnector extends TcpConnector
 
     /**
      * The method determines the key used to store the receiver against.
-     * 
+     *
      * @param component the component for which the endpoint is being registered
      * @param endpoint the endpoint being registered for the component
      * @return the key to store the newly created receiver against
@@ -282,5 +282,4 @@ public class HttpConnector extends TcpConnector
     {
         this.clientConnectionManager = clientConnectionManager;
     }
-    
 }
