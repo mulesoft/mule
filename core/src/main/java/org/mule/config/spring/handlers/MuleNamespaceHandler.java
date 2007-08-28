@@ -170,7 +170,8 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("transformer-string-to-byte-array", new OrphanDefinitionParser(StringToByteArray.class, false));
 
         //Transaction Managers
-        //TODO RM*: Need to review these, since Spring have some facilities for configuring the transactionMaanger
+        //TODO RM*: Need to review these, since Spring have some facilities for configuring the transactionManager
+        registerBeanDefinitionParser("custom-transaction-manager", new OrphanDefinitionParser(true));
         registerBeanDefinitionParser("transaction-manager-jndi", new OrphanDefinitionParser(GenericTransactionManagerLookupFactory.class, true));
         registerBeanDefinitionParser("transaction-manager-weblogic", new OrphanDefinitionParser(WeblogicTransactionManagerLookupFactory.class, true));
         registerBeanDefinitionParser("transaction-manager-jboss", new OrphanDefinitionParser(JBossTransactionManagerLookupFactory.class, true));
@@ -275,6 +276,7 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("properties", new ChildMapDefinitionParser("properties"));
         registerBeanDefinitionParser("meta-info", new ChildMapDefinitionParser("properties"));
         registerBeanDefinitionParser("jndi-provider-properties", new ChildMapDefinitionParser("jndiProviderProperties"));
+        registerBeanDefinitionParser("environment", new ChildMapDefinitionParser("environment"));
 
         //Security
         registerBeanDefinitionParser("security-manager", new NamedDefinitionParser(MuleProperties.OBJECT_SECURITY_MANAGER).addIgnored("type"));

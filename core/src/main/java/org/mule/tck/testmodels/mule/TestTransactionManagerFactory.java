@@ -10,7 +10,7 @@
 
 package org.mule.tck.testmodels.mule;
 
-import org.mule.umo.manager.UMOTransactionManagerFactory;
+import org.mule.transaction.lookup.GenericTransactionManagerLookupFactory;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -21,20 +21,31 @@ import javax.transaction.TransactionManager;
 /**
  * <code>TestTransactionManagerFactory</code> TODO
  */
-
-public class TestTransactionManagerFactory implements UMOTransactionManagerFactory
+public class TestTransactionManagerFactory extends GenericTransactionManagerLookupFactory
 {
     public TransactionManager create() throws Exception
     {
         return (TransactionManager) Proxy.newProxyInstance(getClass().getClassLoader(),
                                                            new Class[] {TransactionManager.class},
-                                                           new InvocationHandler()
-        {
-            public Object invoke (Object proxy, Method method, Object[] args) throws Throwable
-            {
-                return null;
-            }
+                                                           new InternalInvocationHandler());
+    }
 
-        });
+    public void initialise()
+    {
+
+    }
+
+    public class InternalInvocationHandler implements InvocationHandler
+    {
+        public TestTransactionManagerFactory getParent()
+        {
+            return TestTransactionManagerFactory.this;
+        }
+
+        public Object invoke (Object proxy, Method method, Object[] args) throws Throwable
+        {
+            return null;
+        }
+
     }
 }

@@ -261,8 +261,32 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:complexType name="jndiTransactionManagerType">
+            <xsd:complexContent>
+                <xsd:extension base="abstractTransactionManagerType"> 
+                    <xsd:sequence>
+                        <xsd:element name="environment" type="mapType" minOccurs="0" maxOccurs="1">
+                            <xsd:annotation>
+                                <xsd:documentation>Properties to be set on the created object</xsd:documentation>
+                            </xsd:annotation>
+                        </xsd:element>
+                    </xsd:sequence>
+                </xsd:extension>
+            </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="customTransactionManagerType">
+        <xsd:complexContent>
+            <xsd:extension base="jndiTransactionManagerType">
+                <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+
+    <xsd:element name="custom-transaction-manager" type="customTransactionManagerType" substitutionGroup="abstract-transaction-manager"/>
     <xsd:element name="transaction-manager-jndi" type="transactionManagerType" substitutionGroup="abstract-transaction-manager"/>
-    <xsd:element name="transaction-manager-weblogic" type="transactionManagerType" substitutionGroup="abstract-transaction-manager"/>
+    <xsd:element name="transaction-manager-weblogic" type="jndiTransactionManagerType" substitutionGroup="abstract-transaction-manager"/>
     <xsd:element name="transaction-manager-websphere" type="transactionManagerType" substitutionGroup="abstract-transaction-manager"/>
     <xsd:element name="transaction-manager-jrun" type="transactionManagerType" substitutionGroup="abstract-transaction-manager"/>
     <xsd:element name="transaction-manager-jboss" type="transactionManagerType" substitutionGroup="abstract-transaction-manager"/>
