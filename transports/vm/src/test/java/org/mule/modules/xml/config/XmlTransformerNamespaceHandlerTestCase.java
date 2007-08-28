@@ -3,7 +3,7 @@
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
- * The software in this package is published under the terms of the MuleSource MPL
+ * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
@@ -12,16 +12,14 @@ package org.mule.modules.xml.config;
 
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transformers.AbstractTransformer;
+import org.mule.transformers.xml.AbstractXmlTransformer;
 import org.mule.transformers.xml.DomDocumentToXml;
 import org.mule.transformers.xml.JXPathExtractor;
 import org.mule.transformers.xml.ObjectToXml;
 import org.mule.transformers.xml.XmlToDomDocument;
 import org.mule.transformers.xml.XmlToObject;
 import org.mule.transformers.xml.XsltTransformer;
-import org.mule.transformers.xml.AbstractXmlTransformer;
 import org.mule.umo.transformer.UMOTransformer;
-
-import javax.xml.transform.TransformerFactory;
 
 public class XmlTransformerNamespaceHandlerTestCase extends FunctionalTestCase
 {

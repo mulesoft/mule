@@ -3,46 +3,13 @@
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
- * The software in this package is published under the terms of the MuleSource MPL
+ * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.config.builders;
 
-import org.mule.impl.DefaultComponentExceptionStrategy;
-import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.impl.model.seda.SedaModel;
-import org.mule.management.agents.JmxAgent;
-import org.mule.management.agents.RmiRegistryAgent;
-import org.mule.providers.SimpleRetryConnectionStrategy;
-import org.mule.routing.ForwardingCatchAllStrategy;
-import org.mule.routing.filters.PayloadTypeFilter;
-import org.mule.routing.filters.xml.JXPathFilter;
-import org.mule.routing.inbound.InboundRouterCollection;
-import org.mule.routing.nested.NestedRouter;
-import org.mule.routing.nested.NestedRouterCollection;
-import org.mule.routing.response.ResponseRouterCollection;
-import org.mule.tck.testmodels.fruit.FruitCleaner;
-import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.tck.testmodels.mule.TestCompressionTransformer;
-import org.mule.tck.testmodels.mule.TestConnector;
-import org.mule.tck.testmodels.mule.TestDefaultLifecycleAdapterFactory;
-import org.mule.tck.testmodels.mule.TestEntryPointResolver;
-import org.mule.tck.testmodels.mule.TestExceptionStrategy;
-import org.mule.tck.testmodels.mule.TestResponseAggregator;
-import org.mule.tck.testmodels.mule.TestTransactionManagerFactory;
-import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOManagementContext;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.model.UMOModel;
-import org.mule.umo.routing.UMOInboundRouterCollection;
-import org.mule.umo.routing.UMONestedRouterCollection;
-import org.mule.umo.routing.UMOResponseRouterCollection;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class ScriptSource
 {
