@@ -16,6 +16,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
+import org.springframework.beans.factory.config.MapFactoryBean;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
@@ -75,8 +76,17 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
             // Only iterate and parse child mule name-spaced elements. Spring does not do
             // hierarchical parsing by default so we need to maintain this behavior
             // for non-mule elements to ensure that we don't break the parsing of any
-            // other custom name-spaces e.g spring-jee
-            if (isMuleNamespace(element))
+            // other custom name-spaces e.g spring-jee.
+
+            // We also avoid parsing inside elements that have constructed a MapFactoryBean
+            // because that means we're dealing with (something like) ChildmapDefinitionParser,
+            // which handles iteration internally (this is a hack needed because Spring doesn't
+            // expose the DP for "<spring:entry>" elements directly).
+
+            boolean isMapFactory = null != child && null != child.getBeanClassName()
+                    && child.getBeanClassName().equals(MapFactoryBean.class.getName());
+
+            if (isMuleNamespace(element) && ! isMapFactory)
             {
                 NodeList list = element.getChildNodes();
                 for (int i = 0; i < list.getLength() ; i++)
@@ -98,32 +108,38 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
         {
             return false;
         }
-        
+
+        // these are only called if they are at a "top level" - if they are nested inside
+        // other spring elements then spring will handle them itself
+
         if (isLocalName(element, PROPERTY_ELEMENT))
         {
             parsePropertyElement(element, bd);
         }
         else if (isLocalName(element, MAP_ELEMENT))
         {
+            // currently unused?
             parseMapElement(element, bd);
         }
         else if (isLocalName(element, LIST_ELEMENT))
         {
+            // currently unused?
             parseListElement(element, bd);
         }
         else if (isLocalName(element, SET_ELEMENT))
         {
+            // currently unused?
             parseSetElement(element, bd);
         }
         else if (isLocalName(element, BEAN_ELEMENT))
         {
             registerBeanDefinitionHolder(parseBeanDefinitionElement(element, bd));
         }
-        else if (logger.isWarnEnabled())
+        else
         {
-            // perhaps should we fail here
-            logger.warn("Unexpected Spring element: " + elementToString(element));
+            throw new IllegalStateException("Unexpected Spring element: " + elementToString(element));
         }
+        
         return true;
     }
 

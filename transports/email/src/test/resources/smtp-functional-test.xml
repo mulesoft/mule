@@ -20,12 +20,6 @@
             <outbound-router>
                 <outbound-pass-through-router>
                     <endpoint address="smtp://localhost:65437">
-                        <!-- this doesn't work -->
-                        <!-- property name="properties">
-                            <spring:map>
-                                <spring:entry key="toAddresses" value="bob@example.com"/>
-                            </spring:map>
-                        </property -->
                         <properties>
                             <spring:entry key="toAddresses" value="bob@example.com"/>
                         </properties>

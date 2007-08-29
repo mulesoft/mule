@@ -17,7 +17,7 @@ import java.util.StringTokenizer;
 import javax.xml.namespace.QName;
 
 /**
- * TODO
+ * This handles qname{....} syntax as used in stockquote-soap-config.xml
  */
 public class QNamePropertyEditor extends PropertyEditorSupport
 {

@@ -16,8 +16,10 @@ import org.mule.umo.provider.UMOConnector;
 import java.beans.PropertyEditorSupport;
 
 /**
- * Translates a connecotr name property into the corresponding {@link org.mule.umo.provider.UMOConnector}
+ * Translates a connector name property into the corresponding {@link org.mule.umo.provider.UMOConnector}
  * instance.
+ *
+ * TODO - Why isn't this simply a reference?
  */
 public class ConnectorPropertyEditor extends PropertyEditorSupport
 {
