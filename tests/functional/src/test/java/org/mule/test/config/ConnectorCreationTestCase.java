@@ -10,51 +10,60 @@
 
 package org.mule.test.config;
 
-import org.mule.components.simple.EchoComponent;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.MuleServer;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOException;
+import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.routing.UMOOutboundRouter;
 
-// TODO MULE-2206 Reimplement this test using a config file instead of the QuickConfigurationBuilder
-public class ConnectorCreationTestCase extends AbstractMuleTestCase
+import org.springframework.beans.factory.BeanCreationException;
+
+public class ConnectorCreationTestCase extends FunctionalTestCase
 {
 
-//    public void testAlwaysCreateUsingParamString() throws Exception
-//    {
-//        QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
-//        builder.registerEndpoint("test://inbound?createConnector=ALWAYS", "in", true);
-//        builder.registerEndpoint("test://outbound?createConnector=ALWAYS", "out", false);
-//        builder.registerComponent(EchoComponent.class.getName(), "echo", "in", "out", null);
-//        UMOComponent c = builder.getModel().getComponent("echo");
-//        assertTrue(!c.getDescriptor().getInboundRouter().getEndpoint("in").getConnector().equals(
-//            ((UMOOutboundRouter)c.getDescriptor().getOutboundRouter().getRouters().get(0)).getEndpoint("out").getConnector()));
-//    }
-//
-//    public void testCreateOnce() throws Exception
-//    {
-//        QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
-//        builder.registerEndpoint("test://inbound", "in", true);
-//        builder.registerEndpoint("test://outbound", "out", false);
-//        builder.registerComponent(EchoComponent.class.getName(), "echo", "in", "out", null);
-//        UMOComponent c = builder.getModel().getComponent("echo");
-//
-//        assertEquals(c.getDescriptor().getInboundRouter().getEndpoint("in").getConnector(),
-//            ((UMOOutboundRouter)c.getDescriptor().getOutboundRouter().getRouters().get(0)).getEndpoint("out").getConnector());
-//    }
-//
-//    public void testCreateNeverUsingParamString() throws Exception
-//    {
-//        QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
-//        try
-//        {
-//            builder.registerEndpoint("test://inbound?createConnector=NEVER", "in", true);
-//            fail("Should fail as there is no existing test connector");
-//        }
-//        catch (UMOException e)
-//        {
-//            // expected
-//        }
-//    }
+    public ConnectorCreationTestCase()
+    {
+        setStartContext(false);
+    }
+    
+    public void testAlwaysCreateUsingParamString() throws Exception
+    {
+        disposeManager();
+        managementContext = getBuilder().configure("/org/mule/test/config/connector-creation-using-param.xml");
+        MuleServer.setManagementContext(managementContext);
+        managementContext.start();
+        UMOComponent c = managementContext.getRegistry().lookupModel("main").getComponent("echo");
+        UMOConnector con1 = c.getDescriptor().getInboundRouter().getEndpoint("in").getConnector();
+        UMOConnector con2 = ((UMOOutboundRouter)c.getDescriptor().getOutboundRouter().getRouters().get(0)).getEndpoint("out").getConnector();
+        assertTrue(!con1.equals(con2));
+        managementContext.stop();
+    }
+
+    public void testCreateOnce() throws Exception
+    {
+        disposeManager();
+        managementContext = getBuilder().configure("/org/mule/test/config/connector-create-once.xml");
+        MuleServer.setManagementContext(managementContext);
+        managementContext.start();
+        UMOComponent c = managementContext.getRegistry().lookupModel("main").getComponent("echo");
+
+        assertEquals(c.getDescriptor().getInboundRouter().getEndpoint("in").getConnector(),
+            ((UMOOutboundRouter)c.getDescriptor().getOutboundRouter().getRouters().get(0)).getEndpoint("out").getConnector());
+        managementContext.stop();
+    }
+
+    public void testCreateNeverUsingParamString() throws Exception
+    {
+        disposeManager();
+        try
+        {
+            managementContext = getBuilder().configure("/org/mule/test/config/connector-create-never.xml");
+            fail("Should fail as there is no existing test connector");
+        }
+        catch (BeanCreationException e)
+        {
+            // expected
+        }
+    }
 
 }
