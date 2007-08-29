@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
        xmlns:stdio="http://www.mulesource.org/schema/mule/stdio/2.0"
        xsi:schemaLocation="
@@ -21,14 +21,14 @@
         Xslt transformer and then using the XmlToObject transformer.
     </description>
 
-    <bean id="propertyPlaceholderConfigurer"
+    <spring:bean id="propertyPlaceholderConfigurer"
           class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="locations">
-            <list>
-                <value>proxy.properties</value>
-            </list>
-        </property>
-    </bean>
+        <spring:property name="locations">
+            <spring:list>
+                <spring:value>proxy.properties</spring:value>
+            </spring:list>
+        </spring:property>
+    </spring:bean>
 
     <stdio:connector name="SystemStreamConnector"
                      promptMessageCode="2"
@@ -42,62 +42,62 @@
                     proxyPort="${proxyPort}"
                     proxyUsername="${proxyUsername}"/>
 
-    <mule:custom-transformer name="XmlToObject" class="org.mule.transformers.xml.XmlToObject"/>
-    <mule:transformer-xml-entity-decoder name="XmlDecoder"/>
-    <mule:custom-transformer name="Xslt" class="org.mule.transformers.xml.XsltTransformer">
-        <mule:property name="xslFile" value="xsl/soap-stock.xsl"/>
-    </mule:custom-transformer>
+    <custom-transformer name="XmlToObject" class="org.mule.transformers.xml.XmlToObject"/>
+    <transformer-xml-entity-decoder name="XmlDecoder"/>
+    <custom-transformer name="Xslt" class="org.mule.transformers.xml.XsltTransformer">
+        <spring:property name="xslFile" value="xsl/soap-stock.xsl"/>
+    </custom-transformer>
 
     <!--
         The Mule model initialises and manages your UMO components
     -->
-    <mule:model name="Sample-SOAP">
-        <mule:service name="Console I/O">
-            <mule:component class="org.mule.components.simple.BridgeComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="stdio://System.in"/>
-            </mule:inbound-router>
-            <mule:outbound-router>
+    <model name="Sample-SOAP">
+        <service name="Console I/O">
+            <component class="org.mule.components.simple.BridgeComponent"/>
+            <inbound-router>
+                <endpoint address="stdio://System.in"/>
+            </inbound-router>
+            <outbound-router>
                 <!--
                     We use a chaining router to send the results of one endpoint execution as the
                     input for the next endpoint. In this case it writes it out to System.out
                 -->
-                <mule:chaining-router>
-                    <mule:endpoint address="vm://stockquote"/>
-                    <mule:endpoint address="stdio://System.out"/>
-                </mule:chaining-router>
-            </mule:outbound-router>
-        </mule:service>
+                <chaining-router>
+                    <endpoint address="vm://stockquote"/>
+                    <endpoint address="stdio://System.out"/>
+                </chaining-router>
+            </outbound-router>
+        </service>
 
         <!--
             This component can proxy external web service calls over Jms, tcp, ssl or any other transport.
             For this example we use Vm.
         -->
-        <mule:service name="serviceProxy">
-            <mule:component class="org.mule.components.simple.BridgeComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="vm://stockquote"/>
-            </mule:inbound-router>
-            <mule:outbound-router>
-                <mule:outbound-pass-through-router>
-                    <mule:endpoint address="axis:http://www.webservicex.net/stockquote.asmx?method=GetQuote"
+        <service name="serviceProxy">
+            <component class="org.mule.components.simple.BridgeComponent"/>
+            <inbound-router>
+                <endpoint address="vm://stockquote"/>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <endpoint address="axis:http://www.webservicex.net/stockquote.asmx?method=GetQuote"
                         responseTransformers="XmlDecoder Xslt XmlToObject">
-                        <mule:properties>
-                            <entry key="soapAction" value="[methodNamespace][method]"/>
-                            <entry key="soapMethods">
-                                <map>
-                                    <entry key="qname{GetQuote:http://www.webserviceX.NET/}">
-                                        <list>
-                                            <value>symbol;string;in</value>
-                                            <value>GetQuoteResult;string;out</value>
-                                        </list>
-                                    </entry>
-                                </map>
-                            </entry>
-                        </mule:properties>
-                    </mule:endpoint>
-                </mule:outbound-pass-through-router>
-            </mule:outbound-router>
-        </mule:service>
-    </mule:model>
-</beans>
+                        <properties>
+                            <spring:entry key="soapAction" value="[methodNamespace][method]"/>
+                            <spring:entry key="soapMethods">
+                                <spring:map>
+                                    <spring:entry key="qname{GetQuote:http://www.webserviceX.NET/}">
+                                        <spring:list>
+                                            <spring:value>symbol;string;in</spring:value>
+                                            <spring:value>GetQuoteResult;string;out</spring:value>
+                                        </spring:list>
+                                    </spring:entry>
+                                </spring:map>
+                            </spring:entry>
+                        </properties>
+                    </endpoint>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
+    </model>
+</mule>

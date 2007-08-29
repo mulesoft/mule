@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
@@ -16,14 +16,14 @@
         using the XmlToObject transformer.
     </description>
 
-    <bean id="propertyPlaceholderConfigurer"
+    <spring:bean id="propertyPlaceholderConfigurer"
           class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="locations">
-            <list>
-                <value>proxy.properties</value>
-            </list>
-        </property>
-    </bean>
+        <spring:property name="locations">
+            <spring:list>
+                <spring:value>proxy.properties</spring:value>
+            </spring:list>
+        </spring:property>
+    </spring:bean>
 
     <http:connector name="HttpConnector"
                     proxyHostname="${proxyHostname}"
@@ -31,34 +31,34 @@
                     proxyPort="${proxyPort}"
                     proxyUsername="${proxyUsername}"/>
 
-    <mule:custom-transformer name="XmlToObject" class="org.mule.transformers.xml.XmlToObject"/>
-    <mule:transformer-xml-entity-decoder name="XmlDecoder"/>
-    <mule:custom-transformer name="Xslt" class="org.mule.transformers.xml.XsltTransformer">
-        <mule:property name="xslFile" value="xsl/rest-stock.xsl"/>
-    </mule:custom-transformer>
+    <custom-transformer name="XmlToObject" class="org.mule.transformers.xml.XmlToObject"/>
+    <transformer-xml-entity-decoder name="XmlDecoder"/>
+    <custom-transformer name="Xslt" class="org.mule.transformers.xml.XsltTransformer">
+        <spring:property name="xslFile" value="xsl/rest-stock.xsl"/>
+    </custom-transformer>
 
-    <mule:model name="Sample-Rest">
-        <mule:service name="HTTPPostSample">
-            <mule:component class="org.mule.components.rest.RestServiceWrapper">
-                <mule:properties>
-                    <entry key="serviceUrl" value="http://www.webservicex.net/stockquote.asmx/GetQuote"/>
-                    <entry key="payloadParameterNames">
-                        <bean class="org.springframework.beans.factory.config.ListFactoryBean">
-                            <property name="sourceList">
-                                <list>
-                                    <value>symbol</value>
-                                </list>
-                            </property>
-                        </bean>
-                    </entry>
-                    <entry key="httpMethod" value="POST"/>
-                </mule:properties>
-            </mule:component>
+    <model name="Sample-Rest">
+        <service name="HTTPPostSample">
+            <component class="org.mule.components.rest.RestServiceWrapper">
+                <properties>
+                    <spring:entry key="serviceUrl" value="http://www.webservicex.net/stockquote.asmx/GetQuote"/>
+                    <spring:entry key="payloadParameterNames">
+                        <spring:bean class="org.springframework.beans.factory.config.ListFactoryBean">
+                            <spring:property name="sourceList">
+                                <spring:list>
+                                    <spring:value>symbol</spring:value>
+                                </spring:list>
+                            </spring:property>
+                        </spring:bean>
+                    </spring:entry>
+                    <spring:entry key="httpMethod" value="POST"/>
+                </properties>
+            </component>
 
-            <mule:inbound-router>
-                <mule:endpoint address="vm://stockquote"
+            <inbound-router>
+                <endpoint address="vm://stockquote"
                                responseTransformers="XmlDecoder Xslt XmlToObject"/>
-            </mule:inbound-router>
-        </mule:service>
-    </mule:model>
-</beans>
+            </inbound-router>
+        </service>
+    </model>
+</mule>

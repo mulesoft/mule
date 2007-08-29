@@ -1,30 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
                http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
     <!-- Test custom conntector parsing -->
-    <mule:custom-connector name="customConnector" class="org.mule.tck.testmodels.mule.TestConnector">
-        <mule:property name="someProperty" value="foo"/>
+    <custom-connector name="customConnector" class="org.mule.tck.testmodels.mule.TestConnector">
+        <spring:property name="someProperty" value="foo"/>
 
-        <mule:custom-exception-strategy class="org.mule.tck.testmodels.mule.TestExceptionStrategy">
-            <mule:property name="testProperty" value="bar"/>
-        </mule:custom-exception-strategy>
-    </mule:custom-connector>
+        <custom-exception-strategy class="org.mule.tck.testmodels.mule.TestExceptionStrategy">
+            <spring:property name="testProperty" value="bar"/>
+        </custom-exception-strategy>
+    </custom-connector>
 
-    <mule:custom-transformer name="testTransformer" class="org.mule.tck.testmodels.mule.TestCompressionTransformer">
-        <mule:property name="beanProperty1" value="soo"/>
-        <mule:property name="beanProperty2" value="12345"/>
-    </mule:custom-transformer>
+    <custom-transformer name="testTransformer" class="org.mule.tck.testmodels.mule.TestCompressionTransformer">
+        <spring:property name="beanProperty1" value="soo"/>
+        <spring:property name="beanProperty2" value="12345"/>
+    </custom-transformer>
 
     <!-- Test custom filter parsing -->
-    <mule:endpoint address="test://foo" name="fooEndpoint">
-        <mule:custom-filter class="org.mule.test.integration.config.TestFilter">
-           <mule:property name="foo" value="goo"/>
-           <mule:property name="bar" value="12"/>
-        </mule:custom-filter>
-    </mule:endpoint>
-</beans>
+    <endpoint address="test://foo" name="fooEndpoint">
+        <custom-filter class="org.mule.test.integration.config.TestFilter">
+           <spring:property name="foo" value="goo"/>
+           <spring:property name="bar" value="12"/>
+        </custom-filter>
+    </endpoint>
+</mule>

@@ -39,7 +39,7 @@ public class EndpointDefinitionParser extends AbstractChildDefinitionParser
     }
 
     /**
-     * If the endpoint element is decared in the root beens element, this will
+     * If the endpoint element is decared in the root mule element, this will
      * return null since there is no property to be set on a parent bean. In this case the
      * endpoint is a global endpoint and can be referenced by other components
      * @param e the current Endpoint element
@@ -48,7 +48,7 @@ public class EndpointDefinitionParser extends AbstractChildDefinitionParser
     public String getPropertyName(Element e)
     {
         Element parent = (Element) e.getParentNode();
-        if (parent.getNodeName().equals("beans"))
+        if (parent.getLocalName().equals(ROOT_ELEMENT))
         {
             return null;
         }
@@ -60,7 +60,7 @@ public class EndpointDefinitionParser extends AbstractChildDefinitionParser
     {
         //Check to see if this is a global endpoint
         Element parent = (Element) element.getParentNode();
-        if (parent.getNodeName().equals("beans"))
+        if (parent.getLocalName().equals(ROOT_ELEMENT))
         {
             builder.addPropertyValue("type", UMOImmutableEndpoint.ENDPOINT_TYPE_GLOBAL);
             // if global, cannot be a reference (afaik)

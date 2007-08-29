@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:tcp="http://www.mulesource.org/schema/mule/tcp/2.0"
        xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
@@ -15,15 +15,15 @@
 
     <tcp:connector name="closeConnectorLength" tcpProtocolClassName="org.mule.providers.tcp.protocols.LengthProtocol"/>
 
-    <mule:endpoint address="tcp://localhost:60198?connector=openConnector" name="clientEndpoint" synchronous="true"/>
+    <endpoint address="tcp://localhost:60198?connector=openConnector" name="clientEndpoint" synchronous="true"/>
 
-    <mule:model name="main">
-        <mule:service name="testComponent">
-            <mule:component class="org.mule.tck.functional.FunctionalTestComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint ref="clientEndpoint"/>
-            </mule:inbound-router>
-        </mule:service>
-    </mule:model>
+    <model name="main">
+        <service name="testComponent">
+            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
+            <inbound-router>
+                <endpoint ref="clientEndpoint"/>
+            </inbound-router>
+        </service>
+    </model>
 
-</beans>
+</mule>

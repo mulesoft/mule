@@ -1,34 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:axis="http://www.mulesource.org/schema/mule/axis/2.0"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/axis/2.0/mule-axis.xsd">
     
-    <mule:configuration serverId="" defaultSynchronousEndpoints="true"/>
+    <configuration serverId="" defaultSynchronousEndpoints="true"/>
     
-    <mule:model name="WebService_Test">
-        <mule:service name="ServiceEntryPoint">
-            <mule:component class="org.mule.providers.soap.axis.style.DefaultMessageService"/>
-            <mule:inbound-router>
-                <mule:endpoint address="axis:http://localhost:8088">
-                    <mule:properties>
-                        <entry key="style" value="Message"/>
-                        <entry key="serviceNamespace" value=""/>
-                        <entry key="axisOptions">
-                            <map>
-                                <entry key="wsdlServiceElement" value="testService"/>
-                            </map>
-                        </entry>
-                    </mule:properties>
-                </mule:endpoint>
-            </mule:inbound-router>
-        </mule:service>        
-    </mule:model>
-</beans>
+    <model name="WebService_Test">
+        <service name="ServiceEntryPoint">
+            <component class="org.mule.providers.soap.axis.style.DefaultMessageService"/>
+            <inbound-router>
+                <endpoint address="axis:http://localhost:8088">
+                    <properties>
+                        <spring:entry key="style" value="Message"/>
+                        <spring:entry key="serviceNamespace" value=""/>
+                        <spring:entry key="axisOptions">
+                            <spring:map>
+                                <spring:entry key="wsdlServiceElement" value="testService"/>
+                            </spring:map>
+                        </spring:entry>
+                    </properties>
+                </endpoint>
+            </inbound-router>
+        </service>        
+    </model>
+</mule>
 <!-- 
 <!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
                                 "http://mule.mulesource.org/dtds/mule-configuration.dtd">
@@ -41,11 +41,11 @@
             implementation="org.mule.providers.soap.axis.style.DefaultMessageService"
             inboundEndpoint="axis:http://localhost:8088">
             <properties>
-                <property name="style" value="Message" />
-                <property name="serviceNamespace" value=""/>
+                <spring:property name="style" value="Message" />
+                <spring:property name="serviceNamespace" value=""/>
                 <map name="axisOptions">
-                    <property name="wsdlServiceElement" value="testService"/>
-                </map>
+                    <spring:property name="wsdlServiceElement" value="testService"/>
+                </spring:map>
                </properties>
         </mule-descriptor>
     </model>

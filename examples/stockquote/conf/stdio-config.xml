@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:stdio="http://www.mulesource.org/schema/mule/stdio/2.0"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
@@ -13,22 +13,22 @@
                      resourceBundle="messages.stockquote-example-messages"
                      messageDelayTime="1000"/>
 
-    <mule:model name="Sample">
-        <mule:service name="Console I/O">
-            <mule:component class="org.mule.components.simple.BridgeComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="stdio://System.in"/>
-            </mule:inbound-router>
-            <mule:outbound-router>
+    <model name="Sample">
+        <service name="Console I/O">
+            <component class="org.mule.components.simple.BridgeComponent"/>
+            <inbound-router>
+                <endpoint address="stdio://System.in"/>
+            </inbound-router>
+            <outbound-router>
                 <!--
                     We use a chaining router to send the results of one endpoint execution as the
                     input for the next endpoint. In this case it writes it out to System.out
                 -->
-                <mule:chaining-router>
-                    <mule:endpoint address="vm://stockquote"/>
-                    <mule:endpoint address="stdio://System.out" transformers="XmlDecoder Xslt XmlToObject"/>
-                </mule:chaining-router>
-            </mule:outbound-router>
-        </mule:service>
-    </mule:model>
-</beans>
+                <chaining-router>
+                    <endpoint address="vm://stockquote"/>
+                    <endpoint address="stdio://System.out" transformers="XmlDecoder Xslt XmlToObject"/>
+                </chaining-router>
+            </outbound-router>
+        </service>
+    </model>
+</mule>

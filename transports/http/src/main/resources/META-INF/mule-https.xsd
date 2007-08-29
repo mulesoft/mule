@@ -15,8 +15,7 @@
     <xsd:import namespace="http://www.mulesource.org/schema/mule/http/2.0"
                 schemaLocation="http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd"/>
 
-    <xsd:element name="connector" type="httpsConnectorType"/>
-
+    <xsd:element name="connector" type="httpsConnectorType" substitutionGroup="mule:abstract-connector"/>
     <xsd:complexType name="httpsConnectorType">
         <xsd:complexContent>
             <xsd:extension base="http:httpConnectorType">

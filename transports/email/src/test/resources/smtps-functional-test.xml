@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:smtps="http://www.mulesource.org/schema/mule/smtps/2.0"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
@@ -17,24 +17,24 @@
                 trustStorePassword="password"/>
     </smtps:connector>
 
-    <mule:model name="test">
+    <model name="test">
 
-        <mule:service name="relay">
-            <mule:component class="org.mule.components.simple.BridgeComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="vm://send"/>
-            </mule:inbound-router>
-            <mule:outbound-router>
-                <mule:outbound-pass-through-router>
-                    <mule:endpoint address="smtps://localhost:65439">
-                        <mule:properties>
-                            <entry key="toAddresses" value="bob@example.com"/>
-                        </mule:properties>
-                    </mule:endpoint>
-                </mule:outbound-pass-through-router>
-            </mule:outbound-router>
-        </mule:service>
+        <service name="relay">
+            <component class="org.mule.components.simple.BridgeComponent"/>
+            <inbound-router>
+                <endpoint address="vm://send"/>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <endpoint address="smtps://localhost:65439">
+                        <properties>
+                            <spring:entry key="toAddresses" value="bob@example.com"/>
+                        </properties>
+                    </endpoint>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
 
-    </mule:model>
+    </model>
 
-</beans>
+</mule>

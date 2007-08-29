@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:custom="http://www.mulesource.org/schema/mule/custom/2.0"
        xmlns:https="http://www.mulesource.org/schema/mule/https/2.0"
     xsi:schemaLocation="
@@ -23,7 +23,7 @@
                 trustStorePassword="mulepassword"/>
     </https:connector>
 
-    <mule:endpoint
+    <endpoint
             name="clientEndpoint"
             address="https://localhost:60202"
             synchronous="true"
@@ -31,10 +31,10 @@
 
     <custom:model name="main" class="org.mule.tck.testmodels.mule.TestSedaModel">
         <custom:service name="testComponent">
-            <mule:component class="org.mule.tck.functional.FunctionalTestComponent" scope="singleton"/>
-            <mule:inbound-router>
-                <mule:endpoint ref="clientEndpoint"/>
-            </mule:inbound-router>
+            <component class="org.mule.tck.functional.FunctionalTestComponent" scope="singleton"/>
+            <inbound-router>
+                <endpoint ref="clientEndpoint"/>
+            </inbound-router>
         </custom:service>
     </custom:model>
-</beans>
+</mule>

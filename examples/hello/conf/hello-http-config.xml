@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
        xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
        xsi:schemaLocation="
@@ -43,13 +43,13 @@
         determine which method to call on our components based on the return types of these
         transformers.
     -->
-    <mule:custom-transformer class="org.mule.samples.hello.StringToNameString"
+    <custom-transformer class="org.mule.samples.hello.StringToNameString"
         name="StringToNameString" returnClass="org.mule.samples.hello.NameString"/>
-    <mule:custom-transformer class="org.mule.samples.hello.NameStringToChatString"
+    <custom-transformer class="org.mule.samples.hello.NameStringToChatString"
         name="NameStringToChatString" returnClass="org.mule.samples.hello.ChatString"/>
-    <mule:custom-transformer class="org.mule.samples.hello.ChatStringToString"
+    <custom-transformer class="org.mule.samples.hello.ChatStringToString"
         name="ChatStringToString" returnClass="java.lang.String"/>
-    <mule:custom-transformer class="org.mule.samples.hello.HttpRequestToString"
+    <custom-transformer class="org.mule.samples.hello.HttpRequestToString"
         name="HttpRequestToString" returnClass="java.lang.String"/>
 
     <!--
@@ -66,49 +66,49 @@
     <!--
         The Mule model initialises and manages your UMO components
     -->
-    <mule:model name="helloSample">
+    <model name="helloSample">
         <!--
             This component receives input from 3 different endpoints (http, servlet, vm) and routes
             them all to the same place.
         -->
-        <mule:service name="GreetUMO">
-            <mule:component class="org.mule.samples.hello.Greeter"/>
-            <mule:inbound-router>
+        <service name="GreetUMO">
+            <component class="org.mule.samples.hello.Greeter"/>
+            <inbound-router>
                 <!-- Incoming HTTP requests -->
-                <mule:endpoint address="http://localhost:8888" 
+                <endpoint address="http://localhost:8888" 
                     transformers="HttpRequestToString StringToNameString"
                     synchronous="true"/>
                 <!-- Incoming Servlet requests -->
-                <mule:endpoint address="servlet://rest" 
+                <endpoint address="servlet://rest" 
                     transformers="StringToNameString"
                     synchronous="true"/>
                 <!-- Incoming VM requests -->
-                <mule:endpoint address="vm://greeter" 
+                <endpoint address="vm://greeter" 
                     transformers="StringToNameString"
                     synchronous="true"/>
-            </mule:inbound-router>
-            <mule:outbound-router>
-                <mule:outbound-pass-through-router>
-                    <mule:endpoint address="vm://chitchatter"
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <endpoint address="vm://chitchatter"
                         synchronous="true"/>
-                </mule:outbound-pass-through-router>
-            </mule:outbound-router>
+                </outbound-pass-through-router>
+            </outbound-router>
             <!--
             Here we tell this component to use the interceptor stack defined above
             -->
             <!--<interceptor name="default"/>-->
-        </mule:service>
-        <mule:service name="ChitChatUMO">
-            <mule:component class="org.mule.samples.hello.ChitChatter"/>
-            <mule:inbound-router>
+        </service>
+        <service name="ChitChatUMO">
+            <component class="org.mule.samples.hello.ChitChatter"/>
+            <inbound-router>
                 <!-- note the response transformer on this component. even though there is no outbound provider
                      the transformer will transform the result event and pass it back as the http response -->
-                <mule:endpoint address="vm://chitchatter" transformers="NameStringToChatString"
+                <endpoint address="vm://chitchatter" transformers="NameStringToChatString"
                                synchronous="true"
                                responseTransformers="ChatStringToString"/>
-            </mule:inbound-router>
+            </inbound-router>
             <!--<interceptor name="default"/>-->
-        </mule:service>
-    </mule:model>
+        </service>
+    </model>
 
-</beans>
+</mule>

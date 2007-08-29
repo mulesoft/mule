@@ -13,7 +13,7 @@
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0" 
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
 
-    <xsd:element name="connector" type="quartzConnectorType"/>
+    <xsd:element name="connector" type="quartzConnectorType" substitutionGroup="mule:abstract-connector"/>
 
     <xsd:complexType name="quartzConnectorType">
         <xsd:complexContent>

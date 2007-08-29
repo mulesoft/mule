@@ -19,22 +19,67 @@
          environment properties).  We then provide some implementations below.  Other modules
          can provide other implementations. -->
 
-    <xsd:element name="environment-properties">
+    <xsd:element name="mule" type="muleType">
         <xsd:annotation>
-            <xsd:documentation>An simple map of properties to associate with the Mule instance</xsd:documentation>
+            <xsd:documentation>
+                Either the root element or a "top-level" element in a Spring configuration,
+                which contains further Mule elements.
+            </xsd:documentation>
         </xsd:annotation>
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="mapType"/>
-            </xsd:complexContent>
-        </xsd:complexType>
     </xsd:element>
+    <xsd:complexType name="muleType">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:choice>
+                <xsd:element name="environment-properties" type="spring:mapType"/>
+                <xsd:element name="configuration" type="muleManagementContextType"/>
+                <xsd:element ref="spring:bean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            We support direct use of spring beans via this tag. 
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:element>
+                <xsd:element ref="description"/>
+                <xsd:element ref="other"/>
+                <xsd:element ref="abstract-extension"/>
+                <xsd:element ref="abstract-security-manager"/>
+                <xsd:element ref="abstract-connector"/>
+                <xsd:element ref="abstract-endpoint"/>
+                <xsd:element ref="abstract-transformer"/>
+                <xsd:element ref="abstract-model"/>
+            </xsd:choice>
+        </xsd:sequence>
+        <xsd:attribute name="name" type="xsd:string"/>
+    </xsd:complexType>
+
+    <xsd:element name="description" type="descriptionType"/>
+    <xsd:complexType name="descriptionType">
+        <xsd:complexContent mixed="true">
+            <xsd:extension base="xsd:anyType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="abstract-extension" abstract="true" type="abstractExtensionType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Abstract base for arbitrary extensions as children of the mule element.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="abstractExtensionType"/>
 
     <xsd:element name="abstract-connector" abstract="true" type="abstractConnectorType"/>
     <xsd:complexType name="abstractConnectorType"/>
 
     <xsd:element name="abstract-endpoint" abstract="true" type="abstractEndpointType"/>
     <xsd:complexType name="abstractEndpointType"/>
+
+    <xsd:element name="abstract-transformer" abstract="true" type="abstractTransformerType"/>
+    <xsd:complexType name="abstractTransformerType">
+        <xsd:attribute name="name" type="xsd:string"/>
+        <xsd:attribute name="returnClass" type="substitutableClass"/>
+        <xsd:attribute name="ignoreBadInput" type="substitutableBoolean"/>
+    </xsd:complexType>
 
     <xsd:element name="abstract-model" abstract="true" type="abstractModelType"/>
     <xsd:complexType name="abstractModelType">
@@ -82,7 +127,7 @@
             <xsd:element ref="abstract-pooling-profile" minOccurs="0"/>
             <xsd:element ref="abstract-queue-profile" minOccurs="0"/>
             <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
-            <xsd:element name="meta-info" type="mapType" minOccurs="0"/>
+            <xsd:element name="meta-info" type="spring:mapType" minOccurs="0"/>
         </xsd:sequence>
         <xsd:attribute name="name" type="xsd:string" use="required"/>
         <!-- Disabled until it actually does something!
@@ -96,6 +141,23 @@
                 </xsd:restriction>
             </xsd:simpleType>
         </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:element name="other" type="otherType">
+        <xsd:annotation>
+            <xsd:documentation>
+                This element allows any (non-Mule) element to be embedded.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="otherType">
+        <xsd:complexContent mixed="true">
+            <xsd:extension base="xsd:anyType">
+                <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+                    <xsd:any namespace="##other" processContents="strict" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
 
     <xsd:element name="abstract-component" abstract="true" type="abstractComponentType"/>
@@ -163,8 +225,6 @@
     <xsd:element name="abstract-transaction-manager" abstract="true" type="abstractTransactionManagerType"/>
     <xsd:complexType name="abstractTransactionManagerType"/>
 
-    <!-- this isn't abstract because it's a system singleton -->
-    <xsd:element name="configuration" type="muleManagementContextType"/>
     <xsd:complexType name="muleManagementContextType">
         <xsd:sequence>
             <xsd:element name="default-threading-profile" type="threadingProfileType" minOccurs="0"/>
@@ -308,7 +368,7 @@
                     <xsd:element ref="abstract-connection-strategy" minOccurs="0"/>
                     <xsd:element name="properties" type="mapType" minOccurs="0"/>
                     <!-- TODO - can this go now?  we can extend endpoints in modules... -->
-                    <xsd:any namespace="##other" processContents="strict" minOccurs="0" maxOccurs="unbounded"/>
+                    <!-- xsd:any namespace="##other" processContents="strict" minOccurs="0" maxOccurs="unbounded"/ -->
                 </xsd:sequence>
                 <!-- these next two attributes are mutually exclusive and one is required.
                       but there is no way to define this in a schema... -->
@@ -343,7 +403,7 @@
         <xsd:complexContent>
             <xsd:extension base="abstractTransactionType">
                 <xsd:sequence>
-                    <xsd:element name="transaction-factory" type="objectFactoryType"/>
+                    <xsd:element name="transaction-factory" type="objectFactoryType" minOccurs="0"/>
                 </xsd:sequence>
                 <xsd:attribute name="action">
                     <xsd:simpleType>
@@ -419,7 +479,7 @@
         <xsd:complexContent>
             <xsd:extension base="abstractFilterType">
                 <xsd:sequence>
-                    <xsd:element name="property" type="propertyType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
                 <xsd:attribute name="class" type="xsd:NMTOKEN"/>
             </xsd:extension>
@@ -445,51 +505,44 @@
 
 
     <!--==============================================================-->
-    <!--   Transformer elements                                          -->
+    <!--   Transformer elements                                       -->
     <!--==============================================================-->
 
-    <xsd:complexType name="transformerType">
-        <xsd:attribute name="name" type="xsd:string"/>
-        <xsd:attribute name="returnClass" type="substitutableClass"/>
-        <xsd:attribute name="ignoreBadInput" type="substitutableBoolean"/>
+    <xsd:element name="custom-transformer" type="customTransformerType" substitutionGroup="abstract-transformer"/>
+    <xsd:complexType name="customTransformerType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractTransformerType">
+                <xsd:sequence>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="custom-transformer">
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="transformerType">
-                    <xsd:sequence>
-                        <xsd:element name="property" type="propertyType" minOccurs="0" maxOccurs="unbounded"/>
-                    </xsd:sequence>
-                    <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
-                </xsd:extension>
-            </xsd:complexContent>
-        </xsd:complexType>
-    </xsd:element>
-
-    <xsd:element name="transformer-no-action" type="transformerType"/>
-    <xsd:element name="transformer-base64-encoder" type="transformerType"/>
-    <xsd:element name="transformer-base64-decoder" type="transformerType"/>
-    <xsd:element name="transformer-uc-encoder" type="transformerType"/>
-    <xsd:element name="transformer-uc-decoder" type="transformerType"/>
-    <xsd:element name="transformer-uu-encoder" type="transformerType"/>
-    <xsd:element name="transformer-uu-decoder" type="transformerType"/>
-    <xsd:element name="transformer-xml-entity-encoder" type="transformerType"/>
-    <xsd:element name="transformer-xml-entity-decoder" type="transformerType"/>
-    <xsd:element name="transformer-gzip-compress" type="transformerType"/>
-    <xsd:element name="transformer-gzip-uncompress" type="transformerType"/>
+    <xsd:element name="transformer-no-action" type="abstractTransformerType" substitutionGroup="abstract-transformer"/>
+    <xsd:element name="transformer-base64-encoder" type="abstractTransformerType" substitutionGroup="abstract-transformer"/>
+    <xsd:element name="transformer-base64-decoder" type="abstractTransformerType" substitutionGroup="abstract-transformer"/>
+    <xsd:element name="transformer-uc-encoder" type="abstractTransformerType" substitutionGroup="abstract-transformer"/>
+    <xsd:element name="transformer-uc-decoder" type="abstractTransformerType" substitutionGroup="abstract-transformer"/>
+    <xsd:element name="transformer-uu-encoder" type="abstractTransformerType" substitutionGroup="abstract-transformer"/>
+    <xsd:element name="transformer-uu-decoder" type="abstractTransformerType" substitutionGroup="abstract-transformer"/>
+    <xsd:element name="transformer-xml-entity-encoder" type="abstractTransformerType" substitutionGroup="abstract-transformer"/>
+    <xsd:element name="transformer-xml-entity-decoder" type="abstractTransformerType" substitutionGroup="abstract-transformer"/>
+    <xsd:element name="transformer-gzip-compress" type="abstractTransformerType" substitutionGroup="abstract-transformer"/>
+    <xsd:element name="transformer-gzip-uncompress" type="abstractTransformerType" substitutionGroup="abstract-transformer"/>
     <!-- TODO RM* encryption -->
-    <xsd:element name="transformer-encrypt" type="transformerType"/>
-    <xsd:element name="transformer-decrypt" type="transformerType"/>
+    <xsd:element name="transformer-encrypt" type="abstractTransformerType" substitutionGroup="abstract-transformer"/>
+    <xsd:element name="transformer-decrypt" type="abstractTransformerType" substitutionGroup="abstract-transformer"/>
 
-    <xsd:element name="transformer-byte-array-to-hex-string" type="transformerType"/>
-    <xsd:element name="transformer-hex-sting-to-byte-array" type="transformerType"/>
-    <xsd:element name="transformer-byte-array-to-object" type="transformerType"/>
-    <xsd:element name="transformer-object-to-byte-array" type="transformerType"/>
-    <xsd:element name="transformer-byte-array-to-serializable" type="transformerType"/>
-    <xsd:element name="transformer-serializable-to-byte-array" type="transformerType"/>
-    <xsd:element name="transformer-byte-array-to-string" type="transformerType"/>
-    <xsd:element name="transformer-string-to-byte-array" type="transformerType"/>
+    <xsd:element name="transformer-byte-array-to-hex-string" type="abstractTransformerType" substitutionGroup="abstract-transformer"/>
+    <xsd:element name="transformer-hex-sting-to-byte-array" type="abstractTransformerType" substitutionGroup="abstract-transformer"/>
+    <xsd:element name="transformer-byte-array-to-object" type="abstractTransformerType" substitutionGroup="abstract-transformer"/>
+    <xsd:element name="transformer-object-to-byte-array" type="abstractTransformerType" substitutionGroup="abstract-transformer"/>
+    <xsd:element name="transformer-byte-array-to-serializable" type="abstractTransformerType" substitutionGroup="abstract-transformer"/>
+    <xsd:element name="transformer-serializable-to-byte-array" type="abstractTransformerType" substitutionGroup="abstract-transformer"/>
+    <xsd:element name="transformer-byte-array-to-string" type="abstractTransformerType" substitutionGroup="abstract-transformer"/>
+    <xsd:element name="transformer-string-to-byte-array" type="abstractTransformerType" substitutionGroup="abstract-transformer"/>
 
     <!-- TODO RM* Wire formats -->
 
@@ -721,7 +774,7 @@
         <xsd:complexContent>
             <xsd:extension base="exceptionStrategyType">
                 <xsd:sequence>
-                    <xsd:element name="property" type="propertyType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
                 <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
             </xsd:extension>
@@ -767,9 +820,9 @@
     <xsd:complexType name="customConnectorType">
         <xsd:complexContent>
             <xsd:extension base="abstractConnectorType">
-                <!-- MULE-2091, 2093 - cannot extent connectorType as need properties first -->
+                <!-- MULE-2091, 2093 - cannot extend connectorType as need properties first -->
                 <xsd:sequence>
-                    <xsd:element name="property" type="propertyType" minOccurs="0" maxOccurs="unbounded" />
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded" />
                     <xsd:group ref="connectorElements" />
                 </xsd:sequence>
                 <xsd:attribute name="class" type="xsd:NMTOKEN" use="required" />
@@ -1358,24 +1411,6 @@
         </xsd:attribute>
     </xsd:complexType>
 
-    <xsd:complexType name="propertyType">
-        <xsd:complexContent>
-            <xsd:extension base="spring:propertyType" />
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:complexType name="mapType">
-        <xsd:complexContent>
-            <xsd:extension base="spring:mapType" />
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:complexType name="propsType">
-        <xsd:complexContent>
-            <xsd:extension base="spring:propsType" />
-        </xsd:complexContent>
-    </xsd:complexType>
-
     <xsd:simpleType name="propertyPlaceholderType">
         <xsd:annotation>
             <xsd:documentation>
@@ -1486,6 +1521,22 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <!-- i found this a bit confusing, so here's some background...
+         this type is typically called from soemthing like
+           <xsd:element name="properties" type="mapType/>
+         and the "properties" element generates a ChildMapDefinitionParser that
+         can "receive" the map entries generated by the embedded spring <entry..>
+         elements and which is then set via "setProperties" on the parent.
+         in other words, it's a map, and despite the name "properties" has
+         nothing to do with the spring <propeprty ...> element.
+         spring elements like <entry...> are handled by
+         MuleHierarchicalBeanDefinitionParserDelegate which punts them to
+         the spring handler -->
+    <xsd:complexType name="mapType">
+        <xsd:complexContent>
+            <xsd:extension base="spring:mapType" />
+        </xsd:complexContent>
+    </xsd:complexType>
 
     <!--==============================================================-->
     <!--   Connector support                                          -->
@@ -1541,7 +1592,7 @@
          <xsd:complexContent>
              <xsd:extension base="connectorType">
                  <xsd:sequence>
-                     <xsd:element name="jndi-provider-properties" type="mapType" minOccurs="0">
+                     <xsd:element name="jndi-provider-properties" type="spring:mapType" minOccurs="0">
                          <xsd:annotation>
                              <xsd:documentation>
                                  Direct setting of JNDI properties.

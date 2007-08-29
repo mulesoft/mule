@@ -121,6 +121,10 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
 
     public void init()
     {
+        registerIgnoredElement("mule");
+        registerIgnoredElement("other");
+        registerIgnoredElement("description");
+
         //Common elements
         registerBeanDefinitionParser("configuration", new ConfigurationDefinitionParser());
         registerBeanDefinitionParser("environment-properties", new OrphanMapDefinitionParser(HashMap.class, MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES));

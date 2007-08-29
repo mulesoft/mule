@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:servlet="http://www.mulesource.org/schema/mule/servlet/2.0"
        xmlns:xfire="http://www.mulesource.org/schema/mule/xfire/2.0"
     xsi:schemaLocation="
@@ -12,19 +12,19 @@
 
     <servlet:connector name="servlet" servletUrl="http://localhost:18088/services"/>
 
-    <mule:model name="test">
-        <mule:service name="mycomponent">
-            <mule:component class="org.mule.tck.testmodels.services.TestComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="xfire:servlet://mycomponent"/>
-            </mule:inbound-router>
-        </mule:service>
+    <model name="test">
+        <service name="mycomponent">
+            <component class="org.mule.tck.testmodels.services.TestComponent"/>
+            <inbound-router>
+                <endpoint address="xfire:servlet://mycomponent"/>
+            </inbound-router>
+        </service>
 
-        <mule:service name="xfireService">
-            <mule:component class="org.mule.tck.testmodels.services.TestComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="xfire:http://localhost:82"/>
-            </mule:inbound-router>
-        </mule:service>
-    </mule:model>
-</beans>
+        <service name="xfireService">
+            <component class="org.mule.tck.testmodels.services.TestComponent"/>
+            <inbound-router>
+                <endpoint address="xfire:http://localhost:82"/>
+            </inbound-router>
+        </service>
+    </model>
+</mule>

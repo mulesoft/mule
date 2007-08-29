@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
     <!-- for this test the client and server endponts have to be different since, Jetty is a server-only transport so
          we still use the http transport on the client side-->
-    <mule:endpoint address="http://localhost:60203" name="clientEndpoint" synchronous="true"/>
-    <mule:endpoint address="jetty:http://localhost:60203" name="serverEndpoint" synchronous="true"/>
+    <endpoint address="http://localhost:60203" name="clientEndpoint" synchronous="true"/>
+    <endpoint address="jetty:http://localhost:60203" name="serverEndpoint" synchronous="true"/>
 
-    <mule:model name="main">
-        <mule:service name="testComponent">
-            <mule:component class="org.mule.tck.functional.FunctionalTestComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint ref="serverEndpoint"/>
-            </mule:inbound-router>
-        </mule:service>
-    </mule:model>
+    <model name="main">
+        <service name="testComponent">
+            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
+            <inbound-router>
+                <endpoint ref="serverEndpoint"/>
+            </inbound-router>
+        </service>
+    </model>
 
-</beans>
+</mule>

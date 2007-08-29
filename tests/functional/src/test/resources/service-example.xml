@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:nest="http://www.mulesource.org/schema/mule/nest-example-base/2.0"
        xmlns:ext="http://www.mulesource.org/schema/mule/nest-example-extension/2.0"
@@ -22,4 +22,4 @@
         </ext:router>
     </ext:service>
 
-</beans>
+</mule>

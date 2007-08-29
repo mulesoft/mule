@@ -32,6 +32,7 @@ import org.mule.umo.model.UMOModel;
  */
 public abstract class FunctionalTestCase extends AbstractMuleTestCase
 {
+
     /** Expected response after the test message has passed through the FunctionalTestComponent. */
     public static final String TEST_MESSAGE_RESPONSE = FunctionalTestComponent.received(TEST_MESSAGE);
     
@@ -65,4 +66,5 @@ public abstract class FunctionalTestCase extends AbstractMuleTestCase
         assertTrue("Component should be a FunctionalTestComponent", component instanceof FunctionalTestComponent);
         return (FunctionalTestComponent) component;
     }
+
 }

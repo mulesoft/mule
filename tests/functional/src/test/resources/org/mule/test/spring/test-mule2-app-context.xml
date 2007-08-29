@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:mgmt="http://www.mulesource.org/schema/mule/management/2.0"
        xsi:schemaLocation="
            http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
@@ -12,47 +12,46 @@
 
     <!--<mgmt:jmx-server id="jmx"/>-->
 
-    <mule:custom-transformer name="ArrayToLenderList" class="org.mule.transformers.simple.ObjectToString"
+    <custom-transformer name="ArrayToLenderList" class="org.mule.transformers.simple.ObjectToString"
                              returnClass="java.lang.String">
-        <!--<mule:source-type class="java.lang.Exception"/>-->
-    </mule:custom-transformer>
+    </custom-transformer>
 
-    <!--<bean id="creditProfileLookup" class="org.mule.routing.MuleEndpointProxy">-->
-        <!--<mule:endpoint address="xfire:http://localhost:8081/service/CreditAgency?method=getCreditProfile"/>-->
-    <!--</bean>-->
+    <!--<spring:bean id="creditProfileLookup" class="org.mule.routing.MuleEndpointProxy">-->
+        <!--<endpoint address="xfire:http://localhost:8081/service/CreditAgency?method=getCreditProfile"/>-->
+    <!--</spring:bean>-->
 
-    <!--<bean id="lendersLookup" class="org.mule.routing.MuleEndpointProxy">-->
-        <!--<mule:endpoint address="xfire:http://localhost:8082/service/LendersService?method=getAvailableLenders"-->
+    <!--<spring:bean id="lendersLookup" class="org.mule.routing.MuleEndpointProxy">-->
+        <!--<endpoint address="xfire:http://localhost:8082/service/LendersService?method=getAvailableLenders"-->
                 <!--responseTransformers="ArrayToLenderList"/>-->
-    <!--</bean>-->
+    <!--</spring:bean>-->
 
 
-    <bean id="apple" class="org.mule.tck.testmodels.fruit.Apple">
+    <spring:bean id="apple" class="org.mule.tck.testmodels.fruit.Apple">
         <!--<lookup-method name="getCreditProfile" bean="creditProfileLookup"/>-->
         <!--<lookup-method name="getLenders" bean="lendersLookup"/>-->
-    </bean>
+    </spring:bean>
 
 
-    <mule:model name="main">
+    <model name="main">
 
-        <mule:service name="LoanBroker">
-            <mule:component instance-ref="apple"/>
-            <mule:inbound-router>
-                <mule:endpoint address="vm://LoanBrokerRequests"/>
-            </mule:inbound-router>
+        <service name="LoanBroker">
+            <component instance-ref="apple"/>
+            <inbound-router>
+                <endpoint address="vm://LoanBrokerRequests"/>
+            </inbound-router>
 
-            <!--<mule:outbound-router>-->
-                <!--<mule:router-static-recipient-list messageProperty="recipients">-->
-                    <!--<mule:reply-to-endpoint address="vm://LoanBrokerQuotes"/>-->
-                <!--</mule:router-static-recipient-list>-->
-            <!--</mule:outbound-router>-->
+            <!--<outbound-router>-->
+                <!--<router-static-recipient-list messageProperty="recipients">-->
+                    <!--<reply-to-endpoint address="vm://LoanBrokerQuotes"/>-->
+                <!--</router-static-recipient-list>-->
+            <!--</outbound-router>-->
 
-            <!--<mule:response-router timeout="10000" failOnTimeout="false">-->
-                <!--<mule:endpoint address="vm://LoanBrokerQuotes"/>-->
-                <!--<mule:custom-response-router class="org.mule.samples.loanbroker.routers.BankQuotesResponseAggregator"/>-->
-            <!--</mule:response-router>-->
-        </mule:service>
+            <!--<response-router timeout="10000" failOnTimeout="false">-->
+                <!--<endpoint address="vm://LoanBrokerQuotes"/>-->
+                <!--<custom-response-router class="org.mule.samples.loanbroker.routers.BankQuotesResponseAggregator"/>-->
+            <!--</response-router>-->
+        </service>
 
 
-    </mule:model>
-</beans>
+    </model>
+</mule>

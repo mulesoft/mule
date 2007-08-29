@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:scripting="http://www.mulesource.org/schema/mule/scripting/2.0"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
@@ -21,50 +21,50 @@
         return "B"
     </scripting:script>
     
-    <mule:model name="main">
+    <model name="main">
         
-        <mule:service name="GroovyUMO1">
-            <mule:component class="org.mule.components.script.jsr223.ScriptMessageBuilder">
-                <mule:properties>
-                    <entry key="scriptEngineName" value="groovy"/>
-                    <entry key="scriptText" value-ref="scriptText1"/>
-                </mule:properties>
-            </mule:component>
-            <mule:inbound-router>
-                <mule:endpoint address="vm://groovy.1"/>
-            </mule:inbound-router>
-            <mule:outbound-router>
-                <mule:filtering-router>
-                    <mule:endpoint address="vm://groovy.2"/>
-                    <mule:endpoint address="vm://groovy.3"/>
-                </mule:filtering-router>
-            </mule:outbound-router>
-        </mule:service>
+        <service name="GroovyUMO1">
+            <component class="org.mule.components.script.jsr223.ScriptMessageBuilder">
+                <properties>
+                    <spring:entry key="scriptEngineName" value="groovy"/>
+                    <spring:entry key="scriptText" value-ref="scriptText1"/>
+                </properties>
+            </component>
+            <inbound-router>
+                <endpoint address="vm://groovy.1"/>
+            </inbound-router>
+            <outbound-router>
+                <filtering-router>
+                    <endpoint address="vm://groovy.2"/>
+                    <endpoint address="vm://groovy.3"/>
+                </filtering-router>
+            </outbound-router>
+        </service>
                     
-        <mule:service name="GroovyUMO2">
-            <mule:component class="org.mule.components.script.jsr223.ScriptComponent">
-                <mule:properties>
-                    <entry key="scriptEngineName" value="groovy"/>
-                    <entry key="scriptText" value-ref="scriptText2"/>
-                </mule:properties>
-            </mule:component>
-            <mule:inbound-router>
-                <mule:endpoint address="vm://groovy.2"/>
-            </mule:inbound-router>
-        </mule:service>
+        <service name="GroovyUMO2">
+            <component class="org.mule.components.script.jsr223.ScriptComponent">
+                <properties>
+                    <spring:entry key="scriptEngineName" value="groovy"/>
+                    <spring:entry key="scriptText" value-ref="scriptText2"/>
+                </properties>
+            </component>
+            <inbound-router>
+                <endpoint address="vm://groovy.2"/>
+            </inbound-router>
+        </service>
                     
-        <mule:service name="GroovyUMO3">
-            <mule:component class="org.mule.components.script.jsr223.ScriptComponent">
-                <mule:properties>
-                    <entry key="scriptEngineName" value="groovy"/>
-                    <entry key="scriptText" value-ref="scriptText3"/>
-                </mule:properties>
-            </mule:component>
-            <mule:inbound-router>
-                <mule:endpoint address="vm://groovy.3"/>
-            </mule:inbound-router>
-        </mule:service>                   
+        <service name="GroovyUMO3">
+            <component class="org.mule.components.script.jsr223.ScriptComponent">
+                <properties>
+                    <spring:entry key="scriptEngineName" value="groovy"/>
+                    <spring:entry key="scriptText" value-ref="scriptText3"/>
+                </properties>
+            </component>
+            <inbound-router>
+                <endpoint address="vm://groovy.3"/>
+            </inbound-router>
+        </service>                   
                     
-    </mule:model>
+    </model>
     
-</beans>
+</mule>

@@ -12,22 +12,26 @@
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0" 
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
 
-    
-    <xsd:element name="script">
+    <xsd:element name="script" substitutionGroup="mule:abstract-extension">
         <xsd:complexType>
-            <xsd:simpleContent>
-                <xsd:extension base="xsd:string">
-                    <xsd:attribute name="name" type="xsd:string" />
+            <xsd:complexContent mixed="true">
+                <xsd:extension base="mule:abstractExtensionType">
+                    <xsd:attribute name="name" type="xsd:string"/>
                 </xsd:extension>
-            </xsd:simpleContent>
+            </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
     
-    <xsd:element name="groovyRefreshable">
+    <xsd:element name="groovyRefreshable" substitutionGroup="mule:abstract-extension">
         <xsd:complexType>
-            <xsd:attribute name="name" type="xsd:string" use="required" />
-            <xsd:attribute name="refreshableBean-ref" type="xsd:NMTOKEN" />
-            <xsd:attribute name="methodName" type="xsd:string" />
+            <xsd:complexContent>
+                <xsd:extension base="mule:abstractExtensionType">
+                    <xsd:attribute name="name" type="xsd:string" use="required" />
+                    <xsd:attribute name="refreshableBean-ref" type="xsd:NMTOKEN" />
+                    <xsd:attribute name="methodName" type="xsd:string" />
+                </xsd:extension>
+            </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
+
 </xsd:schema>

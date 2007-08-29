@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
        xmlns:stdio="http://www.mulesource.org/schema/mule/stdio/2.0"
        xsi:schemaLocation="
@@ -21,14 +21,14 @@
         Xslt transformer and then using the XmlToObject transformer.
     </description>
 
-    <bean id="propertyPlaceholderConfigurer"
+    <spring:bean id="propertyPlaceholderConfigurer"
           class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="locations">
-            <list>
-                <value>proxy.properties</value>
-            </list>
-        </property>
-    </bean>
+        <spring:property name="locations">
+            <spring:list>
+                <spring:value>proxy.properties</spring:value>
+            </spring:list>
+        </spring:property>
+    </spring:bean>
 
     <http:connector name="HttpConnector"
                     proxyHostname="${proxyHostname}"
@@ -36,27 +36,27 @@
                     proxyPort="${proxyPort}"
                     proxyUsername="${proxyUsername}"/>
 
-    <mule:custom-transformer name="XmlToObject" class="org.mule.transformers.xml.XmlToObject"/>
-    <mule:transformer-xml-entity-decoder name="XmlDecoder"/>
-    <mule:custom-transformer name="Xslt" class="org.mule.transformers.xml.XsltTransformer">
-        <mule:property name="xslFile" value="xsl/rest-stock.xsl"/>
-    </mule:custom-transformer>
+    <custom-transformer name="XmlToObject" class="org.mule.transformers.xml.XmlToObject"/>
+    <transformer-xml-entity-decoder name="XmlDecoder"/>
+    <custom-transformer name="Xslt" class="org.mule.transformers.xml.XsltTransformer">
+        <spring:property name="xslFile" value="xsl/rest-stock.xsl"/>
+    </custom-transformer>
 
-    <mule:model name="Sample-WSDL">
+    <model name="Sample-WSDL">
         <!--
             This component can proxy external web service calls over Jms, tcp, ssl or any other transport.
             For this example we use Vm.
         -->
-        <mule:service name="serviceProxy">
-            <mule:component class="org.mule.components.simple.BridgeComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="vm://stockquote"/>
-            </mule:inbound-router>
-            <mule:outbound-router>
-                <mule:outbound-pass-through-router>
-                    <mule:endpoint address="wsdl-xfire:http://www.webservicex.net/stockquote.asmx?WSDL&amp;method=GetQuote"/>
-                </mule:outbound-pass-through-router>
-            </mule:outbound-router>
-        </mule:service>
-    </mule:model>
-</beans>
+        <service name="serviceProxy">
+            <component class="org.mule.components.simple.BridgeComponent"/>
+            <inbound-router>
+                <endpoint address="vm://stockquote"/>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <endpoint address="wsdl-xfire:http://www.webservicex.net/stockquote.asmx?WSDL&amp;method=GetQuote"/>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
+    </model>
+</mule>

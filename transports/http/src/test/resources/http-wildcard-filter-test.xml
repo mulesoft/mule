@@ -1,36 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd">
 
-    <mule:model name="main">
+    <model name="main">
 
-        <mule:service name="httpIn">
-            <mule:component class="org.mule.components.simple.EchoComponent"/>
+        <service name="httpIn">
+            <component class="org.mule.components.simple.EchoComponent"/>
 
-            <mule:inbound-router>
-                <mule:endpoint address="http://localhost:60201" synchronous="true">
-                    <mule:not-filter>
-                        <mule:wildcard-filter pattern="*xyz*"/>
-                    </mule:not-filter>
-                </mule:endpoint>
-            </mule:inbound-router>
-        </mule:service>
+            <inbound-router>
+                <endpoint address="http://localhost:60201" synchronous="true">
+                    <not-filter>
+                        <wildcard-filter pattern="*xyz*"/>
+                    </not-filter>
+                </endpoint>
+            </inbound-router>
+        </service>
 
-        <mule:service name="reference">
-            <mule:component class="org.mule.components.simple.EchoComponent"/>
+        <service name="reference">
+            <component class="org.mule.components.simple.EchoComponent"/>
             
-            <mule:inbound-router>
-                <mule:endpoint address="http://localhost:60199" synchronous="true">
-                </mule:endpoint>
-            </mule:inbound-router>
-        </mule:service>
+            <inbound-router>
+                <endpoint address="http://localhost:60199" synchronous="true">
+                </endpoint>
+            </inbound-router>
+        </service>
 
-   </mule:model>
+   </model>
 
-</beans>
+</mule>

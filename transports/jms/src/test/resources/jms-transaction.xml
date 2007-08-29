@@ -1,67 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
 
-    <mule:model name="transactionTestModel" class="org.mule.tck.testmodels.mule.TestSedaModel">
-        <mule:service name="component1">
-            <mule:inbound-router>
-                <mule:endpoint address="jms://component1In">
-                    <mule:transaction action="NONE"/>
-                </mule:endpoint>
-            </mule:inbound-router>
-            <mule:component class="org.mule.tck.functional.FunctionalTestComponent" scope="singleton"/>
-            <mule:outbound-router>
-                <mule:outbound-pass-through-router>
-                    <mule:endpoint address="jms://component1Out"/>
-                </mule:outbound-pass-through-router>
-            </mule:outbound-router>
-        </mule:service>
+    <model name="transactionTestModel" class="org.mule.tck.testmodels.mule.TestSedaModel">
+        <service name="component1">
+            <component class="org.mule.tck.functional.FunctionalTestComponent" scope="singleton"/>
+            <inbound-router>
+                <endpoint address="jms://component1In">
+                    <transaction action="NONE"/>
+                </endpoint>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <endpoint address="jms://component1Out"/>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
 
-        <mule:service name="component2">
-            <mule:inbound-router>
-                <mule:endpoint address="jms://component2In">
-                    <mule:transaction action="ALWAYS_BEGIN">
-                        <mule:transaction-factory scope="singleton" instance-ref="txFactory" />
-                    </mule:transaction>
-                </mule:endpoint>
-            </mule:inbound-router>
-            <mule:component class="org.mule.tck.functional.FunctionalTestComponent" scope="singleton"/>
-            <mule:outbound-router>
-                <mule:outbound-pass-through-router>
-                    <mule:endpoint address="jms://component2Out">
-                        <mule:transaction action="ALWAYS_JOIN" />
-                    </mule:endpoint>
-                </mule:outbound-pass-through-router>
-            </mule:outbound-router>
-        </mule:service>
+        <service name="component2">
+            <component class="org.mule.tck.functional.FunctionalTestComponent" scope="singleton"/>
+            <inbound-router>
+                <endpoint address="jms://component2In">
+                    <transaction action="ALWAYS_BEGIN">
+                        <transaction-factory scope="singleton" instance-ref="txFactory" />
+                    </transaction>
+                </endpoint>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <endpoint address="jms://component2Out">
+                        <transaction action="ALWAYS_JOIN" />
+                    </endpoint>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
 
-        <mule:service name="component3">
-            <mule:inbound-router>
-                <mule:endpoint address="jms://component3In">
-                    <mule:transaction action="NONE">
-                        <mule:transaction-factory scope="singleton" instance-ref="txFactory" />
-                    </mule:transaction>
-                </mule:endpoint>
-            </mule:inbound-router>
-            <mule:component class="org.mule.tck.functional.FunctionalTestComponent" scope="singleton"/>
-            <mule:outbound-router>
-                <mule:outbound-pass-through-router>
-                    <mule:endpoint address="jms://component3Out">
-                        <mule:transaction action="ALWAYS_JOIN" />
-                    </mule:endpoint>
-                </mule:outbound-pass-through-router>
-            </mule:outbound-router>
-            <mule:default-connector-exception-strategy>
-                <mule:endpoint address="jms://dead.letter">
-                    <mule:transaction action="ALWAYS_JOIN" />
-                </mule:endpoint>
-            </mule:default-connector-exception-strategy>
-        </mule:service>
-    </mule:model>
-</beans>
+        <service name="component3">
+            <component class="org.mule.tck.functional.FunctionalTestComponent" scope="singleton"/>
+            <inbound-router>
+                <endpoint address="jms://component3In">
+                    <transaction action="NONE">
+                        <transaction-factory scope="singleton" instance-ref="txFactory" />
+                    </transaction>
+                </endpoint>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <endpoint address="jms://component3Out">
+                        <transaction action="ALWAYS_JOIN" />
+                    </endpoint>
+                </outbound-pass-through-router>
+            </outbound-router>
+            <default-connector-exception-strategy>
+                <endpoint address="jms://dead.letter">
+                    <transaction action="ALWAYS_JOIN" />
+                </endpoint>
+            </default-connector-exception-strategy>
+        </service>
+    </model>
+</mule>

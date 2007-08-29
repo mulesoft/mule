@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:stream="http://www.mulesource.org/schema/mule/streaming/2.0"
        xmlns:tcp="http://www.mulesource.org/schema/mule/tcp/2.0"
        xsi:schemaLocation="
@@ -19,24 +19,24 @@
     <stream:model name="echoModel">
 
         <stream:service name="echo">
-            <mule:component class="org.mule.components.simple.StreamingBridgeComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="tcp://localhost:65432" synchronous="false"/>
-            </mule:inbound-router>
-            <mule:outbound-router>
-                <mule:outbound-pass-through-router>
-                    <mule:endpoint address="tcp://localhost:65433" synchronous="false"/>
-                </mule:outbound-pass-through-router>
-            </mule:outbound-router>
+            <component class="org.mule.components.simple.StreamingBridgeComponent"/>
+            <inbound-router>
+                <endpoint address="tcp://localhost:65432" synchronous="false"/>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <endpoint address="tcp://localhost:65433" synchronous="false"/>
+                </outbound-pass-through-router>
+            </outbound-router>
         </stream:service>
 
         <stream:service name="testComponent">
-            <mule:component scope="singleton" class="org.mule.tck.functional.FunctionalStreamingTestComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="tcp://localhost:65433" synchronous="false"/>
-            </mule:inbound-router>
+            <component scope="singleton" class="org.mule.tck.functional.FunctionalStreamingTestComponent"/>
+            <inbound-router>
+                <endpoint address="tcp://localhost:65433" synchronous="false"/>
+            </inbound-router>
         </stream:service>
 
     </stream:model>
 
-</beans>
+</mule>

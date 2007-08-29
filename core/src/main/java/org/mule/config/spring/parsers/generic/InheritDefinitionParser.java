@@ -10,11 +10,8 @@
 
 package org.mule.config.spring.parsers.generic;
 
-import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
-
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
-import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
+import org.springframework.beans.factory.xml.ParserContext;
 
 /**
  * This encapsulates two definition parsers - orphan and named - and returns the
@@ -25,10 +22,8 @@ import org.w3c.dom.Element;
  */
 public class InheritDefinitionParser extends AbstractDelegatingDefinitionParser
 {
-    private static final AtomicInteger counter = new AtomicInteger(0);
+
     public static final String INHERIT = "inherit";
-    public static final String ATTRIBUTE_ID = AbstractMuleBeanDefinitionParser.ATTRIBUTE_ID;
-    public static final String ID_PREFIX = "autogenInheritId";
     private OrphanDefinitionParser orphan;
     private NamedDefinitionParser named;
 
@@ -44,10 +39,7 @@ public class InheritDefinitionParser extends AbstractDelegatingDefinitionParser
     {
         // i'm not sure why this is suddenly necessary here and not elsewhere.
         // perhaps because this is used on the top level but has name deleted?
-        if (null != element && !element.hasAttribute(ATTRIBUTE_ID))
-        {
-            element.setAttribute(ATTRIBUTE_ID, ID_PREFIX + counter.incrementAndGet());
-        }
+        AutoIdUtils.ensureUniqueId(element);
         if (null != element && element.hasAttribute(INHERIT)
                 && Boolean.valueOf(element.getAttribute(INHERIT)).booleanValue())
         {

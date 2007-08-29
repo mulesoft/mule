@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:xfire="http://www.mulesource.org/schema/mule/xfire/2.0"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
@@ -12,15 +12,16 @@
         Testing XFire headers
      -->
 
-    <mule:configuration serverId="" defaultSynchronousEndpoints="true"/>
+    <configuration serverId="" defaultSynchronousEndpoints="true"/>
 
-    <mule:model name="TestXfireHeaders">
-        <mule:service name="TestComponent">
-        <mule:component class="org.mule.tck.functional.FunctionalTestComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="xfire:http://localhost:63181/services"/>
-            </mule:inbound-router>
-        </mule:service>
-    </mule:model>
-</beans>
+    <model name="TestXfireHeaders">
+        <service name="TestComponent">
+        <component class="org.mule.tck.functional.FunctionalTestComponent"/>
+            <inbound-router>
+                <endpoint address="xfire:http://localhost:63181/services"/>
+            </inbound-router>
+        </service>
+    </model>
+
+</mule>
 

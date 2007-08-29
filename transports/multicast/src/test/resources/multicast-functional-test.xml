@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
        xmlns:multicast="http://www.mulesource.org/schema/mule/multicast/2.0"
        xsi:schemaLocation="
@@ -13,58 +13,58 @@
     <vm:connector name="vm-queue" queueEvents="true"/>
 
     <!-- 224.0.0.1 is all systems on this subnet -->
-    <mule:endpoint address="multicast://224.0.0.1:60131" name="serverEndpoint"/>
+    <endpoint address="multicast://224.0.0.1:60131" name="serverEndpoint"/>
 
-    <mule:model name="main">
+    <model name="main">
 
-        <mule:service name="Component1">
-            <mule:component class="org.mule.tck.functional.FunctionalTestComponent">
-                <mule:properties>
-                    <entry key="appendComponentName" value="true"/>
-                </mule:properties>
-            </mule:component>
-            <mule:inbound-router>
-                <mule:endpoint ref="serverEndpoint"/>
-            </mule:inbound-router>
-            <mule:outbound-router>
-                <mule:outbound-pass-through-router>
-                    <mule:endpoint address="vm://foo"/>
-                </mule:outbound-pass-through-router>
-            </mule:outbound-router>
-        </mule:service>
+        <service name="Component1">
+            <component class="org.mule.tck.functional.FunctionalTestComponent">
+                <properties>
+                    <spring:entry key="appendComponentName" value="true"/>
+                </properties>
+            </component>
+            <inbound-router>
+                <endpoint ref="serverEndpoint"/>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <endpoint address="vm://foo"/>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
 
-        <mule:service name="Component2">
-            <mule:component class="org.mule.tck.functional.FunctionalTestComponent">
-                <mule:properties>
-                    <entry key="appendComponentName" value="true"/>
-                </mule:properties>
-            </mule:component>
-            <mule:inbound-router>
-                <mule:endpoint ref="serverEndpoint"/>
-            </mule:inbound-router>
-            <mule:outbound-router>
-                <mule:outbound-pass-through-router>
-                    <mule:endpoint address="vm://foo"/>
-                </mule:outbound-pass-through-router>
-            </mule:outbound-router>
-        </mule:service>
+        <service name="Component2">
+            <component class="org.mule.tck.functional.FunctionalTestComponent">
+                <properties>
+                    <spring:entry key="appendComponentName" value="true"/>
+                </properties>
+            </component>
+            <inbound-router>
+                <endpoint ref="serverEndpoint"/>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <endpoint address="vm://foo"/>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
 
-        <mule:service name="Component3">
-            <mule:component class="org.mule.tck.functional.FunctionalTestComponent">
-                <mule:properties>
-                    <entry key="appendComponentName" value="true"/>
-                </mule:properties>
-            </mule:component>
-            <mule:inbound-router>
-                <mule:endpoint ref="serverEndpoint"/>
-            </mule:inbound-router>
-            <mule:outbound-router>
-                <mule:outbound-pass-through-router>
-                    <mule:endpoint address="vm://foo"/>
-                </mule:outbound-pass-through-router>
-            </mule:outbound-router>
-        </mule:service>
+        <service name="Component3">
+            <component class="org.mule.tck.functional.FunctionalTestComponent">
+                <properties>
+                    <spring:entry key="appendComponentName" value="true"/>
+                </properties>
+            </component>
+            <inbound-router>
+                <endpoint ref="serverEndpoint"/>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <endpoint address="vm://foo"/>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
 
-    </mule:model>
+    </model>
 
-</beans>
+</mule>

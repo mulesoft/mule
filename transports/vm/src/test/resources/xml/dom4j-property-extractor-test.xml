@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:mxml="http://www.mulesource.org/schema/mule/xml/2.0"
        xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
     xsi:schemaLocation="
@@ -13,36 +13,36 @@
     <vm:connector name="default"/>
     <vm:connector name="queue" queueEvents="true"/>
 
-    <mule:endpoint name="in" address="vm://in" connector-ref="default"/>
+    <endpoint name="in" address="vm://in" connector-ref="default"/>
 
-    <mule:model name="jxpath property extractor test">
+    <model name="jxpath property extractor test">
 
-        <mule:service name="test">
-            <mule:component class="org.mule.components.simple.BridgeComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint ref="in"/>
-            </mule:inbound-router>
-            <mule:outbound-router>
-                <mule:exception-based-router>
-                    <mule:endpoint address="vm://unreliable" connector-ref="default"/>
-                    <mule:endpoint address="vm://error" connector-ref="queue"/>
-                </mule:exception-based-router>
-           </mule:outbound-router>
-        </mule:service>
+        <service name="test">
+            <component class="org.mule.components.simple.BridgeComponent"/>
+            <inbound-router>
+                <endpoint ref="in"/>
+            </inbound-router>
+            <outbound-router>
+                <exception-based-router>
+                    <endpoint address="vm://unreliable" connector-ref="default"/>
+                    <endpoint address="vm://error" connector-ref="queue"/>
+                </exception-based-router>
+           </outbound-router>
+        </service>
 
-        <mule:service name="unreliable">
-            <mule:component class="org.mule.components.simple.BridgeComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="vm://unreliable" connector-ref="default"/>
-            </mule:inbound-router>
-            <mule:outbound-router>
-                <mule:endpoint-selector-router selectorProperty="/endpoint" extractorEnabled="true">
-                     <mule:endpoint name="name" address="vm://match" connector-ref="queue"/>
+        <service name="unreliable">
+            <component class="org.mule.components.simple.BridgeComponent"/>
+            <inbound-router>
+                <endpoint address="vm://unreliable" connector-ref="default"/>
+            </inbound-router>
+            <outbound-router>
+                <endpoint-selector-router selectorProperty="/endpoint" extractorEnabled="true">
+                     <endpoint name="name" address="vm://match" connector-ref="queue"/>
                      <mxml:dom4j-property-extractor/>
-                </mule:endpoint-selector-router>
-           </mule:outbound-router>
-        </mule:service>
+                </endpoint-selector-router>
+           </outbound-router>
+        </service>
 
-    </mule:model>
+    </model>
 
-</beans>
+</mule>

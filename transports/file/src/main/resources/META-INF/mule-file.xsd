@@ -12,8 +12,6 @@
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0" 
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
 
-    <xsd:element name="connector" type="fileConnectorType"/>
-
     <xsd:complexType name="filenameParserType">
         <xsd:attribute name="class" type="xsd:NMTOKEN" use="required">
             <xsd:annotation>
@@ -24,6 +22,7 @@
         </xsd:attribute>
     </xsd:complexType>
 
+    <xsd:element name="connector" type="fileConnectorType" substitutionGroup="mule:abstract-connector"/>
     <xsd:complexType name="fileConnectorType">
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">

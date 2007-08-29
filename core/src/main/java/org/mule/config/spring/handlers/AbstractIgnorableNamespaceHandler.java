@@ -21,6 +21,10 @@ import org.w3c.dom.Element;
  */
 public abstract class AbstractIgnorableNamespaceHandler extends NamespaceHandlerSupport
 {
+
+    /**
+     * @param name The name of the element to be ignored.
+     */
     protected final void registerIgnoredElement(String name)
     {
         registerBeanDefinitionParser(name, new IgnoredDefinitionParser());
@@ -28,30 +32,10 @@ public abstract class AbstractIgnorableNamespaceHandler extends NamespaceHandler
 
     private class IgnoredDefinitionParser implements BeanDefinitionParser
     {
-
         public BeanDefinition parse(Element element, ParserContext parserContext)
         {
-            /*
-               This MUST return null, otherwise duplicate BeanDefinitions will be registered,
-               which is wrong. E.g. for this config snippet we want only 1 SSL connector
-               created, not 4!
-
-                   <ssl:connector name="SslConnector">
-                       <ssl:ssl-client
-                               clientKeyStore="clientKeyStore"
-                               clientKeyStorePassword="mulepassword"/>
-                       <ssl:ssl-key-store
-                               keyStore="serverKeystore"
-                               keyStorePassword="mulepassword"
-                               keyPassword="mulepassword"/>
-                       <ssl:ssl-server
-                               trustStore="trustStore"
-                               trustStorePassword="mulepassword"/>
-                   </ssl:connector>
-
-
-            */
             return null;
         }
     }
+
 }

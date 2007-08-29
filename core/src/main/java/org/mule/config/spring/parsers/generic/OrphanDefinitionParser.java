@@ -22,6 +22,7 @@ import org.w3c.dom.Element;
  */
 public class OrphanDefinitionParser extends AbstractMuleBeanDefinitionParser implements DelegateDefinitionParser
 {
+    
     private Class beanClass = null;
     private boolean dynamicClass = false;
 

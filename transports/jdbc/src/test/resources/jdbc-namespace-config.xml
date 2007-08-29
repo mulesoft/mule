@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:jee="http://www.springframework.org/schema/jee"
        xmlns:util="http://www.springframework.org/schema/util"
        xmlns:jdbc="http://www.mulesource.org/schema/mule/jdbc/2.0"
@@ -23,39 +23,42 @@
     <jdbc:connector name="jdbcConnector3">
         <jdbc:dataSource instance-ref="testDS1" scope="singleton" />
         <jdbc:queries>
-            <entry key="getTest"
+            <spring:entry key="getTest"
                    value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE =
                          ${type} AND ACK IS NULL" />
-            <entry key="getTest2"
+            <spring:entry key="getTest2"
                    value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE =
                          ${type} AND ACK IS NULL" />
-            <entry key="getTest.ack"
+            <spring:entry key="getTest.ack"
                    value="UPDATE TEST SET ACK = ${NOW} WHERE ID = ${id} AND TYPE =
                          ${type} AND DATA = ${data}" />
         </jdbc:queries>
         <jdbc:extractors>
-            <mule:bean-property-extractor/>
+            <bean-property-extractor/>
             <jdbc:now-property-extractor/>
         </jdbc:extractors>
     </jdbc:connector>
 
-    <mule:endpoint name="testJdbcEndpoint" address="jdbc://getTest?type=1" connector-ref="jdbcConnector3">
-        <mule:properties>
-            <entry key="queries">
-                <map>
-                    <entry key="getTest2" value="OVERRIDDEN VALUE" />
-                    <entry key="getTest3"
+    <endpoint name="testJdbcEndpoint" address="jdbc://getTest?type=1" connector-ref="jdbcConnector3">
+        <properties>
+            <spring:entry key="queries">
+                <spring:map>
+                    <spring:entry key="getTest2" value="OVERRIDDEN VALUE" />
+                    <spring:entry key="getTest3"
                            value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = ${type} AND ACK IS NULL" />
-                </map>
-            </entry>
-        </mule:properties>
-    </mule:endpoint>
+                </spring:map>
+            </spring:entry>
+        </properties>
+    </endpoint>
 
-    <bean id="testDS1" class="org.mule.providers.jdbc.test.TestDataSource" />
+    <spring:bean id="testDS1" class="org.mule.providers.jdbc.test.TestDataSource" />
 
-    <jee:jndi-lookup id="testDS2" jndi-name="jdbc/testDS" environment-ref="jndiEnv" />
+    <other>
+        <jee:jndi-lookup id="testDS2" jndi-name="jdbc/testDS" environment-ref="jndiEnv" />
+        
+        <util:map id="jndiEnv">
+            <spring:entry key="java.naming.factory.initial" value="org.mule.providers.jdbc.test.JdbcTestContextFactory" />
+        </util:map>
+    </other>
 
-    <util:map id="jndiEnv">
-        <entry key="java.naming.factory.initial" value="org.mule.providers.jdbc.test.JdbcTestContextFactory" />
-    </util:map>
-</beans>
+</mule>

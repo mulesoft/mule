@@ -12,6 +12,14 @@
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0" 
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
 
-    <xsd:element name="connector" type="mule:connectorType"/>
+    <xsd:element name="connector" type="testConnectorType" substitutionGroup="mule:abstract-connector"/>
+    <xsd:complexType name="testConnectorType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractConnectorType">
+                <xsd:group ref="mule:connectorElements"/>
+                <xsd:attributeGroup ref="mule:connectorAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
 </xsd:schema>

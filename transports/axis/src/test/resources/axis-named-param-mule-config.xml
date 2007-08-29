@@ -1,35 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:axis="http://www.mulesource.org/schema/mule/axis/2.0"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/axis/2.0/mule-axis.xsd">
 
-    <mule:model name="test">
-        <mule:service name="mycomponent1">
-            <mule:component class="org.mule.components.simple.EchoComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="vm://mycomponent1"/>
-            </mule:inbound-router>
-            <mule:outbound-router>
-                <mule:outbound-pass-through-router>
-                    <mule:endpoint address="axis:http://localhost:62111/mule/mycomponent2?method=echo"
-                        synchronous="true">
-                        <property name="soapMethods" value="value:string:in,return:string"/>
-                    </mule:endpoint>
-                </mule:outbound-pass-through-router>
-            </mule:outbound-router>
-        </mule:service>
+    <model name="test">
+        <service name="mycomponent1">
+            <component class="org.mule.components.simple.EchoComponent"/>
+            <inbound-router>
+                <endpoint address="vm://mycomponent1"/>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <endpoint address="axis:http://localhost:62111/mule/mycomponent2?method=echo" synchronous="true">
+                        <properties>
+                            <spring:entry key="soapMethods" value="value:string:in,return:string"/>
+                        </properties>
+                    </endpoint>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
 
-        <mule:service name="mycomponent2">
-            <mule:component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="axis:http://localhost:62111/mule" synchronous="true"/>
-            </mule:inbound-router>
-        </mule:service>
-    </mule:model>
-</beans>
+        <service name="mycomponent2">
+            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            <inbound-router>
+                <endpoint address="axis:http://localhost:62111/mule" synchronous="true"/>
+            </inbound-router>
+        </service>
+    </model>
+</mule>
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:axis="http://www.mulesource.org/schema/mule/axis/2.0"
        xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
     xsi:schemaLocation="
@@ -10,38 +10,38 @@
        http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/axis/2.0/mule-axis.xsd
        http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
        
-    <mule:environment-properties>
-        <entry key="synchronous" value="true"/>
-        <entry key="remoteSync" value="true"/>
-    </mule:environment-properties>
+    <environment-properties>
+        <spring:entry key="synchronous" value="true"/>
+        <spring:entry key="remoteSync" value="true"/>
+    </environment-properties>
 
     <jms:activemq-connector name="jmsConnector" />
     <!-- this is needed also, but does not work now -->
 <!--                            brokerUrl="vm://localhost?broker.persistence=true"/> -->
 
-    <mule:endpoint name="soapActionDefined" address="axis:jms://soap.my.queue?method=echo&amp;MULE_REMOTE_SYNC=true">
-        <mule:properties>
-            <entry key="SOAPAction" value="jms://soap.my.queue/echoComponent"/>
-        </mule:properties>
-    </mule:endpoint>
-    <mule:endpoint name="componentName" address="axis:jms://myComponent?method=echo&amp;MULE_REMOTE_SYNC=true"/>
-    <mule:endpoint name="noSoapActionDefined" address="axis:jms://soap.my.queue?method=echo&amp;MULE_REMOTE_SYNC=true"/>
-    <mule:endpoint name="noMethodDefined" address="axis:jms://soap.my.queue"/>
+    <endpoint name="soapActionDefined" address="axis:jms://soap.my.queue?method=echo&amp;MULE_REMOTE_SYNC=true">
+        <properties>
+            <spring:entry key="SOAPAction" value="jms://soap.my.queue/echoComponent"/>
+        </properties>
+    </endpoint>
+    <endpoint name="componentName" address="axis:jms://myComponent?method=echo&amp;MULE_REMOTE_SYNC=true"/>
+    <endpoint name="noSoapActionDefined" address="axis:jms://soap.my.queue?method=echo&amp;MULE_REMOTE_SYNC=true"/>
+    <endpoint name="noMethodDefined" address="axis:jms://soap.my.queue"/>
 
-    <mule:model name="test">
-        <mule:service name="echoComponent">
-            <mule:component class="org.mule.components.simple.EchoComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="axis:jms://soap.my.queue"/>
-            </mule:inbound-router>
-        </mule:service>
+    <model name="test">
+        <service name="echoComponent">
+            <component class="org.mule.components.simple.EchoComponent"/>
+            <inbound-router>
+                <endpoint address="axis:jms://soap.my.queue"/>
+            </inbound-router>
+        </service>
 
-        <mule:service name="myComponent">
-            <mule:component class="org.mule.components.simple.EchoComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="axis:jms://myComponent"/>
-            </mule:inbound-router>
-        </mule:service>
-    </mule:model>
+        <service name="myComponent">
+            <component class="org.mule.components.simple.EchoComponent"/>
+            <inbound-router>
+                <endpoint address="axis:jms://myComponent"/>
+            </inbound-router>
+        </service>
+    </model>
     
-</beans>
+</mule>

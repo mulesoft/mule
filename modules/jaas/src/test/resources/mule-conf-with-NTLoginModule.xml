@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:file="http://www.mulesource.org/schema/mule/file/2.0"
        xmlns:jaas="http://www.mulesource.org/schema/mule/jaas/2.0"
     xsi:schemaLocation="
@@ -18,14 +18,14 @@
         <jaas:password-encryption-strategy  name="PBE" password="mule"/>
     </jaas:security-manager>
 
-    <mule:model name="test">
-        <mule:service name="TestUMO">
-            <mule:component class="org.mule.tck.functional.FunctionalTestComponent"/>
-                <mule:inbound-router>
-                    <mule:endpoint address="vm://test">
-                        <mule:encryption-security-filter strategy-ref="PBE"/>
-                    </mule:endpoint>
-                </mule:inbound-router>
-            </mule:service>
-    </mule:model>
-</beans>
+    <model name="test">
+        <service name="TestUMO">
+            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
+                <inbound-router>
+                    <endpoint address="vm://test">
+                        <encryption-security-filter strategy-ref="PBE"/>
+                    </endpoint>
+                </inbound-router>
+            </service>
+    </model>
+</mule>

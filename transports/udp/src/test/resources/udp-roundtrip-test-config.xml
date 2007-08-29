@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:udp="http://www.mulesource.org/schema/mule/udp/2.0"
        xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
        xsi:schemaLocation="
@@ -10,35 +10,35 @@
                http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd
                http://www.mulesource.org/schema/mule/udp/2.0 http://www.mulesource.org/schema/mule/udp/2.0/mule-udp.xsd">
 
-    <mule:transformer-serializable-to-byte-array name="SerializableToByteArray"/>
+    <transformer-serializable-to-byte-array name="SerializableToByteArray"/>
 
-    <bean class="org.mule.config.spring.processors.PropertyPlaceholderProcessor">
-        <property name="factories">
-            <map>
-                <entry key="hostname">
-                    <bean class="org.mule.config.factories.HostNameFactory"/>
-                </entry>
-            </map>
-        </property>
-    </bean>
+    <spring:bean class="org.mule.config.spring.processors.PropertyPlaceholderProcessor">
+        <spring:property name="factories">
+            <spring:map>
+                <spring:entry key="hostname">
+                    <spring:bean class="org.mule.config.factories.HostNameFactory"/>
+                </spring:entry>
+            </spring:map>
+        </spring:property>
+    </spring:bean>
 
-    <mule:model name="main">
+    <model name="main">
 
-        <mule:service name="PassingThrough">
-            <mule:component class="org.mule.components.simple.PassThroughComponent"/>
-            <mule:inbound-router>
+        <service name="PassingThrough">
+            <component class="org.mule.components.simple.PassThroughComponent"/>
+            <inbound-router>
                 <!-- MULE-2109 -->
                 <!-- mule:endpoint address="udp://${hostname}:9001"/ -->
-                <mule:endpoint address="udp://${hostname}:61000"/>
-            </mule:inbound-router>
-            <mule:outbound-router>
-                <mule:outbound-pass-through-router>
+                <endpoint address="udp://${hostname}:61000"/>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
                     <!-- mule:endpoint address="udp://${hostname}:9002"/ -->
-                    <mule:endpoint address="udp://${hostname}:61001"/>
-                </mule:outbound-pass-through-router>
-            </mule:outbound-router>
-        </mule:service>
+                    <endpoint address="udp://${hostname}:61001"/>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
 
-    </mule:model>
-</beans>
+    </model>
+</mule>
         

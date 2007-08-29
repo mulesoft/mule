@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:scripting="http://www.mulesource.org/schema/mule/scripting/2.0"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
@@ -18,22 +18,22 @@
         return ["Hello", ":-)"];
     </scripting:script>
     
-    <mule:model name="main">
-        <mule:service name="ScriptService">
-            <mule:component class="org.mule.components.script.jsr223.ScriptComponent">
-                <mule:properties>
-                    <entry key="scriptEngineName" value="groovy"/>
-                    <entry key="scriptText" value-ref="scriptText"/>
-                </mule:properties>
-            </mule:component>
-            <mule:inbound-router>
-                <mule:endpoint address="stdio://System.in">
-                    <mule:properties>
-                        <entry key="promptMessage" value="Please enter a message: "/>
-                        <entry key="messageDelayTime" value="1000"/>
-                    </mule:properties>
-                </mule:endpoint>
-            </mule:inbound-router>
-        </mule:service>
-    </mule:model>
-</beans>
+    <model name="main">
+        <service name="ScriptService">
+            <component class="org.mule.components.script.jsr223.ScriptComponent">
+                <properties>
+                    <spring:entry key="scriptEngineName" value="groovy"/>
+                    <spring:entry key="scriptText" value-ref="scriptText"/>
+                </properties>
+            </component>
+            <inbound-router>
+                <endpoint address="stdio://System.in">
+                    <properties>
+                        <spring:entry key="promptMessage" value="Please enter a message: "/>
+                        <spring:entry key="messageDelayTime" value="1000"/>
+                    </properties>
+                </endpoint>
+            </inbound-router>
+        </service>
+    </model>
+</mule>

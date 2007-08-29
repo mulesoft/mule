@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:tcp="http://www.mulesource.org/schema/mule/tcp/2.0"
        xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
@@ -14,32 +14,32 @@
                    socketSoLinger="0"
                    tcpProtocolClassName="org.mule.providers.tcp.protocols.LengthProtocol"/>
 
-    <mule:endpoint name="clientEndpoint" address="tcp://localhost:60198" synchronous="true"/>
+    <endpoint name="clientEndpoint" address="tcp://localhost:60198" synchronous="true"/>
 
-    <mule:endpoint name="asyncClientEndpoint" address="tcp://localhost:60199" synchronous="false"/>
+    <endpoint name="asyncClientEndpoint" address="tcp://localhost:60199" synchronous="false"/>
 
-    <bean id="test2" class="org.mule.tck.functional.FunctionalTestComponent">
-        <property name="eventCallback">
-            <bean class="org.mule.tck.functional.ResponseWriterCallback"/>
-        </property>
-    </bean>
+    <spring:bean id="test2" class="org.mule.tck.functional.FunctionalTestComponent">
+        <spring:property name="eventCallback">
+            <spring:bean class="org.mule.tck.functional.ResponseWriterCallback"/>
+        </spring:property>
+    </spring:bean>
 
-    <mule:model name="main">
-        <mule:service name="testComponent1">
-            <mule:component class="org.mule.tck.functional.FunctionalTestComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint ref="clientEndpoint"/>
-            </mule:inbound-router>
-        </mule:service>
+    <model name="main">
+        <service name="testComponent1">
+            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
+            <inbound-router>
+                <endpoint ref="clientEndpoint"/>
+            </inbound-router>
+        </service>
 
-        <mule:service name="testComponent2">
+        <service name="testComponent2">
             <!-- Note: this doesn't need to be a singleton, it's a workaround because I couldn't 
                 figure out how to set the eventCallback bean as a property within mule:properties -->
-            <mule:component scope="singleton" instance-ref="test2"/>
-            <mule:inbound-router>
-                <mule:endpoint ref="asyncClientEndpoint"/>
-            </mule:inbound-router>
-        </mule:service>
-    </mule:model>
+            <component scope="singleton" instance-ref="test2"/>
+            <inbound-router>
+                <endpoint ref="asyncClientEndpoint"/>
+            </inbound-router>
+        </service>
+    </model>
 
-</beans>
+</mule>

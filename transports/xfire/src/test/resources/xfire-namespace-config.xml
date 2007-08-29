@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:xfire="http://www.mulesource.org/schema/mule/xfire/2.0"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/xfire/2.0 http://www.mulesource.org/schema/mule/xfire/2.0/mule-xfire.xsd">
        
-    <bean name="mockFactory" class="org.mule.providers.soap.xfire.testmodels.MockServiceFactory"/>
-    <bean name="mockXFire" class="org.mule.providers.soap.xfire.testmodels.MockXFire"/>
+    <spring:bean name="mockFactory" class="org.mule.providers.soap.xfire.testmodels.MockServiceFactory"/>
+    <spring:bean name="mockXFire" class="org.mule.providers.soap.xfire.testmodels.MockXFire"/>
        
     <xfire:connector name="xfireConnector"
         bindingProviderClass="org.codehaus.xfire.service.binding.MessageBindingProvider"
@@ -34,4 +34,4 @@
     <xfire:connector name="xfireConnector2"
         serviceFactory-ref="mockFactory"
         xfire-ref="mockXFire"/>
-</beans>
+</mule>

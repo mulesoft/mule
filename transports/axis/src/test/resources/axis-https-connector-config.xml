@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:axis="http://www.mulesource.org/schema/mule/axis/2.0"
        xmlns:https="http://www.mulesource.org/schema/mule/https/2.0"
     xsi:schemaLocation="
@@ -21,12 +21,12 @@
                 requireClientAuthentication="false"/>
     </https:connector>
 
-    <mule:model name="Https_Test_Model">
-        <mule:service name="TestUMO">
-            <mule:component class="org.mule.components.simple.EchoComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="axis:https://localhost:62000"/>
-            </mule:inbound-router>
-        </mule:service>
-    </mule:model>
-</beans>
+    <model name="Https_Test_Model">
+        <service name="TestUMO">
+            <component class="org.mule.components.simple.EchoComponent"/>
+            <inbound-router>
+                <endpoint address="axis:https://localhost:62000"/>
+            </inbound-router>
+        </service>
+    </model>
+</mule>

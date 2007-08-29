@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
        xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
@@ -11,20 +11,20 @@
     <vm:connector name="vm-normal" queueEvents="false"/>
     <vm:connector name="vm-queue" queueEvents="true"/>
 
-    <mule:endpoint name="queue" address="vm://foo" connector-ref="vm-queue"/>
-    <mule:endpoint name="entry" address="vm://entry" connector-ref="vm-normal"/>
+    <endpoint name="queue" address="vm://foo" connector-ref="vm-queue"/>
+    <endpoint name="entry" address="vm://entry" connector-ref="vm-normal"/>
 
-    <mule:model name="main">
-        <mule:service name="testService">
-            <mule:component class="org.mule.tck.functional.FunctionalTestComponent" />
-            <mule:inbound-router>
-                <mule:endpoint address="vm://entry" connector-ref="vm-normal"/>
-            </mule:inbound-router>
-            <mule:outbound-router>
-                <mule:outbound-pass-through-router>
-                    <mule:endpoint ref="queue"/>
-                </mule:outbound-pass-through-router>
-            </mule:outbound-router>
-        </mule:service>
-    </mule:model>
-</beans>
+    <model name="main">
+        <service name="testService">
+            <component class="org.mule.tck.functional.FunctionalTestComponent" />
+            <inbound-router>
+                <endpoint address="vm://entry" connector-ref="vm-normal"/>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <endpoint ref="queue"/>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
+    </model>
+</mule>

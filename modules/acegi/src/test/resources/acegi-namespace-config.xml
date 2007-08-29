@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
        xmlns:acegi="http://www.mulesource.org/schema/mule/acegi/2.0"
     xsi:schemaLocation="
@@ -11,20 +11,20 @@
        http://www.mulesource.org/schema/mule/acegi/2.0 http://www.mulesource.org/schema/mule/acegi/2.0/mule-acegi.xsd">
 
 
-    <bean id="inMemoryDaoImpl" class="org.acegisecurity.userdetails.memory.InMemoryDaoImpl">
-        <property name="userMap">
-            <value>
+    <spring:bean id="inMemoryDaoImpl" class="org.acegisecurity.userdetails.memory.InMemoryDaoImpl">
+        <spring:property name="userMap">
+            <spring:value>
                 ross=ross,ROLE_ADMIN
                 anon=anon,ROLE_ANONYMOUS
-            </value>
-        </property>
-    </bean>
+            </spring:value>
+        </spring:property>
+    </spring:bean>
 
-    <bean id="daoAuthenticationProvider" class="org.acegisecurity.providers.dao.DaoAuthenticationProvider">
-        <property name="userDetailsService" ref="inMemoryDaoImpl"/>
-    </bean>
+    <spring:bean id="daoAuthenticationProvider" class="org.acegisecurity.providers.dao.DaoAuthenticationProvider">
+        <spring:property name="userDetailsService" ref="inMemoryDaoImpl"/>
+    </spring:bean>
 
-    <bean name="echoComponent" class="org.mule.components.simple.EchoComponent"/>
+    <spring:bean name="echoComponent" class="org.mule.components.simple.EchoComponent"/>
 
     <acegi:security-manager>
         <acegi:delegate-security-provider name="memory-dao"
@@ -36,23 +36,23 @@
          through a custom provider.  in normal use it should be set just once, through
          the acegi schema - this is just for extra test coverage -->
 
-    <bean id="explicitCreation1" class="org.mule.extras.acegi.AcegiProviderAdapter">
-        <property name="delegate" ref="daoAuthenticationProvider"/>
-        <property name="name" value="customProvider"/>
-    </bean>
+    <spring:bean id="explicitCreation1" class="org.mule.extras.acegi.AcegiProviderAdapter">
+        <spring:property name="delegate" ref="daoAuthenticationProvider"/>
+        <spring:property name="name" value="customProvider"/>
+    </spring:bean>
 
-    <mule:security-manager>
-        <mule:custom-security-provider name="willNotOverwriteName"
+    <security-manager>
+        <custom-security-provider name="willNotOverwriteName"
                                        provider-ref="explicitCreation1"/>
-    </mule:security-manager>
+    </security-manager>
 
-    <bean id="explicitCreation2" class="org.mule.extras.acegi.AcegiProviderAdapter">
-        <property name="delegate" ref="daoAuthenticationProvider"/>
-    </bean>
+    <spring:bean id="explicitCreation2" class="org.mule.extras.acegi.AcegiProviderAdapter">
+        <spring:property name="delegate" ref="daoAuthenticationProvider"/>
+    </spring:bean>
 
-    <mule:security-manager>
-        <mule:custom-security-provider name="willOverwriteName"
+    <security-manager>
+        <custom-security-provider name="willOverwriteName"
                                        provider-ref="explicitCreation2"/>
-    </mule:security-manager>
+    </security-manager>
 
-</beans>
+</mule>

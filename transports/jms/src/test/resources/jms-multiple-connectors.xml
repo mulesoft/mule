@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
@@ -10,7 +10,7 @@
 
     <jms:activemq-connector name="jmsConnector"/>
 
-    <mule:endpoint name="ep1" address="jms://admin:admin@admin.queue?createConnector=ALWAYS"/>
-    <mule:endpoint name="ep2" address="jms://ross:ross@ross.queue?createConnector=ALWAYS"/>
+    <endpoint name="ep1" address="jms://admin:admin@admin.queue?createConnector=ALWAYS"/>
+    <endpoint name="ep2" address="jms://ross:ross@ross.queue?createConnector=ALWAYS"/>
 
-</beans>
+</mule>

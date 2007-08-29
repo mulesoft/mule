@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:tcp="http://www.mulesource.org/schema/mule/tcp/2.0"
        xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
        xsi:schemaLocation="
@@ -15,35 +15,35 @@
     <tcp:connector name="tcpConnector"
                    tcpProtocolClassName="org.mule.providers.tcp.integration.CustomSerializationProtocol"/>
 
-    <mule:custom-transformer name="NoAction"
+    <custom-transformer name="NoAction"
                              class="org.mule.transformers.NoActionTransformer"/>
 
-    <mule:model name="model">
+    <model name="model">
 
-        <mule:service name="BridgeIn">
-            <mule:component class="org.mule.components.simple.PassThroughComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="vm://in"/>
-            </mule:inbound-router>
-            <mule:outbound-router>
-                <mule:outbound-pass-through-router>
-                    <mule:endpoint address="tcp://localhost:9994" transformers="NoAction"/>
-                </mule:outbound-pass-through-router>
-            </mule:outbound-router>
-        </mule:service>
+        <service name="BridgeIn">
+            <component class="org.mule.components.simple.PassThroughComponent"/>
+            <inbound-router>
+                <endpoint address="vm://in"/>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <endpoint address="tcp://localhost:9994" transformers="NoAction"/>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
 
-        <mule:service name="BridgeOut">
-            <mule:bridge-component/>
-            <mule:inbound-router>
-                <mule:endpoint address="tcp://localhost:9994" transformers="NoAction"/>
-            </mule:inbound-router>
-            <mule:outbound-router>
-                <mule:outbound-pass-through-router>
-                    <mule:endpoint address="vm://out"/>
-                </mule:outbound-pass-through-router>
-            </mule:outbound-router>
-        </mule:service>
+        <service name="BridgeOut">
+            <bridge-component/>
+            <inbound-router>
+                <endpoint address="tcp://localhost:9994" transformers="NoAction"/>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <endpoint address="vm://out"/>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
 
-    </mule:model>
+    </model>
 
-</beans>
+</mule>

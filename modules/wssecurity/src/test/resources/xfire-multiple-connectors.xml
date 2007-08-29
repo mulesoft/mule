@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
 	   xmlns:stdio="http://www.mulesource.org/schema/mule/stdio/2.0"
        xmlns:xfire="http://www.mulesource.org/schema/mule/xfire/2.0"
        xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
@@ -14,16 +14,16 @@
 	   http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd
   	   http://www.mulesource.org/schema/mule/wssecurity/2.0 http://www.mulesource.org/schema/mule/wssecurity/2.0/mule-wssecurity.xsd">
 
-    <mule:configuration serverId="someId" defaultSynchronousEndpoints="false"/>
+    <configuration serverId="someId" defaultSynchronousEndpoints="false"/>
 
-    <bean id="passwords" class="org.mule.extras.wssecurity.callbackhandlers.PasswordContainer">
-        <constructor-arg>
-            <props>
-                <prop key="mulealias">mulepassword</prop>
-                <prop key="gooduser">goodUserPassword</prop>
-            </props>
-        </constructor-arg>
-    </bean>
+    <spring:bean id="passwords" class="org.mule.extras.wssecurity.callbackhandlers.PasswordContainer">
+        <spring:constructor-arg>
+            <spring:props>
+                <spring:prop key="mulealias">mulepassword</spring:prop>
+                <spring:prop key="gooduser">goodUserPassword</spring:prop>
+            </spring:props>
+        </spring:constructor-arg>
+    </spring:bean>
 
     <xfire:connector name="SecuredConnector">
         <xfire:client-out-handler>org.codehaus.xfire.util.dom.DOMOutHandler</xfire:client-out-handler>
@@ -32,50 +32,50 @@
 
     <xfire:connector name="UnsecuredConnector"/>
 
-    <mule:model name="test">
+    <model name="test">
 
-        <mule:service name="SecureBridge">
-            <mule:bridge-component/>
-            <mule:inbound-router>
-                <mule:endpoint address="vm://secured"/>
-            </mule:inbound-router>
-            <mule:outbound-router>
-                <mule:outbound-pass-through-router>
-                    <mule:endpoint name="secured" address="xfire:http://localhost:64282/SecuredWs?method=echo" connector-ref="SecuredConnector"/>
-                </mule:outbound-pass-through-router>
-            </mule:outbound-router>
-        </mule:service>
+        <service name="SecureBridge">
+            <bridge-component/>
+            <inbound-router>
+                <endpoint address="vm://secured"/>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <endpoint name="secured" address="xfire:http://localhost:64282/SecuredWs?method=echo" connector-ref="SecuredConnector"/>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
 
-        <mule:service name="SecuredWS">
-            <mule:echo-component/>
-            <mule:inbound-router>
-                <mule:endpoint address="xfire:http://localhost:64282" connector-ref="SecuredConnector">
+        <service name="SecuredWS">
+            <echo-component/>
+            <inbound-router>
+                <endpoint address="xfire:http://localhost:64282" connector-ref="SecuredConnector">
                     <wssecurity:security-filter
                             decryptionFile="in-encrypted-security.properties"
                             signatureFile="in-signed-security.properties"/>
-                </mule:endpoint>
-            </mule:inbound-router>
-        </mule:service>
+                </endpoint>
+            </inbound-router>
+        </service>
 
-        <mule:service name="UnSecureBridge">
-            <mule:bridge-component/>
-            <mule:inbound-router>
-                <mule:endpoint address="vm://unsecured"/>
-            </mule:inbound-router>
-            <mule:outbound-router>
-                <mule:outbound-pass-through-router>
-                    <mule:endpoint address="xfire:http://localhost:64284/UnSecuredWs?method=echo" connector-ref="UnsecuredConnector"/>
-                </mule:outbound-pass-through-router>
-            </mule:outbound-router>
-        </mule:service>
+        <service name="UnSecureBridge">
+            <bridge-component/>
+            <inbound-router>
+                <endpoint address="vm://unsecured"/>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <endpoint address="xfire:http://localhost:64284/UnSecuredWs?method=echo" connector-ref="UnsecuredConnector"/>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
 
-        <mule:service name="UnsecuredWS">
-            <mule:echo-component/>
-            <mule:inbound-router>
-                <mule:endpoint address="xfire:http://localhost:64284" connector-ref="UnsecuredConnector"/>
-            </mule:inbound-router>
-        </mule:service>
+        <service name="UnsecuredWS">
+            <echo-component/>
+            <inbound-router>
+                <endpoint address="xfire:http://localhost:64284" connector-ref="UnsecuredConnector"/>
+            </inbound-router>
+        </service>
 
-    </mule:model>
+    </model>
 
-</beans>
+</mule>

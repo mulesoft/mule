@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
@@ -13,80 +13,80 @@
         http://today.java.net/pub/a/today/2005/10/18/service-provisioning-through-esb.html.
     </description>
 
-    <mule:configuration serverId="" defaultSynchronousEndpoints="true"/>
+    <configuration serverId="" defaultSynchronousEndpoints="true"/>
 
-    <mule:endpoint name="VoipBrokerRequests" address="vm://VoipBrokerRequests"/>
+    <endpoint name="VoipBrokerRequests" address="vm://VoipBrokerRequests"/>
 
-    <mule:endpoint name="AddressValidation" address="axis:http://localhost:18080/mule/AddressValidationService?method=validateAddress"/>
-    <mule:endpoint name="AddressValidationReceiver" address="axis:http://localhost:18080/mule"/>
+    <endpoint name="AddressValidation" address="axis:http://localhost:18080/mule/AddressValidationService?method=validateAddress"/>
+    <endpoint name="AddressValidationReceiver" address="axis:http://localhost:18080/mule"/>
     
-    <mule:endpoint name="PaymentValidation" address="vm://PaymentValidationService?method=getCreditVendors"/>
+    <endpoint name="PaymentValidation" address="vm://PaymentValidationService?method=getCreditVendors"/>
     
-    <mule:endpoint name="CreditAgency" address="axis:http://localhost:18081/mule/CreditAgencyService?method=getCreditProfile"/>
-    <mule:endpoint name="CreditAgencyReceiver" address="axis:http://localhost:18081/mule"/>
+    <endpoint name="CreditAgency" address="axis:http://localhost:18081/mule/CreditAgencyService?method=getCreditProfile"/>
+    <endpoint name="CreditAgencyReceiver" address="axis:http://localhost:18081/mule"/>
     
-    <mule:endpoint name="BankAgency" address="axis:http://localhost:18082/mule/BankAgencyService?method=getAuthorisedStatus"/>
-    <mule:endpoint name="BankAgencyReceiver" address="axis:http://localhost:18082/mule"/>
+    <endpoint name="BankAgency" address="axis:http://localhost:18082/mule/BankAgencyService?method=getAuthorisedStatus"/>
+    <endpoint name="BankAgencyReceiver" address="axis:http://localhost:18082/mule"/>
 
-    <mule:endpoint name="PaymentValidationResponse" address="vm://PaymentValidationResponse"/>
+    <endpoint name="PaymentValidationResponse" address="vm://PaymentValidationResponse"/>
     
-    <mule:model name="voip-broker">
-        <mule:service name="VoipBroker">
-            <mule:component class="org.mule.samples.voipservice.service.SyncVoipBroker"/>
+    <model name="voip-broker">
+        <service name="VoipBroker">
+            <component class="org.mule.samples.voipservice.service.SyncVoipBroker"/>
 
-            <mule:inbound-router>
-                <mule:endpoint ref="VoipBrokerRequests"/>
-            </mule:inbound-router>
+            <inbound-router>
+                <endpoint ref="VoipBrokerRequests"/>
+            </inbound-router>
             
-            <mule:outbound-router>
-                <mule:filtering-router>
-                    <mule:endpoint ref="AddressValidation"/>
-                    <mule:payload-type-filter expectedType="org.mule.samples.voipservice.to.AddressTO"/>
-                </mule:filtering-router>
+            <outbound-router>
+                <filtering-router>
+                    <endpoint ref="AddressValidation"/>
+                    <payload-type-filter expectedType="org.mule.samples.voipservice.to.AddressTO"/>
+                </filtering-router>
                 
-                <mule:static-recipient-list-router>
-                    <mule:reply-to address="PaymentValidationResponse"/>
-                    <mule:message-property-filter pattern="recipients != null"/>
-                </mule:static-recipient-list-router>
+                <static-recipient-list-router>
+                    <reply-to address="PaymentValidationResponse"/>
+                    <message-property-filter pattern="recipients != null"/>
+                </static-recipient-list-router>
                 
-                <mule:filtering-router>
-                    <mule:endpoint ref="PaymentValidation"/>
-                    <mule:payload-type-filter expectedType="java.lang.String"/>
-                </mule:filtering-router>
-            </mule:outbound-router>
+                <filtering-router>
+                    <endpoint ref="PaymentValidation"/>
+                    <payload-type-filter expectedType="java.lang.String"/>
+                </filtering-router>
+            </outbound-router>
             
-            <mule:response-router>
-                <mule:endpoint ref="PaymentValidationResponse"/>
-                <mule:custom-response-router class="org.mule.samples.voipservice.routers.PaymentValidationResponseAggregator"/>
-            </mule:response-router>
-        </mule:service>
+            <response-router>
+                <endpoint ref="PaymentValidationResponse"/>
+                <custom-response-router class="org.mule.samples.voipservice.routers.PaymentValidationResponseAggregator"/>
+            </response-router>
+        </service>
         
-        <mule:service name="AddressValidationService">
-            <mule:component class="org.mule.samples.voipservice.service.AddressValidationService"/>
-            <mule:inbound-router>
-                <mule:endpoint ref="AddressValidationReceiver"/>
-            </mule:inbound-router>
-        </mule:service>
+        <service name="AddressValidationService">
+            <component class="org.mule.samples.voipservice.service.AddressValidationService"/>
+            <inbound-router>
+                <endpoint ref="AddressValidationReceiver"/>
+            </inbound-router>
+        </service>
         
-        <mule:service name="PaymentValidationService">
-            <mule:component class="org.mule.samples.voipservice.service.PaymentValidationService"/>
-            <mule:inbound-router>
-                <mule:endpoint ref="PaymentValidation"/>
-            </mule:inbound-router>
-        </mule:service>
+        <service name="PaymentValidationService">
+            <component class="org.mule.samples.voipservice.service.PaymentValidationService"/>
+            <inbound-router>
+                <endpoint ref="PaymentValidation"/>
+            </inbound-router>
+        </service>
 
-        <mule:service name="CreditAgencyService">
-            <mule:component class="org.mule.samples.voipservice.service.CreditAgencyService"/>
-            <mule:inbound-router>
-                <mule:endpoint ref="CreditAgencyReceiver"/>
-            </mule:inbound-router>
-        </mule:service>
+        <service name="CreditAgencyService">
+            <component class="org.mule.samples.voipservice.service.CreditAgencyService"/>
+            <inbound-router>
+                <endpoint ref="CreditAgencyReceiver"/>
+            </inbound-router>
+        </service>
 
-        <mule:service name="BankAgencyService">
-            <mule:component class="org.mule.samples.voipservice.service.BankAgencyService"/>
-            <mule:inbound-router>
-                <mule:endpoint ref="BankAgencyReceiver"/>
-            </mule:inbound-router>
-        </mule:service>
-    </mule:model>
-</beans>
+        <service name="BankAgencyService">
+            <component class="org.mule.samples.voipservice.service.BankAgencyService"/>
+            <inbound-router>
+                <endpoint ref="BankAgencyReceiver"/>
+            </inbound-router>
+        </service>
+    </model>
+</mule>

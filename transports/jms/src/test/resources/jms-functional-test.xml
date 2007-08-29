@@ -1,37 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
 
-    <mule:model name="testModel" class="org.mule.tck.testmodels.mule.TestSedaModel">
+    <model name="testModel" class="org.mule.tck.testmodels.mule.TestSedaModel">
 
-        <mule:service name="queueComponent">
-            <mule:inbound-router>
-                <mule:endpoint address="jms://in" />
-            </mule:inbound-router>
-            <mule:component class="org.mule.tck.functional.FunctionalTestComponent" scope="singleton"/>
-            <mule:outbound-router>
-                <mule:outbound-pass-through-router>
-                    <mule:endpoint address="jms://out" />
-                </mule:outbound-pass-through-router>
-            </mule:outbound-router>
-        </mule:service>
+        <service name="queueComponent">
+            <component class="org.mule.tck.functional.FunctionalTestComponent" scope="singleton"/>
+            <inbound-router>
+                <endpoint address="jms://in" />
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <endpoint address="jms://out" />
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
 
-        <mule:service name="topicComponent">
-            <mule:inbound-router>
-                <mule:endpoint address="jms://topic:in" />
-            </mule:inbound-router>
-            <mule:component class="org.mule.tck.functional.FunctionalTestComponent" scope="singleton"/>
-            <mule:outbound-router>
-                <mule:outbound-pass-through-router>
-                    <mule:endpoint address="jms://topic:out" />
-                </mule:outbound-pass-through-router>
-            </mule:outbound-router>
-        </mule:service>
-    </mule:model>
-</beans>
+        <service name="topicComponent">
+            <component class="org.mule.tck.functional.FunctionalTestComponent" scope="singleton"/>
+            <inbound-router>
+                <endpoint address="jms://topic:in" />
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <endpoint address="jms://topic:out" />
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
+    </model>
+
+</mule>

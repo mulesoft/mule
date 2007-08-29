@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:acegi="http://www.mulesource.org/schema/mule/acegi/2.0"
        xmlns:axis="http://www.mulesource.org/schema/mule/axis/2.0"
        xmlns:servlet="http://www.mulesource.org/schema/mule/servlet/2.0"
@@ -12,34 +12,34 @@
        http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/axis/2.0/mule-axis.xsd
        http://www.mulesource.org/schema/mule/servlet/2.0 http://www.mulesource.org/schema/mule/servlet/2.0/mule-servlet.xsd">
 
-    <bean id="daoAuthenticationProvider" class="org.acegisecurity.providers.dao.DaoAuthenticationProvider">
-        <property name="userDetailsService" ref="inMemoryDaoImpl"/>
-    </bean>
+    <spring:bean id="daoAuthenticationProvider" class="org.acegisecurity.providers.dao.DaoAuthenticationProvider">
+        <spring:property name="userDetailsService" ref="inMemoryDaoImpl"/>
+    </spring:bean>
 
-    <bean id="inMemoryDaoImpl" class="org.acegisecurity.userdetails.memory.InMemoryDaoImpl">
-        <property name="userMap" value="ross=ross_may_not_invoke_web_service,ROLE_ADMIN"/>
-    </bean>
+    <spring:bean id="inMemoryDaoImpl" class="org.acegisecurity.userdetails.memory.InMemoryDaoImpl">
+        <spring:property name="userMap" value="ross=ross_may_not_invoke_web_service,ROLE_ADMIN"/>
+    </spring:bean>
     
-    <mule:transformer-byte-array-to-string name="ByteArrayToString"/>
+    <transformer-byte-array-to-string name="ByteArrayToString"/>
     
     <servlet:connector name="servletConnector" servletUrl="http://localhost:18088/services">
         <!--  TODO DO: this should not be necessary, see MULE-1508 -->
-        <mule:custom-exception-strategy class="org.mule.providers.soap.axis.UnitTestExceptionStrategy"/>
+        <custom-exception-strategy class="org.mule.providers.soap.axis.UnitTestExceptionStrategy"/>
     </servlet:connector>
     
     <acegi:security-manager>
         <acegi:delegate-security-provider name="memory-dao" delegate-ref="daoAuthenticationProvider"/>
     </acegi:security-manager>
     
-    <mule:model name="test">
-        <mule:service name="mycomponent">
-            <mule:component class="org.mule.components.simple.EchoComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="axis:servlet://mycomponent" responseTransformers="ByteArrayToString">
+    <model name="test">
+        <service name="mycomponent">
+            <component class="org.mule.components.simple.EchoComponent"/>
+            <inbound-router>
+                <endpoint address="axis:servlet://mycomponent" responseTransformers="ByteArrayToString">
                     <acegi:http-security-filter realm="mule-realm"/>
-                </mule:endpoint>
-            </mule:inbound-router>
-        </mule:service>
-    </mule:model>
+                </endpoint>
+            </inbound-router>
+        </service>
+    </model>
     
-</beans>
+</mule>

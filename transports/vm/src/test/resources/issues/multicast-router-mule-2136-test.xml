@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:mxml="http://www.mulesource.org/schema/mule/xml/2.0"
        xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
     xsi:schemaLocation="
@@ -16,37 +16,37 @@
     <mxml:object-to-xml name="objectToXml"/>
     <mxml:xml-to-object name="xmlToObject"/>
 
-    <mule:endpoint name="xml-in" address="vm://xml-in" connector-ref="default"/>
-    <mule:endpoint name="object-in" address="vm://object-in" connector-ref="default"/>
+    <endpoint name="xml-in" address="vm://xml-in" connector-ref="default"/>
+    <endpoint name="object-in" address="vm://object-in" connector-ref="default"/>
 
-    <mule:model name="mule-2136">
+    <model name="mule-2136">
 
-        <mule:service name="xml to ...">
-            <mule:component class="org.mule.components.simple.BridgeComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint ref="xml-in"/>
-            </mule:inbound-router>
-            <mule:outbound-router>
-                <mule:multicasting-router>
-                    <mule:endpoint name="xml-object-out" address="vm://xml-object-out" connector-ref="queue" transformers="xmlToObject"/>
-                </mule:multicasting-router>
-            </mule:outbound-router>
-        </mule:service>
+        <service name="xml to ...">
+            <component class="org.mule.components.simple.BridgeComponent"/>
+            <inbound-router>
+                <endpoint ref="xml-in"/>
+            </inbound-router>
+            <outbound-router>
+                <multicasting-router>
+                    <endpoint name="xml-object-out" address="vm://xml-object-out" connector-ref="queue" transformers="xmlToObject"/>
+                </multicasting-router>
+            </outbound-router>
+        </service>
 
-        <mule:service name="object to xml">
-            <mule:component class="org.mule.components.simple.BridgeComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint ref="object-in"/>
-            </mule:inbound-router>
-            <mule:outbound-router>
-                <mule:multicasting-router>
-                    <mule:endpoint name="object-out" address="vm://object-out" connector-ref="queue"/>
-                    <mule:endpoint name="object-xml-out" address="vm://object-xml-out" connector-ref="queue" transformers="objectToXml"/>
-                    <mule:endpoint ref="xml-in" transformers="objectToXml"/>
-                </mule:multicasting-router>
-            </mule:outbound-router>
-        </mule:service>
+        <service name="object to xml">
+            <component class="org.mule.components.simple.BridgeComponent"/>
+            <inbound-router>
+                <endpoint ref="object-in"/>
+            </inbound-router>
+            <outbound-router>
+                <multicasting-router>
+                    <endpoint name="object-out" address="vm://object-out" connector-ref="queue"/>
+                    <endpoint name="object-xml-out" address="vm://object-xml-out" connector-ref="queue" transformers="objectToXml"/>
+                    <endpoint ref="xml-in" transformers="objectToXml"/>
+                </multicasting-router>
+            </outbound-router>
+        </service>
 
-    </mule:model>
+    </model>
 
-</beans>
+</mule>

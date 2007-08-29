@@ -1,41 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
-    <mule:model name="main">
-        <mule:service name="orange1">
-            <mule:component class="org.mule.tck.testmodels.fruit.Orange"/>
-        </mule:service>
+    <model name="main">
+        <service name="orange1">
+            <component class="org.mule.tck.testmodels.fruit.Orange"/>
+        </service>
 
-        <mule:service name="orange2">
-            <mule:component class="org.mule.tck.testmodels.fruit.Orange">
-                <mule:properties>
-                    <entry key="brand" value="Florida Sunny"/>
-                    <entry key="segments" value="8"/>
-                    <entry key="radius" value="15"/>
-                </mule:properties>
-            </mule:component>
-        </mule:service>
+        <service name="orange2">
+            <component class="org.mule.tck.testmodels.fruit.Orange">
+                <properties>
+                    <spring:entry key="brand" value="Florida Sunny"/>
+                    <spring:entry key="segments" value="8"/>
+                    <spring:entry key="radius" value="15"/>
+                </properties>
+            </component>
+        </service>
 
-        <mule:service name="orange3">
-            <mule:component scope="singleton" instance-ref="myOnlyOrange"/>
-        </mule:service>
+        <service name="orange3">
+            <component scope="singleton" instance-ref="myOnlyOrange"/>
+        </service>
 
-        <mule:service name="orange4">
-            <mule:component factory-ref="myCustomFactory"/>
-        </mule:service>
-    </mule:model>
+        <service name="orange4">
+            <component factory-ref="myCustomFactory"/>
+        </service>
+    </model>
 
     <!-- Singleton instance -->
-    <bean name="myOnlyOrange" class="org.mule.tck.testmodels.fruit.Orange"/>
+    <spring:bean name="myOnlyOrange" class="org.mule.tck.testmodels.fruit.Orange"/>
 
     <!-- Custom factory -->
-    <bean name="myCustomFactory" class="org.mule.tck.testmodels.fruit.FloridaSunnyOrangeFactory">
-        <property name="segments" value="8"/>
-        <property name="radius" value="15"/>
-    </bean>
-</beans>
+    <spring:bean name="myCustomFactory" class="org.mule.tck.testmodels.fruit.FloridaSunnyOrangeFactory">
+        <spring:property name="segments" value="8"/>
+        <spring:property name="radius" value="15"/>
+    </spring:bean>
+</mule>

@@ -1,51 +1,51 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
-    <bean id="tscFactory" class="org.mule.util.object.SimpleObjectFactory">
-        <property name="objectClass" value="org.mule.tck.testmodels.services.TestServiceComponent"/>
-    </bean>
+    <spring:bean id="tscFactory" class="org.mule.util.object.SimpleObjectFactory">
+        <spring:property name="objectClass" value="org.mule.tck.testmodels.services.TestServiceComponent"/>
+    </spring:bean>
 
-    <mule:model name="test">
-        <mule:service name="mycomponent">
-            <mule:component factory-ref="tscFactory"/>
-            <mule:inbound-router>
-                <mule:endpoint address="axis:vm://mycomponent"/>
-            </mule:inbound-router>
-        </mule:service>
+    <model name="test">
+        <service name="mycomponent">
+            <component factory-ref="tscFactory"/>
+            <inbound-router>
+                <endpoint address="axis:vm://mycomponent"/>
+            </inbound-router>
+        </service>
         
-        <mule:service name="mycomponent2">
-            <mule:component factory-ref="tscFactory"/>
-            <mule:inbound-router>
-                <mule:endpoint address="axis:vm://mycomponent2">
-                    <mule:properties>
-                        <entry key="serviceInterfaces">
-                            <list>
-                                <value>org.mule.components.simple.EchoService</value>
-                                <value>org.mule.tck.testmodels.services.DateService</value>
-                            </list>
-                        </entry>
-                    </mule:properties>
-                </mule:endpoint>
-            </mule:inbound-router>
-        </mule:service>
+        <service name="mycomponent2">
+            <component factory-ref="tscFactory"/>
+            <inbound-router>
+                <endpoint address="axis:vm://mycomponent2">
+                    <properties>
+                        <spring:entry key="serviceInterfaces">
+                            <spring:list>
+                                <spring:value>org.mule.components.simple.EchoService</spring:value>
+                                <spring:value>org.mule.tck.testmodels.services.DateService</spring:value>
+                            </spring:list>
+                        </spring:entry>
+                    </properties>
+                </endpoint>
+            </inbound-router>
+        </service>
         
-        <mule:service name="mycomponent3">
-            <mule:component factory-ref="tscFactory"/>
-            <mule:inbound-router>
-                <mule:endpoint address="axis:vm://mycomponent3"/>
-            </mule:inbound-router>
-        </mule:service>
+        <service name="mycomponent3">
+            <component factory-ref="tscFactory"/>
+            <inbound-router>
+                <endpoint address="axis:vm://mycomponent3"/>
+            </inbound-router>
+        </service>
         
-        <mule:service name="mycomponent4">
-            <mule:component factory-ref="tscFactory"/>
-            <mule:inbound-router>
-                <mule:endpoint address="axis:vm://mycomponent4" synchronous="true"/>
-            </mule:inbound-router>
-        </mule:service>
-    </mule:model>
-</beans>
+        <service name="mycomponent4">
+            <component factory-ref="tscFactory"/>
+            <inbound-router>
+                <endpoint address="axis:vm://mycomponent4" synchronous="true"/>
+            </inbound-router>
+        </service>
+    </model>
+</mule>

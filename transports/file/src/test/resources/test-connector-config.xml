@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:file="http://www.mulesource.org/schema/mule/file/2.0"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
@@ -11,12 +11,12 @@
     <file:connector name="fileConnector1"/>
 
     <file:connector name="fileConnector2">
-        <mule:service-overrides
+        <service-overrides
                 outboundTransformer="org.mule.transformers.simple.SerializableToByteArray"
                 inboundTransformer="org.mule.transformers.simple.ByteArrayToSerializable"/>
     </file:connector>
 
     <file:connector name="fileConnector3"/>
 
-</beans>
+</mule>
         

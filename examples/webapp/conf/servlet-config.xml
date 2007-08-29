@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:servlet="http://www.mulesource.org/schema/mule/servlet/2.0"
        xmlns:file="http://www.mulesource.org/schema/mule/file/2.0"
        xsi:schemaLocation="
@@ -10,35 +10,35 @@
                http://www.mulesource.org/schema/mule/servlet/2.0 http://www.mulesource.org/schema/mule/servlet/2.0/mule-servlet.xsd
                http://www.mulesource.org/schema/mule/file/2.0 http://www.mulesource.org/schema/mule/file/2.0/mule-file.xsd">
 
-    <mule:endpoint name="restFileEndpoint" address="file://./.mule/restFile"/>
+    <endpoint name="restFileEndpoint" address="file://./.mule/restFile"/>
 
     <!-- workaround for http://mule.mulesource.org/jira/browse/MULE-1827 -->
-    <mule:custom-transformer class="org.mule.transformers.simple.MessagePropertiesTransformer">
-        <mule:property name="addProperties">
+    <custom-transformer class="org.mule.transformers.simple.MessagePropertiesTransformer">
+        <spring:property name="addProperties">
             <map>
                 <entry key="Content-Type" value="text/plain"/>
             </map>
-        </mule:property>
-    </mule:custom-transformer>
+        </spring:property>
+    </custom-transformer>
 
-    <mule:model name="samples">
+    <model name="samples">
 
-        <mule:service name="restTest">
-            <mule:component class="org.mule.samples.rest.RestTester">
-                <mule:properties>
-                    <entry key="prefix" value="Received"/>
-                </mule:properties>
-            </mule:component>
-            <mule:inbound-router>
-                <mule:endpoint address="servlet://restPUTTest" responseTransformers="PlainTextResponseTransformer"/>
-            </mule:inbound-router>
-            <mule:outbound-router>
-                <mule:outbound-pass-through-router>
-                    <mule:endpoint address="restFileEndpoint"/>
-                </mule:outbound-pass-through-router>
-            </mule:outbound-router>
-        </mule:service>
+        <service name="restTest">
+            <component class="org.mule.samples.rest.RestTester">
+                <properties>
+                    <spring:entry key="prefix" value="Received"/>
+                </properties>
+            </component>
+            <inbound-router>
+                <endpoint address="servlet://restPUTTest"/>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <endpoint address="restFileEndpoint"/>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
 
-    </mule:model>
+    </model>
 
-</beans>
+</mule>

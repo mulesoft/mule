@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:axis="http://www.mulesource.org/schema/mule/axis/2.0"
        xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
     xsi:schemaLocation="
@@ -14,55 +14,55 @@
     <!-- this is needed also, but does not work now -->
 <!--                            brokerUrl="vm://localhost?broker.persistence=true"/> -->
     
-    <mule:model name="test">
-        <mule:service name="mycomponent">
-            <mule:component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="axis:jms://mycomponent">
-                    <mule:properties>
-                        <entry key="topic" value="true"/>
-                    </mule:properties>
-                </mule:endpoint>
-            </mule:inbound-router>
-        </mule:service>
+    <model name="test">
+        <service name="mycomponent">
+            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            <inbound-router>
+                <endpoint address="axis:jms://mycomponent">
+                    <properties>
+                        <spring:entry key="topic" value="true"/>
+                    </properties>
+                </endpoint>
+            </inbound-router>
+        </service>
 
-        <mule:service name="mycomponent2">
-            <mule:component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="axis:jms://mycomponent2">
-                    <mule:properties>
-                        <entry key="topic" value="true"/>
-                        <entry key="serviceInterfaces">
-                            <list>
-                                <value>org.mule.components.simple.EchoService</value>
-                                <value>org.mule.tck.testmodels.services.DateService</value>
-                            </list>
-                        </entry>
-                    </mule:properties>
-                </mule:endpoint>
-            </mule:inbound-router>
-        </mule:service>
+        <service name="mycomponent2">
+            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            <inbound-router>
+                <endpoint address="axis:jms://mycomponent2">
+                    <properties>
+                        <spring:entry key="topic" value="true"/>
+                        <spring:entry key="serviceInterfaces">
+                            <spring:list>
+                                <spring:value>org.mule.components.simple.EchoService</spring:value>
+                                <spring:value>org.mule.tck.testmodels.services.DateService</spring:value>
+                            </spring:list>
+                        </spring:entry>
+                    </properties>
+                </endpoint>
+            </inbound-router>
+        </service>
 
-        <mule:service name="mycomponent3">
-            <mule:component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="axis:jms://mycomponent3">
-                    <mule:properties>
-                        <entry key="topic" value="true"/>
-                    </mule:properties>
-                </mule:endpoint>
-            </mule:inbound-router>
-        </mule:service>
+        <service name="mycomponent3">
+            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            <inbound-router>
+                <endpoint address="axis:jms://mycomponent3">
+                    <properties>
+                        <spring:entry key="topic" value="true"/>
+                    </properties>
+                </endpoint>
+            </inbound-router>
+        </service>
 
-        <mule:service name="mycomponent4">
-            <mule:component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="axis:jms://mycomponent4" synchronous="false">
-                    <mule:properties>
-                        <entry key="topic" value="true"/>
-                    </mule:properties>
-                </mule:endpoint>
-            </mule:inbound-router>
-        </mule:service>
-    </mule:model>
-</beans>
+        <service name="mycomponent4">
+            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            <inbound-router>
+                <endpoint address="axis:jms://mycomponent4" synchronous="false">
+                    <properties>
+                        <spring:entry key="topic" value="true"/>
+                    </properties>
+                </endpoint>
+            </inbound-router>
+        </service>
+    </model>
+</mule>

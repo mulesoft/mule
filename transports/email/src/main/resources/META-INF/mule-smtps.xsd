@@ -15,7 +15,7 @@
     <xsd:import namespace="http://www.mulesource.org/schema/mule/smtp/2.0"
                 schemaLocation="http://www.mulesource.org/schema/mule/smtp/2.0/mule-smtp.xsd"/>
 
-    <xsd:element name="connector" type="smtpsConnectorType"/>
+    <xsd:element name="connector" type="smtpsConnectorType" substitutionGroup="mule:abstract-connector"/>
 
     <xsd:complexType name="smtpsConnectorType">
         <xsd:complexContent>

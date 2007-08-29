@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:axis="http://www.mulesource.org/schema/mule/axis/2.0"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
@@ -9,22 +9,22 @@
        http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/axis/2.0/mule-axis.xsd">
 
     <axis:connector name="testAxis">
-        <mule:dispatcher-threading-profile doThreading="false"/>
+        <dispatcher-threading-profile doThreading="false"/>
     </axis:connector>
 
-    <mule:custom-connector name="testConnector" class="org.mule.tck.testmodels.mule.TestConnector"/>
+    <custom-connector name="testConnector" class="org.mule.tck.testmodels.mule.TestConnector"/>
 
-    <mule:model name="main">
-        <mule:service name="testComponent">
-            <mule:component class="org.mule.providers.soap.axis.functional.SoapAttachmentsFunctionalTestComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="axis:http://localhost:60198/mule/services" synchronous="true"/>
-            </mule:inbound-router>
-            <mule:outbound-router>
-                <mule:outbound-pass-through-router>
-                    <mule:endpoint address="test://test" name="test1"/>
-                </mule:outbound-pass-through-router>
-            </mule:outbound-router>
-        </mule:service>
-    </mule:model>
-</beans>
+    <model name="main">
+        <service name="testComponent">
+            <component class="org.mule.providers.soap.axis.functional.SoapAttachmentsFunctionalTestComponent"/>
+            <inbound-router>
+                <endpoint address="axis:http://localhost:60198/mule/services" synchronous="true"/>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <endpoint address="test://test" name="test1"/>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
+    </model>
+</mule>

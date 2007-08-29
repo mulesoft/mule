@@ -39,43 +39,47 @@ import org.w3c.dom.NamedNodeMap;
  * consistently customising bean representations for Mule bean definition parsers.  Most custom bean definition parsers
  * in Mule will use this base class. The following enhancements are made -
  *
- * 1. A property name which ends with the suffix "-ref" is assumed to be a reference to another bean.
+ * <ol>
+ * <li>A property name which ends with the suffix "-ref" is assumed to be a reference to another bean.
  * Alternatively, a property can be explicitly registered as a bean reference via registerBeanReference()
  *
- * For example,
- *
- *     <code> &lt;bpm:connector bpms-ref=&quot;testBpms&quot;/&lt; </code>
- *
+ * <p>For example,
+ * <code> &lt;bpm:connector bpms-ref=&quot;testBpms&quot;/&lt; </code>
  * will automatically set a property "bpms" on the connector to reference a bean named "testBpms"
+ * </p></li>
  *
- * 2. Attribute mappings can be registered to control how an attribute name in Mule Xml maps to the bean name in the
- * object being created. For example -
+ * <li>Attribute mappings can be registered to control how an attribute name in Mule Xml maps to the bean name in the
+ * object being created.
  *
- * <code>registerAttributeMapping("poolExhaustedAction", "poolExhaustedActionString");</code>
+ * <p>For example -
+ * <code>addAlias("poolExhaustedAction", "poolExhaustedActionString");</code>
+ * Maps the 'poolExhaustedAction' to the 'poolExhaustedActionString' property on the bean being created.
+ * </p></li>
  *
- * Map the 'poolExhaustedAction' to the 'poolExhaustedActionString' property on the bean being created.
+ * <li>Value Mappings can be used to map key value pairs from selection lists in the XML schema to property values on the
+ * bean being created. These are a comma-separated list of key=value pairs.
  *
- * 3. Value Mappings can be used to map key value pairs from selection lists in the XML schema to property values on the
- * bean being created. These are a comma-separated list of key=value pairs. For example -
- *
- *     <code> registerValueMapping("action", "NONE=0,ALWAYS_BEGIN=1,BEGIN_OR_JOIN=2,JOIN_IF_POSSIBLE=3");</code>
- *
+ * <p>For example -
+ * <code>addMapping("action", "NONE=0,ALWAYS_BEGIN=1,BEGIN_OR_JOIN=2,JOIN_IF_POSSIBLE=3");</code>
  * The first argument is the bean name to set, the second argument is the set of possible key=value pairs
+ * </p></li>
  *
- * 4. Provides an automatic way of setting the 'init-method' and 'destroy-method' for this object. This will then automatically
- * wire the bean into the lifecycle of the Application context.
+ * <li>Provides an automatic way of setting the 'init-method' and 'destroy-method' for this object. This will then automatically
+ * wire the bean into the lifecycle of the Application context.</li>
  *
- * 5. The 'singleton' property provides a fixed way to make sure the bean is always a singleton or not.
+ * <li>The 'singleton' property provides a fixed way to make sure the bean is always a singleton or not.</li>
  *
- * 6. Collections will be automatically created and extended if the setter matches "property+s". 
+ * <li>Collections will be automatically created and extended if the setter matches "property+s".</li>
+ * </ol>
  *
- * Note that this class is not multi-thread safe.  The internal state is reset before each "use"
- * by {@link #preProcess()} which assumes sequential access.
+ * <p>Note that this class is not multi-thread safe.  The internal state is reset before each "use"
+ * by {@link #preProcess()} which assumes sequential access.</p>
  *
  * @see  AbstractBeanDefinitionParser
  */
 public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefinitionParser
 {
+    public static final String ROOT_ELEMENT = "mule";
     public static final String ATTRIBUTE_ID = "id";
     public static final String ATTRIBUTE_NAME = "name";
     public static final String ATTRIBUTE_IDREF = "nameref";

@@ -23,6 +23,8 @@
                          <exclude>**/XfireMultipleConnectorsWSSecurityTestCase.*</exclude>
                          <exclude>**/XfireWsSecurityOnOutboundTestCase.*</exclude>
                          <exclude>**/XfireWsSecurityOnOutboundUsingPropertiesTestCase.*</exclude>
+                         <!-- MULE-2118 -->
+                         <exclude>**/AxisWsSecurityOnOutbound.*</exclude>
                      </excludes>
                  </configuration>
              </plugin>

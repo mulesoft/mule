@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:axis="http://www.mulesource.org/schema/mule/axis/2.0"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
@@ -10,43 +10,45 @@
     
     <!-- TODO how to set the serverUrl in spring config files? -->
     
-    <mule:model name="Testing_an_axis_service_using_xfire_dynamic_client">
+    <model name="Testing_an_axis_service_using_xfire_dynamic_client">
         <!-- hosting the Axis Service -->
-        <mule:service name="AxisService">
-            <mule:component class="org.mule.tck.testmodels.services.TestComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="axis:http://localhost:63381/services">
-                    <property name="style" value="Wrapped"/>
-                    <property name="use" value="Literal"/>
-                </mule:endpoint>
-            </mule:inbound-router>
-        </mule:service>
+        <service name="AxisService">
+            <component class="org.mule.tck.testmodels.services.TestComponent"/>
+            <inbound-router>
+                <endpoint address="axis:http://localhost:63381/services">
+                    <properties>
+                        <spring:entry key="style" value="Wrapped"/>
+                        <spring:entry key="use" value="Literal"/>
+                    </properties>
+                </endpoint>
+            </inbound-router>
+        </service>
         
         <!-- Bridge Component used to test the ExceptionBasedRouting on Axis -->
-        <mule:service name="test">
-            <mule:component class="org.mule.components.simple.BridgeComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="vm://localhost.test"/>
-            </mule:inbound-router>
-            <mule:outbound-router>
-                <mule:exception-based-router>
-                    <mule:endpoint address="axis:http://localhost:63380/services/AxisService?method=receive"/>
-                    <mule:endpoint address="axis:http://localhost:63381/services/AxisService?method=receive"/>
-                </mule:exception-based-router>
-            </mule:outbound-router>
-        </mule:service>
+        <service name="test">
+            <component class="org.mule.components.simple.BridgeComponent"/>
+            <inbound-router>
+                <endpoint address="vm://localhost.test"/>
+            </inbound-router>
+            <outbound-router>
+                <exception-based-router>
+                    <endpoint address="axis:http://localhost:63380/services/AxisService?method=receive"/>
+                    <endpoint address="axis:http://localhost:63381/services/AxisService?method=receive"/>
+                </exception-based-router>
+            </outbound-router>
+        </service>
         
         <!-- Accessing an Axis hosted web-service using XFire dynamic client -->
-        <mule:service name="BridgeToAxisService">
-            <mule:component class="org.mule.components.simple.BridgeComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="vm://axis.in"/>
-            </mule:inbound-router>
-            <mule:outbound-router>
-                <mule:outbound-pass-through-router>
-                    <mule:endpoint address="wsdl-xfire:http://localhost:63381/services/AxisService?WSDL&amp;method=receive"/>
-                </mule:outbound-pass-through-router>
-            </mule:outbound-router>
-        </mule:service>    
-    </mule:model>
-</beans>
+        <service name="BridgeToAxisService">
+            <component class="org.mule.components.simple.BridgeComponent"/>
+            <inbound-router>
+                <endpoint address="vm://axis.in"/>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <endpoint address="wsdl-xfire:http://localhost:63381/services/AxisService?WSDL&amp;method=receive"/>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>    
+    </model>
+</mule>

@@ -15,7 +15,7 @@
     <xsd:import namespace="http://www.mulesource.org/schema/mule/tcp/2.0"
                 schemaLocation="http://www.mulesource.org/schema/mule/tcp/2.0/mule-tcp.xsd"/>
 
-    <xsd:element name="connector">
+    <xsd:element name="connector" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>
             <xsd:documentation>
                 Connect Mule to an SSL socket, to send or receive data via the network.

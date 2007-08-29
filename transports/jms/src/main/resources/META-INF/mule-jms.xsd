@@ -14,7 +14,7 @@
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
 
     <!-- Generic JMS Connector -->    
-    <xsd:element name="connector">
+    <xsd:element name="connector" substitutionGroup="mule:abstract-connector">
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="mule:connectorType">
@@ -30,7 +30,7 @@
     </xsd:element>
 
     <!-- Custom JMS Connector -->    
-    <xsd:element name="custom-connector">
+    <xsd:element name="custom-connector" substitutionGroup="mule:abstract-connector">
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="mule:customConnectorType">
@@ -99,9 +99,8 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="activemq-connector" type="activeMqConnectorType"/>
-    <xsd:element name="activemq-xa-connector" type="activeMqConnectorType"/>
-    
+    <xsd:element name="activemq-connector" type="activeMqConnectorType" substitutionGroup="mule:abstract-connector"/>
+    <xsd:element name="activemq-xa-connector" type="activeMqConnectorType" substitutionGroup="mule:abstract-connector"/>
     <xsd:complexType name="activeMqConnectorType">
         <xsd:complexContent>
             <xsd:extension base="vendorJmsConnectorType">
@@ -111,7 +110,7 @@
     </xsd:complexType>
     
     <!-- TODO MULE-1726 -->
-    <xsd:element name="oracleaq-connector">
+    <xsd:element name="oracleaq-connector" substitutionGroup="mule:abstract-connector">
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="vendorJmsConnectorType">
@@ -121,8 +120,7 @@
         </xsd:complexType>
     </xsd:element>
 
-    <xsd:element name="weblogic-connector" type="vendorJmsConnectorType"/>
-
-    <xsd:element name="websphere-connector" type="vendorJmsConnectorType"/>
+    <xsd:element name="weblogic-connector" type="vendorJmsConnectorType" substitutionGroup="mule:abstract-connector"/>
+    <xsd:element name="websphere-connector" type="vendorJmsConnectorType" substitutionGroup="mule:abstract-connector"/>
  
 </xsd:schema>

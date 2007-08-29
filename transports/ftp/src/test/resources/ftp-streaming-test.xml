@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:stream="http://www.mulesource.org/schema/mule/streaming/2.0"
        xmlns:ftp="http://www.mulesource.org/schema/mule/ftp/2.0"
        xmlns:tcp="http://www.mulesource.org/schema/mule/tcp/2.0"
@@ -13,7 +13,7 @@
                http://www.mulesource.org/schema/mule/tcp/2.0 http://www.mulesource.org/schema/mule/tcp/2.0/mule-tcp.xsd">
 
     <ftp:connector name="ftp" pollingFrequency="2000">
-        <mule:custom-exception-strategy class="org.mule.tck.functional.QuietExceptionStrategy"/>
+        <custom-exception-strategy class="org.mule.tck.functional.QuietExceptionStrategy"/>
     </ftp:connector>
 
     <tcp:connector name="tcp" tcpProtocolClassName="org.mule.providers.tcp.protocols.DefaultProtocol"/>
@@ -21,36 +21,36 @@
     <stream:model name="main">
 
         <stream:service name="bridge">
-            <mule:component class="org.mule.components.simple.StreamingBridgeComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="tcp://localhost:60196">
-                    <mule:retry-connection-strategy
+            <component class="org.mule.components.simple.StreamingBridgeComponent"/>
+            <inbound-router>
+                <endpoint address="tcp://localhost:60196">
+                    <retry-connection-strategy
                             retryCount="3"
                             retryFrequency="2000"/>
-                </mule:endpoint>
-            </mule:inbound-router>
-            <mule:outbound-router>
-                <mule:outbound-pass-through-router>
-                    <mule:endpoint address="ftp://anonymous:email@localhost:60197">
-                        <mule:retry-connection-strategy
+                </endpoint>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <endpoint address="ftp://anonymous:email@localhost:60197">
+                        <retry-connection-strategy
                                 retryCount="3"
                                 retryFrequency="2000"/>
-                    </mule:endpoint>
-                </mule:outbound-pass-through-router>
-            </mule:outbound-router>
+                    </endpoint>
+                </outbound-pass-through-router>
+            </outbound-router>
         </stream:service>
 
         <stream:service name="testComponent">
-            <mule:component scope="singleton" class="org.mule.tck.functional.FunctionalStreamingTestComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="ftp://anonymous:email@localhost:60197">
-                    <mule:retry-connection-strategy
+            <component scope="singleton" class="org.mule.tck.functional.FunctionalStreamingTestComponent"/>
+            <inbound-router>
+                <endpoint address="ftp://anonymous:email@localhost:60197">
+                    <retry-connection-strategy
                             retryCount="3"
                             retryFrequency="2000"/>
-                </mule:endpoint>
-            </mule:inbound-router>
+                </endpoint>
+            </inbound-router>
         </stream:service>
 
     </stream:model>
 
-</beans>
+</mule>

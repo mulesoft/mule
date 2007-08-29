@@ -1,33 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
-    <mule:environment-properties>
-        <entry key="prop1" value="value1"/>
-    </mule:environment-properties>
+    <environment-properties>
+        <spring:entry key="prop1" value="value1"/>
+    </environment-properties>
 
-    <bean id="propertyPlaceholderConfigurer"
+    <spring:bean id="propertyPlaceholderConfigurer"
           class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="locations">
-            <list>
+        <spring:property name="locations">
+            <spring:list>
                 <!-- defines prop2 as value2 -->
-                <value>org/mule/test/spring/test.properties</value>
-            </list>
-        </property>
-    </bean>
+                <spring:value>org/mule/test/spring/test.properties</spring:value>
+            </spring:list>
+        </spring:property>
+    </spring:bean>
 
-    <bean name="props" class="org.mule.test.spring.MapHolder">
-        <property name="map">
-            <map>
-                <entry key="prop1" value="${prop1}"/>
-                <entry key="prop2" value="${prop2}"/>
-                <entry key="prop3" value="${java.version}"/>
-            </map>
-        </property>
-    </bean>
+    <spring:bean name="props" class="org.mule.test.spring.MapHolder">
+        <spring:property name="map">
+            <spring:map>
+                <spring:entry key="prop1" value="${prop1}"/>
+                <spring:entry key="prop2" value="${prop2}"/>
+                <spring:entry key="prop3" value="${java.version}"/>
+            </spring:map>
+        </spring:property>
+    </spring:bean>
 
-</beans>
+</mule>

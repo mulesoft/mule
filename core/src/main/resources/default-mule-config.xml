@@ -50,30 +50,26 @@
     <bean name="_muleRegistry" class="org.mule.config.spring.factories.SpringRegistryFactoryBean">
     </bean>
 
-    <mule:model name="_muleSystemModel" />
-    <!-- 
-    <bean name="_muleSystemModel" class="org.mule.config.spring.factories.SystemModelFactoryBean"
-          depends-on="_muleManagementContext"/>
-    -->
+    <mule:mule name="_muleSystemModel">
 
-    <mule:configuration
-            serverId="_defaultx"
-            defaultSynchronousEndpoints="false"
-            domainId="org.mule"
-            defaultRemoteSync="false"
-            defaultSynchronousEventTimeout="3000"
-            defaultEncoding="UTF-8"
-            defaultTransactionTimeout="5000"
-            workingDirectory=".mule">
-        <!-- MULE-2073 -->
-        <!-- mule:default-threading-profile
-                name="defaultThreadingProfile"
-                maxBufferSize="0" maxThreadsActive="8"
-                maxThreadsIdle="4" poolExhaustedAction="WAIT"/ -->
-        <mule:default-threading-profile name="defaultThreadingProfile"
-                threadWaitTimeout="30" maxThreadsActive="10" maxThreadsIdle="10"
-                maxBufferSize="0" threadTTL="60000" poolExhaustedAction="RUN" />
-    </mule:configuration>
+        <mule:configuration
+                serverId="_defaultx"
+                defaultSynchronousEndpoints="false"
+                domainId="org.mule"
+                defaultRemoteSync="false"
+                defaultSynchronousEventTimeout="3000"
+                defaultEncoding="UTF-8"
+                defaultTransactionTimeout="5000"
+                workingDirectory=".mule">
+            <mule:default-threading-profile
+                    name="defaultThreadingProfile"
+                    threadWaitTimeout="30" maxThreadsActive="10" maxThreadsIdle="10"
+                    maxBufferSize="0" threadTTL="60000" poolExhaustedAction="RUN" />
+        </mule:configuration>
+
+        <mule:model name="_muleSystemModel" />
+
+    </mule:mule>
 
     <bean name="_muleLifecycleManager" class="org.mule.impl.lifecycle.GenericLifecycleManager" scope="prototype">
         <property name="lifecycles">

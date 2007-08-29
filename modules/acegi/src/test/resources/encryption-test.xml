@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
        xmlns:acegi="http://www.mulesource.org/schema/mule/acegi/2.0"
     xsi:schemaLocation="
@@ -10,40 +10,40 @@
        http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd
        http://www.mulesource.org/schema/mule/acegi/2.0 http://www.mulesource.org/schema/mule/acegi/2.0/mule-acegi.xsd">
 
-    <bean id="inMemoryDaoImpl" class="org.acegisecurity.userdetails.memory.InMemoryDaoImpl">
-        <property name="userMap">
-            <value>
+    <spring:bean id="inMemoryDaoImpl" class="org.acegisecurity.userdetails.memory.InMemoryDaoImpl">
+        <spring:property name="userMap">
+            <spring:value>
                 ross=ross,ROLE_ADMIN
                 anon=anon,ROLE_ANONYMOUS
-            </value>
-        </property>
-    </bean>
+            </spring:value>
+        </spring:property>
+    </spring:bean>
 
-    <bean id="daoAuthenticationProvider" class="org.acegisecurity.providers.dao.DaoAuthenticationProvider">
-        <property name="userDetailsService" ref="inMemoryDaoImpl"/>
-    </bean>
+    <spring:bean id="daoAuthenticationProvider" class="org.acegisecurity.providers.dao.DaoAuthenticationProvider">
+        <spring:property name="userDetailsService" ref="inMemoryDaoImpl"/>
+    </spring:bean>
 
     <acegi:security-manager>
         <acegi:delegate-security-provider name="memory-dao"
                                           delegate-ref="daoAuthenticationProvider"/>
     </acegi:security-manager>
 
-    <mule:security-manager>
-        <mule:password-encryption-strategy name="PBE" password="mule"/>
-    </mule:security-manager>
+    <security-manager>
+        <password-encryption-strategy name="PBE" password="mule"/>
+    </security-manager>
 
-    <mule:model name="test">
-        <mule:service name="echo">
-            <mule:component class="org.mule.components.simple.EchoComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="vm://my.queue">
-                    <mule:encryption-security-filter strategy-ref="PBE"/>
-                </mule:endpoint>
-                <mule:endpoint address="http://localhost:4567">
-                    <mule:encryption-security-filter strategy-ref="PBE"/>
-                </mule:endpoint>
-            </mule:inbound-router>
-        </mule:service>
-    </mule:model>
+    <model name="test">
+        <service name="echo">
+            <component class="org.mule.components.simple.EchoComponent"/>
+            <inbound-router>
+                <endpoint address="vm://my.queue">
+                    <encryption-security-filter strategy-ref="PBE"/>
+                </endpoint>
+                <endpoint address="http://localhost:4567">
+                    <encryption-security-filter strategy-ref="PBE"/>
+                </endpoint>
+            </inbound-router>
+        </service>
+    </model>
 
-</beans>
+</mule>

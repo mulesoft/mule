@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:file="http://www.mulesource.org/schema/mule/file/2.0"
        xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
        xmlns:smtp="http://www.mulesource.org/schema/mule/smtp/2.0"
@@ -17,45 +17,45 @@
         The example consists of two components: ExceptionManager and BusinessErrorManager.
     </description>
     
-    <bean id="errorManager" class="org.mule.samples.errorhandler.ErrorManager">
-        <property name="handlers">
-            <list>
+    <spring:bean id="errorManager" class="org.mule.samples.errorhandler.ErrorManager">
+        <spring:property name="handlers">
+            <spring:list>
                 <ref local="fatalHandler"/>
                 <ref local="defaultHandler"/>
                 <ref local="businessHandler"/>
-            </list>
-        </property>
-    </bean>
+            </spring:list>
+        </spring:property>
+    </spring:bean>
     
-    <bean id="defaultHandler" class="org.mule.samples.errorhandler.handlers.DefaultHandler">
-        <property name="endpointName" value="ExceptionFileWriter"/>
-        <property name="errorManager">
+    <spring:bean id="defaultHandler" class="org.mule.samples.errorhandler.handlers.DefaultHandler">
+        <spring:property name="endpointName" value="ExceptionFileWriter"/>
+        <spring:property name="errorManager">
             <ref local="errorManager"/>
-        </property>
-    </bean>
+        </spring:property>
+    </spring:bean>
 
-    <bean id="fatalHandler" class="org.mule.samples.errorhandler.handlers.FatalHandler">
-        <property name="endpointName" value="ExceptionEmailer"/>
-        <property name="errorManager">
+    <spring:bean id="fatalHandler" class="org.mule.samples.errorhandler.handlers.FatalHandler">
+        <spring:property name="endpointName" value="ExceptionEmailer"/>
+        <spring:property name="errorManager">
             <ref local="errorManager"/>
-        </property>
-    </bean>
+        </spring:property>
+    </spring:bean>
 
-    <bean id="businessHandler" class="org.mule.samples.errorhandler.handlers.BusinessHandler">
-        <property name="endpointName" value="ExceptionQueue"/>
-        <property name="errorManager">
+    <spring:bean id="businessHandler" class="org.mule.samples.errorhandler.handlers.BusinessHandler">
+        <spring:property name="endpointName" value="ExceptionQueue"/>
+        <spring:property name="errorManager">
             <ref local="errorManager"/>
-        </property>
-    </bean>
+        </spring:property>
+    </spring:bean>
     
-    <bean id="propertyPlaceholderConfigurer"
+    <spring:bean id="propertyPlaceholderConfigurer"
           class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="locations">
-            <list>
-                <value>email.properties</value>
-            </list>
-        </property>
-    </bean>
+        <spring:property name="locations">
+            <spring:list>
+                <spring:value>email.properties</spring:value>
+            </spring:list>
+        </spring:property>
+    </spring:bean>
 
     <smtp:connector name="EmailConnector"/>
 
@@ -74,28 +74,28 @@
         All transformers must be declared here to be referenced by their names in the 
         endpoint definitions 
     -->
-    <mule:custom-transformer name="XMLToExceptionBean"
+    <custom-transformer name="XMLToExceptionBean"
                              class="org.mule.transformers.xml.XmlToObject"
                              returnClass="org.mule.samples.errorhandler.ExceptionBean"/>
-    <mule:custom-transformer name="ExceptionBeanToXML" 
+    <custom-transformer name="ExceptionBeanToXML" 
                              class="org.mule.transformers.xml.ObjectToXml"
                              returnClass="java.lang.String"/>
-    <mule:custom-transformer name="ExceptionBeanToErrorMessage" 
+    <custom-transformer name="ExceptionBeanToErrorMessage" 
                              class="org.mule.samples.errorhandler.ExceptionBeanToErrorMessage"
                              returnClass="org.mule.samples.errorhandler.ErrorMessage"/>
-    <mule:custom-transformer name="ErrorMessageToException" 
+    <custom-transformer name="ErrorMessageToException" 
                              class="org.mule.samples.errorhandler.ErrorMessageToException"
                              returnClass="java.lang.Throwable"/>
-    <mule:custom-transformer name="ErrorMessageToExceptionBean" 
+    <custom-transformer name="ErrorMessageToExceptionBean" 
                              class="org.mule.samples.errorhandler.ErrorMessageToExceptionBean"
                              returnClass="org.mule.samples.errorhandler.ExceptionBean"/>
-    <mule:custom-transformer name="StringToEmailMessage" 
+    <custom-transformer name="StringToEmailMessage" 
                              class="org.mule.providers.email.transformers.StringToEmailMessage"
                              returnClass="javax.mail.Message"/>
-    <mule:custom-transformer name="ObjectToJMSMessage"
+    <custom-transformer name="ObjectToJMSMessage"
                              class="org.mule.providers.jms.transformers.ObjectToJMSMessage"
                              returnClass="javax.jms.TextMessage"/>
-    <mule:custom-transformer name="JMSMessageToObject" 
+    <custom-transformer name="JMSMessageToObject" 
                              class="org.mule.providers.jms.transformers.JMSMessageToObject"
                              returnClass="java.lang.String"/>
 
@@ -105,80 +105,80 @@
 <!--        <interceptor className="org.mule.interceptors.TimerInterceptor"/>-->
 <!--    </interceptor-stack>-->
     
-    <mule:model name="errorhandler-test">
+    <model name="errorhandler-test">
         <!-- 
             This uses an URL endpointUri instead of a provider config.  Note that this specifies 
             a relative path as the endpoint though fully qualified uri will work i.e. 
             file:///usr/test-data/samples/errorhandler/in
         -->
-        <mule:service name="Error Manager">
-            <mule:component class="org.mule.samples.errorhandler.ErrorManager">
-                <mule:properties>
-                    <entry key="handlers">
-                        <list>
+        <service name="Error Manager">
+            <component class="org.mule.samples.errorhandler.ErrorManager">
+                <properties>
+                    <spring:entry key="handlers">
+                        <spring:list>
                             <ref local="fatalHandler"/>
                             <ref local="defaultHandler"/>
                             <ref local="businessHandler"/>
-                        </list>
-                    </entry>
-                </mule:properties>
-            </mule:component>
-            <mule:inbound-router>
-                <mule:endpoint address="file://./test-data/in"
+                        </spring:list>
+                    </spring:entry>
+                </properties>
+            </component>
+            <inbound-router>
+                <endpoint address="file://./test-data/in"
                                transformers="XMLToExceptionBean ExceptionBeanToErrorMessage">
                     <!-- Ignore other files than our XML error input. When runngin this example from
                          a svn checkout the file connector would try to process subversion's meta
                          dirs which is not what we want.
                     -->
-                    <mule:custom-filter class="org.mule.providers.file.filters.FilenameWildcardFilter">
-                        <mule:property name="pattern" value="*.xml"/>
-                    </mule:custom-filter>
-                </mule:endpoint>
-            </mule:inbound-router>
+                    <custom-filter class="org.mule.providers.file.filters.FilenameWildcardFilter">
+                        <spring:property name="pattern" value="*.xml"/>
+                    </custom-filter>
+                </endpoint>
+            </inbound-router>
             
-            <mule:outbound-router>
-                <mule:custom-catch-all-strategy class="org.mule.routing.LoggingCatchAllStrategy"/>
+            <outbound-router>
+                <custom-catch-all-strategy class="org.mule.routing.LoggingCatchAllStrategy"/>
                 
-                <mule:filtering-router transformers="ErrorMessageToException">
-                    <mule:endpoint address="file://./test-data/exceptions"
+                <filtering-router transformers="ErrorMessageToException">
+                    <endpoint address="file://./test-data/exceptions"
                                    transformers="ErrorMessageToExceptionBean ExceptionBeanToXML">
-                        <mule:properties>
-                            <entry key="outputPattern" value="Exception-[UUID].xml"/>
-                        </mule:properties>
-                    </mule:endpoint>
-                </mule:filtering-router>
+                        <properties>
+                            <spring:entry key="outputPattern" value="Exception-[UUID].xml"/>
+                        </properties>
+                    </endpoint>
+                </filtering-router>
                 
-                <mule:filtering-router transformers="ErrorMessageToException">
-                    <mule:endpoint address="smtp://?address=${email.toAddress}"
+                <filtering-router transformers="ErrorMessageToException">
+                    <endpoint address="smtp://?address=${email.toAddress}"
                                    transformers="ErrorMessageToExceptionBean ExceptionBeanToXML StringToEmailMessage">
-                        <mule:properties>
-                            <entry key="fromAddress" value="${email.fromAddress}"/>
-                            <entry key="subject" value="${email.subject}"/>
-                        </mule:properties>
-                    </mule:endpoint>
-                    <mule:payload-type-filter expectedType="org.mule.umo.lifecycle.FatalException"/>
-                </mule:filtering-router>
+                        <properties>
+                            <spring:entry key="fromAddress" value="${email.fromAddress}"/>
+                            <spring:entry key="subject" value="${email.subject}"/>
+                        </properties>
+                    </endpoint>
+                    <payload-type-filter expectedType="org.mule.umo.lifecycle.FatalException"/>
+                </filtering-router>
                 
-                <mule:filtering-router transformers="ErrorMessageToException">
-                    <mule:endpoint address="jms://exception.queue"
+                <filtering-router transformers="ErrorMessageToException">
+                    <endpoint address="jms://exception.queue"
                                    transformers="ErrorMessageToExceptionBean ExceptionBeanToXML ObjectToJMSMessage"/>
-                    <mule:payload-type-filter expectedType="org.mule.samples.errorhandler.exceptions.BusinessException"/>
-                </mule:filtering-router>
+                    <payload-type-filter expectedType="org.mule.samples.errorhandler.exceptions.BusinessException"/>
+                </filtering-router>
 
                 <!-- TODO how to handle this? The whole interceptor block is commented out in mule.xsd -->
 <!--                <interceptor name="default"/>-->
-            </mule:outbound-router>
-        </mule:service>
+            </outbound-router>
+        </service>
         
-        <mule:service name="Business Error Manager">
-            <mule:component class="org.mule.samples.errorhandler.BusinessErrorManager"/>
-            <mule:inbound-router>
-                <mule:endpoint address="jms://exception.queue"
+        <service name="Business Error Manager">
+            <component class="org.mule.samples.errorhandler.BusinessErrorManager"/>
+            <inbound-router>
+                <endpoint address="jms://exception.queue"
                                transformers="JMSMessageToObject XMLToExceptionBean ExceptionBeanToErrorMessage"/>
-            </mule:inbound-router>
-        </mule:service>
-    </mule:model>
-</beans>
+            </inbound-router>
+        </service>
+    </model>
+</mule>
 
 <!-- 
 <!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
@@ -198,22 +198,22 @@
 
     <container-context className="org.mule.extras.spring.SpringContainerContext">
         <properties>
-            <property name="configFile" value="error-beans.xml"/>
+            <spring:property name="configFile" value="error-beans.xml"/>
         </properties>
     </container-context>
 
     <connector name="EmailConnector" className="org.mule.providers.email.SmtpConnector">
         <properties>
-            <property name="host" value="${smtp.host}" />
-            <property name="port" value="{smtp.port}" />
-            <property name="username" value="{smtp.username}" />
-            <property name="password" value="{smtp.password}" />
+            <spring:property name="host" value="${smtp.host}" />
+            <spring:property name="port" value="{smtp.port}" />
+            <spring:property name="username" value="{smtp.username}" />
+            <spring:property name="password" value="{smtp.password}" />
         </properties>
     </connector>
 
     <connector name="JMSConnector" className="org.mule.providers.jms.activemq.ActiveMqJmsConnector">
         <properties>
-            <property name="specification" value="1.1"/>
+            <spring:property name="specification" value="1.1"/>
             <!- This property references the Spring container defined above ->
             <container-property name="connectionFactory" reference="activeMqConnectionFactory" />
         </properties>
@@ -221,10 +221,10 @@
 
     <connector name="FileConnector" className="org.mule.providers.file.FileConnector">
         <properties>
-            <property name="pollingFrequency" value="1000"/>
-            <property name="moveToDirectory" value="./test-data/out"/>
-            <property name="outputPattern" value="${DATE}.xml"/>
-            <property name="binaryMode" value="false"/>
+            <spring:property name="pollingFrequency" value="1000"/>
+            <spring:property name="moveToDirectory" value="./test-data/out"/>
+            <spring:property name="outputPattern" value="${DATE}.xml"/>
+            <spring:property name="binaryMode" value="false"/>
         </properties>
     </connector>
 
@@ -273,7 +273,7 @@
                     <endpoint address="file://./test-data/exceptions"
                               transformers="ErrorMessageToExceptionBean ExceptionBeanToXML">
 
-                        <properties><property name="outputPattern" value="Exception-${UUID}.xml" /></properties>
+                        <properties><spring:property name="outputPattern" value="Exception-${UUID}.xml" /></properties>
                     </endpoint>
                     <filter className="org.mule.routing.filters.PayloadTypeFilter"
                             expectedType="org.mule.MuleException" />
@@ -285,8 +285,8 @@
                     <endpoint address="smtp://?address=${email.toAddress}"
                               transformers="ErrorMessageToExceptionBean ExceptionBeanToXML StringToEmailMessage">
                         <properties>
-                            <property name="fromAddress" value="${email.fromAddress}" />
-                            <property name="subject" value="${email.subject}" />
+                            <spring:property name="fromAddress" value="${email.fromAddress}" />
+                            <spring:property name="subject" value="${email.subject}" />
                         </properties>
                        </endpoint>
 

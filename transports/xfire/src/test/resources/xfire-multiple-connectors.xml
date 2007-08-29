@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:xfire="http://www.mulesource.org/schema/mule/xfire/2.0"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
@@ -11,28 +11,29 @@
     <xfire:connector name="XFireConnector1"/>
     <xfire:connector name="XFireConnector2"/>
     
-    <mule:endpoint name="xfire1" 
+    <endpoint name="xfire1" 
         address="xfire:http://localhost:61081/services/TestComponent1?method=receive"
         connector-ref="XFireConnector1"/>
 
-    <mule:endpoint name="xfire2" 
+    <endpoint name="xfire2" 
         address="xfire:http://localhost:61082/services/TestComponent2?method=receive" 
         connector-ref="XFireConnector2"/>
 
-    <mule:model name="TestXfireConnectors">
+    <model name="TestXfireConnectors">
         <!-- Two separate components are created instead of 1 with 2 endpoints so that exceptions are not compomised -->
-        <mule:service name="TestComponent1">
-            <mule:component class="org.mule.tck.testmodels.services.TestComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="xfire:http://localhost:61081/services" connector-ref="XFireConnector1"/>
-            </mule:inbound-router>
-        </mule:service>
+        <service name="TestComponent1">
+            <component class="org.mule.tck.testmodels.services.TestComponent"/>
+            <inbound-router>
+                <endpoint address="xfire:http://localhost:61081/services" connector-ref="XFireConnector1"/>
+            </inbound-router>
+        </service>
 
-        <mule:service name="TestComponent2">
-            <mule:component class="org.mule.tck.testmodels.services.TestComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="xfire:http://localhost:61082/services" connector-ref="XFireConnector2"/>
-            </mule:inbound-router>
-        </mule:service>
-    </mule:model>
-</beans>
+        <service name="TestComponent2">
+            <component class="org.mule.tck.testmodels.services.TestComponent"/>
+            <inbound-router>
+                <endpoint address="xfire:http://localhost:61082/services" connector-ref="XFireConnector2"/>
+            </inbound-router>
+        </service>
+    </model>
+
+</mule>

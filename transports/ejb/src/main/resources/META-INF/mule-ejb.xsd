@@ -12,14 +12,13 @@
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0" 
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
 
-    <xsd:element name="connector" type="ejbConnectorType">
+    <xsd:element name="connector" type="ejbConnectorType" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>
             <xsd:documentation>
                 Connector for EJB beans.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-
     <xsd:complexType name="ejbConnectorType">
         <xsd:complexContent>
             <xsd:extension base="mule:jndiConnectorType">

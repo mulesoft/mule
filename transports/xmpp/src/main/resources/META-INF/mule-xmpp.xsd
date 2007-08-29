@@ -12,7 +12,7 @@
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0" 
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
         
-    <xsd:element name="connector" type="xmppConnectorType">
+    <xsd:element name="connector" type="xmppConnectorType" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>
             <xsd:documentation>
                 Connect Mule to an XMPP (Jabber) server, to send or receive data via the network.
@@ -24,5 +24,6 @@
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType"/>
         </xsd:complexContent>
-    </xsd:complexType>    
+    </xsd:complexType>
+    
 </xsd:schema>

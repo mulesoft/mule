@@ -50,109 +50,90 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
         super(readerContext);
     }
 
-
-    public BeanDefinition parseCustomElement(Element ele, BeanDefinition containingBd)
+    public BeanDefinition parseCustomElement(Element element, BeanDefinition parent)
     {
-        BeanDefinition root;
-        BeanDefinition bd = containingBd;
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("parsing: " + writeNode(ele));
-        }
-
-        //If element is not a Spring property element, use a custom handler
-        if(!tryParsingSpringPropertyElements(ele, bd))
+        if (logger.isDebugEnabled())
         {
-            String namespaceUri = ele.getNamespaceURI();
+            logger.debug("parsing: " + elementToString(element));
+        }
+        if (delegateSpringElements(element, parent))
+        {
+            return parent;
+        }
+        else
+        {
+            String namespaceUri = element.getNamespaceURI();
             NamespaceHandler handler = getReaderContext().getNamespaceHandlerResolver().resolve(namespaceUri);
             if (handler == null)
             {
-                getReaderContext().error("Unable to locate NamespaceHandler for namespace [" + namespaceUri + "]", ele);
+                getReaderContext().error("Unable to locate NamespaceHandler for namespace [" + namespaceUri + "]", element);
                 return null;
             }
-            bd = handler.parse(ele, new ParserContext(getReaderContext(), this, containingBd));
-            registerBean(ele, bd);
-        }
-        root = bd;
+            BeanDefinition child = handler.parse(element, new ParserContext(getReaderContext(), this, parent));
+            registerBean(element, child);
 
-        // Only iterate and parse child mule name-spaced elements. Spring does not do
-        // hierarchical parsing by default so we need to maintain this behavior
-        // for non-mule elements to ensure that we don't break the parsing of any
-        // other custom name-spaces e.g spring-jee
-        String ns = ele.getNamespaceURI();
-        if (ns != null && ns.startsWith(MULE_NAMESPACE_PREFIX))
-        {
-            //Grab all nested elements lised as children to this element
-            NodeList list = ele.getChildNodes();
-            for (int i = 0; i < list.getLength() ; i++)
+            // Only iterate and parse child mule name-spaced elements. Spring does not do
+            // hierarchical parsing by default so we need to maintain this behavior
+            // for non-mule elements to ensure that we don't break the parsing of any
+            // other custom name-spaces e.g spring-jee
+            if (isMuleNamespace(element))
             {
-                if(list.item(i) instanceof Element)
+                NodeList list = element.getChildNodes();
+                for (int i = 0; i < list.getLength() ; i++)
                 {
-                    Element element = (Element) list.item(i);
-    
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("parsing: " + writeNode(element));
-                    }
-                    if (!tryParsingSpringPropertyElements(element, bd))
+                    if(list.item(i) instanceof Element)
                     {
-                        bd = parseCustomElement(element, bd);
-                        registerBean(element, bd);
+                        parseCustomElement((Element) list.item(i), child);
                     }
                 }
             }
+            return child;
         }
-        return root;
     }
 
 
-    protected boolean tryParsingSpringPropertyElements(Element element, BeanDefinition bd)
+    protected boolean delegateSpringElements(Element element, BeanDefinition bd)
     {
-        //We add the Spting propertyType to the mule.xsd schema so property elements must match the
-        //mule namespace URI for this custom parser to process them
-        String ns = (element.getNamespaceURI());
-        if (StringUtils.isNotBlank(ns) && ns.startsWith(MULE_DEFAULT_NAMESPACE))
+        if (! isBeansNamespace(element))
         {
-            if (PROPERTY_ELEMENT.equals(element.getLocalName()))
-            {
-                parsePropertyElement(element, bd);
-                return true;
-            }
-            else if (MAP_ELEMENT.equals(element.getLocalName()))
-            {
-                parseMapElement(element, bd);
-                return true;
-            }
-            else if (LIST_ELEMENT.equals(element.getLocalName()))
-            {
-                parseListElement(element, bd);
-                return true;
-            }
-            else if (SET_ELEMENT.equals(element.getLocalName()))
-            {
-                parseSetElement(element, bd);
-                return true;
-            }
-
+            return false;
         }
-        //This is a slight hack since if we get a spring namespaced element here it means that we have a Mule element
-        //that has a spring element embedded. This is not ideal, and we could just mandate that nested spring properties
-        //within Mule elements should always use the mule namespace.
-        //Currently only property collections (such as on the <mule:endpoint>) will hit this code
-        else if(BEANS_NAMESPACE_URI.equals(ns))
+        
+        if (isLocalName(element, PROPERTY_ELEMENT))
         {
-            return true;
+            parsePropertyElement(element, bd);
         }
-        return false;
+        else if (isLocalName(element, MAP_ELEMENT))
+        {
+            parseMapElement(element, bd);
+        }
+        else if (isLocalName(element, LIST_ELEMENT))
+        {
+            parseListElement(element, bd);
+        }
+        else if (isLocalName(element, SET_ELEMENT))
+        {
+            parseSetElement(element, bd);
+        }
+        else if (isLocalName(element, BEAN_ELEMENT))
+        {
+            registerBeanDefinitionHolder(parseBeanDefinitionElement(element, bd));
+        }
+        else if (logger.isWarnEnabled())
+        {
+            // perhaps should we fail here
+            logger.warn("Unexpected Spring element: " + elementToString(element));
+        }
+        return true;
     }
 
-
-    private String writeNode(Element e)
+    public static String elementToString(Element e)
     {
         StringBuffer buf = new StringBuffer();
         buf.append(e.getTagName()).append("{");
         for (int i = 0; i < e.getAttributes().getLength(); i++)
         {
-             Node n = e.getAttributes().item(i);
+            Node n = e.getAttributes().item(i);
             buf.append(n.getLocalName()).append("=").append(n.getNodeValue()).append(", ");
 
         }
@@ -176,8 +157,11 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
         }
 
         String name =  generateChildBeanName(ele);
-        BeanDefinitionHolder bdHolder = new BeanDefinitionHolder(bd, name);
+        registerBeanDefinitionHolder(new BeanDefinitionHolder(bd, name));
+    }
 
+    protected void registerBeanDefinitionHolder(BeanDefinitionHolder bdHolder)
+    {
         //bdHolder = decorateBeanDefinitionIfRequired(ele, bdHolder);
         // Register the final decorated instance.
         BeanDefinitionReaderUtils.registerBeanDefinition(bdHolder, getReaderContext().getRegistry());
@@ -198,7 +182,23 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
         {
             return id;
         }
+    }
 
+    public static boolean isMuleNamespace(Element element)
+    {
+        String ns = element.getNamespaceURI();
+        return ns != null && ns.startsWith(MULE_NAMESPACE_PREFIX);
+    }
+
+    public static boolean isBeansNamespace(Element element)
+    {
+        String ns = element.getNamespaceURI();
+        return ns != null && ns.equals(BEANS_NAMESPACE_URI);
+    }
+
+    public static boolean isLocalName(Element element, String name)
+    {
+        return element.getLocalName().equals(name);
     }
 
 }

@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
-    <mule:endpoint name="inbound" address="test:/inbound" createConnector="ALWAYS_CREATE"/>
-    <mule:endpoint name="outbound" address="test://outbound" createConnector="ALWAYS_CREATE"/>
+    <endpoint name="inbound" address="test:/inbound" createConnector="ALWAYS_CREATE"/>
+    <endpoint name="outbound" address="test://outbound" createConnector="ALWAYS_CREATE"/>
 
-    <mule:model name="dual connector test">
-        <mule:service name="inbound listener">
-            <mule:echo-component/>
-            <mule:inbound-router>
-                <mule:endpoint ref="inbound"/>
-            </mule:inbound-router>
-            <mule:outbound-router>
-                <mule:outbound-pass-through-router>
-                    <mule:endpoint ref="outbound"/>
-                </mule:outbound-pass-through-router>
-            </mule:outbound-router>
-        </mule:service>
-    </mule:model>
+    <model name="dual connector test">
+        <service name="inbound listener">
+            <echo-component/>
+            <inbound-router>
+                <endpoint ref="inbound"/>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <endpoint ref="outbound"/>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
+    </model>
 
     <!-- model name="Dual Connector Test">
         <mule-descriptor name="Inbound Listener"
@@ -37,4 +37,4 @@
         </mule-descriptor>
     </model -->
 
-</beans>
+</mule>

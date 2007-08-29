@@ -43,9 +43,6 @@ public class ManagementNamespaceHandler extends AbstractIgnorableNamespaceHandle
         registerBeanDefinitionParser("log4j-notifications", new OrphanDefinitionParser(Log4jNotificationLoggerAgent.class, true));
         registerBeanDefinitionParser("publish-notifications", new OrphanDefinitionParser(EndpointNotificationLoggerAgent.class, true));
         registerBeanDefinitionParser("rmi-server", new OrphanDefinitionParser(RmiRegistryAgent.class, true));
-
-
-        
         
         //This gets processed by the jmx-server parser
         registerIgnoredElement("connector-server");

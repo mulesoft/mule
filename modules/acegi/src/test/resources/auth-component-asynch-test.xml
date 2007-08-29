@@ -14,33 +14,37 @@
 
     <import resource="auth-component-security.xml"/>
 
-    <acegi:security-manager>
-        <acegi:delegate-security-provider name="memory-dao"
-                                          delegate-ref="daoAuthenticationProvider">
-            <acegi:security-property name="securityMode" value="MODE_GLOBAL"/>
-        </acegi:delegate-security-provider>
-    </acegi:security-manager>
+    <mule:mule>
 
-    <mule:security-manager>
-        <mule:password-encryption-strategy name="PBE" password="mule"/>
-    </mule:security-manager>
+        <acegi:security-manager>
+            <acegi:delegate-security-provider name="memory-dao"
+                                              delegate-ref="daoAuthenticationProvider">
+                <acegi:security-property name="securityMode" value="MODE_GLOBAL"/>
+            </acegi:delegate-security-provider>
+        </acegi:security-manager>
 
-    <vm:connector name="vmQueue" queueEvents="true"/>
+        <mule:security-manager>
+            <mule:password-encryption-strategy name="PBE" password="mule"/>
+        </mule:security-manager>
 
-    <mule:model name="test">
-        <mule:service name="echoUMO">
-            <mule:component scope="singleton" instance-ref="echoComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="vm://test">
-                    <mule:encryption-security-filter strategy-ref="PBE"/>
-                </mule:endpoint>
-            </mule:inbound-router>
-            <mule:outbound-router>
-                <mule:outbound-pass-through-router>
-                    <mule:endpoint address="vm://output"/>
-                </mule:outbound-pass-through-router>
-            </mule:outbound-router>
-        </mule:service>
-    </mule:model>
+        <vm:connector name="vmQueue" queueEvents="true"/>
+
+        <mule:model name="test">
+            <mule:service name="echoUMO">
+                <mule:component scope="singleton" instance-ref="echoComponent"/>
+                <mule:inbound-router>
+                    <mule:endpoint address="vm://test">
+                        <mule:encryption-security-filter strategy-ref="PBE"/>
+                    </mule:endpoint>
+                </mule:inbound-router>
+                <mule:outbound-router>
+                    <mule:outbound-pass-through-router>
+                        <mule:endpoint address="vm://output"/>
+                    </mule:outbound-pass-through-router>
+                </mule:outbound-router>
+            </mule:service>
+        </mule:model>
+
+    </mule:mule>
 
 </beans>

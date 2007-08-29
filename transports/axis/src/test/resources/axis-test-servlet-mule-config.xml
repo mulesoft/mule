@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:servlet="http://www.mulesource.org/schema/mule/servlet/2.0"       
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
@@ -12,12 +12,13 @@
         name="servlet" 
         servletUrl="http://localhost:62088/services"/>
         
-    <mule:model name="test">
-        <mule:service name="mycomponent">
-            <mule:component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="axis:servlet://mycomponent"/>
-            </mule:inbound-router>
-        </mule:service>
-    </mule:model>
-</beans>
+    <model name="test">
+        <service name="mycomponent">
+            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            <inbound-router>
+                <endpoint address="axis:servlet://mycomponent"/>
+            </inbound-router>
+        </service>
+    </model>
+    
+</mule>

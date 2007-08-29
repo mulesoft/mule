@@ -1,44 +1,45 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:xfire="http://www.mulesource.org/schema/mule/xfire/2.0"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/xfire/2.0 http://www.mulesource.org/schema/mule/xfire/2.0/mule-xfire.xsd">
     
-    <mule:environment-properties>
-        <entry key="serverUrl" value=""/>
-    </mule:environment-properties>
+    <environment-properties>
+        <spring:entry key="serverUrl" value=""/>
+    </environment-properties>
     
-    <mule:model name="test">
-        <mule:service name="mycomponent">
-            <mule:component class="org.mule.tck.testmodels.services.TestServiceComponent" />
-            <mule:inbound-router>
-                <mule:endpoint address="xfire:http://localhost:62108/mule"/>
-            </mule:inbound-router>
-        </mule:service>
+    <model name="test">
+        <service name="mycomponent">
+            <component class="org.mule.tck.testmodels.services.TestServiceComponent" />
+            <inbound-router>
+                <endpoint address="xfire:http://localhost:62108/mule"/>
+            </inbound-router>
+        </service>
 
-        <mule:service name="mycomponent2">
-            <mule:component class="org.mule.tck.testmodels.services.TestServiceComponent" />
-            <mule:inbound-router>
-                <mule:endpoint address="xfire:http://localhost:62109/mule/services"/>
-            </mule:inbound-router>
-        </mule:service>
+        <service name="mycomponent2">
+            <component class="org.mule.tck.testmodels.services.TestServiceComponent" />
+            <inbound-router>
+                <endpoint address="xfire:http://localhost:62109/mule/services"/>
+            </inbound-router>
+        </service>
 
-        <mule:service name="mycomponent3">
-            <mule:component class="org.mule.tck.testmodels.services.TestServiceComponent" />
-            <mule:inbound-router>
-                <mule:endpoint address="xfire:http://localhost:62109"/>
-            </mule:inbound-router>
-        </mule:service>
+        <service name="mycomponent3">
+            <component class="org.mule.tck.testmodels.services.TestServiceComponent" />
+            <inbound-router>
+                <endpoint address="xfire:http://localhost:62109"/>
+            </inbound-router>
+        </service>
 
-        <mule:service name="mycomponent4">
-            <mule:component class="org.mule.tck.testmodels.services.TestServiceComponent" />
-            <mule:inbound-router>
-                <mule:endpoint address="xfire:http://localhost:62110" synchronous="false"/>
-            </mule:inbound-router>
-        </mule:service>
-    </mule:model>
-</beans>
+        <service name="mycomponent4">
+            <component class="org.mule.tck.testmodels.services.TestServiceComponent" />
+            <inbound-router>
+                <endpoint address="xfire:http://localhost:62110" synchronous="false"/>
+            </inbound-router>
+        </service>
+    </model>
+    
+</mule>

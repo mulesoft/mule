@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
@@ -11,32 +11,32 @@
     <vm:connector name="default"/>
     <vm:connector name="queue" queueEvents="true"/>
 
-    <mule:endpoint name="in" address="vm://in" connector-ref="default"/>
-    <mule:endpoint name="direct" address="vm://direct" connector-ref="queue"/>
-    <mule:endpoint name="global-name-global-transformer" address="vm://global-name-global-transformer" connector-ref="queue" transformers="transformer"/>
-    <mule:endpoint name="global-name-local-transformer" address="vm://global-name-local-transformer" connector-ref="queue"/>
+    <endpoint name="in" address="vm://in" connector-ref="default"/>
+    <endpoint name="direct" address="vm://direct" connector-ref="queue"/>
+    <endpoint name="global-name-global-transformer" address="vm://global-name-global-transformer" connector-ref="queue" transformers="transformer"/>
+    <endpoint name="global-name-local-transformer" address="vm://global-name-local-transformer" connector-ref="queue"/>
 
-    <mule:custom-transformer name="transformer" class="org.mule.tck.functional.StringAppendTestTransformer"/>
+    <custom-transformer name="transformer" class="org.mule.tck.functional.StringAppendTestTransformer"/>
 
-    <mule:model name="endpoint transformer tests">
+    <model name="endpoint transformer tests">
 
-        <mule:service name="main">
-            <mule:component class="org.mule.components.simple.BridgeComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint ref="in"/>
-            </mule:inbound-router>
-            <mule:outbound-router>
-                <mule:multicasting-router>
-                    <mule:endpoint ref="direct"/>
-                    <mule:endpoint ref="global-name-global-transformer"/>
-                    <mule:endpoint name="local-name-local-transformer" address="vm://local-name-local-transformer" connector-ref="queue" transformers="transformer"/>
+        <service name="main">
+            <component class="org.mule.components.simple.BridgeComponent"/>
+            <inbound-router>
+                <endpoint ref="in"/>
+            </inbound-router>
+            <outbound-router>
+                <multicasting-router>
+                    <endpoint ref="direct"/>
+                    <endpoint ref="global-name-global-transformer"/>
+                    <endpoint name="local-name-local-transformer" address="vm://local-name-local-transformer" connector-ref="queue" transformers="transformer"/>
                     <!-- these two don't transform -->
-                    <mule:endpoint ref="global-name-local-transformer" transformers="transformer"/>
-                    <mule:endpoint address="vm://no-name-local-transformer" connector-ref="queue" transformers="transformer"/>
-                </mule:multicasting-router>
-            </mule:outbound-router>
-        </mule:service>
+                    <endpoint ref="global-name-local-transformer" transformers="transformer"/>
+                    <endpoint address="vm://no-name-local-transformer" connector-ref="queue" transformers="transformer"/>
+                </multicasting-router>
+            </outbound-router>
+        </service>
 
-    </mule:model>
+    </model>
 
-</beans>
+</mule>

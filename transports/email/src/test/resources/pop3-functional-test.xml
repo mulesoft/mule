@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:pop3="http://www.mulesource.org/schema/mule/pop3/2.0"
        xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
        xsi:schemaLocation="
@@ -13,22 +13,22 @@
     <pop3:connector name="pop3Connector"/>
     <vm:connector name="vmConnector" queueEvents="true"/>
 
-    <mule:model name="test">
+    <model name="test">
 
-        <mule:service name="relay">
-            <mule:component class="org.mule.components.simple.BridgeComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="pop3://bob:password@localhost:65435">
-                    <mule:retry-connection-strategy retryCount="3" retryFrequency="1000"/>
-                </mule:endpoint>
-            </mule:inbound-router>
-            <mule:outbound-router>
-                <mule:outbound-pass-through-router>
-                    <mule:endpoint address="vm://receive"/>
-                </mule:outbound-pass-through-router>
-            </mule:outbound-router>
-        </mule:service>
+        <service name="relay">
+            <component class="org.mule.components.simple.BridgeComponent"/>
+            <inbound-router>
+                <endpoint address="pop3://bob:password@localhost:65435">
+                    <retry-connection-strategy retryCount="3" retryFrequency="1000"/>
+                </endpoint>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <endpoint address="vm://receive"/>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
 
-    </mule:model>
+    </model>
 
-</beans>
+</mule>

@@ -81,37 +81,37 @@
 
     <xsd:complexType name="xmlTransformerType">
         <xsd:complexContent>
-            <xsd:extension base="mule:transformerType">
+            <xsd:extension base="mule:abstractTransformerType">
                 <xsd:attribute name="outputEncoding" type="xsd:string"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="dom-to-xml" type="xmlTransformerType"/>
+    <xsd:element name="dom-to-xml" type="xmlTransformerType" substitutionGroup="mule:abstract-transformer"/>
 
-    <xsd:element name="jxpath-extractor" type="jxpathExtractorType"/>
+    <xsd:element name="jxpath-extractor" type="jxpathExtractorType" substitutionGroup="mule:abstract-transformer"/>
     <xsd:complexType name="jxpathExtractorType">
         <xsd:complexContent>
-            <xsd:extension base="mule:transformerType">
+            <xsd:extension base="mule:abstractTransformerType">
                 <xsd:attribute name="expression" type="xsd:string"/>
                 <xsd:attribute name="singleResult" type="mule:substitutableBoolean"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="object-to-xml" type="objectToXmlType"/>
+    <xsd:element name="object-to-xml" type="objectToXmlType" substitutionGroup="mule:abstract-transformer"/>
     <xsd:complexType name="objectToXmlType">
         <xsd:complexContent>
-            <xsd:extension base="mule:transformerType">
+            <xsd:extension base="mule:abstractTransformerType">
                 <xsd:attribute name="acceptUMOMessage" type="mule:substitutableBoolean"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="xml-to-dom" type="xmlTransformerType"/>
-    <xsd:element name="xml-to-object" type="mule:transformerType"/>
+    <xsd:element name="xml-to-dom" type="xmlTransformerType" substitutionGroup="mule:abstract-transformer"/>
+    <xsd:element name="xml-to-object" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
 
-    <xsd:element name="xslt-transformer" type="xsltTransformerType"/>
+    <xsd:element name="xslt-transformer" type="xsltTransformerType" substitutionGroup="mule:abstract-transformer"/>
     <xsd:complexType name="xsltTransformerType">
         <xsd:complexContent>
             <xsd:extension base="xmlTransformerType">

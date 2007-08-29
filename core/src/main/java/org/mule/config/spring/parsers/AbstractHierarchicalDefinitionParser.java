@@ -10,6 +10,7 @@
 package org.mule.config.spring.parsers;
 
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
+import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.util.StringUtils;
 
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -40,10 +41,8 @@ public abstract class AbstractHierarchicalDefinitionParser extends AbstractMuleB
         String parentBean = getParentBeanName(element);
         if (StringUtils.isBlank(parentBean))
         {
-            // MULE-1737 - this used to be just a printed message and a return from
-            // the parser.  Now it's in a separate method it's simpler to have an
-            // exception and fix the incorrect use
-            throw new IllegalStateException("Bean: " + element.getNodeName() + " has no parent");
+            throw new IllegalStateException("No parent for " +
+                    MuleHierarchicalBeanDefinitionParserDelegate.elementToString(element));
         }
         return getRegistry().getBeanDefinition(parentBean);
     }

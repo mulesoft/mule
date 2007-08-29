@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:stdio="http://www.mulesource.org/schema/mule/stdio/2.0"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
@@ -27,20 +27,20 @@
     <!--
         The Mule model initialises and manages your UMO components
     -->
-    <mule:model name="echoSample">
+    <model name="echoSample">
         <!--
             A Mule service defines all the necessary information about how your components will
             interact with the framework, other components in the system and external sources.
             Please refer to the Configuration Guide for a full description of all the parameters.
         -->
-        <mule:service name="EchoUMO">
-            <mule:component class="org.mule.components.simple.EchoComponent"/>
+        <service name="EchoUMO">
+            <component class="org.mule.components.simple.EchoComponent"/>
 
             <!-- any number of endpoints can be added to an inbound router -->
-            <mule:inbound-router>
-                <mule:endpoint address="stdio://System.in"/>
-                <mule:endpoint address="vm://echo"/>
-            </mule:inbound-router>
+            <inbound-router>
+                <endpoint address="stdio://System.in"/>
+                <endpoint address="vm://echo"/>
+            </inbound-router>
 
             <!--
                 An outbound router can have one or more router configurations that can be
@@ -48,11 +48,11 @@
                 criteria. The pass-through-router is a router that automically passes
                 on every message it receives
             -->
-            <mule:outbound-router>
-                <mule:outbound-pass-through-router>
-                    <mule:endpoint address="stdio://System.out"/>
-                </mule:outbound-pass-through-router>
-            </mule:outbound-router>
-        </mule:service>
-    </mule:model>
-</beans>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <endpoint address="stdio://System.out"/>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
+    </model>
+</mule>

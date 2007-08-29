@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
@@ -10,24 +10,24 @@
 
     <http:connector name="httpConnector" reuseAddress="true"/>
     
-    <mule:custom-transformer name="setResponseType"
+    <custom-transformer name="setResponseType"
             class="org.mule.transformers.simple.MessagePropertiesTransformer">
-        <mule:property name="addProperties">
-            <map>
-                <entry key="Content-Type" value="text/baz;charset=UTF-16BE"/>
-            </map>
-        </mule:property>
-    </mule:custom-transformer>
+        <spring:property name="addProperties">
+            <spring:map>
+                <spring:entry key="Content-Type" value="text/baz;charset=UTF-16BE"/>
+            </spring:map>
+        </spring:property>
+    </custom-transformer>
 
-    <mule:endpoint name="clientEndpoint" address="http://localhost:60198" synchronous="true"/>
+    <endpoint name="clientEndpoint" address="http://localhost:60198" synchronous="true"/>
 
-    <mule:model name="main">
-        <mule:service name="testComponent">
-            <mule:component class="org.mule.tck.functional.FunctionalTestComponent" />
-            <mule:inbound-router>
-                <mule:endpoint ref="clientEndpoint" responseTransformers="setResponseType"/>
-            </mule:inbound-router>
-        </mule:service>
-    </mule:model>
+    <model name="main">
+        <service name="testComponent">
+            <component class="org.mule.tck.functional.FunctionalTestComponent" />
+            <inbound-router>
+                <endpoint ref="clientEndpoint" responseTransformers="setResponseType"/>
+            </inbound-router>
+        </service>
+    </model>
 
-</beans>
+</mule>

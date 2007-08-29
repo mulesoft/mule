@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
        xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
     xsi:schemaLocation="
@@ -10,121 +10,121 @@
        http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd
        http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd">
 
-    <mule:endpoint name="base" address="http://localhost:60198" synchronous="true"/>
-    <mule:endpoint name="adapted" address="http://localhost:60199" synchronous="true"/>
-    <mule:endpoint name="ignored" address="http://localhost:60200" synchronous="true"/>
-    <mule:endpoint name="inbound" address="http://localhost:60201" synchronous="true"/>
+    <endpoint name="base" address="http://localhost:60198" synchronous="true"/>
+    <endpoint name="adapted" address="http://localhost:60199" synchronous="true"/>
+    <endpoint name="ignored" address="http://localhost:60200" synchronous="true"/>
+    <endpoint name="inbound" address="http://localhost:60201" synchronous="true"/>
 
-    <mule:custom-transformer name="appendString"
+    <custom-transformer name="appendString"
                              class="org.mule.tck.functional.StringAppendTestTransformer"/>
 
-    <mule:custom-transformer name="appendString2"
+    <custom-transformer name="appendString2"
                              class="org.mule.tck.functional.StringAppendTestTransformer">
-        <mule:property name="message" value=" transformed 2"/>
-    </mule:custom-transformer>
+        <spring:property name="message" value=" transformed 2"/>
+    </custom-transformer>
 
     <!-- first, the simple two service model we use in all cases, with no additional
          transformers -->
 
-    <mule:model name="baseModel">
+    <model name="baseModel">
 
-        <mule:service name="baseService1">
-            <mule:component class="org.mule.components.simple.BridgeComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint ref="base"/>
-            </mule:inbound-router>
-            <mule:outbound-router>
-                <mule:outbound-pass-through-router>
-                    <mule:endpoint address="vm://echo1" synchronous="true"/>
-                </mule:outbound-pass-through-router>
-            </mule:outbound-router>
-        </mule:service>
+        <service name="baseService1">
+            <component class="org.mule.components.simple.BridgeComponent"/>
+            <inbound-router>
+                <endpoint ref="base"/>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <endpoint address="vm://echo1" synchronous="true"/>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
 
-        <mule:service name="baseService2">
-            <mule:component class="org.mule.tck.functional.FunctionalTestComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="vm://echo1" synchronous="true"/>
-            </mule:inbound-router>
-        </mule:service>
+        <service name="baseService2">
+            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
+            <inbound-router>
+                <endpoint address="vm://echo1" synchronous="true"/>
+            </inbound-router>
+        </service>
 
-    </mule:model>
+    </model>
 
 
     <!-- next, the same model but with adapted components that call
          getMessage() rather than getTransformedMessage() -->
 
-    <mule:model name="adaptedModel">
+    <model name="adaptedModel">
 
-        <mule:service name="adaptedService1">
-            <mule:component class="org.mule.providers.http.issues.NoTransformPassThroughComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint ref="adapted"/>
-            </mule:inbound-router>
-            <mule:outbound-router>
-                <mule:outbound-pass-through-router>
-                    <mule:endpoint address="vm://echo2" synchronous="true"/>
-                </mule:outbound-pass-through-router>
-            </mule:outbound-router>
-        </mule:service>
+        <service name="adaptedService1">
+            <component class="org.mule.providers.http.issues.NoTransformPassThroughComponent"/>
+            <inbound-router>
+                <endpoint ref="adapted"/>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <endpoint address="vm://echo2" synchronous="true"/>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
 
-        <mule:service name="adaptedService2">
-            <mule:component class="org.mule.providers.http.issues.NoTransformFunctionalTestComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="vm://echo2" synchronous="true"/>
-            </mule:inbound-router>
-        </mule:service>
+        <service name="adaptedService2">
+            <component class="org.mule.providers.http.issues.NoTransformFunctionalTestComponent"/>
+            <inbound-router>
+                <endpoint address="vm://echo2" synchronous="true"/>
+            </inbound-router>
+        </service>
 
-    </mule:model>
+    </model>
 
 
     <!-- now we add transformers to the adapted model - they should have no effect -->
 
-    <mule:model name="ignoredModel">
+    <model name="ignoredModel">
 
-        <mule:service name="ignoredService1">
-            <mule:component class="org.mule.providers.http.issues.NoTransformPassThroughComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint ref="ignored" transformers="appendString"/>
-            </mule:inbound-router>
-            <mule:outbound-router>
-                <mule:outbound-pass-through-router>
-                    <mule:endpoint address="vm://echo3" synchronous="true"/>
-                </mule:outbound-pass-through-router>
-            </mule:outbound-router>
-        </mule:service>
+        <service name="ignoredService1">
+            <component class="org.mule.providers.http.issues.NoTransformPassThroughComponent"/>
+            <inbound-router>
+                <endpoint ref="ignored" transformers="appendString"/>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <endpoint address="vm://echo3" synchronous="true"/>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
 
-        <mule:service name="ignoredService2">
-            <mule:component class="org.mule.providers.http.issues.NoTransformFunctionalTestComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="vm://echo3" synchronous="true" transformers="appendString2"/>
-            </mule:inbound-router>
-        </mule:service>
+        <service name="ignoredService2">
+            <component class="org.mule.providers.http.issues.NoTransformFunctionalTestComponent"/>
+            <inbound-router>
+                <endpoint address="vm://echo3" synchronous="true" transformers="appendString2"/>
+            </inbound-router>
+        </service>
 
-    </mule:model>
+    </model>
 
     <!-- adding transformers to the base model will have an effect -->
 
-    <mule:model name="inboundModel">
+    <model name="inboundModel">
 
-        <mule:service name="inboundService1">
-            <mule:component class="org.mule.components.simple.BridgeComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint ref="inbound" transformers="appendString"/>
-            </mule:inbound-router>
-            <mule:outbound-router>
-                <mule:outbound-pass-through-router>
-                    <mule:endpoint address="vm://echo4" synchronous="true"/>
-                </mule:outbound-pass-through-router>
-            </mule:outbound-router>
-        </mule:service>
+        <service name="inboundService1">
+            <component class="org.mule.components.simple.BridgeComponent"/>
+            <inbound-router>
+                <endpoint ref="inbound" transformers="appendString"/>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <endpoint address="vm://echo4" synchronous="true"/>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
 
-        <mule:service name="inboundService2">
-            <mule:component class="org.mule.tck.functional.FunctionalTestComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="vm://echo4" synchronous="true" transformers="appendString2"/>
-            </mule:inbound-router>
-        </mule:service>
+        <service name="inboundService2">
+            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
+            <inbound-router>
+                <endpoint address="vm://echo4" synchronous="true" transformers="appendString2"/>
+            </inbound-router>
+        </service>
 
-    </mule:model>
+    </model>
 
-</beans>
+</mule>

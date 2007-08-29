@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
        xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
     xsi:schemaLocation="
@@ -10,76 +10,76 @@
        http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd
        http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd">
     
-    <mule:model name="REST Functional TestCase">
+    <model name="REST Functional TestCase">
         
-        <mule:service name="RESTServiceWrapper1">
-            <mule:component class="org.mule.components.rest.RestServiceWrapper">
-                <mule:properties>
-                    <entry key="serviceUrl" value="http://www.webservicex.net/stockquote.asmx/GetQuote"/>
-                    <entry key="httpMethod" value="POST"/>
-                    <entry key="payloadParameterNames">
-                        <list>
-                            <value>symbol</value>
-                        </list>
-                    </entry>
-                </mule:properties>
-            </mule:component>
-            <mule:inbound-router>
-                <mule:endpoint address="vm://in1"/>
-            </mule:inbound-router>
-        </mule:service>
+        <service name="RESTServiceWrapper1">
+            <component class="org.mule.components.rest.RestServiceWrapper">
+                <properties>
+                    <spring:entry key="serviceUrl" value="http://www.webservicex.net/stockquote.asmx/GetQuote"/>
+                    <spring:entry key="httpMethod" value="POST"/>
+                    <spring:entry key="payloadParameterNames">
+                        <spring:list>
+                            <spring:value>symbol</spring:value>
+                        </spring:list>
+                    </spring:entry>
+                </properties>
+            </component>
+            <inbound-router>
+                <endpoint address="vm://in1"/>
+            </inbound-router>
+        </service>
         
-        <mule:service name="RESTServiceWrapper2">
-            <mule:component class="org.mule.components.rest.RestServiceWrapper">
-                <mule:properties>
-                    <entry key="serviceUrl" value="http://www.webservicex.net/CurrencyConvertor.asmx/ConversionRate"/>
-                    <entry key="httpMethod" value="POST"/>
-                    <entry key="payloadParameterNames">
-                        <list>
-                            <value>FromCurrency</value>
-                            <value>ToCurrency</value>
-                        </list>
-                    </entry>
-                </mule:properties>
-            </mule:component>
-            <mule:inbound-router>
-                <mule:endpoint address="vm://in2"/>
-            </mule:inbound-router>
-        </mule:service>
+        <service name="RESTServiceWrapper2">
+            <component class="org.mule.components.rest.RestServiceWrapper">
+                <properties>
+                    <spring:entry key="serviceUrl" value="http://www.webservicex.net/CurrencyConvertor.asmx/ConversionRate"/>
+                    <spring:entry key="httpMethod" value="POST"/>
+                    <spring:entry key="payloadParameterNames">
+                        <spring:list>
+                            <spring:value>FromCurrency</spring:value>
+                            <spring:value>ToCurrency</spring:value>
+                        </spring:list>
+                    </spring:entry>
+                </properties>
+            </component>
+            <inbound-router>
+                <endpoint address="vm://in2"/>
+            </inbound-router>
+        </service>
         
-        <mule:service name="RESTServiceWrapper3">
-            <mule:component class="org.mule.components.rest.RestServiceWrapper">
-                <mule:properties>
-                    <entry key="serviceUrl" value="http://www.webservicex.net/stockquote.asmx/GetQuote"/>
-                    <entry key="httpMethod" value="GET"/>
-                    <entry key="payloadParameterNames">
-                        <list>
-                            <value>symbol</value>
-                        </list>
-                    </entry>
-                </mule:properties>
-            </mule:component>
-            <mule:inbound-router>
-                <mule:endpoint address="vm://in3"/>
-            </mule:inbound-router>
-        </mule:service>
+        <service name="RESTServiceWrapper3">
+            <component class="org.mule.components.rest.RestServiceWrapper">
+                <properties>
+                    <spring:entry key="serviceUrl" value="http://www.webservicex.net/stockquote.asmx/GetQuote"/>
+                    <spring:entry key="httpMethod" value="GET"/>
+                    <spring:entry key="payloadParameterNames">
+                        <spring:list>
+                            <spring:value>symbol</spring:value>
+                        </spring:list>
+                    </spring:entry>
+                </properties>
+            </component>
+            <inbound-router>
+                <endpoint address="vm://in3"/>
+            </inbound-router>
+        </service>
         
-        <mule:service name="RESTServiceWrapper4">
-            <mule:component class="org.mule.components.rest.RestServiceWrapper">
-                <mule:properties>
-                    <entry key="serviceUrl" value="http://www.webservicex.net/CurrencyConvertor.asmx/ConversionRate"/>
-                    <entry key="httpMethod" value="GET"/>
-                    <entry key="payloadParameterNames">
-                        <list>
-                            <value>FromCurrency</value>
-                            <value>ToCurrency</value>
-                        </list>
-                    </entry>
-                </mule:properties>
-            </mule:component>
-            <mule:inbound-router>
-                <mule:endpoint address="vm://in4"/>
-            </mule:inbound-router>
-        </mule:service>
-    </mule:model>
-</beans>
+        <service name="RESTServiceWrapper4">
+            <component class="org.mule.components.rest.RestServiceWrapper">
+                <properties>
+                    <spring:entry key="serviceUrl" value="http://www.webservicex.net/CurrencyConvertor.asmx/ConversionRate"/>
+                    <spring:entry key="httpMethod" value="GET"/>
+                    <spring:entry key="payloadParameterNames">
+                        <spring:list>
+                            <spring:value>FromCurrency</spring:value>
+                            <spring:value>ToCurrency</spring:value>
+                        </spring:list>
+                    </spring:entry>
+                </properties>
+            </component>
+            <inbound-router>
+                <endpoint address="vm://in4"/>
+            </inbound-router>
+        </service>
+    </model>
+</mule>

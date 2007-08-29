@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:ejb="http://www.mulesource.org/schema/mule/ejb/2.0"
        xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
        xsi:schemaLocation="
@@ -13,16 +13,16 @@
     <!-- in a typical production environment you'd set jndiProviderUrl to the jndi server
          instead, here, we need to provide a "dummy" context -->
 
-    <bean name="jndiFactory" class="org.mule.providers.ejb.SimpleEjbContextFactory"/>
-    <bean name="dummy" class="org.mule.impl.container.DummyEjbHomeProxy"/>
-    <bean name="jndiContext" factory-bean="jndiFactory" factory-method="create">
-        <constructor-arg>
-            <map>
-                <entry key="TestService" value-ref="dummy"/>
-            </map>
-        </constructor-arg>
-    </bean>
+    <spring:bean name="jndiFactory" class="org.mule.providers.ejb.SimpleEjbContextFactory"/>
+    <spring:bean name="dummy" class="org.mule.impl.container.DummyEjbHomeProxy"/>
+    <spring:bean name="jndiContext" factory-bean="jndiFactory" factory-method="create">
+        <spring:constructor-arg>
+            <spring:map>
+                <spring:entry key="TestService" value-ref="dummy"/>
+            </spring:map>
+        </spring:constructor-arg>
+    </spring:bean>
 
     <ejb:connector name="ejb" jndiContext-ref="jndiContext" securityPolicy="rmi.policy"/>
 
-</beans>
+</mule>

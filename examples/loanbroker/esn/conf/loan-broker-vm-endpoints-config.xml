@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
        xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
@@ -13,32 +13,32 @@
     Here we define components and endpoints using the VM transport.
     </description>
 
-    <mule:custom-transformer name="ExtractCustomer" class="org.mule.transformers.simple.GetBeanProperty">
-        <mule:property name="propertyName" value="customerRequest.customer"/>
-    </mule:custom-transformer>
+    <custom-transformer name="ExtractCustomer" class="org.mule.transformers.simple.GetBeanProperty">
+        <spring:property name="propertyName" value="customerRequest.customer"/>
+    </custom-transformer>
 
-    <mule:custom-transformer name="SetLendersAsRecipients" class="org.mule.examples.loanbroker.transformers.SetLendersAsRecipients"/>
+    <custom-transformer name="SetLendersAsRecipients" class="org.mule.examples.loanbroker.transformers.SetLendersAsRecipients"/>
 
-    <mule:endpoint name="CustomerRequests" address="vm://customer.requests" connector-ref="syncVm"/>
-    <mule:endpoint name="LoanBrokerQuotes" address="vm://loan.quotes" connector-ref="syncVm"/>
-    <mule:endpoint name="CreditAgency" address="vm://credit.agency" connector-ref="syncVm"/>
-    <mule:endpoint name="CreditAgencyIn" address="vm://credit.agency" connector-ref="syncVm"/>
-    <mule:endpoint name="LenderService" address="vm://lender.service?method=setLenderList" connector-ref="syncVm"/>
-    <mule:endpoint name="BankGateway" address="vm://bank.gateway" connector-ref="syncVm"/>
+    <endpoint name="CustomerRequests" address="vm://customer.requests" connector-ref="syncVm"/>
+    <endpoint name="LoanBrokerQuotes" address="vm://loan.quotes" connector-ref="syncVm"/>
+    <endpoint name="CreditAgency" address="vm://credit.agency" connector-ref="syncVm"/>
+    <endpoint name="CreditAgencyIn" address="vm://credit.agency" connector-ref="syncVm"/>
+    <endpoint name="LenderService" address="vm://lender.service?method=setLenderList" connector-ref="syncVm"/>
+    <endpoint name="BankGateway" address="vm://bank.gateway" connector-ref="syncVm"/>
 
-    <mule:endpoint name="Bank1" address="vm://bank.1" connector-ref="syncVm"/>
-    <mule:endpoint name="Bank1In" address="vm://bank.1" connector-ref="syncVm"/>
+    <endpoint name="Bank1" address="vm://bank.1" connector-ref="syncVm"/>
+    <endpoint name="Bank1In" address="vm://bank.1" connector-ref="syncVm"/>
 
-    <mule:endpoint name="Bank2" address="vm://bank.2" connector-ref="syncVm"/>
-    <mule:endpoint name="Bank2In" address="vm://bank.2" connector-ref="syncVm"/>
+    <endpoint name="Bank2" address="vm://bank.2" connector-ref="syncVm"/>
+    <endpoint name="Bank2In" address="vm://bank.2" connector-ref="syncVm"/>
 
-    <mule:endpoint name="Bank3" address="vm://bank.3" connector-ref="syncVm"/>
-    <mule:endpoint name="Bank3In" address="vm://bank.3" connector-ref="syncVm"/>
+    <endpoint name="Bank3" address="vm://bank.3" connector-ref="syncVm"/>
+    <endpoint name="Bank3In" address="vm://bank.3" connector-ref="syncVm"/>
 
-    <mule:endpoint name="Bank4" address="vm://bank.4" connector-ref="syncVm"/>
-    <mule:endpoint name="Bank4In" address="vm://bank.4" connector-ref="syncVm"/>
+    <endpoint name="Bank4" address="vm://bank.4" connector-ref="syncVm"/>
+    <endpoint name="Bank4In" address="vm://bank.4" connector-ref="syncVm"/>
 
-    <mule:endpoint name="Bank5" address="vm://bank.5" connector-ref="syncVm"/>
-    <mule:endpoint name="Bank5In" address="vm://bank.5" connector-ref="syncVm"/>
+    <endpoint name="Bank5" address="vm://bank.5" connector-ref="syncVm"/>
+    <endpoint name="Bank5In" address="vm://bank.5" connector-ref="syncVm"/>
 
-</beans>
+</mule>

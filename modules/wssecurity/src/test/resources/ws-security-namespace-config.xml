@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
 	   xmlns:xfire="http://www.mulesource.org/schema/mule/xfire/2.0"
        xmlns:axis="http://www.mulesource.org/schema/mule/axis/2.0"
 	   xmlns:wssecurity="http://www.mulesource.org/schema/mule/wssecurity/2.0"
@@ -12,28 +12,28 @@
 	   http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/axis/2.0/mule-axis.xsd
   	   http://www.mulesource.org/schema/mule/wssecurity/2.0 http://www.mulesource.org/schema/mule/wssecurity/2.0/mule-wssecurity.xsd">
 
-    <bean id="passwords" class="org.mule.extras.wssecurity.callbackhandlers.PasswordContainer">
-	   <constructor-arg>
-		   <props>
-			   <prop key="mulealias">mulepassword</prop>
-			   <prop key="gooduser">goodUserPassword</prop>
-		   </props>
-		</constructor-arg>
-	</bean>
+    <spring:bean id="passwords" class="org.mule.extras.wssecurity.callbackhandlers.PasswordContainer">
+	   <spring:constructor-arg>
+		   <spring:props>
+			   <spring:prop key="mulealias">mulepassword</spring:prop>
+			   <spring:prop key="gooduser">goodUserPassword</spring:prop>
+		   </spring:props>
+		</spring:constructor-arg>
+	</spring:bean>
 													
 	<xfire:connector name="xfireConnector">      
 		<xfire:client-out-handler>org.codehaus.xfire.util.dom.DOMOutHandler</xfire:client-out-handler>
 		<xfire:client-out-handler>org.codehaus.xfire.security.wss4j.WSS4JOutHandler</xfire:client-out-handler>
 	</xfire:connector>
 												
-	<mule:model name="test">
-		<mule:service name="MySecuredUMO">
-			<mule:component class="org.mule.components.simple.EchoComponent"/>
-			<mule:inbound-router>
-				<mule:endpoint address="xfire:http://localhost:64567" connector-ref="xfireConnector">
+	<model name="test">
+		<service name="MySecuredUMO">
+			<component class="org.mule.components.simple.EchoComponent"/>
+			<inbound-router>
+				<endpoint address="xfire:http://localhost:64567" connector-ref="xfireConnector">
                     <wssecurity:security-filter signatureFile="in-signed-security.properties" decryptionFile="in-encrypted-security.properties"/>
-				</mule:endpoint>
-			</mule:inbound-router>
-		</mule:service>
-	</mule:model>
-</beans>
+				</endpoint>
+			</inbound-router>
+		</service>
+	</model>
+</mule>

@@ -12,7 +12,7 @@
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0" 
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
 
-    <xsd:element name="connector" type="smtpConnectorType"/>
+    <xsd:element name="connector" type="smtpConnectorType" substitutionGroup="mule:abstract-connector"/>
 
     <xsd:complexType name="headerType">
         <xsd:attribute name="key" type="xsd:string" use="required"/>

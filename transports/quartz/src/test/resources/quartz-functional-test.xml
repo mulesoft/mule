@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:quartz="http://www.mulesource.org/schema/mule/quartz/2.0"
        xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
@@ -10,36 +10,36 @@
 
     <quartz:connector name="quartzConnectorDefaults"/>
 
-    <mule:endpoint name="quartz.in.1" address="quartz:/myService1">
-        <mule:properties>
-            <entry key="repeatInterval" value="1000"/>
-            <entry key="repeatCount" value="3"/>
-            <entry key="payload" value="quartz test"/>
-        </mule:properties>
-    </mule:endpoint>
+    <endpoint name="quartz.in.1" address="quartz:/myService1">
+        <properties>
+            <spring:entry key="repeatInterval" value="1000"/>
+            <spring:entry key="repeatCount" value="3"/>
+            <spring:entry key="payload" value="quartz test"/>
+        </properties>
+    </endpoint>
 
-    <mule:endpoint name="quartz.in.2" address="quartz:/myService2">
-        <mule:properties>
-            <entry key="repeatInterval" value="1000"/>
-            <entry key="repeatCount" value="1"/>
-        </mule:properties>
-    </mule:endpoint>
+    <endpoint name="quartz.in.2" address="quartz:/myService2">
+        <properties>
+            <spring:entry key="repeatInterval" value="1000"/>
+            <spring:entry key="repeatCount" value="1"/>
+        </properties>
+    </endpoint>
 
-    <mule:model name="quartz">
-        <mule:pooling-profile maxActive="1" exhaustedAction="WAIT"/>
+    <model name="quartz">
+        <pooling-profile maxActive="1" exhaustedAction="WAIT"/>
 
-        <mule:service name="quartzService1">
-            <mule:component class="org.mule.providers.quartz.TestComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint ref="quartz.in.1"/>
-            </mule:inbound-router>
-        </mule:service>
+        <service name="quartzService1">
+            <component class="org.mule.providers.quartz.TestComponent"/>
+            <inbound-router>
+                <endpoint ref="quartz.in.1"/>
+            </inbound-router>
+        </service>
 
-        <mule:service name="quartzService2">
-            <mule:component class="org.mule.providers.quartz.TestComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint ref="quartz.in.2"/>
-            </mule:inbound-router>
-        </mule:service>
-    </mule:model>
-</beans>
+        <service name="quartzService2">
+            <component class="org.mule.providers.quartz.TestComponent"/>
+            <inbound-router>
+                <endpoint ref="quartz.in.2"/>
+            </inbound-router>
+        </service>
+    </model>
+</mule>

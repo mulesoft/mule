@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:file="http://www.mulesource.org/schema/mule/file/2.0"
        xmlns:pgp="http://www.mulesource.org/schema/mule/pgp/2.0"
     xsi:schemaLocation="
@@ -10,13 +10,13 @@
        http://www.mulesource.org/schema/mule/file/2.0 http://www.mulesource.org/schema/mule/file/2.0/mule-file.xsd 
        http://www.mulesource.org/schema/mule/pgp/2.0 http://www.mulesource.org/schema/mule/pgp/2.0/mule-pgp.xsd">
 	
-	<bean id="pgpKeyManager" class="org.mule.extras.pgp.PGPKeyRingImpl" init-method="initialise">
-        <property name="publicKeyRingFileName" value="serverPublic.gpg"/>
-        <property name="secretKeyRingFileName" value="serverPrivate.gpg"/>
-        <property name="secretAliasId" value="0x6168F39C"/>
-        <property name="secretPassphrase" value="TestingPassphrase"/>
-    </bean>
-    <bean id="fakeCredentialAccessor" class="org.mule.extras.pgp.FakeCredentialAccessor" />
+	<spring:bean id="pgpKeyManager" class="org.mule.extras.pgp.PGPKeyRingImpl" init-method="initialise">
+        <spring:property name="publicKeyRingFileName" value="serverPublic.gpg"/>
+        <spring:property name="secretKeyRingFileName" value="serverPrivate.gpg"/>
+        <spring:property name="secretAliasId" value="0x6168F39C"/>
+        <spring:property name="secretPassphrase" value="TestingPassphrase"/>
+    </spring:bean>
+    <spring:bean id="fakeCredentialAccessor" class="org.mule.extras.pgp.FakeCredentialAccessor" />
 	
     <file:connector name="sendConnector" outputPattern="[TARGET_FILE]"/>
     
@@ -25,22 +25,22 @@
         <pgp:keybased-encryption-strategy name="keyBasedEncryptionStrategy" keyManager-ref="pgpKeyManager"/>
     </pgp:security-manager>
 
-     <mule:model name="test">
-        <mule:service name="echo">
-            <mule:component class="org.mule.extras.pgp.EchoMsg"/>
-				<mule:inbound-router>
-					<mule:endpoint address="vm://echo">
+     <model name="test">
+        <service name="echo">
+            <component class="org.mule.extras.pgp.EchoMsg"/>
+				<inbound-router>
+					<endpoint address="vm://echo">
                         <pgp:security-filter strategyName="keyBasedEncryptionStrategy" signRequired="true" credentialsAccessor-ref="fakeCredentialAccessor" keyManager-ref="pgpKeyManager"/>
-                    </mule:endpoint>
-				</mule:inbound-router>
-				<mule:outbound-router>
-					<mule:outbound-pass-through-router>
-						<mule:endpoint address="file://output">
+                    </endpoint>
+				</inbound-router>
+				<outbound-router>
+					<outbound-pass-through-router>
+						<endpoint address="file://output">
                             <pgp:security-filter strategyName="keyBasedEncryptionStrategy" signRequired="true" credentialsAccessor-ref="fakeCredentialAccessor" keyManager-ref="pgpKeyManager"/>
-						</mule:endpoint>
-					</mule:outbound-pass-through-router>
-				</mule:outbound-router>
-			</mule:service>
-	</mule:model>
+						</endpoint>
+					</outbound-pass-through-router>
+				</outbound-router>
+			</service>
+	</model>
     
-</beans>
+</mule>

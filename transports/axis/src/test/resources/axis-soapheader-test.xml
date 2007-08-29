@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:axis="http://www.mulesource.org/schema/mule/axis/2.0"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/axis/2.0/mule-axis.xsd">
 
-    <mule:model name="Axis_Headers_TestCase">
-        <mule:service name="component">
-            <mule:component class="org.mule.components.simple.EchoComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="axis:http://localhost:62181/services"/>
-            </mule:inbound-router>
-            <mule:response-router>
-                <mule:endpoint address="http://localhost:62182/reply"/>
-            </mule:response-router>
-        </mule:service>    
-    </mule:model>
-</beans>
+    <model name="Axis_Headers_TestCase">
+        <service name="component">
+            <component class="org.mule.components.simple.EchoComponent"/>
+            <inbound-router>
+                <endpoint address="axis:http://localhost:62181/services"/>
+            </inbound-router>
+            <response-router>
+                <endpoint address="http://localhost:62182/reply"/>
+            </response-router>
+        </service>    
+    </model>
+</mule>

@@ -19,7 +19,6 @@ public class HttpPollingFunctionalTestCase extends FunctionalTestCase
 
     public void testPollingHttpConnector() throws Exception
     {
-        // this is broken because of MULE-1770
         MuleClient client = new MuleClient();
         UMOMessage result = client.receive("vm://toclient", 5000);
         assertNotNull(result.getPayload());

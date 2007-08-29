@@ -15,7 +15,7 @@
     <xsd:import namespace="http://www.mulesource.org/schema/mule/pop3/2.0"
                 schemaLocation="http://www.mulesource.org/schema/mule/pop3/2.0/mule-pop3.xsd"/>
 
-    <xsd:element name="connector" type="pop3sConnectorType"/>
+    <xsd:element name="connector" type="pop3sConnectorType" substitutionGroup="mule:abstract-connector"/>
 
     <xsd:complexType name="pop3sConnectorType">
         <xsd:complexContent>

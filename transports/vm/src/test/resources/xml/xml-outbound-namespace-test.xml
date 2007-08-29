@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:mxml="http://www.mulesource.org/schema/mule/xml/2.0"
        xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
     xsi:schemaLocation="
@@ -10,11 +10,11 @@
        http://www.mulesource.org/schema/mule/xml/2.0 http://www.mulesource.org/schema/mule/xml/2.0/mule-xml.xsd
        http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
 
-    <mule:model name="xml outbound namespace tests">
+    <model name="xml outbound namespace tests">
 
-        <mule:service name="fancy config splitter">
-            <mule:component class="org.mule.components.simple.BridgeComponent"/>
-            <mule:outbound-router>
+        <service name="fancy config splitter">
+            <component class="org.mule.components.simple.BridgeComponent"/>
+            <outbound-router>
                 <mxml:message-splitter
                         splitExpression="/expression"
                         enableCorrelation="ALWAYS"
@@ -24,12 +24,12 @@
                     <mxml:dom4j-property-extractor/>
                     <mxml:namespace prefix="bar" uri="foo"/>
                 </mxml:message-splitter>
-            </mule:outbound-router>
-        </mule:service>
+            </outbound-router>
+        </service>
 
-        <mule:service name="fancy config round robin">
-            <mule:component class="org.mule.components.simple.BridgeComponent"/>
-            <mule:outbound-router>
+        <service name="fancy config round robin">
+            <component class="org.mule.components.simple.BridgeComponent"/>
+            <outbound-router>
                 <mxml:round-robin-splitter
                         splitExpression="/expression"
                         enableCorrelation="IF_NOT_SET"
@@ -40,9 +40,9 @@
                     <mxml:dom4j-property-extractor/>
                     <mxml:namespace prefix="bar" uri="foo"/>
                 </mxml:round-robin-splitter>
-            </mule:outbound-router>
-        </mule:service>
+            </outbound-router>
+        </service>
 
-    </mule:model>
+    </model>
 
-</beans>
+</mule>

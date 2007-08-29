@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:axis="http://www.mulesource.org/schema/mule/axis/2.0"
        xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
@@ -24,32 +24,32 @@
         <axis:bean-type>org.mule.examples.loanbroker.messages.LoanQuote</axis:bean-type>
     </axis:connector>
 
-    <mule:custom-transformer name="ExtractCustomer" class="org.mule.transformers.simple.GetBeanProperty">
-        <mule:property name="propertyName" value="customerRequest.customer" />
-    </mule:custom-transformer>
+    <custom-transformer name="ExtractCustomer" class="org.mule.transformers.simple.GetBeanProperty">
+        <spring:property name="propertyName" value="customerRequest.customer" />
+    </custom-transformer>
 
-    <mule:custom-transformer name="SetLendersAsRecipients" class="org.mule.examples.loanbroker.transformers.SetLendersAsRecipients"/>
+    <custom-transformer name="SetLendersAsRecipients" class="org.mule.examples.loanbroker.transformers.SetLendersAsRecipients"/>
 
-    <mule:endpoint name="CustomerRequests" address="vm://customer.requests" connector-ref="syncVm"/>
-    <mule:endpoint  name="LoanBrokerQuotes" address="vm://loan.quotes" connector-ref="syncVm"/>
-    <mule:endpoint name="CreditAgency" address="axis:http://localhost:18080/mule/TheCreditAgencyService?method=getCreditProfile"/>
-    <mule:endpoint name="CreditAgencyIn" address="axis:http://localhost:18080/mule"/>
-    <mule:endpoint name="LenderService" address="vm://lender.service?method=setLenderList" connector-ref="syncVm"/>
-    <mule:endpoint name="BankGateway" address="vm://bank.gateway" connector-ref="syncVm"/>
+    <endpoint name="CustomerRequests" address="vm://customer.requests" connector-ref="syncVm"/>
+    <endpoint name="LoanBrokerQuotes" address="vm://loan.quotes" connector-ref="syncVm"/>
+    <endpoint name="CreditAgency" address="axis:http://localhost:18080/mule/TheCreditAgencyService?method=getCreditProfile"/>
+    <endpoint name="CreditAgencyIn" address="axis:http://localhost:18080/mule"/>
+    <endpoint name="LenderService" address="vm://lender.service?method=setLenderList" connector-ref="syncVm"/>
+    <endpoint name="BankGateway" address="vm://bank.gateway" connector-ref="syncVm"/>
 
-    <mule:endpoint name="Bank1" address="axis:http://localhost:10080/mule/TheBank1?method=getLoanQuote"/>
-    <mule:endpoint name="Bank1In" address="axis:http://localhost:10080/mule"/>
+    <endpoint name="Bank1" address="axis:http://localhost:10080/mule/TheBank1?method=getLoanQuote"/>
+    <endpoint name="Bank1In" address="axis:http://localhost:10080/mule"/>
 
-    <mule:endpoint name="Bank2" address="axis:http://localhost:20080/mule/TheBank2?method=getLoanQuote"/>
-    <mule:endpoint name="Bank2In" address="axis:http://localhost:20080/mule"/>
+    <endpoint name="Bank2" address="axis:http://localhost:20080/mule/TheBank2?method=getLoanQuote"/>
+    <endpoint name="Bank2In" address="axis:http://localhost:20080/mule"/>
 
-    <mule:endpoint name="Bank3" address="axis:http://localhost:30080/mule/TheBank3?method=getLoanQuote"/>
-    <mule:endpoint name="Bank3In" address="axis:http://localhost:30080/mule"/>
+    <endpoint name="Bank3" address="axis:http://localhost:30080/mule/TheBank3?method=getLoanQuote"/>
+    <endpoint name="Bank3In" address="axis:http://localhost:30080/mule"/>
 
-    <mule:endpoint name="Bank4" address="axis:http://localhost:40080/mule/TheBank4?method=getLoanQuote"/>
-    <mule:endpoint name="Bank4In" address="axis:http://localhost:40080/mule"/>
+    <endpoint name="Bank4" address="axis:http://localhost:40080/mule/TheBank4?method=getLoanQuote"/>
+    <endpoint name="Bank4In" address="axis:http://localhost:40080/mule"/>
 
-    <mule:endpoint name="Bank5" address="axis:http://localhost:50080/mule/TheBank5?method=getLoanQuote"/>
-    <mule:endpoint name="Bank5In" address="axis:http://localhost:50080/mule"/>
+    <endpoint name="Bank5" address="axis:http://localhost:50080/mule/TheBank5?method=getLoanQuote"/>
+    <endpoint name="Bank5In" address="axis:http://localhost:50080/mule"/>
 
-</beans>
+</mule>

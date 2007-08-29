@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:smtp="http://www.mulesource.org/schema/mule/smtp/2.0"
        xmlns:smtps="http://www.mulesource.org/schema/mule/smtps/2.0"
        xsi:schemaLocation="
@@ -43,4 +43,4 @@
                                trustStorePassword="password"/>
     </smtps:connector>
 
-</beans>
+</mule>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
@@ -17,17 +17,17 @@
             http://localhost:65081/services/EchoUMO?wsdl
     </description>
 
-    <mule:custom-transformer name="HttpRequestToSoapRequest"
+    <custom-transformer name="HttpRequestToSoapRequest"
         class="org.mule.providers.soap.transformers.HttpRequestToSoapRequest"/>
 
-    <mule:model name="echoSample">
-        <mule:service name="EchoUMO">
-            <mule:component class="org.mule.components.simple.EchoComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="xfire:http://localhost:65081/services"
+    <model name="echoSample">
+        <service name="EchoUMO">
+            <component class="org.mule.components.simple.EchoComponent"/>
+            <inbound-router>
+                <endpoint address="xfire:http://localhost:65081/services"
                     transformers="HttpRequestToSoapRequest" />
-                <mule:endpoint address="xfire:http://localhost:65082/services"/>
-            </mule:inbound-router>
-        </mule:service>
-    </mule:model>
-</beans>
+                <endpoint address="xfire:http://localhost:65082/services"/>
+            </inbound-router>
+        </service>
+    </model>
+</mule>

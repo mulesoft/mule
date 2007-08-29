@@ -12,7 +12,7 @@
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0" 
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
 
-    <xsd:element name="connector" type="servletConnectorType">
+    <xsd:element name="connector" type="servletConnectorType" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>
             <xsd:documentation>
                 Servlet connector is a channel adapter between Mule and a servlet
@@ -21,7 +21,6 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-
     <xsd:complexType name="servletConnectorType">
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">

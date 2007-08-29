@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:mxml="http://www.mulesource.org/schema/mule/xml/2.0"
        xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
     xsi:schemaLocation="
@@ -13,51 +13,51 @@
     <vm:connector name="default"/>
     <vm:connector name="queue" queueEvents="true"/>
 
-    <mule:endpoint name="in" address="vm://in" connector-ref="default"/>
-    <mule:endpoint name="notxml" address="vm://notxml" connector-ref="queue"/>
-    <mule:endpoint name="self" address="vm://self" connector-ref="queue"/>
-    <mule:endpoint name="other" address="vm://other" connector-ref="queue"/>
+    <endpoint name="in" address="vm://in" connector-ref="default"/>
+    <endpoint name="notxml" address="vm://notxml" connector-ref="queue"/>
+    <endpoint name="self" address="vm://self" connector-ref="queue"/>
+    <endpoint name="other" address="vm://other" connector-ref="queue"/>
 
-    <mule:model name="xml filter test">
+    <model name="xml filter test">
 
-        <mule:service name="test for xml">
-            <mule:component class="org.mule.components.simple.BridgeComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint ref="in"/>
-            </mule:inbound-router>
-            <mule:outbound-router>
-                <mule:filtering-router>
-                    <mule:endpoint address="vm://xml" connector-ref="default"/>
+        <service name="test for xml">
+            <component class="org.mule.components.simple.BridgeComponent"/>
+            <inbound-router>
+                <endpoint ref="in"/>
+            </inbound-router>
+            <outbound-router>
+                <filtering-router>
+                    <endpoint address="vm://xml" connector-ref="default"/>
                     <mxml:is-xml-filter/>
-                </mule:filtering-router>
-                <mule:filtering-router>
-                    <mule:endpoint ref="notxml"/>
-                    <mule:not-filter>
+                </filtering-router>
+                <filtering-router>
+                    <endpoint ref="notxml"/>
+                    <not-filter>
                         <mxml:is-xml-filter/>
-                    </mule:not-filter>
-                </mule:filtering-router>
-            </mule:outbound-router>
-        </mule:service>
+                    </not-filter>
+                </filtering-router>
+            </outbound-router>
+        </service>
 
-        <mule:service name="filter xml for content">
-            <mule:component class="org.mule.components.simple.BridgeComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="vm://xml" connector-ref="default"/>
-            </mule:inbound-router>
-            <mule:outbound-router>
-                <mule:forwarding-catch-all-strategy>
-                    <mule:endpoint ref="other"/>
-                </mule:forwarding-catch-all-strategy>
-                <mule:filtering-router>
-                    <mule:endpoint ref="self"/>
-                    <mxml:jxpath-filter pattern="/spring:beans/mule:model/mule:service[2]/@name" expectedValue="filter xml for content">
+        <service name="filter xml for content">
+            <component class="org.mule.components.simple.BridgeComponent"/>
+            <inbound-router>
+                <endpoint address="vm://xml" connector-ref="default"/>
+            </inbound-router>
+            <outbound-router>
+                <forwarding-catch-all-strategy>
+                    <endpoint ref="other"/>
+                </forwarding-catch-all-strategy>
+                <filtering-router>
+                    <endpoint ref="self"/>
+                    <mxml:jxpath-filter pattern="/mule:mule/mule:model/mule:service[2]/@name" expectedValue="filter xml for content">
                         <mxml:namespace prefix="spring" uri="http://www.springframework.org/schema/beans"/>
                         <mxml:namespace prefix="mule" uri="http://www.mulesource.org/schema/mule/core/2.0"/>
                     </mxml:jxpath-filter>
-                </mule:filtering-router>
-            </mule:outbound-router>
-        </mule:service>
+                </filtering-router>
+            </outbound-router>
+        </service>
 
-    </mule:model>
+    </model>
 
-</beans>
+</mule>

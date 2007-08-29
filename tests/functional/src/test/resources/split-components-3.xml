@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
@@ -10,16 +10,16 @@
 
     <!-- previous test has same model name here, with "inherited" set to true.
          this option not available in 2.0 -->
-    <mule:model name="main" inherit="true">
-        <mule:service name="Component3">
-            <mule:null-component/>
-        </mule:service>
-        <mule:service name="Component4">
-            <mule:null-component/>
-        </mule:service>
-        <mule:service name="Component5">
-            <mule:null-component/>
-        </mule:service>
-    </mule:model>
+    <model name="main" inherit="true">
+        <service name="Component3">
+            <null-component/>
+        </service>
+        <service name="Component4">
+            <null-component/>
+        </service>
+        <service name="Component5">
+            <null-component/>
+        </service>
+    </model>
 
-</beans>
+</mule>

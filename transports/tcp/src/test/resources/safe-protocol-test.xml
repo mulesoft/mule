@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:tcp="http://www.mulesource.org/schema/mule/tcp/2.0"
        xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
@@ -11,14 +11,14 @@
     <tcp:connector name="safe"/>
     <tcp:connector name="unsafe" tcpProtocolClassName="org.mule.providers.tcp.protocols.DefaultProtocol"/>
 
-    <mule:model name="main">
-        <mule:service name="service">
-            <mule:component class="org.mule.tck.functional.FunctionalTestComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="tcp://localhost:65432" connector-ref="safe" synchronous="true"/>
-                <mule:endpoint address="tcp://localhost:65433" connector-ref="unsafe" synchronous="true"/>
-            </mule:inbound-router>
-        </mule:service>
-    </mule:model>
+    <model name="main">
+        <service name="service">
+            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
+            <inbound-router>
+                <endpoint address="tcp://localhost:65432" connector-ref="safe" synchronous="true"/>
+                <endpoint address="tcp://localhost:65433" connector-ref="unsafe" synchronous="true"/>
+            </inbound-router>
+        </service>
+    </model>
 
-</beans>
+</mule>

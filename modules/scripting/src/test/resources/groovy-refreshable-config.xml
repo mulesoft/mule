@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:lang="http://www.springframework.org/schema/lang"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:scripting="http://www.mulesource.org/schema/mule/scripting/2.0"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
@@ -10,11 +10,12 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/scripting/2.0 http://www.mulesource.org/schema/mule/scripting/2.0/mule-scripting.xsd">
 
+    <other>
+        <lang:groovy id="groovy_class_callable" refresh-check-delay="100" script-source="classpath:groovy-dynamic-script-callable.groovy"/>
+        <lang:groovy id="groovy_class_bean" refresh-check-delay="100" script-source="classpath:groovy-dynamic-script-bean.groovy"/>
+        <lang:groovy id="groovy_class_changeInterfaces" refresh-check-delay="100" script-source="classpath:groovy-dynamic-script.groovy"/>
+    </other>
 
-    <lang:groovy id="groovy_class_callable" refresh-check-delay="100" script-source="classpath:groovy-dynamic-script-callable.groovy"/>
-    <lang:groovy id="groovy_class_bean" refresh-check-delay="100" script-source="classpath:groovy-dynamic-script-bean.groovy"/>
-    <lang:groovy id="groovy_class_changeInterfaces" refresh-check-delay="100" script-source="classpath:groovy-dynamic-script.groovy"/>
-    
     <!--
         The script for this bean will always extend froom the Callable interface, therefore we do not need
         to set the attribute methodName. The GroovyRefreshableBeanBuilder will check for this interface
@@ -36,29 +37,29 @@
     -->
     <scripting:groovyRefreshable name="groovyRefreshableBeanChangeInterfaces" refreshableBean-ref="groovy_class_changeInterfaces"  methodName="receive"/>
     
-    <mule:model name="main">
+    <model name="main">
         
-        <mule:service name="GroovyUMO_Callable">
-            <mule:component instance-ref="groovyRefreshableCallable" scope="singleton"/>
-            <mule:inbound-router>
-                <mule:endpoint address="vm://groovy_refresh_callable"/>
-            </mule:inbound-router>
-        </mule:service>   
+        <service name="GroovyUMO_Callable">
+            <component instance-ref="groovyRefreshableCallable" scope="singleton"/>
+            <inbound-router>
+                <endpoint address="vm://groovy_refresh_callable"/>
+            </inbound-router>
+        </service>
         
-        <mule:service name="GroovyUMO_Bean">
-            <mule:component instance-ref="groovyRefreshableBean" scope="singleton"/>
-            <mule:inbound-router>
-                <mule:endpoint address="vm://groovy_refresh_bean"/>
-            </mule:inbound-router>
-        </mule:service>     
+        <service name="GroovyUMO_Bean">
+            <component instance-ref="groovyRefreshableBean" scope="singleton"/>
+            <inbound-router>
+                <endpoint address="vm://groovy_refresh_bean"/>
+            </inbound-router>
+        </service>
         
-        <mule:service name="GroovyUMO_ChangeIntefaces">
-            <mule:component instance-ref="groovyRefreshableBeanChangeInterfaces" scope="singleton"/>
-            <mule:inbound-router>
-                <mule:endpoint address="vm://groovy_refresh_changeInterfaces"/>
-            </mule:inbound-router>
-        </mule:service>   
+        <service name="GroovyUMO_ChangeIntefaces">
+            <component instance-ref="groovyRefreshableBeanChangeInterfaces" scope="singleton"/>
+            <inbound-router>
+                <endpoint address="vm://groovy_refresh_changeInterfaces"/>
+            </inbound-router>
+        </service>
                     
-    </mule:model>
+    </model>
     
-</beans>
+</mule>

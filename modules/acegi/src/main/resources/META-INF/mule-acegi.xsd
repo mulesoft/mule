@@ -12,6 +12,7 @@
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0" 
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
 
+    <xsd:element name="security-manager" type="securityManagerType" substitutionGroup="mule:abstract-security-manager"/>
     <xsd:complexType name="securityManagerType">
         <xsd:annotation>
             <xsd:documentation>
@@ -26,8 +27,6 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-
-    <xsd:element name="security-manager" type="securityManagerType" substitutionGroup="mule:abstract-security-manager"/>
 
     <xsd:complexType name="securityProperty">
         <xsd:attribute name="name" type="xsd:string" use="required"/>

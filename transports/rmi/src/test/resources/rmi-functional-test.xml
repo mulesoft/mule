@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:rmi="http://www.mulesource.org/schema/mule/rmi/2.0"
        xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
        xsi:schemaLocation="
@@ -10,48 +10,48 @@
                http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd
                http://www.mulesource.org/schema/mule/rmi/2.0 http://www.mulesource.org/schema/mule/rmi/2.0/mule-rmi.xsd">
 
-    <bean name="jndiFactory" class="org.mule.providers.rmi.MuleRMIFactory"/>
+    <spring:bean name="jndiFactory" class="org.mule.providers.rmi.MuleRMIFactory"/>
 
-    <bean name="jndiContext" factory-bean="jndiFactory" factory-method="create"/>
+    <spring:bean name="jndiContext" factory-bean="jndiFactory" factory-method="create"/>
 
     <rmi:connector name="rmi" jndiContext-ref="jndiContext" securityPolicy="rmi.policy"/>
 
     <vm:connector name="vmQueue" queueEvents="true"/>
 
-    <mule:endpoint name="Sender" address="rmi://localhost:1099/SimpleMathsUMO?method=addTen"/>
-    <mule:endpoint name="Sender2" address="rmi://localhost:1099/MatchingUMO?method=reverseString"/>
+    <endpoint name="Sender" address="rmi://localhost:1099/SimpleMathsUMO?method=addTen"/>
+    <endpoint name="Sender2" address="rmi://localhost:1099/MatchingUMO?method=reverseString"/>
 
-    <mule:endpoint name="GoodType" address="rmi://localhost:1099/MatchingUMO?method=reverseString">
-        <mule:properties>
-            <entry key="methodArgumentTypes" value="java.lang.String"/>
-        </mule:properties>
-    </mule:endpoint>
+    <endpoint name="GoodType" address="rmi://localhost:1099/MatchingUMO?method=reverseString">
+        <properties>
+            <spring:entry key="methodArgumentTypes" value="java.lang.String"/>
+        </properties>
+    </endpoint>
 
-    <mule:endpoint name="BadType" address="rmi://localhost:1099/MatchingUMO?method=reverseString">
-        <mule:properties>
-            <entry key="methodArgumentTypes" value="java.lang.StringBuffer"/>
-        </mule:properties>
-    </mule:endpoint>
+    <endpoint name="BadType" address="rmi://localhost:1099/MatchingUMO?method=reverseString">
+        <properties>
+            <spring:entry key="methodArgumentTypes" value="java.lang.StringBuffer"/>
+        </properties>
+    </endpoint>
 
-    <mule:model name="sample">
+    <model name="sample">
 
-        <mule:service name="TestUMO">
-            <mule:component class="org.mule.components.simple.BridgeComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint address="vm://testin"/>
-            </mule:inbound-router>
-            <mule:outbound-router>
-                <mule:filtering-router>
-                    <mule:endpoint ref="Sender"/>
-                    <mule:payload-type-filter expectedType="java.lang.Integer"/>
-                </mule:filtering-router>
-                <mule:filtering-router>
-                    <mule:endpoint ref="Sender2"/>
-                    <mule:payload-type-filter expectedType="java.lang.String"/>
-                </mule:filtering-router>
-            </mule:outbound-router>
-        </mule:service>
+        <service name="TestUMO">
+            <component class="org.mule.components.simple.BridgeComponent"/>
+            <inbound-router>
+                <endpoint address="vm://testin"/>
+            </inbound-router>
+            <outbound-router>
+                <filtering-router>
+                    <endpoint ref="Sender"/>
+                    <payload-type-filter expectedType="java.lang.Integer"/>
+                </filtering-router>
+                <filtering-router>
+                    <endpoint ref="Sender2"/>
+                    <payload-type-filter expectedType="java.lang.String"/>
+                </filtering-router>
+            </outbound-router>
+        </service>
 
-    </mule:model>
+    </model>
 
-</beans>
+</mule>

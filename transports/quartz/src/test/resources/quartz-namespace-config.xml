@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:quartz="http://www.mulesource.org/schema/mule/quartz/2.0"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
@@ -14,30 +14,30 @@
     <!-- Inject the scheduler as a bean. -->
     <quartz:connector name="quartzConnector1" scheduler-ref="myScheduler"/>
 
-    <bean id="myScheduler" factory-bean="mySchedulerFactory" factory-method="getScheduler"/>
+    <spring:bean id="myScheduler" factory-bean="mySchedulerFactory" factory-method="getScheduler"/>
 
-    <bean id="mySchedulerFactory" class="org.quartz.impl.StdSchedulerFactory">
-        <constructor-arg>
-            <props>
-                <prop key="org.quartz.scheduler.instanceName">MuleScheduler1</prop>
-                <prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
-                <prop key="org.quartz.threadPool.threadCount">3</prop>
-                <prop key="org.quartz.scheduler.rmi.export">false</prop>
-                <prop key="org.quartz.scheduler.rmi.proxy">false</prop>
-                <prop key="org.quartz.jobStore.class">org.quartz.simpl.RAMJobStore</prop>
-            </props>
-        </constructor-arg>
-    </bean>
+    <spring:bean id="mySchedulerFactory" class="org.quartz.impl.StdSchedulerFactory">
+        <spring:constructor-arg>
+            <spring:props>
+                <spring:prop key="org.quartz.scheduler.instanceName">MuleScheduler1</spring:prop>
+                <spring:prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</spring:prop>
+                <spring:prop key="org.quartz.threadPool.threadCount">3</spring:prop>
+                <spring:prop key="org.quartz.scheduler.rmi.export">false</spring:prop>
+                <spring:prop key="org.quartz.scheduler.rmi.proxy">false</spring:prop>
+                <spring:prop key="org.quartz.jobStore.class">org.quartz.simpl.RAMJobStore</spring:prop>
+            </spring:props>
+        </spring:constructor-arg>
+    </spring:bean>
 
     <!-- Default config but provide some factory properties. -->
     <quartz:connector name="quartzConnector2">
         <quartz:factory-properties>
-            <entry key="org.quartz.scheduler.instanceName" value="MuleScheduler2"/>
-            <entry key="org.quartz.threadPool.class" value="org.quartz.simpl.SimpleThreadPool"/>
-            <entry key="org.quartz.threadPool.threadCount" value="3"/>
-            <entry key="org.quartz.scheduler.rmi.export" value="false"/>
-            <entry key="org.quartz.scheduler.rmi.proxy" value="false"/>
-            <entry key="org.quartz.jobStore.class" value="org.quartz.simpl.RAMJobStore"/>
+            <spring:entry key="org.quartz.scheduler.instanceName" value="MuleScheduler2"/>
+            <spring:entry key="org.quartz.threadPool.class" value="org.quartz.simpl.SimpleThreadPool"/>
+            <spring:entry key="org.quartz.threadPool.threadCount" value="3"/>
+            <spring:entry key="org.quartz.scheduler.rmi.export" value="false"/>
+            <spring:entry key="org.quartz.scheduler.rmi.proxy" value="false"/>
+            <spring:entry key="org.quartz.jobStore.class" value="org.quartz.simpl.RAMJobStore"/>
         </quartz:factory-properties>
     </quartz:connector>
-</beans>
+</mule>

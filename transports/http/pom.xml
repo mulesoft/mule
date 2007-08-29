@@ -19,10 +19,10 @@
                  <artifactId>maven-surefire-plugin</artifactId>
                  <configuration>
                      <excludes>
-                         <exclude>**/HttpsFunctionalTestCase.*</exclude>
-                         <exclude>**/TwoEndpointsSinglePortTestCase.*</exclude>
+                         <!-- MULE-2208 -->
+                         <exclude>**/HttpsFunctionalTestCase.java</exclude>
+                         
                          <exclude>**/*Mule1389TestCase.java</exclude>
-                         <exclude>**/*RESTTestCase.java</exclude>
                      </excludes>
                  </configuration>
              </plugin>
