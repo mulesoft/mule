@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:ssl="http://www.mulesource.org/schema/mule/ssl/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/ssl/2.0 http://www.mulesource.org/schema/mule/ssl/2.0/mule-ssl.xsd">
+
+    <!-- keepSendSocketOpen is required for the Async test case?  see TCP -->
+    <ssl:connector name="SslConnector" keepSendSocketOpen="true">
+        <ssl:ssl-client
+                clientKeyStore="clientKeyStore"
+                clientKeyStorePassword="mulepassword"/>
+        <ssl:ssl-key-store
+                keyStore="serverKeystore"
+                keyStorePassword="mulepassword"
+                keyPassword="mulepassword"/>
+        <ssl:ssl-server
+                trustStore="trustStore"
+                trustStorePassword="mulepassword"/>
+    </ssl:connector>
+
+    <mule:model name="main" class="org.mule.tck.testmodels.mule.TestSedaModel">
+
+        <mule:service name="testComponent">
+            <mule:component scope="singleton" class="org.mule.tck.functional.FunctionalTestComponent"/>
+            <mule:inbound-router>
+                <mule:endpoint name="in" address="ssl://localhost:61655" synchronous="false"/>
+            </mule:inbound-router>
+
+            <!-- This is just to avoid matching router warnings -->
+            <mule:outbound-router>
+                <mule:outbound-pass-through-router>
+                    <mule:endpoint name="test1" address="test://test"/>
+                </mule:outbound-pass-through-router>
+            </mule:outbound-router>
+        </mule:service>
+
+
+    </mule:model>
+
+
+</beans>
