@@ -30,7 +30,7 @@
     <xsd:complexType name="muleType">
         <xsd:sequence minOccurs="0" maxOccurs="unbounded">
             <xsd:choice>
-                <xsd:element name="environment-properties" type="spring:mapType"/>
+                <xsd:element name="environment-properties" type="mapType"/>
                 <xsd:element name="configuration" type="muleManagementContextType"/>
                 <xsd:element ref="spring:bean">
                     <xsd:annotation>
@@ -128,7 +128,7 @@
             <xsd:element ref="abstract-pooling-profile" minOccurs="0"/>
             <xsd:element ref="abstract-queue-profile" minOccurs="0"/>
             <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
-            <xsd:element name="meta-info" type="spring:mapType" minOccurs="0"/>
+            <xsd:element name="meta-info" type="mapType" minOccurs="0"/>
         </xsd:sequence>
         <xsd:attribute name="name" type="xsd:string" use="required"/>
         <!-- Disabled until it actually does something!

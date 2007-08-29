@@ -17,6 +17,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.MapFactoryBean;
+import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
@@ -78,15 +79,16 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
             // for non-mule elements to ensure that we don't break the parsing of any
             // other custom name-spaces e.g spring-jee.
 
-            // We also avoid parsing inside elements that have constructed a MapFactoryBean
+            // We also avoid parsing inside elements that have constructed a factory bean
             // because that means we're dealing with (something like) ChildmapDefinitionParser,
             // which handles iteration internally (this is a hack needed because Spring doesn't
             // expose the DP for "<spring:entry>" elements directly).
 
-            boolean isMapFactory = null != child && null != child.getBeanClassName()
-                    && child.getBeanClassName().equals(MapFactoryBean.class.getName());
+            boolean isFactory = null != child && null != child.getBeanClassName() &&
+                    (child.getBeanClassName().equals(MapFactoryBean.class.getName()) ||
+                            child.getBeanClassName().equals(PropertiesFactoryBean.class.getName())); 
 
-            if (isMuleNamespace(element) && ! isMapFactory)
+            if (isMuleNamespace(element) && ! isFactory)
             {
                 NodeList list = element.getChildNodes();
                 for (int i = 0; i < list.getLength() ; i++)
