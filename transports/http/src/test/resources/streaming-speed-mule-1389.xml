@@ -14,7 +14,7 @@
         </properties>
     </connector>
 
-    <model name="echo" type="streaming">
+    <model name="echo-model" type="streaming">
 
         <mule-descriptor name="echo" implementation="org.mule.components.simple.StreamingBridgeComponent">
             <inbound-router>
