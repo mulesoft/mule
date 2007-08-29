@@ -9,7 +9,7 @@
  */
 package org.mule.providers.jms.config;
 
-import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
+import org.mule.config.spring.parsers.generic.MuleChildDefinitionParser;
 import org.mule.config.spring.parsers.specific.ObjectFactoryDefinitionParser;
 import org.mule.providers.jms.JmsConnector;
 import org.mule.providers.jms.activemq.ActiveMqJmsConnector;
@@ -43,7 +43,7 @@ public class JmsNamespaceHandler extends NamespaceHandlerSupport
     }
 }
 
-class JmsConnectorDefinitionParser extends OrphanDefinitionParser
+class JmsConnectorDefinitionParser extends MuleChildDefinitionParser
 {
     public JmsConnectorDefinitionParser()
     {

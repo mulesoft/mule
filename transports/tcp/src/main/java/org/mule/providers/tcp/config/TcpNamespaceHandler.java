@@ -9,7 +9,7 @@
  */
 package org.mule.providers.tcp.config;
 
-import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
+import org.mule.config.spring.parsers.generic.MuleChildDefinitionParser;
 import org.mule.providers.tcp.TcpConnector;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
@@ -22,6 +22,6 @@ public class TcpNamespaceHandler extends NamespaceHandlerSupport
 {
     public void init()
     {
-        registerBeanDefinitionParser("connector", new OrphanDefinitionParser(TcpConnector.class, true));
+        registerBeanDefinitionParser("connector", new MuleChildDefinitionParser(TcpConnector.class, true));
     }
 }

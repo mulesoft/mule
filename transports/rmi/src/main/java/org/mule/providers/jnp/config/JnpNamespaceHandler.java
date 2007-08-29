@@ -9,7 +9,7 @@
  */
 package org.mule.providers.jnp.config;
 
-import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
+import org.mule.config.spring.parsers.generic.MuleChildDefinitionParser;
 import org.mule.providers.jnp.JnpConnector;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
@@ -22,6 +22,6 @@ public class JnpNamespaceHandler extends NamespaceHandlerSupport
 {
     public void init()
     {
-        registerBeanDefinitionParser("connector", new OrphanDefinitionParser(JnpConnector.class, true));
+        registerBeanDefinitionParser("connector", new MuleChildDefinitionParser(JnpConnector.class, true));
     }
 }

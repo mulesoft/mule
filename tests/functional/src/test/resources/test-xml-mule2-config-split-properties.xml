@@ -1,95 +1,95 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+<beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:test="http://www.mulesource.org/schema/mule/test/2.0"
-       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/test/2.0 http://www.mulesource.org/schema/mule/test/2.0/mule-test.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
-    <mule>
+    <mule:mule>
 
-        <model name="main" inherit="true">
+        <mule:model name="main" inherit="true">
 
-            <service name="testPropertiesComponent">
-                <component scope="singleton" instance-ref="prop-test-ref"/>
-                <inbound-router>
-                    <endpoint address="test://blah?transformers=TestCompressionTransformer&amp;responseTransformers=TestCompressionTransformer"/>
-                </inbound-router>
-            </service>
+            <mule:service name="testPropertiesComponent">
+                <mule:component scope="singleton" instance-ref="prop-test-ref"/>
+                <mule:inbound-router>
+                    <mule:endpoint address="test://blah?transformers=TestCompressionTransformer&amp;responseTransformers=TestCompressionTransformer"/>
+                </mule:inbound-router>
+            </mule:service>
 
-        </model>
+        </mule:model>
 
-    </mule>
+    </mule:mule>
 
-    <spring:bean name="anApple" class="org.mule.tck.testmodels.fruit.Apple"/>
+    <bean name="anApple" class="org.mule.tck.testmodels.fruit.Apple"/>
 
-    <spring:bean name="prop-test-ref" class="org.mule.tck.testmodels.fruit.Apple">
-    </spring:bean>
+    <bean name="prop-test-ref" class="org.mule.tck.testmodels.fruit.Apple">
+    </bean>
 
-    <spring:bean name="factory-test" class="org.mule.tck.testmodels.mule.TestDependentObject"/>
+    <bean name="factory-test" class="org.mule.tck.testmodels.mule.TestDependentObject"/>
         
-    <spring:bean name="factoryObject" factory-bean="factory-test" factory-method="create">
+    <bean name="factoryObject" factory-bean="factory-test" factory-method="create">
         <constructor-arg>
-            <spring:map>
-                <spring:entry key="test1" value="test1"/>
-                <spring:entry key="test2" value="test2"/>
-                <spring:entry key="containerObject" value-ref="anApple"/>
-                <spring:entry key="osVersion" value="${os.version}"/>
+            <map>
+                <entry key="test1" value="test1"/>
+                <entry key="test2" value="test2"/>
+                <entry key="containerObject" value-ref="anApple"/>
+                <entry key="osVersion" value="${os.version}"/>
                 <!-- no defaults -->
-                <spring:entry key="propertiesMap">
-                    <spring:map>
-                        <spring:entry key="test1" value="test1"/>
-                        <spring:entry key="test2" value="test2"/>
-                        <spring:entry key="containerObject" value-ref="anApple"/>
-                        <spring:entry key="osVersion" value="${os.version}"/>
+                <entry key="propertiesMap">
+                    <map>
+                        <entry key="test1" value="test1"/>
+                        <entry key="test2" value="test2"/>
+                        <entry key="containerObject" value-ref="anApple"/>
+                        <entry key="osVersion" value="${os.version}"/>
                         <!-- no nested factory (could repeat, but life is short...) -->
-                    </spring:map>
-                </spring:entry>
-                <spring:entry key="propertiesList">
-                    <spring:list>
-                        <spring:value>test1</spring:value>
-                        <spring:value>test2</spring:value>
+                    </map>
+                </entry>
+                <entry key="propertiesList">
+                    <list>
+                        <value>test1</value>
+                        <value>test2</value>
                         <ref bean="anApple"/>
-                        <spring:value>${os.version}</spring:value>
-                    </spring:list>
-                </spring:entry>
-            </spring:map>
+                        <value>${os.version}</value>
+                    </list>
+                </entry>
+            </map>
         </constructor-arg>
-    </spring:bean>
+    </bean>
     
-</mule>
+</beans>
 
 
         <!-- mule-descriptor name="testPropertiesComponent"
             inboundEndpoint="test://blah?transformers=TestCompressionTransformer&amp;responseTransformers=TestCompressionTransformer"
             implementation="org.mule.tck.testmodels.fruit.Apple">
             <properties>
-                <spring:property name="test1" value="test1"/>
-                <spring:property name="test2" value="test2"/>
+                <property name="test1" value="test1"/>
+                <property name="test2" value="test2"/>
                 <factory-property name="factoryObject" factory="org.mule.tck.testmodels.mule.TestDependentObject"/>
                 <container-property name="containerObject" reference="org.mule.tck.testmodels.fruit.Apple" required="true"/>
                 <container-property name="doesNotExist" reference="org.mule.tck.testmodels.fruit.XAppleX" required="false"/>
                 <system-property name="osVersion" key="os.version"/>
                 <system-property name="notASystemProperty" key="not.a.system.property" defaultValue="defaultValue"/>
                 <map name="propertiesMap">
-                    <spring:property name="test1" value="test1"/>
-                    <spring:property name="test2" value="test2"/>
+                    <property name="test1" value="test1"/>
+                    <property name="test2" value="test2"/>
                     <factory-property name="factoryObject" factory="org.mule.tck.testmodels.mule.TestDependentObject"/>
                     <container-property name="containerObject" reference="org.mule.tck.testmodels.fruit.Apple" required="true"/>
                     <container-property name="doesNotExist" reference="org.mule.tck.testmodels.fruit.XAppleX" required="false"/>
                     <system-property name="osVersion" key="os.version"/>
                     <system-property name="notASystemProperty" key="not.a.system.property" defaultValue="defaultValue"/>
-                </spring:map>
+                </map>
                 <list name="propertiesList">
                     <factory-entry factory="org.mule.tck.testmodels.mule.TestDependentObject"/>
                     <container-entry reference="org.mule.tck.testmodels.fruit.Apple" required="true"/>
                     <container-entry reference="org.mule.tck.testmodels.fruit.XAppleX" required="false"/>
                     <system-entry key="os.version"/>
                     <system-entry key="not.a.system.property" defaultValue="defaultValue"/>
-                    <spring:entry value="test1"/>
-                    <spring:entry value="test2"/>
-                </spring:list>
+                    <entry value="test1"/>
+                    <entry value="test2"/>
+                </list>
             </properties>
         </mule-descriptor -->

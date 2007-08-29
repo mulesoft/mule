@@ -18,7 +18,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * A stripped-down versino of FunctionalTestCase that allows us to test the parsing of a bad configuration. 
+ * A stripped-down version of FunctionalTestCase that allows us to test the parsing of a bad configuration. 
  */
 public abstract class AbstractBadConfigTestCase extends TestCase
 {

@@ -43,6 +43,7 @@
                 <xsd:element ref="other"/>
                 <xsd:element ref="abstract-extension"/>
                 <xsd:element ref="abstract-security-manager"/>
+                <xsd:element ref="abstract-transaction-manager"/>
                 <xsd:element ref="abstract-connector"/>
                 <xsd:element ref="abstract-endpoint"/>
                 <xsd:element ref="abstract-transformer"/>

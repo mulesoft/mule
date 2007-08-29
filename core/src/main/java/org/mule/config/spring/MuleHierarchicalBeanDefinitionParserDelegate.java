@@ -33,7 +33,7 @@ import org.w3c.dom.NodeList;
  * {@link org.mule.config.spring.parsers.AbstractChildDefinitionParser}
  * {@link org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser}
  * {@link org.mule.config.spring.parsers.generic.ChildDefinitionParser}
- * {@link org.mule.config.spring.parsers.generic.OrphanDefinitionParser}
+ * {@link org.mule.config.spring.parsers.generic.MuleChildDefinitionParser}
  */
 public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinitionParserDelegate
 {

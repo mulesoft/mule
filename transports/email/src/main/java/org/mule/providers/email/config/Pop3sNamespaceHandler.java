@@ -9,7 +9,7 @@
  */
 package org.mule.providers.email.config;
 
-import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
+import org.mule.config.spring.parsers.generic.MuleChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
 import org.mule.providers.email.Pop3sConnector;
 
@@ -23,7 +23,7 @@ public class Pop3sNamespaceHandler extends NamespaceHandlerSupport
 {
     public void init()
     {
-        registerBeanDefinitionParser("connector", new OrphanDefinitionParser(Pop3sConnector.class, true));
+        registerBeanDefinitionParser("connector", new MuleChildDefinitionParser(Pop3sConnector.class, true));
         registerBeanDefinitionParser("tls-trust-store", new ParentDefinitionParser());
         registerBeanDefinitionParser("tls-client", new ParentDefinitionParser());
     }

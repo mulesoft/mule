@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+<beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:test="http://www.mulesource.org/schema/mule/test/2.0"
-       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:mxml="http://www.mulesource.org/schema/mule/xml/2.0"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
@@ -10,7 +10,7 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/xml/2.0 http://www.mulesource.org/schema/mule/xml/2.0/mule-xml.xsd">
 
-    <mule>
+    <mule:mule>
 
         <!-- this is a mule 2 version of test-mule-config.xml.  there is also another
          conversion, with the same name, done by ross, in org.mule.test.spring directory.
@@ -18,29 +18,29 @@
          but currently differs in that it (1) is more detailed/direct and (2) is
          associated with tests (rather than just seeing if parsing fails). -->
 
-        <environment-properties>
-            <spring:entry key="doCompression" value="true"/>
-            <spring:entry key="beanProperty1" value="this was set from the manager properties!"/>
-            <spring:entry key="OS Version" value="${os.version}"/>
-            <spring:entry key="system-prop2" value="${system-prop2-cannot-loop}"/> <!-- defaultValue="default" -->
-        </environment-properties>
+        <mule:environment-properties>
+            <entry key="doCompression" value="true"/>
+            <entry key="beanProperty1" value="this was set from the manager properties!"/>
+            <entry key="OS Version" value="${os.version}"/>
+            <entry key="system-prop2" value="${system-prop2-cannot-loop}"/> <!-- defaultValue="default" -->
+        </mule:environment-properties>
 
         <!-- environment-properties>
-        <spring:property name="doCompression" value="true"/>
-        <spring:property name="beanProperty1" value="this was set from the manager properties!"/>
+        <property name="doCompression" value="true"/>
+        <property name="beanProperty1" value="this was set from the manager properties!"/>
         <system-property name="OS Version" key="os.version"/>
         <system-property name="system-prop2" key="system-prop2" defaultValue="default"/>
     </environment-properties -->
 
-        <configuration serverId="ijio" defaultSynchronousEndpoints="false">
-            <default-threading-profile maxBufferSize="0"
+        <mule:configuration serverId="ijio" defaultSynchronousEndpoints="false">
+            <mule:default-threading-profile maxBufferSize="0"
                                             maxThreadsActive="8"
                                             maxThreadsIdle="4"
                                             poolExhaustedAction="WAIT"
                                             threadTTL="60001"/>
             <!-- TODO -->
             <!-- seem to be missing default pooling and queue profiles and persistence strategy -->
-        </configuration>
+        </mule:configuration>
 
         <!-- mule-environment-properties synchronous="false" model="main">
         <threading-profile id="default" maxBufferSize="0" maxThreadsActive="8"
@@ -61,8 +61,8 @@
     </agents -->
 
         <test:connector name="dummyConnector">
-            <dispatcher-threading-profile maxBufferSize="2"/>
-            <custom-exception-strategy class="org.mule.tck.testmodels.mule.TestExceptionStrategy"/>
+            <mule:dispatcher-threading-profile maxBufferSize="2"/>
+            <mule:custom-exception-strategy class="org.mule.tck.testmodels.mule.TestExceptionStrategy"/>
             <!-- TODO -->
             <!-- no way to specify connection strategy on a connector? -->
         </test:connector>
@@ -71,22 +71,22 @@
         <exception-strategy className="org.mule.tck.testmodels.mule.TestExceptionStrategy"/>
         <connection-strategy className="org.mule.providers.SimpleRetryConnectionStrategy">
             <properties>
-                <spring:property name="retryCount" value="4"/>
-                <spring:property name="frequency" value="3000"/>
+                <property name="retryCount" value="4"/>
+                <property name="frequency" value="3000"/>
             </properties>
         </connection-strategy>
     </connector -->
 
-        <endpoint name="AppleQueue" address="test://apple.queue"/>
-        <endpoint name="Banana_Queue" address="test://banana.queue"/>
-        <endpoint name="TestQueue" address="test://test.queue"/>
+        <mule:endpoint name="AppleQueue" address="test://apple.queue"/>
+        <mule:endpoint name="Banana_Queue" address="test://banana.queue"/>
+        <mule:endpoint name="TestQueue" address="test://test.queue"/>
         <!-- endpoint-identifiers>
         <endpoint-identifier name="AppleQueue" value="test://apple.queue"/>
         <endpoint-identifier name="Banana_Queue" value="test://banana.queue"/>
         <endpoint-identifier name="Test Queue" value="test://test.queue"/>
     </endpoint-identifiers -->
 
-        <custom-transformer name="TestCompressionTransformer"
+        <mule:custom-transformer name="TestCompressionTransformer"
                                  class="org.mule.tck.testmodels.mule.TestCompressionTransformer"
                                  returnClass="java.lang.String">
             <!-- TODO -->
@@ -95,14 +95,14 @@
             <!-- mule:property name="beanProperty2" value="12"/ -->
             <!-- TODO -->
             <!-- what's the container-property below? -->
-        </custom-transformer>
-        <transformer-no-action name="TestTransformer" returnClass="[B"/>
+        </mule:custom-transformer>
+        <mule:transformer-no-action name="TestTransformer" returnClass="[B"/>
         <!-- transformers>
         <transformer name="TestCompressionTransformer" className="org.mule.tck.testmodels.mule.TestCompressionTransformer"
             returnClass="java.lang.String">
             <properties>
-                <spring:property name="org.mule.useManagerProperties" value="true"/>
-                <spring:property name="beanProperty2" value="12"/>
+                <property name="org.mule.useManagerProperties" value="true"/>
+                <property name="beanProperty2" value="12"/>
                 <container-property name="containerProperty" reference="java.lang.String"/>
             </properties>
         </transformer>
@@ -110,33 +110,33 @@
                     returnClass="[B" />
     </transformers -->
 
-        <endpoint name="fruitBowlEndpoint" address="test://fruitBowlPublishQ">
+        <mule:endpoint name="fruitBowlEndpoint" address="test://fruitBowlPublishQ">
             <mxml:jxpath-filter pattern="name">
                 <mxml:namespace prefix="foo" uri="http://foo.com"/>
                 <mxml:context-property key="value" value="bar"/>
             </mxml:jxpath-filter>
-        </endpoint>
+        </mule:endpoint>
         <!-- TODO -->
         <!-- cannot have aliases -->
         <!-- mule:endpoint name="waterMelonEndpoint" ref="TestQueue"/ -->
-        <endpoint name="waterMelonEndpoint" address="test://tmporary-hack"/>
+        <mule:endpoint name="waterMelonEndpoint" address="test://tmporary-hack"/>
         <!-- TODO -->
         <!-- cannot specify type of endpoint -->
-        <endpoint name="appleInEndpoint" address="test://AppleQueue"/>
-        <endpoint name="appleResponseEndpoint" address="test://AppleResponseQueue"/>
-        <endpoint name="orangeEndpoint" address="test://orangeQ">
-            <properties>
-                <spring:entry key="testGlobal" value="value1"/>
-            </properties>
-        </endpoint>
+        <mule:endpoint name="appleInEndpoint" address="test://AppleQueue"/>
+        <mule:endpoint name="appleResponseEndpoint" address="test://AppleResponseQueue"/>
+        <mule:endpoint name="orangeEndpoint" address="test://orangeQ">
+            <mule:properties>
+                <entry key="testGlobal" value="value1"/>
+            </mule:properties>
+        </mule:endpoint>
         <!-- global-endpoints>
         <endpoint name="fruitBowlEndpoint" address="test://fruitBowlPublishQ">
             <filter className="org.mule.routing.filters.xml.JXPathFilter" expression="name">
                 <properties>
-                    <spring:property name="value" value="bar"/>
+                    <property name="value" value="bar"/>
                     <map name="namespaces">
-                        <spring:property name="foo" value="http://foo.com"/>
-                    </spring:map>
+                        <property name="foo" value="http://foo.com"/>
+                    </map>
                 </properties>
             </filter>
         </endpoint>
@@ -145,150 +145,150 @@
         <endpoint name="appleResponseEndpoint" type="receiver" address="test://AppleResponseQueue"/>
         <endpoint name="orangeEndpoint" address="test://orangeQ">
             <properties>
-                <spring:property name="testGlobal" value="value1"/>
+                <property name="testGlobal" value="value1"/>
             </properties>
         </endpoint>
     </global-endpoints -->
 
-    </mule>
+    </mule:mule>
 
-    <spring:bean name="orange" class="org.mule.tck.testmodels.fruit.Orange">
-        <spring:property name="brand" value="Juicy Baby!"/>
-        <spring:property name="segments" value="9"/>
-        <spring:property name="radius" value="4.21"/>
-        <spring:property name="mapProperties">
-            <spring:map>
-                <spring:entry key="prop1" value="prop1"/>
-                <spring:entry key="prop2" value="prop2"/>
-            </spring:map>
-        </spring:property>
-        <spring:property name="listProperties">
-            <spring:list>
-                <spring:value>prop1</spring:value>
-                <spring:value>prop2</spring:value>
-                <spring:value>prop3</spring:value>
-            </spring:list>
-        </spring:property>
-        <spring:property name="arrayProperties">
-            <spring:list>
-                <spring:value>prop4</spring:value>
-                <spring:value>prop5</spring:value>
-                <spring:value>prop6</spring:value>
-            </spring:list>
-        </spring:property>
-    </spring:bean>
+    <bean name="orange" class="org.mule.tck.testmodels.fruit.Orange">
+        <property name="brand" value="Juicy Baby!"/>
+        <property name="segments" value="9"/>
+        <property name="radius" value="4.21"/>
+        <property name="mapProperties">
+            <map>
+                <entry key="prop1" value="prop1"/>
+                <entry key="prop2" value="prop2"/>
+            </map>
+        </property>
+        <property name="listProperties">
+            <list>
+                <value>prop1</value>
+                <value>prop2</value>
+                <value>prop3</value>
+            </list>
+        </property>
+        <property name="arrayProperties">
+            <list>
+                <value>prop4</value>
+                <value>prop5</value>
+                <value>prop6</value>
+            </list>
+        </property>
+    </bean>
     <!-- properties>
         <factory-property name="orange" factory="org.mule.tck.testmodels.fruit.Orange"/>
-        <spring:property name="brand" value="Juicy Baby!"/>
-        <spring:property name="segments" value="9"/>
-        <spring:property name="radius" value="4.21"/>
+        <property name="brand" value="Juicy Baby!"/>
+        <property name="segments" value="9"/>
+        <property name="radius" value="4.21"/>
         <map name="mapProperties">
-            <spring:property name="prop1" value="prop1"/>
-            <spring:property name="prop2" value="prop2"/>
-        </spring:map>
+            <property name="prop1" value="prop1"/>
+            <property name="prop2" value="prop2"/>
+        </map>
         <list name="listProperties">
-            <spring:entry value="prop1"/>
-            <spring:entry value="prop2"/>
-            <spring:entry value="prop3"/>
-        </spring:list>
+            <entry value="prop1"/>
+            <entry value="prop2"/>
+            <entry value="prop3"/>
+        </list>
         <list name="arrayProperties">
-            <spring:entry value="prop4"/>
-            <spring:entry value="prop5"/>
-            <spring:entry value="prop6"/>
-        </spring:list>
+            <entry value="prop4"/>
+            <entry value="prop5"/>
+            <entry value="prop6"/>
+        </list>
     </properties -->
 
-    <mule>
+    <mule:mule>
 
-        <model name="main">
+        <mule:model name="main">
 
             <!-- TODO -->
             <!-- entry point resolver? -->
             <!-- entry-point-resolver className="org.mule.tck.testmodels.mule.TestEntryPointResolver"/ -->
 
-            <custom-exception-strategy class="org.mule.tck.testmodels.mule.TestExceptionStrategy">
-                <endpoint address="test://component.exceptions"/>
-            </custom-exception-strategy>
+            <mule:custom-exception-strategy class="org.mule.tck.testmodels.mule.TestExceptionStrategy">
+                <mule:endpoint address="test://component.exceptions"/>
+            </mule:custom-exception-strategy>
             <!-- exception-strategy className="org.mule.tck.testmodels.mule.TestExceptionStrategy">
            <endpoint address="test://component.exceptions"/>
         </exception-strategy -->
 
             <!-- component-lifecycle-adapter-factory className="org.mule.tck.testmodels.mule.TestDefaultLifecycleAdapterFactory"/ -->
 
-            <service name="orangeComponent">
+            <mule:service name="orangeComponent">
 
-                <component scope="singleton" instance-ref="orange"/>
+                <mule:component scope="singleton" instance-ref="orange"/>
                 <!-- mule-descriptor name="orangeComponent" implementation="orange" container="descriptor" -->
 
-                <inbound-router>
-                    <forwarding-catch-all-strategy>
-                        <endpoint address="test://catch.all"/>
-                    </forwarding-catch-all-strategy>
+                <mule:inbound-router>
+                    <mule:forwarding-catch-all-strategy>
+                        <mule:endpoint address="test://catch.all"/>
+                    </mule:forwarding-catch-all-strategy>
                     <!-- catch-all-strategy className="org.mule.routing.ForwardingCatchAllStrategy">
                     <endpoint address="test://catch.all"/>
                 </catch-all-strategy -->
-                    <endpoint name="Orange"
+                    <mule:endpoint name="Orange"
                                    address="test://orange/"
                                    transformers="TestCompressionTransformer"
                                    responseTransformers="TestCompressionTransformer"/>
                     <!-- endpoint name="Orange" type="receiver" address="test://orange/" transformers="TestCompressionTransformer"
                     responseTransformers="TestCompressionTransformer"/ -->
-                    <endpoint ref="orangeEndpoint" transformers="TestCompressionTransformer">
-                        <payload-type-filter expectedType="java.lang.String"/>
-                        <properties>
-                            <spring:entry key="testLocal" value="value1"/>
-                        </properties>
-                    </endpoint>
+                    <mule:endpoint ref="orangeEndpoint" transformers="TestCompressionTransformer">
+                        <mule:payload-type-filter expectedType="java.lang.String"/>
+                        <mule:properties>
+                            <entry key="testLocal" value="value1"/>
+                        </mule:properties>
+                    </mule:endpoint>
                     <!-- global-endpoint name="orangeEndpoint" transformers="TestCompressionTransformer">
                     <filter className="org.mule.routing.filters.PayloadTypeFilter" expectedType="java.lang.String"/>
                     <properties>
-                        <spring:property name="testLocal" value="value1"/>
+                        <property name="testLocal" value="value1"/>
                     </properties>
                 </global-endpoint -->
-                </inbound-router>
+                </mule:inbound-router>
 
-                <nested-router>
-                    <binding interface="org.mule.tck.testmodels.fruit.FruitCleaner" method="wash">
-                        <endpoint address="test://do.wash"/>
-                    </binding>
+                <mule:nested-router>
+                    <mule:binding interface="org.mule.tck.testmodels.fruit.FruitCleaner" method="wash">
+                        <mule:endpoint address="test://do.wash"/>
+                    </mule:binding>
                     <!-- binding interface="org.mule.tck.testmodels.fruit.FruitCleaner" method="wash">
                     <endpoint address="test://do.wash"/>
                 </binding -->
-                    <binding interface="org.mule.tck.testmodels.fruit.FruitCleaner" method="polish">
-                        <endpoint address="test://do.polish"/>
-                    </binding>
+                    <mule:binding interface="org.mule.tck.testmodels.fruit.FruitCleaner" method="polish">
+                        <mule:endpoint address="test://do.polish"/>
+                    </mule:binding>
                     <!-- binding interface="org.mule.tck.testmodels.fruit.FruitCleaner" method="polish">
                     <endpoint address="test://do.polish"/>
                 </binding -->
-                </nested-router>
+                </mule:nested-router>
 
-                <outbound-router>
-                    <outbound-pass-through-router>
+                <mule:outbound-router>
+                    <mule:outbound-pass-through-router>
                         <!-- TODO -->
                         <!-- shouldn't it be transformers-ref? -->
-                        <endpoint ref="appleInEndpoint" transformers="TestCompressionTransformer"/>
-                    </outbound-pass-through-router>
-                </outbound-router>
+                        <mule:endpoint ref="appleInEndpoint" transformers="TestCompressionTransformer"/>
+                    </mule:outbound-pass-through-router>
+                </mule:outbound-router>
                 <!-- outbound-router>
                 <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
                     <global-endpoint name="appleInEndpoint" transformers="TestCompressionTransformer"/>
                 </router>
             </outbound-router -->
 
-                <response-router timeout="10001">
-                    <endpoint address="test://response1"/>
-                    <endpoint ref="appleResponseEndpoint"/>
-                    <custom-response-router class="org.mule.tck.testmodels.mule.TestResponseAggregator"/>
-                </response-router>
+                <mule:response-router timeout="10001">
+                    <mule:endpoint address="test://response1"/>
+                    <mule:endpoint ref="appleResponseEndpoint"/>
+                    <mule:custom-response-router class="org.mule.tck.testmodels.mule.TestResponseAggregator"/>
+                </mule:response-router>
                 <!-- response-router timeout="10001">
                 <endpoint address="test://response1"/>
                 <global-endpoint name="appleResponseEndpoint"/>
                 <router className="org.mule.tck.testmodels.mule.TestResponseAggregator"/>
             </response-router -->
 
-                <default-connector-exception-strategy>
-                    <endpoint address="test://orange.exceptions"/>
-                </default-connector-exception-strategy>
+                <mule:default-connector-exception-strategy>
+                    <mule:endpoint address="test://orange.exceptions"/>
+                </mule:default-connector-exception-strategy>
                 <!-- exception-strategy className="org.mule.impl.DefaultComponentExceptionStrategy">
                    <endpoint address="test://orange.exceptions"/>
                 </exception-strategy -->
@@ -296,39 +296,39 @@
                 <!-- moved to bean -->
                 <!-- properties>
                 <factory-property name="orange" factory="org.mule.tck.testmodels.fruit.Orange"/>
-                <spring:property name="brand" value="Juicy Baby!"/>
-                <spring:property name="segments" value="9"/>
-                <spring:property name="radius" value="4.21"/>
+                <property name="brand" value="Juicy Baby!"/>
+                <property name="segments" value="9"/>
+                <property name="radius" value="4.21"/>
                 <map name="mapProperties">
-                    <spring:property name="prop1" value="prop1"/>
-                    <spring:property name="prop2" value="prop2"/>
-                </spring:map>
+                    <property name="prop1" value="prop1"/>
+                    <property name="prop2" value="prop2"/>
+                </map>
                 <list name="listProperties">
-                    <spring:entry value="prop1"/>
-                    <spring:entry value="prop2"/>
-                    <spring:entry value="prop3"/>
-                </spring:list>
+                    <entry value="prop1"/>
+                    <entry value="prop2"/>
+                    <entry value="prop3"/>
+                </list>
                 <list name="arrayProperties">
-                    <spring:entry value="prop4"/>
-                    <spring:entry value="prop5"/>
-                    <spring:entry value="prop6"/>
-                </spring:list>
+                    <entry value="prop4"/>
+                    <entry value="prop5"/>
+                    <entry value="prop6"/>
+                </list>
             </properties -->
 
-            </service>
+            </mule:service>
 
-            <service name="appleComponent">
+            <mule:service name="appleComponent">
 
-                <component class="org.mule.tck.testmodels.fruit.Apple"/>
+                <mule:component class="org.mule.tck.testmodels.fruit.Apple"/>
 
-                <inbound-router>
-                    <custom-catch-all-strategy class="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>
-                    <endpoint ref="appleInEndpoint"/>
-                    <selective-consumer-router>
-                        <payload-type-filter expectedType="java.lang.String"/>
-                    </selective-consumer-router>
-                    <idempotent-receiver-router/>
-                </inbound-router>
+                <mule:inbound-router>
+                    <mule:custom-catch-all-strategy class="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>
+                    <mule:endpoint ref="appleInEndpoint"/>
+                    <mule:selective-consumer-router>
+                        <mule:payload-type-filter expectedType="java.lang.String"/>
+                    </mule:selective-consumer-router>
+                    <mule:idempotent-receiver-router/>
+                </mule:inbound-router>
                 <!-- inbound-router>
                 <catch-all-strategy className="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>
                 <global-endpoint name="appleInEndpoint"/>
@@ -338,27 +338,27 @@
                 <router className="org.mule.routing.inbound.IdempotentReceiver"/>
             </inbound-router -->
 
-                <outbound-router>
-                    <custom-catch-all-strategy class="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>
-                    <filtering-router>
-                        <endpoint name="TestApple-Out" address="test://appleQ2" transformers="TestCompressionTransformer"/>
-                        <payload-type-filter expectedType="java.lang.String"/>
-                    </filtering-router>
-                    <filtering-router>
-                        <endpoint ref="waterMelonEndpoint"/>
-                        <and-filter>
-                            <regex-filter pattern="the quick brown (.*)"/>
-                            <regex-filter pattern="(.*) brown (.*)"/>
-                        </and-filter>
-                    </filtering-router>
-                </outbound-router>
+                <mule:outbound-router>
+                    <mule:custom-catch-all-strategy class="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>
+                    <mule:filtering-router>
+                        <mule:endpoint name="TestApple-Out" address="test://appleQ2" transformers="TestCompressionTransformer"/>
+                        <mule:payload-type-filter expectedType="java.lang.String"/>
+                    </mule:filtering-router>
+                    <mule:filtering-router>
+                        <mule:endpoint ref="waterMelonEndpoint"/>
+                        <mule:and-filter>
+                            <mule:regex-filter pattern="the quick brown (.*)"/>
+                            <mule:regex-filter pattern="(.*) brown (.*)"/>
+                        </mule:and-filter>
+                    </mule:filtering-router>
+                </mule:outbound-router>
                 <!-- outbound-router>
                 <catch-all-strategy className="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>
                 <router className="org.mule.routing.outbound.FilteringOutboundRouter">
                     <endpoint name="TestApple-Out" type="sender" address="test://appleQ2"/>
                     <filter expectedType="java.lang.String" className="org.mule.routing.filters.PayloadTypeFilter"/>
                     <properties>
-                        <spring:property name="transformer" value="TestCompressionTransformer"/>
+                        <property name="transformer" value="TestCompressionTransformer"/>
                     </properties>
                 </router>
                 <router className="org.mule.routing.outbound.FilteringOutboundRouter">
@@ -370,45 +370,45 @@
                 </router>
             </outbound-router -->
 
-                <default-component-exception-strategy/>
+                <mule:default-component-exception-strategy/>
                 <!-- exception-strategy className="org.mule.impl.DefaultExceptionStrategy"/ -->
 
-            </service>
+            </mule:service>
 
-            <service name="propertyExtractorTestComponent">
-                <component class="org.mule.tck.testmodels.fruit.Apple"/>
-                <inbound-router/>
-                <outbound-router>
-                    <filtering-router>
+            <mule:service name="propertyExtractorTestComponent">
+                <mule:component class="org.mule.tck.testmodels.fruit.Apple"/>
+                <mule:inbound-router/>
+                <mule:outbound-router>
+                    <mule:filtering-router>
                         <mxml:jxpath-property-extractor/>
-                    </filtering-router>
-                </outbound-router>
+                    </mule:filtering-router>
+                </mule:outbound-router>
                 <!-- outbound-router>
                 <router className="org.mule.routing.outbound.FilteringOutboundRouter"
                         propertyExtractor="org.mule.util.properties.JXPathPropertyExtractor">
                 </router>
             </outbound-router -->
-            </service>
+            </mule:service>
 
-            <service name="propertyExtractorResponseRouterTestComponent">
-                <component class="org.mule.tck.testmodels.fruit.Apple"/>
-                <inbound-router/>
-                <response-router>
+            <mule:service name="propertyExtractorResponseRouterTestComponent">
+                <mule:component class="org.mule.tck.testmodels.fruit.Apple"/>
+                <mule:inbound-router/>
+                <mule:response-router>
                     <!-- TODO -->
                     <!-- this should be predefined -->
                     <!-- TODO -->
                     <!-- propertyExtractor doesn't exist on the class.. should it? -->
                     <!-- mule:custom-response-router class="org.mule.routing.response.SingleResponseRouter"
                                     propertyExtractor="extractor"/ -->
-                </response-router>
+                </mule:response-router>
                 <!-- response-router>
                 <router className="org.mule.routing.response.SingleResponseRouter"
                         propertyExtractor="org.mule.util.properties.JXPathPropertyExtractor"/>
             </response-router -->
-            </service>
+            </mule:service>
 
-        </model>
+        </mule:model>
 
-    </mule>
+    </mule:mule>
 
-</mule>
+</beans>

@@ -10,12 +10,12 @@
 
 package org.mule.scripting.config;
 
-import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
+import org.mule.config.spring.parsers.generic.MuleChildDefinitionParser;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.w3c.dom.Element;
 
-public class ScriptDefinitionParser extends OrphanDefinitionParser
+public class ScriptDefinitionParser extends MuleChildDefinitionParser
 {
 
     public ScriptDefinitionParser(boolean singleton)

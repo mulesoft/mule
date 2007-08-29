@@ -5,13 +5,16 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
+    <mule:mule>
+
         <mule:custom-transaction-manager class="org.mule.tck.testmodels.mule.TestTransactionManagerFactory">
             <mule:environment>
                 <entry key="property1" value="true"/>
                 <entry key="property2" value="Test"/>
             </mule:environment>
         </mule:custom-transaction-manager>
-<!--
+        
+        <!--
     <mule:transaction-manager-weblogic>
         <mule:environment>
             <entry key="java.naming.factory.initial" value="weblogic.jndi.WLInitialContextFactory"/>
@@ -19,5 +22,6 @@
         </mule:environment>
     </mule:transaction-manager-weblogic>
 -->
+    </mule:mule>
 
 </beans>

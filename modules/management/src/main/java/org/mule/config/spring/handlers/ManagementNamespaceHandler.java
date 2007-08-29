@@ -12,7 +12,7 @@ package org.mule.config.spring.handlers;
 import org.mule.config.spring.parsers.JmxAgentDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildPropertiesDefinitionParser;
-import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
+import org.mule.config.spring.parsers.generic.MuleChildDefinitionParser;
 import org.mule.config.spring.parsers.specific.ObjectFactoryDefinitionParser;
 import org.mule.impl.internal.admin.EndpointNotificationLoggerAgent;
 import org.mule.impl.internal.admin.Log4jNotificationLoggerAgent;
@@ -34,15 +34,15 @@ public class ManagementNamespaceHandler extends AbstractIgnorableNamespaceHandle
         registerBeanDefinitionParser("jmx-server", new JmxAgentDefinitionParser());
         registerBeanDefinitionParser("mBeanServer", new ObjectFactoryDefinitionParser("MBeanServerObjectFactory"));
         registerBeanDefinitionParser("credentials", new ChildPropertiesDefinitionParser("credentials"));
-        registerBeanDefinitionParser("jmx-log4j", new OrphanDefinitionParser(Log4jAgent.class, true));
-        registerBeanDefinitionParser("jmx-mx4j-adaptor", new OrphanDefinitionParser(Mx4jAgent.class, true));
-        registerBeanDefinitionParser("jmx-notifications", new OrphanDefinitionParser(JmxServerNotificationAgent.class, true));
-        registerBeanDefinitionParser("jmx-default-config", new OrphanDefinitionParser(DefaultJmxSupportAgent.class, true));
-        registerBeanDefinitionParser("chainsaw-notifications", new OrphanDefinitionParser(Log4jNotificationLoggerAgent.class, true));
+        registerBeanDefinitionParser("jmx-log4j", new MuleChildDefinitionParser(Log4jAgent.class, true));
+        registerBeanDefinitionParser("jmx-mx4j-adaptor", new MuleChildDefinitionParser(Mx4jAgent.class, true));
+        registerBeanDefinitionParser("jmx-notifications", new MuleChildDefinitionParser(JmxServerNotificationAgent.class, true));
+        registerBeanDefinitionParser("jmx-default-config", new MuleChildDefinitionParser(DefaultJmxSupportAgent.class, true));
+        registerBeanDefinitionParser("chainsaw-notifications", new MuleChildDefinitionParser(Log4jNotificationLoggerAgent.class, true));
         registerBeanDefinitionParser("level-mapping", new ChildMapEntryDefinitionParser("levelMappings", "severity", "eventId"));
-        registerBeanDefinitionParser("log4j-notifications", new OrphanDefinitionParser(Log4jNotificationLoggerAgent.class, true));
-        registerBeanDefinitionParser("publish-notifications", new OrphanDefinitionParser(EndpointNotificationLoggerAgent.class, true));
-        registerBeanDefinitionParser("rmi-server", new OrphanDefinitionParser(RmiRegistryAgent.class, true));
+        registerBeanDefinitionParser("log4j-notifications", new MuleChildDefinitionParser(Log4jNotificationLoggerAgent.class, true));
+        registerBeanDefinitionParser("publish-notifications", new MuleChildDefinitionParser(EndpointNotificationLoggerAgent.class, true));
+        registerBeanDefinitionParser("rmi-server", new MuleChildDefinitionParser(RmiRegistryAgent.class, true));
         
         //This gets processed by the jmx-server parser
         registerIgnoredElement("connector-server");

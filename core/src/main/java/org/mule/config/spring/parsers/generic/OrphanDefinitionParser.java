@@ -19,10 +19,13 @@ import org.w3c.dom.Element;
  * Contructs a single, standalone bean from an element - it is not injected into any other object.
  * This parser can be configured to automatically set the class of the object, the init and destroy methods
  * and whether this object is a singleton.
+ *
+ * <p>Typically, you should use {@link org.mule.config.spring.parsers.generic.MuleChildDefinitionParser}
+ * instead of this class, since these elements occur in the <mule> top level element.</p>
  */
 public class OrphanDefinitionParser extends AbstractMuleBeanDefinitionParser implements DelegateDefinitionParser
 {
-    
+
     private Class beanClass = null;
     private boolean dynamicClass = false;
 
@@ -59,7 +62,7 @@ public class OrphanDefinitionParser extends AbstractMuleBeanDefinitionParser imp
 
     public AbstractBeanDefinition parseDelegate(Element element, ParserContext parserContext)
     {
-        return super.parseInternal(element, parserContext);
+        return parseInternal(element, parserContext);
     }
 
 }

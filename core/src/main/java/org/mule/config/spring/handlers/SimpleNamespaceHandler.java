@@ -12,7 +12,6 @@ package org.mule.config.spring.handlers;
 
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.specific.ServiceDescriptorDefinitionParser;
-import org.mule.impl.model.streaming.StreamingModel;
 import org.mule.impl.model.direct.DirectModel;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;

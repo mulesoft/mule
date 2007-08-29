@@ -10,7 +10,7 @@
 package org.mule.providers.quartz.config;
 
 import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
-import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
+import org.mule.config.spring.parsers.generic.MuleChildDefinitionParser;
 import org.mule.providers.quartz.QuartzConnector;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
@@ -25,7 +25,7 @@ public class QuartzNamespaceHandler extends NamespaceHandlerSupport
     }
 }
 
-class QuartzConnectorDefinitionParser extends OrphanDefinitionParser
+class QuartzConnectorDefinitionParser extends MuleChildDefinitionParser
 {
     public QuartzConnectorDefinitionParser()
     {

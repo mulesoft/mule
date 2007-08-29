@@ -9,7 +9,7 @@
  */
 package org.mule.providers.ssl.config;
 
-import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
+import org.mule.config.spring.parsers.generic.MuleChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
 import org.mule.providers.ssl.TlsConnector;
 
@@ -22,7 +22,7 @@ public class TlsNamespaceHandler extends NamespaceHandlerSupport
 {
     public void init()
     {
-        registerBeanDefinitionParser("connector", new OrphanDefinitionParser(TlsConnector.class, true));
+        registerBeanDefinitionParser("connector", new MuleChildDefinitionParser(TlsConnector.class, true));
         registerBeanDefinitionParser("tls-key-store", new ParentDefinitionParser());
         registerBeanDefinitionParser("tls-client", new ParentDefinitionParser());
         registerBeanDefinitionParser("tls-server", new ParentDefinitionParser());

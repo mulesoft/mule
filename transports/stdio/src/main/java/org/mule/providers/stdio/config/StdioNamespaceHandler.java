@@ -9,7 +9,7 @@
  */
 package org.mule.providers.stdio.config;
 
-import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
+import org.mule.config.spring.parsers.generic.MuleChildDefinitionParser;
 import org.mule.providers.stdio.PromptStdioConnector;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
@@ -22,6 +22,6 @@ public class StdioNamespaceHandler extends NamespaceHandlerSupport
 {
     public void init()
     {
-        registerBeanDefinitionParser("connector", new OrphanDefinitionParser(PromptStdioConnector.class, true));
+        registerBeanDefinitionParser("connector", new MuleChildDefinitionParser(PromptStdioConnector.class, true));
     }
 }
