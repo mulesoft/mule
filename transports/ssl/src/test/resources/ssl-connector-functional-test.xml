@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:ssl="http://www.mulesource.org/schema/mule/ssl/2.0"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
@@ -22,24 +22,24 @@
                 trustStorePassword="mulepassword"/>
     </ssl:connector>
 
-    <mule:model name="main" class="org.mule.tck.testmodels.mule.TestSedaModel">
+    <model name="main" class="org.mule.tck.testmodels.mule.TestSedaModel">
 
-        <mule:service name="testComponent">
-            <mule:component scope="singleton" class="org.mule.tck.functional.FunctionalTestComponent"/>
-            <mule:inbound-router>
-                <mule:endpoint name="in" address="ssl://localhost:61655" synchronous="false"/>
-            </mule:inbound-router>
+        <service name="testComponent">
+            <component scope="singleton" class="org.mule.tck.functional.FunctionalTestComponent"/>
+            <inbound-router>
+                <endpoint name="in" address="ssl://localhost:61655" synchronous="false"/>
+            </inbound-router>
 
             <!-- This is just to avoid matching router warnings -->
-            <mule:outbound-router>
-                <mule:outbound-pass-through-router>
-                    <mule:endpoint name="test1" address="test://test"/>
-                </mule:outbound-pass-through-router>
-            </mule:outbound-router>
-        </mule:service>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <endpoint name="test1" address="test://test"/>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
 
 
-    </mule:model>
+    </model>
 
 
-</beans>
+</mule>
