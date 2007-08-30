@@ -9,7 +9,7 @@
 
     <spring:beans>
         <spring:bean name="bean" class="java.lang.Object"/>
-        <spring:alias name="foo" alias="bar"/>
+        <spring:alias name="bean" alias="poot"/>
     </spring:beans>
 
     <environment-properties>
@@ -18,7 +18,7 @@
 
     <model name="model">
         <service name="service">
-            <component scope="singleton" instance-ref="bean"/>
+            <component scope="singleton" instance-ref="poot"/>
             <inbound-router>
                 <endpoint name="endpoint" address="test://${property}"/>
             </inbound-router>

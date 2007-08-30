@@ -69,9 +69,9 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
         {
             logger.debug("parsing: " + elementToString(element));
         }
-        if (delegateSpringElements(element, parent))
+        if (isBeansNamespace(element))
         {
-            return parent;
+            return handleSpringElements(element, parent);
         }
         else
         {
@@ -115,13 +115,8 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
     }
 
 
-    protected boolean delegateSpringElements(Element element, BeanDefinition bd)
+    protected BeanDefinition handleSpringElements(Element element, BeanDefinition parent)
     {
-        if (! isBeansNamespace(element))
-        {
-            return false;
-        }
-
         if (isLocalName(element, BEANS))
         {
             // the delegate doesn't support the full spring schema, but it seems that
@@ -132,7 +127,6 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
                 Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
                 doc.appendChild(doc.importNode(element, true));
                 spring.registerBeanDefinitions(doc, getReaderContext());
-                return true;
             }
             catch (ParserConfigurationException e)
             {
@@ -143,9 +137,9 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
         // these are only called if they are at a "top level" - if they are nested inside
         // other spring elements then spring will handle them itself
 
-        if (isLocalName(element, PROPERTY_ELEMENT))
+        else if (isLocalName(element, PROPERTY_ELEMENT))
         {
-            parsePropertyElement(element, bd);
+            parsePropertyElement(element, parent);
         }
 
         // i am trying to keep these to a minimum - using anything but "bean" is a recipe
@@ -169,14 +163,14 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
 
         else if (isLocalName(element, BEAN_ELEMENT))
         {
-            registerBeanDefinitionHolder(parseBeanDefinitionElement(element, bd));
+            registerBeanDefinitionHolder(parseBeanDefinitionElement(element, parent));
         }
         else
         {
             throw new IllegalStateException("Unexpected Spring element: " + elementToString(element));
         }
 
-        return true;
+        return parent;
     }
 
     public static String elementToString(Element e)
