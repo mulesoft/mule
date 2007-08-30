@@ -46,7 +46,7 @@
                 <xsd:element ref="abstract-security-manager"/>
                 <xsd:element ref="abstract-transaction-manager"/>
                 <xsd:element ref="abstract-connector"/>
-                <xsd:element ref="abstract-endpoint"/>
+                <xsd:element ref="abstract-global-endpoint"/>
                 <xsd:element ref="abstract-transformer"/>
                 <xsd:element ref="abstract-model"/>
             </xsd:choice>
@@ -73,8 +73,17 @@
     <xsd:element name="abstract-connector" abstract="true" type="abstractConnectorType"/>
     <xsd:complexType name="abstractConnectorType"/>
 
-    <xsd:element name="abstract-endpoint" abstract="true" type="abstractEndpointType"/>
-    <xsd:complexType name="abstractEndpointType"/>
+    <xsd:element name="abstract-global-endpoint" abstract="true" type="abstractGlobalEndpointType"/>
+    <xsd:complexType name="abstractGlobalEndpointType"/>
+
+    <xsd:element name="abstract-inbound-endpoint" abstract="true" type="abstractInboundEndpointType"/>
+    <xsd:complexType name="abstractInboundEndpointType"/>
+
+    <xsd:element name="abstract-outbound-endpoint" abstract="true" type="abstractOutboundEndpointType"/>
+    <xsd:complexType name="abstractOutboundEndpointType"/>
+
+    <xsd:element name="abstract-response-endpoint" abstract="true" type="abstractResponseEndpointType"/>
+    <xsd:complexType name="abstractResponseEndpointType"/>
 
     <xsd:element name="abstract-transformer" abstract="true" type="abstractTransformerType"/>
     <xsd:complexType name="abstractTransformerType">
@@ -152,7 +161,8 @@
     <xsd:complexType name="inboundRouterCollectionType">
         <xsd:sequence>
             <xsd:element ref="abstract-catch-all-strategy" minOccurs="0"/>
-            <xsd:element ref="abstract-endpoint" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element ref="abstract-inbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element ref="abstract-global-endpoint" minOccurs="0" maxOccurs="unbounded"/> <!-- TODO -->
             <xsd:element ref="abstract-inbound-router" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
         <xsd:attribute name="matchAll" type="substitutableBoolean" default="false"/>
@@ -191,7 +201,8 @@
 
     <xsd:complexType name="responseRouterCollectionType">
         <xsd:sequence>
-            <xsd:element ref="abstract-endpoint" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element ref="abstract-response-endpoint" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element ref="abstract-global-endpoint" minOccurs="0" maxOccurs="unbounded"/> <!-- TODO -->
             <xsd:element ref="abstract-response-router" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
         <xsd:attribute name="transformers" type="xsd:string"/>
@@ -342,46 +353,81 @@
     <!--   Endpoint elements                                          -->
     <!--==============================================================-->
 
-    <xsd:element name="endpoint" type="endpointType" substitutionGroup="abstract-endpoint"/>
-    <xsd:complexType name="endpointType">
+    <xsd:element name="endpoint" type="globalEndpointType" substitutionGroup="abstract-global-endpoint"/>
+    <xsd:complexType name="globalEndpointType">
         <xsd:complexContent>
-            <xsd:extension base="abstractEndpointType">
-                <xsd:sequence>
-                    <xsd:element ref="abstract-transaction" minOccurs="0"/>
-                    <xsd:element ref="abstract-filter" minOccurs="0"/>
-                    <xsd:element ref="abstract-security-filter" minOccurs="0"/>
-                    <xsd:element ref="abstract-connection-strategy" minOccurs="0"/>
-                    <xsd:element name="properties" type="mapType" minOccurs="0"/>
-                    <!-- TODO - can this go now?  we can extend endpoints in modules... -->
-                    <!-- xsd:any namespace="##other" processContents="strict" minOccurs="0" maxOccurs="unbounded"/ -->
-                </xsd:sequence>
-                <!-- these next two attributes are mutually exclusive and one is required.
-                      but there is no way to define this in a schema... -->
-                <!-- endpoint references - dynamically checked to make sure not top level -->
-                <xsd:attribute name="ref" type="xsd:NMTOKEN"/>
-                <!-- explicit or global endpoints -->
-                <xsd:attribute name="address" type="xsd:string"/>
-
-                <xsd:attribute name="name" type="xsd:NMTOKEN"/>
-                <xsd:attribute name="transformers" type="xsd:string"/>
-                <xsd:attribute name="responseTransformers" type="xsd:string"/>
-                <xsd:attribute name="synchronous" type="substitutableBoolean"/>
-                <xsd:attribute name="remoteSync" type="substitutableBoolean"/>
-                <xsd:attribute name="remoteSyncTimeout" type="xsd:NMTOKEN"/>
-                <xsd:attribute name="encoding" type="xsd:string"/>
-                <xsd:attribute name="connector-ref" type="xsd:NMTOKEN"/>
-                <xsd:attribute name="createConnector">
-                    <xsd:simpleType>
-                        <xsd:restriction base="xsd:NMTOKEN">
-                            <xsd:enumeration value="FIND_OR_CREATE"/>
-                            <xsd:enumeration value="ALWAYS_CREATE"/>
-                            <xsd:enumeration value="NEVER_CREATE"/>
-                        </xsd:restriction>
-                    </xsd:simpleType>
-                </xsd:attribute>
+            <xsd:extension base="abstractGlobalEndpointType">
+                <xsd:group ref="defaultEndpointElements"/>
+                <xsd:attributeGroup ref="defaultEndpointAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+
+    <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="abstract-inbound-endpoint"/>
+    <xsd:complexType name="inboundEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractInboundEndpointType">
+                <xsd:group ref="defaultEndpointElements"/>
+                <xsd:attributeGroup ref="defaultEndpointAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="abstract-outbound-endpoint"/>
+    <xsd:complexType name="outboundEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractOutboundEndpointType">
+                <xsd:group ref="defaultEndpointElements"/>
+                <xsd:attributeGroup ref="defaultEndpointAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="response-endpoint" type="responseEndpointType" substitutionGroup="abstract-response-endpoint"/>
+    <xsd:complexType name="responseEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractResponseEndpointType">
+                <xsd:group ref="defaultEndpointElements"/>
+                <xsd:attributeGroup ref="defaultEndpointAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:group name="defaultEndpointElements">
+        <xsd:sequence>
+            <xsd:element ref="abstract-transaction" minOccurs="0"/>
+            <xsd:element ref="abstract-filter" minOccurs="0"/>
+            <xsd:element ref="abstract-security-filter" minOccurs="0"/>
+            <xsd:element ref="abstract-connection-strategy" minOccurs="0"/>
+            <xsd:element name="properties" type="mapType" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:group>
+
+    <xsd:attributeGroup name="defaultEndpointAttributes">
+        <!-- these next two attributes are mutually exclusive and one is required.
+          but there is no way to define this in a schema... -->
+        <!-- endpoint references - dynamically checked to make sure not top level -->
+        <xsd:attribute name="ref" type="xsd:NMTOKEN"/>
+        <!-- explicit or global endpoints -->
+        <xsd:attribute name="address" type="xsd:string"/>
+        <xsd:attribute name="name" type="xsd:NMTOKEN"/>
+        <xsd:attribute name="transformers" type="xsd:string"/>
+        <xsd:attribute name="responseTransformers" type="xsd:string"/>
+        <xsd:attribute name="synchronous" type="substitutableBoolean"/>
+        <xsd:attribute name="remoteSync" type="substitutableBoolean"/>
+        <xsd:attribute name="remoteSyncTimeout" type="xsd:NMTOKEN"/>
+        <xsd:attribute name="encoding" type="xsd:string"/>
+        <xsd:attribute name="connector-ref" type="xsd:NMTOKEN"/>
+        <xsd:attribute name="createConnector">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="FIND_OR_CREATE"/>
+                    <xsd:enumeration value="ALWAYS_CREATE"/>
+                    <xsd:enumeration value="NEVER_CREATE"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+    </xsd:attributeGroup>
 
     <xsd:element name="transaction" type="transactionType" substitutionGroup="abstract-transaction"/>
     <xsd:complexType name="transactionType">
@@ -748,7 +794,8 @@
         <xsd:complexContent>
             <xsd:extension base="abstractExceptionStrategyType">
                 <xsd:sequence>
-                    <xsd:element name="endpoint" type="endpointType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element ref="abstract-outbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element ref="abstract-global-endpoint" minOccurs="0" maxOccurs="unbounded"/> <!-- TODO -->
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
@@ -899,7 +946,8 @@
         <xsd:complexContent>
             <xsd:extension base="abstractBindingType">
                 <xsd:sequence>
-                    <xsd:element ref="abstract-endpoint"/>
+                    <xsd:element ref="abstract-outbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element ref="abstract-global-endpoint" minOccurs="0" maxOccurs="unbounded"/> <!-- TODO -->
                 </xsd:sequence>
                 <xsd:attribute name="interface" use="required"/>
                 <xsd:attribute name="method" use="optional"/>
@@ -942,7 +990,8 @@
         <xsd:complexContent>
             <xsd:extension base="filteredInboundRouterType">
                 <xsd:sequence>
-                    <xsd:element name="endpoint" type="endpointType"/>
+                    <xsd:element ref="abstract-inbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element ref="abstract-global-endpoint" minOccurs="0" maxOccurs="unbounded"/> <!-- TODO -->
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
@@ -974,7 +1023,8 @@
         <xsd:complexContent>
             <xsd:extension base="filteredInboundRouterType">
                 <xsd:sequence>
-                    <xsd:element name="endpoint" type="endpointType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element ref="abstract-outbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element ref="abstract-global-endpoint" minOccurs="0" maxOccurs="unbounded"/> <!-- TODO -->
                 </xsd:sequence>
                 <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
             </xsd:extension>
@@ -987,7 +1037,8 @@
         <xsd:complexContent>
             <xsd:extension base="abstractResponseRouterType">
                 <xsd:sequence>
-                    <xsd:element ref="abstract-endpoint" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element ref="abstract-response-endpoint" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element ref="abstract-global-endpoint" minOccurs="0" maxOccurs="unbounded"/> <!-- TODO -->
                     <xsd:choice minOccurs="0">
                         <xsd:element ref="abstract-property-extractor"/>
                         <xsd:element ref="custom-property-extractor"/> <!-- hardwired object factory -->
@@ -1014,7 +1065,8 @@
         <xsd:complexContent>
             <xsd:extension base="abstractOutboundRouterType">
                 <xsd:sequence>
-                    <xsd:element ref="abstract-endpoint" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element ref="abstract-outbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element ref="abstract-global-endpoint" minOccurs="0" maxOccurs="unbounded"/> <!-- TODO -->
                     <xsd:element name="reply-to" type="replyToType" minOccurs="0"/>
                     <xsd:element ref="abstract-transaction" minOccurs="0"/>
                     <xsd:choice minOccurs="0">
@@ -1109,7 +1161,8 @@
         <xsd:complexContent>
             <xsd:extension base="abstractCatchAllStrategyType">
                 <xsd:sequence>
-                    <xsd:element ref="abstract-endpoint"/>
+                    <xsd:element ref="abstract-outbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element ref="abstract-global-endpoint" minOccurs="0" maxOccurs="unbounded"/> <!-- TODO -->
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>

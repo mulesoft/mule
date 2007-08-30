@@ -10,7 +10,6 @@
 package org.mule.config.spring.parsers.specific;
 
 import org.mule.config.spring.parsers.AbstractChildDefinitionParser;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.util.StringUtils;
 
@@ -29,8 +28,11 @@ public class EndpointDefinitionParser extends AbstractChildDefinitionParser
     public static final String ADDRESS_ATTRIBUTE = "address";
     public static final String ENDPOINT_REF_ATTRIBUTE = "ref";
 
-    public EndpointDefinitionParser()
+    private Class endpointClass;
+
+    public EndpointDefinitionParser(Class endpointClass)
     {
+        this.endpointClass = endpointClass;
         addAlias("address", "endpointURI");
         addMapping("createConnector", "GET_OR_CREATE=0,ALWAYS_CREATE=1,NEVER_CREATE=2");
         addAlias("transformers", "transformer");
@@ -120,7 +122,7 @@ public class EndpointDefinitionParser extends AbstractChildDefinitionParser
 
     protected Class getBeanClass(Element element)
     {
-        return MuleEndpoint.class;
+        return endpointClass;
     }
 
     protected BeanDefinitionBuilder createBeanDefinitionBuilder(Element element, Class beanClass)

@@ -42,6 +42,10 @@ import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.container.JndiContainerContext;
 import org.mule.impl.container.PropertiesContainerContext;
 import org.mule.impl.container.RmiContainerContext;
+import org.mule.impl.endpoint.GlobalEndpoint;
+import org.mule.impl.endpoint.InboundEndpoint;
+import org.mule.impl.endpoint.OutboundEndpoint;
+import org.mule.impl.endpoint.ResponseEndpoint;
 import org.mule.impl.model.resolvers.CallableEntryPointResolver;
 import org.mule.impl.model.seda.SedaModel;
 import org.mule.impl.security.PasswordBasedEncryptionStrategy;
@@ -184,7 +188,10 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("transaction-manager-websphere", new MuleChildDefinitionParser(WebsphereTransactionManagerLookupFactory.class, true));
 
         //Endpoint elements
-        registerBeanDefinitionParser("endpoint", new EndpointDefinitionParser());
+        registerBeanDefinitionParser("endpoint", new EndpointDefinitionParser(GlobalEndpoint.class));
+        registerBeanDefinitionParser("inbound-endpoint", new EndpointDefinitionParser(InboundEndpoint.class));
+        registerBeanDefinitionParser("outbound-endpoint", new EndpointDefinitionParser(OutboundEndpoint.class));
+        registerBeanDefinitionParser("response-endpoint", new EndpointDefinitionParser(ResponseEndpoint.class));
         registerBeanDefinitionParser("transaction", new TransactionConfigDefinitionParser());
         registerBeanDefinitionParser("transaction-factory", new ObjectFactoryDefinitionParser("factory"));
 
