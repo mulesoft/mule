@@ -12,6 +12,9 @@ package org.mule.config.spring;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
 import org.mule.util.StringUtils;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -21,9 +24,11 @@ import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
+import org.springframework.beans.factory.xml.DefaultBeanDefinitionDocumentReader;
 import org.springframework.beans.factory.xml.NamespaceHandler;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.beans.factory.xml.XmlReaderContext;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -39,17 +44,23 @@ import org.w3c.dom.NodeList;
  */
 public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinitionParserDelegate
 {
+
+    public static final String BEANS = "beans"; // cannot find this in Spring api!
     public static final String MULE_DEFAULT_NAMESPACE = "http://www.mulesource.org/schema/mule/core";
     public static final String MULE_NAMESPACE_PREFIX = "http://www.mulesource.org/schema/mule/";    
-    
+
+    private DefaultBeanDefinitionDocumentReader spring;
+
     /**
      * logger used by this class
      */
     protected static final Log logger = LogFactory.getLog(MuleHierarchicalBeanDefinitionParserDelegate.class);
 
-    public MuleHierarchicalBeanDefinitionParserDelegate (XmlReaderContext readerContext)
+    public MuleHierarchicalBeanDefinitionParserDelegate(XmlReaderContext readerContext,
+                                                        DefaultBeanDefinitionDocumentReader spring)
     {
         super(readerContext);
+        this.spring = spring;
     }
 
     public BeanDefinition parseCustomElement(Element element, BeanDefinition parent)
@@ -111,6 +122,24 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
             return false;
         }
 
+        if (isLocalName(element, BEANS))
+        {
+            // the delegate doesn't support the full spring schema, but it seems that
+            // we can invoke the DefaultBeanDefinitionDocumentReader via registerBeanDefinitions
+            // but we need to create a new DOM document from the element first
+            try
+            {
+                Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+                doc.appendChild(doc.importNode(element, true));
+                spring.registerBeanDefinitions(doc, getReaderContext());
+                return true;
+            }
+            catch (ParserConfigurationException e)
+            {
+                throw new RuntimeException(e);
+            }
+        }
+
         // these are only called if they are at a "top level" - if they are nested inside
         // other spring elements then spring will handle them itself
 
@@ -118,21 +147,26 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
         {
             parsePropertyElement(element, bd);
         }
-        else if (isLocalName(element, MAP_ELEMENT))
-        {
-            // currently unused?
-            parseMapElement(element, bd);
-        }
-        else if (isLocalName(element, LIST_ELEMENT))
-        {
-            // currently unused?
-            parseListElement(element, bd);
-        }
-        else if (isLocalName(element, SET_ELEMENT))
-        {
-            // currently unused?
-            parseSetElement(element, bd);
-        }
+
+        // i am trying to keep these to a minimum - using anything but "bean" is a recipe
+        // for disaster - we already have problems with "property", for example.
+
+//        else if (isLocalName(element, MAP_ELEMENT))
+//        {
+//            // currently unused?
+//            parseMapElement(element, bd);
+//        }
+//        else if (isLocalName(element, LIST_ELEMENT))
+//        {
+//            // currently unused?
+//            parseListElement(element, bd);
+//        }
+//        else if (isLocalName(element, SET_ELEMENT))
+//        {
+//            // currently unused?
+//            parseSetElement(element, bd);
+//        }
+
         else if (isLocalName(element, BEAN_ELEMENT))
         {
             registerBeanDefinitionHolder(parseBeanDefinitionElement(element, bd));
@@ -141,7 +175,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
         {
             throw new IllegalStateException("Unexpected Spring element: " + elementToString(element));
         }
-        
+
         return true;
     }
 

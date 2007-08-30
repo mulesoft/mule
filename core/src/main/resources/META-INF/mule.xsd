@@ -41,6 +41,7 @@
                 </xsd:element>
                 <xsd:element ref="description"/>
                 <xsd:element ref="other"/>
+                <xsd:element ref="spring:beans"/>
                 <xsd:element ref="abstract-extension"/>
                 <xsd:element ref="abstract-security-manager"/>
                 <xsd:element ref="abstract-transaction-manager"/>
@@ -160,6 +161,7 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+
 
     <xsd:element name="abstract-component" abstract="true" type="abstractComponentType"/>
     <xsd:complexType name="abstractComponentType"/>

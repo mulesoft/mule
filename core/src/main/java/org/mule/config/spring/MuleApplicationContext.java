@@ -25,7 +25,7 @@ import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.core.io.Resource;
 
 /**
- * <code>MuleApplicationContext</code> is A Simple extension Application context
+ * <code>MuleApplicationContext</code> is a simple extension application context
  * that allows rosurces to be loaded from the Classpath of file system using the
  * MuleBeanDefinitionReader.
  *

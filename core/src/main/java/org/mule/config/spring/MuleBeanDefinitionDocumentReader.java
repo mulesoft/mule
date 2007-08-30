@@ -20,10 +20,12 @@ import org.w3c.dom.Element;
  */
 public class MuleBeanDefinitionDocumentReader extends DefaultBeanDefinitionDocumentReader
 {
+    
     protected BeanDefinitionParserDelegate createHelper(XmlReaderContext readerContext, Element root)
     {
-        BeanDefinitionParserDelegate delegate = new MuleHierarchicalBeanDefinitionParserDelegate(readerContext);
+        BeanDefinitionParserDelegate delegate = new MuleHierarchicalBeanDefinitionParserDelegate(readerContext, this);
         delegate.initDefaults(root);
         return delegate;
     }
+
 }
