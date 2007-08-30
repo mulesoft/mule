@@ -7,8 +7,9 @@
       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
       http://www.mulesource.org/schema/mule/xml/2.0 http://www.mulesource.org/schema/mule/xml/2.0/mule-xml.xsd">
 
+    <spring:bean name="bean" class="java.lang.Object"/>
+
     <spring:beans>
-        <spring:bean name="bean" class="java.lang.Object"/>
         <spring:alias name="bean" alias="poot"/>
     </spring:beans>
 

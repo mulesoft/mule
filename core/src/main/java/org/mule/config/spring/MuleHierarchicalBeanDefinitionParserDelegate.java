@@ -114,9 +114,9 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
         }
     }
 
-
     protected BeanDefinition handleSpringElements(Element element, BeanDefinition parent)
     {
+
         if (isLocalName(element, BEANS))
         {
             // the delegate doesn't support the full spring schema, but it seems that
