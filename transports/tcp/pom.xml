@@ -19,6 +19,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <excludes>
+                        <exclude>**/SafeProtocolMule2227TestCase.*</exclude>
                         <exclude>**/MuleMessageProtocolChunkingTestCase.*</exclude>
                         <exclude>**/SynchStreamingMule1687TestCase.*</exclude>
                         <exclude>**/AsynchMule1869TestCase.*</exclude>
