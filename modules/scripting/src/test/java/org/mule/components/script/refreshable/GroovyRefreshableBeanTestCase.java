@@ -14,26 +14,25 @@ package org.mule.components.script.refreshable;
 public class GroovyRefreshableBeanTestCase extends AbstractRefreshableBeanTestCase
 {
 
-    public GroovyRefreshableBeanTestCase()
-    {
-        scriptPath_callable = "./target/test-classes/groovy-dynamic-script-callable.groovy";
-        scriptPath_bean = "./target/test-classes/groovy-dynamic-script-bean.groovy";
-        scriptPath_changeInterfaces = "./target/test-classes/groovy-dynamic-script.groovy"; 
-        script1 = "import org.mule.umo.UMOEventContext; import org.mule.umo.lifecycle.Callable; public class GroovyDynamicScript implements Callable { public Object onCall(UMOEventContext eventContext) throws Exception{ return eventContext.getMessage().getPayloadAsString() + \" Received\"; }}";
-        script2 = script1.replaceAll(" Received", " Received2");
-        script3 = "public class GroovyDynamicScript { public String receive(String src) { return src + \" Received\"; }}";
-        script4 = script3.replaceAll(" Received", " Received2");
-        
-    }
+    public static final String RECEIVED = "Received";
+    public static final String RECEIVED2 = "Received2";
+    public static final String PAYLOAD = "Test:";
+    public static final String NAME_CALLABLE = "groovy-dynamic-script-callable.groovy";
+    public static final String NAME_BEAN = "groovy-dynamic-script-bean.groovy";
+    public static final String NAME_CHANGE_INTERFACE = "groovy-dynamic-script.groovy";
+    public static final String ON_CALL_RECEIVED = "import org.mule.umo.UMOEventContext; import org.mule.umo.lifecycle.Callable; public class GroovyDynamicScript implements Callable { public Object onCall(UMOEventContext eventContext) throws Exception{ return eventContext.getMessage().getPayloadAsString() + \"" + RECEIVED + "\"; }}";
+    public static final String ON_CALL_RECEIVED2 = ON_CALL_RECEIVED.replaceAll(RECEIVED, RECEIVED2);
+    public static final String RECEIVE_RECEIVED = "public class GroovyDynamicScript { public String receive(String src) { return src + \"" + RECEIVED + "\"; }}";
+    public static final String RECEIVE_RECEIVED2 = RECEIVE_RECEIVED.replaceAll(RECEIVED, RECEIVED2);
+
     protected String getConfigResources()
     {
         return "groovy-refreshable-config.xml";
     }
 
-    
     public void testFirstOnCallRefresh() throws Exception
     {
-        runScriptTest(script1, scriptPath_callable, "vm://groovy_refresh_callable", "Test:", "Test: Received");
+        runScriptTest(ON_CALL_RECEIVED, NAME_CALLABLE, "vm://groovy_refresh_callable", PAYLOAD, RECEIVED);
     }
     
     public void testCallFirstTest() throws Exception
@@ -41,27 +40,30 @@ public class GroovyRefreshableBeanTestCase extends AbstractRefreshableBeanTestCa
         testFirstOnCallRefresh();
     }
     
+    public void testSecondOnCallRefresh() throws Exception
+    {
+        runScriptTest(ON_CALL_RECEIVED2, NAME_CALLABLE, "vm://groovy_refresh_callable", PAYLOAD, RECEIVED2);
+    }
+
     public void testFirstPojoRefresh() throws Exception
     {
-        runScriptTest(script3, scriptPath_bean, "vm://groovy_refresh_bean", "Test:", "Test: Received");
+        runScriptTest(RECEIVE_RECEIVED, NAME_BEAN, "vm://groovy_refresh_bean", PAYLOAD, RECEIVED);
     }
     
     public void testSecondPojoRefresh() throws Exception
     {
-        runScriptTest(script4, scriptPath_bean, "vm://groovy_refresh_bean", "Test:", "Test: Received2");
+        runScriptTest(RECEIVE_RECEIVED2, NAME_BEAN, "vm://groovy_refresh_bean", PAYLOAD, RECEIVED2);
     }
     
     public void testFirstChangeInterfaces() throws Exception
     {
-        runScriptTest(script1, scriptPath_changeInterfaces, "vm://groovy_refresh_changeInterfaces", "Test:", "Test: Received");
+        runScriptTest(ON_CALL_RECEIVED, NAME_CHANGE_INTERFACE, "vm://groovy_refresh_changeInterfaces", PAYLOAD, RECEIVED);
     }
     
     public void testSecondChangeInterfaces() throws Exception
     {
-        runScriptTest(script3, scriptPath_changeInterfaces, "vm://groovy_refresh_changeInterfaces", "Test:", "Test: Received");
+        runScriptTest(RECEIVE_RECEIVED2, NAME_CHANGE_INTERFACE, "vm://groovy_refresh_changeInterfaces", PAYLOAD, RECEIVED2);
     }
-    
-    
 
 }
 

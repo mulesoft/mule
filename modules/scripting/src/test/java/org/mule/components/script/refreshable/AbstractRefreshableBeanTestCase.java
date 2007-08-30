@@ -13,20 +13,16 @@ package org.mule.components.script.refreshable;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
+import org.mule.util.IOUtils;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URL;
 
 public abstract class AbstractRefreshableBeanTestCase extends FunctionalTestCase
 {
-    protected static String scriptPath_callable;
-    protected static String scriptPath_bean;
-    protected static String scriptPath_changeInterfaces;
-    protected static String script1;
-    protected static String script2;
-    protected static String script3;
-    protected static String script4;
-    protected static int waitTime = 1000;
+
+    protected static final int WAIT_TIME = 1000;
     
     protected void writeScript(String src, String path) throws IOException, InterruptedException
     {
@@ -38,15 +34,26 @@ public abstract class AbstractRefreshableBeanTestCase extends FunctionalTestCase
             scriptFile.close();
         }
     }
-    
-    protected void runScriptTest(String script, String path, String endpoint, String payload, String expectedResult) throws Exception
+
+    protected String nameToPath(String name)
     {
-        writeScript(script, path);
-        Thread.sleep(waitTime); // wait for bean to refresh
+        URL url = IOUtils.getResourceAsUrl(name, getClass());
+        String path = url.getFile();
+        logger.info(url + " -> " + path);
+        return path;
+    }
+
+    // this is a bit of a messy hack.  if it fails check you don't have more than one copy
+    // of the files on your classpath
+    protected void runScriptTest(String script, String name, String endpoint, String payload, String result) throws Exception
+    {
+        // we overwrite the existing resource on the classpath...
+        writeScript(script, nameToPath(name));
+        Thread.sleep(WAIT_TIME); // wait for bean to refresh
         MuleClient client = new MuleClient();
         UMOMessage m = client.send(endpoint, payload, null);
         assertNotNull(m);
-        assertEquals(expectedResult, m.getPayloadAsString());
+        assertEquals(payload + result, m.getPayloadAsString());
     }
 
 }
