@@ -10,11 +10,16 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/scripting/2.0 http://www.mulesource.org/schema/mule/scripting/2.0/mule-scripting.xsd">
 
-    <other>
+    <!-- a module can allow new namespaces to be introduced.. -->
+    <scripting:lang>
         <lang:groovy id="groovy_class_callable" refresh-check-delay="100" script-source="classpath:groovy-dynamic-script-callable.groovy"/>
         <lang:groovy id="groovy_class_bean" refresh-check-delay="100" script-source="classpath:groovy-dynamic-script-bean.groovy"/>
+    </scripting:lang>
+
+    <!-- ..or you can just drop into spring -->
+    <spring:beans>
         <lang:groovy id="groovy_class_changeInterfaces" refresh-check-delay="100" script-source="classpath:groovy-dynamic-script.groovy"/>
-    </other>
+    </spring:beans>
 
     <!--
         The script for this bean will always extend froom the Callable interface, therefore we do not need

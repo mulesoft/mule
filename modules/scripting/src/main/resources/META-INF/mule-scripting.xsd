@@ -34,4 +34,22 @@
         </xsd:complexType>
     </xsd:element>
 
+    <xsd:element name="lang" type="langType" substitutionGroup="mule:abstract-extension">
+        <xsd:annotation>
+            <xsd:documentation>
+                This element allows the http://www.springframework.org/schema/lang namespace
+                to be embedded.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="langType">
+        <xsd:complexContent mixed="true">
+            <xsd:extension base="mule:abstractExtensionType">
+                <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+                    <xsd:any namespace="http://www.springframework.org/schema/lang namespace" processContents="strict" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
 </xsd:schema>

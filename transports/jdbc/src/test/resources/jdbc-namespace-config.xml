@@ -53,12 +53,12 @@
 
     <spring:bean id="testDS1" class="org.mule.providers.jdbc.test.TestDataSource" />
 
-    <other>
+    <spring:beans>
         <jee:jndi-lookup id="testDS2" jndi-name="jdbc/testDS" environment-ref="jndiEnv" />
         
         <util:map id="jndiEnv">
             <spring:entry key="java.naming.factory.initial" value="org.mule.providers.jdbc.test.JdbcTestContextFactory" />
         </util:map>
-    </other>
+    </spring:beans>
 
 </mule>

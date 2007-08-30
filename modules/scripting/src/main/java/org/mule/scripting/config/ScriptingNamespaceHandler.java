@@ -10,12 +10,15 @@
 
 package org.mule.scripting.config;
 
-import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
+import org.mule.config.spring.handlers.AbstractIgnorableNamespaceHandler;
 
-public class ScriptingNamespaceHandler extends NamespaceHandlerSupport 
+
+public class ScriptingNamespaceHandler extends AbstractIgnorableNamespaceHandler
 {
     public void init()
     {
+        registerIgnoredElement("lang");
+
         registerBeanDefinitionParser("script", new ScriptDefinitionParser(false));
         registerBeanDefinitionParser("groovyRefreshable", new GroovyRefreshableBeanBuilderParser(false));
     }

@@ -123,7 +123,6 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
     public void init()
     {
         registerIgnoredElement("mule");
-        registerIgnoredElement("other");
         registerIgnoredElement("description");
 
         //Common elements
