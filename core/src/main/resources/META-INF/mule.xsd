@@ -30,7 +30,23 @@
     </xsd:element>
     <xsd:complexType name="muleType">
         <xsd:sequence minOccurs="0" maxOccurs="unbounded">
-            <xsd:group ref="rootElements"/>
+            <xsd:choice>
+                <xsd:group ref="rootElements"/>
+                <xsd:element ref="spring:beans">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Allow embedding of further spring documents.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:element>
+                 <xsd:element ref="spring:bean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            We support direct use of spring beans via this tag.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:element>
+            </xsd:choice>
         </xsd:sequence>
         <xsd:attribute name="name" type="xsd:string"/>
     </xsd:complexType>
@@ -39,15 +55,7 @@
         <xsd:choice>
             <xsd:element name="environment-properties" type="mapType"/>
             <xsd:element name="configuration" type="muleManagementContextType"/>
-            <xsd:element ref="spring:bean">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        We support direct use of spring beans via this tag.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:element>
             <xsd:element ref="description"/>
-            <xsd:element ref="spring:beans"/>
             <xsd:element ref="abstract-extension"/>
             <xsd:element ref="abstract-security-manager"/>
             <xsd:element ref="abstract-transaction-manager"/>
