@@ -118,40 +118,46 @@
     <xsd:element name="abstract-seda-service" abstract="true" type="abstractSedaServiceType"/>
     <xsd:complexType name="abstractSedaServiceType">
         <xsd:complexContent>
-            <xsd:extension base="abstractServiceType"/>
+            <xsd:extension base="defaultServiceType"/>
         </xsd:complexContent>
     </xsd:complexType>
 
     <!-- this is extended by the (should be abstract, but some undeveloped) services for
          particular models so has no element -->
-    <xsd:complexType name="abstractServiceType">
-        <xsd:sequence>
-            <xsd:choice>
-                <xsd:element ref="component"/> <!-- hardwired to allow objectFactoryType -->
-                <xsd:element ref="abstract-component"/>
-            </xsd:choice>
-            <xsd:element name="inbound-router" type="inboundRouterCollectionType" minOccurs="0"/>
-            <xsd:element name="nested-router" type="nestedRouterCollectionType" minOccurs="0"/>
-            <xsd:element name="outbound-router" type="outboundRouterCollectionType" minOccurs="0"/>
-            <xsd:element name="response-router" type="responseRouterCollectionType" minOccurs="0"/>
-            <xsd:element ref="abstract-threading-profile" minOccurs="0"/>
-            <xsd:element ref="abstract-pooling-profile" minOccurs="0"/>
-            <xsd:element ref="abstract-queue-profile" minOccurs="0"/>
-            <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
-            <xsd:element name="meta-info" type="mapType" minOccurs="0"/>
-        </xsd:sequence>
-        <xsd:attribute name="name" type="xsd:string" use="required"/>
-        <!-- Disabled until it actually does something!
-        <xsd:attribute name="version" type="xsd:string"/>
-        -->
-        <xsd:attribute name="initialState" default="started">
-            <xsd:simpleType>
-                <xsd:restriction base="xsd:NMTOKEN">
-                    <xsd:enumeration value="started"/>
-                    <xsd:enumeration value="stopped"/>
-                </xsd:restriction>
-            </xsd:simpleType>
-        </xsd:attribute>
+    <xsd:complexType name="abstractServiceType"/>
+
+    <xsd:complexType name="defaultServiceType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractServiceType">
+                <xsd:sequence>
+                    <xsd:choice>
+                        <xsd:element ref="component"/> <!-- hardwired to allow objectFactoryType -->
+                        <xsd:element ref="abstract-component"/>
+                    </xsd:choice>
+                    <xsd:element name="inbound-router" type="inboundRouterCollectionType" minOccurs="0"/>
+                    <xsd:element name="nested-router" type="nestedRouterCollectionType" minOccurs="0"/>
+                    <xsd:element name="outbound-router" type="outboundRouterCollectionType" minOccurs="0"/>
+                    <xsd:element name="response-router" type="responseRouterCollectionType" minOccurs="0"/>
+                    <xsd:element ref="abstract-threading-profile" minOccurs="0"/>
+                    <xsd:element ref="abstract-pooling-profile" minOccurs="0"/>
+                    <xsd:element ref="abstract-queue-profile" minOccurs="0"/>
+                    <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
+                    <xsd:element name="meta-info" type="mapType" minOccurs="0"/>
+                </xsd:sequence>
+                <xsd:attribute name="name" type="xsd:string" use="required"/>
+                <!-- Disabled until it actually does something!
+                <xsd:attribute name="version" type="xsd:string"/>
+                -->
+                <xsd:attribute name="initialState" default="started">
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:NMTOKEN">
+                            <xsd:enumeration value="started"/>
+                            <xsd:enumeration value="stopped"/>
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
 
     <xsd:element name="abstract-component" abstract="true" type="abstractComponentType"/>

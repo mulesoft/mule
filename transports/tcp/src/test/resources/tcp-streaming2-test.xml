@@ -22,21 +22,21 @@
 
         <stream:service name="echo">
             <component class="org.mule.components.simple.StreamingBridgeComponent"/>
-            <inbound-router>
-                <endpoint address="tcp://localhost:65432" synchronous="false"/>
-            </inbound-router>
-            <outbound-router>
-                <outbound-pass-through-router>
-                    <endpoint address="tcp://localhost:65433" synchronous="false"/>
-                </outbound-pass-through-router>
-            </outbound-router>
+            <stream:inbound-router>
+                <stream:inbound-endpoint address="tcp://localhost:65432" synchronous="false"/>
+            </stream:inbound-router>
+            <stream:outbound-router>
+                <stream:outbound-pass-through-router>
+                    <stream:outbound-endpoint address="tcp://localhost:65433" synchronous="false"/>
+                </stream:outbound-pass-through-router>
+            </stream:outbound-router>
         </stream:service>
 
         <stream:service name="testComponent">
             <component scope="singleton" class="org.mule.tck.functional.FunctionalStreamingTestComponent"/>
-            <inbound-router>
-                <endpoint address="tcp://localhost:65433" synchronous="false"/>
-            </inbound-router>
+            <stream:inbound-router>
+                <stream:inbound-endpoint address="tcp://localhost:65433" synchronous="false"/>
+            </stream:inbound-router>
         </stream:service>
 
     </stream:model>

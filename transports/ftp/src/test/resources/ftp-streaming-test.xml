@@ -22,33 +22,33 @@
 
         <stream:service name="bridge">
             <component class="org.mule.components.simple.StreamingBridgeComponent"/>
-            <inbound-router>
-                <endpoint address="tcp://localhost:60196">
+            <stream:inbound-router>
+                <stream:inbound-endpoint address="tcp://localhost:60196">
                     <retry-connection-strategy
                             retryCount="3"
                             retryFrequency="2000"/>
-                </endpoint>
-            </inbound-router>
-            <outbound-router>
-                <outbound-pass-through-router>
-                    <endpoint address="ftp://anonymous:email@localhost:60197">
+                </stream:inbound-endpoint>
+            </stream:inbound-router>
+            <stream:outbound-router>
+                <stream:outbound-pass-through-router>
+                    <stream:outbound-endpoint address="ftp://anonymous:email@localhost:60197">
                         <retry-connection-strategy
                                 retryCount="3"
                                 retryFrequency="2000"/>
-                    </endpoint>
-                </outbound-pass-through-router>
-            </outbound-router>
+                    </stream:outbound-endpoint>
+                </stream:outbound-pass-through-router>
+            </stream:outbound-router>
         </stream:service>
 
         <stream:service name="testComponent">
             <component scope="singleton" class="org.mule.tck.functional.FunctionalStreamingTestComponent"/>
-            <inbound-router>
-                <endpoint address="ftp://anonymous:email@localhost:60197">
+            <stream:inbound-router>
+                <stream:inbound-endpoint address="ftp://anonymous:email@localhost:60197">
                     <retry-connection-strategy
                             retryCount="3"
                             retryFrequency="2000"/>
-                </endpoint>
-            </inbound-router>
+                </stream:inbound-endpoint>
+            </stream:inbound-router>
         </stream:service>
 
     </stream:model>

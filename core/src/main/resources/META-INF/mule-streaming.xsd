@@ -25,9 +25,123 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <!-- this is a minimal, incomplete implementation to match the existing examples -->
+
     <xsd:complexType name="streamingServiceType">
         <xsd:complexContent>
-            <xsd:extension base="mule:abstractServiceType"/>
+            <xsd:extension base="mule:abstractServiceType">
+                <xsd:sequence>
+                    <xsd:choice>
+                        <xsd:element ref="mule:component"/> <!-- hardwired to allow objectFactoryType -->
+                        <xsd:element ref="mule:abstract-component"/>
+                    </xsd:choice>
+                    <xsd:element name="inbound-router" type="inboundRouterCollectionType" minOccurs="0"/>
+                    <!-- xsd:element name="nested-router" type="mule:nestedRouterCollectionType" minOccurs="0"/ -->
+                    <xsd:element name="outbound-router" type="outboundRouterCollectionType" minOccurs="0"/>
+                    <!-- xsd:element name="response-router" type="mule:responseRouterCollectionType" minOccurs="0"/ -->
+                    <xsd:element ref="mule:abstract-threading-profile" minOccurs="0"/>
+                    <xsd:element ref="mule:abstract-pooling-profile" minOccurs="0"/>
+                    <xsd:element ref="mule:abstract-queue-profile" minOccurs="0"/>
+                    <xsd:element ref="mule:abstract-exception-strategy" minOccurs="0"/>
+                    <xsd:element name="meta-info" type="mule:mapType" minOccurs="0"/>
+                </xsd:sequence>
+                <xsd:attribute name="name" type="xsd:string" use="required"/>
+                <!-- Disabled until it actually does something!
+                <xsd:attribute name="version" type="xsd:string"/>
+                -->
+                <xsd:attribute name="initialState" default="started">
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:NMTOKEN">
+                            <xsd:enumeration value="started"/>
+                            <xsd:enumeration value="stopped"/>
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="inboundRouterCollectionType">
+        <xsd:sequence>
+            <xsd:element ref="abstract-inbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element ref="mule:abstract-inbound-router" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attribute name="matchAll" type="mule:substitutableBoolean" default="false"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="outboundRouterCollectionType">
+        <xsd:sequence>
+            <!-- xsd:element ref="abstract-catch-all-strategy" minOccurs="0"/ -->
+            <xsd:element ref="abstract-outbound-router" maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attribute name="matchAll" type="mule:substitutableBoolean" default="false"/>
+    </xsd:complexType>
+
+    <xsd:element name="abstract-outbound-router" abstract="true" type="abstractOutboundRouterType"/>
+    <xsd:complexType name="abstractOutboundRouterType"/>
+
+    <xsd:element name="outbound-pass-through-router" type="outboundRouterType" substitutionGroup="abstract-outbound-router"/>
+    <xsd:complexType name="outboundRouterType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractOutboundRouterType">
+                <xsd:sequence>
+                    <xsd:element ref="abstract-outbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
+                    <!-- xsd:element name="reply-to" type="replyToType" minOccurs="0"/ -->
+                    <!-- xsd:element ref="abstract-transaction" minOccurs="0"/ -->
+                    <!-- xsd:choice minOccurs="0">
+                         <xsd:element ref="abstract-property-extractor"/>
+                         <xsd:element ref="custom-property-extractor"/ --> <!-- hardwired object factory -->
+                    <!-- /xsd:choice -->
+                </xsd:sequence>
+                <xsd:attribute name="enableCorrelation" default="IF_NOT_SET">
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:NMTOKEN">
+                            <xsd:enumeration value="ALWAYS"/>
+                            <xsd:enumeration value="NEVER"/>
+                            <xsd:enumeration value="IF_NOT_SET"/>
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="abstract-inbound-endpoint" abstract="true" type="abstractInboundEndpointType"/>
+    <xsd:complexType name="abstractInboundEndpointType"/>
+
+    <xsd:element name="abstract-outbound-endpoint" abstract="true" type="abstractOutboundEndpointType"/>
+    <xsd:complexType name="abstractOutboundEndpointType"/>
+
+    <xsd:element name="abstract-response-endpoint" abstract="true" type="abstractResponseEndpointType"/>
+    <xsd:complexType name="abstractResponseEndpointType"/>
+
+    <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="abstract-inbound-endpoint"/>
+    <xsd:complexType name="inboundEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractInboundEndpointType">
+                <xsd:group ref="mule:defaultEndpointElements"/>
+                <xsd:attributeGroup ref="mule:defaultEndpointAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="abstract-outbound-endpoint"/>
+    <xsd:complexType name="outboundEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractOutboundEndpointType">
+                <xsd:group ref="mule:defaultEndpointElements"/>
+                <xsd:attributeGroup ref="mule:defaultEndpointAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="response-endpoint" type="responseEndpointType" substitutionGroup="abstract-response-endpoint"/>
+    <xsd:complexType name="responseEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractResponseEndpointType">
+                <xsd:group ref="mule:defaultEndpointElements"/>
+                <xsd:attributeGroup ref="mule:defaultEndpointAttributes"/>
+            </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
