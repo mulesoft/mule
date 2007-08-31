@@ -10,6 +10,7 @@
 
 package org.mule.management.mbeans;
 
+import org.mule.config.ThreadingProfile;
 import org.mule.impl.MuleDescriptor;
 import org.mule.management.AbstractMuleJmxTestCase;
 import org.mule.util.object.SingletonObjectFactory;
@@ -26,6 +27,7 @@ public class ComponentServiceTestCase extends AbstractMuleJmxTestCase
 
         final MuleDescriptor descriptor = new MuleDescriptor("TEST_SERVICE");
         descriptor.setServiceFactory(new SingletonObjectFactory(new Object()));
+        descriptor.setThreadingProfile(new ThreadingProfile());
         managementContext.getRegistry().lookupSystemModel().registerComponent(descriptor);
 
         managementContext.start();

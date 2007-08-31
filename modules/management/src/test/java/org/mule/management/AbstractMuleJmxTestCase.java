@@ -10,6 +10,7 @@
 
 package org.mule.management;
 
+import org.mule.management.agents.RmiRegistryAgent;
 import org.mule.management.support.AutoDiscoveryJmxSupportFactory;
 import org.mule.management.support.JmxSupport;
 import org.mule.management.support.JmxSupportFactory;
@@ -36,6 +37,9 @@ public class AbstractMuleJmxTestCase extends AbstractMuleTestCase
 
     protected void doSetUp() throws Exception
     {
+        RmiRegistryAgent rmiRegistryAgent = new RmiRegistryAgent();
+        managementContext.getRegistry().registerAgent(rmiRegistryAgent);
+        
         // simulate a running environment with Log4j MBean already registered
         List servers = MBeanServerFactory.findMBeanServer(null);
         if (servers.size() == 0)

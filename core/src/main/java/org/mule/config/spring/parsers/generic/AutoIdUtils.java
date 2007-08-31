@@ -19,6 +19,7 @@ public class AutoIdUtils
 {
 
     public static final String ATTRIBUTE_ID = AbstractMuleBeanDefinitionParser.ATTRIBUTE_ID;
+    public static final String ATTRIBUTE_NAME = AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME;
     private static final AtomicInteger counter = new AtomicInteger(0);
     public static final String ID_PREFIX = "autogenInheritId";
 
@@ -26,7 +27,14 @@ public class AutoIdUtils
     {
         if (null != element && !element.hasAttribute(ATTRIBUTE_ID))
         {
-            element.setAttribute(ATTRIBUTE_ID, ID_PREFIX + counter.incrementAndGet());
+            if (!element.hasAttribute(ATTRIBUTE_NAME))
+            {
+                element.setAttribute(ATTRIBUTE_ID, ID_PREFIX + counter.incrementAndGet());
+            }
+            else
+            {
+                element.setAttribute(ATTRIBUTE_ID, element.getAttribute(ATTRIBUTE_NAME));
+            }
         }
     }
 

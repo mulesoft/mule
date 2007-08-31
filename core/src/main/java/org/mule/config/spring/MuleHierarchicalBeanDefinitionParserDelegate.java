@@ -82,8 +82,12 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
                 getReaderContext().error("Unable to locate NamespaceHandler for namespace [" + namespaceUri + "]", element);
                 return null;
             }
-            BeanDefinition child = handler.parse(element, new ParserContext(getReaderContext(), this, parent));
-            registerBean(element, child);
+            ParserContext parserContext = new ParserContext(getReaderContext(), this, parent);
+            BeanDefinition child = handler.parse(element, parserContext);
+            if (parserContext.isNested())
+            {
+                registerBean(element, child);
+            }
 
             // Only iterate and parse child mule name-spaced elements. Spring does not do
             // hierarchical parsing by default so we need to maintain this behavior
@@ -99,12 +103,12 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
                     (child.getBeanClassName().equals(MapFactoryBean.class.getName()) ||
                             child.getBeanClassName().equals(PropertiesFactoryBean.class.getName())); 
 
-            if (isMuleNamespace(element) && ! isFactory)
+            if (isMuleNamespace(element) && !isFactory)
             {
                 NodeList list = element.getChildNodes();
-                for (int i = 0; i < list.getLength() ; i++)
+                for (int i = 0; i < list.getLength(); i++)
                 {
-                    if(list.item(i) instanceof Element)
+                    if (list.item(i) instanceof Element)
                     {
                         parseCustomElement((Element) list.item(i), child);
                     }
@@ -196,8 +200,8 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
         //Check to see if the Bean Definition represents a compound element - one represents a subset of
         //configuration for the parent bean. Compound bean definitions should not be registered since the properties
         //set on them are really set on the parent bean.
-        Boolean compoundElement = (Boolean)bd.getAttribute(ParentDefinitionParser.COMPOUND_ELEMENT);
-        if(Boolean.TRUE.equals(compoundElement))
+        Boolean compoundElement = (Boolean) bd.getAttribute(ParentDefinitionParser.COMPOUND_ELEMENT);
+        if (Boolean.TRUE.equals(compoundElement))
         {
             return;
         }

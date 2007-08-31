@@ -39,6 +39,11 @@ public class JmxAgentTestCase extends AbstractMuleTestCase
         managementContext.setId(DOMAIN);
     }
 
+    protected void doTearDown()
+    {
+        jmxAgent.dispose();
+    }
+
     public void testDefaultProperties() throws Exception
     {
         jmxAgent.setCredentials(getValidCredentials());
