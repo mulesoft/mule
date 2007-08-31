@@ -44,25 +44,31 @@ public class EndpointDefinitionParser extends AbstractChildDefinitionParser
      * If the endpoint element is decared in the root mule element, this will
      * return null since there is no property to be set on a parent bean. In this case the
      * endpoint is a global endpoint and can be referenced by other components
-     * @param e the current Endpoint element
+     * @param element the current Endpoint element
      * @return the parent property name or null if the endpoint is in the root beans element.
      */
-    public String getPropertyName(Element e)
+    public String getPropertyName(Element element)
     {
-        Element parent = (Element) e.getParentNode();
-        if (parent.getLocalName().equals(ROOT_ELEMENT))
+        if (isGlobal(element))
         {
             return null;
         }
-        return "endpoint";
+        else
+        {
+            return "endpoint";
+        }
+    }
+
+    protected boolean isGlobal(Element element)
+    {
+        return isTopLevel(element);
     }
 
     //@Override
     protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
         //Check to see if this is a global endpoint
-        Element parent = (Element) element.getParentNode();
-        if (parent.getLocalName().equals(ROOT_ELEMENT))
+        if (isGlobal(element))
         {
             builder.addPropertyValue("type", UMOImmutableEndpoint.ENDPOINT_TYPE_GLOBAL);
             // if global, cannot be a reference (afaik)

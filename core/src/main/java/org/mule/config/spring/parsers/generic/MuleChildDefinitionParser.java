@@ -42,9 +42,10 @@ public class MuleChildDefinitionParser extends OrphanDefinitionParser
 
     protected void assertMuleParent(Element element)
     {
-        if (!element.getParentNode().getLocalName().equals(ROOT_ELEMENT))
+        if (!isTopLevel(element))
         {
-            throw new IllegalStateException("This element should be embedded inside the Mule <mule> element: "
+            throw new IllegalStateException("This element should be embedded inside the Mule <"
+                    + ROOT_ELEMENT + "> or < " + ROOT_UNSAFE_ELEMENT + "> elements: "
                     + MuleHierarchicalBeanDefinitionParserDelegate.elementToString(element));
         }
     }

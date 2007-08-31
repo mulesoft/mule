@@ -80,6 +80,7 @@ import org.w3c.dom.NamedNodeMap;
 public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefinitionParser
 {
     public static final String ROOT_ELEMENT = "mule";
+    public static final String ROOT_UNSAFE_ELEMENT = "mule-unsafe";
     public static final String ATTRIBUTE_ID = "id";
     public static final String ATTRIBUTE_NAME = "name";
     public static final String ATTRIBUTE_IDREF = "nameref";
@@ -422,4 +423,15 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
     {
         this.parserContext = parserContext;
     }
+
+    /**
+     * @param element The element to test
+     * @return true if the element's parent is <mule> or similar
+     */
+    protected boolean isTopLevel(Element element)
+    {
+        return element.getParentNode().getLocalName().equals(ROOT_ELEMENT)
+                || element.getParentNode().getLocalName().equals(ROOT_UNSAFE_ELEMENT);
+    }
+
 }
