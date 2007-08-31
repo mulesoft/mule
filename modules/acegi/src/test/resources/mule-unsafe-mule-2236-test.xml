@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule-unsafe
+        xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:spring="http://www.springframework.org/schema/beans"
+        xmlns:acegi="http://www.mulesource.org/schema/mule/acegi/2.0"
+        xsi:schemaLocation="
+      http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+      http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+      http://www.mulesource.org/schema/mule/acegi/2.0 http://www.mulesource.org/schema/mule/acegi/2.0/mule-acegi.xsd">
+
+    <!-- no java test associated with this file, it's just documenting/verifying the
+         issues involved here -->
+
+    <spring:bean name="bean" class="java.lang.Object"/>
+
+    <!-- this isn't supported, but validates
+         (problem is that spring doesn't expose support for all spring elements, so we
+         would need to implement the functionality ourslves)-->
+    <spring:alias name="bean" alias="poot"/>
+
+    <!-- this should not be allowed here, but validates
+         (problem is that elements used with substitutionGroup - which is necessary
+         for the inheritance-based approach we use - appear at the global level in
+         schema.  this is why we added the extra <mule/> element, for example) -->
+    <acegi:http-security-filter realm="some realm"/>
+
+    <environment-properties>
+        <spring:entry key="property" value="value"/>
+    </environment-properties>
+
+    <model name="model">
+        <service name="service">
+            <component scope="singleton" instance-ref="poot"/>
+            <inbound-router>
+                <endpoint name="endpoint" address="test://${property}"/>
+            </inbound-router>
+        </service>
+    </model>
+
+</mule-unsafe>

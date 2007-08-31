@@ -30,25 +30,48 @@
     </xsd:element>
     <xsd:complexType name="muleType">
         <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:group ref="rootElements"/>
+        </xsd:sequence>
+        <xsd:attribute name="name" type="xsd:string"/>
+    </xsd:complexType>
+
+    <xsd:group name="rootElements">
+        <xsd:choice>
+            <xsd:element name="environment-properties" type="mapType"/>
+            <xsd:element name="configuration" type="muleManagementContextType"/>
+            <xsd:element ref="spring:bean">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        We support direct use of spring beans via this tag.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element ref="description"/>
+            <xsd:element ref="spring:beans"/>
+            <xsd:element ref="abstract-extension"/>
+            <xsd:element ref="abstract-security-manager"/>
+            <xsd:element ref="abstract-transaction-manager"/>
+            <xsd:element ref="abstract-connector"/>
+            <xsd:element ref="abstract-global-endpoint"/>
+            <xsd:element ref="abstract-transformer"/>
+            <xsd:element ref="abstract-model"/>
+        </xsd:choice>
+    </xsd:group>
+
+    <xsd:element name="mule-unsafe" type="muleUnsafeType">
+        <xsd:annotation>
+            <xsd:documentation>
+                An aternative root element that is more flexible, but which is less
+                likely to detect configuration errors during schema validation.
+                In addition, IDEs may give less useful prompts when using this element.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="muleUnsafeType">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
             <xsd:choice>
-                <xsd:element name="environment-properties" type="mapType"/>
-                <xsd:element name="configuration" type="muleManagementContextType"/>
-                <xsd:element ref="spring:bean">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            We support direct use of spring beans via this tag. 
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:element>
-                <xsd:element ref="description"/>
-                <xsd:element ref="spring:beans"/>
-                <xsd:element ref="abstract-extension"/>
-                <xsd:element ref="abstract-security-manager"/>
-                <xsd:element ref="abstract-transaction-manager"/>
-                <xsd:element ref="abstract-connector"/>
-                <xsd:element ref="abstract-global-endpoint"/>
-                <xsd:element ref="abstract-transformer"/>
-                <xsd:element ref="abstract-model"/>
+                <xsd:group ref="rootElements"/>
+                <xsd:any namespace="##other" processContents="strict"/>
             </xsd:choice>
         </xsd:sequence>
         <xsd:attribute name="name" type="xsd:string"/>
