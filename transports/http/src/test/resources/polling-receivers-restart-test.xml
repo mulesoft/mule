@@ -22,12 +22,12 @@
         <service name="Test">
             <component class="org.mule.tck.functional.FunctionalTestComponent" scope="singleton"/>
             <inbound-router>
-                <endpoint name="httpEndpoint" connector-ref="PollingHttpConnector"
-                               address="http://localhost:60206/TestServer"/>
+                <inbound-endpoint name="httpEndpoint" connector-ref="PollingHttpConnector"
+                                  address="http://localhost:60206/TestServer"/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <endpoint address="stdio://System.out"/>
+                    <outbound-endpoint address="stdio://System.out"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
@@ -39,7 +39,7 @@
                 </properties>
             </component>
             <inbound-router>
-                <endpoint address="http://localhost:60206" connector-ref="HttpConnector"/>
+                <inbound-endpoint address="http://localhost:60206" connector-ref="HttpConnector"/>
             </inbound-router>
         </service>
 

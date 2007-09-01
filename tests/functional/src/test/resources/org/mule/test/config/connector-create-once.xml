@@ -8,13 +8,15 @@
 
     <mule:model name="main" class="org.mule.tck.testmodels.mule.TestSedaModel">
         <mule:service name="echo">
-            <mule:component class="org.mule.components.simple.EchoComponent" />
+            <mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
-                <mule:endpoint name="in" address="test://inbound"/>
+                <mule:inbound-endpoint name="in"
+                                       address="test://inbound"/>
             </mule:inbound-router>
             <mule:outbound-router>
                 <mule:outbound-pass-through-router>
-                    <mule:endpoint name="out" address="test://outbound"/>
+                    <mule:outbound-endpoint name="out"
+                                            address="test://outbound"/>
                 </mule:outbound-pass-through-router>
             </mule:outbound-router>
         </mule:service>

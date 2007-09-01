@@ -23,15 +23,15 @@
         <service name="test for xml">
             <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
-                <endpoint ref="in"/>
+                <inbound-endpoint ref="in"/>
             </inbound-router>
             <outbound-router>
                 <filtering-router>
-                    <endpoint address="vm://xml" connector-ref="default"/>
+                    <outbound-endpoint address="vm://xml" connector-ref="default"/>
                     <mxml:is-xml-filter/>
                 </filtering-router>
                 <filtering-router>
-                    <endpoint ref="notxml"/>
+                    <outbound-endpoint ref="notxml"/>
                     <not-filter>
                         <mxml:is-xml-filter/>
                     </not-filter>
@@ -42,15 +42,16 @@
         <service name="filter xml for content">
             <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
-                <endpoint address="vm://xml" connector-ref="default"/>
+                <inbound-endpoint address="vm://xml" connector-ref="default"/>
             </inbound-router>
             <outbound-router>
                 <forwarding-catch-all-strategy>
-                    <endpoint ref="other"/>
+                    <outbound-endpoint ref="other"/>
                 </forwarding-catch-all-strategy>
                 <filtering-router>
-                    <endpoint ref="self"/>
-                    <mxml:jxpath-filter pattern="/mule:mule/mule:model/mule:service[2]/@name" expectedValue="filter xml for content">
+                    <outbound-endpoint ref="self"/>
+                    <mxml:jxpath-filter pattern="/mule:mule/mule:model/mule:service[2]/@name"
+                                        expectedValue="filter xml for content">
                         <mxml:namespace prefix="spring" uri="http://www.springframework.org/schema/beans"/>
                         <mxml:namespace prefix="mule" uri="http://www.mulesource.org/schema/mule/core/2.0"/>
                     </mxml:jxpath-filter>

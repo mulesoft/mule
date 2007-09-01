@@ -11,33 +11,34 @@
        http://www.mulesource.org/schema/mule/xfire/2.0 http://www.mulesource.org/schema/mule/xfire/2.0/mule-xfire.xsd
 	   http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/axis/2.0/mule-axis.xsd
   	   http://www.mulesource.org/schema/mule/wssecurity/2.0 http://www.mulesource.org/schema/mule/wssecurity/2.0/mule-wssecurity.xsd">
-	
-	<spring:bean id="passwords" class="org.mule.extras.wssecurity.callbackhandlers.PasswordContainer">
-       <spring:constructor-arg>
-           <spring:props>
-               <spring:prop key="mulealias">mulepassword</spring:prop>
-               <spring:prop key="gooduser">goodUserPassword</spring:prop>
-           </spring:props>
-       </spring:constructor-arg>
+
+    <spring:bean id="passwords" class="org.mule.extras.wssecurity.callbackhandlers.PasswordContainer">
+        <spring:constructor-arg>
+            <spring:props>
+                <spring:prop key="mulealias">mulepassword</spring:prop>
+                <spring:prop key="gooduser">goodUserPassword</spring:prop>
+            </spring:props>
+        </spring:constructor-arg>
     </spring:bean>
-	
+
     <environment-properties>
         <spring:entry key="synchronous" value="false"/>
     </environment-properties>
 
-	<xfire:connector name="xfireConnector">
-		<xfire:client-out-handler>org.codehaus.xfire.util.dom.DOMOutHandler</xfire:client-out-handler>	
-		 <xfire:client-out-handler>org.codehaus.xfire.security.wss4j.WSS4JOutHandler</xfire:client-out-handler>
-	</xfire:connector>
+    <xfire:connector name="xfireConnector">
+        <xfire:client-out-handler>org.codehaus.xfire.util.dom.DOMOutHandler</xfire:client-out-handler>
+        <xfire:client-out-handler>org.codehaus.xfire.security.wss4j.WSS4JOutHandler</xfire:client-out-handler>
+    </xfire:connector>
 
- 	 <model name="test">
+    <model name="test">
         <service name="MySecuredUMO">
             <component class="org.mule.components.simple.EchoComponent"/>
             <inbound-router>
-                <endpoint address="xfire:http://localhost:64282" connector-ref="xfireConnector">
-                    <wssecurity:security-filter signatureFile="in-signed-security.properties" decryptionFile="in-encrypted-security.properties"/>
-                </endpoint>
+                <inbound-endpoint address="xfire:http://localhost:64282" connector-ref="xfireConnector">
+                    <wssecurity:security-filter signatureFile="in-signed-security.properties"
+                                                decryptionFile="in-encrypted-security.properties"/>
+                </inbound-endpoint>
             </inbound-router>
         </service>
-     </model>
+    </model>
 </mule>

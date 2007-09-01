@@ -24,8 +24,7 @@
     </spring:bean>
 
     <acegi:security-manager>
-        <acegi:delegate-security-provider name="memory-dao"
-                                          delegate-ref="daoAuthenticationProvider"/>
+        <acegi:delegate-security-provider name="memory-dao" delegate-ref="daoAuthenticationProvider"/>
     </acegi:security-manager>
 
     <security-manager>
@@ -36,12 +35,12 @@
         <service name="echo">
             <component class="org.mule.components.simple.EchoComponent"/>
             <inbound-router>
-                <endpoint address="vm://my.queue">
+                <inbound-endpoint address="vm://my.queue">
                     <encryption-security-filter strategy-ref="PBE"/>
-                </endpoint>
-                <endpoint address="http://localhost:4567">
+                </inbound-endpoint>
+                <inbound-endpoint address="http://localhost:4567">
                     <encryption-security-filter strategy-ref="PBE"/>
-                </endpoint>
+                </inbound-endpoint>
             </inbound-router>
         </service>
     </model>

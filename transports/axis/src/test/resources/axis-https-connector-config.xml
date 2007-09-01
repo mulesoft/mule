@@ -10,22 +10,17 @@
        http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/axis/2.0/mule-axis.xsd
        http://www.mulesource.org/schema/mule/https/2.0 http://www.mulesource.org/schema/mule/https/2.0/mule-https.xsd">
 
-    <https:connector name="myHttpsConnector" >
-        <https:tls-key-store 
-            keyStore="axisServerKeystore" 
-            keyStorePassword="mulepassword"
-            keyPassword="mulepassword"/>
-        <https:tls-server
-                trustStore="axisTrustStore"
-                trustStorePassword="mulepassword"
-                requireClientAuthentication="false"/>
+    <https:connector name="myHttpsConnector">
+        <https:tls-key-store keyStore="axisServerKeystore" keyStorePassword="mulepassword" keyPassword="mulepassword"/>
+        <https:tls-server trustStore="axisTrustStore" trustStorePassword="mulepassword"
+                          requireClientAuthentication="false"/>
     </https:connector>
 
     <model name="Https_Test_Model">
         <service name="TestUMO">
             <component class="org.mule.components.simple.EchoComponent"/>
             <inbound-router>
-                <endpoint address="axis:https://localhost:62000"/>
+                <inbound-endpoint address="axis:https://localhost:62000"/>
             </inbound-router>
         </service>
     </model>

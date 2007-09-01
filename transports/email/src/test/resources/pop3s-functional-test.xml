@@ -13,12 +13,8 @@
        http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
 
     <pop3s:connector name="pop3sConnector">
-        <pop3s:tls-client
-                clientKeyStore="clientKeystore"
-                clientKeyStorePassword="mulepassword"/>
-        <pop3s:tls-trust-store
-                trustStore="greenmail-truststore"
-                trustStorePassword="password"/>
+        <pop3s:tls-client clientKeyStore="clientKeystore" clientKeyStorePassword="mulepassword"/>
+        <pop3s:tls-trust-store trustStore="greenmail-truststore" trustStorePassword="password"/>
     </pop3s:connector>
 
     <vm:connector name="vmConnector" queueEvents="true"/>
@@ -28,13 +24,13 @@
         <service name="relay">
             <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
-                <endpoint address="pop3s://bob:password@localhost:65436">
+                <inbound-endpoint address="pop3s://bob:password@localhost:65436">
                     <retry-connection-strategy retryCount="3" retryFrequency="1000"/>
-                </endpoint>
+                </inbound-endpoint>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <endpoint address="vm://receive"/>
+                    <outbound-endpoint address="vm://receive"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>

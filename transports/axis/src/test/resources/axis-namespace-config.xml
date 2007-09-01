@@ -14,20 +14,15 @@
     </spring:bean>
     <spring:bean name="mockProvider" class="org.mule.providers.soap.axis.mock.MockProvider"/>
 
-    <axis:connector name="axisConnector"
-        clientConfig="test-axis-config.wsdd"
-        doAutoTypes="false"
-        serverConfig="test-axis-config.wsdd"
-        treatMapAsNamedParams="false">
+    <axis:connector name="axisConnector" clientConfig="test-axis-config.wsdd" doAutoTypes="false"
+                    serverConfig="test-axis-config.wsdd" treatMapAsNamedParams="false">
 
         <axis:bean-type>org.mule.tck.testmodels.fruit.Apple</axis:bean-type>
         <axis:bean-type>org.mule.tck.testmodels.fruit.Banana</axis:bean-type>
 
         <axis:supported-scheme>http</axis:supported-scheme>
-     </axis:connector>
+    </axis:connector>
 
-    <axis:connector name="axisConnector2"
-        axisServer-ref="axisServer"
-        clientProvider-ref="mockProvider"
-        serverProvider-ref="mockProvider"/>
+    <axis:connector name="axisConnector2" axisServer-ref="axisServer" clientProvider-ref="mockProvider"
+                    serverProvider-ref="mockProvider"/>
 </mule>

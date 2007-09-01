@@ -7,19 +7,14 @@
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
-       http://www.mulesource.org/schema/mule/file/2.0 http://www.mulesource.org/schema/mule/file/2.0/mule-file.xsd 
+       http://www.mulesource.org/schema/mule/file/2.0 http://www.mulesource.org/schema/mule/file/2.0/mule-file.xsd
        http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
 
     <!-- access this from test code to set destination directory -->
-    <file:connector name="sendConnector"
-            outputAppend="true"
-            outputPattern="[TARGET_FILE]"/>
+    <file:connector name="sendConnector" outputAppend="true" outputPattern="[TARGET_FILE]"/>
 
     <!-- access this from test code to set destination directory -->
-    <file:connector name="receiveConnector"
-            fileAge="500"
-            autoDelete="true"
-            pollingFrequency="100"/>
+    <file:connector name="receiveConnector" fileAge="500" autoDelete="true" pollingFrequency="100"/>
 
     <vm:connector name="vmQueue" queueEvents="true"/>
 
@@ -35,7 +30,7 @@
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <endpoint address="vm://receive" name="receive"/>
+                    <outbound-endpoint address="vm://receive" name="receive"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>

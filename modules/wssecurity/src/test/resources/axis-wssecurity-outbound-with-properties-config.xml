@@ -13,7 +13,7 @@
 	   http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/axis/2.0/mule-axis.xsd
   	   http://www.mulesource.org/schema/mule/wssecurity/2.0 http://www.mulesource.org/schema/mule/wssecurity/2.0/mule-wssecurity.xsd
        http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
-	
+
     <spring:bean id="passwords" class="org.mule.extras.wssecurity.callbackhandlers.PasswordContainer">
         <spring:constructor-arg>
             <spring:props>
@@ -22,43 +22,44 @@
             </spring:props>
         </spring:constructor-arg>
     </spring:bean>
-	
+
     <environment-properties>
         <spring:entry key="synchronous" value="false"/>
     </environment-properties>
 
-    <axis:connector name="axisConnector"
-                    clientConfig="mule-axis-secure-client-config.wsdd"
+    <axis:connector name="axisConnector" clientConfig="mule-axis-secure-client-config.wsdd"
                     serverConfig="mule-axis-secure-server-config.wsdd">
     </axis:connector>
 
     <model name="test">
-		 
+
         <service name="BridgeUMO">
             <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
-                <endpoint address="vm://testin"/>
+                <inbound-endpoint address="vm://testin"/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <endpoint address="axis:http://localhost:64484/MySecuredUMO?method=echo" connector-ref="axisConnector">
+                    <outbound-endpoint address="axis:http://localhost:64484/MySecuredUMO?method=echo"
+                                       connector-ref="axisConnector">
                         <wssecurity:security-filter decryptionFile="in-encrypted-security.properties">
                             <wssecurity:property key="action" value="Encrypt"/>
                             <wssecurity:property key="encryptionPropFile" value="out-encrypted-security.properties"/>
                             <wssecurity:property key="user" value="mulealias"/>
-                            <wssecurity:property key="passwordCallbackClass" value="org.mule.extras.wssecurity.callbackhandlers.MuleWsSecurityCallbackHandler"/>
+                            <wssecurity:property key="passwordCallbackClass"
+                                                 value="org.mule.extras.wssecurity.callbackhandlers.MuleWsSecurityCallbackHandler"/>
                         </wssecurity:security-filter>
-                    </endpoint>
+                    </outbound-endpoint>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
-		  
+
         <service name="MySecuredUMO">
             <component class="org.mule.components.simple.EchoComponent"/>
             <inbound-router>
-                <endpoint address="axis:http://localhost:64484" connector-ref="axisConnector">
+                <inbound-endpoint address="axis:http://localhost:64484" connector-ref="axisConnector">
                     <wssecurity:security-filter decryptionFile="in-encrypted-security.properties"/>
-                </endpoint>
+                </inbound-endpoint>
             </inbound-router>
         </service>
     </model>

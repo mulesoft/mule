@@ -25,23 +25,20 @@
         </spring:constructor-arg>
     </spring:bean>
 
-    <stdio:connector name="SystemStreamConnector"
-                     promptMessage="Please enter an input message: "
+    <stdio:connector name="SystemStreamConnector" promptMessage="Please enter an input message: "
                      messageDelayTime="1000"/>
 
-    <http:connector name="HttpConnector"
-                    clientSoTimeout="10000"/>
+    <http:connector name="HttpConnector" clientSoTimeout="10000"/>
 
-    <axis:connector name="SecuredConnector"
-            serverConfig="mule-axis-secure-server-config.wsdd"
-            clientConfig="mule-axis-secure-client-config.wsdd"/>
+    <axis:connector name="SecuredConnector" serverConfig="mule-axis-secure-server-config.wsdd"
+                    clientConfig="mule-axis-secure-client-config.wsdd"/>
 
     <axis:connector name="UnsecuredConnector"/>
 
     <model name="_system">
         <service name="_axisServiceComponent">
             <component class="org.mule.providers.soap.axis.AxisServiceComponent"/>
-            <threading-profile maxBufferSize="100" threadTTL="600000" maxThreadsActive="30" maxThreadsIdle="20" />
+            <threading-profile maxBufferSize="100" threadTTL="600000" maxThreadsActive="30" maxThreadsIdle="20"/>
             <pooling-profile exhaustedAction="WHEN_EXHAUSTED_GROW" maxActive="20" maxIdle="20"/>
         </service>
     </model>
@@ -51,11 +48,13 @@
         <service name="SecureBridge">
             <bridge-component/>
             <inbound-router>
-                <endpoint address="vm://secured"/>
+                <inbound-endpoint address="vm://secured"/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <endpoint name="secured" address="axis:http://localhost:64070/services/SecuredWS?method=echo" connector-ref="SecuredConnector"/>
+                    <outbound-endpoint name="secured"
+                                       address="axis:http://localhost:64070/services/SecuredWS?method=echo"
+                                       connector-ref="SecuredConnector"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
@@ -63,11 +62,12 @@
         <service name="UnSecureBridge1">
             <bridge-component/>
             <inbound-router>
-                <endpoint address="vm://unsecured1"/>
+                <inbound-endpoint address="vm://unsecured1"/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <endpoint address="axis:http://localhost:64077/services/UnsecuredWS1?method=echo" connector-ref="UnsecuredConnector"/>
+                    <outbound-endpoint address="axis:http://localhost:64077/services/UnsecuredWS1?method=echo"
+                                       connector-ref="UnsecuredConnector"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
@@ -75,11 +75,12 @@
         <service name="UnSecureBridge2">
             <bridge-component/>
             <inbound-router>
-                <endpoint address="vm://unsecured2"/>
+                <inbound-endpoint address="vm://unsecured2"/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <endpoint address="axis:http://localhost:64078/services/UnsecuredWS2?method=echo" connector-ref="UnsecuredConnector"/>
+                    <outbound-endpoint address="axis:http://localhost:64078/services/UnsecuredWS2?method=echo"
+                                       connector-ref="UnsecuredConnector"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
@@ -87,13 +88,13 @@
         <service name="SecuredWS">
             <echo-component/>
             <inbound-router>
-                <endpoint address="axis:http://localhost:64070/services" connector-ref="SecuredConnector">
+                <inbound-endpoint address="axis:http://localhost:64070/services" connector-ref="SecuredConnector">
                     <wssecurity:security-filter decryptionFile="in-encrypted-security.properties"/>
-                </endpoint>
+                </inbound-endpoint>
             </inbound-router>
             <outbound-router>
                 <filtering-router>
-                    <endpoint address="stdio://System.out"/>
+                    <outbound-endpoint address="stdio://System.out"/>
                 </filtering-router>
             </outbound-router>
         </service>
@@ -101,11 +102,11 @@
         <service name="UnsecuredWS1">
             <echo-component/>
             <inbound-router>
-                <endpoint address="axis:http://localhost:64077/services" connector-ref="UnsecuredConnector"/>
+                <inbound-endpoint address="axis:http://localhost:64077/services" connector-ref="UnsecuredConnector"/>
             </inbound-router>
             <outbound-router>
                 <filtering-router>
-                    <endpoint address="stdio://System.out"/>
+                    <outbound-endpoint address="stdio://System.out"/>
                 </filtering-router>
             </outbound-router>
         </service>
@@ -113,11 +114,11 @@
         <service name="UnsecuredWS2">
             <echo-component/>
             <inbound-router>
-                <endpoint address="axis:http://localhost:64078/services" connector-ref="UnsecuredConnector"/>
+                <inbound-endpoint address="axis:http://localhost:64078/services" connector-ref="UnsecuredConnector"/>
             </inbound-router>
             <outbound-router>
                 <filtering-router>
-                    <endpoint address="stdio://System.out"/>
+                    <outbound-endpoint address="stdio://System.out"/>
                 </filtering-router>
             </outbound-router>
         </service>
@@ -125,5 +126,3 @@
     </model>
 
 </mule>
-
-

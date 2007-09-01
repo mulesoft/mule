@@ -21,7 +21,7 @@
             </component>
 
             <inbound-router>
-                <endpoint address="http://localhost:60211/mycomponent1" synchronous="true"/>
+                <inbound-endpoint address="http://localhost:60211/mycomponent1" synchronous="true"/>
             </inbound-router>
         </service>
 
@@ -33,7 +33,7 @@
             </component>
 
             <inbound-router>
-                <endpoint address="http://localhost:60211/mycomponent2" synchronous="true"/>
+                <inbound-endpoint address="http://localhost:60211/mycomponent2" synchronous="true"/>
             </inbound-router>
         </service>
 

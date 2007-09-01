@@ -10,27 +10,16 @@
        http://www.mulesource.org/schema/mule/pop3/2.0 http://www.mulesource.org/schema/mule/pop3/2.0/mule-pop3.xsd
        http://www.mulesource.org/schema/mule/pop3s/2.0 http://www.mulesource.org/schema/mule/pop3s/2.0/mule-pop3s.xsd">
 
-    <pop3:connector name="pop3Connector"
-                    backupEnabled="true"
-                    backupFolder="newBackup"
-                    checkFrequency="1234"
-                    mailboxFolder="newMailbox"
-                    deleteReadMessages="false"
-            />
+    <pop3:connector name="pop3Connector" backupEnabled="true" backupFolder="newBackup" checkFrequency="1234"
+                    mailboxFolder="newMailbox" deleteReadMessages="false"/>
 
     <!-- need too revisit this once tests are working - it's not clear to me what
          key store is being used in the tests -->
 
-    <pop3s:connector name="pop3sConnector"
-                     backupEnabled="true"
-                     backupFolder="newBackup"
-                     checkFrequency="1234"
-                     mailboxFolder="newMailbox"
-                     deleteReadMessages="false">
-        <pop3s:tls-client clientKeyStore="greenmail-truststore"
-                          clientKeyStorePassword="password"/>
-        <pop3s:tls-trust-store trustStore="greenmail-truststore"
-                               trustStorePassword="password"/>
+    <pop3s:connector name="pop3sConnector" backupEnabled="true" backupFolder="newBackup" checkFrequency="1234"
+                     mailboxFolder="newMailbox" deleteReadMessages="false">
+        <pop3s:tls-client clientKeyStore="greenmail-truststore" clientKeyStorePassword="password"/>
+        <pop3s:tls-trust-store trustStore="greenmail-truststore" trustStorePassword="password"/>
     </pop3s:connector>
 
 </mule>

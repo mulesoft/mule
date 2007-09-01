@@ -10,16 +10,9 @@
 
     <!-- keepSendSocketOpen is required for the Async test case?  see TCP -->
     <ssl:connector name="SslConnector" keepSendSocketOpen="true">
-        <ssl:ssl-client
-                clientKeyStore="clientKeyStore"
-                clientKeyStorePassword="mulepassword"/>
-        <ssl:ssl-key-store
-                keyStore="serverKeystore"
-                keyStorePassword="mulepassword"
-                keyPassword="mulepassword"/>
-        <ssl:ssl-server
-                trustStore="trustStore"
-                trustStorePassword="mulepassword"/>
+        <ssl:ssl-client clientKeyStore="clientKeyStore" clientKeyStorePassword="mulepassword"/>
+        <ssl:ssl-key-store keyStore="serverKeystore" keyStorePassword="mulepassword" keyPassword="mulepassword"/>
+        <ssl:ssl-server trustStore="trustStore" trustStorePassword="mulepassword"/>
     </ssl:connector>
 
     <model name="main" class="org.mule.tck.testmodels.mule.TestSedaModel">
@@ -27,13 +20,13 @@
         <service name="testComponent">
             <component scope="singleton" class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
-                <endpoint name="in" address="ssl://localhost:61655" synchronous="false"/>
+                <inbound-endpoint name="in" address="ssl://localhost:61655" synchronous="false"/>
             </inbound-router>
 
             <!-- This is just to avoid matching router warnings -->
             <outbound-router>
                 <outbound-pass-through-router>
-                    <endpoint name="test1" address="test://test"/>
+                    <outbound-endpoint name="test1" address="test://test"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>

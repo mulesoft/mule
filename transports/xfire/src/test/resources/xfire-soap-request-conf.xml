@@ -12,12 +12,12 @@
         Testing Xfire Soap Request
      -->
     <configuration serverId="" defaultSynchronousEndpoints="true"/>
-    
+
     <model name="XfireSoapRequest">
         <service name="TestComponent">
             <component class="org.mule.tck.testmodels.services.TestComponent"/>
             <inbound-router>
-                <endpoint address="xfire:http://localhost:63381/services"/>
+                <inbound-endpoint address="xfire:http://localhost:63381/services"/>
             </inbound-router>
         </service>
     </model>

@@ -12,18 +12,18 @@
         <service name="EchoService1">
             <component class="org.mule.components.simple.EchoComponent"/>
             <inbound-router>
-                <endpoint address="axis:http://localhost:62081/services">
+                <inbound-endpoint address="axis:http://localhost:62081/services">
                     <properties>
                         <spring:entry key="serviceNamespace" value="http://foo"/>
                     </properties>
-                </endpoint>
+                </inbound-endpoint>
             </inbound-router>
         </service>
 
         <service name="EchoService2">
             <component class="org.mule.components.simple.EchoComponent"/>
             <inbound-router>
-                <endpoint address="axis:http://localhost:62082/services">
+                <inbound-endpoint address="axis:http://localhost:62082/services">
                     <properties>
                         <spring:entry key="axisOptions">
                             <spring:map>
@@ -33,19 +33,19 @@
                             </spring:map>
                         </spring:entry>
                     </properties>
-                </endpoint>
+                </inbound-endpoint>
             </inbound-router>
-        </service>    
+        </service>
 
         <service name="EchoService3">
             <component class="org.mule.components.simple.EchoComponent"/>
             <inbound-router>
-                <endpoint address="axis:http://localhost:62083/services">
+                <inbound-endpoint address="axis:http://localhost:62083/services">
                     <properties>
                         <spring:entry key="wsdlFile" value="test-service.wsdl"/>
                     </properties>
-                </endpoint>
+                </inbound-endpoint>
             </inbound-router>
-        </service>    
+        </service>
     </model>
 </mule>

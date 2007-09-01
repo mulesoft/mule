@@ -24,17 +24,16 @@
     </spring:bean>
 
     <acegi:security-manager>
-        <acegi:delegate-security-provider name="memory-dao"
-                                          delegate-ref="daoAuthenticationProvider"/>
+        <acegi:delegate-security-provider name="memory-dao" delegate-ref="daoAuthenticationProvider"/>
     </acegi:security-manager>
 
     <model name="test">
         <service name="echo">
             <component class="org.mule.components.simple.EchoComponent"/>
             <inbound-router>
-                <endpoint address="http://localhost:4567">
+                <inbound-endpoint address="http://localhost:4567">
                     <acegi:http-security-filter realm="mule-realm"/>
-                </endpoint>
+                </inbound-endpoint>
             </inbound-router>
         </service>
     </model>

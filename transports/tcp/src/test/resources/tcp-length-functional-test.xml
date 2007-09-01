@@ -9,9 +9,7 @@
                http://www.mulesource.org/schema/mule/tcp/2.0 http://www.mulesource.org/schema/mule/tcp/2.0/mule-tcp.xsd">
 
     <!-- keepSendSocketOpen is required for the Async test case -->
-    <tcp:connector name="tcpConnector"
-                   keepSendSocketOpen="true"
-                   socketSoLinger="0"
+    <tcp:connector name="tcpConnector" keepSendSocketOpen="true" socketSoLinger="0"
                    tcpProtocolClassName="org.mule.providers.tcp.protocols.LengthProtocol"/>
 
     <endpoint name="clientEndpoint" address="tcp://localhost:60198" synchronous="true"/>
@@ -28,7 +26,7 @@
         <service name="testComponent1">
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
-                <endpoint ref="clientEndpoint"/>
+                <inbound-endpoint ref="clientEndpoint"/>
             </inbound-router>
         </service>
 
@@ -37,7 +35,7 @@
                 figure out how to set the eventCallback bean as a property within mule:properties -->
             <component scope="singleton" instance-ref="test2"/>
             <inbound-router>
-                <endpoint ref="asyncClientEndpoint"/>
+                <inbound-endpoint ref="asyncClientEndpoint"/>
             </inbound-router>
         </service>
     </model>

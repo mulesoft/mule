@@ -19,11 +19,12 @@
         <service name="bridge">
             <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
-                <endpoint ref="dispatch"/>
+                <inbound-endpoint ref="dispatch"/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <endpoint address="vm://responder" synchronous="false" remoteSync="true" connector-ref="default"/>
+                    <outbound-endpoint address="vm://responder" synchronous="false" remoteSync="true"
+                                       connector-ref="default"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
@@ -31,11 +32,10 @@
         <service name="responder">
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
-                <endpoint address="vm://responder" synchronous="false" connector-ref="default"/>
+                <inbound-endpoint address="vm://responder" synchronous="false" connector-ref="default"/>
             </inbound-router>
         </service>
 
     </model>
 
 </mule>
-        

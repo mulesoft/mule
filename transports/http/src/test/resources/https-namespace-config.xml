@@ -8,35 +8,15 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/https/2.0 http://www.mulesource.org/schema/mule/https/2.0/mule-https.xsd">
 
-    <https:connector name="httpsConnector"
-                     clientSoTimeout="1234"
-                     cookieSpec="netscape"
-                     proxyHostname="bcd"
-                     proxyPassword="cde"
-                     proxyPort="2345"
-                     proxyUsername="def"
-                     receiveBacklog="34"
-                     receiveBufferSize="4567"
-                     sendBufferSize="5678"
-                     socketSoLinger="6789"
-                     serverSoTimeout="7890"
-                     enableCookies="true"
-                     keepAlive="true"
-                     keepSendSocketOpen="true"
-                     sendTcpNoDelay="true"
+    <https:connector name="httpsConnector" clientSoTimeout="1234" cookieSpec="netscape" proxyHostname="bcd"
+                     proxyPassword="cde" proxyPort="2345" proxyUsername="def" receiveBacklog="34"
+                     receiveBufferSize="4567" sendBufferSize="5678" socketSoLinger="6789" serverSoTimeout="7890"
+                     enableCookies="true" keepAlive="true" keepSendSocketOpen="true" sendTcpNoDelay="true"
                      validateConnections="false">
-        <https:tls-client
-                clientKeyStore="clientKeystore"
-                clientKeyStorePassword="mulepassword"/>
-        <https:tls-key-store
-                keyPassword="mulepassword"
-                keyStore="serverKeystore"
-                keyStorePassword="mulepassword"/>
-        <https:tls-server
-                trustStore="trustStore"
-                trustStorePassword="mulepassword"
-                explicitTrustStoreOnly="true"
-                requireClientAuthentication="true"/>
+        <https:tls-client clientKeyStore="clientKeystore" clientKeyStorePassword="mulepassword"/>
+        <https:tls-key-store keyPassword="mulepassword" keyStore="serverKeystore" keyStorePassword="mulepassword"/>
+        <https:tls-server trustStore="trustStore" trustStorePassword="mulepassword" explicitTrustStoreOnly="true"
+                          requireClientAuthentication="true"/>
         <https:tls-protocol-handler protocolHandler="foo"/>
     </https:connector>
 

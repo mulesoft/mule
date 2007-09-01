@@ -37,11 +37,12 @@
         <service name="SecureBridge">
             <bridge-component/>
             <inbound-router>
-                <endpoint address="vm://secured"/>
+                <inbound-endpoint address="vm://secured"/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <endpoint name="secured" address="xfire:http://localhost:64282/SecuredWs?method=echo" connector-ref="SecuredConnector"/>
+                    <outbound-endpoint name="secured" address="xfire:http://localhost:64282/SecuredWs?method=echo"
+                                       connector-ref="SecuredConnector"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
@@ -49,22 +50,22 @@
         <service name="SecuredWS">
             <echo-component/>
             <inbound-router>
-                <endpoint address="xfire:http://localhost:64282" connector-ref="SecuredConnector">
-                    <wssecurity:security-filter
-                            decryptionFile="in-encrypted-security.properties"
-                            signatureFile="in-signed-security.properties"/>
-                </endpoint>
+                <inbound-endpoint address="xfire:http://localhost:64282" connector-ref="SecuredConnector">
+                    <wssecurity:security-filter decryptionFile="in-encrypted-security.properties"
+                                                signatureFile="in-signed-security.properties"/>
+                </inbound-endpoint>
             </inbound-router>
         </service>
 
         <service name="UnSecureBridge">
             <bridge-component/>
             <inbound-router>
-                <endpoint address="vm://unsecured"/>
+                <inbound-endpoint address="vm://unsecured"/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <endpoint address="xfire:http://localhost:64284/UnSecuredWs?method=echo" connector-ref="UnsecuredConnector"/>
+                    <outbound-endpoint address="xfire:http://localhost:64284/UnSecuredWs?method=echo"
+                                       connector-ref="UnsecuredConnector"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
@@ -72,7 +73,7 @@
         <service name="UnsecuredWS">
             <echo-component/>
             <inbound-router>
-                <endpoint address="xfire:http://localhost:64284" connector-ref="UnsecuredConnector"/>
+                <inbound-endpoint address="xfire:http://localhost:64284" connector-ref="UnsecuredConnector"/>
             </inbound-router>
         </service>
 

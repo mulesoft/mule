@@ -16,14 +16,14 @@
         <service name="mycomponent">
             <component class="org.mule.tck.testmodels.services.TestComponent"/>
             <inbound-router>
-                <endpoint address="xfire:servlet://mycomponent"/>
+                <inbound-endpoint address="xfire:servlet://mycomponent"/>
             </inbound-router>
         </service>
 
         <service name="xfireService">
             <component class="org.mule.tck.testmodels.services.TestComponent"/>
             <inbound-router>
-                <endpoint address="xfire:http://localhost:82"/>
+                <inbound-endpoint address="xfire:http://localhost:82"/>
             </inbound-router>
         </service>
     </model>

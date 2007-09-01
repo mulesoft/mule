@@ -14,18 +14,18 @@
         <service name="fromSimpleProcess">
             <component class="org.mule.components.simple.LogComponent"/>
             <inbound-router>
-                <endpoint address="bpm://simple" />
+                <inbound-endpoint address="bpm://simple"/>
             </inbound-router>
         </service>
 
         <service name="fromMessageProcess">
             <component class="org.mule.components.simple.LogComponent"/>
             <inbound-router>
-                <endpoint address="bpm://message" />
+                <inbound-endpoint address="bpm://message"/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <endpoint address="vm://echo"/>
+                    <outbound-endpoint address="vm://echo"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
@@ -33,19 +33,19 @@
         <service name="echoService">
             <component class="org.mule.components.simple.EchoComponent"/>
             <inbound-router>
-                <endpoint address="vm://echo" />
+                <inbound-endpoint address="vm://echo"/>
             </inbound-router>
         </service>
     </model>
-    
+
     <!-- ***************************************************
-         BPMS Configuration
-         *************************************************** -->
-         
+   BPMS Configuration
+   *************************************************** -->
+
     <!-- BPMS object for Mule's BPM Connector -->
     <spring:bean id="jbpm" class="org.mule.providers.bpm.jbpm.Jbpm" destroy-method="destroy">
         <spring:property name="jbpmConfiguration">
-            <spring:ref local="jbpmConfig" />
+            <spring:ref local="jbpmConfig"/>
         </spring:property>
     </spring:bean>
 
@@ -57,19 +57,21 @@
         <spring:property name="configuration">
             <spring:value>jbpm.cfg.xml</spring:value>
         </spring:property>
-        <spring:property name="createSchema"><spring:value>false</spring:value></spring:property>
+        <spring:property name="createSchema">
+            <spring:value>false</spring:value>
+        </spring:property>
     </spring:bean>
 
     <!-- JBPM Hibernate SessionFactory -->
     <spring:bean id="jbpmSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
         <spring:property name="dataSource">
-            <spring:ref local="jbpmDataSource" />
+            <spring:ref local="jbpmDataSource"/>
         </spring:property>
         <spring:property name="mappingLocations">
             <spring:value>classpath*:/org/jbpm/**/*.hbm.xml</spring:value>
         </spring:property>
         <spring:property name="typeDefinitions">
-            <spring:ref local="jbpmTypes" />
+            <spring:ref local="jbpmTypes"/>
         </spring:property>
         <spring:property name="hibernateProperties">
             <spring:props>
@@ -82,7 +84,8 @@
                 <!-- EhCache is no longer the default cache provider as of Hibernate 3.2 
                   Refer to http://www.hibernate.org/hib_docs/v3/reference/en/html/performance.html
                   for Hibernate's different cache providers. -->
-                <spring:prop key="hibernate.cache.provider_class">org.hibernate.cache.HashtableCacheProvider</spring:prop>
+                <spring:prop key="hibernate.cache.provider_class">org.hibernate.cache.HashtableCacheProvider
+                </spring:prop>
                 <!-- C3P0 (connection pooling) properties -->
                 <spring:prop key="hibernate.c3p0.min_size">1</spring:prop>
                 <spring:prop key="hibernate.c3p0.max_size">3</spring:prop>
@@ -94,16 +97,28 @@
 
     <!-- JBPM Datasource -->
     <spring:bean id="jbpmDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-        <spring:property name="driverClassName"><spring:value>org.hsqldb.jdbcDriver</spring:value></spring:property>
-        <spring:property name="url"><spring:value>jdbc:hsqldb:mem:.;sql.enforce_strict_size=true</spring:value></spring:property>
-        <spring:property name="username"><spring:value>sa</spring:value></spring:property>
-        <spring:property name="password"><spring:value></spring:value></spring:property>
+        <spring:property name="driverClassName">
+            <spring:value>org.hsqldb.jdbcDriver</spring:value>
+        </spring:property>
+        <spring:property name="url">
+            <spring:value>jdbc:hsqldb:mem:.;sql.enforce_strict_size=true</spring:value>
+        </spring:property>
+        <spring:property name="username">
+            <spring:value>sa</spring:value>
+        </spring:property>
+        <spring:property name="password">
+            <spring:value/>
+        </spring:property>
     </spring:bean>
 
     <!-- JBPM data types -->
     <spring:bean id="jbpmTypes" class="org.springframework.orm.hibernate3.TypeDefinitionBean">
-        <spring:property name="typeName"><spring:value>string_max</spring:value></spring:property>
-        <spring:property name="typeClass"><spring:value>org.jbpm.db.hibernate.StringMax</spring:value></spring:property>
+        <spring:property name="typeName">
+            <spring:value>string_max</spring:value>
+        </spring:property>
+        <spring:property name="typeClass">
+            <spring:value>org.jbpm.db.hibernate.StringMax</spring:value>
+        </spring:property>
     </spring:bean>
-    
+
 </mule>

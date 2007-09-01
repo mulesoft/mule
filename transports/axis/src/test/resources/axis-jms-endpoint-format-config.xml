@@ -9,15 +9,15 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/axis/2.0/mule-axis.xsd
        http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
-       
+
     <environment-properties>
         <spring:entry key="synchronous" value="true"/>
         <spring:entry key="remoteSync" value="true"/>
     </environment-properties>
 
-    <jms:activemq-connector name="jmsConnector" />
+    <jms:activemq-connector name="jmsConnector"/>
     <!-- this is needed also, but does not work now -->
-<!--                            brokerUrl="vm://localhost?broker.persistence=true"/> -->
+    <!--                            brokerUrl="vm://localhost?broker.persistence=true"/> -->
 
     <endpoint name="soapActionDefined" address="axis:jms://soap.my.queue?method=echo&amp;MULE_REMOTE_SYNC=true">
         <properties>
@@ -32,16 +32,16 @@
         <service name="echoComponent">
             <component class="org.mule.components.simple.EchoComponent"/>
             <inbound-router>
-                <endpoint address="axis:jms://soap.my.queue"/>
+                <inbound-endpoint address="axis:jms://soap.my.queue"/>
             </inbound-router>
         </service>
 
         <service name="myComponent">
             <component class="org.mule.components.simple.EchoComponent"/>
             <inbound-router>
-                <endpoint address="axis:jms://myComponent"/>
+                <inbound-endpoint address="axis:jms://myComponent"/>
             </inbound-router>
         </service>
     </model>
-    
+
 </mule>

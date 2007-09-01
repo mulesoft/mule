@@ -24,11 +24,12 @@
         <service name="xml to ...">
             <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
-                <endpoint ref="xml-in"/>
+                <inbound-endpoint ref="xml-in"/>
             </inbound-router>
             <outbound-router>
                 <multicasting-router>
-                    <endpoint name="xml-object-out" address="vm://xml-object-out" connector-ref="queue" transformers="xmlToObject"/>
+                    <outbound-endpoint name="xml-object-out" address="vm://xml-object-out" connector-ref="queue"
+                                       transformers="xmlToObject"/>
                 </multicasting-router>
             </outbound-router>
         </service>
@@ -36,13 +37,14 @@
         <service name="object to xml">
             <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
-                <endpoint ref="object-in"/>
+                <inbound-endpoint ref="object-in"/>
             </inbound-router>
             <outbound-router>
                 <multicasting-router>
-                    <endpoint name="object-out" address="vm://object-out" connector-ref="queue"/>
-                    <endpoint name="object-xml-out" address="vm://object-xml-out" connector-ref="queue" transformers="objectToXml"/>
-                    <endpoint ref="xml-in" transformers="objectToXml"/>
+                    <outbound-endpoint name="object-out" address="vm://object-out" connector-ref="queue"/>
+                    <outbound-endpoint name="object-xml-out" address="vm://object-xml-out" connector-ref="queue"
+                                       transformers="objectToXml"/>
+                    <outbound-endpoint ref="xml-in" transformers="objectToXml"/>
                 </multicasting-router>
             </outbound-router>
         </service>

@@ -15,19 +15,18 @@
     <tcp:connector name="tcpConnector"
                    tcpProtocolClassName="org.mule.providers.tcp.integration.CustomSerializationProtocol"/>
 
-    <custom-transformer name="NoAction"
-                             class="org.mule.transformers.NoActionTransformer"/>
+    <custom-transformer name="NoAction" class="org.mule.transformers.NoActionTransformer"/>
 
     <model name="model">
 
         <service name="BridgeIn">
             <component class="org.mule.components.simple.PassThroughComponent"/>
             <inbound-router>
-                <endpoint address="vm://in"/>
+                <inbound-endpoint address="vm://in"/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <endpoint address="tcp://localhost:9994" transformers="NoAction"/>
+                    <outbound-endpoint address="tcp://localhost:9994" transformers="NoAction"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
@@ -35,11 +34,11 @@
         <service name="BridgeOut">
             <bridge-component/>
             <inbound-router>
-                <endpoint address="tcp://localhost:9994" transformers="NoAction"/>
+                <inbound-endpoint address="tcp://localhost:9994" transformers="NoAction"/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <endpoint address="vm://out"/>
+                    <outbound-endpoint address="vm://out"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>

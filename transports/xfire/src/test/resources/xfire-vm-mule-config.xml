@@ -9,40 +9,40 @@
        http://www.mulesource.org/schema/mule/xfire/2.0 http://www.mulesource.org/schema/mule/xfire/2.0/mule-xfire.xsd">
 
     <configuration serverId="" defaultSynchronousEndpoints="true"/>
-        
+
     <model name="test">
         <service name="mycomponent">
             <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             <inbound-router>
-                <endpoint address="xfire:vm://mycomponent"/>
+                <inbound-endpoint address="xfire:vm://mycomponent"/>
             </inbound-router>
         </service>
 
         <service name="mycomponent2">
             <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             <inbound-router>
-                <endpoint address="xfire:vm://mycomponent2">
+                <inbound-endpoint address="xfire:vm://mycomponent2">
                     <spring:property name="serviceInterfaces">
                         <spring:list>
                             <spring:value>org.mule.components.simple.EchoService</spring:value>
                             <spring:value>org.mule.tck.testmodels.services.DateService</spring:value>
                         </spring:list>
                     </spring:property>
-                </endpoint>
+                </inbound-endpoint>
             </inbound-router>
         </service>
 
         <service name="mycomponent3">
             <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             <inbound-router>
-                <endpoint address="xfire:vm://mycomponent3"/>
+                <inbound-endpoint address="xfire:vm://mycomponent3"/>
             </inbound-router>
         </service>
 
         <service name="mycomponent4">
             <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             <inbound-router>
-                <endpoint address="xfire:vm://mycomponent4" synchronous="false"/>
+                <inbound-endpoint address="xfire:vm://mycomponent4" synchronous="false"/>
             </inbound-router>
         </service>
     </model>

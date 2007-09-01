@@ -14,14 +14,14 @@
         <service name="mycomponent">
             <component factory-ref="tscFactory"/>
             <inbound-router>
-                <endpoint address="axis:vm://mycomponent"/>
+                <inbound-endpoint address="axis:vm://mycomponent"/>
             </inbound-router>
         </service>
-        
+
         <service name="mycomponent2">
             <component factory-ref="tscFactory"/>
             <inbound-router>
-                <endpoint address="axis:vm://mycomponent2">
+                <inbound-endpoint address="axis:vm://mycomponent2">
                     <properties>
                         <spring:entry key="serviceInterfaces">
                             <spring:list>
@@ -30,21 +30,21 @@
                             </spring:list>
                         </spring:entry>
                     </properties>
-                </endpoint>
+                </inbound-endpoint>
             </inbound-router>
         </service>
-        
+
         <service name="mycomponent3">
             <component factory-ref="tscFactory"/>
             <inbound-router>
-                <endpoint address="axis:vm://mycomponent3"/>
+                <inbound-endpoint address="axis:vm://mycomponent3"/>
             </inbound-router>
         </service>
-        
+
         <service name="mycomponent4">
             <component factory-ref="tscFactory"/>
             <inbound-router>
-                <endpoint address="axis:vm://mycomponent4" synchronous="true"/>
+                <inbound-endpoint address="axis:vm://mycomponent4" synchronous="true"/>
             </inbound-router>
         </service>
     </model>

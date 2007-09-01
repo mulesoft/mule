@@ -14,23 +14,23 @@
             <component class="org.mule.components.simple.EchoComponent"/>
 
             <inbound-router>
-                <endpoint address="http://localhost:60201" synchronous="true">
+                <inbound-endpoint address="http://localhost:60201" synchronous="true">
                     <not-filter>
                         <wildcard-filter pattern="*xyz*"/>
                     </not-filter>
-                </endpoint>
+                </inbound-endpoint>
             </inbound-router>
         </service>
 
         <service name="reference">
             <component class="org.mule.components.simple.EchoComponent"/>
-            
+
             <inbound-router>
-                <endpoint address="http://localhost:60199" synchronous="true">
-                </endpoint>
+                <inbound-endpoint address="http://localhost:60199" synchronous="true">
+                </inbound-endpoint>
             </inbound-router>
         </service>
 
-   </model>
+    </model>
 
 </mule>

@@ -12,14 +12,14 @@
         Testing XFire http headers
      -->
     <configuration serverId="" defaultSynchronousEndpoints="true"/>
-        
+
     <model name="TestXfireHeaders">
         <service name="TestComponent">
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
-                <endpoint address="xfire:http://localhost:63181/services"/>
+                <inbound-endpoint address="xfire:http://localhost:63181/services"/>
             </inbound-router>
         </service>
     </model>
-    
+
 </mule>

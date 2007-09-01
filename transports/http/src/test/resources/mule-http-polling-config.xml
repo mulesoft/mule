@@ -21,25 +21,25 @@
     <model name="http polling test model">
 
         <service name="pollingUMO">
-            <component class="org.mule.tck.functional.FunctionalTestComponent" />
+            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
-                <endpoint address="http://marie:marie@localhost:60205" connector-ref="PollingHttpConnector">
+                <inbound-endpoint address="http://marie:marie@localhost:60205" connector-ref="PollingHttpConnector">
                     <properties>
                         <spring:entry key="pollingFrequency" value="30000"/>
                     </properties>
-                </endpoint>
+                </inbound-endpoint>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <endpoint address="vm://toclient"/>
+                    <outbound-endpoint address="vm://toclient"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
 
         <service name="polledUMO">
-            <component class="org.mule.tck.functional.FunctionalTestComponent" />
+            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
-                <endpoint address="http://localhost:60205" connector-ref="HttpConnector"/>
+                <inbound-endpoint address="http://localhost:60205" connector-ref="HttpConnector"/>
             </inbound-router>
         </service>
 

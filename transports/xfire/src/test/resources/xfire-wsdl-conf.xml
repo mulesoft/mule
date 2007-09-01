@@ -10,22 +10,22 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/servlet/2.0 http://www.mulesource.org/schema/mule/servlet/2.0/mule-servlet.xsd
        http://www.mulesource.org/schema/mule/xfire/2.0 http://www.mulesource.org/schema/mule/xfire/2.0/mule-xfire.xsd">
-    
+
     <servlet:connector name="servlet" servletUrl="http://localhost:63088/services"/>
 
     <model name="test">
         <service name="mycomponent">
             <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             <inbound-router>
-                <endpoint address="xfire:servlet://mycomponent"/>
+                <inbound-endpoint address="xfire:servlet://mycomponent"/>
             </inbound-router>
-        </service>    
+        </service>
 
         <service name="xfireService">
             <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             <inbound-router>
-                <endpoint address="xfire:http://localhost:63082"/>
+                <inbound-endpoint address="xfire:http://localhost:63082"/>
             </inbound-router>
-        </service>    
+        </service>
     </model>
 </mule>

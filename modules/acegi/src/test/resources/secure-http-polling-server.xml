@@ -19,8 +19,7 @@
     </spring:bean>
 
     <acegi:security-manager>
-        <acegi:delegate-security-provider name="memory-dao"
-                                          delegate-ref="daoAuthenticationProvider"/>
+        <acegi:delegate-security-provider name="memory-dao" delegate-ref="daoAuthenticationProvider"/>
     </acegi:security-manager>
 
     <http:connector name="HttpConnector"/>
@@ -29,9 +28,9 @@
         <service name="SecureUMO">
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
-                <endpoint address="http://localhost:4567" connector-ref="HttpConnector">
+                <inbound-endpoint address="http://localhost:4567" connector-ref="HttpConnector">
                     <acegi:http-security-filter realm="mule-realm"/>
-                </endpoint>
+                </inbound-endpoint>
             </inbound-router>
         </service>
     </model>

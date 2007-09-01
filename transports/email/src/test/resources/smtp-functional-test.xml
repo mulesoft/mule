@@ -15,15 +15,15 @@
         <service name="relay">
             <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
-                <endpoint address="vm://send"/>
+                <inbound-endpoint address="vm://send"/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <endpoint address="smtp://localhost:65437">
+                    <outbound-endpoint address="smtp://localhost:65437">
                         <properties>
                             <spring:entry key="toAddresses" value="bob@example.com"/>
                         </properties>
-                     </endpoint>
+                    </outbound-endpoint>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>

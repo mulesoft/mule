@@ -9,12 +9,8 @@
        http://www.mulesource.org/schema/mule/smtps/2.0 http://www.mulesource.org/schema/mule/smtps/2.0/mule-smtps.xsd">
 
     <smtps:connector name="smtpsConnector">
-        <smtps:tls-client
-                clientKeyStore="clientKeystore"
-                clientKeyStorePassword="mulepassword"/>
-        <smtps:tls-trust-store
-                trustStore="greenmail-truststore"
-                trustStorePassword="password"/>
+        <smtps:tls-client clientKeyStore="clientKeystore" clientKeyStorePassword="mulepassword"/>
+        <smtps:tls-trust-store trustStore="greenmail-truststore" trustStorePassword="password"/>
     </smtps:connector>
 
     <model name="test">
@@ -22,15 +18,15 @@
         <service name="relay">
             <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
-                <endpoint address="vm://send"/>
+                <inbound-endpoint address="vm://send"/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <endpoint address="smtps://localhost:65439">
+                    <outbound-endpoint address="smtps://localhost:65439">
                         <properties>
                             <spring:entry key="toAddresses" value="bob@example.com"/>
                         </properties>
-                    </endpoint>
+                    </outbound-endpoint>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>

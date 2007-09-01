@@ -7,31 +7,29 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/xfire/2.0 http://www.mulesource.org/schema/mule/xfire/2.0/mule-xfire.xsd">
-    
+
     <xfire:connector name="XFireConnector1"/>
     <xfire:connector name="XFireConnector2"/>
-    
-    <endpoint name="xfire1" 
-        address="xfire:http://localhost:61081/services/TestComponent1?method=receive"
-        connector-ref="XFireConnector1"/>
 
-    <endpoint name="xfire2" 
-        address="xfire:http://localhost:61082/services/TestComponent2?method=receive" 
-        connector-ref="XFireConnector2"/>
+    <endpoint name="xfire1" address="xfire:http://localhost:61081/services/TestComponent1?method=receive"
+              connector-ref="XFireConnector1"/>
+
+    <endpoint name="xfire2" address="xfire:http://localhost:61082/services/TestComponent2?method=receive"
+              connector-ref="XFireConnector2"/>
 
     <model name="TestXfireConnectors">
         <!-- Two separate components are created instead of 1 with 2 endpoints so that exceptions are not compomised -->
         <service name="TestComponent1">
             <component class="org.mule.tck.testmodels.services.TestComponent"/>
             <inbound-router>
-                <endpoint address="xfire:http://localhost:61081/services" connector-ref="XFireConnector1"/>
+                <inbound-endpoint address="xfire:http://localhost:61081/services" connector-ref="XFireConnector1"/>
             </inbound-router>
         </service>
 
         <service name="TestComponent2">
             <component class="org.mule.tck.testmodels.services.TestComponent"/>
             <inbound-router>
-                <endpoint address="xfire:http://localhost:61082/services" connector-ref="XFireConnector2"/>
+                <inbound-endpoint address="xfire:http://localhost:61082/services" connector-ref="XFireConnector2"/>
             </inbound-router>
         </service>
     </model>

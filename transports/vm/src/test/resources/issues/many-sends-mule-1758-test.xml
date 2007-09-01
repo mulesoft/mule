@@ -21,9 +21,8 @@
             </component>
 
             <inbound-router>
-                <endpoint address="vm://s-in" synchronous="true"/>
+                <inbound-endpoint address="vm://s-in" synchronous="true"/>
             </inbound-router>
         </service>
     </model>
 </mule>
-        

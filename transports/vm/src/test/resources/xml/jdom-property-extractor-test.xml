@@ -20,27 +20,27 @@
         <service name="test">
             <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
-                <endpoint ref="in"/>
+                <inbound-endpoint ref="in"/>
             </inbound-router>
             <outbound-router>
                 <exception-based-router>
-                    <endpoint address="vm://unreliable" connector-ref="default"/>
-                    <endpoint address="vm://error" connector-ref="queue"/>
+                    <outbound-endpoint address="vm://unreliable" connector-ref="default"/>
+                    <outbound-endpoint address="vm://error" connector-ref="queue"/>
                 </exception-based-router>
-           </outbound-router>
+            </outbound-router>
         </service>
 
         <service name="unreliable">
             <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
-                <endpoint address="vm://unreliable" connector-ref="default"/>
+                <inbound-endpoint address="vm://unreliable" connector-ref="default"/>
             </inbound-router>
             <outbound-router>
                 <endpoint-selector-router selectorProperty="/endpoint" extractorEnabled="true">
-                     <endpoint name="name" address="vm://match" connector-ref="queue"/>
-                     <mxml:jdom-property-extractor/>
+                    <outbound-endpoint name="name" address="vm://match" connector-ref="queue"/>
+                    <mxml:jdom-property-extractor/>
                 </endpoint-selector-router>
-           </outbound-router>
+            </outbound-router>
         </service>
 
     </model>

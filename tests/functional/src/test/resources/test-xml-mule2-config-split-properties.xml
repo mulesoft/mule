@@ -15,7 +15,7 @@
             <mule:service name="testPropertiesComponent">
                 <mule:component scope="singleton" instance-ref="prop-test-ref"/>
                 <mule:inbound-router>
-                    <mule:endpoint address="test://blah?transformers=TestCompressionTransformer&amp;responseTransformers=TestCompressionTransformer"/>
+                    <mule:inbound-endpoint address="test://blah?transformers=TestCompressionTransformer&amp;responseTransformers=TestCompressionTransformer"/>
                 </mule:inbound-router>
             </mule:service>
 
@@ -29,7 +29,7 @@
     </bean>
 
     <bean name="factory-test" class="org.mule.tck.testmodels.mule.TestDependentObject"/>
-        
+
     <bean name="factoryObject" factory-bean="factory-test" factory-method="create">
         <constructor-arg>
             <map>
@@ -58,7 +58,7 @@
             </map>
         </constructor-arg>
     </bean>
-    
+
 </beans>
 
 

@@ -9,27 +9,27 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/axis/2.0/mule-axis.xsd
        http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
-       
-    <jms:activemq-connector name="jmsConnector" />
+
+    <jms:activemq-connector name="jmsConnector"/>
     <!-- this is needed also, but does not work now -->
-<!--                            brokerUrl="vm://localhost?broker.persistence=true"/> -->
-    
+    <!--                            brokerUrl="vm://localhost?broker.persistence=true"/> -->
+
     <model name="test">
         <service name="mycomponent">
             <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             <inbound-router>
-                <endpoint address="axis:jms://mycomponent">
+                <inbound-endpoint address="axis:jms://mycomponent">
                     <properties>
                         <spring:entry key="topic" value="true"/>
                     </properties>
-                </endpoint>
+                </inbound-endpoint>
             </inbound-router>
         </service>
 
         <service name="mycomponent2">
             <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             <inbound-router>
-                <endpoint address="axis:jms://mycomponent2">
+                <inbound-endpoint address="axis:jms://mycomponent2">
                     <properties>
                         <spring:entry key="topic" value="true"/>
                         <spring:entry key="serviceInterfaces">
@@ -39,29 +39,29 @@
                             </spring:list>
                         </spring:entry>
                     </properties>
-                </endpoint>
+                </inbound-endpoint>
             </inbound-router>
         </service>
 
         <service name="mycomponent3">
             <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             <inbound-router>
-                <endpoint address="axis:jms://mycomponent3">
+                <inbound-endpoint address="axis:jms://mycomponent3">
                     <properties>
                         <spring:entry key="topic" value="true"/>
                     </properties>
-                </endpoint>
+                </inbound-endpoint>
             </inbound-router>
         </service>
 
         <service name="mycomponent4">
             <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             <inbound-router>
-                <endpoint address="axis:jms://mycomponent4" synchronous="false">
+                <inbound-endpoint address="axis:jms://mycomponent4" synchronous="false">
                     <properties>
                         <spring:entry key="topic" value="true"/>
                     </properties>
-                </endpoint>
+                </inbound-endpoint>
             </inbound-router>
         </service>
     </model>

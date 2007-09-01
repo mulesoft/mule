@@ -12,13 +12,13 @@
         <service name="component1">
             <component class="org.mule.tck.functional.FunctionalTestComponent" scope="singleton"/>
             <inbound-router>
-                <endpoint address="jms://component1In">
+                <inbound-endpoint address="jms://component1In">
                     <transaction action="NONE"/>
-                </endpoint>
+                </inbound-endpoint>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <endpoint address="jms://component1Out"/>
+                    <outbound-endpoint address="jms://component1Out"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
@@ -26,17 +26,17 @@
         <service name="component2">
             <component class="org.mule.tck.functional.FunctionalTestComponent" scope="singleton"/>
             <inbound-router>
-                <endpoint address="jms://component2In">
+                <inbound-endpoint address="jms://component2In">
                     <transaction action="ALWAYS_BEGIN">
-                        <transaction-factory scope="singleton" instance-ref="txFactory" />
+                        <transaction-factory scope="singleton" instance-ref="txFactory"/>
                     </transaction>
-                </endpoint>
+                </inbound-endpoint>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <endpoint address="jms://component2Out">
-                        <transaction action="ALWAYS_JOIN" />
-                    </endpoint>
+                    <outbound-endpoint address="jms://component2Out">
+                        <transaction action="ALWAYS_JOIN"/>
+                    </outbound-endpoint>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
@@ -44,23 +44,23 @@
         <service name="component3">
             <component class="org.mule.tck.functional.FunctionalTestComponent" scope="singleton"/>
             <inbound-router>
-                <endpoint address="jms://component3In">
+                <inbound-endpoint address="jms://component3In">
                     <transaction action="NONE">
-                        <transaction-factory scope="singleton" instance-ref="txFactory" />
+                        <transaction-factory scope="singleton" instance-ref="txFactory"/>
                     </transaction>
-                </endpoint>
+                </inbound-endpoint>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <endpoint address="jms://component3Out">
-                        <transaction action="ALWAYS_JOIN" />
-                    </endpoint>
+                    <outbound-endpoint address="jms://component3Out">
+                        <transaction action="ALWAYS_JOIN"/>
+                    </outbound-endpoint>
                 </outbound-pass-through-router>
             </outbound-router>
             <default-connector-exception-strategy>
-                <endpoint address="jms://dead.letter">
-                    <transaction action="ALWAYS_JOIN" />
-                </endpoint>
+                <outbound-endpoint address="jms://dead.letter">
+                    <transaction action="ALWAYS_JOIN"/>
+                </outbound-endpoint>
             </default-connector-exception-strategy>
         </service>
     </model>

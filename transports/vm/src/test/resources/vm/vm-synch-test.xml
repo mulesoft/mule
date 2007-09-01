@@ -13,11 +13,11 @@
         <service name="bridge">
             <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
-                <endpoint address="vm://bridge" synchronous="true"/>
+                <inbound-endpoint address="vm://bridge" synchronous="true"/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <endpoint address="vm://responder" synchronous="true"/>
+                    <outbound-endpoint address="vm://responder" synchronous="true"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
@@ -25,11 +25,10 @@
         <service name="responder">
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
-                <endpoint address="vm://responder" synchronous="true"/>
+                <inbound-endpoint address="vm://responder" synchronous="true"/>
             </inbound-router>
         </service>
 
     </model>
 
 </mule>
-        

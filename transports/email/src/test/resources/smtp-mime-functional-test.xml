@@ -9,9 +9,8 @@
        http://www.mulesource.org/schema/mule/smtp/2.0 http://www.mulesource.org/schema/mule/smtp/2.0/mule-smtp.xsd">
 
     <smtp:connector name="smtpConnector">
-        <service-overrides
-                messageAdapter="org.mule.providers.email.SimpleMailMessageAdapter"
-                outboundTransformer="org.mule.transformers.NoActionTransformer"/>
+        <service-overrides messageAdapter="org.mule.providers.email.SimpleMailMessageAdapter"
+                           outboundTransformer="org.mule.transformers.NoActionTransformer"/>
     </smtp:connector>
 
     <model name="test">
@@ -19,11 +18,11 @@
         <service name="relay">
             <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
-                <endpoint address="vm://send"/>
+                <inbound-endpoint address="vm://send"/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <endpoint address="smtp://localhost:65438"/>
+                    <outbound-endpoint address="smtp://localhost:65438"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>

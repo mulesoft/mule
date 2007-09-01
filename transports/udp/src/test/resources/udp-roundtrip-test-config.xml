@@ -29,16 +29,15 @@
             <inbound-router>
                 <!-- MULE-2109 -->
                 <!-- mule:endpoint address="udp://${hostname}:9001"/ -->
-                <endpoint address="udp://${hostname}:61000"/>
+                <inbound-endpoint address="udp://${hostname}:61000"/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
                     <!-- mule:endpoint address="udp://${hostname}:9002"/ -->
-                    <endpoint address="udp://${hostname}:61001"/>
+                    <outbound-endpoint address="udp://${hostname}:61001"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
 
     </model>
 </mule>
-        

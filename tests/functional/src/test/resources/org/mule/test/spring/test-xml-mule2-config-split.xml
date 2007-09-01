@@ -18,9 +18,9 @@
             <component class="org.mule.tck.testmodels.fruit.Apple"/>
 
             <inbound-router>
-                <endpoint name="nonTransactedInboundEndpoint" address="test://endpoint.in3"/>
-                <endpoint name="transactedInboundEndpoint" createConnector="NEVER_CREATE"
-                               address="test://endpoint.in2">
+                <inbound-endpoint name="nonTransactedInboundEndpoint" address="test://endpoint.in3"/>
+                <inbound-endpoint name="transactedInboundEndpoint" createConnector="NEVER_CREATE"
+                                  address="test://endpoint.in2">
                     <!-- Transactions not quite working yet  
                     <transaction action="ALWAYS_BEGIN">
                         <transaction-factory class="org.mule.tck.testmodels.mule.TestTransactionFactory"/>
@@ -29,12 +29,12 @@
                     <properties>
                         <spring:entry key="testEndpointProperty" value="Prop1"/>
                     </properties>
-                </endpoint>
+                </inbound-endpoint>
             </inbound-router>
 
             <outbound-router>
                 <filtering-router>
-                    <endpoint name="transactedOutboundEndpoint" address="test://endpoint.out"/>
+                    <outbound-endpoint name="transactedOutboundEndpoint" address="test://endpoint.out"/>
                 </filtering-router>
             </outbound-router>
 

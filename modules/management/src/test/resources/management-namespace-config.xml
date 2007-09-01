@@ -14,19 +14,19 @@
             <spring:entry key="c" value="c"/>
         </management:credentials>
     </management:jmx-server>
-    
+
     <management:jmx-log4j name="jmx-log4j"/>
-    
-    <management:jmx-mx4j-adaptor name="jmx-mx4j" jmxAdaptorUrl="http://127.0.0.1:8000" />
-    
+
+    <management:jmx-mx4j-adaptor name="jmx-mx4j" jmxAdaptorUrl="http://127.0.0.1:8000"/>
+
     <management:jmx-default-config name="default-config"/>
-    
-    <management:jmx-notifications name="jmxNotificationAgent" />
-    
+
+    <management:jmx-notifications name="jmxNotificationAgent"/>
+
     <management:log4j-notifications name="log4JNotificationAgent"/>
-    
-    <management:chainsaw-notifications chainsawPort="8080" name="chainsawNotificationAgent" chainsawHost="127.0.0.1"></management:chainsaw-notifications>
-    
+
+    <management:chainsaw-notifications chainsawPort="8080" name="chainsawNotificationAgent" chainsawHost="127.0.0.1"/>
+
     <management:publish-notifications name="publishNotificationAgent" endpointAddress="test://test"/>
-    
+
  </mule>

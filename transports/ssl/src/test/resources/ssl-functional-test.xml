@@ -10,16 +10,9 @@
 
     <!-- keepSendSocketOpen is required for the Async test case?  see TCP -->
     <ssl:connector name="SslConnector" keepSendSocketOpen="true">
-        <ssl:ssl-client
-                clientKeyStore="clientKeyStore"
-                clientKeyStorePassword="mulepassword"/>
-        <ssl:ssl-key-store
-                keyStore="serverKeystore"
-                keyStorePassword="mulepassword"
-                keyPassword="mulepassword"/>
-        <ssl:ssl-server
-                trustStore="trustStore"
-                trustStorePassword="mulepassword"/>
+        <ssl:ssl-client clientKeyStore="clientKeyStore" clientKeyStorePassword="mulepassword"/>
+        <ssl:ssl-key-store keyStore="serverKeystore" keyStorePassword="mulepassword" keyPassword="mulepassword"/>
+        <ssl:ssl-server trustStore="trustStore" trustStorePassword="mulepassword"/>
     </ssl:connector>
 
     <endpoint name="sendEndpoint" address="ssl://localhost:60198" synchronous="true"/>
@@ -53,7 +46,7 @@
                 figure out how to set the eventCallback bean as a property within mule:properties -->
             <component scope="singleton" instance-ref="reply"/>
             <inbound-router>
-                <endpoint ref="sendEndpoint"/>
+                <inbound-endpoint ref="sendEndpoint"/>
             </inbound-router>
         </service>
 
@@ -62,7 +55,7 @@
                 figure out how to set the eventCallback bean as a property within mule:properties -->
             <component scope="singleton" instance-ref="countAndReply"/>
             <inbound-router>
-                <endpoint ref="sendManyEndpoint"/>
+                <inbound-endpoint ref="sendManyEndpoint"/>
             </inbound-router>
         </service>
 
@@ -71,7 +64,7 @@
                 figure out how to set the eventCallback bean as a property within mule:properties -->
             <component scope="singleton" instance-ref="asynchronous"/>
             <inbound-router>
-                <endpoint ref="asyncEndpoint"/>
+                <inbound-endpoint ref="asyncEndpoint"/>
             </inbound-router>
         </service>
 

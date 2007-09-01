@@ -11,29 +11,18 @@
        http://www.mulesource.org/schema/mule/https/2.0 http://www.mulesource.org/schema/mule/https/2.0/mule-https.xsd">
 
     <https:connector name="httpConnector">
-        <https:tls-client
-                clientKeyStore="clientKeystore"
-                clientKeyStorePassword="mulepassword"/>
-        <https:tls-key-store
-                keyStore="serverKeystore"
-                keyPassword="mulepassword"
-                keyStorePassword="mulepassword"/>
-        <https:tls-server
-                trustStore="trustStore"
-                trustStorePassword="mulepassword"/>
+        <https:tls-client clientKeyStore="clientKeystore" clientKeyStorePassword="mulepassword"/>
+        <https:tls-key-store keyStore="serverKeystore" keyPassword="mulepassword" keyStorePassword="mulepassword"/>
+        <https:tls-server trustStore="trustStore" trustStorePassword="mulepassword"/>
     </https:connector>
 
-    <endpoint
-            name="clientEndpoint"
-            address="https://localhost:60202"
-            synchronous="true"
-            connector-ref="httpConnector"/>
+    <endpoint name="clientEndpoint" address="https://localhost:60202" synchronous="true" connector-ref="httpConnector"/>
 
     <custom:model name="main" class="org.mule.tck.testmodels.mule.TestSedaModel">
         <custom:service name="testComponent">
             <component class="org.mule.tck.functional.FunctionalTestComponent" scope="singleton"/>
             <inbound-router>
-                <endpoint ref="clientEndpoint"/>
+                <inbound-endpoint ref="clientEndpoint"/>
             </inbound-router>
         </custom:service>
     </custom:model>

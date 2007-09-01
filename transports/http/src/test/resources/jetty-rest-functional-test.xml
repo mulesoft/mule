@@ -13,9 +13,9 @@
 
     <model name="main">
         <service name="testComponent">
-            <component class="org.mule.tck.functional.FunctionalTestComponent" />
+            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
-                <endpoint ref="serverEndpoint"/>
+                <inbound-endpoint ref="serverEndpoint"/>
             </inbound-router>
         </service>
     </model>

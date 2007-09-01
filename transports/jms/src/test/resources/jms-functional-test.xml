@@ -13,11 +13,11 @@
         <service name="queueComponent">
             <component class="org.mule.tck.functional.FunctionalTestComponent" scope="singleton"/>
             <inbound-router>
-                <endpoint address="jms://in" />
+                <inbound-endpoint address="jms://in"/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <endpoint address="jms://out" />
+                    <outbound-endpoint address="jms://out"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
@@ -25,11 +25,11 @@
         <service name="topicComponent">
             <component class="org.mule.tck.functional.FunctionalTestComponent" scope="singleton"/>
             <inbound-router>
-                <endpoint address="jms://topic:in" />
+                <inbound-endpoint address="jms://topic:in"/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <endpoint address="jms://topic:out" />
+                    <outbound-endpoint address="jms://topic:out"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>

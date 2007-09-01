@@ -17,7 +17,7 @@
             <inbound-router>
                 <!-- if the connector-ref was removed this would give an error
                      since we have multiple connectors -->
-                <endpoint address="tcp://localhost:12345" connector-ref="tcpConnector2"/>
+                <inbound-endpoint address="tcp://localhost:12345" connector-ref="tcpConnector2"/>
             </inbound-router>
         </service>
     </model>

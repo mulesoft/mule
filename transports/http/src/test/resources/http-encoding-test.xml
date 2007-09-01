@@ -9,9 +9,8 @@
        http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd">
 
     <http:connector name="httpConnector" reuseAddress="true"/>
-    
-    <custom-transformer name="setResponseType"
-            class="org.mule.transformers.simple.MessagePropertiesTransformer">
+
+    <custom-transformer name="setResponseType" class="org.mule.transformers.simple.MessagePropertiesTransformer">
         <spring:property name="addProperties">
             <spring:map>
                 <spring:entry key="Content-Type" value="text/baz;charset=UTF-16BE"/>
@@ -23,9 +22,9 @@
 
     <model name="main">
         <service name="testComponent">
-            <component class="org.mule.tck.functional.FunctionalTestComponent" />
+            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
-                <endpoint ref="clientEndpoint" responseTransformers="setResponseType"/>
+                <inbound-endpoint ref="clientEndpoint" responseTransformers="setResponseType"/>
             </inbound-router>
         </service>
     </model>

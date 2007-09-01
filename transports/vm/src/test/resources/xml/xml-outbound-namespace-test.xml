@@ -15,12 +15,9 @@
         <service name="fancy config splitter">
             <component class="org.mule.components.simple.BridgeComponent"/>
             <outbound-router>
-                <mxml:message-splitter
-                        splitExpression="/expression"
-                        enableCorrelation="ALWAYS"
-                        externalSchemaLocation="external"
-                        honorSynchronicity="true"
-                        validateSchema="true">
+                <mxml:message-splitter splitExpression="/expression" enableCorrelation="ALWAYS"
+                                       externalSchemaLocation="external" honorSynchronicity="true"
+                                       validateSchema="true">
                     <mxml:dom4j-property-extractor/>
                     <mxml:namespace prefix="bar" uri="foo"/>
                 </mxml:message-splitter>
@@ -30,13 +27,9 @@
         <service name="fancy config round robin">
             <component class="org.mule.components.simple.BridgeComponent"/>
             <outbound-router>
-                <mxml:round-robin-splitter
-                        splitExpression="/expression"
-                        enableCorrelation="IF_NOT_SET"
-                        externalSchemaLocation="external"
-                        honorSynchronicity="true"
-                        validateSchema="true"
-                        endpointFiltering="true">
+                <mxml:round-robin-splitter splitExpression="/expression" enableCorrelation="IF_NOT_SET"
+                                           externalSchemaLocation="external" honorSynchronicity="true"
+                                           validateSchema="true" endpointFiltering="true">
                     <mxml:dom4j-property-extractor/>
                     <mxml:namespace prefix="bar" uri="foo"/>
                 </mxml:round-robin-splitter>

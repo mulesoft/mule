@@ -36,19 +36,19 @@
             <component class="org.mule.examples.loanbroker.esn.SynchronousLoanBroker"/>
 
             <inbound-router>
-                <endpoint ref="CustomerRequests"/>
+                <inbound-endpoint ref="CustomerRequests"/>
             </inbound-router>
 
             <nested-router>
                 <binding interface="org.mule.examples.loanbroker.credit.CreditAgencyService">
-                    <endpoint ref="CreditAgency"/>
+                    <outbound-endpoint ref="CreditAgency"/>
                 </binding>
             </nested-router>
 
             <outbound-router>
                 <!-- couldn't this be pass-through? -->
                 <filtering-router>
-                    <endpoint ref="LenderService"/>
+                    <outbound-endpoint ref="LenderService"/>
                 </filtering-router>
             </outbound-router>
 
@@ -57,19 +57,19 @@
         <service name="TheCreditAgencyService">
             <component class="org.mule.examples.loanbroker.credit.DefaultCreditAgency"/>
             <inbound-router>
-                <endpoint ref="CreditAgencyIn"/>
+                <inbound-endpoint ref="CreditAgencyIn"/>
             </inbound-router>
         </service>
 
         <service name="LenderService">
             <component class="org.mule.examples.loanbroker.lender.DefaultLender"/>
             <inbound-router>
-                <endpoint ref="LenderService"/>
+                <inbound-endpoint ref="LenderService"/>
             </inbound-router>
             <outbound-router>
                 <!-- again, could be pass-through? -->
                 <filtering-router>
-                    <endpoint ref="BankGateway" transformers="SetLendersAsRecipients"/>
+                    <outbound-endpoint ref="BankGateway" transformers="SetLendersAsRecipients"/>
                 </filtering-router>
             </outbound-router>
         </service>
@@ -77,7 +77,7 @@
         <service name="BankGateway">
             <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
-                <endpoint ref="BankGateway"/>
+                <inbound-endpoint ref="BankGateway"/>
             </inbound-router>
             <outbound-router>
                 <logging-catch-all-strategy/>
@@ -91,35 +91,35 @@
         <service name="TheBank1">
             <component class="org.mule.examples.loanbroker.bank.Bank"/>
             <inbound-router>
-                <endpoint ref="Bank1In"/>
+                <inbound-endpoint ref="Bank1In"/>
             </inbound-router>
         </service>
 
         <service name="TheBank2">
             <component class="org.mule.examples.loanbroker.bank.Bank"/>
             <inbound-router>
-                <endpoint ref="Bank2In"/>
+                <inbound-endpoint ref="Bank2In"/>
             </inbound-router>
         </service>
 
         <service name="TheBank3">
             <component class="org.mule.examples.loanbroker.bank.Bank"/>
             <inbound-router>
-                <endpoint ref="Bank3In"/>
+                <inbound-endpoint ref="Bank3In"/>
             </inbound-router>
         </service>
 
         <service name="TheBank4">
             <component class="org.mule.examples.loanbroker.bank.Bank"/>
             <inbound-router>
-                <endpoint ref="Bank4In"/>
+                <inbound-endpoint ref="Bank4In"/>
             </inbound-router>
         </service>
 
         <service name="TheBank5">
             <component class="org.mule.examples.loanbroker.bank.Bank"/>
             <inbound-router>
-                <endpoint ref="Bank5In"/>
+                <inbound-endpoint ref="Bank5In"/>
             </inbound-router>
         </service>
 

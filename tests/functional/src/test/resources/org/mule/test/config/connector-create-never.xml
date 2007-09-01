@@ -8,9 +8,10 @@
 
     <mule:model name="main" class="org.mule.tck.testmodels.mule.TestSedaModel">
         <mule:service name="echo">
-            <mule:component class="org.mule.components.simple.EchoComponent" />
+            <mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
-                <mule:endpoint name="in" address="test://inbound?createConnector=NEVER"/>
+                <mule:inbound-endpoint name="in"
+                                       address="test://inbound?createConnector=NEVER"/>
             </mule:inbound-router>
         </mule:service>
     </mule:model>

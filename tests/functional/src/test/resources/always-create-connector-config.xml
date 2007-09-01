@@ -13,11 +13,11 @@
         <service name="inbound listener">
             <echo-component/>
             <inbound-router>
-                <endpoint ref="inbound"/>
+                <inbound-endpoint ref="inbound"/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <endpoint ref="outbound"/>
+                    <outbound-endpoint ref="outbound"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>

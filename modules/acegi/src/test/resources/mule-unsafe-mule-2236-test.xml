@@ -33,7 +33,7 @@
         <service name="service">
             <component scope="singleton" instance-ref="poot"/>
             <inbound-router>
-                <endpoint name="endpoint" address="test://${property}"/>
+                <inbound-endpoint name="endpoint" address="test://${property}"/>
             </inbound-router>
         </service>
     </model>

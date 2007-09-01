@@ -12,11 +12,11 @@
         <service name="component">
             <component class="org.mule.components.simple.EchoComponent"/>
             <inbound-router>
-                <endpoint address="axis:http://localhost:62181/services"/>
+                <inbound-endpoint address="axis:http://localhost:62181/services"/>
             </inbound-router>
             <response-router>
-                <endpoint address="http://localhost:62182/reply"/>
+                <response-endpoint address="http://localhost:62182/reply"/>
             </response-router>
-        </service>    
+        </service>
     </model>
 </mule>

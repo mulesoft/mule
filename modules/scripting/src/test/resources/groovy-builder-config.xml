@@ -8,21 +8,21 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/scripting/2.0 http://www.mulesource.org/schema/mule/scripting/2.0/mule-scripting.xsd">
 
-    
+
     <scripting:script name="scriptText1">
         return "$request.payload $response.payload Received"
     </scripting:script>
-    
+
     <scripting:script name="scriptText2">
         return "A"
     </scripting:script>
-    
+
     <scripting:script name="scriptText3">
         return "B"
     </scripting:script>
-    
+
     <model name="main">
-        
+
         <service name="GroovyUMO1">
             <component class="org.mule.components.script.jsr223.ScriptMessageBuilder">
                 <properties>
@@ -31,16 +31,16 @@
                 </properties>
             </component>
             <inbound-router>
-                <endpoint address="vm://groovy.1"/>
+                <inbound-endpoint address="vm://groovy.1"/>
             </inbound-router>
             <outbound-router>
                 <filtering-router>
-                    <endpoint address="vm://groovy.2"/>
-                    <endpoint address="vm://groovy.3"/>
+                    <outbound-endpoint address="vm://groovy.2"/>
+                    <outbound-endpoint address="vm://groovy.3"/>
                 </filtering-router>
             </outbound-router>
         </service>
-                    
+
         <service name="GroovyUMO2">
             <component class="org.mule.components.script.jsr223.ScriptComponent">
                 <properties>
@@ -49,10 +49,10 @@
                 </properties>
             </component>
             <inbound-router>
-                <endpoint address="vm://groovy.2"/>
+                <inbound-endpoint address="vm://groovy.2"/>
             </inbound-router>
         </service>
-                    
+
         <service name="GroovyUMO3">
             <component class="org.mule.components.script.jsr223.ScriptComponent">
                 <properties>
@@ -61,10 +61,10 @@
                 </properties>
             </component>
             <inbound-router>
-                <endpoint address="vm://groovy.3"/>
+                <inbound-endpoint address="vm://groovy.3"/>
             </inbound-router>
-        </service>                   
-                    
+        </service>
+
     </model>
-    
+
 </mule>

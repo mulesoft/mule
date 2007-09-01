@@ -11,19 +11,19 @@
     <environment-properties>
         <spring:entry key="serverUrl" value=""/>
     </environment-properties>
-    
+
     <model name="test">
         <service name="mycomponent">
             <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             <inbound-router>
-                <endpoint address="axis:http://localhost:62108/mule"/>
+                <inbound-endpoint address="axis:http://localhost:62108/mule"/>
             </inbound-router>
         </service>
-        
+
         <service name="mycomponent2">
             <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             <inbound-router>
-                <endpoint address="axis:http://localhost:62109/mule/services">
+                <inbound-endpoint address="axis:http://localhost:62109/mule/services">
                     <properties>
                         <spring:entry key="serviceInterfaces">
                             <spring:list>
@@ -32,21 +32,21 @@
                             </spring:list>
                         </spring:entry>
                     </properties>
-                </endpoint>
+                </inbound-endpoint>
             </inbound-router>
         </service>
-        
+
         <service name="mycomponent3">
             <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             <inbound-router>
-                <endpoint address="axis:http://localhost:62109"/>
+                <inbound-endpoint address="axis:http://localhost:62109"/>
             </inbound-router>
         </service>
-        
+
         <service name="mycomponent4">
             <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             <inbound-router>
-                <endpoint address="axis:http://localhost:62110" synchronous="false"/>
+                <inbound-endpoint address="axis:http://localhost:62110" synchronous="false"/>
             </inbound-router>
         </service>
     </model>

@@ -12,21 +12,21 @@
         Testing XFire Exception Strategy
      -->
     <configuration serverId="" defaultSynchronousEndpoints="true"/>
-    
+
     <model name="TestXFireComponentExceptionStrategy">
         <service name="XFireWithExceptionStrategy">
             <component class="org.mule.providers.soap.xfire.testmodels.TestXFireComponent"/>
             <inbound-router>
-                <endpoint address="xfire:http://localhost:63181/services"/>
+                <inbound-endpoint address="xfire:http://localhost:63181/services"/>
             </inbound-router>
             <custom-exception-strategy class="org.mule.providers.soap.xfire.XFireComponentExceptionStrategy"/>
         </service>
         <service name="XFireDefault">
             <component class="org.mule.providers.soap.xfire.testmodels.TestXFireComponent"/>
             <inbound-router>
-                <endpoint address="xfire:http://localhost:63181/services"/>
+                <inbound-endpoint address="xfire:http://localhost:63181/services"/>
             </inbound-router>
         </service>
     </model>
-    
+
 </mule>

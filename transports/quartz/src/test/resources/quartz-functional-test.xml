@@ -31,14 +31,14 @@
         <service name="quartzService1">
             <component class="org.mule.providers.quartz.TestComponent"/>
             <inbound-router>
-                <endpoint ref="quartz.in.1"/>
+                <inbound-endpoint ref="quartz.in.1"/>
             </inbound-router>
         </service>
 
         <service name="quartzService2">
             <component class="org.mule.providers.quartz.TestComponent"/>
             <inbound-router>
-                <endpoint ref="quartz.in.2"/>
+                <inbound-endpoint ref="quartz.in.2"/>
             </inbound-router>
         </service>
     </model>

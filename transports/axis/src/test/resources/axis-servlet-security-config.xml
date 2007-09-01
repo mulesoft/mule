@@ -19,27 +19,27 @@
     <spring:bean id="inMemoryDaoImpl" class="org.acegisecurity.userdetails.memory.InMemoryDaoImpl">
         <spring:property name="userMap" value="ross=ross_may_not_invoke_web_service,ROLE_ADMIN"/>
     </spring:bean>
-    
+
     <transformer-byte-array-to-string name="ByteArrayToString"/>
-    
+
     <servlet:connector name="servletConnector" servletUrl="http://localhost:18088/services">
         <!--  TODO DO: this should not be necessary, see MULE-1508 -->
         <custom-exception-strategy class="org.mule.providers.soap.axis.UnitTestExceptionStrategy"/>
     </servlet:connector>
-    
+
     <acegi:security-manager>
         <acegi:delegate-security-provider name="memory-dao" delegate-ref="daoAuthenticationProvider"/>
     </acegi:security-manager>
-    
+
     <model name="test">
         <service name="mycomponent">
             <component class="org.mule.components.simple.EchoComponent"/>
             <inbound-router>
-                <endpoint address="axis:servlet://mycomponent" responseTransformers="ByteArrayToString">
+                <inbound-endpoint address="axis:servlet://mycomponent" responseTransformers="ByteArrayToString">
                     <acegi:http-security-filter realm="mule-realm"/>
-                </endpoint>
+                </inbound-endpoint>
             </inbound-router>
         </service>
     </model>
-    
+
 </mule>

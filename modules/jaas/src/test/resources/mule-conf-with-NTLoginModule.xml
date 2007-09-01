@@ -7,25 +7,26 @@
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
-       http://www.mulesource.org/schema/mule/file/2.0 http://www.mulesource.org/schema/mule/file/2.0/mule-file.xsd 
+       http://www.mulesource.org/schema/mule/file/2.0 http://www.mulesource.org/schema/mule/file/2.0/mule-file.xsd
        http://www.mulesource.org/schema/mule/jaas/2.0 http://www.mulesource.org/schema/mule/jaas/2.0/mule-jaas.xsd">
-    
+
 
     <!--mule-environment-properties synchronous="true"/-->
 
     <jaas:security-manager>
-        <jaas:security-provider name="jaasSecurityProvider" loginContextName="jaasTest" loginModule="com.sun.security.auth.module.NTLoginModule"/>
-        <jaas:password-encryption-strategy  name="PBE" password="mule"/>
+        <jaas:security-provider name="jaasSecurityProvider" loginContextName="jaasTest"
+                                loginModule="com.sun.security.auth.module.NTLoginModule"/>
+        <jaas:password-encryption-strategy name="PBE" password="mule"/>
     </jaas:security-manager>
 
     <model name="test">
         <service name="TestUMO">
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
-                <inbound-router>
-                    <endpoint address="vm://test">
-                        <encryption-security-filter strategy-ref="PBE"/>
-                    </endpoint>
-                </inbound-router>
-            </service>
+            <inbound-router>
+                <inbound-endpoint address="vm://test">
+                    <encryption-security-filter strategy-ref="PBE"/>
+                </inbound-endpoint>
+            </inbound-router>
+        </service>
     </model>
 </mule>

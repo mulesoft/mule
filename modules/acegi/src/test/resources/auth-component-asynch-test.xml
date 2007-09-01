@@ -17,8 +17,7 @@
     <mule:mule>
 
         <acegi:security-manager>
-            <acegi:delegate-security-provider name="memory-dao"
-                                              delegate-ref="daoAuthenticationProvider">
+            <acegi:delegate-security-provider name="memory-dao" delegate-ref="daoAuthenticationProvider">
                 <acegi:security-property name="securityMode" value="MODE_GLOBAL"/>
             </acegi:delegate-security-provider>
         </acegi:security-manager>
@@ -33,13 +32,13 @@
             <mule:service name="echoUMO">
                 <mule:component scope="singleton" instance-ref="echoComponent"/>
                 <mule:inbound-router>
-                    <mule:endpoint address="vm://test">
+                    <mule:inbound-endpoint address="vm://test">
                         <mule:encryption-security-filter strategy-ref="PBE"/>
-                    </mule:endpoint>
+                    </mule:inbound-endpoint>
                 </mule:inbound-router>
                 <mule:outbound-router>
                     <mule:outbound-pass-through-router>
-                        <mule:endpoint address="vm://output"/>
+                        <mule:outbound-endpoint address="vm://output"/>
                     </mule:outbound-pass-through-router>
                 </mule:outbound-router>
             </mule:service>

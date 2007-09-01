@@ -33,11 +33,8 @@
     </environment-properties -->
 
         <mule:configuration serverId="ijio" defaultSynchronousEndpoints="false">
-            <mule:default-threading-profile maxBufferSize="0"
-                                            maxThreadsActive="8"
-                                            maxThreadsIdle="4"
-                                            poolExhaustedAction="WAIT"
-                                            threadTTL="60001"/>
+            <mule:default-threading-profile maxBufferSize="0" maxThreadsActive="8" maxThreadsIdle="4"
+                                            poolExhaustedAction="WAIT" threadTTL="60001"/>
             <!-- TODO -->
             <!-- seem to be missing default pooling and queue profiles and persistence strategy -->
         </mule:configuration>
@@ -207,7 +204,8 @@
             <!-- entry-point-resolver className="org.mule.tck.testmodels.mule.TestEntryPointResolver"/ -->
 
             <mule:custom-exception-strategy class="org.mule.tck.testmodels.mule.TestExceptionStrategy">
-                <mule:endpoint address="test://component.exceptions"/>
+                <mule:outbound-endpoint
+                        address="test://component.exceptions"/>
             </mule:custom-exception-strategy>
             <!-- exception-strategy className="org.mule.tck.testmodels.mule.TestExceptionStrategy">
            <endpoint address="test://component.exceptions"/>
@@ -222,23 +220,24 @@
 
                 <mule:inbound-router>
                     <mule:forwarding-catch-all-strategy>
-                        <mule:endpoint address="test://catch.all"/>
+                        <mule:outbound-endpoint
+                                address="test://catch.all"/>
                     </mule:forwarding-catch-all-strategy>
                     <!-- catch-all-strategy className="org.mule.routing.ForwardingCatchAllStrategy">
                     <endpoint address="test://catch.all"/>
                 </catch-all-strategy -->
-                    <mule:endpoint name="Orange"
-                                   address="test://orange/"
-                                   transformers="TestCompressionTransformer"
-                                   responseTransformers="TestCompressionTransformer"/>
+                    <mule:inbound-endpoint name="Orange"
+                                           address="test://orange/" transformers="TestCompressionTransformer"
+                                           responseTransformers="TestCompressionTransformer"/>
                     <!-- endpoint name="Orange" type="receiver" address="test://orange/" transformers="TestCompressionTransformer"
                     responseTransformers="TestCompressionTransformer"/ -->
-                    <mule:endpoint ref="orangeEndpoint" transformers="TestCompressionTransformer">
+                    <mule:inbound-endpoint ref="orangeEndpoint"
+                                           transformers="TestCompressionTransformer">
                         <mule:payload-type-filter expectedType="java.lang.String"/>
                         <mule:properties>
                             <entry key="testLocal" value="value1"/>
                         </mule:properties>
-                    </mule:endpoint>
+                    </mule:inbound-endpoint>
                     <!-- global-endpoint name="orangeEndpoint" transformers="TestCompressionTransformer">
                     <filter className="org.mule.routing.filters.PayloadTypeFilter" expectedType="java.lang.String"/>
                     <properties>
@@ -249,13 +248,13 @@
 
                 <mule:nested-router>
                     <mule:binding interface="org.mule.tck.testmodels.fruit.FruitCleaner" method="wash">
-                        <mule:endpoint address="test://do.wash"/>
+                        <mule:outbound-endpoint address="test://do.wash"/>
                     </mule:binding>
                     <!-- binding interface="org.mule.tck.testmodels.fruit.FruitCleaner" method="wash">
                     <endpoint address="test://do.wash"/>
                 </binding -->
                     <mule:binding interface="org.mule.tck.testmodels.fruit.FruitCleaner" method="polish">
-                        <mule:endpoint address="test://do.polish"/>
+                        <mule:outbound-endpoint address="test://do.polish"/>
                     </mule:binding>
                     <!-- binding interface="org.mule.tck.testmodels.fruit.FruitCleaner" method="polish">
                     <endpoint address="test://do.polish"/>
@@ -266,7 +265,8 @@
                     <mule:outbound-pass-through-router>
                         <!-- TODO -->
                         <!-- shouldn't it be transformers-ref? -->
-                        <mule:endpoint ref="appleInEndpoint" transformers="TestCompressionTransformer"/>
+                        <mule:outbound-endpoint ref="appleInEndpoint"
+                                                transformers="TestCompressionTransformer"/>
                     </mule:outbound-pass-through-router>
                 </mule:outbound-router>
                 <!-- outbound-router>
@@ -276,8 +276,8 @@
             </outbound-router -->
 
                 <mule:response-router timeout="10001">
-                    <mule:endpoint address="test://response1"/>
-                    <mule:endpoint ref="appleResponseEndpoint"/>
+                    <mule:response-endpoint address="test://response1"/>
+                    <mule:response-endpoint ref="appleResponseEndpoint"/>
                     <mule:custom-response-router class="org.mule.tck.testmodels.mule.TestResponseAggregator"/>
                 </mule:response-router>
                 <!-- response-router timeout="10001">
@@ -287,7 +287,7 @@
             </response-router -->
 
                 <mule:default-connector-exception-strategy>
-                    <mule:endpoint address="test://orange.exceptions"/>
+                    <mule:outbound-endpoint address="test://orange.exceptions"/>
                 </mule:default-connector-exception-strategy>
                 <!-- exception-strategy className="org.mule.impl.DefaultComponentExceptionStrategy">
                    <endpoint address="test://orange.exceptions"/>
@@ -323,7 +323,7 @@
 
                 <mule:inbound-router>
                     <mule:custom-catch-all-strategy class="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>
-                    <mule:endpoint ref="appleInEndpoint"/>
+                    <mule:inbound-endpoint ref="appleInEndpoint"/>
                     <mule:selective-consumer-router>
                         <mule:payload-type-filter expectedType="java.lang.String"/>
                     </mule:selective-consumer-router>
@@ -341,11 +341,12 @@
                 <mule:outbound-router>
                     <mule:custom-catch-all-strategy class="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>
                     <mule:filtering-router>
-                        <mule:endpoint name="TestApple-Out" address="test://appleQ2" transformers="TestCompressionTransformer"/>
+                        <mule:outbound-endpoint name="TestApple-Out"
+                                           address="test://appleQ2" transformers="TestCompressionTransformer"/>
                         <mule:payload-type-filter expectedType="java.lang.String"/>
                     </mule:filtering-router>
                     <mule:filtering-router>
-                        <mule:endpoint ref="waterMelonEndpoint"/>
+                        <mule:outbound-endpoint ref="waterMelonEndpoint"/>
                         <mule:and-filter>
                             <mule:regex-filter pattern="the quick brown (.*)"/>
                             <mule:regex-filter pattern="(.*) brown (.*)"/>

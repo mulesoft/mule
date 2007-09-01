@@ -27,11 +27,10 @@
     <spring:bean name="echoComponent" class="org.mule.components.simple.EchoComponent"/>
 
     <acegi:security-manager>
-        <acegi:delegate-security-provider name="memory-dao"
-                                          delegate-ref="daoAuthenticationProvider"/>
+        <acegi:delegate-security-provider name="memory-dao" delegate-ref="daoAuthenticationProvider"/>
     </acegi:security-manager>
 
-    
+
     <!-- this sets the same provider three times, once through acegi's provider and twice
          through a custom provider.  in normal use it should be set just once, through
          the acegi schema - this is just for extra test coverage -->
@@ -42,8 +41,7 @@
     </spring:bean>
 
     <security-manager>
-        <custom-security-provider name="willNotOverwriteName"
-                                       provider-ref="explicitCreation1"/>
+        <custom-security-provider name="willNotOverwriteName" provider-ref="explicitCreation1"/>
     </security-manager>
 
     <spring:bean id="explicitCreation2" class="org.mule.extras.acegi.AcegiProviderAdapter">
@@ -51,8 +49,7 @@
     </spring:bean>
 
     <security-manager>
-        <custom-security-provider name="willOverwriteName"
-                                       provider-ref="explicitCreation2"/>
+        <custom-security-provider name="willOverwriteName" provider-ref="explicitCreation2"/>
     </security-manager>
 
 </mule>

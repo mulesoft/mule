@@ -25,7 +25,7 @@ public class WsSecurityNamespaceHandlerTestCase extends FunctionalTestCase
     public void testPropertiesOnFilter() throws Exception
     {
         UMOEndpointSecurityFilter filter = managementContext.getRegistry().getEndpointFromName(
-            ".MySecuredUMO:inbound-router:endpoint").getSecurityFilter();
+            ".MySecuredUMO:inbound-router:inbound-endpoint").getSecurityFilter();
         assertTrue(filter instanceof WsSecurityFilter);
         assertNotNull(((WsSecurityFilter)filter).getWsDecryptionFile());
         assertNotNull(((WsSecurityFilter)filter).getWsSignatureFile());

@@ -8,15 +8,8 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/multicast/2.0 http://www.mulesource.org/schema/mule/multicast/2.0/mule-multicast.xsd">
 
-    <multicast:connector name="multicastConnector"
-                   receiveBufferSize="1234"
-                   receiveTimeout="2345"
-                   sendBufferSize="3456"
-                   sendTimeout="4567"
-                   timeToLive="5678"
-                   broadcast="true"
-                   loopback="true"
-                   keepSendSocketOpen="false"
-            />
+    <multicast:connector name="multicastConnector" receiveBufferSize="1234" receiveTimeout="2345" sendBufferSize="3456"
+                         sendTimeout="4567" timeToLive="5678" broadcast="true" loopback="true"
+                         keepSendSocketOpen="false"/>
 
 </mule>

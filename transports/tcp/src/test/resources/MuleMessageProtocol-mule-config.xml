@@ -10,22 +10,20 @@
                http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd
                http://www.mulesource.org/schema/mule/tcp/2.0 http://www.mulesource.org/schema/mule/tcp/2.0/mule-tcp.xsd">
 
-    <vm:connector name="quedvm"
-                  queueEvents="true"/>
+    <vm:connector name="quedvm" queueEvents="true"/>
 
-    <tcp:connector name="tcpConnector"
-                   tcpProtocolClassName="org.mule.providers.tcp.protocols.MuleMessageEOFProtocol"
+    <tcp:connector name="tcpConnector" tcpProtocolClassName="org.mule.providers.tcp.protocols.MuleMessageEOFProtocol"
                    keepSendSocketOpen="false"/>
 
     <model name="main">
         <service name="BridgeIn">
             <bridge-component/>
             <inbound-router>
-                <endpoint address="vm://in"/>
+                <inbound-endpoint address="vm://in"/>
             </inbound-router>
             <outbound-router>
                 <message-chunking-router messageSize="90">
-                    <endpoint address="tcp://localhost:63994"/>
+                    <outbound-endpoint address="tcp://localhost:63994"/>
                 </message-chunking-router>
             </outbound-router>
         </service>
@@ -33,12 +31,12 @@
         <service name="BridgeOut">
             <bridge-component/>
             <inbound-router>
-                <endpoint address="tcp://localhost:63994"/>
+                <inbound-endpoint address="tcp://localhost:63994"/>
                 <message-chunking-aggregator-router/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <endpoint address="vm://out"/>
+                    <outbound-endpoint address="vm://out"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>

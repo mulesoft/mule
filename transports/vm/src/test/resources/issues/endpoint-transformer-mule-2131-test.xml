@@ -13,7 +13,8 @@
 
     <endpoint name="in" address="vm://in" connector-ref="default"/>
     <endpoint name="direct" address="vm://direct" connector-ref="queue"/>
-    <endpoint name="global-name-global-transformer" address="vm://global-name-global-transformer" connector-ref="queue" transformers="transformer"/>
+    <endpoint name="global-name-global-transformer" address="vm://global-name-global-transformer" connector-ref="queue"
+              transformers="transformer"/>
     <endpoint name="global-name-local-transformer" address="vm://global-name-local-transformer" connector-ref="queue"/>
 
     <custom-transformer name="transformer" class="org.mule.tck.functional.StringAppendTestTransformer"/>
@@ -23,16 +24,18 @@
         <service name="main">
             <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
-                <endpoint ref="in"/>
+                <inbound-endpoint ref="in"/>
             </inbound-router>
             <outbound-router>
                 <multicasting-router>
-                    <endpoint ref="direct"/>
-                    <endpoint ref="global-name-global-transformer"/>
-                    <endpoint name="local-name-local-transformer" address="vm://local-name-local-transformer" connector-ref="queue" transformers="transformer"/>
+                    <outbound-endpoint ref="direct"/>
+                    <outbound-endpoint ref="global-name-global-transformer"/>
+                    <outbound-endpoint name="local-name-local-transformer" address="vm://local-name-local-transformer"
+                                       connector-ref="queue" transformers="transformer"/>
                     <!-- these two don't transform -->
-                    <endpoint ref="global-name-local-transformer" transformers="transformer"/>
-                    <endpoint address="vm://no-name-local-transformer" connector-ref="queue" transformers="transformer"/>
+                    <outbound-endpoint ref="global-name-local-transformer" transformers="transformer"/>
+                    <outbound-endpoint address="vm://no-name-local-transformer" connector-ref="queue"
+                                       transformers="transformer"/>
                 </multicasting-router>
             </outbound-router>
         </service>

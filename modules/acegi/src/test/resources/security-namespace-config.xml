@@ -11,14 +11,11 @@
     <spring:bean name="dummyKeyFactory" class="org.mule.impl.security.MockKeyFactory"/>
 
     <security-manager>
-        <custom-security-provider name="dummySecurityProvider"
-                                       provider-ref="dummySecurityProvider"/>
-        <custom-encryption-strategy name="dummyEncryptionStrategy"
-                                         strategy-ref="dummyEncryptionStrategy"/>
-        <secret-key-encryption-strategy name="secretKeyEncryptionStrategy"
-                                             key="key" keyFactory-ref="dummyKeyFactory"/>
-        <password-encryption-strategy  name="passwordEncryptionStrategy"
-                                            password="password" salt="saltsalt" iterationCount="2"/>
+        <custom-security-provider name="dummySecurityProvider" provider-ref="dummySecurityProvider"/>
+        <custom-encryption-strategy name="dummyEncryptionStrategy" strategy-ref="dummyEncryptionStrategy"/>
+        <secret-key-encryption-strategy name="secretKeyEncryptionStrategy" key="key" keyFactory-ref="dummyKeyFactory"/>
+        <password-encryption-strategy name="passwordEncryptionStrategy" password="password" salt="saltsalt"
+                                      iterationCount="2"/>
     </security-manager>
 
 </mule>

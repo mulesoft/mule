@@ -11,8 +11,8 @@
        http://www.mulesource.org/schema/mule/xml/2.0 http://www.mulesource.org/schema/mule/xml/2.0/mule-xml.xsd">
 
     <configuration serverId="test_Spring" defaultSynchronousEndpoints="false" domainId="org.mule">
-        <default-threading-profile maxBufferSize="0" maxThreadsActive="16"
-                                        maxThreadsIdle="4" poolExhaustedAction="WAIT" threadTTL="60001"/>
+        <default-threading-profile maxBufferSize="0" maxThreadsActive="16" maxThreadsIdle="4" poolExhaustedAction="WAIT"
+                                   threadTTL="60001"/>
     </configuration>
 
     <environment-properties>
@@ -31,7 +31,7 @@
     <!--<mgmt:jmx-default-config name="jmxAgent"/>-->
     <!--<mgmt:rmi-server name="rmiAgent"/>-->
     <!--<mgmt:jmx-server name="jmxAgent">-->
-        <!--<mgmt:connector-server url="service:jmx:rmi:///jndi/rmi://localhost:1099/server" rebind="true"/>-->
+    <!--<mgmt:connector-server url="service:jmx:rmi:///jndi/rmi://localhost:1099/server" rebind="true"/>-->
     <!--</mgmt:jmx-server>-->
 
     <!--<mgmt:chainsaw-notifications chainsawHost="localhost" chainsawPort="20202" name="chainsaw">-->
@@ -47,8 +47,7 @@
     </custom-connector>
 
     <custom-transformer name="TestCompressionTransformer"
-                             class="org.mule.tck.testmodels.mule.TestCompressionTransformer"
-                             returnClass="java.lang.String">
+                        class="org.mule.tck.testmodels.mule.TestCompressionTransformer" returnClass="java.lang.String">
         <spring:property name="beanProperty2" value="12"/>
         <spring:property name="containerProperty" value="myString"/>
     </custom-transformer>
@@ -84,7 +83,7 @@
     <model name="main">
 
         <custom-exception-strategy class="org.mule.tck.testmodels.mule.TestExceptionStrategy">
-            <endpoint address=" test://component.exceptions "/>
+            <outbound-endpoint address=" test://component.exceptions "/>
         </custom-exception-strategy>
 
         <custom-entrypoint-resolver class="org.mule.tck.testmodels.mule.TestEntryPointResolver"/>
@@ -94,41 +93,41 @@
             <inbound-router>
 
                 <forwarding-catch-all-strategy>
-                    <endpoint address="test2://catch.all"/>
+                    <outbound-endpoint address="test2://catch.all"/>
                 </forwarding-catch-all-strategy>
-                <endpoint name="Orange" address="test://orange/" transformers="TestCompressionTransformer"
-                               responseTransformers="TestCompressionTransformer"/>
-                <endpoint ref="orangeEndpoint" transformers="TestCompressionTransformer">
+                <inbound-endpoint name="Orange" address="test://orange/" transformers="TestCompressionTransformer"
+                                  responseTransformers="TestCompressionTransformer"/>
+                <inbound-endpoint ref="orangeEndpoint" transformers="TestCompressionTransformer">
                     <payload-type-filter expectedType="java.lang.String"/>
                     <properties>
                         <spring:entry key="testLocal" value="value1"/>
                     </properties>
-                </endpoint>
+                </inbound-endpoint>
             </inbound-router>
 
             <nested-router>
                 <binding interface="org.mule.tck.testmodels.fruit.FruitCleaner" method="wash">
-                    <endpoint address="test://do.wash"/>
+                    <outbound-endpoint address="test://do.wash"/>
                 </binding>
                 <binding interface="org.mule.tck.testmodels.fruit.FruitCleaner" method="polish">
-                    <endpoint address="test://do.polish"/>
+                    <outbound-endpoint address="test://do.polish"/>
                 </binding>
             </nested-router>
 
             <outbound-router>
                 <outbound-pass-through-router>
-                    <endpoint ref="appleInEndpoint" transformers="TestCompressionTransformer"/>
+                    <outbound-endpoint ref="appleInEndpoint" transformers="TestCompressionTransformer"/>
                 </outbound-pass-through-router>
             </outbound-router>
 
             <response-router timeout="10001">
-                <endpoint address="test://response1"/>
-                <endpoint ref="appleResponseEndpoint"/>
+                <response-endpoint address="test://response1"/>
+                <response-endpoint ref="appleResponseEndpoint"/>
                 <custom-response-router class="org.mule.tck.testmodels.mule.TestResponseAggregator"/>
             </response-router>
 
             <default-component-exception-strategy>
-                <endpoint address="test://orange.exceptions"/>
+                <outbound-endpoint address="test://orange.exceptions"/>
             </default-component-exception-strategy>
 
             <meta-info>
@@ -162,7 +161,7 @@
             <component scope="singleton" instance-ref="apple"/>
             <inbound-router>
                 <custom-catch-all-strategy class="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>
-                <endpoint ref="appleInEndpoint"/>
+                <inbound-endpoint ref="appleInEndpoint"/>
                 <selective-consumer-router>
                     <payload-type-filter expectedType="java.lang.String"/>
                 </selective-consumer-router>
@@ -173,12 +172,12 @@
             <outbound-router>
                 <custom-catch-all-strategy class="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>
                 <filtering-router transformers="TestCompressionTransformer">
-                    <endpoint address="test://appleQ2" name="TestApple-Out"/>
+                    <outbound-endpoint address="test://appleQ2" name="TestApple-Out"/>
                     <payload-type-filter expectedType="java.lang.String"/>
                 </filtering-router>
 
                 <filtering-router>
-                    <endpoint ref="waterMelonEndpoint"/>
+                    <outbound-endpoint ref="waterMelonEndpoint"/>
                     <and-filter>
                         <regex-filter pattern="the quick brown (.*)"/>
                         <regex-filter pattern="(.*) brown (.*)"/>

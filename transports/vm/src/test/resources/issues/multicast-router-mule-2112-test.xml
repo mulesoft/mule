@@ -16,12 +16,12 @@
         <service name="multicastComponent">
             <component class="org.mule.components.simple.PassThroughComponent"/>
             <inbound-router>
-                <endpoint ref="inbound" synchronous="true"/>
+                <inbound-endpoint ref="inbound" synchronous="true"/>
             </inbound-router>
             <outbound-router>
                 <multicasting-router>
-                    <endpoint ref="endpointHop1"/>
-                    <endpoint ref="endpointHop2"/>
+                    <outbound-endpoint ref="endpointHop1"/>
+                    <outbound-endpoint ref="endpointHop2"/>
                 </multicasting-router>
             </outbound-router>
         </service>
@@ -29,14 +29,14 @@
         <service name="hop1">
             <component class="org.mule.tck.functional.FunctionalTestComponent" scope="singleton"/>
             <inbound-router>
-                <endpoint ref="endpointHop1"/>
+                <inbound-endpoint ref="endpointHop1"/>
             </inbound-router>
         </service>
 
         <service name="hop2">
             <component class="org.mule.tck.functional.FunctionalTestComponent" scope="singleton"/>
             <inbound-router>
-                <endpoint ref="endpointHop2"/>
+                <inbound-endpoint ref="endpointHop2"/>
             </inbound-router>
         </service>
     </model>

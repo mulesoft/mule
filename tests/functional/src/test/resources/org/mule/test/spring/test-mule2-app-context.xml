@@ -8,21 +8,21 @@
            http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
            http://www.mulesource.org/schema/mule/management/2.0 http://www.mulesource.org/schema/mule/management/2.0/mule-management.xsd">
 
-<!-- To do replicate the contents of test-mule-autowire-app-context.xml,test-application-context.xml -->
+    <!-- To do replicate the contents of test-mule-autowire-app-context.xml,test-application-context.xml -->
 
     <!--<mgmt:jmx-server id="jmx"/>-->
 
     <custom-transformer name="ArrayToLenderList" class="org.mule.transformers.simple.ObjectToString"
-                             returnClass="java.lang.String">
+                        returnClass="java.lang.String">
     </custom-transformer>
 
     <!--<spring:bean id="creditProfileLookup" class="org.mule.routing.MuleEndpointProxy">-->
-        <!--<endpoint address="xfire:http://localhost:8081/service/CreditAgency?method=getCreditProfile"/>-->
+    <!--<endpoint address="xfire:http://localhost:8081/service/CreditAgency?method=getCreditProfile"/>-->
     <!--</spring:bean>-->
 
     <!--<spring:bean id="lendersLookup" class="org.mule.routing.MuleEndpointProxy">-->
-        <!--<endpoint address="xfire:http://localhost:8082/service/LendersService?method=getAvailableLenders"-->
-                <!--responseTransformers="ArrayToLenderList"/>-->
+    <!--<endpoint address="xfire:http://localhost:8082/service/LendersService?method=getAvailableLenders"-->
+    <!--responseTransformers="ArrayToLenderList"/>-->
     <!--</spring:bean>-->
 
 
@@ -37,18 +37,18 @@
         <service name="LoanBroker">
             <component instance-ref="apple"/>
             <inbound-router>
-                <endpoint address="vm://LoanBrokerRequests"/>
+                <inbound-endpoint address="vm://LoanBrokerRequests"/>
             </inbound-router>
 
             <!--<outbound-router>-->
-                <!--<router-static-recipient-list messageProperty="recipients">-->
-                    <!--<reply-to-endpoint address="vm://LoanBrokerQuotes"/>-->
-                <!--</router-static-recipient-list>-->
+            <!--<router-static-recipient-list messageProperty="recipients">-->
+            <!--<reply-to-endpoint address="vm://LoanBrokerQuotes"/>-->
+            <!--</router-static-recipient-list>-->
             <!--</outbound-router>-->
 
             <!--<response-router timeout="10000" failOnTimeout="false">-->
-                <!--<endpoint address="vm://LoanBrokerQuotes"/>-->
-                <!--<custom-response-router class="org.mule.samples.loanbroker.routers.BankQuotesResponseAggregator"/>-->
+            <!--<endpoint address="vm://LoanBrokerQuotes"/>-->
+            <!--<custom-response-router class="org.mule.samples.loanbroker.routers.BankQuotesResponseAggregator"/>-->
             <!--</response-router>-->
         </service>
 

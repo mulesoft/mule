@@ -38,15 +38,15 @@
         <service name="TestUMO">
             <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
-                <endpoint address="vm://testin"/>
+                <inbound-endpoint address="vm://testin"/>
             </inbound-router>
             <outbound-router>
                 <filtering-router>
-                    <endpoint ref="Sender"/>
+                    <outbound-endpoint ref="Sender"/>
                     <payload-type-filter expectedType="java.lang.Integer"/>
                 </filtering-router>
                 <filtering-router>
-                    <endpoint ref="Sender2"/>
+                    <outbound-endpoint ref="Sender2"/>
                     <payload-type-filter expectedType="java.lang.String"/>
                 </filtering-router>
             </outbound-router>
