@@ -13,6 +13,7 @@ import org.mule.components.simple.BridgeComponent;
 import org.mule.components.simple.EchoComponent;
 import org.mule.components.simple.LogComponent;
 import org.mule.components.simple.NullComponent;
+import org.mule.components.simple.PassThroughComponent;
 import org.mule.config.MuleProperties;
 import org.mule.config.QueueProfile;
 import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
@@ -216,6 +217,7 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("service", new ServiceDescriptorDefinitionParser());
         registerBeanDefinitionParser("component", new ComponentDefinitionParser("serviceFactory"));
         registerBeanDefinitionParser("bridge-component", new SimpleComponentDefinitionParser("serviceFactory", BridgeComponent.class));
+        registerBeanDefinitionParser("pass-through-component", new SimpleComponentDefinitionParser("serviceFactory", PassThroughComponent.class));
         registerBeanDefinitionParser("log-component", new SimpleComponentDefinitionParser("serviceFactory", LogComponent.class));
         registerBeanDefinitionParser("echo-component", new SimpleComponentDefinitionParser("serviceFactory", EchoComponent.class));
         registerBeanDefinitionParser("null-component", new SimpleComponentDefinitionParser("serviceFactory", NullComponent.class));

@@ -318,6 +318,16 @@
         </xsd:annotation>
     </xsd:element>
 
+    <xsd:element name="pass-through-component" type="componentShortcutType" substitutionGroup="abstract-component">
+        <xsd:annotation>
+            <xsd:documentation>
+                Built-in PassThroughComponent that enables a bridge between an inbound and outbound endpoints.
+                This is less efficient than the BridgeComponent, but respects inbound routers that "consume"
+                messages.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
     <xsd:element name="echo-component" type="componentShortcutType" substitutionGroup="abstract-component">
         <xsd:annotation>
             <xsd:documentation>

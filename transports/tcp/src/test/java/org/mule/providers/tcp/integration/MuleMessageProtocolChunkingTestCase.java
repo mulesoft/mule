@@ -20,19 +20,19 @@ import org.mule.umo.UMOMessage;
  */
 public class MuleMessageProtocolChunkingTestCase extends FunctionalTestCase
 {
+
+    public static final long WAIT_MS = 3000L;
     private static int messages = 2;
     private static int messagelength = 10;
 
     public void testChunking() throws Exception
     {
-
         String message = "";
         for (int i = 0; i < messagelength; i++)
         {
             for (int j = 0; j < 10; j++)
                 message += i;
         }
-
         sendString(message);
     }
 
@@ -65,7 +65,7 @@ public class MuleMessageProtocolChunkingTestCase extends FunctionalTestCase
 
         for (int i = 0; i < messages; i++)
         {
-            UMOMessage msg = client.receive("vm://out", 30000);
+            UMOMessage msg = client.receive("vm://out", WAIT_MS);
             assertTrue(msg.getPayload() instanceof MessageObject);
             MessageObject received = (MessageObject)msg.getPayload();
             assertEquals(message.s, received.s);
@@ -84,7 +84,7 @@ public class MuleMessageProtocolChunkingTestCase extends FunctionalTestCase
         }
         for (int i = 0; i < messages; i++)
         {
-            UMOMessage msg = client.receive("vm://out", 30000);
+            UMOMessage msg = client.receive("vm://out", WAIT_MS);
             assertEquals(message, new String((byte[])msg.getPayload()));
         }
     }

@@ -17,7 +17,7 @@
 
     <model name="main">
         <service name="BridgeIn">
-            <bridge-component/>
+            <pass-through-component/>
             <inbound-router>
                 <inbound-endpoint address="vm://in"/>
             </inbound-router>
@@ -29,7 +29,7 @@
         </service>
 
         <service name="BridgeOut">
-            <bridge-component/>
+            <pass-through-component/>
             <inbound-router>
                 <inbound-endpoint address="tcp://localhost:63994"/>
                 <message-chunking-aggregator-router/>
