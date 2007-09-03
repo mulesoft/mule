@@ -20,12 +20,15 @@ import org.mule.config.ReaderResource;
 import org.mule.config.builders.i18n.BuildersMessages;
 import org.mule.impl.ManagementContextAware;
 import org.mule.impl.registry.TransientRegistry;
+import org.mule.registry.Registry;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.util.FileUtils;
 import org.mule.util.PropertiesUtils;
 
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.script.Bindings;
@@ -135,7 +138,13 @@ public class ScriptConfigurationBuilder extends Scriptable implements Configurat
         {
             if (startupProperties != null)
             {
-                managementContext.getRegistry().registerProperties(startupProperties);
+                Registry registry = managementContext.getRegistry();
+                for (Iterator iterator = startupProperties.entrySet().iterator(); iterator.hasNext();)
+                {
+                    Map.Entry e =  (Map.Entry)iterator.next();
+                    registry.registerObject((String)e.getKey(), e.getValue(),
+                            MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES, managementContext);
+                }
             }
             
             for (int i = 0; i < configResources.length; i++)
