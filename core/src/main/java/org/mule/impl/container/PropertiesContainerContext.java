@@ -10,7 +10,7 @@
 
 package org.mule.impl.container;
 
-import org.mule.RegistryContext;
+import org.mule.config.MuleProperties;
 import org.mule.registry.RegistrationException;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.ContainerException;
@@ -61,10 +61,11 @@ public class PropertiesContainerContext extends AbstractContainerContext
             {
                 entry = (Map.Entry)iterator.next();
                 value = entry.getValue().toString();
-                value = templateParser.parse(managementContext.getRegistry().lookupProperties(), value);
+                value = templateParser.parse((Map)managementContext.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES), value);
                 try
                 {
-                    managementContext.getRegistry().registerProperty((String) entry.getKey(), value);
+                    managementContext.getRegistry().registerObject((String) entry.getKey(), value,
+                            MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES, managementContext);
                 }
                 catch (RegistrationException e)
                 {
@@ -97,14 +98,19 @@ public class PropertiesContainerContext extends AbstractContainerContext
         {
             throw new ObjectNotFoundException("null");
         }
-        Object value = RegistryContext.getRegistry().lookupProperty(key.toString());
+        Map properties = (Map)managementContext.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES);
+        if (properties == null)
+        {
+            throw new ObjectNotFoundException(key.toString());
+        }
+        Object value = properties.get(key.toString());
         if (value == null)
         {
             throw new ObjectNotFoundException(key.toString());
         }
         if (value instanceof String && enableTemplates)
         {
-            value = templateParser.parse(managementContext.getRegistry().lookupProperties(), value.toString());
+            value = templateParser.parse(properties, value.toString());
         }
         return value;
     }
@@ -126,7 +132,7 @@ public class PropertiesContainerContext extends AbstractContainerContext
                 entry = (Map.Entry) iterator.next();
                 value = entry.getValue().toString();
                 value = templateParser.parse(systemProperties, value);
-                value = templateParser.parse(managementContext.getRegistry().lookupProperties(), value);
+                value = templateParser.parse((Map)managementContext.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES), value);
                 System.setProperty(entry.getKey().toString(), value);
             }
         }
@@ -139,10 +145,11 @@ public class PropertiesContainerContext extends AbstractContainerContext
             {
                 entry = (Map.Entry) iterator.next();
                 value = entry.getValue().toString();
-                value = templateParser.parse(managementContext.getRegistry().lookupProperties(), value.toString());
+                value = templateParser.parse((Map)managementContext.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES), value.toString());
                 try
                 {
-                    managementContext.getRegistry().registerProperty((String) entry.getKey(), value);
+                    managementContext.getRegistry().registerObject((String) entry.getKey(), value,
+                            MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES, managementContext);
                 }
                 catch (RegistrationException e)
                 {

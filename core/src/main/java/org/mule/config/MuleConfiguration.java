@@ -421,7 +421,7 @@ public class MuleConfiguration
         {
             try
             {
-                RegistryContext.getRegistry().registerProperty(name, value);
+                RegistryContext.getRegistry().registerObject(name, value, MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES);
             }
             catch (RegistrationException e)
             {

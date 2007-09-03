@@ -355,12 +355,15 @@ public class TransientRegistry extends AbstractRegistry
         {
             value = applyProcessors(value);
         }
-        Map objectMap = getObjectTypeMap((Class) metadata);
+        Map objectMap = getObjectTypeMap(metadata);
         if (objectMap != null)
         {
             objectMap.put(key, value);
-            // TODO Why should registering an object affect its lifecycle?
-            applyLifecycle(value, managementContext);
+            if(managementContext != null) // need this check to call doRegisterObject(String, Object) successfully 
+            {
+                // TODO Why should registering an object affect its lifecycle?
+                applyLifecycle(value, managementContext);
+            }
         }
         else
         {
@@ -462,30 +465,6 @@ public class TransientRegistry extends AbstractRegistry
     public UMOTransformer unregisterTransformer(String transformerName)
     {
         return (UMOTransformer)getObjectTypeMap(UMOTransformer.class).remove(transformerName);
-    }
-
-    //@java.lang.Override
-    public void registerProperties(Map props)
-    {
-        getObjectTypeMap(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES).putAll(props);
-    }
-
-    // TODO MULE-2200 This doesn't make much sense, we might as well just register each property on its own as an Object.
-    public void registerProperty(String key, Object value)
-    {
-        getObjectTypeMap(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES).put(key, value);
-    }
-
-    // TODO MULE-2200 This doesn't make much sense, we might as well just register each property on its own as an Object.
-    public void unregisterProperty(String key)
-    {
-        getObjectTypeMap(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES).remove(key);
-    }
-
-    //@java.lang.Override
-    public Object lookupProperty(String key)
-    {
-        return getObjectTypeMap(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES).get(key);
     }
 
     //@java.lang.Override

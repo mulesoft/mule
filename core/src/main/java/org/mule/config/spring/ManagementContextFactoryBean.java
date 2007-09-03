@@ -24,6 +24,7 @@ import org.mule.util.ClassUtils;
 import org.mule.util.queue.QueueManager;
 
 import java.util.Map;
+import java.util.Iterator;
 
 import javax.transaction.TransactionManager;
 
@@ -249,7 +250,12 @@ public class ManagementContextFactoryBean extends AbstractFactoryBean
         {
             try
             {
-                registry.registerProperties(props);
+                for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();)
+                {
+                    Map.Entry e =  (Map.Entry)iterator.next();
+                    registry.registerObject((String)e.getKey(), e.getValue(),
+                            MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES, managementContext);
+                }
             }
             catch (RegistrationException e)
             {

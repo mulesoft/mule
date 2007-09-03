@@ -40,7 +40,6 @@ import org.mule.util.UUID;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -376,37 +375,9 @@ public abstract class AbstractRegistry implements Registry
 
     protected abstract Collection doLookupObjects(Class type);
 
-    // TODO MULE-2200 This doesn't make much sense, we might as well just register each property on its own as an Object.
-    public Object lookupProperty(String key, int scope)
-    {
-        Map props = lookupProperties(scope);
-        if (props != null)
-        {
-            return props.get(key);
-        }
-        return lookupObject(key, scope);
-    }
-
-    /** @deprecated use lookupProperty() instead */
-    public Map lookupProperties(int scope)
-    {
-        return (Map) lookupObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES, scope);
-    }
-
     public Object lookupObject(String key)
     {
         return lookupObject(key, getDefaultScope());
-    }
-
-    /** @deprecated use lookupProperty() instead */
-    public Map lookupProperties()
-    {
-        return lookupProperties(getDefaultScope());
-    }
-
-    public Object lookupProperty(String key)
-    {
-        return lookupProperty(key, getDefaultScope());
     }
 
     /**
@@ -754,21 +725,6 @@ public abstract class AbstractRegistry implements Registry
     {
         unsupportedOperation("unregisterAgent", agentName);
         return null;
-    }
-
-    public void registerProperty(String key, Object value)
-    {
-        unsupportedOperation("registerProperty", value);
-    }
-
-    public void unregisterProperty(String key)
-    {
-        unsupportedOperation("unregisterProperty", key);
-    }
-
-    public void registerProperties(Map props)
-    {
-        unsupportedOperation("registerProperties", props);
     }
 
     public final void registerObject(String key, Object value) throws RegistrationException

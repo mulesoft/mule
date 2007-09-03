@@ -25,7 +25,6 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.UMOTransformer;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.Properties;
 
 public interface Registry extends Initialisable, Disposable
@@ -55,18 +54,6 @@ public interface Registry extends Initialisable, Disposable
     //Object lookupObject(String key, Class returnType);
 
     //Object lookupObject(String key, Class returnType, int scope);
-
-    // TODO MULE-2200 
-    Object lookupProperty(String key);
-
-    // TODO MULE-2200 
-    Object lookupProperty(String key, int scope);
-
-    /** @deprecated Use lookupProperty() instead */    
-    Map lookupProperties();
-
-    /** @deprecated Use lookupProperty() instead */    
-    Map lookupProperties(int scope);
 
     // TODO Not sure these methods are needed since the generic ones above can be used.
     
@@ -118,15 +105,6 @@ public interface Registry extends Initialisable, Disposable
     void registerObject(String key, Object value, Object metadata, UMOManagementContext managementContext) throws RegistrationException;
 
     void unregisterObject(String key);
-
-    // TODO MULE-2200 
-    void registerProperty(String key, Object value) throws RegistrationException;
-
-    // TODO MULE-2200 
-    void unregisterProperty(String key);
-
-    /** @deprecated Use registerProperty() instead */    
-    void registerProperties(Map props) throws RegistrationException;
 
     // TODO MULE-2139 The following methods are Mule-specific and should be split out into a separate class; 
     // leave this one as a "pure" registry interface.

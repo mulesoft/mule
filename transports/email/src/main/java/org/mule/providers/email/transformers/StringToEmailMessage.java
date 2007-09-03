@@ -20,6 +20,7 @@ import org.mule.umo.transformer.TransformerException;
 import org.mule.util.MapUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.TemplateParser;
+import org.mule.config.MuleProperties;
 
 import java.util.Calendar;
 import java.util.HashMap;
@@ -87,7 +88,7 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
         Properties otherHeaders = (Properties) eventMsg.getProperty(MailProperties.CUSTOM_HEADERS_MAP_PROPERTY);
         if (otherHeaders != null && !otherHeaders.isEmpty())
         {
-            Map props = new HashMap(context.getManagementContext().getRegistry().lookupProperties());
+            Map props = new HashMap((Map)context.getManagementContext().getRegistry().lookupObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES));
             for (Iterator iterator = eventMsg.getPropertyNames().iterator(); iterator.hasNext();)
             {
                 String propertyKey = (String) iterator.next();

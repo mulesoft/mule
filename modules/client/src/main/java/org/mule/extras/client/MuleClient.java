@@ -50,15 +50,14 @@ import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.MuleObjectHelper;
 import org.mule.util.StringUtils;
 
-import edu.emory.mathcs.backport.java.util.concurrent.Callable;
-import edu.emory.mathcs.backport.java.util.concurrent.Executor;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import edu.emory.mathcs.backport.java.util.concurrent.Callable;
+import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -1076,7 +1075,8 @@ public class MuleClient implements Disposable
     {
         try
         {
-            managementContext.getRegistry().registerProperty(key, value);
+            managementContext.getRegistry().registerObject(key, value,
+                            MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES, managementContext);
         }
         catch (RegistrationException e)
         {
@@ -1086,7 +1086,12 @@ public class MuleClient implements Disposable
 
     public Object getProperty(String key)
     {
-        return managementContext.getRegistry().lookupProperty(key);
+        Map props = (Map)managementContext.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES);
+        if(props != null)
+        {
+            return props.get(key);
+        }
+        return null;
     }
 
     public MuleConfiguration getConfiguration()

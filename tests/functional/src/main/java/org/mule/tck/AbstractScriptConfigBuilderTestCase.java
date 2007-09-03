@@ -10,8 +10,8 @@
 
 package org.mule.tck;
 
+import org.mule.config.MuleProperties;
 import org.mule.impl.AbstractExceptionListener;
-//import org.mule.management.agents.JmxAgent;
 import org.mule.providers.SimpleRetryConnectionStrategy;
 import org.mule.routing.ForwardingCatchAllStrategy;
 import org.mule.routing.filters.xml.JXPathFilter;
@@ -19,12 +19,10 @@ import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.tck.testmodels.fruit.FruitCleaner;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.mule.tck.testmodels.mule.TestConnector;
-import org.mule.tck.testmodels.mule.TestDefaultLifecycleAdapterFactory;
 import org.mule.tck.testmodels.mule.TestEntryPointResolver;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.tck.testmodels.mule.TestResponseAggregator;
 import org.mule.umo.UMODescriptor;
-import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.umo.model.UMOModel;
@@ -50,7 +48,9 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
 
     public void testManagerConfig() throws Exception
     {
-        assertEquals("true", managementContext.getRegistry().lookupProperty("doCompression"));
+        Map props = (Map)managementContext.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES);
+        assertNotNull(props);
+        assertEquals("true", props.get("doCompression"));
         assertNotNull(managementContext.getTransactionManager());
     }
 

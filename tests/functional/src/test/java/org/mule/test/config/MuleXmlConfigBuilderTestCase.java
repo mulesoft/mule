@@ -14,6 +14,7 @@ import org.mule.MuleException;
 import org.mule.RegistryContext;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.ThreadingProfile;
+import org.mule.config.MuleProperties;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.impl.MuleDescriptor;
 import org.mule.providers.AbstractConnector;
@@ -153,7 +154,9 @@ public class MuleXmlConfigBuilderTestCase extends AbstractConfigBuilderTestCase
 
     public void testSystemPropertyOverride()
     {
-        assertEquals("default", managementContext.getRegistry().lookupProperty("system-prop2"));
+        Map props = (Map)managementContext.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES);
+        assertNotNull(props);
+        assertEquals("default", props.get("system-prop2"));
     }
 
     /**
