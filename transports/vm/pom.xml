@@ -38,8 +38,6 @@
                  <artifactId>maven-surefire-plugin</artifactId>
                  <configuration>
                      <excludes>
-                         <!-- MULE-2041 PersistentVMQueueTestCase needs a converted config -->
-                         <exclude>**/PersistentVMQueueTestCase.*</exclude>
                          <!-- MULE-2136 -->
                          <exclude>**/MulticastRouterMule2136TestCase.*</exclude>
                          <!-- MULE-2131 -->
