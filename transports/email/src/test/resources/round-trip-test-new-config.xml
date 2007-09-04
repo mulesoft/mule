@@ -23,7 +23,7 @@
                 <pop3:inbound-endpoint>
                     <pop3:address username="bob" password="secret" hostname="localhost" port="62002"/>
                     <pop3:transformers>
-                        <email:mime-to-rfc-822/>
+                        <email:transform-mime-to-rfc-822/>
                     </pop3:transformers>
                 </pop3:inbound-endpoint>
             </inbound-router>
@@ -49,9 +49,9 @@
                         <vm:address name="rfc822"/>
                     </vm:outbound-endpoint>
                     <smtp:outbound-endpoint>
-                        <smtp:address username="alice" password="secret" hostname="localhost" port="62000">
+                        <smtp:address username="alice" password="secret" hostname="localhost" port="62000"/>
                         <smtp:transformers>
-                            <email:rfc-822-to-mime/>
+                            <email:transform-rfc-822-to-mime/>
                         </smtp:transformers>
                     </smtp:outbound-endpoint>
                 </multicasting-router>

@@ -45,7 +45,7 @@ public class MuleChildDefinitionParser extends OrphanDefinitionParser
         if (!isTopLevel(element))
         {
             throw new IllegalStateException("This element should be embedded inside the Mule <"
-                    + ROOT_ELEMENT + "> or < " + ROOT_UNSAFE_ELEMENT + "> elements: "
+                    + ROOT_ELEMENT + "> or <" + ROOT_UNSAFE_ELEMENT + "> elements: "
                     + MuleHierarchicalBeanDefinitionParserDelegate.elementToString(element));
         }
     }

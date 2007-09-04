@@ -12,6 +12,8 @@ package org.mule.config.spring.parsers.generic;
 import org.mule.config.spring.parsers.AbstractChildDefinitionParser;
 
 import org.w3c.dom.Element;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.xml.ParserContext;
 
 /**
  * Creates a definition parser that will construct a single child element and inject it into
@@ -21,7 +23,7 @@ import org.w3c.dom.Element;
  * process any nested elements as bean properties too, except the correct Definition parser
  * for the element will be looked up automatically.
  */
-public class ChildDefinitionParser extends AbstractChildDefinitionParser
+public class ChildDefinitionParser extends AbstractChildDefinitionParser implements DelegateDefinitionParser
 {
 
     protected Class clazz;
@@ -91,6 +93,11 @@ public class ChildDefinitionParser extends AbstractChildDefinitionParser
     public String getPropertyName(Element e)
     {
         return setterMethod;
+    }
+
+    public AbstractBeanDefinition parseDelegate(Element element, ParserContext parserContext)
+    {
+        return parseInternal(element, parserContext);
     }
 
 }

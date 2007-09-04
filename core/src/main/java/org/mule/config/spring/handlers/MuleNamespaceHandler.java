@@ -25,6 +25,7 @@ import org.mule.config.spring.parsers.generic.NameTransferDefinitionParser;
 import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
+import org.mule.config.spring.parsers.generic.ParentContextDefinitionParser;
 import org.mule.config.spring.parsers.specific.AddressedEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
 import org.mule.config.spring.parsers.specific.ConfigurationDefinitionParser;
@@ -39,6 +40,7 @@ import org.mule.config.spring.parsers.specific.ServiceOverridesDefinitionParser;
 import org.mule.config.spring.parsers.specific.SimpleComponentDefinitionParser;
 import org.mule.config.spring.parsers.specific.ThreadingProfileDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransactionConfigDefinitionParser;
+import org.mule.config.spring.editors.TransformerChain;
 import org.mule.impl.DefaultComponentExceptionStrategy;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.container.JndiContainerContext;
@@ -112,6 +114,7 @@ import org.mule.transformers.simple.HexStringToByteArray;
 import org.mule.transformers.simple.ObjectToByteArray;
 import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.transformers.simple.StringToByteArray;
+import org.mule.transformers.simple.StringAppendTransformer;
 import org.mule.util.properties.BeanPropertyExtractor;
 import org.mule.util.properties.MapPropertyExtractor;
 import org.mule.util.properties.MessagePropertyExtractor;
@@ -157,6 +160,9 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("custom-connector", new MuleChildDefinitionParser(true));
 
         //Transformer elements
+        registerBeanDefinitionParser("transformers", new ChildDefinitionParser("transformer", TransformerChain.class));
+        registerBeanDefinitionParser("transformers-ref", new ParentDefinitionParser().addAlias("transformers", "transformer"));
+
         registerBeanDefinitionParser("custom-transformer", new MuleChildDefinitionParser(false));
         registerBeanDefinitionParser("transformer-no-action", new MuleChildDefinitionParser(NoActionTransformer.class, false));
 
@@ -178,6 +184,10 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("transformer-serializable-to-byte-array", new MuleChildDefinitionParser(SerializableToByteArray.class, false));
         registerBeanDefinitionParser("transformer-byte-array-to-string", new MuleChildDefinitionParser(ByteArrayToString.class, false));
         registerBeanDefinitionParser("transformer-string-to-byte-array", new MuleChildDefinitionParser(StringToByteArray.class, false));
+
+        registerBeanDefinitionParser("transformer-append-string",
+                new ParentContextDefinitionParser("mule mule-unsafe", new MuleChildDefinitionParser(StringAppendTransformer.class, false))
+                        .and("transformers", new ChildDefinitionParser("transformer", StringAppendTransformer.class)));
 
         //Transaction Managers
         //TODO RM*: Need to review these, since Spring have some facilities for configuring the transactionManager

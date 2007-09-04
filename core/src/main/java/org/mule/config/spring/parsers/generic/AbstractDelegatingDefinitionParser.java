@@ -10,6 +10,8 @@
 
 package org.mule.config.spring.parsers.generic;
 
+import org.mule.util.ArrayUtils;
+
 import java.util.Map;
 
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -32,9 +34,19 @@ public abstract class AbstractDelegatingDefinitionParser extends AbstractBeanDef
 
     private DelegateDefinitionParser[] delegates;
 
+    protected AbstractDelegatingDefinitionParser()
+    {
+        this(new DelegateDefinitionParser[0]);
+    }
+
     protected AbstractDelegatingDefinitionParser(DelegateDefinitionParser[] delegates)
     {
         this.delegates = delegates;
+    }
+
+    protected void addDelegate(DelegateDefinitionParser delegate)
+    {
+        delegates = (DelegateDefinitionParser[]) ArrayUtils.add(delegates, delegate);
     }
 
     protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext)

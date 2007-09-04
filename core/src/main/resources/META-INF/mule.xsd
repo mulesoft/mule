@@ -440,13 +440,20 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <!-- these include option/repeats - should be embedded once -->
     <xsd:group name="defaultEndpointElements">
         <xsd:sequence>
-            <xsd:element ref="abstract-transaction" minOccurs="0"/>
-            <xsd:element ref="abstract-filter" minOccurs="0"/>
-            <xsd:element ref="abstract-security-filter" minOccurs="0"/>
-            <xsd:element ref="abstract-connection-strategy" minOccurs="0"/>
-            <xsd:element name="properties" type="mapType" minOccurs="0"/>
+            <xsd:choice minOccurs="0">
+                <xsd:element ref="transformers"/>
+                <xsd:element ref="transformers-ref"/>
+            </xsd:choice>
+            <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+                <xsd:element ref="abstract-transaction" minOccurs="0"/>
+                <xsd:element ref="abstract-filter" minOccurs="0"/>
+                <xsd:element ref="abstract-security-filter" minOccurs="0"/>
+                <xsd:element ref="abstract-connection-strategy" minOccurs="0"/>
+                <xsd:element name="properties" type="mapType" minOccurs="0"/>
+            </xsd:sequence>
         </xsd:sequence>
     </xsd:group>
 
@@ -590,7 +597,23 @@
     <!--   Transformer elements                                       -->
     <!--==============================================================-->
 
-    <xsd:element name="custom-transformer" type="customTransformerType" substitutionGroup="abstract-transformer"/>
+    <xsd:element name="transformers" type="transformersType"/>
+    <xsd:complexType name="transformersType">
+        <!-- min occurs must be 1 since setting this erases existing transformer.
+             if you don't eant transformers, omit the entire transformers element -->
+        <xsd:sequence minOccurs="1" maxOccurs="unbounded">
+            <xsd:element ref="abstract-transformer"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+     <xsd:element name="transformers-ref" type="transformersRefType"/>
+    <xsd:complexType name="transformersRefType">
+        <!-- min occurs must be 1 since setting this erases existing transformer.
+             if you don't eant transformers, omit the entire transformers element -->
+        <xsd:attribute name="transformers" type="xsd:NMTOKENS" use="required"/>
+    </xsd:complexType>
+
+   <xsd:element name="custom-transformer" type="customTransformerType" substitutionGroup="abstract-transformer"/>
     <xsd:complexType name="customTransformerType">
         <xsd:complexContent>
             <xsd:extension base="abstractTransformerType">
@@ -625,6 +648,16 @@
     <xsd:element name="transformer-serializable-to-byte-array" type="abstractTransformerType" substitutionGroup="abstract-transformer"/>
     <xsd:element name="transformer-byte-array-to-string" type="abstractTransformerType" substitutionGroup="abstract-transformer"/>
     <xsd:element name="transformer-string-to-byte-array" type="abstractTransformerType" substitutionGroup="abstract-transformer"/>
+
+    <xsd:element name="transformer-append-string" substitutionGroup="abstract-transformer">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="abstractTransformerType">
+                    <xsd:attribute name="message" type="xsd:string" use="required"/>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
 
     <!-- TODO RM* Wire formats -->
 

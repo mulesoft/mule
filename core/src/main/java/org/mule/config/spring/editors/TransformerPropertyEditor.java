@@ -10,45 +10,27 @@
 package org.mule.config.spring.editors;
 
 import org.mule.RegistryContext;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.umo.transformer.UMOTransformer;
 
 import java.beans.PropertyEditorSupport;
 import java.util.StringTokenizer;
 
 /**
  * Translates a transformer name property into a transformer instance. If more than one transformer
- * name is supplied, ech will be resolved and chained together.
+ * name is supplied, each will be resolved and chained together.
  */
 public class TransformerPropertyEditor extends PropertyEditorSupport
 {
     public void setAsText(String text) {
 
-        StringTokenizer st = new StringTokenizer(text, " ");
-        UMOTransformer currentTrans = null;
-        UMOTransformer returnTrans = null;
+        StringTokenizer st = new StringTokenizer(text);
+        TransformerChain chain = new TransformerChain();
 
         while (st.hasMoreTokens())
         {
             String name = st.nextToken().trim();
-            UMOTransformer tempTrans = RegistryContext.getRegistry().lookupTransformer(name);
-
-            if (tempTrans == null)
-            {
-                throw new IllegalArgumentException(CoreMessages.objectNotRegistered("Transformer", name).getMessage());
-            }
-
-            if (currentTrans == null)
-            {
-                currentTrans = tempTrans;
-                returnTrans = tempTrans;
-            }
-            else
-            {
-                currentTrans.setNextTransformer(tempTrans);
-                currentTrans = tempTrans;
-            }
+            chain.addTransformer(RegistryContext.getRegistry().lookupTransformer(name));
         }
-        setValue(returnTrans);
+        setValue(chain);
     }
+
 }

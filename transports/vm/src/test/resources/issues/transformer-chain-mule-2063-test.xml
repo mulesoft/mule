@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+       xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+               http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+               http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
+
+    <vm:connector queueEvents="true" name="queue"/>
+
+    <model name="model1">
+        <service name="service1">
+            <pass-through-component/>
+            <inbound-router>
+                <inbound-endpoint address="vm://test1-in">
+                <!-- vm:inbound-endpoint>
+                    <vm:address address="in"/ -->
+                    <transformers>
+                        <transformer-append-string message="1"/>
+                        <transformer-append-string message="2"/>
+                        <transformer-append-string message="3"/>
+                    </transformers>
+                <!-- /vm:inbound-endpoint -->
+                </inbound-endpoint>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="vm://test1-out">
+                    <!-- vm:outbound-endpoint>
+                        <vm:address address="out"/>
+                    </vm:outbound-endpoint -->
+                    </outbound-endpoint>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
+    </model>
+
+    <transformer-append-string message="1" name="1"/>
+    <transformer-append-string message="2" name="2"/>
+    <transformer-append-string message="3" name="3"/>
+
+    <model name="model2">
+        <service name="service2">
+            <pass-through-component/>
+            <inbound-router>
+                <inbound-endpoint address="vm://test2-in">
+                <!-- vm:inbound-endpoint>
+                    <vm:address address="in"/ -->
+                    <transformers-ref transformers="1 2 3"/>
+                <!-- /vm:inbound-endpoint -->
+                </inbound-endpoint>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="vm://test2-out">
+                    <!-- vm:outbound-endpoint>
+                        <vm:address address="out"/>
+                    </vm:outbound-endpoint -->
+                    </outbound-endpoint>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
+    </model>
+
+    <model name="model3">
+        <service name="service3">
+            <pass-through-component/>
+            <inbound-router>
+                <inbound-endpoint address="vm://test3-in">
+                <!-- vm:inbound-endpoint>
+                    <vm:address address="in"/ -->
+                    <transformers>
+                        <transformer-append-string message="1"/>
+                        <transformer-append-string message="2"/>
+                        <transformer-append-string message="3"/>
+                    </transformers>
+                <!-- /vm:inbound-endpoint -->
+                </inbound-endpoint>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="vm://test3-out">
+                    <!-- vm:outbound-endpoint>
+                        <vm:address address="out"/ -->
+                        <transformers>
+                            <transformer-append-string message="a"/>
+                            <transformer-append-string message="b"/>
+                            <transformer-append-string message="c"/>
+                        </transformers>
+                    <!-- /vm:outbound-endpoint -->
+                    </outbound-endpoint>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
+    </model>
+
+</mule>
