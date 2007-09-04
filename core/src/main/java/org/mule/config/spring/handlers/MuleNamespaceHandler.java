@@ -25,12 +25,10 @@ import org.mule.config.spring.parsers.generic.NameTransferDefinitionParser;
 import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
-import org.mule.config.spring.parsers.generic.ParentContextDefinitionParser;
 import org.mule.config.spring.parsers.specific.AddressedEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
 import org.mule.config.spring.parsers.specific.ConfigurationDefinitionParser;
 import org.mule.config.spring.parsers.specific.ConnectionStrategyDefinitionParser;
-import org.mule.config.spring.parsers.specific.EndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
 import org.mule.config.spring.parsers.specific.ObjectFactoryDefinitionParser;
 import org.mule.config.spring.parsers.specific.PoolingProfileDefinitionParser;
@@ -40,6 +38,7 @@ import org.mule.config.spring.parsers.specific.ServiceOverridesDefinitionParser;
 import org.mule.config.spring.parsers.specific.SimpleComponentDefinitionParser;
 import org.mule.config.spring.parsers.specific.ThreadingProfileDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransactionConfigDefinitionParser;
+import org.mule.config.spring.parsers.specific.TransformerDefinitionParser;
 import org.mule.config.spring.editors.TransformerChain;
 import org.mule.impl.DefaultComponentExceptionStrategy;
 import org.mule.impl.DefaultExceptionStrategy;
@@ -164,30 +163,28 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("transformers-ref", new ParentDefinitionParser().addAlias("transformers", "transformer"));
 
         registerBeanDefinitionParser("custom-transformer", new MuleChildDefinitionParser(false));
-        registerBeanDefinitionParser("transformer-no-action", new MuleChildDefinitionParser(NoActionTransformer.class, false));
+        registerBeanDefinitionParser("transformer-no-action", new TransformerDefinitionParser(NoActionTransformer.class));
 
-        registerBeanDefinitionParser("transformer-base64-encoder", new MuleChildDefinitionParser(Base64Encoder.class, false));
-        registerBeanDefinitionParser("transformer-base64-decoder", new MuleChildDefinitionParser(Base64Decoder.class, false));
+        registerBeanDefinitionParser("transformer-base64-encoder", new TransformerDefinitionParser(Base64Encoder.class));
+        registerBeanDefinitionParser("transformer-base64-decoder", new TransformerDefinitionParser(Base64Decoder.class));
 
-        registerBeanDefinitionParser("transformer-xml-entity-encoder", new MuleChildDefinitionParser(XmlEntityEncoder.class, false));
-        registerBeanDefinitionParser("transformer-xml-entity-decoder", new MuleChildDefinitionParser(XmlEntityDecoder.class, false));
-        registerBeanDefinitionParser("transformer-gzip-compress", new MuleChildDefinitionParser(GZipCompressTransformer.class, false));
-        registerBeanDefinitionParser("transformer-gzip-uncompress", new MuleChildDefinitionParser(GZipUncompressTransformer.class, false));
-        registerBeanDefinitionParser("transformer-encrypt", new MuleChildDefinitionParser(EncryptionTransformer.class, false));
-        registerBeanDefinitionParser("transformer-decrypt", new MuleChildDefinitionParser(DecryptionTransformer.class, false));
-        registerBeanDefinitionParser("transformer-byte-array-to-hex-string", new MuleChildDefinitionParser(ByteArrayToHexString.class, false));
-        registerBeanDefinitionParser("transformer-hex-sting-to-byte-array", new MuleChildDefinitionParser(HexStringToByteArray.class, false));
+        registerBeanDefinitionParser("transformer-xml-entity-encoder", new TransformerDefinitionParser(XmlEntityEncoder.class));
+        registerBeanDefinitionParser("transformer-xml-entity-decoder", new TransformerDefinitionParser(XmlEntityDecoder.class));
+        registerBeanDefinitionParser("transformer-gzip-compress", new TransformerDefinitionParser(GZipCompressTransformer.class));
+        registerBeanDefinitionParser("transformer-gzip-uncompress", new TransformerDefinitionParser(GZipUncompressTransformer.class));
+        registerBeanDefinitionParser("transformer-encrypt", new TransformerDefinitionParser(EncryptionTransformer.class));
+        registerBeanDefinitionParser("transformer-decrypt", new TransformerDefinitionParser(DecryptionTransformer.class));
+        registerBeanDefinitionParser("transformer-byte-array-to-hex-string", new TransformerDefinitionParser(ByteArrayToHexString.class));
+        registerBeanDefinitionParser("transformer-hex-sting-to-byte-array", new TransformerDefinitionParser(HexStringToByteArray.class));
 
-        registerBeanDefinitionParser("transformer-byte-array-to-object", new MuleChildDefinitionParser(ByteArrayToObject.class, false));
-        registerBeanDefinitionParser("transformer-object-to-byte-array", new MuleChildDefinitionParser(ObjectToByteArray.class, false));
-        registerBeanDefinitionParser("transformer-byte-array-to-serializable", new MuleChildDefinitionParser(ByteArrayToSerializable.class, false));
-        registerBeanDefinitionParser("transformer-serializable-to-byte-array", new MuleChildDefinitionParser(SerializableToByteArray.class, false));
-        registerBeanDefinitionParser("transformer-byte-array-to-string", new MuleChildDefinitionParser(ByteArrayToString.class, false));
-        registerBeanDefinitionParser("transformer-string-to-byte-array", new MuleChildDefinitionParser(StringToByteArray.class, false));
+        registerBeanDefinitionParser("transformer-byte-array-to-object", new TransformerDefinitionParser(ByteArrayToObject.class));
+        registerBeanDefinitionParser("transformer-object-to-byte-array", new TransformerDefinitionParser(ObjectToByteArray.class));
+        registerBeanDefinitionParser("transformer-byte-array-to-serializable", new TransformerDefinitionParser(ByteArrayToSerializable.class));
+        registerBeanDefinitionParser("transformer-serializable-to-byte-array", new TransformerDefinitionParser(SerializableToByteArray.class));
+        registerBeanDefinitionParser("transformer-byte-array-to-string", new TransformerDefinitionParser(ByteArrayToString.class));
+        registerBeanDefinitionParser("transformer-string-to-byte-array", new TransformerDefinitionParser(StringToByteArray.class));
 
-        registerBeanDefinitionParser("transformer-append-string",
-                new ParentContextDefinitionParser("mule mule-unsafe", new MuleChildDefinitionParser(StringAppendTransformer.class, false))
-                        .and("transformers", new ChildDefinitionParser("transformer", StringAppendTransformer.class)));
+        registerBeanDefinitionParser("transformer-append-string", new TransformerDefinitionParser(StringAppendTransformer.class));
 
         //Transaction Managers
         //TODO RM*: Need to review these, since Spring have some facilities for configuring the transactionManager
