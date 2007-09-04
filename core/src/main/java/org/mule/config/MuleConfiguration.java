@@ -12,14 +12,17 @@ package org.mule.config;
 
 import org.mule.MuleRuntimeException;
 import org.mule.RegistryContext;
+import org.mule.registry.RegistrationException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.providers.ConnectionStrategy;
 import org.mule.providers.SingleAttemptConnectionStrategy;
-import org.mule.registry.RegistrationException;
 import org.mule.umo.manager.DefaultWorkListener;
 import org.mule.util.FileUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.UUID;
+
+import java.util.Map;
+import java.util.HashMap;
 
 import javax.resource.spi.work.WorkListener;
 
@@ -421,9 +424,17 @@ public class MuleConfiguration
         {
             try
             {
-                RegistryContext.getRegistry().registerObject(name, value, MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES);
-            }
-            catch (RegistrationException e)
+                Map props = ((Map)RegistryContext.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES));
+                if(props == null)
+                {
+                    props = new HashMap();
+                    props.put(name, value);
+                    RegistryContext.getRegistry().registerObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES, props);
+                } else
+                {
+                    props.put(name, value);
+                }
+            } catch (RegistrationException e)
             {
                 logger.error(e);
             }

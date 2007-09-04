@@ -20,6 +20,7 @@ import org.mule.util.TemplateParser;
 import java.io.Reader;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Provides a facade for accessing System properties and properties on the
@@ -64,8 +65,16 @@ public class PropertiesContainerContext extends AbstractContainerContext
                 value = templateParser.parse((Map)managementContext.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES), value);
                 try
                 {
-                    managementContext.getRegistry().registerObject((String) entry.getKey(), value,
-                            MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES, managementContext);
+                    Map props = ((Map)managementContext.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES));
+                    if(props == null)
+                    {
+                        props = new HashMap();
+                        props.put(entry.getKey(), value);
+                        managementContext.getRegistry().registerObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES, props, managementContext);
+                    } else
+                    {
+                        props.put(entry.getKey(), value);
+                    }
                 }
                 catch (RegistrationException e)
                 {
@@ -148,8 +157,16 @@ public class PropertiesContainerContext extends AbstractContainerContext
                 value = templateParser.parse((Map)managementContext.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES), value.toString());
                 try
                 {
-                    managementContext.getRegistry().registerObject((String) entry.getKey(), value,
-                            MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES, managementContext);
+                    Map muleProps = ((Map)managementContext.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES));
+                    if(muleProps == null)
+                    {
+                        muleProps = new HashMap();
+                        muleProps.put(entry.getKey(), value);
+                        managementContext.getRegistry().registerObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES, muleProps, managementContext);
+                    } else
+                    {
+                        muleProps.put(entry.getKey(), value);
+                    }
                 }
                 catch (RegistrationException e)
                 {

@@ -314,6 +314,7 @@ public abstract class AbstractRegistry implements Registry
 
     public final Object lookupObject(String key, int scope)
     {
+        logger.debug("lookupObject: key=" + key + " scope=" + scope);
         Object o = doLookupObject(key);
         
         if (o == null)
@@ -344,6 +345,7 @@ public abstract class AbstractRegistry implements Registry
 
     public final Collection lookupObjects(Class type, int scope)
     {
+        logger.debug("lookupObjects: type=" + type + " scope=" + scope);
         Collection collection = doLookupObjects(type);
         if (collection == null)
         {
@@ -744,6 +746,7 @@ public abstract class AbstractRegistry implements Registry
     
     public final void registerObject(String key, Object value, Object metadata, UMOManagementContext managementContext) throws RegistrationException
     {
+        logger.debug("registerObject: key=" + key + " value=" + value + " metadata=" + metadata + " managementContext=" + managementContext);
         if (value instanceof ManagementContextAware)
         {
             if (managementContext == null)

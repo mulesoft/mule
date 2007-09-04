@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
+import java.util.HashMap;
 
 import javax.script.Bindings;
 import javax.script.CompiledScript;
@@ -142,8 +143,16 @@ public class ScriptConfigurationBuilder extends Scriptable implements Configurat
                 for (Iterator iterator = startupProperties.entrySet().iterator(); iterator.hasNext();)
                 {
                     Map.Entry e =  (Map.Entry)iterator.next();
-                    registry.registerObject((String)e.getKey(), e.getValue(),
-                            MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES, managementContext);
+                    Map props = ((Map)registry.lookupObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES));
+                    if(props == null)
+                    {
+                        props = new HashMap();
+                        props.put(e.getKey(), e.getValue());
+                        registry.registerObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES, props, managementContext);
+                    } else
+                    {
+                        props.put(e.getKey(), e.getValue());
+                    }
                 }
             }
             

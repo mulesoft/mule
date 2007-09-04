@@ -29,8 +29,8 @@ import org.mule.impl.registry.TransientRegistry;
 import org.mule.impl.security.MuleCredentials;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.service.TransportFactory;
-import org.mule.registry.RegistrationException;
 import org.mule.registry.Registry;
+import org.mule.registry.RegistrationException;
 import org.mule.umo.FutureMessageResult;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMODescriptor;
@@ -1075,13 +1075,21 @@ public class MuleClient implements Disposable
     {
         try
         {
-            managementContext.getRegistry().registerObject(key, value,
-                            MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES, managementContext);
-        }
-        catch (RegistrationException e)
+            Map props = ((Map)managementContext.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES));
+            if(props == null)
+            {
+                props = new HashMap();
+                props.put(key, value);
+                managementContext.getRegistry().registerObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES, props, managementContext);
+            } else
+            {
+                props.put(key, value);
+            }
+        } catch (RegistrationException e)
         {
             logger.error(e);
         }
+
     }
 
     public Object getProperty(String key)
