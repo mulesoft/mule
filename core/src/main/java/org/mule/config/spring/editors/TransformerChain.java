@@ -51,6 +51,19 @@ public class TransformerChain implements UMOTransformer
         }
     }
 
+    // for testing
+    public Class getDelegateClass()
+    {
+        if (null == delegate)
+        {
+            return null;
+        }
+        else
+        {
+            return delegate.getClass();
+        }
+    }
+
     public boolean isSourceTypeSupported(Class aClass)
     {
         return delegate.isSourceTypeSupported(aClass);
