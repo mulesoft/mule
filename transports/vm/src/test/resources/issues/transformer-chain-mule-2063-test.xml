@@ -14,24 +14,20 @@
         <service name="service1">
             <pass-through-component/>
             <inbound-router>
-                <inbound-endpoint address="vm://test1-in">
-                <!-- vm:inbound-endpoint>
-                    <vm:address address="in"/ -->
+                <vm:inbound-endpoint>
+                    <vm:address address="test1-in"/>
                     <transformers>
                         <transformer-append-string message="1"/>
                         <transformer-append-string message="2"/>
                         <transformer-append-string message="3"/>
                     </transformers>
-                <!-- /vm:inbound-endpoint -->
-                </inbound-endpoint>
+                </vm:inbound-endpoint>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <outbound-endpoint address="vm://test1-out">
-                    <!-- vm:outbound-endpoint>
-                        <vm:address address="out"/>
-                    </vm:outbound-endpoint -->
-                    </outbound-endpoint>
+                    <vm:outbound-endpoint>
+                        <vm:address address="test1-out"/>
+                    </vm:outbound-endpoint>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
@@ -45,20 +41,16 @@
         <service name="service2">
             <pass-through-component/>
             <inbound-router>
-                <inbound-endpoint address="vm://test2-in">
-                <!-- vm:inbound-endpoint>
-                    <vm:address address="in"/ -->
+                <vm:inbound-endpoint>
+                    <vm:address address="test2-in"/>
                     <transformers-ref transformers="1 2 3"/>
-                <!-- /vm:inbound-endpoint -->
-                </inbound-endpoint>
+                </vm:inbound-endpoint>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <outbound-endpoint address="vm://test2-out">
-                    <!-- vm:outbound-endpoint>
-                        <vm:address address="out"/>
-                    </vm:outbound-endpoint -->
-                    </outbound-endpoint>
+                    <vm:outbound-endpoint>
+                        <vm:address address="test2-out"/>
+                    </vm:outbound-endpoint>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
@@ -68,29 +60,25 @@
         <service name="service3">
             <pass-through-component/>
             <inbound-router>
-                <inbound-endpoint address="vm://test3-in">
-                <!-- vm:inbound-endpoint>
-                    <vm:address address="in"/ -->
+                <vm:inbound-endpoint>
+                    <vm:address address="test3-in"/>
                     <transformers>
                         <transformer-append-string message="1"/>
                         <transformer-append-string message="2"/>
                         <transformer-append-string message="3"/>
                     </transformers>
-                <!-- /vm:inbound-endpoint -->
-                </inbound-endpoint>
+                </vm:inbound-endpoint>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <outbound-endpoint address="vm://test3-out">
-                    <!-- vm:outbound-endpoint>
-                        <vm:address address="out"/ -->
+                    <vm:outbound-endpoint>
+                        <vm:address address="test3-out"/>
                         <transformers>
                             <transformer-append-string message="a"/>
                             <transformer-append-string message="b"/>
                             <transformer-append-string message="c"/>
                         </transformers>
-                    <!-- /vm:outbound-endpoint -->
-                    </outbound-endpoint>
+                    </vm:outbound-endpoint>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>

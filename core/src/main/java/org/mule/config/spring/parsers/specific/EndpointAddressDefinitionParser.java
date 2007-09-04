@@ -21,8 +21,7 @@ import java.net.URI;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.w3c.dom.Element;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
 
 public class EndpointAddressDefinitionParser extends ChildDefinitionParser
 {
@@ -44,14 +43,14 @@ public class EndpointAddressDefinitionParser extends ChildDefinitionParser
 
 
     /**
-     * This isn't efficient, but is only used during startup.  It has the advantage that it separates
-     * the simple string-based config here from the bloated mess that is UMOEndpointURI.  Presumably
-     * at some point that will be simplified and the code here should need minimal changes.
+     * The idea here is that we behave identically to the original (address="string")
+     * case, which uses a property editor to construct a MuleEndpointURI from the
+     * string value.  We need to delegate because of the way definition parsers work
+     * (and because subclassing MuleEndpointURI itself to make a lazy child class is
+     * crazy talk)
      */
     public static class EndpointAddress implements UMOEndpointURI
     {
-
-        private Log logger = LogFactory.getLog(getClass());
 
         private String protocol;
         private String username;
@@ -60,33 +59,41 @@ public class EndpointAddressDefinitionParser extends ChildDefinitionParser
         private Integer port;
         private String path;
 
+        private AtomicReference delegate = new AtomicReference();
+
         public void setUsername(String username)
         {
+            assertNotYetInjected();
             this.username = username;
         }
 
         public void setPassword(String password)
         {
+            assertNotYetInjected();
             this.password = password;
         }
 
         public void setHostname(String hostname)
         {
+            assertNotYetInjected();
             this.hostname = hostname;
         }
 
         public void setPort(int port)
         {
+            assertNotYetInjected();
             this.port = new Integer(port);
         }
 
         public void setProtocol(String protocol)
         {
+            assertNotYetInjected();
             this.protocol = protocol;
         }
 
         public void setPath(String path)
         {
+            assertNotYetInjected();
             this.path = path;
         }
 
@@ -119,32 +126,50 @@ public class EndpointAddressDefinitionParser extends ChildDefinitionParser
             return buffer.toString();
         }
 
-        protected UMOEndpointURI delegate()
+        protected void assertNotYetInjected()
         {
-            try
+            if (null != delegate.get())
             {
-                return new MuleEndpointURI(toString());
-            }
-            catch (EndpointException e)
-            {
-                throw (IllegalStateException) new IllegalStateException("Bad address").initCause(e);
+                throw new IllegalStateException("Too late to set values now!");
             }
         }
 
+        protected UMOEndpointURI lazyDelegate()
+        {
+            UMOEndpointURI exists =(UMOEndpointURI) delegate.get();
+            if (null != exists)
+            {
+                return exists;
+            }
+            else
+            {
+                try
+                {
+                    delegate.compareAndSet(null, new MuleEndpointURI(toString()));
+                }
+                catch (EndpointException e)
+                {
+                    throw (IllegalStateException) new IllegalStateException("Bad address").initCause(e);
+                }
+                return lazyDelegate();
+            }
+        }
+
+        // these are called after injection
 
         public String getAddress()
         {
-            return delegate().getAddress();
+            return lazyDelegate().getAddress();
         }
 
         public String getFilterAddress()
         {
-            return delegate().getFilterAddress();
+            return lazyDelegate().getFilterAddress();
         }
 
         public String getEndpointName()
         {
-            return delegate().getEndpointName();
+            return lazyDelegate().getEndpointName();
         }
 
         public void setEndpointName(String name)
@@ -154,102 +179,102 @@ public class EndpointAddressDefinitionParser extends ChildDefinitionParser
 
         public Properties getParams()
         {
-            return delegate().getParams();
+            return lazyDelegate().getParams();
         }
 
         public Properties getUserParams()
         {
-            return delegate().getUserParams();
+            return lazyDelegate().getUserParams();
         }
 
         public String getScheme()
         {
-            return delegate().getScheme();
+            return lazyDelegate().getScheme();
         }
 
         public String getSchemeMetaInfo()
         {
-            return delegate().getSchemeMetaInfo();
+            return lazyDelegate().getSchemeMetaInfo();
         }
 
         public String getFullScheme()
         {
-            return delegate().getFullScheme();
+            return lazyDelegate().getFullScheme();
         }
 
         public String getAuthority()
         {
-            return delegate().getAuthority();
+            return lazyDelegate().getAuthority();
         }
 
         public String getHost()
         {
-            return delegate().getHost();
+            return lazyDelegate().getHost();
         }
 
         public int getPort()
         {
-            return delegate().getPort();
+            return lazyDelegate().getPort();
         }
 
         public String getPath()
         {
-            return delegate().getPath();
+            return lazyDelegate().getPath();
         }
 
         public String getQuery()
         {
-            return delegate().getQuery();
+            return lazyDelegate().getQuery();
         }
 
         public String getUserInfo()
         {
-            return delegate().getUserInfo();
+            return lazyDelegate().getUserInfo();
         }
 
         public String getTransformers()
         {
-            return delegate().getTransformers();
+            return lazyDelegate().getTransformers();
         }
 
         public String getResponseTransformers()
         {
-            return delegate().getResponseTransformers();
+            return lazyDelegate().getResponseTransformers();
         }
 
         public int getCreateConnector()
         {
-            return delegate().getCreateConnector();
+            return lazyDelegate().getCreateConnector();
         }
 
         public URI getUri()
         {
-            return delegate().getUri();
+            return lazyDelegate().getUri();
         }
 
         public String getConnectorName()
         {
-            return delegate().getConnectorName();
+            return lazyDelegate().getConnectorName();
         }
 
         public String getResourceInfo()
         {
-            return delegate().getResourceInfo();
+            return lazyDelegate().getResourceInfo();
         }
 
         public String getUsername()
         {
-            return delegate().getUsername();
+            return lazyDelegate().getUsername();
         }
 
         public String getPassword()
         {
-            return delegate().getPassword();
+            return lazyDelegate().getPassword();
         }
 
         public void initialise() throws InitialisationException
         {
-            // do nothing
+            lazyDelegate().initialise();
         }
 
     }
