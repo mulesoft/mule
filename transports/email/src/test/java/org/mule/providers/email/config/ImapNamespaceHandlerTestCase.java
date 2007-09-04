@@ -12,6 +12,7 @@ package org.mule.providers.email.config;
 import org.mule.providers.email.ImapConnector;
 import org.mule.providers.email.ImapsConnector;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.umo.endpoint.UMOEndpoint;
 
 /**
  * TODO
@@ -62,6 +63,21 @@ public class ImapNamespaceHandlerTestCase extends FunctionalTestCase
 
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());
+    }
+
+    public void testEndpoint()
+    {
+        UMOEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("global");
+        assertNotNull(endpoint);
+        String address = endpoint.getEndpointURI().getAddress();
+        assertNotNull(address);
+        assertEquals("bob@localhost:123", address);
+        String password = endpoint.getEndpointURI().getPassword();
+        assertNotNull(password);
+        assertEquals("secret", password);
+        String protocol = endpoint.getProtocol();
+        assertNotNull(protocol);
+        assertEquals("imap", protocol);
     }
 
 }

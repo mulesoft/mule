@@ -16,7 +16,7 @@
     <model name="test">
 
         <service name="relay">
-            <component class="org.mule.components.simple.BridgeComponent"/>
+            <bridge-component/>
             <inbound-router>
                 <inbound-endpoint address="imap://bob:password@localhost:65433">
                     <retry-connection-strategy retryCount="3" retryFrequency="1000"/>

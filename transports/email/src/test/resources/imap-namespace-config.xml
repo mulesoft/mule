@@ -22,4 +22,8 @@
         <imaps:tls-trust-store trustStore="greenmail-truststore" trustStorePassword="password"/>
     </imaps:connector>
 
+    <imap:endpoint name="global">
+        <imap:address hostname="localhost" password="secret" port="123" username="bob"/>
+    </imap:endpoint>
+
 </mule>

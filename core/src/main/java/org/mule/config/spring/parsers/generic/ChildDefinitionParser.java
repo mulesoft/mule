@@ -23,6 +23,7 @@ import org.w3c.dom.Element;
  */
 public class ChildDefinitionParser extends AbstractChildDefinitionParser
 {
+
     protected Class clazz;
     protected String setterMethod;
 

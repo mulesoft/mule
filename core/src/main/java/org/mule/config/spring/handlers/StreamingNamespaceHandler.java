@@ -10,18 +10,18 @@
 
 package org.mule.config.spring.handlers;
 
-import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.config.spring.parsers.specific.EndpointDefinitionParser;
+import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
+import org.mule.config.spring.parsers.specific.AddressedEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.RouterDefinitionParser;
 import org.mule.config.spring.parsers.specific.ServiceDescriptorDefinitionParser;
 import org.mule.impl.endpoint.InboundStreamingEndpoint;
 import org.mule.impl.endpoint.OutboundStreamingEndpoint;
 import org.mule.impl.endpoint.ResponseStreamingEndpoint;
 import org.mule.impl.model.streaming.StreamingModel;
+import org.mule.routing.inbound.InboundRouterCollection;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.routing.outbound.OutboundRouterCollection;
-import org.mule.routing.inbound.InboundRouterCollection;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
@@ -35,9 +35,9 @@ public class StreamingNamespaceHandler  extends NamespaceHandlerSupport
         registerBeanDefinitionParser("inbound-router", new ChildDefinitionParser("inboundRouter", InboundRouterCollection.class));
         registerBeanDefinitionParser("outbound-router", new ChildDefinitionParser("outboundRouter", OutboundRouterCollection.class));
         registerBeanDefinitionParser("outbound-pass-through-router", new RouterDefinitionParser("router", OutboundPassThroughRouter.class));
-        registerBeanDefinitionParser("inbound-endpoint", new EndpointDefinitionParser(InboundStreamingEndpoint.class));
-        registerBeanDefinitionParser("outbound-endpoint", new EndpointDefinitionParser(OutboundStreamingEndpoint.class));
-        registerBeanDefinitionParser("response-endpoint", new EndpointDefinitionParser(ResponseStreamingEndpoint.class));
+        registerBeanDefinitionParser("inbound-endpoint", new AddressedEndpointDefinitionParser(InboundStreamingEndpoint.class));
+        registerBeanDefinitionParser("outbound-endpoint", new AddressedEndpointDefinitionParser(OutboundStreamingEndpoint.class));
+        registerBeanDefinitionParser("response-endpoint", new AddressedEndpointDefinitionParser(ResponseStreamingEndpoint.class));
     }
 
 }

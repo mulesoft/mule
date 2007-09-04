@@ -25,6 +25,7 @@ import org.w3c.dom.Element;
  */
 public class EndpointDefinitionParser extends AbstractChildDefinitionParser
 {
+
     public static final String ADDRESS_ATTRIBUTE = "address";
     public static final String ENDPOINT_REF_ATTRIBUTE = "ref";
 
@@ -67,42 +68,6 @@ public class EndpointDefinitionParser extends AbstractChildDefinitionParser
     //@Override
     protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
-        //Check to see if this is a global endpoint
-        if (isGlobal(element))
-        {
-            builder.addPropertyValue("type", UMOImmutableEndpoint.ENDPOINT_TYPE_GLOBAL);
-            // if global, cannot be a reference (afaik)
-            if (null == element.getAttributeNode(ADDRESS_ATTRIBUTE))
-            {
-                throw new IllegalStateException("A global endpoint requires an " + ADDRESS_ATTRIBUTE + " attribute.");
-            }
-            if (null != element.getAttributeNode(ENDPOINT_REF_ATTRIBUTE))
-            {
-                throw new IllegalStateException("A global endpoint cannot contain a " + ENDPOINT_REF_ATTRIBUTE +
-                        " attribute.");
-            }
-        }
-        else
-        {
-            // must be reference *or* have an address
-            if (null == element.getAttributeNode(ADDRESS_ATTRIBUTE))
-            {
-                if (null == element.getAttributeNode(ENDPOINT_REF_ATTRIBUTE))
-                {
-                    throw new IllegalStateException("An endpoint requires either an " + ADDRESS_ATTRIBUTE + " or a " +
-                            ENDPOINT_REF_ATTRIBUTE + " attribute.");
-                }
-            }
-            else
-            {
-                if (null != element.getAttributeNode(ENDPOINT_REF_ATTRIBUTE))
-                {
-                    throw new IllegalStateException("The " + ADDRESS_ATTRIBUTE + " and " + ENDPOINT_REF_ATTRIBUTE +
-                            " attributes are mutually exclusive.");
-                }
-            }
-        }
-
         //Register non-descriptive dependencies i.e. string values for objects listed in the container
         if(StringUtils.isNotBlank(element.getAttribute("connector")))
         {

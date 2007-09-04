@@ -25,6 +25,7 @@ import org.mule.config.spring.parsers.generic.NameTransferDefinitionParser;
 import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
+import org.mule.config.spring.parsers.specific.AddressedEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
 import org.mule.config.spring.parsers.specific.ConfigurationDefinitionParser;
 import org.mule.config.spring.parsers.specific.ConnectionStrategyDefinitionParser;
@@ -189,10 +190,10 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("transaction-manager-websphere", new MuleChildDefinitionParser(WebsphereTransactionManagerLookupFactory.class, true));
 
         //Endpoint elements
-        registerBeanDefinitionParser("endpoint", new EndpointDefinitionParser(GlobalEndpoint.class));
-        registerBeanDefinitionParser("inbound-endpoint", new EndpointDefinitionParser(InboundEndpoint.class));
-        registerBeanDefinitionParser("outbound-endpoint", new EndpointDefinitionParser(OutboundEndpoint.class));
-        registerBeanDefinitionParser("response-endpoint", new EndpointDefinitionParser(ResponseEndpoint.class));
+        registerBeanDefinitionParser("endpoint", new AddressedEndpointDefinitionParser(GlobalEndpoint.class));
+        registerBeanDefinitionParser("inbound-endpoint", new AddressedEndpointDefinitionParser(InboundEndpoint.class));
+        registerBeanDefinitionParser("outbound-endpoint", new AddressedEndpointDefinitionParser(OutboundEndpoint.class));
+        registerBeanDefinitionParser("response-endpoint", new AddressedEndpointDefinitionParser(ResponseEndpoint.class));
         registerBeanDefinitionParser("transaction", new TransactionConfigDefinitionParser());
         registerBeanDefinitionParser("transaction-factory", new ObjectFactoryDefinitionParser("factory"));
 

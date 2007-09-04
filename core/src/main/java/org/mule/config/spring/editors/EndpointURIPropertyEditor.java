@@ -15,11 +15,12 @@ import org.mule.umo.endpoint.EndpointException;
 import java.beans.PropertyEditorSupport;
 
 /**
- * Translates a connecotr name property into the corresponding {@link org.mule.umo.provider.UMOConnector}
+ * Translates a connector name property into the corresponding {@link org.mule.umo.provider.UMOConnector}
  * instance.
  */
 public class EndpointURIPropertyEditor extends PropertyEditorSupport
 {
+
     public void setAsText(String text)
     {
         try
@@ -31,4 +32,5 @@ public class EndpointURIPropertyEditor extends PropertyEditorSupport
             throw new IllegalArgumentException(e.getMessage());
         }
     }
+
 }

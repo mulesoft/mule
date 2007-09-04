@@ -451,15 +451,19 @@
     </xsd:group>
 
     <xsd:attributeGroup name="defaultEndpointAttributes">
+        <xsd:attributeGroup ref="restrictedEndpointAttributes"/>
         <!-- these next two attributes are mutually exclusive and one is required.
           but there is no way to define this in a schema... -->
         <!-- endpoint references - dynamically checked to make sure not top level -->
         <xsd:attribute name="ref" type="xsd:NMTOKEN"/>
         <!-- explicit or global endpoints -->
         <xsd:attribute name="address" type="xsd:string"/>
-        <xsd:attribute name="name" type="xsd:NMTOKEN"/>
         <xsd:attribute name="transformers" type="xsd:string"/>
         <xsd:attribute name="responseTransformers" type="xsd:string"/>
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="restrictedEndpointAttributes">
+        <xsd:attribute name="name" type="xsd:NMTOKEN"/>
         <xsd:attribute name="synchronous" type="substitutableBoolean"/>
         <xsd:attribute name="remoteSync" type="substitutableBoolean"/>
         <xsd:attribute name="remoteSyncTimeout" type="xsd:NMTOKEN"/>
@@ -1621,6 +1625,10 @@
         <xsd:complexContent>
             <xsd:extension base="spring:mapType" />
         </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="referenceType">
+        <xsd:attribute name="ref" type="xsd:NMTOKEN"/>
     </xsd:complexType>
 
     <!--==============================================================-->
