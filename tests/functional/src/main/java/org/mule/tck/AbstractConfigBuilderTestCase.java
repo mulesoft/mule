@@ -13,12 +13,12 @@ package org.mule.tck;
 import org.mule.MuleException;
 import org.mule.RegistryContext;
 import org.mule.config.ThreadingProfile;
+import org.mule.config.spring.editors.TransformerChain;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.service.TransportFactory;
-import org.mule.registry.Registry;
 import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.routing.filters.RegExFilter;
 import org.mule.routing.filters.logic.AndFilter;
@@ -129,7 +129,8 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         UMOOutboundRouter route1 = (UMOOutboundRouter) router.getRouters().get(0);
         assertTrue(route1 instanceof FilteringOutboundRouter);
         assertNotNull(((FilteringOutboundRouter) route1).getTransformer());
-        assertTrue(((FilteringOutboundRouter) route1).getTransformer() instanceof TestCompressionTransformer);
+        assertTrue((((FilteringOutboundRouter) route1).getTransformer()) instanceof TransformerChain);
+        assertTrue(((TransformerChain) ((FilteringOutboundRouter) route1).getTransformer()).getDelegateClass().equals(TestCompressionTransformer.class));
 
         UMOFilter filter = ((FilteringOutboundRouter) route1).getFilter();
         assertNotNull(filter);

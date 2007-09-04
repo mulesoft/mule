@@ -11,6 +11,7 @@
 package org.mule.tck;
 
 import org.mule.config.MuleProperties;
+import org.mule.config.spring.editors.TransformerChain;
 import org.mule.impl.AbstractExceptionListener;
 import org.mule.providers.SimpleRetryConnectionStrategy;
 import org.mule.routing.ForwardingCatchAllStrategy;
@@ -213,7 +214,8 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertNotNull(endpoint);
         assertEquals("appleInEndpoint", endpoint.getName());
         assertNotNull(endpoint.getTransformer());
-        assertTrue(endpoint.getTransformer() instanceof TestCompressionTransformer);
+        assertTrue(endpoint.getTransformer() instanceof TransformerChain);
+        assertTrue(((TransformerChain) endpoint.getTransformer()).getDelegateClass().equals(TestCompressionTransformer.class));
 
         // check the global endpoint
         endpoint = managementContext.getRegistry().lookupEndpoint("appleInEndpoint");
@@ -234,7 +236,8 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertEquals("orangeEndpoint", endpoint.getName());
         assertEquals("orangeQ", endpoint.getEndpointURI().getAddress());
         assertNotNull(endpoint.getTransformer());
-        assertTrue(endpoint.getTransformer() instanceof TestCompressionTransformer);
+        assertTrue(endpoint.getTransformer() instanceof TransformerChain);
+        assertTrue(((TransformerChain) endpoint.getTransformer()).getDelegateClass().equals(TestCompressionTransformer.class));
 
         // check the global endpoint
         endpoint = managementContext.getRegistry().lookupEndpoint("orangeEndpoint");
