@@ -62,6 +62,7 @@
                         <!-- These tests are a work-in-progress -->
                         <exclude>**/JettyTestCase.java</exclude>
                         <exclude>**/TomcatTestCase.java</exclude>
+                        <exclude>**/MockTestCase.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>

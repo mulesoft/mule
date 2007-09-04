@@ -15,9 +15,9 @@
     <!-- workaround for http://mule.mulesource.org/jira/browse/MULE-1827 -->
     <custom-transformer class="org.mule.transformers.simple.MessagePropertiesTransformer">
         <spring:property name="addProperties">
-            <map>
-                <entry key="Content-Type" value="text/plain"/>
-            </map>
+            <spring:map>
+                <spring:entry key="Content-Type" value="text/plain"/>
+            </spring:map>
         </spring:property>
     </custom-transformer>
 
@@ -34,7 +34,7 @@
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <endpoint address="restFileEndpoint"/>
+                    <endpoint ref="restFileEndpoint"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
