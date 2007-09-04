@@ -77,7 +77,11 @@
                 <!-- Incoming HTTP requests -->
                 <endpoint address="http://localhost:8888" 
                     transformers="HttpRequestToString StringToNameString"
-                    synchronous="true"/>
+                    synchronous="true">
+                    <not-filter>
+                        <wildcard-filter pattern="/favicon.ico"/>   
+                    </not-filter>
+                </endpoint>
                 <!-- Incoming Servlet requests -->
                 <endpoint address="servlet://rest" 
                     transformers="StringToNameString"
