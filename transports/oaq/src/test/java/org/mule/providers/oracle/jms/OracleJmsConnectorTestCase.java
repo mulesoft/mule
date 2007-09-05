@@ -25,31 +25,25 @@ import javax.jms.TextMessage;
 public class OracleJmsConnectorTestCase extends AbstractConnectorTestCase
 {
 
-    private OracleJmsConnector connector;
-
     // @Override
     public UMOConnector createConnector() throws Exception
     {
-        if (connector == null)
-        {
-            connector = new OracleJmsConnector();
-            connector.setName("TestConnector");
-            connector.setUrl("jdbc:oracle:oci:@TEST_DB");
-            connector.setUsername("scott");
-            connector.setPassword("tiger");
+        OracleJmsConnector newConnector = new OracleJmsConnector();
+        newConnector.setName("TestConnector");
+        newConnector.setUrl("jdbc:oracle:oci:@TEST_DB");
+        newConnector.setUsername("scott");
+        newConnector.setPassword("tiger");
 
-            Mock connectionFactory = new Mock(ConnectionFactory.class);
-            Mock connection = new Mock(Connection.class);
-            connectionFactory.expectAndReturn("createConnection", connection.proxy());
-            connection.expect("close");
-            connection.expect("start");
-            connection.expect("stop");
-            connection.expect("stop");
-            connection.expect("setClientID", "mule.TestConnector");
-            connector.setConnectionFactory(new SingletonObjectFactory(connectionFactory.proxy()));
-            connector.initialise();
-        }
-        return connector;
+        Mock connectionFactory = new Mock(ConnectionFactory.class);
+        Mock connection = new Mock(Connection.class);
+        connectionFactory.expectAndReturn("createConnection", connection.proxy());
+        connection.expect("close");
+        connection.expect("start");
+        connection.expect("stop");
+        connection.expect("stop");
+        connection.expect("setClientID", "mule.TestConnector");
+        newConnector.setConnectionFactory(new SingletonObjectFactory(connectionFactory.proxy()));
+        return newConnector;
     }
 
     public String getTestEndpointURI()
