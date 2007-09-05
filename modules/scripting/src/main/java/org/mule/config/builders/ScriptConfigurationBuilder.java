@@ -10,18 +10,18 @@
 
 package org.mule.config.builders;
 
+import org.mule.MuleServer;
 import org.mule.components.script.jsr223.Scriptable;
 import org.mule.config.ConfigurationException;
 import org.mule.config.MuleProperties;
 import org.mule.config.ReaderResource;
-import org.mule.config.spring.MuleApplicationContext;
 import org.mule.config.builders.i18n.BuildersMessages;
+import org.mule.config.spring.MuleApplicationContext;
 import org.mule.registry.Registry;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.util.FileUtils;
 import org.mule.util.PropertiesUtils;
-import org.mule.MuleServer;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -131,12 +131,13 @@ public class ScriptConfigurationBuilder extends MuleXmlConfigurationBuilder
                 {
                     Map.Entry e =  (Map.Entry)iterator.next();
                     Map props = ((Map)registry.lookupObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES));
-                    if(props == null)
+                    if (props == null)
                     {
                         props = new HashMap();
                         props.put(e.getKey(), e.getValue());
                         registry.registerObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES, props, managementContext);
-                    } else
+                    }
+                    else
                     {
                         props.put(e.getKey(), e.getValue());
                     }
@@ -153,9 +154,9 @@ public class ScriptConfigurationBuilder extends MuleXmlConfigurationBuilder
                 scriptComponent.runScript(ns);
             }
 
-            if (!managementContext.isInitialised() )
+            if (!managementContext.isInitialised() && !managementContext.isInitialising())
             {
-               managementContext.initialise();
+                managementContext.initialise();
             }
 
             if (System.getProperty(MuleProperties.MULE_START_AFTER_CONFIG_SYSTEM_PROPERTY, "true")
@@ -163,7 +164,7 @@ public class ScriptConfigurationBuilder extends MuleXmlConfigurationBuilder
             {
                 if (!managementContext.isStarted())
                 {
-                   managementContext.start();
+                    managementContext.start();
                 }
             }
 
