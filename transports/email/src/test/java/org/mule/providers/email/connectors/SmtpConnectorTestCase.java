@@ -110,7 +110,7 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
         UMOEndpoint endpoint = new MuleEndpoint(getTestEndpointURI(), false);
         managementContext.getRegistry().registerService(
             MuleTestUtils.createDescriptor(FunctionalTestComponent.class.getName(), 
-                                           "testComponent", null, endpoint, props),
+                                           uniqueName("testComponent"), null, endpoint, props),
             managementContext);
 
         UMOMessage message = new MuleMessage(MESSAGE);

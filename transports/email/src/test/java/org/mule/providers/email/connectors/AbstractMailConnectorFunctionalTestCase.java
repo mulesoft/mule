@@ -50,6 +50,7 @@ public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractCo
     
     private static final AtomicInteger nextPort = new AtomicInteger(INITIAL_SERVER_PORT);
     private static final Log staticLogger = LogFactory.getLog(AbstractMailConnectorFunctionalTestCase.class);
+    private static final AtomicInteger nameCount = new AtomicInteger(0);
 
     private MimeMessage message;
     private Servers servers;
@@ -233,6 +234,11 @@ public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractCo
                 }
             }
         }
+    }
+
+    protected String uniqueName(String root)
+    {
+        return root + nameCount.incrementAndGet();
     }
 
 }

@@ -72,7 +72,7 @@ public abstract class AbstractReceivingMailConnectorTestCase extends AbstractMai
         managementContext.getRegistry().registerConnector(createConnector(false), managementContext);
         managementContext.getRegistry().registerService(
             MuleTestUtils.createDescriptor(FunctionalTestComponent.class.getName(), 
-                                           "testComponent", getTestEndpointURI(), 
+                                           uniqueName("testComponent"), getTestEndpointURI(),
                                            null, props, managementContext),
             managementContext);
 
