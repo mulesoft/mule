@@ -28,7 +28,6 @@ public class AxisConnectorTestCase extends AbstractConnectorTestCase
     {
         AxisConnector c = new AxisConnector();
         c.setName("axisConnector");
-        c.setManagementContext(managementContext);
         return c;
     }
 
