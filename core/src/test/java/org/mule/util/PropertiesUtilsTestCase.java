@@ -12,6 +12,7 @@ package org.mule.util;
 
 import org.mule.tck.AbstractMuleTestCase;
 
+import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,7 +60,7 @@ public class PropertiesUtilsTestCase extends AbstractMuleTestCase
         Map props = new HashMap();
 
         props.put("blah.booleanProperty", "true");
-        props.put("blah.blah.doubleProperty", "0.1243");
+        props.put("blah.blah.doubleProperty", NumberFormat.getInstance().format(0.124));
         props.put("blah.blah.Blah.intProperty", "14");
         props.put("longProperty", "999999999");
         props.put("3456.stringProperty", "string");
@@ -67,7 +68,7 @@ public class PropertiesUtilsTestCase extends AbstractMuleTestCase
         props = PropertiesUtils.removeNamespaces(props);
 
         assertTrue(MapUtils.getBooleanValue(props, "booleanProperty", false));
-        assertEquals(0.1243, 0, MapUtils.getDoubleValue(props, "doubleProperty", 0));
+        assertEquals(0.124, 0, MapUtils.getDoubleValue(props, "doubleProperty", 0));
         assertEquals(14, MapUtils.getIntValue(props, "intProperty", 0));
         assertEquals(999999999, 0, MapUtils.getLongValue(props, "longProperty", 0));
         assertEquals("string", MapUtils.getString(props, "stringProperty", ""));
