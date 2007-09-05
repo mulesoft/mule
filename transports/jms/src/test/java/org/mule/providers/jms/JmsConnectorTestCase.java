@@ -26,7 +26,6 @@ import org.apache.commons.collections.IteratorUtils;
 
 public class JmsConnectorTestCase extends AbstractConnectorTestCase
 {
-    private JmsConnector connector;
 
     /*
      * (non-Javadoc)
@@ -36,25 +35,22 @@ public class JmsConnectorTestCase extends AbstractConnectorTestCase
     // @Override
     public UMOConnector createConnector() throws Exception
     {
-        if (connector == null)
-        {
-            connector = new JmsConnector();
-            connector.setName("TestConnector");
-            connector.setSpecification(JmsConstants.JMS_SPECIFICATION_11);
+        JmsConnector newConnector = new JmsConnector();
+        newConnector.setName("TestConnector");
+        newConnector.setSpecification(JmsConstants.JMS_SPECIFICATION_11);
 
-            Mock connectionFactory = new Mock(ConnectionFactory.class);
-            Mock connection = new Mock(Connection.class);
-            connectionFactory.expectAndReturn("createConnection", connection.proxy());
-            connection.expect("setExceptionListener", C.isA(ExceptionListener.class));
-            connection.expect("close");
-            connection.expect("start");
-            connection.expect("stop");
-            connection.expect("stop");
-            connection.expect("setClientID", "mule.TestConnector");
-            connector.setConnectionFactory(new SingletonObjectFactory(connectionFactory.proxy()));
-            //connector.initialise();
-        }
-        return connector;
+        Mock connectionFactory = new Mock(ConnectionFactory.class);
+        Mock connection = new Mock(Connection.class);
+        connectionFactory.expectAndReturn("createConnection", connection.proxy());
+        connection.expect("setExceptionListener", C.isA(ExceptionListener.class));
+        connection.expect("close");
+        connection.expect("start");
+        connection.expect("stop");
+        connection.expect("stop");
+        connection.expect("setClientID", "mule.TestConnector");
+        newConnector.setConnectionFactory(new SingletonObjectFactory(connectionFactory.proxy()));
+
+        return newConnector;
     }
 
     public String getTestEndpointURI()
