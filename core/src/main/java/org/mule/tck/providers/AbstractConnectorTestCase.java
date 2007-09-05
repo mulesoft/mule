@@ -74,6 +74,8 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         }
 
         managementContext.getRegistry().registerConnector(connector, managementContext);
+        // TODO MULE-1988
+        managementContext.start();
     }
 
     protected void doTearDown() throws Exception
