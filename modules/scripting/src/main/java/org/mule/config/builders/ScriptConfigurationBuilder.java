@@ -10,37 +10,35 @@
 
 package org.mule.config.builders;
 
-import org.mule.MuleServer;
-import org.mule.RegistryContext;
 import org.mule.components.script.jsr223.Scriptable;
-import org.mule.config.ConfigurationBuilder;
 import org.mule.config.ConfigurationException;
 import org.mule.config.MuleProperties;
 import org.mule.config.ReaderResource;
+import org.mule.config.spring.MuleApplicationContext;
 import org.mule.config.builders.i18n.BuildersMessages;
-import org.mule.impl.ManagementContextAware;
-import org.mule.impl.registry.TransientRegistry;
 import org.mule.registry.Registry;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.util.FileUtils;
 import org.mule.util.PropertiesUtils;
+import org.mule.MuleServer;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
-import java.util.HashMap;
 
 import javax.script.Bindings;
-import javax.script.CompiledScript;
 
 /**
  * Configures a MuleManager from one or more script files.
  */
-public class ScriptConfigurationBuilder extends Scriptable implements ConfigurationBuilder, ManagementContextAware
+public class ScriptConfigurationBuilder extends MuleXmlConfigurationBuilder
 {
     public static final String SCRIPT_ENGINE_NAME_PROPERTY = "org.mule.script.engine";
+
+    private Scriptable scriptComponent = new Scriptable();
 
     protected UMOManagementContext managementContext = null;
     protected boolean initialised = false;
@@ -55,7 +53,7 @@ public class ScriptConfigurationBuilder extends Scriptable implements Configurat
         }
         else
         {
-            this.setScriptEngineName(scriptName);
+            scriptComponent.setScriptEngineName(scriptName);
         }
     }
 
@@ -67,30 +65,14 @@ public class ScriptConfigurationBuilder extends Scriptable implements Configurat
     public ScriptConfigurationBuilder(String scriptEngineName, boolean createDefaultRegistry) throws UMOException
     {
         //Create a Registry by default if we do not have one
-        if(RegistryContext.getRegistry()==null && createDefaultRegistry)
-        {
-            // TODO MULE-2161
-            TransientRegistry registry = TransientRegistry.createNew();
-            RegistryContext.setRegistry(registry);
-            managementContext = MuleServer.getManagementContext();
-        }
-        this.setScriptEngineName(scriptEngineName);
-    }
-
-    public UMOManagementContext configure(String configResources) throws ConfigurationException
-    {
-        try
-        {
-            // TODO MULE-1988
-            UMOManagementContext context = configure(configResources, null);
-            context.initialise();
-            context.start();
-            return context;
-        }
-        catch (UMOException e)
-        {
-            throw new ConfigurationException(e);
-        }
+//        if(RegistryContext.getRegistry()==null && createDefaultRegistry)
+//        {
+//            // TODO MULE-2161
+//            TransientRegistry registry = TransientRegistry.createNew();
+//            RegistryContext.setRegistry(registry);
+//            managementContext = MuleServer.getManagementContext();
+//        }
+        scriptComponent.setScriptEngineName(scriptEngineName);
     }
 
     /**
@@ -106,6 +88,11 @@ public class ScriptConfigurationBuilder extends Scriptable implements Configurat
     {
         try
         {
+            MuleApplicationContext context = new MuleApplicationContext(new String[]{getDefaultConfigResource()});
+
+            managementContext = context.getManagementContext();
+            MuleServer.setManagementContext(managementContext);
+
             ReaderResource[] readers = ReaderResource.parseResources(configResources, FileUtils.DEFAULT_ENCODING);
 
             // Load startup properties if any.
@@ -159,16 +146,20 @@ public class ScriptConfigurationBuilder extends Scriptable implements Configurat
             for (int i = 0; i < configResources.length; i++)
             {
                 ReaderResource configResource = configResources[i];
-                setScriptFile(configResource.getDescription());
-                initialise();
-                Bindings ns = getScriptEngine().createBindings();
+                scriptComponent.setScriptFile(configResource.getDescription());
+                scriptComponent.initialise();
+                Bindings ns = scriptComponent.getScriptEngine().createBindings();
                 populateBindings(ns);
-                CompiledScript script = compileScript(configResource.getReader());
-                script.eval(ns);
+                scriptComponent.runScript(ns);
+            }
+
+            if (!managementContext.isInitialised() )
+            {
+               managementContext.initialise();
             }
 
             if (System.getProperty(MuleProperties.MULE_START_AFTER_CONFIG_SYSTEM_PROPERTY, "true")
-                .equalsIgnoreCase("true"))
+                .equalsIgnoreCase("true") && isStartContext())
             {
                 if (!managementContext.isStarted())
                 {
@@ -189,13 +180,4 @@ public class ScriptConfigurationBuilder extends Scriptable implements Configurat
         bindings.put("managementContext", managementContext);
     }
 
-    public boolean isConfigured()
-    {
-        return managementContext != null;
-    }
-
-    public void setManagementContext(UMOManagementContext context)
-    {
-        this.managementContext = context;
-    }
 }

@@ -1,7 +1,11 @@
 package org.mule.config.builders;
 
+import org.mule.MuleServer
+import org.mule.config.MuleProperties;
+import org.mule.config.spring.editors.TransformerChain;
 import org.mule.impl.DefaultComponentExceptionStrategy;
 import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.impl.MuleDescriptor;
 import org.mule.impl.model.seda.SedaModel;
 import org.mule.management.agents.JmxAgent;
 import org.mule.management.agents.RmiRegistryAgent;
@@ -12,8 +16,11 @@ import org.mule.routing.filters.xml.JXPathFilter;
 import org.mule.routing.inbound.InboundRouterCollection;
 import org.mule.routing.nested.NestedRouter;
 import org.mule.routing.nested.NestedRouterCollection;
+import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.routing.response.ResponseRouterCollection;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.testmodels.fruit.FruitCleaner;
+import org.mule.tck.testmodels.fruit.FloridaSunnyOrangeFactory;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.mule.tck.testmodels.mule.TestConnector;
@@ -28,130 +35,153 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.routing.UMONestedRouterCollection;
+import org.mule.umo.routing.UMOOutboundRouter;
 import org.mule.umo.routing.UMOResponseRouterCollection;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+UMOManagementContext managementContext = MuleServer.managementContext
      
 // need this when running with JMX
-managementContext.setId("GroovyScriptTestCase");
+managementContext.id = "GroovyScriptTestCase"
 
 //set global properties
-managementContext.getRegistry().registerProperty("doCompression", "true");
-//disable the admin agent
-//manager.getConfiguration().setServerUrl("");
+Map props = ((Map)managementContext.registry.lookupObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES));
+if(props == null)
+{
+    props = new HashMap();
+    props.put("doCompression", "true");
+    managementContext.registry.registerObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES, props, managementContext);
+} else
+{
+    props.put("doCompression", "true");
+}
 
 //Set a dummy TX manager
-managementContext.setTransactionManager(new TestTransactionManagerFactory().create());
+managementContext.transactionManager = new TestTransactionManagerFactory().create()
 
 //register agents
 RmiRegistryAgent rmiAgent = new RmiRegistryAgent();
-rmiAgent.setName("rmiAgent");
-managementContext.getRegistry().registerAgent(rmiAgent);
+rmiAgent.name = "rmiAgent"
+managementContext.registry.registerAgent(rmiAgent);
 
-JmxAgent agent = new JmxAgent();
-agent.setName("jmxAgent");
-agent.setConnectorServerUrl("service:jmx:rmi:///jndi/rmi://localhost:1099/server");
-Map p = new HashMap();
-p.put("jmx.remote.jndi.rebind", "true");
-agent.setConnectorServerProperties(p);
-managementContext.getRegistry().registerAgent(agent);
+//JmxAgent agent = new JmxAgent();
+//agent.name = "jmxAgent"
+//agent.connectorServerUrl = "service:jmx:rmi:///jndi/rmi://localhost:1099/server"
+//Map p = new HashMap();
+//p.put("jmx.remote.jndi.rebind", "true");
+//agent.connectorServerProperties = p
+//managementContext.registry.registerAgent(agent);
 
 //register connector
 TestConnector c = new TestConnector();
-c.setName("dummyConnector");
-c.setExceptionListener(new TestExceptionStrategy());
-managementContext.getRegistry().registerConnector(c);
+c.name = "dummyConnector"
+c.exceptionListener = new TestExceptionStrategy()
+managementContext.registry.registerConnector(c);
 
 //Register transformers
 TestCompressionTransformer t = new TestCompressionTransformer();
-t.setReturnClass(String.class);
-t.setBeanProperty2(12);
-t.setContainerProperty("");
-t.setBeanProperty1("this was set from the manager properties!");
-managementContext.getRegistry().registerTransformer(t);
+t.returnClass = String.class
+t.beanProperty2 = 12
+t.containerProperty = ""
+t.beanProperty1 = "this was set from the manager properties!"
+managementContext.registry.registerTransformer(t);
 
 //Register endpoints
 JXPathFilter filter = new JXPathFilter("name");
-filter.setValue("bar");
+filter.value = "bar"
 Map ns = new HashMap();
 ns.put("foo", "http://foo.com");
-filter.setNamespaces(ns);
-builder.registerEndpoint("test://fruitBowlPublishQ", "fruitBowlEndpoint", false, null, filter);
-builder.registerEndpoint("test://AppleQueue", "appleInEndpoint", true);
-builder.registerEndpoint("test://AppleResponseQueue", "appleResponseEndpoint", false);
-builder.registerEndpoint("test://apple.queue", "AppleQueue", false);
-builder.registerEndpoint("test://banana.queue", "Banana_Queue", false);
-builder.registerEndpoint("test://test.queue", "waterMelonEndpoint", false);
-UMOEndpoint ep = new MuleEndpoint("test://test.queue2", false);
-ep.setName("testEPWithCS");
-SimpleRetryConnectionStrategy cs = new SimpleRetryConnectionStrategy();
-cs.setRetryCount(4);
-cs.setRetryFrequency(3000);
-ep.setConnectionStrategy(cs);
-builder.getManagementContext().getRegistry().registerEndpoint(ep);
+filter.namespaces = ns;
 
-Map props = new HashMap();
+UMOEndpoint ep = new MuleEndpoint("test://fruitBowlPublishQ", false);
+ep.name = "fruitBowlEndpoint"
+ep.filter = filter
+managementContext.registry.registerEndpoint(ep, managementContext);
+managementContext.registry.registerEndpoint(new MuleEndpoint("test://AppleQueue?endpointName=appleInEndpoint", true), managementContext);
+managementContext.registry.registerEndpoint(new MuleEndpoint("test://AppleResponseQueue?endpointName=appleResponseEndpoint", false),managementContext);
+managementContext.registry.registerEndpoint(new MuleEndpoint("test://apple.queue?endpointName=AppleQueue", false),managementContext);
+managementContext.registry.registerEndpoint(new MuleEndpoint("test://banana.queue?endpointName=Banana_Queue", false),managementContext);
+managementContext.registry.registerEndpoint(new MuleEndpoint("test://test.queue?endpointName=waterMelonEndpoint", false),managementContext);
+ep = new MuleEndpoint("test://test.queue2", false);
+ep.name = "testEPWithCS"
+SimpleRetryConnectionStrategy cs = new SimpleRetryConnectionStrategy();
+cs.retryCount = 4
+cs.retryFrequency = 3000
+ep.connectionStrategy = cs
+managementContext.registry.registerEndpoint(ep, managementContext);
+
+props = new HashMap();
 props.put("testGlobal", "value1");
-builder.registerEndpoint("test://orangeQ", "orangeEndpoint", false, props);
+ep = new MuleEndpoint("test://orangeQ", false)
+ep.name = "orangeEndpoint"
+ep.properties = props
+managementContext.registry.registerEndpoint(ep,managementContext);
 
 //register model
 UMOModel model = new SedaModel();
-model.setName("main");
+model.name = "main"
 TestExceptionStrategy es = new TestExceptionStrategy();
 es.addEndpoint(new MuleEndpoint("test://component.exceptions", false));
-model.setExceptionListener(es);
-model.setLifecycleAdapterFactory(new TestDefaultLifecycleAdapterFactory());
-model.setEntryPointResolver(new TestEntryPointResolver());
-managementContext.getRegistry().registerModel(model);
+model.exceptionListener = es
+model.lifecycleAdapterFactory = new TestDefaultLifecycleAdapterFactory()
+model.entryPointResolver = new TestEntryPointResolver()
+managementContext.registry.registerModel(model,managementContext)
 
 //register components
-UMOEndpoint ep1 = managementContext.getRegistry().lookupEndpoint("appleInEndpoint");
-ep1.setTransformer(managementContext.getRegistry().lookupTransformer("TestCompressionTransformer"));
-UMODescriptor d = builder.createDescriptor(Orange.class.getName(), "orangeComponent", null, ep1, props);
+UMOEndpoint ep1 = managementContext.registry.lookupEndpoint("appleInEndpoint")
+TransformerChain tc = new TransformerChain()
+tc.addTransformer(managementContext.registry.lookupTransformer("TestCompressionTransformer"))
+ep1.transformer = tc
+
+UMODescriptor d = MuleTestUtils.createDescriptor(Orange.class.name, "orangeComponent", null, ep1, props)
 
 DefaultComponentExceptionStrategy dces = new DefaultComponentExceptionStrategy();
 dces.addEndpoint(new MuleEndpoint("test://orange.exceptions", false));
-d.setExceptionListener(dces);
+d.exceptionListener = dces
 //Create the inbound router
 UMOInboundRouterCollection inRouter = new InboundRouterCollection();
-inRouter.setCatchAllStrategy(new ForwardingCatchAllStrategy());
-inRouter.getCatchAllStrategy().setEndpoint(new MuleEndpoint("test2://catch.all", false));
-UMOEndpoint ep2 = builder.createEndpoint("test://orange/", "Orange", true, "TestCompressionTransformer");
-ep2.setResponseTransformer(managementContext.getRegistry().lookupTransformer("TestCompressionTransformer"));
+inRouter.catchAllStrategy = new ForwardingCatchAllStrategy()
+inRouter.catchAllStrategy.endpoint = new MuleEndpoint("test2://catch.all", false)
+UMOEndpoint ep2 = new MuleEndpoint("test://orange/", true)
+ep2.name = "Orange"
+ep2.responseTransformer = managementContext.registry.lookupTransformer("TestCompressionTransformer")
 inRouter.addEndpoint(ep2);
-UMOEndpoint ep3 = managementContext.getRegistry().lookupEndpoint("orangeEndpoint");
-ep3.setFilter(new PayloadTypeFilter(String.class));
-ep3.setTransformer(managementContext.getRegistry().lookupTransformer("TestCompressionTransformer"));
+UMOEndpoint ep3 = managementContext.registry.lookupEndpoint("orangeEndpoint")
+ep3.filter = new PayloadTypeFilter(String.class)
+tc = new TransformerChain()
+tc.addTransformer(managementContext.registry.lookupTransformer("TestCompressionTransformer"))
+ep3.transformer = tc
 Map props2 = new HashMap();
 props2.put("testLocal", "value1");
-ep3.setProperties(props2);
+ep3.properties = props2
 inRouter.addEndpoint(ep3);
-d.setInboundRouter(inRouter);
+d.inboundRouter = inRouter
 
 //Nested Router
 UMONestedRouterCollection nestedRouter = new NestedRouterCollection();
 NestedRouter nr1 = new NestedRouter();
-nr1.setEndpoint(new MuleEndpoint("test://do.wash", false));
+nr1.endpoint = new MuleEndpoint("test://do.wash", false)
 nr1.setInterface(FruitCleaner.class);
-nr1.setMethod("wash");
+nr1.method = "wash"
 nestedRouter.addRouter(nr1);
 NestedRouter nr2 = new NestedRouter();
-nr2.setEndpoint(new MuleEndpoint("test://do.polish", false));
+nr2.endpoint = new MuleEndpoint("test://do.polish", false)
 nr2.setInterface(FruitCleaner.class);
-nr2.setMethod("polish");
+nr2.method = "polish"
 nestedRouter.addRouter(nr2);
-d.setNestedRouter(nestedRouter);
+d.nestedRouter = nestedRouter
 
 //Response Router
 UMOResponseRouterCollection responseRouter = new ResponseRouterCollection();
 responseRouter.addEndpoint(new MuleEndpoint("test://response1", true));
-responseRouter.addEndpoint(managementContext.getRegistry().lookupEndpoint("appleResponseEndpoint"));
+responseRouter.addEndpoint(managementContext.registry.lookupEndpoint("appleResponseEndpoint"));
 responseRouter.addRouter(new TestResponseAggregator());
-responseRouter.setTimeout(10001);
-d.setResponseRouter(responseRouter);
+responseRouter.timeout = 10001
+d.responseRouter = responseRouter
 
 //properties
 Map cprops = new HashMap();
@@ -173,9 +203,9 @@ nested3.add("prop4");
 nested3.add("prop5");
 nested3.add("prop6");
 cprops.put("arrayProperties", nested3);
-d.setProperties(cprops);
+d.properties = cprops
 
-d.setModelName("main");
+d.modelName = "main"
 
 //register components
-managementContext.getRegistry().registerService(d);
+managementContext.registry.registerService(d);
