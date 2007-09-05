@@ -54,7 +54,7 @@ public abstract class AbstractHierarchicalDefinitionParser extends AbstractMuleB
      * @param bean The bean being constructed
      * @return An assembler that includes Mule-specific construction logic
      */
-    public BeanAssembler getBeanAssembler(Element element, BeanDefinitionBuilder bean)
+    protected BeanAssembler getBeanAssembler(Element element, BeanDefinitionBuilder bean)
     {
         BeanDefinition target = getParentBeanDefinition(element);
         return beanAssemblerFactory.newBeanAssembler(
