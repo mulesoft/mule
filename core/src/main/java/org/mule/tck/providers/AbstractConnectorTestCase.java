@@ -79,10 +79,12 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
 
     protected void doTearDown() throws Exception
     {
-        if (!connector.isDisposed())
+        if (connector.isDisposed())
         {
-            connector.dispose();
+            fail("Connector has been disposed prematurely - lifecycle problem? Instance: " + connector);
         }
+
+        connector.dispose();
     }
 
     public void testConnectorExceptionHandling() throws Exception
@@ -121,21 +123,27 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
 
     public void testConnectorLifecycle() throws Exception
     {
-        UMOConnector connector = managementContext.getRegistry().lookupConnector(connectorName);
+        // this test used to use the connector created for this test, but since we need to
+        // simulate disposal as well we have to create an extra instance here.
 
-        assertNotNull(connector);
-        assertTrue(connector.isStarted());
-        assertTrue(!connector.isDisposed());
-        connector.stop();
-        assertTrue(!connector.isStarted());
-        assertTrue(!connector.isDisposed());
-        connector.dispose();
-        assertTrue(!connector.isStarted());
-        assertTrue(connector.isDisposed());
+        UMOConnector localConnector = this.createConnector();
+        localConnector.setManagementContext(managementContext);
+        localConnector.setName(connectorName+"-temp");
+        localConnector.start();
+
+        assertNotNull(localConnector);
+        assertTrue(localConnector.isStarted());
+        assertTrue(!localConnector.isDisposed());
+        localConnector.stop();
+        assertTrue(!localConnector.isStarted());
+        assertTrue(!localConnector.isDisposed());
+        localConnector.dispose();
+        assertTrue(!localConnector.isStarted());
+        assertTrue(localConnector.isDisposed());
 
         try
         {
-            connector.start();
+            localConnector.start();
             fail("Connector cannot be restarted after being disposing");
         }
         catch (Exception e)
