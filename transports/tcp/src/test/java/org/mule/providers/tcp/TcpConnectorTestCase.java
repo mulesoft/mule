@@ -79,7 +79,5 @@ public class TcpConnectorTestCase extends AbstractConnectorTestCase
         c.setServerSoTimeout(1000);
         assertEquals(1000, c.getServerSoTimeout());
         assertEquals(1000, c.getClientSoTimeout());
-
-        c.dispose();
     }
 }
