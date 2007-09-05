@@ -85,7 +85,6 @@ public class UdpConnectorTestCase extends AbstractConnectorTestCase
         {
             // expected
         }
-        connector.dispose();
     }
 
     public void testProperties() throws Exception
