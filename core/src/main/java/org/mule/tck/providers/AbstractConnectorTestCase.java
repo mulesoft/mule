@@ -72,6 +72,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         {
             fail("You need to set the connector name on the connector before returning it");
         }
+
         managementContext.getRegistry().registerConnector(connector, managementContext);
         // TODO MULE-1988
         managementContext.start();
@@ -129,6 +130,8 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         UMOConnector localConnector = this.createConnector();
         localConnector.setManagementContext(managementContext);
         localConnector.setName(connectorName+"-temp");
+        // the connector did not come from the registry, so we need to initialise manually
+        localConnector.initialise();
         localConnector.start();
 
         assertNotNull(localConnector);
