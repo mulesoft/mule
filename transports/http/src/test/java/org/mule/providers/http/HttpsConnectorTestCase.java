@@ -94,7 +94,6 @@ public class HttpsConnectorTestCase extends AbstractConnectorTestCase
         c.setSendBufferSize(0);
         assertEquals(TcpConnector.DEFAULT_BUFFER_SIZE, c.getSendBufferSize());
 
-        c.dispose();
         // all kinds of timeouts are tested in TcpConnectorTestCase now
     }
 }

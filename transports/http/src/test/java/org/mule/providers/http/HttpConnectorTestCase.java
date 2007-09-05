@@ -77,8 +77,6 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
         assertEquals(maxThreadsActive, params.getDefaultMaxConnectionsPerHost());
         assertEquals(maxThreadsActive, params.getMaxTotalConnections());
 
-        c.dispose();
-
         // all kinds of timeouts are now being tested in TcpConnectorTestCase
     }
 
