@@ -159,6 +159,18 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
         return this;
     }
 
+    public AbstractMuleBeanDefinitionParser removeIgnored(String propertyName)
+    {
+        propertyConfiguration.removeIgnored(propertyName);
+        return this;
+    }
+
+    public AbstractMuleBeanDefinitionParser setIgnoredDefault(boolean ignoreAll)
+    {
+        propertyConfiguration.setIgnoredDefault(ignoreAll);
+        return this;
+    }
+
     protected void processProperty(Attr attribute, BeanDefinitionBuilder builder)
     {
         getOrphanBeanAssembler(builder).extendBean(attribute);

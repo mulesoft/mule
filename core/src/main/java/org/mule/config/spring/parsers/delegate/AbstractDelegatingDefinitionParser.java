@@ -8,23 +8,20 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config.spring.parsers.generic;
+package org.mule.config.spring.parsers.delegate;
 
 import org.mule.util.ArrayUtils;
 
 import java.util.Map;
 
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
-import org.springframework.beans.factory.xml.ParserContext;
-import org.w3c.dom.Element;
 
 /**
  * This allows a definition parsers to be dynamically represented by different
  * definition parsers, depending on the context.  For example, a single model may
  * be defined across file - the first use defines the model and subsequent uses
  * extend it (for this particular case, see
- * {@link org.mule.config.spring.parsers.generic.InheritDefinitionParser}).
+ * {@link InheritDefinitionParser}).
  *
  * <p>Note that the sub-parsers must be consistent.  That includes matching the
  * same schema, for example.
@@ -49,9 +46,14 @@ public abstract class AbstractDelegatingDefinitionParser extends AbstractBeanDef
         delegates = (DelegateDefinitionParser[]) ArrayUtils.add(delegates, delegate);
     }
 
-    protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext)
+    protected int size()
     {
-        return getDelegate(element, parserContext).parseDelegate(element, parserContext);
+        return delegates.length;
+    }
+
+    protected DelegateDefinitionParser get(int index)
+    {
+        return delegates[index];
     }
 
     public AbstractDelegatingDefinitionParser addReference(String propertyName)
@@ -107,7 +109,5 @@ public abstract class AbstractDelegatingDefinitionParser extends AbstractBeanDef
         }
         return this;
     }
-
-    protected abstract DelegateDefinitionParser getDelegate(Element element, ParserContext parserContext);
 
 }

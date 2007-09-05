@@ -56,6 +56,16 @@ public class TempWrapperPropertyConfiguration implements PropertyConfiguration
         extra.addIgnored(propertyName);
     }
 
+    public void removeIgnored(String propertyName)
+    {
+        extra.removeIgnored(propertyName);
+    }
+
+    public void setIgnoredDefault(boolean ignoreAll)
+    {
+        extra.setIgnoredDefault(ignoreAll);
+    }
+
     public String getAttributeMapping(String alias)
     {
         return extra.getAttributeMapping(alias, delegate.getAttributeMapping(alias));

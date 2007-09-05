@@ -106,4 +106,45 @@
         <xsd:attribute name="value" type="xsd:NMTOKEN"/>
     </xsd:complexType>
 
+    <xsd:element name="string-endpoint" substitutionGroup="mule:abstract-global-endpoint">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="mule:abstractGlobalEndpointType">
+                    <xsd:group ref="mule:defaultEndpointElements"/>
+                    <xsd:attributeGroup ref="mule:defaultEndpointAttributes"/>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="addressed-endpoint" substitutionGroup="mule:abstract-global-endpoint">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="mule:abstractGlobalEndpointType">
+                    <xsd:group ref="mule:defaultEndpointElements"/>
+                    <xsd:attribute name="address" type="xsd:string"/>
+                    <xsd:attributeGroup ref="mule:restrictedEndpointAttributes"/>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="unaddressed-endpoint" substitutionGroup="mule:abstract-global-endpoint">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="mule:abstractGlobalEndpointType">
+                    <xsd:sequence>
+                        <xsd:element name="address">
+                            <xsd:complexType>
+                                <xsd:attribute name="address" type="xsd:string"/>
+                            </xsd:complexType>
+                        </xsd:element>
+                        <xsd:group ref="mule:defaultEndpointElements"/>
+                    </xsd:sequence>
+                    <xsd:attributeGroup ref="mule:restrictedEndpointAttributes"/>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
 </xsd:schema>

@@ -21,11 +21,13 @@ public class ReusablePropertyConfigurationTestCase extends AbstractBasePropertyC
         ReusablePropertyConfiguration config = new ReusablePropertyConfiguration();
         setTestValues(REFERENCE, config); // as normal
         verifyTestValues(REFERENCE, config); // transparent wrapper
+        verifyIgnored(REFERENCE, config);
         config.reset();
         verifyTestValues(REFERENCE, config); // original values still visible via wrapper
         setTestValues(WRAPPER, config); // add extra values
         verifyTestValues(REFERENCE, config); // original values still visible via wrapper
         verifyTestValues(WRAPPER, config); // new values also visible via wrapper
+        verifyIgnored(WRAPPER, config);
         config.reset();
         verifyMissing(WRAPPER, config); // new values deleted
         verifyTestValues(REFERENCE, config); // original values still visible via wrapper

@@ -47,7 +47,8 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
 
     public static final String BEANS = "beans"; // cannot find this in Spring api!
     public static final String MULE_DEFAULT_NAMESPACE = "http://www.mulesource.org/schema/mule/core";
-    public static final String MULE_NAMESPACE_PREFIX = "http://www.mulesource.org/schema/mule/";    
+    public static final String MULE_NAMESPACE_PREFIX = "http://www.mulesource.org/schema/mule/";
+    public static final String MULE_REPEAT_PARSE = "org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate.MULE_REPEAT_PARSE";
 
     private DefaultBeanDefinitionDocumentReader spring;
 
@@ -82,12 +83,24 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
                 getReaderContext().error("Unable to locate NamespaceHandler for namespace [" + namespaceUri + "]", element);
                 return null;
             }
-            ParserContext parserContext = new ParserContext(getReaderContext(), this, parent);
-            BeanDefinition child = handler.parse(element, parserContext);
-            if (parserContext.isNested())
-            {
-                registerBean(element, child);
-            }
+
+            boolean atLeastOneChildNotFactory = false;
+            BeanDefinition finalChild;
+
+            do {
+                ParserContext parserContext = new ParserContext(getReaderContext(), this, parent);
+                finalChild = handler.parse(element, parserContext);
+                if (parserContext.isNested())
+                {
+                    registerBean(element, finalChild);
+                }
+                
+                boolean isFactory = null != finalChild && null != finalChild.getBeanClassName() &&
+                        (finalChild.getBeanClassName().equals(MapFactoryBean.class.getName()) ||
+                                finalChild.getBeanClassName().equals(PropertiesFactoryBean.class.getName()));
+                atLeastOneChildNotFactory = atLeastOneChildNotFactory || (!isFactory);
+
+            } while (null != finalChild && finalChild.hasAttribute(MULE_REPEAT_PARSE));
 
             // Only iterate and parse child mule name-spaced elements. Spring does not do
             // hierarchical parsing by default so we need to maintain this behavior
@@ -99,27 +112,26 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
             // which handles iteration internally (this is a hack needed because Spring doesn't
             // expose the DP for "<spring:entry>" elements directly).
 
-            boolean isFactory = null != child && null != child.getBeanClassName() &&
-                    (child.getBeanClassName().equals(MapFactoryBean.class.getName()) ||
-                            child.getBeanClassName().equals(PropertiesFactoryBean.class.getName())); 
-
-            if (isMuleNamespace(element) && !isFactory)
+            if (isMuleNamespace(element) && atLeastOneChildNotFactory)
             {
                 NodeList list = element.getChildNodes();
                 for (int i = 0; i < list.getLength(); i++)
                 {
                     if (list.item(i) instanceof Element)
                     {
-                        parseCustomElement((Element) list.item(i), child);
+                        parseCustomElement((Element) list.item(i), finalChild);
                     }
                 }
             }
-            return child;
+            return finalChild;
         }
     }
 
     protected BeanDefinition handleSpringElements(Element element, BeanDefinition parent)
     {
+
+        // these are only called if they are at a "top level" - if they are nested inside
+        // other spring elements then spring will handle them itself
 
         if (isLocalName(element, BEANS))
         {
@@ -137,9 +149,6 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
                 throw new RuntimeException(e);
             }
         }
-
-        // these are only called if they are at a "top level" - if they are nested inside
-        // other spring elements then spring will handle them itself
 
         else if (isLocalName(element, PROPERTY_ELEMENT))
         {

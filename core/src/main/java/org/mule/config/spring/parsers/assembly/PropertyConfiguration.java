@@ -32,6 +32,10 @@ public interface PropertyConfiguration
 
     void addIgnored(String propertyName);
 
+    void removeIgnored(String propertyName);
+
+    void setIgnoredDefault(boolean ignoreAll);
+
     String getAttributeMapping(String alias);
 
     boolean isCollection(String propertyName);

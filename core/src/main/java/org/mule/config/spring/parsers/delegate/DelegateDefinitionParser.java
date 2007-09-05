@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config.spring.parsers.generic;
+package org.mule.config.spring.parsers.delegate;
 
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 
@@ -19,7 +19,7 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
- * This interface allows {@link org.mule.config.spring.parsers.generic.AbstractDelegatingDefinitionParser}
+ * This interface allows {@link AbstractParallelDelegatingDefinitionParser}
  * to forward the work of parsing to a particular sub-parser.  We exploit the fact that
  * (nearly?) all parsers subclass Spring's {@link org.springframework.beans.factory.xml.AbstractBeanDefinitionParser}
  * via {@link org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser} and so provide
@@ -45,5 +45,9 @@ public interface DelegateDefinitionParser
     AbstractMuleBeanDefinitionParser addCollection(String propertyName);
 
     AbstractMuleBeanDefinitionParser addIgnored(String propertyName);
+
+    AbstractMuleBeanDefinitionParser removeIgnored(String propertyName);
+
+    AbstractMuleBeanDefinitionParser setIgnoredDefault(boolean ignoreAll);
 
 }

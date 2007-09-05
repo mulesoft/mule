@@ -12,8 +12,8 @@ package org.mule.providers.vm.config;
 import org.mule.config.QueueProfile;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleChildDefinitionParser;
-import org.mule.config.spring.parsers.specific.EndpointDefinitionParser;
-import org.mule.config.spring.parsers.specific.EndpointAddressDefinitionParser;
+import org.mule.config.spring.parsers.specific.UnaddressedEndpointDefinitionParser;
+import org.mule.config.spring.parsers.specific.ChildAddressDefinitionParser;
 import org.mule.providers.vm.VMConnector;
 import org.mule.impl.endpoint.GlobalEndpoint;
 import org.mule.impl.endpoint.InboundEndpoint;
@@ -32,10 +32,10 @@ public class VmNamespaceHandler extends NamespaceHandlerSupport
     {
         registerBeanDefinitionParser("connector", new MuleChildDefinitionParser(VMConnector.class, true));
         registerBeanDefinitionParser("queueProfile", new ChildDefinitionParser("queueProfile", QueueProfile.class));
-        registerBeanDefinitionParser("endpoint", new EndpointDefinitionParser(GlobalEndpoint.class));
-        registerBeanDefinitionParser("inbound-endpoint", new EndpointDefinitionParser(InboundEndpoint.class));
-        registerBeanDefinitionParser("outbound-endpoint", new EndpointDefinitionParser(OutboundEndpoint.class));
-        registerBeanDefinitionParser("address", new EndpointAddressDefinitionParser("vm").addAlias("address", "hostname"));
+        registerBeanDefinitionParser("endpoint", new UnaddressedEndpointDefinitionParser(GlobalEndpoint.class));
+        registerBeanDefinitionParser("inbound-endpoint", new UnaddressedEndpointDefinitionParser(InboundEndpoint.class));
+        registerBeanDefinitionParser("outbound-endpoint", new UnaddressedEndpointDefinitionParser(OutboundEndpoint.class));
+        registerBeanDefinitionParser("address", new ChildAddressDefinitionParser("vm").addAlias("address", "hostname"));
     }
 
 }

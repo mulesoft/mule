@@ -8,7 +8,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config.spring.parsers.generic;
+package org.mule.config.spring.parsers.delegate;
+
+import org.mule.config.spring.parsers.generic.AutoIdUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,9 +20,10 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
- * This encapsulates several definition parsers, selected depending on the parent.
+ * This encapsulates several definition parsers, selected depending on the parent element
+ * in the DOM.
  */
-public class ParentContextDefinitionParser extends AbstractDelegatingDefinitionParser
+public class ParentContextDefinitionParser extends AbstractParallelDelegatingDefinitionParser
 {
 
     private Map parsers = new HashMap();

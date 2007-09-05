@@ -10,20 +10,25 @@
 package org.mule.config.spring.parsers.specific;
 
 import org.mule.config.spring.parsers.AbstractChildDefinitionParser;
+import org.mule.config.spring.parsers.delegate.DelegateDefinitionParser;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.util.StringUtils;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
  * The parser used for processing <code>&lt;endpoint&gt;</code> elements in Mule Xml configuration.
  * This parser is a child bean definition parser which means the endpoint created is always set on the 
- * parent object, unless the parent elemet is the root element <code>&lt;beans&gt;</code> in which 
+ * parent object, unless the parent element is the root element <code>&lt;mule&gt;</code> in which
  * case the Endpoint becomes a <em>global Endpoint</em> and is available via the registry.
+ *
+ * <p>This endpoint parser assumes that the address will be set via some external mechanism.</p>
  */
-public class EndpointDefinitionParser extends AbstractChildDefinitionParser
+public class UnaddressedEndpointDefinitionParser extends AbstractChildDefinitionParser
+    implements DelegateDefinitionParser
 {
 
     public static final String ADDRESS_ATTRIBUTE = "address";
@@ -31,7 +36,7 @@ public class EndpointDefinitionParser extends AbstractChildDefinitionParser
 
     private Class endpointClass;
 
-    public EndpointDefinitionParser(Class endpointClass)
+    public UnaddressedEndpointDefinitionParser(Class endpointClass)
     {
         this.endpointClass = endpointClass;
         addAlias("address", "endpointURI");
@@ -68,6 +73,10 @@ public class EndpointDefinitionParser extends AbstractChildDefinitionParser
     //@Override
     protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
+        if (isGlobal(element))
+        {
+            builder.addPropertyValue("type", UMOImmutableEndpoint.ENDPOINT_TYPE_GLOBAL);
+        }
         //Register non-descriptive dependencies i.e. string values for objects listed in the container
         if(StringUtils.isNotBlank(element.getAttribute("connector")))
         {
@@ -124,6 +133,11 @@ public class EndpointDefinitionParser extends AbstractChildDefinitionParser
         {
             return super.generateChildBeanName(e);
         }
+    }
+
+    public AbstractBeanDefinition parseDelegate(Element element, ParserContext parserContext)
+    {
+        return parseInternal(element, parserContext);
     }
 
 }

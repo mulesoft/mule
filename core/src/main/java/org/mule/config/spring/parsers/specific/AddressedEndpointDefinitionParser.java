@@ -1,5 +1,5 @@
 /*
- * $Id:EndpointDefinitionParser.java 5187 2007-02-16 18:00:42Z rossmason $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -7,66 +7,92 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.config.spring.parsers.specific;
 
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+import org.mule.config.spring.parsers.delegate.AbstractDelegateDelegate;
+import org.mule.config.spring.parsers.delegate.AbstractSerialDelegatingDefinitionParser;
+import org.mule.config.spring.parsers.generic.AutoIdUtils;
 
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import java.util.Iterator;
+
+import edu.emory.mathcs.backport.java.util.Arrays;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
- * Extend {@link org.mule.config.spring.parsers.specific.EndpointDefinitionParser}
- * with validation of simple string address or global endpoint reference
+ * Combine an {@link ChildAddressDefinitionParser} and
+ * an {@link UnaddressedEndpointDefinitionParser} in
+ * one parser.  This lets us put the address attributes in the endpoint element.
  */
-public class AddressedEndpointDefinitionParser extends EndpointDefinitionParser
+public class AddressedEndpointDefinitionParser extends AbstractSerialDelegatingDefinitionParser
 {
 
-    public AddressedEndpointDefinitionParser(Class endpointClass)
+    private String endpointId;
+    private String addressId;
+
+    public AddressedEndpointDefinitionParser(String protocol, Class endpoint)
     {
-        super(endpointClass);
+        addDelegate(new AddressDelegate(protocol));
+        addDelegate(new EndpointDelegate(endpoint));
     }
 
-    //@Override
-    protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
+    /**
+     * This is called first.  It creates an address using the address-related attributes
+     * on the element.
+     */
+    private class AddressDelegate extends AbstractDelegateDelegate
     {
-        //Check to see if this is a global endpoint
-        if (isGlobal(element))
+
+        private AddressDelegate(String protocol)
         {
-            builder.addPropertyValue("type", UMOImmutableEndpoint.ENDPOINT_TYPE_GLOBAL);
-            // if global, cannot be a reference (afaik)
-            if (null == element.getAttributeNode(ADDRESS_ATTRIBUTE))
+            super(new OrphanAddressDefinitionParser(protocol));
+            getDelegate().setIgnoredDefault(true);
+            Iterator names = Arrays.asList(LazyEndpointURI.ATTRIBUTES).iterator();
+            while (names.hasNext())
             {
-                throw new IllegalStateException("A global endpoint requires an " + ADDRESS_ATTRIBUTE + " attribute.");
-            }
-            if (null != element.getAttributeNode(ENDPOINT_REF_ATTRIBUTE))
-            {
-                throw new IllegalStateException("A global endpoint cannot contain a " + ENDPOINT_REF_ATTRIBUTE +
-                        " attribute.");
-            }
-        }
-        else
-        {
-            // must be reference *or* have an address
-            if (null == element.getAttributeNode(ADDRESS_ATTRIBUTE))
-            {
-                if (null == element.getAttributeNode(ENDPOINT_REF_ATTRIBUTE))
-                {
-                    throw new IllegalStateException("An endpoint requires either an " + ADDRESS_ATTRIBUTE + " or a " +
-                            ENDPOINT_REF_ATTRIBUTE + " attribute.");
-                }
-            }
-            else
-            {
-                if (null != element.getAttributeNode(ENDPOINT_REF_ATTRIBUTE))
-                {
-                    throw new IllegalStateException("The " + ADDRESS_ATTRIBUTE + " and " + ENDPOINT_REF_ATTRIBUTE +
-                            " attributes are mutually exclusive.");
-                }
+                getDelegate().removeIgnored((String) names.next());
             }
         }
 
-        super.parseChild(element, parserContext, builder);
+        public AbstractBeanDefinition parseDelegate(Element element, ParserContext parserContext)
+        {
+            AutoIdUtils.ensureUniqueId(element);
+            endpointId = element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_ID);
+            addressId = endpointId + ".address";
+            element.setAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_ID, addressId);
+            element.setAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME, addressId);
+            return super.parseDelegate(element, parserContext);
+        }
+
+    }
+
+    /**
+     * This is called second.  It creates the endpoint and injects the previously created
+     * address.
+     */
+    private class EndpointDelegate extends AbstractDelegateDelegate
+    {
+
+        private EndpointDelegate(Class endpoint)
+        {
+            super(new UnaddressedEndpointDefinitionParser(endpoint));
+            Iterator names = Arrays.asList(LazyEndpointURI.ATTRIBUTES).iterator();
+            while (names.hasNext())
+            {
+                getDelegate().addIgnored((String) names.next());
+            }
+        }
+
+        public AbstractBeanDefinition parseDelegate(Element element, ParserContext parserContext)
+        {
+            element.setAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_ID, endpointId);
+            element.setAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME, endpointId);
+            element.setAttribute("address-ref", addressId);
+            return super.parseDelegate(element, parserContext);
+        }
     }
 
 }

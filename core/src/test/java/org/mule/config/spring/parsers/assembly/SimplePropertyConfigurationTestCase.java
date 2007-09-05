@@ -20,6 +20,7 @@ public class SimplePropertyConfigurationTestCase extends AbstractBasePropertyCon
         PropertyConfiguration config = new SimplePropertyConfiguration();
         setTestValues(SIMPLE, config);
         verifyTestValues(SIMPLE, config);
+        verifyIgnored(SIMPLE, config);
     }
 
 }

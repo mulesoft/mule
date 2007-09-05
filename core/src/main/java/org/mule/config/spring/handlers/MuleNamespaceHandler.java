@@ -19,13 +19,13 @@ import org.mule.config.QueueProfile;
 import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
 import org.mule.config.spring.parsers.collection.OrphanMapDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.config.spring.parsers.generic.InheritDefinitionParser;
+import org.mule.config.spring.parsers.delegate.InheritDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.NameTransferDefinitionParser;
 import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
-import org.mule.config.spring.parsers.specific.AddressedEndpointDefinitionParser;
+import org.mule.config.spring.parsers.specific.StringAddressEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
 import org.mule.config.spring.parsers.specific.ConfigurationDefinitionParser;
 import org.mule.config.spring.parsers.specific.ConnectionStrategyDefinitionParser;
@@ -197,10 +197,10 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("transaction-manager-websphere", new MuleChildDefinitionParser(WebsphereTransactionManagerLookupFactory.class, true));
 
         //Endpoint elements
-        registerBeanDefinitionParser("endpoint", new AddressedEndpointDefinitionParser(GlobalEndpoint.class));
-        registerBeanDefinitionParser("inbound-endpoint", new AddressedEndpointDefinitionParser(InboundEndpoint.class));
-        registerBeanDefinitionParser("outbound-endpoint", new AddressedEndpointDefinitionParser(OutboundEndpoint.class));
-        registerBeanDefinitionParser("response-endpoint", new AddressedEndpointDefinitionParser(ResponseEndpoint.class));
+        registerBeanDefinitionParser("endpoint", new StringAddressEndpointDefinitionParser(GlobalEndpoint.class));
+        registerBeanDefinitionParser("inbound-endpoint", new StringAddressEndpointDefinitionParser(InboundEndpoint.class));
+        registerBeanDefinitionParser("outbound-endpoint", new StringAddressEndpointDefinitionParser(OutboundEndpoint.class));
+        registerBeanDefinitionParser("response-endpoint", new StringAddressEndpointDefinitionParser(ResponseEndpoint.class));
         registerBeanDefinitionParser("transaction", new TransactionConfigDefinitionParser());
         registerBeanDefinitionParser("transaction-factory", new ObjectFactoryDefinitionParser("factory"));
 

@@ -8,7 +8,11 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config.spring.parsers.generic;
+package org.mule.config.spring.parsers.delegate;
+
+import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
+import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
+import org.mule.config.spring.parsers.generic.AutoIdUtils;
 
 import org.w3c.dom.Element;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -18,9 +22,9 @@ import org.springframework.beans.factory.xml.ParserContext;
  * named definition parser if the "inherit" attribute is set.  This allows a named
  * orphan to be defined (inherit="false") and then extended (inherit="true").
  * The two sub-parsers must be consistent, as described in
- * {@link org.mule.config.spring.parsers.generic.AbstractDelegatingDefinitionParser}
+ * {@link AbstractParallelDelegatingDefinitionParser}
  */
-public class InheritDefinitionParser extends AbstractDelegatingDefinitionParser
+public class InheritDefinitionParser extends AbstractParallelDelegatingDefinitionParser
 {
 
     public static final String INHERIT = "inherit";

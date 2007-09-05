@@ -32,7 +32,8 @@ public class SimplePropertyConfiguration implements PropertyConfiguration
     private Properties nameMappings = new Properties();
     private Map valueMappings = new HashMap();
     private Set collections = new HashSet();
-    private Set ignored = new HashSet();
+    private Map ignored = new HashMap();
+    private boolean ignoreAll = false;
 
     public void addReference(String propertyName)
     {
@@ -61,7 +62,17 @@ public class SimplePropertyConfiguration implements PropertyConfiguration
 
     public void addIgnored(String propertyName)
     {
-        ignored.add(propertyName);
+        ignored.put(propertyName, Boolean.TRUE);
+    }
+
+    public void removeIgnored(String propertyName)
+    {
+        ignored.put(propertyName, Boolean.FALSE);
+    }
+
+    public void setIgnoredDefault(boolean ignoreAll)
+    {
+        this.ignoreAll = ignoreAll;
     }
 
     public String getAttributeMapping(String alias)
@@ -81,7 +92,14 @@ public class SimplePropertyConfiguration implements PropertyConfiguration
 
     public boolean isIgnored(String propertyName)
     {
-        return ignored.contains(propertyName);
+        if (ignored.containsKey(propertyName))
+        {
+            return ((Boolean) ignored.get(propertyName)).booleanValue();
+        }
+        else
+        {
+            return ignoreAll;
+        }
     }
 
     /**

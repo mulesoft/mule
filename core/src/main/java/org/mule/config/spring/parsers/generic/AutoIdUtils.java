@@ -21,7 +21,7 @@ public class AutoIdUtils
     public static final String ATTRIBUTE_ID = AbstractMuleBeanDefinitionParser.ATTRIBUTE_ID;
     public static final String ATTRIBUTE_NAME = AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME;
     private static final AtomicInteger counter = new AtomicInteger(0);
-    public static final String ID_PREFIX = "autogenInheritId";
+    public static final String ID_PREFIX = "org.mule.autogen.";
 
     public static void ensureUniqueId(Element element)
     {

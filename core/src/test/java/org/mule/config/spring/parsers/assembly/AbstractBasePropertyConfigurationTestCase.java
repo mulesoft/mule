@@ -22,6 +22,7 @@ public abstract class AbstractBasePropertyConfigurationTestCase extends TestCase
     public static final String NAME = "Name";
     public static final String COLLECTION = "Collection";
     public static final String IGNORED = "Ignored";
+    public static final String NOT_IGNORED = "Not Ignored";
     public static final String MAP_CAPS = "MapCaps";
     public static final String MAP_DIGITS = "MapNumbers";
     public static final String REFERENCE = "Reference";
@@ -45,6 +46,7 @@ public abstract class AbstractBasePropertyConfigurationTestCase extends TestCase
         config.addAlias(prefix + ALIAS, prefix + NAME);
         config.addCollection(prefix + COLLECTION);
         config.addIgnored(prefix + IGNORED);
+        config.removeIgnored(prefix + NOT_IGNORED);
         config.addMapping(prefix + MAP_CAPS, TO_CAPS);
         config.addMapping(prefix + MAP_DIGITS, TO_DIGITS);
         config.addReference(prefix + REFERENCE);
@@ -59,6 +61,7 @@ public abstract class AbstractBasePropertyConfigurationTestCase extends TestCase
         assertEquals(false, config.isCollection(prefix + UNUSED));
         assertEquals(true, config.isIgnored(prefix + IGNORED));
         assertEquals(false, config.isIgnored(prefix + UNUSED));
+        assertEquals(false, config.isIgnored(prefix + NOT_IGNORED));
         assertEquals("A", config.translateValue(prefix + MAP_CAPS, "a"));
         assertEquals("a", config.translateValue(prefix + UNUSED, "a"));
         assertEquals("Z", config.translateValue(prefix + MAP_CAPS, "z"));
@@ -69,6 +72,22 @@ public abstract class AbstractBasePropertyConfigurationTestCase extends TestCase
         assertEquals("3", config.translateValue(prefix + MAP_DIGITS, "three"));
         assertEquals("four", config.translateValue(prefix + MAP_DIGITS, "four"));
         assertEquals("one", config.translateValue(prefix + UNUSED, "one"));
+    }
+
+    protected void verifyIgnored(String prefix, PropertyConfiguration config)
+    {
+        config.setIgnoredDefault(false);
+        assertEquals(true, config.isIgnored(prefix + IGNORED));
+        assertEquals(false, config.isIgnored(prefix + UNUSED));
+        assertEquals(false, config.isIgnored(prefix + NOT_IGNORED));
+        config.setIgnoredDefault(true);
+        assertEquals(true, config.isIgnored(prefix + IGNORED));
+        assertEquals(true, config.isIgnored(prefix + UNUSED));
+        assertEquals(false, config.isIgnored(prefix + NOT_IGNORED));
+        config.setIgnoredDefault(false);
+        config.removeIgnored(prefix + IGNORED);
+        assertEquals(false, config.isIgnored(prefix + IGNORED));
+        config.addIgnored(prefix + IGNORED);
     }
 
     protected void verifyMissing(String prefix, PropertyConfiguration config)

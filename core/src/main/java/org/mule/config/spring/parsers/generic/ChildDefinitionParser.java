@@ -10,6 +10,7 @@
 package org.mule.config.spring.parsers.generic;
 
 import org.mule.config.spring.parsers.AbstractChildDefinitionParser;
+import org.mule.config.spring.parsers.delegate.DelegateDefinitionParser;
 
 import org.w3c.dom.Element;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;

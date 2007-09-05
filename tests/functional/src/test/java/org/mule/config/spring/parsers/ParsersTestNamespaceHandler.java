@@ -12,12 +12,16 @@ package org.mule.config.spring.parsers;
 
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
+import org.mule.config.spring.parsers.delegate.InheritDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.config.spring.parsers.generic.InheritDefinitionParser;
-import org.mule.config.spring.parsers.generic.MuleChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
+import org.mule.config.spring.parsers.specific.ChildAddressDefinitionParser;
+import org.mule.config.spring.parsers.specific.AddressedEndpointDefinitionParser;
+import org.mule.config.spring.parsers.specific.StringAddressEndpointDefinitionParser;
+import org.mule.config.spring.parsers.specific.UnaddressedEndpointDefinitionParser;
+import org.mule.impl.endpoint.GlobalEndpoint;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
@@ -41,6 +45,11 @@ public class ParsersTestNamespaceHandler extends NamespaceHandlerSupport
         registerBeanDefinitionParser("inherit", new InheritDefinitionParser(
                 new OrphanDefinitionParser(OrphanBean.class, true),
                 new NamedDefinitionParser()).addAlias("bar", "foo").addIgnored("ignored").addCollection("offspring"));
+
+        registerBeanDefinitionParser("string-endpoint", new StringAddressEndpointDefinitionParser(GlobalEndpoint.class));
+        registerBeanDefinitionParser("unaddressed-endpoint", new UnaddressedEndpointDefinitionParser(GlobalEndpoint.class));
+        registerBeanDefinitionParser("address", new ChildAddressDefinitionParser("test").addAlias("address", "hostname"));
+        registerBeanDefinitionParser("addressed-endpoint", new AddressedEndpointDefinitionParser("test", GlobalEndpoint.class));
     }
 
 }

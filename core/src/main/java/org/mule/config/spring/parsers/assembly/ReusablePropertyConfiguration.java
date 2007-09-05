@@ -66,6 +66,16 @@ public class ReusablePropertyConfiguration implements PropertyConfiguration
         delegate.addIgnored(propertyName);
     }
 
+    public void removeIgnored(String propertyName)
+    {
+        delegate.removeIgnored(propertyName);
+    }
+
+    public void setIgnoredDefault(boolean ignoreAll)
+    {
+        delegate.setIgnoredDefault(ignoreAll);
+    }
+
     public String getAttributeMapping(String alias)
     {
         return delegate.getAttributeMapping(alias);
