@@ -5,6 +5,7 @@ import org.mule.config.MuleProperties;
 import org.mule.config.spring.editors.TransformerChain;
 import org.mule.impl.DefaultComponentExceptionStrategy;
 import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.impl.endpoint.ResponseEndpoint;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.model.seda.SedaModel;
 import org.mule.management.agents.JmxAgent;
@@ -132,7 +133,7 @@ model.entryPointResolver = new TestEntryPointResolver()
 managementContext.registry.registerModel(model,managementContext)
 
 //register components
-UMOEndpoint ep1 = managementContext.registry.lookupEndpoint("appleInEndpoint")
+UMOEndpoint ep1 = managementContext.registry.getOrCreateEndpointForUri("appleInEndpoint", UMOEndpoint.ENDPOINT_TYPE_SENDER)
 TransformerChain tc = new TransformerChain()
 tc.addTransformer(managementContext.registry.lookupTransformer("TestCompressionTransformer"))
 ep1.transformer = tc
@@ -150,7 +151,7 @@ UMOEndpoint ep2 = new MuleEndpoint("test://orange/", true)
 ep2.name = "Orange"
 ep2.responseTransformer = managementContext.registry.lookupTransformer("TestCompressionTransformer")
 inRouter.addEndpoint(ep2);
-UMOEndpoint ep3 = managementContext.registry.lookupEndpoint("orangeEndpoint")
+UMOEndpoint ep3 = managementContext.registry.getOrCreateEndpointForUri("orangeEndpoint", UMOEndpoint.ENDPOINT_TYPE_RECEIVER)
 ep3.filter = new PayloadTypeFilter(String.class)
 tc = new TransformerChain()
 tc.addTransformer(managementContext.registry.lookupTransformer("TestCompressionTransformer"))
@@ -177,8 +178,8 @@ d.nestedRouter = nestedRouter
 
 //Response Router
 UMOResponseRouterCollection responseRouter = new ResponseRouterCollection();
-responseRouter.addEndpoint(new MuleEndpoint("test://response1", true));
-responseRouter.addEndpoint(managementContext.registry.lookupEndpoint("appleResponseEndpoint"));
+responseRouter.addEndpoint(new ResponseEndpoint("test://response1", true));
+responseRouter.addEndpoint(managementContext.registry.getOrCreateEndpointForUri("appleResponseEndpoint", UMOEndpoint.ENDPOINT_TYPE_RESPONSE));
 responseRouter.addRouter(new TestResponseAggregator());
 responseRouter.timeout = 10001
 d.responseRouter = responseRouter
