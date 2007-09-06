@@ -335,6 +335,7 @@
     </xsl:template>
 
     <xsl:template match="global-endpoint">
+        <xsl:param name="endpointType" />
         <xsl:apply-templates select="@ref"/>
         <xsl:element name="bean">
             <xsl:attribute name="class">org.mule.impl.endpoint.MuleEndpoint</xsl:attribute>
@@ -342,13 +343,17 @@
             <xsl:attribute name="parent">
                 <xsl:value-of select="@name"/>
             </xsl:attribute>
+            <xsl:element name="property">
+                <xsl:attribute name="name">type</xsl:attribute>
+                <xsl:attribute name="value"><xsl:value-of select="$endpointType"/></xsl:attribute>                    
+            </xsl:element>    
             <xsl:apply-templates select="@transformers" mode="addTransformers"/>
             <xsl:apply-templates select="@responseTransformers" mode="addTransformers"/>
             <xsl:apply-templates select="@address" mode="addEndpointURI"/>
             <xsl:apply-templates select="@createConnector"/>
             <xsl:apply-templates select="@connector"/>
             <xsl:apply-templates
-                    select="@*[local-name() != 'address' and local-name() != 'transformers' and local-name() != 'createConnector' and local-name() != 'responseTransformers' and local-name() != 'connector']"
+                select="@*[local-name() != 'address' and local-name() != 'transformers' and local-name() != 'createConnector' and local-name() != 'responseTransformers' and local-name() != 'connector' and local-name() != 'type']"
                     mode="addProperties"/>
             <xsl:apply-templates select="properties" mode="asMap"/>
             <xsl:apply-templates select="transaction"/>
@@ -358,6 +363,7 @@
     </xsl:template>
 
     <xsl:template match="endpoint">
+        <xsl:param name="endpointType" />
         <xsl:apply-templates select="@ref"/>
         <xsl:element name="bean">
             <xsl:if test="@name">
@@ -368,13 +374,17 @@
             <xsl:attribute name="class">org.mule.impl.endpoint.MuleEndpoint</xsl:attribute>
             <xsl:attribute name="singleton">false</xsl:attribute>
             <xsl:attribute name="depends-on">_muleManagementContext</xsl:attribute>
+            <xsl:element name="property">
+                <xsl:attribute name="name">type</xsl:attribute>
+                <xsl:attribute name="value"><xsl:value-of select="$endpointType"/></xsl:attribute>                    
+            </xsl:element>    
             <xsl:apply-templates select="@transformers" mode="addTransformers"/>
             <xsl:apply-templates select="@responseTransformers" mode="addTransformers"/>
             <xsl:apply-templates select="@address" mode="addEndpointURI"/>
             <xsl:apply-templates select="@createConnector"/>
             <xsl:apply-templates select="@connector"/>
             <xsl:apply-templates
-                    select="@*[local-name() != 'address' and local-name() != 'transformers' and local-name() != 'createConnector' and local-name() != 'responseTransformers' and local-name() != 'connector']"
+                select="@*[local-name() != 'address' and local-name() != 'transformers' and local-name() != 'createConnector' and local-name() != 'responseTransformers' and local-name() != 'connector' and local-name() != 'type']"
                     mode="addProperties"/>
             <xsl:apply-templates select="properties" mode="asMap"/>
             <xsl:apply-templates select="transaction"/>
@@ -474,8 +484,12 @@
                 <xsl:apply-templates select="properties"/>
                 <property name="endpoints">
                     <list>
-                        <xsl:apply-templates select="endpoint"/>
-                        <xsl:apply-templates select="global-endpoint"/>
+                        <xsl:apply-templates select="endpoint">
+                            <xsl:with-param name="endpointType" select="'sender'"/>
+                        </xsl:apply-templates>
+                        <xsl:apply-templates select="global-endpoint">
+                            <xsl:with-param name="endpointType" select="'sender'"/>
+                        </xsl:apply-templates>
                     </list>
                 </property>
             </bean>
@@ -628,8 +642,12 @@
             <bean class="{$type}" singleton="false">
                 <property name="endpoints">
                     <list>
-                        <xsl:apply-templates select="endpoint"/>
-                        <xsl:apply-templates select="global-endpoint"/>
+                        <xsl:apply-templates select="endpoint">
+                            <xsl:with-param name="endpointType" select="'receiver'"/>                            
+                        </xsl:apply-templates>
+                        <xsl:apply-templates select="global-endpoint">
+                            <xsl:with-param name="endpointType" select="'receiver'"/>                            
+                        </xsl:apply-templates>
                     </list>
                 </property>
                 <property name="routers">
@@ -678,8 +696,12 @@
                 <xsl:apply-templates select="@*" mode="addProperties"/>
                 <property name="endpoints">
                     <list>
-                        <xsl:apply-templates select="endpoint"/>
-                        <xsl:apply-templates select="global-endpoint"/>
+                        <xsl:apply-templates select="endpoint">
+                            <xsl:with-param name="endpointType" select="'response'"/> 
+                        </xsl:apply-templates>
+                        <xsl:apply-templates select="global-endpoint">
+                            <xsl:with-param name="endpointType" select="'response'"/> 
+                        </xsl:apply-templates>
                     </list>
                 </property>
                 <property name="routers">
@@ -720,8 +742,12 @@
     <xsl:template match="catch-all-strategy">
         <property name="catchAllStrategy">
             <bean class="{@className}" singleton="false">
-                <xsl:apply-templates select="endpoint" mode="propertyEndpoint"/>
-                <xsl:apply-templates select="global-endpoint" mode="propertyEndpoint"/>
+                <xsl:apply-templates select="endpoint" mode="propertyEndpoint">
+                    <xsl:with-param name="endpointType" select="'sender'"/>
+                </xsl:apply-templates>
+                <xsl:apply-templates select="global-endpoint" mode="propertyEndpoint">
+                    <xsl:with-param name="endpointType" select="'sender'"/>
+                </xsl:apply-templates>
                 <xsl:apply-templates select="properties"/>
             </bean>
         </property>
@@ -755,8 +781,12 @@
         <bean class="{@className}" singleton="false">
             <property name="endpoints">
                 <list>
-                    <xsl:apply-templates select="endpoint"/>
-                    <xsl:apply-templates select="global-endpoint"/>
+                    <xsl:apply-templates select="endpoint">
+                        <xsl:with-param name="endpointType" select="'sender'"/>
+                    </xsl:apply-templates>
+                    <xsl:apply-templates select="global-endpoint">
+                        <xsl:with-param name="endpointType" select="'sender'"/>
+                    </xsl:apply-templates>
                 </list>
             </property>
             <xsl:apply-templates select="properties"/>
@@ -769,8 +799,12 @@
         <bean class="org.mule.routing.nested.NestedRouter"
               singleton="false">
             <property name="endpoint">
-                <xsl:apply-templates select="endpoint"/>
-                <xsl:apply-templates select="global-endpoint"/>
+                <xsl:apply-templates select="endpoint">
+                    <xsl:with-param name="endpointType" select="'sender'"/>
+                </xsl:apply-templates>
+                <xsl:apply-templates select="global-endpoint">
+                    <xsl:with-param name="endpointType" select="'sender'"/>
+                </xsl:apply-templates>
             </property>
             <xsl:apply-templates select="@*" mode="addProperties"/>
         </bean>
