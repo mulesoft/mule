@@ -25,8 +25,7 @@ import org.mule.umo.model.UMOModel;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SslFunctionalTestCase extends FunctionalTestCase
-{
+public class SslFunctionalTestCase extends FunctionalTestCase {
 
     protected static String TEST_MESSAGE = "Test Request";
     private static int NUM_MESSAGES = 100;
@@ -73,13 +72,14 @@ public class SslFunctionalTestCase extends FunctionalTestCase
         assertEquals(NUM_MESSAGES, ((CounterCallback) cc).getCallbackCount());
     }
 
-    public void testAsynchronous() throws Exception
-    {
-        MuleClient client = new MuleClient();
-        client.dispatch("asyncEndpoint", TEST_MESSAGE, null);
-        UMOMessage response = client.receive("asyncEndpoint", 5000);
-        assertNotNull("Response is null", response);
-        assertEquals(TEST_MESSAGE + " Received Async", response.getPayloadAsString());
-    }
+    // see AsynchronousSslMule1854TestCase
+//    public void testAsynchronous() throws Exception
+//    {
+//        MuleClient client = new MuleClient();
+//        client.dispatch("asyncEndpoint", TEST_MESSAGE, null);
+//        UMOMessage response = client.receive("asyncEndpoint", 5000);
+//        assertNotNull("Response is null", response);
+//        assertEquals(TEST_MESSAGE + " Received Async", response.getPayloadAsString());
+//    }
 
 }

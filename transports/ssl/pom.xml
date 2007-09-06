@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.mule.transports</groupId>
@@ -11,16 +11,19 @@
     <artifactId>mule-transport-ssl</artifactId>
     <!--<packaging>bundle</packaging>-->
     <name>SSL Transport</name>
-    <description>A Mule transport for Socket connectivity using SSL authentication. This transport supplies a tcp Server
-        and client implementation over SSL.
-    </description>
+    <description>A Mule transport for Socket connectivity using SSL authentication. This transport supplies a tcp Server and client implementation over SSL.</description>
 
     <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-            </plugin>
-            <plugin>
+         <plugins>
+             <plugin>
+                 <artifactId>maven-surefire-plugin</artifactId>
+                 <configuration>
+                     <excludes>
+                         <exclude>**/AsynchronousSslMule1854TestCase.*</exclude>
+                     </excludes>
+                 </configuration>
+             </plugin>
+              <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
@@ -31,7 +34,7 @@
                     </instructions>
                 </configuration>
             </plugin>
-        </plugins>
+         </plugins>
     </build>
 
     <dependencies>
