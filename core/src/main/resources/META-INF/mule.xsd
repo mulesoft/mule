@@ -199,7 +199,6 @@
         <xsd:sequence>
             <xsd:element ref="abstract-catch-all-strategy" minOccurs="0"/>
             <xsd:element ref="abstract-inbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
-            <xsd:element ref="abstract-global-endpoint" minOccurs="0" maxOccurs="unbounded"/> <!-- TODO -->
             <xsd:element ref="abstract-inbound-router" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
         <xsd:attribute name="matchAll" type="substitutableBoolean" default="false"/>
@@ -239,7 +238,6 @@
     <xsd:complexType name="responseRouterCollectionType">
         <xsd:sequence>
             <xsd:element ref="abstract-response-endpoint" minOccurs="0" maxOccurs="unbounded"/>
-            <xsd:element ref="abstract-global-endpoint" minOccurs="0" maxOccurs="unbounded"/> <!-- TODO -->
             <xsd:element ref="abstract-response-router" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
         <xsd:attribute name="transformers" type="xsd:string"/>
@@ -879,7 +877,6 @@
             <xsd:extension base="abstractExceptionStrategyType">
                 <xsd:sequence>
                     <xsd:element ref="abstract-outbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
-                    <xsd:element ref="abstract-global-endpoint" minOccurs="0" maxOccurs="unbounded"/> <!-- TODO -->
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
@@ -1031,7 +1028,6 @@
             <xsd:extension base="abstractBindingType">
                 <xsd:sequence>
                     <xsd:element ref="abstract-outbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
-                    <xsd:element ref="abstract-global-endpoint" minOccurs="0" maxOccurs="unbounded"/> <!-- TODO -->
                 </xsd:sequence>
                 <xsd:attribute name="interface" use="required"/>
                 <xsd:attribute name="method" use="optional"/>
@@ -1075,7 +1071,6 @@
             <xsd:extension base="filteredInboundRouterType">
                 <xsd:sequence>
                     <xsd:element ref="abstract-inbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
-                    <xsd:element ref="abstract-global-endpoint" minOccurs="0" maxOccurs="unbounded"/> <!-- TODO -->
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
@@ -1108,7 +1103,6 @@
             <xsd:extension base="filteredInboundRouterType">
                 <xsd:sequence>
                     <xsd:element ref="abstract-outbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
-                    <xsd:element ref="abstract-global-endpoint" minOccurs="0" maxOccurs="unbounded"/> <!-- TODO -->
                 </xsd:sequence>
                 <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
             </xsd:extension>
@@ -1122,7 +1116,6 @@
             <xsd:extension base="abstractResponseRouterType">
                 <xsd:sequence>
                     <xsd:element ref="abstract-response-endpoint" minOccurs="0" maxOccurs="unbounded"/>
-                    <xsd:element ref="abstract-global-endpoint" minOccurs="0" maxOccurs="unbounded"/> <!-- TODO -->
                     <xsd:choice minOccurs="0">
                         <xsd:element ref="abstract-property-extractor"/>
                         <xsd:element ref="custom-property-extractor"/> <!-- hardwired object factory -->
@@ -1150,7 +1143,6 @@
             <xsd:extension base="abstractOutboundRouterType">
                 <xsd:sequence>
                     <xsd:element ref="abstract-outbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
-                    <xsd:element ref="abstract-global-endpoint" minOccurs="0" maxOccurs="unbounded"/> <!-- TODO -->
                     <xsd:element name="reply-to" type="replyToType" minOccurs="0"/>
                     <xsd:element ref="abstract-transaction" minOccurs="0"/>
                     <xsd:choice minOccurs="0">
@@ -1246,7 +1238,6 @@
             <xsd:extension base="abstractCatchAllStrategyType">
                 <xsd:sequence>
                     <xsd:element ref="abstract-outbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
-                    <xsd:element ref="abstract-global-endpoint" minOccurs="0" maxOccurs="unbounded"/> <!-- TODO -->
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>

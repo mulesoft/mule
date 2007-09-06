@@ -50,11 +50,11 @@
         <service name="serviceProxy">
             <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
-                <endpoint address="vm://stockquote"/>
+                <inbound-endpoint address="vm://stockquote"/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <endpoint address="wsdl-xfire:http://www.webservicex.net/stockquote.asmx?WSDL&amp;method=GetQuote"/>
+                    <outbound-endpoint address="wsdl-xfire:http://www.webservicex.net/stockquote.asmx?WSDL&amp;method=GetQuote"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>

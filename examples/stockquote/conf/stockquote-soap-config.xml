@@ -55,7 +55,7 @@
         <service name="Console I/O">
             <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
-                <endpoint address="stdio://System.in"/>
+                <inbound-endpoint address="stdio://System.in"/>
             </inbound-router>
             <outbound-router>
                 <!--
@@ -63,8 +63,8 @@
                     input for the next endpoint. In this case it writes it out to System.out
                 -->
                 <chaining-router>
-                    <endpoint address="vm://stockquote"/>
-                    <endpoint address="stdio://System.out"/>
+                    <outbound-endpoint address="vm://stockquote"/>
+                    <outbound-endpoint address="stdio://System.out"/>
                 </chaining-router>
             </outbound-router>
         </service>
@@ -76,11 +76,11 @@
         <service name="serviceProxy">
             <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
-                <endpoint address="vm://stockquote"/>
+                <inbound-endpoint address="vm://stockquote"/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <endpoint address="axis:http://www.webservicex.net/stockquote.asmx?method=GetQuote"
+                    <outbound-endpoint address="axis:http://www.webservicex.net/stockquote.asmx?method=GetQuote"
                         responseTransformers="XmlDecoder Xslt XmlToObject">
                         <properties>
                             <spring:entry key="soapAction" value="[methodNamespace][method]"/>
@@ -95,7 +95,7 @@
                                 </spring:map>
                             </spring:entry>
                         </properties>
-                    </endpoint>
+                    </outbound-endpoint>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>

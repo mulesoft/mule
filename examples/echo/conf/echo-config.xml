@@ -38,8 +38,8 @@
 
             <!-- any number of endpoints can be added to an inbound router -->
             <inbound-router>
-                <endpoint address="stdio://System.in"/>
-                <endpoint address="vm://echo"/>
+                <inbound-endpoint address="stdio://System.in"/>
+                <inbound-endpoint address="vm://echo"/>
             </inbound-router>
 
             <!--
@@ -50,7 +50,7 @@
             -->
             <outbound-router>
                 <outbound-pass-through-router>
-                    <endpoint address="stdio://System.out"/>
+                    <outbound-endpoint address="stdio://System.out"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>

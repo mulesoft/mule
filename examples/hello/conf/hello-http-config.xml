@@ -75,7 +75,7 @@
             <component class="org.mule.samples.hello.Greeter"/>
             <inbound-router>
                 <!-- Incoming HTTP requests -->
-                <endpoint address="http://localhost:8888" 
+                <inbound-endpoint address="http://localhost:8888" 
                     transformers="HttpRequestToString StringToNameString"
                     synchronous="true">
                     <not-filter>
@@ -83,17 +83,17 @@
                     </not-filter>
                 </endpoint>
                 <!-- Incoming Servlet requests -->
-                <endpoint address="servlet://rest" 
+                <inbound-endpoint address="servlet://rest" 
                     transformers="StringToNameString"
                     synchronous="true"/>
                 <!-- Incoming VM requests -->
-                <endpoint address="vm://greeter" 
+                <inbound-endpoint address="vm://greeter" 
                     transformers="StringToNameString"
                     synchronous="true"/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <endpoint address="vm://chitchatter"
+                    <outbound-endpoint address="vm://chitchatter"
                         synchronous="true"/>
                 </outbound-pass-through-router>
             </outbound-router>
@@ -107,7 +107,7 @@
             <inbound-router>
                 <!-- note the response transformer on this component. even though there is no outbound provider
                      the transformer will transform the result event and pass it back as the http response -->
-                <endpoint address="vm://chitchatter" transformers="NameStringToChatString"
+                <inbound-endpoint address="vm://chitchatter" transformers="NameStringToChatString"
                                synchronous="true"
                                responseTransformers="ChatStringToString"/>
             </inbound-router>

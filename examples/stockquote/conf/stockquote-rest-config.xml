@@ -56,7 +56,7 @@
             </component>
 
             <inbound-router>
-                <endpoint address="vm://stockquote"
+                <inbound-endpoint address="vm://stockquote"
                                responseTransformers="XmlDecoder Xslt XmlToObject"/>
             </inbound-router>
         </service>

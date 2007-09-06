@@ -68,11 +68,11 @@
         <service name="GreetUMO">
             <component class="org.mule.samples.hello.Greeter"/>
             <inbound-router>
-                <endpoint address="stdio://System.in" transformers="StringToNameString"/>
+                <inbound-endpoint address="stdio://System.in" transformers="StringToNameString"/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <endpoint address="vm://chitchatter"/>
+                    <outbound-endpoint address="vm://chitchatter"/>
                 </outbound-pass-through-router>
             </outbound-router>
             <!--
@@ -83,11 +83,11 @@
         <service name="ChitChatUMO">
             <component class="org.mule.samples.hello.ChitChatter"/>
             <inbound-router>
-                <endpoint address="vm://chitchatter" transformers="NameStringToChatString"/>
+                <inbound-endpoint address="vm://chitchatter" transformers="NameStringToChatString"/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <endpoint address="stdio://System.out" transformers="ChatStringToString"/>
+                    <outbound-endpoint address="stdio://System.out" transformers="ChatStringToString"/>
                 </outbound-pass-through-router>
             </outbound-router>
             <!--<interceptor name="default"/>-->

@@ -92,14 +92,14 @@
         <mule-descriptor name="Error Manager" implementation="errorManager">
 
             <inbound-router>
-                <endpoint address="file://../test-data/samples/errorhandler/in"
+                <inbound-endpoint address="file://../test-data/samples/errorhandler/in"
                         transformers="FileMessageToObject XMLToExceptionBean ExceptionBeanToErrorMessage"/>
             </inbound-router>
             <outbound-router>
                 <catch-all-strategy className="org.mule.routing.LoggingCatchAllStrategy"/>
 
                 <router className="org.mule.routing.outbound.FilteringOutboundRouter" transformer="ErrorMessageToException" >
-                    <endpoint address="file://../test-data/samples/errorhandler/exceptions" transformers="ErrorMessageToExceptionBean ExceptionBeanToXML">
+                    <outbound-endpoint address="file://../test-data/samples/errorhandler/exceptions" transformers="ErrorMessageToExceptionBean ExceptionBeanToXML">
                     <properties>
                             <property name="outputPattern" value="Exception-${UUID}.xml"/>
                         </properties>
@@ -108,12 +108,12 @@
                 </router>
 
                 <router className="org.mule.routing.outbound.FilteringOutboundRouter" transformer="ErrorMessageToException">
-                    <endpoint address="smtp://exceptions@somewhere.com" transformers="ErrorMessageToExceptionBean ExceptionBeanToXML StringToEmailMessage"/>
+                    <outbound-endpoint address="smtp://exceptions@somewhere.com" transformers="ErrorMessageToExceptionBean ExceptionBeanToXML StringToEmailMessage"/>
                     <filter className="org.mule.routing.filters.PayloadTypeFilter" expectedType="org.mule.umo.lifecycle.FatalException"/>
                 </router>
 
                 <router className="org.mule.routing.outbound.FilteringOutboundRouter" transformer="ErrorMessageToException">
-                    <endpoint address="jms://exception.queue" transformers="ErrorMessageToExceptionBean ExceptionBeanToXML ObjectToJMSMessage"/>
+                    <outbound-endpoint address="jms://exception.queue" transformers="ErrorMessageToExceptionBean ExceptionBeanToXML ObjectToJMSMessage"/>
                     <filter className="org.mule.routing.filters.PayloadTypeFilter" expectedType="org.mule.samples.errorhandler.exceptions.BusinessException"/>
                 </router>
             </outbound-router>
@@ -122,7 +122,7 @@
 
         <mule-descriptor name="Business Error Manager" implementation="businessErrorManager">
             <inbound-router>
-                <endpoint address="jms://exception.queue" transformers="JMSMessageToObject XMLToExceptionBean ExceptionBeanToErrorMessage"/>
+                <inbound-endpoint address="jms://exception.queue" transformers="JMSMessageToObject XMLToExceptionBean ExceptionBeanToErrorMessage"/>
             </inbound-router>
         </mule-descriptor>
     </model>

@@ -40,9 +40,9 @@
             <inbound-router>
                 <custom-catch-all-strategy class="org.mule.routing.ComponentCatchAllStrategy"/>
                 <!-- New requests from customers -->
-                <endpoint ref="CustomerRequests"/>
+                <inbound-endpoint ref="CustomerRequests"/>
                 <!-- Loan quotes from banks -->
-                <endpoint ref="LoanBrokerQuotes"/>
+                <inbound-endpoint ref="LoanBrokerQuotes"/>
                 <custom-inbound-router class="org.mule.examples.loanbroker.routers.BankQuotesInboundAggregator">
                     <payload-type-filter expectedType="org.mule.examples.loanbroker.messages.LoanQuote"/>
                 </custom-inbound-router>
@@ -51,17 +51,17 @@
             <outbound-router>
                 <!-- Credit profile requests -->
                 <filtering-router>
-                    <endpoint ref="CreditAgency" transformers="ExtractCustomer"/>
+                    <outbound-endpoint ref="CreditAgency" transformers="ExtractCustomer"/>
                     <payload-type-filter expectedType="org.mule.examples.loanbroker.messages.Customer"/>
                 </filtering-router>
                 <!-- Quote requests to the banks -->
                 <filtering-router>
-                    <endpoint ref="LenderService"/>
+                    <outbound-endpoint ref="LenderService"/>
                     <payload-type-filter expectedType="org.mule.examples.loanbroker.messages.LoanBrokerQuoteRequest"/>
                 </filtering-router>
                 <!-- Final quote response to the customer -->
                 <filtering-router>
-                    <endpoint ref="CustomerResponses"/>
+                    <outbound-endpoint ref="CustomerResponses"/>
                     <payload-type-filter expectedType="org.mule.examples.loanbroker.messages.LoanQuote"/>
                 </filtering-router>
             </outbound-router>
@@ -73,7 +73,7 @@
         <service name="TheCreditAgencyService">
             <component class="org.mule.examples.loanbroker.credit.DefaultCreditAgency"/>
             <inbound-router>
-                <endpoint ref="CreditAgency"/>
+                <inbound-endpoint ref="CreditAgency"/>
             </inbound-router>
         </service>
 
@@ -83,11 +83,11 @@
         <service name="TheLenderService">
             <component class="org.mule.examples.loanbroker.lender.DefaultLender"/>
             <inbound-router>
-                <endpoint ref="LenderService"/>
+                <inbound-endpoint ref="LenderService"/>
             </inbound-router>
             <outbound-router>
                 <filtering-router>
-                    <endpoint ref="BankGateway" transformers="SetLendersAsRecipients"/>
+                    <outbound-endpoint ref="BankGateway" transformers="SetLendersAsRecipients"/>
                 </filtering-router>
             </outbound-router>
         </service>
@@ -95,7 +95,7 @@
         <service name="TheBankGateway">
             <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
-                <endpoint ref="BankGateway"/>
+                <inbound-endpoint ref="BankGateway"/>
             </inbound-router>
             <outbound-router>
                 <logging-catch-all-strategy/>
@@ -116,35 +116,35 @@
         <service name="TheBank1">
             <component class="org.mule.examples.loanbroker.bank.Bank"/>
             <inbound-router>
-                <endpoint ref="Bank1In"/>
+                <inbound-endpoint ref="Bank1In"/>
             </inbound-router>
         </service>
 
         <service name="TheBank2">
             <component class="org.mule.examples.loanbroker.bank.Bank"/>
             <inbound-router>
-                <endpoint ref="Bank2In"/>
+                <inbound-endpoint ref="Bank2In"/>
             </inbound-router>
         </service>
 
         <service name="TheBank3">
             <component class="org.mule.examples.loanbroker.bank.Bank"/>
             <inbound-router>
-                <endpoint ref="Bank3In"/>
+                <inbound-endpoint ref="Bank3In"/>
             </inbound-router>
         </service>
 
         <service name="TheBank4">
             <component class="org.mule.examples.loanbroker.bank.Bank"/>
             <inbound-router>
-                <endpoint ref="Bank4In"/>
+                <inbound-endpoint ref="Bank4In"/>
             </inbound-router>
         </service>
 
         <service name="TheBank5">
             <component class="org.mule.examples.loanbroker.bank.Bank"/>
             <inbound-router>
-                <endpoint ref="Bank5In"/>
+                <inbound-endpoint ref="Bank5In"/>
             </inbound-router>
         </service>
 

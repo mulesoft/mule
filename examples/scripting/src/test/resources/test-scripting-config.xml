@@ -27,7 +27,7 @@
                 </properties>
             </component>
             <inbound-router>
-                <endpoint address="vm://scripting"/>
+                <inbound-endpoint address="vm://scripting"/>
             </inbound-router>
         </service>
     </model>

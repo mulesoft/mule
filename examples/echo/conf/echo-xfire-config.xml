@@ -24,9 +24,9 @@
         <service name="EchoUMO">
             <component class="org.mule.components.simple.EchoComponent"/>
             <inbound-router>
-                <endpoint address="xfire:http://localhost:65081/services"
+                <inbound-endpoint address="xfire:http://localhost:65081/services"
                     transformers="HttpRequestToSoapRequest" />
-                <endpoint address="xfire:http://localhost:65082/services"/>
+                <inbound-endpoint address="xfire:http://localhost:65082/services"/>
             </inbound-router>
         </service>
     </model>

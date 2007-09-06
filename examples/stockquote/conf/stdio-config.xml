@@ -17,7 +17,7 @@
         <service name="Console I/O">
             <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
-                <endpoint address="stdio://System.in"/>
+                <inbound-endpoint address="stdio://System.in"/>
             </inbound-router>
             <outbound-router>
                 <!--
@@ -25,8 +25,8 @@
                     input for the next endpoint. In this case it writes it out to System.out
                 -->
                 <chaining-router>
-                    <endpoint address="vm://stockquote"/>
-                    <endpoint address="stdio://System.out" transformers="XmlDecoder Xslt XmlToObject"/>
+                    <outbound-endpoint address="vm://stockquote"/>
+                    <outbound-endpoint address="stdio://System.out" transformers="XmlDecoder Xslt XmlToObject"/>
                 </chaining-router>
             </outbound-router>
         </service>

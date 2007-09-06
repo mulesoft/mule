@@ -49,13 +49,13 @@
             <component class="org.mule.examples.loanbroker.DefaultLoanBroker" />
             <inbound-router>
                 <!-- Incoming message = CustomerRequest -->
-                <endpoint ref="CustomerRequests" />
+                <inbound-endpoint ref="CustomerRequests" />
                 <!-- Incoming message = CreditProfile -->
-                <endpoint ref="CreditProfiles" />
+                <inbound-endpoint ref="CreditProfiles" />
             </inbound-router>
             <outbound-router>
                 <filtering-router>
-                    <endpoint ref="ProcessEngine" synchronous="false" />
+                    <outbound-endpoint ref="ProcessEngine" synchronous="false" />
                 </filtering-router>
             </outbound-router>
         </service>
@@ -64,32 +64,32 @@
         <service name="FromBPMS">
             <component class="org.mule.examples.loanbroker.DefaultLoanBroker" />
             <inbound-router>
-                <endpoint ref="ProcessEngine" />
+                <inbound-endpoint ref="ProcessEngine" />
             </inbound-router>
             <outbound-router>
                 <endpoint-selector-router selectorProperty="endpoint">
                     <!-- Outgoing message = Customer -->
-                    <endpoint ref="CreditAgency" />
+                    <outbound-endpoint ref="CreditAgency" />
 
                     <!-- Outgoing message = LoanQuote -->
-                    <endpoint ref="CustomerResponses" />
+                    <outbound-endpoint ref="CustomerResponses" />
 
                     <!-- Outgoing message = LoanQuoteRequest -->
-                    <endpoint ref="BigBank" synchronous="true">
+                    <outbound-endpoint ref="BigBank" synchronous="true">
                         <properties>
                             <spring:entry key="method" value="getLoanQuote" />
                         </properties>
-                    </endpoint>
-                    <endpoint ref="MediumBank" synchronous="true">
+                    </outbound-endpoint>
+                    <outbound-endpoint ref="MediumBank" synchronous="true">
                         <properties>
                             <spring:entry key="method" value="getLoanQuote" />
                         </properties>
-                    </endpoint>
-                    <endpoint ref="SmallBank" synchronous="true">
+                    </outbound-endpoint>
+                    <outbound-endpoint ref="SmallBank" synchronous="true">
                         <properties>
                             <spring:entry key="method" value="getLoanQuote" />
                         </properties>
-                    </endpoint>
+                    </outbound-endpoint>
                 </endpoint-selector-router>
             </outbound-router>
         </service>
@@ -102,11 +102,11 @@
         <service name="ACreditAgency">
             <component class="org.mule.examples.loanbroker.credit.DefaultCreditAgency" />
             <inbound-router>
-                <endpoint ref="CreditAgency" />
+                <inbound-endpoint ref="CreditAgency" />
             </inbound-router>
             <outbound-router>
                 <filtering-router>
-                    <endpoint ref="CreditProfiles" />
+                    <outbound-endpoint ref="CreditProfiles" />
                 </filtering-router>
             </outbound-router>
         </service>
@@ -115,19 +115,19 @@
         <service name="ABigBank">
             <component class="org.mule.examples.loanbroker.bank.Bank" />
             <inbound-router>
-                <endpoint ref="BigBank" />
+                <inbound-endpoint ref="BigBank" />
             </inbound-router>
         </service>
         <service name="AMediumBank">
             <component class="org.mule.examples.loanbroker.bank.Bank" />
             <inbound-router>
-                <endpoint ref="MediumBank" />
+                <inbound-endpoint ref="MediumBank" />
             </inbound-router>
         </service>
         <service name="ASmallBank">
             <component class="org.mule.examples.loanbroker.bank.Bank" />
             <inbound-router>
-                <endpoint ref="SmallBank" />
+                <inbound-endpoint ref="SmallBank" />
             </inbound-router>
         </service>
     </model>
