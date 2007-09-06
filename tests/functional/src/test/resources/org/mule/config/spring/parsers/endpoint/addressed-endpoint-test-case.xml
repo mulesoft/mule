@@ -8,4 +8,6 @@
 
     <parsers-test:addressed-endpoint name="addressed" address="foo"/>
 
+    <parsers-test:addressed-orphan-endpoint name="addressed-orphan" address="foo"/>
+
 </mule>

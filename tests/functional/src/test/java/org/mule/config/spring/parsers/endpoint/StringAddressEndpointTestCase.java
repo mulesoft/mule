@@ -14,7 +14,7 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 
-public class StringAddressEndpointTestCase extends FunctionalTestCase
+public class StringAddressEndpointTestCase extends AbstractEndpointTestCase
 {
 
     protected String getConfigResources()
@@ -22,14 +22,19 @@ public class StringAddressEndpointTestCase extends FunctionalTestCase
         return "org/mule/config/spring/parsers/endpoint/string-address-endpoint-test-case.xml";
     }
 
-    public void testAddress()
+    public void testStringAddress()
     {
-        UMOEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("string");
-        assertNotNull(endpoint);
-        UMOEndpointURI uri = endpoint.getEndpointURI();
-        assertNotNull(uri);
-        assertEquals("foo", uri.getAddress());
-        assertEquals("test", uri.getScheme());
+        doTest("string");
+    }
+
+    public void testOrphanAddress()
+    {
+        doTest("orphan");
+    }
+
+    public void testChildAddress()
+    {
+        doTest("child");
     }
 
 }

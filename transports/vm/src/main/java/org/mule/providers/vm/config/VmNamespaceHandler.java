@@ -12,15 +12,13 @@ package org.mule.providers.vm.config;
 import org.mule.config.QueueProfile;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleChildDefinitionParser;
-import org.mule.config.spring.parsers.specific.UnaddressedEndpointDefinitionParser;
-import org.mule.config.spring.parsers.specific.ChildAddressDefinitionParser;
+import org.mule.config.spring.parsers.specific.endpoint.UnaddressedEndpointDefinitionParser;
+import org.mule.config.spring.parsers.specific.endpoint.ChildAddressDefinitionParser;
 import org.mule.config.spring.handlers.AbstractIgnorableNamespaceHandler;
 import org.mule.providers.vm.VMConnector;
 import org.mule.impl.endpoint.GlobalEndpoint;
 import org.mule.impl.endpoint.InboundEndpoint;
 import org.mule.impl.endpoint.OutboundEndpoint;
-
-import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 /**
  * Reigsters a Bean Definition Parser for handling <code><vm:connector></code> elements.

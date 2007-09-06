@@ -8,4 +8,15 @@
 
     <parsers-test:string-endpoint address="test://foo" name="string"/>
 
+    <parsers-test:orphan-endpoint address="test://foo" name="orphan"/>
+
+    <model name="model">
+        <service name="service">
+            <bridge-component/>
+            <inbound-router>
+                <parsers-test:child-endpoint address="test://foo" name="child"/>
+            </inbound-router>
+        </service>
+    </model>
+
 </mule>

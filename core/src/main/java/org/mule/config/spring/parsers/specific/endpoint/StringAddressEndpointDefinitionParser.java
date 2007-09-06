@@ -7,9 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers.specific;
-
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
+package org.mule.config.spring.parsers.specific.endpoint;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -17,7 +15,12 @@ import org.w3c.dom.Element;
 
 /**
  * Extend {@link UnaddressedEndpointDefinitionParser}
- * with validation of simple string address or global endpoint reference
+ * with validation of simple string address or global endpoint reference .
+ *
+ * @deprecated - see
+ * {@link org.mule.config.spring.parsers.specific.endpoint.OrphanEndpointDefinitionParser}
+ * and
+ * {@link org.mule.config.spring.parsers.specific.endpoint.ChildEndpointDefinitionParser}
  */
 public class StringAddressEndpointDefinitionParser extends UnaddressedEndpointDefinitionParser
 {

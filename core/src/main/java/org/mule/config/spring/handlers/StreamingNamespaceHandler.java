@@ -12,7 +12,7 @@ package org.mule.config.spring.handlers;
 
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
-import org.mule.config.spring.parsers.specific.StringAddressEndpointDefinitionParser;
+import org.mule.config.spring.parsers.specific.endpoint.StringAddressEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.RouterDefinitionParser;
 import org.mule.config.spring.parsers.specific.ServiceDescriptorDefinitionParser;
 import org.mule.impl.endpoint.InboundStreamingEndpoint;

@@ -10,8 +10,8 @@
 package org.mule.providers.email.config;
 
 import org.mule.config.spring.parsers.generic.MuleChildDefinitionParser;
-import org.mule.config.spring.parsers.specific.UnaddressedEndpointDefinitionParser;
-import org.mule.config.spring.parsers.specific.ChildAddressDefinitionParser;
+import org.mule.config.spring.parsers.specific.endpoint.UnaddressedEndpointDefinitionParser;
+import org.mule.config.spring.parsers.specific.endpoint.ChildAddressDefinitionParser;
 import org.mule.providers.email.ImapConnector;
 import org.mule.impl.endpoint.GlobalEndpoint;
 import org.mule.impl.endpoint.InboundEndpoint;

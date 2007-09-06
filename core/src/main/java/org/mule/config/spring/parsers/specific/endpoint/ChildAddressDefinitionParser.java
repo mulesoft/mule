@@ -8,10 +8,11 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config.spring.parsers.specific;
+package org.mule.config.spring.parsers.specific.endpoint;
 
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.config.spring.parsers.specific.LazyEndpointURI;
 
 import org.w3c.dom.Element;
 

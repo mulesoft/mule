@@ -8,37 +8,42 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config.spring.parsers.specific;
+package org.mule.config.spring.parsers.specific.endpoint;
 
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+import org.mule.config.spring.parsers.specific.endpoint.OrphanAddressDefinitionParser;
+import org.mule.config.spring.parsers.specific.LazyEndpointURI;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.delegate.AbstractDelegateDelegate;
 import org.mule.config.spring.parsers.delegate.AbstractSerialDelegatingDefinitionParser;
 import org.mule.config.spring.parsers.delegate.PostProcessor;
 import org.mule.config.spring.parsers.delegate.PreProcessor;
+import org.mule.config.spring.parsers.delegate.DelegateDefinitionParser;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
 
 import java.util.Iterator;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
-import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
- * Combine an {@link ChildAddressDefinitionParser} and
- * an {@link UnaddressedEndpointDefinitionParser} in
- * one parser.  This lets us put the address attributes in the endpoint element.
+ * Combine a
+ * {@link org.mule.config.spring.parsers.specific.endpoint.ChildAddressDefinitionParser} and
+ * either a
+ * {@link org.mule.config.spring.parsers.specific.endpoint.OrphanEndpointDefinitionParser}
+ * or a
+ * {@link org.mule.config.spring.parsers.specific.endpoint.ChildEndpointDefinitionParser}
+ * in one parser.  This lets us put the address attributes in the endpoint element.
  */
 public class AddressedEndpointDefinitionParser extends AbstractSerialDelegatingDefinitionParser
 {
 
     private String addressId;
 
-    public AddressedEndpointDefinitionParser(String protocol, Class endpoint)
+    public AddressedEndpointDefinitionParser(String protocol, DelegateDefinitionParser endpointParser)
     {
         addDelegate(new AddressDelegate(protocol));
-        addDelegate(new EndpointDelegate(endpoint));
+        addDelegate(new EndpointDelegate(endpointParser));
     }
 
     /**
@@ -57,6 +62,7 @@ public class AddressedEndpointDefinitionParser extends AbstractSerialDelegatingD
             {
                 getDelegate().removeIgnored((String) names.next());
             }
+            
             registerPreProcessor(new PreProcessor()
             {
                 public void preProcess(Element element)
@@ -76,14 +82,15 @@ public class AddressedEndpointDefinitionParser extends AbstractSerialDelegatingD
     private class EndpointDelegate extends AbstractDelegateDelegate
     {
 
-        private EndpointDelegate(Class endpoint)
+        private EndpointDelegate(DelegateDefinitionParser endpointParser)
         {
-            super(new UnaddressedEndpointDefinitionParser(endpoint));
+            super(endpointParser);
             Iterator names = Arrays.asList(LazyEndpointURI.ATTRIBUTES).iterator();
             while (names.hasNext())
             {
                 getDelegate().addIgnored((String) names.next());
             }
+
             registerPreProcessor(new PreProcessor()
             {
                 public void preProcess(Element element)
@@ -91,6 +98,7 @@ public class AddressedEndpointDefinitionParser extends AbstractSerialDelegatingD
                     AutoIdUtils.ensureUniqueId(element, "endpoint");
                 }
             });
+
             registerPostProcessor(new PostProcessor()
             {
                 public void postProcess(BeanAssembler assembler, Element element)

@@ -14,22 +14,17 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 
-public class AddressedEndpointTestCase extends AbstractEndpointTestCase
+public abstract class AbstractEndpointTestCase extends FunctionalTestCase
 {
 
-    protected String getConfigResources()
+    public void doTest(String name)
     {
-        return "org/mule/config/spring/parsers/endpoint/addressed-endpoint-test-case.xml";
-    }
-
-    public void testAddressed()
-    {
-        doTest("addressed");
-    }
-
-    public void testAddressedOrphan()
-    {
-        doTest("addressed-orphan");
+        UMOEndpoint endpoint = managementContext.getRegistry().lookupEndpoint(name);
+        assertNotNull(endpoint);
+        UMOEndpointURI uri = endpoint.getEndpointURI();
+        assertNotNull(uri);
+        assertEquals("foo", uri.getAddress());
+        assertEquals("test", uri.getScheme());
     }
 
 }

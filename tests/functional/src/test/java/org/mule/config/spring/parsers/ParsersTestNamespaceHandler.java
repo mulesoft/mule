@@ -10,6 +10,7 @@
 
 package org.mule.config.spring.parsers;
 
+import org.mule.config.spring.handlers.AbstractIgnorableNamespaceHandler;
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.delegate.InheritDefinitionParser;
@@ -17,14 +18,14 @@ import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
-import org.mule.config.spring.parsers.specific.ChildAddressDefinitionParser;
-import org.mule.config.spring.parsers.specific.AddressedEndpointDefinitionParser;
-import org.mule.config.spring.parsers.specific.StringAddressEndpointDefinitionParser;
-import org.mule.config.spring.parsers.specific.UnaddressedEndpointDefinitionParser;
-import org.mule.config.spring.handlers.AbstractIgnorableNamespaceHandler;
+import org.mule.config.spring.parsers.specific.endpoint.AddressedEndpointDefinitionParser;
+import org.mule.config.spring.parsers.specific.endpoint.ChildAddressDefinitionParser;
+import org.mule.config.spring.parsers.specific.endpoint.ChildEndpointDefinitionParser;
+import org.mule.config.spring.parsers.specific.endpoint.OrphanEndpointDefinitionParser;
+import org.mule.config.spring.parsers.specific.endpoint.StringAddressEndpointDefinitionParser;
+import org.mule.config.spring.parsers.specific.endpoint.UnaddressedEndpointDefinitionParser;
 import org.mule.impl.endpoint.GlobalEndpoint;
-
-import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
+import org.mule.impl.endpoint.InboundEndpoint;
 
 /**
  * Registers a Bean Definition Parser for handling <code><parsers-test:...></code> elements.
@@ -50,7 +51,11 @@ public class ParsersTestNamespaceHandler extends AbstractIgnorableNamespaceHandl
         registerBeanDefinitionParser("string-endpoint", new StringAddressEndpointDefinitionParser(GlobalEndpoint.class));
         registerBeanDefinitionParser("unaddressed-endpoint", new UnaddressedEndpointDefinitionParser(GlobalEndpoint.class));
         registerMuleDefinitionParser("address", new ChildAddressDefinitionParser("test")).addAlias("address", "hostname");
-        registerBeanDefinitionParser("addressed-endpoint", new AddressedEndpointDefinitionParser("test", GlobalEndpoint.class));
+        registerBeanDefinitionParser("addressed-endpoint", new AddressedEndpointDefinitionParser("test", new UnaddressedEndpointDefinitionParser(GlobalEndpoint.class)));
+        registerBeanDefinitionParser("orphan-endpoint", new OrphanEndpointDefinitionParser(GlobalEndpoint.class));
+        registerBeanDefinitionParser("child-endpoint", new ChildEndpointDefinitionParser(InboundEndpoint.class));
+        registerBeanDefinitionParser("unaddressed-orphan-endpoint", new OrphanEndpointDefinitionParser(GlobalEndpoint.class));
+        registerBeanDefinitionParser("addressed-orphan-endpoint", new AddressedEndpointDefinitionParser("test", new OrphanEndpointDefinitionParser(GlobalEndpoint.class)));
     }
 
 }

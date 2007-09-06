@@ -7,7 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.config.spring.parsers.specific;
+package org.mule.config.spring.parsers.specific.endpoint;
 
 import org.mule.config.spring.parsers.AbstractChildDefinitionParser;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
@@ -27,6 +27,11 @@ import org.w3c.dom.Element;
  * case the Endpoint becomes a <em>global Endpoint</em> and is available via the registry.
  *
  * <p>This endpoint parser assumes that the address will be set via some external mechanism.</p>
+ *
+ * @deprecated - see
+ * {@link org.mule.config.spring.parsers.specific.endpoint.OrphanEndpointDefinitionParser}
+ * and
+ * {@link org.mule.config.spring.parsers.specific.endpoint.ChildEndpointDefinitionParser}
  */
 public class UnaddressedEndpointDefinitionParser extends AbstractChildDefinitionParser
 {

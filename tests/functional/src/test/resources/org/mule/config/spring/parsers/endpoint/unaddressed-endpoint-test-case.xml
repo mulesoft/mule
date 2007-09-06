@@ -10,4 +10,8 @@
         <parsers-test:address address="foo"/>
     </parsers-test:unaddressed-endpoint>
 
+    <parsers-test:unaddressed-orphan-endpoint name="unaddressed-orphan">
+        <parsers-test:address address="foo"/>
+    </parsers-test:unaddressed-orphan-endpoint>
+
 </mule>
