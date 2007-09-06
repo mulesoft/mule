@@ -12,7 +12,9 @@ package org.mule.config.spring.parsers.assembly;
 
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
+import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.util.ClassUtils;
+import org.mule.impl.security.MuleHeaderCredentialsAccessor;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
@@ -256,6 +258,11 @@ public class DefaultBeanAssembler implements BeanAssembler
                 targetProperties.addPropertyValue(name, value);
             }
         }
+    }
+
+    public void setBeanFlag(String flag)
+    {
+        MuleHierarchicalBeanDefinitionParserDelegate.setFlag(bean.getRawBeanDefinition(), flag);
     }
 
     public static String attributeName(Attr attribute)

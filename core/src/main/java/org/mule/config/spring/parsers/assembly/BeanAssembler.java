@@ -86,4 +86,12 @@ public interface BeanAssembler
      */
     void copyBeanToTarget();
 
+    /**
+     * Set a flag on the bean - this is used to communicate with
+     * {@link org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate}
+     *
+     * @param flag The flag to set
+     */
+    void setBeanFlag(String flag);
+
 }

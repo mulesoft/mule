@@ -10,6 +10,7 @@
 package org.mule.config.spring.parsers.collection;
 
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 
 import java.util.Properties;
 
@@ -38,8 +39,9 @@ public class ChildPropertiesDefinitionParser extends ChildDefinitionParser
     protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
         super.parseChild(element, parserContext, builder);
-        
         Properties parsedProps = parserContext.getDelegate().parsePropsElement(element);
         builder.addPropertyValue("properties", parsedProps);
+        getBeanAssembler(element, builder).setBeanFlag(MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_RECURSE);
     }
+
 }

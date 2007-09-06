@@ -10,6 +10,7 @@
 package org.mule.config.spring.parsers.collection;
 
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 
 import java.util.Map;
 
@@ -51,6 +52,7 @@ public class OrphanMapDefinitionParser extends AbstractMuleBeanDefinitionParser
         Map parsedMap = parserContext.getDelegate().parseMapElement(element, builder.getRawBeanDefinition());
         builder.addPropertyValue("sourceMap", parsedMap);
         builder.addPropertyValue("targetMapClass", mapClass.getName());
+        getBeanAssembler(element, builder).setBeanFlag(MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_RECURSE);
     }
 
     //@Override

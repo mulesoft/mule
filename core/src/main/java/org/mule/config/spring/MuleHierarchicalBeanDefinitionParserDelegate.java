@@ -49,6 +49,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
     public static final String MULE_DEFAULT_NAMESPACE = "http://www.mulesource.org/schema/mule/core";
     public static final String MULE_NAMESPACE_PREFIX = "http://www.mulesource.org/schema/mule/";
     public static final String MULE_REPEAT_PARSE = "org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate.MULE_REPEAT_PARSE";
+    public static final String MULE_NO_RECURSE = "org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_RECURSE";
 
     private DefaultBeanDefinitionDocumentReader spring;
 
@@ -84,7 +85,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
                 return null;
             }
 
-            boolean atLeastOneChildNotFactory = false;
+            boolean isRecurse = false;
             BeanDefinition finalChild;
 
             do {
@@ -94,13 +95,10 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
                 {
                     registerBean(element, finalChild);
                 }
-                
-                boolean isFactory = null != finalChild && null != finalChild.getBeanClassName() &&
-                        (finalChild.getBeanClassName().equals(MapFactoryBean.class.getName()) ||
-                                finalChild.getBeanClassName().equals(PropertiesFactoryBean.class.getName()));
-                atLeastOneChildNotFactory = atLeastOneChildNotFactory || (!isFactory);
 
-            } while (null != finalChild && finalChild.hasAttribute(MULE_REPEAT_PARSE));
+                isRecurse = isRecurse || ! testFlag(finalChild, MULE_NO_RECURSE);
+
+            } while (null != finalChild && testFlag(finalChild, MULE_REPEAT_PARSE));
 
             // Only iterate and parse child mule name-spaced elements. Spring does not do
             // hierarchical parsing by default so we need to maintain this behavior
@@ -112,7 +110,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
             // which handles iteration internally (this is a hack needed because Spring doesn't
             // expose the DP for "<spring:entry>" elements directly).
 
-            if (isMuleNamespace(element) && atLeastOneChildNotFactory)
+            if (isMuleNamespace(element) && isRecurse)
             {
                 NodeList list = element.getChildNodes();
                 for (int i = 0; i < list.getLength(); i++)
@@ -258,6 +256,19 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
     public static boolean isLocalName(Element element, String name)
     {
         return element.getLocalName().equals(name);
+    }
+
+    public static void setFlag(BeanDefinition bean, String flag)
+    {
+        bean.setAttribute(flag, Boolean.TRUE);
+    }
+
+    public static boolean testFlag(BeanDefinition bean, String flag)
+    {
+        return null != bean
+                && bean.hasAttribute(flag)
+                && bean.getAttribute(flag) instanceof Boolean
+                && ((Boolean) bean.getAttribute(flag)).booleanValue();
     }
 
 }
