@@ -29,8 +29,8 @@ import org.mule.impl.registry.TransientRegistry;
 import org.mule.impl.security.MuleCredentials;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.service.TransportFactory;
-import org.mule.registry.Registry;
 import org.mule.registry.RegistrationException;
+import org.mule.registry.Registry;
 import org.mule.umo.FutureMessageResult;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMODescriptor;
@@ -58,6 +58,7 @@ import java.util.Map;
 
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
 import edu.emory.mathcs.backport.java.util.concurrent.Executor;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -856,7 +857,7 @@ public class MuleClient implements Disposable
 
     protected UMOEndpoint getEndpoint(String uri, String type) throws UMOException
     {
-        return managementContext.getRegistry().getOrCreateEndpointForUri(uri, type);
+        return managementContext.getRegistry().getOrCreateEndpointForUri(uri, type, managementContext);
     }
 
     protected UMOEndpoint getDefaultClientEndpoint(UMODescriptor descriptor, Object payload)
@@ -1075,27 +1076,31 @@ public class MuleClient implements Disposable
     {
         try
         {
-            Map props = ((Map)managementContext.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES));
-            if(props == null)
+            Map props = ((Map) managementContext.getRegistry().lookupObject(
+                MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES));
+            if (props == null)
             {
                 props = new HashMap();
                 props.put(key, value);
-                managementContext.getRegistry().registerObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES, props, managementContext);
-            } else
+                managementContext.getRegistry().registerObject(
+                    MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES, props, managementContext);
+            }
+            else
             {
                 props.put(key, value);
             }
-        } catch (RegistrationException e)
+        }
+        catch (RegistrationException e)
         {
             logger.error(e);
         }
-
     }
 
     public Object getProperty(String key)
     {
-        Map props = (Map)managementContext.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES);
-        if(props != null)
+        Map props = (Map) managementContext.getRegistry().lookupObject(
+            MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES);
+        if (props != null)
         {
             return props.get(key);
         }
