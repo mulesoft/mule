@@ -11,14 +11,16 @@
 package org.mule.routing.response;
 
 import org.mule.config.MuleConfiguration;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.routing.AbstractRouterCollection;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.endpoint.InvalidEndpointTypeException;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.routing.RoutingException;
-import org.mule.umo.routing.UMOOutboundRouter;
 import org.mule.umo.routing.UMOResponseRouter;
 import org.mule.umo.routing.UMOResponseRouterCollection;
 import org.mule.umo.routing.UMORouter;
@@ -135,7 +137,11 @@ public class ResponseRouterCollection extends AbstractRouterCollection implement
     {
         if (endpoint != null)
         {
-            endpoint.setType(UMOEndpoint.ENDPOINT_TYPE_RESPONSE);
+            if (!UMOEndpoint.ENDPOINT_TYPE_RESPONSE.equals(endpoint.getType()))
+            {
+                throw new InvalidEndpointTypeException(CoreMessages.responseRouterMustUseResponseEndpoints(
+                    this, endpoint));
+            }
             endpoints.add(endpoint);
         }
         else
@@ -161,12 +167,15 @@ public class ResponseRouterCollection extends AbstractRouterCollection implement
             this.endpoints.clear();
             this.endpoints.addAll(endpoints);
 
-            UMOEndpoint endpoint;
-            // Force all endpoints' type to RESPONSE just in case.
+            // Ensure all endpoints are response endpoints
             for (Iterator it = this.endpoints.iterator(); it.hasNext();)
             {
-                endpoint = (UMOEndpoint)it.next();
-                endpoint.setType(UMOEndpoint.ENDPOINT_TYPE_RESPONSE);
+                UMOImmutableEndpoint endpoint=(UMOImmutableEndpoint) it.next();
+                if (!UMOEndpoint.ENDPOINT_TYPE_RESPONSE.equals(endpoint.getType()))
+                {
+                    throw new InvalidEndpointTypeException(CoreMessages.responseRouterMustUseResponseEndpoints(
+                        this, endpoint));
+                }
             }
 
         }

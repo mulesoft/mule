@@ -10,7 +10,13 @@
 
 package org.mule.impl.endpoint;
 
-public class OutboundStreamingEndpoint extends MuleEndpoint
+public class OutboundStreamingEndpoint extends OutboundEndpoint
 {
 
+    private static final long serialVersionUID = -7565594337514235463L;
+
+    public boolean isStreaming()
+    {
+        return true;
+    }
 }

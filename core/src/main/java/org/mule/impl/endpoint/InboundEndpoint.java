@@ -10,7 +10,28 @@
 
 package org.mule.impl.endpoint;
 
+import org.mule.umo.UMOException;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
+
 public class InboundEndpoint extends MuleEndpoint
 {
 
+    private static final long serialVersionUID = -4752772777414636142L;
+
+    public InboundEndpoint()
+    {
+        // TODO Auto-generated constructor stub
+    }
+    
+    public InboundEndpoint(UMOImmutableEndpoint endpoint) throws UMOException
+    {
+        super(endpoint);
+    }
+
+    public String getType()
+    {
+        return UMOEndpoint.ENDPOINT_TYPE_RECEIVER;
+    }
+    
 }

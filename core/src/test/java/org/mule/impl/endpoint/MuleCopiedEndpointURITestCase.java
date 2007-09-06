@@ -27,7 +27,7 @@ public class MuleCopiedEndpointURITestCase extends AbstractMuleTestCase
 
         // Create and test values
         UMOEndpoint endpoint = MuleTestUtils.getTestSchemeMetaInfoEndpoint("testEndpoint",
-            UMOEndpoint.ENDPOINT_TYPE_SENDER_AND_RECEIVER, "protocol", managementContext);
+            UMOEndpoint.ENDPOINT_TYPE_SENDER, "protocol", managementContext);
         UMOEndpointURI endpointUri = endpoint.getEndpointURI();
         assertEquals("protocol", endpointUri.getScheme());
         assertEquals("test", endpointUri.getSchemeMetaInfo());

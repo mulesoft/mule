@@ -11,12 +11,14 @@
 package org.mule.routing.outbound;
 
 import org.mule.config.MuleProperties;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.routing.AbstractRouter;
 import org.mule.routing.CorrelationPropertiesExtractor;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.UMOTransactionConfig;
+import org.mule.umo.endpoint.InvalidEndpointTypeException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.routing.UMOOutboundRouter;
@@ -223,17 +225,27 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements U
 
     public void setEndpoints(List endpoints)
     {
+        this.endpoints.clear();
         // this.endpoints = new CopyOnWriteArrayList(endpoints);
         for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
         {
             UMOEndpoint umoEndpoint = (UMOEndpoint) iterator.next();
+            if (!umoEndpoint.canSend())
+            {
+                throw new InvalidEndpointTypeException(CoreMessages.outboundRouterMustUseOutboudEndpoints(
+                    this, umoEndpoint));
+            }
             addEndpoint(umoEndpoint);
         }
     }
 
     public void addEndpoint(UMOEndpoint endpoint)
     {
-        //TODO RM** endpoint.setType(UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        if (!endpoint.canSend())
+        {
+            throw new InvalidEndpointTypeException(CoreMessages.outboundRouterMustUseOutboudEndpoints(
+                this, endpoint));
+        }
         endpoints.add(endpoint);
     }
 

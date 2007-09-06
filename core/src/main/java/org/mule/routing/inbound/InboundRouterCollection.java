@@ -11,13 +11,16 @@
 package org.mule.routing.inbound;
 
 import org.mule.config.MuleProperties;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.routing.AbstractRouterCollection;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.endpoint.InvalidEndpointTypeException;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.routing.RoutingException;
 import org.mule.umo.routing.UMOInboundRouter;
@@ -230,7 +233,11 @@ public class InboundRouterCollection extends AbstractRouterCollection implements
     {
         if (endpoint != null)
         {
-            endpoint.setType(UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
+            if (!endpoint.canReceive())
+            {
+                throw new InvalidEndpointTypeException(CoreMessages.inboundRouterMustUseInboundEndpoints(
+                    this, endpoint));
+            }
             endpoints.add(endpoint);
         }
         else
@@ -253,10 +260,15 @@ public class InboundRouterCollection extends AbstractRouterCollection implements
     {
         if (endpoints != null)
         {
-            // Force all endpoints' type to RECEIVER just in case.
+            // Ensure all endpoints are receiver endpoints
             for (Iterator it = endpoints.iterator(); it.hasNext();)
             {
-                ((UMOEndpoint) it.next()).setType(UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
+                UMOImmutableEndpoint endpoint=(UMOImmutableEndpoint) it.next();
+                if (!endpoint.canReceive())
+                {
+                    throw new InvalidEndpointTypeException(CoreMessages.inboundRouterMustUseInboundEndpoints(
+                        this, endpoint));
+                }
             }
 
             this.endpoints.clear();

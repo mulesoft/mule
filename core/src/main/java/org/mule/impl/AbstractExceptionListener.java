@@ -11,6 +11,7 @@
 package org.mule.impl;
 
 import org.mule.config.ExceptionHelper;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.internal.notifications.ExceptionNotification;
 import org.mule.impl.message.ExceptionMessage;
 import org.mule.providers.NullPayload;
@@ -23,6 +24,7 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransaction;
+import org.mule.umo.endpoint.InvalidEndpointTypeException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
@@ -32,12 +34,12 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.routing.RoutingException;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import java.beans.ExceptionListener;
 import java.util.Iterator;
 import java.util.List;
+
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -74,6 +76,7 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
 
     public void setEndpoints(List endpoints)
     {
+        this.endpoints.clear();
         for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
         {
             addEndpoint((UMOEndpoint) iterator.next());
@@ -84,7 +87,11 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
     {
         if (endpoint != null)
         {
-            endpoint.setType(UMOEndpoint.ENDPOINT_TYPE_SENDER);
+            if (!endpoint.canSend())
+            {
+                throw new InvalidEndpointTypeException(CoreMessages.exceptionListenerMustUseOutboundEndpoint(
+                    this, endpoint));
+            }
             endpoints.add(endpoint);
         }
     }

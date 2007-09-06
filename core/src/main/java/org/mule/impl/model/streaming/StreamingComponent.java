@@ -60,14 +60,12 @@ public class StreamingComponent extends AbstractComponent
         // Right now we do not support transformers on the Streaming model
         for (Iterator iterator = descriptor.getInboundRouter().getEndpoints().iterator(); iterator.hasNext();)
         {
-            //Enforce streaming
+            // Ensure streaming type is correct
             UMOEndpoint ep = (UMOEndpoint) iterator.next();
-            ep.setStreaming(true);
-//            if (!ep.isStreaming())
-//            {
-//                throw new InitialisationException(
-//                    CoreMessages.streamingEndpointsMustBeUsedWithStreamingModel(), this);
-//            }
+            if (!ep.isStreaming())
+            {
+                throw new InitialisationException(CoreMessages.streamingEndpointsMustBeUsedWithStreamingModel(), this);
+            }
             // TODO RM*: This restriction could be lifted in future
             if (ep.getTransformer() != null)
             {

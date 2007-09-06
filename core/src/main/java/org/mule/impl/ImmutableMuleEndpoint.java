@@ -48,6 +48,7 @@ import java.util.regex.Pattern;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -415,13 +416,12 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     public boolean canReceive()
     {
-        return (getType().equals(ENDPOINT_TYPE_RECEIVER) || getType().equals(
-                ENDPOINT_TYPE_SENDER_AND_RECEIVER));
+        return getType().equals(ENDPOINT_TYPE_RECEIVER);
     }
 
     public boolean canSend()
     {
-        return (getType().equals(ENDPOINT_TYPE_SENDER) || getType().equals(ENDPOINT_TYPE_SENDER_AND_RECEIVER));
+        return getType().equals(ENDPOINT_TYPE_SENDER);
     }
 
     public UMOTransactionConfig getTransactionConfig()

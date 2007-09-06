@@ -10,10 +10,14 @@
 
 package org.mule.config.i18n;
 
+import org.mule.impl.AbstractExceptionListener;
 import org.mule.umo.UMOImmutableDescriptor;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.routing.UMOInboundRouterCollection;
+import org.mule.umo.routing.UMOOutboundRouter;
+import org.mule.umo.routing.UMOResponseRouterCollection;
 import org.mule.util.ClassUtils;
 import org.mule.util.DateUtils;
 import org.mule.util.StringMessageUtils;
@@ -867,4 +871,27 @@ public class CoreMessages extends MessageFactory
     {
         return createMessage(BUNDLE_PATH, 231, descriptor.getName(), descriptor.getModelName(), modelName);
     }
+    
+    //These endpoint errors should go away once we make setting endpoints on routers typesafe
+    
+    public static Message inboundRouterMustUseInboundEndpoints(UMOInboundRouterCollection router, UMOImmutableEndpoint endpoint)
+    {
+        return createMessage(BUNDLE_PATH, 232, endpoint, router);
+    }
+  
+    public static Message outboundRouterMustUseOutboudEndpoints(UMOOutboundRouter router, UMOImmutableEndpoint endpoint)
+    {
+        return createMessage(BUNDLE_PATH, 233, endpoint, router);
+    }
+    
+    public static Message responseRouterMustUseResponseEndpoints(UMOResponseRouterCollection router, UMOImmutableEndpoint endpoint)
+    {
+        return createMessage(BUNDLE_PATH, 234, endpoint, router);
+    }
+
+    public static Message exceptionListenerMustUseOutboundEndpoint(AbstractExceptionListener exceptionListener, UMOImmutableEndpoint endpoint)
+    {
+        return createMessage(BUNDLE_PATH, 235, endpoint, exceptionListener);
+    }
+
 }

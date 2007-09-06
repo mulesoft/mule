@@ -170,7 +170,7 @@ public interface UMOEventContext
      * @throws UMOException if the event fails to be processed by the component or
      *             the transport for the endpoint
      */
-    UMOMessage sendEvent(UMOMessage message, UMOEndpointURI endpoint) throws UMOException;
+    //UMOMessage sendEvent(UMOMessage message, UMOEndpointURI endpoint) throws UMOException;
 
     /**
      * Depending on the session state this methods either Passes an event
@@ -253,8 +253,8 @@ public interface UMOEventContext
      *             transfromers cannot be found
      * @see FutureMessageResult
      */
-    FutureMessageResult sendEventAsync(UMOMessage message, UMOEndpointURI endpoint, int timeout)
-        throws UMOException;
+    //FutureMessageResult sendEventAsync(UMOMessage message, UMOEndpointURI endpoint, int timeout)
+    //    throws UMOException;
 
     /**
      * sends an event request via the configured outbound router for this component.
@@ -309,7 +309,7 @@ public interface UMOEventContext
      * @throws UMOException if the event fails to be processed by the component or
      *             the transport for the endpoint
      */
-    void dispatchEvent(UMOMessage message, UMOEndpointURI endpoint) throws UMOException;
+    //void dispatchEvent(UMOMessage message, UMOEndpointURI endpoint) throws UMOException;
 
     /**
      * Depending on the session state this methods either Passes an event
@@ -367,7 +367,7 @@ public interface UMOEventContext
      * @return The requested event or null if the request times out
      * @throws UMOException if the request operation fails
      */
-    UMOMessage receiveEvent(UMOEndpointURI endpoint, long timeout) throws UMOException;
+    //UMOMessage receiveEvent(UMOEndpointURI endpoint, long timeout) throws UMOException;
 
     UMODescriptor getComponentDescriptor();
 
