@@ -10,9 +10,9 @@
 
 package org.mule.scripting.config;
 
+import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.generic.MuleChildDefinitionParser;
 
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.w3c.dom.Element;
 
 public class ScriptDefinitionParser extends MuleChildDefinitionParser
@@ -29,10 +29,10 @@ public class ScriptDefinitionParser extends MuleChildDefinitionParser
         return String.class;
     }
     
-    protected void postProcess(BeanDefinitionBuilder beanDefinition, Element element)
+    protected void postProcess(BeanAssembler assembler, Element element)
     {
-        super.postProcess(beanDefinition, element);        
-        beanDefinition.addConstructorArg(element.getFirstChild().getNodeValue());
+        assembler.getBean().addConstructorArg(element.getFirstChild().getNodeValue());
+        super.postProcess(assembler, element);
     }
 
 }

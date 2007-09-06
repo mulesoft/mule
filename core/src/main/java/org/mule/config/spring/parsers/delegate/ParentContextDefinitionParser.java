@@ -48,7 +48,7 @@ public class ParentContextDefinitionParser extends AbstractParallelDelegatingDef
     {
         // i'm not sure why this is suddenly necessary here and not elsewhere.
         // perhaps because this is used on the top level but has name deleted?
-        AutoIdUtils.ensureUniqueId(element);
+        AutoIdUtils.ensureUniqueId(element, "context");
         String context = element.getParentNode().getLocalName();
         if (parsers.containsKey(context))
         {

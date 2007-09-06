@@ -46,7 +46,7 @@ public class ChildListEntryDefinitionParser extends AbstractChildDefinitionParse
     {   
         String beanType = element.getChildNodes().item(0).getNodeValue();
         builder.setSource(new ListEntry(beanType));
-        this.postProcess(builder, element);
+        this.postProcess(getBeanAssembler(element, builder), element);
     }
     
     public static class ListEntry extends Object

@@ -61,4 +61,18 @@ public abstract class AbstractHierarchicalDefinitionParser extends AbstractMuleB
                 propertyConfiguration, bean, propertyConfiguration, target);
     }
 
+    /**
+     * Provide access to bean assembler from non-hierarchical case.  Legacy support for
+     * "mixed" definition parsers.
+     *
+     * @deprecated
+     * @param element
+     * @param bean
+     * @return
+     */
+    protected BeanAssembler getOrphanBeanAssembler(Element element, BeanDefinitionBuilder bean)
+    {
+        return super.getBeanAssembler(element, bean);
+    }
+
 }

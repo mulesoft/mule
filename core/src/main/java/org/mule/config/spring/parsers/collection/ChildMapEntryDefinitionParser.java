@@ -59,9 +59,8 @@ public class ChildMapEntryDefinitionParser extends AbstractChildDefinitionParser
     {
         String key = element.getAttribute(keyName);
         String value = element.getAttribute(valueName);
-
         builder.setSource(new ChildMapEntryDefinitionParser.KeyValuePair(key, value));
-        postProcess(builder, element);
+        postProcess(getBeanAssembler(element, builder), element);
     }
 
     public static class KeyValuePair

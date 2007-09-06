@@ -13,14 +13,18 @@ import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.assembly.BeanAssemblerFactory;
 import org.mule.config.spring.parsers.assembly.DefaultBeanAssemblerFactory;
 import org.mule.config.spring.parsers.assembly.ReusablePropertyConfiguration;
+import org.mule.config.spring.parsers.delegate.DelegateDefinitionParser;
+import org.mule.config.spring.parsers.delegate.PostProcess;
+import org.mule.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.util.ClassUtils;
 
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
@@ -78,16 +82,14 @@ import org.w3c.dom.NamedNodeMap;
  * @see  AbstractBeanDefinitionParser
  */
 public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefinitionParser
+    implements DelegateDefinitionParser
 {
     public static final String ROOT_ELEMENT = "mule";
     public static final String ROOT_UNSAFE_ELEMENT = "mule-unsafe";
     public static final String ATTRIBUTE_ID = "id";
     public static final String ATTRIBUTE_NAME = "name";
-    public static final String ATTRIBUTE_IDREF = "nameref";
     public static final String ATTRIBUTE_CLASS = "class";
     public static final String ATTRIBUTE_REF_SUFFIX = "-ref";
-    public static final String BASE_NAME = "autogenNameForMule-";
-    private static AtomicInteger nameCount = new AtomicInteger(0);
 
     /**
      * logger used by this class
@@ -98,6 +100,7 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
     protected ReusablePropertyConfiguration propertyConfiguration = new ReusablePropertyConfiguration();
     private ParserContext parserContext;
     private BeanDefinitionRegistry registry;
+    private List postProcesses = new LinkedList();
     //By default Mule objects are not singletons
     protected boolean singleton = false;
 
@@ -171,9 +174,9 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
         return this;
     }
 
-    protected void processProperty(Attr attribute, BeanDefinitionBuilder builder)
+    protected void processProperty(Attr attribute, BeanAssembler assembler)
     {
-        getOrphanBeanAssembler(builder).extendBean(attribute);
+        assembler.extendBean(attribute);
     }
 
     /**
@@ -181,12 +184,17 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
      * bean definition after parsing is complete.
      * <p>The default implementation does nothing.
      *
-     * @param beanDefinition the parsed (and probably totally defined) bean definition being built
-     * @param element        the XML element that was the source of the bean definition's metadata
+     * @param assembler the parsed (and probably totally defined) bean definition being built
+     * @param element   the XML element that was the source of the bean definition's metadata
      */
-    protected void postProcess(BeanDefinitionBuilder beanDefinition, Element element)
+    protected void postProcess(BeanAssembler assembler, Element element)
     {
-        guaranteeElementName(element);
+        AutoIdUtils.ensureUniqueName(element, "bean");
+        Iterator processes = postProcesses.iterator();
+        while (processes.hasNext())
+        {
+            ((PostProcess) processes.next()).postProcess(assembler, element);
+        }
     }
 
     /**
@@ -202,10 +210,6 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
         registry = null;
         propertyConfiguration.reset();
     }
-
-    //-----------------------------------------------------------------------------------
-    //- Taken from AbstractSingleBeanDefinitionParser to allow pluggable BeanDefinitionParser
-    //-----------------------------------------------------------------------------------
 
     /**
      * Creates a {@link BeanDefinitionBuilder} instance for the
@@ -278,14 +282,6 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
             {
                 throw new IllegalArgumentException("A component named " + name + " already exists.");
             }
-        }
-    }
-
-    protected void guaranteeElementName(Element element)
-    {
-        if (null == element.getAttributeNode(ATTRIBUTE_NAME))
-        {
-            element.setAttribute(ATTRIBUTE_NAME, BASE_NAME + nameCount.incrementAndGet());
         }
     }
 
@@ -368,13 +364,14 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
      */
     protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
+        BeanAssembler assembler = getBeanAssembler(element, builder);
         NamedNodeMap attributes = element.getAttributes();
         for (int x = 0; x < attributes.getLength(); x++)
         {
             Attr attribute = (Attr) attributes.item(x);
-            processProperty(attribute, builder);
+            processProperty(attribute, assembler);
         }
-        postProcess(builder, element);
+        postProcess(assembler, element);
     }
 
     //@Override
@@ -400,7 +397,7 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
      * @param bean The bean being constructed
      * @return An assembler that automates Mule-specific logic for bean construction
      */
-    protected BeanAssembler getOrphanBeanAssembler(BeanDefinitionBuilder bean)
+    protected BeanAssembler getBeanAssembler(Element element, BeanDefinitionBuilder bean)
     {
         return beanAssemblerFactory.newBeanAssembler(
                 propertyConfiguration, bean, propertyConfiguration, null);
@@ -444,6 +441,16 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
     {
         return element.getParentNode().getLocalName().equals(ROOT_ELEMENT)
                 || element.getParentNode().getLocalName().equals(ROOT_UNSAFE_ELEMENT);
+    }
+
+    public AbstractBeanDefinition parseDelegate(Element element, ParserContext parserContext)
+    {
+        return parseInternal(element, parserContext);
+    }
+
+    public void registerPostProcess(PostProcess postProcess)
+    {
+        postProcesses.add(postProcess);
     }
 
 }

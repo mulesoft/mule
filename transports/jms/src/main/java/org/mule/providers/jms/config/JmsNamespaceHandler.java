@@ -11,6 +11,7 @@ package org.mule.providers.jms.config;
 
 import org.mule.config.spring.parsers.generic.MuleChildDefinitionParser;
 import org.mule.config.spring.parsers.specific.ObjectFactoryDefinitionParser;
+import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.providers.jms.JmsConnector;
 import org.mule.providers.jms.activemq.ActiveMqJmsConnector;
 import org.mule.providers.jms.weblogic.WeblogicJmsConnector;
@@ -19,7 +20,6 @@ import org.mule.util.StringUtils;
 
 import javax.jms.Session;
 
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -28,6 +28,7 @@ import org.w3c.dom.Element;
 /** Registers Bean Definition Parsers for the "jms" namespace. */
 public class JmsNamespaceHandler extends NamespaceHandlerSupport
 {
+
     public void init()
     {
         registerBeanDefinitionParser("connector", new JmsConnectorDefinitionParser());
@@ -62,31 +63,31 @@ class JmsConnectorDefinitionParser extends MuleChildDefinitionParser
 
 class ConnectionFactoryDefinitionParser extends ObjectFactoryDefinitionParser
 {
+
+    public static final String USERNAME = "username";
+    public static final String PASSWORD = "password";
+
     public ConnectionFactoryDefinitionParser()
     {
         super("connectionFactory");
     }
 
-    // TODO AC: How can we simplify this code using BeanAssemblers?
     protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
-        BeanDefinition parent = getParentBeanDefinition(element);
-
-        String username = element.getAttribute("username");
-        if (StringUtils.isNotBlank(username))
-        {
-            parent.getPropertyValues().addPropertyValue("username", username);
-            element.removeAttribute("username");
-        }
-
-        String password = element.getAttribute("password");
-        if (StringUtils.isNotBlank(password))
-        {
-            parent.getPropertyValues().addPropertyValue("password", password);
-            element.removeAttribute("password");
-        }
-            
+        BeanAssembler assembler = getBeanAssembler(element, builder);
+        extendTargetAndRemoveAttributeIfNotBlank(assembler, element, USERNAME);
+        extendTargetAndRemoveAttributeIfNotBlank(assembler, element, PASSWORD);
         super.parseChild(element, parserContext, builder);
     }
+
+    protected void extendTargetAndRemoveAttributeIfNotBlank(BeanAssembler assembler, Element element, String name)
+    {
+        if (StringUtils.isNotBlank(element.getAttribute(name)))
+        {
+            assembler.extendTarget(element.getAttributeNode(name));
+            element.removeAttribute(name);
+        }
+    }
+
 }
 

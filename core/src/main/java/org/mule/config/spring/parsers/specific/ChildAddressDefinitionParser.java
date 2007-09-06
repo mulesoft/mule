@@ -10,18 +10,10 @@
 
 package org.mule.config.spring.parsers.specific;
 
+import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.endpoint.EndpointException;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.impl.endpoint.MuleEndpointURI;
 
-import java.util.Properties;
-import java.net.URI;
-
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.w3c.dom.Element;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Generate an Endpoint URI from simple address components.
@@ -38,10 +30,10 @@ public class ChildAddressDefinitionParser extends ChildDefinitionParser
     }
 
     // @Override
-    protected void postProcess(BeanDefinitionBuilder builder, Element element)
+    protected void postProcess(BeanAssembler assembler, Element element)
     {
-        super.postProcess(builder, element);
-        getBeanAssembler(element, builder).extendBean("protocol", protocol, false);
+        assembler.extendBean("protocol", protocol, false);
+        super.postProcess(assembler, element);
     }
 
 }

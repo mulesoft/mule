@@ -20,7 +20,7 @@ import org.w3c.dom.Element;
  * Behaves as {@link org.mule.config.spring.parsers.generic.ParentDefinitionParser},
  * but allows any named bean to be the parent, rather than using the enclosing element in the DOM tree.
  */
-public class NamedDefinitionParser extends ParentDefinitionParser implements DelegateDefinitionParser
+public class NamedDefinitionParser extends ParentDefinitionParser
 {
 
     private String name;
@@ -67,11 +67,6 @@ public class NamedDefinitionParser extends ParentDefinitionParser implements Del
             }
         }
         return super.parseInternal(element, parserContext);
-    }
-
-    public AbstractBeanDefinition parseDelegate(Element element, ParserContext parserContext)
-    {
-        return parseInternal(element, parserContext);
     }
 
 }

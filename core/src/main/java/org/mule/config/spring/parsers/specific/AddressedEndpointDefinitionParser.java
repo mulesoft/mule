@@ -11,8 +11,10 @@
 package org.mule.config.spring.parsers.specific;
 
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.delegate.AbstractDelegateDelegate;
 import org.mule.config.spring.parsers.delegate.AbstractSerialDelegatingDefinitionParser;
+import org.mule.config.spring.parsers.delegate.PostProcess;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
 
 import java.util.Iterator;
@@ -59,7 +61,7 @@ public class AddressedEndpointDefinitionParser extends AbstractSerialDelegatingD
 
         public AbstractBeanDefinition parseDelegate(Element element, ParserContext parserContext)
         {
-            AutoIdUtils.ensureUniqueId(element);
+            AutoIdUtils.ensureUniqueId(element, "endpoint");
             endpointId = element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_ID);
             addressId = endpointId + ".address";
             element.setAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_ID, addressId);
@@ -84,15 +86,21 @@ public class AddressedEndpointDefinitionParser extends AbstractSerialDelegatingD
             {
                 getDelegate().addIgnored((String) names.next());
             }
+            registerPostProcess(new PostProcess() {
+                public void postProcess(BeanAssembler assembler, Element element)
+                {
+                    assembler.extendBean(UnaddressedEndpointDefinitionParser.ENDPOINT_URI_ATTRIBUTE, addressId, true);
+                }
+            });
         }
 
         public AbstractBeanDefinition parseDelegate(Element element, ParserContext parserContext)
         {
             element.setAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_ID, endpointId);
             element.setAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME, endpointId);
-            element.setAttribute("address-ref", addressId);
             return super.parseDelegate(element, parserContext);
         }
+
     }
 
 }

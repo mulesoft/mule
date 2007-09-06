@@ -34,6 +34,8 @@ public interface DelegateDefinitionParser
 
     AbstractBeanDefinition parseDelegate(Element element, ParserContext parserContext);
 
+    void registerPostProcess(PostProcess postProcess);
+
     AbstractMuleBeanDefinitionParser addReference(String propertyName);
 
     AbstractMuleBeanDefinitionParser addMapping(String propertyName, Map mappings);

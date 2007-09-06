@@ -9,13 +9,13 @@
  */
 package org.mule.config.spring.parsers;
 
+import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.management.agents.JmxAgent;
 import org.mule.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -38,20 +38,20 @@ public class JmxAgentDefinitionParser extends AbstractMuleBeanDefinitionParser
         }
 
 
-        protected void postProcess(BeanDefinitionBuilder definition, Element element) {
-            super.postProcess(definition, element);
+        protected void postProcess(BeanAssembler assembler, Element element) {
             NodeList childNodes = element.getChildNodes();
             for (int i = 0; i < childNodes.getLength(); i++) {
                 Node node = childNodes.item(i);
                 if (CONNECTOR_SERVER.equals(node.getLocalName())) {
-                    definition.getBeanDefinition().getPropertyValues().addPropertyValue("connectorServerUrl", ((Element) node).getAttribute("url"));
+                    assembler.extendBean("connectorServerUrl", ((Element) node).getAttribute("url"), false);
                     String rebind = ((Element) node).getAttribute("rebind");
                     if(!StringUtils.isEmpty(rebind)) {
                         Map csProps = new HashMap();
                         csProps.put("jmx.remote.jndi.rebind", rebind);
-                        definition.getBeanDefinition().getPropertyValues().addPropertyValue("connectorServerProperties", csProps);
+                        assembler.extendBean("connectorServerProperties", csProps, false);
                     }
                 }
             }
+            super.postProcess(assembler, element);
         }
 }

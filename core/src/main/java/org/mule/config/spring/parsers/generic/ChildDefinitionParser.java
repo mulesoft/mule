@@ -24,7 +24,7 @@ import org.springframework.beans.factory.xml.ParserContext;
  * process any nested elements as bean properties too, except the correct Definition parser
  * for the element will be looked up automatically.
  */
-public class ChildDefinitionParser extends AbstractChildDefinitionParser implements DelegateDefinitionParser
+public class ChildDefinitionParser extends AbstractChildDefinitionParser
 {
 
     protected Class clazz;
@@ -94,11 +94,6 @@ public class ChildDefinitionParser extends AbstractChildDefinitionParser impleme
     public String getPropertyName(Element e)
     {
         return setterMethod;
-    }
-
-    public AbstractBeanDefinition parseDelegate(Element element, ParserContext parserContext)
-    {
-        return parseInternal(element, parserContext);
     }
 
 }

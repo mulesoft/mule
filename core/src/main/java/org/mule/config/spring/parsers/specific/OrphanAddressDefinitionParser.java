@@ -10,9 +10,9 @@
 
 package org.mule.config.spring.parsers.specific;
 
+import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.w3c.dom.Element;
 
 /**
@@ -30,10 +30,10 @@ public class OrphanAddressDefinitionParser extends OrphanDefinitionParser
     }
 
     // @Override
-    protected void postProcess(BeanDefinitionBuilder builder, Element element)
+    protected void postProcess(BeanAssembler assembler, Element element)
     {
-        super.postProcess(builder, element);
-        getOrphanBeanAssembler(builder).extendBean("protocol", protocol, false);
+        assembler.extendBean("protocol", protocol, false);
+        super.postProcess(assembler, element);
     }
 
 }

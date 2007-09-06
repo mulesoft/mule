@@ -10,6 +10,7 @@
 package org.mule.config.spring.parsers.specific;
 
 import org.mule.config.spring.parsers.AbstractChildDefinitionParser;
+import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.delegate.DelegateDefinitionParser;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.util.StringUtils;
@@ -28,9 +29,9 @@ import org.w3c.dom.Element;
  * <p>This endpoint parser assumes that the address will be set via some external mechanism.</p>
  */
 public class UnaddressedEndpointDefinitionParser extends AbstractChildDefinitionParser
-    implements DelegateDefinitionParser
 {
 
+    public static final String ENDPOINT_URI_ATTRIBUTE = "endpointURI";
     public static final String ADDRESS_ATTRIBUTE = "address";
     public static final String ENDPOINT_REF_ATTRIBUTE = "ref";
 
@@ -39,7 +40,7 @@ public class UnaddressedEndpointDefinitionParser extends AbstractChildDefinition
     public UnaddressedEndpointDefinitionParser(Class endpointClass)
     {
         this.endpointClass = endpointClass;
-        addAlias("address", "endpointURI");
+        addAlias(ADDRESS_ATTRIBUTE, ENDPOINT_URI_ATTRIBUTE);
         addMapping("createConnector", "GET_OR_CREATE=0,ALWAYS_CREATE=1,NEVER_CREATE=2");
         addAlias("transformers", "transformer");
         addAlias("responseTransformers", "responseTransformer");
@@ -135,9 +136,19 @@ public class UnaddressedEndpointDefinitionParser extends AbstractChildDefinition
         }
     }
 
-    public AbstractBeanDefinition parseDelegate(Element element, ParserContext parserContext)
+    // override this method to handle global case
+    // in a perfect work we would be using two different dps for global and embedded
+    // endpoints - TODO refactor
+    protected BeanAssembler getBeanAssembler(Element element, BeanDefinitionBuilder bean)
     {
-        return parseInternal(element, parserContext);
+        if (isGlobal(element))
+        {
+            return getOrphanBeanAssembler(element, bean);
+        }
+        else
+        {
+            return super.getBeanAssembler(element, bean);
+        }
     }
 
 }

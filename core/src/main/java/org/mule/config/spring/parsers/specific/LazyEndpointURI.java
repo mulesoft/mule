@@ -23,8 +23,10 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
 public class LazyEndpointURI implements UMOEndpointURI
 {
 
+    public static final String ADDRESS = "address";
+    // TODO - pull out other strings as needed
     public static final String[] ATTRIBUTES =
-            new String[]{"protocol", "username", "password", "hostname", "address", "port", "path"};
+            new String[]{"protocol", "username", "password", "hostname", ADDRESS, "port", "path"};
 
     private String protocol;
     private String username;

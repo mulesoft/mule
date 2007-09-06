@@ -63,12 +63,14 @@ public class ParentDefinitionParser extends AbstractHierarchicalDefinitionParser
         return (AbstractBeanDefinition) beanAssembler.getTarget();
     }
 
-    protected void postProcess(BeanDefinitionBuilder beanDefinition, Element element)
+    protected void postProcess(BeanAssembler assembler, Element element)
     {
         // by default the name matches the "real" bean
         if (null == element.getAttributeNode(ATTRIBUTE_NAME))
         {
             element.setAttribute(ATTRIBUTE_NAME, getParentBeanName(element));
         }
+        super.postProcess(assembler, element);
     }
+
 }

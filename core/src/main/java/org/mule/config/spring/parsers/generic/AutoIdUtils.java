@@ -21,20 +21,28 @@ public class AutoIdUtils
     public static final String ATTRIBUTE_ID = AbstractMuleBeanDefinitionParser.ATTRIBUTE_ID;
     public static final String ATTRIBUTE_NAME = AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME;
     private static final AtomicInteger counter = new AtomicInteger(0);
-    public static final String ID_PREFIX = "org.mule.autogen.";
+    public static final String PREFIX = "org.mule.autogen.";
 
-    public static void ensureUniqueId(Element element)
+    public static void ensureUniqueId(Element element, String type)
     {
         if (null != element && !element.hasAttribute(ATTRIBUTE_ID))
         {
             if (!element.hasAttribute(ATTRIBUTE_NAME))
             {
-                element.setAttribute(ATTRIBUTE_ID, ID_PREFIX + counter.incrementAndGet());
+                element.setAttribute(ATTRIBUTE_ID, PREFIX + type + "." + counter.incrementAndGet());
             }
             else
             {
                 element.setAttribute(ATTRIBUTE_ID, element.getAttribute(ATTRIBUTE_NAME));
             }
+        }
+    }
+
+    public static void ensureUniqueName(Element element, String type)
+    {
+        if (null != element && !element.hasAttribute(ATTRIBUTE_NAME))
+        {
+            element.setAttribute(ATTRIBUTE_NAME, PREFIX + type + "." + counter.incrementAndGet());
         }
     }
 

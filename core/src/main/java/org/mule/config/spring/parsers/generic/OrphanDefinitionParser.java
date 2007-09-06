@@ -24,7 +24,7 @@ import org.w3c.dom.Element;
  * <p>Typically, you should use {@link org.mule.config.spring.parsers.generic.MuleChildDefinitionParser}
  * instead of this class, since these elements occur in the <mule> top level element.</p>
  */
-public class OrphanDefinitionParser extends AbstractMuleBeanDefinitionParser implements DelegateDefinitionParser
+public class OrphanDefinitionParser extends AbstractMuleBeanDefinitionParser
 {
 
     private Class beanClass = null;
@@ -59,11 +59,6 @@ public class OrphanDefinitionParser extends AbstractMuleBeanDefinitionParser imp
     protected Class getBeanClass(Element element)
     {
         return beanClass;
-    }
-
-    public AbstractBeanDefinition parseDelegate(Element element, ParserContext parserContext)
-    {
-        return parseInternal(element, parserContext);
     }
 
 }

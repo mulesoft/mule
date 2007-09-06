@@ -42,6 +42,11 @@ public abstract class AbstractDelegateDelegate implements DelegateDefinitionPars
         return delegate.parseDelegate(element, parserContext);
     }
 
+    public void registerPostProcess(PostProcess postProcess)
+    {
+        delegate.registerPostProcess(postProcess);
+    }
+
     public AbstractMuleBeanDefinitionParser addReference(String propertyName)
     {
         return delegate.addReference(propertyName);

@@ -9,6 +9,7 @@
  */
 package org.mule.config.spring.parsers;
 
+import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.util.StringUtils;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -51,20 +52,18 @@ public abstract class AbstractChildDefinitionParser extends AbstractHierarchical
         super.doParse(element, parserContext, builder);
     }
 
-    protected void postProcess(BeanDefinitionBuilder builder, Element element)
+    protected void postProcess(BeanAssembler assembler, Element element)
     {
         String name = generateChildBeanName(element);
         element.setAttribute(ATTRIBUTE_NAME, name);
 
-        //Some objects may or may not have a parent.  We need to check if
-        //If this bean has a property name (that will be set on the parent)
-        //If not, we can skip the post processing here
-        if(getPropertyName(element)==null)
+        // legacy handling of orphan beans - avoid setting parent
+        if (null != getPropertyName(element))
         {
-            return;
+            assembler.insertBeanInTarget(getPropertyName(element));
         }
 
-        getBeanAssembler(element, builder).insertBeanInTarget(getPropertyName(element));
+        super.postProcess(assembler, element);
     }
 
     protected String generateChildBeanName(Element e)

@@ -10,6 +10,7 @@
 
 package org.mule.config.spring.parsers;
 
+import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.generic.MuleChildDefinitionParser;
 import org.mule.transformers.xml.XsltTransformer;
 
@@ -20,7 +21,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -37,9 +37,8 @@ public class XsltTransformerDefinitionParser extends MuleChildDefinitionParser
         addAlias("transformerFactoryClass", "xslTransformerFactory");
     }
 
-    protected void postProcess(BeanDefinitionBuilder beanDefinition, Element element)
+    protected void postProcess(BeanAssembler assembler, Element element)
     {
-        super.postProcess(beanDefinition, element);
         NodeList children = element.getChildNodes();
         if (0 != children.getLength())
         {
@@ -56,11 +55,12 @@ public class XsltTransformerDefinitionParser extends MuleChildDefinitionParser
             {
                 assertArgument(STYLESHEET.equals(stylesheet.getLocalName()),
                         "XSLT transformer child element must be named " + STYLESHEET);
-                getOrphanBeanAssembler(beanDefinition).extendBean("xslt", domToString(stylesheet), false);
+                assembler.extendBean("xslt", domToString(stylesheet), false);
                 // block processing by Spring
                 element.removeChild(stylesheet);
             }
         }
+        super.postProcess(assembler, element);
     }
 
     protected String domToString(Element dom)
