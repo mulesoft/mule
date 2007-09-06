@@ -94,7 +94,7 @@ public class SpringRegistry extends AbstractRegistry implements ApplicationConte
         {
             return applicationContext.getBean(key.toString());
         }
-        catch (BeansException e)
+        catch (Exception e)
         {
             logger.debug(e);
             return null;
