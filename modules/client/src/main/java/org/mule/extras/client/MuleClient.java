@@ -755,8 +755,6 @@ public class MuleClient implements Disposable
     public UMOMessage receive(String url, long timeout) throws UMOException
     {
         UMOEndpoint endpoint = getEndpoint(url, UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
-        //TODO DF: MULE-2267
-        endpoint.setType(UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
         try
         {
             UMOMessage message = endpoint.receive(timeout);
@@ -833,8 +831,6 @@ public class MuleClient implements Disposable
         throws UMOException
     {
         UMOEndpoint endpoint = getEndpoint(uri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
-        //TODO DF: MULE-2267
-        endpoint.setType(UMOEndpoint.ENDPOINT_TYPE_SENDER);
         if (!endpoint.getConnector().isStarted() &&managementContext.isStarted())
         {
             endpoint.getConnector().start();
