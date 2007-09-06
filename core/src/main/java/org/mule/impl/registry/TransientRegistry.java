@@ -18,7 +18,6 @@ import org.mule.config.ThreadingProfile;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.impl.ManagementContext;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.internal.notifications.AdminNotification;
 import org.mule.impl.internal.notifications.AdminNotificationListener;
 import org.mule.impl.internal.notifications.ComponentNotification;
@@ -465,25 +464,6 @@ public class TransientRegistry extends AbstractRegistry
     public UMOTransformer unregisterTransformer(String transformerName)
     {
         return (UMOTransformer)getObjectTypeMap(UMOTransformer.class).remove(transformerName);
-    }
-
-    //@java.lang.Override
-    public UMOEndpoint lookupEndpoint(String name)
-    {
-        UMOEndpoint ep = super.lookupEndpoint(name);
-        if(ep!=null)
-        {
-            try
-            {
-                //TODO: friggin' cloning
-                ep = new MuleEndpoint(ep);                
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-        }
-        return ep;
     }
 
     //@java.lang.Override

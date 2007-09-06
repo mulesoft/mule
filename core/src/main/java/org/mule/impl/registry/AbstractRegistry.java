@@ -15,7 +15,10 @@ import org.mule.config.MuleConfiguration;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.ManagementContextAware;
+import org.mule.impl.endpoint.InboundEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.impl.endpoint.OutboundEndpoint;
+import org.mule.impl.endpoint.ResponseEndpoint;
 import org.mule.providers.service.TransportFactory;
 import org.mule.registry.RegistrationException;
 import org.mule.registry.Registry;
@@ -585,26 +588,41 @@ public abstract class AbstractRegistry implements Registry
         return getOrCreateEndpointForUri(uriIdentifier, type, MuleServer.getManagementContext());
     }
 
-    public UMOEndpoint getOrCreateEndpointForUri(String uriIdentifier, String type, UMOManagementContext managementContext) throws UMOException
+    /**
+     * Returns a NEW INSTANCE of a sending/receiving/responding endpoint, for a given uriIdentifier
+     */
+    public UMOEndpoint getOrCreateEndpointForUri(String uriIdentifier,
+                                                 String type,
+                                                 UMOManagementContext managementContext) throws UMOException
     {
-        UMOEndpoint endpoint = getEndpointFromName(uriIdentifier);
+        UMOEndpoint endpoint = lookupEndpoint(uriIdentifier);
         if (endpoint == null)
         {
-            endpoint = createEndpointFromUri(new MuleEndpointURI(uriIdentifier), type, managementContext);
-
+            return createEndpointFromUri(uriIdentifier, type, managementContext);
         }
         else
         {
-            if (!endpoint.getType().equals(type) && !endpoint.getType().equals(UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER_AND_RECEIVER))
+            if (UMOEndpoint.ENDPOINT_TYPE_SENDER.equals(type))
+            {
+                return new OutboundEndpoint(endpoint);
+            }
+            else if (UMOEndpoint.ENDPOINT_TYPE_RECEIVER.equals(type))
+            {
+                return new InboundEndpoint(endpoint);
+            }
+            else if (UMOEndpoint.ENDPOINT_TYPE_RESPONSE.equals(type))
+            {
+                return new ResponseEndpoint(endpoint);
+            }
+            else
             {
                 throw new IllegalArgumentException("Endpoint matching: " + uriIdentifier
-                        + " is not of type: " + type + ". It is of type: "
-                        + endpoint.getType());
-
+                                                   + " is not of a recognized type: " + type
+                                                   + ". It is of type: " + endpoint.getType());
             }
         }
-        return endpoint;
     }
+
 
     /** {@inheritDoc} */
     public UMOEndpoint getOrCreateEndpointForUri(UMOEndpointURI uri, String type) throws UMOException
