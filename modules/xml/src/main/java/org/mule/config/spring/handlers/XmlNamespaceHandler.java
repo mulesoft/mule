@@ -30,7 +30,7 @@ import org.mule.util.properties.JXPathPropertyExtractor;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
-public class XmlNamespaceHandler extends NamespaceHandlerSupport
+public class XmlNamespaceHandler extends AbstractIgnorableNamespaceHandler
 {
 
     public void init()
@@ -38,7 +38,7 @@ public class XmlNamespaceHandler extends NamespaceHandlerSupport
         registerBeanDefinitionParser("jxpath-filter", new ChildDefinitionParser("filter", JXPathFilter.class));
         registerBeanDefinitionParser("is-xml-filter", new ChildDefinitionParser("filter", IsXmlFilter.class));
         registerBeanDefinitionParser("message-splitter", new RouterDefinitionParser("router", FilteringXmlMessageSplitter.class));
-        registerBeanDefinitionParser("round-robin-splitter", new RouterDefinitionParser("router", RoundRobinXmlSplitter.class).addAlias("endpointFiltering", "enableEndpointFiltering"));
+        registerMuleDefinitionParser("round-robin-splitter", new RouterDefinitionParser("router", RoundRobinXmlSplitter.class)).addAlias("endpointFiltering", "enableEndpointFiltering");
         registerBeanDefinitionParser("dom-to-xml", new MuleChildDefinitionParser(DomDocumentToXml.class, false));
         registerBeanDefinitionParser("jxpath-extractor", new MuleChildDefinitionParser(JXPathExtractor.class, false));
         registerBeanDefinitionParser("object-to-xml", new MuleChildDefinitionParser(ObjectToXml.class, false));

@@ -11,6 +11,8 @@
 package org.mule.config.spring.parsers.delegate;
 
 import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
+import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+import org.mule.util.StringUtils;
 
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -27,29 +29,68 @@ public abstract class AbstractSerialDelegatingDefinitionParser extends AbstractD
 {
 
     private int index = 0;
+    private boolean first;
+    private String originalId;
+    private String originalName;
 
-    protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext)
+    public AbstractBeanDefinition parseDelegate(Element element, ParserContext parserContext)
     {
-        if (! repeat())
+        if (index == 0 || index >= size())
         {
+            first = true;
             index = 0;
-        }
-        DelegateDefinitionParser parser = get(index++);
-        AbstractBeanDefinition bean = parser.parseDelegate(element, parserContext);
-        if (repeat())
-        {
-            bean.setAttribute(MuleHierarchicalBeanDefinitionParserDelegate.MULE_REPEAT_PARSE, Boolean.TRUE);
         }
         else
         {
+            first = false;
+        }
+        DelegateDefinitionParser parser = get(index++);
+        AbstractBeanDefinition bean = parser.parseDelegate(element, parserContext);
+        if (index == size())
+        {
             bean.removeAttribute(MuleHierarchicalBeanDefinitionParserDelegate.MULE_REPEAT_PARSE);
+        }
+        else
+        {
+            bean.setAttribute(MuleHierarchicalBeanDefinitionParserDelegate.MULE_REPEAT_PARSE, Boolean.TRUE);
         }
         return bean;
     }
 
-    private boolean repeat()
+    protected void addDelegate(DelegateDefinitionParser delegate)
     {
-        return index < size();
+        delegate.registerPreProcessor(new PreProcessor()
+        {
+            public void preProcess(Element element)
+            {
+                if (first)
+                {
+                    originalId = element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_ID);
+                    originalName = element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
+                }
+                else
+                {
+                    resetAttribute(element, AbstractMuleBeanDefinitionParser.ATTRIBUTE_ID, originalId);
+                    resetAttribute(element, AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME, originalName);
+                }
+            }
+        });
+        super.addDelegate(delegate);
+    }
+
+    protected void resetAttribute(Element element, String name, String value)
+    {
+        if (StringUtils.isEmpty(value))
+        {
+            if (element.hasAttribute(name))
+            {
+                element.removeAttribute(name);
+            }
+        }
+        else
+        {
+            element.setAttribute(name, value);
+        }
     }
 
 }

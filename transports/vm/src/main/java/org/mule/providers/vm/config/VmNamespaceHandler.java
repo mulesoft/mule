@@ -14,6 +14,7 @@ import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleChildDefinitionParser;
 import org.mule.config.spring.parsers.specific.UnaddressedEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.ChildAddressDefinitionParser;
+import org.mule.config.spring.handlers.AbstractIgnorableNamespaceHandler;
 import org.mule.providers.vm.VMConnector;
 import org.mule.impl.endpoint.GlobalEndpoint;
 import org.mule.impl.endpoint.InboundEndpoint;
@@ -25,7 +26,7 @@ import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
  * Reigsters a Bean Definition Parser for handling <code><vm:connector></code> elements.
  *
  */
-public class VmNamespaceHandler extends NamespaceHandlerSupport
+public class VmNamespaceHandler extends AbstractIgnorableNamespaceHandler
 {
 
     public void init()
@@ -35,7 +36,7 @@ public class VmNamespaceHandler extends NamespaceHandlerSupport
         registerBeanDefinitionParser("endpoint", new UnaddressedEndpointDefinitionParser(GlobalEndpoint.class));
         registerBeanDefinitionParser("inbound-endpoint", new UnaddressedEndpointDefinitionParser(InboundEndpoint.class));
         registerBeanDefinitionParser("outbound-endpoint", new UnaddressedEndpointDefinitionParser(OutboundEndpoint.class));
-        registerBeanDefinitionParser("address", new ChildAddressDefinitionParser("vm").addAlias("address", "hostname"));
+        registerMuleDefinitionParser("address", new ChildAddressDefinitionParser("vm")).addAlias("address", "hostname");
     }
 
 }

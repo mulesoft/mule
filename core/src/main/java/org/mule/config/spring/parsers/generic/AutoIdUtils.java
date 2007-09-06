@@ -46,4 +46,14 @@ public class AutoIdUtils
         }
     }
 
+    public static void forceUniqueId(Element element, String type)
+    {
+        if (null != element)
+        {
+            String id = PREFIX + type + "." + counter.incrementAndGet();
+            element.setAttribute(ATTRIBUTE_ID, id);
+            element.setAttribute(ATTRIBUTE_NAME, id);
+        }
+    }
+
 }

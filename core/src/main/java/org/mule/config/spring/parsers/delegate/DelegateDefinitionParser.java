@@ -34,22 +34,32 @@ public interface DelegateDefinitionParser
 
     AbstractBeanDefinition parseDelegate(Element element, ParserContext parserContext);
 
-    void registerPostProcess(PostProcess postProcess);
+    /**
+     * These are prepended to existing processors
+     * @param preProcessor
+     */
+    void registerPreProcessor(PreProcessor preProcessor);
 
-    AbstractMuleBeanDefinitionParser addReference(String propertyName);
+    /**
+     * These are appended to existing processors
+     * @param postProcessor
+     */
+    void registerPostProcessor(PostProcessor postProcessor);
 
-    AbstractMuleBeanDefinitionParser addMapping(String propertyName, Map mappings);
+    DelegateDefinitionParser addReference(String propertyName);
 
-    AbstractMuleBeanDefinitionParser addMapping(String propertyName, String mappings);
+    DelegateDefinitionParser addMapping(String propertyName, Map mappings);
 
-    AbstractMuleBeanDefinitionParser addAlias(String alias, String propertyName);
+    DelegateDefinitionParser addMapping(String propertyName, String mappings);
 
-    AbstractMuleBeanDefinitionParser addCollection(String propertyName);
+    DelegateDefinitionParser addAlias(String alias, String propertyName);
 
-    AbstractMuleBeanDefinitionParser addIgnored(String propertyName);
+    DelegateDefinitionParser addCollection(String propertyName);
 
-    AbstractMuleBeanDefinitionParser removeIgnored(String propertyName);
+    DelegateDefinitionParser addIgnored(String propertyName);
 
-    AbstractMuleBeanDefinitionParser setIgnoredDefault(boolean ignoreAll);
+    DelegateDefinitionParser removeIgnored(String propertyName);
+
+    DelegateDefinitionParser setIgnoredDefault(boolean ignoreAll);
 
 }

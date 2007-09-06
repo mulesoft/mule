@@ -160,7 +160,7 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
 
         //Transformer elements
         registerBeanDefinitionParser("transformers", new ChildDefinitionParser("transformer", TransformerChain.class));
-        registerBeanDefinitionParser("transformers-ref", new ParentDefinitionParser().addAlias("transformers", "transformer"));
+        registerMuleDefinitionParser("transformers-ref", new ParentDefinitionParser()).addAlias("transformers", "transformer");
 
         registerBeanDefinitionParser("custom-transformer", new MuleChildDefinitionParser(false));
         registerBeanDefinitionParser("transformer-no-action", new TransformerDefinitionParser(NoActionTransformer.class));
@@ -260,7 +260,7 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("static-recipient-list-router", new RouterDefinitionParser("router", StaticRecipientList.class));
         registerBeanDefinitionParser("template-endpoint-router", new RouterDefinitionParser("router", TemplateEndpointRouter.class));
         registerBeanDefinitionParser("custom-outbound-router", new RouterDefinitionParser("router", null));
-        registerBeanDefinitionParser("reply-to", new ParentDefinitionParser().addAlias("address", "replyTo"));
+        registerMuleDefinitionParser("reply-to", new ParentDefinitionParser()).addAlias("address", "replyTo");
 
         //Response Routers
         registerBeanDefinitionParser("custom-response-router", new RouterDefinitionParser("router", null));
@@ -300,9 +300,9 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("environment", new ChildMapDefinitionParser("environment"));
 
         //Security
-        registerBeanDefinitionParser("security-manager", new NamedDefinitionParser(MuleProperties.OBJECT_SECURITY_MANAGER).addIgnored("type"));
+        registerMuleDefinitionParser("security-manager", new NamedDefinitionParser(MuleProperties.OBJECT_SECURITY_MANAGER)).addIgnored("type");
         registerBeanDefinitionParser("custom-security-provider", new NameTransferDefinitionParser("providers"));
-        registerBeanDefinitionParser("custom-encryption-strategy", new NameTransferDefinitionParser("encryptionStrategies").addAlias("strategy", "encryptionStrategy"));
+        registerMuleDefinitionParser("custom-encryption-strategy", new NameTransferDefinitionParser("encryptionStrategies")).addAlias("strategy", "encryptionStrategy");
         registerBeanDefinitionParser("password-encryption-strategy", new ChildDefinitionParser("encryptionStrategy", PasswordBasedEncryptionStrategy.class));
         registerBeanDefinitionParser("secret-key-encryption-strategy", new ChildDefinitionParser("encryptionStrategy", SecretKeyEncryptionStrategy.class));
         registerBeanDefinitionParser("encryption-security-filter", new ChildDefinitionParser("securityFilter", MuleEncryptionEndpointSecurityFilter.class));

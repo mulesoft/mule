@@ -12,9 +12,15 @@ package org.mule.config.spring.parsers.delegate;
 
 import org.mule.util.ArrayUtils;
 
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
+import org.springframework.beans.factory.xml.ParserContext;
+import org.w3c.dom.Element;
 
 /**
  * This allows a definition parsers to be dynamically represented by different
@@ -24,9 +30,10 @@ import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
  * {@link InheritDefinitionParser}).
  *
  * <p>Note that the sub-parsers must be consistent.  That includes matching the
- * same schema, for example.
+ * same schema, for example.</p>
  */
 public abstract class AbstractDelegatingDefinitionParser extends AbstractBeanDefinitionParser
+    implements DelegateDefinitionParser
 {
 
     private DelegateDefinitionParser[] delegates;
@@ -34,6 +41,11 @@ public abstract class AbstractDelegatingDefinitionParser extends AbstractBeanDef
     protected AbstractDelegatingDefinitionParser()
     {
         this(new DelegateDefinitionParser[0]);
+    }
+
+    protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext)
+    {
+        return parseDelegate(element, parserContext);
     }
 
     protected AbstractDelegatingDefinitionParser(DelegateDefinitionParser[] delegates)
@@ -56,7 +68,23 @@ public abstract class AbstractDelegatingDefinitionParser extends AbstractBeanDef
         return delegates[index];
     }
 
-    public AbstractDelegatingDefinitionParser addReference(String propertyName)
+    public void registerPreProcessor(PreProcessor preProcessor)
+    {
+        for (int i = 0; i < delegates.length; ++i)
+        {
+            delegates[i].registerPreProcessor(preProcessor);
+        }
+    }
+
+    public void registerPostProcessor(PostProcessor postProcessor)
+    {
+        for (int i = 0; i < delegates.length; ++i)
+        {
+            delegates[i].registerPostProcessor(postProcessor);
+        }
+    }
+
+    public DelegateDefinitionParser addReference(String propertyName)
     {
         for (int i = 0; i < delegates.length; ++i)
         {
@@ -65,7 +93,7 @@ public abstract class AbstractDelegatingDefinitionParser extends AbstractBeanDef
         return this;
     }
 
-    public AbstractDelegatingDefinitionParser addMapping(String propertyName, Map mappings)
+    public DelegateDefinitionParser addMapping(String propertyName, Map mappings)
     {
         for (int i = 0; i < delegates.length; ++i)
         {
@@ -74,7 +102,7 @@ public abstract class AbstractDelegatingDefinitionParser extends AbstractBeanDef
         return this;
     }
 
-    public AbstractDelegatingDefinitionParser addMapping(String propertyName, String mappings)
+    public DelegateDefinitionParser addMapping(String propertyName, String mappings)
     {
         for (int i = 0; i < delegates.length; ++i)
         {
@@ -83,7 +111,7 @@ public abstract class AbstractDelegatingDefinitionParser extends AbstractBeanDef
         return this;
     }
 
-    public AbstractDelegatingDefinitionParser addAlias(String alias, String propertyName)
+    public DelegateDefinitionParser addAlias(String alias, String propertyName)
     {
         for (int i = 0; i < delegates.length; ++i)
         {
@@ -92,7 +120,7 @@ public abstract class AbstractDelegatingDefinitionParser extends AbstractBeanDef
         return this;
     }
 
-    public AbstractDelegatingDefinitionParser addCollection(String propertyName)
+    public DelegateDefinitionParser addCollection(String propertyName)
     {
         for (int i = 0; i < delegates.length; ++i)
         {
@@ -101,11 +129,29 @@ public abstract class AbstractDelegatingDefinitionParser extends AbstractBeanDef
         return this;
     }
 
-    public AbstractDelegatingDefinitionParser addIgnored(String propertyName)
+    public DelegateDefinitionParser addIgnored(String propertyName)
     {
         for (int i = 0; i < delegates.length; ++i)
         {
             delegates[i].addIgnored(propertyName);
+        }
+        return this;
+    }
+
+    public DelegateDefinitionParser removeIgnored(String propertyName)
+    {
+        for (int i = 0; i < delegates.length; ++i)
+        {
+            delegates[i].removeIgnored(propertyName);
+        }
+        return this;
+    }
+
+    public DelegateDefinitionParser setIgnoredDefault(boolean ignoreAll)
+    {
+        for (int i = 0; i < delegates.length; ++i)
+        {
+            delegates[i].setIgnoredDefault(ignoreAll);
         }
         return this;
     }

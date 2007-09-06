@@ -15,12 +15,11 @@ import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.w3c.dom.Element;
 
 /**
- * This interface allows post-processing of the bean assmebler to be injected into
- * definition parsers
+ * This interface allows pre-processing of the element.
  */
-public interface PostProcess
+public interface PreProcessor
 {
 
-    public void postProcess(BeanAssembler assembler, Element element);
+    public void preProcess(Element element);
 
 }

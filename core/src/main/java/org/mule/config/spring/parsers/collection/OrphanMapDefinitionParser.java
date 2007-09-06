@@ -57,9 +57,9 @@ public class OrphanMapDefinitionParser extends AbstractMuleBeanDefinitionParser
 
     //@Override
 
-    protected void preProcess()
+    protected void preProcess(Element element)
     {
-        super.preProcess();
+        super.preProcess(element);
         if (dynamicName)
         {
             name = null;

@@ -10,8 +10,6 @@
 
 package org.mule.config.spring.parsers.delegate;
 
-import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
-
 import java.util.Map;
 
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -42,47 +40,52 @@ public abstract class AbstractDelegateDelegate implements DelegateDefinitionPars
         return delegate.parseDelegate(element, parserContext);
     }
 
-    public void registerPostProcess(PostProcess postProcess)
+    public void registerPreProcessor(PreProcessor preProcessor)
     {
-        delegate.registerPostProcess(postProcess);
+        delegate.registerPreProcessor(preProcessor);
     }
 
-    public AbstractMuleBeanDefinitionParser addReference(String propertyName)
+    public void registerPostProcessor(PostProcessor postProcessor)
+    {
+        delegate.registerPostProcessor(postProcessor);
+    }
+
+    public DelegateDefinitionParser addReference(String propertyName)
     {
         return delegate.addReference(propertyName);
     }
 
-    public AbstractMuleBeanDefinitionParser addMapping(String propertyName, Map mappings)
+    public DelegateDefinitionParser addMapping(String propertyName, Map mappings)
     {
         return delegate.addMapping(propertyName, mappings);
     }
 
-    public AbstractMuleBeanDefinitionParser addMapping(String propertyName, String mappings)
+    public DelegateDefinitionParser addMapping(String propertyName, String mappings)
     {
         return delegate.addMapping(propertyName, mappings);
     }
 
-    public AbstractMuleBeanDefinitionParser addAlias(String alias, String propertyName)
+    public DelegateDefinitionParser addAlias(String alias, String propertyName)
     {
         return delegate.addAlias(alias, propertyName);
     }
 
-    public AbstractMuleBeanDefinitionParser addCollection(String propertyName)
+    public DelegateDefinitionParser addCollection(String propertyName)
     {
         return delegate.addCollection(propertyName);
     }
 
-    public AbstractMuleBeanDefinitionParser addIgnored(String propertyName)
+    public DelegateDefinitionParser addIgnored(String propertyName)
     {
         return delegate.addIgnored(propertyName);
     }
 
-    public AbstractMuleBeanDefinitionParser removeIgnored(String propertyName)
+    public DelegateDefinitionParser removeIgnored(String propertyName)
     {
         return delegate.removeIgnored(propertyName);
     }
 
-    public AbstractMuleBeanDefinitionParser setIgnoredDefault(boolean ignoreAll)
+    public DelegateDefinitionParser setIgnoredDefault(boolean ignoreAll)
     {
         return delegate.setIgnoredDefault(ignoreAll);
     }

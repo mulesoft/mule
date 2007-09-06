@@ -9,6 +9,10 @@
  */
 package org.mule.config.spring.handlers;
 
+import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+import org.mule.config.spring.parsers.delegate.AbstractDelegatingDefinitionParser;
+import org.mule.config.spring.parsers.delegate.DelegateDefinitionParser;
+
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
@@ -28,6 +32,18 @@ public abstract class AbstractIgnorableNamespaceHandler extends NamespaceHandler
     protected final void registerIgnoredElement(String name)
     {
         registerBeanDefinitionParser(name, new IgnoredDefinitionParser());
+    }
+
+    protected final DelegateDefinitionParser registerMuleDefinitionParser(String name, AbstractMuleBeanDefinitionParser parser)
+    {
+        super.registerBeanDefinitionParser(name, parser);
+        return parser;
+    }
+
+    protected final DelegateDefinitionParser registerDelegateDefinitionParser(String name, AbstractDelegatingDefinitionParser parser)
+    {
+        super.registerBeanDefinitionParser(name, parser);
+        return parser;
     }
 
     private class IgnoredDefinitionParser implements BeanDefinitionParser

@@ -37,7 +37,7 @@ public abstract class AbstractParallelDelegatingDefinitionParser extends Abstrac
         super(delegates);
     }
 
-    protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext)
+    public AbstractBeanDefinition parseDelegate(Element element, ParserContext parserContext)
     {
         return getDelegate(element, parserContext).parseDelegate(element, parserContext);
     }

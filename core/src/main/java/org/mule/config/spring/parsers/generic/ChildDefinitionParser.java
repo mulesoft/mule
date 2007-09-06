@@ -77,9 +77,9 @@ public class ChildDefinitionParser extends AbstractChildDefinitionParser
         setAllowClassAttribute(allowClassAttribute);
     }
 
-    protected void preProcess()
+    protected void preProcess(Element element)
     {
-        super.preProcess();
+        super.preProcess(element);
         if (isAllowClassAttribute())
         {
            clazz = null; // reset for this element

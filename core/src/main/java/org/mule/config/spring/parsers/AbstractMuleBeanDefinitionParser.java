@@ -14,7 +14,8 @@ import org.mule.config.spring.parsers.assembly.BeanAssemblerFactory;
 import org.mule.config.spring.parsers.assembly.DefaultBeanAssemblerFactory;
 import org.mule.config.spring.parsers.assembly.ReusablePropertyConfiguration;
 import org.mule.config.spring.parsers.delegate.DelegateDefinitionParser;
-import org.mule.config.spring.parsers.delegate.PostProcess;
+import org.mule.config.spring.parsers.delegate.PostProcessor;
+import org.mule.config.spring.parsers.delegate.PreProcessor;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
@@ -77,7 +78,7 @@ import org.w3c.dom.NamedNodeMap;
  * </ol>
  *
  * <p>Note that this class is not multi-thread safe.  The internal state is reset before each "use"
- * by {@link #preProcess()} which assumes sequential access.</p>
+ * by {@link #preProcess(org.w3c.dom.Element)} which assumes sequential access.</p>
  *
  * @see  AbstractBeanDefinitionParser
  */
@@ -100,7 +101,8 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
     protected ReusablePropertyConfiguration propertyConfiguration = new ReusablePropertyConfiguration();
     private ParserContext parserContext;
     private BeanDefinitionRegistry registry;
-    private List postProcesses = new LinkedList();
+    private LinkedList preProcessors = new LinkedList();
+    private List postProcessors = new LinkedList();
     //By default Mule objects are not singletons
     protected boolean singleton = false;
 
@@ -113,19 +115,19 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
         addIgnored(ATTRIBUTE_ID);
     }
 
-    public AbstractMuleBeanDefinitionParser addReference(String propertyName)
+    public DelegateDefinitionParser addReference(String propertyName)
     {
         propertyConfiguration.addReference(propertyName);
         return this;
     }
 
-    public AbstractMuleBeanDefinitionParser addMapping(String propertyName, Map mappings)
+    public DelegateDefinitionParser addMapping(String propertyName, Map mappings)
     {
         propertyConfiguration.addMapping(propertyName, mappings);
         return this;
     }
 
-    public AbstractMuleBeanDefinitionParser addMapping(String propertyName, String mappings)
+    public DelegateDefinitionParser addMapping(String propertyName, String mappings)
     {
         propertyConfiguration.addMapping(propertyName, mappings);
         return this;
@@ -136,7 +138,7 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
      * @param propertyName The bean property name
      * @return This instance, allowing chaining during use, avoiding subclasses
      */
-    public AbstractMuleBeanDefinitionParser addAlias(String alias, String propertyName)
+    public DelegateDefinitionParser addAlias(String alias, String propertyName)
     {
         propertyConfiguration.addAlias(alias, propertyName);
         return this;
@@ -146,7 +148,7 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
      * @param propertyName Property that is a collection
      * @return This instance, allowing chaining during use, avoiding subclasses
      */
-    public AbstractMuleBeanDefinitionParser addCollection(String propertyName)
+    public DelegateDefinitionParser addCollection(String propertyName)
     {
         propertyConfiguration.addCollection(propertyName);
         return this;
@@ -156,19 +158,19 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
      * @param propertyName Property that is to be ignored
      * @return This instance, allowing chaining during use, avoiding subclasses
      */
-    public AbstractMuleBeanDefinitionParser addIgnored(String propertyName)
+    public DelegateDefinitionParser addIgnored(String propertyName)
     {
         propertyConfiguration.addIgnored(propertyName);
         return this;
     }
 
-    public AbstractMuleBeanDefinitionParser removeIgnored(String propertyName)
+    public DelegateDefinitionParser removeIgnored(String propertyName)
     {
         propertyConfiguration.removeIgnored(propertyName);
         return this;
     }
 
-    public AbstractMuleBeanDefinitionParser setIgnoredDefault(boolean ignoreAll)
+    public DelegateDefinitionParser setIgnoredDefault(boolean ignoreAll)
     {
         propertyConfiguration.setIgnoredDefault(ignoreAll);
         return this;
@@ -190,10 +192,10 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
     protected void postProcess(BeanAssembler assembler, Element element)
     {
         AutoIdUtils.ensureUniqueName(element, "bean");
-        Iterator processes = postProcesses.iterator();
+        Iterator processes = postProcessors.iterator();
         while (processes.hasNext())
         {
-            ((PostProcess) processes.next()).postProcess(assembler, element);
+            ((PostProcessor) processes.next()).postProcess(assembler, element);
         }
     }
 
@@ -204,11 +206,16 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
      * initial configuration for each element (it may be modified by the BeanAssembler)
      * and that other mutable instance variables are cleared.
      */
-    protected void preProcess()
+    protected void preProcess(Element element)
     {
         parserContext = null;
         registry = null;
         propertyConfiguration.reset();
+        Iterator processes = preProcessors.iterator();
+        while (processes.hasNext())
+        {
+            ((PreProcessor) processes.next()).preProcess(element);
+        }
     }
 
     /**
@@ -225,7 +232,7 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
      */
     protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext)
     {
-        preProcess();
+        preProcess(element);
         setParserContext(parserContext);
         setRegistry(parserContext.getRegistry());
         checkElementNameUnique(element);
@@ -448,9 +455,14 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
         return parseInternal(element, parserContext);
     }
 
-    public void registerPostProcess(PostProcess postProcess)
+    public void registerPreProcessor(PreProcessor preProcessor)
     {
-        postProcesses.add(postProcess);
+        preProcessors.addFirst(preProcessor);
+    }
+
+    public void registerPostProcessor(PostProcessor postProcessor)
+    {
+        postProcessors.add(postProcessor);
     }
 
 }

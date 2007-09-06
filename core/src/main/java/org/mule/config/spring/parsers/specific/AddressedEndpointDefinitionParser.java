@@ -14,7 +14,8 @@ import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.delegate.AbstractDelegateDelegate;
 import org.mule.config.spring.parsers.delegate.AbstractSerialDelegatingDefinitionParser;
-import org.mule.config.spring.parsers.delegate.PostProcess;
+import org.mule.config.spring.parsers.delegate.PostProcessor;
+import org.mule.config.spring.parsers.delegate.PreProcessor;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
 
 import java.util.Iterator;
@@ -32,7 +33,6 @@ import org.w3c.dom.Element;
 public class AddressedEndpointDefinitionParser extends AbstractSerialDelegatingDefinitionParser
 {
 
-    private String endpointId;
     private String addressId;
 
     public AddressedEndpointDefinitionParser(String protocol, Class endpoint)
@@ -57,16 +57,14 @@ public class AddressedEndpointDefinitionParser extends AbstractSerialDelegatingD
             {
                 getDelegate().removeIgnored((String) names.next());
             }
-        }
-
-        public AbstractBeanDefinition parseDelegate(Element element, ParserContext parserContext)
-        {
-            AutoIdUtils.ensureUniqueId(element, "endpoint");
-            endpointId = element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_ID);
-            addressId = endpointId + ".address";
-            element.setAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_ID, addressId);
-            element.setAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME, addressId);
-            return super.parseDelegate(element, parserContext);
+            registerPreProcessor(new PreProcessor()
+            {
+                public void preProcess(Element element)
+                {
+                    AutoIdUtils.forceUniqueId(element, "address");
+                    addressId = element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
+                }
+            });
         }
 
     }
@@ -86,19 +84,20 @@ public class AddressedEndpointDefinitionParser extends AbstractSerialDelegatingD
             {
                 getDelegate().addIgnored((String) names.next());
             }
-            registerPostProcess(new PostProcess() {
+            registerPreProcessor(new PreProcessor()
+            {
+                public void preProcess(Element element)
+                {
+                    AutoIdUtils.ensureUniqueId(element, "endpoint");
+                }
+            });
+            registerPostProcessor(new PostProcessor()
+            {
                 public void postProcess(BeanAssembler assembler, Element element)
                 {
                     assembler.extendBean(UnaddressedEndpointDefinitionParser.ENDPOINT_URI_ATTRIBUTE, addressId, true);
                 }
             });
-        }
-
-        public AbstractBeanDefinition parseDelegate(Element element, ParserContext parserContext)
-        {
-            element.setAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_ID, endpointId);
-            element.setAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME, endpointId);
-            return super.parseDelegate(element, parserContext);
         }
 
     }
