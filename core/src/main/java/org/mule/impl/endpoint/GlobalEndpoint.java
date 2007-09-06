@@ -10,7 +10,16 @@
 
 package org.mule.impl.endpoint;
 
+import org.mule.umo.endpoint.UMOEndpoint;
+
 public class GlobalEndpoint extends MuleEndpoint
 {
+
+    private static final long serialVersionUID = 987360887269899791L;
+
+    public String getType()
+    {
+        return UMOEndpoint.ENDPOINT_TYPE_GLOBAL;
+    }
 
 }

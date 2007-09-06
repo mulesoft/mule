@@ -464,7 +464,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 //        {
 //            return false;
 //        }
-        return type.equals(immutableMuleProviderDescriptor.type);
+        return getType().equals(immutableMuleProviderDescriptor.getType());
     }
 
     public int hashCode()

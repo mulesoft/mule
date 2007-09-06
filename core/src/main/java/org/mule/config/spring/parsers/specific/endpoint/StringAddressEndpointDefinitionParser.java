@@ -67,6 +67,13 @@ public class StringAddressEndpointDefinitionParser extends UnaddressedEndpointDe
                 }
             }
         }
+        
+        // Not sure if this is required. Adding for now for backwards compatability
+        if (element.getParentNode().getNodeName().equals("chaining-router")
+            || element.getParentNode().getNodeName().equals("exception-based-router"))
+        {
+            builder.addPropertyValue("remoteSync", Boolean.TRUE);
+        }
 
         super.parseChild(element, parserContext, builder);
     }

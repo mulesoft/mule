@@ -11,12 +11,10 @@ package org.mule.config.spring.parsers.specific.endpoint;
 
 import org.mule.config.spring.parsers.AbstractChildDefinitionParser;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
-import org.mule.config.spring.parsers.delegate.DelegateDefinitionParser;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.util.StringUtils;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
@@ -79,10 +77,6 @@ public class UnaddressedEndpointDefinitionParser extends AbstractChildDefinition
     //@Override
     protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
-        if (isGlobal(element))
-        {
-            builder.addPropertyValue("type", UMOImmutableEndpoint.ENDPOINT_TYPE_GLOBAL);
-        }
         //Register non-descriptive dependencies i.e. string values for objects listed in the container
         if(StringUtils.isNotBlank(element.getAttribute("connector")))
         {
