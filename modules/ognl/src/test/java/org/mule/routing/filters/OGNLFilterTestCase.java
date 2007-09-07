@@ -11,12 +11,28 @@
 package org.mule.routing.filters;
 
 import org.mule.config.ConfigurationException;
+import org.mule.extras.client.MuleClient;
 import org.mule.impl.MuleMessage;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.routing.outbound.FilteringOutboundRouter;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
-public class OGNLFilterTestCase extends AbstractMuleTestCase
+public class OGNLFilterTestCase extends FunctionalTestCase
 {
+    public static final String DEFAULT_INPUT_QUEUE = "vm://in";
+    public static final String DEFUALT_OUTPUT_QUEUE = "vm://out";
+    public static final String FIRST_MESSAGE = "foo";
+    public static final String SECOND_MESSAGE = "foobar";
+    public static final String THIRD_MESSAGE = "INPUT MESSAGE";
+    public static final long TIMEOUT = 2000;
+    public static final String OGNL_EXSPRESSION = " equals(\"foo\") || content.endsWith(\"bar\") ";
+    public static final String SERVICE_NAME = "OGNLServiceWrapper1";
+
+    protected String getConfigResources()
+    {
+        return "ognl-functional-test.xml";
+    }
+
     private OGNLFilter filter;
 
     // @Override
@@ -48,21 +64,48 @@ public class OGNLFilterTestCase extends AbstractMuleTestCase
         assertFalse(filter.accept(message));
     }
 
-    public void testStringExpression() throws ConfigurationException
+    public void testNamespaceHandler()
     {
-        UMOMessage message = new MuleMessage("foo");
-        filter.setExpression("equals(\"foo\")");
-        assertTrue(filter.accept(message));
+        String expression =
+                ((OGNLFilter) ((FilteringOutboundRouter) managementContext.getRegistry().
+                        lookupService(SERVICE_NAME).getOutboundRouter().getRouters().get(0)).
+                        getFilter()).getExpression();
+
+        assertEquals(expression, OGNL_EXSPRESSION);
     }
 
-    public void testValidObjectExpression() throws ConfigurationException
+    public void testFunctionalTest() throws Exception
     {
-        Dummy payload = new Dummy();
-        payload.setContent("foobar");
-        UMOMessage message = new MuleMessage(payload);
-        filter.setExpression("content.endsWith(\"bar\")");
-        assertTrue(filter.accept(message));
+        MuleClient client = new MuleClient();
+        try
+        {
+            client.dispatch(DEFAULT_INPUT_QUEUE, FIRST_MESSAGE, null);
+            UMOMessage message = client.receive(DEFUALT_OUTPUT_QUEUE, TIMEOUT);
+            assertNotNull(message);
+            assertNotNull(message.getPayload());
+            assertNull(message.getExceptionPayload());
+            assertEquals(FIRST_MESSAGE, message.getPayload());
+
+            Dummy payload = new Dummy();
+            payload.setContent(SECOND_MESSAGE);
+            client.dispatch(DEFAULT_INPUT_QUEUE, new MuleMessage(payload));
+            message = client.receive(DEFUALT_OUTPUT_QUEUE, TIMEOUT);
+            assertNotNull(message);
+            assertNotNull(message.getPayload());
+            assertNull(message.getExceptionPayload());
+            assertEquals(SECOND_MESSAGE, ((Dummy) message.getPayload()).getContent());
+
+            client.dispatch(DEFAULT_INPUT_QUEUE, THIRD_MESSAGE, null);
+            message = client.receive(DEFUALT_OUTPUT_QUEUE, TIMEOUT);
+            assertNull(message);
+        }
+        finally
+        {
+            client.dispose();
+        }
+
     }
+
 
     public void testInvalidObjectExpression()
     {

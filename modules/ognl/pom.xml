@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.mule.modules</groupId>
         <artifactId>mule-modules</artifactId>
         <version>2.0-M2-SNAPSHOT</version>
     </parent>
-  <artifactId>mule-module-ognl</artifactId>
+    <artifactId>mule-module-ognl</artifactId>
     <!--<packaging>bundle</packaging>-->
-  <name>OGNL Filter</name>
-  <description>Support for filtering events using OGNL notation.</description>
+    <name>OGNL Filter</name>
+    <description>Support for filtering events using OGNL notation.</description>
 
     <build>
-         <plugins>
-              <plugin>
+        <plugins>
+            <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
@@ -30,14 +30,35 @@
                     </instructions>
                 </configuration>
             </plugin>
-         </plugins>
+        </plugins>
     </build>
-    
-  <dependencies>
-    <dependency>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-client</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-vm</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
             <groupId>ognl</groupId>
             <artifactId>ognl</artifactId>
             <version>2.6.9</version>
         </dependency>
-  </dependencies>
+    </dependencies>
 </project>
