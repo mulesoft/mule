@@ -242,8 +242,7 @@
         <transformer name="StringToEmailMessage" className="org.mule.providers.email.transformers.StringToEmailMessage"
             returnClass="javax.mail.Message"/>
         <transformer name="ObjectToJMSMessage" className="org.mule.providers.jms.transformers.ObjectToJMSMessage"
-            returnClass="javax.jms.TextMessage">
-        </transformer>
+            returnClass="javax.jms.TextMessage"/>
         <transformer name="JMSMessageToObject" className="org.mule.providers.jms.transformers.JMSMessageToObject"
             returnClass="java.lang.String"/>
     </transformers>
@@ -261,7 +260,10 @@
         <mule-descriptor name="Error Manager" implementation="errorManager">
             <inbound-router>
                 <endpoint address="file://./test-data/in"
-                          transformers="XMLToExceptionBean ExceptionBeanToErrorMessage" />
+                          transformers="XMLToExceptionBean ExceptionBeanToErrorMessage">
+                     <!-- this filter avoids processing .svn directories when running from the source tree -->
+                     <filter pattern="*.xml" className="org.mule.providers.file.filters.FilenameWildcardFilter"/>                          
+                </endpoint>
             </inbound-router>
 
             <outbound-router>

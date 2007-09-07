@@ -23,7 +23,7 @@ import javax.mail.internet.MimeMessage;
  * as RFC822 encoded bytes (this would let the message be transmitted over JMS etc).
  *
  * <p>The email servers for the test are managed by the greenMailSupport instance.
- * The Mule services (defined in round-trip-test.xml) are started by the test framework.
+ * The Mule services (defined in email-round-trip-test.xml) are started by the test framework.
  * So all we need to do here is test that the message is handled correctly.</p>
  */
 public class EmailRoundTripTestCase extends FunctionalTestCase

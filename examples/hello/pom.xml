@@ -35,5 +35,10 @@
             <artifactId>mule-transport-http</artifactId>
             <version>${version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-vm</artifactId>
+            <version>${version}</version>
+        </dependency>
     </dependencies>
 </project>

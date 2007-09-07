@@ -30,7 +30,7 @@
             <artifactId>mule-transport-xfire</artifactId>
             <version>${muleVersion}</version>
         </dependency>
-        <!-- Better testing of XML -->        
+        <!-- Better testing of XML -->
         <dependency>
             <groupId>xmlunit</groupId>
             <artifactId>xmlunit</artifactId>
@@ -73,7 +73,7 @@
             </releases>
         </pluginRepository>
     </pluginRepositories>
-  
+
     <build>
         <defaultGoal>install</defaultGoal>
         <finalName>${artifactId}</finalName>

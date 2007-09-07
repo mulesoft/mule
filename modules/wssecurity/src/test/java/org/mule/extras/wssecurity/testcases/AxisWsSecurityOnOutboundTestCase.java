@@ -15,7 +15,7 @@ import org.mule.impl.MuleMessage;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
-public class AxisWsSecurityOnOutbound extends FunctionalTestCase
+public class AxisWsSecurityOnOutboundTestCase extends FunctionalTestCase
 {
     public void testAxisWsSecurityOnOutbound() throws Exception
     {

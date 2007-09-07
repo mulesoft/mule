@@ -12,6 +12,7 @@ package org.mule.providers.file;
 
 import org.mule.MuleRuntimeException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.impl.ThreadSafeAccess;
 import org.mule.umo.MessagingException;
 
 import java.io.File;
@@ -34,6 +35,11 @@ public class FileContentsMessageAdapter extends FileMessageAdapter
         super(message);
     }
 
+    public FileContentsMessageAdapter(FileContentsMessageAdapter template)
+    {
+        super(template);
+    }
+    
     protected void setMessage(File message) throws MessagingException
     {
         super.setMessage(message);
@@ -54,5 +60,10 @@ public class FileContentsMessageAdapter extends FileMessageAdapter
                 throw new MuleRuntimeException(CoreMessages.failedToReadPayload(), noPayloadException);
             }
         }
+    }
+    
+    public ThreadSafeAccess newThreadCopy()
+    {
+        return new FileContentsMessageAdapter(this);
     }
 }

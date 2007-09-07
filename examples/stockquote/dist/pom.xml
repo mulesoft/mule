@@ -77,7 +77,7 @@
             </releases>
         </pluginRepository>
     </pluginRepositories>
-  
+
     <build>
         <defaultGoal>install</defaultGoal>
         <finalName>${artifactId}</finalName>

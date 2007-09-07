@@ -66,7 +66,7 @@ public class HelloSampleTestCase extends AbstractMuleTestCase
         assertNotNull(name.getName());
         assertNull(name.getGreeting());
 
-        result = trans.transform("Another Wilma\r\n");
+        result = trans.transform("Another Wilma");
 
         assertNotNull(result);
         assertTrue(result instanceof NameString);
@@ -77,6 +77,58 @@ public class HelloSampleTestCase extends AbstractMuleTestCase
         assertEquals("Another Wilma", name.getName());
     }
 
+    public void testHttpRequestToNameTransformer() throws Exception
+    {
+        String temp = "whateverUrl?name=Wilma";
+        HttpRequestToNameString trans = new HttpRequestToNameString();
+        trans.setReturnClass(NameString.class);
+        Object result = trans.transform(temp);
+
+        assertNotNull(result);
+        assertTrue(result instanceof NameString);
+
+        NameString name = (NameString)result;
+
+        assertNotNull(name.getName());
+        assertNull(name.getGreeting());
+
+        result = trans.transform("whateverUrl?street=Sonnenstrasse&name=Another%20Wilma");
+
+        assertNotNull(result);
+        assertTrue(result instanceof NameString);
+
+        name = (NameString)result;
+
+        assertNotNull(name.getName());
+        assertEquals("Another Wilma", name.getName());
+    }
+    
+    public void testStdinToNameTransformer() throws Exception
+    {
+        String temp = "Wilma";
+        StdinToNameString trans = new StdinToNameString();
+        trans.setReturnClass(NameString.class);
+        Object result = trans.transform(temp);
+
+        assertNotNull(result);
+        assertTrue(result instanceof NameString);
+
+        NameString name = (NameString)result;
+
+        assertNotNull(name.getName());
+        assertNull(name.getGreeting());
+
+        result = trans.transform("Another Wilma\r\n");
+
+        assertNotNull(result);
+        assertTrue(result instanceof NameString);
+
+        name = (NameString)result;
+
+        assertNotNull(name.getName());
+        assertEquals("Another Wilma", name.getName());
+    }    
+    
     public void testNameToChatTransformer() throws Exception
     {
         NameString temp = new NameString("the other one");

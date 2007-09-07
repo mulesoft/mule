@@ -25,6 +25,11 @@ public class NameString implements Serializable
     private String name;
     private String greeting;
 
+    public NameString()
+    {
+        this.name = null;
+    }
+    
     public NameString(String name)
     {
         this.name = name;
@@ -60,6 +65,11 @@ public class NameString implements Serializable
     public void setGreeting(String greeting)
     {
         this.greeting = greeting;
+    }
+    
+    public boolean isValid()
+    {
+        return name != null && name.length() > 0;
     }
 
 }

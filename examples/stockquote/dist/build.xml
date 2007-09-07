@@ -12,7 +12,7 @@
 
     <property name="dir.java" value="src"/>
     <property name="dir.conf" value="conf"/>
-    <property name="dir.resources" value="resources"/>
+    <property name="dir.resources" value="${dir.java}/main/resources"/>
     <property name="dir.build" value="target"/>
     <property name="dir.classes" value="${dir.build}/classes"/>
 
@@ -86,8 +86,8 @@
        <condition>
         <or>
          <equals arg1="${env.MULE_HOME}" arg2=""/>
-          <!-- Using a trick here. If there was no MULE_HOME environment 
-               variable set, ant will set the value to the unprocessed 
+          <!-- Using a trick here. If there was no MULE_HOME environment
+               variable set, ant will set the value to the unprocessed
                template string -->
           <equals arg1="${env.MULE_HOME}" arg2="$${env.MULE_HOME}"/>
          </or>

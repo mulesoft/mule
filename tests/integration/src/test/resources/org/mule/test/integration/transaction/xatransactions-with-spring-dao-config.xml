@@ -3,8 +3,8 @@
                                 "http://mule.mulesource.org/dtds/mule-configuration.dtd">
 
 <mule-configuration id="test" version="1.0">
-	
-	<!-- Container context -->
+    
+    <!-- Container context -->
     <container-context name="spring" className="org.mule.extras.spring.SpringContainerContext">
         <properties>
             <property name="configFile" value="org/mule/test/integration/transaction/xatransaction-with-spring-datasource.xml"/>
@@ -12,33 +12,33 @@
     </container-context>
 
     <transaction-manager factory="org.mule.extras.jotm.JotmTransactionManagerFactory"/>
-    					    
+
     <connector name="jmsXAConnector" className="org.mule.providers.jms.activemq.ActiveMqJmsConnector">
         <properties>
             <container-property name="connectionFactory" reference="jmsConnectionFactory"/>
             <property name="specification" value="1.1"/>
         </properties>
     </connector>
-	
-	<connector name="VMQueue" className="org.mule.providers.vm.VMConnector">
-		<properties>
-			<property value="true" name="queueEvents"/>
-		</properties>
-	</connector>
-		
-	<model name="model">
-		        
-		<mule-descriptor name="JmsToJdbc" implementation="MyComponent" singleton="true">
-			<inbound-router>
-				<endpoint address="jms://my.queue" connector="jmsXAConnector" remoteSync="true">
-					<transaction action="ALWAYS_BEGIN" factory="org.mule.transaction.XaTransactionFactory"/>
-				</endpoint>
-			</inbound-router>
-			<outbound-router>
-				<router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-					<endpoint address="vm://output"/>
-				</router>
-			</outbound-router>
-		</mule-descriptor>
-	</model>	
+
+    <connector name="VMQueue" className="org.mule.providers.vm.VMConnector">
+        <properties>
+            <property value="true" name="queueEvents"/>
+        </properties>
+    </connector>
+
+    <model name="model">
+
+        <mule-descriptor name="JmsToJdbc" implementation="MyComponent" singleton="true">
+            <inbound-router>
+                <endpoint address="jms://my.queue" connector="jmsXAConnector" remoteSync="true">
+                    <transaction action="ALWAYS_BEGIN" factory="org.mule.transaction.XaTransactionFactory"/>
+                </endpoint>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="vm://output"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+    </model>
 </mule-configuration>

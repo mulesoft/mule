@@ -35,4 +35,9 @@ public class LocaleMessage extends MessageFactory
     {
         return getString(BUNDLE_PATH, 3);
     }
+
+    public static String getInvalidUserNameError()
+    {
+        return getString(BUNDLE_PATH, 4);
+    }
 }

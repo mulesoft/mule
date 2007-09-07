@@ -459,7 +459,7 @@ public abstract class AbstractConnector
                 }
             }
         }
-
+        
         if (this.isConnected())
         {
             try
@@ -476,6 +476,9 @@ public abstract class AbstractConnector
         // make sure the scheduler is gone
         scheduler.set(null);
 
+        // we do not need to stop the work managers because they do no harm (will just be idle)
+        // and will be reused on restart without problems.
+        
         this.initialised.set(false);
         // started=false already issued above right after doStop()
         if (logger.isInfoEnabled())
@@ -510,14 +513,34 @@ public abstract class AbstractConnector
 
         this.disposeReceivers();
         this.disposeDispatchers();
+        this.disposeWorkManagers();
 
-        this.doDispose();
+        this.doDispose();        
         disposed.set(true);
 
         if (logger.isInfoEnabled())
         {
             logger.info("Disposed: " + this);
         }
+    }
+
+    protected void disposeWorkManagers()
+    {
+        logger.debug("Disposing dispatcher work manager");
+        UMOWorkManager workManager = (UMOWorkManager) dispatcherWorkManager.get();
+        if (workManager != null)
+        {
+            workManager.dispose();
+        }
+        dispatcherWorkManager.set(null);
+
+        logger.debug("Disposing receiver work manager");
+        workManager = (UMOWorkManager) receiverWorkManager.get();
+        if (workManager != null)
+        {
+            workManager.dispose();
+        }
+        receiverWorkManager.set(null);
     }
 
     protected void disposeReceivers()

@@ -66,7 +66,7 @@
 
         <!-- ActiveMQ for JMS -->
         <dependency>
-            <groupId>org.apache.activemq</groupId> 
+            <groupId>org.apache.activemq</groupId>
             <artifactId>apache-activemq</artifactId>
             <version>${activemqVersion}</version>
             <scope>provided</scope>

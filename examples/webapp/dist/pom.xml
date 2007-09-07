@@ -53,7 +53,7 @@
                             <maxIdleTime>60000</maxIdleTime>
                         </connector>
                     </connectors>
-                 </configuration>       
+                 </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>

@@ -2,16 +2,16 @@
 <beans>
     
     <!-- Transaction management for XA transactions involving multiple JDBC and/or JMS -->
-	<bean id="jotmFactory" class="org.mule.extras.jotm.JotmTransactionManagerFactory"/>
-	<bean id="jotm" factory-bean="jotmFactory" factory-method="create"/>
+    <bean id="jotmFactory" class="org.mule.extras.jotm.JotmTransactionManagerFactory"/>
+    <bean id="jotm" factory-bean="jotmFactory" factory-method="create"/>
  
- 	<!-- This def is used for Spring/Hibernate usage from within Components.
- 	Both Mule and Spring use a JOTM singleton if one is already built, so whoever builds
- 	this first, the other one uses it. -->
- 	<bean id="springJotmFactory" class="org.springframework.transaction.jta.JotmFactoryBean"/>
-	<bean id="springJotm" class="org.springframework.transaction.jta.JtaTransactionManager">
-		<property name="userTransaction" ref="springJotmFactory"/>
-	</bean>
+     <!-- This def is used for Spring/Hibernate usage from within Components.
+     Both Mule and Spring use a JOTM singleton if one is already built, so whoever builds
+     this first, the other one uses it. -->
+     <bean id="springJotmFactory" class="org.springframework.transaction.jta.JotmFactoryBean"/>
+    <bean id="springJotm" class="org.springframework.transaction.jta.JtaTransactionManager">
+        <property name="userTransaction" ref="springJotmFactory"/>
+    </bean>
     
     <bean id="myManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">
@@ -30,18 +30,18 @@
     </bean>
   
     <bean id="libraryDao" class="org.mule.test.integration.transaction.extras.LibraryDao" singleton="false">
-		<property name="jdbcTemplate">
-			<ref bean="jdbcTemplate" />
-		</property>
-	</bean>
-	
-	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
-		<constructor-arg>
-			<ref bean="jdbcDataSourceXa" />
-		</constructor-arg>
-	</bean>
-	
-	    <!-- Data Source -->
+        <property name="jdbcTemplate">
+            <ref bean="jdbcTemplate" />
+        </property>
+    </bean>
+
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <constructor-arg>
+            <ref bean="jdbcDataSourceXa" />
+        </constructor-arg>
+    </bean>
+
+        <!-- Data Source -->
     <bean id="innerDataSource"
         class="org.enhydra.jdbc.standard.StandardXADataSource"
         destroy-method="shutdown">
@@ -71,7 +71,7 @@
     <bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
         <property name="brokerURL"><value>vm://localhost?broker.persistent=false&amp;broker.useJmx=false</value></property>
     </bean>
-	
+
     <!-- My Component -->
     <bean id="MyComponent" class="org.mule.test.integration.transaction.extras.MyComponent"/>
     

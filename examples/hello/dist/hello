@@ -6,14 +6,14 @@
 if [ -z "$MULE_HOME" ] ; then
   # find the name of the real MULE_HOME which is two levels up
   MULE_HOME=`pwd`
-  MULE_HOME=`dirname $MULE_HOME`
-  MULE_HOME=`dirname $MULE_HOME`
+  MULE_HOME=`dirname "$MULE_HOME"`
+  MULE_HOME=`dirname "$MULE_HOME"`
   export MULE_HOME
 fi
 
 # If MULE_BASE is not set, make it MULE_HOME
 if [ -z "$MULE_BASE" ] ; then
-  MULE_BASE=$MULE_HOME
+  MULE_BASE="$MULE_HOME"
   export MULE_BASE
 fi
 

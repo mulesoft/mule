@@ -14,16 +14,16 @@ import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 
 /**
- * <code>NameStringToChatString</code> is a dummy transformer used in the hello world
- * application to transform the ChatString object into a string.
+ * <code>ExceptionToString</code> converts an exception to a String,
+ * returning the exception's <code>getMessage()</code> result.
  */
-public class ChatStringToString extends AbstractTransformer
+public class ExceptionToString extends AbstractTransformer
 {
 
-    public ChatStringToString()
+    public ExceptionToString()
     {
         super();
-        this.registerSourceType(ChatString.class);
+        this.registerSourceType(Exception.class);
         this.setReturnClass(String.class);
     }
 
@@ -34,7 +34,7 @@ public class ChatStringToString extends AbstractTransformer
      */
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
-        ChatString chatString = (ChatString)src;
-        return chatString.toString();
+        return ((Exception) src).getMessage();
     }
+
 }

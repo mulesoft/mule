@@ -11,7 +11,9 @@
 package org.mule.samples.hello;
 
 /**
- * <code>Greeter</code> TODO (document class)
+ * <code>Greeter</code> expects a valid <code>NameString</code> object. If invalid,
+ * an exception is created and returned. The outbound router will filter exceptions
+ * as user errors and return the messages to the original requester accordingly.
  */
 public class Greeter
 {
@@ -22,9 +24,17 @@ public class Greeter
         greeting = LocaleMessage.getGreetingPart1();
     }
 
-    public void greet(NameString person)
+    public Object greet(NameString person)
     {
-        person.setGreeting(greeting);
-
+        Object payload = person;
+        if (person.isValid())
+        {
+            person.setGreeting(greeting);
+        }
+        else
+        {
+            payload = new Exception(LocaleMessage.getInvalidUserNameError());
+        }
+        return payload;
     }
 }

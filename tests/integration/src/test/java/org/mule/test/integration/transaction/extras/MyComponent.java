@@ -14,6 +14,7 @@ public class MyComponent
 {
     public boolean doInsertTitle(Book book) throws Exception
     {
+        // TODO this LibraryDao must be injected, not looked up directly
         //LibraryDao library = (LibraryDao) MuleManager.getInstance().getContainerContext().getComponent("myManager");
         //return library.insertBook(book);
         return false;
