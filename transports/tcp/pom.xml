@@ -21,7 +21,7 @@
                     <excludes>
                         <exclude>**/SafeProtocolMule2227TestCase.*</exclude>
                         <exclude>**/MuleMessageProtocolChunkingTestCase.*</exclude>
-                        <exclude>**/SynchStreamingMule1687TestCase.*</exclude>
+                        <!--<exclude>**/SynchStreamingMule1687TestCase.*</exclude>-->
                         <exclude>**/AsynchMule1869TestCase.*</exclude>
                         <!-- be careful when re-enabling this, it may hang the CI server -->
                         <exclude>**/KeepSendSocketOpenMule1491TestCase.*</exclude>

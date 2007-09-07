@@ -11,10 +11,11 @@
 package org.mule.providers.tcp.issues;
 
 import org.mule.extras.client.MuleClient;
+import org.mule.providers.streaming.StreamMessageAdapter;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOMessage;
+import org.mule.umo.provider.UMOStreamMessageAdapter;
 
-import java.util.HashMap;
+import java.io.ByteArrayInputStream;
 
 
 public class SynchStreamingMule1687TestCase extends FunctionalTestCase
@@ -34,13 +35,14 @@ public class SynchStreamingMule1687TestCase extends FunctionalTestCase
 
     public void testSendAndReceive() throws Exception
     {
-        if (true)
-        {
-            throw new Exception("This test hangs - remove this exception when a fix has been added");
-        }
+//        if (true)
+//        {
+//            throw new Exception("This test hangs - remove this exception when a fix has been added");
+//        }
         MuleClient client = new MuleClient();
 
-        UMOMessage message = client.send("tcp://localhost:65432", TEST_MESSAGE, new HashMap());
+        UMOStreamMessageAdapter message = client.sendStream("tcp://localhost:65432", new StreamMessageAdapter(new ByteArrayInputStream(TEST_MESSAGE.getBytes())));
+//        UMOMessage message = client.send("tcp://localhost:65432", TEST_MESSAGE, new HashMap());
 
         assertNotNull(message);
     }
