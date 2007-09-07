@@ -19,8 +19,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <!-- MULE-2284 Hangs on CI server -->
-                        <exclude>**/ImapsNamespaceHandlerTestCase.*</exclude>
+                        <exclude>**/Imap*.*</exclude>
                     </excludes>
                 </configuration>
             </plugin>
