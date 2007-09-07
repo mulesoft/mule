@@ -36,7 +36,8 @@ public abstract class AbstractWebappTestCase extends AbstractMuleTestCase
     {
         MuleClient client = new MuleClient();
         UMOMessage response = client.send("vm://greeter", "Julius Caesar", null);
-        assertEquals("Hello Julius Caesar, how are you?", response.getPayloadAsString());
+        // ATTENTION: thie message is localized, a full comparison cannot be done here
+        assertTrue(response.getPayloadAsString().indexOf("Julius Caesar") > -1);
     }
     
     public void testStockQuoteExample() throws Exception

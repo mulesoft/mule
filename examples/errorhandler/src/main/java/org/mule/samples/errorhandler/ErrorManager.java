@@ -10,6 +10,7 @@
 
 package org.mule.samples.errorhandler;
 
+import org.mule.MuleServer;
 import org.mule.samples.errorhandler.handlers.DefaultHandler;
 import org.mule.samples.errorhandler.handlers.FatalHandler;
 import org.mule.umo.UMOException;
@@ -37,7 +38,7 @@ public class ErrorManager
     {
         defaultHandler = new DefaultHandler();
     }
-    
+
     public void setHandlers(List handlers)
     {
         Iterator handlerIter = handlers.iterator();
@@ -80,7 +81,7 @@ public class ErrorManager
         }
         catch (Exception e)
         {
-        
+
             logger.error(LocaleMessage.handlerFailure(eh));
 
             if (eh instanceof DefaultHandler)
@@ -92,6 +93,7 @@ public class ErrorManager
             else if (eh instanceof FatalHandler)
             {
                 logger.fatal(LocaleMessage.fatalHandling(e));
+                MuleServer.getManagementContext().dispose();
                 System.exit(-1);
             }
             else
@@ -133,6 +135,7 @@ public class ErrorManager
         // If this method has been called, all other handlers failed
         // this is all we can do
         logger.fatal(LocaleMessage.fatalException(t), t);
+        MuleServer.getManagementContext().dispose();
         System.exit(-1);
     }
 }
