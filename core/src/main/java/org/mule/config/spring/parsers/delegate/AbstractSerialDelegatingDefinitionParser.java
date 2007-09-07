@@ -23,7 +23,7 @@ import org.w3c.dom.Element;
  * the same element.  This lets multipe beans be generated from a single element.
  *
  * <p>Typically, subclasses will add additional processing by wrapping delegate parsers
- * with {@link org.mule.config.spring.parsers.delegate.AbstractDelegateDelegate}.</p>
+ * with {@link AbstractPluggableDelegate}.</p>
  */
 public abstract class AbstractSerialDelegatingDefinitionParser extends AbstractDelegatingDefinitionParser
 {

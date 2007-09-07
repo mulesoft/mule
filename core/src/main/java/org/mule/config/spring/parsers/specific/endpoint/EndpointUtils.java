@@ -13,13 +13,18 @@ package org.mule.config.spring.parsers.specific.endpoint;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.delegate.DelegateDefinitionParser;
 import org.mule.config.spring.parsers.delegate.PostProcessor;
-import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.util.StringUtils;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 import org.w3c.dom.Element;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 
+/**
+ * Routines and constants common to the two endpoint definition parsers.
+ *
+ * @see org.mule.config.spring.parsers.specific.endpoint.ChildEndpointDefinitionParser
+ * @see org.mule.config.spring.parsers.specific.endpoint.OrphanEndpointDefinitionParser
+ */
 public class EndpointUtils
 {
 

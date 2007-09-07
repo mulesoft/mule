@@ -18,21 +18,18 @@ import org.w3c.dom.Element;
 
 /**
  * Support for extending a
- * {@link org.mule.config.spring.parsers.delegate.DelegateDefinitionParser}
+ * {@link org.mule.config.spring.parsers.delegate.DelegateDefinitionParser} without
+ * needing to subclass (see example of use in
+ * {@link org.mule.config.spring.parsers.specific.endpoint.AddressedEndpointDefinitionParser}).
  */
-public abstract class AbstractDelegateDelegate implements DelegateDefinitionParser
+public abstract class AbstractPluggableDelegate implements DelegateDefinitionParser
 {
 
     private DelegateDefinitionParser delegate;
 
-    public AbstractDelegateDelegate(DelegateDefinitionParser delegate)
+    public AbstractPluggableDelegate(DelegateDefinitionParser delegate)
     {
         this.delegate = delegate;
-    }
-
-    protected DelegateDefinitionParser getDelegate()
-    {
-        return delegate;
     }
 
     public AbstractBeanDefinition parseDelegate(Element element, ParserContext parserContext)
