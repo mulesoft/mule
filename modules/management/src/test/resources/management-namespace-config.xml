@@ -19,8 +19,6 @@
 
     <management:jmx-mx4j-adaptor name="jmx-mx4j" jmxAdaptorUrl="http://127.0.0.1:8000"/>
 
-    <management:jmx-default-config name="default-config"/>
-
     <management:jmx-notifications name="jmxNotificationAgent"/>
 
     <management:log4j-notifications name="log4JNotificationAgent"/>

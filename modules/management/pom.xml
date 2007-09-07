@@ -19,9 +19,6 @@
                  <artifactId>maven-surefire-plugin</artifactId>
                  <configuration>
                      <excludes>
-                         <exclude>**/ManagementNamespaceHandlerTestCase.*</exclude>                         
-                         <!-- Finds 5 components registered now instead of 6.  What are the 6?  Why 6?  Documentation, please! -->
-                         <exclude>**/ConnectorServiceTestCase.*</exclude>
                      </excludes>
                  </configuration>
              </plugin>

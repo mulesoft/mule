@@ -16,6 +16,7 @@ import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
 import org.mule.impl.NullSessionHandler;
 import org.mule.providers.NullPayload;
+import org.mule.RegistryContext;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
@@ -50,8 +51,8 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
         {
             if (endpointAddress != null)
             {
-                logEndpoint = managementContext.getRegistry().getOrCreateEndpointForUri(endpointAddress,
-                    UMOEndpoint.ENDPOINT_TYPE_SENDER);
+                logEndpoint = RegistryContext.getRegistry().getOrCreateEndpointForUri(endpointAddress,
+                    UMOEndpoint.ENDPOINT_TYPE_SENDER, managementContext);
             }
             else
             {

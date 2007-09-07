@@ -15,6 +15,7 @@ import org.mule.management.support.AutoDiscoveryJmxSupportFactory;
 import org.mule.management.support.JmxSupport;
 import org.mule.management.support.JmxSupportFactory;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.RegistryContext;
 
 import java.util.Iterator;
 import java.util.List;
@@ -38,7 +39,7 @@ public class AbstractMuleJmxTestCase extends AbstractMuleTestCase
     protected void doSetUp() throws Exception
     {
         RmiRegistryAgent rmiRegistryAgent = new RmiRegistryAgent();
-        managementContext.getRegistry().registerAgent(rmiRegistryAgent);
+        RegistryContext.getRegistry().registerAgent(rmiRegistryAgent, managementContext);
         
         // simulate a running environment with Log4j MBean already registered
         List servers = MBeanServerFactory.findMBeanServer(null);
@@ -47,19 +48,23 @@ public class AbstractMuleJmxTestCase extends AbstractMuleTestCase
             MBeanServerFactory.createMBeanServer();
         }
 
-        mBeanServer = (MBeanServer)MBeanServerFactory.findMBeanServer(null).get(0);
+        mBeanServer = (MBeanServer) MBeanServerFactory.findMBeanServer(null).get(0);
+    }
+
+    private void unregisterMBeansByMask(final String mask) throws Exception
+    {
+        Set objectInstances = mBeanServer.queryMBeans(ObjectName.getInstance(mask), null);
+        for (Iterator it = objectInstances.iterator(); it.hasNext();)
+        {
+            ObjectInstance instance = (ObjectInstance) it.next();
+            mBeanServer.unregisterMBean(instance.getObjectName());
+        }
     }
 
     protected void doTearDown() throws Exception
     {
-        // unregister all MBeans
-        Set objectInstances = mBeanServer.queryMBeans(ObjectName.getInstance("*.*:*"), null);
-        for (Iterator it = objectInstances.iterator(); it.hasNext();)
-        {
-            ObjectInstance instance = (ObjectInstance)it.next();
-            mBeanServer.unregisterMBean(instance.getObjectName());
-        }
-
+        unregisterMBeansByMask("*.*:*");
+        unregisterMBeansByMask("log4j:*");
         mBeanServer = null;
     }
 

@@ -126,7 +126,7 @@ public class TransportFactory
         }
         try
         {
-            RegistryContext.getRegistry().registerEndpoint(endpoint);
+            RegistryContext.getRegistry().registerEndpoint(endpoint, managementContext);
 
         }
         catch (UMOException e)

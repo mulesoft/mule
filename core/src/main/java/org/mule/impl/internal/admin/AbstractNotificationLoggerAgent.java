@@ -101,6 +101,16 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
         this.ignoreManagerNotifications = ignoreManagerNotifications;
     }
 
+    public boolean isIgnoreMessageNotifications()
+    {
+        return ignoreMessageNotifications;
+    }
+
+    public void setIgnoreMessageNotifications(boolean ignoreMessageNotifications)
+    {
+        this.ignoreMessageNotifications = ignoreMessageNotifications;
+    }
+
     public boolean isIgnoreModelNotifications()
     {
         return ignoreModelNotifications;

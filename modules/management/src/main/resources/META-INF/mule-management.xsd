@@ -12,26 +12,29 @@
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
 
     <xsd:complexType name="agentType">
-        <xsd:attribute name="name" type="xsd:string" use="required" />
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractExtensionType">
+                <xsd:attribute name="name" type="xsd:string" use="required"/>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
 
     <!-- JMX Agent-->
-    <xsd:element name="jmx-server">
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="agentType">
-                    <xsd:sequence>
-                        <xsd:element name="connector-server" type="connectorServerType" minOccurs="0" />
-                        <xsd:element name="mBeanServer" type="mule:objectFactoryType" minOccurs="0" />
-                        <xsd:element name="credentials" type="mule:mapType" minOccurs="0" />
-                    </xsd:sequence>
-                    <xsd:attribute name="locateServer" type="mule:substitutableBoolean" default="true" />
-                    <xsd:attribute name="createServer" type="mule:substitutableBoolean" default="true" />
-                    <xsd:attribute name="enableStatistics" type="mule:substitutableBoolean" default="true" />
-                </xsd:extension>
-            </xsd:complexContent>
-        </xsd:complexType>
-    </xsd:element>
+    <xsd:element name="jmx-server" type="jmxServerType" substitutionGroup="mule:abstract-extension"/>
+    <xsd:complexType name="jmxServerType">
+        <xsd:complexContent>
+            <xsd:extension base="agentType">
+                <xsd:sequence>
+                    <xsd:element name="connector-server" type="connectorServerType" minOccurs="0" />
+                    <xsd:element name="mBeanServer" type="mule:objectFactoryType" minOccurs="0" />
+                    <xsd:element name="credentials" type="mule:mapType" minOccurs="0" />
+                </xsd:sequence>
+                <xsd:attribute name="locateServer" type="mule:substitutableBoolean" default="true" />
+                <xsd:attribute name="createServer" type="mule:substitutableBoolean" default="true" />
+                <xsd:attribute name="enableStatistics" type="mule:substitutableBoolean" default="true" />
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
     <xsd:complexType name="connectorServerType">
         <xsd:attribute name="url" type="xsd:string" use="required" />
@@ -39,70 +42,66 @@
     </xsd:complexType>
 
     <!-- JMX Adaptors -->
-    <xsd:element name="jmx-mx4j-adaptor">
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="agentType">
-                    <xsd:sequence>
-                        <xsd:element name="socketFactoryProperties" type="mule:mapType" minOccurs="0" />
-                    </xsd:sequence>
-                    <xsd:attribute name="jmxAdaptorUrl" type="xsd:string" />
-                    <xsd:attribute name="login" type="xsd:string" />
-                    <xsd:attribute name="password" type="xsd:string" />
-                    <xsd:attribute name="authenticationMethod" default="basic">
-                        <xsd:simpleType>
-                            <xsd:restriction base="xsd:NMTOKEN">
-                                <xsd:enumeration value="none" />
-                                <xsd:enumeration value="basic" />
-                                <xsd:enumeration value="digest" />
-                            </xsd:restriction>
-                        </xsd:simpleType>
-                    </xsd:attribute>
-                    <xsd:attribute name="cacheXsl" type="xsd:string" default="true" />
-                    <xsd:attribute name="xslFilePath" type="xsd:string" />
-                    <xsd:attribute name="pathInJar" type="xsd:string" />
-                </xsd:extension>
-            </xsd:complexContent>
-        </xsd:complexType>
-    </xsd:element>
+    <xsd:element name="jmx-mx4j-adaptor" type="jmxMx4jAdaptorType" substitutionGroup="mule:abstract-extension"/>
+    <xsd:complexType name="jmxMx4jAdaptorType">
+        <xsd:complexContent>
+            <xsd:extension base="agentType">
+                <xsd:sequence>
+                    <xsd:element name="socketFactoryProperties" type="mule:mapType" minOccurs="0" />
+                </xsd:sequence>
+                <xsd:attribute name="jmxAdaptorUrl" type="xsd:string" />
+                <xsd:attribute name="login" type="xsd:string" />
+                <xsd:attribute name="password" type="xsd:string" />
+                <xsd:attribute name="authenticationMethod" default="basic">
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:NMTOKEN">
+                            <xsd:enumeration value="none" />
+                            <xsd:enumeration value="basic" />
+                            <xsd:enumeration value="digest" />
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+                <xsd:attribute name="cacheXsl" type="xsd:string" default="true" />
+                <xsd:attribute name="xslFilePath" type="xsd:string" />
+                <xsd:attribute name="pathInJar" type="xsd:string" />
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
 
     <!--  JMX Agents -->
 
     <!-- Rmi Registry Agent -->
-    <xsd:element name="rmi-server">
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="agentType">
-                    <xsd:attribute name="serverUri" type="xsd:string" />
-                    <xsd:attribute name="createRegistry" type="mule:substitutableBoolean" />
-                </xsd:extension>
-            </xsd:complexContent>
-        </xsd:complexType>
-    </xsd:element>
+    <xsd:element name="rmi-server" type="rmiServerTyper" substitutionGroup="mule:abstract-extension"/>
+    <xsd:complexType name="rmiServerTyper">
+        <xsd:complexContent>
+            <xsd:extension base="agentType">
+                <xsd:attribute name="serverUri" type="xsd:string" />
+                <xsd:attribute name="createRegistry" type="mule:substitutableBoolean" />
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
-    <xsd:element name="jmx-log4j">
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="agentType" />
-            </xsd:complexContent>
-        </xsd:complexType>
-    </xsd:element>
+    <xsd:element name="jmx-log4j" type="jmxLog4jType" substitutionGroup="mule:abstract-extension"/>
+    <xsd:complexType name="jmxLog4jType">
+        <xsd:complexContent>
+            <xsd:extension base="agentType" />
+        </xsd:complexContent>
+    </xsd:complexType>
 
-    <xsd:element name="jmx-default-config">
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="agentType">
-                    <xsd:sequence>
-                        <xsd:element name="credentials" type="mule:mapType" minOccurs="0" />
-                    </xsd:sequence>
-                    <xsd:attribute name="registerMx4jAdapter" type="mule:substitutableBoolean" />
-                    <xsd:attribute name="host" type="xsd:string" />
-                    <xsd:attribute name="port" type="mule:substitutablePortNumber" />
-                </xsd:extension>
-            </xsd:complexContent>
-        </xsd:complexType>
-    </xsd:element>
+    <xsd:element name="jmx-default-config" type="jmxDefaultConfigType" substitutionGroup="mule:abstract-extension"/>
+    <xsd:complexType name="jmxDefaultConfigType">
+        <xsd:complexContent>
+            <xsd:extension base="agentType">
+                <xsd:sequence>
+                    <xsd:element name="credentials" type="mule:mapType" minOccurs="0" />
+                </xsd:sequence>
+                <xsd:attribute name="registerMx4jAdapter" type="mule:substitutableBoolean" />
+                <xsd:attribute name="host" type="xsd:string" />
+                <xsd:attribute name="port" type="mule:substitutablePortNumber" />
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
 
     <!-- JMX Notifications -->
@@ -123,51 +122,48 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="jmx-notifications">
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="notificationLoggerAgentType" />
-            </xsd:complexContent>
-        </xsd:complexType>
-    </xsd:element>
+    <xsd:element name="jmx-notifications" type="jmxNotificationType" substitutionGroup="mule:abstract-extension"/>
+    <xsd:complexType name="jmxNotificationType">
+        <xsd:complexContent>
+            <xsd:extension base="notificationLoggerAgentType" />
+        </xsd:complexContent>
+    </xsd:complexType>
 
-    <xsd:element name="log4j-notifications">
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="notificationLoggerAgentType">
-                    <xsd:sequence>
-                        <xsd:element name="level-mapping" minOccurs="0" maxOccurs="unbounded">
-                            <xsd:complexType>
-                                <xsd:attribute name="severity" type="serveritySimpleType" default="INFO" />
-                                <xsd:attribute name="eventId" type="xsd:string" use="required" />
-                            </xsd:complexType>
-                        </xsd:element>
-                    </xsd:sequence>
-                    <xsd:attribute name="logName" type="xsd:string" />
-                    <xsd:attribute name="logConfigFile" type="xsd:string" />
-                </xsd:extension>
-            </xsd:complexContent>
-        </xsd:complexType>
-    </xsd:element>
+    <xsd:element name="log4j-notifications" type="log4jNotificationType" substitutionGroup="mule:abstract-extension"/>
+    <xsd:complexType name="log4jNotificationType">
+        <xsd:complexContent>
+            <xsd:extension base="notificationLoggerAgentType">
+                <xsd:sequence>
+                    <xsd:element name="level-mapping" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:complexType>
+                            <xsd:attribute name="severity" type="serveritySimpleType" default="INFO" />
+                            <xsd:attribute name="eventId" type="xsd:string" use="required" />
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+                <xsd:attribute name="logName" type="xsd:string" />
+                <xsd:attribute name="logConfigFile" type="xsd:string" />
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
-    <xsd:element name="chainsaw-notifications">
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="notificationLoggerAgentType">
-                    <xsd:sequence>
-                        <xsd:element name="level-mapping" minOccurs="0" maxOccurs="unbounded">
-                            <xsd:complexType>
-                                <xsd:attribute name="severity" type="serveritySimpleType" default="INFO" />
-                                <xsd:attribute name="eventId" type="xsd:string" use="required" />
-                            </xsd:complexType>
-                        </xsd:element>
-                    </xsd:sequence>
-                    <xsd:attribute name="chainsawHost" type="xsd:string" use="required" />
-                    <xsd:attribute name="chainsawPort" type="mule:substitutablePortNumber" use="required" />
-                </xsd:extension>
-            </xsd:complexContent>
-        </xsd:complexType>
-    </xsd:element>
+    <xsd:element name="chainsaw-notifications" type="chainsawNotificationType" substitutionGroup="mule:abstract-extension"/>
+    <xsd:complexType name="chainsawNotificationType">
+        <xsd:complexContent>
+            <xsd:extension base="notificationLoggerAgentType">
+                <xsd:sequence>
+                    <xsd:element name="level-mapping" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:complexType>
+                            <xsd:attribute name="severity" type="serveritySimpleType" default="INFO" />
+                            <xsd:attribute name="eventId" type="xsd:string" use="required" />
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+                <xsd:attribute name="chainsawHost" type="xsd:string" use="required" />
+                <xsd:attribute name="chainsawPort" type="mule:substitutablePortNumber" use="required" />
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
     <xsd:simpleType name="serveritySimpleType">
         <xsd:restriction base="xsd:NMTOKEN">
@@ -179,14 +175,13 @@
         </xsd:restriction>
     </xsd:simpleType>
 
-    <xsd:element name="publish-notifications">
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="notificationLoggerAgentType">
-                    <xsd:attribute name="endpointAddress" type="xsd:string" use="required" />
-                </xsd:extension>
-            </xsd:complexContent>
-        </xsd:complexType>
-    </xsd:element>
+    <xsd:element name="publish-notifications" type="publishNotificationType" substitutionGroup="mule:abstract-extension"/>
+    <xsd:complexType name="publishNotificationType">
+        <xsd:complexContent>
+            <xsd:extension base="notificationLoggerAgentType">
+                <xsd:attribute name="endpointAddress" type="xsd:string" use="required" />
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
 </xsd:schema>

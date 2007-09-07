@@ -13,6 +13,7 @@ package org.mule.management.mbeans;
 import org.mule.management.AbstractMuleJmxTestCase;
 import org.mule.management.agents.JmxAgent;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.RegistryContext;
 
 import java.util.Set;
 
@@ -20,7 +21,8 @@ import javax.management.ObjectName;
 
 public class ConnectorServiceTestCase extends AbstractMuleJmxTestCase
 {
-    // TODO Finds 5 components registered now instead of 6.  What are the 6?  Why 6?  Documentation, please!
+    private static final int NUMBER_OF_COMPONENTS = 5;
+
     public void testUndeploy() throws Exception
     {
         final String configId = "ConnectorServiceTest";
@@ -28,16 +30,18 @@ public class ConnectorServiceTestCase extends AbstractMuleJmxTestCase
         final UMOConnector connector = getTestConnector();
         connector.setName("TEST_CONNECTOR");
         final JmxAgent jmxAgent = new JmxAgent();
-        managementContext.getRegistry().registerConnector(connector);
-        managementContext.getRegistry().registerAgent(jmxAgent);
+        RegistryContext.getRegistry().registerConnector(connector, managementContext);
+        RegistryContext.getRegistry().registerAgent(jmxAgent, managementContext);
         managementContext.start();
 
         final String query = jmxSupport.getDomainName(managementContext) + ":*";
         final ObjectName objectName = jmxSupport.getObjectName(query);
         Set mbeans = mBeanServer.queryMBeans(objectName, null);
-        assertEquals("Unexpected number of components registered in the domain.", 6, mbeans.size());
+        assertEquals("Unexpected number of components registered in the domain.", NUMBER_OF_COMPONENTS, mbeans.size());
 
         managementContext.dispose();
+        //TODO: remove next line when MULE-2275 will be fixed.
+        jmxAgent.dispose();
 
         mbeans = mBeanServer.queryMBeans(objectName, null);
         assertEquals("There should be no MBeans left in the domain", 0, mbeans.size());
