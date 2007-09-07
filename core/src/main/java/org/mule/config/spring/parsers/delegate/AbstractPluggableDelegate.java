@@ -10,10 +10,6 @@
 
 package org.mule.config.spring.parsers.delegate;
 
-import org.mule.config.spring.parsers.MuleDefinitionParser;
-import org.mule.config.spring.parsers.PostProcessor;
-import org.mule.config.spring.parsers.PreProcessor;
-
 import java.util.Map;
 
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -22,15 +18,16 @@ import org.w3c.dom.Element;
 
 /**
  * Support for extending a
- * {@link org.mule.config.spring.parsers.MuleDefinitionParser} without
- * needing to subclass.
+ * {@link org.mule.config.spring.parsers.delegate.DelegateDefinitionParser} without
+ * needing to subclass (see example of use in
+ * {@link org.mule.config.spring.parsers.specific.endpoint.AddressedEndpointDefinitionParser}).
  */
-public abstract class AbstractPluggableDelegate implements MuleDefinitionParser
+public abstract class AbstractPluggableDelegate implements DelegateDefinitionParser
 {
 
-    private MuleDefinitionParser delegate;
+    private DelegateDefinitionParser delegate;
 
-    public AbstractPluggableDelegate(MuleDefinitionParser delegate)
+    public AbstractPluggableDelegate(DelegateDefinitionParser delegate)
     {
         this.delegate = delegate;
     }
@@ -50,42 +47,42 @@ public abstract class AbstractPluggableDelegate implements MuleDefinitionParser
         delegate.registerPostProcessor(postProcessor);
     }
 
-    public MuleDefinitionParser addReference(String propertyName)
+    public DelegateDefinitionParser addReference(String propertyName)
     {
         return delegate.addReference(propertyName);
     }
 
-    public MuleDefinitionParser addMapping(String propertyName, Map mappings)
+    public DelegateDefinitionParser addMapping(String propertyName, Map mappings)
     {
         return delegate.addMapping(propertyName, mappings);
     }
 
-    public MuleDefinitionParser addMapping(String propertyName, String mappings)
+    public DelegateDefinitionParser addMapping(String propertyName, String mappings)
     {
         return delegate.addMapping(propertyName, mappings);
     }
 
-    public MuleDefinitionParser addAlias(String alias, String propertyName)
+    public DelegateDefinitionParser addAlias(String alias, String propertyName)
     {
         return delegate.addAlias(alias, propertyName);
     }
 
-    public MuleDefinitionParser addCollection(String propertyName)
+    public DelegateDefinitionParser addCollection(String propertyName)
     {
         return delegate.addCollection(propertyName);
     }
 
-    public MuleDefinitionParser addIgnored(String propertyName)
+    public DelegateDefinitionParser addIgnored(String propertyName)
     {
         return delegate.addIgnored(propertyName);
     }
 
-    public MuleDefinitionParser removeIgnored(String propertyName)
+    public DelegateDefinitionParser removeIgnored(String propertyName)
     {
         return delegate.removeIgnored(propertyName);
     }
 
-    public MuleDefinitionParser setIgnoredDefault(boolean ignoreAll)
+    public DelegateDefinitionParser setIgnoredDefault(boolean ignoreAll)
     {
         return delegate.setIgnoredDefault(ignoreAll);
     }

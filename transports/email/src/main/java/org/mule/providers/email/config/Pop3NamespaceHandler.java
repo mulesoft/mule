@@ -20,10 +20,8 @@ import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
  */
 public class Pop3NamespaceHandler extends NamespaceHandlerSupport
 {
-
     public void init()
     {
         registerBeanDefinitionParser("connector", new MuleChildDefinitionParser(Pop3Connector.class, true));
     }
-    
 }

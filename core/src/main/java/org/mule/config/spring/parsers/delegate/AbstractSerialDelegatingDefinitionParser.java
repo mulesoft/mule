@@ -12,28 +12,18 @@ package org.mule.config.spring.parsers.delegate;
 
 import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
-import org.mule.config.spring.parsers.MuleDefinitionParser;
-import org.mule.config.spring.parsers.PreProcessor;
 import org.mule.util.StringUtils;
-
-import java.util.Iterator;
 
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
-import edu.emory.mathcs.backport.java.util.Arrays;
 
 /**
  * This allows a set of definition parsers to be used, one after another, to process
- * the same element.  This lets multiple beans be generated from a single element.
+ * the same element.  This lets multipe beans be generated from a single element.
  *
- * <p>Since each bean typically needs a spearate name, this class guarantees that the
- * name and id attributes are reset before each call.  Delegates can then modify these
- * on the element without worrying about interfering with other parsers.</p>
- *
- * <p>Typically, subclasses will add additional processing with
- * {@link org.mule.config.spring.parsers.PreProcessor} and
- * {@link org.mule.config.spring.parsers.PostProcessor} anonymous classes.</p>
+ * <p>Typically, subclasses will add additional processing by wrapping delegate parsers
+ * with {@link AbstractPluggableDelegate}.</p>
  */
 public abstract class AbstractSerialDelegatingDefinitionParser extends AbstractDelegatingDefinitionParser
 {
@@ -54,26 +44,20 @@ public abstract class AbstractSerialDelegatingDefinitionParser extends AbstractD
         {
             first = false;
         }
-        AbstractBeanDefinition bean = null;
-        while (null == bean && index < size())
+        DelegateDefinitionParser parser = get(index++);
+        AbstractBeanDefinition bean = parser.parseDelegate(element, parserContext);
+        if (index == size())
         {
-            bean = getDelegate(index++).parseDelegate(element, parserContext);
+            bean.removeAttribute(MuleHierarchicalBeanDefinitionParserDelegate.MULE_REPEAT_PARSE);
         }
-        if (null != bean)
+        else
         {
-            if (index == size())
-            {
-                bean.removeAttribute(MuleHierarchicalBeanDefinitionParserDelegate.MULE_REPEAT_PARSE);
-            }
-            else
-            {
-                bean.setAttribute(MuleHierarchicalBeanDefinitionParserDelegate.MULE_REPEAT_PARSE, Boolean.TRUE);
-            }
+            bean.setAttribute(MuleHierarchicalBeanDefinitionParserDelegate.MULE_REPEAT_PARSE, Boolean.TRUE);
         }
         return bean;
     }
 
-    protected void addDelegate(MuleDefinitionParser delegate)
+    protected void addDelegate(DelegateDefinitionParser delegate)
     {
         delegate.registerPreProcessor(new PreProcessor()
         {
@@ -106,35 +90,6 @@ public abstract class AbstractSerialDelegatingDefinitionParser extends AbstractD
         else
         {
             element.setAttribute(name, value);
-        }
-    }
-
-    /**
-     * A utility class for selecting certain attributes.  If the attributes are enabled,
-     * the default is set to block others; if specific attributes are disabled the default
-     * is set to allow others.
-     *
-     * @param delegate
-     * @param attributes
-     * @param enable
-     */
-    public static void enableAttributes(MuleDefinitionParser delegate, String[] attributes, boolean enable)
-    {
-        // if enabling specific attributes, block globally
-        delegate.setIgnoredDefault(enable);
-
-        Iterator names = Arrays.asList(attributes).iterator();
-        while (names.hasNext())
-        {
-            String name = (String) names.next();
-            if (enable)
-            {
-                delegate.removeIgnored(name);
-            }
-            else
-            {
-                delegate.addIgnored(name);
-            }
         }
     }
 

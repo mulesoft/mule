@@ -10,7 +10,7 @@
 
     <model name="main">
         <service name="httpIn">
-            <echo-component/>
+            <component class="org.mule.components.simple.EchoComponent"/>
             <inbound-router>
                 <inbound-endpoint address="http://localhost:60200" synchronous="true"/>
             </inbound-router>

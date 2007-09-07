@@ -8,11 +8,11 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config.spring.parsers.specific.endpoint.support;
+package org.mule.config.spring.parsers.specific.endpoint;
 
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
-import org.mule.config.spring.parsers.MuleDefinitionParser;
-import org.mule.config.spring.parsers.PostProcessor;
+import org.mule.config.spring.parsers.delegate.DelegateDefinitionParser;
+import org.mule.config.spring.parsers.delegate.PostProcessor;
 import org.mule.util.StringUtils;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
@@ -22,8 +22,8 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 /**
  * Routines and constants common to the two endpoint definition parsers.
  *
- * @see ChildEndpointDefinitionParser
- * @see OrphanEndpointDefinitionParser
+ * @see org.mule.config.spring.parsers.specific.endpoint.ChildEndpointDefinitionParser
+ * @see org.mule.config.spring.parsers.specific.endpoint.OrphanEndpointDefinitionParser
  */
 public class EndpointUtils
 {
@@ -33,6 +33,7 @@ public class EndpointUtils
     public static final String RESPONSE_TRANSFORMERS_ATTRIBUTE = "responseTransformers";
     public static final String ENDPOINT_URI_ATTRIBUTE = "endpointURI";
     public static final String ADDRESS_ATTRIBUTE = "address";
+    public static final String ENDPOINT_REF_ATTRIBUTE = "ref";
 
     private static void processTransformerDependencies(BeanAssembler assembler, Element element, String attributeName)
     {
@@ -54,7 +55,7 @@ public class EndpointUtils
         }
     }
 
-    public static void addPostProcess(MuleDefinitionParser parser)
+    public static void addPostProcess(DelegateDefinitionParser parser)
     {
         parser.registerPostProcessor(new PostProcessor()
         {
@@ -67,12 +68,30 @@ public class EndpointUtils
         });
     }
 
-    public static void addProperties(MuleDefinitionParser parser)
+    public static void addConditions(DelegateDefinitionParser parser)
     {
         parser.addAlias(ADDRESS_ATTRIBUTE, ENDPOINT_URI_ATTRIBUTE);
         parser.addMapping("createConnector", "GET_OR_CREATE=0,ALWAYS_CREATE=1,NEVER_CREATE=2");
         parser.addAlias("transformers", "transformer");
         parser.addAlias("responseTransformers", "responseTransformer");
+        parser.addIgnored(ENDPOINT_REF_ATTRIBUTE);
+    }
+
+    public static BeanDefinitionBuilder createBeanDefinitionBuilder(Element element, Class beanClass)
+    {
+        if (null == element.getAttributeNode(ENDPOINT_REF_ATTRIBUTE))
+        {
+            return null;
+        }
+        else
+        {
+            String parent = element.getAttribute(ENDPOINT_REF_ATTRIBUTE);
+            BeanDefinitionBuilder bdb = BeanDefinitionBuilder.childBeanDefinition(parent);
+            bdb.getBeanDefinition().setBeanClassName(beanClass.getName());
+            // need to overload the type so it becomes a local endpoint
+            bdb.addPropertyValue("type", UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER_AND_RECEIVER);
+            return bdb;
+        }
     }
 
 }

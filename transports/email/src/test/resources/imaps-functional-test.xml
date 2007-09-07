@@ -18,16 +18,14 @@
     </imaps:connector>
     <vm:connector name="vmConnector" queueEvents="true"/>
 
-    <imaps:endpoint name="imap" hostname="localhost" password="password" port="65444" username="bob"/>
-
     <model name="test">
 
         <service name="relay">
             <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
-                <imaps:inbound-endpoint ref="imap">
+                <inbound-endpoint address="imaps://bob:password@localhost:65444">
                     <retry-connection-strategy retryCount="3" retryFrequency="1000"/>
-                </imaps:inbound-endpoint>
+                </inbound-endpoint>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>

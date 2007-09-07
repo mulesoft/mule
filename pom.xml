@@ -688,9 +688,6 @@
                         <version>${version}</version>
                     </dependency>
                 </dependencies>
-                <configuration>
-                    <headerLocation>codecheck/LicenseHeader.txt</headerLocation>
-                </configuration>
             </plugin>
 
 

@@ -81,7 +81,7 @@
                     <not-filter>
                         <wildcard-filter pattern="/favicon.ico"/>   
                     </not-filter>
-                </inbound-endpoint>
+                </endpoint>
                 <!-- Incoming Servlet requests -->
                 <inbound-endpoint address="servlet://rest" 
                     transformers="StringToNameString"

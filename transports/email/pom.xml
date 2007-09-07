@@ -19,7 +19,6 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <exclude>**/Imap*.*</exclude>
                     </excludes>
                 </configuration>
             </plugin>

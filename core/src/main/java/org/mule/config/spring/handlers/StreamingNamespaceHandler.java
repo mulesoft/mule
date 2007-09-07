@@ -12,10 +12,9 @@ package org.mule.config.spring.handlers;
 
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
+import org.mule.config.spring.parsers.specific.endpoint.StringAddressEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.RouterDefinitionParser;
 import org.mule.config.spring.parsers.specific.ServiceDescriptorDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.GenericEndpointDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.StringAddressEndpointDefinitionParser;
 import org.mule.impl.endpoint.InboundStreamingEndpoint;
 import org.mule.impl.endpoint.OutboundStreamingEndpoint;
 import org.mule.impl.endpoint.ResponseStreamingEndpoint;
@@ -36,9 +35,9 @@ public class StreamingNamespaceHandler  extends NamespaceHandlerSupport
         registerBeanDefinitionParser("inbound-router", new ChildDefinitionParser("inboundRouter", InboundRouterCollection.class));
         registerBeanDefinitionParser("outbound-router", new ChildDefinitionParser("outboundRouter", OutboundRouterCollection.class));
         registerBeanDefinitionParser("outbound-pass-through-router", new RouterDefinitionParser("router", OutboundPassThroughRouter.class));
-        registerBeanDefinitionParser("inbound-endpoint", new GenericEndpointDefinitionParser(InboundStreamingEndpoint.class));
-        registerBeanDefinitionParser("outbound-endpoint", new GenericEndpointDefinitionParser(OutboundStreamingEndpoint.class));
-        registerBeanDefinitionParser("response-endpoint", new GenericEndpointDefinitionParser(ResponseStreamingEndpoint.class));
+        registerBeanDefinitionParser("inbound-endpoint", new StringAddressEndpointDefinitionParser(InboundStreamingEndpoint.class));
+        registerBeanDefinitionParser("outbound-endpoint", new StringAddressEndpointDefinitionParser(OutboundStreamingEndpoint.class));
+        registerBeanDefinitionParser("response-endpoint", new StringAddressEndpointDefinitionParser(ResponseStreamingEndpoint.class));
     }
 
 }

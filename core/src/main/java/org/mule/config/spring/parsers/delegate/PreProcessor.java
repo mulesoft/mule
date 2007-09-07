@@ -7,3 +7,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
+package org.mule.config.spring.parsers.delegate;
+
+import org.mule.config.spring.parsers.assembly.BeanAssembler;
+
+import org.w3c.dom.Element;
+
+/**
+ * This interface allows pre-processing of the element.
+ */
+public interface PreProcessor
+{
+
+    public void preProcess(Element element);
+
+}

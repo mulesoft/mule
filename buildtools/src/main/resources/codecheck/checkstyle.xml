@@ -20,7 +20,7 @@
         <!-- <property name="cacheFile" value="${checkstyle.cache.file}"/> -->
 
         <property name="tabWidth" value="4"/>
-
+        
         <!-- http://checkstyle.sf.net/config_javadoc.html -->
         <!--<module name="JavadocMethod"/>-->
         <!--<module name="JavadocType"/>-->
@@ -94,15 +94,11 @@
         <module name="InterfaceIsType"/>
         <module name="VisibilityModifier"/>
 
+
         <!-- http://checkstyle.sf.net/config_misc.html -->
         <module name="TodoComment"/>
         <module name="UpperEll"/>
 
-        <!-- http://checkstyle.sourceforge.net/config_header.html -->
-        <module name="Header">
-            <property name="headerFile" value="${checkstyle.header.file}"/>
-            <property name="ignoreLines" value="2"/>
-        </module>
     </module>
 
 </module>

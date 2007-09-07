@@ -8,10 +8,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config.spring.parsers.specific.endpoint.support;
+package org.mule.config.spring.parsers.specific.endpoint;
 
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.w3c.dom.Element;
@@ -21,54 +20,41 @@ import org.w3c.dom.Element;
  * Because we have automatic String -> MuleEnpointURI conversin via property editors
  * this can be used in a variety of ways.  It should work directly with a simple String
  * address attribute or, in combination with a child element (handled by
- * {@link ChildAddressDefinitionParser},
+ * {@link org.mule.config.spring.parsers.specific.endpoint.ChildAddressDefinitionParser},
  * or embedded in
- * {@link AddressedEndpointDefinitionParser}
+ * {@link org.mule.config.spring.parsers.specific.endpoint.AddressedEndpointDefinitionParser}
  * for a more compact single-eleent approach.
- *
- * <p>This class does support references to other endpoints.</p>
- * TODO - check that references are global!
  */
 public class ChildEndpointDefinitionParser extends ChildDefinitionParser
 {
 
-    public static final String ENDPOINT_REF_ATTRIBUTE = "ref";
-
     public ChildEndpointDefinitionParser(Class endpoint)
     {
         super("endpoint", endpoint);
-        addIgnored(ENDPOINT_REF_ATTRIBUTE);
-        EndpointUtils.addProperties(this);
+        EndpointUtils.addConditions(this);
         EndpointUtils.addPostProcess(this);
     }
 
     // @Override
-    public BeanDefinitionBuilder createBeanDefinitionBuilder(Element element, Class beanClass)
+    protected BeanDefinitionBuilder createBeanDefinitionBuilder(Element element, Class beanClass)
     {
-        if (null == element.getAttributeNode(ENDPOINT_REF_ATTRIBUTE))
+        BeanDefinitionBuilder builder = EndpointUtils.createBeanDefinitionBuilder(element, beanClass);
+        if (null == builder)
         {
             return super.createBeanDefinitionBuilder(element, beanClass);
         }
         else
         {
-            String parent = element.getAttribute(ENDPOINT_REF_ATTRIBUTE);
-            BeanDefinitionBuilder bdb = BeanDefinitionBuilder.childBeanDefinition(parent);
-            bdb.getBeanDefinition().setBeanClassName(beanClass.getName());
-            // need to overload the type so it becomes a local endpoint
-            bdb.addPropertyValue("type", UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER_AND_RECEIVER);
-            return bdb;
+            return builder;
         }
     }
 
     // @Override
     protected String generateChildBeanName(Element element)
     {
-        if (null != element.getAttributeNode(ENDPOINT_REF_ATTRIBUTE))
+        if (null != element.getAttributeNode(EndpointUtils.ENDPOINT_REF_ATTRIBUTE))
         {
-            // why do we do this?  it doesn't seem to be used anwhere else
-            // is it to avoid having to specify a name?  if so, we should
-            // perhaps check to see if a name is given?  TODO
-            return "ref:" + element.getAttribute(ENDPOINT_REF_ATTRIBUTE);
+            return "ref:" + element.getAttribute(EndpointUtils.ENDPOINT_REF_ATTRIBUTE);
         }
         else
         {

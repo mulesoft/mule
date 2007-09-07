@@ -10,12 +10,16 @@
 
 package org.mule.config.spring.parsers.endpoint;
 
+import org.mule.tck.FunctionalTestCase;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOEndpointURI;
+
 public class StringAddressEndpointTestCase extends AbstractEndpointTestCase
 {
 
     protected String getConfigResources()
     {
-        return "org/mule/config/spring/parsers/endpoint/string-address-endpoint-test.xml";
+        return "org/mule/config/spring/parsers/endpoint/string-address-endpoint-test-case.xml";
     }
 
     public void testStringAddress()

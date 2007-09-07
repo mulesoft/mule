@@ -11,7 +11,6 @@
 package org.mule.config.spring.parsers.delegate;
 
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
-import org.mule.config.spring.parsers.MuleDefinitionParser;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,12 +28,12 @@ public class ParentContextDefinitionParser extends AbstractParallelDelegatingDef
 
     private Map parsers = new HashMap();
 
-    public ParentContextDefinitionParser(String context, MuleDefinitionParser parser)
+    public ParentContextDefinitionParser(String context, DelegateDefinitionParser parser)
     {
         and(context, parser);
     }
 
-    public ParentContextDefinitionParser and(String context, MuleDefinitionParser parser)
+    public ParentContextDefinitionParser and(String context, DelegateDefinitionParser parser)
     {
         StringTokenizer names = new StringTokenizer(context);
         while (names.hasMoreTokens())
@@ -45,7 +44,7 @@ public class ParentContextDefinitionParser extends AbstractParallelDelegatingDef
         return this;
     }
 
-    protected MuleDefinitionParser getDelegate(Element element, ParserContext parserContext)
+    protected DelegateDefinitionParser getDelegate(Element element, ParserContext parserContext)
     {
         // i'm not sure why this is suddenly necessary here and not elsewhere.
         // perhaps because this is used on the top level but has name deleted?
@@ -53,7 +52,7 @@ public class ParentContextDefinitionParser extends AbstractParallelDelegatingDef
         String context = element.getParentNode().getLocalName();
         if (parsers.containsKey(context))
         {
-            return (MuleDefinitionParser) parsers.get(context);
+            return (DelegateDefinitionParser) parsers.get(context);
         }
         else
         {

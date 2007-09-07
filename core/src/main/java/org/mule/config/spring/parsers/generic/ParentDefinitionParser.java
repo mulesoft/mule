@@ -11,7 +11,6 @@ package org.mule.config.spring.parsers.generic;
 
 import org.mule.config.spring.parsers.AbstractHierarchicalDefinitionParser;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
-import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -27,6 +26,8 @@ import org.w3c.dom.Element;
 public class ParentDefinitionParser extends AbstractHierarchicalDefinitionParser
 {
 
+    public static final String COMPOUND_ELEMENT = "compound";
+    
     protected Class getBeanClass(Element element)
     {
         try
@@ -58,7 +59,7 @@ public class ParentDefinitionParser extends AbstractHierarchicalDefinitionParser
         doParse(element, parserContext, builder);
         BeanAssembler beanAssembler = getBeanAssembler(element, builder);
         beanAssembler.copyBeanToTarget();
-        beanAssembler.setBeanFlag(MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_REGISTRATION);
+        beanAssembler.getTarget().setAttribute(COMPOUND_ELEMENT, Boolean.TRUE);
         return (AbstractBeanDefinition) beanAssembler.getTarget();
     }
 

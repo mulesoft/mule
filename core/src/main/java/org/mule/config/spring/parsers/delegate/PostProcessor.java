@@ -8,18 +8,19 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config.spring.parsers;
+package org.mule.config.spring.parsers.delegate;
 
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 
 import org.w3c.dom.Element;
 
 /**
- * This interface allows pre-processing of the element.
+ * This interface allows post-processing of the bean assmebler to be injected into
+ * definition parsers
  */
-public interface PreProcessor
+public interface PostProcessor
 {
 
-    public void preProcess(Element element);
+    public void postProcess(BeanAssembler assembler, Element element);
 
 }

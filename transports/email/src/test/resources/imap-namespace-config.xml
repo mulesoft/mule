@@ -22,15 +22,8 @@
         <imaps:tls-trust-store trustStore="greenmail-truststore" trustStorePassword="password"/>
     </imaps:connector>
 
-    <imap:endpoint name="global" hostname="localhost" password="password" port="65532" username="bob"/>
-
-    <model name="model">
-        <service name="service">
-            <bridge-component/>
-            <inbound-router>
-                <imap:inbound-endpoint name="in" hostname="localhost" password="password" port="65532" username="bob"/>
-            </inbound-router>
-        </service>
-    </model>
+    <imap:endpoint name="global">
+        <imap:address hostname="localhost" password="secret" port="123" username="bob"/>
+    </imap:endpoint>
 
 </mule>
