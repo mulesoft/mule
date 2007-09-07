@@ -11,9 +11,11 @@
 package org.mule;
 
 import org.mule.config.ConfigurationBuilder;
+import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 import org.mule.impl.MuleShutdownHook;
+import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
@@ -22,7 +24,10 @@ import org.mule.util.StringMessageUtils;
 import org.mule.util.SystemUtils;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -93,14 +98,14 @@ public class MuleServer implements Runnable
 
     protected Map options = Collections.EMPTY_MAP;
 
-    /** 
-     * The ManagementContext should contain anything which does not belong in the Registry.  
-     * There is one ManagementContext per Mule instance.  
-     * Assuming it has been created, a handle to the local ManagementContext can be obtained from anywhere 
+    /**
+     * The ManagementContext should contain anything which does not belong in the Registry.
+     * There is one ManagementContext per Mule instance.
+     * Assuming it has been created, a handle to the local ManagementContext can be obtained from anywhere
      * by calling MuleServer.getManagementContext()
      */
     protected static UMOManagementContext managementContext = null;
-    
+
     /**
      * Application entry point.
      *
@@ -146,7 +151,7 @@ public class MuleServer implements Runnable
         {
             throw new IllegalArgumentException(me.toString());
         }
-        
+
         // set our own UrlStreamHandlerFactory to become more independent of system properties
         MuleUrlStreamHandlerFactory.installUrlStreamHandlerFactory();
 
@@ -310,12 +315,7 @@ public class MuleServer implements Runnable
     {
         logger.info("Mule Server starting...");
 
-        // install an RMI security manager in case we expose any RMI objects
-        //if (System.getSecurityManager() == null)
-        //{
-        // TODO Why is this disabled?
-        // System.setSecurityManager(new RMISecurityManager());
-        //}
+        Runtime.getRuntime().addShutdownHook(new ShutdownThread());
 
         // create a new ConfigurationBuilder that is disposed afterwards
         Class cfgBuilderClass = ClassUtils.loadClass(getConfigBuilderClassName(), MuleServer.class);
@@ -341,8 +341,31 @@ public class MuleServer implements Runnable
      */
     public void shutdown(Throwable e)
     {
-        muleShutdownHook.setException(e);
-        System.exit(-1);
+        Message msg = CoreMessages.fatalErrorWhileRunning();
+        UMOException muleException = ExceptionHelper.getRootMuleException(e);
+        if (muleException != null)
+        {
+            logger.fatal(muleException.getDetailedMessage());
+        }
+        else
+        {
+            logger.fatal(msg.toString() + " " + e.getMessage(), e);
+        }
+        List msgs = new ArrayList();
+        msgs.add(msg.getMessage());
+        Throwable root = ExceptionHelper.getRootException(e);
+        msgs.add(root.getMessage() + " (" + root.getClass().getName() + ")");
+        msgs.add(" ");
+        msgs.add(CoreMessages.fatalErrorInShutdown());
+        msgs.add(CoreMessages.serverStartedAt(managementContext.getStartDate()));
+        msgs.add(CoreMessages.serverShutdownAt(new Date()));
+
+        String shutdownMessage = StringMessageUtils.getBoilerPlate(msgs, '*', 80);
+        logger.fatal(shutdownMessage);
+
+        // make sure that Mule is shutdown correctly.
+        managementContext.dispose();
+        System.exit(0);
     }
 
     /**
@@ -350,6 +373,16 @@ public class MuleServer implements Runnable
      */
     public void shutdown()
     {
+        logger.info("Mule server shutting dow due to normal shutdown request");
+        List msgs = new ArrayList();
+        msgs.add(CoreMessages.normalShutdown());
+        msgs.add(CoreMessages.serverStartedAt(managementContext.getStartDate()).getMessage());
+        msgs.add(CoreMessages.serverShutdownAt(new Date()).getMessage());
+        String shutdownMessage = StringMessageUtils.getBoilerPlate(msgs, '*', 80);
+        logger.info(shutdownMessage);
+
+        // make sure that Mule is shutdown correctly.
+        managementContext.dispose();
         System.exit(0);
     }
 
@@ -406,5 +439,17 @@ public class MuleServer implements Runnable
     public static void setManagementContext(UMOManagementContext managementContext)
     {
         MuleServer.managementContext = managementContext;
+    }
+
+     /**
+     * This class is installed only for MuleServer running as commandline app. A clean Mule
+     * shutdown can be achieved by disposing the {@link org.mule.impl.ManagementContext}.
+     */
+    private class ShutdownThread extends Thread
+    {
+        public void run()
+        {
+            managementContext.dispose();
+        }
     }
 }
