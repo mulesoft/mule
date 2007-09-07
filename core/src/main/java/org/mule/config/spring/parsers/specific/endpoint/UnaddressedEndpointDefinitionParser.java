@@ -27,9 +27,9 @@ import org.w3c.dom.Element;
  * <p>This endpoint parser assumes that the address will be set via some external mechanism.</p>
  *
  * @deprecated - see
- * {@link org.mule.config.spring.parsers.specific.endpoint.OrphanEndpointDefinitionParser}
+ * {@link org.mule.config.spring.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser}
  * and
- * {@link org.mule.config.spring.parsers.specific.endpoint.ChildEndpointDefinitionParser}
+ * {@link org.mule.config.spring.parsers.specific.endpoint.support.ChildEndpointDefinitionParser}
  */
 public class UnaddressedEndpointDefinitionParser extends AbstractChildDefinitionParser
 {

@@ -21,10 +21,12 @@ import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
  */
 public class Pop3sNamespaceHandler extends NamespaceHandlerSupport
 {
+
     public void init()
     {
         registerBeanDefinitionParser("connector", new MuleChildDefinitionParser(Pop3sConnector.class, true));
         registerBeanDefinitionParser("tls-trust-store", new ParentDefinitionParser());
         registerBeanDefinitionParser("tls-client", new ParentDefinitionParser());
     }
+    
 }

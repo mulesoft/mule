@@ -10,12 +10,14 @@
 package org.mule.providers.email.config;
 
 import org.mule.config.spring.parsers.generic.MuleChildDefinitionParser;
+import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
+import org.mule.config.spring.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.UnaddressedEndpointDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.ChildAddressDefinitionParser;
-import org.mule.providers.email.ImapConnector;
+import org.mule.config.spring.parsers.specific.endpoint.support.ChildAddressDefinitionParser;
 import org.mule.impl.endpoint.GlobalEndpoint;
 import org.mule.impl.endpoint.InboundEndpoint;
 import org.mule.impl.endpoint.OutboundEndpoint;
+import org.mule.providers.email.ImapConnector;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
@@ -29,10 +31,9 @@ public class ImapNamespaceHandler extends NamespaceHandlerSupport
     public void init()
     {
         registerBeanDefinitionParser("connector", new MuleChildDefinitionParser(ImapConnector.class, true));
-        registerBeanDefinitionParser("endpoint", new UnaddressedEndpointDefinitionParser(GlobalEndpoint.class));
-        registerBeanDefinitionParser("inbound-endpoint", new UnaddressedEndpointDefinitionParser(InboundEndpoint.class));
-        registerBeanDefinitionParser("outbound-endpoint", new UnaddressedEndpointDefinitionParser(OutboundEndpoint.class));
-        registerBeanDefinitionParser("address", new ChildAddressDefinitionParser("imap"));
+        registerBeanDefinitionParser("endpoint", new TransportGlobalEndpointDefinitionParser("imap"));
+        registerBeanDefinitionParser("inbound-endpoint", new TransportEndpointDefinitionParser("imap", InboundEndpoint.class));
+        registerBeanDefinitionParser("outbound-endpoint", new TransportEndpointDefinitionParser("imap", OutboundEndpoint.class));
     }
 
 }

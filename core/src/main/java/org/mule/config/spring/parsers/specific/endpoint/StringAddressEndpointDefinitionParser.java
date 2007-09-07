@@ -18,9 +18,9 @@ import org.w3c.dom.Element;
  * with validation of simple string address or global endpoint reference .
  *
  * @deprecated - see
- * {@link org.mule.config.spring.parsers.specific.endpoint.OrphanEndpointDefinitionParser}
+ * {@link org.mule.config.spring.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser}
  * and
- * {@link org.mule.config.spring.parsers.specific.endpoint.ChildEndpointDefinitionParser}
+ * {@link org.mule.config.spring.parsers.specific.endpoint.support.ChildEndpointDefinitionParser}
  */
 public class StringAddressEndpointDefinitionParser extends UnaddressedEndpointDefinitionParser
 {

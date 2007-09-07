@@ -10,16 +10,12 @@
 
 package org.mule.config.spring.parsers.endpoint;
 
-import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOEndpointURI;
-
 public class UnaddressedEndpointTestCase extends AbstractEndpointTestCase
 {
 
     protected String getConfigResources()
     {
-        return "org/mule/config/spring/parsers/endpoint/unaddressed-endpoint-test-case.xml";
+        return "org/mule/config/spring/parsers/endpoint/unaddressed-endpoint-test.xml";
     }
 
     public void testUnaddressed()

@@ -11,14 +11,23 @@ package org.mule.providers.email.config;
 
 import org.mule.providers.email.ImapConnector;
 import org.mule.providers.email.ImapsConnector;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.providers.email.functional.AbstractEmailFunctionalTestCase;
+import org.mule.umo.UMODescriptor;
+import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.endpoint.UMOEndpoint;
 
 /**
- * TODO
+ * This includes a connection because the IMAP poller starts by default (without
+ * the server running we cannot easily start an inbound endpoint)
  */
-public class ImapNamespaceHandlerTestCase extends FunctionalTestCase
+public class ImapNamespaceHandlerTestCase extends AbstractEmailFunctionalTestCase
 {
+
+    public ImapNamespaceHandlerTestCase()
+    {
+        super(65432, STRING_MESSAGE, "imap");
+    }
+
     protected String getConfigResources()
     {
         return "imap-namespace-config.xml";
@@ -54,7 +63,7 @@ public class ImapNamespaceHandlerTestCase extends FunctionalTestCase
 
         // authenticator?
 
-        //The full path gets resolved, we're just checkng that the property got set
+        //The full path gets resolved, we're just checking that the property got set
         assertTrue(c.getClientKeyStore().endsWith("/greenmail-truststore"));
         assertEquals("password", c.getClientKeyStorePassword());
         //The full path gets resolved, we're just checkng that the property got set
@@ -65,19 +74,32 @@ public class ImapNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.isStarted());
     }
 
-    public void testEndpoint()
+    public void testGlobalEndpoint()
     {
-        UMOEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("global");
+        testEndpoint(managementContext.getRegistry().lookupEndpoint("global"));
+    }
+
+    protected void testEndpoint(UMOEndpoint endpoint)
+    {
         assertNotNull(endpoint);
         String address = endpoint.getEndpointURI().getAddress();
         assertNotNull(address);
-        assertEquals("bob@localhost:123", address);
+        assertEquals("bob@localhost:65432", address);
         String password = endpoint.getEndpointURI().getPassword();
         assertNotNull(password);
-        assertEquals("secret", password);
+        assertEquals("password", password);
         String protocol = endpoint.getProtocol();
         assertNotNull(protocol);
         assertEquals("imap", protocol);
+    }
+
+    public void testInboundEndpoint()
+    {
+        UMODescriptor service = managementContext.getRegistry().lookupService("service");
+        assertNotNull(service);
+        UMOInboundRouterCollection inbound = service.getInboundRouter();
+        assertNotNull(inbound);
+        testEndpoint(inbound.getEndpoint("in"));
     }
 
 }

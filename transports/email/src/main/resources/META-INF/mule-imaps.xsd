@@ -28,4 +28,8 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="inbound-endpoint" type="imap:inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
+
+    <xsd:element name="endpoint" type="imap:globalEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
+
 </xsd:schema>

@@ -85,7 +85,6 @@ public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase
         startServer();
     }
 
-
     // @Override
     protected void suitePostTearDown() throws Exception
     {
@@ -170,7 +169,10 @@ public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase
 
     private void stopServer()
     {
-        server.stop();
+        if (null != server)
+        {
+            server.stop();
+        }
     }
 
 }

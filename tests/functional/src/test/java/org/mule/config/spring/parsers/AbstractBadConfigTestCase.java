@@ -31,7 +31,8 @@ public abstract class AbstractBadConfigTestCase extends TestCase
             fail("expected error");
         } catch (Exception e) {
             logger.debug("Caught " + e);
-            assertTrue("Missing phrase: " + phrase, e.toString().indexOf(phrase) > -1);
+            assertTrue("Missing phrase '" + phrase + "' in '" + e.toString() + "'",
+                    e.toString().indexOf(phrase) > -1);
         }
     }
 

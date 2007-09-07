@@ -11,7 +11,11 @@ package org.mule.providers.email.config;
 
 import org.mule.config.spring.parsers.generic.MuleChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
+import org.mule.config.spring.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
+import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
 import org.mule.providers.email.ImapsConnector;
+import org.mule.impl.endpoint.InboundEndpoint;
+import org.mule.impl.endpoint.OutboundEndpoint;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
@@ -21,10 +25,15 @@ import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
  */
 public class ImapsNamespaceHandler extends NamespaceHandlerSupport
 {
+
     public void init()
     {
         registerBeanDefinitionParser("connector", new MuleChildDefinitionParser(ImapsConnector.class, true));
+        registerBeanDefinitionParser("endpoint", new TransportGlobalEndpointDefinitionParser("imaps"));
+        registerBeanDefinitionParser("inbound-endpoint", new TransportEndpointDefinitionParser("imaps", InboundEndpoint.class));
+        registerBeanDefinitionParser("outbound-endpoint", new TransportEndpointDefinitionParser("imaps", OutboundEndpoint.class));
         registerBeanDefinitionParser("tls-trust-store", new ParentDefinitionParser());
         registerBeanDefinitionParser("tls-client", new ParentDefinitionParser());
     }
+    
 }

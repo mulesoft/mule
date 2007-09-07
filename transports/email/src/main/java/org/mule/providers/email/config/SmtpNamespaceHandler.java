@@ -21,9 +21,11 @@ import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
  */
 public class SmtpNamespaceHandler extends NamespaceHandlerSupport
 {
+
     public void init()
     {
         registerBeanDefinitionParser("connector", new MuleChildDefinitionParser(SmtpConnector.class, true));
         registerBeanDefinitionParser("header", new ChildMapEntryDefinitionParser("customHeaders", "key", "value"));
     }
+    
 }

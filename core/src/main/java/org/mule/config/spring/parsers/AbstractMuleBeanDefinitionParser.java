@@ -13,9 +13,9 @@ import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.assembly.BeanAssemblerFactory;
 import org.mule.config.spring.parsers.assembly.DefaultBeanAssemblerFactory;
 import org.mule.config.spring.parsers.assembly.ReusablePropertyConfiguration;
-import org.mule.config.spring.parsers.delegate.DelegateDefinitionParser;
-import org.mule.config.spring.parsers.delegate.PostProcessor;
-import org.mule.config.spring.parsers.delegate.PreProcessor;
+import org.mule.config.spring.parsers.MuleDefinitionParser;
+import org.mule.config.spring.parsers.PostProcessor;
+import org.mule.config.spring.parsers.PreProcessor;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
@@ -83,7 +83,7 @@ import org.w3c.dom.NamedNodeMap;
  * @see  AbstractBeanDefinitionParser
  */
 public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefinitionParser
-    implements DelegateDefinitionParser
+    implements MuleDefinitionParser
 {
     public static final String ROOT_ELEMENT = "mule";
     public static final String ROOT_UNSAFE_ELEMENT = "mule-unsafe";
@@ -115,19 +115,19 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
         addIgnored(ATTRIBUTE_ID);
     }
 
-    public DelegateDefinitionParser addReference(String propertyName)
+    public MuleDefinitionParser addReference(String propertyName)
     {
         propertyConfiguration.addReference(propertyName);
         return this;
     }
 
-    public DelegateDefinitionParser addMapping(String propertyName, Map mappings)
+    public MuleDefinitionParser addMapping(String propertyName, Map mappings)
     {
         propertyConfiguration.addMapping(propertyName, mappings);
         return this;
     }
 
-    public DelegateDefinitionParser addMapping(String propertyName, String mappings)
+    public MuleDefinitionParser addMapping(String propertyName, String mappings)
     {
         propertyConfiguration.addMapping(propertyName, mappings);
         return this;
@@ -138,7 +138,7 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
      * @param propertyName The bean property name
      * @return This instance, allowing chaining during use, avoiding subclasses
      */
-    public DelegateDefinitionParser addAlias(String alias, String propertyName)
+    public MuleDefinitionParser addAlias(String alias, String propertyName)
     {
         propertyConfiguration.addAlias(alias, propertyName);
         return this;
@@ -148,7 +148,7 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
      * @param propertyName Property that is a collection
      * @return This instance, allowing chaining during use, avoiding subclasses
      */
-    public DelegateDefinitionParser addCollection(String propertyName)
+    public MuleDefinitionParser addCollection(String propertyName)
     {
         propertyConfiguration.addCollection(propertyName);
         return this;
@@ -158,19 +158,19 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
      * @param propertyName Property that is to be ignored
      * @return This instance, allowing chaining during use, avoiding subclasses
      */
-    public DelegateDefinitionParser addIgnored(String propertyName)
+    public MuleDefinitionParser addIgnored(String propertyName)
     {
         propertyConfiguration.addIgnored(propertyName);
         return this;
     }
 
-    public DelegateDefinitionParser removeIgnored(String propertyName)
+    public MuleDefinitionParser removeIgnored(String propertyName)
     {
         propertyConfiguration.removeIgnored(propertyName);
         return this;
     }
 
-    public DelegateDefinitionParser setIgnoredDefault(boolean ignoreAll)
+    public MuleDefinitionParser setIgnoredDefault(boolean ignoreAll)
     {
         propertyConfiguration.setIgnoredDefault(ignoreAll);
         return this;

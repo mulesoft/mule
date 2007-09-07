@@ -139,6 +139,18 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="addressed-child-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
+    <xsd:complexType name="inboundEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractInboundEndpointType">
+                <xsd:group ref="mule:defaultEndpointElements"/>
+                <xsd:attribute name="address" type="xsd:string"/>
+                <xsd:attribute name="ref" type="xsd:string"/>
+                <xsd:attributeGroup ref="mule:restrictedEndpointAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <xsd:element name="unaddressed-endpoint" type="unaddressedEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
     <xsd:element name="unaddressed-orphan-endpoint" type="unaddressedEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
     <xsd:complexType name="unaddressedEndpointType">

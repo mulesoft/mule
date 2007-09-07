@@ -28,29 +28,9 @@
     <xsd:complexType name="inboundEndpointType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractInboundEndpointType">
-                <xsd:sequence>
-                    <xsd:choice>
-                        <xsd:element name="address" type="addressType"/>
-                        <xsd:element name="global-endpoint" type="mule:referenceType"/>
-                    </xsd:choice>
-                    <xsd:group ref="mule:defaultEndpointElements"/>
-                </xsd:sequence>
-                <xsd:attributeGroup ref="mule:restrictedEndpointAttributes"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint"/>
-    <xsd:complexType name="outboundEndpointType">
-        <xsd:complexContent>
-            <xsd:extension base="mule:abstractOutboundEndpointType">
-                <xsd:sequence>
-                    <xsd:choice>
-                        <xsd:element name="address" type="addressType"/>
-                        <xsd:element name="global-endpoint" type="mule:referenceType"/>
-                    </xsd:choice>
-                    <xsd:group ref="mule:defaultEndpointElements"/>
-                </xsd:sequence>
+                <xsd:group ref="mule:defaultEndpointElements"/>
+                <xsd:attributeGroup ref="addressAttributes"/>
+                <xsd:attribute name="ref" type="xsd:NMTOKEN"/>
                 <xsd:attributeGroup ref="mule:restrictedEndpointAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -60,23 +40,18 @@
     <xsd:complexType name="globalEndpointType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractGlobalEndpointType">
-                <xsd:sequence>
-                    <xsd:choice>
-                        <xsd:element name="address" type="addressType"/>
-                        <xsd:element name="global-endpoint" type="mule:referenceType"/>
-                    </xsd:choice>
-                    <xsd:group ref="mule:defaultEndpointElements"/>
-                </xsd:sequence>
+                <xsd:group ref="mule:defaultEndpointElements"/>
+                <xsd:attributeGroup ref="addressAttributes"/>
                 <xsd:attributeGroup ref="mule:restrictedEndpointAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="addressType">
+    <xsd:attributeGroup name="addressAttributes">
         <xsd:attribute name="username" type="xsd:string"/>
         <xsd:attribute name="password" type="xsd:string"/>
         <xsd:attribute name="hostname" type="xsd:string"/>
         <xsd:attribute name="port" type="mule:substitutablePortNumber"/>
-    </xsd:complexType>
+    </xsd:attributeGroup>
 
 </xsd:schema>

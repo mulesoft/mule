@@ -10,6 +10,8 @@
 
 package org.mule.config.spring.parsers.delegate;
 
+import org.mule.config.spring.parsers.MuleDefinitionParser;
+
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
@@ -32,7 +34,7 @@ public abstract class AbstractParallelDelegatingDefinitionParser extends Abstrac
         super();
     }
 
-    protected AbstractParallelDelegatingDefinitionParser(DelegateDefinitionParser[] delegates)
+    protected AbstractParallelDelegatingDefinitionParser(MuleDefinitionParser[] delegates)
     {
         super(delegates);
     }
@@ -42,6 +44,6 @@ public abstract class AbstractParallelDelegatingDefinitionParser extends Abstrac
         return getDelegate(element, parserContext).parseDelegate(element, parserContext);
     }
 
-    protected abstract DelegateDefinitionParser getDelegate(Element element, ParserContext parserContext);
+    protected abstract MuleDefinitionParser getDelegate(Element element, ParserContext parserContext);
 
 }
