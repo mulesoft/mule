@@ -19,6 +19,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <excludes>
+                        <exclude>**/ImapsNamespaceHandlerTestCase.*</exclude>
                     </excludes>
                 </configuration>
             </plugin>
