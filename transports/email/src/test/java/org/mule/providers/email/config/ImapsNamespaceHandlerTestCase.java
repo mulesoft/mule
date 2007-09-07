@@ -9,35 +9,31 @@
  */
 package org.mule.providers.email.config;
 
-import org.mule.providers.email.ImapConnector;
+import org.mule.providers.email.ImapsConnector;
 import org.mule.providers.email.functional.AbstractEmailFunctionalTestCase;
 import org.mule.umo.UMODescriptor;
-import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.routing.UMOInboundRouterCollection;
 
-/**
- * This includes a connection because the IMAP poller starts by default (without
- * the server running we cannot easily start an inbound endpoint)
- */
-public class ImapNamespaceHandlerTestCase extends AbstractEmailFunctionalTestCase
+public class ImapsNamespaceHandlerTestCase extends AbstractEmailFunctionalTestCase
 {
 
-    public ImapNamespaceHandlerTestCase()
+    public ImapsNamespaceHandlerTestCase()
     {
-        super(65432, STRING_MESSAGE, "imap");
+        super(65433, STRING_MESSAGE, "imaps");
     }
 
     protected String getConfigResources()
     {
-        return "imap-namespace-config.xml";
+        return "imaps-namespace-config.xml";
     }
 
-    public void testConfig() throws Exception
+    public void testSecureConfig() throws Exception
     {
-        ImapConnector c = (ImapConnector)managementContext.getRegistry().lookupConnector("imapConnector");
+        ImapsConnector c = (ImapsConnector)managementContext.getRegistry().lookupConnector("imapsConnector");
         assertNotNull(c);
 
-        assertTrue(c.isBackupEnabled());
+        assertFalse(c.isBackupEnabled());
         assertEquals("newBackup", c.getBackupFolder());
         assertEquals(1234, c.getCheckFrequency());
         assertEquals("newMailbox", c.getMailboxFolder());
@@ -45,27 +41,15 @@ public class ImapNamespaceHandlerTestCase extends AbstractEmailFunctionalTestCas
 
         // authenticator?
 
+        //The full path gets resolved, we're just checking that the property got set
+        assertTrue(c.getClientKeyStore().endsWith("/greenmail-truststore"));
+        assertEquals("password", c.getClientKeyStorePassword());
+        //The full path gets resolved, we're just checkng that the property got set
+        assertTrue(c.getTrustStore().endsWith("/greenmail-truststore"));
+        assertEquals("password", c.getTrustStorePassword());
+
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());
-    }
-
-    public void testGlobalEndpoint()
-    {
-        testEndpoint(managementContext.getRegistry().lookupEndpoint("global"));
-    }
-
-    protected void testEndpoint(UMOEndpoint endpoint)
-    {
-        assertNotNull(endpoint);
-        String address = endpoint.getEndpointURI().getAddress();
-        assertNotNull(address);
-        assertEquals("bob@localhost:65432", address);
-        String password = endpoint.getEndpointURI().getPassword();
-        assertNotNull(password);
-        assertEquals("password", password);
-        String protocol = endpoint.getProtocol();
-        assertNotNull(protocol);
-        assertEquals("imap", protocol);
     }
 
     public void testInboundEndpoint()
@@ -77,4 +61,18 @@ public class ImapNamespaceHandlerTestCase extends AbstractEmailFunctionalTestCas
         testEndpoint(inbound.getEndpoint("in"));
     }
 
+    protected void testEndpoint(UMOEndpoint endpoint)
+    {
+        assertNotNull(endpoint);
+        String address = endpoint.getEndpointURI().getAddress();
+        assertNotNull(address);
+        assertEquals("bob@localhost:65433", address);
+        String password = endpoint.getEndpointURI().getPassword();
+        assertNotNull(password);
+        assertEquals("password", password);
+        String protocol = endpoint.getProtocol();
+        assertNotNull(protocol);
+        assertEquals("imaps", protocol);
+    }
+                                     
 }

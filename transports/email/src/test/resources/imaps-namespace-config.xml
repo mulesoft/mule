@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:imap="http://www.mulesource.org/schema/mule/imap/2.0"
+       xmlns:imaps="http://www.mulesource.org/schema/mule/imaps/2.0"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/imap/2.0 http://www.mulesource.org/schema/mule/imap/2.0/mule-imap.xsd
+       http://www.mulesource.org/schema/mule/imaps/2.0 http://www.mulesource.org/schema/mule/imaps/2.0/mule-imaps.xsd">
+
+    <imaps:connector name="imapsConnector" backupEnabled="false" backupFolder="newBackup" checkFrequency="1234"
+                     mailboxFolder="newMailbox" deleteReadMessages="false">
+        <imaps:tls-client clientKeyStore="greenmail-truststore" clientKeyStorePassword="password"/>
+        <imaps:tls-trust-store trustStore="greenmail-truststore" trustStorePassword="password"/>
+    </imaps:connector>
+
+    <model name="model">
+        <service name="service">
+            <bridge-component/>
+            <inbound-router>
+                <imaps:inbound-endpoint name="in" hostname="localhost" password="password" port="65433" username="bob"/>
+            </inbound-router>
+        </service>
+    </model>
+
+</mule>
