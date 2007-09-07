@@ -24,12 +24,7 @@ public class ImapNamespaceHandlerTestCase extends AbstractEmailFunctionalTestCas
 
     public ImapNamespaceHandlerTestCase()
     {
-        super(65432, STRING_MESSAGE, "imap");
-    }
-
-    protected String getConfigResources()
-    {
-        return "imap-namespace-config.xml";
+        super(65532, STRING_MESSAGE, "imap", "imap-namespace-config.xml");
     }
 
     public void testConfig() throws Exception
@@ -59,7 +54,7 @@ public class ImapNamespaceHandlerTestCase extends AbstractEmailFunctionalTestCas
         assertNotNull(endpoint);
         String address = endpoint.getEndpointURI().getAddress();
         assertNotNull(address);
-        assertEquals("bob@localhost:65432", address);
+        assertEquals("bob@localhost:65532", address);
         String password = endpoint.getEndpointURI().getPassword();
         assertNotNull(password);
         assertEquals("password", password);

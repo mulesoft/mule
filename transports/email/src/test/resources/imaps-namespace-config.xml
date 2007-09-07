@@ -20,7 +20,7 @@
         <service name="service">
             <bridge-component/>
             <inbound-router>
-                <imaps:inbound-endpoint name="in" hostname="localhost" password="password" port="65433" username="bob"/>
+                <imaps:inbound-endpoint name="in" hostname="localhost" password="password" port="65533" username="bob"/>
             </inbound-router>
         </service>
     </model>
