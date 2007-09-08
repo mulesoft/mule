@@ -16,6 +16,8 @@
     2. The ChitChater component that adds some additional conversation to the event it receives
     An event is triggered by input through the system console and the outbound event is
     aslo written out through the system console.
+    This configuration also demonstrates user and system error handling. User error handling returns
+    an error message to the end user. System error handling logs errors.
     </description>
 
     <!--
@@ -38,12 +40,10 @@
         determine which method to call on our components based on the return types of these
         transformers.
     -->
-    <custom-transformer class="org.mule.samples.hello.StringToNameString"
-        name="StringToNameString" returnClass="org.mule.samples.hello.NameString"/>
-    <custom-transformer class="org.mule.samples.hello.NameStringToChatString"
-        name="NameStringToChatString" returnClass="org.mule.samples.hello.ChatString"/>
-    <custom-transformer class="org.mule.samples.hello.ChatStringToString"
-        name="ChatStringToString" returnClass="java.lang.String"/>
+    <custom-transformer name="StdinToNameString" class="org.mule.samples.hello.StdinToNameString"/>
+    <custom-transformer name="NameStringToChatString" class="org.mule.samples.hello.NameStringToChatString"/>
+    <custom-transformer name="ChatStringToString" class="org.mule.samples.hello.ChatStringToString"/>
+    <custom-transformer name="ExceptionToString" class="org.mule.samples.hello.ExceptionToString"/>
 
     <!--
         An interceptor is a piece of code that can be configued to execute
@@ -51,11 +51,12 @@
         You can define a stack of interceptors that will be executed in sequence.
         You can then configure the stack on your components.
     -->
-    <!--<interceptor-stack name="default">-->
-        <!--<interceptor className="org.mule.interceptors.LoggingInterceptor"/>-->
-        <!--<interceptor className="org.mule.interceptors.TimerInterceptor"/>-->
-    <!--</interceptor-stack>-->
-
+    <!-- TODO: MULE-2285 - How does this work in 2.0?
+    <interceptor-stack name="default">
+        <interceptor className="org.mule.interceptors.LoggingInterceptor"/>
+        <interceptor className="org.mule.interceptors.TimerInterceptor"/>
+    </interceptor-stack>
+    -->
     <!--
         The Mule model initialises and manages your UMO components
     -->
@@ -65,34 +66,87 @@
             interact with the framework, other components in the system and external sources.
             Please refer to the Configuration Guide for a full description of all the parameters.
         -->
-        <service name="GreetUMO">
+        <service name="GreeterUMO">
             <component class="org.mule.samples.hello.Greeter"/>
+            
             <inbound-router>
-                <inbound-endpoint address="stdio://System.in" transformers="StringToNameString"/>
+                <inbound-endpoint address="stdio://System.in" transformers="StdinToNameString"/>
             </inbound-router>
+            
             <outbound-router>
-                <outbound-pass-through-router>
+                <filtering-router>
                     <outbound-endpoint address="vm://chitchatter"/>
-                </outbound-pass-through-router>
+                    <payload-type-filter expectedType="org.mule.samples.hello.NameString"/>
+                </filtering-router>
+                
+                <filtering-router>
+                    <outbound-endpoint address="vm://userErrorHandler"/>
+                    <payload-type-filter expectedType="java.lang.Exception"/>
+                </filtering-router>
             </outbound-router>
+
             <!--
             Here we tell this component to use the interceptor stack defined above
             -->
-            <!--<interceptor name="default"/>-->
+            <!-- TODO: MULE-2285 - How does this work in 2.0?
+            <interceptor name="default"/>
+            -->
+            
+            <!-- Route unexpected errors to separate error handler -->
+            <default-component-exception-strategy>
+                <outbound-endpoint address="vm://systemErrorHandler"/>
+            </default-component-exception-strategy>
         </service>
+
         <service name="ChitChatUMO">
             <component class="org.mule.samples.hello.ChitChatter"/>
+
             <inbound-router>
                 <inbound-endpoint address="vm://chitchatter" transformers="NameStringToChatString"/>
             </inbound-router>
+                
             <outbound-router>
                 <outbound-pass-through-router>
-                    <outbound-endpoint address="stdio://System.out" transformers="ChatStringToString"/>
+                    <outbound-endpoint address="stdio://System.out" transformers="ChatStringToString" />
                 </outbound-pass-through-router>
             </outbound-router>
-            <!--<interceptor name="default"/>-->
+
+            <!-- TODO: MULE-2285 - How does this work in 2.0?                
+            <interceptor name="default"/>
+            -->
         </service>
+        
+        <!-- This error handler returns user error messages to caller. Errors could also be routed elsewhere,
+            e.g. into an error file, send via email to a list, stored in a database, etc. -->
+        <service name="UserErrorHandler">
+            <bridge-component/>
+                
+            <inbound-router>
+                <inbound-endpoint address="vm://userErrorHandler" transformers="ExceptionToString"/>
+            </inbound-router>
+            
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="stdio://System.out"/>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
+                
+        <!-- Handle any unexpected errors. Errors could also be routed elsewhere,
+            e.g. into an error file, send via email to a list, stored in a database, etc. -->
+        <service name="SystemErrorHandler">
+            <bridge-component/>
+                
+            <inbound-router>
+                <inbound-endpoint address="vm://systemErrorHandler"/>
+            </inbound-router>
+                
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="stdio://System.err"/>
+                </outbound-pass-through-router>
+            </outbound-router>            
+        </service>        
     </model>
 
 </mule>
-        

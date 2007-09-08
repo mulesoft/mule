@@ -15,7 +15,6 @@
     for I/O, other methods are used.  The example demonstrates how easy it is to swap out different transports 
     while never affecting the application.
     </description>
-
     <!--
     To invoke the Hello service over HTTP, hit the following URL in your browser:
 
@@ -35,84 +34,99 @@
         UMOMessage response = client.send("vm://greeter", "Ross", null);
         System.out.println("response = " + response.getPayload());
     -->
+ 
+    <custom-transformer name="StringToNameString" class="org.mule.samples.hello.StringToNameString"/>
+    <custom-transformer name="NameStringToChatString" class="org.mule.samples.hello.NameStringToChatString"/>
+    <custom-transformer name="ChatStringToString" class="org.mule.samples.hello.ChatStringToString"/>
+    <custom-transformer name="HttpRequestToNameString" class="org.mule.samples.hello.HttpRequestToNameString"/>
+    <custom-transformer name="ExceptionToString" class="org.mule.samples.hello.ExceptionToString"/>
+
+    <!-- workaround for http://mule.mulesource.org/jira/browse/MULE-1827 -->
+    <custom-transformer name="PlainTextResponseTransformer" class="org.mule.transformers.simple.MessagePropertiesTransformer">
+        <spring:property name="addProperties">
+            <spring:map>
+                <spring:entry key="Content-Type" value="text/plain"/>
+            </spring:map>
+        </spring:property>
+    </custom-transformer>   
     
-    <!--
-        All transformers must be defined here.  For this example we have two transformers
-        used to transform the inbound events for the Greeter and Chatter components into
-        objects they understand.  The entryPointResolver configured on the Model below will
-        determine which method to call on our components based on the return types of these
-        transformers.
-    -->
-    <custom-transformer class="org.mule.samples.hello.StringToNameString"
-        name="StringToNameString" returnClass="org.mule.samples.hello.NameString"/>
-    <custom-transformer class="org.mule.samples.hello.NameStringToChatString"
-        name="NameStringToChatString" returnClass="org.mule.samples.hello.ChatString"/>
-    <custom-transformer class="org.mule.samples.hello.ChatStringToString"
-        name="ChatStringToString" returnClass="java.lang.String"/>
-    <custom-transformer class="org.mule.samples.hello.HttpRequestToString"
-        name="HttpRequestToString" returnClass="java.lang.String"/>
-
-    <!--
-        An interceptor is a piece of code that can be configued to execute
-        before and/or after an event is received for a component.
-        You can define a stack of interceptors that will be executed in sequence.
-        You can then configure the stack on your components.
-    -->
-    <!--<interceptor-stack name="default">-->
-        <!--<interceptor className="org.mule.interceptors.LoggingInterceptor"/>-->
-        <!--<interceptor className="org.mule.interceptors.TimerInterceptor"/>-->
-    <!--</interceptor-stack>-->
-
-    <!--
-        The Mule model initialises and manages your UMO components
-    -->
     <model name="helloSample">
         <!--
-            This component receives input from 3 different endpoints (http, servlet, vm) and routes
+            This component receives input from 3 different endpoints (http, servlet, vm) and routes 
             them all to the same place.
         -->
-        <service name="GreetUMO">
+        <service name="GreeterUMO">
             <component class="org.mule.samples.hello.Greeter"/>
+            
             <inbound-router>
                 <!-- Incoming HTTP requests -->
-                <inbound-endpoint address="http://localhost:8888" 
-                    transformers="HttpRequestToString StringToNameString"
-                    synchronous="true">
+                <inbound-endpoint address="http://localhost:8888" transformers="HttpRequestToNameString" synchronous="true">
                     <not-filter>
                         <wildcard-filter pattern="/favicon.ico"/>   
                     </not-filter>
-                </inbound-endpoint>
+                </inbound-endpoint>                    
+                
                 <!-- Incoming Servlet requests -->
-                <inbound-endpoint address="servlet://rest" 
-                    transformers="StringToNameString"
-                    synchronous="true"/>
+                <inbound-endpoint address="servlet://rest" transformers="StringToNameString" responseTransformers="PlainTextResponseTransformer" synchronous="true"/>
+
                 <!-- Incoming VM requests -->
-                <inbound-endpoint address="vm://greeter" 
-                    transformers="StringToNameString"
-                    synchronous="true"/>
+                <inbound-endpoint address="vm://greeter" transformers="StringToNameString" synchronous="true"/>
             </inbound-router>
+
             <outbound-router>
-                <outbound-pass-through-router>
-                    <outbound-endpoint address="vm://chitchatter"
-                        synchronous="true"/>
-                </outbound-pass-through-router>
+                <filtering-router>
+                    <outbound-endpoint address="vm://chitchatter"/>
+                    <payload-type-filter expectedType="org.mule.samples.hello.NameString"/>
+                </filtering-router>
+                
+                <filtering-router>
+                    <outbound-endpoint address="vm://userErrorHandler"/>
+                    <payload-type-filter expectedType="java.lang.Exception"/>
+                </filtering-router>
             </outbound-router>
-            <!--
-            Here we tell this component to use the interceptor stack defined above
-            -->
-            <!--<interceptor name="default"/>-->
+
+            <!-- Route unexpected errors to separate error handler -->
+            <default-component-exception-strategy>
+                <outbound-endpoint address="vm://systemErrorHandler"/>
+            </default-component-exception-strategy>
         </service>
+
+        <!-- note the response transformer on this component. even though there is no outbound provider
+        the transformer will transform the result event and pass it back as the http response -->
         <service name="ChitChatUMO">
             <component class="org.mule.samples.hello.ChitChatter"/>
+            
             <inbound-router>
-                <!-- note the response transformer on this component. even though there is no outbound provider
-                     the transformer will transform the result event and pass it back as the http response -->
-                <inbound-endpoint address="vm://chitchatter" transformers="NameStringToChatString"
-                               synchronous="true"
-                               responseTransformers="ChatStringToString"/>
+                <inbound-endpoint address="vm://chitchatter" transformers="NameStringToChatString" responseTransformers="ChatStringToString" synchronous="true"/>
             </inbound-router>
-            <!--<interceptor name="default"/>-->
         </service>
+
+        <!-- This error handler returns user error messages to caller. Errors could also be routed elsewhere,
+            e.g. into an error file, send via email to a list, stored in a database, etc. -->
+        <service name="UserErrorHandler">
+            <bridge-component/>
+            
+            <inbound-router>
+                <inbound-endpoint address="vm://userErrorHandler" responseTransformers="ExceptionToString" synchronous="true"/>
+            </inbound-router>
+        </service>
+                
+        <!-- Handle any unexpected errors. Errors could also be routed elsewhere,
+            e.g. into an error file, send via email to a list, stored in a database, etc. -->
+        <service name="SystemErrorHandler">
+            <bridge-component/>
+            
+            <inbound-router>
+                <inbound-endpoint address="vm://systemErrorHandler" synchronous="true"/>
+            </inbound-router>
+            
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="stdio://System.err"/>
+                </outbound-pass-through-router>
+            </outbound-router>            
+        </service>
+                
     </model>
 
 </mule>

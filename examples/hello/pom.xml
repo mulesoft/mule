@@ -32,6 +32,11 @@
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-stdio</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-http</artifactId>
             <version>${version}</version>
         </dependency>
