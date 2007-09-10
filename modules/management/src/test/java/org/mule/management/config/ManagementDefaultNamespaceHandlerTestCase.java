@@ -1,5 +1,5 @@
 /*
- * $Id: ManagementDefaultNamespaceHandlerTestCase.java 8083 2007-08-28 02:25:36Z ashaposhnikov $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *

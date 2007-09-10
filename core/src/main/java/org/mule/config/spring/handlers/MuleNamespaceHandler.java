@@ -16,6 +16,7 @@ import org.mule.components.simple.NullComponent;
 import org.mule.components.simple.PassThroughComponent;
 import org.mule.config.MuleProperties;
 import org.mule.config.QueueProfile;
+import org.mule.config.spring.parsers.collection.ChildListDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
 import org.mule.config.spring.parsers.collection.OrphanMapDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
@@ -110,6 +111,7 @@ import org.mule.transformers.simple.ByteArrayToObject;
 import org.mule.transformers.simple.ByteArrayToSerializable;
 import org.mule.transformers.simple.ByteArrayToString;
 import org.mule.transformers.simple.HexStringToByteArray;
+import org.mule.transformers.simple.MessagePropertiesTransformer;
 import org.mule.transformers.simple.ObjectToByteArray;
 import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.transformers.simple.StringToByteArray;
@@ -164,6 +166,7 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
 
         registerBeanDefinitionParser("custom-transformer", new MuleChildDefinitionParser(false));
         registerBeanDefinitionParser("transformer-no-action", new TransformerDefinitionParser(NoActionTransformer.class));
+        registerBeanDefinitionParser("transformer-message-properties", new TransformerDefinitionParser(MessagePropertiesTransformer.class));
 
         registerBeanDefinitionParser("transformer-base64-encoder", new TransformerDefinitionParser(Base64Encoder.class));
         registerBeanDefinitionParser("transformer-base64-decoder", new TransformerDefinitionParser(Base64Decoder.class));
@@ -295,6 +298,8 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
 
         //Utils / Standard Types
         registerBeanDefinitionParser("properties", new ChildMapDefinitionParser("properties"));
+        registerBeanDefinitionParser("addProperties", new ChildMapDefinitionParser("addProperties"));
+        registerBeanDefinitionParser("deleteProperties", new ChildListDefinitionParser("deleteProperties"));
         registerBeanDefinitionParser("meta-info", new ChildMapDefinitionParser("properties"));
         registerBeanDefinitionParser("jndi-provider-properties", new ChildMapDefinitionParser("jndiProviderProperties"));
         registerBeanDefinitionParser("environment", new ChildMapDefinitionParser("environment"));

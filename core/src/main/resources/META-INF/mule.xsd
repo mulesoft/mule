@@ -611,7 +611,7 @@
         <xsd:attribute name="transformers" type="xsd:NMTOKENS" use="required"/>
     </xsd:complexType>
 
-   <xsd:element name="custom-transformer" type="customTransformerType" substitutionGroup="abstract-transformer"/>
+    <xsd:element name="custom-transformer" type="customTransformerType" substitutionGroup="abstract-transformer"/>
     <xsd:complexType name="customTransformerType">
         <xsd:complexContent>
             <xsd:extension base="abstractTransformerType">
@@ -619,6 +619,19 @@
                     <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
                 <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="transformer-message-properties" type="messagePropertiesTransformerType" substitutionGroup="abstract-transformer"/>
+    <xsd:complexType name="messagePropertiesTransformerType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractTransformerType">
+                <xsd:sequence>
+                    <xsd:element name="deleteProperties" type="listOrSetType" minOccurs="0" maxOccurs="1"/>
+                    <xsd:element name="addProperties" type="mapType" minOccurs="0" maxOccurs="1"/>
+                </xsd:sequence>
+                <xsd:attribute name="overwrite" type="substitutableBoolean" use="optional" default="true"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -1648,6 +1661,13 @@
     <xsd:complexType name="mapType">
         <xsd:complexContent>
             <xsd:extension base="spring:mapType" />
+        </xsd:complexContent>
+    </xsd:complexType>
+
+
+    <xsd:complexType name="listOrSetType">
+        <xsd:complexContent>
+            <xsd:extension base="spring:listOrSetType" />
         </xsd:complexContent>
     </xsd:complexType>
 
