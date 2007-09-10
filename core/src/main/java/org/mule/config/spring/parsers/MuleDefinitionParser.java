@@ -8,9 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config.spring.parsers.delegate;
-
-import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+package org.mule.config.spring.parsers;
 
 import java.util.Map;
 
@@ -19,7 +17,7 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
- * This interface allows {@link AbstractParallelDelegatingDefinitionParser}
+ * This interface allows {@link org.mule.config.spring.parsers.delegate.AbstractParallelDelegatingDefinitionParser}
  * to forward the work of parsing to a particular sub-parser.  We exploit the fact that
  * (nearly?) all parsers subclass Spring's {@link org.springframework.beans.factory.xml.AbstractBeanDefinitionParser}
  * via {@link org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser} and so provide
@@ -29,7 +27,7 @@ import org.w3c.dom.Element;
  * {@link org.springframework.beans.factory.xml.AbstractBeanDefinitionParser#parseInternal(org.w3c.dom.Element, org.springframework.beans.factory.xml.ParserContext)}
  * and so can be delegated).
  */
-public interface DelegateDefinitionParser
+public interface MuleDefinitionParser
 {
 
     AbstractBeanDefinition parseDelegate(Element element, ParserContext parserContext);
@@ -46,20 +44,20 @@ public interface DelegateDefinitionParser
      */
     void registerPostProcessor(PostProcessor postProcessor);
 
-    DelegateDefinitionParser addReference(String propertyName);
+    MuleDefinitionParser addReference(String propertyName);
 
-    DelegateDefinitionParser addMapping(String propertyName, Map mappings);
+    MuleDefinitionParser addMapping(String propertyName, Map mappings);
 
-    DelegateDefinitionParser addMapping(String propertyName, String mappings);
+    MuleDefinitionParser addMapping(String propertyName, String mappings);
 
-    DelegateDefinitionParser addAlias(String alias, String propertyName);
+    MuleDefinitionParser addAlias(String alias, String propertyName);
 
-    DelegateDefinitionParser addCollection(String propertyName);
+    MuleDefinitionParser addCollection(String propertyName);
 
-    DelegateDefinitionParser addIgnored(String propertyName);
+    MuleDefinitionParser addIgnored(String propertyName);
 
-    DelegateDefinitionParser removeIgnored(String propertyName);
+    MuleDefinitionParser removeIgnored(String propertyName);
 
-    DelegateDefinitionParser setIgnoredDefault(boolean ignoreAll);
+    MuleDefinitionParser setIgnoredDefault(boolean ignoreAll);
 
 }

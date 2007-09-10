@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config.spring.parsers.specific.endpoint;
+package org.mule.config.spring.parsers.specific.endpoint.support;
 
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 
@@ -17,13 +17,15 @@ import org.w3c.dom.Element;
 
 /**
  * A parser for "orphan" (top-level) endpoints - ie GlobalEndpoints.
- * Because we have automatic String -> MuleEnpointURI conversin via property editors
+ * Because we have automatic String -> MuleEnpointURI conversion via property editors
  * this can be used in a variety of ways.  It should work directly with a simple String
  * address attribute or, in combination with a child element (handled by
- * {@link org.mule.config.spring.parsers.specific.endpoint.ChildAddressDefinitionParser},
+ * {@link ChildAddressDefinitionParser},
  * or embedded in
- * {@link org.mule.config.spring.parsers.specific.endpoint.AddressedEndpointDefinitionParser}
+ * {@link AddressedEndpointDefinitionParser}
  * for a more compact single-eleent approach.
+ *
+ * <p>This class does not support references to other endpoints.</p>
  */
 public class OrphanEndpointDefinitionParser extends OrphanDefinitionParser
 {
@@ -31,22 +33,8 @@ public class OrphanEndpointDefinitionParser extends OrphanDefinitionParser
     public OrphanEndpointDefinitionParser(Class endpoint)
     {
         super(endpoint, false);
-        EndpointUtils.addConditions(this);
+        EndpointUtils.addProperties(this);
         EndpointUtils.addPostProcess(this);
-    }
-
-    // @Override
-    protected BeanDefinitionBuilder createBeanDefinitionBuilder(Element element, Class beanClass)
-    {
-        BeanDefinitionBuilder builder = EndpointUtils.createBeanDefinitionBuilder(element, beanClass);
-        if (null == builder)
-        {
-            return super.createBeanDefinitionBuilder(element, beanClass);
-        }
-        else
-        {
-            return builder;
-        }
     }
 
 }

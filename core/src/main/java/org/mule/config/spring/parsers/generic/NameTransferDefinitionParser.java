@@ -63,7 +63,9 @@ public class NameTransferDefinitionParser extends ParentDefinitionParser
     {
         name = null;
         componentAttributeValue = null;
-        return super.parseInternal(element, parserContext);
+        AbstractBeanDefinition bd = super.parseInternal(element, parserContext);
+        element.removeAttribute(ATTRIBUTE_NAME);
+        return bd; 
     }
 
 
@@ -74,7 +76,13 @@ public class NameTransferDefinitionParser extends ParentDefinitionParser
         MutablePropertyValues propertyValues = beanDef.getPropertyValues();
         if (!propertyValues.contains(ATTRIBUTE_NAME))
         {
+            logger.debug("Setting " + ATTRIBUTE_NAME + " on " + componentAttributeValue + " to " + name);
             propertyValues.addPropertyValue(ATTRIBUTE_NAME, name);
+        }
+        else
+        {
+            logger.debug("Not setting " + ATTRIBUTE_NAME + " on " + componentAttributeValue +
+                    " as already " + propertyValues.getPropertyValue(ATTRIBUTE_NAME));
         }
     }
 
@@ -89,19 +97,25 @@ public class NameTransferDefinitionParser extends ParentDefinitionParser
 
         public void extendBean(String newName, Object newValue, boolean isReference)
         {
+            // intercept setting of name
             if (ATTRIBUTE_NAME.equals(newName) && newValue instanceof String)
             {
                 name = (String) newValue;
+                // name is set after component
                 if (null != componentAttributeValue)
                 {
                     setName();
                 }
             }
-            else {
+            else
+            {
                 super.extendBean(newName, newValue, isReference);
+
+                // intercept setting of component
                 if (componentAttributeName.equals(newName) && newValue instanceof String)
                 {
                     componentAttributeValue = (String) newValue;
+                    // name was set before component
                     if (null != name)
                     {
                         setName();

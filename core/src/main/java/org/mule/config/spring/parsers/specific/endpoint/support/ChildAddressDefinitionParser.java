@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config.spring.parsers.specific.endpoint;
+package org.mule.config.spring.parsers.specific.endpoint.support;
 
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;

@@ -13,6 +13,7 @@ package org.mule.config.spring.parsers.delegate;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
+import org.mule.config.spring.parsers.MuleDefinitionParser;
 
 import org.w3c.dom.Element;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -33,13 +34,13 @@ public class InheritDefinitionParser extends AbstractParallelDelegatingDefinitio
 
     public InheritDefinitionParser(OrphanDefinitionParser orphan, NamedDefinitionParser named)
     {
-        super(new DelegateDefinitionParser[]{orphan, named});
+        super(new MuleDefinitionParser[]{orphan, named});
         this.orphan = orphan;
         this.named = named;
         addIgnored(INHERIT);
     }
 
-    protected DelegateDefinitionParser getDelegate(Element element, ParserContext parserContext)
+    protected MuleDefinitionParser getDelegate(Element element, ParserContext parserContext)
     {
         // i'm not sure why this is suddenly necessary here and not elsewhere.
         // perhaps because this is used on the top level but has name deleted?

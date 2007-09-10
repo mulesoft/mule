@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:parsers-test="http://www.mulesource.org/schema/mule/parsers-test/2.0"
+    xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/parsers-test/2.0 http://www.mulesource.org/schema/mule/parsers-test/2.0/mule-parsers-test.xsd">
+
+    <model name="model">
+        <service name="service">
+            <bridge-component/>
+            <inbound-router>
+                <parsers-test:addressed-child-endpoint address="foo" ref="bar" name="error"/>
+            </inbound-router>
+        </service>
+    </model>
+
+</mule>

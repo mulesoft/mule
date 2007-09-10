@@ -10,22 +10,19 @@
 
 package org.mule.config.spring.parsers.endpoint;
 
-public class AddressedEndpointTestCase extends AbstractEndpointTestCase
+import org.mule.config.spring.parsers.AbstractBadConfigTestCase;
+
+public class AttributeErrorTestCase extends AbstractBadConfigTestCase
 {
 
     protected String getConfigResources()
     {
-        return "org/mule/config/spring/parsers/endpoint/addressed-endpoint-test.xml";
+        return "org/mule/config/spring/parsers/endpoint/attribute-error-test.xml";
     }
 
-    public void testAddressed()
+    public void testError() throws Exception
     {
-        doTest("addressed");
-    }
-
-    public void testAddressedOrphan()
-    {
-        doTest("addressed-orphan");
+        assertErrorContains("The attribute 'ref' cannot appear with the attribute 'address'");
     }
 
 }

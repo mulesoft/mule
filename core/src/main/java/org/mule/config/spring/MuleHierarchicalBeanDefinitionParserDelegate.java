@@ -50,6 +50,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
     public static final String MULE_NAMESPACE_PREFIX = "http://www.mulesource.org/schema/mule/";
     public static final String MULE_REPEAT_PARSE = "org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate.MULE_REPEAT_PARSE";
     public static final String MULE_NO_RECURSE = "org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_RECURSE";
+    public static final String MULE_NO_REGISTRATION = "org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_REGISTRATION";
 
     private DefaultBeanDefinitionDocumentReader spring;
 
@@ -91,13 +92,8 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
             do {
                 ParserContext parserContext = new ParserContext(getReaderContext(), this, parent);
                 finalChild = handler.parse(element, parserContext);
-                if (parserContext.isNested())
-                {
-                    registerBean(element, finalChild);
-                }
-
+                registerBean(element, finalChild);
                 isRecurse = isRecurse || ! testFlag(finalChild, MULE_NO_RECURSE);
-
             } while (null != finalChild && testFlag(finalChild, MULE_REPEAT_PARSE));
 
             // Only iterate and parse child mule name-spaced elements. Spring does not do
@@ -204,17 +200,15 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
         {
             return;
         }
-        //Check to see if the Bean Definition represents a compound element - one represents a subset of
-        //configuration for the parent bean. Compound bean definitions should not be registered since the properties
-        //set on them are really set on the parent bean.
-        Boolean compoundElement = (Boolean) bd.getAttribute(ParentDefinitionParser.COMPOUND_ELEMENT);
-        if (Boolean.TRUE.equals(compoundElement))
-        {
-            return;
-        }
 
-        String name =  generateChildBeanName(ele);
-        registerBeanDefinitionHolder(new BeanDefinitionHolder(bd, name));
+        // Check to see if the Bean Definition represents a compound element - one represents a subset of
+        // configuration for the parent bean. Compound bean definitions should not be registered since the properties
+        // set on them are really set on the parent bean.
+        if (! testFlag(bd, MULE_NO_REGISTRATION))
+        {
+            String name =  generateChildBeanName(ele);
+            registerBeanDefinitionHolder(new BeanDefinitionHolder(bd, name));
+        }
     }
 
     protected void registerBeanDefinitionHolder(BeanDefinitionHolder bdHolder)
