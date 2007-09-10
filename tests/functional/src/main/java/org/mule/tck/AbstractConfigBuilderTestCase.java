@@ -12,6 +12,7 @@ package org.mule.tck;
 
 import org.mule.MuleException;
 import org.mule.RegistryContext;
+import org.mule.config.MuleProperties;
 import org.mule.config.ThreadingProfile;
 import org.mule.config.spring.editors.TransformerChain;
 import org.mule.impl.DefaultExceptionStrategy;
@@ -41,6 +42,8 @@ import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.routing.UMOOutboundRouter;
 import org.mule.umo.routing.UMOOutboundRouterCollection;
 import org.mule.umo.transformer.UMOTransformer;
+
+import java.util.Map;
 
 public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfigBuilderTestCase
 {
@@ -292,14 +295,14 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
 //        assertNull(inEndpoint.getTransactionConfig().getConstraint());
 //    }
 
-    // TODO MULE-2207 Mule 1.x <environment-properties> are not getting picked-up.
-//    public void testEnvironmentProperties()
-//    {
-//        Registry r = managementContext.getRegistry();
-//        assertEquals("true", r.lookupProperty("doCompression"));
-//        assertEquals("this was set from the manager properties!", r.lookupProperty("beanProperty1"));
-//        assertNotNull(r.lookupProperty("OS Version"));
-//    }
+    public void testEnvironmentProperties()
+    {
+        Map props = (Map) managementContext.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES);
+        assertNotNull(props);
+        assertEquals("true", props.get("doCompression"));
+        assertEquals("this was set from the manager properties!", props.get("beanProperty1"));
+        assertNotNull(props.get("OS Version"));
+    }
 
 //    public void testObjectReferences() throws UMOException
 //    {
