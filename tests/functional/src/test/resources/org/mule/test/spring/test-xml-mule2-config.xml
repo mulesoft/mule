@@ -17,7 +17,7 @@
 
     <environment-properties>
         <spring:entry key="doCompression" value="true"/>
-        <spring:entry key="spring:beanProperty1" value="this was set from the manager properties!"/>
+        <spring:entry key="beanProperty1" value="this was set from the manager properties!"/>
         <spring:entry key="OS Version" value="not found"/>
     </environment-properties>
 
