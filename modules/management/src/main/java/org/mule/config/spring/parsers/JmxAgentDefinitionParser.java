@@ -31,27 +31,28 @@ public class JmxAgentDefinitionParser extends AbstractMuleBeanDefinitionParser
 
     public JmxAgentDefinitionParser()
     {
+        singleton = true;
     }
 
     protected Class getBeanClass(Element element) {
-            return JmxAgent.class;
-        }
+        return JmxAgent.class;
+    }
 
 
-        protected void postProcess(BeanAssembler assembler, Element element) {
-            NodeList childNodes = element.getChildNodes();
-            for (int i = 0; i < childNodes.getLength(); i++) {
-                Node node = childNodes.item(i);
-                if (CONNECTOR_SERVER.equals(node.getLocalName())) {
-                    assembler.extendBean("connectorServerUrl", ((Element) node).getAttribute("url"), false);
-                    String rebind = ((Element) node).getAttribute("rebind");
-                    if(!StringUtils.isEmpty(rebind)) {
-                        Map csProps = new HashMap();
-                        csProps.put("jmx.remote.jndi.rebind", rebind);
-                        assembler.extendBean("connectorServerProperties", csProps, false);
-                    }
+    protected void postProcess(BeanAssembler assembler, Element element) {
+        NodeList childNodes = element.getChildNodes();
+        for (int i = 0; i < childNodes.getLength(); i++) {
+            Node node = childNodes.item(i);
+            if (CONNECTOR_SERVER.equals(node.getLocalName())) {
+                assembler.extendBean("connectorServerUrl", ((Element) node).getAttribute("url"), false);
+                String rebind = ((Element) node).getAttribute("rebind");
+                if (!StringUtils.isEmpty(rebind)) {
+                    Map csProps = new HashMap();
+                    csProps.put("jmx.remote.jndi.rebind", rebind);
+                    assembler.extendBean("connectorServerProperties", csProps, false);
                 }
             }
-            super.postProcess(assembler, element);
         }
+        super.postProcess(assembler, element);
+    }
 }

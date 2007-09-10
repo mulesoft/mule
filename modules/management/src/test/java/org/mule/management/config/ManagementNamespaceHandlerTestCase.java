@@ -19,8 +19,6 @@ import org.mule.management.agents.Mx4jAgent;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.manager.UMOAgent;
 
-import javax.management.MBeanServerFactory;
-
 public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase
 {
     private static final int CHAINSAW_PORT = 8080;
@@ -28,14 +26,6 @@ public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase
     {
         return "management-namespace-config.xml";
     }
-
-    protected void suitePreSetUp()
-    {
-        //TODO: Remove this when MULE-2276 will be fixed
-        // because 'simpleJmxServer' isn't initialized first and consequently it doesn't create MBeanServer
-        MBeanServerFactory.createMBeanServer();
-    }
-
 
     public void testSimpleJmxAgentConfig() throws Exception
     {
