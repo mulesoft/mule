@@ -42,13 +42,11 @@
     <custom-transformer name="ExceptionToString" class="org.mule.samples.hello.ExceptionToString"/>
 
     <!-- workaround for http://mule.mulesource.org/jira/browse/MULE-1827 -->
-    <custom-transformer name="PlainTextResponseTransformer" class="org.mule.transformers.simple.MessagePropertiesTransformer">
-        <spring:property name="addProperties">
-            <spring:map>
-                <spring:entry key="Content-Type" value="text/plain"/>
-            </spring:map>
-        </spring:property>
-    </custom-transformer>   
+    <transformer-message-properties name="PlainTextResponseTransformer">
+        <add-properties>
+            <spring:entry key="Content-Type" value="text/plain"/>
+        </add-properties>
+    </transformer-message-properties>
     
     <model name="helloSample">
         <!--

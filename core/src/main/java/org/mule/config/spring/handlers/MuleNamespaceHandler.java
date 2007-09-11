@@ -298,8 +298,8 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
 
         //Utils / Standard Types
         registerBeanDefinitionParser("properties", new ChildMapDefinitionParser("properties"));
-        registerBeanDefinitionParser("addProperties", new ChildMapDefinitionParser("addProperties"));
-        registerBeanDefinitionParser("deleteProperties", new ChildListDefinitionParser("deleteProperties"));
+        registerMuleDefinitionParser("add-properties", new ChildMapDefinitionParser("addProperties"));
+        registerMuleDefinitionParser("delete-properties", new ChildListDefinitionParser("deleteProperties"));
         registerBeanDefinitionParser("meta-info", new ChildMapDefinitionParser("properties"));
         registerBeanDefinitionParser("jndi-provider-properties", new ChildMapDefinitionParser("jndiProviderProperties"));
         registerBeanDefinitionParser("environment", new ChildMapDefinitionParser("environment"));

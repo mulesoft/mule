@@ -10,13 +10,11 @@
 
     <http:connector name="httpConnector" reuseAddress="true"/>
 
-    <custom-transformer name="setResponseType" class="org.mule.transformers.simple.MessagePropertiesTransformer">
-        <spring:property name="addProperties">
-            <spring:map>
-                <spring:entry key="Content-Type" value="text/baz;charset=UTF-16BE"/>
-            </spring:map>
-        </spring:property>
-    </custom-transformer>
+    <transformer-message-properties name="setResponseType">
+        <add-properties>
+            <spring:entry key="Content-Type" value="text/baz;charset=UTF-16BE"/>
+        </add-properties>
+    </transformer-message-properties>
 
     <endpoint name="clientEndpoint" address="http://localhost:60198" synchronous="true"/>
 

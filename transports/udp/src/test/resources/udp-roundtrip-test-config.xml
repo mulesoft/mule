@@ -17,13 +17,10 @@
         <service name="PassingThrough">
             <component class="org.mule.components.simple.PassThroughComponent"/>
             <inbound-router>
-                <!-- MULE-2109 -->
-                <!-- mule:endpoint address="udp://${hostname}:9001"/ -->
                 <inbound-endpoint address="udp://${hostname}:61000"/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <!-- mule:endpoint address="udp://${hostname}:9002"/ -->
                     <outbound-endpoint address="udp://${hostname}:61001"/>
                 </outbound-pass-through-router>
             </outbound-router>
