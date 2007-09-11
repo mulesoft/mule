@@ -18,4 +18,5 @@
             </inbound-router>
         </mule-descriptor>
     </model>
+
 </mule-configuration>

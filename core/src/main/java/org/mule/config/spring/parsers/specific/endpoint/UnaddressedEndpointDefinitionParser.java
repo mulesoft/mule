@@ -10,6 +10,7 @@
 package org.mule.config.spring.parsers.specific.endpoint;
 
 import org.mule.config.spring.parsers.AbstractChildDefinitionParser;
+import org.mule.config.spring.parsers.specific.endpoint.support.EndpointUtils;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.util.StringUtils;
 
@@ -33,9 +34,8 @@ import org.w3c.dom.Element;
 public class UnaddressedEndpointDefinitionParser extends AbstractChildDefinitionParser
 {
 
-    public static final String ENDPOINT_URI_ATTRIBUTE = "endpointURI";
-    public static final String ADDRESS_ATTRIBUTE = "address";
-    public static final String ENDPOINT_REF_ATTRIBUTE = "ref";
+    public static final String ENDPOINT_URI_ATTRIBUTE = EndpointUtils.ENDPOINT_URI_ATTRIBUTE;
+    public static final String ADDRESS_ATTRIBUTE = EndpointUtils.ADDRESS_ATTRIBUTE;
 
     private Class endpointClass;
 
@@ -46,7 +46,7 @@ public class UnaddressedEndpointDefinitionParser extends AbstractChildDefinition
         addMapping("createConnector", "GET_OR_CREATE=0,ALWAYS_CREATE=1,NEVER_CREATE=2");
         addAlias("transformers", "transformer");
         addAlias("responseTransformers", "responseTransformer");
-        addIgnored(ENDPOINT_REF_ATTRIBUTE);
+        addIgnored(ATTRIBUTE_REF);
     }
 
     /**
@@ -106,13 +106,13 @@ public class UnaddressedEndpointDefinitionParser extends AbstractChildDefinition
 
     protected BeanDefinitionBuilder createBeanDefinitionBuilder(Element element, Class beanClass)
     {
-        if (null == element.getAttributeNode(ENDPOINT_REF_ATTRIBUTE))
+        if (null == element.getAttributeNode(ATTRIBUTE_REF))
         {
             return super.createBeanDefinitionBuilder(element, beanClass);
         }
         else
         {
-            String parent = element.getAttribute(ENDPOINT_REF_ATTRIBUTE);
+            String parent = element.getAttribute(ATTRIBUTE_REF);
             BeanDefinitionBuilder bdb = BeanDefinitionBuilder.childBeanDefinition(parent);
             bdb.getBeanDefinition().setBeanClassName(beanClass.getName());
             return bdb;
@@ -122,9 +122,9 @@ public class UnaddressedEndpointDefinitionParser extends AbstractChildDefinition
     // @Override
     protected String generateChildBeanName(Element e)
     {
-        if (null != e.getAttributeNode(ENDPOINT_REF_ATTRIBUTE))
+        if (null != e.getAttributeNode(ATTRIBUTE_REF))
         {
-            return "ref:" + e.getAttribute(ENDPOINT_REF_ATTRIBUTE);
+            return "ref:" + e.getAttribute(ATTRIBUTE_REF);
         }
         else
         {

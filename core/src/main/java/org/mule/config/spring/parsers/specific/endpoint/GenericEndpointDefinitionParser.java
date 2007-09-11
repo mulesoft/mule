@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id:GenericEndpointDefinitionParser.java 8321 2007-09-10 19:22:52Z acooke $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -19,10 +19,6 @@ public class GenericEndpointDefinitionParser extends ChildEndpointDefinitionPars
     public GenericEndpointDefinitionParser(Class endpoint)
     {
         super(endpoint);
-        registerPreProcessor(
-                new CheckExclusiveAttributes(new String[][]{
-                        new String[]{"ref"},
-                        new String[]{"address"}}));
     }
 
 }

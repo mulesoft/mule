@@ -10,15 +10,14 @@
 package org.mule.providers.vm.config;
 
 import org.mule.config.QueueProfile;
+import org.mule.config.spring.handlers.AbstractIgnorableNamespaceHandler;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleChildDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.UnaddressedEndpointDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.support.ChildAddressDefinitionParser;
-import org.mule.config.spring.handlers.AbstractIgnorableNamespaceHandler;
-import org.mule.providers.vm.VMConnector;
-import org.mule.impl.endpoint.GlobalEndpoint;
+import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
+import org.mule.config.spring.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
 import org.mule.impl.endpoint.InboundEndpoint;
 import org.mule.impl.endpoint.OutboundEndpoint;
+import org.mule.providers.vm.VMConnector;
 
 /**
  * Reigsters a Bean Definition Parser for handling <code><vm:connector></code> elements.
@@ -31,10 +30,9 @@ public class VmNamespaceHandler extends AbstractIgnorableNamespaceHandler
     {
         registerBeanDefinitionParser("connector", new MuleChildDefinitionParser(VMConnector.class, true));
         registerBeanDefinitionParser("queueProfile", new ChildDefinitionParser("queueProfile", QueueProfile.class));
-        registerBeanDefinitionParser("endpoint", new UnaddressedEndpointDefinitionParser(GlobalEndpoint.class));
-        registerBeanDefinitionParser("inbound-endpoint", new UnaddressedEndpointDefinitionParser(InboundEndpoint.class));
-        registerBeanDefinitionParser("outbound-endpoint", new UnaddressedEndpointDefinitionParser(OutboundEndpoint.class));
-        registerMuleDefinitionParser("address", new ChildAddressDefinitionParser("vm")).addAlias("address", "hostname");
+        registerBeanDefinitionParser("endpoint", new TransportGlobalEndpointDefinitionParser("vm"));
+        registerBeanDefinitionParser("inbound-endpoint", new TransportEndpointDefinitionParser("vm", InboundEndpoint.class));
+        registerBeanDefinitionParser("outbound-endpoint", new TransportEndpointDefinitionParser("vm", OutboundEndpoint.class));
     }
 
 }

@@ -19,9 +19,8 @@
                     <spring:entry key="returnMessage" value="Polo"/>
                 </properties>
             </component>
-
             <inbound-router>
-                <inbound-endpoint address="vm://s-in" synchronous="true"/>
+                <vm:inbound-endpoint address="s-in" synchronous="true"/>
             </inbound-router>
         </service>
     </model>

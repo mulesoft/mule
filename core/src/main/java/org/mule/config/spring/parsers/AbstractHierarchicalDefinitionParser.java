@@ -10,8 +10,8 @@
 package org.mule.config.spring.parsers;
 
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
-import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.util.StringUtils;
+import org.mule.util.XmlUtils;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -42,7 +42,7 @@ public abstract class AbstractHierarchicalDefinitionParser extends AbstractMuleB
         if (StringUtils.isBlank(parentBean))
         {
             throw new IllegalStateException("No parent for " +
-                    MuleHierarchicalBeanDefinitionParserDelegate.elementToString(element));
+                    XmlUtils.elementToString(element));
         }
         return getRegistry().getBeanDefinition(parentBean);
     }

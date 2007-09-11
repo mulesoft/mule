@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id:CheckExclusiveAttributes.java 8321 2007-09-10 19:22:52Z acooke $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -11,8 +11,8 @@
 package org.mule.config.spring.parsers.preprocessors;
 
 import org.mule.config.spring.parsers.PreProcessor;
-import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
-import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
+import org.mule.config.spring.parsers.assembly.PropertyConfiguration;
+import org.mule.util.XmlUtils;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Attr;
 
 public class CheckExclusiveAttributes implements PreProcessor
 {
@@ -41,7 +42,7 @@ public class CheckExclusiveAttributes implements PreProcessor
         }
     }
 
-    public void preProcess(Element element)
+    public void preProcess(PropertyConfiguration config, Element element)
     {
         List foundAttributes = new LinkedList();
         int foundSetIndex = NONE;
@@ -49,7 +50,8 @@ public class CheckExclusiveAttributes implements PreProcessor
         NamedNodeMap attributes = element.getAttributes();
         for (int i = 0; i < attributes.getLength(); i++)
         {
-            String name = attributes.item(i).getLocalName();
+            String alias = XmlUtils.attributeName((Attr) attributes.item(i));
+            String name = config.translateName(alias);
             if (knownAttributes.containsKey(name))
             {
                 int index = ((Integer) knownAttributes.get(name)).intValue();
@@ -70,9 +72,9 @@ public class CheckExclusiveAttributes implements PreProcessor
                         message.append("'");
                     }
                     message.append(" in element ");
-                    message.append(MuleHierarchicalBeanDefinitionParserDelegate.elementToString(element));
+                    message.append(XmlUtils.elementToString(element));
                     message.append(".");
-                    throw new IllegalStateException(message.toString());
+                    throw new CheckExclusiveAttributesException(message.toString());
                 }
                 else
                 {
@@ -81,6 +83,16 @@ public class CheckExclusiveAttributes implements PreProcessor
                 }
             }
         }
+    }
+
+    public static class CheckExclusiveAttributesException extends IllegalStateException
+    {
+
+        private CheckExclusiveAttributesException(String message)
+        {
+            super(message);
+        }
+
     }
 
 }

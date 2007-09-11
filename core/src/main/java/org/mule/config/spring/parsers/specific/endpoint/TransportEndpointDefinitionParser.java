@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id:TransportEndpointDefinitionParser.java 8321 2007-09-10 19:22:52Z acooke $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -14,7 +14,20 @@ import org.mule.config.spring.parsers.specific.endpoint.support.ChildEndpointDef
 import org.mule.config.spring.parsers.specific.endpoint.support.AddressedEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.LazyEndpointURI;
 import org.mule.config.spring.parsers.preprocessors.CheckExclusiveAttributes;
+import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 
+/**
+ * This is intended for use by endpoint-specific parsers for non-global endpoint
+ * elements.  It will not allow the "ref" attribute with any of the
+ * {@link org.mule.config.spring.parsers.specific.LazyEndpointURI#ATTRIBUTES}.
+ *
+ * <p>It generates both an endpoint (which should subclass
+ * {@link org.mule.impl.endpoint.MuleEndpoint}) and a
+ * {@link org.mule.config.spring.parsers.specific.LazyEndpointURI}.  The URI is
+ * then injected into the endpoint.  So the associated schema can enable any of the
+ * suitable {@link org.mule.config.spring.parsers.specific.LazyEndpointURI#ATTRIBUTES}
+ * or add appropriate mappings.
+ */
 public class TransportEndpointDefinitionParser extends AddressedEndpointDefinitionParser
 {
 
@@ -23,7 +36,7 @@ public class TransportEndpointDefinitionParser extends AddressedEndpointDefiniti
         super(protocol, new ChildEndpointDefinitionParser(endpoint));
         registerPreProcessor(
                 new CheckExclusiveAttributes(new String[][]{
-                        new String[]{"ref"},
+                        new String[]{AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF},
                         LazyEndpointURI.ATTRIBUTES}));
     }
 

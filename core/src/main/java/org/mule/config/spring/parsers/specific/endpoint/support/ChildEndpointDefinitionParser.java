@@ -10,6 +10,7 @@
 
 package org.mule.config.spring.parsers.specific.endpoint.support;
 
+import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -31,12 +32,10 @@ import org.w3c.dom.Element;
 public class ChildEndpointDefinitionParser extends ChildDefinitionParser
 {
 
-    public static final String ENDPOINT_REF_ATTRIBUTE = "ref";
-
     public ChildEndpointDefinitionParser(Class endpoint)
     {
         super("endpoint", endpoint);
-        addIgnored(ENDPOINT_REF_ATTRIBUTE);
+        addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF);
         EndpointUtils.addProperties(this);
         EndpointUtils.addPostProcess(this);
     }
@@ -44,13 +43,13 @@ public class ChildEndpointDefinitionParser extends ChildDefinitionParser
     // @Override
     public BeanDefinitionBuilder createBeanDefinitionBuilder(Element element, Class beanClass)
     {
-        if (null == element.getAttributeNode(ENDPOINT_REF_ATTRIBUTE))
+        if (null == element.getAttributeNode(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF))
         {
             return super.createBeanDefinitionBuilder(element, beanClass);
         }
         else
         {
-            String parent = element.getAttribute(ENDPOINT_REF_ATTRIBUTE);
+            String parent = element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF);
             BeanDefinitionBuilder bdb = BeanDefinitionBuilder.childBeanDefinition(parent);
             bdb.getBeanDefinition().setBeanClassName(beanClass.getName());
             return bdb;
@@ -60,12 +59,12 @@ public class ChildEndpointDefinitionParser extends ChildDefinitionParser
     // @Override
     protected String generateChildBeanName(Element element)
     {
-        if (null != element.getAttributeNode(ENDPOINT_REF_ATTRIBUTE))
+        if (null != element.getAttributeNode(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF))
         {
             // why do we do this?  it doesn't seem to be used anwhere else
             // is it to avoid having to specify a name?  if so, we should
             // perhaps check to see if a name is given?  TODO
-            return "ref:" + element.getAttribute(ENDPOINT_REF_ATTRIBUTE);
+            return "ref:" + element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF);
         }
         else
         {

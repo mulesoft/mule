@@ -105,7 +105,9 @@
     <xsd:complexType name="abstractConnectorType"/>
 
     <xsd:element name="abstract-global-endpoint" abstract="true" type="abstractGlobalEndpointType"/>
-    <xsd:complexType name="abstractGlobalEndpointType"/>
+    <xsd:complexType name="abstractGlobalEndpointType">
+        <xsd:attribute name="name" type="xsd:NMTOKEN" use="required"/>
+    </xsd:complexType>
 
     <xsd:element name="abstract-inbound-endpoint" abstract="true" type="abstractInboundEndpointType"/>
     <xsd:complexType name="abstractInboundEndpointType"/>
@@ -381,17 +383,17 @@
     </xsd:complexType>
 
     <xsd:complexType name="jndiTransactionManagerType">
-            <xsd:complexContent>
-                <xsd:extension base="abstractTransactionManagerType"> 
-                    <xsd:sequence>
-                        <xsd:element name="environment" type="mapType" minOccurs="0" maxOccurs="1">
-                            <xsd:annotation>
-                                <xsd:documentation>Properties to be set on the created object</xsd:documentation>
-                            </xsd:annotation>
-                        </xsd:element>
-                    </xsd:sequence>
-                </xsd:extension>
-            </xsd:complexContent>
+        <xsd:complexContent>
+            <xsd:extension base="abstractTransactionManagerType">
+                <xsd:sequence>
+                    <xsd:element name="environment" type="mapType" minOccurs="0" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>Properties to be set on the created object</xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
 
     <xsd:complexType name="customTransactionManagerType">
@@ -431,6 +433,7 @@
         <xsd:complexContent>
             <xsd:extension base="abstractInboundEndpointType">
                 <xsd:group ref="defaultEndpointElements"/>
+                <xsd:attribute name="name" type="xsd:NMTOKEN"/>
                 <xsd:attributeGroup ref="defaultEndpointAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -441,6 +444,7 @@
         <xsd:complexContent>
             <xsd:extension base="abstractOutboundEndpointType">
                 <xsd:group ref="defaultEndpointElements"/>
+                <xsd:attribute name="name" type="xsd:NMTOKEN"/>
                 <xsd:attributeGroup ref="defaultEndpointAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -451,6 +455,7 @@
         <xsd:complexContent>
             <xsd:extension base="abstractResponseEndpointType">
                 <xsd:group ref="defaultEndpointElements"/>
+                <xsd:attribute name="name" type="xsd:NMTOKEN"/>
                 <xsd:attributeGroup ref="defaultEndpointAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -486,7 +491,6 @@
     </xsd:attributeGroup>
 
     <xsd:attributeGroup name="restrictedEndpointAttributes">
-        <xsd:attribute name="name" type="xsd:NMTOKEN"/>
         <xsd:attribute name="synchronous" type="substitutableBoolean"/>
         <xsd:attribute name="remoteSync" type="substitutableBoolean"/>
         <xsd:attribute name="remoteSyncTimeout" type="xsd:NMTOKEN"/>

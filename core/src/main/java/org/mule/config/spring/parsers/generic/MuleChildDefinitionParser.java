@@ -9,7 +9,7 @@
  */
 package org.mule.config.spring.parsers.generic;
 
-import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
+import org.mule.util.XmlUtils;
 
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -46,7 +46,7 @@ public class MuleChildDefinitionParser extends OrphanDefinitionParser
         {
             throw new IllegalStateException("This element should be embedded inside the Mule <"
                     + ROOT_ELEMENT + "> or <" + ROOT_UNSAFE_ELEMENT + "> elements: "
-                    + MuleHierarchicalBeanDefinitionParserDelegate.elementToString(element));
+                    + XmlUtils.elementToString(element));
         }
     }
 

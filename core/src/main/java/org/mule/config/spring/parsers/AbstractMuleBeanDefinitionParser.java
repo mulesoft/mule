@@ -90,7 +90,8 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
     public static final String ATTRIBUTE_ID = "id";
     public static final String ATTRIBUTE_NAME = "name";
     public static final String ATTRIBUTE_CLASS = "class";
-    public static final String ATTRIBUTE_REF_SUFFIX = "-ref";
+    public static final String ATTRIBUTE_REF = "ref";
+    public static final String ATTRIBUTE_REF_SUFFIX = "-" + ATTRIBUTE_REF;
 
     /**
      * logger used by this class
@@ -214,7 +215,7 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
         Iterator processes = preProcessors.iterator();
         while (processes.hasNext())
         {
-            ((PreProcessor) processes.next()).preProcess(element);
+            ((PreProcessor) processes.next()).preProcess(propertyConfiguration, element);
         }
     }
 

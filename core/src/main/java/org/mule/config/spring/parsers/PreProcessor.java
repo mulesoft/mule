@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id:PreProcessor.java 8321 2007-09-10 19:22:52Z acooke $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -10,7 +10,7 @@
 
 package org.mule.config.spring.parsers;
 
-import org.mule.config.spring.parsers.assembly.BeanAssembler;
+import org.mule.config.spring.parsers.assembly.PropertyConfiguration;
 
 import org.w3c.dom.Element;
 
@@ -20,6 +20,6 @@ import org.w3c.dom.Element;
 public interface PreProcessor
 {
 
-    public void preProcess(Element element);
+    public void preProcess(PropertyConfiguration config, Element element);
 
 }

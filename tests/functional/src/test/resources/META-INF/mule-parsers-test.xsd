@@ -122,6 +122,7 @@
         <xsd:complexContent>
             <xsd:extension base="mule:abstractInboundEndpointType">
                 <xsd:group ref="mule:defaultEndpointElements"/>
+                <xsd:attribute name="name" type="xsd:NMTOKEN"/>
                 <xsd:attributeGroup ref="mule:defaultEndpointAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -144,6 +145,7 @@
         <xsd:complexContent>
             <xsd:extension base="mule:abstractInboundEndpointType">
                 <xsd:group ref="mule:defaultEndpointElements"/>
+                <xsd:attribute name="name" type="xsd:NMTOKEN" use="required"/>
                 <xsd:attribute name="address" type="xsd:string"/>
                 <xsd:attribute name="ref" type="xsd:string"/>
                 <xsd:attributeGroup ref="mule:restrictedEndpointAttributes"/>

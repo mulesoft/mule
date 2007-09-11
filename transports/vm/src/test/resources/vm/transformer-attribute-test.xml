@@ -14,7 +14,9 @@
         <service name="testServiceSimple">
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
-                <inbound-endpoint address="vm://simple" transformers="appendString"/>
+                <vm:inbound-endpoint address="simple">
+                    <transformers-ref transformers="appendString"/>
+                </vm:inbound-endpoint>
             </inbound-router>
         </service>
     </model>
@@ -23,19 +25,22 @@
         <service name="testServiceChained">
             <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
-                <inbound-endpoint address="vm://chained"/>
+                <vm:inbound-endpoint address="chained"/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <outbound-endpoint address="vm://out" synchronous="true"/>
+                    <vm:outbound-endpoint address="out" synchronous="true"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
         <service name="testServiceChainedB">
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
-                <inbound-endpoint address="vm://out" transformers="appendString"/>
+                <vm:inbound-endpoint address="out">
+                    <transformers-ref transformers="appendString"/>
+                </vm:inbound-endpoint>
             </inbound-router>
         </service>
     </model>
+    
 </mule>

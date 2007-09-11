@@ -9,8 +9,8 @@
  */
 package org.mule.config.spring;
 
-import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
 import org.mule.util.StringUtils;
+import org.mule.util.XmlUtils;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -19,8 +19,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
-import org.springframework.beans.factory.config.MapFactoryBean;
-import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
@@ -30,7 +28,6 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.beans.factory.xml.XmlReaderContext;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 
@@ -46,8 +43,6 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
 {
 
     public static final String BEANS = "beans"; // cannot find this in Spring api!
-    public static final String MULE_DEFAULT_NAMESPACE = "http://www.mulesource.org/schema/mule/core";
-    public static final String MULE_NAMESPACE_PREFIX = "http://www.mulesource.org/schema/mule/";
     public static final String MULE_REPEAT_PARSE = "org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate.MULE_REPEAT_PARSE";
     public static final String MULE_NO_RECURSE = "org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_RECURSE";
     public static final String MULE_NO_REGISTRATION = "org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_REGISTRATION";
@@ -70,9 +65,9 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
     {
         if (logger.isDebugEnabled())
         {
-            logger.debug("parsing: " + elementToString(element));
+            logger.debug("parsing: " + XmlUtils.elementToString(element));
         }
-        if (isBeansNamespace(element))
+        if (XmlUtils.isBeansNamespace(element))
         {
             return handleSpringElements(element, parent);
         }
@@ -106,7 +101,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
             // which handles iteration internally (this is a hack needed because Spring doesn't
             // expose the DP for "<spring:entry>" elements directly).
 
-            if (isMuleNamespace(element) && isRecurse)
+            if (XmlUtils.isMuleNamespace(element) && isRecurse)
             {
                 NodeList list = element.getChildNodes();
                 for (int i = 0; i < list.getLength(); i++)
@@ -127,7 +122,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
         // these are only called if they are at a "top level" - if they are nested inside
         // other spring elements then spring will handle them itself
 
-        if (isLocalName(element, BEANS))
+        if (XmlUtils.isLocalName(element, BEANS))
         {
             // the delegate doesn't support the full spring schema, but it seems that
             // we can invoke the DefaultBeanDefinitionDocumentReader via registerBeanDefinitions
@@ -144,7 +139,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
             }
         }
 
-        else if (isLocalName(element, PROPERTY_ELEMENT))
+        else if (XmlUtils.isLocalName(element, PROPERTY_ELEMENT))
         {
             parsePropertyElement(element, parent);
         }
@@ -168,30 +163,16 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
 //            parseSetElement(element, bd);
 //        }
 
-        else if (isLocalName(element, BEAN_ELEMENT))
+        else if (XmlUtils.isLocalName(element, BEAN_ELEMENT))
         {
             registerBeanDefinitionHolder(parseBeanDefinitionElement(element, parent));
         }
         else
         {
-            throw new IllegalStateException("Unexpected Spring element: " + elementToString(element));
+            throw new IllegalStateException("Unexpected Spring element: " + XmlUtils.elementToString(element));
         }
 
         return parent;
-    }
-
-    public static String elementToString(Element e)
-    {
-        StringBuffer buf = new StringBuffer();
-        buf.append(e.getTagName()).append("{");
-        for (int i = 0; i < e.getAttributes().getLength(); i++)
-        {
-            Node n = e.getAttributes().item(i);
-            buf.append(n.getLocalName()).append("=").append(n.getNodeValue()).append(", ");
-
-        }
-        buf.append("}");
-        return buf.toString();
     }
 
     protected void registerBean(Element ele, BeanDefinition bd)
@@ -233,23 +214,6 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
         {
             return id;
         }
-    }
-
-    public static boolean isMuleNamespace(Element element)
-    {
-        String ns = element.getNamespaceURI();
-        return ns != null && ns.startsWith(MULE_NAMESPACE_PREFIX);
-    }
-
-    public static boolean isBeansNamespace(Element element)
-    {
-        String ns = element.getNamespaceURI();
-        return ns != null && ns.equals(BEANS_NAMESPACE_URI);
-    }
-
-    public static boolean isLocalName(Element element, String name)
-    {
-        return element.getLocalName().equals(name);
     }
 
     public static void setFlag(BeanDefinition bean, String flag)

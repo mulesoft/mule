@@ -14,14 +14,16 @@ import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.config.spring.parsers.PreProcessor;
+import org.mule.config.spring.parsers.assembly.PropertyConfiguration;
+import org.mule.config.spring.parsers.preprocessors.DisableByAttribute;
 import org.mule.util.StringUtils;
 
 import java.util.Iterator;
 
+import edu.emory.mathcs.backport.java.util.Arrays;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
-import edu.emory.mathcs.backport.java.util.Arrays;
 
 /**
  * This allows a set of definition parsers to be used, one after another, to process
@@ -34,6 +36,10 @@ import edu.emory.mathcs.backport.java.util.Arrays;
  * <p>Typically, subclasses will add additional processing with
  * {@link org.mule.config.spring.parsers.PreProcessor} and
  * {@link org.mule.config.spring.parsers.PostProcessor} anonymous classes.</p>
+ *
+ * <p>If {@link org.mule.config.spring.parsers.preprocessors.DisableByAttribute.DisableByAttributeException}
+ * is thrown it is trapped (not shown to the user) and the next parser invoked.  This allows programatic
+ * selection of parsers (for static selection use the schema).</p>
  */
 public abstract class AbstractSerialDelegatingDefinitionParser extends AbstractDelegatingDefinitionParser
 {
@@ -57,7 +63,14 @@ public abstract class AbstractSerialDelegatingDefinitionParser extends AbstractD
         AbstractBeanDefinition bean = null;
         while (null == bean && index < size())
         {
-            bean = getDelegate(index++).parseDelegate(element, parserContext);
+            try
+            {
+                bean = getDelegate(index++).parseDelegate(element, parserContext);
+            }
+            catch (DisableByAttribute.DisableByAttributeException e)
+            {
+                bean = null;
+            }
         }
         if (null != bean)
         {
@@ -77,7 +90,7 @@ public abstract class AbstractSerialDelegatingDefinitionParser extends AbstractD
     {
         delegate.registerPreProcessor(new PreProcessor()
         {
-            public void preProcess(Element element)
+            public void preProcess(PropertyConfiguration config, Element element)
             {
                 if (first)
                 {

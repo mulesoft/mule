@@ -12,6 +12,8 @@ package org.mule.providers.vm.config;
 import org.mule.config.QueueProfile;
 import org.mule.providers.vm.VMConnector;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 
 /**
@@ -67,5 +69,16 @@ public class VmNamespaceHandlerTestCase extends FunctionalTestCase
 
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());
-    }    
+    }
+
+    public void testGlobalEndpoint() throws Exception
+    {
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("vmEndpoint", managementContext);
+        assertNotNull(endpoint);
+        UMOEndpointURI uri = endpoint.getEndpointURI();
+        assertNotNull(uri);
+        String address = uri.getAddress();
+        assertEquals(address, "queue");
+    }
+
 }

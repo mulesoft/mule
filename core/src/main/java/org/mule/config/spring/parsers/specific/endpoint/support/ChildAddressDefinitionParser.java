@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id:ChildAddressDefinitionParser.java 8321 2007-09-10 19:22:52Z acooke $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -26,7 +26,7 @@ public class ChildAddressDefinitionParser extends ChildDefinitionParser
 
     public ChildAddressDefinitionParser(String protocol)
     {
-        super("endpointURI", LazyEndpointURI.class);
+        super(EndpointUtils.ENDPOINT_URI_ATTRIBUTE, LazyEndpointURI.class);
         this.protocol = protocol;
     }
 

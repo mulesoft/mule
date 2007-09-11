@@ -41,9 +41,9 @@ public class StringAddressEndpointDefinitionParser extends UnaddressedEndpointDe
             {
                 throw new IllegalStateException("A global endpoint requires an " + ADDRESS_ATTRIBUTE + " attribute.");
             }
-            if (null != element.getAttributeNode(ENDPOINT_REF_ATTRIBUTE))
+            if (null != element.getAttributeNode(ATTRIBUTE_REF))
             {
-                throw new IllegalStateException("A global endpoint cannot contain a " + ENDPOINT_REF_ATTRIBUTE +
+                throw new IllegalStateException("A global endpoint cannot contain a " + ATTRIBUTE_REF +
                         " attribute.");
             }
         }
@@ -52,17 +52,17 @@ public class StringAddressEndpointDefinitionParser extends UnaddressedEndpointDe
             // must be reference *or* have an address
             if (null == element.getAttributeNode(ADDRESS_ATTRIBUTE))
             {
-                if (null == element.getAttributeNode(ENDPOINT_REF_ATTRIBUTE))
+                if (null == element.getAttributeNode(ATTRIBUTE_REF))
                 {
                     throw new IllegalStateException("An endpoint requires either an " + ADDRESS_ATTRIBUTE + " or a " +
-                            ENDPOINT_REF_ATTRIBUTE + " attribute.");
+                            ATTRIBUTE_REF + " attribute.");
                 }
             }
             else
             {
-                if (null != element.getAttributeNode(ENDPOINT_REF_ATTRIBUTE))
+                if (null != element.getAttributeNode(ATTRIBUTE_REF))
                 {
-                    throw new IllegalStateException("The " + ADDRESS_ATTRIBUTE + " and " + ENDPOINT_REF_ATTRIBUTE +
+                    throw new IllegalStateException("The " + ADDRESS_ATTRIBUTE + " and " + ATTRIBUTE_REF +
                             " attributes are mutually exclusive.");
                 }
             }
