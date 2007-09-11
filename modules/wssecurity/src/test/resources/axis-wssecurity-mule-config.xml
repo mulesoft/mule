@@ -21,9 +21,7 @@
         </spring:constructor-arg>
     </spring:bean>
 
-    <environment-properties>
-        <spring:entry key="synchronous" value="false"/>
-    </environment-properties>
+    <configuration serverId="testServer" defaultSynchronousEndpoints="false"/>
 
     <axis:connector name="axisConnector" clientConfig="mule-axis-secure-client-config.wsdd"
                     serverConfig="mule-axis-secure-server-config.wsdd">

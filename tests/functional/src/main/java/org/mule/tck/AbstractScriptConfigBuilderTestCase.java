@@ -10,7 +10,6 @@
 
 package org.mule.tck;
 
-import org.mule.config.MuleProperties;
 import org.mule.config.spring.editors.TransformerChain;
 import org.mule.impl.AbstractExceptionListener;
 import org.mule.providers.SimpleRetryConnectionStrategy;
@@ -50,9 +49,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
 
     public void testManagerConfig() throws Exception
     {
-        Map props = (Map)managementContext.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES);
-        assertNotNull(props);
-        assertEquals("true", props.get("doCompression"));
+        assertEquals("true", managementContext.getRegistry().lookupObject("doCompression"));
         assertNotNull(managementContext.getTransactionManager());
     }
 

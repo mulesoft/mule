@@ -53,7 +53,7 @@
 
     <xsd:group name="rootElements">
         <xsd:choice>
-            <xsd:element name="environment-properties" type="mapType"/>
+            <xsd:element name="environment-property" type="environmentPropertyType"/>
             <xsd:element name="configuration" type="muleManagementContextType"/>
             <xsd:element ref="description"/>
             <xsd:element ref="abstract-extension"/>
@@ -189,6 +189,24 @@
                 </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="environmentPropertyType">
+<!--         <xsd:sequence>
+            <xsd:choice minOccurs="0" maxOccurs="1">
+                <xsd:element ref="spring:bean"/>
+                <xsd:element ref="spring:ref"/>
+                <xsd:element ref="spring:idref"/>
+                <xsd:element ref="spring:value"/>
+                <xsd:element ref="spring:null"/>
+                <xsd:element ref="spring:list"/>
+                <xsd:element ref="spring:set"/>
+                <xsd:element ref="spring:map"/>
+                <xsd:element ref="spring:props"/>
+            </xsd:choice>
+        </xsd:sequence>  -->
+        <xsd:attribute name="name" type="xsd:string" use="required"/>
+        <xsd:attribute name="value" type="xsd:string" use="required"/>
     </xsd:complexType>
 
     <xsd:element name="abstract-component" abstract="true" type="abstractComponentType"/>

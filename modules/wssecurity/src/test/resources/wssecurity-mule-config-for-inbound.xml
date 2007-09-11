@@ -21,9 +21,7 @@
         </spring:constructor-arg>
     </spring:bean>
 
-    <environment-properties>
-        <spring:entry key="synchronous" value="false"/>
-    </environment-properties>
+    <configuration serverId="testServer" defaultSynchronousEndpoints="false"/>
 
     <xfire:connector name="xfireConnector">
         <xfire:client-out-handler>org.codehaus.xfire.util.dom.DOMOutHandler</xfire:client-out-handler>

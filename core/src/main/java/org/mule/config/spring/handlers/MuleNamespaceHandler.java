@@ -16,21 +16,20 @@ import org.mule.components.simple.NullComponent;
 import org.mule.components.simple.PassThroughComponent;
 import org.mule.config.MuleProperties;
 import org.mule.config.QueueProfile;
+import org.mule.config.spring.editors.TransformerChain;
 import org.mule.config.spring.parsers.collection.ChildListDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
-import org.mule.config.spring.parsers.collection.OrphanMapDefinitionParser;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.delegate.InheritDefinitionParser;
+import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.NameTransferDefinitionParser;
 import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.GenericGlobalEndpointDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.GenericEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
 import org.mule.config.spring.parsers.specific.ConfigurationDefinitionParser;
 import org.mule.config.spring.parsers.specific.ConnectionStrategyDefinitionParser;
+import org.mule.config.spring.parsers.specific.EnvironmentPropertyDefinitionParser;
 import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
 import org.mule.config.spring.parsers.specific.ObjectFactoryDefinitionParser;
 import org.mule.config.spring.parsers.specific.PoolingProfileDefinitionParser;
@@ -41,7 +40,8 @@ import org.mule.config.spring.parsers.specific.SimpleComponentDefinitionParser;
 import org.mule.config.spring.parsers.specific.ThreadingProfileDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransactionConfigDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransformerDefinitionParser;
-import org.mule.config.spring.editors.TransformerChain;
+import org.mule.config.spring.parsers.specific.endpoint.GenericEndpointDefinitionParser;
+import org.mule.config.spring.parsers.specific.endpoint.GenericGlobalEndpointDefinitionParser;
 import org.mule.impl.DefaultComponentExceptionStrategy;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.container.JndiContainerContext;
@@ -114,14 +114,12 @@ import org.mule.transformers.simple.HexStringToByteArray;
 import org.mule.transformers.simple.MessagePropertiesTransformer;
 import org.mule.transformers.simple.ObjectToByteArray;
 import org.mule.transformers.simple.SerializableToByteArray;
-import org.mule.transformers.simple.StringToByteArray;
 import org.mule.transformers.simple.StringAppendTransformer;
+import org.mule.transformers.simple.StringToByteArray;
 import org.mule.util.properties.BeanPropertyExtractor;
 import org.mule.util.properties.MapPropertyExtractor;
 import org.mule.util.properties.MessagePropertyExtractor;
 import org.mule.util.properties.PayloadPropertyExtractor;
-
-import java.util.HashMap;
 
 /**
  * This is the core namespace handler for Mule and configures all Mule configuration elements under the
@@ -137,7 +135,8 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
 
         //Common elements
         registerBeanDefinitionParser("configuration", new ConfigurationDefinitionParser());
-        registerBeanDefinitionParser("environment-properties", new OrphanMapDefinitionParser(HashMap.class, MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES));
+//        registerBeanDefinitionParser("environment-properties", new OrphanMapDefinitionParser(HashMap.class, MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES));
+        registerBeanDefinitionParser("environment-property", new EnvironmentPropertyDefinitionParser());
         registerBeanDefinitionParser("default-threading-profile", new ThreadingProfileDefinitionParser("defaultThreadingProfile"));
         registerBeanDefinitionParser("default-dispatcher-threading-profile", new ThreadingProfileDefinitionParser("defaultMessageDispatcherThreadingProfile"));
         registerBeanDefinitionParser("default-receiver-threading-profile", new ThreadingProfileDefinitionParser("defaultMessageReceiverThreadingProfile"));

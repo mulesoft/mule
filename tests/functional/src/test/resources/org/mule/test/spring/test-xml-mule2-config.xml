@@ -15,11 +15,9 @@
                                    threadTTL="60001"/>
     </configuration>
 
-    <environment-properties>
-        <spring:entry key="doCompression" value="true"/>
-        <spring:entry key="beanProperty1" value="this was set from the manager properties!"/>
-        <spring:entry key="OS Version" value="not found"/>
-    </environment-properties>
+    <environment-property name="doCompression" value="true"/>
+    <environment-property name="beanProperty1" value="this was set from the manager properties!"/>
+    <environment-property name="OS_Version" value="not found"/>
 
 
     <!-- TODO ConnectionStrategies on endpoints -->

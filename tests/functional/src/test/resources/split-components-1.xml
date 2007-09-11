@@ -8,6 +8,6 @@
 
     <!-- part 1 of 3 -->
     
-    <environment-properties/>
+    <environment-property name="a" value="b"/>
 
 </mule>

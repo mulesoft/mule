@@ -1083,19 +1083,7 @@ public class MuleClient implements Disposable
     {
         try
         {
-            Map props = ((Map) managementContext.getRegistry().lookupObject(
-                MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES));
-            if (props == null)
-            {
-                props = new HashMap();
-                props.put(key, value);
-                managementContext.getRegistry().registerObject(
-                    MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES, props, managementContext);
-            }
-            else
-            {
-                props.put(key, value);
-            }
+            managementContext.getRegistry().registerObject(key, value, managementContext);
         }
         catch (RegistrationException e)
         {
@@ -1105,13 +1093,7 @@ public class MuleClient implements Disposable
 
     public Object getProperty(String key)
     {
-        Map props = (Map) managementContext.getRegistry().lookupObject(
-            MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES);
-        if (props != null)
-        {
-            return props.get(key);
-        }
-        return null;
+        return managementContext.getRegistry().lookupObject(key);
     }
 
     public MuleConfiguration getConfiguration()

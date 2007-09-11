@@ -10,10 +10,6 @@
 
 package org.mule.extras.spring.events;
 
-import org.mule.config.MuleProperties;
-
-import java.util.Map;
-
 public class SpringEventsWithEmbeddedManagerTestCase extends SpringEventsTestCase
 {
 
@@ -24,8 +20,6 @@ public class SpringEventsWithEmbeddedManagerTestCase extends SpringEventsTestCas
 
     public void testCorrectManagerLoaded()
     {
-        Map props = (Map)managementContext.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES);
-        assertNotNull(props);
-        assertNotNull(props.get("embeddedManager"));
+        assertNotNull(managementContext.getRegistry().lookupObject("embeddedManager"));
     }
 }

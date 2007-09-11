@@ -18,17 +18,15 @@
          but currently differs in that it (1) is more detailed/direct and (2) is
          associated with tests (rather than just seeing if parsing fails). -->
 
-        <mule:environment-properties>
-            <entry key="doCompression" value="true"/>
-            <entry key="beanProperty1" value="this was set from the manager properties!"/>
-            <entry key="OS Version" value="${os.version}"/>
-            <entry key="system-prop2" value="${system-prop2-cannot-loop}"/> <!-- defaultValue="default" -->
-        </mule:environment-properties>
+        <mule:environment-property name="doCompression" value="true"/>
+        <mule:environment-property name="beanProperty1" value="this was set from the manager properties!"/>
+        <mule:environment-property name="OS_Version" value="${os.version}"/>
+        <mule:environment-property name="system-prop2" value="${system-prop2-cannot-loop}"/> <!-- defaultValue="default" -->
 
         <!-- environment-properties>
         <property name="doCompression" value="true"/>
         <property name="beanProperty1" value="this was set from the manager properties!"/>
-        <system-property name="OS Version" key="os.version"/>
+        <system-property name="OS_Version" key="os.version"/>
         <system-property name="system-prop2" key="system-prop2" defaultValue="default"/>
     </environment-properties -->
 

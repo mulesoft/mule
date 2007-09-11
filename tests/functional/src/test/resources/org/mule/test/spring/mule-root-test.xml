@@ -12,9 +12,7 @@
         <spring:alias name="bean" alias="poot"/>
     </spring:beans>
 
-    <environment-properties>
-        <spring:entry key="property" value="value"/>
-    </environment-properties>
+    <environment-property name="property" value="value"/>
 
     <model name="model">
         <service name="service">

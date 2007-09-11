@@ -253,8 +253,7 @@ public class ManagementContextFactoryBean extends AbstractFactoryBean
                 for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();)
                 {
                     Map.Entry e =  (Map.Entry)iterator.next();
-                    registry.registerObject((String)e.getKey(), e.getValue(),
-                            MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES, managementContext);
+                    registry.registerObject((String)e.getKey(), e.getValue(), managementContext);
                 }
             }
             catch (RegistrationException e)

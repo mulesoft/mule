@@ -13,17 +13,17 @@ package org.mule.providers.email.transformers;
 import org.mule.providers.email.MailProperties;
 import org.mule.providers.email.MailUtils;
 import org.mule.providers.email.SmtpConnector;
+import org.mule.registry.RegistrationException;
 import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.UMOEventContext;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.MapUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.TemplateParser;
-import org.mule.config.MuleProperties;
 
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
@@ -88,13 +88,26 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
         Properties otherHeaders = (Properties) eventMsg.getProperty(MailProperties.CUSTOM_HEADERS_MAP_PROPERTY);
         if (otherHeaders != null && !otherHeaders.isEmpty())
         {
-            Map props = new HashMap((Map)context.getManagementContext().getRegistry().lookupObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES));
-            for (Iterator iterator = eventMsg.getPropertyNames().iterator(); iterator.hasNext();)
+            try
             {
-                String propertyKey = (String) iterator.next();
-                props.put(propertyKey, eventMsg.getProperty(propertyKey));
+                final UMOManagementContext mc = context.getManagementContext();
+                for (Iterator iterator = eventMsg.getPropertyNames().iterator(); iterator.hasNext();)
+                {
+                    String propertyKey = (String) iterator.next();
+                    mc.getRegistry().registerObject(propertyKey, eventMsg.getProperty(propertyKey), mc);
+                }
+                headers.putAll(templateParser.parse(new TemplateParser.TemplateCallback()
+                {
+                    public Object match(String token)
+                    {
+                        return mc.getRegistry().lookupObject(token);
+                    }
+                }, otherHeaders));
             }
-            headers.putAll(templateParser.parse(props, otherHeaders));
+            catch (RegistrationException e)
+            {
+                throw new TransformerException(this, e);
+            }
         }
 
         if (logger.isDebugEnabled())

@@ -10,7 +10,7 @@
         <!-- Whether mule transfromers should use compression when sending and recieving messages -->
         <property name="doCompression" value="true"/>
         <property name="beanProperty1" value="this was set from the manager properties!"/>
-        <system-property name="OS Version" key="os.version"/>
+        <system-property name="OS_Version" key="os.version"/>
     </environment-properties>
 
     <mule-environment-properties synchronous="false">

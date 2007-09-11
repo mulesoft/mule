@@ -179,7 +179,17 @@ public final class TemplateParser
      *            parsed
      * @return the parsed String
      */
-    public Map parse(Map props, Map templates)
+    public Map parse(final Map props, Map templates)
+    {
+        return parse(new TemplateCallback(){
+            public Object match(String token)
+            {
+                return props.get(token);
+            }
+        }, templates);
+    }
+
+    public Map parse(TemplateCallback callback, Map templates)
     {
         if (templates == null)
         {
@@ -190,7 +200,7 @@ public final class TemplateParser
         for (Iterator iterator = templates.entrySet().iterator(); iterator.hasNext();)
         {
             entry = (Map.Entry) iterator.next();
-            map.put(entry.getKey(), parse(props, entry.getValue().toString()));
+            map.put(entry.getKey(), parse(callback, entry.getValue().toString()));
         }
         return map;
     }

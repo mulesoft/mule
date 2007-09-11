@@ -180,6 +180,14 @@
         <!--</xsl:if>-->
         <!--</bean>-->
 
+        <xsl:apply-templates select="property" mode="beanProperty"/>
+        <xsl:apply-templates select="container-property" mode="beanContainerProperty"/>
+        <xsl:apply-templates select="system-property" mode="beanSystemProperty"/>
+        <xsl:apply-templates select="factory-property" mode="beanFactoryProperty"/>
+        <xsl:apply-templates select="map" mode="beanMapProperty"/>
+        <xsl:apply-templates select="list" mode="beanListProperty"/>
+
+<!--
         <bean name="_muleProperties" class="java.util.HashMap">
             <constructor-arg>
                 <map>
@@ -194,6 +202,7 @@
                 </map>
             </constructor-arg>
         </bean>
+-->
     </xsl:template>
 
     <!-- Connector Template -->
@@ -1189,11 +1198,21 @@
         </entry>
     </xsl:template>
 
+    <xsl:template match="property" mode="beanProperty">
+        <bean name="{@name}" class="java.lang.String">
+            <constructor-arg class="java.lang.String" value="{@value}"/>
+        </bean>
+    </xsl:template>
+
     <!-- container properties -->
     <xsl:template match="container-property" mode="mapContainerProperty">
         <entry key="{@name}">
             <ref local="{@reference}"/>
         </entry>
+    </xsl:template>
+
+    <xsl:template match="container-property" mode="beanContainerProperty">
+        <alias name="{@reference}" alias="{@name}"/>
     </xsl:template>
 
     <!-- System Properties -->
@@ -1207,11 +1226,27 @@
         </entry>
     </xsl:template>
 
+    <xsl:template match="system-property" mode="beanSystemProperty">
+        <bean name="{@name}" class="java.lang.String">
+            <constructor-arg class="java.lang.String">
+                <value>
+                    <xsl:text disable-output-escaping="yes">${</xsl:text>
+                    <xsl:value-of select="@key"/>
+                    <xsl:text disable-output-escaping="yes">}</xsl:text>
+                </value>
+            </constructor-arg>
+        </bean>
+    </xsl:template>
+
     <!-- Factory Properties in a Map -->
     <xsl:template match="factory-property" mode="mapFactoryProperty">
         <entry key="{@name}">
             <bean class="{@factory}"/>
         </entry>
+    </xsl:template>
+
+    <xsl:template match="factory-property" mode="beanFactoryProperty">
+        <bean name="{@name}" class="{@factory}"/>
     </xsl:template>
 
     <!-- List Properties in a Map -->
@@ -1226,6 +1261,19 @@
         </entry>
     </xsl:template>
 
+    <xsl:template match="list" mode="beanListProperty">
+        <bean name="{@name}" class="java.util.ArrayList">
+            <constructor-arg>
+                <list>
+                    <xsl:apply-templates select="entry"/>
+                    <xsl:apply-templates select="container-entry"/>
+                    <xsl:apply-templates select="system-entry"/>
+                    <xsl:apply-templates select="factory-entry"/>
+                </list>
+            </constructor-arg>
+        </bean>
+    </xsl:template>
+
     <!-- Map Properties in a Map -->
     <xsl:template match="map" mode="mapMapProperty">
         <entry key="{@name}">
@@ -1236,6 +1284,19 @@
                 <xsl:apply-templates select="factory-property" mode="mapFactoryProperty"/>
             </map>
         </entry>
+    </xsl:template>
+
+    <xsl:template match="map" mode="beanMapProperty">
+        <bean name="{@name}" class="java.util.HashMap">
+            <constructor-arg>
+                <map>
+                    <xsl:apply-templates select="property" mode="mapProperty"/>
+                    <xsl:apply-templates select="container-property" mode="mapContainerProperty"/>
+                    <xsl:apply-templates select="system-property" mode="mapSystemProperty"/>
+                    <xsl:apply-templates select="factory-property" mode="mapFactoryProperty"/>
+                </map>
+            </constructor-arg>
+        </bean>
     </xsl:template>
 
     <!-- List properties -->

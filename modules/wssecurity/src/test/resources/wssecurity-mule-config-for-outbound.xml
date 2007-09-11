@@ -21,9 +21,7 @@
         </spring:constructor-arg>
     </spring:bean>
 
-    <environment-properties>
-        <spring:entry key="synchronous" value="false"/>
-    </environment-properties>
+    <configuration serverId="testServer" defaultSynchronousEndpoints="false"/>
 
     <model name="test">
         <service name="BridgeUMO">

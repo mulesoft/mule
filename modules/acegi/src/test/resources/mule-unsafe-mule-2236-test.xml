@@ -25,9 +25,7 @@
          schema.  this is why we added the extra <mule/> element, for example) -->
     <acegi:http-security-filter realm="some realm"/>
 
-    <environment-properties>
-        <spring:entry key="property" value="value"/>
-    </environment-properties>
+    <environment-property name="property" value="value"/>
 
     <model name="model">
         <service name="service">

@@ -10,7 +10,6 @@
 
 package org.mule.impl.container;
 
-import org.mule.config.MuleProperties;
 import org.mule.registry.RegistrationException;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.ContainerException;
@@ -20,7 +19,6 @@ import org.mule.util.TemplateParser;
 import java.io.Reader;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.HashMap;
 
 /**
  * Provides a facade for accessing System properties and properties on the
@@ -36,7 +34,7 @@ import java.util.HashMap;
  * the future.
  * </ol>
  */
-public class PropertiesContainerContext extends AbstractContainerContext
+public class PropertiesContainerContext extends AbstractContainerContext implements TemplateParser.TemplateCallback
 {
 
     protected Map systemProperties;
@@ -62,19 +60,10 @@ public class PropertiesContainerContext extends AbstractContainerContext
             {
                 entry = (Map.Entry)iterator.next();
                 value = entry.getValue().toString();
-                value = templateParser.parse((Map)managementContext.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES), value);
+                value = templateParser.parse(this, value);
                 try
                 {
-                    Map props = ((Map)managementContext.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES));
-                    if(props == null)
-                    {
-                        props = new HashMap();
-                        props.put(entry.getKey(), value);
-                        managementContext.getRegistry().registerObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES, props, managementContext);
-                    } else
-                    {
-                        props.put(entry.getKey(), value);
-                    }
+                    managementContext.getRegistry().registerObject(entry.getKey().toString(), value, managementContext);
                 }
                 catch (RegistrationException e)
                 {
@@ -83,6 +72,11 @@ public class PropertiesContainerContext extends AbstractContainerContext
             }
         }
         setSystemProperties(null);
+    }
+
+    public Object match(String token)
+    {
+        return managementContext.getRegistry().lookupObject(token);
     }
 
     public void configure(Reader configuration) throws ContainerException
@@ -107,12 +101,7 @@ public class PropertiesContainerContext extends AbstractContainerContext
         {
             throw new ObjectNotFoundException("null");
         }
-        Map properties = (Map)managementContext.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES);
-        if (properties == null)
-        {
-            throw new ObjectNotFoundException(key.toString());
-        }
-        Object value = properties.get(key.toString());
+        Object value = managementContext.getRegistry().lookupObject(key.toString());
         if (value == null)
         {
             throw new ObjectNotFoundException(key.toString());
@@ -141,7 +130,7 @@ public class PropertiesContainerContext extends AbstractContainerContext
                 entry = (Map.Entry) iterator.next();
                 value = entry.getValue().toString();
                 value = templateParser.parse(systemProperties, value);
-                value = templateParser.parse((Map)managementContext.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES), value);
+                value = templateParser.parse(this, value);
                 System.setProperty(entry.getKey().toString(), value);
             }
         }
@@ -154,19 +143,10 @@ public class PropertiesContainerContext extends AbstractContainerContext
             {
                 entry = (Map.Entry) iterator.next();
                 value = entry.getValue().toString();
-                value = templateParser.parse((Map)managementContext.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES), value.toString());
+                value = templateParser.parse(this, value.toString());
                 try
                 {
-                    Map muleProps = ((Map)managementContext.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES));
-                    if(muleProps == null)
-                    {
-                        muleProps = new HashMap();
-                        muleProps.put(entry.getKey(), value);
-                        managementContext.getRegistry().registerObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES, muleProps, managementContext);
-                    } else
-                    {
-                        muleProps.put(entry.getKey(), value);
-                    }
+                    managementContext.getRegistry().registerObject(entry.getKey().toString(), value, managementContext);
                 }
                 catch (RegistrationException e)
                 {

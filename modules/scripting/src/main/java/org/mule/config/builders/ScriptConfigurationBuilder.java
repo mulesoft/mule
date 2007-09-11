@@ -24,7 +24,6 @@ import org.mule.util.FileUtils;
 import org.mule.util.PropertiesUtils;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
@@ -130,17 +129,7 @@ public class ScriptConfigurationBuilder extends MuleXmlConfigurationBuilder
                 for (Iterator iterator = startupProperties.entrySet().iterator(); iterator.hasNext();)
                 {
                     Map.Entry e =  (Map.Entry)iterator.next();
-                    Map props = ((Map)registry.lookupObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES));
-                    if (props == null)
-                    {
-                        props = new HashMap();
-                        props.put(e.getKey(), e.getValue());
-                        registry.registerObject(MuleProperties.OBJECT_MULE_APPLICATION_PROPERTIES, props, managementContext);
-                    }
-                    else
-                    {
-                        props.put(e.getKey(), e.getValue());
-                    }
+                    registry.registerObject(e.getKey().toString(), e.getValue(), managementContext);
                 }
             }
             

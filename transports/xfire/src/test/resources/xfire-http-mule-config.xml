@@ -8,10 +8,6 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/xfire/2.0 http://www.mulesource.org/schema/mule/xfire/2.0/mule-xfire.xsd">
 
-    <environment-properties>
-        <spring:entry key="serverUrl" value=""/>
-    </environment-properties>
-
     <model name="test">
         <service name="mycomponent">
             <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>

@@ -12,7 +12,7 @@
                 <entry key="beanProperty1">
                     <value>this was set from the manager properties!</value>
                 </entry>
-                <entry key="OS Version">
+                <entry key="OS_Version">
                     <value>${os.version}</value>
                 </entry>
                 <entry key="system-prop2">

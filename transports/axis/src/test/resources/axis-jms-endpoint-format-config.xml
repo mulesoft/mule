@@ -10,10 +10,7 @@
        http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/axis/2.0/mule-axis.xsd
        http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
 
-    <environment-properties>
-        <spring:entry key="synchronous" value="true"/>
-        <spring:entry key="remoteSync" value="true"/>
-    </environment-properties>
+    <configuration serverId="testServer" defaultSynchronousEndpoints="true" defaultRemoteSync="true"/>
 
     <jms:activemq-connector name="jmsConnector"/>
     <!-- this is needed also, but does not work now -->
