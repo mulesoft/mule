@@ -627,7 +627,7 @@ public class MuleEventContext implements UMOEventContext
      * An outputstream the can optionally be used write response data to an incoming
      * message.
      * 
-     * @return an output strem if one has been made available by the message receiver
+     * @return an output stream if one has been made available by the message receiver
      *         that received the message
      */
     public OutputStream getOutputStream()

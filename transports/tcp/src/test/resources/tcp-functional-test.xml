@@ -8,8 +8,9 @@
                http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
                http://www.mulesource.org/schema/mule/tcp/2.0 http://www.mulesource.org/schema/mule/tcp/2.0/mule-tcp.xsd">
 
+    <!-- socketSoLinger="0" -->
     <!-- keepSendSocketOpen is required for the Async test case -->
-    <tcp:connector name="tcpConnector" keepSendSocketOpen="true" socketSoLinger="0"
+    <tcp:connector name="tcpConnector" keepSendSocketOpen="true"
                    tcpProtocolClassName="org.mule.providers.tcp.protocols.DefaultProtocol"/>
 
     <endpoint name="clientEndpoint" address="tcp://localhost:60198" synchronous="true"/>

@@ -17,7 +17,6 @@ import org.mule.umo.UMOMessage;
 public class AsynchronousSslMule1854TestCase extends FunctionalTestCase {
 
     protected static String TEST_MESSAGE = "Test Request";
-    private static int NUM_MESSAGES = 100;
 
     public AsynchronousSslMule1854TestCase()
     {

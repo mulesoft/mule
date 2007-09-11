@@ -69,6 +69,9 @@ public class TcpConnector extends AbstractConnector
     private SimpleServerSocketFactory serverSocketFactory;
     private GenericKeyedObjectPool dispatcherSocketsPool = new GenericKeyedObjectPool();
 
+    //TODO MULE-2031 remove once fixed
+    private UMOImmutableEndpoint lastEndpoint;
+
     public TcpConnector()
     {
         setSocketFactory(new TcpSocketFactory());
@@ -159,6 +162,11 @@ public class TcpConnector extends AbstractConnector
         Socket socket = (Socket) dispatcherSocketsPool.borrowObject(endpoint);
         if (logger.isDebugEnabled())
         {
+            if (null != lastEndpoint)
+            {
+                logger.debug("same as " + lastEndpoint.hashCode() + "? " + lastEndpoint.equals(endpoint));
+            }
+            logger.debug("borrowing socket for " + endpoint.hashCode());
             logger.debug("borrowing socket; debt " + dispatcherSocketsPool.getNumActive());
         }
         return socket;
@@ -166,9 +174,11 @@ public class TcpConnector extends AbstractConnector
 
     void releaseSocket(Socket socket, UMOImmutableEndpoint endpoint) throws Exception
     {
+        lastEndpoint = endpoint;
         dispatcherSocketsPool.returnObject(endpoint, socket);
         if (logger.isDebugEnabled())
         {
+            logger.debug("returning socket for " + endpoint.hashCode());
             logger.debug("returned socket; debt " + dispatcherSocketsPool.getNumActive());
         }
     }
