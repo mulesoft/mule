@@ -10,8 +10,8 @@
 
 package org.mule.umo;
 
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.transformer.TransformerException;
 
 import java.io.OutputStream;
@@ -198,7 +198,7 @@ public interface UMOEventContext
      * @throws UMOException if the event fails to be processed by the component or
      *             the transport for the endpoint
      */
-    UMOMessage sendEvent(UMOMessage message, UMOEndpoint endpoint) throws UMOException;
+    UMOMessage sendEvent(UMOMessage message, UMOImmutableEndpoint endpoint) throws UMOException;
 
     /**
      * sends an event request via the configured outbound router for this component.
@@ -335,7 +335,7 @@ public interface UMOEventContext
      * @throws UMOException if the event fails to be processed by the component or
      *             the transport for the endpoint
      */
-    void dispatchEvent(UMOMessage message, UMOEndpoint endpoint) throws UMOException;
+    void dispatchEvent(UMOMessage message, UMOImmutableEndpoint endpoint) throws UMOException;
 
     /**
      * Requests a synchronous receive of an event on the component.
@@ -346,7 +346,7 @@ public interface UMOEventContext
      * @return The requested event or null if the request times out
      * @throws UMOException if the request operation fails
      */
-    UMOMessage receiveEvent(UMOEndpoint endpoint, long timeout) throws UMOException;
+    UMOMessage receiveEvent(UMOImmutableEndpoint endpoint, long timeout) throws UMOException;
 
     /**
      * Requests a synchronous receive of an event on the component.

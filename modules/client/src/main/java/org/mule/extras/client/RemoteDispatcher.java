@@ -18,11 +18,9 @@ import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
 import org.mule.impl.MuleSessionHandler;
 import org.mule.impl.RequestContext;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.internal.notifications.AdminNotification;
 import org.mule.impl.security.MuleCredentials;
 import org.mule.providers.AbstractConnector;
-import org.mule.providers.service.TransportFactory;
 import org.mule.transformers.wire.SerializationWireFormat;
 import org.mule.transformers.wire.WireFormat;
 import org.mule.umo.FutureMessageResult;
@@ -30,18 +28,19 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.security.UMOCredentials;
 import org.mule.util.MuleObjectHelper;
 
-import edu.emory.mathcs.backport.java.util.concurrent.Callable;
-import edu.emory.mathcs.backport.java.util.concurrent.Executor;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.Map;
+
+import edu.emory.mathcs.backport.java.util.concurrent.Callable;
+import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -63,7 +62,7 @@ public class RemoteDispatcher implements Disposable
     /**
      * dispatch destination
      */
-    private UMOEndpoint serverEndpoint;
+    private UMOImmutableEndpoint serverEndpoint;
     private UMOCredentials credentials = null;
 
     /**
@@ -84,7 +83,7 @@ public class RemoteDispatcher implements Disposable
 
     protected RemoteDispatcher(String endpoint) throws UMOException
     {
-        serverEndpoint = new MuleEndpoint(endpoint, true);
+        serverEndpoint = RegistryContext.getRegistry().lookupInboundEndpoint(endpoint, MuleServer.getManagementContext());
         wireFormat = new SerializationWireFormat();
     }
 
@@ -281,11 +280,9 @@ public class RemoteDispatcher implements Disposable
     protected UMOMessage dispatchAction(AdminNotification action, boolean synchronous, int timeout)
         throws UMOException
     {
-
-        UMOEndpoint endpoint = TransportFactory.createEndpoint(serverEndpoint.getEndpointURI(),
-            UMOEndpoint.ENDPOINT_TYPE_SENDER, MuleServer.getManagementContext());
-        endpoint.setRemoteSync(synchronous);
-        updateContext(new MuleMessage(action), endpoint, synchronous);
+        // TODO DF: MULE-2291 Resolve pending endpoint mutability issues
+        ((UMOEndpoint) serverEndpoint).setRemoteSync(synchronous);
+        updateContext(new MuleMessage(action), serverEndpoint, synchronous);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         wireFormat.write(out, action, serverEndpoint.getEncoding());
@@ -304,9 +301,9 @@ public class RemoteDispatcher implements Disposable
 
         message.addProperties(action.getProperties());
         MuleSession session = new MuleSession(message,
-            ((AbstractConnector)endpoint.getConnector()).getSessionHandler());
+            ((AbstractConnector)serverEndpoint.getConnector()).getSessionHandler());
 
-        UMOEvent event = new MuleEvent(message, endpoint, session, true);
+        UMOEvent event = new MuleEvent(message, serverEndpoint, session, true);
         event.setTimeout(timeout);
         if (logger.isDebugEnabled())
         {
@@ -320,11 +317,11 @@ public class RemoteDispatcher implements Disposable
         {
             if (synchronous)
             {
-                result = endpoint.send(event);
+                result = serverEndpoint.send(event);
             }
             else
             {
-                endpoint.dispatch(event);
+                serverEndpoint.dispatch(event);
                 return null;
             }
 
@@ -389,7 +386,7 @@ public class RemoteDispatcher implements Disposable
         this.wireFormat = wireFormat;
     }
 
-    protected void updateContext(UMOMessage message, UMOEndpoint endpoint, boolean synchronous)
+    protected void updateContext(UMOMessage message, UMOImmutableEndpoint endpoint, boolean synchronous)
         throws UMOException
     {
 

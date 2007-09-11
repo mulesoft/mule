@@ -27,7 +27,6 @@ import org.mule.umo.TransactionException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOTransaction;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
@@ -390,7 +389,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         return adapter;
     }
 
-    protected Object getReceiverKey(UMOComponent component, UMOEndpoint endpoint)
+    protected Object getReceiverKey(UMOComponent component, UMOImmutableEndpoint endpoint)
     {
         return component.getDescriptor().getName() + "~" + endpoint.getEndpointURI().getAddress();
     }

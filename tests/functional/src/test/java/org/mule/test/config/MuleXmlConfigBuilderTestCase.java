@@ -13,8 +13,8 @@ package org.mule.test.config;
 import org.mule.MuleException;
 import org.mule.RegistryContext;
 import org.mule.config.ConfigurationBuilder;
-import org.mule.config.ThreadingProfile;
 import org.mule.config.MuleProperties;
+import org.mule.config.ThreadingProfile;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.impl.MuleDescriptor;
 import org.mule.providers.AbstractConnector;
@@ -25,7 +25,7 @@ import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.mule.umo.UMODescriptor;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.routing.UMOOutboundRouterCollection;
 import org.mule.umo.routing.UMOResponseRouterCollection;
 import org.mule.umo.transformer.UMOTransformer;
@@ -230,7 +230,7 @@ public class MuleXmlConfigBuilderTestCase extends AbstractConfigBuilderTestCase
 
     public void testGlobalEndpointOverrides()
     {
-        UMOEndpoint ep = managementContext.getRegistry().lookupEndpoint("orangeEndpoint");
+        UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpoint("orangeEndpoint");
         assertNotNull(ep);
         assertEquals(1, ep.getProperties().size());
         assertEquals("value1", ep.getProperties().get("testGlobal"));

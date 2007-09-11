@@ -53,9 +53,8 @@ public class XFireWsdlTestCase extends AbstractMuleTestCase
         // without this - shouldn't it happen automatically?
 //        MuleManager.getInstance().start();
 
-
-        UMOEndpoint endpoint = managementContext.getRegistry().getOrCreateEndpointForUri(TEST_URL_NOWSDL,
-            UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        // TODO DF: MULE-2291 Resolve pending endpoint mutability issues
+        UMOEndpoint endpoint = (UMOEndpoint) managementContext.getRegistry().lookupOutboundEndpoint(TEST_URL_NOWSDL, managementContext);
         endpoint.setProperty("wsdlUrl", TEST_URL_WSDL);
 
         UMOMessage message = new MuleMessage("test1");

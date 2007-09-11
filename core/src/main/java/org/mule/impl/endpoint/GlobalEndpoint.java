@@ -10,7 +10,7 @@
 
 package org.mule.impl.endpoint;
 
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 public class GlobalEndpoint extends MuleEndpoint
 {
@@ -19,7 +19,7 @@ public class GlobalEndpoint extends MuleEndpoint
 
     public String getType()
     {
-        return UMOEndpoint.ENDPOINT_TYPE_GLOBAL;
+        return UMOImmutableEndpoint.ENDPOINT_TYPE_GLOBAL;
     }
 
 }

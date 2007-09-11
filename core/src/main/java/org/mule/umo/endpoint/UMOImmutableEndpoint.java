@@ -39,9 +39,6 @@ public interface UMOImmutableEndpoint extends Serializable, Initialisable, UMOMe
     /** The endpoint is indound */
     String ENDPOINT_TYPE_RECEIVER = "receiver";
 
-    /** The endpoint is either and will be set depending on how it is used */
-    String ENDPOINT_TYPE_SENDER_AND_RECEIVER = "senderAndReceiver";
-
     /** The endpoit is a global endpoint */
     public static final String ENDPOINT_TYPE_GLOBAL = "global";
 
@@ -49,7 +46,7 @@ public interface UMOImmutableEndpoint extends Serializable, Initialisable, UMOMe
     String ENDPOINT_TYPE_RESPONSE = "response";
 
     /**
-     * This specifes the communication endpointUri. This will have a different format
+     * This specifess the communication endpointUri. This will have a different format
      * depending on the transport protocol being used i.e.
      * <ul>
      * <li>smtp -&gt; admin&#64;mycompany.com</li>

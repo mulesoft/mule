@@ -31,6 +31,7 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.model.UMOModel;
@@ -296,7 +297,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
      * @return the key to store the newly created receiver against. In this case it
      *         is the component name, which is equivalent to the Axis service name.
      */
-    protected Object getReceiverKey(UMOComponent component, UMOEndpoint endpoint)
+    protected Object getReceiverKey(UMOComponent component, UMOImmutableEndpoint endpoint)
     {
         if (endpoint.getEndpointURI().getPort() == -1)
         {
@@ -308,7 +309,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
         }
     }
 
-    public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception
+    public UMOMessageReceiver createReceiver(UMOComponent component, UMOImmutableEndpoint endpoint) throws Exception
     {
         // this is always initialised as synchronous as ws invocations should
         // always execute in a single thread unless the endpoint has explicitly
@@ -319,7 +320,8 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
             {
                 logger.debug("overriding endpoint synchronicity and setting it to true. Web service requests are executed in a single thread");
             }
-            endpoint.setSynchronous(true);
+            // TODO DF: MULE-2291 Resolve pending endpoint mutability issues
+            ((MuleEndpoint) endpoint).setSynchronous(true);
         }
 
         return super.createReceiver(component, endpoint);
@@ -413,11 +415,14 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
         {
             logger.debug("Modified endpoint with " + scheme + " scheme to " + endpoint);
         }
+        
+        // TODO DF: MULE-2291 Resolve pending endpoint mutability issues
+        UMOEndpoint receiverEndpoint=(UMOEndpoint) receiver.getEndpoint();
 
         // Default to using synchronous for socket based protocols unless the
         // synchronous property has been set explicitly
         boolean sync = false;
-        if (!receiver.getEndpoint().isSynchronousSet())
+        if (!receiverEndpoint.isSynchronousSet())
         {
             if (scheme.equals("http") || scheme.equals("https") || scheme.equals("ssl")
                 || scheme.equals("tcp"))
@@ -427,7 +432,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
         }
         else
         {
-            sync = receiver.getEndpoint().isSynchronous();
+            sync = receiverEndpoint.isSynchronous();
         }
 
         UMOEndpoint serviceEndpoint = new MuleEndpoint(endpoint, true);
@@ -437,28 +442,30 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
         // set the filter on the axis endpoint on the real receiver endpoint
         serviceEndpoint.setFilter(receiver.getEndpoint().getFilter());
         // Remove the Axis filter now
-        receiver.getEndpoint().setFilter(null);
+
+        
+        receiverEndpoint.setFilter(null);
 
         // set the Security filter on the axis endpoint on the real receiver endpoint
-        serviceEndpoint.setSecurityFilter(receiver.getEndpoint().getSecurityFilter());
+        serviceEndpoint.setSecurityFilter(receiverEndpoint.getSecurityFilter());
         // Remove the Axis Receiver Security filter now
-        receiver.getEndpoint().setSecurityFilter(null);
+        receiverEndpoint.setSecurityFilter(null);
 
-        if (receiver.getEndpoint().getTransformer() != null)
+        if (receiverEndpoint.getTransformer() != null)
         {
-            serviceEndpoint.setTransformer(receiver.getEndpoint().getTransformer());
-            receiver.getEndpoint().setTransformer(null);
+            serviceEndpoint.setTransformer(receiverEndpoint.getTransformer());
+            receiverEndpoint.setTransformer(null);
         }
 
         //set transaction properties
-        if(receiver.getEndpoint().getTransactionConfig()!= null)
+        if(receiverEndpoint.getTransactionConfig()!= null)
         {
-            serviceEndpoint.setTransactionConfig(receiver.getEndpoint().getTransactionConfig());
-            receiver.getEndpoint().setTransactionConfig(null);
+            serviceEndpoint.setTransactionConfig(receiverEndpoint.getTransactionConfig());
+            receiverEndpoint.setTransactionConfig(null);
         }
 
         // propagate properties to the service endpoint
-        serviceEndpoint.getProperties().putAll(receiver.getEndpoint().getProperties());
+        serviceEndpoint.getProperties().putAll(receiverEndpoint.getProperties());
 
         axisDescriptor.getInboundRouter().addEndpoint(serviceEndpoint);
 

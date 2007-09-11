@@ -149,6 +149,12 @@
     <bean name="_muleSecurityManager" class="org.mule.impl.security.MuleSecurityManager"/>
 
     <bean name="_muleProperties" class="java.util.HashMap"/>
+    
+    <bean name="_muleEndpointFactory" class="org.mule.impl.endpoint.EndpointFactory" depends-on="_muleRegistry">
+<!--        <property name="defaultEndpointBuilder" ref="_muleDefaultEndpointBuilder"/>-->
+    </bean>
+
+<!--    <bean name="_muleDefaultEndpointBuilder" class="org.mule.impl.endpoint.EndpointBuilder"/>-->
 
     <!--<mule:properties-container includeSystemProperties="true" name="_muleSystemModelProperties"/>-->
 

@@ -20,6 +20,7 @@ import org.mule.providers.http.servlet.ServletConnector;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.provider.UMOConnector;
@@ -70,9 +71,10 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
                     path = "/";
                 }
 
-                UMOEndpoint ep = connector.getManagementContext().getRegistry().createEndpointFromUri(
-                        "servlet://" + path.substring(1), UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
-                ep.setTransformer(endpoint.getTransformer());
+                UMOImmutableEndpoint ep = connector.getManagementContext().getRegistry().lookupInboundEndpoint(
+                        "servlet://" + path.substring(1), connector.getManagementContext());
+                // TODO DF: Endpoint mutability
+                ((UMOEndpoint) ep).setTransformer(endpoint.getTransformer());
                 scon.registerListener(component, ep);
             }
             catch (Exception e)

@@ -18,6 +18,7 @@ import org.mule.impl.registry.AbstractRegistry;
 import org.mule.registry.ServiceDescriptor;
 import org.mule.registry.ServiceDescriptorFactory;
 import org.mule.registry.ServiceException;
+import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
@@ -224,5 +225,6 @@ public class SpringRegistry extends AbstractRegistry implements ApplicationConte
     {
         return false;
     }
+
 }
 

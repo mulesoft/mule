@@ -20,7 +20,6 @@ import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.DispatchException;
@@ -107,7 +106,7 @@ public class FileConnector extends AbstractConnector
         filenameParser = new SimpleFilenameParser();
     }
 
-    protected Object getReceiverKey(UMOComponent component, UMOEndpoint endpoint)
+    protected Object getReceiverKey(UMOComponent component, UMOImmutableEndpoint endpoint)
     {
         if (endpoint.getFilter() != null)
         {
@@ -127,7 +126,7 @@ public class FileConnector extends AbstractConnector
      * <li>pollingFrequency</li>
      * </ul>
      */
-    public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception
+    public UMOMessageReceiver createReceiver(UMOComponent component, UMOImmutableEndpoint endpoint) throws Exception
     {
         String readDir = endpoint.getEndpointURI().getAddress();
         if (null != getReadFromDirectory())

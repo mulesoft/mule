@@ -55,7 +55,7 @@ public class InboundRouterCollection extends AbstractRouterCollection implements
         super.initialise();
         for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
         {
-            UMOEndpoint endpoint = (UMOEndpoint) iterator.next();
+            UMOImmutableEndpoint endpoint = (UMOImmutableEndpoint) iterator.next();
             endpoint.initialise();
         }
     }
@@ -229,7 +229,7 @@ public class InboundRouterCollection extends AbstractRouterCollection implements
         }
     }
 
-    public void addEndpoint(UMOEndpoint endpoint)
+    public void addEndpoint(UMOImmutableEndpoint endpoint)
     {
         if (endpoint != null)
         {
@@ -246,7 +246,7 @@ public class InboundRouterCollection extends AbstractRouterCollection implements
         }
     }
 
-    public boolean removeEndpoint(UMOEndpoint endpoint)
+    public boolean removeEndpoint(UMOImmutableEndpoint endpoint)
     {
         return endpoints.remove(endpoint);
     }
@@ -285,7 +285,7 @@ public class InboundRouterCollection extends AbstractRouterCollection implements
      * @return the Endpoint or null if the endpointUri is not registered
      * @see org.mule.umo.routing.UMOInboundRouterCollection
      */
-    public UMOEndpoint getEndpoint(String name)
+    public UMOImmutableEndpoint getEndpoint(String name)
     {
         UMOEndpoint endpointDescriptor;
         for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)

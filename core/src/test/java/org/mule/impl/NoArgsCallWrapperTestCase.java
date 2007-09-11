@@ -18,7 +18,7 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.ExceptionUtils;
 
@@ -39,7 +39,7 @@ public class NoArgsCallWrapperTestCase extends AbstractMuleTestCase
         properties.put("delegateClass", Apple.class.getName());
         properties.put("delegateMethod", "toString");
 
-        UMOEndpoint endpoint = managementContext.getRegistry().createEndpointFromUri("test://in", UMOEndpoint.ENDPOINT_TYPE_RECEIVER, managementContext);
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupInboundEndpoint("test://in", managementContext);
         MuleDescriptor desc = (MuleDescriptor) MuleTestUtils.createDescriptor(NoArgsCallWrapper.class.getName(), "WrapperUMO", endpoint, null, properties);
         managementContext.getRegistry().registerService(desc, managementContext);
 
@@ -59,7 +59,7 @@ public class NoArgsCallWrapperTestCase extends AbstractMuleTestCase
         properties.put("delegateClass", Apple.class.getName());
         properties.put("delegateMethod", "wash");
 
-        UMOEndpoint endpoint = managementContext.getRegistry().createEndpointFromUri("test://in", UMOEndpoint.ENDPOINT_TYPE_RECEIVER, managementContext);
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupInboundEndpoint("test://in", managementContext);
         MuleDescriptor desc = (MuleDescriptor) MuleTestUtils.createDescriptor(NoArgsCallWrapper.class.getName(), "WrapperUMO", endpoint, null, properties);
         managementContext.getRegistry().registerService(desc, managementContext);
 
@@ -80,7 +80,7 @@ public class NoArgsCallWrapperTestCase extends AbstractMuleTestCase
         properties.put("delegateClass", Apple.class.getName());
         properties.put("delegateMethod", "methodReturningNull");
 
-        UMOEndpoint endpoint = managementContext.getRegistry().createEndpointFromUri("test://in", UMOEndpoint.ENDPOINT_TYPE_RECEIVER, managementContext);
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupInboundEndpoint("test://in", managementContext);
         MuleDescriptor desc = (MuleDescriptor) MuleTestUtils.createDescriptor(NoArgsCallWrapper.class.getName(), "WrapperUMO", endpoint, null, properties);
         managementContext.getRegistry().registerService(desc, managementContext);
 
@@ -97,7 +97,7 @@ public class NoArgsCallWrapperTestCase extends AbstractMuleTestCase
     {
         try
         {
-            UMOEndpoint endpoint = managementContext.getRegistry().createEndpointFromUri("test://in", UMOEndpoint.ENDPOINT_TYPE_RECEIVER, managementContext);
+            UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupInboundEndpoint("test://in", managementContext);
             MuleDescriptor desc = (MuleDescriptor) MuleTestUtils.createDescriptor(NoArgsCallWrapper.class.getName(), "WrapperUMO", endpoint, null, Collections.EMPTY_MAP);
             managementContext.getRegistry().registerService(desc, managementContext);
         }
@@ -117,7 +117,7 @@ public class NoArgsCallWrapperTestCase extends AbstractMuleTestCase
 
         try
         {
-            UMOEndpoint endpoint = managementContext.getRegistry().createEndpointFromUri("test://in", UMOEndpoint.ENDPOINT_TYPE_RECEIVER, managementContext);
+            UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupInboundEndpoint("test://in", managementContext);
             MuleDescriptor desc = (MuleDescriptor) MuleTestUtils.createDescriptor(NoArgsCallWrapper.class.getName(), "WrapperUMO", endpoint, null, properties);
             managementContext.getRegistry().registerService(desc, managementContext);
         }
@@ -137,7 +137,7 @@ public class NoArgsCallWrapperTestCase extends AbstractMuleTestCase
 
         try
         {
-            UMOEndpoint endpoint = managementContext.getRegistry().createEndpointFromUri("test://in", UMOEndpoint.ENDPOINT_TYPE_RECEIVER, managementContext);
+            UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupInboundEndpoint("test://in", managementContext);
             MuleDescriptor desc = (MuleDescriptor) MuleTestUtils.createDescriptor(NoArgsCallWrapper.class.getName(), "WrapperUMO", endpoint, null, properties);
             managementContext.getRegistry().registerService(desc, managementContext);
         }
@@ -158,7 +158,7 @@ public class NoArgsCallWrapperTestCase extends AbstractMuleTestCase
 
         try
         {
-            UMOEndpoint endpoint = managementContext.getRegistry().createEndpointFromUri("test://in", UMOEndpoint.ENDPOINT_TYPE_RECEIVER, managementContext);
+            UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupInboundEndpoint("test://in", managementContext);
             MuleDescriptor desc = (MuleDescriptor) MuleTestUtils.createDescriptor(NoArgsCallWrapper.class.getName(), "WrapperUMO", endpoint, null, properties);
             managementContext.getRegistry().registerService(desc, managementContext);
         }
@@ -178,7 +178,7 @@ public class NoArgsCallWrapperTestCase extends AbstractMuleTestCase
 
         try
         {
-            UMOEndpoint endpoint = managementContext.getRegistry().createEndpointFromUri("test://in", UMOEndpoint.ENDPOINT_TYPE_RECEIVER, managementContext);
+            UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupInboundEndpoint("test://in", managementContext);
             MuleDescriptor desc = (MuleDescriptor) MuleTestUtils.createDescriptor(NoArgsCallWrapper.class.getName(), "WrapperUMO", endpoint, null, properties);
             managementContext.getRegistry().registerService(desc, managementContext);
         }

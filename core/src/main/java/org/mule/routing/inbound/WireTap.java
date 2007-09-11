@@ -64,8 +64,8 @@ public class WireTap extends SelectiveConsumer
         this.endpoint = endpoint;
         if (this.endpoint != null)
         {
-            tap = RegistryContext.getRegistry().getOrCreateEndpointForUri(
-                    this.endpoint, UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER);
+            tap = RegistryContext.getRegistry().lookupOutboundEndpoint(this.endpoint,
+                getManagementContext());
         }
     }
 

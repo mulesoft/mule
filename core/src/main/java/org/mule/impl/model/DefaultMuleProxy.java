@@ -19,7 +19,6 @@ import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.OptimizedRequestContext;
 import org.mule.impl.RequestContext;
-import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.message.ExceptionPayload;
 import org.mule.management.stats.ComponentStatistics;
 import org.mule.management.stats.SedaComponentStatistics;
@@ -33,8 +32,6 @@ import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.UMOImmutableDescriptor;
 import org.mule.umo.UMOInterceptor;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
@@ -413,12 +410,13 @@ public class DefaultMuleProxy implements MuleProxy
                 logger.debug("sending reply to: " + returnMessage.getReplyTo());
             }
 
-            UMOEndpointURI endpointUri = new MuleEndpointURI(returnMessage.getReplyTo().toString());
-
             // get the endpointUri for this uri
-            UMOEndpoint endpoint = descriptor.getManagementContext().getRegistry().getOrCreateEndpointForUri(endpointUri,
-                UMOEndpoint.ENDPOINT_TYPE_SENDER);
+            UMOImmutableEndpoint endpoint = descriptor.getManagementContext()
+                .getRegistry()
+                .lookupOutboundEndpoint(returnMessage.getReplyTo().toString(),
+                    descriptor.getManagementContext());
 
+            
             // make sure remove the replyTo property as not cause a a forever
             // replyto loop
             returnMessage.removeProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);

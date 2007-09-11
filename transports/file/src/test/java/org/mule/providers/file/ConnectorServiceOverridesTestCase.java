@@ -11,14 +11,12 @@
 package org.mule.providers.file;
 
 import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractConnector;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transformers.simple.ByteArrayToSerializable;
 import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOEndpointURI;
 
 public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
 {
@@ -58,8 +56,8 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
 
     public void testServiceOverrides3() throws InterruptedException, UMOException
     {
-        UMOEndpointURI uri = new MuleEndpointURI("file:///temp?connector=fileConnector1");
-        UMOEndpoint endpoint = managementContext.getRegistry().getOrCreateEndpointForUri(uri, UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
+        //UMOEndpointURI uri = new MuleEndpointURI("file:///temp?connector=fileConnector1");
+        UMOEndpoint endpoint = (UMOEndpoint) managementContext.getRegistry().lookupInboundEndpoint("file:///temp?connector=fileConnector1", managementContext);
 
         assertNotNull(endpoint);
         assertNotNull(endpoint.getConnector());

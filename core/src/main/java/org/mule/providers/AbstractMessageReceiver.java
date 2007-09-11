@@ -32,6 +32,7 @@ import org.mule.umo.UMOSession;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.manager.UMOWorkManager;
 import org.mule.umo.provider.UMOConnector;
@@ -43,9 +44,9 @@ import org.mule.util.ClassUtils;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.concurrent.WaitableBoolean;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import java.io.OutputStream;
+
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -64,7 +65,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
     protected UMOComponent component = null;
 
     /** The endpoint descriptor which is associated with this receiver */
-    protected UMOEndpoint endpoint = null;
+    protected UMOImmutableEndpoint endpoint = null;
 
     private InternalMessageListener listener;
 
@@ -112,7 +113,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
      * @see UMOComponent
      * @see UMOEndpoint
      */
-    public AbstractMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
+    public AbstractMessageReceiver(UMOConnector connector, UMOComponent component, UMOImmutableEndpoint endpoint)
             throws CreateException
     {
         setConnector(connector);
@@ -139,7 +140,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
      * 
      * @see org.mule.umo.provider.UMOMessageReceiver#getEndpointName()
      */
-    public UMOEndpoint getEndpoint()
+    public UMOImmutableEndpoint getEndpoint()
     {
         return endpoint;
     }
@@ -334,7 +335,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
      * 
      * @see org.mule.umo.provider.UMOMessageReceiver#setEndpoint(org.mule.umo.endpoint.UMOEndpoint)
      */
-    public void setEndpoint(UMOEndpoint endpoint)
+    public void setEndpoint(UMOImmutableEndpoint endpoint)
     {
         if (endpoint == null)
         {

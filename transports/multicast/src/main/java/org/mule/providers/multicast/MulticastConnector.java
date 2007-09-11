@@ -12,7 +12,7 @@ package org.mule.providers.multicast;
 
 import org.mule.providers.udp.UdpConnector;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 
 /**
@@ -63,7 +63,7 @@ public class MulticastConnector extends UdpConnector
 
 
     //@java.lang.Override
-    protected Object getReceiverKey(UMOComponent component, UMOEndpoint endpoint)
+    protected Object getReceiverKey(UMOComponent component, UMOImmutableEndpoint endpoint)
     {
         //you can have multiple Multicast sockets bound to a single port,
         // so store listeners with the component name too

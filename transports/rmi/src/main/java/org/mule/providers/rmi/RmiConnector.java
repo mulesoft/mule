@@ -17,7 +17,6 @@ import org.mule.providers.rmi.i18n.RmiMessages;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -201,7 +200,7 @@ public class RmiConnector extends AbstractJndiConnector
         this.securityManager = securityManager;
     }
 
-    public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception
+    public UMOMessageReceiver createReceiver(UMOComponent component, UMOImmutableEndpoint endpoint) throws Exception
     {
         final Object[] args = new Object[]{new Long(pollingFrequency)};
         return getServiceDescriptor().createMessageReceiver(this, component, endpoint, args);

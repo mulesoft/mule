@@ -11,7 +11,6 @@
 package org.mule.impl.endpoint;
 
 import org.mule.umo.UMOException;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 public class ResponseEndpoint extends MuleEndpoint
@@ -28,15 +27,10 @@ public class ResponseEndpoint extends MuleEndpoint
     {
         super(endpoint);
     }
-    
-    public ResponseEndpoint(String uri, boolean receiver) throws UMOException
-    {
-        super(uri, receiver);
-    }
 
     public String getType()
     {
-        return UMOEndpoint.ENDPOINT_TYPE_RESPONSE;
+        return UMOImmutableEndpoint.ENDPOINT_TYPE_RESPONSE;
     }
 
 }

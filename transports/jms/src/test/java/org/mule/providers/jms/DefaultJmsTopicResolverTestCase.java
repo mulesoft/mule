@@ -11,7 +11,7 @@
 package org.mule.providers.jms;
 
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 import com.mockobjects.dynamic.Mock;
 
@@ -42,25 +42,25 @@ public class DefaultJmsTopicResolverTestCase extends FunctionalTestCase
 
     public void testEndpointNotTopicNoFallback() throws Exception
     {
-        UMOEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("ep1");
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("ep1");
         assertFalse(resolver.isTopic(endpoint));        
     }
 
     public void testEndpointTopicNoFallback() throws Exception
     {
-        UMOEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("ep2");
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("ep2");
         assertTrue(resolver.isTopic(endpoint));
     }
 
     public void testEndpointNotTopicWithFallback() throws Exception
     {
-        UMOEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("ep3");
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("ep3");
         assertTrue(resolver.isTopic(endpoint, true));
     }
 
     public void testEndpointTopicFallbackNotUsed() throws Exception
     {
-        UMOEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("ep4");
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("ep4");
         assertTrue(resolver.isTopic(endpoint, true));
     }
 

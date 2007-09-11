@@ -13,7 +13,7 @@ package org.mule.routing.outbound;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.routing.RoutingException;
 
 import java.util.List;
@@ -32,7 +32,7 @@ public class OutboundPassThroughRouter extends FilteringOutboundRouter
     }
 
 
-    public void addEndpoint(UMOEndpoint endpoint)
+    public void addEndpoint(UMOImmutableEndpoint endpoint)
     {
         if (endpoint == null)
         {

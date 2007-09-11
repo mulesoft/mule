@@ -12,14 +12,12 @@ package org.mule.components.rest;
 
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleMessage;
-import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.NullPayload;
 import org.mule.routing.filters.MessagePropertyFilter;
 import org.mule.routing.filters.RegExFilter;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -219,17 +217,15 @@ public class RestServiceWrapper implements Callable, Initialisable
         tempUrl = urlBuffer.toString();
         logger.info("Invoking REST service: " + tempUrl);
 
-        UMOEndpointURI endpointURI = new MuleEndpointURI(tempUrl);
         eventContext.getMessage().setProperty(HTTP_METHOD, httpMethod);
-        
 
         UMOMessage result = eventContext.sendEvent(new MuleMessage(requestBody, eventContext.getMessage()),
-            endpointURI);
+            tempUrl);
 
         if (isErrorPayload(result))
         {
-            handleException(new RestServiceException(
-                CoreMessages.failedToInvokeRestService(tempUrl), result), result);
+            handleException(
+                new RestServiceException(CoreMessages.failedToInvokeRestService(tempUrl), result), result);
         }
         return result;
     }

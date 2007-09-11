@@ -17,8 +17,6 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.Lifecycle;
@@ -45,7 +43,7 @@ public interface UMOConnector extends Lifecycle, Initialisable, ManagementContex
      * @throws Exception if the UMOMessageReceiver cannot be created or the Receiver
      *             cannot be registered
      */
-    UMOMessageReceiver registerListener(UMOComponent component, UMOEndpoint endpoint) throws Exception;
+    UMOMessageReceiver registerListener(UMOComponent component, UMOImmutableEndpoint endpoint) throws Exception;
 
     /**
      * @param component the listening component
@@ -54,7 +52,7 @@ public interface UMOConnector extends Lifecycle, Initialisable, ManagementContex
      *             associated with the given endpoint this will not throw an
      *             exception
      */
-    void unregisterListener(UMOComponent component, UMOEndpoint endpoint) throws Exception;
+    void unregisterListener(UMOComponent component, UMOImmutableEndpoint endpoint) throws Exception;
 
     /**
      * @return true if the endpoint is started
@@ -164,7 +162,7 @@ public interface UMOConnector extends Lifecycle, Initialisable, ManagementContex
     /**
      * Make a specific request to the underlying transport
      * 
-     * @param endpointUri the endpoint URI to use when connecting to the resource
+     * @param uri the endpoint uri to use when connecting to the resource
      * @param timeout the maximum time the operation should block before returning.
      *            The call should return immediately if there is data available. If
      *            no data becomes available before the timeout elapses, null will be
@@ -174,7 +172,7 @@ public interface UMOConnector extends Lifecycle, Initialisable, ManagementContex
      * @throws Exception if the call to the underlying protocal cuases an exception
      * @deprecated Use receive(UMOImmutableEndpoint endpoint, long timeout)
      */
-    UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception;
+    UMOMessage receive(String uri, long timeout) throws Exception;
 
     /**
      * Make a specific request to the underlying transport

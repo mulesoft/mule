@@ -17,12 +17,12 @@ import org.mule.config.ThreadingProfile;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractConnector;
-import org.mule.providers.service.TransportFactory;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.manager.UMOWorkManager;
 import org.mule.util.ClassUtils;
 import org.mule.util.object.SingletonObjectFactory;
@@ -149,7 +149,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
             try
             {
                 UMOEndpointURI uri = new MuleEndpointURI(((MuleActivationSpec)activationSpec).getEndpoint());
-                UMOEndpoint endpoint = TransportFactory.createEndpoint(uri,
+                UMOImmutableEndpoint endpoint = managementContext.getRegistry().createEndpoint(uri,
                     UMOEndpoint.ENDPOINT_TYPE_RECEIVER, managementContext);
 
                 ((AbstractConnector)endpoint.getConnector()).getReceiverThreadingProfile()

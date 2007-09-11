@@ -13,7 +13,7 @@ package org.mule.providers;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.util.ObjectUtils;
@@ -46,7 +46,7 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
 
     public AbstractPollingMessageReceiver(UMOConnector connector,
                                           UMOComponent component,
-                                          final UMOEndpoint endpoint) throws CreateException
+                                          final UMOImmutableEndpoint endpoint) throws CreateException
     {
         super(connector, component, endpoint);
     }

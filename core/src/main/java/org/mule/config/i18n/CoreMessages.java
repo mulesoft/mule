@@ -12,7 +12,6 @@ package org.mule.config.i18n;
 
 import org.mule.impl.AbstractExceptionListener;
 import org.mule.umo.UMOImmutableDescriptor;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.routing.UMOInboundRouterCollection;
@@ -517,7 +516,7 @@ public class CoreMessages extends MessageFactory
         return createMessage(BUNDLE_PATH, 127, name);
     }
 
-    public static Message failedToDispatchToReplyto(UMOEndpoint endpoint)
+    public static Message failedToDispatchToReplyto(UMOImmutableEndpoint endpoint)
     {
         return createMessage(BUNDLE_PATH, 128, endpoint);
     }

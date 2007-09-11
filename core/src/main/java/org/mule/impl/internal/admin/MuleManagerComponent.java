@@ -11,6 +11,7 @@
 package org.mule.impl.internal.admin;
 
 import org.mule.MuleException;
+import org.mule.MuleServer;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleDescriptor;
@@ -19,7 +20,6 @@ import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
 import org.mule.impl.RequestContext;
 import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.internal.notifications.AdminNotification;
 import org.mule.impl.message.ExceptionPayload;
 import org.mule.impl.model.ModelHelper;
@@ -33,7 +33,6 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Initialisable;
@@ -163,8 +162,9 @@ public class MuleManagerComponent implements Callable, Initialisable
         UMOMessage result = null;
         try
         {
-            UMOEndpoint endpoint = context.getManagementContext().getRegistry().getOrCreateEndpointForUri(
-                    action.getResourceIdentifier(), UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER);
+            UMOImmutableEndpoint endpoint = context.getManagementContext()
+                .getRegistry()
+                .lookupOutboundEndpoint(action.getResourceIdentifier(), MuleServer.getManagementContext());
 
             if (AdminNotification.ACTION_DISPATCH == action.getAction())
             {
@@ -173,7 +173,8 @@ public class MuleManagerComponent implements Callable, Initialisable
             }
             else
             {
-                endpoint.setRemoteSync(true);
+                //TODO DF: MULE-2291 Resolve pending endpoint mutability issues
+                ((UMOEndpoint) endpoint).setRemoteSync(true);
                 result = context.sendEvent(action.getMessage(), endpoint);
                 if (result == null)
                 {
@@ -198,15 +199,14 @@ public class MuleManagerComponent implements Callable, Initialisable
         UMOMessage result = null;
         try
         {
-            UMOEndpointURI endpointUri = new MuleEndpointURI(action.getResourceIdentifier());
-            UMOEndpoint endpoint = context.getManagementContext().getRegistry().getOrCreateEndpointForUri(endpointUri,
-                UMOEndpoint.ENDPOINT_TYPE_SENDER);
+            UMOImmutableEndpoint endpoint = context.getManagementContext()
+                .getRegistry()
+                .lookupOutboundEndpoint(action.getResourceIdentifier(), MuleServer.getManagementContext());
 
             long timeout = MapUtils.getLongValue(action.getProperties(),
                 MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, getSynchronousEventTimeout());
 
-            UMOEndpointURI ep = new MuleEndpointURI(action.getResourceIdentifier());
-            result = endpoint.getConnector().receive(ep, timeout);
+            result = endpoint.getConnector().receive(action.getResourceIdentifier(), timeout);
             if (result != null)
             {
                 // See if there is a default transformer on the connector

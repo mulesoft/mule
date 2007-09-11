@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.impl.registry;
 
 import org.mule.MuleServer;
@@ -15,24 +16,19 @@ import org.mule.config.MuleConfiguration;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.ManagementContextAware;
-import org.mule.impl.endpoint.InboundEndpoint;
-import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.impl.endpoint.OutboundEndpoint;
-import org.mule.impl.endpoint.ResponseEndpoint;
-import org.mule.providers.service.TransportFactory;
 import org.mule.registry.RegistrationException;
 import org.mule.registry.Registry;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.EndpointException;
+import org.mule.umo.endpoint.UMOEndpointFactory;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.UMOLifecycleManager;
-import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.umo.manager.UMOAgent;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
@@ -42,7 +38,6 @@ import org.mule.util.UUID;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -53,6 +48,7 @@ import org.apache.commons.logging.LogFactory;
 public abstract class AbstractRegistry implements Registry
 
 {
+
     private Registry parent;
     /**
      * the unique id for this Registry
@@ -99,7 +95,7 @@ public abstract class AbstractRegistry implements Registry
 
     public final synchronized void dispose()
     {
-        //TODO lifecycleManager.checkPhase(Disposable.PHASE_NAME);
+        // TODO lifecycleManager.checkPhase(Disposable.PHASE_NAME);
 
         if (isDisposed())
         {
@@ -116,13 +112,13 @@ public abstract class AbstractRegistry implements Registry
             }
             else
             {
-                //remove this reference once there is no one else left to dispose
+                // remove this reference once there is no one else left to dispose
                 RegistryContext.setRegistry(null);
             }
         }
         catch (UMOException e)
         {
-            //TODO
+            // TODO
             logger.error("Failed to cleanly dispose: " + e.getMessage(), e);
         }
     }
@@ -162,12 +158,12 @@ public abstract class AbstractRegistry implements Registry
         }
 
         // I don't think it makes sense for the Registry to know about the ManagementContext at this point.
-//        UMOManagementContext mc = MuleServer.getManagementContext();
-//        if (mc != null)
-//        {
-//            mc.fireNotification(new RegistryNotification(this, RegistryNotification.REGISTRY_INITIALISING));
-//        }
-        
+        // UMOManagementContext mc = MuleServer.getManagementContext();
+        // if (mc != null)
+        // {
+        // mc.fireNotification(new RegistryNotification(this, RegistryNotification.REGISTRY_INITIALISING));
+        // }
+
         if (id == null)
         {
             logger.warn("No unique id has been set on this registry");
@@ -195,69 +191,106 @@ public abstract class AbstractRegistry implements Registry
     }
 
     /**
-     * Start the <code>MuleManager</code>. This will start the connectors and
-     * sessions.
-     *
+     * Start the <code>MuleManager</code>. This will start the connectors and sessions.
+     * 
      * @throws org.mule.umo.UMOException if the the connectors or components fail to start
      */
-//    public final synchronized void start() throws UMOException
-//    {
-//        if (getParent() != null)
-//        {
-//            parent.start();
-//        }
-//
-//
-//        if (!started.get())
-//        {
-//            starting.set(true);
-//            fireSystemEvent(new RegistryNotification(getManagementContext(), RegistryNotification.MANAGER_STARTING));
-//            startObjects();
-//            started.set(true);
-//            starting.set(false);
-//
-//            fireSystemEvent(new RegistryNotification(getManagementContext(), RegistryNotification.MANAGER_STARTED));
-//        }
-//    }
-
+    // public final synchronized void start() throws UMOException
+    // {
+    // if (getParent() != null)
+    // {
+    // parent.start();
+    // }
+    //
+    //
+    // if (!started.get())
+    // {
+    // starting.set(true);
+    // fireSystemEvent(new RegistryNotification(getManagementContext(),
+    // RegistryNotification.MANAGER_STARTING));
+    // startObjects();
+    // started.set(true);
+    // starting.set(false);
+    //
+    // fireSystemEvent(new RegistryNotification(getManagementContext(),
+    // RegistryNotification.MANAGER_STARTED));
+    // }
+    // }
     /**
      * Stops the <code>MuleManager</code> which stops all sessions and connectors
-     *
+     * 
      * @throws org.mule.umo.UMOException if either any of the sessions or connectors fail to stop
      */
-//    public final synchronized void stop() throws UMOException
-//    {
-//        if (getParent() != null)
-//        {
-//            parent.stop();
-//        }
-//
-//        started.set(false);
-//        stopping.set(true);
-//        fireSystemEvent(new RegistryNotification(getManagementContext(), RegistryNotification.MANAGER_STOPPING));
-//
-//        stopObjects();
-//        stopping.set(false);
-//        fireSystemEvent(new RegistryNotification(getManagementContext(), RegistryNotification.MANAGER_STOPPED));
-//    }
-
-
+    // public final synchronized void stop() throws UMOException
+    // {
+    // if (getParent() != null)
+    // {
+    // parent.stop();
+    // }
+    //
+    // started.set(false);
+    // stopping.set(true);
+    // fireSystemEvent(new RegistryNotification(getManagementContext(),
+    // RegistryNotification.MANAGER_STOPPING));
+    //
+    // stopObjects();
+    // stopping.set(false);
+    // fireSystemEvent(new RegistryNotification(getManagementContext(),
+    // RegistryNotification.MANAGER_STOPPED));
+    // }
     public UMOConnector lookupConnector(String name)
     {
         return (UMOConnector) lookupObject(name);
     }
 
-    public UMOEndpoint lookupEndpoint(String name)
+    public UMOImmutableEndpoint lookupEndpoint(String name, UMOManagementContext managementContext)
     {
-        //This will grab a new prototype from the context
-        UMOEndpoint ep = (UMOEndpoint) lookupObject(name);
-        //If endpoint type is not explicitly set, set it here once the object has been requested
-        if(ep!=null && ep.getType().equals(UMOEndpoint.ENDPOINT_TYPE_GLOBAL))
-        {
-            ep.setType(UMOEndpoint.ENDPOINT_TYPE_SENDER_AND_RECEIVER);
-        }
+        return (UMOImmutableEndpoint) lookupObject(name);
+    }
 
-        return ep;
+    public UMOImmutableEndpoint lookupEndpoint(String name)
+    {
+        return (UMOImmutableEndpoint) lookupObject(name);
+    }
+
+    protected UMOEndpointFactory lookupEndpointFactory()
+    {
+        return (UMOEndpointFactory) lookupObject(MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY);
+    }
+
+    public UMOImmutableEndpoint lookupInboundEndpoint(String uri, UMOManagementContext managementContext)
+        throws UMOException
+    {
+        // For now create new instance with factory, existing instances in registry don't serve us as
+        // endpoints are not yet truely immutable
+        return lookupEndpointFactory().createInboundEndpoint(uri, managementContext);
+    }
+
+    public UMOImmutableEndpoint lookupOutboundEndpoint(String uri, UMOManagementContext managementContext)
+        throws UMOException
+    {
+        // For now create new instance with factory, existing instances in registry don't serve us as
+        // endpoints are not yet truely immutable
+        return lookupEndpointFactory().createOutboundEndpoint(uri, managementContext);
+    }
+
+    public UMOImmutableEndpoint lookupResponseEndpoint(String uri, UMOManagementContext managementContext)
+        throws UMOException
+    {
+        // For now create new instance with factory, existing instances in registry don't serve us as
+        // endpoints are not yet truely immutable
+        return lookupEndpointFactory().createResponseEndpoint(uri, managementContext);
+    }
+
+    /**
+     * @deprecated
+     */
+    public UMOImmutableEndpoint createEndpoint(UMOEndpointURI endpointUri,
+                                               String endpointType,
+                                               UMOManagementContext managementContext)
+        throws EndpointException, UMOException
+    {
+        return lookupEndpointFactory().createEndpoint(endpointUri, endpointType, managementContext);
     }
 
     public UMOTransformer lookupTransformer(String name)
@@ -274,7 +307,7 @@ public abstract class AbstractRegistry implements Registry
     {
         return lookupModel(MuleProperties.OBJECT_SYSTEM_MODEL);
     }
-    
+
     public Collection getModels()
     {
         return lookupObjects(UMOModel.class);
@@ -319,7 +352,7 @@ public abstract class AbstractRegistry implements Registry
     {
         logger.debug("lookupObject: key=" + key + " scope=" + scope);
         Object o = doLookupObject(key);
-        
+
         if (o == null)
         {
             if (logger.isDebugEnabled())
@@ -328,11 +361,11 @@ public abstract class AbstractRegistry implements Registry
             }
             if (getParent() != null && scope > SCOPE_IMMEDIATE)
             {
-                if(getParent().isRemote() && scope == SCOPE_REMOTE)
+                if (getParent().isRemote() && scope == SCOPE_REMOTE)
                 {
                     o = getParent().lookupObject(key);
                 }
-                else if(!getParent().isRemote() && scope >= SCOPE_LOCAL)
+                else if (!getParent().isRemote() && scope >= SCOPE_LOCAL)
                 {
                     o = getParent().lookupObject(key);
                 }
@@ -357,7 +390,7 @@ public abstract class AbstractRegistry implements Registry
 
         if (getParent() != null && scope > SCOPE_IMMEDIATE)
         {
-            if(getParent().isRemote() && scope == SCOPE_REMOTE)
+            if (getParent().isRemote() && scope == SCOPE_REMOTE)
             {
                 Collection collection2 = getParent().lookupObjects(type);
                 if (collection2 != null)
@@ -365,7 +398,7 @@ public abstract class AbstractRegistry implements Registry
                     collection.addAll(collection2);
                 }
             }
-            else if(!getParent().isRemote() && scope >= SCOPE_LOCAL)
+            else if (!getParent().isRemote() && scope >= SCOPE_LOCAL)
             {
                 Collection collection2 = getParent().lookupObjects(type);
                 if (collection2 != null)
@@ -387,79 +420,78 @@ public abstract class AbstractRegistry implements Registry
 
     /**
      * Initialises all registered agents
-     *
+     * 
      * @throws org.mule.umo.lifecycle.InitialisationException
-     *
      */
-    //TODO: Spring is now taking care of the initialisation lifecycle, need to check that we still get this problem
-//    protected void initialiseAgents() throws InitialisationException
-//    {
-//        logger.info("Initialising agents...");
-//
-//        // Do not iterate over the map directly, as 'complex' agents
-//        // may spawn extra agents during initialisation. This will
-//        // cause a ConcurrentModificationException.
-//        // Use a cursorable iteration, which supports on-the-fly underlying
-//        // data structure changes.
-//        Collection agentsSnapshot = lookupCollection(UMOAgent.class).values();
-//        CursorableLinkedList agentRegistrationQueue = new CursorableLinkedList(agentsSnapshot);
-//        CursorableLinkedList.Cursor cursor = agentRegistrationQueue.cursor();
-//
-//        // the actual agent object refs are the same, so we are just
-//        // providing different views of the same underlying data
-//
-//        try
-//        {
-//            while (cursor.hasNext())
-//            {
-//                UMOAgent umoAgent = (UMOAgent) cursor.next();
-//
-//                int originalSize = agentsSnapshot.size();
-//                logger.debug("Initialising agent: " + umoAgent.getName());
-//                umoAgent.initialise();
-//                // thank you, we are done with you
-//                cursor.remove();
-//
-//                // Direct calls to MuleManager.registerAgent() modify the original
-//                // agents map, re-check if the above agent registered any
-//                // 'child' agents.
-//                int newSize = agentsSnapshot.size();
-//                int delta = newSize - originalSize;
-//                if (delta > 0)
-//                {
-//                    // TODO there's some mess going on in
-//                    // http://issues.apache.org/jira/browse/COLLECTIONS-219
-//                    // watch out when upgrading the commons-collections.
-//                    Collection tail = CollectionUtils.retainAll(agentsSnapshot, agentRegistrationQueue);
-//                    Collection head = CollectionUtils.subtract(agentsSnapshot, tail);
-//
-//                    // again, above are only refs, all going back to the original agents map
-//
-//                    // re-order the queue
-//                    agentRegistrationQueue.clear();
-//                    // 'spawned' agents first
-//                    agentRegistrationQueue.addAll(head);
-//                    // and the rest
-//                    agentRegistrationQueue.addAll(tail);
-//
-//                    // update agents map with a new order in case we want to re-initialise
-//                    // MuleManager on the fly
-//                    for (Iterator it = agentRegistrationQueue.iterator(); it.hasNext();)
-//                    {
-//                        UMOAgent theAgent = (UMOAgent) it.next();
-//                        theAgent.initialise();
-//                    }
-//                }
-//            }
-//        }
-//        finally
-//        {
-//            // close the cursor as per JavaDoc
-//            cursor.close();
-//        }
-//        logger.info("Agents Successfully Initialised");
-//    }
-    
+    // TODO: Spring is now taking care of the initialisation lifecycle, need to check that we still get this
+    // problem
+    // protected void initialiseAgents() throws InitialisationException
+    // {
+    // logger.info("Initialising agents...");
+    //
+    // // Do not iterate over the map directly, as 'complex' agents
+    // // may spawn extra agents during initialisation. This will
+    // // cause a ConcurrentModificationException.
+    // // Use a cursorable iteration, which supports on-the-fly underlying
+    // // data structure changes.
+    // Collection agentsSnapshot = lookupCollection(UMOAgent.class).values();
+    // CursorableLinkedList agentRegistrationQueue = new CursorableLinkedList(agentsSnapshot);
+    // CursorableLinkedList.Cursor cursor = agentRegistrationQueue.cursor();
+    //
+    // // the actual agent object refs are the same, so we are just
+    // // providing different views of the same underlying data
+    //
+    // try
+    // {
+    // while (cursor.hasNext())
+    // {
+    // UMOAgent umoAgent = (UMOAgent) cursor.next();
+    //
+    // int originalSize = agentsSnapshot.size();
+    // logger.debug("Initialising agent: " + umoAgent.getName());
+    // umoAgent.initialise();
+    // // thank you, we are done with you
+    // cursor.remove();
+    //
+    // // Direct calls to MuleManager.registerAgent() modify the original
+    // // agents map, re-check if the above agent registered any
+    // // 'child' agents.
+    // int newSize = agentsSnapshot.size();
+    // int delta = newSize - originalSize;
+    // if (delta > 0)
+    // {
+    // // TODO there's some mess going on in
+    // // http://issues.apache.org/jira/browse/COLLECTIONS-219
+    // // watch out when upgrading the commons-collections.
+    // Collection tail = CollectionUtils.retainAll(agentsSnapshot, agentRegistrationQueue);
+    // Collection head = CollectionUtils.subtract(agentsSnapshot, tail);
+    //
+    // // again, above are only refs, all going back to the original agents map
+    //
+    // // re-order the queue
+    // agentRegistrationQueue.clear();
+    // // 'spawned' agents first
+    // agentRegistrationQueue.addAll(head);
+    // // and the rest
+    // agentRegistrationQueue.addAll(tail);
+    //
+    // // update agents map with a new order in case we want to re-initialise
+    // // MuleManager on the fly
+    // for (Iterator it = agentRegistrationQueue.iterator(); it.hasNext();)
+    // {
+    // UMOAgent theAgent = (UMOAgent) it.next();
+    // theAgent.initialise();
+    // }
+    // }
+    // }
+    // }
+    // finally
+    // {
+    // // close the cursor as per JavaDoc
+    // cursor.close();
+    // }
+    // logger.info("Agents Successfully Initialised");
+    // }
     /** @return null if object not found */
     protected abstract Object doLookupObject(String key);
 
@@ -473,185 +505,25 @@ public abstract class AbstractRegistry implements Registry
         this.parent = registry;
     }
 
-    /** {@inheritDoc} */
-    public UMOEndpoint createEndpointFromUri(String uri, String type) throws UMOException
-    {
-        return createEndpointFromUri(uri, type, MuleServer.getManagementContext());
-    }
-
-    public UMOEndpoint createEndpointFromUri(String uri, String type, UMOManagementContext managementContext) throws UMOException
-    {
-        return createEndpointFromUri(new MuleEndpointURI(uri), type, managementContext);
-    }
-
-    /** {@inheritDoc} */
-    public UMOEndpoint createEndpointFromUri(UMOEndpointURI uri, String type) throws UMOException
-    {
-        return createEndpointFromUri(uri, type, MuleServer.getManagementContext());
-    }
-
-    public UMOEndpoint createEndpointFromUri(UMOEndpointURI uri, String type, UMOManagementContext managementContext) throws UMOException
-    {
-        uri.initialise();
-        UMOEndpoint endpoint = TransportFactory.createEndpoint(uri, type, managementContext);
-        registerEndpoint(endpoint, managementContext);
-        return endpoint;
-    }
-
-    /**
-     * Return an endpoint, given that endpoint's <em>name</em>.
-     *
-     * <p>This only returns an endpoint if the argument is a name (at least, when working
-     * with Spring).  If the logic is changed to be similar to that of
-     * {@link #getEndpointFromUri(org.mule.umo.endpoint.UMOEndpointURI)} below (ie
-     * looping through addresses too) then endpoints are also returned if the address
-     * matches the argument.  HOWEVER, this breaks other tests (XFire i nparticular).
-     * As far as I can tell, this is because the "additional prefix" is lost, so
-     * xfire:http://... and http://... are identical.  But I do not have a more
-     * complete explanation.
-     *
-     * @param name The endpoint name
-     * @return An endpoint, or null
-     * @throws ObjectNotFoundException
-     */
-    public UMOEndpoint getEndpointFromName(String name) throws ObjectNotFoundException
-    {
-        if (null != name)
-        {
-            return lookupEndpoint(name);
-        }
-        else
-        {
-            return null;
-        }
-    }
-
-    public UMOEndpoint getEndpointFromUri(String name) throws ObjectNotFoundException
-    {
-        return getEndpointFromName(name);
-    }
-
-    /**
-     * Return an endpoint whose name or address matches the given URI.
-     *
-     * <p>This is more forgiving than {@link #getEndpointFromUri(String)} above, in that
-     * it recognises endpoints via both names and addresses.
-     *
-     * @param uri
-     * @return
-     * @throws UMOException
-     */
-    public UMOEndpoint getEndpointFromUri(UMOEndpointURI uri) throws UMOException
-    {
-        String name = uri.getEndpointName();
-        UMOEndpoint endpoint = getEndpointFromName(name);
-        if (null == endpoint)
-        {
-            String address = uri.getAddress();
-            if (null != address)
-            {
-                Collection endpoints = getEndpoints();
-                if (null != name && endpoints.contains(name))
-                {
-                    throw new IllegalStateException("Endpoint present, but direct lookup failed");
-                }
-
-                Iterator it = endpoints.iterator();
-                while (it.hasNext())
-                {
-                    Object value = it.next();
-                    if (value instanceof UMOEndpoint)
-                    {
-                        UMOEndpoint candidate = (UMOEndpoint) value;
-                        String candidateAddress = candidate.getEndpointURI().getAddress();
-                        if (null != candidateAddress && address.equals(candidateAddress))
-                        {
-                            if (null == endpoint)
-                            {
-                                endpoint = candidate;
-                            }
-                            else
-                            {
-                                throw new IllegalStateException("Duplicate endpoint URI");
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return endpoint;
-    }
-
-    /** {@inheritDoc} */
-    public UMOEndpoint getOrCreateEndpointForUri(String uriIdentifier, String type) throws UMOException
-    {
-        return getOrCreateEndpointForUri(uriIdentifier, type, MuleServer.getManagementContext());
-    }
-
-    /**
-     * Returns a NEW INSTANCE of a sending/receiving/responding endpoint, for a given uriIdentifier
-     */
-    public UMOEndpoint getOrCreateEndpointForUri(String uriIdentifier,
-                                                 String type,
-                                                 UMOManagementContext managementContext) throws UMOException
-    {
-        UMOEndpoint endpoint = lookupEndpoint(uriIdentifier);
-        if (endpoint == null)
-        {
-            return createEndpointFromUri(uriIdentifier, type, managementContext);
-        }
-        else
-        {
-            if (UMOEndpoint.ENDPOINT_TYPE_SENDER.equals(type))
-            {
-                return new OutboundEndpoint(endpoint);
-            }
-            else if (UMOEndpoint.ENDPOINT_TYPE_RECEIVER.equals(type))
-            {
-                return new InboundEndpoint(endpoint);
-            }
-            else if (UMOEndpoint.ENDPOINT_TYPE_RESPONSE.equals(type))
-            {
-                return new ResponseEndpoint(endpoint);
-            }
-            else
-            {
-                throw new IllegalArgumentException("Endpoint matching: " + uriIdentifier
-                                                   + " is not of a recognized type: " + type
-                                                   + ". It is of type: " + endpoint.getType());
-            }
-        }
-    }
-
-
-    /** {@inheritDoc} */
-    public UMOEndpoint getOrCreateEndpointForUri(UMOEndpointURI uri, String type) throws UMOException
-    {
-        return getOrCreateEndpointForUri(uri, type, MuleServer.getManagementContext());
-    }
-
-    public UMOEndpoint getOrCreateEndpointForUri(UMOEndpointURI uri, String type, UMOManagementContext managementContext) throws UMOException
-    {
-        UMOEndpoint endpoint = getEndpointFromUri(uri);
-        if (endpoint == null)
-        {
-            endpoint = createEndpointFromUri(uri, type, managementContext);
-        }
-        return endpoint;
-    }
-
     protected void unsupportedOperation(String operation, Object o) throws UnsupportedOperationException
     {
-        throw new UnsupportedOperationException("Registry: " + getRegistryId() + " is read-only so objects cannot be registered or unregistered. Failed to execute operation " + operation + " on object: " + o);
+        throw new UnsupportedOperationException(
+            "Registry: "
+                            + getRegistryId()
+                            + " is read-only so objects cannot be registered or unregistered. Failed to execute operation "
+                            + operation + " on object: " + o);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * @deprecated
+     */
     public void registerConnector(UMOConnector connector) throws UMOException
     {
         registerConnector(connector, MuleServer.getManagementContext());
     }
 
-    public void registerConnector(UMOConnector connector, UMOManagementContext managementContext) throws UMOException
+    public void registerConnector(UMOConnector connector, UMOManagementContext managementContext)
+        throws UMOException
     {
         unsupportedOperation("registerConnector", connector);
     }
@@ -663,12 +535,13 @@ public abstract class AbstractRegistry implements Registry
     }
 
     /** {@inheritDoc} */
-    public void registerEndpoint(UMOEndpoint endpoint) throws UMOException
+    public void registerEndpoint(UMOImmutableEndpoint endpoint) throws UMOException
     {
         registerEndpoint(endpoint, MuleServer.getManagementContext());
     }
 
-    public void registerEndpoint(UMOEndpoint endpoint, UMOManagementContext managementContext) throws UMOException
+    public void registerEndpoint(UMOImmutableEndpoint endpoint, UMOManagementContext managementContext)
+        throws UMOException
     {
         unsupportedOperation("registerEndpoint", endpoint);
     }
@@ -685,7 +558,8 @@ public abstract class AbstractRegistry implements Registry
         registerTransformer(transformer, MuleServer.getManagementContext());
     }
 
-    public void registerTransformer(UMOTransformer transformer, UMOManagementContext managementContext) throws UMOException
+    public void registerTransformer(UMOTransformer transformer, UMOManagementContext managementContext)
+        throws UMOException
     {
         unsupportedOperation("registerTransformer", transformer);
     }
@@ -702,7 +576,8 @@ public abstract class AbstractRegistry implements Registry
         registerService(service, MuleServer.getManagementContext());
     }
 
-    public void registerService(UMODescriptor service, UMOManagementContext managementContext) throws UMOException
+    public void registerService(UMODescriptor service, UMOManagementContext managementContext)
+        throws UMOException
     {
         unsupportedOperation("registerService", service);
     }
@@ -757,26 +632,35 @@ public abstract class AbstractRegistry implements Registry
         registerObject(key, value, metadata, null);
     }
 
-    public final void registerObject(String key, Object value, UMOManagementContext managementContext) throws RegistrationException
+    public final void registerObject(String key, Object value, UMOManagementContext managementContext)
+        throws RegistrationException
     {
         registerObject(key, value, null, managementContext);
     }
-    
-    public final void registerObject(String key, Object value, Object metadata, UMOManagementContext managementContext) throws RegistrationException
+
+    public final void registerObject(String key,
+                                     Object value,
+                                     Object metadata,
+                                     UMOManagementContext managementContext) throws RegistrationException
     {
-        logger.debug("registerObject: key=" + key + " value=" + value + " metadata=" + metadata + " managementContext=" + managementContext);
+        logger.debug("registerObject: key=" + key + " value=" + value + " metadata=" + metadata
+                     + " managementContext=" + managementContext);
         if (value instanceof ManagementContextAware)
         {
             if (managementContext == null)
             {
-                throw new RegistrationException("Attempting to register a ManagementContextAware object without providing a ManagementContext.");
+                throw new RegistrationException(
+                    "Attempting to register a ManagementContextAware object without providing a ManagementContext.");
             }
             ((ManagementContextAware) value).setManagementContext(managementContext);
         }
         doRegisterObject(key, value, metadata, managementContext);
     }
 
-    protected void doRegisterObject(String key, Object value, Object metadata, UMOManagementContext managementContext) throws RegistrationException
+    protected void doRegisterObject(String key,
+                                    Object value,
+                                    Object metadata,
+                                    UMOManagementContext managementContext) throws RegistrationException
     {
         unsupportedOperation("doRegisterObject", key);
     }
@@ -805,7 +689,7 @@ public abstract class AbstractRegistry implements Registry
     {
         unsupportedOperation("setConfiguration", config);
     }
-    
+
     public int getDefaultScope()
     {
         return defaultScope;
@@ -813,9 +697,9 @@ public abstract class AbstractRegistry implements Registry
 
     public void setDefaultScope(int scope)
     {
-        if(scope < SCOPE_IMMEDIATE || scope > SCOPE_REMOTE)
+        if (scope < SCOPE_IMMEDIATE || scope > SCOPE_REMOTE)
         {
-            throw new IllegalArgumentException("Invalid value for scope: "+ scope);
+            throw new IllegalArgumentException("Invalid value for scope: " + scope);
         }
         defaultScope = scope;
     }

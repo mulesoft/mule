@@ -28,6 +28,7 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
@@ -430,7 +431,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         return path;
     }
 
-    protected UMOMessageReceiver getTargetReceiver(UMOMessage message, UMOEndpoint endpoint)
+    protected UMOMessageReceiver getTargetReceiver(UMOMessage message, UMOImmutableEndpoint endpoint)
             throws ConnectException
     {
         String path = (String) message.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY);

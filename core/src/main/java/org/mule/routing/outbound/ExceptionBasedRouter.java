@@ -16,6 +16,7 @@ import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.routing.CouldNotRouteOutboundMessageException;
 import org.mule.umo.routing.RoutePathNotFoundException;
 import org.mule.umo.routing.RoutingException;
@@ -57,7 +58,7 @@ public class ExceptionBasedRouter extends FilteringOutboundRouter
 
         UMOMessage result = null;
         // need that ref for an error message
-        UMOEndpoint endpoint = null;
+        UMOImmutableEndpoint endpoint = null;
         boolean success = false;
 
         synchronized (endpoints)

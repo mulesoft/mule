@@ -49,7 +49,7 @@ public interface UMOOutboundRouter extends UMORouter
      * 
      * @param endpoint the endpoint to add to the router
      */
-    void addEndpoint(UMOEndpoint endpoint);
+    void addEndpoint(UMOImmutableEndpoint endpoint);
 
     /**
      * Removes a specific endpoint from the router
@@ -132,6 +132,6 @@ public interface UMOOutboundRouter extends UMORouter
      * @param name the Endpoint identifier
      * @return the Endpoint or null if the endpointUri is not registered
      */
-    public UMOEndpoint getEndpoint(String name);
+    public UMOImmutableEndpoint getEndpoint(String name);
 
 }

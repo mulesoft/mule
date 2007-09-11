@@ -14,13 +14,12 @@ import org.mule.RegistryContext;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleEvent;
-import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.model.AbstractComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.UMOTransformer;
 
@@ -60,7 +59,7 @@ public class DefaultReplyToHandler implements ReplyToHandler
         String replyToEndpoint = replyTo.toString();
 
         // get the endpoint for this url
-        UMOEndpoint endpoint = getEndpoint(event, replyToEndpoint);
+        UMOImmutableEndpoint endpoint = getEndpoint(event, replyToEndpoint);
 
         if (transformer == null)
         {
@@ -69,7 +68,8 @@ public class DefaultReplyToHandler implements ReplyToHandler
 
         if (transformer != null)
         {
-            endpoint.setTransformer(transformer);
+            //TODO DF: Endpoint mutabily issue pending
+            ((UMOEndpoint) endpoint).setTransformer(transformer);
         }
 
         // make sure remove the replyTo property as not cause a a forever
@@ -98,27 +98,13 @@ public class DefaultReplyToHandler implements ReplyToHandler
 
     }
 
-    protected synchronized UMOEndpoint getEndpoint(UMOEvent event, String endpointUri) throws UMOException
+    protected synchronized UMOImmutableEndpoint getEndpoint(UMOEvent event, String endpointUri) throws UMOException
     {
-        UMOEndpoint endpoint = (UMOEndpoint)endpointCache.get(endpointUri);
+        UMOImmutableEndpoint endpoint = (UMOImmutableEndpoint) endpointCache.get(endpointUri);
         if (endpoint == null)
         {
-            endpoint = RegistryContext.getRegistry().lookupEndpoint(endpointUri);
-            if (endpoint != null)
-            {
-                // TODO MULE-2066: We should not need to set correct transformer
-                // here, this should rather be done generically based on the endpoint
-                // type.
-                endpoint.setType(UMOEndpoint.ENDPOINT_TYPE_SENDER);
-                endpoint.setTransformer(((AbstractConnector) endpoint.getConnector()).getDefaultOutboundTransformer());
-            }
-            else
-            {
-                UMOEndpointURI ep = new MuleEndpointURI(endpointUri);
-                endpoint = event.getManagementContext().getRegistry().getOrCreateEndpointForUri(ep,
-                    UMOEndpoint.ENDPOINT_TYPE_SENDER);
-                endpointCache.put(endpointUri, endpoint);
-            }
+            endpoint = RegistryContext.getRegistry().lookupOutboundEndpoint(endpointUri,event.getManagementContext());
+            endpointCache.put(endpointUri, endpoint);
         }
         return endpoint;
     }

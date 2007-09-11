@@ -19,6 +19,7 @@ import org.mule.tck.MuleTestUtils;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
@@ -86,7 +87,7 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
         UMOMessage message = new MuleMessage("test event", m);
         assertTrue(router.isMatch(message));
 
-        UMOEndpoint ep = router.getEndpoint(2, message);
+        UMOImmutableEndpoint ep = router.getEndpoint(2, message);
         assertEquals("test://foo?bar", ep.getEndpointURI().toString());
 
         session.expectAndReturn("sendEvent", C.eq(message, router.getEndpoints().get(0)), message);

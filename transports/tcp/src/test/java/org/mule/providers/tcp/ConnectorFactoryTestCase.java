@@ -10,17 +10,14 @@
 
 package org.mule.providers.tcp;
 
-import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.providers.service.TransportFactory;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 public class ConnectorFactoryTestCase extends AbstractMuleTestCase
 {
     public void testCreate() throws Exception
     {
-        MuleEndpointURI url = new MuleEndpointURI("tcp://7877");
-        UMOEndpoint endpoint = TransportFactory.createEndpoint(url, UMOEndpoint.ENDPOINT_TYPE_RECEIVER, managementContext);
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupInboundEndpoint("tcp://7877", managementContext);
         assertNotNull(endpoint);
         assertNotNull(endpoint.getConnector());
         assertEquals("tcp://localhost:7877", endpoint.getEndpointURI().getAddress());

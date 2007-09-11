@@ -111,11 +111,11 @@ public abstract class AbstractEndpointSecurityFilter implements UMOEndpointSecur
             throw new InitialisationException(CoreMessages.objectIsNull("Endpoint"), this);
         }
 
-        if (endpoint.getType().equals(UMOEndpoint.ENDPOINT_TYPE_RECEIVER))
+        if (endpoint.canReceive())
         {
             inbound = true;
         }
-        else if (endpoint.getType().equals(UMOEndpoint.ENDPOINT_TYPE_SENDER))
+        else if (endpoint.canSend())
         {
             inbound = false;
         }

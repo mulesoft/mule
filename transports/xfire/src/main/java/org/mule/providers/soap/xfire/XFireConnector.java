@@ -26,6 +26,7 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.provider.UMOMessageReceiver;
@@ -359,21 +360,25 @@ public class XFireConnector extends AbstractConnector
 
         // Set the transformers on the endpoint too
         serviceEndpoint.setTransformer(receiver.getEndpoint().getTransformer());
-        receiver.getEndpoint().setTransformer(null);
+        // TODO DF: MULE-2291 Resolve pending endpoint mutability issues
+        ((MuleEndpoint) receiver.getEndpoint()).setTransformer(null);
 
         serviceEndpoint.setResponseTransformer(receiver.getEndpoint().getResponseTransformer());
-        receiver.getEndpoint().setResponseTransformer(null);
+        // TODO DF: MULE-2291 Resolve pending endpoint mutability issues
+        ((MuleEndpoint) receiver.getEndpoint()).setResponseTransformer(null);
 
         // set the filter on the axis endpoint on the real receiver endpoint
         serviceEndpoint.setFilter(receiver.getEndpoint().getFilter());
         // Remove the Axis filter now
-        receiver.getEndpoint().setFilter(null);
+        // TODO DF: MULE-2291 Resolve pending endpoint mutability issues
+        ((MuleEndpoint) receiver.getEndpoint()).setFilter(null);
 
         // set the Security filter on the axis endpoint on the real receiver
         // endpoint
         serviceEndpoint.setSecurityFilter(receiver.getEndpoint().getSecurityFilter());
         // Remove the Axis Receiver Security filter now
-        receiver.getEndpoint().setSecurityFilter(null);
+        // TODO DF: MULE-2291 Resolve pending endpoint mutability issues
+        ((MuleEndpoint) receiver.getEndpoint()).setSecurityFilter(null);
         xfireDescriptor.getInboundRouter().addEndpoint(serviceEndpoint);
     }
 
@@ -406,7 +411,7 @@ public class XFireConnector extends AbstractConnector
      * @return the key to store the newly created receiver against. In this case it
      *         is the component name, which is equivilent to the Axis service name.
      */
-    protected Object getReceiverKey(UMOComponent component, UMOEndpoint endpoint)
+    protected Object getReceiverKey(UMOComponent component, UMOImmutableEndpoint endpoint)
     {
         if (endpoint.getEndpointURI().getPort() == -1)
         {

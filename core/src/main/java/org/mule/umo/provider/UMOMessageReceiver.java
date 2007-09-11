@@ -16,6 +16,7 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Lifecycle;
 
 import java.io.OutputStream;
@@ -36,7 +37,7 @@ public interface UMOMessageReceiver extends Lifecycle, UMOConnectable
     /**
      * @return the receivers endpoint
      */
-    UMOEndpoint getEndpoint();
+    UMOImmutableEndpoint getEndpoint();
 
     /**
      * @param message
@@ -52,7 +53,7 @@ public interface UMOMessageReceiver extends Lifecycle, UMOConnectable
      * @param endpoint the endpoint to listen on
      * @see UMOEndpoint
      */
-    void setEndpoint(UMOEndpoint endpoint);
+    void setEndpoint(UMOImmutableEndpoint endpoint);
 
     /**
      * @param component the component to associate with the receiver. When data is

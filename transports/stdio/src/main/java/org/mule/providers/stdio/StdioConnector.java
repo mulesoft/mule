@@ -13,7 +13,7 @@ package org.mule.providers.stdio;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.AbstractPollingMessageReceiver;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOMessageReceiver;
 
 import java.io.InputStream;
@@ -41,7 +41,7 @@ public abstract class StdioConnector extends AbstractConnector
      * @see org.mule.umo.provider.UMOConnector#registerListener(org.mule.umo.UMOSession,
      *      org.mule.umo.endpoint.UMOEndpoint)
      */
-    public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception
+    public UMOMessageReceiver createReceiver(UMOComponent component, UMOImmutableEndpoint endpoint) throws Exception
     {
         return serviceDescriptor.createMessageReceiver(this, component, endpoint,
             new Object[]{new Long(AbstractPollingMessageReceiver.DEFAULT_POLL_FREQUENCY)});

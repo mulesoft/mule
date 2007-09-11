@@ -10,10 +10,9 @@
 
 package org.mule.providers.email.transformers;
 
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOException;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.transformer.TransformerException;
 
 import java.io.IOException;
@@ -51,7 +50,7 @@ public class Rfc822ByteArrayTestCase extends FunctionalTestCase
     protected MimeMessage byteArrayToMimeMessage(byte[] bytes) throws UMOException
     {
         Rfc822ByteArraytoMimeMessage transformer = new Rfc822ByteArraytoMimeMessage();
-        UMOEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("smtp");
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("smtp");
         transformer.setEndpoint(endpoint);
         Object result = transformer.transform(bytes);
         assertTrue(result instanceof MimeMessage);

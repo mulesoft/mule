@@ -25,6 +25,7 @@ import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.tck.testmodels.mule.TestResponseAggregator;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.routing.UMOInboundRouterCollection;
@@ -66,7 +67,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
 
     public void testGlobalEndpointConfig()
     {
-        UMOEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("fruitBowlEndpoint");
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("fruitBowlEndpoint");
         assertNotNull(endpoint);
         assertEquals(endpoint.getEndpointURI().getAddress(), "fruitBowlPublishQ");
         assertNotNull(endpoint.getFilter());
@@ -75,7 +76,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertEquals("bar", filter.getExpectedValue());
         assertEquals("http://foo.com", filter.getNamespaces().get("foo"));
 
-        UMOEndpoint ep = managementContext.getRegistry().lookupEndpoint("testEPWithCS");
+        UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpoint("testEPWithCS");
         assertNotNull(ep);
         assertNotNull(ep.getConnectionStrategy());
         assertTrue(ep.getConnectionStrategy() instanceof SimpleRetryConnectionStrategy);
@@ -86,12 +87,12 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
     public void testEndpointConfig()
     {
         // test that endpoints have been resolved on endpoints
-        UMOEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("waterMelonEndpoint");
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("waterMelonEndpoint");
         assertNotNull(endpoint);
         assertEquals("test.queue", endpoint.getEndpointURI().getAddress());
 
         UMODescriptor descriptor = managementContext.getRegistry().lookupService("orangeComponent");
-        UMOEndpoint ep = descriptor.getInboundRouter().getEndpoint("Orange");
+        UMOImmutableEndpoint ep = descriptor.getInboundRouter().getEndpoint("Orange");
         assertNotNull(ep);
         assertNotNull(ep.getResponseTransformer());
         assertTrue(ep.getResponseTransformer() instanceof TestCompressionTransformer);
@@ -210,7 +211,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertEquals(1, descriptor.getOutboundRouter().getRouters().size());
         UMOOutboundRouter router = (UMOOutboundRouter)descriptor.getOutboundRouter().getRouters().get(0);
         assertEquals(1, router.getEndpoints().size());
-        UMOEndpoint endpoint = (UMOEndpoint)router.getEndpoints().get(0);
+        UMOImmutableEndpoint endpoint = (UMOImmutableEndpoint)router.getEndpoints().get(0);
         assertNotNull(endpoint);
         assertEquals("appleInEndpoint", endpoint.getName());
         assertNotNull(endpoint.getTransformer());

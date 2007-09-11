@@ -13,12 +13,11 @@ package org.mule.tck.providers;
 import org.mule.MuleException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.impl.MuleDescriptor;
-import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractConnector;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
@@ -164,8 +163,8 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         managementContext.getRegistry().registerService(d, managementContext);
         UMOComponent component = model.getComponent(d.getName());
 
-        UMOEndpoint endpoint = managementContext.getRegistry().createEndpointFromUri(
-                new MuleEndpointURI(getTestEndpointURI()), UMOEndpoint.ENDPOINT_TYPE_SENDER, managementContext);
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry()
+            .lookupOutboundEndpoint(getTestEndpointURI(), managementContext);
 
         try
         {

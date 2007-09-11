@@ -27,10 +27,10 @@ import org.mule.util.StringMessageUtils;
 import org.mule.util.SystemUtils;
 import org.mule.util.properties.PropertyExtractor;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-
 import java.util.Iterator;
 import java.util.List;
+
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -60,7 +60,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements U
 
     protected UMOTransactionConfig transactionConfig;
 
-    public void dispatch(UMOSession session, UMOMessage message, UMOEndpoint endpoint) throws UMOException
+    public void dispatch(UMOSession session, UMOMessage message, UMOImmutableEndpoint endpoint) throws UMOException
     {
         setMessageProperties(session, message, endpoint);
 
@@ -90,7 +90,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements U
         }
     }
 
-    public UMOMessage send(UMOSession session, UMOMessage message, UMOEndpoint endpoint) throws UMOException
+    public UMOMessage send(UMOSession session, UMOMessage message, UMOImmutableEndpoint endpoint) throws UMOException
     {
         if (replyTo != null)
         {
@@ -150,7 +150,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements U
         return result;
     }
 
-    protected void setMessageProperties(UMOSession session, UMOMessage message, UMOEndpoint endpoint)
+    protected void setMessageProperties(UMOSession session, UMOMessage message, UMOImmutableEndpoint endpoint)
     {
         if (replyTo != null)
         {
@@ -229,7 +229,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements U
         // this.endpoints = new CopyOnWriteArrayList(endpoints);
         for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
         {
-            UMOEndpoint umoEndpoint = (UMOEndpoint) iterator.next();
+            UMOImmutableEndpoint umoEndpoint = (UMOImmutableEndpoint) iterator.next();
             if (!umoEndpoint.canSend())
             {
                 throw new InvalidEndpointTypeException(CoreMessages.outboundRouterMustUseOutboudEndpoints(
@@ -239,7 +239,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements U
         }
     }
 
-    public void addEndpoint(UMOEndpoint endpoint)
+    public void addEndpoint(UMOImmutableEndpoint endpoint)
     {
         if (!endpoint.canSend())
         {
@@ -342,7 +342,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements U
      * @return the Endpoint or null if the endpointUri is not registered
      * @see org.mule.umo.routing.UMOInboundRouterCollection
      */
-    public UMOEndpoint getEndpoint(String name)
+    public UMOImmutableEndpoint getEndpoint(String name)
     {
         UMOEndpoint endpointDescriptor;
         for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)

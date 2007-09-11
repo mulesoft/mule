@@ -20,6 +20,7 @@ import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.routing.CouldNotRouteOutboundMessageException;
 import org.mule.umo.routing.RoutePathNotFoundException;
 import org.mule.umo.routing.RoutingException;
@@ -57,7 +58,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
             throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), message, null);
         }
 
-        UMOEndpoint ep = getEndpoint(0, message);
+        UMOImmutableEndpoint ep = getEndpoint(0, message);
 
         try
         {
@@ -120,7 +121,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
         this.transformer = transformer;
     }
 
-    public void addEndpoint(UMOEndpoint endpoint)
+    public void addEndpoint(UMOImmutableEndpoint endpoint)
     {
         if (!useTemplates && parser.isContainsTemplate(endpoint.getEndpointURI().toString()))
         {
@@ -140,16 +141,16 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
      * @throws CouldNotRouteOutboundMessageException if the template causs the
      *             endpoint to become illegal or malformed
      */
-    public UMOEndpoint getEndpoint(int index, UMOMessage message)
+    public UMOImmutableEndpoint getEndpoint(int index, UMOMessage message)
         throws CouldNotRouteOutboundMessageException
     {
         if (!useTemplates)
         {
-            return (UMOEndpoint) endpoints.get(index);
+            return (UMOImmutableEndpoint) endpoints.get(index);
         }
         else
         {
-            UMOEndpoint ep = (UMOEndpoint) endpoints.get(index);
+            UMOImmutableEndpoint ep = (UMOImmutableEndpoint) endpoints.get(index);
             String uri = ep.getEndpointURI().toString();
             if (logger.isDebugEnabled())
             {
@@ -178,7 +179,8 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
                         CoreMessages.schemeCannotChangeForRouter(ep.getEndpointURI().getScheme(),
                         newUri.getScheme()), message, ep);
                 }
-                ep.setEndpointURI(newUri);
+                //TODO DF: MULE-2291 Resolve pending endpoint mutability issues
+                ((UMOEndpoint) ep).setEndpointURI(newUri);
             }
             catch (EndpointException e)
             {

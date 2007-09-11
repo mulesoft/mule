@@ -11,7 +11,6 @@
 package org.mule.impl.endpoint;
 
 import org.mule.umo.UMOException;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 public class InboundEndpoint extends MuleEndpoint
@@ -31,7 +30,7 @@ public class InboundEndpoint extends MuleEndpoint
 
     public String getType()
     {
-        return UMOEndpoint.ENDPOINT_TYPE_RECEIVER;
+        return UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER;
     }
     
 }

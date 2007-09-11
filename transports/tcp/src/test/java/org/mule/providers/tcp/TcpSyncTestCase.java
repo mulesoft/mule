@@ -14,10 +14,9 @@ import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
 import org.mule.impl.NullSessionHandler;
-import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 import java.util.Arrays;
 
@@ -34,8 +33,7 @@ public class TcpSyncTestCase extends FunctionalTestCase
     protected UMOMessage send(Object payload) throws Exception
     {
         UMOMessage message = new MuleMessage(payload);
-        UMOEndpoint endpoint = managementContext.getRegistry().getOrCreateEndpointForUri(new MuleEndpointURI(endpointUri),
-            UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupOutboundEndpoint(endpointUri, managementContext);
         MuleSession session = new MuleSession(message, new NullSessionHandler());
         MuleEvent event = new MuleEvent(message, endpoint, session, true);
         event.setTimeout(60000);

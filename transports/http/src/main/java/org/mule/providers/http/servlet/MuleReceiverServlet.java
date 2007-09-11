@@ -20,6 +20,7 @@ import org.mule.providers.http.i18n.HttpMessages;
 import org.mule.providers.service.TransportFactory;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.EndpointException;
+import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.NoReceiverForEndpointException;
 import org.mule.util.PropertiesUtils;
 
@@ -246,7 +247,8 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
                 throw new NoReceiverForEndpointException("No receiver found for endpointUri: " + uri);
             }
         }
-        receiver.getEndpoint().setEndpointURI(new MuleEndpointURI(getRequestUrl(httpServletRequest)));
+        //TODO DF: Endpoint mutability
+        ((UMOEndpoint) receiver.getEndpoint()).setEndpointURI(new MuleEndpointURI(getRequestUrl(httpServletRequest)));
         return receiver;
     }
 

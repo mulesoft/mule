@@ -11,7 +11,7 @@
 package org.mule.providers.jms.functional;
 
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 public class MultipleJmsConnectorsTestCase extends FunctionalTestCase
 {
@@ -22,9 +22,9 @@ public class MultipleJmsConnectorsTestCase extends FunctionalTestCase
     
     public void testMultipleJmsClientConnections() throws Exception
     {
-        UMOEndpoint ep1 = managementContext.getRegistry().lookupEndpoint("ep1");
+        UMOImmutableEndpoint ep1 = managementContext.getRegistry().lookupEndpoint("ep1");
         ep1.dispatch(getTestEvent("testing"));
-        UMOEndpoint ep2 = managementContext.getRegistry().lookupEndpoint("ep2");
+        UMOImmutableEndpoint ep2 = managementContext.getRegistry().lookupEndpoint("ep2");
         ep2.dispatch(getTestEvent("testing"));
 
         // wait a bit to let the messages go on their way

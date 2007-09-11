@@ -313,16 +313,16 @@ public final class MuleTestUtils
                                           UMOManagementContext managementContext) throws UMOException
     {
         // Create the endpoints
-        UMOEndpoint inboundEndpoint = null;
-        UMOEndpoint outboundEndpoint = null;
+        UMOImmutableEndpoint inboundEndpoint = null;
+        UMOImmutableEndpoint outboundEndpoint = null;
         if (inboundEndpointUri != null)
         {
-            inboundEndpoint = TransportFactory.createEndpoint(inboundEndpointUri,
+            inboundEndpoint = managementContext.getRegistry().createEndpoint(inboundEndpointUri,
                     UMOEndpoint.ENDPOINT_TYPE_RECEIVER, managementContext);
         }
         if (outboundEndpointUri != null)
         {
-            outboundEndpoint = TransportFactory.createEndpoint(outboundEndpointUri,
+            outboundEndpoint = managementContext.getRegistry().createEndpoint(outboundEndpointUri,
                     UMOEndpoint.ENDPOINT_TYPE_SENDER, managementContext);
         }
         return createDescriptor(implementation, name, inboundEndpoint, outboundEndpoint, properties);
@@ -344,8 +344,8 @@ public final class MuleTestUtils
      */
     public static UMODescriptor createDescriptor(String implementation,
                                           String name,
-                                          UMOEndpoint inboundEndpoint,
-                                          UMOEndpoint outboundEndpoint,
+                                          UMOImmutableEndpoint inboundEndpoint,
+                                          UMOImmutableEndpoint outboundEndpoint,
                                           Map properties) throws UMOException
     {
         MuleDescriptor descriptor = new MuleDescriptor();

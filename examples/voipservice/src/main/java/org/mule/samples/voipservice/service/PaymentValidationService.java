@@ -12,8 +12,8 @@ package org.mule.samples.voipservice.service;
 
 import org.mule.RegistryContext;
 import org.mule.samples.voipservice.interfaces.PaymentValidation;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +39,7 @@ public class PaymentValidationService implements PaymentValidation
 
     private UMOEndpointURI getEndpointUri(String endpointName)
     {
-        UMOEndpoint endpoint = RegistryContext.getRegistry().lookupEndpoint(endpointName);
+        UMOImmutableEndpoint endpoint = RegistryContext.getRegistry().lookupEndpoint(endpointName);
         return endpoint.getEndpointURI();
     }
 

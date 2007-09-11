@@ -14,6 +14,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.providers.tcp.TcpConnector;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
@@ -123,7 +124,7 @@ public class HttpConnector extends TcpConnector
     /**
      * @see UMOConnector#registerListener(UMOComponent, UMOEndpoint)
      */
-    public UMOMessageReceiver registerListener(UMOComponent component, UMOEndpoint endpoint) throws Exception
+    public UMOMessageReceiver registerListener(UMOComponent component, UMOImmutableEndpoint endpoint) throws Exception
     {
         if (endpoint != null)
         {
@@ -145,7 +146,8 @@ public class HttpConnector extends TcpConnector
                     newProperties.put(key, entry.getValue());
                 }
                 // set normalized properties back on the endpoint
-                endpoint.setProperties(newProperties);
+                // TODO DF: MULE-2291 Resolve pending endpoint mutability issues
+                ((UMOEndpoint) endpoint).setProperties(newProperties);
             }
         }
         // proceed as usual
@@ -159,7 +161,7 @@ public class HttpConnector extends TcpConnector
      * @param endpoint the endpoint being registered for the component
      * @return the key to store the newly created receiver against
      */
-    protected Object getReceiverKey(UMOComponent component, UMOEndpoint endpoint)
+    protected Object getReceiverKey(UMOComponent component, UMOImmutableEndpoint endpoint)
     {
         String key = endpoint.getEndpointURI().toString();
         int i = key.indexOf('?');

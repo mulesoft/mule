@@ -36,7 +36,7 @@ import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.routing.UMOInboundRouterCollection;
@@ -45,15 +45,15 @@ import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
 import org.mule.util.object.SimpleObjectFactory;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArraySet;
-import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
-
 import java.beans.ExceptionListener;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArraySet;
+import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -474,11 +474,11 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
      */
     protected void dispatchEvent(MuleApplicationEvent applicationEvent) throws ApplicationEventException
     {
-        UMOEndpoint endpoint;
+        UMOImmutableEndpoint endpoint;
         try
         {
-            endpoint = managementContext.getRegistry().getOrCreateEndpointForUri(applicationEvent.getEndpoint(),
-                UMOEndpoint.ENDPOINT_TYPE_SENDER);
+            endpoint = managementContext.getRegistry().lookupOutboundEndpoint(
+                applicationEvent.getEndpoint(), managementContext);
         }
         catch (UMOException e)
         {
@@ -806,12 +806,12 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
             for (int i = 0; i < subscriptions.length; i++)
             {
                 String subscription = subscriptions[i];
-                UMOEndpointURI endpointUri = new MuleEndpointURI(subscription);
-                UMOEndpoint endpoint = managementContext.getRegistry().getOrCreateEndpointForUri(endpointUri,
-                    UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
+                UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupInboundEndpoint(subscription,
+                    managementContext);
                 if (!asynchronous)
                 {
-                    endpoint.setSynchronous(true);
+                    // TODO DF: MULE-2291 Resolve pending endpoint mutability issues
+                    ((UMOEndpoint) endpoint).setSynchronous(true);
                 }
                 messageRouter.addEndpoint(endpoint);
             }

@@ -31,7 +31,6 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.DisposeException;
@@ -80,6 +79,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
@@ -459,7 +459,7 @@ public abstract class AbstractConnector
                 }
             }
         }
-        
+
         if (this.isConnected())
         {
             try
@@ -811,7 +811,7 @@ public abstract class AbstractConnector
         }
     }
 
-    public UMOMessageReceiver registerListener(UMOComponent component, UMOEndpoint endpoint) throws Exception
+    public UMOMessageReceiver registerListener(UMOComponent component, UMOImmutableEndpoint endpoint) throws Exception
     {
         if (endpoint == null)
         {
@@ -858,13 +858,13 @@ public abstract class AbstractConnector
      * @param endpoint the endpoint being registered for the component
      * @return the key to store the newly created receiver against
      */
-    protected Object getReceiverKey(UMOComponent component, UMOEndpoint endpoint)
+    protected Object getReceiverKey(UMOComponent component, UMOImmutableEndpoint endpoint)
     {
         return StringUtils.defaultIfEmpty(endpoint.getEndpointURI().getFilterAddress(), endpoint
             .getEndpointURI().getAddress());
     }
 
-    public final void unregisterListener(UMOComponent component, UMOEndpoint endpoint) throws Exception
+    public final void unregisterListener(UMOComponent component, UMOImmutableEndpoint endpoint) throws Exception
     {
         if (component == null)
         {
@@ -943,7 +943,7 @@ public abstract class AbstractConnector
         this.receiverThreadingProfile = receiverThreadingProfile;
     }
 
-    public void destroyReceiver(UMOMessageReceiver receiver, UMOEndpoint endpoint) throws Exception
+    public void destroyReceiver(UMOMessageReceiver receiver, UMOImmutableEndpoint endpoint) throws Exception
     {
         receiver.dispose();
     }
@@ -1086,7 +1086,7 @@ public abstract class AbstractConnector
         return false;
     }
 
-    public UMOMessageReceiver getReceiver(UMOComponent component, UMOEndpoint endpoint)
+    public UMOMessageReceiver getReceiver(UMOComponent component, UMOImmutableEndpoint endpoint)
     {
         return (UMOMessageReceiver) receivers.get(this.getReceiverKey(component, endpoint));
     }
@@ -1591,10 +1591,10 @@ public abstract class AbstractConnector
         }
     }
 
-    public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception
+    public UMOMessage receive(String uri, long timeout) throws Exception
     {
-        return this.receive(getManagementContext().getRegistry().getOrCreateEndpointForUri(
-                endpointUri.toString(), UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER), timeout);
+        return this.receive(getManagementContext().getRegistry()
+            .lookupOutboundEndpoint(uri, getManagementContext()), timeout);
     }
 
     public UMOMessage receive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
@@ -1773,7 +1773,7 @@ public abstract class AbstractConnector
      *             really depends on the underlying transport, thus any exception
      *             could be thrown
      */
-    protected UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint)
+    protected UMOMessageReceiver createReceiver(UMOComponent component, UMOImmutableEndpoint endpoint)
         throws Exception
     {
         return getServiceDescriptor().createMessageReceiver(this, component, endpoint);

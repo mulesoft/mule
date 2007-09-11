@@ -11,6 +11,7 @@
 package org.mule.impl;
 
 import org.mule.MuleException;
+import org.mule.MuleServer;
 import org.mule.RegistryContext;
 import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
@@ -93,6 +94,9 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
      */
     protected String name = null;
 
+    // TODO Remove MULE-2266
+    protected static String ENDPOINT_TYPE_SENDER_AND_RECEIVER = "senderAndReceiver";
+    
     /**
      * Determines whether the endpoint is a receiver or sender or both
      */
@@ -238,7 +242,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     {
         this();
         String type = (receiver ? UMOEndpoint.ENDPOINT_TYPE_RECEIVER : UMOEndpoint.ENDPOINT_TYPE_SENDER);
-        UMOEndpoint p = RegistryContext.getRegistry().getOrCreateEndpointForUri(new MuleEndpointURI(endpointName), type);
+        UMOImmutableEndpoint p = RegistryContext.getRegistry().createEndpoint(new MuleEndpointURI(endpointName), type, MuleServer.getManagementContext());
         this.initFromDescriptor(p);
     }
 
@@ -474,7 +478,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         // MULE-1551
 //        result = appendHash(result, transformer);
         result = appendHash(result, name);
-        result = appendHash(result, type);
+        result = appendHash(result, getType());
 //        if (logger.isDebugEnabled())
 //        {
 //            logger.debug("hashCode: " + result);
@@ -661,10 +665,6 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
                 if (UMOEndpoint.ENDPOINT_TYPE_SENDER.equals(type))
                 {
                     newTransformer = ((AbstractConnector) connector).getDefaultOutboundTransformer();
-                }
-                else if (UMOEndpoint.ENDPOINT_TYPE_SENDER_AND_RECEIVER.equals(type))
-                {
-                    newTransformer = ((AbstractConnector) connector).getDefaultInboundTransformer();
                 }
                 else
                 {

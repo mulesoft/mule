@@ -12,7 +12,7 @@ package org.mule.providers.jdbc.config;
 import org.mule.providers.jdbc.JdbcConnector;
 import org.mule.providers.jdbc.test.TestDataSource;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.util.object.ObjectFactory;
 import org.mule.util.properties.PropertyExtractor;
 
@@ -91,7 +91,7 @@ public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
     public void testEndpointQueryOverride() throws Exception
     {
         JdbcConnector c = (JdbcConnector) managementContext.getRegistry().lookupConnector("jdbcConnector3");
-        UMOEndpoint testJdbcEndpoint =  managementContext.getRegistry().lookupEndpoint("testJdbcEndpoint");
+        UMOImmutableEndpoint testJdbcEndpoint =  managementContext.getRegistry().lookupEndpoint("testJdbcEndpoint");
         
         //On connector, not overridden
         assertNotNull(c.getQuery(testJdbcEndpoint, "getTest"));

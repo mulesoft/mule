@@ -14,7 +14,6 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
@@ -193,7 +192,7 @@ public class PromptStdioConnector extends StdioConnector
         return this;
     }
 
-    public UMOMessageReceiver registerListener(UMOComponent component, UMOEndpoint endpoint) throws Exception
+    public UMOMessageReceiver registerListener(UMOComponent component, UMOImmutableEndpoint endpoint) throws Exception
     {
         if (receivers.size() > 0)
         {

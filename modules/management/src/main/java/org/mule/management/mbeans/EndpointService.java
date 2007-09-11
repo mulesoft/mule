@@ -12,6 +12,7 @@ package org.mule.management.mbeans;
 
 import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.ObjectNameHelper;
 
@@ -29,12 +30,12 @@ public class EndpointService implements EndpointServiceMBean
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    private UMOEndpoint endpoint;
+    private UMOImmutableEndpoint endpoint;
     private UMOMessageReceiver receiver;
     private String name;
     private String componentName;
 
-    public EndpointService(UMOEndpoint endpoint)
+    public EndpointService(UMOImmutableEndpoint endpoint)
     {
         this.endpoint = endpoint;
         init();

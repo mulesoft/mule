@@ -7,18 +7,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.registry;
 
 import org.mule.config.MuleConfiguration;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
-import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.umo.manager.UMOAgent;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
@@ -32,12 +32,12 @@ public interface Registry extends Initialisable, Disposable
     public static final int SCOPE_IMMEDIATE = 0;
     public static final int SCOPE_LOCAL = 1;
     public static final int SCOPE_REMOTE = 2;
-    
+
     public static final int DEFAULT_SCOPE = SCOPE_REMOTE;
 
-    ///////////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////////
     // Lookup methods - these should NOT create a new object, only return existing ones
-    ///////////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////////
 
     /** Look up a single object by name. */
     Object lookupObject(String key);
@@ -51,15 +51,96 @@ public interface Registry extends Initialisable, Disposable
     /** Look up all objects of a given type. */
     Collection lookupObjects(Class type, int scope);
 
-    //Object lookupObject(String key, Class returnType);
+    // Object lookupObject(String key, Class returnType);
 
-    //Object lookupObject(String key, Class returnType, int scope);
+    // Object lookupObject(String key, Class returnType, int scope);
 
     // TODO Not sure these methods are needed since the generic ones above can be used.
-    
+
     UMOConnector lookupConnector(String name);
 
-    UMOEndpoint lookupEndpoint(String logicalName);
+    /**
+     * Looks up an returns endpoints registered in the registry by their idendifier (currently endpoint name)<br/><br/
+     * <b>NOTE: This method does not create new endpoint instances, but rather returns existing endpoint
+     * instances that have been registered. This lookup method should be avoided and the intelligent, role
+     * specific endpoint lookup methods should be used instead.<br/><br/>
+     * {@link #lookupInboundEndpoint(String)} {@link #lookupOutboundEndpoint(String)}
+     * {@link #lookupResponseEndpoint(String)}
+     * 
+     * @param name the idendtifer/name used to register endpoint in registry
+     * @return
+     */
+    UMOImmutableEndpoint lookupEndpoint(String name, UMOManagementContext managementContext);
+
+    /**
+     * Deprecated. Use {@link #lookupEndpoint(String, UMOManagementContext)}
+     * @param name
+     * @param managementContext
+     * @return
+     * @deprecated
+     */
+    UMOImmutableEndpoint lookupEndpoint(String name);
+    
+    /**
+     * Returns immutable endpoint instance with the "INBOUND" role. <br/><br/> The uri paramater can be one
+     * of the following:
+     * <li> A global endpoint name
+     * <li> The name of a concrete endpoint configured with a name via the name attribute.
+     * <li> A uri string as documented here :<a
+     * href="http://mule.codehaus.org/display/MULE/Mule+Endpoint+URIs">http://mule.codehaus.org/display/MULE/Mule+Endpoint+URIs</a>
+     * <br/><br/> The {@link UMOImmutableEndpoint} interface is currently used as the return type but this
+     * will be replaces by and more specific interface. SEE MULE-2292
+     * 
+     * @param uri
+     * @return
+     */
+    UMOImmutableEndpoint lookupInboundEndpoint(String uri, UMOManagementContext managementContext)
+        throws UMOException;
+
+    /**
+     * Returns immutable endpoint instance with the "OUTBOUND" role. <br/><br/> The uri paramater can be one
+     * of the following:
+     * <li> A global endpoint name
+     * <li> The name of a concrete endpoint configured with a name via the name attribute.
+     * <li> A uri string as documented here :<a
+     * href="http://mule.codehaus.org/display/MULE/Mule+Endpoint+URIs">http://mule.codehaus.org/display/MULE/Mule+Endpoint+URIs</a>
+     * <br/><br/> The {@link UMOImmutableEndpoint} interface is currently used as the return type but this
+     * will be replaces by and more specific interface. SEE MULE-2292
+     * 
+     * @param uri
+     * @return
+     */
+    UMOImmutableEndpoint lookupOutboundEndpoint(String uri, UMOManagementContext managementContext)
+        throws UMOException;
+
+    /**
+     * Returns immutable endpoint instance with the "RESPONSE" role. <br/><br/> The uri paramater can be one
+     * of the following:
+     * <li> A global endpoint name
+     * <li> The name of a concrete endpoint configured with a name via the name attribute.
+     * <li> A uri string as documented here :<a
+     * href="http://mule.codehaus.org/display/MULE/Mule+Endpoint+URIs">http://mule.codehaus.org/display/MULE/Mule+Endpoint+URIs</a>
+     * <br/><br/> The {@link UMOImmutableEndpoint} interface is currently used as the return type but this
+     * will be replaces by and more specific interface. SEE MULE-2292
+     * 
+     * @param uri
+     * @return
+     */
+    UMOImmutableEndpoint lookupResponseEndpoint(String uri, UMOManagementContext managementContext)
+        throws UMOException;
+
+    /**
+     * @param endpointUri
+     * @param endpointType
+     * @param managementContext
+     * @return
+     * @throws EndpointException
+     * @throws UMOException
+     */
+    UMOImmutableEndpoint createEndpoint(UMOEndpointURI endpointUri,
+                                        String endpointType,
+                                        UMOManagementContext managementContext)
+        throws EndpointException, UMOException;
 
     UMOTransformer lookupTransformer(String name);
 
@@ -68,7 +149,7 @@ public interface Registry extends Initialisable, Disposable
     UMOModel lookupModel(String name);
 
     UMOModel lookupSystemModel();
-    
+
     UMOAgent lookupAgent(String agentName);
 
     // TODO MULE-2162 MuleConfiguration belongs in the ManagementContext rather than the Registry
@@ -92,58 +173,76 @@ public interface Registry extends Initialisable, Disposable
     /** @deprecated Use lookupTransformer() instead */
     Collection getTransformers();
 
-    ///////////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////////
     // Registration methods
-    ///////////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////////
 
     void registerObject(String key, Object value) throws RegistrationException;
 
     void registerObject(String key, Object value, Object metadata) throws RegistrationException;
 
-    void registerObject(String key, Object value, UMOManagementContext managementContext) throws RegistrationException;
+    void registerObject(String key, Object value, UMOManagementContext managementContext)
+        throws RegistrationException;
 
-    void registerObject(String key, Object value, Object metadata, UMOManagementContext managementContext) throws RegistrationException;
+    void registerObject(String key, Object value, Object metadata, UMOManagementContext managementContext)
+        throws RegistrationException;
 
     void unregisterObject(String key);
 
-    // TODO MULE-2139 The following methods are Mule-specific and should be split out into a separate class; 
+    // TODO MULE-2139 The following methods are Mule-specific and should be split out into a separate class;
     // leave this one as a "pure" registry interface.
-    
-    // The deprecated registerXXX() methods below use MuleServer.getManagementContext() as a workaround 
-    // to get the managementContext.  They should eventually be replaced by the equivalent method which 
+
+    // The deprecated registerXXX() methods below use MuleServer.getManagementContext() as a workaround
+    // to get the managementContext. They should eventually be replaced by the equivalent method which
     // receives the managementContext as a parameter.
-    
-    void registerConnector(UMOConnector connector, UMOManagementContext managementContext) throws UMOException;
-    /** @deprecated Use registerConnector(UMOConnector connector, UMOManagementContext managementContext) instead. */
+
+    void registerConnector(UMOConnector connector, UMOManagementContext managementContext)
+        throws UMOException;
+
+    /**
+     * @deprecated Use registerConnector(UMOConnector connector, UMOManagementContext managementContext)
+     *             instead.
+     */
     void registerConnector(UMOConnector connector) throws UMOException;
 
     UMOConnector unregisterConnector(String connectorName) throws UMOException;
 
-    void registerEndpoint(UMOEndpoint endpoint, UMOManagementContext managementContext)  throws UMOException;
+    void registerEndpoint(UMOImmutableEndpoint endpoint, UMOManagementContext managementContext)
+        throws UMOException;
+
     /** @deprecated Use registerEndpoint(UMOEndpoint endpoint, UMOManagementContext managementContext) instead. */
-    void registerEndpoint(UMOEndpoint endpoint)  throws UMOException;;
+    void registerEndpoint(UMOImmutableEndpoint endpoint) throws UMOException;;
 
     UMOImmutableEndpoint unregisterEndpoint(String endpointName);
 
-    void registerTransformer(UMOTransformer transformer, UMOManagementContext managementContext) throws UMOException;
-    /** @deprecated Use registerTransformer(UMOTransformer transformer, UMOManagementContext managementContext) instead. */
+    void registerTransformer(UMOTransformer transformer, UMOManagementContext managementContext)
+        throws UMOException;
+
+    /**
+     * @deprecated Use registerTransformer(UMOTransformer transformer, UMOManagementContext managementContext)
+     *             instead.
+     */
     void registerTransformer(UMOTransformer transformer) throws UMOException;
 
     UMOTransformer unregisterTransformer(String transformerName);
 
-    public void registerService(UMODescriptor service, UMOManagementContext managementContext) throws UMOException;
+    public void registerService(UMODescriptor service, UMOManagementContext managementContext)
+        throws UMOException;
+
     /** @deprecated Use registerService(UMODescriptor service, UMOManagementContext managementContext) instead. */
     public void registerService(UMODescriptor service) throws UMOException;
 
     public UMODescriptor unregisterService(String serviceName);
 
     void registerModel(UMOModel model, UMOManagementContext managementContext) throws UMOException;
+
     /** @deprecated Use registerModel(UMOModel model, UMOManagementContext managementContext) instead. */
     void registerModel(UMOModel model) throws UMOException;
 
     UMOModel unregisterModel(String modelName);
 
     void registerAgent(UMOAgent agent, UMOManagementContext managementContext) throws UMOException;
+
     /** @deprecated Use registerAgent(UMOAgent agent, UMOManagementContext managementContext) instead. */
     void registerAgent(UMOAgent agent) throws UMOException;
 
@@ -152,40 +251,18 @@ public interface Registry extends Initialisable, Disposable
     // TODO MULE-2162 MuleConfiguration belongs in the ManagementContext rather than the Registry
     void setConfiguration(MuleConfiguration config);
 
-    ///////////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////////
     // Creation methods
-    ///////////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////////
 
-    // TODO These methods are a mess (they blur lookup with creation, uris with names).  Need to clean this up.
-    
-    ServiceDescriptor lookupServiceDescriptor(String type, String name, Properties overrides) throws ServiceException;
+    // TODO These methods are a mess (they blur lookup with creation, uris with names). Need to clean this up.
 
-    UMOEndpoint getEndpointFromName(String name) throws ObjectNotFoundException;
-    UMOEndpoint getEndpointFromUri(UMOEndpointURI uri) throws UMOException;
+    ServiceDescriptor lookupServiceDescriptor(String type, String name, Properties overrides)
+        throws ServiceException;
 
-    UMOEndpoint getOrCreateEndpointForUri(String uriIdentifier, String type, UMOManagementContext managementContext) throws UMOException;
-    /** @deprecated Use getOrCreateEndpointForUri(String uriIdentifier, String type, UMOManagementContext managementContext) instead. */
-    UMOEndpoint getOrCreateEndpointForUri(String uriIdentifier, String type) throws UMOException;
-
-    UMOEndpoint getOrCreateEndpointForUri(UMOEndpointURI uri, String type, UMOManagementContext managementContext) throws UMOException;
-    /** @deprecated Use getOrCreateEndpointForUri(UMOEndpointURI uri, String type, UMOManagementContext managementContext) instead. */
-    UMOEndpoint getOrCreateEndpointForUri(UMOEndpointURI uri, String type) throws UMOException;
-
-    UMOEndpoint createEndpointFromUri(UMOEndpointURI uri, String type, UMOManagementContext managementContext) throws UMOException;
-    /** @deprecated Use createEndpointFromUri(UMOEndpointURI uri, String type, UMOManagementContext managementContext) instead. */
-    UMOEndpoint createEndpointFromUri(UMOEndpointURI uri, String type) throws UMOException;
-
-    UMOEndpoint createEndpointFromUri(String uri, String type, UMOManagementContext managementContext) throws UMOException;
-    /** @deprecated Use createEndpointFromUri(String uri, String type, UMOManagementContext managementContext) instead. */
-    UMOEndpoint createEndpointFromUri(String uri, String type) throws UMOException;
-
-    /** @deprecated Use {@link #getEndpointFromUri(org.mule.umo.endpoint.UMOEndpointURI)}
-     *  or {@link #getEndpointFromName(String)} instead  **/
-    UMOEndpoint getEndpointFromUri(String uri) throws ObjectNotFoundException;
-
-    ///////////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////////
     // Registry Metadata
-    ///////////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////////
 
     Registry getParent();
 

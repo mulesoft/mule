@@ -20,6 +20,7 @@ import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.transformer.TransformerException;
 
 import com.mockobjects.dynamic.C;
@@ -106,7 +107,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
         UMOMessage message = new MuleMessage("test event", m);
 
         assertTrue(router.isMatch(message));
-        UMOEndpoint ep = router.getEndpoint(0, message);
+        UMOImmutableEndpoint ep = router.getEndpoint(0, message);
         assertEquals("test://foo?bar", ep.getEndpointURI().toString());
     }
 }

@@ -19,7 +19,6 @@ import org.mule.umo.MessagingException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.OutputHandler;
@@ -109,7 +108,7 @@ public class TestConnector extends AbstractConnector
         this.someProperty = someProperty;
     }
 
-    public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception
+    public UMOMessageReceiver createReceiver(UMOComponent component, UMOImmutableEndpoint endpoint) throws Exception
     {
         UMOMessageReceiver receiver = new AbstractMessageReceiver(this, component, endpoint)
         {
@@ -141,7 +140,7 @@ public class TestConnector extends AbstractConnector
         return receiver;
     }
 
-    public void destroyReceiver(UMOMessageReceiver receiver, UMOEndpoint endpoint) throws Exception
+    public void destroyReceiver(UMOMessageReceiver receiver, UMOImmutableEndpoint endpoint) throws Exception
     {
         // nothing to do
     }

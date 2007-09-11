@@ -19,7 +19,7 @@ import org.mule.registry.AbstractServiceDescriptor;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOTransactionFactory;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
@@ -216,7 +216,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
      */
     public UMOMessageReceiver createMessageReceiver(UMOConnector connector,
                                                     UMOComponent component,
-                                                    UMOEndpoint endpoint) throws UMOException
+                                                    UMOImmutableEndpoint endpoint) throws UMOException
     {
 
         return createMessageReceiver(connector, component, endpoint, null);
@@ -227,7 +227,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
      */
     public UMOMessageReceiver createMessageReceiver(UMOConnector connector,
                                                     UMOComponent component,
-                                                    UMOEndpoint endpoint,
+                                                    UMOImmutableEndpoint endpoint,
                                                     Object[] args) throws UMOException
     {
         String receiverClass = messageReceiver;

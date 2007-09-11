@@ -137,4 +137,5 @@ public interface MuleProperties
     String OBJECT_QUEUE_MANAGER = "_muleQueueManager";
     String OBJECT_MULE_APPLICATION_PROPERTIES = "_muleProperties";
     String OBJECT_MULE_CONFIGURATION = "_muleConfiguration";
+    String OBJECT_MULE_ENDPOINT_FACTORY = "_muleEndpointFactory";
 }

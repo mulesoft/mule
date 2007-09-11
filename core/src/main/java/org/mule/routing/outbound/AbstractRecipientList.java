@@ -11,13 +11,13 @@
 package org.mule.routing.outbound;
 
 import org.mule.impl.MuleMessage;
-import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.registry.RegistrationException;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.routing.CouldNotRouteOutboundMessageException;
 import org.mule.umo.routing.RoutingException;
 
@@ -27,6 +27,7 @@ import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -66,7 +67,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         }
 
         UMOMessage result = null;
-        UMOEndpoint endpoint;
+        UMOImmutableEndpoint endpoint;
         UMOMessage request;
 
         for (Iterator iterator = recipients.iterator(); iterator.hasNext();)
@@ -121,9 +122,9 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         }
     }
 
-    protected UMOEndpoint getRecipientEndpoint(UMOMessage message, Object recipient) throws RoutingException
+    protected UMOImmutableEndpoint getRecipientEndpoint(UMOMessage message, Object recipient) throws RoutingException
     {
-        UMOEndpoint endpoint = null;
+        UMOImmutableEndpoint endpoint = null;
         try
         {
             if (recipient instanceof UMOEndpointURI)
@@ -139,7 +140,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
                 throw new RegistrationException("Failed to create endpoint for: " + recipient);
             }
 
-            UMOEndpoint existingEndpoint = (UMOEndpoint) recipientCache.putIfAbsent(recipient, endpoint);
+            UMOImmutableEndpoint existingEndpoint = (UMOEndpoint) recipientCache.putIfAbsent(recipient, endpoint);
             if (existingEndpoint != null)
             {
                 endpoint = existingEndpoint;
@@ -152,14 +153,14 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         return endpoint;
     }
 
-    protected UMOEndpoint getRecipientEndpointFromUri(UMOEndpointURI uri)
+    protected UMOImmutableEndpoint getRecipientEndpointFromUri(UMOEndpointURI uri)
             throws UMOException
     {
-        UMOEndpoint endpoint = null;
+        UMOImmutableEndpoint endpoint = null;
         if (null != getManagementContext() && null != getManagementContext().getRegistry())
         {
-            endpoint = getManagementContext().getRegistry()
-                    .getOrCreateEndpointForUri(uri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
+            endpoint = getManagementContext().getRegistry().createEndpoint(uri,
+                UMOEndpoint.ENDPOINT_TYPE_SENDER, getManagementContext());
         }
         if (null != endpoint)
         {
@@ -168,17 +169,13 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         return endpoint;
     }
 
-    protected UMOEndpoint getRecipientEndpointFromString(UMOMessage message, String recipient)
+    protected UMOImmutableEndpoint getRecipientEndpointFromString(UMOMessage message, String recipient)
             throws UMOException
     {
-        UMOEndpoint endpoint = (UMOEndpoint) recipientCache.get(recipient);
+        UMOImmutableEndpoint endpoint = (UMOEndpoint) recipientCache.get(recipient);
         if (null == endpoint && null != getManagementContext() && null != getManagementContext().getRegistry())
         {
-            endpoint = getManagementContext().getRegistry().getEndpointFromName(recipient);
-        }
-        if (null == endpoint)
-        {
-            endpoint = getRecipientEndpointFromUri(new MuleEndpointURI(recipient));
+            endpoint = getManagementContext().getRegistry().lookupOutboundEndpoint(recipient, getManagementContext());
         }
         return endpoint;
     }

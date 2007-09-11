@@ -11,7 +11,6 @@
 package org.mule.config.spring.parsers.specific.endpoint.support;
 
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.w3c.dom.Element;
@@ -54,8 +53,6 @@ public class ChildEndpointDefinitionParser extends ChildDefinitionParser
             String parent = element.getAttribute(ENDPOINT_REF_ATTRIBUTE);
             BeanDefinitionBuilder bdb = BeanDefinitionBuilder.childBeanDefinition(parent);
             bdb.getBeanDefinition().setBeanClassName(beanClass.getName());
-            // need to overload the type so it becomes a local endpoint
-            bdb.addPropertyValue("type", UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER_AND_RECEIVER);
             return bdb;
         }
     }

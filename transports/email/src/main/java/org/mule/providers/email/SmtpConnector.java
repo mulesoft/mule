@@ -11,7 +11,7 @@
 package org.mule.providers.email;
 
 import org.mule.umo.UMOComponent;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOMessageReceiver;
 
@@ -95,7 +95,7 @@ public class SmtpConnector extends AbstractMailConnector
      * @see org.mule.providers.UMOConnector#registerListener(javax.jms.MessageListener,
      *      java.lang.String)
      */
-    public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception
+    public UMOMessageReceiver createReceiver(UMOComponent component, UMOImmutableEndpoint endpoint) throws Exception
     {
         throw new UnsupportedOperationException("Listeners cannot be registered on a SMTP endpoint");
     }

@@ -18,7 +18,7 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.EndpointNotFoundException;
 import org.mule.umo.endpoint.MalformedEndpointException;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOMessageReceiver;
 
 import java.io.IOException;
@@ -57,7 +57,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
         {
             if (httpServletRequest.getParameter("endpoint") != null)
             {
-                UMOEndpoint endpoint = getEndpointForURI(httpServletRequest);
+                UMOImmutableEndpoint endpoint = getEndpointForURI(httpServletRequest);
                 String timeoutString = httpServletRequest.getParameter("timeout");
                 long to = timeout;
 
@@ -139,7 +139,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
     {
         try
         {
-            UMOEndpoint endpoint = getEndpointForURI(httpServletRequest);
+            UMOImmutableEndpoint endpoint = getEndpointForURI(httpServletRequest);
             String timeoutString = httpServletRequest.getParameter("timeout");
             long to = timeout;
 
@@ -170,7 +170,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
         }
     }
 
-    protected UMOEndpoint getEndpointForURI(HttpServletRequest httpServletRequest)
+    protected UMOImmutableEndpoint getEndpointForURI(HttpServletRequest httpServletRequest)
         throws EndpointException, MalformedEndpointException
     {
         String endpointName = httpServletRequest.getParameter("endpoint");
@@ -179,7 +179,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
             throw new EndpointException(HttpMessages.httpParameterNotSet("endpoint"));
         }
 
-        UMOEndpoint endpoint = RegistryContext.getRegistry().lookupEndpoint(endpointName);
+        UMOImmutableEndpoint endpoint = RegistryContext.getRegistry().lookupEndpoint(endpointName);
         if (endpoint == null)
         {
             // if we dont find an endpoint for the given name, lets check the

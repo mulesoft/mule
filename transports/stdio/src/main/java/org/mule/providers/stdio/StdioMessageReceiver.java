@@ -14,7 +14,7 @@ import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractPollingMessageReceiver;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
 
@@ -38,7 +38,7 @@ public class StdioMessageReceiver extends AbstractPollingMessageReceiver
 
     public StdioMessageReceiver(UMOConnector connector,
                                 UMOComponent component,
-                                UMOEndpoint endpoint,
+                                UMOImmutableEndpoint endpoint,
                                 long checkFrequency) throws CreateException
     {
         super(connector, component, endpoint);

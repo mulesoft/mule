@@ -695,7 +695,7 @@ public class MuleEvent extends EventObject implements UMOEvent, ThreadSafeAccess
         UMOTransformer trans = unmarshallTransformers(in);
         try
         {
-            endpoint = getManagementContext().getRegistry().getOrCreateEndpointForUri(uri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
+            endpoint = getManagementContext().getRegistry().lookupOutboundEndpoint(uri,getManagementContext());
 
             if (endpoint.getTransformer() == null)
             {

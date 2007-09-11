@@ -41,6 +41,7 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.ReceiveException;
@@ -413,7 +414,7 @@ public class MuleClient implements Disposable
             logger.warn("The mule managementContext is running synchronously, a null message payload will be returned");
         }
         UMOSession session = new MuleSession(ModelHelper.getComponent(component));
-        UMOEndpoint endpoint = getDefaultClientEndpoint(session.getComponent().getDescriptor(),
+        UMOImmutableEndpoint endpoint = getDefaultClientEndpoint(session.getComponent().getDescriptor(),
             message.getPayload());
         UMOEvent event = new MuleEvent(message, endpoint, session, true);
 
@@ -473,7 +474,7 @@ public class MuleClient implements Disposable
                 message, null);
         }
         UMOSession session = new MuleSession(ModelHelper.getComponent(component));
-        UMOEndpoint endpoint = getDefaultClientEndpoint(session.getComponent().getDescriptor(),
+        UMOImmutableEndpoint endpoint = getDefaultClientEndpoint(session.getComponent().getDescriptor(),
             message.getPayload());
         UMOEvent event = new MuleEvent(message, endpoint, session, true);
 
@@ -754,7 +755,7 @@ public class MuleClient implements Disposable
      */
     public UMOMessage receive(String url, long timeout) throws UMOException
     {
-        UMOEndpoint endpoint = getEndpoint(url, UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
+        UMOImmutableEndpoint endpoint = getInboundEndpoint(url);
         try
         {
             UMOMessage message = endpoint.receive(timeout);
@@ -830,12 +831,13 @@ public class MuleClient implements Disposable
     protected UMOEvent getEvent(UMOMessage message, String uri, boolean synchronous, boolean streaming)
         throws UMOException
     {
-        UMOEndpoint endpoint = getEndpoint(uri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        UMOImmutableEndpoint endpoint = getOutboundEndpoint(uri);
         if (!endpoint.getConnector().isStarted() &&managementContext.isStarted())
         {
             endpoint.getConnector().start();
         }
-        endpoint.setStreaming(streaming);
+        // TODO DF: MULE-2291 Resolve pending endpoint mutability issues
+        ((UMOEndpoint) endpoint).setStreaming(streaming);
         try
         {
             MuleSession session = new MuleSession(message,
@@ -855,12 +857,17 @@ public class MuleClient implements Disposable
         }
     }
 
-    protected UMOEndpoint getEndpoint(String uri, String type) throws UMOException
+    protected UMOImmutableEndpoint getInboundEndpoint(String uri) throws UMOException
     {
-        return managementContext.getRegistry().getOrCreateEndpointForUri(uri, type, managementContext);
+        return managementContext.getRegistry().lookupInboundEndpoint(uri, managementContext);
+    }
+    
+    protected UMOImmutableEndpoint getOutboundEndpoint(String uri) throws UMOException
+    {
+        return managementContext.getRegistry().lookupOutboundEndpoint(uri, managementContext);
     }
 
-    protected UMOEndpoint getDefaultClientEndpoint(UMODescriptor descriptor, Object payload)
+    protected UMOImmutableEndpoint getDefaultClientEndpoint(UMODescriptor descriptor, Object payload)
         throws UMOException
     {
         // as we are bypassing the message transport layer we need to check that

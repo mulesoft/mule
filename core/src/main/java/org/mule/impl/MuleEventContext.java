@@ -32,6 +32,7 @@ import org.mule.umo.transformer.TransformerException;
 import java.io.OutputStream;
 
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -239,7 +240,7 @@ public class MuleEventContext implements UMOEventContext
      * @throws org.mule.umo.UMOException if the event fails to be processed by the
      *             component or the transport for the endpoint
      */
-    public UMOMessage sendEvent(UMOMessage message, UMOEndpoint endpoint) throws UMOException
+    public UMOMessage sendEvent(UMOMessage message, UMOImmutableEndpoint endpoint) throws UMOException
     {
         // If synchronous receive has not been explicitly set, default it to true
         setRemoteSync(message, endpoint);
@@ -277,8 +278,8 @@ public class MuleEventContext implements UMOEventContext
      */
     public UMOMessage sendEvent(UMOMessage message, UMOEndpointURI endpointUri) throws UMOException
     {
-        UMOEndpoint endpoint = getManagementContext().getRegistry().getOrCreateEndpointForUri(endpointUri,
-            UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        UMOImmutableEndpoint endpoint = getManagementContext().getRegistry().createEndpoint(endpointUri,
+            UMOEndpoint.ENDPOINT_TYPE_SENDER, getManagementContext());
 
         // If synchronous receive has not been explicitly set, default it to
         // true
@@ -447,7 +448,8 @@ public class MuleEventContext implements UMOEventContext
      */
     public UMOMessage sendEvent(UMOMessage message, String endpointName) throws UMOException
     {
-        UMOEndpoint endpoint = RegistryContext.getRegistry().lookupEndpoint(endpointName);
+        UMOImmutableEndpoint endpoint = RegistryContext.getRegistry()
+            .lookupOutboundEndpoint(endpointName, getManagementContext());
         setRemoteSync(message, endpoint);
         return session.sendEvent(message, endpoint);
     }
@@ -491,8 +493,8 @@ public class MuleEventContext implements UMOEventContext
      */
     public void dispatchEvent(UMOMessage message, UMOEndpointURI endpointUri) throws UMOException
     {
-        UMOEndpoint endpoint = getManagementContext().getRegistry().getOrCreateEndpointForUri(endpointUri,
-            UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        UMOImmutableEndpoint endpoint = getManagementContext().getRegistry().createEndpoint(endpointUri,
+            UMOEndpoint.ENDPOINT_TYPE_SENDER, getManagementContext());
         session.dispatchEvent(message, endpoint);
     }
 
@@ -523,7 +525,7 @@ public class MuleEventContext implements UMOEventContext
      * @throws org.mule.umo.UMOException if the event fails to be processed by the
      *             component or the transport for the endpoint
      */
-    public void dispatchEvent(UMOMessage message, UMOEndpoint endpoint) throws UMOException
+    public void dispatchEvent(UMOMessage message, UMOImmutableEndpoint endpoint) throws UMOException
     {
         session.dispatchEvent(message, endpoint);
     }
@@ -537,7 +539,7 @@ public class MuleEventContext implements UMOEventContext
      * @return The requested event or null if the request times out
      * @throws org.mule.umo.UMOException if the request operation fails
      */
-    public UMOMessage receiveEvent(UMOEndpoint endpoint, long timeout) throws UMOException
+    public UMOMessage receiveEvent(UMOImmutableEndpoint endpoint, long timeout) throws UMOException
     {
         return session.receiveEvent(endpoint, timeout);
     }
@@ -566,8 +568,8 @@ public class MuleEventContext implements UMOEventContext
      */
     public UMOMessage receiveEvent(UMOEndpointURI endpointUri, long timeout) throws UMOException
     {
-        UMOEndpoint endpoint = getManagementContext().getRegistry().getOrCreateEndpointForUri(endpointUri,
-            UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        UMOImmutableEndpoint endpoint = getManagementContext().getRegistry().createEndpoint(endpointUri,
+            UMOEndpoint.ENDPOINT_TYPE_SENDER, getManagementContext());
         return session.receiveEvent(endpoint, timeout);
     }
 

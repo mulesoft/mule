@@ -19,6 +19,8 @@
                  <artifactId>maven-surefire-plugin</artifactId>
                  <configuration>
                     <excludes>
+                        <!--  MULE-2297 -->
+                        <exclude>**/GroovyScriptConfigurationBuilderTestCase.*</exclude>
                     </excludes>
                 </configuration>
              </plugin>

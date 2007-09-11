@@ -10,13 +10,13 @@
 
 package org.mule.ra;
 
+import org.mule.MuleServer;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.extras.client.i18n.ClientMessages;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
-import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.security.MuleCredentials;
 import org.mule.providers.AbstractConnector;
 import org.mule.ra.i18n.JcaMessages;
@@ -25,8 +25,7 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.ReceiveException;
 
@@ -66,9 +65,8 @@ public class DefaultMuleConnection implements MuleConnection
      */
     public void dispatch(String url, Object payload, Map messageProperties) throws UMOException
     {
-        UMOEndpointURI muleEndpoint = new MuleEndpointURI(url);
         UMOMessage message = new MuleMessage(payload, messageProperties);
-        UMOEvent event = getEvent(message, muleEndpoint, false);
+        UMOEvent event = getEvent(message, url, false);
         try
         {
             event.getSession().dispatchEvent(event);
@@ -100,9 +98,8 @@ public class DefaultMuleConnection implements MuleConnection
      */
     public UMOMessage send(String url, Object payload, Map messageProperties) throws UMOException
     {
-        UMOEndpointURI muleEndpoint = new MuleEndpointURI(url);
         UMOMessage message = new MuleMessage(payload, messageProperties);
-        UMOEvent event = getEvent(message, muleEndpoint, true);
+        UMOEvent event = getEvent(message, url, true);
 
         UMOMessage response;
         try
@@ -135,10 +132,8 @@ public class DefaultMuleConnection implements MuleConnection
      */
     public UMOMessage receive(String url, long timeout) throws UMOException
     {
-        MuleEndpointURI muleEndpoint = new MuleEndpointURI(url);
-
-        UMOEndpoint endpoint = manager.getRegistry().getOrCreateEndpointForUri(muleEndpoint,
-            UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        UMOImmutableEndpoint endpoint = manager.getRegistry().lookupOutboundEndpoint(url,
+            MuleServer.getManagementContext());
 
         try
         {
@@ -159,10 +154,10 @@ public class DefaultMuleConnection implements MuleConnection
      * @return the UMOEvent
      * @throws UMOException in case of Mule error
      */
-    protected UMOEvent getEvent(UMOMessage message, UMOEndpointURI uri, boolean synchronous)
+    protected UMOEvent getEvent(UMOMessage message, String uri, boolean synchronous)
         throws UMOException
     {
-        UMOEndpoint endpoint = manager.getRegistry().getOrCreateEndpointForUri(uri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        UMOImmutableEndpoint endpoint = manager.getRegistry().lookupOutboundEndpoint(uri, MuleServer.getManagementContext());
         //UMOConnector connector = endpoint.getConnector();
 
 //        if (!connector.isStarted() && manager.isStarted())

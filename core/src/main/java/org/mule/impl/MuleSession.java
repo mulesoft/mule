@@ -10,6 +10,7 @@
 
 package org.mule.impl;
 
+import org.mule.MuleServer;
 import org.mule.RegistryContext;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
@@ -140,7 +141,8 @@ public final class MuleSession implements UMOSession
 
     public void dispatchEvent(UMOMessage message, String endpointName) throws UMOException
     {
-        dispatchEvent(message, RegistryContext.getRegistry().lookupEndpoint(endpointName));
+        dispatchEvent(message, RegistryContext.getRegistry().lookupOutboundEndpoint(
+            endpointName, MuleServer.getManagementContext()));
     }
 
     public void dispatchEvent(UMOMessage message, UMOImmutableEndpoint endpoint) throws UMOException
@@ -167,7 +169,8 @@ public final class MuleSession implements UMOSession
 
     public UMOMessage sendEvent(UMOMessage message, String endpointName) throws UMOException
     {
-        return sendEvent(message, RegistryContext.getRegistry().lookupEndpoint(endpointName));
+        return sendEvent(message, RegistryContext.getRegistry()
+            .lookupOutboundEndpoint(endpointName, MuleServer.getManagementContext()));
     }
 
     public UMOMessage sendEvent(UMOMessage message) throws UMOException
@@ -399,8 +402,8 @@ public final class MuleSession implements UMOSession
      */
     public UMOMessage receiveEvent(String endpointName, long timeout) throws UMOException
     {
-        UMOEndpoint endpoint = RegistryContext.getRegistry().getOrCreateEndpointForUri(endpointName,
-            UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
+        UMOImmutableEndpoint endpoint = RegistryContext.getRegistry()
+            .lookupOutboundEndpoint(endpointName, MuleServer.getManagementContext());
         return receiveEvent(endpoint, timeout);
     }
 
