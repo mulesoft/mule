@@ -23,7 +23,6 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOEndpointBuilder;
 import org.mule.umo.endpoint.UMOEndpointFactory;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
@@ -40,8 +39,6 @@ import org.apache.commons.logging.LogFactory;
 
 public class EndpointFactory implements UMOEndpointFactory
 {
-    
-    private UMOEndpointBuilder defaultEndpointBuilder;
     
     /**
      * logger used by this class
@@ -278,17 +275,5 @@ public class EndpointFactory implements UMOEndpointFactory
             throw new TransportFactoryException(e);
         }
     }
-
-    public UMOEndpointBuilder getDefaultEndpointBuilder()
-    {
-        return defaultEndpointBuilder;
-    }
-
-    public void setDefaultEndpointBuilder(UMOEndpointBuilder defaultEndpointBuilder)
-    {
-        this.defaultEndpointBuilder = defaultEndpointBuilder;
-    }
-    
-    
 
 }
