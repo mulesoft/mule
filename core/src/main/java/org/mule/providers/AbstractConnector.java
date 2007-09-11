@@ -1594,7 +1594,7 @@ public abstract class AbstractConnector
     public UMOMessage receive(String uri, long timeout) throws Exception
     {
         return this.receive(getManagementContext().getRegistry()
-            .lookupOutboundEndpoint(uri, getManagementContext()), timeout);
+            .lookupInboundEndpoint(uri, getManagementContext()), timeout);
     }
 
     public UMOMessage receive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
