@@ -12,16 +12,6 @@
 
     <transformer-serializable-to-byte-array name="SerializableToByteArray"/>
 
-    <spring:bean class="org.mule.config.spring.processors.PropertyPlaceholderProcessor">
-        <spring:property name="factories">
-            <spring:map>
-                <spring:entry key="hostname">
-                    <spring:bean class="org.mule.config.factories.HostNameFactory"/>
-                </spring:entry>
-            </spring:map>
-        </spring:property>
-    </spring:bean>
-
     <model name="main">
 
         <service name="PassingThrough">
