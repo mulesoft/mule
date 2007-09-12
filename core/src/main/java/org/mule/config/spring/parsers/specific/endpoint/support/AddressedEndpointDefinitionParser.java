@@ -20,7 +20,7 @@ import org.mule.config.spring.parsers.PostProcessor;
 import org.mule.config.spring.parsers.PreProcessor;
 import org.mule.config.spring.parsers.preprocessors.DisableByAttribute;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
-import org.mule.util.XmlUtils;
+import org.mule.util.CoreXMLUtils;
 
 import org.w3c.dom.Element;
 import org.apache.commons.logging.Log;
@@ -94,7 +94,7 @@ public class AddressedEndpointDefinitionParser extends AbstractSerialDelegatingD
             {
                 if (null != addressId)
                 {
-                    logger.debug("Injecting " + addressId + " in " + XmlUtils.elementToString(element));
+                    logger.debug("Injecting " + addressId + " in " + CoreXMLUtils.elementToString(element));
                     assembler.extendBean(EndpointUtils.ENDPOINT_URI_ATTRIBUTE, addressId, true);
                     // reset state
                     addressId = null;

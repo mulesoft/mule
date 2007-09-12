@@ -12,7 +12,7 @@ package org.mule.config.spring.parsers.preprocessors;
 
 import org.mule.config.spring.parsers.PreProcessor;
 import org.mule.config.spring.parsers.assembly.PropertyConfiguration;
-import org.mule.util.XmlUtils;
+import org.mule.util.CoreXMLUtils;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -41,7 +41,7 @@ public class DisableByAttribute implements PreProcessor
         NamedNodeMap attributes = element.getAttributes();
         for (int i = 0; i < attributes.getLength(); i++)
         {
-            String alias = XmlUtils.attributeName((Attr) attributes.item(i));
+            String alias = CoreXMLUtils.attributeName((Attr) attributes.item(i));
             String name = config.translateName(alias);
             if (disallowed.contains(name))
             {

@@ -16,8 +16,9 @@ import org.w3c.dom.Document;
 /**
  * General utility methods for working with XML.
  */
-public class XMLUtils
+public class XMLUtils extends CoreXMLUtils
 {
+
     /**
      * Converts a DOM to an XML string.
      */
@@ -25,6 +26,7 @@ public class XMLUtils
     {
         return new DOMReader().read(dom).asXML();
     }
+    
 }
 
 

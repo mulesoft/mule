@@ -15,7 +15,11 @@ import org.w3c.dom.Node;
 import org.w3c.dom.Attr;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 
-public class XmlUtils
+/**
+ * These only depend on standard (JSE) XML classes and are used by Spring config code.
+ * For a more extensive (sub-)class, see the XMLUtils class in the XML module.
+ */
+public class CoreXMLUtils
 {
 
     public static final String MULE_DEFAULT_NAMESPACE = "http://www.mulesource.org/schema/mule/core";

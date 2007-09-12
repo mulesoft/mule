@@ -12,7 +12,7 @@ package org.mule.config.spring.parsers.preprocessors;
 
 import org.mule.config.spring.parsers.PreProcessor;
 import org.mule.config.spring.parsers.assembly.PropertyConfiguration;
-import org.mule.util.XmlUtils;
+import org.mule.util.CoreXMLUtils;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -50,7 +50,7 @@ public class CheckExclusiveAttributes implements PreProcessor
         NamedNodeMap attributes = element.getAttributes();
         for (int i = 0; i < attributes.getLength(); i++)
         {
-            String alias = XmlUtils.attributeName((Attr) attributes.item(i));
+            String alias = CoreXMLUtils.attributeName((Attr) attributes.item(i));
             String name = config.translateName(alias);
             if (knownAttributes.containsKey(name))
             {
@@ -72,7 +72,7 @@ public class CheckExclusiveAttributes implements PreProcessor
                         message.append("'");
                     }
                     message.append(" in element ");
-                    message.append(XmlUtils.elementToString(element));
+                    message.append(CoreXMLUtils.elementToString(element));
                     message.append(".");
                     throw new CheckExclusiveAttributesException(message.toString());
                 }
