@@ -14,6 +14,7 @@ import org.mule.impl.MuleMessage;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
+import org.mule.RegistryContext;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,6 +22,10 @@ import java.util.Map;
 
 public class MessagePropertiesTransformerTestCase extends AbstractMuleTestCase
 {
+    protected String getConfigResources()
+    {
+        return "message-properties-transformer-config.xml";
+    }
 
     public void testOverwriteFlagEnabledByDefault() throws Exception
     {
@@ -78,6 +83,19 @@ public class MessagePropertiesTransformerTestCase extends AbstractMuleTestCase
         assertEquals(msg.getPayload(), transformed.getPayload());
         assertEquals(msg.getPropertyNames(), transformed.getPropertyNames());
         assertFalse(transformed.getPropertyNames().contains("badValue"));
+    }
+
+    public void testTransformerConfig() throws Exception
+    {
+        MessagePropertiesTransformer transformer = (MessagePropertiesTransformer) RegistryContext.getRegistry().lookupTransformer("testTransformer");
+        assertNotNull(transformer.getAddProperties());
+        assertNotNull(transformer.getDeleteProperties());
+        assertEquals(transformer.getAddProperties().size(), 1);
+        assertEquals(transformer.getDeleteProperties().size(), 2);
+        assertTrue(transformer.isOverwrite());
+        assertEquals(transformer.getAddProperties().get("Content-Type"), "text/baz;charset=UTF-16BE");
+        assertEquals(transformer.getDeleteProperties().get(0), "test-property1");
+        assertEquals(transformer.getDeleteProperties().get(1), "test-property2");
     }
 
 }
