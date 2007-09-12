@@ -53,7 +53,7 @@ public class AbstractMuleJmxTestCase extends AbstractMuleTestCase
 
     private void unregisterMBeansByMask(final String mask) throws Exception
     {
-        Set objectInstances = mBeanServer.queryMBeans(ObjectName.getInstance(mask), null);
+        Set objectInstances = mBeanServer.queryMBeans(jmxSupport.getObjectName(mask), null);
         for (Iterator it = objectInstances.iterator(); it.hasNext();)
         {
             ObjectInstance instance = (ObjectInstance) it.next();

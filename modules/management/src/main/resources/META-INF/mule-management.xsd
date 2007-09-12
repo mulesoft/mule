@@ -11,19 +11,11 @@
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
 
-    <xsd:complexType name="agentType">
-        <xsd:complexContent>
-            <xsd:extension base="mule:abstractExtensionType">
-                <xsd:attribute name="name" type="xsd:string" use="required"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
     <!-- JMX Agent-->
     <xsd:element name="jmx-server" type="jmxServerType" substitutionGroup="mule:abstract-extension"/>
     <xsd:complexType name="jmxServerType">
         <xsd:complexContent>
-            <xsd:extension base="agentType">
+            <xsd:extension base="mule:abstractAgentType">
                 <xsd:sequence>
                     <xsd:element name="connector-server" type="connectorServerType" minOccurs="0" />
                     <xsd:element name="mBeanServer" type="mule:objectFactoryType" minOccurs="0" />
@@ -45,7 +37,7 @@
     <xsd:element name="jmx-mx4j-adaptor" type="jmxMx4jAdaptorType" substitutionGroup="mule:abstract-extension"/>
     <xsd:complexType name="jmxMx4jAdaptorType">
         <xsd:complexContent>
-            <xsd:extension base="agentType">
+            <xsd:extension base="mule:abstractAgentType">
                 <xsd:sequence>
                     <xsd:element name="socketFactoryProperties" type="mule:mapType" minOccurs="0" />
                 </xsd:sequence>
@@ -75,7 +67,7 @@
     <xsd:element name="rmi-server" type="rmiServerTyper" substitutionGroup="mule:abstract-extension"/>
     <xsd:complexType name="rmiServerTyper">
         <xsd:complexContent>
-            <xsd:extension base="agentType">
+            <xsd:extension base="mule:abstractAgentType">
                 <xsd:attribute name="serverUri" type="xsd:string" />
                 <xsd:attribute name="createRegistry" type="mule:substitutableBoolean" />
             </xsd:extension>
@@ -85,14 +77,14 @@
     <xsd:element name="jmx-log4j" type="jmxLog4jType" substitutionGroup="mule:abstract-extension"/>
     <xsd:complexType name="jmxLog4jType">
         <xsd:complexContent>
-            <xsd:extension base="agentType" />
+            <xsd:extension base="mule:abstractAgentType" />
         </xsd:complexContent>
     </xsd:complexType>
 
     <xsd:element name="jmx-default-config" type="jmxDefaultConfigType" substitutionGroup="mule:abstract-extension"/>
     <xsd:complexType name="jmxDefaultConfigType">
         <xsd:complexContent>
-            <xsd:extension base="agentType">
+            <xsd:extension base="mule:abstractAgentType">
                 <xsd:sequence>
                     <xsd:element name="credentials" type="mule:mapType" minOccurs="0" />
                 </xsd:sequence>
@@ -108,7 +100,7 @@
 
     <xsd:complexType name="notificationLoggerAgentType">
         <xsd:complexContent>
-            <xsd:extension base="agentType">
+            <xsd:extension base="mule:abstractAgentType">
                 <xsd:attribute name="ignoreManagerNotifications" type="mule:substitutableBoolean" default="false"></xsd:attribute>
                 <xsd:attribute name="ignoreModelNotifications" type="mule:substitutableBoolean" default="false"></xsd:attribute>
                 <xsd:attribute name="ignoreComponentNotifications" type="mule:substitutableBoolean" default="false"></xsd:attribute>
@@ -180,6 +172,15 @@
         <xsd:complexContent>
             <xsd:extension base="notificationLoggerAgentType">
                 <xsd:attribute name="endpointAddress" type="xsd:string" use="required" />
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="custom-agent" type="customAgentType" substitutionGroup="mule:abstract-extension"/>
+    <xsd:complexType name="customAgentType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractAgentType">
+                <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

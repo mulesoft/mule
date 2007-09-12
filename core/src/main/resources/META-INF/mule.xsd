@@ -276,6 +276,14 @@
     <xsd:element name="abstract-transaction-manager" abstract="true" type="abstractTransactionManagerType"/>
     <xsd:complexType name="abstractTransactionManagerType"/>
 
+    <xsd:complexType name="abstractAgentType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractExtensionType">
+                <xsd:attribute name="name" type="xsd:string" use="required"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <xsd:complexType name="muleManagementContextType">
         <xsd:sequence>
             <xsd:element name="default-threading-profile" type="threadingProfileType" minOccurs="0"/>

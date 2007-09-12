@@ -16,15 +16,38 @@ import org.mule.management.agents.JmxAgent;
 import org.mule.management.agents.JmxServerNotificationAgent;
 import org.mule.management.agents.Log4jAgent;
 import org.mule.management.agents.Mx4jAgent;
+import org.mule.management.support.JmxSupportFactory;
+import org.mule.management.support.AutoDiscoveryJmxSupportFactory;
+import org.mule.management.support.JmxSupport;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.testmodels.mule.TestAgent;
 import org.mule.umo.manager.UMOAgent;
+import org.mule.RegistryContext;
+import org.mule.config.spring.SpringRegistry;
+import org.mule.registry.Registry;
+
+import javax.management.ObjectInstance;
+import javax.management.MBeanServer;
+import javax.management.MBeanServerFactory;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Set;
 
 public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase
 {
     private static final int CHAINSAW_PORT = 8080;
+    private MBeanServer mBeanServer;
+    protected JmxSupportFactory jmxSupportFactory = AutoDiscoveryJmxSupportFactory.getInstance();
+    protected JmxSupport jmxSupport = jmxSupportFactory.getJmxSupport();
+
     protected String getConfigResources()
     {
         return "management-namespace-config.xml";
+    }
+
+    protected void doSetUp()
+    {
+        mBeanServer = (MBeanServer) MBeanServerFactory.findMBeanServer(null).get(0);
     }
 
     public void testSimpleJmxAgentConfig() throws Exception
@@ -69,8 +92,42 @@ public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals(enlAgent.getEndpointAddress(), "test://test");
     }
 
-    
-    
+    public void testAgentsOrder() throws Exception
+    {
+        Registry registry = RegistryContext.getRegistry();
+        SpringRegistry springRegistry = (SpringRegistry) registry.getParent();
+        assertNotNull(springRegistry);
+        Collection agents = springRegistry.lookupObjects(UMOAgent.class);
+        assertEquals(agents.size(), 8);
+        Iterator iter = agents.iterator();
+        assertTrue(iter.next() instanceof JmxAgent);
+        assertTrue(iter.next() instanceof Log4jAgent);
+        assertTrue(iter.next() instanceof Mx4jAgent);
+        assertTrue(iter.next() instanceof TestAgent);
+        assertTrue(iter.next() instanceof JmxServerNotificationAgent);
+        Log4jNotificationLoggerAgent log4jAgent = (Log4jNotificationLoggerAgent) iter.next();
+        assertEquals(log4jAgent.getName(), "log4JNotificationAgent");
+        log4jAgent = (Log4jNotificationLoggerAgent) iter.next();
+        assertEquals(log4jAgent.getName(), "chainsawNotificationAgent");
+        assertTrue(iter.next() instanceof EndpointNotificationLoggerAgent);
+    }
+
+    private void unregisterMBeansByMask(final String mask) throws Exception
+    {
+        Set objectInstances = mBeanServer.queryMBeans(jmxSupport.getObjectName(mask), null);
+        for (Iterator it = objectInstances.iterator(); it.hasNext();)
+        {
+            ObjectInstance instance = (ObjectInstance) it.next();
+            mBeanServer.unregisterMBean(instance.getObjectName());
+        }
+    }
+
+    protected void doTearDown() throws Exception
+    {
+        unregisterMBeansByMask("*.*:*");
+        unregisterMBeansByMask("log4j:*");
+        mBeanServer = null;
+    }
 
 }
 

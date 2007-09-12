@@ -12,6 +12,7 @@ package org.mule.config.spring.handlers;
 import org.mule.config.spring.parsers.JmxAgentDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildPropertiesDefinitionParser;
+import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleChildDefinitionParser;
 import org.mule.config.spring.parsers.specific.ObjectFactoryDefinitionParser;
 import org.mule.impl.internal.admin.EndpointNotificationLoggerAgent;
@@ -33,7 +34,7 @@ public class ManagementNamespaceHandler extends AbstractIgnorableNamespaceHandle
     {
         registerBeanDefinitionParser("jmx-server", new JmxAgentDefinitionParser());
         registerBeanDefinitionParser("mBeanServer", new ObjectFactoryDefinitionParser("MBeanServerObjectFactory"));
-        registerBeanDefinitionParser("credentials", new ChildPropertiesDefinitionParser("credentials"));
+        registerBeanDefinitionParser("credentials", new ChildMapDefinitionParser("credentials"));
         registerBeanDefinitionParser("jmx-log4j", new MuleChildDefinitionParser(Log4jAgent.class, true));
         registerBeanDefinitionParser("jmx-mx4j-adaptor", new MuleChildDefinitionParser(Mx4jAgent.class, true));
         registerBeanDefinitionParser("jmx-notifications", new MuleChildDefinitionParser(JmxServerNotificationAgent.class, true));
@@ -43,7 +44,8 @@ public class ManagementNamespaceHandler extends AbstractIgnorableNamespaceHandle
         registerBeanDefinitionParser("log4j-notifications", new MuleChildDefinitionParser(Log4jNotificationLoggerAgent.class, true));
         registerBeanDefinitionParser("publish-notifications", new MuleChildDefinitionParser(EndpointNotificationLoggerAgent.class, true));
         registerBeanDefinitionParser("rmi-server", new MuleChildDefinitionParser(RmiRegistryAgent.class, true));
-        
+        registerBeanDefinitionParser("custom-agent", new MuleChildDefinitionParser(true));
+
         //This gets processed by the jmx-server parser
         registerIgnoredElement("connector-server");
     }
