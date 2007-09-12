@@ -755,9 +755,7 @@ public class MuleClient implements Disposable
      */
     public UMOMessage receive(String url, long timeout) throws UMOException
     {
-        // Use outbound endpoint for here for now
-        // See MULE-2300
-        UMOImmutableEndpoint endpoint = getOutboundEndpoint(url);
+        UMOImmutableEndpoint endpoint = getInboundEndpoint(url);
         try
         {
             UMOMessage message = endpoint.receive(timeout);
