@@ -9,7 +9,6 @@
                http://www.mulesource.org/schema/mule/tcp/2.0 http://www.mulesource.org/schema/mule/tcp/2.0/mule-tcp.xsd">
 
     <model name="Tcp_with_remote_sync">
-
         <service name="Echo1">
             <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
@@ -41,7 +40,5 @@
                 <inbound-endpoint address="vm://sync" synchronous="true"/>
             </inbound-router>
         </service>
-
     </model>
-
 </mule>

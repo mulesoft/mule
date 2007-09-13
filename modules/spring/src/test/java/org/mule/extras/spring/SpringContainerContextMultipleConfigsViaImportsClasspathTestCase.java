@@ -1,5 +1,5 @@
 /*
- * $Id: SpringContainerContextTestCase.java 3765 2006-10-31 19:38:26Z holger $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
