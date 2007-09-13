@@ -10,6 +10,9 @@
 package org.mule.config.spring.parsers;
 
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
+import org.mule.config.spring.parsers.assembly.ReusablePropertyConfiguration;
+import org.mule.config.spring.parsers.assembly.PropertyConfiguration;
+import org.mule.config.spring.parsers.assembly.TempWrapperPropertyConfiguration;
 import org.mule.util.StringUtils;
 import org.mule.util.CoreXMLUtils;
 
@@ -31,6 +34,16 @@ import org.w3c.dom.Element;
 public abstract class AbstractHierarchicalDefinitionParser extends AbstractMuleBeanDefinitionParser
 {
 
+    private ReusablePropertyConfiguration targetPropertyConfiguration =
+            new ReusablePropertyConfiguration(
+                    new TempWrapperPropertyConfiguration(beanPropertyConfiguration, false));
+    private BeanDefinition forcedParent = null;
+
+    public PropertyConfiguration getTargetPropertyConfiguration()
+    {
+        return targetPropertyConfiguration;
+    }
+
     protected String getParentBeanName(Element element)
     {
         return ((Element) element.getParentNode()).getAttribute(ATTRIBUTE_NAME);
@@ -38,13 +51,20 @@ public abstract class AbstractHierarchicalDefinitionParser extends AbstractMuleB
 
     protected BeanDefinition getParentBeanDefinition(Element element)
     {
-        String parentBean = getParentBeanName(element);
-        if (StringUtils.isBlank(parentBean))
+        if (null != forcedParent)
         {
-            throw new IllegalStateException("No parent for " +
-                    CoreXMLUtils.elementToString(element));
+            return forcedParent;
         }
-        return getRegistry().getBeanDefinition(parentBean);
+        else
+        {
+            String parentBean = getParentBeanName(element);
+            if (StringUtils.isBlank(parentBean))
+            {
+                throw new IllegalStateException("No parent for " +
+                        CoreXMLUtils.elementToString(element));
+            }
+            return getRegistry().getBeanDefinition(parentBean);
+        }
     }
 
     /**
@@ -58,7 +78,7 @@ public abstract class AbstractHierarchicalDefinitionParser extends AbstractMuleB
     {
         BeanDefinition target = getParentBeanDefinition(element);
         return beanAssemblerFactory.newBeanAssembler(
-                propertyConfiguration, bean, propertyConfiguration, target);
+                beanPropertyConfiguration, bean, targetPropertyConfiguration, target);
     }
 
     /**
@@ -75,4 +95,22 @@ public abstract class AbstractHierarchicalDefinitionParser extends AbstractMuleB
         return super.getBeanAssembler(element, bean);
     }
 
+    public void forceParent(BeanDefinition parent)
+    {
+        forcedParent = parent;
+    }
+
+    protected void preProcess(Element element)
+    {
+        super.preProcess(element);
+        targetPropertyConfiguration.reset();
+    }
+
+    // reset the forced parent
+    protected void postProcess(BeanAssembler assembler, Element element)
+    {
+        super.postProcess(assembler, element);
+        forcedParent = null;
+    }
+    
 }

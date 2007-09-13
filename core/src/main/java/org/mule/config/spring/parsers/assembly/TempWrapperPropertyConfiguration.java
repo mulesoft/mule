@@ -20,10 +20,17 @@ public class TempWrapperPropertyConfiguration implements PropertyConfiguration
 
     protected PropertyConfiguration delegate;
     protected SimplePropertyConfiguration extra = new SimplePropertyConfiguration();
+    private boolean greedyIgnore;
 
     public TempWrapperPropertyConfiguration(PropertyConfiguration delegate)
     {
+        this(delegate, true);
+    }
+
+    public TempWrapperPropertyConfiguration(PropertyConfiguration delegate, boolean greedyIgnore)
+    {
         this.delegate = delegate;
+        this.greedyIgnore = greedyIgnore;
     }
 
     public void addReference(String propertyName)
@@ -78,7 +85,14 @@ public class TempWrapperPropertyConfiguration implements PropertyConfiguration
 
     public boolean isIgnored(String propertyName)
     {
-        return extra.isIgnored(propertyName) || delegate.isIgnored(propertyName);
+        if (greedyIgnore)
+        {
+            return extra.isIgnored(propertyName) || delegate.isIgnored(propertyName);
+        }
+        else
+        {
+            return extra.isIgnored(propertyName) && delegate.isIgnored(propertyName);            
+        }
     }
 
     public boolean isBeanReference(String attributeName)

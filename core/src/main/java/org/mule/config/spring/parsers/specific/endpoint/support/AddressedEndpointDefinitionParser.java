@@ -13,96 +13,53 @@ package org.mule.config.spring.parsers.specific.endpoint.support;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.config.spring.parsers.specific.LazyEndpointURI;
-import org.mule.config.spring.parsers.assembly.BeanAssembler;
-import org.mule.config.spring.parsers.assembly.PropertyConfiguration;
-import org.mule.config.spring.parsers.delegate.AbstractSerialDelegatingDefinitionParser;
-import org.mule.config.spring.parsers.PostProcessor;
-import org.mule.config.spring.parsers.PreProcessor;
+import org.mule.config.spring.parsers.delegate.AbstractSingleParentFamilyDefinitionParser;
 import org.mule.config.spring.parsers.preprocessors.DisableByAttribute;
-import org.mule.config.spring.parsers.generic.AutoIdUtils;
-import org.mule.util.CoreXMLUtils;
 
-import org.w3c.dom.Element;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
  * Combine a
- * {@link ChildAddressDefinitionParser} and
+ * {@link org.mule.config.spring.parsers.specific.endpoint.support.ChildAddressDefinitionParser} and
  * either a
- * {@link OrphanEndpointDefinitionParser}
+ * {@link org.mule.config.spring.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser}
  * or a
- * {@link ChildEndpointDefinitionParser}
+ * {@link org.mule.config.spring.parsers.specific.endpoint.support.ChildEndpointDefinitionParser}
  * in one parser.  This lets us put the address attributes in the endpoint element.
  */
-public class AddressedEndpointDefinitionParser extends AbstractSerialDelegatingDefinitionParser
+public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamilyDefinitionParser
 {
 
     protected Log logger = LogFactory.getLog(getClass());
     public static final String[] BAD_ADDRESS_ATTRIBUTES =
             new String[]{AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF};
-    private String addressId = null;
+
+    // this is an example of parsing a single element with several parsers.  in this case
+    // (because we extend SingleParentFamilyDefinitionParser) the first parser is expected to
+    // create the "parent".  then subsequent parsers will be called as children.
+
+    // because all are generated from one element we need to be careful to block attributes
+    // that are irrelevant to a particular parser.
 
     public AddressedEndpointDefinitionParser(String protocol, MuleDefinitionParser endpointParser)
     {
-        setAddressDelegate(new OrphanAddressDefinitionParser(protocol));
-        setEndpointDelegate(endpointParser);
-    }
+        // the first delegate, the parent, is an endpoint; we block address related attributes
+        disableAttributes(endpointParser, LazyEndpointURI.ATTRIBUTES);
+        addDelegate(endpointParser);
 
-    /**
-     * This is called first.  It creates an address using the address-related attributes
-     * on the element.
-     */
-    protected void setAddressDelegate(MuleDefinitionParser delegate)
-    {
-        enableAttributes(delegate, LazyEndpointURI.ATTRIBUTES, true);
+        // the next delegate parses the address.  it will see the endpoint as parent automatically.
+        MuleDefinitionParser addressParser = new ChildAddressDefinitionParser(protocol);
+        // it should see only the endpoint attributes
+        enableAttributes(addressParser, LazyEndpointURI.ATTRIBUTES);
+        addDelegate(addressParser);
 
-        delegate.registerPreProcessor(new PreProcessor()
-        {
-            public void preProcess(PropertyConfiguration config, Element element)
-            {
-                AutoIdUtils.forceUniqueId(element, "address");
-                addressId = element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
-                logger.debug("Generated address name: " + addressId);
-            }
-        });
-
-        delegate.registerPreProcessor(new DisableByAttribute(BAD_ADDRESS_ATTRIBUTES));
-
-        addDelegate(delegate);
-    }
-
-    /**
-     * This is called second.  It creates the endpoint and injects the previously created
-     * address.
-     */
-    protected void setEndpointDelegate(MuleDefinitionParser delegate)
-    {
-        enableAttributes(delegate, LazyEndpointURI.ATTRIBUTES, false);
-
-        delegate.registerPreProcessor(new PreProcessor()
-        {
-            public void preProcess(PropertyConfiguration config, Element element)
-            {
-                AutoIdUtils.ensureUniqueId(element, "endpoint");
-            }
-        });
-
-        delegate.registerPostProcessor(new PostProcessor()
-        {
-            public void postProcess(BeanAssembler assembler, Element element)
-            {
-                if (null != addressId)
-                {
-                    logger.debug("Injecting " + addressId + " in " + CoreXMLUtils.elementToString(element));
-                    assembler.extendBean(EndpointUtils.ENDPOINT_URI_ATTRIBUTE, addressId, true);
-                    // reset state
-                    addressId = null;
-                }
-            }
-        });
-
-        addDelegate(delegate);
+        // this handles the "ref problem" and is specific to the endpoint element.
+        // we don't want this parser to be used if a "ref" defines the endpoint
+        // so add a preprocessor to check for that and indicate that the exception should
+        // be handled internally, rather than shown to the user
+        addressParser.registerPreProcessor(new DisableByAttribute(BAD_ADDRESS_ATTRIBUTES));
+        addHandledException(DisableByAttribute.DisableByAttributeException.class);
     }
 
 }

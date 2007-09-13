@@ -12,9 +12,6 @@ package org.mule.config.spring.parsers.specific.endpoint.support;
 
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.w3c.dom.Element;
-
 /**
  * A parser for "orphan" (top-level) endpoints - ie GlobalEndpoints.
  * Because we have automatic String -> MuleEnpointURI conversion via property editors

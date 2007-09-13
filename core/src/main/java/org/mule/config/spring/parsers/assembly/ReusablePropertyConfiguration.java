@@ -24,10 +24,15 @@ public class ReusablePropertyConfiguration implements PropertyConfiguration
 
     public ReusablePropertyConfiguration()
     {
-        this.delegate = new SimplePropertyConfiguration();
+        this(new SimplePropertyConfiguration());
     }
 
-    public void reset()
+    public ReusablePropertyConfiguration(PropertyConfiguration delegate)
+    {
+        this.delegate = delegate;
+    }
+
+   public void reset()
     {
         if (null == reference)
         {

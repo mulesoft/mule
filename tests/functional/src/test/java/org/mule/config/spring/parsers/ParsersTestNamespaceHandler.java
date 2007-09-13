@@ -18,13 +18,13 @@ import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
+import org.mule.config.spring.parsers.specific.endpoint.StringAddressEndpointDefinitionParser;
+import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
+import org.mule.config.spring.parsers.specific.endpoint.UnaddressedEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.AddressedEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.ChildAddressDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.ChildEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.StringAddressEndpointDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.UnaddressedEndpointDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
 import org.mule.impl.endpoint.GlobalEndpoint;
 import org.mule.impl.endpoint.InboundEndpoint;
 

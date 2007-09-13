@@ -10,11 +10,11 @@
 
 package org.mule.config.spring.parsers.specific.endpoint;
 
-import org.mule.config.spring.parsers.specific.endpoint.support.ChildEndpointDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.support.AddressedEndpointDefinitionParser;
-import org.mule.config.spring.parsers.specific.LazyEndpointURI;
-import org.mule.config.spring.parsers.preprocessors.CheckExclusiveAttributes;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+import org.mule.config.spring.parsers.preprocessors.CheckExclusiveAttributes;
+import org.mule.config.spring.parsers.specific.LazyEndpointURI;
+import org.mule.config.spring.parsers.specific.endpoint.support.AddressedEndpointDefinitionParser;
+import org.mule.config.spring.parsers.specific.endpoint.support.ChildEndpointDefinitionParser;
 
 /**
  * This is intended for use by endpoint-specific parsers for non-global endpoint

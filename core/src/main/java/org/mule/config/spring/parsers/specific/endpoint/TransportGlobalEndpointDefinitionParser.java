@@ -10,9 +10,9 @@
 
 package org.mule.config.spring.parsers.specific.endpoint;
 
-import org.mule.impl.endpoint.GlobalEndpoint;
 import org.mule.config.spring.parsers.specific.endpoint.support.AddressedEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser;
+import org.mule.impl.endpoint.GlobalEndpoint;
 
 public class TransportGlobalEndpointDefinitionParser extends AddressedEndpointDefinitionParser
 {

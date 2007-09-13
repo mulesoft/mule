@@ -10,6 +10,7 @@
 package org.mule.config.spring.parsers.specific.endpoint;
 
 import org.mule.config.spring.parsers.AbstractChildDefinitionParser;
+import org.mule.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.config.spring.parsers.specific.endpoint.support.EndpointUtils;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.util.StringUtils;
@@ -147,4 +148,9 @@ public class UnaddressedEndpointDefinitionParser extends AbstractChildDefinition
         }
     }
 
+    protected void preProcess(Element element)
+    {
+        super.preProcess(element);
+        AutoIdUtils.ensureUniqueId(element, "endpoint");
+    }
 }

@@ -24,7 +24,8 @@ import org.w3c.dom.Attr;
 
 /**
  * Throws an exception if any of the disallowed attributes (after translation) is present.
- * Cooperates with {@link org.mule.config.spring.parsers.delegate.AbstractSerialDelegatingDefinitionParser}
+ * Designed to cooperates with
+ * {@link org.mule.config.spring.parsers.delegate.AbstractSerialDelegatingDefinitionParser#addHandledException(Class)}
  */
 public class DisableByAttribute implements PreProcessor
 {

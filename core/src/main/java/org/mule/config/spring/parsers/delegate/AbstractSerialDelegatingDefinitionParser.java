@@ -15,10 +15,11 @@ import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.config.spring.parsers.PreProcessor;
 import org.mule.config.spring.parsers.assembly.PropertyConfiguration;
-import org.mule.config.spring.parsers.preprocessors.DisableByAttribute;
 import org.mule.util.StringUtils;
 
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -36,10 +37,6 @@ import org.w3c.dom.Element;
  * <p>Typically, subclasses will add additional processing with
  * {@link org.mule.config.spring.parsers.PreProcessor} and
  * {@link org.mule.config.spring.parsers.PostProcessor} anonymous classes.</p>
- *
- * <p>If {@link org.mule.config.spring.parsers.preprocessors.DisableByAttribute.DisableByAttributeException}
- * is thrown it is trapped (not shown to the user) and the next parser invoked.  This allows programatic
- * selection of parsers (for static selection use the schema).</p>
  */
 public abstract class AbstractSerialDelegatingDefinitionParser extends AbstractDelegatingDefinitionParser
 {
@@ -48,6 +45,7 @@ public abstract class AbstractSerialDelegatingDefinitionParser extends AbstractD
     private boolean first;
     private String originalId;
     private String originalName;
+    private Set handledExceptions = new HashSet();
 
     public AbstractBeanDefinition parseDelegate(Element element, ParserContext parserContext)
     {
@@ -65,11 +63,19 @@ public abstract class AbstractSerialDelegatingDefinitionParser extends AbstractD
         {
             try
             {
-                bean = getDelegate(index++).parseDelegate(element, parserContext);
+                MuleDefinitionParser parser = getDelegate(index);
+                bean = doSingleBean(index++, parser, element, parserContext);
             }
-            catch (DisableByAttribute.DisableByAttributeException e)
+            catch (RuntimeException e)
             {
-                bean = null;
+                if (handledExceptions.contains(e.getClass()))
+                {
+                    bean = null;
+                }
+                else
+                {
+                    throw e;
+                }
             }
         }
         if (null != bean)
@@ -86,6 +92,12 @@ public abstract class AbstractSerialDelegatingDefinitionParser extends AbstractD
         return bean;
     }
 
+    protected AbstractBeanDefinition doSingleBean(int index, MuleDefinitionParser parser,
+                                                  Element element, ParserContext parserContext)
+    {
+        return parser.parseDelegate(element, parserContext);
+    }
+
     protected void addDelegate(MuleDefinitionParser delegate)
     {
         delegate.registerPreProcessor(new PreProcessor()
@@ -99,12 +111,17 @@ public abstract class AbstractSerialDelegatingDefinitionParser extends AbstractD
                 }
                 else
                 {
-                    resetAttribute(element, AbstractMuleBeanDefinitionParser.ATTRIBUTE_ID, originalId);
-                    resetAttribute(element, AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME, originalName);
+                    resetNameAndId(element);
                 }
             }
         });
         super.addDelegate(delegate);
+    }
+
+    protected void resetNameAndId(Element element)
+    {
+        resetAttribute(element, AbstractMuleBeanDefinitionParser.ATTRIBUTE_ID, originalId);
+        resetAttribute(element, AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME, originalName);
     }
 
     protected void resetAttribute(Element element, String name, String value)
@@ -120,6 +137,11 @@ public abstract class AbstractSerialDelegatingDefinitionParser extends AbstractD
         {
             element.setAttribute(name, value);
         }
+    }
+
+    protected void addHandledException(Class exception)
+    {
+        handledExceptions.add(exception);
     }
 
     /**
@@ -149,6 +171,16 @@ public abstract class AbstractSerialDelegatingDefinitionParser extends AbstractD
                 delegate.addIgnored(name);
             }
         }
+    }
+
+    public static void enableAttributes(MuleDefinitionParser delegate, String[] attributes)
+    {
+        enableAttributes(delegate, attributes, true);
+    }
+
+    public static void disableAttributes(MuleDefinitionParser delegate, String[] attributes)
+    {
+        enableAttributes(delegate, attributes, false);
     }
 
 }
