@@ -54,8 +54,8 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
         enableAttributes(addressParser, LazyEndpointURI.ATTRIBUTES);
         addDelegate(addressParser);
 
-        // this handles the "ref problem" and is specific to the endpoint element.
-        // we don't want this parser to be used if a "ref" defines the endpoint
+        // this handles the "ref problem" and is specific to the endpoint/address element.
+        // we don't want this parser to be used if a "ref" defines the address
         // so add a preprocessor to check for that and indicate that the exception should
         // be handled internally, rather than shown to the user
         addressParser.registerPreProcessor(new DisableByAttribute(BAD_ADDRESS_ATTRIBUTES));
