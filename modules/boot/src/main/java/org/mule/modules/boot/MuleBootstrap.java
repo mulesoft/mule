@@ -30,7 +30,7 @@ import org.tanukisoftware.wrapper.WrapperSimpleApp;
  * Determine which is the main class to run and delegate control to the Java Service
  * Wrapper.  If OSGi is not being used to boot with, configure the classpath based on
  * the libraries in $MULE_HOME/lib/*
- *
+ * <p/>
  * Note: this class is intentionally kept free of any external library dependencies and
  * therefore repeats a few utility methods.
  */
@@ -40,12 +40,13 @@ public class MuleBootstrap
     public static final String MAIN_CLASS_OSGI_FRAMEWORK = "org.mule.modules.osgi.OsgiFrameworkWrapper";
 
     public static final String CLI_OPTIONS[][] = {
-        {"main", "true", "Main Class"},
-        {"osgi", "false", "Run in an OSGi framework"},
-        {"nogui", "false", "Suppress graphical console"}
+            {"main", "true", "Main Class"},
+            {"osgi", "false", "Run in an OSGi framework"},
+            {"nogui", "false", "Suppress graphical console"},
+            {"version", "false", "Show product and version information"}
     };
 
-    public static void main( String[] args ) throws Exception
+    public static void main(String[] args) throws Exception
     {
         // Parse any command line options based on the list above.
         CommandLine commandLine = parseCommandLine(args);
@@ -53,7 +54,12 @@ public class MuleBootstrap
         String[] remainingArgs = commandLine.getArgs();
 
         String mainClassName = commandLine.getOptionValue("main");
-        if (commandLine.hasOption("osgi"))
+        if (commandLine.hasOption("version"))
+        {
+            configureClasspath();
+            WrapperManager.start(new VersionWrapper(), remainingArgs);
+        }
+        else if (commandLine.hasOption("osgi"))
         {
             boolean startGui = !commandLine.hasOption("nogui");
             System.out.println("Starting the OSGi Framework...");
@@ -92,7 +98,7 @@ public class MuleBootstrap
         if (muleHome == null || !muleHome.exists() || !muleHome.isDirectory())
         {
             throw new IllegalArgumentException(
-                "Either MULE_HOME is not set or does not contain a valid directory.");
+                    "Either MULE_HOME is not set or does not contain a valid directory.");
         }
 
         File muleBase;
@@ -139,20 +145,20 @@ public class MuleBootstrap
     }
 
     private static void addLibrariesToClasspath(List urls)
-        throws NoSuchMethodException, IllegalAccessException, InvocationTargetException
+            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException
     {
 
         ClassLoader sys = ClassLoader.getSystemClassLoader();
         if (!(sys instanceof URLClassLoader))
         {
             throw new IllegalArgumentException(
-                "PANIC: Mule has been started with an unsupported classloader: " + sys.getClass().getName()
-                                + ". " + "Please report this error to user<at>mule<dot>codehaus<dot>org");
+                    "PANIC: Mule has been started with an unsupported classloader: " + sys.getClass().getName()
+                    + ". " + "Please report this error to user<at>mule<dot>codehaus<dot>org");
         }
 
         // system classloader is in this case the one that launched the application,
         // which is usually something like a JDK-vendor proprietary AppClassLoader
-        URLClassLoader sysCl = (URLClassLoader)sys;
+        URLClassLoader sysCl = (URLClassLoader) sys;
 
         /*
          * IMPORTANT NOTE: The more 'natural' way would be to create a custom
@@ -177,7 +183,7 @@ public class MuleBootstrap
         methodAddUrl.setAccessible(true);
         for (Iterator it = urls.iterator(); it.hasNext();)
         {
-            URL url = (URL)it.next();
+            URL url = (URL) it.next();
             // System.out.println("Adding: " + url.toExternalForm());
             methodAddUrl.invoke(sysCl, new Object[]{url});
         }

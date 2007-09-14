@@ -11,6 +11,7 @@
 package org.mule.modules.boot;
 
 import org.mule.MuleServer;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ClassUtils;
 import org.mule.util.SystemUtils;
 
@@ -101,6 +102,17 @@ public class ReflectionHelper
         Class clazz = WrapperSimpleApp.class;
         Method m = clazz.getMethod("stop", new Class[] {int.class});
         m.invoke(null, new Object[] {new Integer(exitCode)});
+    }
+
+    /**
+     * Workaround for JRockit unable to access to CoreMessages.
+     * @return String contains one of core messages
+     */
+    public static String getCoreMessages(String methodName) throws Exception
+    {
+        Method method=CoreMessages.class.getMethod(methodName,null);
+        Object message=method.invoke(null,null);
+        return message.toString();
     }
 
 }

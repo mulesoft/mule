@@ -10,6 +10,7 @@
 
 package org.mule.config.i18n;
 
+import org.mule.config.MuleManifest;
 import org.mule.impl.AbstractExceptionListener;
 import org.mule.umo.UMOImmutableDescriptor;
 import org.mule.umo.endpoint.UMOEndpointURI;
@@ -20,6 +21,7 @@ import org.mule.umo.routing.UMOResponseRouterCollection;
 import org.mule.util.ClassUtils;
 import org.mule.util.DateUtils;
 import org.mule.util.StringMessageUtils;
+import org.mule.util.StringUtils;
 
 import java.util.Date;
 
@@ -211,14 +213,14 @@ public class CoreMessages extends MessageFactory
     public static Message transformUnexpectedType(Class class1, Class returnClass)
     {
         return createMessage(BUNDLE_PATH, 53, ClassUtils.getSimpleName(class1),
-            ClassUtils.getSimpleName(returnClass));
+                             ClassUtils.getSimpleName(returnClass));
     }
 
     public static Message transformOnObjectUnsupportedTypeOfEndpoint(String name, Class class1,
-        UMOImmutableEndpoint endpoint)
+                                                                     UMOImmutableEndpoint endpoint)
     {
         return createMessage(BUNDLE_PATH, 54, name, StringMessageUtils.toString(class1),
-            (endpoint != null ? endpoint.getEndpointURI() : null));
+                             (endpoint != null ? endpoint.getEndpointURI() : null));
     }
 
     public static Message transformFailedFrom(Class clazz)
@@ -249,14 +251,14 @@ public class CoreMessages extends MessageFactory
     public static Message tooManyAcceptableMethodsOnObjectForTypes(Object object, Object types)
     {
         return createMessage(BUNDLE_PATH, 60, StringMessageUtils.toString(object),
-            StringMessageUtils.toString(types));
+                             StringMessageUtils.toString(types));
     }
 
     public static Message cannotSetPropertyOnObjectWithParamType(String property,
-        Class class1, Class class2)
+                                                                 Class class1, Class class2)
     {
         return createMessage(BUNDLE_PATH, 61, property, StringMessageUtils.toString(class1),
-            StringMessageUtils.toString(class2));
+                             StringMessageUtils.toString(class2));
     }
 
     public static Message noComponentForEndpoint()
@@ -462,7 +464,7 @@ public class CoreMessages extends MessageFactory
     public static Message methodWithParamsNotFoundOnObject(String method, Object class1, Class class2)
     {
         return createMessage(BUNDLE_PATH, 109, method, StringMessageUtils.toString(class1),
-            StringMessageUtils.toString(class2));
+                             StringMessageUtils.toString(class2));
     }
 
     public static Message transformFailed(String from, String to)
@@ -483,7 +485,7 @@ public class CoreMessages extends MessageFactory
     public static Message noEntryPointFoundWithArgs(Object object, Object args)
     {
         return createMessage(BUNDLE_PATH, 116, StringMessageUtils.toString(object),
-            StringMessageUtils.toString(args));
+                             StringMessageUtils.toString(args));
     }
 
     public static Message authNoSecurityProvider(String providerName)
@@ -602,10 +604,10 @@ public class CoreMessages extends MessageFactory
     }
 
     public static Message propertyIsNotSupportedType(String property, Class expected,
-        Class actual)
+                                                     Class actual)
     {
         return createMessage(BUNDLE_PATH, 157, property, StringMessageUtils.toString(expected),
-            StringMessageUtils.toString(actual));
+                             StringMessageUtils.toString(actual));
     }
 
     public static Message containerAlreadyRegistered(String name)
@@ -696,7 +698,7 @@ public class CoreMessages extends MessageFactory
     public static Message objectNotOfCorrectType(Class actualClass, Class expectedClass)
     {
         return createMessage(BUNDLE_PATH, 185, StringMessageUtils.toString(actualClass),
-            StringMessageUtils.toString(expectedClass));
+                             StringMessageUtils.toString(expectedClass));
     }
 
     public static Message failedToConvertStringUsingEncoding(String encoding)
@@ -797,7 +799,7 @@ public class CoreMessages extends MessageFactory
     public static Message tooManyMatchingMethodsOnObjectWhichReturn(Object object, Object returnType)
     {
         return createMessage(BUNDLE_PATH, 216, StringMessageUtils.toString(object),
-            StringMessageUtils.toString(returnType));
+                             StringMessageUtils.toString(returnType));
     }
 
     public static Message failedToSetProxyOnService(Object proxy, Class routerClass)
@@ -818,7 +820,7 @@ public class CoreMessages extends MessageFactory
     public static Message noMatchingMethodsOnObjectReturning(Object object, Class returnType)
     {
         return createMessage(BUNDLE_PATH, 220, StringMessageUtils.toString(object),
-            StringMessageUtils.toString(returnType));
+                             StringMessageUtils.toString(returnType));
     }
 
     public static Message moreThanOneConnectorWithProtocol(String protocol)
@@ -870,19 +872,19 @@ public class CoreMessages extends MessageFactory
     {
         return createMessage(BUNDLE_PATH, 231, descriptor.getName(), descriptor.getModelName(), modelName);
     }
-    
+
     //These endpoint errors should go away once we make setting endpoints on routers typesafe
-    
+
     public static Message inboundRouterMustUseInboundEndpoints(UMOInboundRouterCollection router, UMOImmutableEndpoint endpoint)
     {
         return createMessage(BUNDLE_PATH, 232, endpoint, router);
     }
-  
+
     public static Message outboundRouterMustUseOutboudEndpoints(UMOOutboundRouter router, UMOImmutableEndpoint endpoint)
     {
         return createMessage(BUNDLE_PATH, 233, endpoint, router);
     }
-    
+
     public static Message responseRouterMustUseResponseEndpoints(UMOResponseRouterCollection router, UMOImmutableEndpoint endpoint)
     {
         return createMessage(BUNDLE_PATH, 234, endpoint, router);
@@ -892,5 +894,20 @@ public class CoreMessages extends MessageFactory
     {
         return createMessage(BUNDLE_PATH, 235, endpoint, exceptionListener);
     }
+
+    /**
+     * Returns a message that is a product informatin.
+     *
+     * @return message
+     */
+    public static Message productInformation()
+    {
+        MuleManifest config = new MuleManifest();
+        String notset = CoreMessages.notSet().getMessage();
+        return createMessage(BUNDLE_PATH, 236, StringUtils.defaultString(config.getProductDescription(), notset),
+                             StringUtils.defaultString(config.getProductVersion(), notset),
+                             StringUtils.defaultString(config.getVendorName(), notset) + " " + StringUtils.defaultString(config.getVendorUrl(), notset));
+    }
+
 
 }
