@@ -10,7 +10,7 @@
 
 package org.mule.providers.xmpp;
 
-import org.mule.impl.endpoint.UserInfoEndpointBuilder;
+import org.mule.impl.endpoint.UserInfoEndpointURIBuilder;
 import org.mule.providers.xmpp.i18n.XmppMessages;
 import org.mule.umo.endpoint.MalformedEndpointException;
 
@@ -22,7 +22,7 @@ import java.util.Properties;
  * on the uri. The path is used as either the groupChat name or the recipient name of
  * a one on one chat.
  */
-public class XmppEndpointBuilder extends UserInfoEndpointBuilder
+public class XmppEndpointURIBuilder extends UserInfoEndpointURIBuilder
 {
     protected void setEndpoint(URI uri, Properties props) throws MalformedEndpointException
     {

@@ -19,7 +19,7 @@ import java.util.Properties;
  * <code>SocketEndpointBuilder</code> builds an endpointUri based on host and port
  * only
  */
-public class SocketEndpointBuilder extends AbstractEndpointBuilder
+public class SocketEndpointURIBuilder extends AbstractEndpointURIBuilder
 {
     protected void setEndpoint(URI uri, Properties props) throws MalformedEndpointException
     {

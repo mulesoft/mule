@@ -21,7 +21,7 @@ import java.util.Properties;
  * most connectors
  */
 
-public class UrlEndpointBuilder extends AbstractEndpointBuilder
+public class UrlEndpointURIBuilder extends AbstractEndpointURIBuilder
 {
 
     protected void setEndpoint(URI uri, Properties props) throws MalformedEndpointException

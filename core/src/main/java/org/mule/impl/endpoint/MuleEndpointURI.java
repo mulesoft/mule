@@ -184,7 +184,7 @@ public class MuleEndpointURI implements UMOEndpointURI
             {
                 throw new ServiceException(CoreMessages.noServiceTransportDescriptor(scheme));
             }
-            EndpointBuilder builder = sd.createEndpointBuilder();
+            EndpointURIBuilder builder = sd.createEndpointBuilder();
             UMOEndpointURI built = builder.build(this.uri);
             initialise(built);
         }

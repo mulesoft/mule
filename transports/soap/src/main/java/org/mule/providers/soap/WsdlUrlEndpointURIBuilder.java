@@ -10,7 +10,7 @@
 
 package org.mule.providers.soap;
 
-import org.mule.impl.endpoint.AbstractEndpointBuilder;
+import org.mule.impl.endpoint.AbstractEndpointURIBuilder;
 import org.mule.umo.endpoint.MalformedEndpointException;
 
 import java.net.URI;
@@ -20,7 +20,7 @@ import java.util.Properties;
  * The same as the UrlEndpointbuilder except that all parameters except the first are
  * set as properties on the endpoint and stripped from the endpoint Uri
  */
-public class WsdlUrlEndpointBuilder extends AbstractEndpointBuilder
+public class WsdlUrlEndpointURIBuilder extends AbstractEndpointURIBuilder
 {
 
     protected void setEndpoint(URI uri, Properties props) throws MalformedEndpointException

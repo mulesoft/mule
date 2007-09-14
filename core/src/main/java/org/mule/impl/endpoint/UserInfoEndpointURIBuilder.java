@@ -20,7 +20,7 @@ import java.util.Properties;
  * host details. This endpoint builder is used where endpoints as of the form :
  * xxx://ross:secret@host:1000
  */
-public class UserInfoEndpointBuilder extends AbstractEndpointBuilder
+public class UserInfoEndpointURIBuilder extends AbstractEndpointURIBuilder
 {
     //TODO THis endpoint builder is redundant I think. We should be able to use the URL endpoint builder.
     //It depends on where deriving classes can work with the URL endpoint builder, but there are a lot of similarities

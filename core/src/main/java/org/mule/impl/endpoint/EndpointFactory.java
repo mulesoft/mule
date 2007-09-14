@@ -11,35 +11,21 @@
 package org.mule.impl.endpoint;
 
 import org.mule.RegistryContext;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.config.i18n.Message;
-import org.mule.providers.AbstractConnector;
-import org.mule.providers.service.TransportFactory;
-import org.mule.providers.service.TransportFactoryException;
-import org.mule.providers.service.TransportServiceDescriptor;
-import org.mule.registry.ServiceDescriptorFactory;
-import org.mule.registry.ServiceException;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.endpoint.EndpointException;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOEndpointBuilder;
 import org.mule.umo.endpoint.UMOEndpointFactory;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.provider.UMOConnector;
-import org.mule.umo.transformer.UMOTransformer;
-import org.mule.util.MuleObjectHelper;
-import org.mule.util.ObjectNameHelper;
-
-import java.util.Map;
-import java.util.Properties;
+import org.mule.umo.lifecycle.InitialisationException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class EndpointFactory implements UMOEndpointFactory
 {
-    
+
     /**
      * logger used by this class
      */
@@ -50,50 +36,71 @@ public class EndpointFactory implements UMOEndpointFactory
     public static final int NEVER_CREATE_CONNECTOR = 2;
     public static final int USE_CONNECTOR = 3;
 
-    public UMOImmutableEndpoint createInboundEndpoint(String uri, UMOManagementContext managementContext) throws UMOException
+    public UMOImmutableEndpoint createInboundEndpoint(String uri, UMOManagementContext managementContext)
+        throws UMOException
     {
         UMOImmutableEndpoint globalEndpoint = lookupEndpoint(uri);
         UMOImmutableEndpoint endpoint = null;
         if (globalEndpoint != null)
         {
+            // Copy for now.  Once global endpoints are builders we will invoke builder here
             endpoint = new InboundEndpoint(globalEndpoint);
-
         }
         else
         {
-            endpoint = createEndpoint(new MuleEndpointURI(uri), UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER, managementContext);
+            UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(new MuleEndpointURI(uri), managementContext);
+            return endpointBuilder.buildInboundEndpoint();
         }
         return endpoint;
     }
 
-    public UMOImmutableEndpoint createOutboundEndpoint(String uri, UMOManagementContext managementContext) throws UMOException
+    public UMOImmutableEndpoint createOutboundEndpoint(String uri, UMOManagementContext managementContext)
+        throws UMOException
     {
         UMOImmutableEndpoint globalEndpoint = lookupEndpoint(uri);
         UMOImmutableEndpoint endpoint = null;
         if (globalEndpoint != null)
         {
+            // Copy for now.  Once global endpoints are builders we will invoke builder here
             endpoint = new OutboundEndpoint(globalEndpoint);
-
         }
         else
         {
-            endpoint = createEndpoint(new MuleEndpointURI(uri), UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER, managementContext);
+            UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(new MuleEndpointURI(uri), managementContext);
+            return endpointBuilder.buildOutboundEndpoint();
         }
         return endpoint;
     }
 
-    public UMOImmutableEndpoint createResponseEndpoint(String uri, UMOManagementContext managementContext) throws UMOException
+    public UMOImmutableEndpoint createResponseEndpoint(String uri, UMOManagementContext managementContext)
+        throws UMOException
     {
         UMOImmutableEndpoint globalEndpoint = lookupEndpoint(uri);
         UMOImmutableEndpoint endpoint = null;
         if (globalEndpoint != null)
         {
+            // Copy for now.  Once global endpoints are builders we will invoke builder here
             endpoint = new ResponseEndpoint(globalEndpoint);
-
         }
         else
         {
-            endpoint = createEndpoint(new MuleEndpointURI(uri), UMOImmutableEndpoint.ENDPOINT_TYPE_RESPONSE, managementContext);
+            UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(new MuleEndpointURI(uri), managementContext);
+            return endpointBuilder.buildResponseEndpoint();
+        }
+        return endpoint;
+    }
+
+    /**
+     * @deprecated
+     */
+    public UMOImmutableEndpoint createEndpoint(UMOEndpointURI uri,
+                                               String type,
+                                               UMOManagementContext managementContext) throws UMOException
+    {
+        UMOImmutableEndpoint endpoint = lookupEndpoint(uri.getEndpointName());
+        if (endpoint == null)
+        {
+            endpoint = buidNewEndpoint(uri, type, managementContext);
         }
         return endpoint;
     }
@@ -102,178 +109,57 @@ public class EndpointFactory implements UMOEndpointFactory
     {
         return RegistryContext.getRegistry().lookupEndpoint(poiendpointNamentName);
     }
-    
-    /**
-     * @deprecated
-     */
-    public UMOImmutableEndpoint createEndpoint(UMOEndpointURI uri, String type, UMOManagementContext managementContext) throws UMOException
+
+    protected UMOImmutableEndpoint buidNewEndpoint(UMOEndpointURI uri,
+                                                   String type,
+                                                   UMOManagementContext managementContext)
+        throws InitialisationException, EndpointException
     {
-        UMOImmutableEndpoint endpoint = lookupEndpoint(uri.getEndpointName());
-        if (endpoint == null)
+        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, managementContext);
+        if (UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER.equals(type))
         {
-            uri.initialise();
-            endpoint = createEndpointInternal(uri, type, managementContext);
-            return endpoint;
+            return endpointBuilder.buildInboundEndpoint();
         }
-        return endpoint;
+        else if (UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER.equals(type))
+        {
+            return endpointBuilder.buildOutboundEndpoint();
+        }
+        else if (UMOImmutableEndpoint.ENDPOINT_TYPE_RESPONSE.equals(type))
+        {
+            return endpointBuilder.buildResponseEndpoint();
+        }
+        else
+        {
+            throw new IllegalArgumentException("The endpoint type: " + type + "is not recognized.");
+
+        }
     }
 
-    
-    private UMOEndpoint createEndpointInternal(UMOEndpointURI uri, String type, UMOManagementContext managementContext) throws EndpointException
+    protected UMOImmutableEndpoint buidNewInboundEndpoint(UMOEndpointURI uri,
+                                                          String type,
+                                                          UMOManagementContext managementContext)
+        throws InitialisationException, EndpointException
     {
-        String scheme = uri.getFullScheme();
-        UMOConnector connector;
-        try
-        {
-            if (uri.getCreateConnector() == ALWAYS_CREATE_CONNECTOR)
-            {
-                connector = TransportFactory.createConnector(uri, managementContext);
-            }
-            else if (uri.getCreateConnector() == NEVER_CREATE_CONNECTOR)
-            {
-                connector = TransportFactory.getConnectorByProtocol(scheme);
-            }
-            else if (uri.getConnectorName() != null)
-            {
-                connector = RegistryContext.getRegistry().lookupConnector(uri.getConnectorName());
-                if (connector == null)
-                {
-                    throw new TransportFactoryException(
-                        CoreMessages.objectNotRegistered("Connector", uri.getConnectorName()));
-                }
-            }
-            else
-            {
-                connector = TransportFactory.getConnectorByProtocol(scheme);
-                if (connector == null)
-                {
-                    connector = TransportFactory.createConnector(uri, managementContext);
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            throw new TransportFactoryException(e);
-        }
-
-        if (connector == null)
-        {
-            Message m = CoreMessages.failedToCreateObjectWith("Endpoint", "Uri: " + uri);
-            m.setNextMessage(CoreMessages.objectIsNull("connector"));
-            throw new TransportFactoryException(m);
-
-        }
-
-        UMOEndpoint endpoint = new MuleEndpoint();
-        endpoint.setConnector(connector);
-        endpoint.setEndpointURI(uri);
-        if (uri.getEndpointName() != null)
-        {
-            endpoint.setName(uri.getEndpointName());
-        }
-        String name = ObjectNameHelper.getEndpointName(endpoint);
-        endpoint.setName(name);
-
-        if (type != null)
-        {
-            endpoint.setType(type);
-            UMOTransformer trans = getTransformer(uri, connector,
-                (UMOEndpoint.ENDPOINT_TYPE_RECEIVER.equals(type) ? 0 : 1));
-            endpoint.setTransformer(trans);
-            if (UMOEndpoint.ENDPOINT_TYPE_RECEIVER.equals(type))
-            {
-                // set the response transformer
-                trans = getTransformer(uri, connector, 2);
-                endpoint.setResponseTransformer(trans);
-            }
-        }
-        try
-        {
-            RegistryContext.getRegistry().registerEndpoint(endpoint);
-
-        }
-        catch (UMOException e)
-        {
-            throw new TransportFactoryException(e);
-        }
-        return endpoint;
+        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, managementContext);
+        return endpointBuilder.buildInboundEndpoint();
     }
-    
-    /**
-     * @param url
-     * @param cnn
-     * @param type 0=inbound, 1=outbound, 2=response
-     * @return
-     * @throws TransportFactoryException
-     */
-    private static UMOTransformer getTransformer(UMOEndpointURI url, UMOConnector cnn, int type)
-        throws TransportFactoryException
+
+    protected UMOImmutableEndpoint buidNewOutboundEndpoint(UMOEndpointURI uri,
+                                                           String type,
+                                                           UMOManagementContext managementContext)
+        throws InitialisationException, EndpointException
     {
-        try
-        {
-            UMOTransformer trans = null;
-            String transId = null;
-            if (type == 2)
-            {
-                transId = url.getResponseTransformers();
-            }
-            else
-            {
-                transId = url.getTransformers();
-            }
+        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, managementContext);
+        return endpointBuilder.buildOutboundEndpoint();
+    }
 
-            if (transId != null)
-            {
-                trans = MuleObjectHelper.getTransformer(transId, ",");
-            }
-            else
-            {
-                // Get connector specific overrides to set on the descriptor
-                Properties overrides = new Properties();
-                if (cnn instanceof AbstractConnector)
-                {
-                    Map so = ((AbstractConnector)cnn).getServiceOverrides();
-                    if (so != null)
-                    {
-                        overrides.putAll(so);
-                    }
-                }
-
-                String scheme = url.getSchemeMetaInfo();
-
-                TransportServiceDescriptor sd = (TransportServiceDescriptor)
-                    RegistryContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, scheme, overrides);
-                if (sd != null)
-                {
-                    if (type == 0)
-                    {
-                        trans = sd.createInboundTransformer();
-                    }
-                    else if (type == 1)
-                    {
-                        trans = sd.createOutboundTransformer();
-                    }
-                    else
-                    {
-                        trans = sd.createResponseTransformer();
-                    }
-                    
-                    if (trans != null)
-                    {
-                        trans.initialise();
-                    }
-                }
-                else
-                {
-                    throw new ServiceException(CoreMessages.noServiceTransportDescriptor(scheme));
-                }
-            }
-            return trans;
-        }
-        catch (Exception e)
-        {
-            throw new TransportFactoryException(e);
-        }
+    protected UMOImmutableEndpoint buidNewResponeEndpoint(UMOEndpointURI uri,
+                                                          String type,
+                                                          UMOManagementContext managementContext)
+        throws InitialisationException, EndpointException
+    {
+        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, managementContext);
+        return endpointBuilder.buildResponseEndpoint();
     }
 
 }

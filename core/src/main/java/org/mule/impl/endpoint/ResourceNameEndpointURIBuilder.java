@@ -21,7 +21,7 @@ import java.util.Properties;
  * endpointUri
  * 
  */
-public class ResourceNameEndpointBuilder extends AbstractEndpointBuilder
+public class ResourceNameEndpointURIBuilder extends AbstractEndpointURIBuilder
 {
     public static final String RESOURCE_INFO_PROPERTY = "resourceInfo";
 

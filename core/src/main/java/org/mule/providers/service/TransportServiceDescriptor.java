@@ -10,7 +10,7 @@
 
 package org.mule.providers.service;
 
-import org.mule.impl.endpoint.EndpointBuilder;
+import org.mule.impl.endpoint.EndpointURIBuilder;
 import org.mule.registry.ServiceDescriptor;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
@@ -65,7 +65,7 @@ public interface TransportServiceDescriptor extends ServiceDescriptor
 
     public UMOTransformer createResponseTransformer() throws TransportFactoryException;
 
-    public EndpointBuilder createEndpointBuilder() throws TransportFactoryException;
+    public EndpointURIBuilder createEndpointBuilder() throws TransportFactoryException;
 
     public void setExceptionMappings(Properties props);
 

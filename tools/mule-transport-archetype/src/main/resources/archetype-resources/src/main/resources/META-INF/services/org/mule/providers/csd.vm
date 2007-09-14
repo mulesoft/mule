@@ -57,13 +57,13 @@ outbound.transformer=org.mule.providers.${TransportNameLower}.transformers.$Outb
 #org.mule.impl.endpoint.SocketEndpointBuilder i.e. udp://localhost:2222
 
 #if($EndpointBuilder == "r")
-endpoint.builder=org.mule.impl.endpoint.ResourceEndpointBuilder
+endpoint.builder=org.mule.impl.endpoint.ResourceEndpointURIBuilder
 #elseif($EndpointBuilder == "u")
-endpoint.builder=org.mule.impl.endpoint.UrlEndpointBuilder
+endpoint.builder=org.mule.impl.endpoint.UrlEndpointURIBuilder
 #elseif($EndpointBuilder == "s")
-endpoint.builder=org.mule.impl.endpoint.SocketEndpointBuilder
+endpoint.builder=org.mule.impl.endpoint.SocketEndpointURIBuilder
 #else
-endpoint.builder=org.mule.providers.${TransportNameLower}.${TransportName}EndpointBuilder
+endpoint.builder=org.mule.providers.${TransportNameLower}.${TransportName}EndpointURIBuilder
 #end
 
 #For more information see - http://mule.mulesource.org/wiki/x/DQ

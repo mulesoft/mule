@@ -10,7 +10,7 @@
 
 package org.mule.providers.file;
 
-import org.mule.impl.endpoint.AbstractEndpointBuilder;
+import org.mule.impl.endpoint.AbstractEndpointURIBuilder;
 import org.mule.umo.endpoint.MalformedEndpointException;
 
 import java.net.URI;
@@ -22,7 +22,7 @@ import java.util.Properties;
  * path format.
  */
 
-public class FileEndpointBuilder extends AbstractEndpointBuilder
+public class FileEndpointURIBuilder extends AbstractEndpointURIBuilder
 {
     protected void setEndpoint(URI uri, Properties props) throws MalformedEndpointException
     {

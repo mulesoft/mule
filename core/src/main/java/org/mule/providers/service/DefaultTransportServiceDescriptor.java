@@ -13,7 +13,7 @@ package org.mule.providers.service;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleSessionHandler;
-import org.mule.impl.endpoint.EndpointBuilder;
+import org.mule.impl.endpoint.EndpointURIBuilder;
 import org.mule.providers.NullPayload;
 import org.mule.registry.AbstractServiceDescriptor;
 import org.mule.umo.UMOComponent;
@@ -412,12 +412,12 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
     /* (non-Javadoc)
      * @see org.mule.providers.service.TransportServiceDescriptor#createEndpointBuilder()
      */
-    public EndpointBuilder createEndpointBuilder() throws TransportFactoryException
+    public EndpointURIBuilder createEndpointBuilder() throws TransportFactoryException
     {
-        EndpointBuilder epb = null;
+        EndpointURIBuilder epb = null;
         if (context.containsBean(MuleProperties.CONNECTOR_ENDPOINT_BUILDER))
         {
-            epb = (EndpointBuilder)context.getBean(MuleProperties.CONNECTOR_ENDPOINT_BUILDER);
+            epb = (EndpointURIBuilder)context.getBean(MuleProperties.CONNECTOR_ENDPOINT_BUILDER);
         }
         if(epb==null)
         {
