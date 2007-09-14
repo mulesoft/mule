@@ -614,7 +614,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
             }
             else
             {
-                newTransformers = null;
+                newTransformers = TransformerUtils.UNDEFINED;
                 // Why would a connector not inherit AbstractConnector?
                 logger.warn("Connector " + connector.getName() + " does not inherit AbstractConnector");
             }
