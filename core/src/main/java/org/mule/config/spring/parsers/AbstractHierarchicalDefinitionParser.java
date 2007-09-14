@@ -49,7 +49,7 @@ public abstract class AbstractHierarchicalDefinitionParser extends AbstractMuleB
         return ((Element) element.getParentNode()).getAttribute(ATTRIBUTE_NAME);
     }
 
-    protected BeanDefinition getParentBeanDefinition(Element element)
+    public BeanDefinition getParentBeanDefinition(Element element)
     {
         if (null != forcedParent)
         {

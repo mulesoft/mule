@@ -74,11 +74,11 @@ public class DefaultBeanAssembler implements BeanAssembler
     public void extendBean(Attr attribute)
     {
         String oldName = CoreXMLUtils.attributeName(attribute);
-        String oldValue = attribute.getNodeValue();
-        String newName = bestGuessName(beanConfig, oldName, bean.getBeanDefinition().getBeanClassName());
-        String newValue = beanConfig.translateValue(oldName, oldValue);
         if (!beanConfig.isIgnored(oldName))
         {
+            String oldValue = attribute.getNodeValue();
+            String newName = bestGuessName(beanConfig, oldName, bean.getBeanDefinition().getBeanClassName());
+            String newValue = beanConfig.translateValue(oldName, oldValue);
             extendBean(newName, newValue, beanConfig.isBeanReference(oldName));
         }
     }

@@ -11,9 +11,12 @@
 package org.mule.config.spring.parsers;
 
 import org.mule.config.spring.handlers.AbstractIgnorableNamespaceHandler;
+import org.mule.config.spring.parsers.collection.AttributeListEntryDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
+import org.mule.config.spring.parsers.delegate.AllAttributeChildDefinitionParser;
 import org.mule.config.spring.parsers.delegate.InheritDefinitionParser;
+import org.mule.config.spring.parsers.delegate.SimpleSingleParentFamilyDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
@@ -27,6 +30,8 @@ import org.mule.config.spring.parsers.specific.endpoint.support.ChildEndpointDef
 import org.mule.config.spring.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser;
 import org.mule.impl.endpoint.GlobalEndpoint;
 import org.mule.impl.endpoint.InboundEndpoint;
+
+import java.util.List;
 
 /**
  * Registers a Bean Definition Parser for handling <code><parsers-test:...></code> elements.
@@ -58,6 +63,14 @@ public class ParsersTestNamespaceHandler extends AbstractIgnorableNamespaceHandl
         registerBeanDefinitionParser("unaddressed-orphan-endpoint", new OrphanEndpointDefinitionParser(GlobalEndpoint.class));
         registerBeanDefinitionParser("addressed-orphan-endpoint", new AddressedEndpointDefinitionParser("test", new OrphanEndpointDefinitionParser(GlobalEndpoint.class)));
         registerBeanDefinitionParser("addressed-child-endpoint", new TransportEndpointDefinitionParser("test", InboundEndpoint.class));
+
+        registerBeanDefinitionParser("list-element-test-1", new AttributeListEntryDefinitionParser("kids", "listAttribute"));
+        registerBeanDefinitionParser("list-element-test-2",
+                new SimpleSingleParentFamilyDefinitionParser(
+                        new OrphanDefinitionParser(OrphanBean.class, true))
+                        .addDelegate("kid1", new AttributeListEntryDefinitionParser("kids", "kid1"))
+                        .addDelegate("kid2", new AttributeListEntryDefinitionParser("kids", "kid2")));
+        registerBeanDefinitionParser("list-element-test-3", new AllAttributeChildDefinitionParser(new AttributeListEntryDefinitionParser("kids")));
     }
 
 }
